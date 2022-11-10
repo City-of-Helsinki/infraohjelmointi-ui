@@ -1,6 +1,6 @@
-# infraohjelmointi-ui
+# Infraohjelmointi UI
 
-- [infraohjelmointi-ui](#infraohjelmointi-ui)
+- [Infraohjelmointi UI](#infraohjelmointi-ui)
     - [Serving the application](#serving-the-application)
         - [Webpack](#webpack)
         - [Babel](#babel)
@@ -8,6 +8,9 @@
         - [ESLint](#eslint)
         - [Prettier](#prettier)
     - [State and storage](#state-and-storage)
+    - [Routing](#routing)
+    - [Testing](#testing)
+    - [Collection of scripts](#collection-of-scripts)
 
 ### Serving the application
 
@@ -22,7 +25,7 @@ There are two sepparate [configuration files](https://webpack.js.org/configurati
 
 ##### Babel
 
-[Babel](https://babeljs.io/) is used as the complier to convert our source code to older versions of JavaScript. The [configuration file](https://babeljs.io/docs/en/config-files), `.babelrc` can be found in the project root folder.
+[Babel](https://babeljs.io/) is used as the complier to convert our source code to older versions of JavaScript. The [configuration file](https://babeljs.io/docs/en/config-files), `.babelrc.json` can be found in the project root folder.
 
 ### Formatting and validation
 
@@ -54,3 +57,27 @@ If using VS Code, download the [Prettier - Code formatter](https://marketplace.v
 The application state is managed by [React-Redux](https://react-redux.js.org/) and uses the built-in [Redux Toolkit](https://redux-toolkit.js.org/introduction/getting-started), for managing the state.
 
 The built-in hooks (useSelector and useDispatch) have been typed to our own store, so make sure to use `useAppDispatch` and `useAppSelector` instead when calling the store.
+
+### Routing
+
+We use [react-router v6](https://reactrouter.com/en/main/start/overview) for routing.
+
+We create the whole hierarchy-tree of routes in `index.tsx`, using the new `createBrowserRouter` which is recommended since v6.
+
+### Testing
+
+- Run all tests: `npm test`
+- For running specific tests use the same command and specify a file i.e: `npm test App.test.tsx`
+
+This project uses [jest](https://jestjs.io/docs/tutorial-react) and [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro/) for unit testing. There is also a `test-utils.tsx` file where a `renderWithProviders()` function is created to help wrap the component being tested with the redux-store Provider, [more about redux and RTL](https://redux.js.org/usage/writing-tests).
+
+### Collection of scripts
+
+- **Install packages** : `npm install --legacy-peer-deps` (--legacy-peer-deps flag is needed for npm since hds-react uses v17 and v16.8.0)
+- **Serve the application**: `npm run`
+- **Build the application**: `npm run build`
+- **Format the application with prettier**: `npm run format`
+- **Lint**: `npm run lint`
+- **Lint and fix linting errors**: `npm run lint:fix`
+- **Run all tests**: `npm test`
+- **Run specific test** i.e App: `npm test App.test.tsx`

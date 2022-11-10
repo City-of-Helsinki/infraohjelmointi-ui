@@ -1,9 +1,9 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react';
-import { renderWithProviders } from './utils/test-utils';
-import App from './App';
-import { setupStore } from './store';
-import { customMessage } from './reducers/testSlice';
+import { renderWithProviders } from '../utils/test-utils';
+import App from '../App';
+import { setupStore } from '../store';
+import { customMessage } from '../reducers/testSlice';
 
 /**
  * These tests are just for testing the redux changes and Provider wrapper for tests, can be removed later.
