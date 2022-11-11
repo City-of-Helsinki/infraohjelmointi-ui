@@ -1,0 +1,24 @@
+{
+  "error": {
+    "404": "404",
+    "pageNotFound": "Sidan hittades inte"
+  },
+  "projectCard": {
+    "projectCard": "Projektkort",
+    "basicInfo": "Basinfromation",
+    "tasks": "Uppgifter"
+  },
+  "topBar": {
+    "programming": "Programmering"
+  },
+  "lang": {
+    "fi": "FI",
+    "se": "SE",
+    "inFinnish": "Suomeksi",
+    "inSwedish": "På Svenska"
+  },
+  "appTitle": "Infrastruktur programmering UI",
+  "search": "Sök",
+  "searchPage": "Sök på sidan",
+  "login": "Logga in"
+}

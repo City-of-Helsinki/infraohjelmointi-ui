@@ -1,19 +1,18 @@
 import React, { FC } from 'react';
-import { Button } from 'hds-react/components/Button';
-import { RootState } from './store';
-import { useAppDispatch, useAppSelector } from './hooks/common';
-import { newMessage, oldMessage } from './reducers/testSlice';
+import { Outlet } from 'react-router';
+import Title from '@/components/shared/Title';
+import TopBar from '@/components/TopBar';
+import SideBar from './components/sidebar/SideBar';
 
 const App: FC = () => {
-  const dispatch = useAppDispatch();
-  const message = useAppSelector((state: RootState) => state.test.message);
-  const setMessage = () =>
-    message === 'Hello World' ? dispatch(newMessage()) : dispatch(oldMessage());
-
   return (
     <div>
-      <h1>{message}</h1>
-      <Button onClick={() => setMessage()}>Change message</Button>
+      <SideBar />
+      <TopBar />
+      <div className="app-content">
+        <Title size="xxl" text="appTitle" />
+        <Outlet />
+      </div>
     </div>
   );
 };

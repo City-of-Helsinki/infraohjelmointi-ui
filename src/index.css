@@ -1,3 +1,33 @@
+html {
+  font-size: 100%;
+  font-family: var(--font-defaut);
+}
+
 body {
   margin: 0;
+}
+
+/* COLORS: https://hds.hel.fi/foundation/design-tokens/colour */
+/* BREAKPOINTS: https://hds.hel.fi/foundation/design-tokens/breakpoints */
+
+/* FONTS: https://hds.hel.fi/foundation/design-tokens/typography */
+.font-xl {
+  font-size: var(--fontsize-body-xl);
+}
+
+.font-l {
+  font-size: var(--fontsize-body-l);
+}
+
+.font-m {
+  font-size: var(--fontsize-body-m);
+}
+
+.font-s {
+  font-size: var(--fontsize-body-s);
+}
+
+/* Margin to fit the sidebar, not final values */
+.app-content {
+  margin-left: 4rem;
 }
