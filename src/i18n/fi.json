@@ -1,0 +1,24 @@
+{
+  "error": {
+    "404": "404",
+    "pageNotFound": "Sivua ei löytynyt"
+  },
+  "projectCard": {
+    "projectCard": "Hankekortti",
+    "basicInfo": "Perustiedot",
+    "tasks": "Tehtävät"
+  },
+  "topBar": {
+    "programming": "Ohjelmointi"
+  },
+  "lang": {
+    "fi": "FI",
+    "se": "SE",
+    "inFinnish": "Suomeksi",
+    "inSwedish": "På Svenska"
+  },
+  "appTitle": "Infraohjelmointi UI",
+  "search": "Haku",
+  "searchPage": "Hae sivulta",
+  "login": "Kirjaudu sisään"
+}

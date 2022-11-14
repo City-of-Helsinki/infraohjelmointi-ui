@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 /**
  * Used for running the application using Babel and WebPack in development
@@ -33,6 +34,8 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    // Allows our tsconfig aliases to work with webpack
+    plugins: [new TsconfigPathsPlugin()],
   },
   plugins: [
     new HtmlWebpackPlugin({
