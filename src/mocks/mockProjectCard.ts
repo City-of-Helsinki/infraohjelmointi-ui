@@ -1,6 +1,6 @@
 import { CategoryType, IProjectCard, ProjectType } from '@/interfaces/projectCardInterfaces';
 
-export const mockProjectCard: { data: IProjectCard } = {
+const mockProjectCard: { data: IProjectCard } = {
   data: {
     hkrProjectId: '',
     projectType: ProjectType.Omastadi,
@@ -22,14 +22,14 @@ export const mockProjectCard: { data: IProjectCard } = {
     constructionPhaseSpecification: '',
     estimatedStreetOrParkPlanningYear: '',
     estimatedStreetOrParkCompletionYear: '',
-    streetOrParkPlanStart: new Date(),
-    streetOrParkPlanEnd: new Date(),
-    streetOrParkConstructionStart: new Date(),
-    streetOrParkConstructionEnd: new Date(),
-    presenceStart: new Date(),
-    presenceEnd: new Date(),
-    visibilityStart: new Date(),
-    visibilityEnd: new Date(),
+    streetOrParkPlanStart: new Date().toString(),
+    streetOrParkPlanEnd: new Date().toString(),
+    streetOrParkConstructionStart: new Date().toString(),
+    streetOrParkConstructionEnd: new Date().toString(),
+    presenceStart: new Date().toString(),
+    presenceEnd: new Date().toString(),
+    visibilityStart: new Date().toString(),
+    visibilityEnd: new Date().toString(),
     toLouhi: false,
     projectLocation: '',
     category: CategoryType.Category,
@@ -45,5 +45,9 @@ export const mockProjectCard: { data: IProjectCard } = {
     qualityLevel: '',
     unitPrice: '',
     hashtagIdentifiers: '',
+    textDescription: '',
+    notes: [''],
   },
 };
+
+export default mockProjectCard;

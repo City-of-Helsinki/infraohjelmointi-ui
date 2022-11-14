@@ -1,6 +1,5 @@
 import React from 'react';
-import Paragraph from '@/components/shared/Paragraph';
-import Title from '@/components/shared/Title';
+import { Paragraph, Title } from '@/components/shared';
 
 const ErrorView = () => {
   return (

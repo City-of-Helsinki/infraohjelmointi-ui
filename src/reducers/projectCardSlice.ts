@@ -5,7 +5,6 @@ interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
 }
 
-// TODO: initialState should be empty when we get actual data using Thunks
 const initialState: IProjectCardState = {
   selectedProjectCard: null,
 };

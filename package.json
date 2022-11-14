@@ -43,7 +43,10 @@
   "jest": {
     "transformIgnorePatterns": [
       "node_modules/(?!your-module-name)/\""
-    ]
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
   },
   "browserslist": {
     "production": [

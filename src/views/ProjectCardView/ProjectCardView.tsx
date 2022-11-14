@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import Title from '@/components/shared/Title';
 import { Outlet } from 'react-router';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
-import Paragraph from '@/components/shared/Paragraph';
+import { Paragraph, Title } from '@/components/shared';
 import { setProjectCard } from '@/reducers/projectCardSlice';
-import { mockProjectCard } from '@/mocks/mockProjectCard';
+import mockProjectCard from '@/mocks/mockProjectCard';
 
 const ProjectCardView = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +18,7 @@ const ProjectCardView = () => {
   return (
     <>
       <Title size="xl" text="projectCard.projectCard" />
-      {projectCard && <Paragraph size="m" text="Project card loaded" />}
+      {projectCard && <Paragraph size="m" text="Project card fetched" />}
       <Outlet />
     </>
   );

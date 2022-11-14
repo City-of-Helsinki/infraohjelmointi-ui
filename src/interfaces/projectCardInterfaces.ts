@@ -17,14 +17,14 @@ export interface IProjectCard {
   constructionPhaseSpecification: string; // says "menu" in the task description
   estimatedStreetOrParkPlanningYear: string; // says "menu" in the task description
   estimatedStreetOrParkCompletionYear: string; // says "menu" in the task description
-  streetOrParkPlanStart: Date;
-  streetOrParkPlanEnd: Date;
-  streetOrParkConstructionStart: Date;
-  streetOrParkConstructionEnd: Date;
-  presenceStart: Date;
-  presenceEnd: Date;
-  visibilityStart: Date;
-  visibilityEnd: Date;
+  streetOrParkPlanStart: string;
+  streetOrParkPlanEnd: string;
+  streetOrParkConstructionStart: string;
+  streetOrParkConstructionEnd: string;
+  presenceStart: string;
+  presenceEnd: string;
+  visibilityStart: string;
+  visibilityEnd: string;
   toLouhi: boolean;
   projectLocation: string; // not sure if dropdown / free-text or coordinates
   category: CategoryType;
@@ -40,6 +40,8 @@ export interface IProjectCard {
   qualityLevel: string; //Cost estimate, and what phase the estimate is from.
   unitPrice: string; //Cost estimate, and what phase the estimate is from.
   hashtagIdentifiers: string;
+  textDescription: string;
+  notes: Array<string>;
   // Some things under HANKEKORTILLA TAPAHTUVAT ASIAT: (THINGS ON THE PROJECT CARD) are too unclear
 }
 
