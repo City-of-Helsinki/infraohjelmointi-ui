@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 /**
  * Used for building the application for production, should be easily callable for the CI/CD
  */
@@ -34,8 +34,15 @@ module.exports = {
       },
     ],
   },
+  // Limit size of the bundled resource, webpack will warn if this is exceeded
+  performance: {
+    maxAssetSize: 512000,
+    maxEntrypointSize: 512000,
+  },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    // Allows our tsconfig aliases to work with webpack
+    plugins: [new TsconfigPathsPlugin()],
   },
   plugins: [
     new HtmlWebpackPlugin({
