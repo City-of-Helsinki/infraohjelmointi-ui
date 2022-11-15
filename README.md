@@ -16,7 +16,7 @@
 ### Setup
 
 1. `npm run create-env` to create your own development and production .env files
-2. `npm install --legacy-peer-deps`
+2. `yarn install`
 3. `npm start`
 
 ### Serving the application
@@ -80,7 +80,7 @@ This project uses [jest](https://jestjs.io/docs/tutorial-react) and [React Testi
 
 ### Collection of scripts
 
-- **Install packages** : `npm install --legacy-peer-deps` (--legacy-peer-deps flag is needed for npm since hds-react uses v17 and v16.8.0)
+- **Install packages** : `yarn install`
 - **Serve the application**: `npm run`
 - **Build the application**: `npm run build`
 - **Format the application with prettier**: `npm run format`
