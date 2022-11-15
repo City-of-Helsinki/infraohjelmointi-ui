@@ -11,6 +11,7 @@
     - [State and storage](#state-and-storage)
     - [Routing](#routing)
     - [Testing](#testing)
+    - [Localization](#localization)
     - [Collection of scripts](#collection-of-scripts)
 
 ### Setup
@@ -77,6 +78,12 @@ We create the whole hierarchy-tree of routes in `index.tsx`, using the new `crea
 - For running specific tests use the same command and specify a file i.e: `npm test App.test.tsx`
 
 This project uses [jest](https://jestjs.io/docs/tutorial-react) and [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro/) for unit testing. There is also a `test-utils.tsx` file where a `renderWithProviders()` function is created to help wrap the component being tested with the redux-store Provider, [more about redux and RTL](https://redux.js.org/usage/writing-tests).
+
+### Localization
+
+We use i18next-react for localization. You can find the localization files under `/src/i18n/*`.
+
+> **_NOTE:_** Localization will not be included in the MVP version of the app. The app will only be using the constants from `fi.json` until the full release.
 
 ### Collection of scripts
 
