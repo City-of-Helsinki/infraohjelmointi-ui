@@ -15,7 +15,7 @@
 
 ### Setup
 
-1. Add an .env.development and .env.production file to the project root, please ask a developer for the values.
+1. `npm run create-env` to create your own development and production .env files
 2. `npm install --legacy-peer-deps`
 3. `npm start`
 
