@@ -1,6 +1,7 @@
 # Infraohjelmointi UI
 
 - [Infraohjelmointi UI](#infraohjelmointi-ui)
+    - [Setup](#setup)
     - [Serving the application](#serving-the-application)
         - [Webpack](#webpack)
         - [Babel](#babel)
@@ -11,6 +12,12 @@
     - [Routing](#routing)
     - [Testing](#testing)
     - [Collection of scripts](#collection-of-scripts)
+
+### Setup
+
+1. Add an .env.development and .env.production file to the project root, please ask a developer for the values.
+2. `npm install --legacy-peer-deps`
+3. `npm start`
 
 ### Serving the application
 

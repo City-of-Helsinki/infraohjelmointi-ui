@@ -4,6 +4,8 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
+
 /**
  * Used for building the application for production, should be easily callable for the CI/CD
  */
@@ -56,5 +58,8 @@ module.exports = {
     }),
     // Plugin empties the build folder at start of the every new bundle
     new CleanWebpackPlugin(),
+    new Dotenv({
+      path: './.env.production',
+    }),
   ],
 };

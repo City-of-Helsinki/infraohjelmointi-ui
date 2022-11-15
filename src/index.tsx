@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { setupStore } from '@/store';
+import './utils/interceptors';
 import './index.css';
 import 'hds-core';
 import './i18n';
