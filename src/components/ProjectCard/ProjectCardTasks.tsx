@@ -1,11 +1,11 @@
 import React from 'react';
-import Title from '@/components/shared/Title';
+import { Title } from '@/components/shared';
 
 const ProjectCardTasksView = () => {
   return (
-    <div>
+    <>
       <Title size="l" text="projectCard.tasks" />
-    </div>
+    </>
   );
 };
 

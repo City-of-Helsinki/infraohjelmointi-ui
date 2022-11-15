@@ -38,8 +38,19 @@ export const renderWithProviders = (
     ...renderOptions
   }: ExtendedRenderOptions = {},
 ) => {
-  const Wrapper: FC<IWrapperProps> = ({ children }) => (
-    <Provider store={store}>{children}</Provider>
-  );
+  const Wrapper: FC<IWrapperProps> = ({ children }) => {
+    jest.mock('react-i18next', () => ({
+      useTranslation: () => {
+        return {
+          t: (str: string) => str,
+          i18n: {
+            changeLanguage: () => new Promise(() => {}),
+          },
+        };
+      },
+    }));
+    return <Provider store={store}>{children}</Provider>;
+  };
+
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
 };

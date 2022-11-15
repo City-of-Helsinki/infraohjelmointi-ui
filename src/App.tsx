@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { Outlet } from 'react-router';
-import Title from '@/components/shared/Title';
-import TopBar from '@/components/TopBar';
-import SideBar from './components/sidebar/SideBar';
+import { Title } from '@/components/shared';
+import TopBar from '@/components/TopBar/TopBar';
+import SideBar from '@/components/SideBar/SideBar';
 
 const App: FC = () => {
   return (

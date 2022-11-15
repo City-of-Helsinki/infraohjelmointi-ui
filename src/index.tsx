@@ -9,8 +9,7 @@ import './i18n';
 
 import App from '@/App';
 import ProjectCardView from '@/views/ProjectCardView';
-import ProjectCardBasicsView from '@/views/ProjectCardBasicsView';
-import ProjectCardTasksView from '@/views/ProjectCardTasksView';
+import { ProjectCardBasics, ProjectCardTasks } from '@/components/ProjectCard';
 import ErrorView from '@/views/ErrorView';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -36,11 +35,11 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'basics',
-            element: <ProjectCardBasicsView />,
+            element: <ProjectCardBasics />,
           },
           {
             path: 'tasks',
-            element: <ProjectCardTasksView />,
+            element: <ProjectCardTasks />,
           },
         ],
       },
