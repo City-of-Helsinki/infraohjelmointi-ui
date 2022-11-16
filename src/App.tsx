@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
 import { Outlet } from 'react-router';
 import { Title } from '@/components/shared';
-import TopBar from '@/components/TopBar/TopBar';
-import SideBar from '@/components/SideBar/SideBar';
+import TopBar from '@/components/TopBar';
+import SideBar from '@/components/Sidebar';
 
 const App: FC = () => {
+  const unused = 'unused';
   return (
     <div>
       <SideBar />

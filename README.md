@@ -1,37 +1,33 @@
 # Infraohjelmointi UI
 
 - [Infraohjelmointi UI](#infraohjelmointi-ui)
+    - [Setup](#setup)
     - [Serving the application](#serving-the-application)
-        - [Webpack](#webpack)
-        - [Babel](#babel)
     - [Formatting and validation](#formatting-and-validation)
         - [ESLint](#eslint)
         - [Prettier](#prettier)
     - [State and storage](#state-and-storage)
     - [Routing](#routing)
     - [Testing](#testing)
+    - [Localization](#localization)
     - [Collection of scripts](#collection-of-scripts)
+
+### Setup
+
+1. `yarn run create-env` to create your own development and production .env files
+2. `yarn install`
+3. `yarn start`
 
 ### Serving the application
 
-- To serve the application run `npm run`
-- To build the application run `npm run build`
-
-##### Webpack
-
-We use [webpack](https://webpack.js.org/) for bundling, building and serving the application in development and production.
-
-There are two sepparate [configuration files](https://webpack.js.org/configuration/) in the project root folder for webpack, `webpack.dev.config.js` for development and `webpack.prod.config.js` for production.
-
-##### Babel
-
-[Babel](https://babeljs.io/) is used as the complier to convert our source code to older versions of JavaScript. The [configuration file](https://babeljs.io/docs/en/config-files), `.babelrc.json` can be found in the project root folder.
+- To serve the application run `yarn run`
+- To build the application run `yarn run build`
 
 ### Formatting and validation
 
-- To format the application with prettier: `npm run format`
-- To check for linting errors: `npm run lint`
-- To check **and fix** linting errors: `npm run lint:fix`
+- To format the application with prettier: `yarn run format`
+- To check for linting errors: `yarn run lint`
+- To check **and fix** linting errors: `yarn run lint:fix`
 
 ##### ESLint
 
@@ -66,18 +62,24 @@ We create the whole hierarchy-tree of routes in `index.tsx`, using the new `crea
 
 ### Testing
 
-- Run all tests: `npm test`
-- For running specific tests use the same command and specify a file i.e: `npm test App.test.tsx`
+- Run all tests: `yarn test`
+- For running specific tests use the same command and specify a file i.e: `yarn test App.test.tsx`
 
 This project uses [jest](https://jestjs.io/docs/tutorial-react) and [React Testing Library (RTL)](https://testing-library.com/docs/react-testing-library/intro/) for unit testing. There is also a `test-utils.tsx` file where a `renderWithProviders()` function is created to help wrap the component being tested with the redux-store Provider, [more about redux and RTL](https://redux.js.org/usage/writing-tests).
 
+### Localization
+
+We use i18next-react for localization. You can find the localization files under `/src/i18n/*`.
+
+> **_NOTE:_** Localization will not be included in the MVP version of the app. The app will only be using the constants from `fi.json` until the full release.
+
 ### Collection of scripts
 
-- **Install packages** : `npm install --legacy-peer-deps` (--legacy-peer-deps flag is needed for npm since hds-react uses v17 and v16.8.0)
-- **Serve the application**: `npm run`
-- **Build the application**: `npm run build`
-- **Format the application with prettier**: `npm run format`
-- **Lint**: `npm run lint`
-- **Lint and fix linting errors**: `npm run lint:fix`
-- **Run all tests**: `npm test`
-- **Run specific test** i.e App: `npm test App.test.tsx`
+- **Install packages** : `yarn install`
+- **Serve the application**: `yarn start`
+- **Build the application**: `yarn run build`
+- **Format the application with prettier**: `yarn run format`
+- **Lint**: `yarn run lint`
+- **Lint and fix linting errors**: `yarn run lint:fix`
+- **Run all tests**: `yarn test`
+- **Run specific test** i.e App: `yarn test App.test.tsx`

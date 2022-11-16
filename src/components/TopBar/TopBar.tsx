@@ -15,12 +15,10 @@ const TopBar: FC = () => {
       skipToContentLabel="Skip to content"
     >
       <Navigation.Actions>
-        <Navigation.Search searchLabel={t('search')} searchPlaceholder={t('searchPage')} />
+        <Navigation.Search searchLabel={t('search')} searchPlaceholder={t('searchPage') || ''} />
         <Navigation.User label={t('login')} />
-        <Navigation.LanguageSelector label={t('lang.fi')}>
-          <Navigation.Item lang="fi" label={t('lang.inFinnish')} />
-          <Navigation.Item lang="sv" label={t('lang.inSwedish')} />
-        </Navigation.LanguageSelector>
+        {/* Localization will not come to the MVP version */}
+        <Navigation.Item label={t('lang.fi')} />
       </Navigation.Actions>
     </Navigation>
   );
