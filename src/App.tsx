@@ -5,6 +5,7 @@ import TopBar from '@/components/TopBar';
 import SideBar from '@/components/Sidebar';
 
 const App: FC = () => {
+  const unused = 'unused';
   return (
     <div>
       <SideBar />
