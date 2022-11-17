@@ -11,13 +11,14 @@ interface ILabelIconProps {
   size?: SizeType;
   color?: TextColorType;
   fontWeight?: FontWeightType;
+  id?: string;
 }
 
-const LabelIcon: FC<ILabelIconProps> = ({ size, text, icon, color, fontWeight }) => {
+const LabelIcon: FC<ILabelIconProps> = ({ size, text, icon, color, fontWeight, id }) => {
   const { t } = useTranslation();
   const Icon = icon;
   return (
-    <div className="label-icon-container">
+    <div className="label-icon-container" id={id}>
       <Icon size={size} aria-hidden="true" color={`var(--color-${color || 'black'})`} />
       <span className={`label-icon-text text-${color || 'black'} text-${fontWeight || 'medium'}`}>
         {t(text)}

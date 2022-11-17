@@ -6,8 +6,8 @@ import ProjectCardBasics from './ProjectCardBasics';
 jest.mock('react-i18next', () => mockI18next());
 
 describe('ProjectCardBasics', () => {
-  renderWithProviders(<ProjectCardBasics />);
   it('title should render', async () => {
+    renderWithProviders(<ProjectCardBasics />);
     expect(screen.getByText(/basicInfo/i)).toBeInTheDocument();
   });
 });

@@ -5,6 +5,7 @@ import { LabelIcon, Paragraph, ProgressCircle, Title } from '../shared';
 
 const ProjectCardHeader = () => {
   const { t } = useTranslation();
+
   const phaseOptions = [
     { label: <LabelIcon icon={IconAlertCircle} text={t('enums.underConstruction')} /> },
   ];
@@ -20,23 +21,25 @@ const ProjectCardHeader = () => {
           </div>
           {/* address & phase */}
           <div className="header-column">
-            <div>
+            <div data-testid="project-name-and-address">
               <Title size="m" color="white" text="Hakaniementori" />
               <Paragraph size="l" color="white" text="Hämeentie 1, 00530 Helsinki" />
             </div>
-            <Select label="" placeholder={t('projectPhase') || ''} options={phaseOptions} />
+            <div data-testid="project-phase-dropdown">
+              <Select label="" placeholder={t('projectPhase') || ''} options={phaseOptions} />
+            </div>
           </div>
         </div>
         {/* right */}
         <div className="header-column">
           <div className="text-right">
             {/* favourite */}
-            <button className="favourite-button">
-              <LabelIcon color="white" icon={IconStarFill} text={'removeFavourite'} />
+            <button className="favourite-button" data-testid="favourite-button">
+              <LabelIcon id="" color="white" icon={IconStarFill} text={'removeFavourite'} />
             </button>
             {/* group */}
-            <Paragraph color="white" size="m" text={'inGroup'} />
-            <Paragraph color="white" size="l" fontWeight="bold" text="Hakaniemi" />
+            <Paragraph id="in-group" color="white" size="m" text={'inGroup'} />
+            <Paragraph id="pc-group" color="white" size="l" fontWeight="bold" text="Hakaniemi" />
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import axios from 'axios';
 import mockProjectCard from '@/mocks/mockProjectCard';
 import ProjectCardView from './ProjectCardView';
 import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
-import { renderWithBrowserRouter, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
 import { screen } from '@testing-library/react';
 
@@ -15,14 +15,9 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 describe('ProjectCardView', () => {
   const store = setupStore();
 
-  let container: any = null;
-  let projectCardComponent: any;
-
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockProjectCard);
     await store.dispatch(getProjectCardsThunk());
-    projectCardComponent = renderWithProviders(renderWithBrowserRouter(<ProjectCardView />));
-    container = projectCardComponent.container;
   });
 
   afterEach(async () => {
@@ -30,21 +25,22 @@ describe('ProjectCardView', () => {
   });
 
   it('renders the parent container', async () => {
-    const projectCardContainer = container.getElementsByClassName('project-card-container');
-    expect(projectCardContainer.length).toBe(1);
+    const { container } = renderWithProviders(<ProjectCardView />);
+    expect(container.getElementsByClassName('project-card-container').length).toBe(1);
   });
 
   it('renders the ProjectCardToolbar', async () => {
-    const toolbarContainer = container.getElementsByClassName('project-card-toolbar-container');
-    expect(toolbarContainer.length).toBe(1);
+    const { container } = renderWithProviders(<ProjectCardView />);
+    expect(container.getElementsByClassName('project-card-toolbar-container').length).toBe(1);
   });
 
   it('renders the ProjectCardHeader', async () => {
-    const headerContainer = container.getElementsByClassName('project-card-header-container');
-    expect(headerContainer.length).toBe(1);
+    const { container } = renderWithProviders(<ProjectCardView />);
+    expect(container.getElementsByClassName('project-card-header-container').length).toBe(1);
   });
 
   it('renders the ProjectCardTabs', async () => {
+    renderWithProviders(<ProjectCardView />);
     expect(screen.getByTestId('project-card-tabs-container')).toBeInTheDocument();
   });
 

@@ -6,8 +6,8 @@ import ProjectCardTasks from './ProjectCardTasks';
 jest.mock('react-i18next', () => mockI18next());
 
 describe('ProjectCardTasks', () => {
-  renderWithProviders(<ProjectCardTasks />);
   it('title should render', async () => {
+    renderWithProviders(<ProjectCardTasks />);
     expect(screen.getByText(/tasks/i)).toBeInTheDocument();
   });
 });

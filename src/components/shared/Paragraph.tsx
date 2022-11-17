@@ -16,12 +16,16 @@ interface IParagraphProps {
   text: string;
   color?: TextColorType;
   fontWeight?: FontWeightType;
+  id?: string;
 }
 
-const Paragraph: FC<IParagraphProps> = ({ size, text, color, fontWeight }) => {
+const Paragraph: FC<IParagraphProps> = ({ size, text, color, fontWeight, id }) => {
   const { t } = useTranslation();
   return (
-    <p className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}>
+    <p
+      data-testid={id}
+      className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}
+    >
       {t(text)}
     </p>
   );
