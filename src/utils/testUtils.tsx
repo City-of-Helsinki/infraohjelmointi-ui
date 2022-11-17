@@ -7,6 +7,7 @@ import { storeItems } from '../store';
 import type { PreloadedState } from '@reduxjs/toolkit';
 import type { RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
+import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 
 // This type interface extends the default options for render from RTL, as well
@@ -56,6 +57,11 @@ export const renderWithProviders = (
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
 };
 
-export const renderWithBrowserRouter = (ui: React.ReactElement) => (
-  <BrowserRouter>{ui}</BrowserRouter>
-);
+export const renderWithRouter = (ui: React.ReactElement, { route = '/' } = {}) => {
+  window.history.pushState({}, 'Test page', route);
+
+  return {
+    user: userEvent.setup(),
+    ...render(ui, { wrapper: BrowserRouter }),
+  };
+};

@@ -1,7 +1,8 @@
 {
   "error": {
     "404": "404",
-    "pageNotFound": "Sivua ei löytynyt"
+    "pageNotFound": "Sivua ei löytynyt",
+    "returnToPrevious": "Palaa edelliselle sivulle"
   },
   "lang": {
     "fi": "FI",

@@ -27,7 +27,9 @@ export const projectCardSlice = createSlice({
     builder.addCase(
       getProjectCardsThunk.fulfilled,
       (state, action: PayloadAction<Array<IProjectCard>>) => {
-        state.selectedProjectCard = action.payload[0];
+        state.selectedProjectCard = action.payload
+          ? action.payload[0]
+          : initialState.selectedProjectCard;
       },
     );
     builder.addCase(

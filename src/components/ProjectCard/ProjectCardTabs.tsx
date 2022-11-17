@@ -22,20 +22,22 @@ const ProjectCardTabs = () => {
   const getActiveTab = () => navItems.findIndex((n) => path.includes(n.route));
 
   return (
-    <Tabs initiallyActiveTab={getActiveTab()} theme={tabThemeOverrides}>
-      {/* tabs */}
-      <TabList className="project-card-tab-list">
+    <div data-testid="project-card-tabs-container">
+      <Tabs initiallyActiveTab={getActiveTab()} theme={tabThemeOverrides}>
+        {/* tabs */}
+        <TabList className="project-card-tab-list">
+          {navItems.map((n) => (
+            <Tab key={n.route} onClick={() => navigate(n.route)}>
+              {n.label}
+            </Tab>
+          ))}
+        </TabList>
+        {/* panel (active view is rendered here) */}
         {navItems.map((n) => (
-          <Tab key={n.route} onClick={() => navigate(n.route)}>
-            {n.label}
-          </Tab>
+          <TabPanel key={n.route}>{n.component}</TabPanel>
         ))}
-      </TabList>
-      {/* panel (active view is rendered here) */}
-      {navItems.map((n) => (
-        <TabPanel key={n.route}>{n.component}</TabPanel>
-      ))}
-    </Tabs>
+      </Tabs>
+    </div>
   );
 };
 
