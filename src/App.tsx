@@ -9,7 +9,7 @@ const App: FC = () => {
       <TopBar />
       <div className="app-content">
         <SideBar />
-        <div className="width-100-p">
+        <div className="width-100-p" data-testid="app-outlet">
           <Outlet />
         </div>
       </div>

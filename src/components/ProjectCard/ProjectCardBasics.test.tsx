@@ -7,7 +7,7 @@ jest.mock('react-i18next', () => mockI18next());
 
 describe('ProjectCardBasics', () => {
   renderWithProviders(<ProjectCardBasics />);
-  it('title should render', () => {
-    expect(screen.getByText(/projectCard.basicInfo/i)).toBeInTheDocument();
+  it('title should render', async () => {
+    expect(screen.getByText(/basicInfo/i)).toBeInTheDocument();
   });
 });
