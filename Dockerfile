@@ -20,4 +20,5 @@ RUN apk add --update nginx nodejs yarn && \
 
 EXPOSE 4000
 # start nginx service
+USER 1001
 CMD ["nginx", "-g", "daemon off;"]
