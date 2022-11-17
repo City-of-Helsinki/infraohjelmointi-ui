@@ -21,7 +21,7 @@ const SideBar = () => {
   ];
 
   return (
-    <div className="sidebar-container">
+    <div className="sidebar-container" data-testid="sidebar">
       {navItems.map((n) => (
         <button
           className={`sidebar-button ${path.includes(n.route) ? 'selected' : ''}`}
