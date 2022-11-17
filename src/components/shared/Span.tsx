@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import { FontWeightType, TextColorType } from '@/interfaces/common';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -13,11 +14,17 @@ type SizeType = 'xl' | 'l' | 'm' | 's';
 interface ISpanProps {
   size: SizeType;
   text: string;
+  color?: TextColorType;
+  fontWeight?: FontWeightType;
 }
 
-const Span: FC<ISpanProps> = ({ size, text }) => {
+const Span: FC<ISpanProps> = ({ size, text, color, fontWeight }) => {
   const { t } = useTranslation();
-  return <span className={`font-${size}`}>{t(text)}</span>;
+  return (
+    <span className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}>
+      {t(text)}
+    </span>
+  );
 };
 
 export default Span;

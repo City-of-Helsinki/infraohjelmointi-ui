@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
-import { Outlet } from 'react-router';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { RootState } from '@/store';
-import { Paragraph, Title } from '@/components/shared';
+import { useEffect } from 'react';
+import { useAppDispatch } from '@/hooks/common';
 import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
+import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
+import ProjectCardTabs from '@/components/ProjectCard/ProjectCardTabs';
+import './styles.css';
+import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
 
 const ProjectCardView = () => {
   const dispatch = useAppDispatch();
-  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
 
   useEffect(() => {
     dispatch(getProjectCardsThunk()).then((res) => {
@@ -18,11 +18,11 @@ const ProjectCardView = () => {
   }, [dispatch]);
 
   return (
-    <>
-      <Title size="xl" text="projectCard.projectCard" />
-      {projectCard && <Paragraph size="m" text="Project card fetched" />}
-      <Outlet />
-    </>
+    <div className="project-card-container">
+      <ProjectCardToolbar />
+      <ProjectCardHeader />
+      <ProjectCardTabs />
+    </div>
   );
 };
 

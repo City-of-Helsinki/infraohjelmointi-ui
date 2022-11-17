@@ -1,0 +1,50 @@
+.label-icon-container {
+  display: flex;
+  align-items: center;
+}
+
+.label-icon-text {
+  margin-left: 6px;
+}
+
+/* Progress Circle */
+@property --circle-percent {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.progress-circle {
+  transform: rotate(-90deg);
+  height: 100%;
+  width: 100%;
+}
+
+.progress-circle .circle {
+  fill: transparent;
+  stroke: var(--color-coat-of-arms);
+  stroke-width: 14px;
+}
+
+.progress-circle .percent-indicator {
+  stroke-dasharray: 100; /* dasharray 100 with pathLength 100 makes the "percent" value work */
+  stroke-dashoffset: calc(100 - var(--circle-percent));
+  stroke-linecap: round; /* round edge */
+  animation: progress 1s ease-out;
+  fill: transparent;
+  stroke-width: 14px;
+}
+
+.progress-circle .percent-text {
+  transform: rotate(90deg);
+  fill: white;
+}
+
+@keyframes progress {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: calc(100 - --circle-percent); /* why doesn't var() work here */
+  }
+}

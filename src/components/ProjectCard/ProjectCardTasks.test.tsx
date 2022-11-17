@@ -1,4 +1,3 @@
-import React from 'react';
 import mockI18next from '@/mocks/mockI18next';
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../../utils/testUtils';

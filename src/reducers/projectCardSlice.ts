@@ -33,7 +33,6 @@ export const projectCardSlice = createSlice({
     builder.addCase(
       getProjectCardsThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
-        state.selectedProjectCard = initialState.selectedProjectCard;
         state.error = action.payload;
       },
     );

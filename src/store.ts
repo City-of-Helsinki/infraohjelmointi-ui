@@ -1,9 +1,11 @@
 import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolkit';
-import projectCardReducer from './reducers/projectCardSlice';
+import projectCardReducer from '@/reducers/projectCardSlice';
+import authReducer from '@/reducers/authSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
   projectCard: projectCardReducer,
+  auth: authReducer,
 };
 
 const rootReducer = combineReducers(storeItems);

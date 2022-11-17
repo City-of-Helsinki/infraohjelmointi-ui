@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -12,6 +11,7 @@ import App from '@/App';
 import ProjectCardView from '@/views/ProjectCardView';
 import { ProjectCardBasics, ProjectCardTasks } from '@/components/ProjectCard';
 import ErrorView from '@/views/ErrorView';
+import AuthGuard from '@/components/AuthGuard';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -25,6 +25,7 @@ const router = createBrowserRouter([
     path: '/',
     element: (
       <Provider store={store}>
+        <AuthGuard />
         <App />
       </Provider>
     ),

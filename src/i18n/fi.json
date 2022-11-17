@@ -3,22 +3,30 @@
     "404": "404",
     "pageNotFound": "Sivua ei löytynyt"
   },
-  "projectCard": {
-    "projectCard": "Hankekortti",
-    "basicInfo": "Perustiedot",
-    "tasks": "Tehtävät"
-  },
-  "topBar": {
-    "programming": "Ohjelmointi"
-  },
   "lang": {
     "fi": "FI",
     "se": "SE",
     "inFinnish": "Suomeksi",
     "inSwedish": "På Svenska"
   },
+  "nav": {
+    "search": "Haku",
+    "searchPage": "Hae sivulta",
+    "notifications": "Ilmoitukset",
+    "skipToContent": "Siirry kohteeseen",
+    "login": "Kirjaudu sisään"
+  },
+  "enums": {
+    "underConstruction": "Rakenteilla",
+    "programming": "Ohjelmointi"
+  },
   "appTitle": "Infraohjelmointi UI",
-  "search": "Haku",
-  "searchPage": "Hae sivulta",
-  "login": "Kirjaudu sisään"
+  "projectCard": "Hankekortti",
+  "basicInfo": "Perustiedot",
+  "tasks": "Tehtävät",
+  "new": "Uusi",
+  "shareProject": "Jaa hanke",
+  "projectPhase": "Hankkeen vaihe",
+  "removeFavourite": "Poista suosikeista",
+  "inGroup": "Kuuluu ryhmään"
 }
