@@ -2,10 +2,12 @@ import { FC } from 'react';
 import { Outlet } from 'react-router';
 import TopBar from '@/components/TopBar';
 import SideBar from '@/components/Sidebar';
+import Notification from '@/components/Notification';
 
 const App: FC = () => {
   return (
     <div>
+      <Notification />
       <TopBar />
       <div className="app-content">
         <SideBar />

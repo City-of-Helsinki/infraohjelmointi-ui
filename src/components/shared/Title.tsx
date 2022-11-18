@@ -16,9 +16,10 @@ interface ITitleProps {
   size: SizeType;
   text: string;
   color?: TextColorType;
+  id?: string;
 }
 
-const Title: FC<ITitleProps> = ({ size, text, color }) => {
+const Title: FC<ITitleProps> = ({ size, text, color, id }) => {
   const [width] = useWindowSize();
   const { t } = useTranslation();
 
@@ -48,7 +49,7 @@ const Title: FC<ITitleProps> = ({ size, text, color }) => {
     }
   };
 
-  return getHeading();
+  return <div data-testid={id}>{getHeading()}</div>;
 };
 
 export default Title;

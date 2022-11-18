@@ -11,7 +11,7 @@ describe('ErrorView', () => {
     expect(screen.getByText(/error.404/i)).toBeInTheDocument();
     expect(screen.getByText(/error.pageNotFound/i)).toBeInTheDocument();
   });
-  it('renders a return to previous page', () => {
+  it('renders a return to previous page button', () => {
     renderWithProviders(<ErrorView />);
     expect(screen.getByText(/error.returnToPrevious/i)).toBeInTheDocument();
   });

@@ -8,6 +8,7 @@
 }
 
 /* Progress Circle */
+
 @property --circle-percent {
   syntax: '<number>';
   inherits: true;
@@ -47,4 +48,24 @@
   to {
     stroke-dashoffset: calc(100 - --circle-percent); /* why doesn't var() work here */
   }
+}
+
+/* Notification */
+
+.notifications-container {
+  position: absolute;
+  width: 350px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 999;
+}
+
+.notification-wrapper {
+  margin-top: var(--spacing-xs);
+}
+
+.notification-wrapper:first-child {
+  margin-top: var(--spacing-2-xl);
 }

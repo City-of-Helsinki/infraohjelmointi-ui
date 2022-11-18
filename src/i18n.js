@@ -24,7 +24,6 @@ i18n
   .init({
     fallbackLng: 'fi',
     resources: resources,
-    debug: true,
   });
 
 export default i18n;

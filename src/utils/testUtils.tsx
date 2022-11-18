@@ -61,6 +61,7 @@ export const renderWithProviders = (
   window.history.pushState({}, 'Test page', route);
   const wrappedWithRedux = ReduxProvider(store)({ children: ui });
   return {
+    store,
     user: userEvent.setup(),
     ...render(wrappedWithRedux, { wrapper: BrowserRouter, ...renderOptions }),
   };

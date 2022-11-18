@@ -16,12 +16,16 @@ interface ISpanProps {
   text: string;
   color?: TextColorType;
   fontWeight?: FontWeightType;
+  id?: string;
 }
 
-const Span: FC<ISpanProps> = ({ size, text, color, fontWeight }) => {
+const Span: FC<ISpanProps> = ({ size, text, color, fontWeight, id }) => {
   const { t } = useTranslation();
   return (
-    <span className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}>
+    <span
+      data-testid={id}
+      className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}
+    >
       {t(text)}
     </span>
   );

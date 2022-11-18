@@ -28,6 +28,7 @@ const SideBar = () => {
           onClick={() => navigate(n.route)}
           aria-label={n.label}
           key={n.route}
+          data-testid="button-testing"
         >
           {n.component}
         </button>
