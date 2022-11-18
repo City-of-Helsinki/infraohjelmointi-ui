@@ -12,9 +12,11 @@ const SideBar = () => {
   const path = useLocation().pathname;
   const { t } = useTranslation();
 
+  const projectId = '79786137-d73e-471b-a7a0-c366967b7158';
+
   const navItems: Array<INavigationItem> = [
     {
-      route: 'project-card',
+      route: `project-card/${projectId}`,
       label: t('projectCard'),
       component: <IconPenLine />,
     },

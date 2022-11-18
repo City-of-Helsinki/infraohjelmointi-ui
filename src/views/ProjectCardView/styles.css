@@ -46,6 +46,7 @@
 .project-card-tab-list {
   padding-left: 15%;
   border-bottom: 1px solid var(--color-black-20);
+  z-index: 0;
 }
 
 /* CONTENT WRAPPED */

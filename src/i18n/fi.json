@@ -19,7 +19,16 @@
   },
   "enums": {
     "underConstruction": "Rakenteilla",
-    "programming": "Ohjelmointi"
+    "proposal": "Hanke-ehdotus",
+    "design": "Yleissuunnittelu",
+    "programming": "Ohjelmointi",
+    "draftInitiation": "Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos",
+    "draftApproval": "Katu-/puistosuunnitelmaehdotus ja hyväksyminen",
+    "constructionPlan": "Rakennussuunnitelma",
+    "constructionWait": "Odottaa rakentamista",
+    "construction": "Rakentaminen",
+    "warrantyPeriod": "Takuuaika",
+    "completed": "Valmis / ylläpidossa"
   },
   "appTitle": "Infraohjelmointi UI",
   "projectCard": "Hankekortti",

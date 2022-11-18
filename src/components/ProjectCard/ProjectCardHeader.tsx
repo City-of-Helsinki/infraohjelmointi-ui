@@ -1,25 +1,40 @@
 import { useAppSelector } from '@/hooks/common';
+import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
 import { RootState } from '@/store';
 import { Select } from 'hds-react/components/Select';
-import { IconAlertCircle, IconStar, IconStarFill } from 'hds-react/icons';
-import { useState } from 'react';
+import { IconAlertCircle, IconFaceSmile, IconStar, IconStarFill } from 'hds-react/icons';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LabelIcon, Paragraph, ProgressCircle, Title } from '../shared';
+
+interface OptionType {
+  label: string;
+}
 
 const ProjectCardHeader = () => {
   const { t } = useTranslation();
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
-  const phaseOptions = [
-    { label: <LabelIcon icon={IconAlertCircle} text={t('enums.underConstruction')} /> },
-  ];
+  const user = useAppSelector((state: RootState) => state.auth.user);
+  const [favourite, setFavourite] = useState(false);
 
   // Vars that will come from API
-  const [favourite, setFavourite] = useState(false);
   const address = 'Hämeentie 1, 00530 Helsinki';
   const group = 'Hakaniemi';
 
-  //TODO: phase dropdown
-  //TODO: route by id
+  const getPhaseOptions = () => {
+    const phaseOptions: Array<OptionType> = [];
+    Object.values(ProjectPhase).map((p) => phaseOptions.push({ label: t(`enums.${p}`) }));
+    return phaseOptions;
+  };
+
+  useEffect(
+    function checkIfUserHasFavoured() {
+      if (user && projectCard && projectCard.favPersons.length > 0) {
+        setFavourite(projectCard?.favPersons.includes(user.id));
+      }
+    },
+    [user, projectCard],
+  );
 
   return (
     <div className="project-card-header-container">
@@ -37,7 +52,13 @@ const ProjectCardHeader = () => {
               <Paragraph id="project-address" size="l" color="white" text={address} />
             </div>
             <div data-testid="project-phase-dropdown">
-              <Select label="" placeholder={t('projectPhase') || ''} options={phaseOptions} />
+              <Select
+                label=""
+                defaultValue={{ label: t(`enums.${projectCard?.phase}`) }}
+                icon={<IconFaceSmile />}
+                placeholder={t('projectPhase') || ''}
+                options={getPhaseOptions()}
+              />
             </div>
           </div>
         </div>
