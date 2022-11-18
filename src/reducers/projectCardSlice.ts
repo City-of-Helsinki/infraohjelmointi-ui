@@ -35,24 +35,6 @@ export const getProjectCardThunk = createAsyncThunk(
   },
 );
 
-export const postProjectCardThunk = createAsyncThunk(
-  'projectCard/post',
-  async (projectCard: IProjectCard, thunkAPI) => {
-    return await postProjectCard(projectCard)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
-export const deleteProjectCardThunk = createAsyncThunk(
-  'projectCard/delete',
-  async (id: string, thunkAPI) => {
-    return await deleteProjectCard(id)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
 export const projectCardSlice = createSlice({
   name: 'projectCard',
   initialState,

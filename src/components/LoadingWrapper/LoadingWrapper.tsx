@@ -4,7 +4,7 @@ import { LoadingSpinner } from 'hds-react/components/LoadingSpinner';
 import { FC, ReactNode } from 'react';
 import './styles.css';
 
-interface ILoaderProps {
+interface ILoadingWrapperProps {
   children: ReactNode;
 }
 
@@ -14,7 +14,7 @@ interface ILoaderProps {
  *
  * @param children ReactNode, component(s) to render
  */
-const Loader: FC<ILoaderProps> = ({ children }) => {
+const LoadingWrapper: FC<ILoadingWrapperProps> = ({ children }) => {
   const loading = useAppSelector((state: RootState) => state.loading);
 
   return (
@@ -30,4 +30,4 @@ const Loader: FC<ILoaderProps> = ({ children }) => {
   );
 };
 
-export default Loader;
+export default LoadingWrapper;

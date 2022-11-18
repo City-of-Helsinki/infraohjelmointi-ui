@@ -3,7 +3,7 @@ import { useAppDispatch } from '@/hooks/common';
 import { getProjectCardThunk } from '@/reducers/projectCardSlice';
 import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
 import ProjectCardTabs from '@/components/ProjectCard/ProjectCardTabs';
-import Loader from '@/components/Loader';
+import LoadingWrapper from '@/components/LoadingWrapper';
 import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
 import './styles.css';
 import { useParams } from 'react-router-dom';
@@ -19,13 +19,13 @@ const ProjectCardView = () => {
   }, [dispatch]);
 
   return (
-    <Loader>
+    <LoadingWrapper>
       <div className="project-card-container">
         <ProjectCardToolbar />
         <ProjectCardHeader />
         <ProjectCardTabs />
       </div>
-    </Loader>
+    </LoadingWrapper>
   );
 };
 
