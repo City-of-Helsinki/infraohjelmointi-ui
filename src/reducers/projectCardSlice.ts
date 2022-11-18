@@ -44,23 +44,23 @@ export const projectCardSlice = createSlice({
     builder.addCase(
       getProjectCardsThunk.fulfilled,
       (state, action: PayloadAction<Array<IProjectCard>>) => {
-        state.projectCards = action.payload;
+        return { ...state, projectCards: action.payload };
       },
     );
     builder.addCase(
       getProjectCardsThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
-        state.error = action.payload;
+        return { ...state, error: action.payload };
       },
     );
     // GET ONE
     builder.addCase(getProjectCardThunk.fulfilled, (state, action: PayloadAction<IProjectCard>) => {
-      state.selectedProjectCard = action.payload;
+      return { ...state, selectedProjectCard: action.payload };
     });
     builder.addCase(
       getProjectCardThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
-        state.error = action.payload;
+        return { ...state, error: action.payload };
       },
     );
   },

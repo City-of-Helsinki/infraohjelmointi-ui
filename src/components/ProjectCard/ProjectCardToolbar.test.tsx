@@ -19,8 +19,9 @@ describe('ProjectCardToolbar', () => {
   it('renders all right left elements', () => {
     const { container } = renderWithProviders(<ProjectCardToolbar />);
     expect(container.getElementsByClassName('display-flex')[0].childElementCount).toBe(2);
-    expect(screen.getByTestId('new-project-button')).toBeInTheDocument();
-    expect(screen.getByTestId('share-project-button')).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /new/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /shareProject/i })).toBeInTheDocument();
   });
 
   it('renders all left side elements', () => {

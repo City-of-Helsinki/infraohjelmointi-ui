@@ -11,6 +11,10 @@ export interface INavigationItem {
   component?: ReactNode;
 }
 
+export interface IOptionType {
+  label: string;
+}
+
 export type NotificationType = 'error' | 'info';
 
 export interface INotification {
@@ -22,3 +26,4 @@ export interface INotification {
 
 export type TextColorType = 'black' | 'white';
 export type FontWeightType = 'bold' | 'light';
+export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';

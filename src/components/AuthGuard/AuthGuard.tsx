@@ -13,12 +13,9 @@ const AuthGuard: FC = () => {
 
   useEffect(
     function checkIfUserExists() {
-      if (user) {
-        console.log('User found');
-      } else {
+      if (!user) {
         // Temporarily adding a mock user
         dispatch(setUser(mockUser));
-        console.log('No user found');
       }
     },
     [user, dispatch],

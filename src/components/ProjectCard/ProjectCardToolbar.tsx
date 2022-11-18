@@ -1,17 +1,14 @@
 import { IconArrowDown, IconMap, IconPlus } from 'hds-react/icons';
-import { LabelIcon } from '../shared';
+import { IconButton } from '../shared';
 
 const ProjectCardToolbar = () => {
+  const click = () => console.log('click');
   return (
     <div className="project-card-toolbar-container">
       {/* left (new & share) */}
       <div className="display-flex">
-        <button className="toolbar-button" data-testid="new-project-button">
-          <LabelIcon icon={IconPlus} text="new" />
-        </button>
-        <button className="toolbar-button" data-testid="share-project-button">
-          <LabelIcon icon={IconArrowDown} text="shareProject" />
-        </button>
+        <IconButton icon={IconPlus} text="new" onClick={() => click()} />
+        <IconButton icon={IconArrowDown} text="shareProject" onClick={() => click()} />
       </div>
       {/* right (map) */}
       <div className="display-flex">

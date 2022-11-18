@@ -1,31 +1,37 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '@/hooks/common';
 import { getProjectCardThunk } from '@/reducers/projectCardSlice';
+import { TabsList } from '@/components/shared';
+import { useParams } from 'react-router-dom';
+import { INavigationItem } from '@/interfaces/common';
+import { ProjectCardBasics, ProjectCardTasks } from '@/components/ProjectCard';
+import { useTranslation } from 'react-i18next';
 import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
-import ProjectCardTabs from '@/components/ProjectCard/ProjectCardTabs';
-import LoadingWrapper from '@/components/LoadingWrapper';
 import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
 import './styles.css';
-import { useParams } from 'react-router-dom';
-import { clearLoading, setLoading } from '@/reducers/loadingSlice';
 
 const ProjectCardView = () => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { projectId } = useParams();
 
+  const tabItems: Array<INavigationItem> = [
+    { route: 'basics', label: t('basicInfo'), component: <ProjectCardBasics /> },
+    { route: 'tasks', label: t('tasks'), component: <ProjectCardTasks /> },
+  ];
+
   useEffect(() => {
-    dispatch(setLoading('Ladataan sivua'));
-    dispatch(getProjectCardThunk(projectId || '')).finally(() => dispatch(clearLoading()));
-  }, [dispatch]);
+    // dispatch(setLoading('Ladataan sivua'));
+    dispatch(getProjectCardThunk(projectId || ''));
+    // .finally(() => dispatch(clearLoading()));
+  }, [dispatch, projectId]);
 
   return (
-    <LoadingWrapper>
-      <div className="project-card-container">
-        <ProjectCardToolbar />
-        <ProjectCardHeader />
-        <ProjectCardTabs />
-      </div>
-    </LoadingWrapper>
+    <div className="project-card-container">
+      <ProjectCardToolbar />
+      <ProjectCardHeader />
+      <TabsList tabItems={tabItems} />
+    </div>
   );
 };
 

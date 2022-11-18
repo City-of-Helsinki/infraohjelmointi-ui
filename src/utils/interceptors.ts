@@ -1,4 +1,5 @@
 import { IError } from '@/interfaces/common';
+import { clearLoading, setLoading } from '@/reducers/loadingSlice';
 import { setNotification } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
@@ -16,6 +17,7 @@ export const injectStore = (_store: AppStore) => {
  * This could also be done by assigning a customAxios variable, but that will interfere with the
  * testing of axios requests.
  */
+
 // Request interceptor
 axios.interceptors.request.use(
   (request) => handleRequest(request),
@@ -29,14 +31,16 @@ axios.interceptors.response.use(
 );
 
 const handleRequest = (request: AxiosRequestConfig) => {
-  // Check if auth/token found here
+  store.dispatch(setLoading('Ladataan sivua'));
   return request;
 };
 
-const handleResponse = (response: AxiosResponse) => response;
+const handleResponse = (response: AxiosResponse) => {
+  store.dispatch(clearLoading());
+  return response;
+};
 
 const handleError = (error: AxiosError): Promise<IError> => {
-  // Add error notification
   const parsedError: IError = {
     status: error.response?.status,
     message: error.message || 'Unknown error',
@@ -50,6 +54,8 @@ const handleError = (error: AxiosError): Promise<IError> => {
       status: parsedError.status?.toLocaleString(),
     }),
   );
+
+  store.dispatch(clearLoading());
 
   return Promise.reject(parsedError);
 };

@@ -1,36 +1,92 @@
-import { useAppSelector } from '@/hooks/common';
-import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
+import { FC, useEffect, useState } from 'react';
 import { RootState } from '@/store';
+import { useAppSelector } from '@/hooks/common';
+import { Paragraph, ProgressCircle, IconButton, Title } from '@/components/shared';
+import { IconFaceSmile, IconPenLine, IconStar, IconStarFill } from 'hds-react/icons';
+import { TextInput } from 'hds-react/components/TextInput';
 import { Select } from 'hds-react/components/Select';
-import { IconAlertCircle, IconFaceSmile, IconStar, IconStarFill } from 'hds-react/icons';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LabelIcon, Paragraph, ProgressCircle, Title } from '../shared';
+import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
+import { IOptionType } from '@/interfaces/common';
 
-interface OptionType {
-  label: string;
+interface INameFormProps {
+  name: string;
+  onChange: any;
 }
 
-const ProjectCardHeader = () => {
-  const { t } = useTranslation();
-  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
-  const user = useAppSelector((state: RootState) => state.auth.user);
-  const [favourite, setFavourite] = useState(false);
-
-  // Vars that will come from API
+const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
+  const [editing, setEditing] = useState(false);
   const address = 'Hämeentie 1, 00530 Helsinki';
-  const group = 'Hakaniemi';
+  return (
+    <div className="edit-name-form">
+      <div>
+        {editing ? (
+          <TextInput id="textinput" value={name || ''} onChange={onChange} required />
+        ) : (
+          <>
+            <Title size="m" color="white" text={name} />
+            <Paragraph size="l" color="white" text={address} />
+          </>
+        )}
+      </div>
+      <IconButton
+        onClick={() => setEditing(!editing)}
+        icon={IconPenLine}
+        color="white"
+        label="edit-project-name"
+      />
+    </div>
+  );
+};
+
+interface IProjectPhaseDropdown {
+  selectedOption: string;
+}
+
+const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption }) => {
+  const { t } = useTranslation();
 
   const getPhaseOptions = () => {
-    const phaseOptions: Array<OptionType> = [];
+    const phaseOptions: Array<IOptionType> = [];
     Object.values(ProjectPhase).map((p) => phaseOptions.push({ label: t(`enums.${p}`) }));
     return phaseOptions;
   };
 
+  return (
+    <>
+      {/* FIXME: this hack is here because HDS-Select component doesn't re-rendering the defaultValue */}
+      {selectedOption && (
+        <div className="phase-dropdown">
+          <Select
+            label=""
+            defaultValue={{ label: t(`enums.${selectedOption}`) }}
+            icon={<IconFaceSmile />}
+            placeholder={t('projectPhase') || ''}
+            options={getPhaseOptions()}
+          />
+        </div>
+      )}
+    </>
+  );
+};
+
+const ProjectCardHeader: FC = () => {
+  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const user = useAppSelector((state: RootState) => state.auth.user);
+
+  const [favourite, setFavourite] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
+  const [name, setName] = useState('');
+
+  // Vars that will come from API
+  const group = 'Hakaniemi';
+
   useEffect(
-    function checkIfUserHasFavoured() {
-      if (user && projectCard && projectCard.favPersons.length > 0) {
-        setFavourite(projectCard?.favPersons.includes(user.id));
+    function onProjectCardChanges() {
+      if (projectCard) {
+        setFavourite((user && projectCard.favPersons.includes(user.id)) || false);
+        setSelectedOption(projectCard.phase);
+        setName(projectCard.name);
       }
     },
     [user, projectCard],
@@ -41,41 +97,27 @@ const ProjectCardHeader = () => {
       <div className="header-row">
         {/* left */}
         <div className="display-flex">
-          {/* percent */}
           <div className="progress-indicator-container">
             <ProgressCircle color={'--color-engel'} percent={projectCard?.projectReadiness} />
           </div>
-          {/* address & phase */}
           <div className="header-column">
-            <div>
-              <Title id="project-name" size="m" color="white" text={projectCard?.name} />
-              <Paragraph id="project-address" size="l" color="white" text={address} />
-            </div>
-            <div data-testid="project-phase-dropdown">
-              <Select
-                label=""
-                defaultValue={{ label: t(`enums.${projectCard?.phase}`) }}
-                icon={<IconFaceSmile />}
-                placeholder={t('projectPhase') || ''}
-                options={getPhaseOptions()}
-              />
-            </div>
+            <NameForm name={name} onChange={(e: any) => setName(e.target.value)} />
+            <ProjectPhaseDropdown selectedOption={selectedOption} />
           </div>
         </div>
         {/* right */}
         <div className="header-column text-right">
           <div>
-            {/* favourite */}
-            <button className="favourite-button" onClick={() => setFavourite(!favourite)}>
-              <LabelIcon
-                color="white"
-                icon={favourite ? IconStarFill : IconStar}
-                text={favourite ? 'removeFavourite' : 'addFavourite'}
-              />
-            </button>
-            {/* group */}
-            <Paragraph id="in-group" color="white" size="m" text={'inGroup'} />
-            <Paragraph id="pc-group" color="white" size="l" fontWeight="bold" text={group} />
+            <IconButton
+              onClick={() => setFavourite(!favourite)}
+              color="white"
+              icon={favourite ? IconStarFill : IconStar}
+              text={favourite ? 'removeFavourite' : 'addFavourite'}
+            />
+            <div>
+              <Paragraph color="white" size="m" text={'inGroup'} />
+              <Paragraph color="white" size="l" fontWeight="bold" text={group} />
+            </div>
           </div>
         </div>
       </div>

@@ -69,6 +69,10 @@ p {
   display: flex;
 }
 
+.pos-relative {
+  position: relative;
+}
+
 .flex-col {
   flex-direction: column;
 }
