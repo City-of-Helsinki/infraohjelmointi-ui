@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '@/hooks/common';
-import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
+import { getProjectCardThunk } from '@/reducers/projectCardSlice';
 import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
 import ProjectCardTabs from '@/components/ProjectCard/ProjectCardTabs';
 import './styles.css';
@@ -8,13 +8,10 @@ import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
 
 const ProjectCardView = () => {
   const dispatch = useAppDispatch();
+  const projectCardId = '79786137-d73e-471b-a7a0-c366967b7158';
 
   useEffect(() => {
-    dispatch(getProjectCardsThunk()).then((res) => {
-      if (res.type.includes('rejected')) {
-        console.log('Call failed, do error stuff!');
-      }
-    });
+    dispatch(getProjectCardThunk(projectCardId));
   }, [dispatch]);
 
   return (

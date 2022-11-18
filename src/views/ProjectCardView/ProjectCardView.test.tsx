@@ -50,6 +50,6 @@ describe('ProjectCardView', () => {
 
     expect(projectCardState).toBeDefined();
     expect(projectCard).not.toBeNull();
-    expect(projectCard).toEqual(mockProjectCard.data[0]);
+    expect(projectCard).toEqual(mockProjectCard.data);
   });
 });

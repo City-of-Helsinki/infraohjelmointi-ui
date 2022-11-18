@@ -1,3 +1,5 @@
+import { useAppSelector } from '@/hooks/common';
+import { RootState } from '@/store';
 import { Select } from 'hds-react/components/Select';
 import { IconAlertCircle, IconStar, IconStarFill } from 'hds-react/icons';
 import { useState } from 'react';
@@ -6,17 +8,18 @@ import { LabelIcon, Paragraph, ProgressCircle, Title } from '../shared';
 
 const ProjectCardHeader = () => {
   const { t } = useTranslation();
-
+  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const phaseOptions = [
     { label: <LabelIcon icon={IconAlertCircle} text={t('enums.underConstruction')} /> },
   ];
 
   // Vars that will come from API
   const [favourite, setFavourite] = useState(false);
-  const projectName = 'Hakaniementori';
   const address = 'Hämeentie 1, 00530 Helsinki';
-  const projectReadinessPercent = 45;
   const group = 'Hakaniemi';
+
+  //TODO: phase dropdown
+  //TODO: route by id
 
   return (
     <div className="project-card-header-container">
@@ -25,12 +28,12 @@ const ProjectCardHeader = () => {
         <div className="display-flex">
           {/* percent */}
           <div className="progress-indicator-container">
-            <ProgressCircle color={'--color-engel'} percent={projectReadinessPercent} />
+            <ProgressCircle color={'--color-engel'} percent={projectCard?.projectReadiness} />
           </div>
           {/* address & phase */}
           <div className="header-column">
             <div>
-              <Title id="project-name" size="m" color="white" text={projectName} />
+              <Title id="project-name" size="m" color="white" text={projectCard?.name} />
               <Paragraph id="project-address" size="l" color="white" text={address} />
             </div>
             <div data-testid="project-phase-dropdown">

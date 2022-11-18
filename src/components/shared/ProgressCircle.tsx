@@ -2,12 +2,14 @@ import { CSSProperties, FC } from 'react';
 import './styles.css';
 
 interface IProgressCircleProps {
-  percent: number;
+  percent: number | undefined;
   color: string;
 }
 
 /** Indicates a progress in percentages, svg will scale to parent container */
 const ProgressCircle: FC<IProgressCircleProps> = ({ color, percent }) => {
+  const percentOrZero = percent || 0;
+
   const circleDimensions = {
     cx: 60,
     cy: 60,
@@ -15,7 +17,10 @@ const ProgressCircle: FC<IProgressCircleProps> = ({ color, percent }) => {
     pathLength: 100,
   };
 
-  const circlePercent = { '--circle-percent': percent, stroke: `var(${color})` } as CSSProperties;
+  const circlePercent = {
+    '--circle-percent': percentOrZero,
+    stroke: `var(${color})`,
+  } as CSSProperties;
 
   return (
     <svg className="progress-circle" viewBox="0 0 120 120" aria-label="">
@@ -26,7 +31,7 @@ const ProgressCircle: FC<IProgressCircleProps> = ({ color, percent }) => {
         {...circleDimensions}
       />
       <text className="percent-text text-bold" x="46" y="-53">
-        {`${percent}%`}
+        {`${percentOrZero}%`}
       </text>
     </svg>
   );

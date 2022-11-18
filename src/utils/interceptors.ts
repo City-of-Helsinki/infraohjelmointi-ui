@@ -36,12 +36,12 @@ const handleRequest = (request: AxiosRequestConfig) => {
 const handleResponse = (response: AxiosResponse) => response;
 
 const handleError = (error: AxiosError): Promise<IError> => {
-  console.log('Error: ', error);
   // Add error notification
   const parsedError: IError = {
     status: error.response?.status,
     message: error.message || 'Unknown error',
   };
+
   store.dispatch(
     setNotification({
       message: parsedError.message,
@@ -50,5 +50,6 @@ const handleError = (error: AxiosError): Promise<IError> => {
       status: parsedError.status?.toLocaleString(),
     }),
   );
+
   return Promise.reject(parsedError);
 };
