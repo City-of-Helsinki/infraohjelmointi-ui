@@ -1,11 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
-import {
-  deleteProjectCard,
-  getProjectCard,
-  getProjectCards,
-  postProjectCard,
-} from '@/services/projectCardServices';
+import { getProjectCard, getProjectCards } from '@/services/projectCardServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IProjectCardState {

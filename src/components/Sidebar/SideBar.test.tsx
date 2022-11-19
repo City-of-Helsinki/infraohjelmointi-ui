@@ -3,7 +3,6 @@ import SideBar from './SideBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { INavigationItem } from '@/interfaces/common';
 import { screen } from '@testing-library/dom';
-import { debug } from 'console';
 
 jest.mock('react-i18next', () => mockI18next());
 

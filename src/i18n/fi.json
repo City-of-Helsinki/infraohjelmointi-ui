@@ -39,5 +39,6 @@
   "projectPhase": "Hankkeen vaihe",
   "removeFavourite": "Poista suosikeista",
   "addFavourite": "Lisää suosikkeihin",
-  "inGroup": "Kuuluu ryhmään"
+  "inGroup": "Kuuluu ryhmään",
+  "closeNotification": "Sulje ilmoitus"
 }

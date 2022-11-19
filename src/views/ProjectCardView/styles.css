@@ -17,7 +17,7 @@
 }
 
 .project-card-toolbar-container .display-flex button {
-  margin-left: var(--spacing-xs);
+  margin-left: var(--spacing-s);
 }
 
 /* PROJECT CARD */
@@ -49,8 +49,8 @@
   justify-content: space-between;
 }
 
-.project-card-header-container .favourite-button {
-  margin-bottom: var(--spacing-l);
+.project-card-header-container .favourite-button-container {
+  margin-bottom: var(--spacing-m);
 }
 
 .project-card-header-container .phase-dropdown {

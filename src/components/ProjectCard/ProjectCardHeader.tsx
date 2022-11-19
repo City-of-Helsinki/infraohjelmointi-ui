@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { ChangeEventHandler, FC, useEffect, useState } from 'react';
 import { RootState } from '@/store';
 import { useAppSelector } from '@/hooks/common';
 import { Paragraph, ProgressCircle, IconButton, Title } from '@/components/shared';
@@ -7,11 +7,11 @@ import { TextInput } from 'hds-react/components/TextInput';
 import { Select } from 'hds-react/components/Select';
 import { useTranslation } from 'react-i18next';
 import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
-import { IOptionType } from '@/interfaces/common';
+import { IOptionType, SelectCallback } from '@/interfaces/common';
 
 interface INameFormProps {
   name: string;
-  onChange: any;
+  onChange: ChangeEventHandler<HTMLInputElement>;
 }
 
 const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
@@ -41,9 +41,10 @@ const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
 
 interface IProjectPhaseDropdown {
   selectedOption: string;
+  onChange: SelectCallback;
 }
 
-const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption }) => {
+const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption, onChange }) => {
   const { t } = useTranslation();
 
   const getPhaseOptions = () => {
@@ -63,6 +64,7 @@ const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption }) => 
             icon={<IconFaceSmile />}
             placeholder={t('projectPhase') || ''}
             options={getPhaseOptions()}
+            onChange={onChange}
           />
         </div>
       )}
@@ -101,19 +103,24 @@ const ProjectCardHeader: FC = () => {
             <ProgressCircle color={'--color-engel'} percent={projectCard?.projectReadiness} />
           </div>
           <div className="header-column">
-            <NameForm name={name} onChange={(e: any) => setName(e.target.value)} />
-            <ProjectPhaseDropdown selectedOption={selectedOption} />
+            <NameForm name={name} onChange={(e) => setName(e.target.value)} />
+            <ProjectPhaseDropdown
+              selectedOption={selectedOption}
+              onChange={(o) => setSelectedOption(o.label)}
+            />
           </div>
         </div>
         {/* right */}
         <div className="header-column text-right">
           <div>
-            <IconButton
-              onClick={() => setFavourite(!favourite)}
-              color="white"
-              icon={favourite ? IconStarFill : IconStar}
-              text={favourite ? 'removeFavourite' : 'addFavourite'}
-            />
+            <div className="favourite-button-container">
+              <IconButton
+                onClick={() => setFavourite(!favourite)}
+                color="white"
+                icon={favourite ? IconStarFill : IconStar}
+                text={favourite ? 'removeFavourite' : 'addFavourite'}
+              />
+            </div>
             <div>
               <Paragraph color="white" size="m" text={'inGroup'} />
               <Paragraph color="white" size="l" fontWeight="bold" text={group} />

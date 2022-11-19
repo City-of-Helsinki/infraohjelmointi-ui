@@ -15,16 +15,14 @@ const ProjectCardView = () => {
   const { t } = useTranslation();
   const { projectId } = useParams();
 
+  useEffect(() => {
+    dispatch(getProjectCardThunk(projectId || ''));
+  }, [dispatch, projectId]);
+
   const tabItems: Array<INavigationItem> = [
     { route: 'basics', label: t('basicInfo'), component: <ProjectCardBasics /> },
     { route: 'tasks', label: t('tasks'), component: <ProjectCardTasks /> },
   ];
-
-  useEffect(() => {
-    // dispatch(setLoading('Ladataan sivua'));
-    dispatch(getProjectCardThunk(projectId || ''));
-    // .finally(() => dispatch(clearLoading()));
-  }, [dispatch, projectId]);
 
   return (
     <div className="project-card-container">

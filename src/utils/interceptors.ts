@@ -31,7 +31,7 @@ axios.interceptors.response.use(
 );
 
 const handleRequest = (request: AxiosRequestConfig) => {
-  store.dispatch(setLoading('Ladataan sivua'));
+  store.dispatch(setLoading('Loading request'));
   return request;
 };
 

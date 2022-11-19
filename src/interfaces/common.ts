@@ -15,15 +15,15 @@ export interface IOptionType {
   label: string;
 }
 
-export type NotificationType = 'error' | 'info';
-
 export interface INotification {
-  message: string | null;
+  message: string;
   type: NotificationType | null;
   status?: string | null;
-  title?: string | null;
+  title?: string;
 }
 
+export type NotificationType = 'error' | 'info';
+export type SelectCallback = (selected: IOptionType) => void;
 export type TextColorType = 'black' | 'white';
 export type FontWeightType = 'bold' | 'light';
 export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';

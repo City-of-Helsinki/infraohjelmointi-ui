@@ -23,20 +23,22 @@ const TabsList: FC<INavigationTabProps> = ({ tabItems }) => {
   const getActiveTab = () => tabItems.findIndex((n) => path.includes(n.route));
 
   return (
-    <Tabs initiallyActiveTab={getActiveTab()} theme={tabThemeOverrides}>
-      {/* tabs */}
-      <TabList className="custom-tab-list">
+    <div data-testid="tabs-list">
+      <Tabs initiallyActiveTab={getActiveTab()} theme={tabThemeOverrides}>
+        {/* tabs */}
+        <TabList className="custom-tab-list">
+          {tabItems.map((n) => (
+            <Tab key={n.route} onClick={() => navigate(n.route)}>
+              {n.label}
+            </Tab>
+          ))}
+        </TabList>
+        {/* panel (active view is rendered here) */}
         {tabItems.map((n) => (
-          <Tab key={n.route} onClick={() => navigate(n.route)}>
-            {n.label}
-          </Tab>
+          <TabPanel key={n.route}>{n.component}</TabPanel>
         ))}
-      </TabList>
-      {/* panel (active view is rendered here) */}
-      {tabItems.map((n) => (
-        <TabPanel key={n.route}>{n.component}</TabPanel>
-      ))}
-    </Tabs>
+      </Tabs>
+    </div>
   );
 };
 

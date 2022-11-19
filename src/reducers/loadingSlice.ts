@@ -1,4 +1,3 @@
-import { INotification } from '@/interfaces/common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ILoadingState {
@@ -18,7 +17,7 @@ export const loadingSlice = createSlice({
     setLoading(state, action: PayloadAction<string>) {
       return { isLoading: true, text: action.payload };
     },
-    clearLoading(state) {
+    clearLoading() {
       return initialState;
     },
   },
