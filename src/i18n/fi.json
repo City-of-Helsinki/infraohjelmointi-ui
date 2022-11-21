@@ -15,7 +15,9 @@
     "searchPage": "Hae sivulta",
     "notifications": "Ilmoitukset",
     "skipToContent": "Siirry kohteeseen",
-    "login": "Kirjaudu sisään"
+    "login": "Kirjaudu sisään",
+    "basics": "Hankkeen perustiedot",
+    "navigateToForm": "Navigoi lomakkeeseen"
   },
   "enums": {
     "underConstruction": "Rakenteilla",

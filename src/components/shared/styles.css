@@ -69,3 +69,10 @@
 .notification-wrapper:first-child {
   margin-top: var(--spacing-2-xl);
 }
+
+/* TABS */
+.custom-tab-list {
+  padding-left: 12rem;
+  border-bottom: 1px solid var(--color-black-20);
+  z-index: 0;
+}

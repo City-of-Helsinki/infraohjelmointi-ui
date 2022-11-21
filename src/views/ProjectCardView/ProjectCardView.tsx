@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '@/hooks/common';
 import { getProjectCardThunk } from '@/reducers/projectCardSlice';
-import { TabsList } from '@/components/shared';
+import { TabList } from '@/components/shared';
 import { useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
 import { ProjectCardBasics, ProjectCardTasks } from '@/components/ProjectCard';
@@ -19,7 +19,7 @@ const ProjectCardView = () => {
     dispatch(getProjectCardThunk(projectId || ''));
   }, [dispatch, projectId]);
 
-  const tabItems: Array<INavigationItem> = [
+  const navItems: Array<INavigationItem> = [
     { route: 'basics', label: t('basicInfo'), component: <ProjectCardBasics /> },
     { route: 'tasks', label: t('tasks'), component: <ProjectCardTasks /> },
   ];
@@ -28,7 +28,7 @@ const ProjectCardView = () => {
     <div className="project-card-container">
       <ProjectCardToolbar />
       <ProjectCardHeader />
-      <TabsList tabItems={tabItems} />
+      <TabList navItems={navItems} />
     </div>
   );
 };

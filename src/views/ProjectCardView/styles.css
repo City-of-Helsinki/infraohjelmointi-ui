@@ -57,14 +57,8 @@
   width: 280px;
 }
 
-/* TABS */
-.custom-tab-list {
-  padding-left: 15%;
-  border-bottom: 1px solid var(--color-black-20);
-  z-index: 0;
-}
-
 /* CONTENT WRAPPED */
 .project-card-content-container {
-  margin: var(--spacing-layout-l) var(--spacing-layout-xl) 0 var(--spacing-layout-xl);
+  margin: var(--spacing-layout-l) var(--spacing-layout-2-xl) 0 var(--spacing-layout-2-xl);
+  display: flex;
 }
