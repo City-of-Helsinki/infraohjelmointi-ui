@@ -69,12 +69,12 @@ p {
   display: flex;
 }
 
-.pos-relative {
-  position: relative;
+.display-flex-col {
+  flex-direction: column;
 }
 
-.flex-col {
-  flex-direction: column;
+.pos-relative {
+  position: relative;
 }
 
 .w-100-p {
@@ -83,4 +83,20 @@ p {
 
 .text-right {
   text-align: right;
+}
+
+.input-wrapper {
+  margin-bottom: var(--spacing-l);
+}
+
+.input-l {
+  max-width: 360px;
+}
+
+.legend-margin {
+  color: var(--label-color-default, var(--color-black-90));
+  display: block;
+  font-size: var(--fontsize-body-m);
+  font-weight: 500;
+  margin-bottom: var(--spacing-m);
 }

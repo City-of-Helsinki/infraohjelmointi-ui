@@ -62,3 +62,47 @@
   margin: var(--spacing-layout-l) var(--spacing-layout-2-xl) 0 var(--spacing-layout-2-xl);
   display: flex;
 }
+
+/* BASICS FORM */
+.project-card-content-container .basics-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-card-content-container .basics-form .basics-form-column {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.project-card-content-container .basics-form .nn-row {
+  margin-bottom: var(--spacing-xs);
+}
+
+.project-card-content-container .basics-form .nn-label {
+  color: var(--label-color-default, var(--color-black-90));
+  font-size: var(--fontsize-body-l);
+  font-weight: bold;
+  width: 110px;
+  display: inline-block;
+}
+
+.project-card-content-container .basics-form .identifiers-label {
+  color: var(--label-color-default, var(--color-black-90));
+  display: block;
+  font-size: var(--fontsize-body-m);
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+.project-card-content-container .basics-form .tags-container {
+  display: flex;
+  width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+}
+
+.tags-container .tag-wrapper {
+  margin: 0 var(--spacing-xs) var(--spacing-xs) 0;
+}

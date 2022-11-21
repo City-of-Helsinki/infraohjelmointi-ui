@@ -76,3 +76,8 @@
   border-bottom: 1px solid var(--color-black-20);
   z-index: 0;
 }
+
+.side-nav {
+  width: 100%;
+  max-width: 264px;
+}

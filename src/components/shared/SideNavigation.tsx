@@ -32,8 +32,7 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
     <HDSSideNavigation
       id="side-navigation"
       toggleButtonLabel={t('nav.navigateToForm')}
-      className="w-100-p"
-      style={{ maxWidth: '264px' }}
+      className="side-nav"
     >
       {hdsNavItems.map((s) => (
         <HDSSideNavigation.MainLevel {...s} key={s.href} />

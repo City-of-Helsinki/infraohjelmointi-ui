@@ -10,30 +10,6 @@ const ProjectCardBasics = () => {
       route: 'basics',
       label: t('nav.basics'),
     },
-    {
-      route: 'status',
-      label: 'Hankkeen tila',
-    },
-    {
-      route: 'status',
-      label: 'Hankkeen aikataulu',
-    },
-    {
-      route: 'status',
-      label: 'Hankkeen kustannustiedot',
-    },
-    {
-      route: 'status',
-      label: 'Hankkeen vastuuhenkilöt',
-    },
-    {
-      route: 'status',
-      label: 'Hankkeen sijainti',
-    },
-    {
-      route: 'status',
-      label: 'Hankkeen kuvaus',
-    },
   ];
 
   return (

@@ -40,18 +40,13 @@ const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
 };
 
 interface IProjectPhaseDropdown {
+  options: Array<IOptionType>;
   selectedOption: string;
   onChange: SelectCallback;
 }
 
-const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption, onChange }) => {
+const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ options, selectedOption, onChange }) => {
   const { t } = useTranslation();
-
-  const getPhaseOptions = () => {
-    const phaseOptions: Array<IOptionType> = [];
-    Object.values(ProjectPhase).map((p) => phaseOptions.push({ label: t(`enums.${p}`) }));
-    return phaseOptions;
-  };
 
   return (
     <>
@@ -63,7 +58,7 @@ const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption, onCha
             defaultValue={{ label: t(`enums.${selectedOption}`) }}
             icon={<IconFaceSmile />}
             placeholder={t('projectPhase') || ''}
-            options={getPhaseOptions()}
+            options={options}
             onChange={onChange}
           />
         </div>
@@ -80,8 +75,16 @@ const ProjectCardHeader: FC = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const [name, setName] = useState('');
 
+  const { t } = useTranslation();
+
   // Vars that will come from API
   const group = 'Hakaniemi';
+
+  const getPhaseOptions = () => {
+    const phaseOptions: Array<IOptionType> = [];
+    Object.values(ProjectPhase).map((p) => phaseOptions.push({ label: t(`enums.${p}`) }));
+    return phaseOptions;
+  };
 
   useEffect(
     function onProjectCardChanges() {
@@ -105,6 +108,7 @@ const ProjectCardHeader: FC = () => {
           <div className="header-column">
             <NameForm name={name} onChange={(e) => setName(e.target.value)} />
             <ProjectPhaseDropdown
+              options={getPhaseOptions()}
               selectedOption={selectedOption}
               onChange={(o) => setSelectedOption(o.label)}
             />
