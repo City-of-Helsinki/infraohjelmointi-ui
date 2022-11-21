@@ -26,15 +26,3 @@ const ProjectCardBasics = () => {
 };
 
 export default ProjectCardBasics;
-
-{
-  /* <div className="project-card-content-container">
-<div style={{ display: 'flex', width: '25%', maxWidth: '264px' }}>
-  <SideNavigation navItems={navItems} />
-  <hr />
-</div>
-<div style={{ display: 'flex', width: '75%', marginLeft: 'var(--spacing-layout-2-xl)' }}>
-  <ProjectCardBasicsForm />
-</div>
-</div> */
-}

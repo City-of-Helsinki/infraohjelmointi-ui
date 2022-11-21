@@ -105,7 +105,7 @@ interface IBudget {
   need: number;
 }
 
-interface IProjectArea {
+export interface IProjectArea {
   id: string;
   areaName: string;
   location: string;

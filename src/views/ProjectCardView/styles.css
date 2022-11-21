@@ -40,6 +40,7 @@
   position: relative;
   display: flex;
   justify-content: space-between;
+  margin-bottom: var(--spacing-s);
 }
 
 .project-card-header-container .header-column {
@@ -59,7 +60,7 @@
 
 /* CONTENT WRAPPED */
 .project-card-content-container {
-  margin: var(--spacing-layout-l) var(--spacing-layout-2-xl) 0 var(--spacing-layout-2-xl);
+  margin: var(--spacing-layout-l) 0 0 var(--spacing-layout-2-xl);
   display: flex;
 }
 

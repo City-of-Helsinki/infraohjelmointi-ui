@@ -77,6 +77,10 @@
   z-index: 0;
 }
 
+.custom-tab-list span {
+  z-index: 0;
+}
+
 .side-nav {
   width: 100%;
   max-width: 264px;

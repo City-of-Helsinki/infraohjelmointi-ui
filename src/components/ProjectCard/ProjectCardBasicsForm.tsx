@@ -1,11 +1,10 @@
-import { IOptionType, SelectCallback } from '@/interfaces/common';
+import { InputSizeType, IOptionType } from '@/interfaces/common';
 import { ProjectType } from '@/interfaces/projectCardInterfaces';
-import { Select } from 'hds-react/components/Select';
 import { Tag } from 'hds-react/components/Tag';
 import { TextInput as HDSTextInput } from 'hds-react/components/TextInput';
-import { FC, ReactNode, useState } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Span, Title } from '../shared';
+import { Dropdown, Span, Title } from '../shared';
 
 interface INetworkNumberRowProps {
   label: string;
@@ -61,17 +60,17 @@ const Identifiers = () => {
   );
 };
 
-type InputSizeType = 'l' | 'm';
-
 interface ITextInputProps {
   label: string;
   value: string;
   size?: InputSizeType;
   placeholder?: string;
   required?: boolean;
+  readOnly?: boolean;
 }
 
-const TextInput: FC<ITextInputProps> = ({ label, value, size, placeholder, required }) => {
+const TextInput: FC<ITextInputProps> = (props) => {
+  const { label, value, size, placeholder, required, readOnly } = props;
   return (
     <div className="input-wrapper">
       <HDSTextInput
@@ -81,38 +80,9 @@ const TextInput: FC<ITextInputProps> = ({ label, value, size, placeholder, requi
         id={label}
         required={required}
         value={value}
+        readOnly={readOnly}
       />
     </div>
-  );
-};
-
-interface IDropdownOptions {
-  options: Array<IOptionType>;
-  selectedOption: string;
-  onChange: SelectCallback;
-  icon?: ReactNode;
-  size?: InputSizeType;
-}
-
-const Dropdown: FC<IDropdownOptions> = ({ options, selectedOption, onChange, icon, size }) => {
-  const { t } = useTranslation();
-  return (
-    <>
-      {/* FIXME: this hack is here because HDS-Select component doesn't re-rendering the defaultValue */}
-      {selectedOption && (
-        <div className="input-wrapper">
-          <Select
-            className={`input-${size || 'l'}`}
-            label=""
-            defaultValue={{ label: t(`enums.${selectedOption}`) }}
-            icon={icon}
-            placeholder={t('projectPhase') || ''}
-            options={options}
-            onChange={onChange}
-          />
-        </div>
-      )}
-    </>
   );
 };
 
@@ -137,54 +107,22 @@ const ProjectCardBasicsForm = () => {
           <Dropdown
             options={getProjectTypes()}
             selectedOption={projectType}
+            label="Hanketyyppi"
             onChange={(o) => setProjectType(o.label)}
           />
+          <TextInput label={'Hankkeen kuvaus'} value={''} required />
           <TextInput label={'Hankekokonaisuuden nimi'} value={''} />
-          <div className="input-wrapper">
-            <HDSTextInput
-              style={{ maxWidth: '360px' }}
-              id="textinput"
-              label="Hankekokonaisuuden nimi"
-              placeholder="Placeholder"
-            />
-          </div>
-          <div className="input-wrapper">
-            <HDSTextInput
-              style={{ maxWidth: '360px' }}
-              id="textinput"
-              label="Hankekokonaisuuden nimi"
-              placeholder="Placeholder"
-            />
-          </div>
-          <div className="input-wrapper">
-            <HDSTextInput
-              style={{ maxWidth: '360px' }}
-              id="textinput"
-              label="Hankekokonaisuuden nimi"
-              placeholder="Placeholder"
-            />
-          </div>
+          <Dropdown
+            options={getProjectTypes()}
+            selectedOption={projectType}
+            label="Projektialue"
+            onChange={(o) => setProjectType(o.label)}
+          />
         </div>
         {/* Readonly Fields next to first 4 fields */}
         <div className="basics-form-column">
-          <div className="input-wrapper">
-            <HDSTextInput
-              style={{ maxWidth: '360px' }}
-              id="textinput"
-              readOnly
-              label="Hankekokonaisuuden nimi"
-              placeholder="Placeholder"
-            />
-          </div>
-          <div className="input-wrapper">
-            <HDSTextInput
-              style={{ maxWidth: '360px' }}
-              id="textinput"
-              readOnly
-              label="Hankekokonaisuuden nimi"
-              placeholder="Placeholder"
-            />
-          </div>
+          <TextInput label={'PW Hanketunnus'} value={'2850'} readOnly />
+          <TextInput label={'PW Hanketunnus'} value={'3893892'} readOnly />
           <NetworkNumbers />
         </div>
       </div>

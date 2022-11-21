@@ -6,3 +6,4 @@ export { default as ProgressCircle } from './ProgressCircle';
 export { default as IconButton } from './IconButton';
 export { default as TabList } from './TabList';
 export { default as SideNavigation } from './SideNavigation';
+export { default as Dropdown } from './Dropdown';
