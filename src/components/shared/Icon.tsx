@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import './styles.css';
 
 interface IIconProps {
-  icon: FC<{ size?: IconSizeType | undefined; color?: string }>;
+  icon: FC<{ size?: IconSizeType; color?: string }>;
   text?: string;
   size?: IconSizeType;
   color?: TextColorType;

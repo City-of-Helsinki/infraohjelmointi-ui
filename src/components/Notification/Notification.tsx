@@ -39,21 +39,3 @@ const Notification: FC = () => {
 };
 
 export default Notification;
-
-/**
- * 
- * notifications.map((n) => (
-            <div key={n.id} className="notification-wrapper">
-              <HDSNotification
-                label={n.title}
-                type={n.type || undefined}
-                dismissible
-                position="inline"
-                closeButtonLabelText="Close toast"
-                onClose={() => dispatch(clearNotification(n.id || 0))}
-              >
-                {n.message}
-              </HDSNotification>
-            </div>
-          ))
- */

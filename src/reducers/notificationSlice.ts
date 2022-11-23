@@ -14,7 +14,7 @@ export const notificationSlice = createSlice({
       state.push({ id: state.length, ...action.payload });
     },
     clearNotification(state, action: PayloadAction<number>) {
-      return (state = state.filter((s) => s.id !== action.payload));
+      return state.filter((s) => s.id !== action.payload);
     },
   },
 });

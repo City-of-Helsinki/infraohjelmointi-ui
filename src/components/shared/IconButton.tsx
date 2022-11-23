@@ -4,7 +4,7 @@ import Icon from './Icon';
 
 interface IIconButton {
   onClick: MouseEventHandler<HTMLButtonElement>;
-  icon: FC<{ size?: IconSizeType | undefined; color?: string }>;
+  icon: FC<{ size?: IconSizeType; color?: string }>;
   text?: string;
   size?: IconSizeType;
   color?: TextColorType;

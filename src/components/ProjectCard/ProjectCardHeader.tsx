@@ -8,6 +8,7 @@ import { Select } from 'hds-react/components/Select';
 import { useTranslation } from 'react-i18next';
 import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
 import { IOptionType, SelectCallback } from '@/interfaces/common';
+import { projectCardAddress } from '@/mocks/common';
 
 interface INameFormProps {
   name: string;
@@ -16,7 +17,6 @@ interface INameFormProps {
 
 const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
   const [editing, setEditing] = useState(false);
-  const address = 'Hämeentie 1, 00530 Helsinki';
   return (
     <div className="edit-name-form">
       <div>
@@ -25,7 +25,7 @@ const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
         ) : (
           <>
             <Title size="m" color="white" text={name} />
-            <Paragraph size="l" color="white" text={address} />
+            <Paragraph size="l" color="white" text={projectCardAddress} />
           </>
         )}
       </div>
