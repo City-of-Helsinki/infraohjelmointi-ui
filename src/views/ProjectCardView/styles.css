@@ -87,8 +87,8 @@
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  height: 100vh;
-  margin-top: var(--spacing-layout-l);
+  height: 100%;
+  margin: var(--spacing-layout-l) 0;
 }
 
 .project-card-content-container .side-panel {
@@ -108,13 +108,6 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-}
-
-.basics-form .basics-form-column {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  margin: 0 var(--spacing-2-xl) 0 0;
 }
 
 .basics-form .nn-row {

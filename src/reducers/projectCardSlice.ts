@@ -1,5 +1,5 @@
 import { IError } from '@/interfaces/common';
-import { IProjectCard, IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
+import { IProjectCard, IProjectCardRequestObject } from '@/interfaces/projectCardInterfaces';
 import {
   getProjectCard,
   getProjectCards,
@@ -37,7 +37,7 @@ export const getProjectCardThunk = createAsyncThunk(
 
 export const postProjectCardThunk = createAsyncThunk(
   'projectCard/post',
-  async (request: IProjectCardRequest, thunkAPI) => {
+  async (request: IProjectCardRequestObject, thunkAPI) => {
     return await postProjectCard(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
@@ -46,7 +46,7 @@ export const postProjectCardThunk = createAsyncThunk(
 
 export const patchProjectCardThunk = createAsyncThunk(
   'projectCard/patch',
-  async (request: IProjectCardRequest, thunkAPI) => {
+  async (request: IProjectCardRequestObject, thunkAPI) => {
     return await patchProjectCard(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));

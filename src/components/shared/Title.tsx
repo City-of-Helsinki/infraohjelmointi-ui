@@ -14,7 +14,7 @@ type SizeType = 'xxl' | 'xl' | 'l' | 'm' | 's' | 'xs' | 'xxs';
 
 interface ITitleProps {
   size: SizeType;
-  text: string | undefined;
+  text?: string;
   color?: TextColorType;
   id?: string;
 }
@@ -49,7 +49,11 @@ const Title: FC<ITitleProps> = ({ size, text, color, id }) => {
     }
   };
 
-  return <div data-testid={id}>{getHeading()}</div>;
+  return (
+    <div data-testid={id} id={id}>
+      {getHeading()}
+    </div>
+  );
 };
 
 export default Title;

@@ -12,6 +12,7 @@ const mockProjectCard: { data: IProjectCard } = {
     hkrId: '101591cb-46df-43a6-8ca4-a4a70bcae92f',
     sapProject: 'c0f2c791-e20f-45fe-afce-a9ba434f046e',
     sapNetwork: '17b75067-42b6-42b9-b21a-7873093f84d0',
+    entityName: 'Test entity',
     type: ProjectType.ProjectComplex,
     name: 'Hakaniementori',
     description: 'Hakanimentori should be built.',

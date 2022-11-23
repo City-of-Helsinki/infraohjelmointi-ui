@@ -10,3 +10,4 @@ export { default as Dropdown } from './Dropdown';
 export { default as TextField } from './TextField';
 export { default as SelectField } from './SelectField';
 export { default as FormFieldCreator } from './FormFieldCreator';
+export { default as FormSectionTitle } from './FormSectionTitle';

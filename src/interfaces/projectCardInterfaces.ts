@@ -1,8 +1,3 @@
-import { IProjectCardBasicsForm } from './formInterfaces';
-
-/**
- * Not all of these were 100% clear in the Jira description, some might change as we go
- */
 export interface IProjectCard {
   id: string;
   projectReadiness: number;
@@ -11,6 +6,7 @@ export interface IProjectCard {
   sapNetwork: string;
   type: ProjectType;
   name: string;
+  entityName: string;
   description: string;
   phase: ProjectPhase;
   programmed: boolean;
@@ -47,6 +43,17 @@ export interface IProjectCard {
   favPersons: Array<string>;
 }
 
+export interface IProjectCardRequest {
+  // type: string;
+  description: string;
+  entityName: string;
+}
+
+export interface IProjectCardRequestObject {
+  id?: string;
+  data: IProjectCardRequest;
+}
+
 export enum ProjectType {
   ProjectComplex = 'projectComplex',
   Street = 'street',
@@ -68,6 +75,11 @@ export enum ProjectPhase {
   Construction = 'construction',
   WarrantyPeriod = 'warrantyPeriod',
   Completed = 'completed',
+}
+
+export enum ProjectArea {
+  Hakaniemi = 'hakaniemi',
+  Kaisaniemi = 'kaisaniemi',
 }
 
 export enum ProjectPriority {
@@ -111,9 +123,4 @@ export interface IProjectArea {
   id: string;
   areaName: string;
   location: string;
-}
-
-export interface IProjectCardRequest {
-  id?: string;
-  data: IProjectCardBasicsForm;
 }

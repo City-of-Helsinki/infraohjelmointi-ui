@@ -7,7 +7,7 @@ import { Select } from 'hds-react/components/Select';
 import { useTranslation } from 'react-i18next';
 import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
 import { IOptionType, SelectCallback } from '@/interfaces/common';
-import { getOptionsFromEnum } from '@/utils/common';
+import { getOptionsFromObject } from '@/utils/common';
 import ProjectCardNameForm from './ProjectCardNameForm';
 
 interface IPhaseDropdown {
@@ -72,7 +72,7 @@ const ProjectCardHeader: FC = () => {
         <div className="center-wrapper">
           <ProjectCardNameForm name={name} onChange={(e) => setName(e.target.value)} />
           <PhaseDropdown
-            options={getOptionsFromEnum(ProjectPhase)}
+            options={getOptionsFromObject(ProjectPhase)}
             selectedOption={selectedOption}
             onChange={(o) => setSelectedOption(o.label)}
           />

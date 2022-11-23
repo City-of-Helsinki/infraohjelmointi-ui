@@ -23,12 +23,12 @@ const Input: FC<IInputProps> = forwardRef(
     ref: Ref<HTMLInputElement>,
   ) => {
     return (
-      <div className="input-wrapper">
+      <div className="input-wrapper" id={name}>
         <HDSTextInput
           className={`input-${size || 'l'}`}
           placeholder={placeholder || ''}
           label={label}
-          id={name}
+          id={label}
           value={value}
           readOnly={readOnly}
           onChange={onChange}
