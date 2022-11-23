@@ -1,58 +1,29 @@
-import { ChangeEventHandler, FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { RootState } from '@/store';
 import { useAppSelector } from '@/hooks/common';
-import { Paragraph, ProgressCircle, IconButton, Title } from '@/components/shared';
-import { IconFaceSmile, IconPenLine, IconStar, IconStarFill } from 'hds-react/icons';
-import { TextInput } from 'hds-react/components/TextInput';
+import { Paragraph, ProgressCircle, IconButton } from '@/components/shared';
+import { IconFaceSmile, IconStar, IconStarFill } from 'hds-react/icons';
 import { Select } from 'hds-react/components/Select';
 import { useTranslation } from 'react-i18next';
 import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
 import { IOptionType, SelectCallback } from '@/interfaces/common';
-import { projectCardAddress } from '@/mocks/common';
+import { getOptionsFromEnum } from '@/utils/common';
+import ProjectCardNameForm from './ProjectCardNameForm';
 
-interface INameFormProps {
-  name: string;
-  onChange: ChangeEventHandler<HTMLInputElement>;
-}
-
-const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
-  const [editing, setEditing] = useState(false);
-  return (
-    <div className="edit-name-form">
-      <div>
-        {editing ? (
-          <TextInput id="textinput" value={name || ''} onChange={onChange} required />
-        ) : (
-          <>
-            <Title size="m" color="white" text={name} />
-            <Paragraph size="l" color="white" text={projectCardAddress} />
-          </>
-        )}
-      </div>
-      <IconButton
-        onClick={() => setEditing(!editing)}
-        icon={IconPenLine}
-        color="white"
-        label="edit-project-name"
-      />
-    </div>
-  );
-};
-
-interface IProjectPhaseDropdown {
+interface IPhaseDropdown {
   options: Array<IOptionType>;
   selectedOption: string;
   onChange: SelectCallback;
 }
 
-const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ options, selectedOption, onChange }) => {
+const PhaseDropdown: FC<IPhaseDropdown> = ({ options, selectedOption, onChange }) => {
   const { t } = useTranslation();
 
   return (
     <>
       {/* FIXME: this hack is here because HDS-Select component doesn't re-rendering the defaultValue */}
       {selectedOption && (
-        <div className="phase-dropdown">
+        <div>
           <Select
             label=""
             defaultValue={{ label: t(`enums.${selectedOption}`) }}
@@ -75,16 +46,8 @@ const ProjectCardHeader: FC = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const [name, setName] = useState('');
 
-  const { t } = useTranslation();
-
   // Vars that will come from API
   const group = 'Hakaniemi';
-
-  const getPhaseOptions = () => {
-    const phaseOptions: Array<IOptionType> = [];
-    Object.values(ProjectPhase).map((p) => phaseOptions.push({ label: t(`enums.${p}`) }));
-    return phaseOptions;
-  };
 
   useEffect(
     function onProjectCardChanges() {
@@ -96,27 +59,28 @@ const ProjectCardHeader: FC = () => {
     },
     [user, projectCard],
   );
-
   return (
     <div className="project-card-header-container">
-      <div className="header-row">
-        {/* left */}
-        <div className="display-flex">
-          <div className="progress-indicator-container">
+      <div className="left">
+        <div className="left-wrapper">
+          <div className="readiness-container">
             <ProgressCircle color={'--color-engel'} percent={projectCard?.projectReadiness} />
           </div>
-          <div className="header-column">
-            <NameForm name={name} onChange={(e) => setName(e.target.value)} />
-            <ProjectPhaseDropdown
-              options={getPhaseOptions()}
-              selectedOption={selectedOption}
-              onChange={(o) => setSelectedOption(o.label)}
-            />
-          </div>
         </div>
-        {/* right */}
-        <div className="header-column text-right">
-          <div>
+      </div>
+      <div className="center">
+        <div className="center-wrapper">
+          <ProjectCardNameForm name={name} onChange={(e) => setName(e.target.value)} />
+          <PhaseDropdown
+            options={getOptionsFromEnum(ProjectPhase)}
+            selectedOption={selectedOption}
+            onChange={(o) => setSelectedOption(o.label)}
+          />
+        </div>
+      </div>
+      <div className="right">
+        <div className="right-wrapper">
+          <div className="right-wrapper-inner">
             <div className="favourite-button-container">
               <IconButton
                 onClick={() => setFavourite(!favourite)}
@@ -125,10 +89,8 @@ const ProjectCardHeader: FC = () => {
                 text={favourite ? 'removeFavourite' : 'addFavourite'}
               />
             </div>
-            <div>
-              <Paragraph color="white" size="m" text={'inGroup'} />
-              <Paragraph color="white" size="l" fontWeight="bold" text={group} />
-            </div>
+            <Paragraph color="white" size="m" text={'inGroup'} />
+            <Paragraph color="white" size="l" fontWeight="bold" text={group} />
           </div>
         </div>
       </div>

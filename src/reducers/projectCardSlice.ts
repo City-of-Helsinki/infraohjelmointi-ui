@@ -1,6 +1,11 @@
 import { IError } from '@/interfaces/common';
-import { IProjectCard } from '@/interfaces/projectCardInterfaces';
-import { getProjectCard, getProjectCards } from '@/services/projectCardServices';
+import { IProjectCard, IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
+import {
+  getProjectCard,
+  getProjectCards,
+  patchProjectCard,
+  postProjectCard,
+} from '@/services/projectCardServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IProjectCardState {
@@ -30,6 +35,24 @@ export const getProjectCardThunk = createAsyncThunk(
   },
 );
 
+export const postProjectCardThunk = createAsyncThunk(
+  'projectCard/post',
+  async (request: IProjectCardRequest, thunkAPI) => {
+    return await postProjectCard(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const patchProjectCardThunk = createAsyncThunk(
+  'projectCard/patch',
+  async (request: IProjectCardRequest, thunkAPI) => {
+    return await patchProjectCard(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
 export const projectCardSlice = createSlice({
   name: 'projectCard',
   initialState,
@@ -54,6 +77,20 @@ export const projectCardSlice = createSlice({
     });
     builder.addCase(
       getProjectCardThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // POST
+    builder.addCase(
+      postProjectCardThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // PATCH
+    builder.addCase(
+      patchProjectCardThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

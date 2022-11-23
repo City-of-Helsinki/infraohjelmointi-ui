@@ -1,3 +1,5 @@
+import { IProjectCardBasicsForm } from './formInterfaces';
+
 /**
  * Not all of these were 100% clear in the Jira description, some might change as we go
  */
@@ -109,4 +111,9 @@ export interface IProjectArea {
   id: string;
   areaName: string;
   location: string;
+}
+
+export interface IProjectCardRequest {
+  id?: string;
+  data: IProjectCardBasicsForm;
 }

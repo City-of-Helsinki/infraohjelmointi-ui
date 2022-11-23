@@ -13,7 +13,7 @@ const ProgressCircle: FC<IProgressCircleProps> = ({ color, percent }) => {
   const circleDimensions = {
     cx: 60,
     cy: 60,
-    r: 40,
+    r: 50,
     pathLength: 100,
   };
 
@@ -30,7 +30,7 @@ const ProgressCircle: FC<IProgressCircleProps> = ({ color, percent }) => {
         style={circlePercent}
         {...circleDimensions}
       />
-      <text className="percent-text text-bold" x="46" y="-53">
+      <text className="percent-text text-bold" x="42" y="-51">
         {`${percentOrZero}%`}
       </text>
     </svg>

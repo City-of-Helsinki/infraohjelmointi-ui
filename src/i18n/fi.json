@@ -39,6 +39,14 @@
     "projectArea": "Projektialue",
     "park": "Puisto tai taitorakenne"
   },
+  "projectCardBasicsForm": {
+    "type": "Hanketyyppi",
+    "entityName": "Hankekokonaisuuden nimi",
+    "description": "Hankkeen kuvaus",
+    "area": "Projektialue",
+    "hkrId": "PW Hanketunnus",
+    "sapProject": "Projektinumero"
+  },
   "appTitle": "Infraohjelmointi UI",
   "projectCard": "Hankekortti",
   "basicInfo": "Perustiedot",

@@ -1,25 +1,35 @@
-import { InputSizeType, IOptionType } from '@/interfaces/common';
-import { ProjectType } from '@/interfaces/projectCardInterfaces';
+import useProjectCardBasicsForm from '@/hooks/useProjectCardBasicsForm';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
+import { RootState } from '@/store';
 import { Tag } from 'hds-react/components/Tag';
-import { TextInput as HDSTextInput } from 'hds-react/components/TextInput';
-import { FC, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Dropdown, Span, Title } from '../shared';
+import { IconPenLine } from 'hds-react/icons';
+import { FC, useState, MouseEvent, MouseEventHandler } from 'react';
+import { SubmitHandler } from 'react-hook-form';
+import { FormFieldCreator, Span, Title } from '../shared';
+import { Button } from 'hds-react/components/Button';
+import { patchProjectCardThunk, postProjectCardThunk } from '@/reducers/projectCardSlice';
+import { useParams } from 'react-router-dom';
 
-interface INetworkNumberRowProps {
-  label: string;
-  value: string;
+interface IPenAndLabelProps {
+  text: string;
+  onClick: MouseEventHandler<HTMLButtonElement>;
 }
 
-const NetworkNumberRow: FC<INetworkNumberRowProps> = ({ label, value }) => (
-  <div className="nn-row">
-    <label className="nn-label">{label}</label>
-    <Span size="m" text={value} />
-  </div>
-);
+const PenAndLabel: FC<IPenAndLabelProps> = ({ text, onClick }) => {
+  return (
+    <div style={{ display: 'flex' }}>
+      <label>{text}</label>
+      <button onClick={onClick}>
+        <IconPenLine style={{ transform: 'translate(20px, -6px)' }} />
+      </button>
+    </div>
+  );
+};
 
 const NetworkNumbers = () => {
-  const networkNumber = [
+  // Temp values until API returns / enables these
+  const [networkNumbers, setNetworkNumber] = useState([
     {
       label: 'RAKE',
       value: 'A39390033390',
@@ -32,102 +42,94 @@ const NetworkNumbers = () => {
       label: 'Toim.ohj.',
       value: 'B39838939923',
     },
-  ];
+  ]);
+
+  const addNetworkNumber = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setNetworkNumber([...networkNumbers, { label: 'TESTI', value: 'X56838939563' }]);
+  };
 
   return (
     <div className="display-flex-col">
-      <legend className="legend-margin">Verkkonumerot</legend>
-      {networkNumber.map((nn) => (
-        <NetworkNumberRow key={nn.label} {...nn} />
+      <PenAndLabel text="Verkkonumerot" onClick={(e) => addNetworkNumber(e)} />
+      {networkNumbers.map((nn) => (
+        <div className="nn-row" key={nn.label}>
+          <label className="nn-label">{nn.label}</label>
+          <Span size="m" text={nn.value} />
+        </div>
       ))}
     </div>
   );
 };
 
 const Identifiers = () => {
-  const tags = ['uudisrakentaminen', 'pyöräily', 'pohjoinensuurpiiri', 'ylitysoikeus2021'];
-  return (
-    <div className="display-flex-col">
-      <label className="identifiers-label">Tunnisteet</label>
-      <div className="tags-container">
-        {tags.map((t) => (
-          <div key={t} className="tag-wrapper">
-            <Tag>{t}</Tag>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+  // Temp values until API returns / enables these
+  const [tags, setTags] = useState(['uudisrakentaminen', 'pyöräily', 'pohjoinensuurpiiri']);
 
-interface ITextInputProps {
-  label: string;
-  value: string;
-  size?: InputSizeType;
-  placeholder?: string;
-  required?: boolean;
-  readOnly?: boolean;
-}
-
-const TextInput: FC<ITextInputProps> = (props) => {
-  const { label, value, size, placeholder, required, readOnly } = props;
-  return (
-    <div className="input-wrapper">
-      <HDSTextInput
-        className={`input-${size || 'l'}`}
-        label={label}
-        placeholder={placeholder}
-        id={label}
-        required={required}
-        value={value}
-        readOnly={readOnly}
-      />
-    </div>
-  );
-};
-
-const ProjectCardBasicsForm = () => {
-  const { t } = useTranslation();
-  const [projectType, setProjectType] = useState('projectComplex');
-
-  const getProjectTypes = () => {
-    const phaseOptions: Array<IOptionType> = [];
-    Object.values(ProjectType).map((p) => phaseOptions.push({ label: t(`enums.${p}`) }));
-    return phaseOptions;
+  const onEdit = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setTags([...tags, 'testi']);
   };
 
   return (
+    <div className="input-wrapper">
+      <div className="display-flex-col">
+        <PenAndLabel text={'Tunnisteet'} onClick={(e) => onEdit(e)} />
+        <div className="tags-container">
+          {tags.map((t) => (
+            <div key={t} className="tag-wrapper">
+              <Tag>{t}</Tag>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ProjectCardBasicsForm: FC = () => {
+  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const dispatch = useAppDispatch();
+  const { projectId } = useParams();
+  const { handleSubmit, formFields } = useProjectCardBasicsForm(projectCard);
+
+  const onSubmit: SubmitHandler<IProjectCardBasicsForm> = async (data) => {
+    if (projectId) {
+      dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {
+        console.log('PATCH response: ', res);
+      });
+    } else {
+      dispatch(postProjectCardThunk({ data })).then((res) => {
+        console.log('POST response: ', res);
+      });
+    }
+  };
+
+  /*
+   * TODO: create a component that works with the "Pen icon" to add network numbers and edit/add tags,
+   * add it to form when types are known
+   */
+  return (
     <div className="basics-form">
-      <div className="input-wrapper">
-        <Title size="l" text="Hankkeen perustiedot" />
-      </div>
-      <div className="display-flex">
-        {/* First 4 form fields */}
-        <div className="basics-form-column">
-          <Dropdown
-            options={getProjectTypes()}
-            selectedOption={projectType}
-            label="Hanketyyppi"
-            onChange={(o) => setProjectType(o.label)}
-          />
-          <TextInput label={'Hankkeen kuvaus'} value={''} required />
-          <TextInput label={'Hankekokonaisuuden nimi'} value={''} />
-          <Dropdown
-            options={getProjectTypes()}
-            selectedOption={projectType}
-            label="Projektialue"
-            onChange={(o) => setProjectType(o.label)}
-          />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="input-wrapper">
+          <Title size="l" text="Hankkeen perustiedot" />
         </div>
-        {/* Readonly Fields next to first 4 fields */}
-        <div className="basics-form-column">
-          <TextInput label={'PW Hanketunnus'} value={'2850'} readOnly />
-          <TextInput label={'PW Hanketunnus'} value={'3893892'} readOnly />
-          <NetworkNumbers />
+        <div className="display-flex">
+          {/* First 4 form fields */}
+          <div className="basics-form-column">
+            <FormFieldCreator form={formFields[0]} />
+          </div>
+          {/* Readonly Fields next to first 4 fields */}
+          <div className="basics-form-column">
+            <FormFieldCreator form={formFields[1]} />
+            <NetworkNumbers />
+          </div>
         </div>
-      </div>
-      {/* Tags */}
-      <Identifiers />
+        {/* Tags */}
+        <Identifiers />
+        <Button type="submit">Lähetä</Button>
+      </form>
     </div>
   );
 };

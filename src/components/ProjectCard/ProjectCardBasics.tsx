@@ -14,11 +14,10 @@ const ProjectCardBasics = () => {
 
   return (
     <div className="project-card-content-container">
-      <div style={{ display: 'flex', width: '30%' }}>
+      <div className="side-panel">
         <SideNavigation navItems={navItems} />
-        <hr />
       </div>
-      <div style={{ display: 'flex', width: '70%' }}>
+      <div className="form-panel">
         <ProjectCardBasicsForm />
       </div>
     </div>

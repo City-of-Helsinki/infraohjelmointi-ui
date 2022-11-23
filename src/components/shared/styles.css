@@ -24,7 +24,7 @@
 .progress-circle .circle {
   fill: transparent;
   stroke: var(--color-coat-of-arms);
-  stroke-width: 14px;
+  stroke-width: 20px;
 }
 
 .progress-circle .percent-indicator {
@@ -33,12 +33,13 @@
   stroke-linecap: round; /* round edge */
   animation: progress 1s ease-out;
   fill: transparent;
-  stroke-width: 14px;
+  stroke-width: 20px;
 }
 
 .progress-circle .percent-text {
   transform: rotate(90deg);
   fill: white;
+  font-size: 20px;
 }
 
 @keyframes progress {
@@ -82,6 +83,22 @@
 }
 
 .side-nav {
-  width: 100%;
+  width: 65%;
   max-width: 264px;
+}
+
+.error-text-container {
+  display: inline;
+}
+
+.error-text-container .error-icon {
+  transform: translateY(6px);
+  margin-right: 0.4rem;
+}
+
+.error-text-container .error-text {
+  display: inline;
+  color: var(--color-error);
+  font-weight: 500;
+  font-size: var(--fontsize-body-m);
 }
