@@ -1,26 +1,38 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Navigation } from 'hds-react/components/Navigation';
 import { useTranslation } from 'react-i18next';
+import { IconBell } from 'hds-react/icons';
+import { useAppSelector } from '@/hooks/common';
+import { RootState } from '@/store';
 
-/**
- * TODO: Implement actual functionality, this is just a placeholder to help style the rest of the page
- */
 const TopBar: FC = () => {
+  const user = useAppSelector((state: RootState) => state.auth.user);
   const { t } = useTranslation();
+  const { Dropdown, Actions, Search, User, Item } = Navigation;
+
   return (
-    <Navigation
-      title={t('topBar.programming')}
-      menuToggleAriaLabel="menu"
-      skipTo="#content"
-      skipToContentLabel="Skip to content"
-    >
-      <Navigation.Actions>
-        <Navigation.Search searchLabel={t('search')} searchPlaceholder={t('searchPage') || ''} />
-        <Navigation.User label={t('login')} />
-        {/* Localization will not come to the MVP version */}
-        <Navigation.Item label={t('lang.fi')} />
-      </Navigation.Actions>
-    </Navigation>
+    <div data-testid="top-bar">
+      <Navigation
+        title={t('enums.programming')}
+        menuToggleAriaLabel="menu"
+        skipTo="#content"
+        skipToContentLabel={t('nav.skipToContent')}
+      >
+        <Actions>
+          {/* search */}
+          <Search searchLabel={t('nav.search')} searchPlaceholder={t('nav.searchPage') || ''} />
+          {/* user */}
+          <User label={t('nav.login')} userName={user?.username} authenticated={!!user}>
+            <Item label={'Tietoa käyttäjästä'} />
+          </User>
+          {/* notifications */}
+          <Dropdown label={t('nav.notifications')} icon={<IconBell />}>
+            <Item label={'Ilmoitus'} />
+            <Item label={'Ilmoitus'} />
+          </Dropdown>
+        </Actions>
+      </Navigation>
+    </div>
   );
 };
 

@@ -2,70 +2,111 @@
  * Not all of these were 100% clear in the Jira description, some might change as we go
  */
 export interface IProjectCard {
-  hkrProjectId: string;
-  projectType: ProjectType;
-  target: string;
-  streetOrParkName: string;
-  projectArea: string;
-  projectEntityName: string;
-  projectDescription: string;
-  responsiblePerson: IResponsiblePerson;
-  responsiblePersonForConstruction: string; // maybe IResponsiblePerson?
-  otherResponsiblePersons: string; // maybe Array<IResponsiblePerson>?
-  projectStatus: string; // says "menu" in the task description
-  programmed: boolean;
-  constructionPhaseSpecification: string; // says "menu" in the task description
-  estimatedStreetOrParkPlanningYear: string; // says "menu" in the task description
-  estimatedStreetOrParkCompletionYear: string; // says "menu" in the task description
-  streetOrParkPlanStart: string;
-  streetOrParkPlanEnd: string;
-  streetOrParkConstructionStart: string;
-  streetOrParkConstructionEnd: string;
-  presenceStart: string;
-  presenceEnd: string;
-  visibilityStart: string;
-  visibilityEnd: string;
-  toLouhi: boolean;
-  projectLocation: string; // not sure if dropdown / free-text or coordinates
-  category: CategoryType;
-  gravelStreet: boolean;
-  workQuantity: string;
-  unitCostForecast: string;
-  costForecast: string;
-  sapProjectNumber: Array<string>;
-  sapNetworkNumber: Array<string>;
-  realizedAndCommitedCosts: string;
-  nameOfPlanner: string; // says "menu" (maybe IResponsiblePerson)
-  quantity: string; //Cost estimate, and what phase the estimate is from.
-  qualityLevel: string; //Cost estimate, and what phase the estimate is from.
-  unitPrice: string; //Cost estimate, and what phase the estimate is from.
-  hashtagIdentifiers: string;
-  textDescription: string;
-  notes: Array<string>;
-  // Some things under HANKEKORTILLA TAPAHTUVAT ASIAT: (THINGS ON THE PROJECT CARD) are too unclear
-}
-
-// The enum values should be included in the i18n files,
-// so that we can get the value like = t(`projectType.${ProjectType.ProjectComplex}`)
-export enum ProjectType {
-  ProjectComplex = 'Hankekokonaisuus',
-  Street = 'Katu',
-  Traffic = 'Liikenne',
-  Sports = 'Liikunta',
-  Omastadi = 'Omastadi',
-  ProjectArea = 'Projektialue',
-  Park = 'Puisto tai taitorakenne',
-}
-
-export enum CategoryType {
-  MainCategory = 'Pääluokka',
-  Category = 'Luokka',
-  SubCategory = 'Alaluokka',
-}
-
-export interface IResponsiblePerson {
+  id: string;
+  projectReadiness: number;
+  hkrId: string;
+  sapProject: string;
+  sapNetwork: string;
+  type: ProjectType;
   name: string;
+  description: string;
+  phase: ProjectPhase;
+  programmed: boolean;
+  constructionPhaseDetail: string;
+  estPlanningStartYear: string;
+  estDesignEndYear: string;
+  estDesignStartDate: string;
+  estDesignEndDate: string;
+  contractPrepStartDate: string;
+  contractPrepEndDate: string;
+  warrantyStartDate: string;
+  warrantyExpireDate: string;
+  perfAmount: string;
+  unitCost: string;
+  costForecast: string;
+  neighborhood: string;
+  comittedCost: string;
+  tiedCurrYear: string;
+  realizedCost: string;
+  spentCost: string;
+  riskAssess: string;
+  priority: ProjectPriority;
+  locked: boolean;
+  comments: string;
+  delays: string;
+  createdDate: string;
+  updatedDate: string;
+  siteId: IBudget | null;
+  projectSet: IProjectSet | null;
+  area: IProjectArea | null;
+  personPlanning: IPerson | null;
+  personProgramming: IPerson | null;
+  personConstruction: IPerson | null;
+  favPersons: Array<string>;
+}
+
+export enum ProjectType {
+  ProjectComplex = 'projectComplex',
+  Street = 'street',
+  Traffic = 'traffic',
+  Sports = 'sports',
+  Omastadi = 'omaStadi',
+  ProjectArea = 'projectArea',
+  Park = 'park',
+}
+
+export enum ProjectPhase {
+  Proposal = 'proposal',
+  Design = 'design',
+  Programming = 'programming',
+  DraftInitiation = 'draftInitiation',
+  DraftApproval = 'draftApproval',
+  ConstructionPlan = 'constructionPlan',
+  ConstructionWait = 'constructionWait',
+  Construction = 'construction',
+  WarrantyPeriod = 'warrantyPeriod',
+  Completed = 'completed',
+}
+
+export enum ProjectPriority {
+  Low = 'low',
+  Medium = 'medium',
+  High = 'high',
+}
+
+export interface IPerson {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   title: string;
   phone: string;
-  email: string;
+}
+
+interface IProjectSet {
+  id: string;
+  sapProject: Array<string>;
+  sapNetworks: Array<string>;
+  name: string;
+  hkrId: string;
+  description: string;
+  projectPhase: ProjectPhase;
+  programmed: boolean;
+  responsiblePerson: IPerson;
+}
+
+interface IBudget {
+  id: string;
+  budgetMain: number;
+  budgetPlan: number;
+  site: string;
+  siteName: string;
+  district: string;
+  need: number;
+}
+
+interface IProjectArea {
+  id: string;
+  areaName: string;
+  location: string;
 }

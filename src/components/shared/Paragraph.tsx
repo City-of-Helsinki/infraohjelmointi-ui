@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import { FontWeightType, TextColorType } from '@/interfaces/common';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -13,11 +14,17 @@ type SizeType = 'xl' | 'l' | 'm' | 's';
 interface IParagraphProps {
   size: SizeType;
   text: string;
+  color?: TextColorType;
+  fontWeight?: FontWeightType;
 }
 
-const Paragraph: FC<IParagraphProps> = ({ size, text }) => {
+const Paragraph: FC<IParagraphProps> = ({ size, text, color, fontWeight }) => {
   const { t } = useTranslation();
-  return <p className={`font-${size}`}>{t(text)}</p>;
+  return (
+    <p className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}>
+      {t(text)}
+    </p>
+  );
 };
 
 export default Paragraph;

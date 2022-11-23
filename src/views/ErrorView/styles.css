@@ -1,0 +1,16 @@
+.error-page-container {
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+}
+
+.error-page-container .error-column {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+}
+
+.error-page-container .error-column .error-spacer {
+  margin-bottom: var(--spacing-s);
+}

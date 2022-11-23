@@ -1,28 +1,35 @@
-import React, { useEffect } from 'react';
-import { Outlet } from 'react-router';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { RootState } from '@/store';
-import { Paragraph, Title } from '@/components/shared';
-import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
+import { useEffect } from 'react';
+import { useAppDispatch } from '@/hooks/common';
+import { getProjectCardThunk } from '@/reducers/projectCardSlice';
+import { TabsList } from '@/components/shared';
+import { useParams } from 'react-router-dom';
+import { INavigationItem } from '@/interfaces/common';
+import { ProjectCardBasics, ProjectCardTasks } from '@/components/ProjectCard';
+import { useTranslation } from 'react-i18next';
+import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
+import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
+import './styles.css';
 
 const ProjectCardView = () => {
   const dispatch = useAppDispatch();
-  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const { t } = useTranslation();
+  const { projectId } = useParams();
 
   useEffect(() => {
-    dispatch(getProjectCardsThunk()).then((res) => {
-      if (res.type.includes('rejected')) {
-        console.log('Call failed, do error stuff!');
-      }
-    });
-  }, [dispatch]);
+    dispatch(getProjectCardThunk(projectId || ''));
+  }, [dispatch, projectId]);
+
+  const tabItems: Array<INavigationItem> = [
+    { route: 'basics', label: t('basicInfo'), component: <ProjectCardBasics /> },
+    { route: 'tasks', label: t('tasks'), component: <ProjectCardTasks /> },
+  ];
 
   return (
-    <>
-      <Title size="xl" text="projectCard.projectCard" />
-      {projectCard && <Paragraph size="m" text="Project card fetched" />}
-      <Outlet />
-    </>
+    <div className="project-card-container">
+      <ProjectCardToolbar />
+      <ProjectCardHeader />
+      <TabsList tabItems={tabItems} />
+    </div>
   );
 };
 

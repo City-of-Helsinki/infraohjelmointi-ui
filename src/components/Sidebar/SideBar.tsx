@@ -1,20 +1,40 @@
-import React from 'react';
-import { SideNavigation } from 'hds-react/components/SideNavigation';
+import { INavigationItem } from '@/interfaces/common';
+import { IconPenLine } from 'hds-react/icons';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
 
 /**
- * TODO: Implement actual functionality, this is just a placeholder to help style the rest of the page
- */
+ * Custom Sidebar, since the HDS sidebar wasn't suited for our needs
+ **/
 const SideBar = () => {
+  const navigate = useNavigate();
+  const path = useLocation().pathname;
+  const { t } = useTranslation();
+
+  const projectId = '79786137-d73e-471b-a7a0-c366967b7158';
+
+  const navItems: Array<INavigationItem> = [
+    {
+      route: `project-card/${projectId}`,
+      label: t('projectCard'),
+      component: <IconPenLine />,
+    },
+  ];
+
   return (
-    <div className="sidebar-container">
-      <div className="sidebar-container-inner">
-        <SideNavigation
-          id="side-navigation-icons"
-          style={{ background: 'var(--color-silver-light)' }}
-          toggleButtonLabel=""
-        />
-      </div>
+    <div className="sidebar-container" data-testid="sidebar">
+      {navItems.map((n) => (
+        <button
+          className={`sidebar-button ${path.includes(n.route) ? 'selected' : ''}`}
+          onClick={() => navigate(n.route)}
+          aria-label={n.label}
+          key={n.route}
+          data-testid="button-testing"
+        >
+          {n.component}
+        </button>
+      ))}
     </div>
   );
 };

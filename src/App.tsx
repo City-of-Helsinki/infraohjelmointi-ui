@@ -1,18 +1,21 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Outlet } from 'react-router';
-import { Title } from '@/components/shared';
 import TopBar from '@/components/TopBar';
 import SideBar from '@/components/Sidebar';
+import Notification from '@/components/Notification';
+import Loader from '@/components/Loader';
 
 const App: FC = () => {
-  const unused = 'unused';
   return (
     <div>
-      <SideBar />
+      <Notification />
       <TopBar />
       <div className="app-content">
-        <Title size="xxl" text="appTitle" />
-        <Outlet />
+        <SideBar />
+        <div className="width-100-p" data-testid="app-outlet">
+          <Loader />
+          <Outlet />
+        </div>
       </div>
     </div>
   );

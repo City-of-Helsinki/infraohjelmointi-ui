@@ -1,0 +1,70 @@
+/* PROJECT CARD */
+.project-card-container {
+  width: 100%;
+}
+
+/* TOOLBAR */
+.project-card-toolbar-container {
+  height: var(--spacing-3-xl);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-m);
+  justify-content: space-between;
+}
+
+.project-card-toolbar-container .toolbar-item {
+  padding-right: var(--spacing-s);
+}
+
+.project-card-toolbar-container .display-flex button {
+  margin-left: var(--spacing-s);
+}
+
+/* PROJECT CARD */
+.project-card-header-container {
+  background: var(--color-bus);
+  padding: var(--spacing-2-xl) var(--spacing-layout-xl);
+}
+
+.project-card-header-container .header-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.project-card-header-container .progress-indicator-container {
+  max-width: 150px;
+  min-width: 150px;
+}
+
+.project-card-header-container .edit-name-form {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.project-card-header-container .header-column {
+  padding: 0 var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.project-card-header-container .favourite-button-container {
+  margin-bottom: var(--spacing-m);
+}
+
+.project-card-header-container .phase-dropdown {
+  width: 280px;
+}
+
+/* TABS */
+.custom-tab-list {
+  padding-left: 15%;
+  border-bottom: 1px solid var(--color-black-20);
+  z-index: 0;
+}
+
+/* CONTENT WRAPPED */
+.project-card-content-container {
+  margin: var(--spacing-layout-l) var(--spacing-layout-xl) 0 var(--spacing-layout-xl);
+}

@@ -1,15 +1,8 @@
 {
   "error": {
     "404": "404",
-    "pageNotFound": "Sivua ei löytynyt"
-  },
-  "projectCard": {
-    "projectCard": "Hankekortti",
-    "basicInfo": "Perustiedot",
-    "tasks": "Tehtävät"
-  },
-  "topBar": {
-    "programming": "Ohjelmointi"
+    "pageNotFound": "Sivua ei löytynyt",
+    "returnToPrevious": "Palaa edelliselle sivulle"
   },
   "lang": {
     "fi": "FI",
@@ -17,8 +10,35 @@
     "inFinnish": "Suomeksi",
     "inSwedish": "På Svenska"
   },
+  "nav": {
+    "search": "Haku",
+    "searchPage": "Hae sivulta",
+    "notifications": "Ilmoitukset",
+    "skipToContent": "Siirry kohteeseen",
+    "login": "Kirjaudu sisään"
+  },
+  "enums": {
+    "underConstruction": "Rakenteilla",
+    "proposal": "Hanke-ehdotus",
+    "design": "Yleissuunnittelu",
+    "programming": "Ohjelmointi",
+    "draftInitiation": "Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos",
+    "draftApproval": "Katu-/puistosuunnitelmaehdotus ja hyväksyminen",
+    "constructionPlan": "Rakennussuunnitelma",
+    "constructionWait": "Odottaa rakentamista",
+    "construction": "Rakentaminen",
+    "warrantyPeriod": "Takuuaika",
+    "completed": "Valmis / ylläpidossa"
+  },
   "appTitle": "Infraohjelmointi UI",
-  "search": "Haku",
-  "searchPage": "Hae sivulta",
-  "login": "Kirjaudu sisään"
+  "projectCard": "Hankekortti",
+  "basicInfo": "Perustiedot",
+  "tasks": "Tehtävät",
+  "new": "Uusi",
+  "shareProject": "Jaa hanke",
+  "projectPhase": "Hankkeen vaihe",
+  "removeFavourite": "Poista suosikeista",
+  "addFavourite": "Lisää suosikkeihin",
+  "inGroup": "Kuuluu ryhmään",
+  "closeNotification": "Sulje ilmoitus"
 }

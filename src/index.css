@@ -5,6 +5,24 @@ html {
 
 body {
   margin: 0;
+  width: 100%;
+}
+
+/* completely remove styling from the default button */
+button,
+input[type='submit'],
+input[type='reset'] {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+p {
+  margin: var(--spacing-2-xs) 0;
 }
 
 /* COLORS: https://hds.hel.fi/foundation/design-tokens/colour */
@@ -29,5 +47,40 @@ body {
 
 /* Margin to fit the sidebar, not final values */
 .app-content {
-  margin-left: 4rem;
+  width: 100%;
+  display: flex;
+  /* Hacky calc, since the TopBar has a 1px border bottom */
+  min-height: calc(100vh - calc(var(--spacing-5-xl) + 1px));
+}
+
+.text-black {
+  color: var(--color-black);
+}
+
+.text-white {
+  color: var(--color-white);
+}
+
+.margin-0 {
+  margin: 0;
+}
+
+.display-flex {
+  display: flex;
+}
+
+.pos-relative {
+  position: relative;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.width-100-p {
+  width: 100%;
+}
+
+.text-right {
+  text-align: right;
 }
