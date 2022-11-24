@@ -1,5 +1,7 @@
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
-import { getProjectCards } from '@/services/projectCardServices';
+import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
+import { RootState } from '@/store';
 import { IconPenLine } from 'hds-react/icons';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,12 +14,24 @@ import './styles.css';
 const SideBar = () => {
   const navigate = useNavigate();
   const path = useLocation().pathname;
-  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const projectCards = useAppSelector((state: RootState) => state.projectCard.projectCards);
   const [projectId, setProjectId] = useState('');
+  const { t } = useTranslation();
 
-  useEffect(function getProjectCardIds() {
-    getProjectCards().then((res) => setProjectId(res[0].id));
-  }, []);
+  useEffect(
+    function getProjectCards() {
+      dispatch(getProjectCardsThunk());
+    },
+    [dispatch],
+  );
+
+  useEffect(
+    function getProjectCardId() {
+      setProjectId((projectCards && projectCards[0].id) || '');
+    },
+    [projectCards],
+  );
 
   const navItems: Array<INavigationItem> = [
     {
@@ -35,7 +49,6 @@ const SideBar = () => {
           onClick={() => navigate(n.route)}
           aria-label={n.label}
           key={n.route}
-          data-testid="button-testing"
         >
           {n.component}
         </button>

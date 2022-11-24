@@ -5,7 +5,8 @@ import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-// import i18n from '@/i18n';
+import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -14,7 +15,7 @@ import { useForm } from 'react-hook-form';
  * @param control react-hook-form control to add to the fields
  * @returns IProjectCard
  */
-const getProjectBasicsFormFields = (control: HookFormControlType): Array<IForm> => {
+const getProjectBasicsFormFields = (control: HookFormControlType, translate: any): Array<IForm> => {
   const formFields = [
     {
       name: 'basicInfoTitle',
@@ -64,8 +65,8 @@ const getProjectBasicsFormFields = (control: HookFormControlType): Array<IForm> 
   const projectCardBasicsFormFields = formFields.map((ff) => ({
     ...ff,
     control: control,
-    // label: i18n.t(`projectCardBasicsForm.${ff.name}`),
-    label: `projectCardBasicsForm.${ff.name}`,
+    label: translate(`projectCardBasicsForm.${ff.name}`),
+    // label: `projectCardBasicsForm.${ff.name}`,
   }));
 
   return projectCardBasicsFormFields;
@@ -80,6 +81,8 @@ const getProjectBasicsFormFields = (control: HookFormControlType): Array<IForm> 
  * @returns control, handleSubmit, reset
  */
 export const useProjectCardBasicsForm = (projectCard?: IProjectCard | null) => {
+  const { t } = useTranslation();
+
   const defaultFormValues: IProjectCardBasicsForm = useMemo(
     () => ({
       type: projectCard?.type || '',
@@ -108,7 +111,7 @@ export const useProjectCardBasicsForm = (projectCard?: IProjectCard | null) => {
     [projectCard, defaultFormValues, reset],
   );
 
-  const formFields = getProjectBasicsFormFields(control);
+  const formFields = getProjectBasicsFormFields(control, t);
 
   return { control, handleSubmit, reset, formFields };
 };
