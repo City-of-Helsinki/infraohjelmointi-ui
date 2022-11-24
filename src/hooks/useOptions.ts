@@ -20,6 +20,9 @@ export const useOptions = (name?: ListType) => {
           case 'phase':
             setList(optionsFromRedux.projectPhases);
             break;
+          case 'area':
+            setList(optionsFromRedux.projectAreas);
+            break;
           default:
             setList([]);
         }
@@ -39,10 +42,12 @@ export const useOptions = (name?: ListType) => {
 
   const getOptionFromListItem = useMemo(
     () =>
-      (listItem?: IListItem): IOption => ({
-        label: listItem ? t(`enums.${listItem.value}`) : '',
-        value: listItem ? listItem.id : '',
-      }),
+      (listItem?: IListItem): IOption => {
+        return {
+          label: listItem ? t(`enums.${listItem.value}`) : '',
+          value: listItem ? listItem.id : '',
+        };
+      },
     [t],
   );
 

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import { useOptions } from './useOptions';
+import { IListItem, IOption } from '@/interfaces/common';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -48,7 +49,7 @@ const getProjectBasicsFormFields = (
       type: FormField.Text,
     },
     {
-      name: 'networkNumbers',
+      name: 'sapNetwork',
       type: FormField.NetworkNumbers,
     },
     {
@@ -58,7 +59,6 @@ const getProjectBasicsFormFields = (
     {
       name: 'hashTags',
       type: FormField.HashTags,
-      control: control,
     },
   ];
 
@@ -66,7 +66,6 @@ const getProjectBasicsFormFields = (
     ...ff,
     control: control,
     label: translate(`projectCardBasicsForm.${ff.name}`),
-    // label: `projectCardBasicsForm.${ff.name}`,
   }));
 
   return projectCardBasicsFormFields;
@@ -88,12 +87,11 @@ export const useProjectCardBasicsForm = (projectCard?: IProjectCard | null) => {
     () => ({
       type: getOptionFromListItem(projectCard?.type),
       description: projectCard?.description || '',
-      area: getOptionFromListItem(projectCard?.type) || '',
+      area: getOptionFromListItem(projectCard?.area),
       hkrId: projectCard?.hkrId || '',
       sapProject: projectCard?.sapProject || [''],
       sapNetwork: projectCard?.sapNetwork || [''],
       entityName: projectCard?.entityName || '',
-      networkNumbers: [],
       hashTags: projectCard?.hashTags || [''],
     }),
     [projectCard, getOptionFromListItem],

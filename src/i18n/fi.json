@@ -38,8 +38,15 @@
     "omaStadi": "OmaStadi",
     "projectArea": "Projektialue",
     "park": "Puisto tai taitorakenne",
-    "hakaniemi": "Hakaniemi",
-    "kaisaniemi": "Kaisaniemi"
+    "honkasuo": "Honkasuo",
+    "kalasatama": "Kalasatama",
+    "kruunuvuori": "Kruunuvuori",
+    "kuninkaantammi": "Kuinkaantammi",
+    "lansisatama": "Länsisatama",
+    "malminLentokenttaalue": "Malmin lentokenttäalue",
+    "pasila": "Pasila",
+    "ostersundom": "Östersundom",
+    "kruunuvuorenranta": "Kruunuvuorenranta"
   },
   "projectCardBasicsForm": {
     "basicInfoTitle": "Hankkeen perustiedot",

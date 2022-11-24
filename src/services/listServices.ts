@@ -14,3 +14,10 @@ export const getProjectPhases = async () => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getProjectAreas = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/project-areas/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};

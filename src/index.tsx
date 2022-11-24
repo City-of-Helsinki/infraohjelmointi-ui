@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { setupStore } from '@/store';
 import './index.css';
-import 'hds-core';
 import './i18n';
 
 import App from '@/App';

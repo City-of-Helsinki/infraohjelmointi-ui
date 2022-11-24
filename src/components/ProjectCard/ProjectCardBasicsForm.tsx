@@ -9,6 +9,7 @@ import { Button } from 'hds-react/components/Button';
 import { patchProjectCardThunk, postProjectCardThunk } from '@/reducers/projectCardSlice';
 import { useParams } from 'react-router-dom';
 import './styles.css';
+import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 
 const ProjectCardBasicsForm: FC = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
@@ -18,10 +19,15 @@ const ProjectCardBasicsForm: FC = () => {
 
   const onSubmit: SubmitHandler<IProjectCardBasicsForm> = async (form: IProjectCardBasicsForm) => {
     // Currently we're re-assigning a smaller object, because all the values do not work for the API yet
-    const data = {
-      // type: form.type,
+    const data: IProjectCardRequest = {
+      type: form.type.value,
       description: form.description,
       entityName: form.entityName,
+      hkrId: form.hkrId,
+      area: form.area.value,
+      hashTags: form.hashTags,
+      sapNetwork: form.sapNetwork,
+      sapProject: form.sapNetwork,
     };
 
     console.log('Formdata to be posted: ', form);

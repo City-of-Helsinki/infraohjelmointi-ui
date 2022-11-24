@@ -27,7 +27,6 @@ export interface IProjectCardBasicsForm {
   hkrId: string;
   sapProject: Array<string>;
   sapNetwork: Array<string>;
-  networkNumbers: [];
   hashTags: Array<string>;
 }
 

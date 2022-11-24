@@ -1,31 +1,36 @@
 import { IError, IListItem } from '@/interfaces/common';
-import { getProjectPhases, getProjectTypes } from '@/services/listServices';
+import { getProjectAreas, getProjectPhases, getProjectTypes } from '@/services/listServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IListState {
   projectTypes: Array<IListItem>;
   projectPhases: Array<IListItem>;
+  projectAreas: Array<IListItem>;
 }
 
 const initialState: IListState = {
   projectTypes: [],
   projectPhases: [],
+  projectAreas: [],
 };
 
-export const getProjectTypesThunk = createAsyncThunk('projectTypes/getAll', async (_, thunkAPI) => {
+export const getProjectTypesThunk = createAsyncThunk('projectTypes/get', async (_, thunkAPI) => {
   return await getProjectTypes()
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
 
-export const getProjectPhasesThunk = createAsyncThunk(
-  'projectPhases/getAll',
-  async (_, thunkAPI) => {
-    return await getProjectPhases()
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
+export const getProjectPhasesThunk = createAsyncThunk('projectPhases/get', async (_, thunkAPI) => {
+  return await getProjectPhases()
+    .then((res) => res)
+    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+});
+
+export const getProjectAreasThunk = createAsyncThunk('projectAreas/get', async (_, thunkAPI) => {
+  return await getProjectAreas()
+    .then((res) => res)
+    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+});
 
 export const listsSlice = createSlice({
   name: 'lists',
@@ -54,6 +59,19 @@ export const listsSlice = createSlice({
     );
     builder.addCase(
       getProjectPhasesThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // GET PROJECT AREAS
+    builder.addCase(
+      getProjectAreasThunk.fulfilled,
+      (state, action: PayloadAction<Array<IListItem>>) => {
+        return { ...state, projectAreas: action.payload };
+      },
+    );
+    builder.addCase(
+      getProjectAreasThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

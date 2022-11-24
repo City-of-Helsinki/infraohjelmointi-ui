@@ -45,6 +45,8 @@ const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => 
   const required = rules?.required ? true : false;
   const { options } = useOptions(name);
 
+  console.log('Options: ', options);
+
   return (
     <Controller
       name={name}

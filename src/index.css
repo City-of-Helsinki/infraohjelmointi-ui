@@ -1,5 +1,8 @@
-@import url('https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/HelsinkiGrotesk.css');
 @import '~hds-core/lib/utils/helpers.css';
+
+:root {
+  --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
+}
 
 html {
   font-size: 100%;
@@ -8,7 +11,7 @@ html {
 body {
   margin: 0;
   width: 100%;
-  font-family: var(--font-defaut);
+  font-family: var(--infra-font-default);
   font-size: var(--fontsize-body-m);
   color: var(--color-black-90);
   line-height: var(--lineheight-l);

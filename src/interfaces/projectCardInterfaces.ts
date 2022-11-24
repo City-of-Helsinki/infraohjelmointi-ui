@@ -36,7 +36,7 @@ export interface IProjectCard {
   updatedDate?: string;
   siteId?: IBudget;
   projectSet?: IProjectSet;
-  area?: IProjectArea;
+  area?: IListItem;
   personPlanning?: IPerson;
   personProgramming?: IPerson;
   personConstruction?: IPerson;
@@ -59,9 +59,14 @@ export interface IProjectCard {
 }
 
 export interface IProjectCardRequest {
-  // type: string;
+  type: string;
   description: string;
   entityName: string;
+  hkrId: string;
+  area: string;
+  hashTags: Array<string>;
+  sapProject: Array<string>;
+  sapNetwork: Array<string>;
 }
 
 export interface IProjectCardRequestObject {
