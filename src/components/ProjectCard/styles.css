@@ -17,6 +17,6 @@
   grid-row: 4 / 7; /* starts at row 4, end at 7 */
 }
 
-.basic-info-form #identifiers {
+.basic-info-form #hashTags {
   grid-column: 1/3;
 }

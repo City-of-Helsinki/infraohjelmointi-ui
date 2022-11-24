@@ -1,12 +1,11 @@
 import { FormField, HookFormControlType, IForm } from '@/interfaces/formInterfaces';
-import { ProjectArea, ProjectType } from '@/interfaces/projectCardInterfaces';
-import { getOptionsFromObject } from '@/utils/common';
 import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
+import { useOptions } from './useOptions';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -26,7 +25,6 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'type',
-      options: getOptionsFromObject(ProjectType, translate),
       rules: { required: 'Hankkeen tyyppi on pakollinen tieto' },
       type: FormField.Select,
     },
@@ -55,12 +53,11 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'area',
-      options: getOptionsFromObject(ProjectArea, translate),
       type: FormField.Select,
     },
     {
-      name: 'identifiers',
-      type: FormField.Identifiers,
+      name: 'hashTags',
+      type: FormField.HashTags,
       control: control,
     },
   ];
@@ -85,20 +82,21 @@ const getProjectBasicsFormFields = (
  */
 export const useProjectCardBasicsForm = (projectCard?: IProjectCard | null) => {
   const { t } = useTranslation();
+  const { getOptionFromListItem } = useOptions();
 
   const defaultFormValues: IProjectCardBasicsForm = useMemo(
     () => ({
-      type: projectCard?.type || '',
+      type: getOptionFromListItem(projectCard?.type),
       description: projectCard?.description || '',
-      area: projectCard?.area?.areaName || '',
+      area: getOptionFromListItem(projectCard?.type) || '',
       hkrId: projectCard?.hkrId || '',
-      sapProject: projectCard?.sapProject || '',
-      sapNetwork: projectCard?.sapNetwork || '',
+      sapProject: projectCard?.sapProject || [''],
+      sapNetwork: projectCard?.sapNetwork || [''],
       entityName: projectCard?.entityName || '',
       networkNumbers: [],
-      identifiers: [],
+      hashTags: projectCard?.hashTags || [''],
     }),
-    [projectCard],
+    [projectCard, getOptionFromListItem],
   );
 
   const { control, handleSubmit, reset } = useForm<IProjectCardBasicsForm>({

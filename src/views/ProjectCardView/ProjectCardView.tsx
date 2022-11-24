@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
 import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
 import './styles.css';
+import { getProjectPhasesThunk, getProjectTypesThunk } from '@/reducers/listsSlice';
 
 const ProjectCardView = () => {
   const dispatch = useAppDispatch();
@@ -18,6 +19,14 @@ const ProjectCardView = () => {
   useEffect(() => {
     dispatch(getProjectCardThunk(projectId || ''));
   }, [dispatch, projectId]);
+
+  useEffect(() => {
+    dispatch(getProjectTypesThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getProjectPhasesThunk());
+  }, [dispatch]);
 
   const navItems: Array<INavigationItem> = [
     { route: 'basics', label: t('basicInfo'), component: <ProjectCardBasics /> },

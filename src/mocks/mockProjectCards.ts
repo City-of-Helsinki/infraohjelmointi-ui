@@ -1,22 +1,26 @@
-import {
-  IProjectCard,
-  ProjectPhase,
-  ProjectPriority,
-  ProjectType,
-} from '@/interfaces/projectCardInterfaces';
+import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 
 const mockProjectCards: { data: Array<IProjectCard> } = {
   data: [
     {
       id: '79e6bc78-9fa2-49a1-aaad-b50030da170e',
       projectReadiness: 95,
-      type: ProjectType.Street,
-      priority: ProjectPriority.Medium,
-      phase: ProjectPhase.DraftInitiation,
+      type: {
+        id: 'cc37d0d2-2a8e-4368-b548-18de6d2a967b',
+        value: 'street',
+      },
+      priority: {
+        id: 'f55fb6ec-5c96-47d2-bc6b-8499eaf7e544',
+        value: 'medium',
+      },
+      phase: {
+        id: '81a46b1c-8b7d-4a32-b1fb-437624d8f618',
+        value: 'draftInitiation',
+      },
       hkrId: '2580',
       entityName: 'Entity Name',
-      sapProject: 'c0f2c791-e20f-45fe-afce-a9ba434f046e',
-      sapNetwork: '17b75067-42b6-42b9-b21a-7873093f84d0',
+      sapProject: ['c0f2c791-e20f-45fe-afce-a9ba434f046e'],
+      sapNetwork: ['17b75067-42b6-42b9-b21a-7873093f84d0'],
       name: 'Hakaniementori',
       description: 'Hakaniemen torilla tavataan.',
       programmed: true,

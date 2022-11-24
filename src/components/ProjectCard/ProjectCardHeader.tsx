@@ -5,35 +5,31 @@ import { Paragraph, ProgressCircle, IconButton } from '@/components/shared';
 import { IconFaceSmile, IconStar, IconStarFill } from 'hds-react/icons';
 import { Select } from 'hds-react/components/Select';
 import { useTranslation } from 'react-i18next';
-import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
-import { IOptionType, SelectCallback } from '@/interfaces/common';
-import { getOptionsFromObject } from '@/utils/common';
+import { IOption, SelectCallback } from '@/interfaces/common';
 import ProjectCardNameForm from './ProjectCardNameForm';
+import { useOptions } from '@/hooks/useOptions';
 
 interface IPhaseDropdown {
-  options: Array<IOptionType>;
-  selectedOption: string;
+  options: Array<IOption>;
+  value: IOption;
   onChange: SelectCallback;
 }
 
-const PhaseDropdown: FC<IPhaseDropdown> = ({ options, selectedOption, onChange }) => {
+const PhaseDropdown: FC<IPhaseDropdown> = ({ options, value, onChange }) => {
   const { t } = useTranslation();
 
   return (
     <>
-      {/* FIXME: this hack is here because HDS-Select component doesn't re-rendering the defaultValue */}
-      {selectedOption && (
-        <div>
-          <Select
-            label=""
-            defaultValue={{ label: t(`enums.${selectedOption}`) }}
-            icon={<IconFaceSmile />}
-            placeholder={t('projectPhase') || ''}
-            options={options}
-            onChange={onChange}
-          />
-        </div>
-      )}
+      <div>
+        <Select
+          label=""
+          value={value}
+          icon={<IconFaceSmile />}
+          placeholder={t('projectPhase') || ''}
+          options={options}
+          onChange={onChange}
+        />
+      </div>
     </>
   );
 };
@@ -41,10 +37,12 @@ const PhaseDropdown: FC<IPhaseDropdown> = ({ options, selectedOption, onChange }
 const ProjectCardHeader: FC = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const user = useAppSelector((state: RootState) => state.auth.user);
-  const { t } = useTranslation();
   const [favourite, setFavourite] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('');
   const [name, setName] = useState('');
+
+  const { options, getOptionFromListItem } = useOptions('phase');
+
+  const [selectedOption, setSelectedOption] = useState<IOption>({ label: '', value: '' });
 
   // Vars that will come from API
   const group = 'Hakaniemi';
@@ -55,11 +53,11 @@ const ProjectCardHeader: FC = () => {
         setFavourite(
           (user && projectCard.favPersons && projectCard.favPersons.includes(user.id)) || false,
         );
-        setSelectedOption(projectCard.phase);
         setName(projectCard.name);
+        setSelectedOption(getOptionFromListItem(projectCard?.phase));
       }
     },
-    [user, projectCard],
+    [user, projectCard, setSelectedOption, getOptionFromListItem],
   );
   return (
     <div className="project-card-header-container">
@@ -74,9 +72,9 @@ const ProjectCardHeader: FC = () => {
         <div className="center-wrapper">
           <ProjectCardNameForm name={name} onChange={(e) => setName(e.target.value)} />
           <PhaseDropdown
-            options={getOptionsFromObject(ProjectPhase, t)}
-            selectedOption={selectedOption}
-            onChange={(o) => setSelectedOption(o.label)}
+            options={options}
+            value={selectedOption}
+            onChange={(o) => setSelectedOption(o)}
           />
         </div>
       </div>

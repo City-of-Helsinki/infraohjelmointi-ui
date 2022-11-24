@@ -1,11 +1,17 @@
+@import url('https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/HelsinkiGrotesk.css');
+@import '~hds-core/lib/utils/helpers.css';
+
 html {
   font-size: 100%;
-  font-family: var(--font-defaut);
 }
 
 body {
   margin: 0;
   width: 100%;
+  font-family: var(--font-defaut);
+  font-size: var(--fontsize-body-m);
+  color: var(--color-black-90);
+  line-height: var(--lineheight-l);
 }
 
 /* completely remove styling from the default button */

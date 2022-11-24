@@ -1,15 +1,14 @@
-import { InputSizeType, IOptionType, SelectCallback } from '@/interfaces/common';
+import { InputSizeType, IOption, ListType, SelectCallback } from '@/interfaces/common';
 import { FC, forwardRef, Ref } from 'react';
 import { Control, Controller, FieldError, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select } from 'hds-react/components/Select';
-import { useTranslation } from 'react-i18next';
-import translationFI from '@/i18n/fi.json';
+import { useOptions } from '@/hooks/useOptions';
 
 interface IDropdownOptions {
-  options: Array<IOptionType> | undefined;
+  options: Array<IOption>;
   name: string;
-  value: IOptionType;
+  value: IOption;
   onChange: SelectCallback;
   label?: string;
   size?: InputSizeType;
@@ -18,64 +17,49 @@ interface IDropdownOptions {
   error?: FieldError;
 }
 
-const Dropdown: FC<IDropdownOptions> = forwardRef(
-  (
-    { options, onChange, label, size, required, value, onBlur, name, error },
-    ref: Ref<HTMLInputElement>,
-  ) => {
-    const { t } = useTranslation();
-
-    return (
-      <div className="input-wrapper" ref={ref} id={name} data-testid={name}>
-        <Select
-          className={`input-${size || 'l'}`}
-          label={label || ''}
-          id={label}
-          defaultValue={{ label: value ? t(`enums.${value}`) : '' }}
-          options={options || []}
-          onChange={onChange}
-          required={required}
-          onBlur={onBlur}
-          invalid={error ? true : false}
-          error={error?.message}
-        />
-      </div>
-    );
-  },
-);
+const Dropdown: FC<IDropdownOptions> = forwardRef((props, ref: Ref<HTMLInputElement>) => {
+  const { label, error, size, name, ...selectProps } = props;
+  return (
+    <div className="input-wrapper" ref={ref} id={name} data-testid={name}>
+      <Select
+        className={`input-${size || 'l'}`}
+        label={label || ''}
+        id={label}
+        invalid={error ? true : false}
+        error={error?.message}
+        {...selectProps}
+      />
+    </div>
+  );
+});
 
 interface ISelectFieldProps {
-  name: string;
+  name: ListType;
   label: string;
-  options: Array<IOptionType> | undefined;
+  options?: Array<IOption>;
   control: HookFormControlType;
   rules?: HookFormRulesType;
 }
 
-const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, options }) => {
+const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => {
   const required = rules?.required ? true : false;
-
-  // Since HDS-Select doesn't have the option for have a sepparate "value", we need to get the
-  // property key from our translation file when saving this to form
-  const getEnumKey = (label: string) =>
-    Object.keys(translationFI.enums).find(
-      (key) => translationFI.enums[key as keyof typeof translationFI.enums] === label,
-    );
+  const { options } = useOptions(name);
 
   return (
     <Controller
       name={name}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState }) => (
-        <Dropdown
-          {...field}
-          {...fieldState}
-          label={label}
-          required={required}
-          options={options}
-          onChange={(e) => field.onChange(getEnumKey(e.label))}
-        />
-      )}
+      render={({ field, fieldState }) => {
+        return (
+          <Dropdown
+            {...field}
+            {...fieldState}
+            label={label}
+            required={required}
+            options={options}
+          />
+        );
+      }}
       rules={rules}
     />
   );

@@ -1,11 +1,11 @@
 import { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
-import { IOptionType } from './common';
+import { IOption } from './common';
 
 export enum FormField {
   Select,
   Text,
   NetworkNumbers,
-  Identifiers,
+  HashTags,
   Title,
 }
 
@@ -15,21 +15,20 @@ export interface IForm {
   control: HookFormControlType;
   type: FormField;
   rules?: HookFormRulesType;
-  options?: Array<IOptionType>;
   required?: boolean;
   readOnly?: boolean;
 }
 
 export interface IProjectCardBasicsForm {
-  type: string;
+  type: IOption;
   entityName: string;
   description: string;
-  area: string;
+  area: IOption;
   hkrId: string;
-  sapProject: string;
-  sapNetwork: string;
+  sapProject: Array<string>;
+  sapNetwork: Array<string>;
   networkNumbers: [];
-  identifiers: [];
+  hashTags: Array<string>;
 }
 
 export type HookFormControlType =

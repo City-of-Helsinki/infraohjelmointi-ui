@@ -11,8 +11,9 @@ export interface INavigationItem {
   component?: ReactNode;
 }
 
-export interface IOptionType {
+export interface IOption {
   label: string;
+  value: string;
 }
 
 export interface INotification {
@@ -22,9 +23,16 @@ export interface INotification {
   title?: string;
 }
 
+export interface IListItem {
+  id: string;
+  value: string;
+}
+
+export type ListType = 'type' | 'phase';
+
 export type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';
-export type SelectCallback = (selected: IOptionType) => void;
+export type SelectCallback = (selected: IOption) => void;
 export type TextColorType = 'black' | 'white';
 export type FontWeightType = 'bold' | 'light';
 export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';

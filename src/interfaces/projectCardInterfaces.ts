@@ -1,14 +1,16 @@
+import { IListItem } from './common';
+
 export interface IProjectCard {
   id: string;
   projectReadiness: number;
   hkrId: string;
-  sapProject: string;
-  sapNetwork: string;
-  type: ProjectType;
+  sapProject: Array<string>;
+  sapNetwork: Array<string>;
+  type: IListItem;
   name: string;
   entityName: string;
   description: string;
-  phase: ProjectPhase;
+  phase: IListItem;
   programmed: boolean;
   constructionPhaseDetail: string;
   estPlanningStartYear?: string;
@@ -26,7 +28,7 @@ export interface IProjectCard {
   realizedCost: string;
   spentCost: string;
   riskAssess: string;
-  priority: ProjectPriority;
+  priority: IListItem;
   locked: boolean;
   comments: string;
   delays: string;
@@ -39,7 +41,7 @@ export interface IProjectCard {
   personProgramming?: IPerson;
   personConstruction?: IPerson;
   favPersons?: Array<string>;
-  hashTags?: null;
+  hashTags?: Array<string>;
   budgetForecast1CurrentYear?: string;
   budgetForecast2CurrentYear?: string;
   budgetForecast3CurrentYear?: string;
@@ -117,7 +119,7 @@ interface IProjectSet {
   name: string;
   hkrId: string;
   description: string;
-  projectPhase: ProjectPhase;
+  projectPhase: IListItem;
   programmed: boolean;
   responsiblePerson: IPerson;
 }
