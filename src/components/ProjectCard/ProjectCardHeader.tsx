@@ -41,7 +41,7 @@ const PhaseDropdown: FC<IPhaseDropdown> = ({ options, selectedOption, onChange }
 const ProjectCardHeader: FC = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const user = useAppSelector((state: RootState) => state.auth.user);
-
+  const { t } = useTranslation();
   const [favourite, setFavourite] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
   const [name, setName] = useState('');
@@ -74,7 +74,7 @@ const ProjectCardHeader: FC = () => {
         <div className="center-wrapper">
           <ProjectCardNameForm name={name} onChange={(e) => setName(e.target.value)} />
           <PhaseDropdown
-            options={getOptionsFromObject(ProjectPhase)}
+            options={getOptionsFromObject(ProjectPhase, t)}
             selectedOption={selectedOption}
             onChange={(o) => setSelectedOption(o.label)}
           />

@@ -7,6 +7,7 @@ import { renderWithProviders } from '@/utils/testUtils';
 import ProjectCardBasicsForm from './ProjectCardBasicsForm';
 import { getOptionsFromObject, matchExact } from '@/utils/common';
 import { IProjectCard, ProjectType } from '@/interfaces/projectCardInterfaces';
+import { useTranslation } from 'react-i18next';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -69,8 +70,10 @@ describe('ProjectCardBasicsForm', () => {
         store,
       },
     );
+
+    const { t } = useTranslation();
     const projectCard = store.getState().projectCard.selectedProjectCard;
-    const typeOptions = getOptionsFromObject(ProjectType);
+    const typeOptions = getOptionsFromObject(ProjectType, t);
     const selectedOption = `enums.${projectCard?.type}`;
     const newOption = 'enums.traffic';
 

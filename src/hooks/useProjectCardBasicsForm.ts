@@ -5,8 +5,8 @@ import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import i18n from '@/i18n';
 import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -15,7 +15,10 @@ import { useTranslation } from 'react-i18next';
  * @param control react-hook-form control to add to the fields
  * @returns IProjectCard
  */
-const getProjectBasicsFormFields = (control: HookFormControlType, translate: any): Array<IForm> => {
+const getProjectBasicsFormFields = (
+  control: HookFormControlType,
+  translate: TFunction<'translation', undefined>,
+): Array<IForm> => {
   const formFields = [
     {
       name: 'basicInfoTitle',
@@ -23,7 +26,7 @@ const getProjectBasicsFormFields = (control: HookFormControlType, translate: any
     },
     {
       name: 'type',
-      options: getOptionsFromObject(ProjectType),
+      options: getOptionsFromObject(ProjectType, translate),
       rules: { required: 'Hankkeen tyyppi on pakollinen tieto' },
       type: FormField.Select,
     },
@@ -52,7 +55,7 @@ const getProjectBasicsFormFields = (control: HookFormControlType, translate: any
     },
     {
       name: 'area',
-      options: getOptionsFromObject(ProjectArea),
+      options: getOptionsFromObject(ProjectArea, translate),
       type: FormField.Select,
     },
     {
