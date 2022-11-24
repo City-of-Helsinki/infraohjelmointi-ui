@@ -5,7 +5,7 @@ import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import i18n from '@/i18n';
+// import i18n from '@/i18n';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -64,7 +64,8 @@ const getProjectBasicsFormFields = (control: HookFormControlType): Array<IForm> 
   const projectCardBasicsFormFields = formFields.map((ff) => ({
     ...ff,
     control: control,
-    label: i18n.t(`projectCardBasicsForm.${ff.name}`),
+    // label: i18n.t(`projectCardBasicsForm.${ff.name}`),
+    label: `projectCardBasicsForm.${ff.name}`,
   }));
 
   return projectCardBasicsFormFields;

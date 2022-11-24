@@ -31,8 +31,8 @@ describe('TopBar', () => {
   it.skip('render username if user is found', () => {
     const store = setupStore();
     store.dispatch(setUser(mockUser));
-    const { getByText } = renderWithProviders(<TopBar />);
+    const { getByText } = renderWithProviders(<TopBar />, { store });
 
-    expect(getByText(matchExact(mockUser.username))).toBeInTheDocument();
+    expect(getByText(matchExact(`${mockUser.firstName} ${mockUser.lastName}`))).toBeInTheDocument();
   });
 });

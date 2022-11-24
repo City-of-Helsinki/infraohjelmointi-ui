@@ -40,10 +40,13 @@ describe('ProjectCardHeader', () => {
   it('renders all component wrappers', () => {
     const { container } = renderResult;
 
-    expect(container.getElementsByClassName('header-column').length).toBe(2);
     expect(container.getElementsByClassName('project-card-header-container').length).toBe(1);
-    expect(container.getElementsByClassName('header-row').length).toBe(1);
-    expect(container.getElementsByClassName('header-row')[0].childElementCount).toBe(2);
+    expect(container.getElementsByClassName('left').length).toBe(1);
+    expect(container.getElementsByClassName('left-wrapper').length).toBe(1);
+    expect(container.getElementsByClassName('center').length).toBe(1);
+    expect(container.getElementsByClassName('center-wrapper').length).toBe(1);
+    expect(container.getElementsByClassName('right').length).toBe(1);
+    expect(container.getElementsByClassName('right-wrapper').length).toBe(1);
   });
 
   it('renders all left side elements', async () => {

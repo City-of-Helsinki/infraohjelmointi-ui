@@ -7,6 +7,7 @@ import {
   postProjectCard,
 } from '@/services/projectCardServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { notifySuccess } from './notificationSlice';
 
 interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
@@ -48,7 +49,16 @@ export const patchProjectCardThunk = createAsyncThunk(
   'projectCard/patch',
   async (request: IProjectCardRequestObject, thunkAPI) => {
     return await patchProjectCard(request)
-      .then((res) => res)
+      .then((res) => {
+        thunkAPI.dispatch(
+          notifySuccess({
+            title: 'Lähetys onnistui',
+            message: 'Lomake tallennettu onnistuneesti.',
+            type: 'toast',
+          }),
+        );
+        return res;
+      })
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );

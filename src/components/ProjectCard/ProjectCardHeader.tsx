@@ -52,7 +52,9 @@ const ProjectCardHeader: FC = () => {
   useEffect(
     function onProjectCardChanges() {
       if (projectCard) {
-        setFavourite((user && projectCard.favPersons.includes(user.id)) || false);
+        setFavourite(
+          (user && projectCard.favPersons && projectCard.favPersons.includes(user.id)) || false,
+        );
         setSelectedOption(projectCard.phase);
         setName(projectCard.name);
       }

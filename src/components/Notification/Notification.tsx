@@ -4,16 +4,13 @@ import { RootState } from '@/store';
 import { FC } from 'react';
 import { clearNotification } from '@/reducers/notificationSlice';
 import { useTranslation } from 'react-i18next';
+import './styles.css';
 
 const Notification: FC = () => {
   const dispatch = useAppDispatch();
   const notifications = useAppSelector((state: RootState) => state.notifications);
   const { t } = useTranslation();
 
-  /**
-   * Notifications are placed in a centered absolute container
-   * in order to make multiple stack ontop of eachother
-   */
   return (
     <>
       {notifications.length > 0 && (
@@ -22,9 +19,11 @@ const Notification: FC = () => {
             <div key={n.id} className="notification-wrapper">
               <HDSNotification
                 label={n.title}
-                type={n.type || undefined}
+                type={n.color || undefined}
                 dismissible
-                position="inline"
+                position={n.type === 'toast' ? 'top-right' : 'inline'}
+                autoClose={n.type === 'toast'}
+                autoCloseDuration={2500}
                 closeButtonLabelText={t('closeNotification') || ''}
                 onClose={() => dispatch(clearNotification(n.id || 0))}
               >

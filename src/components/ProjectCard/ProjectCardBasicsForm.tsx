@@ -24,11 +24,14 @@ const ProjectCardBasicsForm: FC = () => {
       entityName: form.entityName,
     };
 
+    console.log('Formdata to be posted: ', form);
+
     if (projectId) {
       dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {
         console.log('PATCH response: ', res);
       });
     } else {
+      // creation of new project cards isn't fully documented yet
       dispatch(postProjectCardThunk({ data })).then((res) => {
         console.log('POST response: ', res);
       });
@@ -38,10 +41,8 @@ const ProjectCardBasicsForm: FC = () => {
   return (
     <div className="basics-form">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="display-flex">
-          <div className="basic-info-form">
-            <FormFieldCreator form={formFields} />
-          </div>
+        <div className="basic-info-form">
+          <FormFieldCreator form={formFields} />
         </div>
         <Button type="submit">Lähetä</Button>
       </form>

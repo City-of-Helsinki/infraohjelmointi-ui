@@ -24,8 +24,9 @@ const Dropdown: FC<IDropdownOptions> = forwardRef(
     ref: Ref<HTMLInputElement>,
   ) => {
     const { t } = useTranslation();
+
     return (
-      <div className="input-wrapper" ref={ref} id={name}>
+      <div className="input-wrapper" ref={ref} id={name} data-testid={name}>
         <Select
           className={`input-${size || 'l'}`}
           label={label || ''}

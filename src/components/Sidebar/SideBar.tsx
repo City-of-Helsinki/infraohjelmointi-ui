@@ -1,5 +1,7 @@
 import { INavigationItem } from '@/interfaces/common';
+import { getProjectCards } from '@/services/projectCardServices';
 import { IconPenLine } from 'hds-react/icons';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
@@ -11,8 +13,11 @@ const SideBar = () => {
   const navigate = useNavigate();
   const path = useLocation().pathname;
   const { t } = useTranslation();
+  const [projectId, setProjectId] = useState('');
 
-  const projectId = '050ea5d5-4a12-49d1-97b3-4d5be3d944eb';
+  useEffect(function getProjectCardIds() {
+    getProjectCards().then((res) => setProjectId(res[0].id));
+  }, []);
 
   const navItems: Array<INavigationItem> = [
     {

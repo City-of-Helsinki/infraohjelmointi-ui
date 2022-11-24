@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import Notification from './Notification';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
-import { clearNotification, setNotification } from '@/reducers/notificationSlice';
+import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
 
@@ -16,7 +16,7 @@ describe('Notification', () => {
 
   it('renders a notification if dispatched', () => {
     const store = setupStore();
-    store.dispatch(setNotification(mockNotification));
+    store.dispatch(notifyInfo(mockNotification));
     const { container, getByText, getByRole } = renderWithProviders(<Notification />, { store });
 
     expect(container.getElementsByClassName('notifications-container').length).toBe(1);
@@ -29,7 +29,7 @@ describe('Notification', () => {
 
   it.skip('is destroyed if notification is cleared', async () => {
     const store = setupStore();
-    store.dispatch(setNotification(mockNotification));
+    store.dispatch(notifyInfo(mockNotification));
     const { queryByText, getByText } = renderWithProviders(<Notification />, { store });
 
     Object.values(mockNotification).forEach((v) => {

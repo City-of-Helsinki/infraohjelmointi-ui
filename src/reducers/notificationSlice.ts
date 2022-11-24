@@ -1,17 +1,33 @@
-import { INotification } from '@/interfaces/common';
+import { INotification, NotificationColorType } from '@/interfaces/common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface INotificationState extends INotification {
   id: number;
+  color: NotificationColorType;
 }
 const initialState: Array<INotificationState> = [];
+
+const setNotification = (
+  notification: INotification,
+  id: number,
+  color: NotificationColorType,
+): INotificationState => {
+  notification.type = notification.type || 'notification';
+  return { id, color, ...notification };
+};
 
 export const notificationSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
-    setNotification(state, action: PayloadAction<INotification>) {
-      state.push({ id: state.length, ...action.payload });
+    notifySuccess(state, action: PayloadAction<INotification>) {
+      state.push(setNotification(action.payload, state.length, 'success'));
+    },
+    notifyError(state, action: PayloadAction<INotification>) {
+      state.push(setNotification(action.payload, state.length, 'error'));
+    },
+    notifyInfo(state, action: PayloadAction<INotification>) {
+      state.push(setNotification(action.payload, state.length, 'info'));
     },
     clearNotification(state, action: PayloadAction<number>) {
       return state.filter((s) => s.id !== action.payload);
@@ -19,5 +35,7 @@ export const notificationSlice = createSlice({
   },
 });
 
-export const { setNotification, clearNotification } = notificationSlice.actions;
+export const { notifySuccess, notifyError, notifyInfo, clearNotification } =
+  notificationSlice.actions;
+
 export default notificationSlice.reducer;

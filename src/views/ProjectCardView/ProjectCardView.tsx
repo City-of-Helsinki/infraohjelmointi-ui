@@ -4,7 +4,7 @@ import { getProjectCardThunk } from '@/reducers/projectCardSlice';
 import { TabList } from '@/components/shared';
 import { useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
-import { ProjectCardBasics, ProjectCardTasks } from '@/components/ProjectCard';
+import { ProjectCardBasics } from '@/components/ProjectCard';
 import { useTranslation } from 'react-i18next';
 import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
 import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
@@ -21,7 +21,6 @@ const ProjectCardView = () => {
 
   const navItems: Array<INavigationItem> = [
     { route: 'basics', label: t('basicInfo'), component: <ProjectCardBasics /> },
-    { route: 'tasks', label: t('tasks'), component: <ProjectCardTasks /> },
   ];
 
   return (
