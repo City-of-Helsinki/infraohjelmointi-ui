@@ -12,7 +12,7 @@ const SideBar = () => {
   const path = useLocation().pathname;
   const { t } = useTranslation();
 
-  const projectId = '79786137-d73e-471b-a7a0-c366967b7158';
+  const projectId = 'd9b0f06d-161f-466a-bf43-fec866b2c6b7';
 
   const navItems: Array<INavigationItem> = [
     {
