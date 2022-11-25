@@ -88,10 +88,10 @@ const useProjectCardBasicsValues = () => {
       description: projectCard?.description || '',
       area: listItemToOption(projectCard?.area),
       hkrId: projectCard?.hkrId || '',
-      sapProject: projectCard?.sapProject || [''],
-      sapNetwork: projectCard?.sapNetwork || [''],
+      sapProject: projectCard?.sapProject || [],
+      sapNetwork: projectCard?.sapNetwork || [],
       entityName: projectCard?.entityName || '',
-      hashTags: projectCard?.hashTags || [''],
+      hashTags: projectCard?.hashTags || [],
     }),
     [projectCard, listItemToOption],
   );

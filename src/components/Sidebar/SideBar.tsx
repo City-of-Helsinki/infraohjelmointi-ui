@@ -28,14 +28,16 @@ const SideBar = () => {
 
   useEffect(
     function getProjectCardId() {
-      setProjectId((projectCards && projectCards[0].id) || '');
+      if (projectCards && projectCards?.length > 0) {
+        setProjectId((projectCards && projectCards[0].id) || '');
+      }
     },
     [projectCards],
   );
 
   const navItems: Array<INavigationItem> = [
     {
-      route: `project-card/${projectId}`,
+      route: `${projectId}`,
       label: t('projectCard'),
       component: <IconPenLine />,
     },

@@ -32,12 +32,18 @@ const router = createBrowserRouter([
     errorElement: <ErrorView />,
     children: [
       {
-        path: 'project-card/:projectId',
+        path: 'project-card/',
         element: <ProjectCardView />,
         children: [
           {
-            path: 'basics',
-            element: <ProjectCardBasics />,
+            path: ':projectId/',
+            element: <ProjectCardView />,
+            children: [
+              {
+                path: 'basics/',
+                element: <ProjectCardBasics />,
+              },
+            ],
           },
         ],
       },

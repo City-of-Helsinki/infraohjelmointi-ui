@@ -20,7 +20,8 @@ interface ITagsDialogProps {
  */
 const TagsDialog: FC<ITagsDialogProps> = forwardRef(
   ({ name, label, value, onChange }, ref: Ref<HTMLDivElement>) => {
-    const [tags, setTags] = useState(['']);
+    const [tags, setTags] = useState<Array<string>>([]);
+    const [allTags, setAllTags] = useState(tempTags);
     const [isOpen, setIsOpen] = useState(false);
 
     const { Header, Content, ActionButtons } = Dialog;
@@ -32,15 +33,31 @@ const TagsDialog: FC<ITagsDialogProps> = forwardRef(
       }
     }, [value]);
 
+    useEffect(() => {
+      setAllTags(allTags.filter((tag) => tags.indexOf(tag) === -1));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tags]);
+
+    const onTagDelete = (t: string) => {
+      setTags(tags.filter((tag) => tag !== t));
+      setAllTags([...allTags, t]);
+    };
+
     const onEdit = (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       setIsOpen(!isOpen);
     };
 
+    const onTagClick = (tag: string) => {
+      setTags([...tags, tag]);
+    };
+
     const onSaveTags = () => {
-      onChange(tags.filter((t) => t));
+      onChange(tags);
       setIsOpen(!isOpen);
     };
+
+    const onChangeOpen = () => setIsOpen(!isOpen);
 
     return (
       <div className="input-wrapper" id={name} ref={ref}>
@@ -49,7 +66,7 @@ const TagsDialog: FC<ITagsDialogProps> = forwardRef(
             id="tags-dialog"
             aria-labelledby={label}
             isOpen={isOpen}
-            close={() => setIsOpen(!isOpen)}
+            close={onChangeOpen}
             closeButtonLabelText="Sulje "
             className="tags-dialog"
           >
@@ -60,10 +77,7 @@ const TagsDialog: FC<ITagsDialogProps> = forwardRef(
                 <div className="added-tags-title-container">
                   <Title size="xs" text="Hankkeen tunnisteet" />
                 </div>
-                <TagsContainer
-                  tags={tags}
-                  onDelete={(t) => setTags(tags.filter((tag) => tag !== t))}
-                />
+                <TagsContainer tags={tags} onDelete={onTagDelete} />
               </div>
             </Content>
             <hr />
@@ -78,14 +92,14 @@ const TagsDialog: FC<ITagsDialogProps> = forwardRef(
                     Hae tunnisteita tai luo uusi
                   </Button>
                 </div>
-                <TagsContainer tags={tempTags} onClick={(t) => setTags([...tags, t])} />
+                <TagsContainer tags={allTags} onClick={onTagClick} />
               </div>
             </Content>
             <ActionButtons>
-              <Button onClick={() => onSaveTags()}>Tallenna</Button>
+              <Button onClick={onSaveTags}>Tallenna</Button>
             </ActionButtons>
           </Dialog>
-          <PenAndLabelButton text={'Tunnisteet'} onClick={(e) => onEdit(e)} />
+          <PenAndLabelButton text={'Tunnisteet'} onClick={onEdit} />
           <TagsContainer tags={value} />
         </div>
       </div>
