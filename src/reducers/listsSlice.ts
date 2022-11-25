@@ -2,16 +2,16 @@ import { IError, IListItem } from '@/interfaces/common';
 import { getProjectAreas, getProjectPhases, getProjectTypes } from '@/services/listServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface IListState {
-  projectTypes: Array<IListItem>;
-  projectPhases: Array<IListItem>;
-  projectAreas: Array<IListItem>;
+export interface IListState {
+  type: Array<IListItem>;
+  phase: Array<IListItem>;
+  area: Array<IListItem>;
 }
 
 const initialState: IListState = {
-  projectTypes: [],
-  projectPhases: [],
-  projectAreas: [],
+  type: [],
+  phase: [],
+  area: [],
 };
 
 export const getProjectTypesThunk = createAsyncThunk('projectTypes/get', async (_, thunkAPI) => {
@@ -41,7 +41,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectTypesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, projectTypes: action.payload };
+        return { ...state, type: action.payload };
       },
     );
     builder.addCase(
@@ -54,7 +54,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectPhasesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, projectPhases: action.payload };
+        return { ...state, phase: action.payload };
       },
     );
     builder.addCase(
@@ -67,7 +67,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectAreasThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, projectAreas: action.payload };
+        return { ...state, area: action.payload };
       },
     );
     builder.addCase(

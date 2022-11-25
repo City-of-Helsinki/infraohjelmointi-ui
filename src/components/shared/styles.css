@@ -82,3 +82,57 @@
   font-weight: 500;
   font-size: var(--fontsize-body-m);
 }
+
+.tags-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+}
+
+.tags-dialog {
+  width: 65%;
+}
+
+.tags-dialog h2 {
+  font-size: var(--fontsize-heading-s);
+  font-weight: 500;
+  margin: var(--spacing-2-xs) 0 var(--spacing-m) 0;
+}
+
+.tags-dialog .tags-content-container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-m) 0 var(--spacing-xs) 0;
+}
+
+.tags-dialog .added-tags-title-container {
+  margin-bottom: var(--spacing-s);
+}
+
+.tags-dialog .all-tags-title-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tags-dialog .all-tags-container {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-l) 0;
+}
+
+.tags-dialog .text-button {
+  font-weight: bold;
+  text-decoration: underline;
+  color: var(--color-bus);
+}
+
+.tags-dialog hr {
+  border-top: 1px solid;
+  margin: 0;
+}
+
+.tags-container .tag-wrapper {
+  margin: 0 var(--spacing-xs) var(--spacing-xs) 0;
+}

@@ -40,7 +40,7 @@ const ProjectCardHeader: FC = () => {
   const [favourite, setFavourite] = useState(false);
   const [name, setName] = useState('');
 
-  const { options, getOptionFromListItem } = useOptions('phase');
+  const { options, listItemToOption } = useOptions('phase');
 
   const [selectedOption, setSelectedOption] = useState<IOption>({ label: '', value: '' });
 
@@ -54,10 +54,10 @@ const ProjectCardHeader: FC = () => {
           (user && projectCard.favPersons && projectCard.favPersons.includes(user.id)) || false,
         );
         setName(projectCard.name);
-        setSelectedOption(getOptionFromListItem(projectCard?.phase));
+        setSelectedOption(listItemToOption(projectCard?.phase));
       }
     },
-    [user, projectCard, setSelectedOption, getOptionFromListItem],
+    [user, projectCard, setSelectedOption, listItemToOption],
   );
   return (
     <div className="project-card-header-container">

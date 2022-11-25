@@ -3,8 +3,8 @@ import PenAndLabelButton from './PenAndLabelButton';
 import Span from './Span';
 
 /**
- * TODO: this should be its own generic form component.
- * We still don't know how this should work when editing, so this doesn't have its own generic form-component yet.
+ * We still don't know how this should work when editing,
+ * so this doesn't have its own generic form-component yet.
  */
 const NetworkNumbers = ({ name }: { name: string }) => {
   const networkNumbers: Array<{ label: string; value: string }> = [];

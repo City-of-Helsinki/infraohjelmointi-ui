@@ -2,7 +2,7 @@ import { ListType } from '@/interfaces/common';
 import { FormField, IForm } from '@/interfaces/formInterfaces';
 import { FC } from 'react';
 import FormSectionTitle from './FormSectionTitle';
-import HashTags from './HashTags';
+import TagsForm from './TagsForm';
 import NetworkNumbers from './NetworkNumbers';
 import SelectField from './SelectField';
 import TextField from './TextField';
@@ -25,8 +25,8 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <FormSectionTitle key={f.name} label={f.label} />;
           case FormField.NetworkNumbers:
             return <NetworkNumbers key={f.name} name={f.name} />;
-          case FormField.HashTags:
-            return <HashTags key={f.name} name={f.name} />;
+          case FormField.TagsForm:
+            return <TagsForm key={f.name} name={f.name} {...formProps} />;
           default:
             return null;
         }

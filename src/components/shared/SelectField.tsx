@@ -17,7 +17,7 @@ interface IDropdownOptions {
   error?: FieldError;
 }
 
-const Dropdown: FC<IDropdownOptions> = forwardRef((props, ref: Ref<HTMLInputElement>) => {
+const Dropdown: FC<IDropdownOptions> = forwardRef((props, ref: Ref<HTMLDivElement>) => {
   const { label, error, size, name, ...selectProps } = props;
   return (
     <div className="input-wrapper" ref={ref} id={name} data-testid={name}>
@@ -42,10 +42,8 @@ interface ISelectFieldProps {
 }
 
 const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => {
-  const required = rules?.required ? true : false;
+  const required = rules?.required === true;
   const { options } = useOptions(name);
-
-  console.log('Options: ', options);
 
   return (
     <Controller

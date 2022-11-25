@@ -5,7 +5,7 @@ export enum FormField {
   Select,
   Text,
   NetworkNumbers,
-  HashTags,
+  TagsForm,
   Title,
 }
 
@@ -28,6 +28,11 @@ export interface IProjectCardBasicsForm {
   sapProject: Array<string>;
   sapNetwork: Array<string>;
   hashTags: Array<string>;
+}
+
+export interface ISomeOtherForm {
+  name: string;
+  phone: number;
 }
 
 export type HookFormControlType =

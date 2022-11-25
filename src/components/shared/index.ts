@@ -12,4 +12,4 @@ export { default as FormFieldCreator } from './FormFieldCreator';
 export { default as FormSectionTitle } from './FormSectionTitle';
 export { default as PenAndLabelButton } from './PenAndLabelButton';
 export { default as NetworkNumbers } from './NetworkNumbers';
-export { default as HashTags } from './HashTags';
+export { default as HashTags } from './TagsForm';

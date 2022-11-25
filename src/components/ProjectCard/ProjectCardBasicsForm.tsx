@@ -1,36 +1,28 @@
 import useProjectCardBasicsForm from '@/hooks/useProjectCardBasicsForm';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppDispatch } from '@/hooks/common';
 import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
-import { RootState } from '@/store';
 import { FC } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
 import { patchProjectCardThunk, postProjectCardThunk } from '@/reducers/projectCardSlice';
 import { useParams } from 'react-router-dom';
-import './styles.css';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
+import './styles.css';
 
 const ProjectCardBasicsForm: FC = () => {
-  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const dispatch = useAppDispatch();
   const { projectId } = useParams();
-  const { handleSubmit, formFields } = useProjectCardBasicsForm(projectCard);
+  const { handleSubmit, formFields } = useProjectCardBasicsForm();
 
   const onSubmit: SubmitHandler<IProjectCardBasicsForm> = async (form: IProjectCardBasicsForm) => {
-    // Currently we're re-assigning a smaller object, because all the values do not work for the API yet
-    const data: IProjectCardRequest = {
-      type: form.type.value,
-      description: form.description,
-      entityName: form.entityName,
-      hkrId: form.hkrId,
-      area: form.area.value,
-      hashTags: form.hashTags,
-      sapNetwork: form.sapNetwork,
-      sapProject: form.sapNetwork,
-    };
+    const { type, area, ...formData } = form;
 
-    console.log('Formdata to be posted: ', form);
+    const data: IProjectCardRequest = {
+      type: type.value,
+      area: area.value,
+      ...formData,
+    };
 
     if (projectId) {
       dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {

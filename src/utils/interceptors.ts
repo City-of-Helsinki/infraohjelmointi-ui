@@ -31,12 +31,16 @@ axios.interceptors.response.use(
 );
 
 const handleRequest = (req: AxiosRequestConfig) => {
-  store.dispatch(setLoading('Loading request'));
+  if (!store.getState().loading.isLoading) {
+    store.dispatch(setLoading('Loading request'));
+  }
   return req;
 };
 
 const handleResponse = (res: AxiosResponse) => {
-  store.dispatch(clearLoading());
+  if (store.getState().loading.isLoading) {
+    store.dispatch(clearLoading());
+  }
   return res;
 };
 

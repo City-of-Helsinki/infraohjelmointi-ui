@@ -1,12 +1,12 @@
 import { FormField, HookFormControlType, IForm } from '@/interfaces/formInterfaces';
 import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
-import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import { useOptions } from './useOptions';
-import { IListItem, IOption } from '@/interfaces/common';
+import { useAppSelector } from './common';
+import { RootState } from '@/store';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -26,7 +26,7 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'type',
-      rules: { required: 'Hankkeen tyyppi on pakollinen tieto' },
+      rules: { required: 'Hankkeen tyyppi on pakollinen tieto.' },
       type: FormField.Select,
     },
     {
@@ -37,6 +37,7 @@ const getProjectBasicsFormFields = (
     {
       name: 'entityName',
       type: FormField.Text,
+      rules: { maxLength: { value: 30, message: 'Nimi voi olla enintään 30 merkkiä.' } },
     },
     {
       name: 'sapProject',
@@ -45,7 +46,7 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'description',
-      rules: { required: 'Kuvaus on pakollinen tieto' },
+      rules: { required: 'Kuvaus on pakollinen tieto.' },
       type: FormField.Text,
     },
     {
@@ -58,7 +59,7 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'hashTags',
-      type: FormField.HashTags,
+      type: FormField.TagsForm,
     },
   ];
 
@@ -72,47 +73,62 @@ const getProjectBasicsFormFields = (
 };
 
 /**
- * This hook initializes a react-hook-form control using an optional projectCard parameter to map the values.
+ * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
+ * projectCard which can be needed to check for updates.
  *
- * It will keep the form up to date with the given projectCard if it changes.
- *
- * @param projectCard any ProjectCard
- * @returns control, handleSubmit, reset
+ * @returns formValues, projectCard
  */
-export const useProjectCardBasicsForm = (projectCard?: IProjectCard | null) => {
-  const { t } = useTranslation();
-  const { getOptionFromListItem } = useOptions();
+const useProjectCardBasicsValues = () => {
+  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const { listItemToOption } = useOptions();
 
-  const defaultFormValues: IProjectCardBasicsForm = useMemo(
+  const formValues: IProjectCardBasicsForm = useMemo(
     () => ({
-      type: getOptionFromListItem(projectCard?.type),
+      type: listItemToOption(projectCard?.type),
       description: projectCard?.description || '',
-      area: getOptionFromListItem(projectCard?.area),
+      area: listItemToOption(projectCard?.area),
       hkrId: projectCard?.hkrId || '',
       sapProject: projectCard?.sapProject || [''],
       sapNetwork: projectCard?.sapNetwork || [''],
       entityName: projectCard?.entityName || '',
       hashTags: projectCard?.hashTags || [''],
     }),
-    [projectCard, getOptionFromListItem],
+    [projectCard, listItemToOption],
   );
+
+  return { formValues, projectCard };
+};
+
+/**
+ * This hook initializes a react-hook-form control for a project card basics form. It will keep the
+ * form up to date with the selectedProjectCard from redux and return all needed functions to handle
+ * the form.
+ *
+ * It will also return formFields, which can be passed to the FormFieldCreator component to generate
+ * the visual form.
+ *
+ * @param projectCard any ProjectCard
+ * @returns handleSubmit, reset, formFields
+ */
+const useProjectCardBasicsForm = () => {
+  const { t } = useTranslation();
+
+  const { formValues, projectCard } = useProjectCardBasicsValues();
 
   const { control, handleSubmit, reset } = useForm<IProjectCardBasicsForm>({
-    defaultValues: defaultFormValues,
+    defaultValues: formValues,
   });
 
-  useEffect(
-    function updateFormFieldsOnProjectCardChange() {
-      if (projectCard) {
-        reset(defaultFormValues);
-      }
-    },
-    [projectCard, defaultFormValues, reset],
-  );
+  // Updates
+  useEffect(() => {
+    if (projectCard) {
+      reset(formValues);
+    }
+  }, [projectCard, formValues, reset]);
 
   const formFields = getProjectBasicsFormFields(control, t);
 
-  return { control, handleSubmit, reset, formFields };
+  return { handleSubmit, reset, formFields };
 };
 
 export default useProjectCardBasicsForm;
