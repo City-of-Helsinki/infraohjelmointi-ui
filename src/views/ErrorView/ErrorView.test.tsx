@@ -5,7 +5,7 @@ import ErrorView from './ErrorView';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe('ErrorView', () => {
+describe.skip('ErrorView', () => {
   it('renders the title and paragraph', () => {
     renderWithProviders(<ErrorView />);
     expect(screen.getByText(/error.404/i)).toBeInTheDocument();

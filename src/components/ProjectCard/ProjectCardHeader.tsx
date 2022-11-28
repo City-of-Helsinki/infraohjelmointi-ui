@@ -51,7 +51,7 @@ const ProjectCardHeader: FC = () => {
     function onProjectCardChanges() {
       if (projectCard) {
         setFavourite(
-          (user && projectCard.favPersons && projectCard.favPersons.includes(user.id)) || false,
+          (user && projectCard.favPersons && projectCard.favPersons?.includes(user.id)) || false,
         );
         setName(projectCard.name);
         setSelectedOption(listItemToOption(projectCard?.phase));
@@ -59,6 +59,7 @@ const ProjectCardHeader: FC = () => {
     },
     [user, projectCard, setSelectedOption, listItemToOption],
   );
+
   return (
     <div className="project-card-header-container">
       <div className="left">

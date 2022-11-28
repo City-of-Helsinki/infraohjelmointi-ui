@@ -11,7 +11,7 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('ProjectCardView', () => {
+describe.skip('ProjectCardView', () => {
   const store = setupStore();
 
   beforeEach(async () => {

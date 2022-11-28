@@ -37,7 +37,7 @@ const SideBar = () => {
 
   const navItems: Array<INavigationItem> = [
     {
-      route: `${projectId}`,
+      route: `project-card/${projectId}/`,
       label: t('projectCard'),
       component: <IconPenLine />,
     },

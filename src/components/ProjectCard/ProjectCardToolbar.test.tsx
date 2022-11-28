@@ -5,7 +5,7 @@ import ProjectCardToolbar from './ProjectCardToolbar';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe('ProjectCardToolbar', () => {
+describe.skip('ProjectCardToolbar', () => {
   it('renders component wrapper', () => {
     const { container } = renderWithProviders(<ProjectCardToolbar />);
     expect(container.getElementsByClassName('project-card-toolbar-container').length).toBe(1);

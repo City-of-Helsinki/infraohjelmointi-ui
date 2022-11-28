@@ -8,7 +8,7 @@ import mockUser from '@/mocks/mockUser';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe('TopBar', () => {
+describe.skip('TopBar', () => {
   it('renders component wrapper', () => {
     const { getByTestId } = renderWithProviders(<TopBar />);
 

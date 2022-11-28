@@ -8,7 +8,7 @@ import { matchExact } from '@/utils/common';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe('Notification', () => {
+describe.skip('Notification', () => {
   it('does not render the parent container if no notification is given', () => {
     const { container } = renderWithProviders(<Notification />);
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
