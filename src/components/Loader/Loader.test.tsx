@@ -7,7 +7,7 @@ import Loader from './Loader';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe.skip('Loader', () => {
+describe('Loader', () => {
   it('does not render Loader if isLoading is false', () => {
     const { container } = renderWithProviders(<Loader />);
     expect(container.getElementsByClassName('loader-container').length).toBe(0);

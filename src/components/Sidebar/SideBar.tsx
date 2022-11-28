@@ -19,21 +19,15 @@ const SideBar = () => {
   const [projectId, setProjectId] = useState('');
   const { t } = useTranslation();
 
-  useEffect(
-    function getProjectCards() {
-      dispatch(getProjectCardsThunk());
-    },
-    [dispatch],
-  );
+  // Get all project cards
+  useEffect(() => {
+    dispatch(getProjectCardsThunk());
+  }, [dispatch]);
 
-  useEffect(
-    function getProjectCardId() {
-      if (projectCards && projectCards?.length > 0) {
-        setProjectId((projectCards && projectCards[0].id) || '');
-      }
-    },
-    [projectCards],
-  );
+  // Set the project card ID to the first in the list if found
+  useEffect(() => {
+    setProjectId((projectCards && projectCards?.length > 0 && projectCards[0].id) || '');
+  }, [projectCards]);
 
   const navItems: Array<INavigationItem> = [
     {

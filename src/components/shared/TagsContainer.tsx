@@ -5,9 +5,10 @@ interface ITagsProps {
   tags: Array<string>;
   onClick?: (tag: string) => void;
   onDelete?: (tag: string) => void;
+  id?: string;
 }
 
-const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete }) => {
+const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
   const getAriaLabel = (tag: string) =>
     onDelete ? `Poista tunniste: ${tag}` : onClick ? `Lisää tunniste: ${tag}` : '';
   const handleClick = (tag: string) => (onClick ? onClick(tag) : onDelete ? onDelete(tag) : null);
@@ -17,7 +18,12 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete }) => {
       {tags.map((t, i) => {
         if (t) {
           return (
-            <div key={`${t}-${i}`} className="tag-wrapper" aria-label={getAriaLabel(t)}>
+            <div
+              key={`${t}-${i}`}
+              className="tag-wrapper"
+              aria-label={getAriaLabel(t)}
+              data-testid={id}
+            >
               <Tag
                 onClick={onClick ? () => handleClick(t) : undefined}
                 onDelete={onDelete ? () => handleClick(t) : undefined}

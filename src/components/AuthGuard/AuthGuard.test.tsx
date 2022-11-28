@@ -5,7 +5,7 @@ import { setUser } from '@/reducers/authSlice';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe.skip('AuthGuard', () => {
+describe('AuthGuard', () => {
   const store = setupStore();
 
   beforeEach(async () => {

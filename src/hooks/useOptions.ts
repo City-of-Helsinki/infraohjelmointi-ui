@@ -18,24 +18,27 @@ export const useOptions = (name?: ListType) => {
   const [options, setOptions] = useState<Array<IOption> | []>([]);
   const { t } = useTranslation();
 
+  const translate = useMemo(() => t, [t]);
+
+  // Parse an array of list-items to an array of options to use SelectField
   useEffect(
-    function parseListToOption() {
-      if (list) {
-        setOptions(list.map((o) => ({ label: t(`enums.${o.value}`), value: o.id })));
-      }
+    () => {
+      setOptions(list && list.map((o) => ({ label: translate(`enums.${o.value}`), value: o.id })));
     },
-    [list, t],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [list],
   );
 
   const listItemToOption = useMemo(
     () =>
       (listItem?: IListItem): IOption => {
         return {
-          label: listItem ? t(`enums.${listItem.value}`) : '',
+          label: listItem ? translate(`enums.${listItem.value}`) : '',
           value: listItem ? listItem.id : '',
         };
       },
-    [t],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   return { options, listItemToOption };

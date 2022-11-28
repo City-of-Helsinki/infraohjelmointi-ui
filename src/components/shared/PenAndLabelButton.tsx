@@ -19,6 +19,8 @@ const PenAndLabelButton: FC<IPenAndLabelProps> = ({ text, onClick, disabled }) =
         onClick={onClick}
         disabled={disabled}
         style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+        name={text}
+        aria-label={text}
       >
         <IconPenLine style={{ transform: 'translate(20px, -3px)' }} />
       </button>

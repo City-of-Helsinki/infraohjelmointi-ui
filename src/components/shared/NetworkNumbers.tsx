@@ -14,7 +14,7 @@ const NetworkNumbers = ({ name }: { name: string }) => {
   };
 
   return (
-    <div className="display-flex-col" id={name}>
+    <div className="display-flex-col" id={name} data-testid={name}>
       <PenAndLabelButton text="Verkkonumerot" disabled onClick={(e) => addNetworkNumber(e)} />
       {networkNumbers.length > 0 &&
         networkNumbers.map((nn) => (

@@ -47,8 +47,9 @@ const ProjectCardHeader: FC = () => {
   // Vars that will come from API
   const group = 'Hakaniemi';
 
+  // Add values on project card changes
   useEffect(
-    function onProjectCardChanges() {
+    () => {
       if (projectCard) {
         setFavourite(
           (user && projectCard.favPersons && projectCard.favPersons?.includes(user.id)) || false,
@@ -57,7 +58,8 @@ const ProjectCardHeader: FC = () => {
         setSelectedOption(listItemToOption(projectCard?.phase));
       }
     },
-    [user, projectCard, setSelectedOption, listItemToOption],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, projectCard],
   );
 
   return (

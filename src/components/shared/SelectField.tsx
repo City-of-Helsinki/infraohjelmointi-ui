@@ -42,7 +42,7 @@ interface ISelectFieldProps {
 }
 
 const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => {
-  const required = rules?.required === true;
+  const required = rules?.required ? true : false;
   const { options } = useOptions(name);
 
   return (

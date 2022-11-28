@@ -8,7 +8,7 @@ import { matchExact } from '@/utils/common';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe.skip('Notification', () => {
+describe('Notification', () => {
   it('does not render the parent container if no notification is given', () => {
     const { container } = renderWithProviders(<Notification />);
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
@@ -32,16 +32,16 @@ describe.skip('Notification', () => {
     store.dispatch(notifyInfo(mockNotification));
     const { queryByText, getByText } = renderWithProviders(<Notification />, { store });
 
-    Object.values(mockNotification).forEach((v) => {
-      expect(getByText(matchExact(v))).toBeInTheDocument();
+    Object.values(mockNotification).forEach((n) => {
+      expect(getByText(matchExact(n))).toBeInTheDocument();
     });
 
-    // FIXME: we should test by clicking the button, but that doesn't not dispatch the action
+    // FIXME: we should test by clicking the button, but that doesn't dispatch the action
     // => await user.click(getByRole('button', { name: matchExact('Close toast') }));
     store.dispatch(clearNotification(0));
 
-    Object.values(mockNotification).forEach((v) => {
-      expect(queryByText(matchExact(v))).toBeNull();
+    Object.values(mockNotification).forEach((n) => {
+      expect(queryByText(matchExact(n))).toBeNull();
     });
 
     expect(store.getState().notifications).toBeNull();

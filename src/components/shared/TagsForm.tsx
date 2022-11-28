@@ -1,5 +1,5 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { tempTags } from '@/mocks/common';
+import { mockTags } from '@/mocks/common';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useState, MouseEvent, FC, forwardRef, Ref, useEffect } from 'react';
@@ -21,7 +21,7 @@ interface ITagsDialogProps {
 const TagsDialog: FC<ITagsDialogProps> = forwardRef(
   ({ name, label, value, onChange }, ref: Ref<HTMLDivElement>) => {
     const [tags, setTags] = useState<Array<string>>([]);
-    const [allTags, setAllTags] = useState(tempTags);
+    const [allTags, setAllTags] = useState(mockTags);
     const [isOpen, setIsOpen] = useState(false);
 
     const { Header, Content, ActionButtons } = Dialog;
@@ -60,14 +60,14 @@ const TagsDialog: FC<ITagsDialogProps> = forwardRef(
     const onChangeOpen = () => setIsOpen(!isOpen);
 
     return (
-      <div className="input-wrapper" id={name} ref={ref}>
+      <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
         <div className="display-flex-col">
           <Dialog
             id="tags-dialog"
             aria-labelledby={label}
             isOpen={isOpen}
             close={onChangeOpen}
-            closeButtonLabelText="Sulje "
+            closeButtonLabelText="Sulje tunnisteikkuna"
             className="tags-dialog"
           >
             <Header id={label} title="Hakaniementori - Hallitse tunnisteita" />
@@ -77,7 +77,7 @@ const TagsDialog: FC<ITagsDialogProps> = forwardRef(
                 <div className="added-tags-title-container">
                   <Title size="xs" text="Hankkeen tunnisteet" />
                 </div>
-                <TagsContainer tags={tags} onDelete={onTagDelete} />
+                <TagsContainer tags={tags} onDelete={onTagDelete} id={'project-card-tags'} />
               </div>
             </Content>
             <hr />
@@ -92,7 +92,7 @@ const TagsDialog: FC<ITagsDialogProps> = forwardRef(
                     Hae tunnisteita tai luo uusi
                   </Button>
                 </div>
-                <TagsContainer tags={allTags} onClick={onTagClick} />
+                <TagsContainer tags={allTags} onClick={onTagClick} id={'all-tags'} />
               </div>
             </Content>
             <ActionButtons>
