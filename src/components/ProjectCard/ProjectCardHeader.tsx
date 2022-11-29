@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { IOption, SelectCallback } from '@/interfaces/common';
 import ProjectCardNameForm from './ProjectCardNameForm';
 import { useOptions } from '@/hooks/useOptions';
+import { listItemToOption } from '@/utils/common';
 
 interface IPhaseDropdown {
   options: Array<IOption>;
@@ -39,8 +40,9 @@ const ProjectCardHeader: FC = () => {
   const user = useAppSelector((state: RootState) => state.auth.user);
   const [favourite, setFavourite] = useState(false);
   const [name, setName] = useState('');
+  const { t } = useTranslation();
 
-  const { options, listItemToOption } = useOptions('phase');
+  const { options } = useOptions('phase');
 
   const [selectedOption, setSelectedOption] = useState<IOption>({ label: '', value: '' });
 
@@ -55,7 +57,7 @@ const ProjectCardHeader: FC = () => {
           (user && projectCard.favPersons && projectCard.favPersons?.includes(user.id)) || false,
         );
         setName(projectCard.name);
-        setSelectedOption(listItemToOption(projectCard?.phase));
+        setSelectedOption(listItemToOption(projectCard?.phase, t));
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

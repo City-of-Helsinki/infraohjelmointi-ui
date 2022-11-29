@@ -83,7 +83,7 @@
   font-size: var(--fontsize-body-m);
 }
 
-.hashtags-container {
+.tags-container {
   display: flex;
   flex-direction: row;
   width: 100%;

@@ -4,9 +4,9 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
-import { useOptions } from './useOptions';
 import { useAppSelector } from './common';
 import { RootState } from '@/store';
+import { listItemToOption } from '@/utils/common';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -80,13 +80,12 @@ const getProjectBasicsFormFields = (
  */
 const useProjectCardBasicsValues = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
-  const { listItemToOption } = useOptions();
-
+  const { t } = useTranslation();
   const formValues: IProjectCardBasicsForm = useMemo(
     () => ({
-      type: listItemToOption(projectCard?.type),
+      type: listItemToOption(projectCard?.type, t),
       description: projectCard?.description || '',
-      area: listItemToOption(projectCard?.area),
+      area: listItemToOption(projectCard?.area, t),
       hkrId: projectCard?.hkrId || '',
       sapProject: projectCard?.sapProject || [],
       sapNetwork: projectCard?.sapNetwork || [],

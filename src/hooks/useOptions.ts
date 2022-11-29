@@ -1,6 +1,7 @@
-import { IListItem, IOption, ListType } from '@/interfaces/common';
+import { IOption, ListType } from '@/interfaces/common';
 import { IListState } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
+import { listItemToOption } from '@/utils/common';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from './common';
@@ -23,18 +24,11 @@ export const useOptions = (name?: ListType) => {
   // Parse an array of list-items to an array of options to use SelectField
   useEffect(
     () => {
-      setOptions(list && list.map((o) => ({ label: translate(`enums.${o.value}`), value: o.id })));
+      setOptions(list && list.map((i) => listItemToOption(i, translate)));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [list],
   );
 
-  const listItemToOption = (listItem?: IListItem): IOption => ({
-    label: listItem ? translate(`enums.${listItem.value}`) : '',
-    value: listItem ? listItem.id : '',
-  });
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-
-  return { options, listItemToOption };
+  return { options };
 };

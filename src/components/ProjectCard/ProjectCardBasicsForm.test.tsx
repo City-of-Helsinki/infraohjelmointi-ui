@@ -81,8 +81,8 @@ describe('ProjectCardBasicsForm', () => {
     });
 
     expect(projectCard?.sapProject.length).toBe(1);
-    projectCard?.sapProject?.forEach((h) => {
-      expect(getByDisplayValue(matchExact(h))).toBeInTheDocument();
+    projectCard?.sapProject?.forEach((s) => {
+      expect(getByDisplayValue(matchExact(s))).toBeInTheDocument();
     });
   });
 
