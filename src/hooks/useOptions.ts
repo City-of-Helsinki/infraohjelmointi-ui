@@ -29,17 +29,12 @@ export const useOptions = (name?: ListType) => {
     [list],
   );
 
-  const listItemToOption = useMemo(
-    () =>
-      (listItem?: IListItem): IOption => {
-        return {
-          label: listItem ? translate(`enums.${listItem.value}`) : '',
-          value: listItem ? listItem.id : '',
-        };
-      },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  const listItemToOption = (listItem?: IListItem): IOption => ({
+    label: listItem ? translate(`enums.${listItem.value}`) : '',
+    value: listItem ? listItem.id : '',
+  });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   return { options, listItemToOption };
 };

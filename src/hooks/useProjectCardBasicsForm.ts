@@ -93,7 +93,8 @@ const useProjectCardBasicsValues = () => {
       entityName: projectCard?.entityName || '',
       hashTags: projectCard?.hashTags || [],
     }),
-    [projectCard, listItemToOption],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [projectCard],
   );
 
   return { formValues, projectCard };
