@@ -1,5 +1,6 @@
 import { Tag } from 'hds-react/components/Tag';
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ITagsProps {
   tags: Array<string>;
@@ -9,26 +10,27 @@ interface ITagsProps {
 }
 
 const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
+  const { t } = useTranslation();
   const getAriaLabel = (tag: string) =>
-    onDelete ? `Poista tunniste: ${tag}` : onClick ? `Lisää tunniste: ${tag}` : '';
+    t(onDelete ? `removeHashTag ${tag}` : onClick ? `addHashTag ${tag}` : '');
   const handleClick = (tag: string) => (onClick ? onClick(tag) : onDelete ? onDelete(tag) : null);
 
   return (
     <div className="tags-container">
-      {tags.map((t, i) => {
+      {tags.map((tag, i) => {
         if (t) {
           return (
             <div
               key={`${t}-${i}`}
               className="tag-wrapper"
-              aria-label={getAriaLabel(t)}
+              aria-label={getAriaLabel(tag)}
               data-testid={id}
             >
               <Tag
-                onClick={onClick ? () => handleClick(t) : undefined}
-                onDelete={onDelete ? () => handleClick(t) : undefined}
+                onClick={onClick ? () => handleClick(tag) : undefined}
+                onDelete={onDelete ? () => handleClick(tag) : undefined}
               >
-                {t}
+                {tag}
               </Tag>
             </div>
           );

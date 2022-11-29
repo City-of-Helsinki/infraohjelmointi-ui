@@ -55,7 +55,18 @@
     "description": "Hankkeen kuvaus",
     "area": "Projektialue",
     "hkrId": "PW Hanketunnus",
-    "sapProject": "Projektinumero"
+    "sapNetwork": "Verkkonumerot",
+    "sapProject": "Projektinumero",
+    "hashTags": "HashTags"
+  },
+  "notification": {
+    "title": {
+      "sendSuccess": "Lähetys onnistui",
+      "404": "Virhe, resurssia ei löytynyt"
+    },
+    "message": {
+      "formSaveSuccess": "Lomake tallennettu onnistuneesti."
+    }
   },
   "appTitle": "Infraohjelmointi UI",
   "projectCard": "Hankekortti",
@@ -67,5 +78,14 @@
   "removeFavourite": "Poista suosikeista",
   "addFavourite": "Lisää suosikkeihin",
   "inGroup": "Kuuluu ryhmään",
-  "closeNotification": "Sulje ilmoitus"
+  "closeNotification": "Sulje ilmoitus",
+  "addHashTag": "Lisää tunniste",
+  "removeHashTag": "Poista tunniste",
+  "closeHashTagsWindow": "Sulje tunnisteikkuna",
+  "manageHashTags": "Hallitse tunnisteita",
+  "projectCardHashTags": "Hankkeen tunnisteet",
+  "addHashTagsToProject": "Lisää hankkeelle uusi tunniste",
+  "modifyGeneralMode": "Muokkaa yleistilaa",
+  "getHashTagsOrCreateNew": "Hae tunnisteita tai luo uusi",
+  "save": "Tallenna"
 }

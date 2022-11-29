@@ -4,7 +4,7 @@ import ProjectCardBasics from './ProjectCardBasics';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe.skip('ProjectCardBasics', () => {
+describe('ProjectCardBasics', () => {
   const navItems = [
     {
       route: 'basics',

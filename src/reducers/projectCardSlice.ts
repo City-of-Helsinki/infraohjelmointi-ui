@@ -52,8 +52,8 @@ export const patchProjectCardThunk = createAsyncThunk(
       .then((res) => {
         thunkAPI.dispatch(
           notifySuccess({
-            title: 'Lähetys onnistui',
-            message: 'Lomake tallennettu onnistuneesti.',
+            title: 'sendSuccess',
+            message: 'formSaveSuccess',
             type: 'toast',
           }),
         );

@@ -1,8 +1,8 @@
 import { INotification } from '@/interfaces/common';
 
 const mockNotification: INotification = {
-  title: 'Info',
-  message: 'New notification',
+  title: 'sendSuccess',
+  message: 'formSaveSuccess',
 };
 
 export default mockNotification;

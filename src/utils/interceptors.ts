@@ -53,7 +53,7 @@ const handleError = (error: AxiosError): Promise<IError> => {
   store.dispatch(
     notifyError({
       message: parsedError.message,
-      title: `Virhe ${parsedError.status || ''}`,
+      title: `${parsedError.status || ''}`,
       status: parsedError.status?.toLocaleString(),
     }),
   );

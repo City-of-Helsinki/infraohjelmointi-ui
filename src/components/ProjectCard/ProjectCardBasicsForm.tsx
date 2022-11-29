@@ -8,11 +8,13 @@ import { Button } from 'hds-react/components/Button';
 import { patchProjectCardThunk, postProjectCardThunk } from '@/reducers/projectCardSlice';
 import { useParams } from 'react-router-dom';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
+import { useTranslation } from 'react-i18next';
 import './styles.css';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
   const { projectId } = useParams();
+  const { t } = useTranslation();
   const { handleSubmit, formFields } = useProjectCardBasicsForm();
 
   const onSubmit: SubmitHandler<IProjectCardBasicsForm> = async (form: IProjectCardBasicsForm) => {
@@ -42,7 +44,7 @@ const ProjectCardBasicsForm: FC = () => {
         <div className="basic-info-form">
           <FormFieldCreator form={formFields} />
         </div>
-        <Button type="submit">Lähetä</Button>
+        <Button type="submit">{t('send')}</Button>
       </form>
     </div>
   );

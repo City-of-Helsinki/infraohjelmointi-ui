@@ -182,32 +182,29 @@ describe('ProjectCardBasicsForm', () => {
     });
 
     // Open modal
-    await user.click(getByRole('button', { name: matchExact('Tunnisteet') }));
+    await user.click(getByRole('button', { name: matchExact('hashTags') }));
 
     // Expect all elements
-    expect(getByText(matchExact('Hakaniementori - Hallitse tunnisteita'))).toBeInTheDocument();
-    expect(getByText(matchExact('Hankkeen tunnisteet'))).toBeInTheDocument();
-    expect(getAllByTestId('project-card-tags').length).toBe(projectCardTagsLength);
-    expect(getAllByTestId('all-tags').length).toBe(availableTagsLength);
+    expect(getByText(matchExact('manageHashTags'))).toBeInTheDocument();
+    expect(getByText(matchExact('projectCardHashTags'))).toBeInTheDocument();
+    expect(getAllByTestId('project-card-hashtags').length).toBe(projectCardTagsLength);
+    expect(getAllByTestId('all-hashtags').length).toBe(availableTagsLength);
 
     // TODO: Remove tag, how to access HDS-close button?
 
     // Add tag
     await user.click(getByRole('link', { name: matchExact(availableTags[0]) }));
-    expect(getAllByTestId('project-card-tags').length).toBe(projectCardTagsLength + 1);
+    expect(getAllByTestId('project-card-hashtags').length).toBe(projectCardTagsLength + 1);
 
     // Close modal
-    await user.click(getByRole('button', { name: matchExact('Sulje tunnisteikkuna') }));
-    expect(queryByText(matchExact('Hakaniementori - Hallitse tunnisteita'))).toBeNull();
+    await user.click(getByRole('button', { name: matchExact('closeHashTagsWindow') }));
+    expect(queryByText(matchExact('manageHashTags'))).toBeNull();
   });
 
-  it('can send a the basic form', async () => {
-    const { getByText, getByRole, user, getAllByTestId, queryByText } = renderWithProviders(
-      <ProjectCardBasicsForm />,
-      {
-        store,
-      },
-    );
+  it('can send the basic form', async () => {
+    const { getByText, getByRole, user } = renderWithProviders(<ProjectCardBasicsForm />, {
+      store,
+    });
 
     const projectCardTags = store.getState().projectCard.selectedProjectCard?.hashTags;
     const availableTags = mockTags.filter((tag) => projectCardTags?.indexOf(tag) === -1);
@@ -225,9 +222,9 @@ describe('ProjectCardBasicsForm', () => {
     await user.click(getByText(matchExact('enums.sports')));
 
     // Add a tag
-    await user.click(getByRole('button', { name: matchExact('Tunnisteet') }));
+    await user.click(getByRole('button', { name: matchExact('projectCardBasicsForm.hashTags') }));
     await user.click(getByRole('link', { name: matchExact(availableTags[0]) }));
-    await user.click(getByRole('button', { name: matchExact('Sulje tunnisteikkuna') }));
+    await user.click(getByRole('button', { name: matchExact('closeHashTagsWindow') }));
 
     // TODO: Send form
     // await user.click(getByRole('button', { name: 'Lähetä' }));

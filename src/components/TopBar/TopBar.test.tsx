@@ -8,12 +8,13 @@ import mockUser from '@/mocks/mockUser';
 
 jest.mock('react-i18next', () => mockI18next());
 
-describe.skip('TopBar', () => {
+describe('TopBar', () => {
   it('renders component wrapper', () => {
     const { getByTestId } = renderWithProviders(<TopBar />);
 
     expect(getByTestId('top-bar')).toBeInTheDocument();
   });
+
   it('renders all content', () => {
     const { getByTestId, getByRole, getAllByRole } = renderWithProviders(<TopBar />);
 

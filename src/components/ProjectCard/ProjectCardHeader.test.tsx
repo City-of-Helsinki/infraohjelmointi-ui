@@ -1,5 +1,4 @@
 import mockI18next from '@/mocks/mockI18next';
-import { RenderResult } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectCardHeader from './ProjectCardHeader';
 import axios from 'axios';
@@ -19,13 +18,12 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('ProjectCardHeader', () => {
   const store = setupStore();
-  let renderResult: RenderResult;
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockProjectCard);
-    mockedAxios.get.mockResolvedValue(mockProjectPhases);
-
     await store.dispatch(getProjectCardThunk(mockProjectCard.data.id));
+
+    mockedAxios.get.mockResolvedValue(mockProjectPhases);
     await store.dispatch(getProjectPhasesThunk());
   });
 
@@ -45,21 +43,21 @@ describe('ProjectCardHeader', () => {
     expect(container.getElementsByClassName('right-wrapper').length).toBe(1);
   });
 
-  it.skip('renders all left side elements', async () => {
-    const { getByRole, getByText } = renderResult;
+  it('renders all left side elements', async () => {
+    const { getByRole, getByText } = renderWithProviders(<ProjectCardHeader />, { store });
 
     const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
     const { projectReadiness, name, phase } = projectCard;
 
     expect(getByRole('button', { name: /edit-project-name/i })).toBeInTheDocument();
     expect(getByText(matchExact(name))).toBeInTheDocument();
-    // TODO: expect(getByText(matchExact(phase))).toBeInTheDocument();
+    expect(getByText(matchExact(phase.value))).toBeInTheDocument();
     expect(getByText(matchExact(`${projectReadiness}%`))).toBeInTheDocument();
     expect(getByText(matchExact('Hämeentie 1, 00530 Helsinki'))).toBeInTheDocument();
   });
 
-  it.skip('project name can be edited by clicking the edit button', async () => {
-    const { getByRole, queryByRole } = renderResult;
+  it('project name can be edited by clicking the edit button', async () => {
+    const { getByRole, queryByRole } = renderWithProviders(<ProjectCardHeader />, { store });
     const user = userEvent.setup();
 
     // TODO: this needs to be tested better
@@ -69,8 +67,10 @@ describe('ProjectCardHeader', () => {
     expect(queryByRole('textbox')).toBeNull();
   });
 
-  it.skip('renders all right side elements', async () => {
-    const { getByRole, getByText, container } = renderResult;
+  it('renders all right side elements', async () => {
+    const { getByRole, getByText, container } = renderWithProviders(<ProjectCardHeader />, {
+      store,
+    });
 
     expect(container.getElementsByClassName('favourite-button-container').length).toBe(1);
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
@@ -78,8 +78,8 @@ describe('ProjectCardHeader', () => {
     expect(getByText(matchExact('Hakaniemi'))).toBeInTheDocument();
   });
 
-  it.skip('can add and remove favourites', async () => {
-    const { getByRole } = renderResult;
+  it('can add and remove favourites', async () => {
+    const { getByRole } = renderWithProviders(<ProjectCardHeader />, { store });
     const user = userEvent.setup();
 
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
