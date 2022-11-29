@@ -5,7 +5,7 @@ import { FC } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
-import { patchProjectCardThunk, postProjectCardThunk } from '@/reducers/projectCardSlice';
+import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { useParams } from 'react-router-dom';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { useTranslation } from 'react-i18next';
@@ -29,11 +29,6 @@ const ProjectCardBasicsForm: FC = () => {
     if (projectId) {
       dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {
         console.log('PATCH response: ', res);
-      });
-    } else {
-      // creation of new project cards isn't fully documented yet
-      dispatch(postProjectCardThunk({ data })).then((res) => {
-        console.log('POST response: ', res);
       });
     }
   };

@@ -206,8 +206,16 @@ describe('ProjectCardBasicsForm', () => {
       store,
     });
 
-    const projectCardTags = store.getState().projectCard.selectedProjectCard?.hashTags;
-    const availableTags = mockTags.filter((tag) => projectCardTags?.indexOf(tag) === -1);
+    const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
+    const availableTags = mockTags.filter((tag) => projectCard.hashTags?.indexOf(tag) === -1);
+    const patchedProjectCard: IProjectCard = {
+      ...projectCard,
+      description: 'Desc',
+      entityName: 'Ent',
+      area: { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' },
+      type: { id: '434e8052-9f76-4c41-b450-d9eff680d503', value: 'sports' },
+      hashTags: ['pyöräily', 'uudisrakentaminen', 'pohjoinensuurpiiri'],
+    };
 
     // Add entity and description
     user.type(getByRole('textbox', { name: 'projectCardBasicsForm.description *' }), 'Desc');
@@ -226,6 +234,7 @@ describe('ProjectCardBasicsForm', () => {
     await user.click(getByRole('link', { name: matchExact(availableTags[0]) }));
     await user.click(getByRole('button', { name: matchExact('closeHashTagsWindow') }));
 
+    mockedAxios.get.mockResolvedValue(patchedProjectCard);
     // TODO: Send form
     // await user.click(getByRole('button', { name: 'Lähetä' }));
   });

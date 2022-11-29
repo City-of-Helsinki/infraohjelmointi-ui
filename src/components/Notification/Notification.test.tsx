@@ -5,7 +5,6 @@ import { setupStore } from '@/store';
 import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
-import { debug } from 'console';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -23,7 +22,6 @@ describe('Notification', () => {
     expect(container.getElementsByClassName('notifications-container').length).toBe(1);
     expect(getByRole('button', { name: matchExact('closeNotification') })).toBeInTheDocument();
 
-    debug(mockNotification);
     Object.values(mockNotification).forEach((n) => {
       if (n !== 'notification') {
         expect(getByText(matchExact(n))).toBeInTheDocument();

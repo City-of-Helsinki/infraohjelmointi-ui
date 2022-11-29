@@ -20,7 +20,7 @@ export const getProjectCard = async (id: string): Promise<IProjectCard> => {
 
 export const postProjectCard = async (request: IProjectCardRequestObject): Promise<void> => {
   return axios
-    .post(`${REACT_APP_API_URL}/projects/`, projectCard)
+    .post(`${REACT_APP_API_URL}/projects/`, request.data)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
