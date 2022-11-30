@@ -11,6 +11,7 @@ import { getProjectAreasThunk, getProjectTypesThunk } from '@/reducers/listsSlic
 import { mockProjectAreas, mockProjectTypes } from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
 import { waitFor } from '@testing-library/react';
+import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -203,14 +204,19 @@ describe('ProjectCardBasicsForm', () => {
   });
 
   it('can send the basic form', async () => {
-    const { getByText, getByRole, user } = renderWithProviders(<ProjectCardBasicsForm />, {
-      store,
-    });
+    const { getByText, getByRole, user, getByDisplayValue } = renderWithProviders(
+      <ProjectCardBasicsForm />,
+      {
+        store,
+      },
+    );
 
     const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
     const availableTags = mockTags.filter((tag) => projectCard.hashTags?.indexOf(tag) === -1);
+
     const patchedProjectCard: IProjectCard = {
       ...projectCard,
+      id: '79e6bc76-9fa2-49a1-aaad-b52330da170e',
       description: 'Desc',
       entityName: 'Ent',
       area: { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' },
@@ -218,25 +224,37 @@ describe('ProjectCardBasicsForm', () => {
       hashTags: ['pyöräily', 'uudisrakentaminen', 'pohjoinensuurpiiri'],
     };
 
-    // Add entity and description
-    user.type(getByRole('textbox', { name: 'projectCardBasicsForm.description *' }), 'Desc');
-    user.type(getByRole('textbox', { name: 'projectCardBasicsForm.entityName' }), 'Ent');
+    await waitFor(async () => {
+      // Add entity and description
+      user.type(getByRole('textbox', { name: 'projectCardBasicsForm.description *' }), 'Desc');
+      user.type(getByRole('textbox', { name: 'projectCardBasicsForm.entityName' }), 'Ent');
 
-    // Select new area
-    await user.click(getByRole('button', { name: 'projectCardBasicsForm.area' }));
-    await user.click(getByText(matchExact('enums.lansisatama')));
+      // Select new area
+      await user.click(getByRole('button', { name: 'projectCardBasicsForm.area' }));
+      await user.click(getByText(matchExact('enums.lansisatama')));
 
-    // Select new type
-    await user.click(getByRole('button', { name: 'projectCardBasicsForm.type *' }));
-    await user.click(getByText(matchExact('enums.sports')));
+      // Select new type
+      await user.click(getByRole('button', { name: 'projectCardBasicsForm.type *' }));
+      await user.click(getByText(matchExact('enums.sports')));
 
-    // Add a tag
-    await user.click(getByRole('button', { name: matchExact('projectCardBasicsForm.hashTags') }));
-    await user.click(getByRole('link', { name: matchExact(availableTags[0]) }));
-    await user.click(getByRole('button', { name: matchExact('closeHashTagsWindow') }));
+      // Add a tag
+      await user.click(getByRole('button', { name: matchExact('projectCardBasicsForm.hashTags') }));
+      await user.click(getByRole('link', { name: matchExact(availableTags[0]) }));
+      await user.click(getByRole('button', { name: matchExact('closeHashTagsWindow') }));
+
+      expect(getByDisplayValue(matchExact(patchedProjectCard?.description))).toBeInTheDocument();
+      // expect(getByDisplayValue(matchExact(patchedProjectCard?.entityName))).toBeInTheDocument();
+
+      // expect(patchedProjectCard?.hashTags?.length).toBe(3);
+      // patchedProjectCard?.hashTags?.forEach((h) => {
+      //   expect(getByText(matchExact(h))).toBeInTheDocument();
+      // });
+    });
+
+    await waitFor(async () => {
+      mockedAxios.get.mockResolvedValue(async () => await Promise.resolve(patchedProjectCard));
+    });
 
     // await user.click(getByRole('button', { name: 'send' })).then();
-
-    // xmockedAxios.get.mockResolvedValue(async () => await Promise.resolve(patchedProjectCard));
   });
 });

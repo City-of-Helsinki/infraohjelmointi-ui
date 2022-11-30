@@ -1,21 +1,21 @@
 import useProjectCardBasicsForm from '@/hooks/useProjectCardBasicsForm';
-import { useAppDispatch } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { FC } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
 import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
-import { useParams } from 'react-router-dom';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
+import { RootState } from '@/store';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
-  const { projectId } = useParams();
   const { t } = useTranslation();
   const { handleSubmit, formFields } = useProjectCardBasicsForm();
+  const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
 
   const onSubmit: SubmitHandler<IProjectCardBasicsForm> = async (form: IProjectCardBasicsForm) => {
     const { type, area, ...formData } = form;
@@ -26,13 +26,13 @@ const ProjectCardBasicsForm: FC = () => {
       ...formData,
     };
 
-    console.log('Posting with data: ', { id: '79e6bc78-9fa2-49a1-aaad-b50030da170e', data });
+    console.log('Posting with data: ', { id: projectId, data });
 
-    dispatch(patchProjectCardThunk({ id: '79e6bc78-9fa2-49a1-aaad-b50030da170e', data })).then(
-      (res) => {
+    if (projectId) {
+      dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {
         console.log('PATCH response: ', res);
-      },
-    );
+      });
+    }
   };
 
   return (
