@@ -10,6 +10,7 @@ import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { getProjectAreasThunk, getProjectTypesThunk } from '@/reducers/listsSlice';
 import { mockProjectAreas, mockProjectTypes } from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
+import { waitFor } from '@testing-library/react';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -234,8 +235,8 @@ describe('ProjectCardBasicsForm', () => {
     await user.click(getByRole('link', { name: matchExact(availableTags[0]) }));
     await user.click(getByRole('button', { name: matchExact('closeHashTagsWindow') }));
 
-    mockedAxios.get.mockResolvedValue(patchedProjectCard);
-    // TODO: Send form
-    // await user.click(getByRole('button', { name: 'Lähetä' }));
+    // await user.click(getByRole('button', { name: 'send' })).then();
+
+    // xmockedAxios.get.mockResolvedValue(async () => await Promise.resolve(patchedProjectCard));
   });
 });

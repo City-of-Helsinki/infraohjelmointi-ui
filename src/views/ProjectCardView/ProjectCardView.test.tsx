@@ -11,14 +11,17 @@ import {
   getProjectPhasesThunk,
   getProjectTypesThunk,
 } from '@/reducers/listsSlice';
+import { RenderResult } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe.skip('ProjectCardView', () => {
+describe('ProjectCardView', () => {
   const store = setupStore();
+  let renderResult: RenderResult;
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockProjectCard);
@@ -32,6 +35,8 @@ describe.skip('ProjectCardView', () => {
 
     mockedAxios.get.mockResolvedValue(mockProjectPhases);
     await store.dispatch(getProjectPhasesThunk());
+
+    await act(async () => (renderResult = renderWithProviders(<ProjectCardView />, { store })));
   });
 
   afterEach(async () => {
@@ -46,22 +51,22 @@ describe.skip('ProjectCardView', () => {
   });
 
   it('renders the parent container', () => {
-    const { container } = renderWithProviders(<ProjectCardView />, { store });
+    const { container } = renderResult;
     expect(container.getElementsByClassName('project-card-container').length).toBe(1);
   });
 
   it('renders the ProjectCardToolbar', () => {
-    const { container } = renderWithProviders(<ProjectCardView />, { store });
+    const { container } = renderResult;
     expect(container.getElementsByClassName('project-card-toolbar-container').length).toBe(1);
   });
 
   it('renders the ProjectCardHeader', () => {
-    const { container } = renderWithProviders(<ProjectCardView />, { store });
+    const { container } = renderResult;
     expect(container.getElementsByClassName('project-card-header-container').length).toBe(1);
   });
 
   it('renders the ProjectCardTabs', async () => {
-    const { findByTestId } = renderWithProviders(<ProjectCardView />, { store });
+    const { findByTestId } = renderResult;
     expect(await findByTestId('tabs-list')).toBeInTheDocument();
   });
 });

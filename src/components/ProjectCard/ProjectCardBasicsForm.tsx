@@ -26,11 +26,13 @@ const ProjectCardBasicsForm: FC = () => {
       ...formData,
     };
 
-    if (projectId) {
-      dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {
+    console.log('Posting with data: ', { id: '79e6bc78-9fa2-49a1-aaad-b50030da170e', data });
+
+    dispatch(patchProjectCardThunk({ id: '79e6bc78-9fa2-49a1-aaad-b50030da170e', data })).then(
+      (res) => {
         console.log('PATCH response: ', res);
-      });
-    }
+      },
+    );
   };
 
   return (
