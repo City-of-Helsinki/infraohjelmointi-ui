@@ -1,5 +1,5 @@
 import { Tag } from 'hds-react/components/Tag';
-import { FC, memo } from 'react';
+import { FC, memo, MouseEvent, KeyboardEvent, SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ITagsProps {
@@ -13,7 +13,10 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
   const { t } = useTranslation();
   const getAriaLabel = (tag: string) =>
     t(onDelete ? `removeHashTag ${tag}` : onClick ? `addHashTag ${tag}` : '');
-  const handleClick = (tag: string) => (onClick ? onClick(tag) : onDelete ? onDelete(tag) : null);
+
+  const handleOnClick = (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
+    onClick && onClick((e.target as HTMLDivElement).innerText);
+  };
 
   return (
     <div className="tags-container">
@@ -25,11 +28,9 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
               className="tag-wrapper"
               aria-label={getAriaLabel(tag)}
               data-testid={id}
+              id={tag}
             >
-              <Tag
-                onClick={onClick ? () => handleClick(tag) : undefined}
-                onDelete={onDelete ? () => handleClick(tag) : undefined}
-              >
+              <Tag onClick={handleOnClick} onDelete={onDelete ? () => onDelete(tag) : undefined}>
                 {tag}
               </Tag>
             </div>

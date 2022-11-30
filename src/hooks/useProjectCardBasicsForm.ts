@@ -81,6 +81,7 @@ const getProjectBasicsFormFields = (
 const useProjectCardBasicsValues = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const { t } = useTranslation();
+
   const formValues: IProjectCardBasicsForm = useMemo(
     () => ({
       type: listItemToOption(projectCard?.type, t),

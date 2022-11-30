@@ -135,4 +135,5 @@
 
 .tags-container .tag-wrapper {
   margin: 0 var(--spacing-xs) var(--spacing-xs) 0;
+  z-index: 999;
 }

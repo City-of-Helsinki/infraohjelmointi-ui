@@ -28,6 +28,8 @@ const ProjectCardBasicsForm: FC = () => {
 
     console.log('Posting with data: ', { id: projectId, data });
 
+    console.log('Hello world');
+
     if (projectId) {
       dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {
         console.log('PATCH response: ', res);

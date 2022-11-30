@@ -21,7 +21,7 @@ interface IHashTagsDialogProps {
  */
 const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
   ({ name, label, value, onChange }, ref: Ref<HTMLDivElement>) => {
-    const [tags, setTags] = useState<Array<string>>([]);
+    const [tags, setTags] = useState<Array<string>>(value);
     const [allTags, setAllTags] = useState(mockTags);
     const [isOpen, setIsOpen] = useState(false);
     const { t } = useTranslation();
@@ -48,6 +48,8 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
       e.preventDefault();
       setIsOpen(!isOpen);
     };
+
+    useEffect(() => console.log('Tags on muuttunut, ', tags), [tags]);
 
     const onTagClick = (tag: string) => {
       setTags([...tags, tag]);
@@ -101,6 +103,7 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
               <Button onClick={onSaveTags}>{t('save')}</Button>
             </ActionButtons>
           </Dialog>
+
           {/* Displayed on form */}
           <PenAndLabelButton text={t(`projectCardBasicsForm.${name}`)} onClick={onEdit} />
           <TagsContainer tags={value} />
