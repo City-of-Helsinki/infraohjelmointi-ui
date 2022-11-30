@@ -11,13 +11,13 @@ import { notifySuccess } from './notificationSlice';
 
 interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
-  projectCards: Array<IProjectCard> | null;
+  projectCards: Array<IProjectCard>;
   error: IError | null | unknown;
 }
 
 const initialState: IProjectCardState = {
   selectedProjectCard: null,
-  projectCards: null,
+  projectCards: [],
   error: null,
 };
 

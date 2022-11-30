@@ -22,11 +22,12 @@ const SideBar = () => {
   // Get all project cards
   useEffect(() => {
     dispatch(getProjectCardsThunk());
-  }, [dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Set the project card ID to the first in the list if found
   useEffect(() => {
-    setProjectId((projectCards && projectCards?.length > 0 && projectCards[0].id) || '');
+    setProjectId((projectCards?.length > 0 && projectCards[0].id) || '');
   }, [projectCards]);
 
   const navItems: Array<INavigationItem> = [

@@ -124,7 +124,8 @@ const useProjectCardBasicsForm = () => {
     if (projectCard) {
       reset(formValues);
     }
-  }, [projectCard, formValues, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectCard, formValues]);
 
   const formFields = getProjectBasicsFormFields(control, t);
 

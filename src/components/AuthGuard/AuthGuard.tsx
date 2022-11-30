@@ -17,7 +17,8 @@ const AuthGuard: FC = () => {
       // Temporarily adding a mock user
       dispatch(setUser(mockUser));
     }
-  }, [user, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return <></>;
 };

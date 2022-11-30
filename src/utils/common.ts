@@ -7,6 +7,7 @@ export const listItemToOption = (
   listItem: IListItem | undefined,
   translate?: TFunction<'translation'>,
 ): IOption => ({
-  label: translate ? translate(`enums.${listItem?.value}`) : listItem?.value || '',
+  label:
+    listItem?.value && translate ? translate(`enums.${listItem?.value}`) : listItem?.value || '',
   value: listItem?.id || '',
 });

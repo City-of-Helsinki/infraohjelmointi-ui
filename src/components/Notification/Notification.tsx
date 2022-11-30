@@ -19,7 +19,7 @@ const Notification: FC = () => {
             <div key={n.id} className="notification-wrapper">
               <HDSNotification
                 label={t(`notification.title.${n.title}`)}
-                type={n.color || undefined}
+                type={n.color}
                 dismissible
                 position={n.type === 'toast' ? 'top-right' : 'inline'}
                 autoClose={n.type === 'toast'}

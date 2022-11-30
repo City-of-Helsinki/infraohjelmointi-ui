@@ -26,7 +26,7 @@ const NetworkNumbersContainer: FC<INetworkNumberContainerProps> = forwardRef(
 
     return (
       <div className="display-flex-col" id={name} data-testid={name} ref={ref}>
-        <PenAndLabelButton text={label} disabled onClick={(e) => addNetworkNumber(e)} />
+        <PenAndLabelButton text={label} disabled onClick={addNetworkNumber} />
         {networkNumbers.length > 0 &&
           networkNumbers.map((nn) => (
             <div className="nn-row" key={nn.label}>

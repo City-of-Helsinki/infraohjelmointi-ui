@@ -1,5 +1,5 @@
 import { Tag } from 'hds-react/components/Tag';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ITagsProps {
@@ -40,4 +40,4 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
   );
 };
 
-export default TagsContainer;
+export default memo(TagsContainer);

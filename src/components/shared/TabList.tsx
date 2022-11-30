@@ -27,7 +27,7 @@ const TabList: FC<ITabListProps> = ({ navItems }) => {
         {/* tabs */}
         <Tabs.TabList className="custom-tab-list">
           {navItems.map((n) => (
-            <Tabs.Tab key={n.route} onClick={() => navigate('basics')}>
+            <Tabs.Tab key={n.route} onClick={() => navigate(n.route)}>
               {n.label}
             </Tabs.Tab>
           ))}

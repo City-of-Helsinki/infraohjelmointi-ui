@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { RootState } from '@/store';
 import { useAppSelector } from '@/hooks/common';
 import { Paragraph, ProgressCircle, IconButton } from '@/components/shared';
@@ -14,6 +14,13 @@ interface IPhaseDropdown {
   options: Array<IOption>;
   value: IOption;
   onChange: SelectCallback;
+}
+
+interface IFormState {
+  selectedOption: IOption;
+  favourite: boolean;
+  name: string;
+  group: string;
 }
 
 const PhaseDropdown: FC<IPhaseDropdown> = ({ options, value, onChange }) => {
@@ -38,26 +45,32 @@ const PhaseDropdown: FC<IPhaseDropdown> = ({ options, value, onChange }) => {
 const ProjectCardHeader: FC = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const user = useAppSelector((state: RootState) => state.auth.user);
-  const [favourite, setFavourite] = useState(false);
-  const [name, setName] = useState('');
   const { t } = useTranslation();
-
   const { options } = useOptions('phase');
 
-  const [selectedOption, setSelectedOption] = useState<IOption>({ label: '', value: '' });
+  // Adapt this to useForm() when we need to submit this
+  const [formState, setFormState] = useState<IFormState>({
+    favourite: false,
+    selectedOption: { label: '', value: '' },
+    name: '',
+    group: 'Hakaniemi',
+  });
 
-  // Vars that will come from API
-  const group = 'Hakaniemi';
+  const handlePhaseChange = (o: IOption) => setFormState({ ...formState, selectedOption: o });
+  const handleFavChange = () => setFormState({ ...formState, favourite: !formState.favourite });
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setFormState({ ...formState, name: e.target.value });
 
   // Add values on project card changes
   useEffect(
     () => {
       if (projectCard) {
-        setFavourite(
-          (user && projectCard.favPersons && projectCard.favPersons?.includes(user.id)) || false,
-        );
-        setName(projectCard.name);
-        setSelectedOption(listItemToOption(projectCard?.phase, t));
+        setFormState({
+          ...formState,
+          favourite: (user && projectCard.favPersons?.includes(user.id)) || false,
+          selectedOption: listItemToOption(projectCard.phase, t),
+          name: projectCard.name,
+        });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,11 +88,11 @@ const ProjectCardHeader: FC = () => {
       </div>
       <div className="center">
         <div className="center-wrapper">
-          <ProjectCardNameForm name={name} onChange={(e) => setName(e.target.value)} />
+          <ProjectCardNameForm name={formState.name} onChange={handleNameChange} />
           <PhaseDropdown
             options={options}
-            value={selectedOption}
-            onChange={(o) => setSelectedOption(o)}
+            value={formState.selectedOption}
+            onChange={handlePhaseChange}
           />
         </div>
       </div>
@@ -88,14 +101,14 @@ const ProjectCardHeader: FC = () => {
           <div className="right-wrapper-inner">
             <div className="favourite-button-container">
               <IconButton
-                onClick={() => setFavourite(!favourite)}
+                onClick={handleFavChange}
                 color="white"
-                icon={favourite ? IconStarFill : IconStar}
-                text={favourite ? 'removeFavourite' : 'addFavourite'}
+                icon={formState.favourite ? IconStarFill : IconStar}
+                text={formState.favourite ? 'removeFavourite' : 'addFavourite'}
               />
             </div>
             <Paragraph color="white" size="m" text={'inGroup'} />
-            <Paragraph color="white" size="l" fontWeight="bold" text={group} />
+            <Paragraph color="white" size="l" fontWeight="bold" text={formState.group} />
           </div>
         </div>
       </div>
