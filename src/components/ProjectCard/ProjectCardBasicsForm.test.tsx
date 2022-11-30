@@ -10,8 +10,9 @@ import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { getProjectAreasThunk, getProjectTypesThunk } from '@/reducers/listsSlice';
 import { mockProjectAreas, mockProjectTypes } from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
-import { waitFor } from '@testing-library/react';
 import { debug } from 'console';
+import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
+import { waitFor } from '@testing-library/react';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -203,8 +204,8 @@ describe('ProjectCardBasicsForm', () => {
     expect(queryByText(matchExact('manageHashTags'))).toBeNull();
   });
 
-  it('can send the basic form', async () => {
-    const { getByText, getByRole, user, getByDisplayValue } = renderWithProviders(
+  it('can patch an existing project card and recieve the updates', async () => {
+    const { getByRole, user, getByText, getByDisplayValue, getAllByTestId } = renderWithProviders(
       <ProjectCardBasicsForm />,
       {
         store,
@@ -213,8 +214,7 @@ describe('ProjectCardBasicsForm', () => {
 
     const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
     const availableTags = mockTags.filter((tag) => projectCard.hashTags?.indexOf(tag) === -1);
-
-    const patchedProjectCard: IProjectCard = {
+    const responseProjectCard: IProjectCard = {
       ...projectCard,
       id: '79e6bc76-9fa2-49a1-aaad-b52330da170e',
       description: 'Desc',
@@ -224,37 +224,50 @@ describe('ProjectCardBasicsForm', () => {
       hashTags: ['pyöräily', 'uudisrakentaminen', 'pohjoinensuurpiiri'],
     };
 
-    await waitFor(async () => {
-      // Add entity and description
-      user.type(getByRole('textbox', { name: 'projectCardBasicsForm.description *' }), 'Desc');
-      user.type(getByRole('textbox', { name: 'projectCardBasicsForm.entityName' }), 'Ent');
+    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
 
-      // Select new area
-      await user.click(getByRole('button', { name: 'projectCardBasicsForm.area' }));
-      await user.click(getByText(matchExact('enums.lansisatama')));
+    const descriptionField = getByRole('textbox', { name: 'projectCardBasicsForm.description *' });
+    const entityNameField = getByRole('textbox', { name: 'projectCardBasicsForm.entityName' });
 
-      // Select new type
-      await user.click(getByRole('button', { name: 'projectCardBasicsForm.type *' }));
-      await user.click(getByText(matchExact('enums.sports')));
+    // Fill in the form
+    await user.clear(descriptionField);
+    await user.type(descriptionField, 'Desc');
 
-      // Add a tag
-      await user.click(getByRole('button', { name: matchExact('projectCardBasicsForm.hashTags') }));
-      await user.click(getByRole('link', { name: matchExact(availableTags[0]) }));
-      await user.click(getByRole('button', { name: matchExact('closeHashTagsWindow') }));
+    await user.clear(entityNameField);
+    await user.type(entityNameField, 'Ent');
 
-      expect(getByDisplayValue(matchExact(patchedProjectCard?.description))).toBeInTheDocument();
-      // expect(getByDisplayValue(matchExact(patchedProjectCard?.entityName))).toBeInTheDocument();
+    await user.click(getByRole('button', { name: 'projectCardBasicsForm.area' }));
+    await user.click(getByText(matchExact('enums.lansisatama')));
 
-      // expect(patchedProjectCard?.hashTags?.length).toBe(3);
-      // patchedProjectCard?.hashTags?.forEach((h) => {
-      //   expect(getByText(matchExact(h))).toBeInTheDocument();
-      // });
-    });
+    await user.click(getByRole('button', { name: 'projectCardBasicsForm.type *' }));
+    await user.click(getByText(matchExact('enums.sports')));
 
-    await waitFor(async () => {
-      mockedAxios.get.mockResolvedValue(async () => await Promise.resolve(patchedProjectCard));
-    });
+    /**
+     * FIXME: when adding a hashTag the value added becomes undefined, so this can't be tested because:
+     * debug(getByText('pohjoinensuurpiiri').innerText); <- returns "undefined"
+     * debug(getByText('pohjoinensuurpiiri').innerHTML); <- returns "pohjoinensuurpiiri"
+     *
+     * The component (TagsContainer.tsx) handleOnClick() retrieves the innerText value, which results in our
+     * test adding "undefined" to our form.
+     */
+    await user.click(getByRole('button', { name: matchExact('projectCardBasicsForm.hashTags') }));
+    await user.click(getByText('pohjoinensuurpiiri'));
+    await user.click(getByRole('button', { name: matchExact('save') }));
 
-    // await user.click(getByRole('button', { name: 'send' })).then();
+    // Click the send button
+    await user.click(getByRole('button', { name: 'send' }));
+
+    const patchMock = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+
+    // Check axios values
+    expect(patchMock.description).toEqual(responseProjectCard.description);
+    expect(patchMock.entityName).toEqual(responseProjectCard.entityName);
+    expect(patchMock.hashTags?.length).toBe(responseProjectCard.hashTags?.length);
+
+    // Check that the form values stay updated with the state
+    expect(getByDisplayValue(responseProjectCard.description)).toBeInTheDocument();
+    expect(getByDisplayValue(responseProjectCard.entityName)).toBeInTheDocument();
+    // Test hashTags when "undefined"-error is fixed (see above FIXME)
+    // Test dropdowns when backend returns an actual IListItem from patch-response
   });
 });

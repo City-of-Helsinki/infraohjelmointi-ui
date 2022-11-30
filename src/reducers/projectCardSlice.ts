@@ -100,6 +100,12 @@ export const projectCardSlice = createSlice({
     );
     // PATCH
     builder.addCase(
+      patchProjectCardThunk.fulfilled,
+      (state, action: PayloadAction<IProjectCard>) => {
+        return { ...state, selectedProjectCard: action.payload };
+      },
+    );
+    builder.addCase(
       patchProjectCardThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };

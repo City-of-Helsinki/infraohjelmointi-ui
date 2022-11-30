@@ -49,8 +49,6 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
       setIsOpen(!isOpen);
     };
 
-    useEffect(() => console.log('Tags on muuttunut, ', tags), [tags]);
-
     const onTagClick = (tag: string) => {
       setTags([...tags, tag]);
     };

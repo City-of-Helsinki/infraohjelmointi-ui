@@ -21,19 +21,13 @@ const ProjectCardBasicsForm: FC = () => {
     const { type, area, ...formData } = form;
 
     const data: IProjectCardRequest = {
+      ...formData,
       type: type.value,
       area: area.value,
-      ...formData,
     };
 
-    console.log('Posting with data: ', { id: projectId, data });
-
-    console.log('Hello world');
-
     if (projectId) {
-      dispatch(patchProjectCardThunk({ id: projectId, data })).then((res) => {
-        console.log('PATCH response: ', res);
-      });
+      dispatch(patchProjectCardThunk({ id: projectId, data }));
     }
   };
 

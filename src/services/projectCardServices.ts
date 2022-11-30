@@ -32,7 +32,9 @@ export const deleteProjectCard = async (id: string): Promise<void> => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const patchProjectCard = async (request: IProjectCardRequestObject): Promise<void> => {
+export const patchProjectCard = async (
+  request: IProjectCardRequestObject,
+): Promise<IProjectCard> => {
   return axios
     .patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data)
     .then((res) => res.data)
