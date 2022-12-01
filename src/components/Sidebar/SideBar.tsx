@@ -1,5 +1,9 @@
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
+import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
+import { RootState } from '@/store';
 import { IconPenLine } from 'hds-react/icons';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
@@ -10,13 +14,25 @@ import './styles.css';
 const SideBar = () => {
   const navigate = useNavigate();
   const path = useLocation().pathname;
+  const dispatch = useAppDispatch();
+  const projectCards = useAppSelector((state: RootState) => state.projectCard.projectCards);
+  const [projectId, setProjectId] = useState('');
   const { t } = useTranslation();
 
-  const projectId = 'd9b0f06d-161f-466a-bf43-fec866b2c6b7';
+  // Get all project cards
+  useEffect(() => {
+    dispatch(getProjectCardsThunk());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Set the project card ID to the first in the list if found
+  useEffect(() => {
+    setProjectId((projectCards?.length > 0 && projectCards[0].id) || '');
+  }, [projectCards]);
 
   const navItems: Array<INavigationItem> = [
     {
-      route: `project-card/${projectId}`,
+      route: `project-card/${projectId}/`,
       label: t('projectCard'),
       component: <IconPenLine />,
     },
@@ -30,7 +46,6 @@ const SideBar = () => {
           onClick={() => navigate(n.route)}
           aria-label={n.label}
           key={n.route}
-          data-testid="button-testing"
         >
           {n.component}
         </button>

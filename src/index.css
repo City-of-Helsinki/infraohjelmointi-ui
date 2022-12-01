@@ -1,11 +1,21 @@
+@import '~hds-core/lib/utils/helpers.css';
+@import 'fonts.css';
+
+:root {
+  --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
+}
+
 html {
   font-size: 100%;
-  font-family: var(--font-defaut);
 }
 
 body {
   margin: 0;
   width: 100%;
+  font-family: var(--infra-font-default);
+  font-size: var(--fontsize-body-m);
+  color: var(--color-black-90);
+  line-height: var(--lineheight-l);
 }
 
 /* completely remove styling from the default button */
@@ -69,18 +79,34 @@ p {
   display: flex;
 }
 
+.display-flex-col {
+  flex-direction: column;
+}
+
 .pos-relative {
   position: relative;
 }
 
-.flex-col {
-  flex-direction: column;
-}
-
-.width-100-p {
+.w-100-p {
   width: 100%;
 }
 
 .text-right {
   text-align: right;
+}
+
+.input-wrapper {
+  margin-bottom: var(--spacing-l);
+}
+
+.input-l {
+  max-width: 360px;
+}
+
+.legend-margin {
+  color: var(--label-color-default, var(--color-black-90));
+  display: block;
+  font-size: var(--fontsize-body-m);
+  font-weight: 500;
+  margin-bottom: var(--spacing-m);
 }

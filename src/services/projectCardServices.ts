@@ -1,5 +1,5 @@
 import { IError } from '@/interfaces/common';
-import { IProjectCard } from '@/interfaces/projectCardInterfaces';
+import { IProjectCard, IProjectCardRequestObject } from '@/interfaces/projectCardInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
@@ -18,16 +18,25 @@ export const getProjectCard = async (id: string): Promise<IProjectCard> => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const postProjectCard = async (projectCard: IProjectCard): Promise<void> => {
+export const postProjectCard = async (request: IProjectCardRequestObject): Promise<void> => {
   return axios
-    .post(`${REACT_APP_API_URL}/projects/`, projectCard)
+    .post(`${REACT_APP_API_URL}/projects/`, request.data)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
 
 export const deleteProjectCard = async (id: string): Promise<void> => {
   return axios
-    .delete(`${REACT_APP_API_URL}/projects/${id}`)
+    .delete(`${REACT_APP_API_URL}/projects/${id}/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const patchProjectCard = async (
+  request: IProjectCardRequestObject,
+): Promise<IProjectCard> => {
+  return axios
+    .patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

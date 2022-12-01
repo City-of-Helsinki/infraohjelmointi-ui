@@ -11,15 +11,14 @@ const AuthGuard: FC = () => {
   const user = useAppSelector((state: RootState) => state.auth.user);
   const dispatch = useAppDispatch();
 
-  useEffect(
-    function checkIfUserExists() {
-      if (!user) {
-        // Temporarily adding a mock user
-        dispatch(setUser(mockUser));
-      }
-    },
-    [user, dispatch],
-  );
+  // Check if user exists
+  useEffect(() => {
+    if (!user) {
+      // Temporarily adding a mock user
+      dispatch(setUser(mockUser));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return <></>;
 };

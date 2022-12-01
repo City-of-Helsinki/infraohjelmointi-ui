@@ -15,7 +15,9 @@
     "searchPage": "Hae sivulta",
     "notifications": "Ilmoitukset",
     "skipToContent": "Siirry kohteeseen",
-    "login": "Kirjaudu sisään"
+    "login": "Kirjaudu sisään",
+    "basics": "Hankkeen perustiedot",
+    "navigateToForm": "Navigoi lomakkeeseen"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -28,7 +30,43 @@
     "constructionWait": "Odottaa rakentamista",
     "construction": "Rakentaminen",
     "warrantyPeriod": "Takuuaika",
-    "completed": "Valmis / ylläpidossa"
+    "completed": "Valmis / ylläpidossa",
+    "projectComplex": "Hankekokonaisuus",
+    "street": "Katu",
+    "traffic": "Liikenne",
+    "sports": "Liikunta",
+    "omaStadi": "OmaStadi",
+    "projectArea": "Projektialue",
+    "park": "Puisto tai taitorakenne",
+    "honkasuo": "Honkasuo",
+    "kalasatama": "Kalasatama",
+    "kruunuvuori": "Kruunuvuori",
+    "kuninkaantammi": "Kuinkaantammi",
+    "lansisatama": "Länsisatama",
+    "malminLentokenttaalue": "Malmin lentokenttäalue",
+    "pasila": "Pasila",
+    "ostersundom": "Östersundom",
+    "kruunuvuorenranta": "Kruunuvuorenranta"
+  },
+  "projectCardBasicsForm": {
+    "basicInfoTitle": "Hankkeen perustiedot",
+    "type": "Hanketyyppi",
+    "entityName": "Hankekokonaisuuden nimi",
+    "description": "Hankkeen kuvaus",
+    "area": "Projektialue",
+    "hkrId": "PW Hanketunnus",
+    "sapNetwork": "Verkkonumerot",
+    "sapProject": "Projektinumero",
+    "hashTags": "Tunnisteet"
+  },
+  "notification": {
+    "title": {
+      "sendSuccess": "Lähetys onnistui",
+      "404": "Virhe, resurssia ei löytynyt"
+    },
+    "message": {
+      "formSaveSuccess": "Lomake tallennettu onnistuneesti."
+    }
   },
   "appTitle": "Infraohjelmointi UI",
   "projectCard": "Hankekortti",
@@ -40,5 +78,14 @@
   "removeFavourite": "Poista suosikeista",
   "addFavourite": "Lisää suosikkeihin",
   "inGroup": "Kuuluu ryhmään",
-  "closeNotification": "Sulje ilmoitus"
+  "closeNotification": "Sulje ilmoitus",
+  "addHashTag": "Lisää tunniste",
+  "removeHashTag": "Poista tunniste",
+  "closeHashTagsWindow": "Sulje tunnisteikkuna",
+  "manageHashTags": "Hallitse tunnisteita",
+  "projectCardHashTags": "Hankkeen tunnisteet",
+  "addHashTagsToProject": "Lisää hankkeelle uusi tunniste",
+  "modifyGeneralMode": "Muokkaa yleistilaa",
+  "getHashTagsOrCreateNew": "Hae tunnisteita tai luo uusi",
+  "save": "Tallenna"
 }

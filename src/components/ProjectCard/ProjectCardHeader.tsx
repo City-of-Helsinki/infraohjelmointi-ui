@@ -1,73 +1,43 @@
-import { ChangeEventHandler, FC, useEffect, useState } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { RootState } from '@/store';
 import { useAppSelector } from '@/hooks/common';
-import { Paragraph, ProgressCircle, IconButton, Title } from '@/components/shared';
-import { IconFaceSmile, IconPenLine, IconStar, IconStarFill } from 'hds-react/icons';
-import { TextInput } from 'hds-react/components/TextInput';
+import { Paragraph, ProgressCircle, IconButton } from '@/components/shared';
+import { IconFaceSmile, IconStar, IconStarFill } from 'hds-react/icons';
 import { Select } from 'hds-react/components/Select';
 import { useTranslation } from 'react-i18next';
-import { ProjectPhase } from '@/interfaces/projectCardInterfaces';
-import { IOptionType, SelectCallback } from '@/interfaces/common';
-import { projectCardAddress } from '@/mocks/common';
+import { IOption, SelectCallback } from '@/interfaces/common';
+import ProjectCardNameForm from './ProjectCardNameForm';
+import { useOptions } from '@/hooks/useOptions';
+import { listItemToOption } from '@/utils/common';
 
-interface INameFormProps {
-  name: string;
-  onChange: ChangeEventHandler<HTMLInputElement>;
-}
-
-const NameForm: FC<INameFormProps> = ({ name, onChange }) => {
-  const [editing, setEditing] = useState(false);
-  return (
-    <div className="edit-name-form">
-      <div>
-        {editing ? (
-          <TextInput id="textinput" value={name || ''} onChange={onChange} required />
-        ) : (
-          <>
-            <Title size="m" color="white" text={name} />
-            <Paragraph size="l" color="white" text={projectCardAddress} />
-          </>
-        )}
-      </div>
-      <IconButton
-        onClick={() => setEditing(!editing)}
-        icon={IconPenLine}
-        color="white"
-        label="edit-project-name"
-      />
-    </div>
-  );
-};
-
-interface IProjectPhaseDropdown {
-  selectedOption: string;
+interface IPhaseDropdown {
+  options: Array<IOption>;
+  value: IOption;
   onChange: SelectCallback;
 }
 
-const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption, onChange }) => {
-  const { t } = useTranslation();
+interface IFormState {
+  selectedOption: IOption;
+  favourite: boolean;
+  name: string;
+  group: string;
+}
 
-  const getPhaseOptions = () => {
-    const phaseOptions: Array<IOptionType> = [];
-    Object.values(ProjectPhase).map((p) => phaseOptions.push({ label: t(`enums.${p}`) }));
-    return phaseOptions;
-  };
+const PhaseDropdown: FC<IPhaseDropdown> = ({ options, value, onChange }) => {
+  const { t } = useTranslation();
 
   return (
     <>
-      {/* FIXME: this hack is here because HDS-Select component doesn't re-rendering the defaultValue */}
-      {selectedOption && (
-        <div className="phase-dropdown">
-          <Select
-            label=""
-            defaultValue={{ label: t(`enums.${selectedOption}`) }}
-            icon={<IconFaceSmile />}
-            placeholder={t('projectPhase') || ''}
-            options={getPhaseOptions()}
-            onChange={onChange}
-          />
-        </div>
-      )}
+      <div>
+        <Select
+          label=""
+          value={value}
+          icon={<IconFaceSmile />}
+          placeholder={t('projectPhase') || ''}
+          options={options}
+          onChange={onChange}
+        />
+      </div>
     </>
   );
 };
@@ -75,56 +45,70 @@ const ProjectPhaseDropdown: FC<IProjectPhaseDropdown> = ({ selectedOption, onCha
 const ProjectCardHeader: FC = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const user = useAppSelector((state: RootState) => state.auth.user);
+  const { t } = useTranslation();
+  const { options } = useOptions('phase');
 
-  const [favourite, setFavourite] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('');
-  const [name, setName] = useState('');
+  // Adapt this to useForm() when we need to submit this
+  const [formState, setFormState] = useState<IFormState>({
+    favourite: false,
+    selectedOption: { label: '', value: '' },
+    name: '',
+    group: 'Hakaniemi',
+  });
 
-  // Vars that will come from API
-  const group = 'Hakaniemi';
+  const handlePhaseChange = (o: IOption) => setFormState({ ...formState, selectedOption: o });
+  const handleFavChange = () => setFormState({ ...formState, favourite: !formState.favourite });
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setFormState({ ...formState, name: e.target.value });
 
+  // Add values on project card changes
   useEffect(
-    function onProjectCardChanges() {
+    () => {
       if (projectCard) {
-        setFavourite((user && projectCard.favPersons.includes(user.id)) || false);
-        setSelectedOption(projectCard.phase);
-        setName(projectCard.name);
+        setFormState({
+          ...formState,
+          favourite: (user && projectCard.favPersons?.includes(user.id)) || false,
+          selectedOption: listItemToOption(projectCard.phase, t),
+          name: projectCard.name,
+        });
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [user, projectCard],
   );
 
   return (
     <div className="project-card-header-container">
-      <div className="header-row">
-        {/* left */}
-        <div className="display-flex">
-          <div className="progress-indicator-container">
+      <div className="left">
+        <div className="left-wrapper">
+          <div className="readiness-container">
             <ProgressCircle color={'--color-engel'} percent={projectCard?.projectReadiness} />
           </div>
-          <div className="header-column">
-            <NameForm name={name} onChange={(e) => setName(e.target.value)} />
-            <ProjectPhaseDropdown
-              selectedOption={selectedOption}
-              onChange={(o) => setSelectedOption(o.label)}
-            />
-          </div>
         </div>
-        {/* right */}
-        <div className="header-column text-right">
-          <div>
+      </div>
+      <div className="center">
+        <div className="center-wrapper">
+          <ProjectCardNameForm name={formState.name} onChange={handleNameChange} />
+          <PhaseDropdown
+            options={options}
+            value={formState.selectedOption}
+            onChange={handlePhaseChange}
+          />
+        </div>
+      </div>
+      <div className="right">
+        <div className="right-wrapper">
+          <div className="right-wrapper-inner">
             <div className="favourite-button-container">
               <IconButton
-                onClick={() => setFavourite(!favourite)}
+                onClick={handleFavChange}
                 color="white"
-                icon={favourite ? IconStarFill : IconStar}
-                text={favourite ? 'removeFavourite' : 'addFavourite'}
+                icon={formState.favourite ? IconStarFill : IconStar}
+                text={formState.favourite ? 'removeFavourite' : 'addFavourite'}
               />
             </div>
-            <div>
-              <Paragraph color="white" size="m" text={'inGroup'} />
-              <Paragraph color="white" size="l" fontWeight="bold" text={group} />
-            </div>
+            <Paragraph color="white" size="m" text={'inGroup'} />
+            <Paragraph color="white" size="l" fontWeight="bold" text={formState.group} />
           </div>
         </div>
       </div>

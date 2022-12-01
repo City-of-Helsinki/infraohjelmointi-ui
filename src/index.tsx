@@ -3,12 +3,11 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { setupStore } from '@/store';
 import './index.css';
-import 'hds-core';
 import './i18n';
 
 import App from '@/App';
 import ProjectCardView from '@/views/ProjectCardView';
-import { ProjectCardBasics, ProjectCardTasks } from '@/components/ProjectCard';
+import { ProjectCardBasics } from '@/components/ProjectCard';
 import ErrorView from '@/views/ErrorView';
 import AuthGuard from '@/components/AuthGuard';
 import { injectStore } from './utils/interceptors';
@@ -39,10 +38,6 @@ const router = createBrowserRouter([
           {
             path: 'basics',
             element: <ProjectCardBasics />,
-          },
-          {
-            path: 'tasks',
-            element: <ProjectCardTasks />,
           },
         ],
       },

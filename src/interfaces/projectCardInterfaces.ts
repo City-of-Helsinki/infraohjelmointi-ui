@@ -1,26 +1,24 @@
-/**
- * Not all of these were 100% clear in the Jira description, some might change as we go
- */
+import { IListItem } from './common';
+
 export interface IProjectCard {
   id: string;
   projectReadiness: number;
   hkrId: string;
-  sapProject: string;
-  sapNetwork: string;
-  type: ProjectType;
+  sapProject: Array<string>;
+  sapNetwork: Array<string>;
+  type: IListItem;
   name: string;
+  entityName: string;
   description: string;
-  phase: ProjectPhase;
+  phase: IListItem;
   programmed: boolean;
   constructionPhaseDetail: string;
-  estPlanningStartYear: string;
-  estDesignEndYear: string;
-  estDesignStartDate: string;
-  estDesignEndDate: string;
-  contractPrepStartDate: string;
-  contractPrepEndDate: string;
-  warrantyStartDate: string;
-  warrantyExpireDate: string;
+  estPlanningStartYear?: string;
+  estDesignEndYear?: string;
+  contractPrepStartDate?: string;
+  contractPrepEndDate?: string;
+  warrantyStartDate?: string;
+  warrantyExpireDate?: string;
   perfAmount: string;
   unitCost: string;
   costForecast: string;
@@ -30,19 +28,50 @@ export interface IProjectCard {
   realizedCost: string;
   spentCost: string;
   riskAssess: string;
-  priority: ProjectPriority;
+  priority: IListItem;
   locked: boolean;
   comments: string;
   delays: string;
-  createdDate: string;
-  updatedDate: string;
-  siteId: IBudget | null;
-  projectSet: IProjectSet | null;
-  area: IProjectArea | null;
-  personPlanning: IPerson | null;
-  personProgramming: IPerson | null;
-  personConstruction: IPerson | null;
-  favPersons: Array<string>;
+  createdDate?: string;
+  updatedDate?: string;
+  siteId?: IBudget;
+  projectSet?: IProjectSet;
+  area?: IListItem;
+  personPlanning?: IPerson;
+  personProgramming?: IPerson;
+  personConstruction?: IPerson;
+  favPersons?: Array<string>;
+  hashTags?: Array<string>;
+  budgetForecast1CurrentYear?: string;
+  budgetForecast2CurrentYear?: string;
+  budgetForecast3CurrentYear?: string;
+  budgetForecast4CurrentYear?: string;
+  budgetProposalCurrentYearPlus1?: string;
+  budgetProposalCurrentYearPlus2?: string;
+  preliminaryCurrentYearPlus3?: string;
+  preliminaryCurrentYearPlus4?: string;
+  preliminaryCurrentYearPlus5?: string;
+  preliminaryCurrentYearPlus6?: string;
+  preliminaryCurrentYearPlus7?: string;
+  preliminaryCurrentYearPlus8?: string;
+  preliminaryCurrentYearPlus9?: string;
+  preliminaryCurrentYearPlus10?: string;
+}
+
+export interface IProjectCardRequest {
+  type: string;
+  description: string;
+  entityName: string;
+  hkrId: string;
+  area: string;
+  hashTags: Array<string>;
+  sapProject: Array<string>;
+  sapNetwork: Array<string>;
+}
+
+export interface IProjectCardRequestObject {
+  id?: string;
+  data: IProjectCardRequest;
 }
 
 export enum ProjectType {
@@ -68,6 +97,11 @@ export enum ProjectPhase {
   Completed = 'completed',
 }
 
+export enum ProjectArea {
+  Hakaniemi = 'hakaniemi',
+  Kaisaniemi = 'kaisaniemi',
+}
+
 export enum ProjectPriority {
   Low = 'low',
   Medium = 'medium',
@@ -90,7 +124,7 @@ interface IProjectSet {
   name: string;
   hkrId: string;
   description: string;
-  projectPhase: ProjectPhase;
+  projectPhase: IListItem;
   programmed: boolean;
   responsiblePerson: IPerson;
 }
@@ -105,7 +139,7 @@ interface IBudget {
   need: number;
 }
 
-interface IProjectArea {
+export interface IProjectArea {
   id: string;
   areaName: string;
   location: string;

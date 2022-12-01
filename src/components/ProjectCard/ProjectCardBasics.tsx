@@ -1,9 +1,25 @@
-import { Title } from '@/components/shared';
+import { useTranslation } from 'react-i18next';
+import { SideNavigation } from '@/components/shared';
+import ProjectCardBasicsForm from './ProjectCardBasicsForm';
 
 const ProjectCardBasics = () => {
+  const { t } = useTranslation();
+
+  const navItems = [
+    {
+      route: 'basics',
+      label: t('nav.basics'),
+    },
+  ];
+
   return (
     <div className="project-card-content-container">
-      <Title size="l" text="basicInfo" />
+      <div className="side-panel">
+        <SideNavigation navItems={navItems} />
+      </div>
+      <div className="form-panel">
+        <ProjectCardBasicsForm />
+      </div>
     </div>
   );
 };

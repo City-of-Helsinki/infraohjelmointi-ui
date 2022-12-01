@@ -22,7 +22,11 @@ const Icon: FC<IIconProps> = ({ size, text, icon, color, fontWeight }) => {
         color={`var(--color-${color || 'black'})`}
       />
       {text && (
-        <span className={`label-icon-text text-${color || 'black'} text-${fontWeight || 'medium'}`}>
+        <span
+          className={`label-icon-text text-${color || 'black'} text-${
+            fontWeight ? fontWeight : ''
+          }`}
+        >
           {t(text)}
         </span>
       )}

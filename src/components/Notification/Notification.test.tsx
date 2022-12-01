@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import Notification from './Notification';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
-import { clearNotification, setNotification } from '@/reducers/notificationSlice';
+import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
 
@@ -16,32 +16,36 @@ describe('Notification', () => {
 
   it('renders a notification if dispatched', () => {
     const store = setupStore();
-    store.dispatch(setNotification(mockNotification));
+    store.dispatch(notifyInfo(mockNotification));
     const { container, getByText, getByRole } = renderWithProviders(<Notification />, { store });
 
     expect(container.getElementsByClassName('notifications-container').length).toBe(1);
     expect(getByRole('button', { name: matchExact('closeNotification') })).toBeInTheDocument();
 
-    Object.values(mockNotification).forEach((v) => {
-      expect(getByText(matchExact(v))).toBeInTheDocument();
+    Object.values(mockNotification).forEach((n) => {
+      if (n !== 'notification') {
+        expect(getByText(matchExact(n))).toBeInTheDocument();
+      }
     });
   });
 
   it.skip('is destroyed if notification is cleared', async () => {
     const store = setupStore();
-    store.dispatch(setNotification(mockNotification));
+    store.dispatch(notifyInfo(mockNotification));
     const { queryByText, getByText } = renderWithProviders(<Notification />, { store });
 
-    Object.values(mockNotification).forEach((v) => {
-      expect(getByText(matchExact(v))).toBeInTheDocument();
+    Object.values(mockNotification).forEach((n) => {
+      expect(getByText(matchExact(n))).toBeInTheDocument();
     });
 
-    // FIXME: we should test by clicking the button, but that doesn't not dispatch the action
+    // FIXME: we should test by clicking the button, but that doesn't dispatch the action
     // => await user.click(getByRole('button', { name: matchExact('Close toast') }));
     store.dispatch(clearNotification(0));
 
-    Object.values(mockNotification).forEach((v) => {
-      expect(queryByText(matchExact(v))).toBeNull();
+    Object.values(mockNotification).forEach((n) => {
+      if (n !== 'notification') {
+        expect(queryByText(matchExact(n))).toBeNull();
+      }
     });
 
     expect(store.getState().notifications).toBeNull();

@@ -1,6 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { clearLoading, setLoading } from '@/reducers/loadingSlice';
-import { setNotification } from '@/reducers/notificationSlice';
+import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
@@ -30,14 +30,18 @@ axios.interceptors.response.use(
   (error) => handleError(error),
 );
 
-const handleRequest = (request: AxiosRequestConfig) => {
-  store.dispatch(setLoading('Loading request'));
-  return request;
+const handleRequest = (req: AxiosRequestConfig) => {
+  if (!store.getState().loading.isLoading) {
+    store.dispatch(setLoading('Loading request'));
+  }
+  return req;
 };
 
-const handleResponse = (response: AxiosResponse) => {
-  store.dispatch(clearLoading());
-  return response;
+const handleResponse = (res: AxiosResponse) => {
+  if (store.getState().loading.isLoading) {
+    store.dispatch(clearLoading());
+  }
+  return res;
 };
 
 const handleError = (error: AxiosError): Promise<IError> => {
@@ -47,10 +51,9 @@ const handleError = (error: AxiosError): Promise<IError> => {
   };
 
   store.dispatch(
-    setNotification({
+    notifyError({
       message: parsedError.message,
-      title: `Virhe ${parsedError.status || ''}`,
-      type: 'error',
+      title: `${parsedError.status || ''}`,
       status: parsedError.status?.toLocaleString(),
     }),
   );

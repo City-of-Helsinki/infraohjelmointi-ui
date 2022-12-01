@@ -1,9 +1,12 @@
 import { IUser } from '@/interfaces/userInterfaces';
 
 const mockUser: IUser = {
-  username: 'John Doe',
+  id: '9d6a0854-a784-44b0-ad35-ca5e8b8f0e90',
+  firstName: 'John',
+  lastName: 'Doe',
   email: 'john.doe@hel.fi',
-  id: '6525336a-149e-422a-82d4-5907cf8bd47f',
+  title: 'Developer',
+  phone: '+35844666666',
 };
 
 export default mockUser;

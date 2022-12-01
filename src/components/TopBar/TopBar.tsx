@@ -22,7 +22,11 @@ const TopBar: FC = () => {
           {/* search */}
           <Search searchLabel={t('nav.search')} searchPlaceholder={t('nav.searchPage') || ''} />
           {/* user */}
-          <User label={t('nav.login')} userName={user?.username} authenticated={!!user}>
+          <User
+            label={t('nav.login')}
+            userName={`${user?.firstName} ${user?.lastName}`}
+            authenticated={!!user}
+          >
             <Item label={'Tietoa käyttäjästä'} />
           </User>
           {/* notifications */}
