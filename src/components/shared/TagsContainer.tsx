@@ -1,5 +1,5 @@
 import { Tag } from 'hds-react/components/Tag';
-import { FC, memo, MouseEvent, KeyboardEvent, SyntheticEvent } from 'react';
+import { FC, memo, MouseEvent, KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ITagsProps {

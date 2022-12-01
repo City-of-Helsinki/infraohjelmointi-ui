@@ -10,9 +10,6 @@ import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { getProjectAreasThunk, getProjectTypesThunk } from '@/reducers/listsSlice';
 import { mockProjectAreas, mockProjectTypes } from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
-import { debug } from 'console';
-import { IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
-import { waitFor } from '@testing-library/react';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -205,7 +202,7 @@ describe('ProjectCardBasicsForm', () => {
   });
 
   it('can patch an existing project card and recieve the updates', async () => {
-    const { getByRole, user, getByText, getByDisplayValue, getAllByTestId } = renderWithProviders(
+    const { getByRole, user, getByText, getByDisplayValue } = renderWithProviders(
       <ProjectCardBasicsForm />,
       {
         store,
@@ -213,7 +210,6 @@ describe('ProjectCardBasicsForm', () => {
     );
 
     const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
-    const availableTags = mockTags.filter((tag) => projectCard.hashTags?.indexOf(tag) === -1);
     const responseProjectCard: IProjectCard = {
       ...projectCard,
       id: '79e6bc76-9fa2-49a1-aaad-b52330da170e',
@@ -268,6 +264,7 @@ describe('ProjectCardBasicsForm', () => {
     expect(getByDisplayValue(responseProjectCard.description)).toBeInTheDocument();
     expect(getByDisplayValue(responseProjectCard.entityName)).toBeInTheDocument();
     // Test hashTags when "undefined"-error is fixed (see above FIXME)
-    // Test dropdowns when backend returns an actual IListItem from patch-response
+    expect(getByText(matchExact(responseProjectCard?.area?.value || ''))).toBeInTheDocument();
+    expect(getByText(matchExact(responseProjectCard?.type.value || ''))).toBeInTheDocument();
   });
 });
