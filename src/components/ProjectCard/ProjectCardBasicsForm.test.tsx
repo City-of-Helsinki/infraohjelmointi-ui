@@ -253,12 +253,12 @@ describe('ProjectCardBasicsForm', () => {
     // Click the send button
     await user.click(getByRole('button', { name: 'send' }));
 
-    const patchMock = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
 
     // Check axios values
-    expect(patchMock.description).toEqual(responseProjectCard.description);
-    expect(patchMock.entityName).toEqual(responseProjectCard.entityName);
-    expect(patchMock.hashTags?.length).toBe(responseProjectCard.hashTags?.length);
+    expect(formPatchRequest.description).toEqual(responseProjectCard.description);
+    expect(formPatchRequest.entityName).toEqual(responseProjectCard.entityName);
+    expect(formPatchRequest.hashTags?.length).toBe(responseProjectCard.hashTags?.length);
 
     // Check that the form values stay updated with the state
     expect(getByDisplayValue(responseProjectCard.description)).toBeInTheDocument();
