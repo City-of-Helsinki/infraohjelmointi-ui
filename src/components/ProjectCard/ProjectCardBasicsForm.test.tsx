@@ -238,14 +238,6 @@ describe('ProjectCardBasicsForm', () => {
     await user.click(getByRole('button', { name: 'projectCardBasicsForm.type *' }));
     await user.click(getByText(matchExact('enums.sports')));
 
-    /**
-     * FIXME: when adding a hashTag the value added becomes undefined, so this can't be tested because:
-     * debug(getByText('pohjoinensuurpiiri').innerText); <- returns "undefined"
-     * debug(getByText('pohjoinensuurpiiri').innerHTML); <- returns "pohjoinensuurpiiri"
-     *
-     * The component (TagsContainer.tsx) handleOnClick() retrieves the innerText value, which results in our
-     * test adding "undefined" to our form.
-     */
     await user.click(getByRole('button', { name: matchExact('projectCardBasicsForm.hashTags') }));
     await user.click(getByText('pohjoinensuurpiiri'));
     await user.click(getByRole('button', { name: matchExact('save') }));
@@ -263,8 +255,8 @@ describe('ProjectCardBasicsForm', () => {
     // Check that the form values stay updated with the state
     expect(getByDisplayValue(responseProjectCard.description)).toBeInTheDocument();
     expect(getByDisplayValue(responseProjectCard.entityName)).toBeInTheDocument();
-    // Test hashTags when "undefined"-error is fixed (see above FIXME)
     expect(getByText(matchExact(responseProjectCard?.area?.value || ''))).toBeInTheDocument();
     expect(getByText(matchExact(responseProjectCard?.type.value || ''))).toBeInTheDocument();
+    responseProjectCard.hashTags?.forEach((h) => expect(getByText(h)).toBeInTheDocument());
   });
 });

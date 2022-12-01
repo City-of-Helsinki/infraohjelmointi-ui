@@ -1,4 +1,5 @@
 @import '~hds-core/lib/utils/helpers.css';
+@import 'fonts.css';
 
 :root {
   --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;

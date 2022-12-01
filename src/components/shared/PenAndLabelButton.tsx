@@ -14,7 +14,7 @@ interface IPenAndLabelProps {
 const PenAndLabelButton: FC<IPenAndLabelProps> = ({ text, onClick, disabled }) => {
   return (
     <div className="display-flex">
-      <label>{text}</label>
+      <label className="pen-and-label-text">{text}</label>
       <button
         onClick={onClick}
         disabled={disabled}

@@ -121,3 +121,7 @@
   width: 110px;
   display: inline-block;
 }
+
+.pen-and-label-text {
+  font-weight: 500;
+}

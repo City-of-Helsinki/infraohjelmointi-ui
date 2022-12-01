@@ -6,7 +6,7 @@ interface IFormSectionTitleProps {
 }
 const FormSectionTitle: FC<IFormSectionTitleProps> = ({ label }) => (
   <div className="input-wrapper" id={'formTitle'}>
-    <Title size="l" text={label} />
+    <Title size="m" text={label} />
   </div>
 );
 

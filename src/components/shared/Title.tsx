@@ -10,7 +10,7 @@ import { TextColorType } from '@/interfaces/common';
  * https://github.com/City-of-Helsinki/helsinki-design-system/blob/master/packages/core/src/utils/helpers.css
  */
 
-type SizeType = 'xxl' | 'xl' | 'l' | 'm' | 's' | 'xs' | 'xxs';
+type SizeType = 'xl' | 'l' | 'm' | 's' | 'xs';
 
 interface ITitleProps {
   size: SizeType;
@@ -32,20 +32,16 @@ const Title: FC<ITitleProps> = ({ size, text, color, id }) => {
       `heading-${size} ${color ? `text-${color}` : 'text-black'} margin-0`;
 
     switch (size) {
-      case 'xxl':
-        return <h1 className={createClasses(isMobile ? 'xl-mobile' : size)}>{t(text || '')}</h1>;
       case 'xl':
-        return <h2 className={createClasses(isMobile ? 'l' : size)}>{t(text || '')}</h2>;
+        return <h1 className={createClasses(isMobile ? 'l' : size)}>{t(text || '')}</h1>;
       case 'l':
-        return <h3 className={createClasses(isMobile ? 'm' : size)}>{t(text || '')}</h3>;
+        return <h2 className={createClasses(isMobile ? 's' : size)}>{t(text || '')}</h2>;
       case 'm':
-        return <h4 className={createClasses(isMobile ? 's' : size)}>{t(text || '')}</h4>;
+        return <h3 className={createClasses(isMobile ? 'xs' : size)}>{t(text || '')}</h3>;
       case 's':
-        return <h5 className={createClasses(isMobile ? 'xs' : size)}>{t(text || '')}</h5>;
+        return <h4 className={createClasses(isMobile ? 'xxs' : size)}>{t(text || '')}</h4>;
       case 'xs':
-        return <h6 className={createClasses(isMobile ? 'xxs' : size)}>{t(text || '')}</h6>;
-      case 'xxs':
-        return <h6 className={createClasses(size)}>{t(text || '')}</h6>;
+        return <h5 className={createClasses(size)}>{t(text || '')}</h5>;
     }
   };
 

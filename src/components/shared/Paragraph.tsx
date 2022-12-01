@@ -21,7 +21,7 @@ interface IParagraphProps {
 const Paragraph: FC<IParagraphProps> = ({ size, text, color, fontWeight }) => {
   const { t } = useTranslation();
   return (
-    <p className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}>
+    <p className={`font-${size} text-${color || 'black'} text-${fontWeight ? fontWeight : ''}`}>
       {t(text)}
     </p>
   );

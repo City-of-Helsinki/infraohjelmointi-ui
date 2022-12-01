@@ -15,7 +15,17 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
     t(onDelete ? `removeHashTag ${tag}` : onClick ? `addHashTag ${tag}` : '');
 
   const handleOnClick = (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
-    onClick && onClick((e.target as HTMLDivElement).innerText);
+    onClick && onClick((e.currentTarget as HTMLDivElement).parentElement?.id || '');
+  };
+
+  const handleOnDelete = (e: MouseEvent<HTMLButtonElement>) => {
+    onDelete &&
+      onDelete((e.currentTarget as HTMLButtonElement).parentElement?.parentElement?.id || '');
+  };
+
+  const handlers = {
+    onClick: handleOnClick,
+    onDelete: onDelete ? handleOnDelete : undefined,
   };
 
   return (
@@ -30,7 +40,7 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
               data-testid={id}
               id={tag}
             >
-              <Tag onClick={handleOnClick} onDelete={onDelete ? () => onDelete(tag) : undefined}>
+              <Tag {...handlers} id={tag}>
                 {tag}
               </Tag>
             </div>

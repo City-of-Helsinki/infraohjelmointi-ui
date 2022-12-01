@@ -25,7 +25,7 @@ const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ name, onChange }) 
         ) : (
           <>
             <Title size="m" color="white" text={name} />
-            <Paragraph size="l" color="white" text={projectCardAddress} />
+            <Paragraph size="m" color="white" text={projectCardAddress} />
           </>
         )}
       </div>
