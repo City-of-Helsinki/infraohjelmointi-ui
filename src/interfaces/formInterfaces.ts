@@ -4,6 +4,7 @@ import { IOption } from './common';
 export enum FormField {
   Select,
   Text,
+  Number,
   NetworkNumbers,
   TagsForm,
   Title,

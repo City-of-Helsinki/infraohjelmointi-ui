@@ -31,7 +31,7 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'hkrId',
-      type: FormField.Text,
+      type: FormField.Number,
     },
     {
       name: 'entityName',
@@ -40,7 +40,7 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'sapProject',
-      type: FormField.Text,
+      type: FormField.Number,
     },
     {
       name: 'description',

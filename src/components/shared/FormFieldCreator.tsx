@@ -4,6 +4,7 @@ import { FC } from 'react';
 import FormSectionTitle from './FormSectionTitle';
 import HashTagsForm from './HashTagsForm';
 import NetworkNumbers from './NetworkNumbers';
+import NumberField from './NumberField';
 import SelectField from './SelectField';
 import TextField from './TextField';
 
@@ -21,6 +22,8 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <SelectField key={f.name} name={name as ListType} {...formProps} />;
           case FormField.Text:
             return <TextField key={f.name} name={name} {...formProps} />;
+          case FormField.Number:
+            return <NumberField key={f.name} name={name} {...formProps} />;
           case FormField.Title:
             return <FormSectionTitle key={f.name} label={f.label} />;
           case FormField.NetworkNumbers:
