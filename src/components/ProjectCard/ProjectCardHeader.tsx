@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { RootState } from '@/store';
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { Paragraph, ProgressCircle, IconButton } from '@/components/shared';
 import { IconFaceSmile, IconStar, IconStarFill } from 'hds-react/icons';
 import { Select } from 'hds-react/components/Select';
@@ -20,6 +20,7 @@ interface IFormState {
   selectedOption: IOption;
   favourite: boolean;
   name: string;
+  address?: string;
   group: string;
 }
 
@@ -45,6 +46,7 @@ const PhaseDropdown: FC<IPhaseDropdown> = ({ options, value, onChange }) => {
 const ProjectCardHeader: FC = () => {
   const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
   const user = useAppSelector((state: RootState) => state.auth.user);
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { options } = useOptions('phase');
 
@@ -53,6 +55,7 @@ const ProjectCardHeader: FC = () => {
     favourite: false,
     selectedOption: { label: '', value: '' },
     name: '',
+    address: '',
     group: 'Hakaniemi',
   });
 
@@ -60,6 +63,8 @@ const ProjectCardHeader: FC = () => {
   const handleFavChange = () => setFormState({ ...formState, favourite: !formState.favourite });
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) =>
     setFormState({ ...formState, name: e.target.value });
+  const handleAddressChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setFormState({ ...formState, address: e.target.value });
 
   // Add values on project card changes
   useEffect(
@@ -70,6 +75,7 @@ const ProjectCardHeader: FC = () => {
           favourite: (user && projectCard.favPersons?.includes(user.id)) || false,
           selectedOption: listItemToOption(projectCard.phase, t),
           name: projectCard.name,
+          address: projectCard.address,
         });
       }
     },
@@ -88,7 +94,12 @@ const ProjectCardHeader: FC = () => {
       </div>
       <div className="center">
         <div className="center-wrapper">
-          <ProjectCardNameForm name={formState.name} onChange={handleNameChange} />
+          <ProjectCardNameForm
+            name={formState.name}
+            address={formState.address}
+            onNameChange={handleNameChange}
+            onAddressChange={handleAddressChange}
+          />
           <PhaseDropdown
             options={options}
             value={formState.selectedOption}

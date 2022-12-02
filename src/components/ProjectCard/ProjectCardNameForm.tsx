@@ -1,4 +1,3 @@
-import { projectCardAddress } from '@/mocks/common';
 import { TextInput } from 'hds-react/components/TextInput';
 import { IconPenLine } from 'hds-react/icons';
 import { ChangeEventHandler, FC, useState } from 'react';
@@ -6,26 +5,42 @@ import { IconButton, Paragraph, Title } from '../shared';
 
 interface IProjectCardNameFormProps {
   name: string;
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  address?: string;
+  onNameChange: ChangeEventHandler<HTMLInputElement>;
+  onAddressChange: ChangeEventHandler<HTMLInputElement>;
 }
 
-const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ name, onChange }) => {
+const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({
+  name,
+  address,
+  onNameChange,
+  onAddressChange,
+}) => {
   const [editing, setEditing] = useState(false);
   return (
     <div className="edit-name-form">
       <div>
         {editing ? (
-          <TextInput
-            className="edit-name-input"
-            id="textinput"
-            value={name || ''}
-            onChange={onChange}
-            required
-          />
+          <>
+            <TextInput
+              className="edit-name-input"
+              id="name"
+              value={name || ''}
+              onChange={onNameChange}
+              required
+            />
+            <TextInput
+              className="edit-address-input"
+              id="address"
+              value={address || ''}
+              onChange={onAddressChange}
+              required
+            />
+          </>
         ) : (
           <>
             <Title size="m" color="white" text={name} />
-            <Paragraph size="m" color="white" text={projectCardAddress} />
+            <Paragraph size="m" color="white" text={address || ''} />
           </>
         )}
       </div>

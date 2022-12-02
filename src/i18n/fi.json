@@ -87,5 +87,6 @@
   "addHashTagsToProject": "Lisää hankkeelle uusi tunniste",
   "modifyGeneralMode": "Muokkaa yleistilaa",
   "getHashTagsOrCreateNew": "Hae tunnisteita tai luo uusi",
-  "save": "Tallenna"
+  "save": "Tallenna",
+  "Send:": "Lähetä"
 }

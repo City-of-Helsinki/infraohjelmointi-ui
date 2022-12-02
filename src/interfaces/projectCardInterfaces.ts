@@ -8,6 +8,7 @@ export interface IProjectCard {
   sapNetwork: Array<string>;
   type: IListItem;
   name: string;
+  address?: string;
   entityName: string;
   description: string;
   phase: IListItem;
