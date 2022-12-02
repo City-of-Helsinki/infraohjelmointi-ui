@@ -10,6 +10,7 @@ import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { RootState } from '@/store';
+import { IOption } from '@/interfaces/common';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
@@ -18,12 +19,25 @@ const ProjectCardBasicsForm: FC = () => {
   const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
 
   const onSubmit: SubmitHandler<IProjectCardBasicsForm> = async (form: IProjectCardBasicsForm) => {
-    const { type, area, ...formData } = form;
+    const emptyStringsToNull = (formData: IProjectCardBasicsForm) => {
+      const transformedFields = Object.keys(formData)
+        .filter((field) => typeof formData[field as keyof IProjectCardBasicsForm] === 'string')
+        .reduce((accumulator, current) => {
+          const key = current as keyof IProjectCardBasicsForm;
+          return { ...accumulator, [current]: formData[key] || null };
+        }, {});
+
+      return { ...formData, ...transformedFields };
+    };
+
+    const getOptionId = (option: IOption) => option.value || null;
+
+    const { type, area, ...formData } = emptyStringsToNull(form);
 
     const data: IProjectCardRequest = {
       ...formData,
-      type: type.value,
-      area: area.value,
+      type: getOptionId(type),
+      area: getOptionId(area),
     };
 
     if (projectId) {

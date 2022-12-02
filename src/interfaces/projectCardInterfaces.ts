@@ -59,11 +59,11 @@ export interface IProjectCard {
 }
 
 export interface IProjectCardRequest {
-  type: string;
+  type: string | null;
   description: string;
-  entityName: string;
-  hkrId: string;
-  area: string;
+  entityName: string | null;
+  hkrId: string | null;
+  area: string | null;
   hashTags: Array<string>;
   sapProject: Array<string>;
   sapNetwork: Array<string>;
