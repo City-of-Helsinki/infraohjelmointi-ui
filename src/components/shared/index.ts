@@ -10,6 +10,6 @@ export { default as TextField } from './TextField';
 export { default as SelectField } from './SelectField';
 export { default as FormFieldCreator } from './FormFieldCreator';
 export { default as FormSectionTitle } from './FormSectionTitle';
-export { default as PenAndLabelButton } from './PenAndLabelButton';
+export { default as FormFieldLabel } from './FormFieldLabel';
 export { default as NetworkNumbers } from './NetworkNumbers';
-export { default as HashTags } from './HashTagsForm';
+export { default as HashTagsForm } from './HashTagsForm';
