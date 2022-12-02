@@ -9,6 +9,9 @@ import { IOption, SelectCallback } from '@/interfaces/common';
 import ProjectCardNameForm from './ProjectCardNameForm';
 import { useOptions } from '@/hooks/useOptions';
 import { listItemToOption } from '@/utils/common';
+import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
+import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
+import { Button } from 'hds-react/components/Button';
 
 interface IPhaseDropdown {
   options: Array<IOption>;
@@ -66,6 +69,16 @@ const ProjectCardHeader: FC = () => {
   const handleAddressChange = (e: ChangeEvent<HTMLInputElement>) =>
     setFormState({ ...formState, address: e.target.value });
 
+  const handleSubmit = async () => {
+    const projectId = projectCard?.id;
+    const data: IProjectCardRequest = {
+      name: formState.name,
+    };
+    if (projectId) {
+      await dispatch(patchProjectCardThunk({ id: projectCard?.id, data: data }));
+    }
+  };
+
   // Add values on project card changes
   useEffect(
     () => {
@@ -84,44 +97,55 @@ const ProjectCardHeader: FC = () => {
   );
 
   return (
-    <div className="project-card-header-container">
-      <div className="left">
-        <div className="left-wrapper">
-          <div className="readiness-container">
-            <ProgressCircle color={'--color-engel'} percent={projectCard?.projectReadiness} />
-          </div>
-        </div>
-      </div>
-      <div className="center">
-        <div className="center-wrapper">
-          <ProjectCardNameForm
-            name={formState.name}
-            address={formState.address}
-            onNameChange={handleNameChange}
-            onAddressChange={handleAddressChange}
-          />
-          <PhaseDropdown
-            options={options}
-            value={formState.selectedOption}
-            onChange={handlePhaseChange}
-          />
-        </div>
-      </div>
-      <div className="right">
-        <div className="right-wrapper">
-          <div className="right-wrapper-inner">
-            <div className="favourite-button-container">
-              <IconButton
-                onClick={handleFavChange}
-                color="white"
-                icon={formState.favourite ? IconStarFill : IconStar}
-                text={formState.favourite ? 'removeFavourite' : 'addFavourite'}
-              />
+    <div>
+      <div className="project-card-header-container">
+        <div className="left">
+          <div className="left-wrapper">
+            <div className="readiness-container">
+              <ProgressCircle color={'--color-engel'} percent={projectCard?.projectReadiness} />
             </div>
-            <Paragraph color="white" size="m" text={'inGroup'} />
-            <Paragraph color="white" size="l" fontWeight="bold" text={formState.group} />
           </div>
         </div>
+        <div className="center">
+          <div className="center-wrapper">
+            <ProjectCardNameForm
+              name={formState.name}
+              address={formState.address}
+              onNameChange={handleNameChange}
+              onAddressChange={handleAddressChange}
+            />
+            <PhaseDropdown
+              options={options}
+              value={formState.selectedOption}
+              onChange={handlePhaseChange}
+            />
+          </div>
+        </div>
+        <div className="right">
+          <div className="right-wrapper">
+            <div className="right-wrapper-inner">
+              <div className="favourite-button-container">
+                <IconButton
+                  onClick={handleFavChange}
+                  color="white"
+                  icon={formState.favourite ? IconStarFill : IconStar}
+                  text={formState.favourite ? 'removeFavourite' : 'addFavourite'}
+                />
+              </div>
+              <Paragraph color="white" size="m" text={'inGroup'} />
+              <Paragraph color="white" size="l" fontWeight="bold" text={formState.group} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          style={{ marginLeft: '2rem', marginTop: '1rem' }}
+        >
+          Tallenna otsikon tiedot
+        </Button>
       </div>
     </div>
   );

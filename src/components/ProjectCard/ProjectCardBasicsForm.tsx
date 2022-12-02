@@ -7,14 +7,12 @@ import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
 import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
-import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { RootState } from '@/store';
 import { IOption } from '@/interfaces/common';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
   const { handleSubmit, formFields } = useProjectCardBasicsForm();
   const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
 
@@ -51,7 +49,7 @@ const ProjectCardBasicsForm: FC = () => {
         <div className="basic-info-form">
           <FormFieldCreator form={formFields} />
         </div>
-        <Button type="submit">{t('send')}</Button>
+        <Button type="submit">Tallenna perustiedot</Button>
       </form>
     </div>
   );

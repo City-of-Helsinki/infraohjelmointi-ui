@@ -60,14 +60,17 @@ export interface IProjectCard {
 }
 
 export interface IProjectCardRequest {
-  type: string | null;
-  description: string;
-  entityName: string | null;
-  hkrId: string | null;
-  area: string | null;
-  hashTags: Array<string>;
-  sapProject: string | null;
-  sapNetwork: Array<string>;
+  type?: string | null;
+  description?: string;
+  entityName?: string | null;
+  hkrId?: string | null;
+  area?: string | null;
+  hashTags?: Array<string>;
+  sapProject?: Array<string>;
+  sapNetwork?: Array<string>;
+  name?: string | null;
+  address?: string | null;
+  favPersons?: Array<string> | [];
 }
 
 export interface IProjectCardRequestObject {
