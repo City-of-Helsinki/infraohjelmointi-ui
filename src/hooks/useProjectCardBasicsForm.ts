@@ -31,7 +31,6 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'hkrId',
-      readOnly: true,
       type: FormField.Text,
     },
     {
