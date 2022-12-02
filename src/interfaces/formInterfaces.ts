@@ -25,7 +25,7 @@ export interface IProjectCardBasicsForm {
   description: string;
   area: IOption;
   hkrId: string;
-  sapProject: Array<string>;
+  sapProject: string;
   sapNetwork: Array<string>;
   hashTags: Array<string>;
 }

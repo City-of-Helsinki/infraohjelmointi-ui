@@ -40,7 +40,6 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'sapProject',
-      readOnly: true,
       type: FormField.Text,
     },
     {
@@ -87,7 +86,7 @@ const useProjectCardBasicsValues = () => {
       description: projectCard?.description || '',
       area: listItemToOption(projectCard?.area, t),
       hkrId: projectCard?.hkrId || '',
-      sapProject: projectCard?.sapProject || [],
+      sapProject: projectCard?.sapProject || '',
       sapNetwork: projectCard?.sapNetwork || [],
       entityName: projectCard?.entityName || '',
       hashTags: projectCard?.hashTags || [],

@@ -4,7 +4,7 @@ export interface IProjectCard {
   id: string;
   projectReadiness: number;
   hkrId: string;
-  sapProject: Array<string>;
+  sapProject?: string;
   sapNetwork: Array<string>;
   type: IListItem;
   name: string;
@@ -65,7 +65,7 @@ export interface IProjectCardRequest {
   hkrId: string | null;
   area: string | null;
   hashTags: Array<string>;
-  sapProject: Array<string>;
+  sapProject: string | null;
   sapNetwork: Array<string>;
 }
 

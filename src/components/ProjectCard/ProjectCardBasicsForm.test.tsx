@@ -74,15 +74,11 @@ describe('ProjectCardBasicsForm', () => {
     expect(getByText(matchExact(projectCard?.area?.value || ''))).toBeInTheDocument();
     expect(getByText(matchExact(projectCard?.type.value || ''))).toBeInTheDocument();
     expect(getByDisplayValue(matchExact(projectCard?.hkrId))).toBeInTheDocument();
+    expect(getByDisplayValue(matchExact(projectCard?.sapProject || ''))).toBeInTheDocument();
 
     expect(projectCard?.hashTags?.length).toBe(2);
     projectCard?.hashTags?.forEach((h) => {
       expect(getByText(matchExact(h))).toBeInTheDocument();
-    });
-
-    expect(projectCard?.sapProject.length).toBe(1);
-    projectCard?.sapProject?.forEach((s) => {
-      expect(getByDisplayValue(matchExact(s))).toBeInTheDocument();
     });
   });
 
@@ -218,12 +214,16 @@ describe('ProjectCardBasicsForm', () => {
       area: { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' },
       type: { id: '434e8052-9f76-4c41-b450-d9eff680d503', value: 'sports' },
       hashTags: ['pyöräily', 'uudisrakentaminen', 'pohjoinensuurpiiri'],
+      sapProject: '111',
+      hkrId: '2222',
     };
 
     mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
 
     const descriptionField = getByRole('textbox', { name: 'projectCardBasicsForm.description *' });
     const entityNameField = getByRole('textbox', { name: 'projectCardBasicsForm.entityName' });
+    const hkrId = getByRole('textbox', { name: 'projectCardBasicsForm.hkrId' });
+    const sapProject = getByRole('textbox', { name: 'projectCardBasicsForm.sapProject' });
 
     // Fill in the form
     await user.clear(descriptionField);
@@ -231,6 +231,12 @@ describe('ProjectCardBasicsForm', () => {
 
     await user.clear(entityNameField);
     await user.type(entityNameField, 'Ent');
+
+    await user.clear(hkrId);
+    await user.type(hkrId, '2222');
+
+    await user.clear(sapProject);
+    await user.type(sapProject, '111');
 
     await user.click(getByRole('button', { name: 'projectCardBasicsForm.area' }));
     await user.click(getByText(matchExact('enums.lansisatama')));
@@ -253,10 +259,14 @@ describe('ProjectCardBasicsForm', () => {
     expect(formPatchRequest.hashTags?.length).toBe(responseProjectCard.hashTags?.length);
 
     // Check that the form values stay updated with the state
-    expect(getByDisplayValue(responseProjectCard.description)).toBeInTheDocument();
-    expect(getByDisplayValue(responseProjectCard.entityName)).toBeInTheDocument();
+    expect(getByDisplayValue(matchExact(responseProjectCard.description))).toBeInTheDocument();
+    expect(getByDisplayValue(matchExact(responseProjectCard.entityName))).toBeInTheDocument();
     expect(getByText(matchExact(responseProjectCard?.area?.value || ''))).toBeInTheDocument();
     expect(getByText(matchExact(responseProjectCard?.type.value || ''))).toBeInTheDocument();
     responseProjectCard.hashTags?.forEach((h) => expect(getByText(h)).toBeInTheDocument());
+    expect(getByDisplayValue(matchExact(responseProjectCard?.hkrId))).toBeInTheDocument();
+    expect(
+      getByDisplayValue(matchExact(responseProjectCard?.sapProject || '')),
+    ).toBeInTheDocument();
   });
 });
