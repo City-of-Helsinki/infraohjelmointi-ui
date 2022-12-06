@@ -71,6 +71,7 @@ export interface IProjectCardRequest {
   name?: string | null;
   address?: string | null;
   favPersons?: Array<string> | [];
+  phase?: string | null;
 }
 
 export interface IProjectCardRequestObject {

@@ -249,7 +249,7 @@ describe('ProjectCardBasicsForm', () => {
     await user.click(getByRole('button', { name: matchExact('save') }));
 
     // Click the send button
-    await user.click(getByRole('button', { name: 'send' }));
+    await user.click(getByRole('button', { name: 'Tallenna perustiedot' }));
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
 

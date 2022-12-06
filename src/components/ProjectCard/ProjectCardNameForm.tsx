@@ -27,14 +27,17 @@ const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({
               id="name"
               value={name || ''}
               onChange={onNameChange}
-              required
+              placeholder={'Nimi'}
+              aria-label="project-card-name"
             />
+            <br />
             <TextInput
               className="edit-address-input"
               id="address"
               value={address || ''}
               onChange={onAddressChange}
-              required
+              placeholder={'Osoite'}
+              aria-label="project-card-address"
             />
           </>
         ) : (

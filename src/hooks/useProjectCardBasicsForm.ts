@@ -106,7 +106,6 @@ const useProjectCardBasicsValues = () => {
  * It will also return formFields, which can be passed to the FormFieldCreator component to generate
  * the visual form.
  *
- * @param projectCard any ProjectCard
  * @returns handleSubmit, reset, formFields
  */
 const useProjectCardBasicsForm = () => {

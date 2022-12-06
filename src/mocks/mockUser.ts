@@ -1,7 +1,7 @@
 import { IUser } from '@/interfaces/userInterfaces';
 
 const mockUser: IUser = {
-  id: '9d6a0854-a784-44b0-ad35-ca5e8b8f0e90',
+  id: '9990de74-96ac-4896-bd5f-f4bb506da38f',
   firstName: 'John',
   lastName: 'Doe',
   email: 'john.doe@hel.fi',

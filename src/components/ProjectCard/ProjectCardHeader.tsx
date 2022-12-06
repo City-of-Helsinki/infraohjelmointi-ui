@@ -8,23 +8,16 @@ import { useTranslation } from 'react-i18next';
 import { IOption, SelectCallback } from '@/interfaces/common';
 import ProjectCardNameForm from './ProjectCardNameForm';
 import { useOptions } from '@/hooks/useOptions';
-import { listItemToOption } from '@/utils/common';
+import { emptyStringsToNull, getOptionId, listItemToOption } from '@/utils/common';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { Button } from 'hds-react/components/Button';
+import { IAppForms, IProjectCardHeaderForm } from '@/interfaces/formInterfaces';
 
 interface IPhaseDropdown {
   options: Array<IOption>;
   value: IOption;
   onChange: SelectCallback;
-}
-
-interface IFormState {
-  selectedOption: IOption;
-  favourite: boolean;
-  name: string;
-  address?: string;
-  group: string;
 }
 
 const PhaseDropdown: FC<IPhaseDropdown> = ({ options, value, onChange }) => {
@@ -54,15 +47,15 @@ const ProjectCardHeader: FC = () => {
   const { options } = useOptions('phase');
 
   // Adapt this to useForm() when we need to submit this
-  const [formState, setFormState] = useState<IFormState>({
+  const [formState, setFormState] = useState<IProjectCardHeaderForm>({
     favourite: false,
-    selectedOption: { label: '', value: '' },
+    phase: { label: '', value: '' },
     name: '',
     address: '',
     group: 'Hakaniemi',
   });
 
-  const handlePhaseChange = (o: IOption) => setFormState({ ...formState, selectedOption: o });
+  const handlePhaseChange = (o: IOption) => setFormState({ ...formState, phase: o });
   const handleFavChange = () => setFormState({ ...formState, favourite: !formState.favourite });
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) =>
     setFormState({ ...formState, name: e.target.value });
@@ -71,9 +64,21 @@ const ProjectCardHeader: FC = () => {
 
   const handleSubmit = async () => {
     const projectId = projectCard?.id;
+    const { favourite, phase, ...formData } = emptyStringsToNull(
+      formState as IAppForms,
+    ) as IProjectCardHeaderForm;
+
+    // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
+    const favPersons = Array.from(
+      new Set<string>([...(projectCard?.favPersons || []), user?.id || '']),
+    ).filter((fp) => (!favourite ? fp !== user?.id : fp));
+
     const data: IProjectCardRequest = {
-      name: formState.name,
+      ...formData,
+      favPersons,
+      phase: getOptionId(phase),
     };
+
     if (projectId) {
       await dispatch(patchProjectCardThunk({ id: projectCard?.id, data: data }));
     }
@@ -86,7 +91,7 @@ const ProjectCardHeader: FC = () => {
         setFormState({
           ...formState,
           favourite: (user && projectCard.favPersons?.includes(user.id)) || false,
-          selectedOption: listItemToOption(projectCard.phase, t),
+          phase: listItemToOption(projectCard.phase, t),
           name: projectCard.name,
           address: projectCard.address,
         });
@@ -114,11 +119,7 @@ const ProjectCardHeader: FC = () => {
               onNameChange={handleNameChange}
               onAddressChange={handleAddressChange}
             />
-            <PhaseDropdown
-              options={options}
-              value={formState.selectedOption}
-              onChange={handlePhaseChange}
-            />
+            <PhaseDropdown options={options} value={formState.phase} onChange={handlePhaseChange} />
           </div>
         </div>
         <div className="right">

@@ -10,6 +10,7 @@ import { matchExact } from '@/utils/common';
 import userEvent from '@testing-library/user-event';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { getProjectPhasesThunk } from '@/reducers/listsSlice';
+import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -53,16 +54,18 @@ describe('ProjectCardHeader', () => {
     expect(getByText(matchExact(name))).toBeInTheDocument();
     expect(getByText(matchExact(phase.value))).toBeInTheDocument();
     expect(getByText(matchExact(`${projectReadiness}%`))).toBeInTheDocument();
-    expect(getByText(matchExact('Hämeentie 1, 00530 Helsinki'))).toBeInTheDocument();
+    // TODO: check address
   });
 
   it('project name can be edited by clicking the edit button', async () => {
-    const { getByRole, queryByRole } = renderWithProviders(<ProjectCardHeader />, { store });
+    const { getByRole, queryByRole, getAllByRole } = renderWithProviders(<ProjectCardHeader />, {
+      store,
+    });
     const user = userEvent.setup();
 
     // TODO: this needs to be tested better
     await user.click(getByRole('button', { name: /edit-project-name/i }));
-    expect(getByRole('textbox')).toBeInTheDocument();
+    expect(getAllByRole('textbox').length).toBe(2);
     await user.click(getByRole('button', { name: /edit-project-name/i }));
     expect(queryByRole('textbox')).toBeNull();
   });
@@ -85,5 +88,54 @@ describe('ProjectCardHeader', () => {
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
     await user.click(getByRole('button', { name: /addFavourite/i }));
     expect(getByRole('button', { name: /removeFavourite/i })).toBeInTheDocument();
+  });
+
+  it('can patch the header form', async () => {
+    const { getByRole, user, getByText } = renderWithProviders(<ProjectCardHeader />, {
+      store,
+    });
+
+    const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
+
+    const responseProjectCard: IProjectCard = {
+      ...projectCard,
+      favPersons: ['9d6a0854-a784-44b0-ad35-ca5e8b8f0e90'],
+      phase: { id: 'c0011fd1-89a5-491c-a6d2-f968b0384069', value: 'draftInitiation' },
+      name: 'new name',
+      address: 'new address',
+    };
+
+    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
+
+    // Click add favourite
+    await user.click(getByRole('button', { name: /addFavourite/i }));
+
+    // Enable editing of address & name
+    await user.click(getByRole('button', { name: /edit-project-name/i }));
+
+    const nameField = getByRole('textbox', { name: 'project-card-name' });
+    const addressField = getByRole('textbox', { name: 'project-card-address' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'new name');
+
+    await user.clear(addressField);
+    await user.type(addressField, 'new address');
+
+    await user.click(getByRole('button', { name: /edit-project-name/i }));
+
+    await user.click(getByRole('button', { name: 'Tallenna otsikon tiedot' }));
+
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+
+    // Check axios values
+    expect(formPatchRequest.name).toEqual(responseProjectCard.name);
+    expect(formPatchRequest.address).toEqual(responseProjectCard.address);
+    expect(formPatchRequest.favPersons).toStrictEqual(responseProjectCard.favPersons);
+
+    // Check that the form values stay updated with the state
+    expect(getByText(matchExact(responseProjectCard.name))).toBeInTheDocument();
+    expect(getByText(matchExact(responseProjectCard.address || ''))).toBeInTheDocument();
+    expect(getByText(/removeFavourite/i)).toBeInTheDocument();
   });
 });
