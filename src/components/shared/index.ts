@@ -13,4 +13,5 @@ export { default as FormFieldCreator } from './FormFieldCreator';
 export { default as FormSectionTitle } from './FormSectionTitle';
 export { default as FormFieldLabel } from './FormFieldLabel';
 export { default as NetworkNumbers } from './NetworkNumbers';
-export { default as HashTagsForm } from './HashTagsForm';
+export { default as HashTags } from './HashTagsForm';
+export { default as Toolbar } from './Toolbar';

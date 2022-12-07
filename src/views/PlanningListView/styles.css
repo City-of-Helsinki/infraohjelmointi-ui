@@ -1,0 +1,84 @@
+.planning-list-table-container {
+  margin: 2rem 4rem;
+}
+
+.planning-list-table {
+  width: 100%;
+}
+
+.group-header-cell {
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  background: var(--color-bus);
+  color: white;
+  padding: 0.5rem 1.5rem;
+}
+
+.group-header-cell .left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.group-header-cell .right {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-cell {
+  background: var(--color-bus);
+  color: white;
+  text-align: center;
+  font-weight: bold;
+}
+
+.project-header-cell {
+  text-align: left;
+  display: flex;
+  padding: 0.5rem 1.5rem;
+}
+
+.project-header-cell .left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-weight: 400;
+  width: 60%;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.project-header-cell .right {
+  display: flex;
+  width: 40%;
+  align-items: center;
+  justify-content: space-between;
+}
+.project-header-cell .right .project-header-left {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.project-header-cell .right .project-header-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.circle-number-icon {
+  background: gray;
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.project-cell {
+  text-align: center;
+}

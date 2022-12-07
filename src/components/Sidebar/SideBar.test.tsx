@@ -21,6 +21,10 @@ describe('SideBar', () => {
       route: 'project-card',
       label: 'projectCard',
     },
+    {
+      route: 'planning-list',
+      label: 'planningList',
+    },
   ];
 
   beforeEach(async () => {
