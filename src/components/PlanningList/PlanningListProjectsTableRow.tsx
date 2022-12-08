@@ -37,7 +37,7 @@ const CircleIcon = ({ value }: { value: string }) => (
  */
 const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ project }) => {
   const navigate = useNavigate();
-  const navigateToProjectCard = () => navigate(`/project-card/${project.id}`);
+  const navigateToProjectCard = () => navigate(`/project-card/${project.id}/basics`);
   return (
     <tr>
       {/* HEADER */}
