@@ -24,7 +24,6 @@ export const authSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // GET PROJECT TYPES
     builder.addCase(getUsersThunk.fulfilled, (state, action: PayloadAction<Array<IUser>>) => {
       return { ...state, user: action.payload[0] };
     });

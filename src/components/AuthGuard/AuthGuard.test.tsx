@@ -4,6 +4,8 @@ import mockUser from '@/mocks/mockUser';
 import { getUsersThunk } from '@/reducers/authSlice';
 import { setupStore } from '@/store';
 import mockUsers from '@/mocks/mockUsers';
+import { mockError } from '@/mocks/mockError';
+import { IError } from '@/interfaces/common';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
@@ -25,5 +27,14 @@ describe('AuthGuard', () => {
     expect(authState).toBeDefined();
     expect(user).not.toBeNull();
     expect(user).toEqual(mockUser);
+  });
+
+  it('catches a failed users fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getUsersThunk());
+
+    const storeError = store.getState().auth.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
   });
 });

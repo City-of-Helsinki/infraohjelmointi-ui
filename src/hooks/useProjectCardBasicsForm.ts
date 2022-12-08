@@ -31,6 +31,7 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'hkrId',
+      rules: { maxLength: '9223372036854775807'.length - 1 },
       type: FormField.Number,
     },
     {
