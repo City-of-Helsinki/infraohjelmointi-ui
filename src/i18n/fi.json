@@ -94,5 +94,10 @@
   "modifyGeneralMode": "Muokkaa yleistilaa",
   "getHashTagsOrCreateNew": "Hae tunnisteita tai luo uusi",
   "save": "Tallenna",
+  "budgetProposalPreparation": "Talousarvioehdotusten valmistelu",
+  "allocationPreparation": "Määrärahojen valmistelu",
+  "keur": "keur",
+  "basicInfoKA": ">< Perustiedot <> KA ja ohj.",
+  "inProgressUntil": "Käynnissä {{planningListInfo.date}} asti",
   "send:": "Lähetä"
 }

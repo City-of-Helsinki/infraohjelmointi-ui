@@ -2,14 +2,14 @@ import { IconAngleDown, IconAngleUp, IconCopy, IconMenuDots } from 'hds-react/ic
 import { IconButton, Title } from '../shared';
 import { FC, MouseEventHandler } from 'react';
 
-const randomNumbers = ['360', '360', '360', '360', '360', '360', '360', '360', '360', '360', '360'];
-
-interface IPlanningListTableHeaderProps {
+interface IPlanningListProjectsTableHeaderProps {
+  group: any;
   isProjectsVisible: boolean;
   handleProjectsVisible: MouseEventHandler<HTMLButtonElement>;
 }
 
-const PlanningListTableHeader: FC<IPlanningListTableHeaderProps> = ({
+const PlanningListProjectsTableHeader: FC<IPlanningListProjectsTableHeaderProps> = ({
+  group,
   isProjectsVisible,
   handleProjectsVisible,
 }) => {
@@ -24,15 +24,15 @@ const PlanningListTableHeader: FC<IPlanningListTableHeaderProps> = ({
             onClick={handleProjectsVisible}
           />
           <IconMenuDots />
-          <Title size="s" text="Hakaniemi" color="white" /> <IconCopy />
+          <Title size="s" text={group.name} color="white" /> <IconCopy />
         </div>
         <div className="right">
-          <span>3 400</span>
-          <span style={{ fontWeight: '300' }}>2 700</span>
+          <span>{group.value1}</span>
+          <span>{group.value2}</span>
         </div>
       </th>
       {/* CELLS */}
-      {randomNumbers.map((rn, i) => (
+      {group.sums.map((rn: any, i: number) => (
         <th key={i} className="group-cell">
           {rn}
         </th>
@@ -41,4 +41,4 @@ const PlanningListTableHeader: FC<IPlanningListTableHeaderProps> = ({
   );
 };
 
-export default PlanningListTableHeader;
+export default PlanningListProjectsTableHeader;

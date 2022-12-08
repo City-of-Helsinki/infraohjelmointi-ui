@@ -4,10 +4,13 @@ import {
   IconPlaybackRecord,
   IconSpeechbubbleText,
 } from 'hds-react/icons';
+import { FC } from 'react';
 
-const randomNumbers = ['460', '460', '460', '460', '460', '460', '460', '460', '460', '460', '460'];
+interface IPlanningListProjectsTableProps {
+  project: any;
+}
 
-const PlanningListTableRow = () => {
+const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ project }) => {
   return (
     <tr>
       {/* HEADER */}
@@ -16,28 +19,28 @@ const PlanningListTableRow = () => {
         <div className="left">
           <IconMenuDots />
           <IconDocument />
-          Hakaniementori
+          {project.name}
         </div>
         {/* RIGHT */}
         <div className="right">
           <div className="project-header-left">
-            <div className="circle-number-icon">1</div>
+            <div className="circle-number-icon">{project.readiness}</div>
             <IconPlaybackRecord />
             <IconSpeechbubbleText />
           </div>
           <div className="project-header-right">
-            <span>3 400</span>
-            <span style={{ fontWeight: '300' }}>2 700</span>
+            <span>{project.value1}</span>
+            <span>{project.value2}</span>
           </div>
         </div>
       </th>
-      {randomNumbers.map((rn, i) => (
+      {project.sums.map((p: any, i: number) => (
         <td key={i} className="project-cell">
-          {rn}
+          {p}
         </td>
       ))}
     </tr>
   );
 };
 
-export default PlanningListTableRow;
+export default PlanningListProjectsTableRow;
