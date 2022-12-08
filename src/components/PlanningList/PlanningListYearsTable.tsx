@@ -8,7 +8,7 @@ const PlanningListYearsTable: FC = () => {
       <thead>
         <tr>
           {planningListYearsTableData.map((o, i) => (
-            <td key={i}>
+            <td key={i} className="years-table-cell">
               <Span text={o.title} fontWeight="light" size="s" />
               <Span text={`<> ${o.year}`} fontWeight="bold" size="s" />
             </td>

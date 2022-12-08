@@ -18,6 +18,11 @@
   padding: 0.5rem 1rem;
 }
 
+.years-table-cell {
+  min-width: 80px;
+  max-width: 80px;
+}
+
 .planning-list-projects-table {
   width: 100%;
 }
@@ -94,6 +99,8 @@
   color: white;
   text-align: center;
   font-weight: bold;
+  min-width: 80px;
+  max-width: 80px;
 }
 
 .project-header-cell {
