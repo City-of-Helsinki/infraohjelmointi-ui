@@ -5,6 +5,7 @@ const mockProjectCards: { data: Array<IProjectCard> } = {
     {
       id: '79e6bc78-9fa2-49a1-aaad-b50030da170e',
       projectReadiness: 95,
+      sapProject: '123',
       type: {
         id: 'cc37d0d2-2a8e-4368-b548-18de6d2a967b',
         value: 'street',
@@ -19,7 +20,6 @@ const mockProjectCards: { data: Array<IProjectCard> } = {
       },
       hkrId: '2580',
       entityName: 'Entity Name',
-      sapProject: ['c0f2c791-e20f-45fe-afce-a9ba434f046e'],
       sapNetwork: ['17b75067-42b6-42b9-b21a-7873093f84d0'],
       name: 'Hakaniementori',
       description: 'Hakaniemen torilla tavataan.',

@@ -5,7 +5,7 @@ import { Dialog } from 'hds-react/components/Dialog';
 import { useState, MouseEvent, FC, forwardRef, Ref, useEffect } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import PenAndLabelButton from './PenAndLabelButton';
+import FormFieldLabel from './FormFieldLabel';
 import TagsContainer from './TagsContainer';
 import Title from './Title';
 
@@ -103,7 +103,7 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
           </Dialog>
 
           {/* Displayed on form */}
-          <PenAndLabelButton text={t(`projectCardBasicsForm.${name}`)} onClick={onEdit} />
+          <FormFieldLabel text={t(`projectCardBasicsForm.${name}`)} onClick={onEdit} />
           <TagsContainer tags={value} />
         </div>
       </div>
@@ -111,13 +111,13 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
   },
 );
 
-interface IHashTagsProps {
+interface IHashTagsFormProps {
   name: string;
   label: string;
   control: HookFormControlType;
 }
 
-const HashTags: FC<IHashTagsProps> = ({ name, label, control }) => {
+const HashTagsForm: FC<IHashTagsFormProps> = ({ name, label, control }) => {
   return (
     <Controller
       name={name}
@@ -131,4 +131,4 @@ const HashTags: FC<IHashTagsProps> = ({ name, label, control }) => {
 
 HashTagsDialog.displayName = 'HashTagsDialog';
 
-export default HashTags;
+export default HashTagsForm;

@@ -1,7 +1,7 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { FC, forwardRef, MouseEvent, Ref } from 'react';
+import { FC, forwardRef, Ref } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
-import PenAndLabelButton from './PenAndLabelButton';
+import FormFieldLabel from './FormFieldLabel';
 import Span from './Span';
 
 interface INetworkNumberContainerProps {
@@ -20,13 +20,9 @@ const NetworkNumbersContainer: FC<INetworkNumberContainerProps> = forwardRef(
       value: v,
     }));
 
-    const addNetworkNumber = (e: MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-    };
-
     return (
       <div className="display-flex-col" id={name} data-testid={name} ref={ref}>
-        <PenAndLabelButton text={label} disabled onClick={addNetworkNumber} />
+        <FormFieldLabel text={label} />
         {networkNumbers.length > 0 &&
           networkNumbers.map((nn) => (
             <div className="nn-row" key={nn.label}>

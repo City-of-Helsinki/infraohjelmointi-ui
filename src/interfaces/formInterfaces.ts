@@ -4,6 +4,7 @@ import { IOption } from './common';
 export enum FormField {
   Select,
   Text,
+  Number,
   NetworkNumbers,
   TagsForm,
   Title,
@@ -25,7 +26,7 @@ export interface IProjectCardBasicsForm {
   description: string;
   area: IOption;
   hkrId: string;
-  sapProject: Array<string>;
+  sapProject: string;
   sapNetwork: Array<string>;
   hashTags: Array<string>;
 }
