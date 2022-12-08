@@ -66,7 +66,7 @@ export interface IProjectCardRequest {
   hkrId?: string | null;
   area?: string | null;
   hashTags?: Array<string>;
-  sapProject?: Array<string>;
+  sapProject?: string;
   sapNetwork?: Array<string>;
   name?: string | null;
   address?: string | null;

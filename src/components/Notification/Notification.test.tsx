@@ -1,3 +1,4 @@
+import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import Notification from './Notification';
 import { renderWithProviders } from '@/utils/testUtils';
@@ -5,12 +6,24 @@ import { setupStore } from '@/store';
 import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
+import mockUsers from '@/mocks/mockUsers';
+import { getUsersThunk } from '@/reducers/authSlice';
 
+jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
 describe('Notification', () => {
+  const store = setupStore();
+
+  beforeEach(async () => {
+    mockedAxios.get.mockResolvedValue(mockUsers);
+    await store.dispatch(getUsersThunk());
+  });
+
   it('does not render the parent container if no notification is given', () => {
-    const { container } = renderWithProviders(<Notification />);
+    const { container } = renderWithProviders(<Notification />, { store });
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
   });
 

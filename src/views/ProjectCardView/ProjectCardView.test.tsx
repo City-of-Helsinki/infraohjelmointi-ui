@@ -13,6 +13,8 @@ import {
 } from '@/reducers/listsSlice';
 import { RenderResult } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
+import { getUsersThunk } from '@/reducers/authSlice';
+import mockUsers from '@/mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -24,6 +26,9 @@ describe('ProjectCardView', () => {
   let renderResult: RenderResult;
 
   beforeEach(async () => {
+    mockedAxios.get.mockResolvedValue(mockUsers);
+    await store.dispatch(getUsersThunk());
+
     mockedAxios.get.mockResolvedValue(mockProjectCard);
     await store.dispatch(getProjectCardThunk(mockProjectCard.data.id));
 

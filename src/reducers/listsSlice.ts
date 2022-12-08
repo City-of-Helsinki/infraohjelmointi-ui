@@ -6,12 +6,14 @@ export interface IListState {
   type: Array<IListItem>;
   phase: Array<IListItem>;
   area: Array<IListItem>;
+  error: IError | null | unknown;
 }
 
 const initialState: IListState = {
   type: [],
   phase: [],
   area: [],
+  error: null,
 };
 
 export const getProjectTypesThunk = createAsyncThunk('projectTypes/get', async (_, thunkAPI) => {

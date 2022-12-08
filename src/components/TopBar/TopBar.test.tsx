@@ -1,14 +1,25 @@
+import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import TopBar from './TopBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
 import { setupStore } from '@/store';
-import { setUser } from '@/reducers/authSlice';
+import { getUsersThunk } from '@/reducers/authSlice';
 import mockUser from '@/mocks/mockUser';
+import mockUsers from '@/mocks/mockUsers';
 
 jest.mock('react-i18next', () => mockI18next());
+jest.mock('axios');
 
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 describe('TopBar', () => {
+  const store = setupStore();
+
+  beforeEach(async () => {
+    mockedAxios.get.mockResolvedValue(mockUsers);
+    store.dispatch(getUsersThunk());
+  });
+
   it('renders component wrapper', () => {
     const { getByTestId } = renderWithProviders(<TopBar />);
 
@@ -30,8 +41,6 @@ describe('TopBar', () => {
 
   // FIXME: username doesn't update to nav for some reason
   it.skip('render username if user is found', () => {
-    const store = setupStore();
-    store.dispatch(setUser(mockUser));
     const { getByText } = renderWithProviders(<TopBar />, { store });
 
     expect(getByText(matchExact(`${mockUser.firstName} ${mockUser.lastName}`))).toBeInTheDocument();

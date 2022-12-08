@@ -10,6 +10,8 @@ import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { getProjectAreasThunk, getProjectTypesThunk } from '@/reducers/listsSlice';
 import { mockProjectAreas, mockProjectTypes } from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
+import mockUsers from '@/mocks/mockUsers';
+import { getUsersThunk } from '@/reducers/authSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -20,6 +22,9 @@ describe('ProjectCardBasicsForm', () => {
   const store = setupStore();
 
   beforeEach(async () => {
+    mockedAxios.get.mockResolvedValue(mockUsers);
+    await store.dispatch(getUsersThunk());
+
     mockedAxios.get.mockResolvedValue(mockProjectCard);
     await store.dispatch(getProjectCardThunk(mockProjectCard.data.id));
 

@@ -1,4 +1,4 @@
-import { IOption, ListType } from '@/interfaces/common';
+import { IListItem, IOption, ListType } from '@/interfaces/common';
 import { IListState } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
@@ -15,7 +15,9 @@ import { useAppSelector } from './common';
  * @returns options & listItemToOption
  */
 export const useOptions = (name?: ListType) => {
-  const list = useAppSelector((state: RootState) => state.lists[name as keyof IListState]);
+  const list = useAppSelector(
+    (state: RootState) => state.lists[name as keyof IListState],
+  ) as Array<IListItem>;
   const [options, setOptions] = useState<Array<IOption> | []>([]);
   const { t } = useTranslation();
 

@@ -10,7 +10,6 @@ import { matchExact } from '@/utils/common';
 import userEvent from '@testing-library/user-event';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { getProjectPhasesThunk } from '@/reducers/listsSlice';
-import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
