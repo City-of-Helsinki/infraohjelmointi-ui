@@ -1,5 +1,7 @@
-const PlanningListHeader = () => {
-  return <div />;
+import { Toolbar } from '../shared';
+
+const PlanningListToolbar = () => {
+  return <Toolbar />;
 };
 
-export default PlanningListHeader;
+export default PlanningListToolbar;

@@ -35,6 +35,10 @@ p {
   margin: var(--spacing-2-xs) 0;
 }
 
+table p {
+  margin: 0;
+}
+
 /* COLORS: https://hds.hel.fi/foundation/design-tokens/colour */
 /* BREAKPOINTS: https://hds.hel.fi/foundation/design-tokens/breakpoints */
 

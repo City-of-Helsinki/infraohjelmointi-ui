@@ -1,9 +1,40 @@
 .planning-list-table-container {
-  margin: 2rem 4rem;
+  margin: var(--spacing-layout-s);
+  font-size: var(--fontsize-body-s);
 }
 
 .planning-list-table {
   width: 100%;
+}
+
+.planning-table-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* repeat 2 rows with 1fr (fractional unit) */
+  grid-auto-flow: row;
+  overflow-x: visible;
+  margin: 0 var(--spacing-xs) 0 0;
+  width: 100%;
+}
+
+.planning-table-info span {
+  display: block;
+}
+.planning-table-info #planningTableTitle {
+  grid-column: 1/3;
+}
+
+.planning-table-info #group-info {
+  text-align: right;
+}
+
+#group-info .group-info-text {
+  font-weight: bold;
+}
+
+.planning-table-info #basic-info {
+  font-weight: bold;
+  grid-column: 2/3;
+  text-align: right;
 }
 
 .group-header-cell {
@@ -81,4 +112,5 @@
 
 .project-cell {
   text-align: center;
+  background: var(--color-bus-light);
 }
