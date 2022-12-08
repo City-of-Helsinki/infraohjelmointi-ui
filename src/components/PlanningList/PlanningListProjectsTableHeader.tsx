@@ -17,18 +17,20 @@ const PlanningListProjectsTableHeader: FC<IPlanningListProjectsTableHeaderProps>
     <tr>
       {/* HEADER */}
       <th className="group-header-cell">
-        <div className="left">
-          <IconButton
-            icon={isProjectsVisible ? IconAngleUp : IconAngleDown}
-            color="white"
-            onClick={handleProjectsVisible}
-          />
-          <IconMenuDots />
-          <Title size="s" text={group.name} color="white" /> <IconCopy />
-        </div>
-        <div className="right">
-          <span>{group.value1}</span>
-          <span>{group.value2}</span>
+        <div className="group-header-cell-content">
+          <div className="left">
+            <IconButton
+              icon={isProjectsVisible ? IconAngleUp : IconAngleDown}
+              color="white"
+              onClick={handleProjectsVisible}
+            />
+            <IconMenuDots />
+            <Title size="s" text={group.name} color="white" /> <IconCopy />
+          </div>
+          <div className="right">
+            <span>{group.value1}</span>
+            <span>{group.value2}</span>
+          </div>
         </div>
       </th>
       {/* CELLS */}

@@ -59,12 +59,18 @@
 }
 
 .group-header-cell {
+  width: 30.5%;
   text-align: left;
+  background: var(--color-bus);
+  padding: 0.5rem 1.5rem;
+  color: white;
+}
+
+.group-header-cell-content {
   display: flex;
   justify-content: space-between;
-  background: var(--color-bus);
-  color: white;
-  padding: 0.5rem 1.5rem;
+  height: 100%;
+  width: 100%;
 }
 
 .group-header-cell .left {
@@ -92,8 +98,11 @@
 
 .project-header-cell {
   text-align: left;
-  display: flex;
   padding: 0.5rem 1.5rem;
+}
+
+.project-header-cell-container {
+  display: flex;
 }
 
 .project-header-cell .left {
@@ -128,19 +137,32 @@
   flex-direction: column;
 }
 
+.project-cell {
+  text-align: center;
+  background: var(--color-bus-light);
+}
+
 .circle-number-icon {
   background: gray;
   border-radius: 50%;
-  height: 30px;
-  width: 30px;
+  height: 26px;
+  width: 26px;
   text-align: center;
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
-.project-cell {
-  text-align: center;
-  background: var(--color-bus-light);
+.circle-number-icon-indicator {
+  position: absolute;
+  background: black;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 14px;
+  bottom: 0px;
+  right: -5px;
 }

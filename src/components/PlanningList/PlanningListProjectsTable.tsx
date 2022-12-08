@@ -10,7 +10,6 @@ const PlanningListProjectsTable: FC = () => {
   return (
     <table className="planning-list-projects-table" cellSpacing={0}>
       <thead>
-        {/* GROUP */}
         {planningListGroups.map((g, i) => (
           <PlanningListProjectsTableHeader
             key={i}
@@ -21,7 +20,6 @@ const PlanningListProjectsTable: FC = () => {
         ))}
       </thead>
       <tbody>
-        {/* PROJECT ROWS */}
         {isProjectsVisible &&
           planningListProjects.map((p) => (
             <PlanningListProjectsTableRow key={p.name} project={p} />
