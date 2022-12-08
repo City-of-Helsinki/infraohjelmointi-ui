@@ -11,15 +11,15 @@ export const planListGroups = [
     name: 'Mock Group 1',
     value1: '3 400',
     value2: '2 700',
-    sums: ['800', '280', '500', '640', '', '', '530', '450', '460', '300', '100'],
+    sums: ['800', '280', '500', '640', '', '', '530', '450', '460', '300', '100', '200', '200'],
   },
 ];
 
 export const planListProjectValues = {
   readiness: '1',
-  value1: '3400',
-  value2: '2700',
-  sums: ['460', '', '350', '580', '', '', '200', '', '', '300', '100'],
+  value1: '3 400',
+  value2: '2 700',
+  sums: ['460', '', '350', '580', '', '', '200', '', '', '300', '100', '200', '200'],
 };
 
 export const planningListYearsTableData = [

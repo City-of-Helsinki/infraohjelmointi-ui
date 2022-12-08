@@ -22,7 +22,7 @@ describe('ProjectCardToolbar', () => {
 
   it('renders component wrapper', () => {
     const { container } = renderWithProviders(<ProjectCardToolbar />);
-    expect(container.getElementsByClassName('project-card-toolbar-container').length).toBe(1);
+    expect(container.getElementsByClassName('toolbar-container').length).toBe(1);
   });
 
   it('renders two containers', () => {
