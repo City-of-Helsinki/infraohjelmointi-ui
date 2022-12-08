@@ -6,7 +6,7 @@ export const planningListInfo = {
   date: '20.6.2020',
 };
 
-export const planningListGroups = [
+export const planListGroups = [
   {
     name: 'Mock Group 1',
     value1: '3 400',
@@ -15,22 +15,12 @@ export const planningListGroups = [
   },
 ];
 
-export const planningListProjects = [
-  {
-    name: 'Mock Project 1',
-    readiness: '1',
-    value1: '3400',
-    value2: '2700',
-    sums: ['460', '', '350', '580', '', '', '200', '', '', '300', '100'],
-  },
-  {
-    name: 'Mock Project 2',
-    readiness: '1',
-    value1: '3400',
-    value2: '2700',
-    sums: ['340', '280', '150', '60', '', '', '330', '450', '460', '', ''],
-  },
-];
+export const planListProjectValues = {
+  readiness: '1',
+  value1: '3400',
+  value2: '2700',
+  sums: ['460', '', '350', '580', '', '', '200', '', '', '300', '100'],
+};
 
 export const planningListYearsTableData = [
   {

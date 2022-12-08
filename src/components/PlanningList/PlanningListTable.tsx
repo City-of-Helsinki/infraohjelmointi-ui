@@ -2,6 +2,7 @@ import { FC } from 'react';
 import PlanningListInfoPanel from './PlanningListInfoPanel';
 import PlanningListYearsTable from './PlanningListYearsTable';
 import PlanningListProjectsTable from './PlanningListProjectsTable';
+import { planListGroups } from '@/mocks/common';
 
 const PlanningListTable: FC = () => {
   return (
@@ -10,7 +11,9 @@ const PlanningListTable: FC = () => {
         <PlanningListInfoPanel />
         <PlanningListYearsTable />
       </div>
-      <PlanningListProjectsTable />
+      {planListGroups.map((g) => (
+        <PlanningListProjectsTable key={g.name} group={g} />
+      ))}
     </div>
   );
 };

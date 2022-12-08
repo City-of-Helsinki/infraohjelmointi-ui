@@ -1,3 +1,5 @@
+import { IProjectCard } from '@/interfaces/projectCardInterfaces';
+import { planListProjectValues } from '@/mocks/common';
 import {
   IconDocument,
   IconMenuDots,
@@ -5,9 +7,22 @@ import {
   IconSpeechbubbleText,
 } from 'hds-react/icons';
 import { FC } from 'react';
+import { useNavigate } from 'react-router';
+
+/**
+ * RED CELLS
+ * background: 'var(--color-suomenlinna-light)'
+ * borderBottom: '4px solid var(--color-suomenlinna)'
+ *
+ * GREEN CELLS
+ * ?
+ *
+ * BLUE CELLS
+ * ?
+ */
 
 interface IPlanningListProjectsTableProps {
-  project: any;
+  project: IProjectCard;
 }
 
 const CircleIcon = ({ value }: { value: string }) => (
@@ -17,7 +32,12 @@ const CircleIcon = ({ value }: { value: string }) => (
   </div>
 );
 
+/**
+ * We're only mapping the project name here for now since the values aren't yet implemented
+ */
 const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ project }) => {
+  const navigate = useNavigate();
+  const navigateToProjectCard = () => navigate(`/project-card/${project.id}`);
   return (
     <tr>
       {/* HEADER */}
@@ -27,24 +47,31 @@ const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ pro
           <div className="left">
             <IconMenuDots />
             <IconDocument />
-            {project.name}
+            <button onClick={navigateToProjectCard}>{project.name}</button>
           </div>
           {/* RIGHT */}
           <div className="right">
             <div className="project-header-left">
-              <CircleIcon value={project.readiness} />
+              <CircleIcon value={planListProjectValues.readiness} />
               <IconPlaybackRecord />
               <IconSpeechbubbleText />
             </div>
             <div className="project-header-right">
-              <span>{project.value1}</span>
-              <span>{project.value2}</span>
+              <span>{planListProjectValues.value1}</span>
+              <span>{planListProjectValues.value2}</span>
             </div>
           </div>
         </div>
       </th>
-      {project.sums.map((p: any, i: number) => (
-        <td key={i} className="project-cell">
+      {planListProjectValues.sums.map((p, i) => (
+        <td
+          key={i}
+          className="project-cell"
+          style={{
+            background: p ? 'var(--color-suomenlinna-light)' : 'var(--color-bus-light)',
+            borderBottom: p ? '4px solid var(--color-suomenlinna)' : 'none',
+          }}
+        >
           {p}
         </td>
       ))}
