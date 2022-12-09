@@ -149,6 +149,13 @@
 .project-cell {
   text-align: center;
   background: var(--color-bus-light);
+  border-bottom: 0.05rem solid var(--color-bus-medium-light);
+  border-collapse: collapse;
+}
+
+.project-cell:last-child {
+  border-right: 0.05rem solid var(--color-bus-medium-light);
+  border-collapse: collapse;
 }
 
 .circle-number-icon {
