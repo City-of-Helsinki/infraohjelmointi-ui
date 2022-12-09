@@ -15,11 +15,12 @@ import { listItemToOption } from '@/utils/common';
  * @param control react-hook-form control to add to the fields
  * @returns IProjectCard
  */
-const getProjectBasicsFormFields = (
+const buildProjectCardBasicsFormFields = (
   control: HookFormControlType,
   translate: TFunction<'translation', undefined>,
 ): Array<IForm> => {
   const formFields = [
+    // Basic info
     {
       name: 'basicInfoTitle',
       type: FormField.Title,
@@ -65,12 +66,42 @@ const getProjectBasicsFormFields = (
       name: 'hashTags',
       type: FormField.TagsForm,
     },
+    // Schedule
+    {
+      name: 'schedule',
+      type: FormField.Title,
+    },
+    {
+      name: 'planning',
+      type: FormField.FieldSet,
+      fieldSet: [
+        { name: 'estPlanningStartYear', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'estPlanningEndYear', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'presenceStartYear', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'presenceEndYear', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'visibilityEndYear', type: FormField.Date },
+        { name: 'visibilityStartYear', type: FormField.Date },
+      ],
+    },
+    {
+      name: 'construction',
+      type: FormField.FieldSet,
+      fieldSet: [
+        { name: 'constructionStartYear', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'constructionEndYear', type: FormField.Date, dateFormat: 'YYYY' },
+      ],
+    },
   ];
 
-  const projectCardBasicsFormFields = formFields.map((ff) => ({
-    ...ff,
+  const projectCardBasicsFormFields = formFields.map((formField) => ({
+    ...formField,
     control: control,
-    label: translate(`projectCardBasicsForm.${ff.name}`),
+    label: translate(`projectCardBasicsForm.${formField.name}`),
+    fieldSet: formField.fieldSet?.map((fieldSetField) => ({
+      ...fieldSetField,
+      control: control,
+      label: translate(`projectCardBasicsForm.${fieldSetField.name}`),
+    })),
   }));
 
   return projectCardBasicsFormFields;
@@ -96,6 +127,14 @@ const useProjectCardBasicsValues = () => {
       sapNetwork: projectCard?.sapNetwork || [],
       entityName: projectCard?.entityName || '',
       hashTags: projectCard?.hashTags || [],
+      estPlanningStartYear: projectCard?.estPlanningStartYear,
+      estPlanningEndYear: '',
+      estConstructionStartYear: '',
+      estConstructionEndYear: '',
+      presenceStart: '',
+      presenceEnd: '',
+      visibilityStart: '',
+      visibilityEnd: '',
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [projectCard],
@@ -132,7 +171,7 @@ const useProjectCardBasicsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectCard, formValues]);
 
-  const formFields = getProjectBasicsFormFields(control, t);
+  const formFields = buildProjectCardBasicsFormFields(control, t);
 
   return { handleSubmit, reset, formFields };
 };

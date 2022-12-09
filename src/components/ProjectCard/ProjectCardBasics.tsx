@@ -7,9 +7,10 @@ const ProjectCardBasics = () => {
 
   const navItems = [
     {
-      route: 'basics',
+      route: '#basics',
       label: t('nav.basics'),
     },
+    { route: '#schedule', label: t('nav.schedule') },
   ];
 
   return (

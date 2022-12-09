@@ -8,6 +8,9 @@ export enum FormField {
   NetworkNumbers,
   TagsForm,
   Title,
+  FieldSet,
+  Date,
+  Multi,
 }
 
 export interface IForm {
@@ -18,6 +21,8 @@ export interface IForm {
   rules?: HookFormRulesType;
   required?: boolean;
   readOnly?: boolean;
+  fieldSet?: Array<IForm>;
+  dateFormat?: string;
 }
 
 export interface IProjectCardHeaderForm {

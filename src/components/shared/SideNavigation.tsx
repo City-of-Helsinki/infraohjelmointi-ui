@@ -9,13 +9,14 @@ interface ISideNavigationProps {
 }
 
 const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
-  const [active, setActive] = useState('basics');
+  const [active, setActive] = useState('#basics');
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setActivePage = (e: any) => {
     e.preventDefault();
+    console.log('Target: ', e.target.getAttribute('href'));
     setActive(e.target.getAttribute('href'));
     navigate(e.target.getAttribute('href'));
   };

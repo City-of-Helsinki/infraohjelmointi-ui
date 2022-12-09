@@ -1,0 +1,76 @@
+/*
+This CSS-file is made to build the project card basics form together with the <FormFieldCreator /> component.
+
+- The form is wrapped inside a basic-info-form class which always creates 2 columns for each row.
+
+- Each form element container gets an id with the name of the form field, so to make specific changes to the default
+  2-column-grid layout, the element can be called here with .basic-info-form #elementId { some-css; }.
+
+- The form element can also be a fieldset, which contains an x-amount of form-fields. Fieldsets will always be set to
+  take up both of the basic-info-form columns and creates 3 columns inside it.
+
+- All elements inside a fieldset will start from their parent fieldsets grid, so the first row inside the fieldset
+  will be on row 1, no matter where the fieldset exists in the basic-info-form grid.
+
+  I.E; we want a form-item to start on column 2 and row 4 no matter where it would "naturally" be generated, 
+  we also want it to grow all the way to row 7. 
+  
+  .basic-info-form #elementId {
+    grid-column: 2;
+    grid-row: 4 / 7;
+  }
+*/
+
+.basic-info-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* repeat 2 rows with 1fr (fractional unit) */
+  grid-auto-flow: row;
+  gap: 0px var(--spacing-layout-l);
+  width: 85%;
+  overflow-x: visible;
+  margin: 0 var(--spacing-2-xl) 0 0;
+}
+
+.basic-info-form #formTitle {
+  grid-column: 1/3;
+}
+
+.basic-info-form #networkNumbers {
+  grid-column: 2; /* at column 2 */
+  grid-row: 4 / 7; /* starts at row 4, end at 7 */
+}
+
+.basic-info-form #hashTags {
+  grid-column: 1/3;
+}
+
+.basic-info-form #planning {
+  grid-row: 8;
+}
+
+/* elements inside FIELDSET will start from row 1 and repeat 3 columns */
+.basic-info-form fieldset {
+  display: grid;
+  grid-column: 1/3; /* use up both columns of basic-info-form */
+  grid-template-columns: repeat(3, 1fr); /* repeat 3 columns */
+}
+
+/* the start-to-end date fields will be put next to eachother and the 3rd column will be left empty */
+.basic-info-form #presenceStartYear {
+  grid-row: 2;
+}
+.basic-info-form #presenceEndYear {
+  grid-column: 2;
+}
+
+.basic-info-form #visibilityStartYear {
+  grid-row: 3;
+}
+.basic-info-form #visibilityEndYear {
+  grid-column: 2;
+}
+
+.basic-info-form #construction {
+  grid-column: 1/3;
+  grid-row: 9;
+}

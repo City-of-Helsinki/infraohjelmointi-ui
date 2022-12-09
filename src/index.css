@@ -107,6 +107,11 @@ table p {
   max-width: 360px;
 }
 
+.input-m {
+  max-width: 264px;
+  margin-right: var(--spacing-s);
+}
+
 .legend-margin {
   color: var(--label-color-default, var(--color-black-90));
   display: block;

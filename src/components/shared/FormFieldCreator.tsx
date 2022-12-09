@@ -1,6 +1,8 @@
 import { ListType } from '@/interfaces/common';
 import { FormField, IForm } from '@/interfaces/formInterfaces';
 import { FC } from 'react';
+import DateField from './DateField';
+import FieldSetCreator from './FieldSetCreator';
 import FormSectionTitle from './FormSectionTitle';
 import HashTagsForm from './HashTagsForm';
 import NetworkNumbers from './NetworkNumbers';
@@ -15,7 +17,7 @@ interface IFormFieldCreatorProps {
 const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
   return (
     <>
-      {form.map((f) => {
+      {form?.map((f) => {
         const { type, name, ...formProps } = f;
         switch (type) {
           case FormField.Select:
@@ -30,6 +32,10 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <NetworkNumbers key={f.name} name={f.name} {...formProps} />;
           case FormField.TagsForm:
             return <HashTagsForm key={f.name} name={f.name} {...formProps} />;
+          case FormField.FieldSet:
+            return <FieldSetCreator key={f.name} form={f} />;
+          case FormField.Date:
+            return <DateField key={f.name} name={name} {...formProps} />;
           default:
             return null;
         }

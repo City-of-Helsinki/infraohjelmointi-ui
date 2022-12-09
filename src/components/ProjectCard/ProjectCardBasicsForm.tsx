@@ -7,7 +7,7 @@ import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
 import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
-import './styles.css';
+import './basicsFormStyles.css';
 import { RootState } from '@/store';
 import { emptyStringsToNull, getOptionId } from '@/utils/common';
 

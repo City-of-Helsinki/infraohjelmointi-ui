@@ -17,7 +17,8 @@
     "skipToContent": "Siirry kohteeseen",
     "login": "Kirjaudu sisään",
     "basics": "Hankkeen perustiedot",
-    "navigateToForm": "Navigoi lomakkeeseen"
+    "navigateToForm": "Navigoi lomakkeeseen",
+    "schedule": "Hankkeen aikataulu"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -57,7 +58,18 @@
     "hkrId": "PW Hanketunnus",
     "sapNetwork": "Verkkonumerot",
     "sapProject": "Projektinumero",
-    "hashTags": "Tunnisteet"
+    "hashTags": "Tunnisteet",
+    "schedule": "Hankkeen aikataulu",
+    "planning": "Suunnittelu",
+    "estPlanningStartYear": "Alkaa",
+    "estPlanningEndYear": "Päättyy",
+    "presenceStartYear": "Esilläolo alkaa",
+    "presenceEndYear": "Esilläolo päättyy",
+    "visibilityEndYear": "Nähtävilläolo alkaa",
+    "visibilityStartYear": "Nähtävilläolo päättyy",
+    "construction": "Rakentaminen",
+    "constructionStartYear": "Alkaa",
+    "constructionEndYear": "Päättyy"
   },
   "notification": {
     "title": {
