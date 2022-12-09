@@ -114,3 +114,13 @@ table p {
   font-weight: 500;
   margin-bottom: var(--spacing-m);
 }
+
+.planning-list-projects-table td {
+  border-bottom: 0.05rem solid var(--color-bus-medium-light);
+  border-collapse: collapse;
+}
+
+.planning-list-projects-table td:last-child {
+  border-right: 0.05rem solid var(--color-bus-medium-light);
+  border-collapse: collapse;
+}

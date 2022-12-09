@@ -37,19 +37,21 @@ const PlanningListProjectsTableCell: FC<IPlanningListProjectsTableCellProps> = (
         background: formValue ? 'var(--color-white)' : 'var(--color-bus-light)',
         borderBottom: formValue
           ? '0.2rem solid var(--color-copper)'
-          : '0.2rem solid var(--color-bus-light)',
+          : '0.05rem solid var(--color-bus-medium-light)',
       }}
     >
-      <NumberInput
-        value={formValue || ''}
-        id="pc-sum"
-        label=""
-        className="table-input"
-        readOnly={isReadOnly}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        onChange={handleChange}
-      />
+      <div>
+        <NumberInput
+          value={formValue || ''}
+          id="pc-sum"
+          label=""
+          className="table-input"
+          readOnly={isReadOnly}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          onChange={handleChange}
+        />
+      </div>
     </td>
   );
 };
