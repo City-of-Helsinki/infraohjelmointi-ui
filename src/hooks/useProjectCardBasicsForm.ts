@@ -121,6 +121,7 @@ const useProjectCardBasicsForm = () => {
 
   const { control, handleSubmit, reset } = useForm<IProjectCardBasicsForm>({
     defaultValues: formValues,
+    mode: 'all',
   });
 
   // Updates
