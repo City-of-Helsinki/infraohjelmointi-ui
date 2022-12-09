@@ -15,22 +15,25 @@ const Notification: FC = () => {
     <>
       {notifications.length > 0 && (
         <div className="notifications-container">
-          {notifications.map((n) => (
-            <div key={n.id} className="notification-wrapper">
-              <HDSNotification
-                label={t(`notification.title.${n.title}`)}
-                type={n.color}
-                dismissible
-                position={n.type === 'toast' ? 'top-right' : 'inline'}
-                autoClose={n.type === 'toast'}
-                autoCloseDuration={2500}
-                closeButtonLabelText={t('closeNotification') || ''}
-                onClose={() => dispatch(clearNotification(n.id || 0))}
-              >
-                {t(`notification.message.${n.message}`)}
-              </HDSNotification>
-            </div>
-          ))}
+          {notifications.map((n) => {
+            console.log('Notification:  ', n);
+            return (
+              <div key={n.id} className="notification-wrapper">
+                <HDSNotification
+                  label={t(`notification.title.${n.title}`)}
+                  type={n.color}
+                  dismissible
+                  position={n.type === 'toast' ? 'top-right' : 'inline'}
+                  autoClose={n.type === 'toast'}
+                  autoCloseDuration={2500}
+                  closeButtonLabelText={t('closeNotification') || ''}
+                  onClose={() => dispatch(clearNotification(n.id || 0))}
+                >
+                  {t(`notification.message.${n.message}`)}
+                </HDSNotification>
+              </div>
+            );
+          })}
         </div>
       )}
     </>

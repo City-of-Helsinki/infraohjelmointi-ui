@@ -22,6 +22,7 @@ const Input: FC<IInputProps> = forwardRef(
     { name, value, size, readOnly, error, onChange, onBlur, label, required },
     ref: Ref<HTMLInputElement>,
   ) => {
+    console.log('Error: ', error);
     return (
       <div className="input-wrapper" id={name} data-testid={name}>
         <HDSNumberInput

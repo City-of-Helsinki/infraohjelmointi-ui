@@ -31,7 +31,12 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'hkrId',
-      rules: { maxLength: '9223372036854775807'.length - 1 },
+      rules: {
+        maxLength: {
+          value: '9223372036854775807'.length - 1,
+          message: 'Maksimipituus on 18 numeroa',
+        },
+      },
       type: FormField.Number,
     },
     {

@@ -45,6 +45,7 @@ const handleResponse = (res: AxiosResponse) => {
 };
 
 const handleError = (error: AxiosError): Promise<IError> => {
+  console.log('Error: ', error);
   const parsedError: IError = {
     status: error.response?.status,
     message: error.message || 'Unknown error',

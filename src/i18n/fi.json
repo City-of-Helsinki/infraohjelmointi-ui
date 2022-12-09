@@ -62,10 +62,15 @@
   "notification": {
     "title": {
       "sendSuccess": "Lähetys onnistui",
-      "404": "Virhe, resurssia ei löytynyt"
+      "404": "Virhe, resurssia ei löytynyt",
+      "400": "Vääränlainen pyyntö",
+      "500": "Palvelinvirhe"
     },
     "message": {
-      "formSaveSuccess": "Lomake tallennettu onnistuneesti."
+      "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
+      "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
+      "Request failed with status code 404": "Pyyntö epäonnistui virhekoodilla 404",
+      "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500"
     }
   },
   "appTitle": "Infraohjelmointi UI",
