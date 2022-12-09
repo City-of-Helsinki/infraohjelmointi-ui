@@ -3,7 +3,8 @@ import { IconButton, Title } from '../shared';
 import { FC, MouseEventHandler } from 'react';
 
 interface IPlanningListProjectsTableHeaderProps {
-  group: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  group: any; // FIXME: this any will be removed ones we get the actual group model
   isProjectsVisible: boolean;
   handleProjectsVisible: MouseEventHandler<HTMLButtonElement>;
 }
@@ -33,7 +34,15 @@ const PlanningListProjectsTableHeader: FC<IPlanningListProjectsTableHeaderProps>
           </div>
         </div>
       </th>
-      {/* CELLS */}
+      {/**
+       * TODO:
+       * These cell values should listen to the current project card values for that year from redux:
+       * 1. We patch the project card each time the user types a value
+       * 2. The value will change in redux with the response
+       * 3. We calculate the sum and display it for the user when a change in redux state is detected
+       */}
+      {/* FIXME: this any will be removed ones we get the actual group model */}
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
       {group.sums.map((rn: any, i: number) => (
         <th key={i} className="group-cell">
           {rn}

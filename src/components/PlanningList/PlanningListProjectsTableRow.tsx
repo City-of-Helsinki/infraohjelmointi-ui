@@ -1,5 +1,6 @@
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { planListProjectValues } from '@/mocks/common';
+import { TextInput } from 'hds-react/components/TextInput';
 import {
   IconDocument,
   IconMenuDots,
@@ -8,6 +9,7 @@ import {
 } from 'hds-react/icons';
 import { FC } from 'react';
 import { useNavigate } from 'react-router';
+import PlanningListProjectsTableCell from './PlanningListProjectsTableCell';
 
 /**
  * RED CELLS
@@ -64,16 +66,7 @@ const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ pro
         </div>
       </th>
       {planListProjectValues.sums.map((p, i) => (
-        <td
-          key={i}
-          className="project-cell"
-          style={{
-            background: p ? 'var(--color-suomenlinna-light)' : 'var(--color-bus-light)',
-            borderBottom: p ? '4px solid var(--color-suomenlinna)' : 'none',
-          }}
-        >
-          {p}
-        </td>
+        <PlanningListProjectsTableCell key={i} value={p} />
       ))}
     </tr>
   );

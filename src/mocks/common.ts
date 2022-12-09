@@ -19,7 +19,7 @@ export const planListProjectValues = {
   readiness: '1',
   value1: '3 400',
   value2: '2 700',
-  sums: ['460', '', '350', '580', '', '', '200', '', '', '300', '100'],
+  sums: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 };
 
 export const planningListYearsTableData = [

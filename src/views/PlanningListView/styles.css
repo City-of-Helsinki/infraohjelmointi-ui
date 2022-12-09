@@ -173,3 +173,17 @@
   bottom: 0px;
   right: -5px;
 }
+
+.table-input input {
+  text-align: center !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  height: 44px !important;
+  width: 90% !important;
+  font-size: var(--fontsize-body-s) !important;
+  font-weight: 300 !important;
+  position: absolute; /* absolute prevents the form from jumping when a field is selected */
+  bottom: 0;
+  top: -20px;
+  left: 4px;
+}
