@@ -25,7 +25,7 @@ const PlanningListYearsTable: FC = () => {
         </tr>
         <tr>
           {planningListYearsTableData.map((o, i) => (
-            <td key={i}>{o.otherVal3 && o.otherVal3}</td>
+            <td key={i}>{o.otherVal3}</td>
           ))}
         </tr>
         <tr>

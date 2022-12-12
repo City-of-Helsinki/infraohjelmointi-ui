@@ -5,7 +5,10 @@ import PlanningListProjectsTableHeader from './PlanningListProjectsTableHeader';
 import PlanningListProjectsTableRow from './PlanningListProjectsTableRow';
 
 const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) => {
-  const projectCards = useAppSelector((state: RootState) => state.projectCard.projectCards);
+  const projectCards = useAppSelector((state: RootState) => state.projectCard.projectCards).slice(
+    0,
+    20,
+  );
 
   const [isProjectsVisible, setIsProjectsVisible] = useState(true);
 

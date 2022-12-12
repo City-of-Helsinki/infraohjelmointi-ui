@@ -49,7 +49,9 @@ const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ pro
           <div className="left">
             <IconMenuDots />
             <IconDocument />
-            <button onClick={navigateToProjectCard}>{project.name}</button>
+            <button className="project-name-button" onClick={navigateToProjectCard}>
+              {project.name}
+            </button>
           </div>
           {/* RIGHT */}
           <div className="right">

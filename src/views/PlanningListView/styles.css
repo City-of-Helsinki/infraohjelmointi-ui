@@ -146,6 +146,14 @@
   flex-direction: column;
 }
 
+/* Hide too long project names */
+.project-header-cell .project-name-button {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 130px;
+}
+
 .project-cell {
   text-align: center;
   background: var(--color-bus-light);
