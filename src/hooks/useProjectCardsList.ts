@@ -24,7 +24,7 @@ const useProjectCardsList = (page: number) => {
   }, [isFetchingCards]);
 
   useEffect(() => {
-    setIsLastProjectsFetched(projectCards.length === projectCardsCount);
+    setIsLastProjectsFetched(projectCards.length >= projectCardsCount);
   }, [projectCards, projectCardsCount]);
 
   return { projectCards, isLastProjectsFetched, isFetchingCards };

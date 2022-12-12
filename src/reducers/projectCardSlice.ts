@@ -16,7 +16,6 @@ import { notifySuccess } from './notificationSlice';
 interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
   projectCards: Array<IProjectCard>;
-  page: number;
   count: number;
   error: IError | null | unknown;
 }
@@ -24,7 +23,6 @@ interface IProjectCardState {
 const initialState: IProjectCardState = {
   selectedProjectCard: null,
   projectCards: [],
-  page: 1,
   count: 0,
   error: null,
 };
@@ -85,7 +83,9 @@ export const projectCardSlice = createSlice({
       (state, action: PayloadAction<IProjectCardsResponse>) => {
         return {
           ...state,
-          projectCards: [...state.projectCards, ...action.payload.results],
+          projectCards: Array.from(
+            new Set<IProjectCard>([...state.projectCards, ...action.payload.results]),
+          ),
           count: action.payload.count,
         };
       },
