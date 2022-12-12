@@ -15,10 +15,13 @@ interface INetworkNumberContainerProps {
  */
 const NetworkNumbersContainer: FC<INetworkNumberContainerProps> = forwardRef(
   ({ name, value, label }, ref: Ref<HTMLDivElement>) => {
-    const networkNumbers: Array<{ label: string; value: string }> = value.map((v) => ({
-      label: 'TEST',
-      value: v,
-    }));
+    // We're still uncertain if these will come as a list or as a single value
+    const networkNumbers: Array<{ label: string; value: string }> = Array.isArray(value)
+      ? value.map((v) => ({
+          label: 'TEST',
+          value: v,
+        }))
+      : [{ label: 'TEST', value: value }];
 
     return (
       <div className="display-flex-col" id={name} data-testid={name} ref={ref}>
@@ -27,7 +30,7 @@ const NetworkNumbersContainer: FC<INetworkNumberContainerProps> = forwardRef(
           networkNumbers.map((nn) => (
             <div className="nn-row" key={nn.label}>
               <label className="nn-label">{nn.label}</label>
-              <Span size="m" text={nn.value} />
+              <Span size="m" text={nn.value} fontWeight="light" />
             </div>
           ))}
       </div>

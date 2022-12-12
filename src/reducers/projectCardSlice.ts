@@ -10,28 +10,37 @@ import {
   patchProjectCard,
   postProjectCard,
 } from '@/services/projectCardServices';
+import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
 
 interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
   projectCards: Array<IProjectCard>;
-  count: number;
+  count: number | null;
+  page: number;
   error: IError | null | unknown;
 }
 
 const initialState: IProjectCardState = {
   selectedProjectCard: null,
   projectCards: [],
-  count: 0,
+  count: null,
   error: null,
+  page: 1,
 };
 
 export const getProjectCardsThunk = createAsyncThunk(
   'projectCard/getAll',
   async (page: number, thunkAPI) => {
     return await getProjectCards(page)
-      .then((res) => res)
+      .then((res) => {
+        thunkAPI.dispatch(setPage(page));
+        if ((thunkAPI.getState() as RootState).projectCard.projectCards.length > 0 && page === 1) {
+          thunkAPI.dispatch(resetProjectCards());
+        }
+        return res;
+      })
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
@@ -75,7 +84,20 @@ export const patchProjectCardThunk = createAsyncThunk(
 export const projectCardSlice = createSlice({
   name: 'projectCard',
   initialState,
-  reducers: {},
+  reducers: {
+    setPage(state, action: PayloadAction<number>) {
+      return {
+        ...state,
+        page: action.payload,
+      };
+    },
+    resetProjectCards(state) {
+      return {
+        ...state,
+        projectCards: initialState.projectCards,
+      };
+    },
+  },
   extraReducers: (builder) => {
     // GET ALL
     builder.addCase(
@@ -128,5 +150,7 @@ export const projectCardSlice = createSlice({
     );
   },
 });
+
+export const { setPage, resetProjectCards } = projectCardSlice.actions;
 
 export default projectCardSlice.reducer;

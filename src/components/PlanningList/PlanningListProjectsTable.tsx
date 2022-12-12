@@ -4,18 +4,21 @@ import { useInView } from 'react-intersection-observer';
 import PlanningListProjectsTableHeader from './PlanningListProjectsTableHeader';
 import PlanningListProjectsTableRow from './PlanningListProjectsTableRow';
 
+// FIXME: this any will be removed ones we get the actual group model
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) => {
-  const [page, setPage] = useState(1);
-  const { projectCards, isLastProjectsFetched, isFetchingCards } = useProjectCardsList(page);
+  const { projectCards, fetchNext } = useProjectCardsList();
+
   const { ref, inView } = useInView();
 
   const [isProjectsVisible, setIsProjectsVisible] = useState(true);
 
   const handleProjectsVisible = () => setIsProjectsVisible(!isProjectsVisible);
 
+  // Fetch the next projects if the "fetch-projects-trigger" element comes into view
   useEffect(() => {
-    if (inView) {
-      setPage(page + 1);
+    if (inView && isProjectsVisible) {
+      fetchNext();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
@@ -35,9 +38,7 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
             projectCards.map((p, i) => <PlanningListProjectsTableRow key={i} project={p} />)}
         </tbody>
       </table>
-      {!isFetchingCards && !isLastProjectsFetched && (
-        <div data-testid="fetch-projects-triggerer" ref={ref} />
-      )}
+      <div data-testid="fetch-projects-trigger" ref={ref} />
     </>
   );
 };
