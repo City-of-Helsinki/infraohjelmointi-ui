@@ -21,7 +21,7 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
       </thead>
       <tbody>
         {isProjectsVisible &&
-          projectCards.map((p) => <PlanningListProjectsTableRow key={p.name} project={p} />)}
+          projectCards.map((p) => <PlanningListProjectsTableRow key={p.id} project={p} />)}
       </tbody>
     </table>
   );
