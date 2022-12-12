@@ -31,6 +31,12 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'hkrId',
+      rules: {
+        maxLength: {
+          value: '9223372036854775807'.length - 1,
+          message: 'Maksimipituus on 18 numeroa',
+        },
+      },
       type: FormField.Number,
     },
     {
@@ -106,7 +112,6 @@ const useProjectCardBasicsValues = () => {
  * It will also return formFields, which can be passed to the FormFieldCreator component to generate
  * the visual form.
  *
- * @param projectCard any ProjectCard
  * @returns handleSubmit, reset, formFields
  */
 const useProjectCardBasicsForm = () => {
@@ -116,6 +121,7 @@ const useProjectCardBasicsForm = () => {
 
   const { control, handleSubmit, reset } = useForm<IProjectCardBasicsForm>({
     defaultValues: formValues,
+    mode: 'all',
   });
 
   // Updates

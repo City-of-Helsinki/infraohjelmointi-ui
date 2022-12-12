@@ -1,15 +1,28 @@
+import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
+import mockUsers from '@/mocks/mockUsers';
+import { getUsersThunk } from '@/reducers/authSlice';
 import { clearLoading, setLoading } from '@/reducers/loadingSlice';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import { waitFor } from '@testing-library/react';
 import Loader from './Loader';
 
+jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
 describe('Loader', () => {
+  const store = setupStore();
+
+  beforeEach(async () => {
+    mockedAxios.get.mockResolvedValue(mockUsers);
+    await store.dispatch(getUsersThunk());
+  });
+
   it('does not render Loader if isLoading is false', () => {
-    const { container } = renderWithProviders(<Loader />);
+    const { container } = renderWithProviders(<Loader />, { store });
     expect(container.getElementsByClassName('loader-container').length).toBe(0);
   });
 

@@ -1,7 +1,6 @@
 import { FC, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import mockUser from '@/mocks/mockUser';
-import { setUser } from '@/reducers/authSlice';
+import { getUsersThunk } from '@/reducers/authSlice';
 import { RootState } from '@/store';
 
 /**
@@ -15,7 +14,7 @@ const AuthGuard: FC = () => {
   useEffect(() => {
     if (!user) {
       // Temporarily adding a mock user
-      dispatch(setUser(mockUser));
+      dispatch(getUsersThunk());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

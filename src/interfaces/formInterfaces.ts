@@ -14,10 +14,18 @@ export interface IForm {
   name: string;
   label: string;
   control: HookFormControlType;
-  type: FormField;
+  type?: FormField;
   rules?: HookFormRulesType;
   required?: boolean;
   readOnly?: boolean;
+}
+
+export interface IProjectCardHeaderForm {
+  phase: IOption;
+  favourite: boolean;
+  name: string;
+  address?: string;
+  group: string;
 }
 
 export interface IProjectCardBasicsForm {
@@ -31,6 +39,8 @@ export interface IProjectCardBasicsForm {
   hashTags: Array<string>;
 }
 
+export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}
+
 export interface ISomeOtherForm {
   name: string;
   phone: number;
@@ -39,6 +49,7 @@ export interface ISomeOtherForm {
 export type HookFormControlType =
   | Control<FieldValues>
   | Control<IProjectCardBasicsForm>
+  | Control<IProjectCardHeaderForm>
   | undefined;
 
 export type HookFormRulesType = Omit<

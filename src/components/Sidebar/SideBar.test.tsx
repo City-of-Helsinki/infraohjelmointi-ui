@@ -1,12 +1,12 @@
-import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
+import mockI18next from '@/mocks/mockI18next';
 import SideBar from './SideBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { INavigationItem } from '@/interfaces/common';
-import mockProjectCards from '@/mocks/mockProjectCards';
 import { setupStore } from '@/store';
-import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
 import { matchExact } from '@/utils/common';
+import mockUsers from '@/mocks/mockUsers';
+import { getUsersThunk } from '@/reducers/authSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -24,8 +24,8 @@ describe('SideBar', () => {
   ];
 
   beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockProjectCards);
-    await store.dispatch(getProjectCardsThunk());
+    mockedAxios.get.mockResolvedValue(mockUsers);
+    await store.dispatch(getUsersThunk());
   });
 
   afterEach(async () => {
@@ -44,11 +44,6 @@ describe('SideBar', () => {
     navItems.forEach((n) => {
       expect(getByRole('button', { name: n.label })).toBeInTheDocument();
     });
-  });
-
-  it('populates projectCards to redux', async () => {
-    renderWithProviders(<SideBar />, { store });
-    expect(store.getState().projectCard.projectCards?.length).toBeGreaterThan(0);
   });
 
   // FIXME: tests with routes don't work yet

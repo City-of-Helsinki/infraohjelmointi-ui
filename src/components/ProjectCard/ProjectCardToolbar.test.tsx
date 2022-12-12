@@ -2,10 +2,24 @@ import mockI18next from '@/mocks/mockI18next';
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectCardToolbar from './ProjectCardToolbar';
+import { setupStore } from '@/store';
+import axios from 'axios';
+import mockUsers from '@/mocks/mockUsers';
+import { getUsersThunk } from '@/reducers/authSlice';
 
+jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
 describe('ProjectCardToolbar', () => {
+  const store = setupStore();
+
+  beforeEach(async () => {
+    mockedAxios.get.mockResolvedValue(mockUsers);
+    await store.dispatch(getUsersThunk());
+  });
+
   it('renders component wrapper', () => {
     const { container } = renderWithProviders(<ProjectCardToolbar />);
     expect(container.getElementsByClassName('project-card-toolbar-container').length).toBe(1);

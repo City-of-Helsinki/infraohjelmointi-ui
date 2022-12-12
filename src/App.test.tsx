@@ -6,6 +6,8 @@ import App from './App';
 import { setupStore } from './store';
 import mockProjectCards from './mocks/mockProjectCards';
 import { getProjectCardsThunk } from './reducers/projectCardSlice';
+import { mockError } from './mocks/mockError';
+import { IError } from './interfaces/common';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -18,6 +20,11 @@ describe('App', () => {
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockProjectCards);
     await store.dispatch(getProjectCardsThunk());
+  });
+
+  it('populates projectCards to redux', async () => {
+    renderWithProviders(<App />, { store });
+    expect(store.getState().projectCard.projectCards?.length).toBeGreaterThan(0);
   });
 
   it('renders TopBar', () => {
@@ -44,6 +51,15 @@ describe('App', () => {
   it('does not render Notification', () => {
     const { container } = renderWithProviders(<App />, { store });
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
+  });
+
+  it('catches a failed projectCards fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getProjectCardsThunk());
+
+    const storeError = store.getState().projectCard.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
   });
 
   /**

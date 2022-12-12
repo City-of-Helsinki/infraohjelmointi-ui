@@ -1,6 +1,5 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
-import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
 import { RootState } from '@/store';
 import { IconPenLine } from 'hds-react/icons';
 import { useEffect, useState } from 'react';
@@ -14,16 +13,9 @@ import './styles.css';
 const SideBar = () => {
   const navigate = useNavigate();
   const path = useLocation().pathname;
-  const dispatch = useAppDispatch();
   const projectCards = useAppSelector((state: RootState) => state.projectCard.projectCards);
   const [projectId, setProjectId] = useState('');
   const { t } = useTranslation();
-
-  // Get all project cards
-  useEffect(() => {
-    dispatch(getProjectCardsThunk());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Set the project card ID to the first in the list if found
   useEffect(() => {

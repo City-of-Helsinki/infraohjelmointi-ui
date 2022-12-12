@@ -8,6 +8,7 @@ export interface IProjectCard {
   sapNetwork: Array<string>;
   type: IListItem;
   name: string;
+  address?: string;
   entityName: string;
   description: string;
   phase: IListItem;
@@ -59,14 +60,18 @@ export interface IProjectCard {
 }
 
 export interface IProjectCardRequest {
-  type: string | null;
-  description: string;
-  entityName: string | null;
-  hkrId: string | null;
-  area: string | null;
-  hashTags: Array<string>;
-  sapProject: string | null;
-  sapNetwork: Array<string>;
+  type?: string | null;
+  description?: string;
+  entityName?: string | null;
+  hkrId?: string | null;
+  area?: string | null;
+  hashTags?: Array<string>;
+  sapProject?: string;
+  sapNetwork?: Array<string>;
+  name?: string | null;
+  address?: string | null;
+  favPersons?: Array<string> | [];
+  phase?: string | null;
 }
 
 export interface IProjectCardRequestObject {
