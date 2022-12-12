@@ -1,5 +1,9 @@
 import { IError } from '@/interfaces/common';
-import { IProjectCard, IProjectCardRequestObject } from '@/interfaces/projectCardInterfaces';
+import {
+  IProjectCard,
+  IProjectCardRequestObject,
+  IProjectCardsResponse,
+} from '@/interfaces/projectCardInterfaces';
 import {
   getProjectCard,
   getProjectCards,
@@ -13,6 +17,7 @@ interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
   projectCards: Array<IProjectCard>;
   page: number;
+  count: number;
   error: IError | null | unknown;
 }
 
@@ -20,6 +25,7 @@ const initialState: IProjectCardState = {
   selectedProjectCard: null,
   projectCards: [],
   page: 1,
+  count: 0,
   error: null,
 };
 
@@ -76,8 +82,12 @@ export const projectCardSlice = createSlice({
     // GET ALL
     builder.addCase(
       getProjectCardsThunk.fulfilled,
-      (state, action: PayloadAction<Array<IProjectCard>>) => {
-        return { ...state, projectCards: [...state.projectCards, ...action.payload] };
+      (state, action: PayloadAction<IProjectCardsResponse>) => {
+        return {
+          ...state,
+          projectCards: [...state.projectCards, ...action.payload.results],
+          count: action.payload.count,
+        };
       },
     );
     builder.addCase(

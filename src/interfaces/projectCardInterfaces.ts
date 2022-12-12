@@ -149,3 +149,8 @@ export interface IProjectArea {
   areaName: string;
   location: string;
 }
+
+export interface IProjectCardsResponse {
+  results: Array<IProjectCard>;
+  count: number;
+}
