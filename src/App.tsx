@@ -12,7 +12,7 @@ const App: FC = () => {
 
   // Get all project cards
   useEffect(() => {
-    dispatch(getProjectCardsThunk());
+    dispatch(getProjectCardsThunk(1));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

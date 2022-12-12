@@ -55,7 +55,7 @@ describe('App', () => {
 
   it('catches a failed projectCards fetch', async () => {
     mockedAxios.get.mockRejectedValue(mockError);
-    await store.dispatch(getProjectCardsThunk());
+    await store.dispatch(getProjectCardsThunk(1));
 
     const storeError = store.getState().projectCard.error as IError;
     expect(storeError.message).toBe(mockError.message);
