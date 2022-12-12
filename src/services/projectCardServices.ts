@@ -4,9 +4,9 @@ import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const getProjectCards = async (): Promise<Array<IProjectCard>> => {
+export const getProjectCards = async (page: number): Promise<Array<IProjectCard>> => {
   return axios
-    .get(`${REACT_APP_API_URL}/projects/`)
+    .get(`${REACT_APP_API_URL}/projects?page=${page}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

@@ -19,7 +19,7 @@ describe('App', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockProjectCards);
-    await store.dispatch(getProjectCardsThunk());
+    await store.dispatch(getProjectCardsThunk(1));
   });
 
   it('populates projectCards to redux', async () => {

@@ -1,6 +1,5 @@
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { planListProjectValues } from '@/mocks/common';
-import { TextInput } from 'hds-react/components/TextInput';
 import {
   IconDocument,
   IconMenuDots,

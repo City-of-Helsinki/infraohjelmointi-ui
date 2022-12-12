@@ -12,20 +12,25 @@ import { notifySuccess } from './notificationSlice';
 interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
   projectCards: Array<IProjectCard>;
+  page: number;
   error: IError | null | unknown;
 }
 
 const initialState: IProjectCardState = {
   selectedProjectCard: null,
   projectCards: [],
+  page: 1,
   error: null,
 };
 
-export const getProjectCardsThunk = createAsyncThunk('projectCard/getAll', async (_, thunkAPI) => {
-  return await getProjectCards()
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
-});
+export const getProjectCardsThunk = createAsyncThunk(
+  'projectCard/getAll',
+  async (page: number, thunkAPI) => {
+    return await getProjectCards(page)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
 
 export const getProjectCardThunk = createAsyncThunk(
   'projectCard/getOne',
@@ -72,7 +77,7 @@ export const projectCardSlice = createSlice({
     builder.addCase(
       getProjectCardsThunk.fulfilled,
       (state, action: PayloadAction<Array<IProjectCard>>) => {
-        return { ...state, projectCards: action.payload };
+        return { ...state, projectCards: [...state.projectCards, ...action.payload] };
       },
     );
     builder.addCase(
