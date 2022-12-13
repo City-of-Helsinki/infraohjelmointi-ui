@@ -105,9 +105,7 @@ export const projectCardSlice = createSlice({
       (state, action: PayloadAction<IProjectCardsResponse>) => {
         return {
           ...state,
-          projectCards: Array.from(
-            new Set<IProjectCard>([...state.projectCards, ...action.payload.results]),
-          ),
+          projectCards: [...state.projectCards, ...action.payload.results],
           count: action.payload.count,
         };
       },
