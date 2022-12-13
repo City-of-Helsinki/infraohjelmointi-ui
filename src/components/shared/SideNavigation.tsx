@@ -16,7 +16,6 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setActivePage = (e: any) => {
     e.preventDefault();
-    console.log('Target: ', e.target.getAttribute('href'));
     setActive(e.target.getAttribute('href'));
     navigate(e.target.getAttribute('href'));
   };

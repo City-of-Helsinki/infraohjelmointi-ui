@@ -95,11 +95,11 @@ const buildProjectCardBasicsFormFields = (
 
   const projectCardBasicsFormFields = formFields.map((formField) => ({
     ...formField,
-    control: control,
+    control,
     label: translate(`projectCardBasicsForm.${formField.name}`),
     fieldSet: formField.fieldSet?.map((fieldSetField) => ({
       ...fieldSetField,
-      control: control,
+      control,
       label: translate(`projectCardBasicsForm.${fieldSetField.name}`),
     })),
   }));
