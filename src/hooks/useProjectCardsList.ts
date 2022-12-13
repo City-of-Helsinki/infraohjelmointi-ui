@@ -1,7 +1,7 @@
 import { IError } from '@/interfaces/common';
 import { getProjectCardsThunk } from '@/reducers/projectCardSlice';
 import { RootState } from '@/store';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import _ from 'lodash';
 
@@ -20,13 +20,13 @@ const useProjectCardsList = () => {
   const [isFetchingCards, setIsFetchingCards] = useState(false);
   const dispatch = useAppDispatch();
 
-  const fetchNext = useCallback(() => {
+  const fetchNext = () => {
     if (!isLastProjectsFetched && !isFetchingCards && !error?.message) {
       setIsFetchingCards(true);
       dispatch(getProjectCardsThunk(page + 1)).finally(() => setIsFetchingCards(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
   const projectCards = useMemo(() => projectCardsFromRedux, [projectCardsFromRedux]);
 

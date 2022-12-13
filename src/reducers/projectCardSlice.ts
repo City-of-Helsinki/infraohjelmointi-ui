@@ -27,7 +27,7 @@ const initialState: IProjectCardState = {
   projectCards: [],
   count: null,
   error: null,
-  page: 1,
+  page: 0,
 };
 
 export const getProjectCardsThunk = createAsyncThunk(
