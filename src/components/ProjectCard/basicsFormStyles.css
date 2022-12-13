@@ -15,6 +15,10 @@
   grid-column: 1/7;
 }
 
+.basic-info-form #hkrId {
+  grid-column: 7/13;
+}
+
 .basic-info-form #entityName {
   grid-column: 1/7;
 }
@@ -27,14 +31,6 @@
   grid-column: 1/7;
 }
 
-.basic-info-form #hashTags {
-  grid-column: 1/13;
-}
-
-.basic-info-form #hkrId {
-  grid-column: 7/13;
-}
-
 .basic-info-form #sapProject {
   grid-column: 7/13;
 }
@@ -42,6 +38,10 @@
 .basic-info-form #sapNetwork {
   grid-column: 7/13;
   grid-row: 4 / 7;
+}
+
+.basic-info-form #hashTags {
+  grid-column: 1/13;
 }
 
 /* elements inside FIELDSET will start from row 1 and repeat 3 columns */
