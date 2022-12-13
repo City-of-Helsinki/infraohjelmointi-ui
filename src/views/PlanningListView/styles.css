@@ -1,0 +1,207 @@
+.planning-list-table-container {
+  margin: var(--spacing-layout-s);
+  font-size: var(--fontsize-body-s);
+}
+
+.planning-list-years-table {
+  flex: 7 1;
+  text-align: center;
+}
+
+.planning-list-years-table span {
+  display: block;
+}
+
+.planning-list-years-table .row-1-cell {
+  background: var(--color-bus);
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+.years-table-cell {
+  min-width: 80px;
+  max-width: 80px;
+}
+
+.planning-list-projects-table {
+  width: 100%;
+}
+
+.planning-list-info-panel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* repeat 2 rows with 1fr (fractional unit) */
+  grid-auto-flow: row;
+  overflow-x: visible;
+  margin: 0 var(--spacing-xs) 0 0;
+  width: 100%;
+  flex: 3 1;
+}
+
+.planning-list-info-panel span {
+  display: block;
+}
+.planning-list-info-panel #planningListTitle {
+  grid-column: 1/3;
+}
+
+.planning-list-info-panel #planningListGroupInfo {
+  text-align: right;
+}
+
+#planningListGroupInfo .group-info-text {
+  font-weight: bold;
+}
+
+#planningListButton button {
+  height: 44px !important;
+  width: 239px !important;
+}
+
+.planning-list-info-panel #planningListBasicInfo {
+  font-weight: bold;
+  grid-column: 2/3;
+  text-align: right;
+}
+
+.group-header-cell {
+  width: 30.5%;
+  text-align: left;
+  background: var(--color-bus);
+  padding: 0.5rem 1.5rem;
+  color: white;
+}
+
+.group-header-cell-content {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+}
+
+.group-header-cell .left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.group-header-cell .right {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-header-cell .right span:last-child {
+  font-weight: 400;
+}
+
+.group-cell {
+  background: var(--color-bus);
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  min-width: 80px;
+  max-width: 80px;
+}
+
+.project-header-cell {
+  text-align: left;
+  padding: 0.5rem 1.5rem;
+  border-bottom: 0.05rem solid var(--color-bus-medium-light);
+  border-left: 0.05rem solid var(--color-bus-medium-light);
+  min-width: 350px;
+}
+
+.project-header-cell-container {
+  display: flex;
+}
+
+.project-header-cell .left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-weight: 400;
+  width: 60%;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.project-header-cell .right {
+  display: flex;
+  width: 40%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-header-cell .right span:last-child {
+  font-weight: 400;
+}
+
+.project-header-cell .right .project-header-left {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.project-header-cell .right .project-header-right {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hide too long project names */
+.project-header-cell .project-name-button {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 130px;
+}
+
+.project-cell {
+  text-align: center;
+  background: var(--color-bus-light);
+  border-bottom: 0.05rem solid var(--color-bus-medium-light);
+  border-collapse: collapse;
+}
+
+.project-cell:last-child {
+  border-right: 0.05rem solid var(--color-bus-medium-light);
+  border-collapse: collapse;
+}
+
+.circle-number-icon {
+  background: gray;
+  border-radius: 50%;
+  height: 26px;
+  width: 26px;
+  text-align: center;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.circle-number-icon-indicator {
+  position: absolute;
+  background: black;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 14px;
+  bottom: 0px;
+  right: -5px;
+}
+
+.table-input input {
+  text-align: center !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  height: 44px !important;
+  width: 90% !important;
+  font-size: var(--fontsize-body-s) !important;
+  font-weight: 300 !important;
+  position: absolute; /* absolute prevents the form from jumping when a field is selected */
+  bottom: 0;
+  top: -20px;
+  left: 4px;
+}

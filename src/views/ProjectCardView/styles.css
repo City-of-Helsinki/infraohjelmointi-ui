@@ -3,23 +3,6 @@
   width: 100%;
 }
 
-/* TOOLBAR */
-.project-card-toolbar-container {
-  height: var(--spacing-3-xl);
-  display: flex;
-  align-items: center;
-  padding: 0 var(--spacing-m);
-  justify-content: space-between;
-}
-
-.project-card-toolbar-container .toolbar-item {
-  padding-right: var(--spacing-s);
-}
-
-.project-card-toolbar-container .display-flex button {
-  margin-left: var(--spacing-s);
-}
-
 /* PROJECT CARD */
 .project-card-header-container {
   display: flex;

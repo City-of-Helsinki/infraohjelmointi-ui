@@ -1,12 +1,16 @@
 import { IError } from '@/interfaces/common';
-import { IProjectCard, IProjectCardRequestObject } from '@/interfaces/projectCardInterfaces';
+import {
+  IProjectCard,
+  IProjectCardRequestObject,
+  IProjectCardsResponse,
+} from '@/interfaces/projectCardInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const getProjectCards = async (): Promise<Array<IProjectCard>> => {
+export const getProjectCards = async (page: number): Promise<IProjectCardsResponse> => {
   return axios
-    .get(`${REACT_APP_API_URL}/projects/`)
+    .get(`${REACT_APP_API_URL}/projects?page=${page}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

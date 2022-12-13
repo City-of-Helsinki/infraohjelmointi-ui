@@ -136,3 +136,20 @@
 .tags-container .tag-wrapper {
   margin: 0 var(--spacing-xs) var(--spacing-xs) 0;
 }
+
+/* TOOLBAR */
+.toolbar-container {
+  height: var(--spacing-3-xl);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-m);
+  justify-content: space-between;
+}
+
+.toolbar-container .toolbar-item {
+  padding-right: var(--spacing-s);
+}
+
+.toolbar-container .display-flex button {
+  margin-left: var(--spacing-s);
+}

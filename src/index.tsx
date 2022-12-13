@@ -10,7 +10,8 @@ import ProjectCardView from '@/views/ProjectCardView';
 import { ProjectCardBasics } from '@/components/ProjectCard';
 import ErrorView from '@/views/ErrorView';
 import AuthGuard from '@/components/AuthGuard';
-import { injectStore } from './utils/interceptors';
+import { injectStore } from '@/utils/interceptors';
+import PlanningListView from '@/views/PlanningListView';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
             element: <ProjectCardBasics />,
           },
         ],
+      },
+      {
+        path: 'planning-list',
+        element: <PlanningListView />,
       },
     ],
   },

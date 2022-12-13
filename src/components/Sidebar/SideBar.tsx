@@ -1,7 +1,7 @@
 import { useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
 import { RootState } from '@/store';
-import { IconPenLine } from 'hds-react/icons';
+import { IconPenLine, IconTicket } from 'hds-react/icons';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -24,9 +24,14 @@ const SideBar = () => {
 
   const navItems: Array<INavigationItem> = [
     {
-      route: `project-card/${projectId}/`,
+      route: `/project-card/${projectId}/basics`,
       label: t('projectCard'),
       component: <IconPenLine />,
+    },
+    {
+      route: `planning-list`,
+      label: t('planningList'),
+      component: <IconTicket />,
     },
   ];
 
