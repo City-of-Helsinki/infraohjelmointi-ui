@@ -1,6 +1,17 @@
+:root {
+  --grid-col-full: 1/25;
+  --grid-col-half-left: 1/13;
+  --grid-col-half-right: 13/25;
+  --grid-col-small-left: 1/8;
+  --grid-col-small-right: 8/15;
+  --grid-col-xs-right: 1/4;
+  --grid-col-xs-middle: 4/11;
+  --grid-col-xs-left: 11/14;
+}
+
 .basic-info-form {
   display: grid;
-  grid-template-columns: repeat(12, 1fr); /* repeat 2 rows with 1fr (fractional unit) */
+  grid-template-columns: repeat(24, 1fr); /* repeat 24 rows with 1fr (fractional unit) */
   grid-auto-flow: row;
   gap: 0px var(--spacing-layout-s);
   width: 85%;
@@ -8,81 +19,83 @@
 }
 
 .basic-info-form #formTitle {
-  grid-column: 1/13;
+  grid-column: var(--grid-col-full);
 }
 
 .basic-info-form #type {
-  grid-column: 1/7;
+  grid-column: var(--grid-col-half-left);
 }
 
 .basic-info-form #hkrId {
-  grid-column: 7/13;
+  grid-column: var(--grid-col-half-right);
 }
 
 .basic-info-form #entityName {
-  grid-column: 1/7;
+  grid-column: var(--grid-col-half-left);
 }
 
 .basic-info-form #description {
-  grid-column: 1/7;
+  grid-column: var(--grid-col-half-left);
 }
 
 .basic-info-form #area {
-  grid-column: 1/7;
+  grid-column: var(--grid-col-half-left);
 }
 
 .basic-info-form #sapProject {
-  grid-column: 7/13;
+  grid-column: var(--grid-col-half-right);
 }
 
 .basic-info-form #sapNetwork {
-  grid-column: 7/13;
+  grid-column: var(--grid-col-half-right);
   grid-row: 4 / 7;
 }
 
 .basic-info-form #hashTags {
-  grid-column: 1/13;
+  grid-column: var(--grid-col-full);
 }
 
 /* elements inside FIELDSET will start from row 1 and repeat 3 columns */
 .basic-info-form fieldset {
   display: grid;
-  grid-column: 1/13; /* use up both columns of basic-info-form */
-  grid-template-columns: repeat(12, 1fr); /* repeat 3 columns */
+  grid-column: 1/25; /* use up both columns of basic-info-form */
+  grid-template-columns: repeat(24, 1fr); /* repeat 3 columns */
   grid-auto-flow: row;
+  gap: var(--spacing-s);
 }
 
 .basic-info-form #estPlanningStartYear {
-  grid-column: 1/5;
+  grid-row: 1;
+  grid-column: var(--grid-col-small-left);
 }
 
 .basic-info-form #estPlanningEndYear {
-  grid-column: 5/9;
+  grid-row: 1;
+  grid-column: var(--grid-col-small-right);
 }
 
-/* the start-to-end date fields will be put next to eachother and the 3rd column will be left empty */
 .basic-info-form #presenceStartYear {
   grid-row: 2;
-  grid-column: 1/5;
+  grid-column: var(--grid-col-small-left);
 }
 .basic-info-form #presenceEndYear {
-  grid-column: 2;
-  grid-column: 5/9;
+  grid-row: 2;
+  grid-column: var(--grid-col-small-right);
 }
 
 .basic-info-form #visibilityStartYear {
   grid-row: 3;
-  grid-column: 1/5;
+  grid-column: var(--grid-col-small-left);
 }
 .basic-info-form #visibilityEndYear {
-  grid-column: 2;
-  grid-column: 5/9;
+  grid-row: 3;
+  grid-column: var(--grid-col-small-right);
 }
 
 .basic-info-form #constructionStartYear {
-  grid-column: 1/5;
+  grid-column: var(--grid-col-small-left);
 }
 
 .basic-info-form #constructionEndYear {
-  grid-column: 5/9;
+  grid-column: var(--grid-col-small-right);
 }
