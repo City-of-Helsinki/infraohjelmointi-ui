@@ -10,7 +10,6 @@ export enum FormField {
   Title,
   FieldSet,
   Date,
-  Multi,
 }
 
 export interface IForm {

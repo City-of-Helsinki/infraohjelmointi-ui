@@ -1,5 +1,5 @@
 import { DateInput as HDSDateInput } from 'hds-react/components/DateInput';
-import { ChangeEventHandler, FC, FocusEventHandler, forwardRef, Ref } from 'react';
+import { FC, FocusEventHandler, forwardRef, Ref } from 'react';
 import { Control, Controller, FieldError, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 
@@ -7,25 +7,30 @@ interface IDateInput {
   name: string;
   value: string;
   label: string;
-  onChange: ChangeEventHandler<HTMLInputElement> | undefined;
   onBlur: FocusEventHandler<HTMLInputElement> | undefined;
   placeholder?: string;
   readOnly?: boolean;
   error?: FieldError;
   required?: boolean;
+  onDateChange: (value: string) => void;
 }
 
 const Input: FC<IDateInput> = forwardRef(
   (
-    { name, value, placeholder, readOnly, error, onBlur, label, required },
+    { name, value, placeholder, readOnly, error, onBlur, label, required, onDateChange },
     ref: Ref<HTMLInputElement>,
   ) => {
+    const noRefChange = (value: string) => {
+      onDateChange(value);
+    };
     return (
       <div className="input-wrapper" id={name} data-testid={name}>
         <HDSDateInput
           className="input-m"
           placeholder={placeholder || ''}
+          onChange={noRefChange}
           label={label}
+          language="fi"
           id={label}
           value={value}
           readOnly={readOnly}
@@ -55,7 +60,14 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
       name={name}
       control={control as Control<FieldValues>}
       render={({ field, fieldState }) => (
-        <Input {...field} {...fieldState} label={label} readOnly={readOnly} required={required} />
+        <Input
+          {...field}
+          {...fieldState}
+          label={label}
+          readOnly={readOnly}
+          required={required}
+          onDateChange={(value) => field.onChange(value)}
+        />
       )}
       rules={rules}
     />

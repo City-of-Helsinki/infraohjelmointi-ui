@@ -15,6 +15,13 @@ export interface IProjectCard {
   programmed: boolean;
   constructionPhaseDetail: string;
   estPlanningStartYear?: string;
+  estPlanningEndYear?: string;
+  estConstructionStartYear?: string;
+  estConstructionEndYear?: string;
+  presenceStart?: string;
+  presenceEnd?: string;
+  visibilityStart?: string;
+  visibilityEnd?: string;
   estDesignEndYear?: string;
   contractPrepStartDate?: string;
   contractPrepEndDate?: string;
@@ -72,6 +79,14 @@ export interface IProjectCardRequest {
   address?: string | null;
   favPersons?: Array<string> | [];
   phase?: string | null;
+  estPlanningStartYear?: string;
+  estPlanningEndYear?: string;
+  estConstructionStartYear?: string;
+  estConstructionEndYear?: string;
+  presenceStart?: string;
+  presenceEnd?: string;
+  visibilityStart?: string;
+  visibilityEnd?: string;
 }
 
 export interface IProjectCardRequestObject {
