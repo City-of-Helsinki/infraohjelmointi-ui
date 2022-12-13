@@ -228,7 +228,7 @@ describe('ProjectCardBasicsForm', () => {
     const descriptionField = getByRole('textbox', { name: 'projectCardBasicsForm.description *' });
     const entityNameField = getByRole('textbox', { name: 'projectCardBasicsForm.entityName' });
     const hkrId = getByRole('spinbutton', { name: 'projectCardBasicsForm.hkrId' });
-    const sapProject = getByRole('spinbutton', { name: 'projectCardBasicsForm.sapProject' });
+    const sapProject = getByRole('textbox', { name: 'projectCardBasicsForm.sapProject' });
 
     // Fill in the form
     await user.clear(descriptionField);

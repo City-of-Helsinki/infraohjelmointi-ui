@@ -1,5 +1,5 @@
 import useProjectCardsList from '@/hooks/useProjectCardsList';
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import PlanningListProjectsTableHeader from './PlanningListProjectsTableHeader';
 import PlanningListProjectsTableRow from './PlanningListProjectsTableRow';
@@ -13,7 +13,10 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
 
   const [isProjectsVisible, setIsProjectsVisible] = useState(true);
 
-  const handleProjectsVisible = () => setIsProjectsVisible(!isProjectsVisible);
+  const handleProjectsVisible = useCallback(
+    () => setIsProjectsVisible((visibility) => !visibility),
+    [setIsProjectsVisible],
+  );
 
   // Fetch the next projects if the "fetch-projects-trigger" element comes into view
   useEffect(() => {

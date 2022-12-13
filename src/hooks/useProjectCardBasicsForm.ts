@@ -46,7 +46,7 @@ const getProjectBasicsFormFields = (
     },
     {
       name: 'sapProject',
-      type: FormField.Number,
+      type: FormField.Text,
     },
     {
       name: 'description',
