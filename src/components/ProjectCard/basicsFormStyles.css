@@ -64,38 +64,38 @@
   gap: var(--spacing-s);
 }
 
-.basic-info-form #estPlanningStartYear {
+.basic-info-form #estPlanningStart {
   grid-row: 1;
   grid-column: var(--grid-col-small-left);
 }
 
-.basic-info-form #estPlanningEndYear {
+.basic-info-form #estPlanningEnd {
   grid-row: 1;
   grid-column: var(--grid-col-small-right);
 }
 
-.basic-info-form #presenceStartYear {
+.basic-info-form #presenceStart {
   grid-row: 2;
   grid-column: var(--grid-col-small-left);
 }
-.basic-info-form #presenceEndYear {
+.basic-info-form #presenceEnd {
   grid-row: 2;
   grid-column: var(--grid-col-small-right);
 }
 
-.basic-info-form #visibilityStartYear {
+.basic-info-form #visibilityStart {
   grid-row: 3;
   grid-column: var(--grid-col-small-left);
 }
-.basic-info-form #visibilityEndYear {
+.basic-info-form #visibilityEnd {
   grid-row: 3;
   grid-column: var(--grid-col-small-right);
 }
 
-.basic-info-form #constructionStartYear {
+.basic-info-form #estConstructionStart {
   grid-column: var(--grid-col-small-left);
 }
 
-.basic-info-form #constructionEndYear {
+.basic-info-form #estConstructionEnd {
   grid-column: var(--grid-col-small-right);
 }

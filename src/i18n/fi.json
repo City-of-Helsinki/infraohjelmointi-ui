@@ -61,15 +61,15 @@
     "hashTags": "Tunnisteet",
     "schedule": "Hankkeen aikataulu",
     "planning": "Suunnittelu",
-    "estPlanningStartYear": "Alkaa",
-    "estPlanningEndYear": "Päättyy",
-    "presenceStartYear": "Esilläolo alkaa",
-    "presenceEndYear": "Esilläolo päättyy",
-    "visibilityEndYear": "Nähtävilläolo alkaa",
-    "visibilityStartYear": "Nähtävilläolo päättyy",
+    "estPlanningStart": "Alkaa",
+    "estPlanningEnd": "Päättyy",
+    "presenceStart": "Esilläolo alkaa",
+    "presenceEnd": "Esilläolo päättyy",
+    "visibilityEnd": "Nähtävilläolo alkaa",
+    "visibilityStart": "Nähtävilläolo päättyy",
     "construction": "Rakentaminen",
-    "constructionStartYear": "Alkaa",
-    "constructionEndYear": "Päättyy"
+    "estConstructionStart": "Alkaa",
+    "estConstructionEnd": "Päättyy"
   },
   "notification": {
     "title": {
