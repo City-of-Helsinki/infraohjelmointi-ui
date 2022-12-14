@@ -1,11 +1,12 @@
 .planning-list-table-container {
   margin: var(--spacing-layout-s);
   font-size: var(--fontsize-body-s);
+  white-space: nowrap;
 }
 
 .planning-list-years-table {
-  flex: 7 1;
   text-align: center;
+  width: 65%;
 }
 
 .planning-list-years-table span {
@@ -15,12 +16,13 @@
 .planning-list-years-table .row-1-cell {
   background: var(--color-bus);
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.25rem;
+  font-size: 14px;
 }
 
 .years-table-cell {
-  min-width: 80px;
-  max-width: 80px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
 .planning-list-projects-table {
@@ -33,8 +35,8 @@
   grid-auto-flow: row;
   overflow-x: visible;
   margin: 0 var(--spacing-xs) 0 0;
-  width: 100%;
-  flex: 3 1;
+  width: 35%;
+  min-width: 24rem;
 }
 
 .planning-list-info-panel span {
@@ -64,7 +66,7 @@
 }
 
 .group-header-cell {
-  width: 30.5%;
+  width: 35.7%;
   text-align: left;
   background: var(--color-bus);
   padding: 0.5rem 1.5rem;
@@ -99,16 +101,17 @@
   color: white;
   text-align: center;
   font-weight: bold;
-  min-width: 80px;
-  max-width: 80px;
+  padding: 0.5rem 0.25rem;
+  font-size: 14px;
+  max-width: 0px;
 }
 
 .project-header-cell {
   text-align: left;
-  padding: 0.5rem 1.5rem;
+  padding: 0.1rem 1.25rem;
   border-bottom: 0.05rem solid var(--color-bus-medium-light);
   border-left: 0.05rem solid var(--color-bus-medium-light);
-  min-width: 350px;
+  min-width: 22rem;
 }
 
 .project-header-cell-container {
@@ -150,7 +153,6 @@
 /* Hide too long project names */
 .project-header-cell .project-name-button {
   text-overflow: ellipsis;
-  white-space: nowrap;
   overflow: hidden;
   max-width: 130px;
 }

@@ -22,7 +22,7 @@ const buildProjectCardBasicsFormFields = (
   const formFields = [
     // Basic info
     {
-      name: 'basicInfoTitle',
+      name: 'basics',
       type: FormField.Title,
     },
     {

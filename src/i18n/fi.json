@@ -50,7 +50,7 @@
     "kruunuvuorenranta": "Kruunuvuorenranta"
   },
   "projectCardBasicsForm": {
-    "basicInfoTitle": "Hankkeen perustiedot",
+    "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
     "entityName": "Hankekokonaisuuden nimi",
     "description": "Hankkeen kuvaus",

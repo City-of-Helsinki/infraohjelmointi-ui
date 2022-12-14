@@ -27,7 +27,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
           case FormField.Number:
             return <NumberField key={name} name={name} {...formProps} />;
           case FormField.Title:
-            return <FormSectionTitle key={name} label={f.label} />;
+            return <FormSectionTitle key={name} name={name} label={f.label} />;
           case FormField.NetworkNumbers:
             return <NetworkNumbers key={name} name={name} {...formProps} />;
           case FormField.TagsForm:
