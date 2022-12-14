@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  width: var(--spacing-2-xl);
+  width: var(--spacing-layout-m);
   box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.07), 0 0.125rem 0.25rem rgba(0, 0, 0, 0.07),
     0 0.25rem 0.5rem rgba(0, 0, 0, 0.07), 0 0.5rem 1rem rgba(0, 0, 0, 0.07),
     0 1rem 2rem rgba(0, 0, 0, 0.07), 0 2rem 4rem rgba(0, 0, 0, 0.07);
@@ -13,8 +13,8 @@
 }
 
 .sidebar-button {
-  margin: 0.2rem auto 0 auto;
-  padding: 0.35rem 0.5rem;
+  margin: 0.4rem auto 0 auto;
+  padding: 0.25rem 0.4rem;
   cursor: pointer;
 }
 

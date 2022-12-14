@@ -26,12 +26,12 @@ const SideBar = () => {
     {
       route: `/project-card/${projectId}/basics`,
       label: t('projectCard'),
-      component: <IconPenLine size="xs" />,
+      component: <IconPenLine />,
     },
     {
       route: `planning-list`,
       label: t('planningList'),
-      component: <IconTicket size="xs" />,
+      component: <IconTicket />,
     },
   ];
 
