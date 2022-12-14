@@ -47,7 +47,7 @@
 }
 
 .project-card-header-container .readiness-container {
-  max-width: 110px;
+  max-width: 6.875rem;
   height: 100%;
 }
 
@@ -101,7 +101,7 @@
   color: var(--label-color-default, var(--color-black-90));
   font-size: var(--fontsize-body-l);
   font-weight: bold;
-  width: 110px;
+  width: 6.875rem;
   display: inline-block;
 }
 

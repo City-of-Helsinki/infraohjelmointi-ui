@@ -3,9 +3,9 @@
   flex-direction: column;
   min-height: 100%;
   width: var(--spacing-4-xl);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07),
-    0 4px 8px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07),
-    0 32px 64px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.07), 0 0.125rem 0.25rem rgba(0, 0, 0, 0.07),
+    0 0.25rem 0.5rem rgba(0, 0, 0, 0.07), 0 0.5rem 1rem rgba(0, 0, 0, 0.07),
+    0 1rem 2rem rgba(0, 0, 0, 0.07), 0 2rem 4rem rgba(0, 0, 0, 0.07);
 }
 
 .sidebar-button {
@@ -15,13 +15,13 @@
 }
 
 .sidebar-button:hover {
-  border-radius: 2px;
+  border-radius: 0.125rem;
   background: var(--color-silver);
   transition: 0.4s ease-in-out;
 }
 
 .sidebar-button.selected {
-  border-radius: 2px;
+  border-radius: 0.125rem;
   background: var(--color-silver);
   transition: 0.4s ease-in-out;
 }

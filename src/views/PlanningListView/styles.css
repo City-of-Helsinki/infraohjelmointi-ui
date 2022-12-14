@@ -18,7 +18,7 @@
   background: var(--color-bus);
   color: white;
   padding: 0.5rem 0.25rem;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .planning-list-projects-table {
@@ -51,8 +51,8 @@
 }
 
 #planningListButton button {
-  height: 44px !important;
-  width: 239px !important;
+  height: 2.75rem !important;
+  width: 14.9375rem !important;
 }
 
 .planning-list-info-panel #planningListBasicInfo {
@@ -99,8 +99,8 @@
   text-align: center;
   font-weight: bold;
   padding: 0.5rem 0.25rem;
-  font-size: 14px;
-  max-width: 0px;
+  font-size: 0.875rem;
+  max-width: 0rem;
 }
 
 .project-header-cell {
@@ -150,7 +150,7 @@
 .project-header-cell .project-name-button {
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 130px;
+  max-width: 8.125rem;
 }
 
 .project-cell {
@@ -186,20 +186,20 @@
   border-radius: 50%;
   font-size: 0.6rem;
   line-height: 0.85rem;
-  bottom: 0px;
-  right: -5px;
+  bottom: 0rem;
+  right: -0.3125rem;
 }
 
 .table-input input {
   text-align: center !important;
   cursor: pointer !important;
-  border-radius: 4px !important;
-  height: 44px !important;
+  border-radius: 0.25rem !important;
+  height: 2.75rem !important;
   width: 90% !important;
   font-size: var(--fontsize-body-s) !important;
   font-weight: 300 !important;
   position: absolute; /* absolute prevents the form from jumping when a field is selected */
   bottom: 0;
-  top: -20px;
-  left: 4px;
+  top: -1.25rem;
+  left: 0.25rem;
 }
