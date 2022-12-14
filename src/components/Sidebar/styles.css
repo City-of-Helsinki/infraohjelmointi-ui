@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  width: var(--spacing-4-xl);
+  width: var(--spacing-2-xl);
   box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.07), 0 0.125rem 0.25rem rgba(0, 0, 0, 0.07),
     0 0.25rem 0.5rem rgba(0, 0, 0, 0.07), 0 0.5rem 1rem rgba(0, 0, 0, 0.07),
     0 1rem 2rem rgba(0, 0, 0, 0.07), 0 2rem 4rem rgba(0, 0, 0, 0.07);
@@ -13,9 +13,13 @@
 }
 
 .sidebar-button {
-  margin: var(--spacing-xs) auto 0 auto;
-  padding: 0.5rem 0.6rem;
+  margin: 0.2rem auto 0 auto;
+  padding: 0.35rem 0.5rem;
   cursor: pointer;
+}
+
+.sidebar-button:first-child {
+  margin: var(--spacing-xs) auto 0 auto;
 }
 
 .sidebar-button:hover {
@@ -25,7 +29,11 @@
 }
 
 .sidebar-button.selected {
-  border-radius: 0.125rem;
+  border-radius: 0.07rem;
   background: var(--color-silver);
   transition: 0.4s ease-in-out;
+}
+
+.sidebar-button svg {
+  transform: translateY(0.125rem);
 }
