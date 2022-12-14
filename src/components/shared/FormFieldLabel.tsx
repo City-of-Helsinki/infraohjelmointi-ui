@@ -23,7 +23,7 @@ const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled }) => {
           name={text}
           aria-label={text}
         >
-          <IconPenLine style={{ transform: 'translate(1.25rem, 0.1875rem)' }} />
+          <IconPenLine style={{ transform: 'translate(1.25rem, -0.18rem)' }} />
         </button>
       )}
     </div>
