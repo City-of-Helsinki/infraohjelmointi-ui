@@ -16,7 +16,7 @@ const ProjectCardBasics = () => {
 
   return (
     <div className="project-card-content-container">
-      <ScrollToTop />
+      {/* <ScrollToTop /> */}
       <div className="side-panel">
         <SideNavigation navItems={navItems} />
       </div>
