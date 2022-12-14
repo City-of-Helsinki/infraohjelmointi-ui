@@ -2,6 +2,7 @@
   margin: var(--spacing-layout-s);
   font-size: var(--fontsize-body-s);
   white-space: nowrap;
+  line-height: 1.15rem;
 }
 
 .planning-list-years-table {
@@ -69,7 +70,7 @@
   width: 35.7%;
   text-align: left;
   background: var(--color-bus);
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 1.25rem;
   color: white;
 }
 
@@ -172,8 +173,8 @@
 .circle-number-icon {
   background: gray;
   border-radius: 50%;
-  height: 26px;
-  width: 26px;
+  height: 1.5rem;
+  width: 1.5rem;
   text-align: center;
   color: white;
   display: flex;
@@ -185,11 +186,11 @@
 .circle-number-icon-indicator {
   position: absolute;
   background: black;
-  height: 14px;
-  width: 14px;
+  height: 0.8rem;
+  width: 0.8rem;
   border-radius: 50%;
-  font-size: 10px;
-  line-height: 14px;
+  font-size: 0.6rem;
+  line-height: 0.85rem;
   bottom: 0px;
   right: -5px;
 }
