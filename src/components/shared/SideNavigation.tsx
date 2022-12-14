@@ -16,8 +16,11 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setActivePage = (e: any) => {
     e.preventDefault();
-    setActive(e.target.getAttribute('href'));
-    navigate(e.target.getAttribute('href'));
+    const hash = e.target.hash || e.target.parentElement.hash;
+    setActive(hash);
+    navigate(hash);
+    const scrollToElement = document.getElementById(hash.split('#')[1]);
+    window.scrollTo({ top: scrollToElement?.offsetTop, behavior: 'smooth' });
   };
 
   const hdsNavItems = navItems.map((s, i) => ({

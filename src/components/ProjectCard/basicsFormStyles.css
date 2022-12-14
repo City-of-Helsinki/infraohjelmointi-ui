@@ -13,7 +13,7 @@
   display: grid;
   grid-template-columns: repeat(24, 1fr); /* repeat 24 rows with 1fr (fractional unit) */
   grid-auto-flow: row;
-  gap: 0px var(--spacing-layout-s);
+  gap: 0rem var(--spacing-layout-s);
   width: 85%;
   margin: 0 var(--spacing-2-xl) 0 0;
 }
