@@ -16,11 +16,12 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
   const required = rules?.required ? true : false;
   const [valueOnFocus, setValueOnFocus] = useState('');
 
-  // const handleSetInitialValue
-  const handleSetInitialValue = (e: FocusEvent<HTMLInputElement>) => {
+  // Save the initial form value to compare it when autosaving
+  const handleSetValueOnFocus = (e: FocusEvent<HTMLInputElement>) => {
     setValueOnFocus(e.target.value);
   };
 
+  // Autosave, if the initial value of the field has changed, otherwise do nothing
   const handleAutoSave = (e: FocusEvent<HTMLInputElement>) => {
     if (e.target.value === valueOnFocus) {
       return;
@@ -44,7 +45,7 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
             readOnly={readOnly}
             onChange={field.onChange}
             onBlur={handleAutoSave}
-            onFocus={handleSetInitialValue}
+            onFocus={handleSetValueOnFocus}
             required={required}
             invalid={fieldState.error ? true : false}
             errorText={fieldState.error?.message}
