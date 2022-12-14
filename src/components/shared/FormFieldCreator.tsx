@@ -12,9 +12,10 @@ import TextField from './TextField';
 
 interface IFormFieldCreatorProps {
   form: Array<IForm>;
+  handleSave?: any;
 }
 
-const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
+const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form, handleSave }) => {
   return (
     <>
       {form?.map((f) => {
@@ -23,7 +24,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
           case FormField.Select:
             return <SelectField key={name} name={name as ListType} {...formProps} />;
           case FormField.Text:
-            return <TextField key={name} name={name} {...formProps} />;
+            return <TextField key={f.name} name={name} {...formProps} handleSave={handleSave} />;
           case FormField.Number:
             return <NumberField key={name} name={name} {...formProps} />;
           case FormField.Title:

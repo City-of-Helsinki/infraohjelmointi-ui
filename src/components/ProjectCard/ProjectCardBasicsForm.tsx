@@ -39,7 +39,7 @@ const ProjectCardBasicsForm: FC = () => {
     <div className="basics-form">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="basic-info-form">
-          <FormFieldCreator form={formFields} />
+          <FormFieldCreator form={formFields} handleSave={handleSubmit(onSubmit)} />
         </div>
         <Button type="submit">Tallenna perustiedot</Button>
       </form>
