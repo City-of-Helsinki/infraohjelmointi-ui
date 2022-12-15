@@ -36,7 +36,6 @@ const mockProjectCard: { data: IProjectCard } = {
     presenceEnd: '06.12.2022',
     visibilityStart: '07.12.2022',
     visibilityEnd: '08.12.2022',
-    estDesignEndYear: '2030',
     perfAmount: '300.00',
     unitCost: '400.00',
     costForecast: '500.00',

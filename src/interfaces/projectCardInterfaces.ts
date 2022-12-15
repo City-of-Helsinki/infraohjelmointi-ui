@@ -22,11 +22,6 @@ export interface IProjectCard {
   presenceEnd?: string;
   visibilityStart?: string;
   visibilityEnd?: string;
-  estDesignEndYear?: string;
-  contractPrepStartDate?: string;
-  contractPrepEndDate?: string;
-  warrantyStartDate?: string;
-  warrantyExpireDate?: string;
   perfAmount: string;
   unitCost: string;
   costForecast: string;
