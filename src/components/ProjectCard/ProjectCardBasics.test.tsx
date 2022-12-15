@@ -16,7 +16,12 @@ describe('ProjectCardBasics', () => {
   const store = setupStore();
   let renderResult: CustomRenderResult;
 
+  const spyScrollTo = jest.fn();
+  Object.defineProperty(global.window, 'scrollTo', { value: spyScrollTo });
+
   beforeEach(async () => {
+    spyScrollTo.mockClear();
+
     mockedAxios.get.mockResolvedValue(mockUsers);
     await store.dispatch(getUsersThunk());
 
