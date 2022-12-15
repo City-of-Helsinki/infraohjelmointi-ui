@@ -34,7 +34,7 @@ describe('ProjectCardBasics', () => {
       label: 'nav.basics',
     },
     {
-      route: '#schedulezsszs',
+      route: '#schedule',
       label: 'nav.schedule',
     },
   ];
