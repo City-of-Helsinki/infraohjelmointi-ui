@@ -120,6 +120,93 @@
   padding-right: var(--spacing-s);
 }
 
+.class-header-cell {
+  width: 30.6%;
+  padding: 0.5rem 1.25rem;
+  color: white;
+  min-width: 24.3rem;
+}
+
+.class-header-cell.class-1 {
+  background: var(--color-bus);
+}
+
+.class-header-cell.class-2 {
+  background: rgb(0, 0, 163);
+}
+
+.class-header-cell.class-3 {
+  background: rgb(0, 0, 129);
+}
+
+.class-header-cell.class-4 {
+  background: rgb(0, 0, 102);
+}
+
+.class-header-content-item.value-container {
+  width: 3rem;
+}
+
+.class-cell {
+  color: white;
+  padding: 1rem 0.25rem;
+  font-size: 0.875rem;
+  text-align: right;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
+}
+
+.class-cell span {
+  font-weight: 300;
+  padding-right: var(--spacing-s);
+}
+
+.class-cell.class-1 {
+  background: var(--color-bus);
+}
+
+.class-cell.class-2 {
+  background: rgb(0, 0, 163);
+}
+
+.class-cell.class-3 {
+  background: rgb(0, 0, 129);
+}
+
+.class-cell.class-4 {
+  background: rgb(0, 0, 102);
+}
+
+.class-header-cell .class-header-content {
+  display: flex;
+  align-items: center;
+}
+
+.class-header-content.class-1 {
+  padding-left: 0;
+}
+
+.class-header-content.class-2 {
+  padding-left: 2rem;
+}
+
+.class-header-content.class-3 {
+  padding-left: 4rem;
+}
+
+.class-header-content.class-4 {
+  padding-left: 6rem;
+}
+
+.class-header-content-item {
+  display: flex;
+  margin-right: 0.5rem;
+}
+
+.class-header-content-item span:first-child {
+  font-weight: 300;
+}
+
 /* Second cell in the projects table header */
 .planning-list-projects-table thead tr th:nth-child(2) {
   text-align: center;

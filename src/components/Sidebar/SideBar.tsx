@@ -29,7 +29,7 @@ const SideBar = () => {
       component: <IconPenLine />,
     },
     {
-      route: `planning-list`,
+      route: `planning-list/programmer`,
       label: t('planningList'),
       component: <IconTicket />,
     },

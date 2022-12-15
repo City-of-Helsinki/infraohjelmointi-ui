@@ -1,17 +1,32 @@
 import useProjectsList from '@/hooks/useProjectsList';
+import { planListClasses } from '@/mocks/common';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import PlanningListProjectsTableHeader from './PlanningListProjectsTableHeader';
+import { useLocation } from 'react-router';
+import PlanningListProjectsTableClassesHeader from './PlanningListProjectsTableClassesHeader';
+import PlanningListProjectsTableGroupHeader from './PlanningListProjectsTableGroupHeader';
 import PlanningListProjectsTableRow from './PlanningListProjectsTableRow';
 
 // FIXME: this any will be removed ones we get the actual group model
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) => {
   const { projects, fetchNext } = useProjectsList();
+  const pathname = useLocation().pathname;
 
   const { ref, inView } = useInView();
 
   const [isProjectsVisible, setIsProjectsVisible] = useState(true);
+  const [isClassView, setIsClassView] = useState(false);
+
+  // Check if there is a need to change between programmer / coordinator view
+  useEffect(() => {
+    console.log('Pathname changed');
+    if (pathname.includes('programmer')) {
+      setIsClassView(false);
+    } else if (pathname.includes('coordinator')) {
+      setIsClassView(true);
+    }
+  }, [pathname]);
 
   const handleProjectsVisible = useCallback(
     () => setIsProjectsVisible((visibility) => !visibility),
@@ -30,11 +45,23 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
     <>
       <table className="planning-list-projects-table" cellSpacing={0}>
         <thead>
-          <PlanningListProjectsTableHeader
-            group={group}
-            isProjectsVisible={isProjectsVisible}
-            handleProjectsVisible={handleProjectsVisible}
-          />
+          {isClassView ? (
+            planListClasses.map((c, i) => (
+              <PlanningListProjectsTableClassesHeader
+                key={i}
+                name={c.name}
+                sums={c.sums}
+                value={c.value}
+                index={(i + 1).toString()}
+              />
+            ))
+          ) : (
+            <PlanningListProjectsTableGroupHeader
+              group={group}
+              isProjectsVisible={isProjectsVisible}
+              handleProjectsVisible={handleProjectsVisible}
+            />
+          )}
         </thead>
         <tbody>
           {isProjectsVisible &&

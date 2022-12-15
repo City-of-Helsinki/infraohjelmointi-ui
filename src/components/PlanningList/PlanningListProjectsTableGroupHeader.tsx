@@ -2,14 +2,14 @@ import { IconAngleDown, IconAngleUp, IconCopy, IconMenuDots } from 'hds-react/ic
 import { IconButton, Title } from '../shared';
 import { FC, MouseEventHandler } from 'react';
 
-interface IPlanningListProjectsTableHeaderProps {
+interface IPlanningListProjectsTableGroupHeaderProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   group: any; // FIXME: this any will be removed ones we get the actual group model
   isProjectsVisible: boolean;
   handleProjectsVisible: MouseEventHandler<HTMLButtonElement>;
 }
 
-const PlanningListProjectsTableHeader: FC<IPlanningListProjectsTableHeaderProps> = ({
+const PlanningListProjectsTableGroupHeader: FC<IPlanningListProjectsTableGroupHeaderProps> = ({
   group,
   isProjectsVisible,
   handleProjectsVisible,
@@ -52,4 +52,4 @@ const PlanningListProjectsTableHeader: FC<IPlanningListProjectsTableHeaderProps>
   );
 };
 
-export default PlanningListProjectsTableHeader;
+export default PlanningListProjectsTableGroupHeader;
