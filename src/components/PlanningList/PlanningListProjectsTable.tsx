@@ -18,10 +18,9 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
   const [isProjectsVisible, setIsProjectsVisible] = useState(true);
   const [isClassView, setIsClassView] = useState(false);
 
-  // Check if there is a need to change between programmer / coordinator view
+  // Check if there is a need to change between planner / coordinator view
   useEffect(() => {
-    console.log('Pathname changed');
-    if (pathname.includes('programmer')) {
+    if (pathname.includes('planner')) {
       setIsClassView(false);
     } else if (pathname.includes('coordinator')) {
       setIsClassView(true);

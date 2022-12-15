@@ -48,7 +48,7 @@ const router = createBrowserRouter([
         path: 'planning-list',
         children: [
           {
-            path: 'programmer',
+            path: 'planner',
             element: <PlanningListView />,
           },
           {
