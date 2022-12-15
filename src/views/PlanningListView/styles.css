@@ -3,6 +3,8 @@
   font-size: var(--fontsize-body-s);
   white-space: nowrap;
   line-height: 1.15rem;
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .planning-list-years-table {
@@ -19,8 +21,8 @@
   color: white;
   padding: 0.5rem 0.25rem;
   font-size: 0.875rem;
-  max-width: 78px;
-  min-width: 78px;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
 }
 
 .planning-list-projects-table {
@@ -34,7 +36,7 @@
   overflow-x: visible;
   margin: 0 var(--spacing-xs) 0 0;
   width: 30%;
-  min-width: 24rem;
+  min-width: 26rem;
 }
 
 .planning-list-info-panel span {
@@ -77,7 +79,7 @@
   background: var(--color-bus);
   padding: 0.5rem 1.25rem;
   color: white;
-  min-width: 22rem;
+  min-width: 24.3rem;
 }
 
 .group-header-cell-content {
@@ -109,8 +111,8 @@
   padding: 0.5rem 0.25rem;
   font-size: 0.875rem;
   text-align: right;
-  max-width: 78px;
-  min-width: 78px;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
 }
 
 .group-cell span {
