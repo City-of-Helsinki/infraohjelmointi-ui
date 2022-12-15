@@ -15,6 +15,29 @@ export const planListGroups = [
   },
 ];
 
+export const planListClasses = [
+  {
+    name: 'Mock Class 1',
+    value: '830',
+    sums: ['800', '280', '500', '640', null, null, '530', '450', '460', '300', '100'],
+  },
+  {
+    value: '8 03 01',
+    name: 'Mock Class 2',
+    sums: ['800', '280', '500', '640', null, null, '530', '450', '460', '300', '100'],
+  },
+  {
+    value: null,
+    name: 'Mock Class 3',
+    sums: ['800', '280', '500', '640', null, null, '530', '450', '460', '300', '100'],
+  },
+  {
+    value: null,
+    name: 'Mock Class 4',
+    sums: ['800', '280', '500', '640', null, null, '530', '450', '460', '300', '100'],
+  },
+];
+
 export const planListProjectValues = {
   readiness: '1',
   value1: '3 400',

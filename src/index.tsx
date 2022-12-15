@@ -46,7 +46,16 @@ const router = createBrowserRouter([
       },
       {
         path: 'planning-list',
-        element: <PlanningListView />,
+        children: [
+          {
+            path: 'programmer',
+            element: <PlanningListView />,
+          },
+          {
+            path: 'coordinator',
+            element: <PlanningListView />,
+          },
+        ],
       },
     ],
   },
