@@ -7,7 +7,7 @@
 
 .planning-list-years-table {
   text-align: center;
-  width: 65%;
+  width: 70%;
 }
 
 .planning-list-years-table span {
@@ -19,6 +19,8 @@
   color: white;
   padding: 0.5rem 0.25rem;
   font-size: 0.875rem;
+  max-width: 78px;
+  min-width: 78px;
 }
 
 .planning-list-projects-table {
@@ -31,7 +33,7 @@
   grid-auto-flow: row;
   overflow-x: visible;
   margin: 0 var(--spacing-xs) 0 0;
-  width: 35%;
+  width: 30%;
   min-width: 24rem;
 }
 
@@ -40,6 +42,14 @@
 }
 .planning-list-info-panel #planningListTitle {
   grid-column: 1/3;
+}
+
+#planningListTitle .info-icon {
+  transform: translate(0.8rem, 0.15rem);
+}
+
+#planningListTitle div {
+  display: flex;
 }
 
 .planning-list-info-panel #planningListGroupInfo {
@@ -62,7 +72,7 @@
 }
 
 .group-header-cell {
-  width: 35.7%;
+  width: 30.6%;
   text-align: left;
   background: var(--color-bus);
   padding: 0.5rem 1.25rem;
@@ -96,11 +106,26 @@
 .group-cell {
   background: var(--color-bus);
   color: white;
-  text-align: center;
-  font-weight: bold;
   padding: 0.5rem 0.25rem;
   font-size: 0.875rem;
-  max-width: 0rem;
+  text-align: right;
+  max-width: 78px;
+  min-width: 78px;
+}
+
+.group-cell span {
+  font-weight: 300;
+  padding-right: var(--spacing-s);
+}
+
+/* Second cell in the projects table header */
+.planning-list-projects-table thead tr th:nth-child(2) {
+  text-align: center;
+}
+
+.planning-list-projects-table thead tr th:nth-child(2) span {
+  font-weight: bold;
+  padding-right: 0;
 }
 
 .project-header-cell {

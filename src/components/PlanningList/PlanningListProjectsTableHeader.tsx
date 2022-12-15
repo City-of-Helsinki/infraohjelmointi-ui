@@ -45,7 +45,7 @@ const PlanningListProjectsTableHeader: FC<IPlanningListProjectsTableHeaderProps>
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
       {group.sums.map((rn: any, i: number) => (
         <th key={i} className="group-cell">
-          {rn}
+          <span>{rn}</span>
         </th>
       ))}
     </tr>
