@@ -8,6 +8,7 @@ import HashTagsForm from './HashTagsForm';
 import ListField from './ListField';
 import NumberField from './NumberField';
 import OverrunRightField from './OverrunRightField';
+import RadioCheckboxField from './RadioCheckboxField';
 import SelectField from './SelectField';
 import TextField from './TextField';
 
@@ -40,6 +41,8 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <FieldSetCreator {...listFormProps} />;
           case FormField.Date:
             return <DateField {...formProps} />;
+          case FormField.RadioCheckbox:
+            return <RadioCheckboxField {...formProps} />;
           case FormField.OverrunRight:
             return <OverrunRightField key={f.name} form={f} />;
           default:

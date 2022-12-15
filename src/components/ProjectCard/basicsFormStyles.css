@@ -8,6 +8,9 @@
   --grid-col-xs-middle: 4/11;
   --grid-col-xs-right: 11/14;
 }
+.basic-info-form .custom-radio div:nth-child(2) {
+  display: flex;
+}
 
 .basic-info-form {
   display: grid;
@@ -55,11 +58,11 @@
   grid-column: var(--grid-col-full);
 }
 
-/* elements inside FIELDSET will start from row 1 and repeat 3 columns */
-.basic-info-form fieldset {
+/* elements inside custom-fieldset will take up the whole row */
+.basic-info-form .custom-fieldset {
   display: grid;
-  grid-column: 1/25; /* use up both columns of basic-info-form */
-  grid-template-columns: repeat(24, 1fr); /* repeat 3 columns */
+  grid-column: 1/25; /* use up all columns of basic-info-form */
+  grid-template-columns: repeat(24, 1fr); /* repeat 24 columns */
   grid-auto-flow: row;
   gap: var(--spacing-s);
 }
@@ -98,6 +101,14 @@
 
 .basic-info-form #estConstructionEnd {
   grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #programmed {
+  grid-column: var(--grid-col-full);
+}
+
+.basic-info-form #phase {
+  grid-column: var(--grid-col-small-left);
 }
 
 .basic-info-form #masterClass {

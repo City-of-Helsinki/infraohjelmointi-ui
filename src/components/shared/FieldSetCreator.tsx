@@ -9,7 +9,7 @@ interface IFieldSetCreatorProps {
 
 const FieldSetCreator: FC<IFieldSetCreatorProps> = ({ form }) => {
   return (
-    <Fieldset heading={form.label} id={form.name}>
+    <Fieldset heading={form.label} className="custom-fieldset" id={form.name}>
       <FormFieldCreator form={form.fieldSet as Array<IForm>} />
     </Fieldset>
   );

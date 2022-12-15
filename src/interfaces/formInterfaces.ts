@@ -9,6 +9,7 @@ export enum FormField {
   Title,
   FieldSet,
   Date,
+  RadioCheckbox,
   ListField,
   OverrunRight,
 }
@@ -42,6 +43,8 @@ export interface IProjectCardBasicsForm {
   sapProject: string;
   sapNetwork: Array<string>;
   hashTags: Array<string>;
+  phase: IOption;
+  programmed: boolean;
 }
 
 export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}

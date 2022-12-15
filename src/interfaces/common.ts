@@ -14,6 +14,7 @@ export interface INavigationItem {
 export interface IOption {
   label: string;
   value: string;
+  name?: string;
 }
 
 export interface INotification {

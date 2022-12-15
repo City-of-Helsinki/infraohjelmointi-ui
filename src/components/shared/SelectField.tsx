@@ -8,7 +8,6 @@ import { useOptions } from '@/hooks/useOptions';
 interface ISelectFieldProps {
   name: ListType;
   label: string;
-  options?: Array<IOption>;
   control: HookFormControlType;
   rules?: HookFormRulesType;
   hideLabel?: boolean;

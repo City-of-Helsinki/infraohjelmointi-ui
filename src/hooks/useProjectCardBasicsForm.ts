@@ -68,6 +68,19 @@ const buildProjectCardBasicsFormFields = (
       name: 'hashTags',
       type: FormField.TagsForm,
     },
+    //status
+    {
+      name: 'status',
+      type: FormField.Title,
+    },
+    {
+      name: 'phase',
+      type: FormField.Select,
+    },
+    {
+      name: 'programmed',
+      type: FormField.RadioCheckbox,
+    },
     // Schedule
     {
       name: 'schedule',
@@ -172,6 +185,8 @@ const useProjectCardBasicsValues = () => {
       presenceEnd: projectCard?.presenceEnd || '',
       visibilityStart: projectCard?.visibilityStart || '',
       visibilityEnd: projectCard?.visibilityEnd || '',
+      phase: listItemToOption(projectCard?.phase, t),
+      programmed: projectCard?.programmed || false,
       projectWorkQuantity: projectCard?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(projectCard?.projectQualityLevel, t),
       projectCostForecast: projectCard?.projectCostForecast,
