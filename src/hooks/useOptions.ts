@@ -2,7 +2,7 @@ import { IListItem, IOption, ListType } from '@/interfaces/common';
 import { IListState } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from './common';
 
@@ -18,13 +18,14 @@ export const useOptions = (name?: ListType) => {
   const list = useAppSelector(
     (state: RootState) => state.lists[name as keyof IListState],
   ) as Array<IListItem>;
+
   const [options, setOptions] = useState<Array<IOption> | []>([]);
   const { t } = useTranslation();
 
   const translate = useMemo(() => t, [t]);
 
   // Parse an array of list-items to an array of options to use SelectField
-  useEffect(
+  useMemo(
     () => {
       setOptions(list && list.map((i) => listItemToOption(i, translate)));
     },
