@@ -15,8 +15,37 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
 
   const { ref, inView } = useInView();
 
-  const [isProjectsVisible, setIsProjectsVisible] = useState(true);
   const [isClassView, setIsClassView] = useState(false);
+
+  const [secondVisible, setSeconVisible] = useState(true);
+  const [thirdVisible, setThirdVisible] = useState(true);
+  const [fourthVisible, setFourthVisible] = useState(true);
+  const [projectsVisible, setProjectsVisible] = useState(true);
+
+  const handleFourthVisible = useCallback(
+    () => setProjectsVisible((currentState) => !currentState),
+    [],
+  );
+
+  const handleThirdVisible = useCallback(
+    () => setFourthVisible((currentState) => !currentState),
+    [],
+  );
+
+  const handleSecondVisible = useCallback(
+    () => setThirdVisible((currentState) => !currentState),
+    [],
+  );
+
+  const handleFirstVisible = useCallback(
+    () => setSeconVisible((currentState) => !currentState),
+    [],
+  );
+
+  const handleProjectsVisible = useCallback(
+    () => setProjectsVisible((currentState) => !currentState),
+    [],
+  );
 
   // Check if there is a need to change between planner / coordinator view
   useEffect(() => {
@@ -27,18 +56,54 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
     }
   }, [pathname]);
 
-  const handleProjectsVisible = useCallback(
-    () => setIsProjectsVisible((visibility) => !visibility),
-    [setIsProjectsVisible],
-  );
+  // Changes when clicking fourth row
+  useEffect(() => {
+    setProjectsVisible(fourthVisible);
+  }, [fourthVisible]);
+
+  // Changes when clicking third row
+  useEffect(() => {
+    if (!thirdVisible) {
+      setProjectsVisible(false);
+      setFourthVisible(false);
+    } else {
+      setProjectsVisible(true);
+      setFourthVisible(true);
+    }
+  }, [thirdVisible]);
+
+  // Changes when clicking second row
+  useEffect(() => {
+    if (!secondVisible) {
+      setProjectsVisible(false);
+      setFourthVisible(false);
+      setThirdVisible(false);
+    } else {
+      setProjectsVisible(true);
+      setFourthVisible(true);
+      setThirdVisible(true);
+    }
+  }, [secondVisible]);
 
   // Fetch the next projects if the "fetch-projects-trigger" element comes into view
   useEffect(() => {
-    if (inView && isProjectsVisible) {
+    if (inView && projectsVisible) {
       fetchNext();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
+
+  const isCurrentRowVisible = (i: number) =>
+    i === 3 ? fourthVisible : i === 2 ? thirdVisible : i === 1 ? secondVisible : true;
+
+  const handleChangeRowVisibility = (i: number) =>
+    i === 3
+      ? handleFourthVisible
+      : i === 2
+      ? handleThirdVisible
+      : i === 1
+      ? handleSecondVisible
+      : handleFirstVisible;
 
   return (
     <>
@@ -52,18 +117,20 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
                 sums={c.sums}
                 value={c.value}
                 index={(i + 1).toString()}
+                isVisible={isCurrentRowVisible(i)}
+                handleClick={handleChangeRowVisibility(i)}
               />
             ))
           ) : (
             <PlanningListProjectsTableGroupHeader
               group={group}
-              isProjectsVisible={isProjectsVisible}
+              isProjectsVisible={projectsVisible}
               handleProjectsVisible={handleProjectsVisible}
             />
           )}
         </thead>
         <tbody>
-          {isProjectsVisible &&
+          {projectsVisible &&
             projects.map((p, i) => <PlanningListProjectsTableRow key={i} project={p} />)}
         </tbody>
       </table>
