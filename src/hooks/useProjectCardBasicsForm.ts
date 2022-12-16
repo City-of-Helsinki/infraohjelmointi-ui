@@ -7,6 +7,7 @@ import { TFunction } from 'i18next';
 import { useAppSelector } from './common';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
+import _ from 'lodash';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -114,7 +115,10 @@ const buildProjectCardBasicsFormFields = (
  * @returns formValues, projectCard
  */
 const useProjectCardBasicsValues = () => {
-  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const projectCard = useAppSelector(
+    (state: RootState) => state.projectCard.selectedProjectCard,
+    _.isEqual,
+  );
   const { t } = useTranslation();
 
   const formValues: IProjectCardBasicsForm = useMemo(
@@ -171,7 +175,8 @@ const useProjectCardBasicsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectCard, formValues]);
 
-  const formFields = buildProjectCardBasicsFormFields(control, t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const formFields = useMemo(() => buildProjectCardBasicsFormFields(control, t), [control]);
 
   return { handleSubmit, reset, formFields };
 };

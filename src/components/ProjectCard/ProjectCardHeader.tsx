@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { Paragraph, ProgressCircle, IconButton } from '@/components/shared';
@@ -24,25 +24,25 @@ interface IPhaseDropdown {
 // eslint-disable-next-line react/display-name
 const PhaseDropdown: FC<IPhaseDropdown> = memo(({ options, value, onChange }) => {
   const { t } = useTranslation();
+  const icon = useMemo(() => <IconFaceSmile />, []);
 
   return (
-    <>
-      <div>
-        <Select
-          label=""
-          value={value}
-          icon={<IconFaceSmile />}
-          placeholder={t('projectPhase') || ''}
-          options={options}
-          onChange={onChange}
-        />
-      </div>
-    </>
+    <Select
+      label={null}
+      value={value}
+      icon={icon}
+      placeholder={t('projectPhase') || ''}
+      options={options}
+      onChange={onChange}
+    />
   );
 });
 
 const ProjectCardHeader: FC = () => {
-  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const projectCard = useAppSelector(
+    (state: RootState) => state.projectCard.selectedProjectCard,
+    _.isEqual,
+  );
   const user = useAppSelector((state: RootState) => state.auth.user, _.isEqual);
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -99,21 +99,18 @@ const ProjectCardHeader: FC = () => {
   }, [dispatch, formState, projectCard?.favPersons, projectCard?.id, user?.id]);
 
   // Add values on project card changes
-  useEffect(
-    () => {
-      if (projectCard) {
-        setFormState({
-          ...formState,
-          favourite: (user && projectCard.favPersons?.includes(user.id)) || false,
-          phase: listItemToOption(projectCard.phase, t),
-          name: projectCard.name,
-          address: projectCard.address,
-        });
-      }
-    },
+  useEffect(() => {
+    if (projectCard) {
+      setFormState((currentState) => ({
+        ...currentState,
+        favourite: (user && projectCard.favPersons?.includes(user.id)) || false,
+        phase: listItemToOption(projectCard.phase, t),
+        name: projectCard.name,
+        address: projectCard.address,
+      }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, projectCard],
-  );
+  }, [user, projectCard]);
 
   return (
     <div>

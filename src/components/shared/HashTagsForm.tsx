@@ -2,7 +2,7 @@ import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { mockTags } from '@/mocks/common';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
-import { useState, MouseEvent, FC, forwardRef, Ref, useEffect } from 'react';
+import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
@@ -131,4 +131,4 @@ const HashTagsForm: FC<IHashTagsFormProps> = ({ name, label, control }) => {
 
 HashTagsDialog.displayName = 'HashTagsDialog';
 
-export default HashTagsForm;
+export default memo(HashTagsForm);

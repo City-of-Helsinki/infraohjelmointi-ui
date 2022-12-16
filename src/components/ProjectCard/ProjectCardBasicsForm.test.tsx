@@ -1,18 +1,15 @@
 import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProjectCard from '@/mocks/mockProjectCard';
-import { getProjectCardThunk } from '@/reducers/projectCardSlice';
-import { setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectCardBasicsForm from './ProjectCardBasicsForm';
 import { matchExact } from '@/utils/common';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
-import { getProjectAreasThunk, getProjectTypesThunk } from '@/reducers/listsSlice';
-import { mockProjectAreas, mockProjectTypes } from '@/mocks/mockLists';
+import { mockProjectAreas, mockProjectPhases, mockProjectTypes } from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
-import mockUsers from '@/mocks/mockUsers';
-import { getUsersThunk } from '@/reducers/authSlice';
 import { act } from 'react-dom/test-utils';
+import mockUser from '@/mocks/mockUser';
+import { screen } from '@testing-library/react';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -24,24 +21,29 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 jest.setTimeout(40000);
 
 describe('ProjectCardBasicsForm', () => {
-  const store = setupStore();
   let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUsersThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectCard);
-    await store.dispatch(getProjectCardThunk(mockProjectCard.data.id));
-
-    mockedAxios.get.mockResolvedValue(mockProjectTypes);
-    await store.dispatch(getProjectTypesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectAreas);
-    await store.dispatch(getProjectAreasThunk());
-
     await act(
-      async () => (renderResult = renderWithProviders(<ProjectCardBasicsForm />, { store })),
+      async () =>
+        (renderResult = renderWithProviders(<ProjectCardBasicsForm />, {
+          preloadedState: {
+            projectCard: {
+              projectCards: [mockProjectCard.data as IProjectCard],
+              selectedProjectCard: mockProjectCard.data as IProjectCard,
+              count: 1,
+              error: {},
+              page: 1,
+            },
+            auth: { user: mockUser, error: {} },
+            lists: {
+              area: mockProjectAreas.data,
+              phase: mockProjectPhases.data,
+              type: mockProjectTypes.data,
+              error: {},
+            },
+          },
+        })),
     );
   });
 
@@ -57,13 +59,14 @@ describe('ProjectCardBasicsForm', () => {
 
   it('fills the fields with existing project card data', async () => {
     const { getByDisplayValue, getByText } = renderResult;
-    const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
+    const projectCard = mockProjectCard.data;
 
     const expectDisplayValue = (value: string) =>
       expect(getByDisplayValue(matchExact(value))).toBeInTheDocument();
 
-    expect(getByText(matchExact(projectCard?.area?.value || ''))).toBeInTheDocument();
-    expect(getByText(matchExact(projectCard?.type.value || ''))).toBeInTheDocument();
+    expect(getByText(`enums.${projectCard?.area?.value}`)).toBeInTheDocument();
+    expect(getByText(`enums.${projectCard?.type?.value}`)).toBeInTheDocument();
+
     expectDisplayValue(projectCard?.description);
     expectDisplayValue(projectCard?.entityName);
     expectDisplayValue(projectCard?.hkrId);
@@ -86,12 +89,12 @@ describe('ProjectCardBasicsForm', () => {
     const { getByText } = renderResult;
 
     // Hack to check required for now... since HDS always adds the star to the input label
-    expect(getByText(matchExact('projectCardBasicsForm.type *'))).toBeInTheDocument();
-    expect(getByText(matchExact('projectCardBasicsForm.description *'))).toBeInTheDocument();
+    expect(getByText('projectCardBasicsForm.type')).toBeInTheDocument();
+    expect(getByText('projectCardBasicsForm.description')).toBeInTheDocument();
   });
 
   it('renders chosen hashTags and can add or remove hasTags', async () => {
-    const { getByText, getByRole, user, getAllByTestId, queryByText } = renderResult;
+    const { getByText, getByRole, user, getAllByTestId, queryByText, store } = renderResult;
     const projectCardTags = store.getState().projectCard.selectedProjectCard?.hashTags;
     const availableTags = mockTags.filter((tag) => projectCardTags?.indexOf(tag) === -1);
 
@@ -106,8 +109,8 @@ describe('ProjectCardBasicsForm', () => {
     await user.click(getByRole('button', { name: matchExact('hashTags') }));
 
     // Expect all elements
-    expect(getByText(matchExact('manageHashTags'))).toBeInTheDocument();
-    expect(getByText(matchExact('projectCardHashTags'))).toBeInTheDocument();
+    expect(getByText('manageHashTags')).toBeInTheDocument();
+    expect(getByText('projectCardHashTags')).toBeInTheDocument();
     expect(getAllByTestId('project-card-hashtags').length).toBe(projectCardTagsLength);
     expect(getAllByTestId('all-hashtags').length).toBe(availableTagsLength);
 
@@ -125,7 +128,7 @@ describe('ProjectCardBasicsForm', () => {
   it('can patch an existing project card and recieve the updates', async () => {
     const { getByRole, user, getByText, getByDisplayValue } = renderResult;
 
-    const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
+    const projectCard = mockProjectCard.data;
     const responseProjectCard: IProjectCard = {
       ...projectCard,
       id: '79e6bc76-9fa2-49a1-aaad-b52330da170e',
@@ -150,10 +153,10 @@ describe('ProjectCardBasicsForm', () => {
 
     const formField = (name: string) => `projectCardBasicsForm.${name}`;
 
-    const descriptionField = getByRole('textbox', { name: formField('description *') });
-    const entityNameField = getByRole('textbox', { name: formField('entityName') });
-    const hkrId = getByRole('spinbutton', { name: formField('hkrId') });
-    const sapProject = getByRole('textbox', { name: formField('sapProject') });
+    const descriptionField = screen.getByRole('textbox', { name: formField('description *') });
+    const entityNameField = screen.getByRole('textbox', { name: formField('entityName') });
+    const hkrId = screen.getByRole('spinbutton', { name: formField('hkrId') });
+    const sapProject = screen.getByRole('textbox', { name: formField('sapProject') });
     const estPlanningStart = getByRole('textbox', { name: formField('estPlanningStart') });
     const estPlanningEnd = getByRole('textbox', { name: formField('estPlanningEnd') });
     const presenceStart = getByRole('textbox', { name: formField('presenceStart') });
@@ -218,8 +221,8 @@ describe('ProjectCardBasicsForm', () => {
     expect(getByText(matchExact(responseProjectCard?.area?.value || ''))).toBeInTheDocument();
     expect(getByText(matchExact(responseProjectCard?.type.value || ''))).toBeInTheDocument();
     responseProjectCard.hashTags?.forEach((h) => expect(getByText(h)).toBeInTheDocument());
-    expectDisplayValue(responseProjectCard?.description || '');
-    expectDisplayValue(responseProjectCard?.entityName || '');
+    expectDisplayValue(responseProjectCard?.description);
+    expectDisplayValue(responseProjectCard?.entityName);
     expectDisplayValue(responseProjectCard?.sapProject || '');
     expectDisplayValue(responseProjectCard?.hkrId || '');
     expectDisplayValue(responseProjectCard?.sapProject || '');

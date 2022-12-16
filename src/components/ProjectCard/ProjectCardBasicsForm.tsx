@@ -1,7 +1,7 @@
 import useProjectCardBasicsForm from '@/hooks/useProjectCardBasicsForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
-import { FC } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
@@ -16,21 +16,24 @@ const ProjectCardBasicsForm: FC = () => {
   const { handleSubmit, formFields } = useProjectCardBasicsForm();
   const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
 
-  const onSubmit: SubmitHandler<IProjectCardBasicsForm> = async (form: IProjectCardBasicsForm) => {
-    const { type, area, ...formData } = emptyStringsToNull(
-      form as IAppForms,
-    ) as IProjectCardBasicsForm;
+  const onSubmit: SubmitHandler<IProjectCardBasicsForm> = useCallback(
+    async (form: IProjectCardBasicsForm) => {
+      const { type, area, ...formData } = emptyStringsToNull(
+        form as IAppForms,
+      ) as IProjectCardBasicsForm;
 
-    const data: IProjectCardRequest = {
-      ...formData,
-      type: getOptionId(type),
-      area: getOptionId(area),
-    };
+      const data: IProjectCardRequest = {
+        ...formData,
+        type: getOptionId(type),
+        area: getOptionId(area),
+      };
 
-    if (projectId) {
-      dispatch(patchProjectCardThunk({ id: projectId, data }));
-    }
-  };
+      if (projectId) {
+        dispatch(patchProjectCardThunk({ id: projectId, data }));
+      }
+    },
+    [dispatch, projectId],
+  );
 
   return (
     <div className="basics-form">
@@ -44,4 +47,4 @@ const ProjectCardBasicsForm: FC = () => {
   );
 };
 
-export default ProjectCardBasicsForm;
+export default memo(ProjectCardBasicsForm);

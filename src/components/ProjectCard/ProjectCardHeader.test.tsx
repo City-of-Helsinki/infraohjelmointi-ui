@@ -4,12 +4,9 @@ import ProjectCardHeader from './ProjectCardHeader';
 import axios from 'axios';
 import { setupStore } from '@/store';
 import mockProjectCard from '@/mocks/mockProjectCard';
-import { getProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { matchExact } from '@/utils/common';
 import userEvent from '@testing-library/user-event';
-import { mockProjectPhases } from '@/mocks/mockLists';
-import { getProjectPhasesThunk } from '@/reducers/listsSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -17,14 +14,14 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('ProjectCardHeader', () => {
-  const store = setupStore();
-
-  beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockProjectCard);
-    await store.dispatch(getProjectCardThunk(mockProjectCard.data.id));
-
-    mockedAxios.get.mockResolvedValue(mockProjectPhases);
-    await store.dispatch(getProjectPhasesThunk());
+  const store = setupStore({
+    projectCard: {
+      projectCards: [mockProjectCard.data as IProjectCard],
+      selectedProjectCard: mockProjectCard.data as IProjectCard,
+      count: 1,
+      error: {},
+      page: 1,
+    },
   });
 
   afterEach(async () => {

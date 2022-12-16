@@ -1,19 +1,18 @@
-import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
-import mockUsers from '@/mocks/mockUsers';
-import { getUsersThunk } from '@/reducers/authSlice';
+
+import mockUser from '@/mocks/mockUser';
+
 import { setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectCardBasics from './ProjectCardBasics';
 import { waitFor } from '@testing-library/react';
 
 jest.mock('react-i18next', () => mockI18next());
-jest.mock('axios');
-
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('ProjectCardBasics', () => {
-  const store = setupStore();
+  const store = setupStore({
+    auth: { user: mockUser, error: {} },
+  });
   let renderResult: CustomRenderResult;
 
   const spyScrollTo = jest.fn();
@@ -21,9 +20,6 @@ describe('ProjectCardBasics', () => {
 
   beforeEach(async () => {
     spyScrollTo.mockClear();
-
-    mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUsersThunk());
 
     await waitFor(() => (renderResult = renderWithProviders(<ProjectCardBasics />, { store })));
   });
