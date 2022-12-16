@@ -149,11 +149,27 @@
 
 .class-cell {
   color: white;
-  padding: 1rem 0.25rem;
+  padding: 0.35rem 0.25rem;
   font-size: 0.875rem;
   text-align: right;
   max-width: 4.875rem;
   min-width: 4.875rem;
+}
+
+.class-cell .class-cell-container {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: repeat(3, 1fr);
+  height: 100%;
+}
+
+.class-cell .class-cell-container span:first-child {
+  font-size: 16px !important;
+  font-weight: bold;
+}
+
+.class-cell .class-cell-container span {
+  font-size: 14px !important;
 }
 
 .class-cell span {
@@ -213,7 +229,6 @@
 }
 
 .planning-list-projects-table thead tr th:nth-child(2) span {
-  font-weight: bold;
   padding-right: 0;
 }
 
@@ -316,4 +331,10 @@
   bottom: 0;
   top: -1.25rem;
   left: 0.25rem;
+}
+
+@media (max-width: 1490px) {
+  .planning-list-table-container {
+    margin-right: 5rem;
+  }
 }

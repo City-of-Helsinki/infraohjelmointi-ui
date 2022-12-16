@@ -7,6 +7,7 @@
 
 html {
   font-size: 100%;
+  /* overflow-x: hidden; */
 }
 
 body {
@@ -16,6 +17,7 @@ body {
   font-size: var(--fontsize-body-m);
   color: var(--color-black-90);
   line-height: var(--lineheight-l);
+  overflow-x: hidden;
 }
 
 /* completely remove styling from the default button */

@@ -1,4 +1,4 @@
-import { IconAngleUp, IconCopy, IconMenuDots } from 'hds-react/icons';
+import { IconAngleDown, IconAngleUp, IconCopy, IconMenuDots } from 'hds-react/icons';
 import { IconButton, Span } from '../shared';
 import { FC } from 'react';
 
@@ -7,6 +7,8 @@ interface IPlanningListProjectsTableClassesHeaderProps {
   index: string;
   value: string | null;
   sums: Array<string | null>;
+  handleClick: any;
+  isVisible: boolean;
 }
 
 const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClassesHeaderProps> = ({
@@ -14,10 +16,11 @@ const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClass
   index,
   value,
   sums,
+  handleClick,
+  isVisible,
 }) => {
-  return (
+  return isVisible ? (
     <tr>
-      {/* HEADER */}
       <th className={`class-header-cell class-${index}`}>
         <div style={{ display: 'flex' }}>
           <div className="class-header-content-item value-container">
@@ -25,7 +28,11 @@ const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClass
           </div>
           <div className={`class-header-content class-${index}`}>
             <div className="class-header-content-item">
-              <IconButton icon={IconAngleUp} color="white" onClick={() => console.log('click')} />
+              <IconButton
+                icon={isVisible ? IconAngleUp : IconAngleDown}
+                color="white"
+                onClick={handleClick}
+              />
             </div>
             <div className="class-header-content-item">
               <IconMenuDots size="xs" />
@@ -40,6 +47,7 @@ const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClass
           </div>
         </div>
       </th>
+
       {/**
        * TODO:
        * These cell values should listen to the current project card values for that year from redux:
@@ -51,11 +59,15 @@ const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClass
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
       {sums.map((rn: any, i: number) => (
         <th key={i} className={`class-cell class-${index}`}>
-          <span>{rn}</span>
+          <div className="class-cell-container">
+            <span>{rn}</span>
+            <span>{rn}</span>
+            <span>{i === 0 && rn}</span>
+          </div>
         </th>
       ))}
     </tr>
-  );
+  ) : null;
 };
 
 export default PlanningListProjectsTableClassesHeader;
