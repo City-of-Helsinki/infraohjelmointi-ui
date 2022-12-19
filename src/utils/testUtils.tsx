@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { render } from '@testing-library/react';
+import { render, RenderResult } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
 import { setupStore } from '../store';
@@ -8,6 +8,7 @@ import type { RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
+import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store.
@@ -24,6 +25,11 @@ export const ReduxProvider =
   (store: Store) =>
   ({ children }: IWrapperProps): ReactElement =>
     (<Provider store={store}>{children}</Provider>) as unknown as ReactElement;
+
+export interface CustomRenderResult extends RenderResult {
+  user: UserEvent;
+  store: AppStore;
+}
 
 /**
  * Wrapper function for testing components that the redux provider and the react-router
@@ -42,7 +48,7 @@ export const renderWithProviders = (
     ...renderOptions
   }: ExtendedRenderOptions = {},
   { route = '/' } = {},
-) => {
+): CustomRenderResult => {
   window.history.pushState({}, 'Test page', route);
 
   const WrappedWithReduxProvider = ReduxProvider(store)({ children: ui });
@@ -50,6 +56,9 @@ export const renderWithProviders = (
   return {
     store,
     user: userEvent.setup(),
-    ...render(WrappedWithReduxProvider, { wrapper: BrowserRouter, ...renderOptions }),
+    ...(render(WrappedWithReduxProvider, {
+      wrapper: BrowserRouter,
+      ...renderOptions,
+    }) as RenderResult),
   };
 };

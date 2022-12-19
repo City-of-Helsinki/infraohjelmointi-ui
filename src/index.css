@@ -64,7 +64,7 @@ table p {
   width: 100%;
   display: flex;
   /* Hacky calc, since the TopBar has a 1px border bottom */
-  min-height: calc(100vh - calc(var(--spacing-5-xl) + 1px));
+  min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
 }
 
 .text-black {
@@ -104,7 +104,11 @@ table p {
 }
 
 .input-l {
-  max-width: 360px;
+  max-width: 22.5rem;
+}
+
+.input-m {
+  max-width: 16.5rem;
 }
 
 .legend-margin {

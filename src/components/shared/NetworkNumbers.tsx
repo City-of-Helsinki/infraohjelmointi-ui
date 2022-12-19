@@ -1,5 +1,5 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { FC, forwardRef, Ref } from 'react';
+import { FC, forwardRef, memo, Ref } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import FormFieldLabel from './FormFieldLabel';
 import Span from './Span';
@@ -58,4 +58,4 @@ const NetworkNumbers: FC<INetworkNumberProps> = ({ name, label, control }) => {
 
 NetworkNumbersContainer.displayName = 'NetworkNumbersContainer';
 
-export default NetworkNumbers;
+export default memo(NetworkNumbers);

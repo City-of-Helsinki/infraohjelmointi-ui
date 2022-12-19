@@ -14,12 +14,14 @@ export interface IProjectCard {
   phase: IListItem;
   programmed: boolean;
   constructionPhaseDetail: string;
-  estPlanningStartYear?: string;
-  estDesignEndYear?: string;
-  contractPrepStartDate?: string;
-  contractPrepEndDate?: string;
-  warrantyStartDate?: string;
-  warrantyExpireDate?: string;
+  estPlanningStart?: string;
+  estPlanningEnd?: string;
+  estConstructionStart?: string;
+  estConstructionEnd?: string;
+  presenceStart?: string;
+  presenceEnd?: string;
+  visibilityStart?: string;
+  visibilityEnd?: string;
   perfAmount: string;
   unitCost: string;
   costForecast: string;
@@ -72,6 +74,14 @@ export interface IProjectCardRequest {
   address?: string | null;
   favPersons?: Array<string> | [];
   phase?: string | null;
+  estPlanningStart?: string;
+  estPlanningEnd?: string;
+  estConstructionStart?: string;
+  estConstructionEnd?: string;
+  presenceStart?: string;
+  presenceEnd?: string;
+  visibilityStart?: string;
+  visibilityEnd?: string;
 }
 
 export interface IProjectCardRequestObject {

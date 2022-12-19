@@ -7,6 +7,7 @@ import { TFunction } from 'i18next';
 import { useAppSelector } from './common';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
+import _ from 'lodash';
 
 /**
  * Creates form fields for the project card, in order for the labels to work the 'fi.json'-translations need
@@ -15,13 +16,14 @@ import { listItemToOption } from '@/utils/common';
  * @param control react-hook-form control to add to the fields
  * @returns IProjectCard
  */
-const getProjectBasicsFormFields = (
+const buildProjectCardBasicsFormFields = (
   control: HookFormControlType,
   translate: TFunction<'translation', undefined>,
 ): Array<IForm> => {
   const formFields = [
+    // Basic info
     {
-      name: 'basicInfoTitle',
+      name: 'basics',
       type: FormField.Title,
     },
     {
@@ -65,12 +67,42 @@ const getProjectBasicsFormFields = (
       name: 'hashTags',
       type: FormField.TagsForm,
     },
+    // Schedule
+    {
+      name: 'schedule',
+      type: FormField.Title,
+    },
+    {
+      name: 'planning',
+      type: FormField.FieldSet,
+      fieldSet: [
+        { name: 'estPlanningStart', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'estPlanningEnd', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'presenceStart', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'presenceEnd', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'visibilityEnd', type: FormField.Date },
+        { name: 'visibilityStart', type: FormField.Date },
+      ],
+    },
+    {
+      name: 'construction',
+      type: FormField.FieldSet,
+      fieldSet: [
+        { name: 'estConstructionStart', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'estConstructionEnd', type: FormField.Date, dateFormat: 'YYYY' },
+      ],
+    },
   ];
 
-  const projectCardBasicsFormFields = formFields.map((ff) => ({
-    ...ff,
-    control: control,
-    label: translate(`projectCardBasicsForm.${ff.name}`),
+  const projectCardBasicsFormFields = formFields.map((formField) => ({
+    ...formField,
+    control,
+    label: translate(`projectCardBasicsForm.${formField.name}`),
+    fieldSet: formField.fieldSet?.map((fieldSetField) => ({
+      ...fieldSetField,
+      control,
+      label: translate(`projectCardBasicsForm.${fieldSetField.name}`),
+    })),
   }));
 
   return projectCardBasicsFormFields;
@@ -83,7 +115,10 @@ const getProjectBasicsFormFields = (
  * @returns formValues, projectCard
  */
 const useProjectCardBasicsValues = () => {
-  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const projectCard = useAppSelector(
+    (state: RootState) => state.projectCard.selectedProjectCard,
+    _.isEqual,
+  );
   const { t } = useTranslation();
 
   const formValues: IProjectCardBasicsForm = useMemo(
@@ -96,6 +131,14 @@ const useProjectCardBasicsValues = () => {
       sapNetwork: projectCard?.sapNetwork || [],
       entityName: projectCard?.entityName || '',
       hashTags: projectCard?.hashTags || [],
+      estPlanningStart: projectCard?.estPlanningStart || '',
+      estPlanningEnd: projectCard?.estPlanningEnd || '',
+      estConstructionStart: projectCard?.estConstructionStart || '',
+      estConstructionEnd: projectCard?.estConstructionEnd || '',
+      presenceStart: projectCard?.presenceStart || '',
+      presenceEnd: projectCard?.presenceEnd || '',
+      visibilityStart: projectCard?.visibilityStart || '',
+      visibilityEnd: projectCard?.visibilityEnd || '',
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [projectCard],
@@ -132,7 +175,8 @@ const useProjectCardBasicsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectCard, formValues]);
 
-  const formFields = getProjectBasicsFormFields(control, t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const formFields = useMemo(() => buildProjectCardBasicsFormFields(control, t), [control]);
 
   return { handleSubmit, reset, formFields };
 };

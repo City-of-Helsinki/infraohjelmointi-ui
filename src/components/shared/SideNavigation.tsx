@@ -1,6 +1,6 @@
 import { INavigationItem } from '@/interfaces/common';
 import { SideNavigation as HDSSideNavigation } from 'hds-react/components/SideNavigation';
-import { FC, useState } from 'react';
+import { FC, useState, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -9,24 +9,34 @@ interface ISideNavigationProps {
 }
 
 const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
-  const [active, setActive] = useState('basics');
+  const [active, setActive] = useState('#basics');
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const setActivePage = (e: any) => {
-    e.preventDefault();
-    setActive(e.target.getAttribute('href'));
-    navigate(e.target.getAttribute('href'));
-  };
+  const setActivePage = useCallback(
+    (e: any) => {
+      e.preventDefault();
+      const hash = e.target.hash || e.target.parentElement.hash;
+      setActive(hash);
+      navigate(hash);
+      const scrollToElement = document.getElementById(hash.split('#')[1]);
+      window.scrollTo({ top: scrollToElement?.offsetTop, behavior: 'smooth' });
+    },
+    [navigate],
+  );
 
-  const hdsNavItems = navItems.map((s, i) => ({
-    ...s,
-    href: s.route,
-    onClick: setActivePage,
-    active: active === s.route,
-    id: `main-level-${i}`,
-  }));
+  const hdsNavItems = useMemo(
+    () =>
+      navItems.map((s, i) => ({
+        ...s,
+        href: s.route,
+        onClick: setActivePage,
+        active: active === s.route,
+        id: `main-level-${i}`,
+      })),
+    [active, navItems, setActivePage],
+  );
 
   return (
     <HDSSideNavigation
@@ -41,4 +51,4 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   );
 };
 
-export default SideNavigation;
+export default memo(SideNavigation);

@@ -1,4 +1,5 @@
 import { planningListInfo } from '@/mocks/common';
+import { IconInfoCircleFill } from 'hds-react/icons';
 import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
 import { Title } from '../shared';
@@ -8,7 +9,10 @@ const PlanningListInfoPanel = () => {
   return (
     <div className="planning-list-info-panel">
       <div id="planningListTitle">
-        <Title text="budgetProposalPreparation" size="s" />
+        <div>
+          <Title text="budgetProposalPreparation" size="s" />
+          <IconInfoCircleFill className="info-icon" />
+        </div>
       </div>
       <div id="planningListButton">
         <Button variant="success">{t('allocationPreparation')}</Button>

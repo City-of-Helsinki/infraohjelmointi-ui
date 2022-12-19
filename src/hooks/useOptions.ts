@@ -1,10 +1,11 @@
-import { IListItem, IOption, ListType } from '@/interfaces/common';
+import { IListItem, ListType } from '@/interfaces/common';
 import { IListState } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from './common';
+import _ from 'lodash';
 
 /**
  * This hook creates an options list and returns a function to convert a IListItem to an option.
@@ -15,22 +16,15 @@ import { useAppSelector } from './common';
  * @returns options & listItemToOption
  */
 export const useOptions = (name?: ListType) => {
-  const list = useAppSelector(
-    (state: RootState) => state.lists[name as keyof IListState],
-  ) as Array<IListItem>;
-  const [options, setOptions] = useState<Array<IOption> | []>([]);
   const { t } = useTranslation();
 
-  const translate = useMemo(() => t, [t]);
+  const optionsList = useAppSelector(
+    (state: RootState) => state.lists[name as keyof IListState],
+    _.isEqual,
+  ) as Array<IListItem>;
 
-  // Parse an array of list-items to an array of options to use SelectField
-  useEffect(
-    () => {
-      setOptions(list && list.map((i) => listItemToOption(i, translate)));
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [list],
-  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const options = useMemo(() => optionsList.map((i) => listItemToOption(i, t)), [optionsList]);
 
   return { options };
 };

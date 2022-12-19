@@ -46,8 +46,8 @@ const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ pro
         <div className="project-header-cell-container">
           {/* LEFT */}
           <div className="left">
-            <IconMenuDots />
-            <IconDocument />
+            <IconMenuDots size="xs" />
+            <IconDocument size="xs" />
             <button className="project-name-button" onClick={navigateToProjectCard}>
               {project.name}
             </button>
@@ -56,8 +56,8 @@ const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ pro
           <div className="right">
             <div className="project-header-left">
               <CircleIcon value={planListProjectValues.readiness} />
-              <IconPlaybackRecord />
-              <IconSpeechbubbleText />
+              <IconPlaybackRecord size="xs" />
+              <IconSpeechbubbleText size="xs" />
             </div>
             <div className="project-header-right">
               <span>{planListProjectValues.value1}</span>

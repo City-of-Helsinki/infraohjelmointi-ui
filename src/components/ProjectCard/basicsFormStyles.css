@@ -1,0 +1,101 @@
+:root {
+  --grid-col-full: 1/25;
+  --grid-col-half-left: 1/13;
+  --grid-col-half-right: 13/25;
+  --grid-col-small-left: 1/8;
+  --grid-col-small-right: 8/15;
+  --grid-col-xs-right: 1/4;
+  --grid-col-xs-middle: 4/11;
+  --grid-col-xs-left: 11/14;
+}
+
+.basic-info-form {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr); /* repeat 24 rows with 1fr (fractional unit) */
+  grid-auto-flow: row;
+  gap: 0rem var(--spacing-layout-s);
+  width: 85%;
+  margin: 0 var(--spacing-2-xl) 0 0;
+}
+
+.basic-info-form #formTitle {
+  grid-column: var(--grid-col-full);
+}
+
+.basic-info-form #type {
+  grid-column: var(--grid-col-half-left);
+}
+
+.basic-info-form #hkrId {
+  grid-column: var(--grid-col-half-right);
+}
+
+.basic-info-form #entityName {
+  grid-column: var(--grid-col-half-left);
+}
+
+.basic-info-form #description {
+  grid-column: var(--grid-col-half-left);
+}
+
+.basic-info-form #area {
+  grid-column: var(--grid-col-half-left);
+}
+
+.basic-info-form #sapProject {
+  grid-column: var(--grid-col-half-right);
+}
+
+.basic-info-form #sapNetwork {
+  grid-column: var(--grid-col-half-right);
+  grid-row: 4 / 7;
+}
+
+.basic-info-form #hashTags {
+  grid-column: var(--grid-col-full);
+}
+
+/* elements inside FIELDSET will start from row 1 and repeat 3 columns */
+.basic-info-form fieldset {
+  display: grid;
+  grid-column: 1/25; /* use up both columns of basic-info-form */
+  grid-template-columns: repeat(24, 1fr); /* repeat 3 columns */
+  grid-auto-flow: row;
+  gap: var(--spacing-s);
+}
+
+.basic-info-form #estPlanningStart {
+  grid-row: 1;
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #estPlanningEnd {
+  grid-row: 1;
+  grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #presenceStart {
+  grid-row: 2;
+  grid-column: var(--grid-col-small-left);
+}
+.basic-info-form #presenceEnd {
+  grid-row: 2;
+  grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #visibilityStart {
+  grid-row: 3;
+  grid-column: var(--grid-col-small-left);
+}
+.basic-info-form #visibilityEnd {
+  grid-row: 3;
+  grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #estConstructionStart {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #estConstructionEnd {
+  grid-column: var(--grid-col-small-right);
+}

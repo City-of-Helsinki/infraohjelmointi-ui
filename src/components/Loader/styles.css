@@ -10,9 +10,9 @@
   height: 100%;
   width: 100%;
   position: fixed;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(0.625rem);
+  backdrop-filter: blur(0.625rem);
   z-index: 9; /* this makes the overlay one index under the top bar*/
   overflow: hidden;
-  margin-top: -75px; /* this makes the overlay extend under the topbar to fill the whole page */
+  margin-top: -4.6875rem; /* this makes the overlay extend under the topbar to fill the whole page */
 }

@@ -16,7 +16,7 @@ const TabList: FC<ITabListProps> = ({ navItems }) => {
 
   const tabThemeOverrides: TabsCustomTheme = {
     '--tablist-border-color': 'white',
-    '--tab-focus-outline-size': '1px',
+    '--tab-focus-outline-size': '0.0625rem',
   };
 
   const getActiveTab = () => navItems.findIndex((n) => path.includes(n.route));

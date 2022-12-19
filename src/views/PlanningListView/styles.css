@@ -1,11 +1,15 @@
 .planning-list-table-container {
   margin: var(--spacing-layout-s);
   font-size: var(--fontsize-body-s);
+  white-space: nowrap;
+  line-height: 1.15rem;
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .planning-list-years-table {
-  flex: 7 1;
   text-align: center;
+  width: 70%;
 }
 
 .planning-list-years-table span {
@@ -15,12 +19,10 @@
 .planning-list-years-table .row-1-cell {
   background: var(--color-bus);
   color: white;
-  padding: 0.5rem 1rem;
-}
-
-.years-table-cell {
-  min-width: 80px;
-  max-width: 80px;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.875rem;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
 }
 
 .planning-list-projects-table {
@@ -33,8 +35,8 @@
   grid-auto-flow: row;
   overflow-x: visible;
   margin: 0 var(--spacing-xs) 0 0;
-  width: 100%;
-  flex: 3 1;
+  width: 30%;
+  min-width: 26rem;
 }
 
 .planning-list-info-panel span {
@@ -42,6 +44,14 @@
 }
 .planning-list-info-panel #planningListTitle {
   grid-column: 1/3;
+}
+
+#planningListTitle .info-icon {
+  transform: translate(0.8rem, 0.15rem);
+}
+
+#planningListTitle div {
+  display: flex;
 }
 
 .planning-list-info-panel #planningListGroupInfo {
@@ -53,8 +63,8 @@
 }
 
 #planningListButton button {
-  height: 44px !important;
-  width: 239px !important;
+  height: 2.75rem !important;
+  width: 14.9375rem !important;
 }
 
 .planning-list-info-panel #planningListBasicInfo {
@@ -64,11 +74,12 @@
 }
 
 .group-header-cell {
-  width: 30.5%;
+  width: 30.6%;
   text-align: left;
   background: var(--color-bus);
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 1.25rem;
   color: white;
+  min-width: 24.3rem;
 }
 
 .group-header-cell-content {
@@ -97,18 +108,33 @@
 .group-cell {
   background: var(--color-bus);
   color: white;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.875rem;
+  text-align: right;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
+}
+
+.group-cell span {
+  font-weight: 300;
+  padding-right: var(--spacing-s);
+}
+
+/* Second cell in the projects table header */
+.planning-list-projects-table thead tr th:nth-child(2) {
   text-align: center;
+}
+
+.planning-list-projects-table thead tr th:nth-child(2) span {
   font-weight: bold;
-  min-width: 80px;
-  max-width: 80px;
+  padding-right: 0;
 }
 
 .project-header-cell {
   text-align: left;
-  padding: 0.5rem 1.5rem;
+  padding: 0.1rem 1.25rem;
   border-bottom: 0.05rem solid var(--color-bus-medium-light);
   border-left: 0.05rem solid var(--color-bus-medium-light);
-  min-width: 350px;
 }
 
 .project-header-cell-container {
@@ -150,9 +176,8 @@
 /* Hide too long project names */
 .project-header-cell .project-name-button {
   text-overflow: ellipsis;
-  white-space: nowrap;
   overflow: hidden;
-  max-width: 130px;
+  max-width: 8.125rem;
 }
 
 .project-cell {
@@ -170,8 +195,8 @@
 .circle-number-icon {
   background: gray;
   border-radius: 50%;
-  height: 26px;
-  width: 26px;
+  height: 1.5rem;
+  width: 1.5rem;
   text-align: center;
   color: white;
   display: flex;
@@ -183,25 +208,25 @@
 .circle-number-icon-indicator {
   position: absolute;
   background: black;
-  height: 14px;
-  width: 14px;
+  height: 0.8rem;
+  width: 0.8rem;
   border-radius: 50%;
-  font-size: 10px;
-  line-height: 14px;
-  bottom: 0px;
-  right: -5px;
+  font-size: 0.6rem;
+  line-height: 0.85rem;
+  bottom: 0rem;
+  right: -0.3125rem;
 }
 
 .table-input input {
   text-align: center !important;
   cursor: pointer !important;
-  border-radius: 4px !important;
-  height: 44px !important;
+  border-radius: 0.25rem !important;
+  height: 2.75rem !important;
   width: 90% !important;
   font-size: var(--fontsize-body-s) !important;
   font-weight: 300 !important;
   position: absolute; /* absolute prevents the form from jumping when a field is selected */
   bottom: 0;
-  top: -20px;
-  left: 4px;
+  top: -1.25rem;
+  left: 0.25rem;
 }

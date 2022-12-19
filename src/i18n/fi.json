@@ -17,7 +17,8 @@
     "skipToContent": "Siirry kohteeseen",
     "login": "Kirjaudu sisään",
     "basics": "Hankkeen perustiedot",
-    "navigateToForm": "Navigoi lomakkeeseen"
+    "navigateToForm": "Navigoi lomakkeeseen",
+    "schedule": "Hankkeen aikataulu"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -49,7 +50,7 @@
     "kruunuvuorenranta": "Kruunuvuorenranta"
   },
   "projectCardBasicsForm": {
-    "basicInfoTitle": "Hankkeen perustiedot",
+    "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
     "entityName": "Hankekokonaisuuden nimi",
     "description": "Hankkeen kuvaus",
@@ -57,7 +58,18 @@
     "hkrId": "PW Hanketunnus",
     "sapNetwork": "Verkkonumerot",
     "sapProject": "Projektinumero",
-    "hashTags": "Tunnisteet"
+    "hashTags": "Tunnisteet",
+    "schedule": "Hankkeen aikataulu",
+    "planning": "Suunnittelu",
+    "estPlanningStart": "Alkaa",
+    "estPlanningEnd": "Päättyy",
+    "presenceStart": "Esilläolo alkaa",
+    "presenceEnd": "Esilläolo päättyy",
+    "visibilityEnd": "Nähtävilläolo alkaa",
+    "visibilityStart": "Nähtävilläolo päättyy",
+    "construction": "Rakentaminen",
+    "estConstructionStart": "Alkaa",
+    "estConstructionEnd": "Päättyy"
   },
   "notification": {
     "title": {
