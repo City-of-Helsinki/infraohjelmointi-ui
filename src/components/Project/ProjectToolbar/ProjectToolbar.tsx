@@ -1,5 +1,6 @@
-import { IconArrowDown, IconMap, IconPlus } from 'hds-react/icons';
+import { IconArrowDown, IconMap } from 'hds-react/icons';
 import { IconButton, Toolbar } from '../../shared';
+import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
 
 const ProjectToolbar = () => {
   const click = () => console.log('click');
@@ -7,7 +8,7 @@ const ProjectToolbar = () => {
     <Toolbar
       left={
         <>
-          <IconButton icon={IconPlus} text="new" onClick={() => click()} />
+          <IconButton icon={IconNewItem} text="new" onClick={() => click()} />
           <IconButton icon={IconArrowDown} text="shareProject" onClick={() => click()} />
         </>
       }

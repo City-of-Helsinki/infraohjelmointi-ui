@@ -79,18 +79,18 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
   }, [pathname]);
 
   // Changes when clicking fourth row
-  useEffect(() => {
-    setHeaderState({ ...headerState, projectsVisible: headerState.fourthVisible });
-  }, [headerState.fourthVisible]);
+  // useEffect(() => {
+  //   setHeaderState({ ...headerState, projectsVisible: headerState.fourthVisible });
+  // }, [headerState.fourthVisible]);
 
   // Changes when clicking third row
-  useEffect(() => {
-    if (!headerState.thirdVisible) {
-      setHeaderState({ ...headerState, projectsVisible: false, fourthVisible: false });
-    } else {
-      setHeaderState({ ...headerState, projectsVisible: true, fourthVisible: true });
-    }
-  }, [headerState.thirdVisible]);
+  // useEffect(() => {
+  //   if (!headerState.thirdVisible) {
+  //     setHeaderState({ ...headerState, projectsVisible: false, fourthVisible: false });
+  //   } else {
+  //     setHeaderState({ ...headerState, projectsVisible: true, fourthVisible: true });
+  //   }
+  // }, [headerState.thirdVisible]);
 
   // Changes when clicking second row
   useEffect(() => {

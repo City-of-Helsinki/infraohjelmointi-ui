@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icons/project-status/on-hold</title>
+    <g id="icons/project-status/on-hold" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-3" transform="translate(3.999840, 6.000126)" fill="#000000">
+            <polygon id="Fill-1" points="0.1132 0 0.1132 2.20374 5.3112 2.20374 0 10.20432 0 11.72892 8.5236 11.72892 8.5236 9.52476 3.148 9.52476 8.3952 1.62708 8.3952 0"></polygon>
+            <polygon id="Fill-2" points="10.3516 1.80306 10.3516 3.67794 12.4264 3.67794 10.2984 6.8817 10.2984 8.1501 15.1008 8.1501 15.1008 6.27522 12.9432 6.27522 15.0404 3.11892 15.0404 1.80306"></polygon>
+        </g>
+    </g>
+</svg>
