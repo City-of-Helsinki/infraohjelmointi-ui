@@ -17,33 +17,55 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
 
   const [isClassView, setIsClassView] = useState(false);
 
-  const [secondVisible, setSeconVisible] = useState(true);
-  const [thirdVisible, setThirdVisible] = useState(true);
-  const [fourthVisible, setFourthVisible] = useState(true);
-  const [projectsVisible, setProjectsVisible] = useState(true);
+  const [headerState, setHeaderState] = useState({
+    secondVisible: true,
+    thirdVisible: true,
+    fourthVisible: true,
+    projectsVisible: true,
+  });
 
   const handleFourthVisible = useCallback(
-    () => setProjectsVisible((currentState) => !currentState),
+    () =>
+      setHeaderState((currentState) => ({
+        ...currentState,
+        projectsVisible: !currentState.projectsVisible,
+      })),
     [],
   );
 
   const handleThirdVisible = useCallback(
-    () => setFourthVisible((currentState) => !currentState),
+    () =>
+      setHeaderState((currentState) => ({
+        ...currentState,
+        fourthVisible: !currentState.fourthVisible,
+      })),
     [],
   );
 
   const handleSecondVisible = useCallback(
-    () => setThirdVisible((currentState) => !currentState),
+    () =>
+      setHeaderState((currentState) => ({
+        ...currentState,
+        thirdVisible: !currentState.thirdVisible,
+      })),
     [],
   );
 
   const handleFirstVisible = useCallback(
-    () => setSeconVisible((currentState) => !currentState),
+    () =>
+      setHeaderState((currentState) => ({
+        ...currentState,
+        secondVisible: !currentState.secondVisible,
+      })),
     [],
   );
 
   const handleProjectsVisible = useCallback(
-    () => setProjectsVisible((currentState) => !currentState),
+    () =>
+      setHeaderState((currentState) => ({
+        ...currentState,
+        projectsVisible: !currentState.projectsVisible,
+      })),
     [],
   );
 
@@ -58,43 +80,53 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
 
   // Changes when clicking fourth row
   useEffect(() => {
-    setProjectsVisible(fourthVisible);
-  }, [fourthVisible]);
+    setHeaderState({ ...headerState, projectsVisible: headerState.fourthVisible });
+  }, [headerState.fourthVisible]);
 
   // Changes when clicking third row
   useEffect(() => {
-    if (!thirdVisible) {
-      setProjectsVisible(false);
-      setFourthVisible(false);
+    if (!headerState.thirdVisible) {
+      setHeaderState({ ...headerState, projectsVisible: false, fourthVisible: false });
     } else {
-      setProjectsVisible(true);
-      setFourthVisible(true);
+      setHeaderState({ ...headerState, projectsVisible: true, fourthVisible: true });
     }
-  }, [thirdVisible]);
+  }, [headerState.thirdVisible]);
 
   // Changes when clicking second row
   useEffect(() => {
-    if (!secondVisible) {
-      setProjectsVisible(false);
-      setFourthVisible(false);
-      setThirdVisible(false);
+    if (!headerState.secondVisible) {
+      setHeaderState({
+        ...headerState,
+        projectsVisible: false,
+        fourthVisible: false,
+        thirdVisible: false,
+      });
     } else {
-      setProjectsVisible(true);
-      setFourthVisible(true);
-      setThirdVisible(true);
+      setHeaderState({
+        ...headerState,
+        projectsVisible: true,
+        fourthVisible: true,
+        thirdVisible: true,
+      });
     }
-  }, [secondVisible]);
+  }, [headerState.secondVisible]);
 
   // Fetch the next projects if the "fetch-projects-trigger" element comes into view
   useEffect(() => {
-    if (inView && projectsVisible) {
+    if (inView && headerState.projectsVisible) {
       fetchNext();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   const isCurrentRowVisible = (i: number) =>
-    i === 3 ? fourthVisible : i === 2 ? thirdVisible : i === 1 ? secondVisible : true;
+    i === 3
+      ? headerState.fourthVisible
+      : i === 2
+      ? headerState.thirdVisible
+      : i === 1
+      ? headerState.secondVisible
+      : true;
 
   const handleChangeRowVisibility = (i: number) =>
     i === 3
@@ -124,13 +156,13 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
           ) : (
             <PlanningListProjectsTableGroupHeader
               group={group}
-              isProjectsVisible={projectsVisible}
+              isProjectsVisible={headerState.projectsVisible}
               handleProjectsVisible={handleProjectsVisible}
             />
           )}
         </thead>
         <tbody>
-          {projectsVisible &&
+          {headerState.projectsVisible &&
             projects.map((p, i) => <PlanningListProjectsTableRow key={i} project={p} />)}
         </tbody>
       </table>
