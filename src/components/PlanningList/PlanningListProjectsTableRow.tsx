@@ -39,6 +39,17 @@ const CircleIcon = ({ value }: { value: string }) => (
 const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ project }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
+
+  // TODO: render an icon based on the status when we have the project status list
+  // const icon = useMemo(() => {
+  //   switch (project.type?.id) {
+  //     case ProjectType.ProjectComplex:
+  //       return null;
+  //     default:
+  //       return null;
+  //   }
+  // }, []);
+
   return (
     <tr>
       {/* HEADER */}
