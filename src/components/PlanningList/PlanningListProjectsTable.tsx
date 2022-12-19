@@ -24,6 +24,8 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
     projectsVisible: true,
   });
 
+  const { secondVisible, thirdVisible, fourthVisible, projectsVisible } = headerState;
+
   const handleFourthVisible = useCallback(
     () =>
       setHeaderState((currentState) => ({
@@ -79,22 +81,24 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
   }, [pathname]);
 
   // Changes when clicking fourth row
-  // useEffect(() => {
-  //   setHeaderState({ ...headerState, projectsVisible: headerState.fourthVisible });
-  // }, [headerState.fourthVisible]);
+  useEffect(() => {
+    setHeaderState({ ...headerState, projectsVisible: fourthVisible });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fourthVisible]);
 
   // Changes when clicking third row
-  // useEffect(() => {
-  //   if (!headerState.thirdVisible) {
-  //     setHeaderState({ ...headerState, projectsVisible: false, fourthVisible: false });
-  //   } else {
-  //     setHeaderState({ ...headerState, projectsVisible: true, fourthVisible: true });
-  //   }
-  // }, [headerState.thirdVisible]);
+  useEffect(() => {
+    if (!thirdVisible) {
+      setHeaderState({ ...headerState, projectsVisible: false, fourthVisible: false });
+    } else {
+      setHeaderState({ ...headerState, projectsVisible: true, fourthVisible: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thirdVisible]);
 
   // Changes when clicking second row
   useEffect(() => {
-    if (!headerState.secondVisible) {
+    if (!secondVisible) {
       setHeaderState({
         ...headerState,
         projectsVisible: false,
@@ -109,24 +113,19 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
         thirdVisible: true,
       });
     }
-  }, [headerState.secondVisible]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [secondVisible]);
 
   // Fetch the next projects if the "fetch-projects-trigger" element comes into view
   useEffect(() => {
-    if (inView && headerState.projectsVisible) {
+    if (inView && projectsVisible) {
       fetchNext();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   const isCurrentRowVisible = (i: number) =>
-    i === 3
-      ? headerState.fourthVisible
-      : i === 2
-      ? headerState.thirdVisible
-      : i === 1
-      ? headerState.secondVisible
-      : true;
+    i === 3 ? fourthVisible : i === 2 ? thirdVisible : i === 1 ? secondVisible : true;
 
   const handleChangeRowVisibility = (i: number) =>
     i === 3
@@ -156,13 +155,13 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
           ) : (
             <PlanningListProjectsTableGroupHeader
               group={group}
-              isProjectsVisible={headerState.projectsVisible}
+              isProjectsVisible={projectsVisible}
               handleProjectsVisible={handleProjectsVisible}
             />
           )}
         </thead>
         <tbody>
-          {headerState.projectsVisible &&
+          {projectsVisible &&
             projects.map((p, i) => <PlanningListProjectsTableRow key={i} project={p} />)}
         </tbody>
       </table>
