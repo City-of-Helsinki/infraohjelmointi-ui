@@ -99,3 +99,15 @@
 .basic-info-form #estConstructionEnd {
   grid-column: var(--grid-col-small-right);
 }
+
+.basic-info-form #mainClass {
+  grid-column: var(--grid-col-half-left);
+}
+
+.basic-info-form #class {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #subClass {
+  grid-column: var(--grid-col-small-right);
+}

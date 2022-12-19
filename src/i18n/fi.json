@@ -69,7 +69,11 @@
     "visibilityStart": "Nähtävilläolo päättyy",
     "construction": "Rakentaminen",
     "estConstructionStart": "Alkaa",
-    "estConstructionEnd": "Päättyy"
+    "estConstructionEnd": "Päättyy",
+    "financialInformation": "Hankkeen kustannustiedot",
+    "mainClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka"
   },
   "notification": {
     "title": {

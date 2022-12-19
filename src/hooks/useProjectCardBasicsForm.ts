@@ -92,6 +92,11 @@ const buildProjectCardBasicsFormFields = (
         { name: 'estConstructionEnd', type: FormField.Date },
       ],
     },
+    { name: 'financialInformation', type: FormField.Title },
+    { name: 'mainClass', type: FormField.Text },
+    { name: 'class', type: FormField.Text },
+    { name: 'subClass', type: FormField.Text },
+    { name: 'costForecast', type: FormField.Number },
   ];
 
   const projectCardBasicsFormFields = formFields.map((formField) => ({
