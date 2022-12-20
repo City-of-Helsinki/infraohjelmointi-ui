@@ -72,6 +72,7 @@ const mockProjectCard: { data: IProjectCard } = {
     delays: '',
     hashTags: ['pyöräily', 'uudisrakentaminen'],
     favPersons: ['9d6a0854-a784-44b0-ad35-ca5e8b8f0e90'],
+    louhi: false
   },
 };
 

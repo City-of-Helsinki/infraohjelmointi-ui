@@ -58,6 +58,13 @@
   grid-column: var(--grid-col-full);
 }
 
+.basic-info-form #phase {
+  grid-column: var(--grid-col-small-left);
+}
+.basic-info-form #constructionPhaseDetail {
+  grid-column: var(--grid-col-small-right);
+}
+
 /* elements inside custom-fieldset will take up the whole row */
 .basic-info-form .custom-fieldset {
   display: grid;

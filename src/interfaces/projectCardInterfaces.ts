@@ -71,6 +71,7 @@ export interface IProjectCard {
   preliminaryCurrentYearPlus8?: string;
   preliminaryCurrentYearPlus9?: string;
   preliminaryCurrentYearPlus10?: string;
+  louhi: boolean;
 }
 
 export interface IProjectCardRequest {
@@ -94,6 +95,7 @@ export interface IProjectCardRequest {
   presenceEnd?: string;
   visibilityStart?: string;
   visibilityEnd?: string;
+  constructionPhaseDetail?: string | null;
   favourite?: boolean;
   projectWorkQuantity?: string;
   projectCostForecast?: string;
