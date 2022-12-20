@@ -90,6 +90,10 @@ const buildProjectCardBasicsFormFields = (
       name: 'louhi',
       type: FormField.RadioCheckbox,
     },
+    {
+      name: 'gravel',
+      type: FormField.RadioCheckbox,
+    },
     // Schedule
     {
       name: 'schedule',
@@ -198,6 +202,7 @@ const useProjectCardBasicsValues = () => {
       programmed: projectCard?.programmed || false,
       constructionPhaseDetail: listItemToOption(projectCard?.constructionPhaseDetail, t),
       louhi: projectCard?.louhi || false,
+      gravel: projectCard?.gravel || false,
       projectWorkQuantity: projectCard?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(projectCard?.projectQualityLevel, t),
       projectCostForecast: projectCard?.projectCostForecast,

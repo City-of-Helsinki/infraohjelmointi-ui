@@ -64,6 +64,15 @@
 .basic-info-form #constructionPhaseDetail {
   grid-column: var(--grid-col-small-right);
 }
+.basic-info-form #programmed {
+  grid-column: var(--grid-col-full);
+}
+.basic-info-form #louhi {
+  grid-column: var(--grid-col-full);
+}
+.basic-info-form #gravel {
+  grid-column: var(--grid-col-full);
+}
 
 /* elements inside custom-fieldset will take up the whole row */
 .basic-info-form .custom-fieldset {
