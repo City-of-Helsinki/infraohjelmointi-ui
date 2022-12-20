@@ -24,6 +24,7 @@ const NumberField: FC<INumberFieldProps> = ({
   return (
     <Controller
       name={name}
+      rules={rules}
       control={control as Control<FieldValues>}
       render={({ field: { onChange, value }, fieldState: { isDirty, error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
@@ -41,7 +42,6 @@ const NumberField: FC<INumberFieldProps> = ({
           />
         </div>
       )}
-      rules={rules}
     />
   );
 };

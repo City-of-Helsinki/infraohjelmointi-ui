@@ -37,7 +37,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form, handleSave }) => {
           case FormField.TagsForm:
             return <HashTagsForm {...formProps} />;
           case FormField.FieldSet:
-            return <FieldSetCreator key={f.name} form={f} />;
+            return <FieldSetCreator key={f.name} form={f} handleSave={handleSave} />;
           case FormField.Date:
             return <DateField {...formPropsWithSave} />;
           default:

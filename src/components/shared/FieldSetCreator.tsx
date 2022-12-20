@@ -5,12 +5,13 @@ import FormFieldCreator from './FormFieldCreator';
 
 interface IFieldSetCreatorProps {
   form: IForm;
+  handleSave?: any;
 }
 
-const FieldSetCreator: FC<IFieldSetCreatorProps> = ({ form }) => {
+const FieldSetCreator: FC<IFieldSetCreatorProps> = ({ form, handleSave }) => {
   return (
     <Fieldset heading={form.label} id={form.name}>
-      <FormFieldCreator form={form.fieldSet as Array<IForm>} />
+      <FormFieldCreator form={form.fieldSet as Array<IForm>} handleSave={handleSave} />
     </Fieldset>
   );
 };

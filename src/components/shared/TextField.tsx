@@ -18,26 +18,24 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
   return (
     <Controller
       name={name}
-      control={control as Control<FieldValues>}
       rules={rules}
+      control={control as Control<FieldValues>}
       render={({ field: { onChange, value }, fieldState: { isDirty, error } }) => (
-        <>
-          <div className="input-wrapper" id={name} data-testid={name}>
-            <HDSTextInput
-              className="input-l"
-              placeholder={''}
-              label={label}
-              id={label}
-              value={value}
-              readOnly={readOnly}
-              onChange={onChange}
-              onBlur={isDirty ? handleSave : null}
-              required={required}
-              invalid={error ? true : false}
-              errorText={error?.message}
-            />
-          </div>
-        </>
+        <div className="input-wrapper" id={name} data-testid={name}>
+          <HDSTextInput
+            className="input-l"
+            placeholder={''}
+            label={label}
+            id={label}
+            value={value}
+            readOnly={readOnly}
+            onChange={onChange}
+            onBlur={isDirty ? handleSave : null}
+            required={required}
+            invalid={error ? true : false}
+            errorText={error?.message}
+          />
+        </div>
       )}
     />
   );
