@@ -67,6 +67,10 @@ const mockProjectCard: { data: IProjectCard } = {
     neighborhood: 'Kamppi',
     tiedCurrYear: '800.00',
     riskAssess: '50',
+    riskAssessment: {
+      id: '8fd009ef-ab34-492e-889c-9062a2b3fce8',
+      value: 'Placeholder risk',
+    },
     locked: false,
     comments: '',
     delays: '',
@@ -78,7 +82,7 @@ const mockProjectCard: { data: IProjectCard } = {
       id: '05b71287-bfab-4616-bdb5-94171722756b',
       value: 'K1',
     },
-    effectHousing: false
+    effectHousing: false,
   },
 };
 

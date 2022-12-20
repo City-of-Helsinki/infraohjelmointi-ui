@@ -8,6 +8,7 @@ import {
   getProjectTypes,
   getConstructionPhaseDetails,
   getProjectCategories,
+  getProjectRisks,
 } from '@/services/listServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -17,6 +18,7 @@ export interface IListState {
   area: Array<IListItem>;
   constructionPhaseDetail: Array<IListItem>;
   category: Array<IListItem>;
+  riskAssessment: Array<IListItem>;
   masterClass: Array<IListItem>;
   class: Array<IListItem>;
   subClass: Array<IListItem>;
@@ -32,6 +34,7 @@ const initialState: IListState = {
   area: [],
   constructionPhaseDetail: [],
   category: [],
+  riskAssessment: [],
   masterClass: [],
   class: [],
   subClass: [],
@@ -104,6 +107,12 @@ export const getProjectCategoriesThunk = createAsyncThunk(
   },
 );
 
+export const getProjectRisksThunk = createAsyncThunk('projectRisks/get', async (_, thunkAPI) => {
+  return await getProjectRisks()
+    .then((res) => res)
+    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+});
+
 export const listsSlice = createSlice({
   name: 'lists',
   initialState,
@@ -174,6 +183,19 @@ export const listsSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
+    // GET PROJECT RISKS
+    builder.addCase(
+      getProjectRisksThunk.fulfilled,
+      (state, action: PayloadAction<Array<IListItem>>) => {
+        return { ...state, riskAssessment: action.payload };
+      },
+    );
+    builder.addCase(
+      getProjectRisksThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
     // GET PROJECT QUALITIES
     builder.addCase(
       getProjectQualityLevelsThunk.fulfilled,
@@ -212,12 +234,6 @@ export const listsSlice = createSlice({
       getConstructionPhasesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
         return { ...state, constructionPhase: action.payload };
-      },
-    );
-    builder.addCase(
-      getConstructionPhasesThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
       },
     );
   },

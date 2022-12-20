@@ -102,6 +102,10 @@ const buildProjectCardBasicsFormFields = (
       name: 'effectHousing',
       type: FormField.RadioCheckbox,
     },
+    {
+      name: 'riskAssessment',
+      type: FormField.Select,
+    },
     // Schedule
     {
       name: 'schedule',
@@ -213,6 +217,7 @@ const useProjectCardBasicsValues = () => {
       gravel: projectCard?.gravel || false,
       category: listItemToOption(projectCard?.category, t),
       effectHousing: projectCard?.effectHousing || false,
+      riskAssessment: listItemToOption(projectCard?.riskAssessment, t),
       projectWorkQuantity: projectCard?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(projectCard?.projectQualityLevel, t),
       projectCostForecast: projectCard?.projectCostForecast,

@@ -43,6 +43,7 @@ export interface IProjectCard {
   neighborhood: string;
   tiedCurrYear: string;
   riskAssess: string;
+  riskAssessment: IListItem;
   priority: IListItem;
   locked: boolean;
   comments: string;
@@ -120,6 +121,7 @@ export interface IProjectCardRequest {
   budgetOverrunAmount?: string;
   category?: string | null;
   effectHousing?: boolean;
+  riskAssessment?: string | null;
 }
 
 export interface IProjectCardRequestObject {

@@ -50,6 +50,7 @@ export interface IProjectCardBasicsForm {
   gravel: boolean;
   category: IOption;
   effectHousing: boolean;
+  riskAssessment: IOption;
 }
 
 export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}

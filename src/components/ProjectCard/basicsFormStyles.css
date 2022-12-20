@@ -79,6 +79,9 @@
 .basic-info-form #effectHousing {
   grid-column: var(--grid-col-full);
 }
+.basic-info-form #riskAssessment {
+  grid-column: var(--grid-col-full);
+}
 /* elements inside custom-fieldset will take up the whole row */
 .basic-info-form .custom-fieldset {
   display: grid;
