@@ -74,6 +74,7 @@ export interface IProjectCard {
   louhi: boolean;
   gravel: boolean;
   category: IListItem;
+  effectHousing: boolean;
 }
 
 export interface IProjectCardRequest {
@@ -118,6 +119,7 @@ export interface IProjectCardRequest {
   budgetOverrunYear?: string;
   budgetOverrunAmount?: string;
   category?: string | null;
+  effectHousing?: boolean;
 }
 
 export interface IProjectCardRequestObject {

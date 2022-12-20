@@ -78,6 +78,7 @@ const mockProjectCard: { data: IProjectCard } = {
       id: '05b71287-bfab-4616-bdb5-94171722756b',
       value: 'K1',
     },
+    effectHousing: false
   },
 };
 
