@@ -17,6 +17,7 @@ import {
   getProjectQualityLevelsThunk,
   getProjectTypesThunk,
   getConstructionPhaseDetailsThunk,
+  getProjectCategoriesThunk,
 } from '@/reducers/listsSlice';
 
 const ProjectCardView = () => {
@@ -30,6 +31,7 @@ const ProjectCardView = () => {
     dispatch(getProjectPhasesThunk());
     dispatch(getProjectAreasThunk());
     dispatch(getConstructionPhaseDetailsThunk());
+    dispatch(getProjectCategoriesThunk());
     dispatch(getProjectQualityLevelsThunk());
     dispatch(getPlanningPhasesThunk());
     dispatch(getConstructionPhasesThunk());

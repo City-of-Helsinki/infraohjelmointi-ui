@@ -73,6 +73,7 @@ export interface IProjectCard {
   preliminaryCurrentYearPlus10?: string;
   louhi: boolean;
   gravel: boolean;
+  category: IListItem;
 }
 
 export interface IProjectCardRequest {
@@ -116,6 +117,7 @@ export interface IProjectCardRequest {
   spentCost?: string;
   budgetOverrunYear?: string;
   budgetOverrunAmount?: string;
+  category?: string | null;
 }
 
 export interface IProjectCardRequestObject {

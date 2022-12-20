@@ -20,7 +20,8 @@ export const listItemToOption = (
 export const booleanToString = (
   boolVal: boolean | undefined,
   translate?: TFunction<'translation'>,
-): string => ((typeof boolVal === 'boolean') && translate ? translate(`enums.${boolVal.toString()}`) : 'Ei')
+): string =>
+  typeof boolVal === 'boolean' && translate ? translate(`enums.${boolVal.toString()}`) : 'Ei';
 
 /**
  * Converts all empty string values from a form to null values. Useful when submitting forms,

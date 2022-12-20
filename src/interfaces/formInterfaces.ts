@@ -48,6 +48,7 @@ export interface IProjectCardBasicsForm {
   constructionPhaseDetail: IOption;
   louhi: boolean;
   gravel: boolean;
+  category: IOption;
 }
 
 export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}
