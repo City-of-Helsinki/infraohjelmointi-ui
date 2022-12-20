@@ -7,29 +7,37 @@ interface INumberFieldProps {
   name: string;
   label: string;
   control: HookFormControlType;
+  handleSave: any;
   rules?: HookFormRulesType;
   readOnly?: boolean;
 }
 
-const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readOnly }) => {
+const NumberField: FC<INumberFieldProps> = ({
+  name,
+  label,
+  control,
+  rules,
+  readOnly,
+  handleSave,
+}) => {
   const required = rules?.required ? true : false;
   return (
     <Controller
       name={name}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState }) => (
+      render={({ field: { onChange, value }, fieldState: { isDirty, error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
             className={`input-l`}
             label={label}
             id={label}
-            value={field.value || ''}
+            value={value || ''}
             readOnly={readOnly}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
+            onChange={onChange}
+            onBlur={isDirty ? handleSave : null}
             required={required}
-            invalid={fieldState.error ? true : false}
-            errorText={fieldState.error?.message}
+            invalid={error ? true : false}
+            errorText={error?.message}
           />
         </div>
       )}

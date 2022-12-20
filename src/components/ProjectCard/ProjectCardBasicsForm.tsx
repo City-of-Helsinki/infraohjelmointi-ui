@@ -5,11 +5,38 @@ import { FC, memo, useCallback } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
-import { patchProjectCardThunk, silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
+import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import './basicsFormStyles.css';
 import { RootState } from '@/store';
 import { emptyStringsToNull, getOptionId } from '@/utils/common';
+
+// const getObjectsDifferences = (obj1: any, obj2: any) => {
+//   const differences = [];
+
+//   for (const key of Object.keys(obj1)) {
+//     // eslint-disable-next-line no-prototype-builtins
+//     if (obj1[key].hasOwnProperty('value') && obj1[key].value !== obj2[key].value) {
+//       console.log('value found');
+//       differences.push({
+//         key: key,
+//         value: getOptionId(obj2[key]),
+//       });
+//     } else if (Array.isArray(obj1[key])) {
+//       console.log('was array');
+//       // differences.push({
+//       //   key: key,
+//       //   value: [...obj2[key]],
+//       // });
+//     } else if (obj1[key] !== obj2[key]) {
+//       differences.push({
+//         key: key,
+//         value: obj2[key],
+//       });
+//     }
+//   }
+//   return differences;
+// };
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();

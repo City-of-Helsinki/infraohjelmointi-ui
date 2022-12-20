@@ -8,12 +8,13 @@ import { useOptions } from '@/hooks/useOptions';
 interface ISelectFieldProps {
   name: ListType;
   label: string;
+  handleSave: any;
   options?: Array<IOption>;
   control: HookFormControlType;
   rules?: HookFormRulesType;
 }
 
-const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => {
+const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, handleSave }) => {
   const required = rules?.required ? true : false;
   const { options } = useOptions(name);
 
@@ -21,18 +22,18 @@ const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => 
     <Controller
       name={name}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState }) => {
+      render={({ field: { onChange, value }, fieldState: { isDirty, error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
             <HDSSelect
               className="input-l"
               label={label || ''}
               id={label}
-              invalid={fieldState.error ? true : false}
-              error={fieldState.error?.message}
-              onBlur={field.onBlur}
-              onChange={field.onChange}
-              value={field.value}
+              invalid={error ? true : false}
+              error={error?.message}
+              onBlur={isDirty ? handleSave : null}
+              onChange={onChange}
+              value={value}
               options={options}
               required={required}
             />

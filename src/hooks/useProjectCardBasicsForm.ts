@@ -163,7 +163,7 @@ const useProjectCardBasicsForm = () => {
   const { formValues, projectCard } = useProjectCardBasicsValues();
 
   const { control, handleSubmit, reset } = useForm<IProjectCardBasicsForm>({
-    defaultValues: formValues,
+    defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'all',
   });
 
