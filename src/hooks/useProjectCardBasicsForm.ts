@@ -76,9 +76,10 @@ const buildProjectCardBasicsFormFields = (
     {
       name: 'phase',
       type: FormField.Select,
+      rules: { required: 'Vaihe on pakollinen tieto.' },
     },
     {
-      name: 'phaseDetail',
+      name: 'constructionPhaseDetail',
       type: FormField.Select,
     },
     {

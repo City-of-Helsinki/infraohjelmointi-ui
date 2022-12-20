@@ -22,6 +22,13 @@ export const getProjectAreas = async () => {
     .catch((err: IError) => Promise.reject(err));
 };
 
+export const getConstructionPhaseDetails = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/construction-phases/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
 export const getProjectQualityLevels = async () => {
   return axios
     .get(`${process.env.REACT_APP_API_URL}/project-quality-levels/`)
