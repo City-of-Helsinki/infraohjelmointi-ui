@@ -96,6 +96,8 @@ export interface IProjectCardRequest {
   visibilityStart?: string;
   visibilityEnd?: string;
   constructionPhaseDetail?: string | null;
+  louhi?: boolean;
+  programmed?: boolean;
   favourite?: boolean;
   projectWorkQuantity?: string;
   projectCostForecast?: string;
