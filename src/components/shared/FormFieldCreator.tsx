@@ -35,7 +35,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form, handleSave }) => {
           case FormField.NetworkNumbers:
             return <NetworkNumbers {...formProps} />;
           case FormField.TagsForm:
-            return <HashTagsForm {...formProps} />;
+            return <HashTagsForm {...formPropsWithSave} />;
           case FormField.FieldSet:
             return <FieldSetCreator key={f.name} form={f} handleSave={handleSave} />;
           case FormField.Date:

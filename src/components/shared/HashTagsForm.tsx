@@ -115,15 +115,26 @@ interface IHashTagsFormProps {
   name: string;
   label: string;
   control: HookFormControlType;
+  handleSave: any;
 }
 
-const HashTagsForm: FC<IHashTagsFormProps> = ({ name, label, control }) => {
+const HashTagsForm: FC<IHashTagsFormProps> = ({ name, label, control, handleSave }) => {
+  const handleChangeAndSave = (onChange: (...event: unknown[]) => void, value: string[]) => {
+    onChange(value);
+    handleSave();
+  };
+
   return (
     <Controller
       name={name}
       control={control as Control<FieldValues>}
       render={({ field, fieldState }) => (
-        <HashTagsDialog {...field} {...fieldState} label={label} />
+        <HashTagsDialog
+          {...field}
+          {...fieldState}
+          label={label}
+          onChange={(val) => handleChangeAndSave(field.onChange, val)}
+        />
       )}
     />
   );
