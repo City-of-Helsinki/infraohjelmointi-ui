@@ -1,13 +1,17 @@
 import { DateInput as HDSDateInput } from 'hds-react/components/DateInput';
 import { FC, memo, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
-import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
+import {
+  FormSubmitEventType,
+  HookFormControlType,
+  HookFormRulesType,
+} from '@/interfaces/formInterfaces';
 
 interface IDateFieldProps {
   name: string;
   label: string;
   control: HookFormControlType;
-  handleSave: any;
+  handleSave: FormSubmitEventType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
 }
@@ -23,7 +27,7 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly,
 
   const handleChangeAndSave = (onChange: (...event: unknown[]) => void, value: string) => {
     onChange(value);
-    handleSave();
+    handleSave && handleSave();
   };
 
   return (

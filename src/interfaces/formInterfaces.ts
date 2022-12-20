@@ -60,3 +60,6 @@ export type HookFormRulesType = Omit<
   RegisterOptions<FieldValues, FieldPath<FieldValues>>,
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
+
+// Could this be typed better?
+export type FormSubmitEventType = (() => void) | undefined;

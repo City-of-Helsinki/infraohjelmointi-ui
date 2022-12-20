@@ -1,5 +1,5 @@
 import { ListType } from '@/interfaces/common';
-import { FormField, IForm } from '@/interfaces/formInterfaces';
+import { FormField, FormSubmitEventType, IForm } from '@/interfaces/formInterfaces';
 import { FC } from 'react';
 import DateField from './DateField';
 import FieldSetCreator from './FieldSetCreator';
@@ -12,7 +12,7 @@ import TextField from './TextField';
 
 interface IFormFieldCreatorProps {
   form: Array<IForm>;
-  handleSave?: any;
+  handleSave: FormSubmitEventType;
 }
 
 const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form, handleSave }) => {

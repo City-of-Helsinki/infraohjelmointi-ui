@@ -1,13 +1,17 @@
 import { TextInput as HDSTextInput } from 'hds-react/components/TextInput';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
-import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
+import {
+  FormSubmitEventType,
+  HookFormControlType,
+  HookFormRulesType,
+} from '@/interfaces/formInterfaces';
 
 interface ITextFieldProps {
   name: string;
   label: string;
   control: HookFormControlType;
-  handleSave: any;
+  handleSave: FormSubmitEventType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
 }
@@ -20,7 +24,7 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value }, fieldState: { isDirty, error } }) => (
+      render={({ field: { onChange, value, onBlur }, fieldState: { isDirty, error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextInput
             className="input-l"
@@ -30,7 +34,7 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
             value={value}
             readOnly={readOnly}
             onChange={onChange}
-            onBlur={isDirty ? handleSave : null}
+            onBlur={isDirty ? handleSave : onBlur}
             required={required}
             invalid={error ? true : false}
             errorText={error?.message}

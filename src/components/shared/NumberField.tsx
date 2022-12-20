@@ -1,13 +1,17 @@
 import { NumberInput as HDSNumberInput } from 'hds-react/components/NumberInput';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
-import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
+import {
+  FormSubmitEventType,
+  HookFormControlType,
+  HookFormRulesType,
+} from '@/interfaces/formInterfaces';
 
 interface INumberFieldProps {
   name: string;
   label: string;
   control: HookFormControlType;
-  handleSave: any;
+  handleSave: FormSubmitEventType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
 }
@@ -26,7 +30,7 @@ const NumberField: FC<INumberFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value }, fieldState: { isDirty, error } }) => (
+      render={({ field: { onChange, value, onBlur }, fieldState: { isDirty, error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
             className={`input-l`}
@@ -35,7 +39,7 @@ const NumberField: FC<INumberFieldProps> = ({
             value={value || ''}
             readOnly={readOnly}
             onChange={onChange}
-            onBlur={isDirty ? handleSave : null}
+            onBlur={isDirty ? handleSave : onBlur}
             required={required}
             invalid={error ? true : false}
             errorText={error?.message}

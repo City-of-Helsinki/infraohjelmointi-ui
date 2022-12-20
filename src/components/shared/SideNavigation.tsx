@@ -13,8 +13,8 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setActivePage = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (e: any) => {
       e.preventDefault();
       const hash = e.target.hash || e.target.parentElement.hash;

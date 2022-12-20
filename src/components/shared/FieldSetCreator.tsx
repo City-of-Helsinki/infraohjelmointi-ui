@@ -1,11 +1,11 @@
-import { IForm } from '@/interfaces/formInterfaces';
+import { FormSubmitEventType, IForm } from '@/interfaces/formInterfaces';
 import { Fieldset } from 'hds-react/components/Fieldset';
 import { FC } from 'react';
 import FormFieldCreator from './FormFieldCreator';
 
 interface IFieldSetCreatorProps {
   form: IForm;
-  handleSave?: any;
+  handleSave: FormSubmitEventType;
 }
 
 const FieldSetCreator: FC<IFieldSetCreatorProps> = ({ form, handleSave }) => {
