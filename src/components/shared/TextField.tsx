@@ -22,13 +22,8 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
   };
 
   // Autosave, if the initial value of the field has changed, otherwise do nothing
-  const handleAutoSave = (e: FocusEvent<HTMLInputElement>) => {
-    if (e.target.value === valueOnFocus) {
-      return;
-    } else {
-      handleSave();
-    }
-  };
+  const handleAutoSave = (e: FocusEvent<HTMLInputElement>) =>
+    e.target.value === valueOnFocus ? null : handleSave();
 
   return (
     <Controller
@@ -37,7 +32,7 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
       render={({ field, fieldState }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextInput
-            className={`input-l`}
+            className="input-l"
             placeholder={''}
             label={label}
             id={label}
