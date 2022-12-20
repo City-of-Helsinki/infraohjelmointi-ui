@@ -73,7 +73,13 @@
     "financialInformation": "Hankkeen kustannustiedot",
     "mainClass": "Pääluokka",
     "class": "Luokka",
-    "subClass": "Alaluokka"
+    "subClass": "Alaluokka",
+    "costForecast": "Hankkeen kustannus ja laatutaso",
+    "quality": "Laatutaso",
+    "quantity": "Suoritemäärä",
+    "actualInformation": "Toteumatiedot",
+    "rightOfWay": "Ylitysoikeus",
+    "preBreakdown": "kustannusarvion alustava jakautuminen"
   },
   "notification": {
     "title": {

@@ -58,6 +58,7 @@ const buildProjectCardBasicsFormFields = (
     {
       name: 'sapNetwork',
       type: FormField.NetworkNumbers,
+      readOnly: true,
     },
     {
       name: 'area',
@@ -96,7 +97,12 @@ const buildProjectCardBasicsFormFields = (
     { name: 'mainClass', type: FormField.Text },
     { name: 'class', type: FormField.Text },
     { name: 'subClass', type: FormField.Text },
-    { name: 'costForecast', type: FormField.Number },
+    { name: 'costForecast', type: FormField.Number, tooltip: 'keur' },
+    { name: 'quality', type: FormField.Text, hideLabel: true },
+    { name: 'quantity', type: FormField.Number, tooltip: 'm2' },
+    { name: 'actualInformation', type: FormField.NetworkNumbers },
+    { name: 'rightOfWay', type: FormField.Text, readOnly: true },
+    { name: 'preBreakdown', type: FormField.NetworkNumbers },
   ];
 
   const projectCardBasicsFormFields = formFields.map((formField) => ({

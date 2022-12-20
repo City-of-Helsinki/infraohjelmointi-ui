@@ -9,9 +9,10 @@ interface ITextFieldProps {
   control: HookFormControlType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
+  hideLabel?: boolean;
 }
 
-const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly }) => {
+const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly, hideLabel }) => {
   const required = rules?.required ? true : false;
   return (
     <Controller
@@ -29,6 +30,7 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly 
             required={required}
             invalid={error ? true : false}
             errorText={error?.message}
+            style={{ paddingTop: hideLabel ? '1.7rem' : '0' }}
           />
         </div>
       )}

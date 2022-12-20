@@ -4,16 +4,16 @@
   --grid-col-half-right: 13/25;
   --grid-col-small-left: 1/8;
   --grid-col-small-right: 8/15;
-  --grid-col-xs-right: 1/4;
+  --grid-col-xs-left: 1/4;
   --grid-col-xs-middle: 4/11;
-  --grid-col-xs-left: 11/14;
+  --grid-col-xs-right: 11/14;
 }
 
 .basic-info-form {
   display: grid;
   grid-template-columns: repeat(24, 1fr); /* repeat 24 rows with 1fr (fractional unit) */
   grid-auto-flow: row;
-  gap: 0rem var(--spacing-layout-s);
+  gap: 0rem var(--spacing-s);
   width: 85%;
   margin: 0 var(--spacing-2-xl) 0 0;
 }
@@ -110,4 +110,31 @@
 
 .basic-info-form #subClass {
   grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #costForecast {
+  grid-column: var(--grid-col-xs-left);
+}
+
+.basic-info-form #quality {
+  grid-column: var(--grid-col-xs-middle);
+}
+
+.basic-info-form #quantity {
+  grid-column: var(--grid-col-xs-right);
+}
+
+.basic-info-form #actualInformation {
+  grid-row: 15;
+  grid-column: var(--grid-col-full);
+}
+
+.basic-info-form #rightOfWay {
+  grid-row: 16;
+  grid-column: var(--grid-col-full);
+}
+
+.basic-info-form #preBreakdown {
+  grid-row: 17;
+  grid-column: var(--grid-col-full);
 }

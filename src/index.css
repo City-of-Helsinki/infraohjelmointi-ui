@@ -103,6 +103,10 @@ table p {
   margin-bottom: var(--spacing-l);
 }
 
+.input-wrapper label {
+  width: 250px;
+}
+
 .input-l {
   max-width: 22.5rem;
 }

@@ -9,9 +9,11 @@ interface INumberFieldProps {
   control: HookFormControlType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
+  tooltip?: string;
+  hideLabel?: boolean;
 }
 
-const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readOnly }) => {
+const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readOnly, tooltip }) => {
   const required = rules?.required ? true : false;
   return (
     <Controller
@@ -29,6 +31,7 @@ const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readO
             required={required}
             invalid={error ? true : false}
             errorText={error?.message}
+            helperText={tooltip}
           />
         </div>
       )}

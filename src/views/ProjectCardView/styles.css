@@ -128,4 +128,5 @@
 
 .pen-and-label-text {
   font-weight: 500;
+  width: auto !important;
 }
