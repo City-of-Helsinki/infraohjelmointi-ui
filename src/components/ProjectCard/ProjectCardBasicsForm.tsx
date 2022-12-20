@@ -5,7 +5,7 @@ import { FC, memo, useCallback } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
 import { Button } from 'hds-react/components/Button';
-import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
+import { patchProjectCardThunk, silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import './basicsFormStyles.css';
 import { RootState } from '@/store';
@@ -29,7 +29,7 @@ const ProjectCardBasicsForm: FC = () => {
       };
 
       if (projectId) {
-        dispatch(patchProjectCardThunk({ id: projectId, data }));
+        dispatch(silentPatchProjectCardThunk({ id: projectId, data }));
       }
     },
     [dispatch, projectId],
