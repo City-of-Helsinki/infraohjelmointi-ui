@@ -30,7 +30,7 @@ export interface IListItem {
   value: string;
 }
 
-export type ListType = 'type' | 'phase' | 'area';
+export type ListType = 'type' | 'phase' | 'area' | 'phaseDetail';
 
 export type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

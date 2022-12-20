@@ -28,7 +28,7 @@ const mockProjectCard: { data: IProjectCard } = {
     address: 'Address 1B 12',
     description: 'Hakaniementori description',
     programmed: true,
-    constructionPhaseDetail: '',
+    constructionPhaseDetail: { id: '3f72b5bd-4a32-4db9-b8bf-399c1de574cd', value: 'firstPhase' },
     estPlanningStart: '01.12.2022',
     estPlanningEnd: '02.12.2022',
     estConstructionStart: '03.12.2022',

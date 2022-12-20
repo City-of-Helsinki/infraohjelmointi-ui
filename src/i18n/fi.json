@@ -49,6 +49,12 @@
     "pasila": "Pasila",
     "ostersundom": "Östersundom",
     "kruunuvuorenranta": "Kruunuvuorenranta",
+    "true": "Kyllä",
+    "false": "Ei",
+    "preConstruction": "Esirakentaminen",
+    "firstPhase": "Ensimmäinen vaihe",
+    "firstPhaseComplete": "Ensimmäinen vaihe valmis",
+    "secondPhase": "Toinen vaihe / viimeistely",
     "1class": "1 luokka",
     "2class": "2 luokka",
     "3class": "3 luokka",
@@ -66,9 +72,7 @@
     "planning": "Suunnitteluvaiheen",
     "contractCalculation": "Urakkalaskentavaiheen",
     "additionalWork": "Urakkavaiheen sis. lisätyöt",
-    "reception": "Vastaanottovaiheen",
-    "true": "Kyllä",
-    "false": "Ei"
+    "reception": "Vastaanottovaiheen"
   },
   "projectCardBasicsForm": {
     "basics": "Hankkeen perustiedot",
@@ -96,6 +100,7 @@
     "programmed": "Ohjelmoitu",
     "true": "Kyllä",
     "false": "Ei",
+    "phaseDetail": "Rakentamisvaiheen tarkenne",
     "financial": "Hankkeen kustannustiedot",
     "masterClass": "Pääluokka",
     "class": "Luokka",

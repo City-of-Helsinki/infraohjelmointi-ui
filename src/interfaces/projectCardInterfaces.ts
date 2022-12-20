@@ -13,7 +13,7 @@ export interface IProjectCard {
   description: string;
   phase: IListItem;
   programmed: boolean;
-  constructionPhaseDetail: string;
+  constructionPhaseDetail: IListItem;
   estPlanningStart?: string;
   estPlanningEnd?: string;
   estConstructionStart?: string;

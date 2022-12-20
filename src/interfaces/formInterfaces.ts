@@ -45,6 +45,7 @@ export interface IProjectCardBasicsForm {
   hashTags: Array<string>;
   phase: IOption;
   programmed: boolean;
+  constructionPhaseDetail: IOption;
 }
 
 export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}

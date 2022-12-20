@@ -68,13 +68,17 @@ const buildProjectCardBasicsFormFields = (
       name: 'hashTags',
       type: FormField.TagsForm,
     },
-    //status
+    // Status
     {
       name: 'status',
       type: FormField.Title,
     },
     {
       name: 'phase',
+      type: FormField.Select,
+    },
+    {
+      name: 'phaseDetail',
       type: FormField.Select,
     },
     {
@@ -187,6 +191,7 @@ const useProjectCardBasicsValues = () => {
       visibilityEnd: projectCard?.visibilityEnd || '',
       phase: listItemToOption(projectCard?.phase, t),
       programmed: projectCard?.programmed || false,
+      constructionPhaseDetail: listItemToOption(projectCard?.constructionPhaseDetail, t),
       projectWorkQuantity: projectCard?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(projectCard?.projectQualityLevel, t),
       projectCostForecast: projectCard?.projectCostForecast,
