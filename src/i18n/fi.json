@@ -19,7 +19,8 @@
     "basics": "Hankkeen perustiedot",
     "navigateToForm": "Navigoi lomakkeeseen",
     "schedule": "Hankkeen aikataulu",
-    "financial": "Hankkeen kustannustiedot"
+    "financial": "Hankkeen kustannustiedot",
+    "status": "Hankkeen tila"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
