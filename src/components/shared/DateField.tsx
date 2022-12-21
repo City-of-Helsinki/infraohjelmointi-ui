@@ -52,7 +52,6 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly,
               required={required}
               invalid={error ? true : false}
               errorText={error?.message}
-              onButtonClick={() => console.log('button click')}
             />
           </div>
         );

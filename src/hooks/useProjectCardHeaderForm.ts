@@ -37,22 +37,21 @@ const useProjectCardHeaderValues = () => {
 };
 
 /**
- * This hook initializes a react-hook-form control for a project card basics form. It will keep the
+ * This hook initializes a react-hook-form control for a project card header form. It will keep the
  * form up to date with the selectedProjectCard from redux and return all needed functions to handle
  * the form.
  *
- * It will also return formFields, which can be passed to the FormFieldCreator component to generate
- * the visual form.
- *
- * @returns handleSubmit, control
+ * @returns handleSubmit, control, dirtyFields
  */
 const useProjectCardHeaderForm = () => {
   const { formValues, projectCard } = useProjectCardHeaderValues();
 
-  const { control, handleSubmit, reset } = useForm<IProjectCardHeaderForm>({
+  const { control, handleSubmit, reset, formState } = useForm<IProjectCardHeaderForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'all',
   });
+
+  const { dirtyFields } = formState;
 
   // Updates
   useEffect(() => {
@@ -62,7 +61,7 @@ const useProjectCardHeaderForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectCard, formValues]);
 
-  return { handleSubmit, control };
+  return { handleSubmit, control, dirtyFields };
 };
 
 export default useProjectCardHeaderForm;

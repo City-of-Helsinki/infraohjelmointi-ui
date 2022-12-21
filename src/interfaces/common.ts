@@ -17,10 +17,11 @@ export interface IOption {
 }
 
 export interface INotification {
-  message: string;
+  message?: string;
   type?: NotificationType;
   status?: string;
   title?: string;
+  duration?: number;
 }
 
 export interface IListItem {

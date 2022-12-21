@@ -82,6 +82,7 @@ export interface IProjectCardRequest {
   presenceEnd?: string;
   visibilityStart?: string;
   visibilityEnd?: string;
+  favourite?: boolean;
 }
 
 export interface IProjectCardRequestObject {

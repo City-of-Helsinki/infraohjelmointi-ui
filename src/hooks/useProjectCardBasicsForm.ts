@@ -155,7 +155,7 @@ const useProjectCardBasicsValues = () => {
  * It will also return formFields, which can be passed to the FormFieldCreator component to generate
  * the visual form.
  *
- * @returns handleSubmit, reset, formFields
+ * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectCardBasicsForm = () => {
   const { t } = useTranslation();
@@ -163,9 +163,14 @@ const useProjectCardBasicsForm = () => {
   const { formValues, projectCard } = useProjectCardBasicsValues();
 
   const { control, handleSubmit, reset, formState } = useForm<IProjectCardBasicsForm>({
-    defaultValues: formValues,
+    defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'all',
   });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const formFields = useMemo(() => buildProjectCardBasicsFormFields(control, t), [control]);
+
+  const { dirtyFields } = formState;
 
   // Updates
   useEffect(() => {
@@ -175,10 +180,7 @@ const useProjectCardBasicsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectCard, formValues]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const formFields = useMemo(() => buildProjectCardBasicsFormFields(control, t), [control]);
-
-  return { handleSubmit, reset, formFields, formState };
+  return { handleSubmit, reset, formFields, dirtyFields };
 };
 
 export default useProjectCardBasicsForm;

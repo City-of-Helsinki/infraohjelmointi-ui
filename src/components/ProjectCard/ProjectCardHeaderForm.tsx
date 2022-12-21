@@ -2,7 +2,12 @@ import { FC, useCallback } from 'react';
 import { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { Paragraph, ProgressCircle } from '@/components/shared';
-import { emptyStringsToNull, getOptionId } from '@/utils/common';
+import {
+  dirtyFieldsToRequestObject,
+  emptyStringsToNull,
+  getOptionId,
+  objectHasProperty,
+} from '@/utils/common';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { SubmitHandler } from 'react-hook-form';
@@ -33,30 +38,24 @@ const ProjectCardHeaderForm: FC = () => {
   const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
 
-  const { control, handleSubmit } = useProjectCardHeaderForm();
+  const { control, handleSubmit, dirtyFields } = useProjectCardHeaderForm();
 
   const onSubmit: SubmitHandler<IProjectCardHeaderForm> = useCallback(
     async (form: IProjectCardHeaderForm) => {
-      const { favourite, phase, ...formData } = emptyStringsToNull(
-        form as IAppForms,
-      ) as IProjectCardHeaderForm;
+      const data: IProjectCardRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
-      // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
-      const favPersons = Array.from(
-        new Set<string>([...(projectCard?.favPersons || []), user?.id || '']),
-      ).filter((fp) => (!favourite ? fp !== user?.id : fp));
+      if (objectHasProperty(data, 'favourite')) {
+        // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
+        data.favPersons = Array.from(
+          new Set<string>([...(projectCard?.favPersons || []), user?.id || '']),
+        ).filter((fp) => (!form.favourite ? fp !== user?.id : fp));
 
-      const data: IProjectCardRequest = {
-        ...formData,
-        favPersons,
-        phase: getOptionId(phase),
-      };
-
-      if (projectId) {
-        await dispatch(silentPatchProjectCardThunk({ id: projectId, data: data }));
+        delete data.favourite;
       }
+
+      projectId && (await dispatch(silentPatchProjectCardThunk({ id: projectId, data: data })));
     },
-    [projectCard?.favPersons, projectId, user?.id, dispatch],
+    [projectCard?.favPersons, projectId, user?.id, dispatch, dirtyFields],
   );
 
   const formFieldProps = { control, handleSave: handleSubmit(onSubmit) };

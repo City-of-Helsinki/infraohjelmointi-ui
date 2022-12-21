@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface INotificationState extends INotification {
   id: number;
   color: NotificationColorType;
+  duration?: number;
 }
 const initialState: Array<INotificationState> = [];
 

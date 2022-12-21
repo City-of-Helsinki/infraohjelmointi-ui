@@ -18,7 +18,6 @@ interface ITextFieldProps {
 
 const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly, handleSave }) => {
   const required = rules?.required ? true : false;
-
   return (
     <Controller
       name={name}

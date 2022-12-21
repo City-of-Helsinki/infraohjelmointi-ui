@@ -18,12 +18,12 @@ const Notification: FC = () => {
           {notifications.map((n) => (
             <div key={n.id} className="notification-wrapper">
               <HDSNotification
-                label={t(`notification.title.${n.title}`)}
+                label={n?.title && t(`notification.title.${n.title}`)}
                 type={n.color}
                 dismissible
                 position={n.type === 'toast' ? 'top-right' : 'inline'}
                 autoClose={n.type === 'toast'}
-                autoCloseDuration={2500}
+                autoCloseDuration={n.duration}
                 closeButtonLabelText={t('closeNotification') || ''}
                 onClose={() => dispatch(clearNotification(n.id || 0))}
               >
