@@ -39,7 +39,7 @@ import { emptyStringsToNull, getOptionId } from '@/utils/common';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
-  const { handleSubmit, formFields } = useProjectCardBasicsForm();
+  const { handleSubmit, formFields, formState } = useProjectCardBasicsForm();
   const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
 
   const onSubmit: SubmitHandler<IProjectCardBasicsForm> = useCallback(
@@ -47,6 +47,8 @@ const ProjectCardBasicsForm: FC = () => {
       const { type, area, ...formData } = emptyStringsToNull(
         form as IAppForms,
       ) as IProjectCardBasicsForm;
+
+      console.log('formsate: ', formState);
 
       const data: IProjectCardRequest = {
         ...formData,
@@ -65,7 +67,7 @@ const ProjectCardBasicsForm: FC = () => {
     <div className="basics-form">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="basic-info-form">
-          <FormFieldCreator form={formFields} handleSave={handleSubmit(onSubmit)} />
+          {formFields && <FormFieldCreator form={formFields} handleSave={handleSubmit(onSubmit)} />}
         </div>
       </form>
     </div>

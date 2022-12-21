@@ -10,6 +10,7 @@ import { mockTags } from '@/mocks/common';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
 import { screen } from '@testing-library/react';
+import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -196,10 +197,9 @@ describe('ProjectCardBasicsForm', () => {
     await clearAndType(estConstructionStart, '19.12.2022');
     await clearAndType(estConstructionEnd, '20.12.2022');
 
-    // Click the send button
-    await user.click(getByRole('button', { name: 'Tallenna perustiedot' }));
-
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+
+    debug(formPatchRequest);
 
     // Check axios values
     expect(formPatchRequest.description).toEqual(responseProjectCard.description);

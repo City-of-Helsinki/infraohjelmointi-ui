@@ -160,25 +160,17 @@ const useProjectCardBasicsValues = () => {
 const useProjectCardBasicsForm = () => {
   const { t } = useTranslation();
 
-  const { formValues, projectCard } = useProjectCardBasicsValues();
+  const { formValues } = useProjectCardBasicsValues();
 
-  const { control, handleSubmit, reset } = useForm<IProjectCardBasicsForm>({
-    defaultValues: useMemo(() => formValues, [formValues]),
+  const { control, handleSubmit, reset, formState } = useForm<IProjectCardBasicsForm>({
+    defaultValues: formValues,
     mode: 'all',
   });
-
-  // Updates
-  useEffect(() => {
-    if (projectCard) {
-      reset(formValues);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectCard, formValues]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const formFields = useMemo(() => buildProjectCardBasicsFormFields(control, t), [control]);
 
-  return { handleSubmit, reset, formFields };
+  return { handleSubmit, reset, formFields, formState };
 };
 
 export default useProjectCardBasicsForm;
