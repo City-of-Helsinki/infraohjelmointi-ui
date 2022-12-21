@@ -29,7 +29,6 @@ export interface IProjectCardHeaderForm {
   favourite: boolean;
   name: string;
   address?: string;
-  group: string;
 }
 
 export interface IProjectCardBasicsForm {

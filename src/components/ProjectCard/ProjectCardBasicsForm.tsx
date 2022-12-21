@@ -4,7 +4,6 @@ import { IAppForms, IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
-import { Button } from 'hds-react/components/Button';
 import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import './basicsFormStyles.css';
@@ -68,7 +67,6 @@ const ProjectCardBasicsForm: FC = () => {
         <div className="basic-info-form">
           <FormFieldCreator form={formFields} handleSave={handleSubmit(onSubmit)} />
         </div>
-        <Button type="submit">Tallenna perustiedot</Button>
       </form>
     </div>
   );

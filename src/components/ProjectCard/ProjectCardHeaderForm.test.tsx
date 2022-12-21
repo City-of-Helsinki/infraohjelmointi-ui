@@ -1,6 +1,6 @@
 import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
-import ProjectCardHeader from './ProjectCardHeader';
+import ProjectCardHeaderForm from './ProjectCardHeaderForm';
 import axios from 'axios';
 import { setupStore } from '@/store';
 import mockProjectCard from '@/mocks/mockProjectCard';
@@ -13,7 +13,7 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('ProjectCardHeader', () => {
+describe('ProjectCardHeaderForm', () => {
   const store = setupStore({
     projectCard: {
       projectCards: [mockProjectCard.data as IProjectCard],
@@ -29,7 +29,7 @@ describe('ProjectCardHeader', () => {
   });
 
   it('renders all component wrappers', () => {
-    const { container } = renderWithProviders(<ProjectCardHeader />, { store });
+    const { container } = renderWithProviders(<ProjectCardHeaderForm />, { store });
 
     expect(container.getElementsByClassName('project-card-header-container').length).toBe(1);
     expect(container.getElementsByClassName('left').length).toBe(1);
@@ -41,7 +41,7 @@ describe('ProjectCardHeader', () => {
   });
 
   it('renders all left side elements', async () => {
-    const { getByRole, getByText } = renderWithProviders(<ProjectCardHeader />, { store });
+    const { getByRole, getByText } = renderWithProviders(<ProjectCardHeaderForm />, { store });
 
     const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
     const { projectReadiness, name, phase } = projectCard;
@@ -54,9 +54,12 @@ describe('ProjectCardHeader', () => {
   });
 
   it('project name can be edited by clicking the edit button', async () => {
-    const { getByRole, queryByRole, getAllByRole } = renderWithProviders(<ProjectCardHeader />, {
-      store,
-    });
+    const { getByRole, queryByRole, getAllByRole } = renderWithProviders(
+      <ProjectCardHeaderForm />,
+      {
+        store,
+      },
+    );
     const user = userEvent.setup();
 
     // TODO: this needs to be tested better
@@ -67,7 +70,7 @@ describe('ProjectCardHeader', () => {
   });
 
   it('renders all right side elements', async () => {
-    const { getByRole, getByText, container } = renderWithProviders(<ProjectCardHeader />, {
+    const { getByRole, getByText, container } = renderWithProviders(<ProjectCardHeaderForm />, {
       store,
     });
 
@@ -78,7 +81,7 @@ describe('ProjectCardHeader', () => {
   });
 
   it('can add and remove favourites', async () => {
-    const { getByRole } = renderWithProviders(<ProjectCardHeader />, { store });
+    const { getByRole } = renderWithProviders(<ProjectCardHeaderForm />, { store });
     const user = userEvent.setup();
 
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
@@ -87,7 +90,7 @@ describe('ProjectCardHeader', () => {
   });
 
   it('can patch the header form', async () => {
-    const { getByRole, user, getByText } = renderWithProviders(<ProjectCardHeader />, {
+    const { getByRole, user, getByText } = renderWithProviders(<ProjectCardHeaderForm />, {
       store,
     });
 

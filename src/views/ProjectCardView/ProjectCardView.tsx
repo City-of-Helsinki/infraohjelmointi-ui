@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
 import { ProjectCardBasics } from '@/components/ProjectCard';
 import { useTranslation } from 'react-i18next';
-import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeader';
+import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeaderForm';
 import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
 import './styles.css';
 import {

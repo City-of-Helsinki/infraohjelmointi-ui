@@ -4,12 +4,16 @@ import { TFunction } from 'i18next';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
 
+export const removeDotsFromString = (value: string) => value.replace('.', '');
+
 export const listItemToOption = (
   listItem: IListItem | undefined,
   translate?: TFunction<'translation'>,
 ): IOption => ({
   label:
-    listItem?.value && translate ? translate(`enums.${listItem?.value}`) : listItem?.value || '',
+    listItem?.value && translate
+      ? translate(`enums.${removeDotsFromString(listItem?.value)}`)
+      : listItem?.value || '',
   value: listItem?.id || '',
 });
 
