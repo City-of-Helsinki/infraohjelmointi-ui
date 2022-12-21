@@ -87,6 +87,34 @@ const buildProjectCardBasicsFormFields = (
       type: FormField.RadioCheckbox,
     },
     {
+      name: 'planningStartYear',
+      type: FormField.Number,
+      rules: {
+        min: {
+          value: 0,
+          message: 'Arvon on oltava suurempi tai yhtä suuri kuin 0',
+        },
+        max: {
+          value: 3000,
+          message: 'Arvon on oltava pienempi tai yhtä suuri kuin 3000',
+        },
+      },
+    },
+    {
+      name: 'constructionEndYear',
+      type: FormField.Number,
+      rules: {
+        min: {
+          value: 0,
+          message: 'Arvon on oltava suurempi tai yhtä suuri kuin 0',
+        },
+        max: {
+          value: 3000,
+          message: 'Arvon on oltava pienempi tai yhtä suuri kuin 3000',
+        },
+      },
+    },
+    {
       name: 'louhi',
       type: FormField.RadioCheckbox,
     },
@@ -218,6 +246,8 @@ const useProjectCardBasicsValues = () => {
       category: listItemToOption(projectCard?.category, t),
       effectHousing: projectCard?.effectHousing || false,
       riskAssessment: listItemToOption(projectCard?.riskAssessment, t),
+      constructionEndYear: projectCard?.constructionEndYear || '',
+      planningStartYear: projectCard?.planningStartYear || '',
       projectWorkQuantity: projectCard?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(projectCard?.projectQualityLevel, t),
       projectCostForecast: projectCard?.projectCostForecast,

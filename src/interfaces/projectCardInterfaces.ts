@@ -76,6 +76,8 @@ export interface IProjectCard {
   gravel: boolean;
   category: IListItem;
   effectHousing: boolean;
+  constructionEndYear: string;
+  planningStartYear: string;
 }
 
 export interface IProjectCardRequest {
@@ -122,6 +124,8 @@ export interface IProjectCardRequest {
   category?: string | null;
   effectHousing?: boolean;
   riskAssessment?: string | null;
+  constructionEndYear?: string;
+  planningStartYear?: string;
 }
 
 export interface IProjectCardRequestObject {

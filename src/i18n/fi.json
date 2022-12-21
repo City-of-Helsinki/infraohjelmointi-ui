@@ -110,7 +110,6 @@
     "status": "Hankkeen tila",
     "phase": "Hankkeen vaihe",
     "programmed": "Ohjelmoitu",
-
     "true": "Kyllä",
     "false": "Ei",
     "constructionPhaseDetail": "Rakentamisvaiheen tarkenne",
@@ -119,6 +118,8 @@
     "category": "Kategoria",
     "effectHousing": "Vaikutus asuntotuotantoon",
     "riskAssessment": "Riskiarvio",
+    "planningStartYear": "Suunnittelun aloitusvuosi",
+    "constructionEndYear": "Rakentamisen valmistumisvuosi",
     "phaseDetail": "Rakentamisvaiheen tarkenne",
     "financial": "Hankkeen kustannustiedot",
     "masterClass": "Pääluokka",

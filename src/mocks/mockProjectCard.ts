@@ -83,6 +83,8 @@ const mockProjectCard: { data: IProjectCard } = {
       value: 'K1',
     },
     effectHousing: false,
+    constructionEndYear: '2025',
+    planningStartYear: '2022'
   },
 };
 

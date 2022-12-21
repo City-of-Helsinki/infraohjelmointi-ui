@@ -67,6 +67,12 @@
 .basic-info-form #programmed {
   grid-column: var(--grid-col-full);
 }
+.basic-info-form #planningStartYear {
+  grid-column: var(--grid-col-full);
+}
+.basic-info-form #constructionEndYear {
+  grid-column: var(--grid-col-full);
+}
 .basic-info-form #louhi {
   grid-column: var(--grid-col-full);
 }

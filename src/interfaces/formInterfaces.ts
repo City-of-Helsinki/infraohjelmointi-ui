@@ -51,6 +51,8 @@ export interface IProjectCardBasicsForm {
   category: IOption;
   effectHousing: boolean;
   riskAssessment: IOption;
+  constructionEndYear: string;
+  planningStartYear: string;
 }
 
 export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}
