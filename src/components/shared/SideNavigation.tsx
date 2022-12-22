@@ -10,6 +10,7 @@ interface ISideNavigationProps {
 
 const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   const [active, setActive] = useState('#basics');
+
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -39,15 +40,17 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   );
 
   return (
-    <HDSSideNavigation
-      id="side-navigation"
-      toggleButtonLabel={t('nav.navigateToForm')}
-      className="side-nav"
-    >
-      {hdsNavItems.map((s) => (
-        <HDSSideNavigation.MainLevel {...s} key={s.href} />
-      ))}
-    </HDSSideNavigation>
+    <>
+      <HDSSideNavigation
+        id="side-navigation"
+        toggleButtonLabel={t('nav.navigateToForm')}
+        className="side-nav"
+      >
+        {hdsNavItems.map((s) => (
+          <HDSSideNavigation.MainLevel {...s} key={s.href} />
+        ))}
+      </HDSSideNavigation>
+    </>
   );
 };
 

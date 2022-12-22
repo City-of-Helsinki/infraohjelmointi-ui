@@ -77,10 +77,27 @@
   display: flex;
   flex: 1;
   justify-content: center;
-  height: 100vh;
+  height: 0.1rem;
   position: sticky;
   top: 0;
   transform: translateY(4rem);
+}
+
+.side-panel .side-panel-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-panel-container .nav-container {
+  display: flex;
+  justify-content: center;
+}
+
+.side-panel-container .label-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 .project-card-content-container .form-panel {

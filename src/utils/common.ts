@@ -67,3 +67,6 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
 
   return data;
 };
+
+export const getCurrentTime = () =>
+  new Intl.DateTimeFormat('en-GB', { timeStyle: 'medium' }).format(new Date());

@@ -11,6 +11,7 @@ import {
   postProjectCard,
 } from '@/services/projectCardServices';
 import { RootState } from '@/store';
+import { getCurrentTime } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
 
@@ -20,6 +21,7 @@ interface IProjectCardState {
   count: number | null;
   page: number;
   error: IError | null | unknown;
+  updated: string | null;
 }
 
 const initialState: IProjectCardState = {
@@ -28,6 +30,7 @@ const initialState: IProjectCardState = {
   count: null,
   error: null,
   page: 0,
+  updated: null,
 };
 
 export const getProjectCardsThunk = createAsyncThunk(
@@ -159,7 +162,7 @@ export const projectCardSlice = createSlice({
     builder.addCase(
       silentPatchProjectCardThunk.fulfilled,
       (state, action: PayloadAction<IProjectCard>) => {
-        return { ...state, selectedProjectCard: action.payload };
+        return { ...state, selectedProjectCard: action.payload, updated: getCurrentTime() };
       },
     );
     builder.addCase(

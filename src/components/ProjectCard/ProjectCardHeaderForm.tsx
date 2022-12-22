@@ -2,12 +2,7 @@ import { FC, useCallback } from 'react';
 import { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { Paragraph, ProgressCircle } from '@/components/shared';
-import {
-  dirtyFieldsToRequestObject,
-  emptyStringsToNull,
-  getOptionId,
-  objectHasProperty,
-} from '@/utils/common';
+import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { SubmitHandler } from 'react-hook-form';
