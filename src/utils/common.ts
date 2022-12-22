@@ -38,7 +38,7 @@ export const objectHasProperty = (obj: object, prop: string) =>
   Object.prototype.hasOwnProperty.call(obj, prop);
 
 export const isOption = (obj: object) =>
-  objectHasProperty(obj, 'label') && objectHasProperty(obj, 'label');
+  objectHasProperty(obj, 'label') && objectHasProperty(obj, 'value');
 
 /**
  *
