@@ -16,15 +16,17 @@ const ProjectCardPhaseField: FC<IProjectCardHeaderFieldProps> = ({ control, hand
       name="phase"
       control={control as Control<FieldValues>}
       render={({ field: { value, onChange, onBlur }, fieldState: { isDirty } }) => (
-        <Select
-          label={null}
-          value={value}
-          icon={icon}
-          placeholder={t('projectPhase') || ''}
-          onBlur={isDirty ? handleSave : onBlur}
-          options={options}
-          onChange={onChange}
-        />
+        <div data-testid="project-card-phase">
+          <Select
+            label={null}
+            value={value}
+            icon={icon}
+            placeholder={t('projectPhase') || ''}
+            onBlur={isDirty ? handleSave : onBlur}
+            options={options}
+            onChange={onChange}
+          />
+        </div>
       )}
     />
   );

@@ -25,6 +25,7 @@ const mockProjectCard: { data: IProjectCard } = {
     entityName: 'Hakaniementori entity name',
     sapNetwork: ['17b75067-42b6-42b9-b21a-7873093f84d0'],
     name: 'Hakaniementori',
+    address: 'Address 1B 12',
     description: 'Hakaniementori description',
     programmed: true,
     constructionPhaseDetail: '',
