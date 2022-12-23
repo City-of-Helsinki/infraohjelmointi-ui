@@ -5,7 +5,7 @@ import DateField from './DateField';
 import FieldSetCreator from './FieldSetCreator';
 import FormSectionTitle from './FormSectionTitle';
 import HashTagsForm from './HashTagsForm';
-import NetworkNumbers from './NetworkNumbers';
+import ListField from './ListField';
 import NumberField from './NumberField';
 import SelectField from './SelectField';
 import TextField from './TextField';
@@ -30,8 +30,8 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <NumberField {...formProps} />;
           case FormField.Title:
             return <FormSectionTitle {...formProps} />;
-          case FormField.NetworkNumbers:
-            return <NetworkNumbers {...formProps} />;
+          case FormField.ListField:
+            return <ListField {...formProps} />;
           case FormField.TagsForm:
             return <HashTagsForm {...formProps} />;
           case FormField.FieldSet:

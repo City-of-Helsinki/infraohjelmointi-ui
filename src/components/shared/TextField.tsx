@@ -25,12 +25,13 @@ const TextField: FC<ITextFieldProps> = ({ name, label, control, rules, readOnly,
             className="input-l"
             {...field}
             label={label}
+            hideLabel={hideLabel}
             id={label}
             readOnly={readOnly}
             required={required}
             invalid={error ? true : false}
             errorText={error?.message}
-            style={{ paddingTop: hideLabel ? '1.7rem' : '0' }}
+            style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
           />
         </div>
       )}

@@ -5,7 +5,7 @@ export enum FormField {
   Select,
   Text,
   Number,
-  NetworkNumbers,
+  ListField,
   TagsForm,
   Title,
   FieldSet,

@@ -5,7 +5,14 @@ import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectCardBasicsForm from './ProjectCardBasicsForm';
 import { matchExact } from '@/utils/common';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
-import { mockProjectAreas, mockProjectPhases, mockProjectTypes } from '@/mocks/mockLists';
+import {
+  mockConstructionPhases,
+  mockPlanningPhases,
+  mockProjectAreas,
+  mockProjectPhases,
+  mockProjectQualityLevels,
+  mockProjectTypes,
+} from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
@@ -43,6 +50,12 @@ describe('ProjectCardBasicsForm', () => {
               area: mockProjectAreas.data,
               phase: mockProjectPhases.data,
               type: mockProjectTypes.data,
+              masterClass: [],
+              class: [],
+              subClass: [],
+              projectQualityLevel: mockProjectQualityLevels.data,
+              planningPhase: mockPlanningPhases.data,
+              constructionPhase: mockConstructionPhases.data,
               error: {},
             },
           },

@@ -100,7 +100,7 @@
   grid-column: var(--grid-col-small-right);
 }
 
-.basic-info-form #mainClass {
+.basic-info-form #masterClass {
   grid-column: var(--grid-col-half-left);
 }
 
@@ -112,29 +112,50 @@
   grid-column: var(--grid-col-small-right);
 }
 
-.basic-info-form #costForecast {
+.basic-info-form #projectCostForecast {
   grid-column: var(--grid-col-xs-left);
 }
 
-.basic-info-form #quality {
+.basic-info-form #projectQualityLevel {
   grid-column: var(--grid-col-xs-middle);
 }
 
-.basic-info-form #quantity {
+.basic-info-form #projectWorkQuantity {
   grid-column: var(--grid-col-xs-right);
 }
 
-.basic-info-form #actualInformation {
-  grid-row: 15;
+.basic-info-form #planningCostForecast {
+  grid-column: var(--grid-col-xs-left);
+}
+
+.basic-info-form #planningPhase {
+  grid-column: var(--grid-col-xs-middle);
+}
+
+.basic-info-form #planningWorkQuantity {
+  grid-column: var(--grid-col-xs-right);
+}
+
+.basic-info-form #constructionCostForecast {
+  grid-column: var(--grid-col-xs-left);
+}
+
+.basic-info-form #constructionPhase {
+  grid-column: var(--grid-col-xs-middle);
+}
+
+.basic-info-form #constructionWorkQuantity {
+  grid-column: var(--grid-col-xs-right);
+}
+
+.basic-info-form #realizedCosts {
   grid-column: var(--grid-col-full);
 }
 
-.basic-info-form #rightOfWay {
-  grid-row: 16;
+.basic-info-form #overrunRight {
   grid-column: var(--grid-col-full);
 }
 
-.basic-info-form #preBreakdown {
-  grid-row: 17;
+.basic-info-form #preliminaryBudgetDivision {
   grid-column: var(--grid-col-full);
 }

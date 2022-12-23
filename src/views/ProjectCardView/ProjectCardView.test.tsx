@@ -1,14 +1,24 @@
 import mockI18next from '@/mocks/mockI18next';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import mockProjectCard from '@/mocks/mockProjectCard';
 import ProjectCardView from './ProjectCardView';
 import { getProjectCardThunk } from '@/reducers/projectCardSlice';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
-import { mockProjectAreas, mockProjectPhases, mockProjectTypes } from '@/mocks/mockLists';
 import {
+  mockConstructionPhases,
+  mockPlanningPhases,
+  mockProjectAreas,
+  mockProjectPhases,
+  mockProjectQualityLevels,
+  mockProjectTypes,
+} from '@/mocks/mockLists';
+import {
+  getConstructionPhasesThunk,
+  getPlanningPhasesThunk,
   getProjectAreasThunk,
   getProjectPhasesThunk,
+  getProjectQualityLevelsThunk,
   getProjectTypesThunk,
 } from '@/reducers/listsSlice';
 import { RenderResult } from '@testing-library/react';
@@ -38,6 +48,15 @@ describe('ProjectCardView', () => {
 
     mockedAxios.get.mockResolvedValue(mockProjectPhases);
     await store.dispatch(getProjectPhasesThunk());
+
+    mockedAxios.get.mockResolvedValue(mockProjectQualityLevels);
+    await store.dispatch(getProjectQualityLevelsThunk());
+
+    mockedAxios.get.mockResolvedValue(mockPlanningPhases);
+    await store.dispatch(getPlanningPhasesThunk());
+
+    mockedAxios.get.mockResolvedValue(mockConstructionPhases);
+    await store.dispatch(getConstructionPhasesThunk());
 
     await act(async () => (renderResult = renderWithProviders(<ProjectCardView />, { store })));
   });

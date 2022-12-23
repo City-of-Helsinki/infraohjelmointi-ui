@@ -22,14 +22,26 @@ export interface IProjectCard {
   presenceEnd?: string;
   visibilityStart?: string;
   visibilityEnd?: string;
+  projectWorkQuantity: string;
+  projectCostForecast: string;
+  projectQualityLevel: IListItem;
+  planningCostForecast?: string;
+  planningPhase?: IListItem;
+  planningWorkQuantity?: string;
+  constructionCostForecast?: string;
+  constructionPhase?: IListItem;
+  constructionWorkQuantity?: string;
+  budget?: string;
+  realizedCost?: string;
+  comittedCost?: string;
+  spentCost?: string;
+  budgetOverrunYear?: string;
+  budgetOverrunAmount?: string;
   perfAmount: string;
   unitCost: string;
   costForecast: string;
   neighborhood: string;
-  comittedCost: string;
   tiedCurrYear: string;
-  realizedCost: string;
-  spentCost: string;
   riskAssess: string;
   priority: IListItem;
   locked: boolean;
@@ -83,6 +95,21 @@ export interface IProjectCardRequest {
   visibilityStart?: string;
   visibilityEnd?: string;
   favourite?: boolean;
+  projectWorkQuantity?: string;
+  projectCostForecast?: string;
+  projectQualityLevel?: IListItem;
+  planningCostForecast?: string;
+  planningPhase?: IListItem;
+  planningWorkQuantity?: string;
+  constructionCostForecast?: string;
+  constructionPhase?: IListItem;
+  constructionWorkQuantity?: string;
+  budget?: string;
+  realizedCost?: string;
+  comittedCost?: string;
+  spentCost?: string;
+  budgetOverrunYear?: string;
+  budgetOverrunAmount?: string;
 }
 
 export interface IProjectCardRequestObject {
