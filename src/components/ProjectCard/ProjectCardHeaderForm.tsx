@@ -11,7 +11,6 @@ import useProjectCardHeaderForm from '@/hooks/useProjectCardHeaderForm';
 import ProjectCardPhaseField from './ProjectCardPhaseField';
 import ProjectCardFavouriteField from './ProjectCardFavouriteField';
 import {
-  FormSubmitEventType,
   HookFormControlType,
   IAppForms,
   IProjectCardHeaderForm,
@@ -20,7 +19,7 @@ import _ from 'lodash';
 
 export interface IProjectCardHeaderFieldProps {
   control: HookFormControlType;
-  handleSave: FormSubmitEventType;
+  handleSave: any;
 }
 
 const ProjectCardHeaderForm: FC = () => {

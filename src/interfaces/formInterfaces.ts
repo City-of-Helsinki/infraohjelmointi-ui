@@ -60,7 +60,4 @@ export type HookFormRulesType = Omit<
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
 
-// Could this be typed better?
-export type FormSubmitEventType = (() => void) | undefined;
-
 export type IFormValueType = string | boolean | IOption | string[] | undefined;

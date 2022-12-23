@@ -1,4 +1,4 @@
-import { FormSubmitEventType, HookFormControlType } from '@/interfaces/formInterfaces';
+import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { mockTags } from '@/mocks/common';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
@@ -115,26 +115,15 @@ interface IHashTagsFormProps {
   name: string;
   label: string;
   control: HookFormControlType;
-  handleSave: FormSubmitEventType;
 }
 
-const HashTagsForm: FC<IHashTagsFormProps> = ({ name, label, control, handleSave }) => {
-  const handleChangeAndSave = (onChange: (...event: unknown[]) => void, value: string[]) => {
-    onChange(value);
-    handleSave && handleSave();
-  };
-
+const HashTagsForm: FC<IHashTagsFormProps> = ({ name, label, control }) => {
   return (
     <Controller
       name={name}
       control={control as Control<FieldValues>}
       render={({ field, fieldState }) => (
-        <HashTagsDialog
-          {...field}
-          {...fieldState}
-          label={label}
-          onChange={(val) => handleChangeAndSave(field.onChange, val)}
-        />
+        <HashTagsDialog {...field} {...fieldState} label={label} />
       )}
     />
   );

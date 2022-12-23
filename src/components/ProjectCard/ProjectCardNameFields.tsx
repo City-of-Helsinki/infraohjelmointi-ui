@@ -1,4 +1,4 @@
-import { FormSubmitEventType, HookFormControlType } from '@/interfaces/formInterfaces';
+import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { TextInput } from 'hds-react/components/TextInput';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, MouseEvent, useState } from 'react';
@@ -7,7 +7,7 @@ import { IconButton, Paragraph, Title } from '../shared';
 
 interface IProjectCardNameFormProps {
   control: HookFormControlType;
-  handleSave: FormSubmitEventType;
+  handleSave: any;
 }
 
 const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control, handleSave }) => {
