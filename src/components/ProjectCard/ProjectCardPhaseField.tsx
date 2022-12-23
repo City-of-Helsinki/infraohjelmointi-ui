@@ -6,7 +6,7 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { IProjectCardHeaderFieldProps } from './ProjectCardHeaderForm';
 
-const ProjectCardPhaseField: FC<IProjectCardHeaderFieldProps> = ({ control, handleSave }) => {
+const ProjectCardPhaseField: FC<IProjectCardHeaderFieldProps> = ({ control }) => {
   const { t } = useTranslation();
   const icon = useMemo(() => <IconFaceSmile />, []);
   const { options } = useOptions('phase');
@@ -15,14 +15,14 @@ const ProjectCardPhaseField: FC<IProjectCardHeaderFieldProps> = ({ control, hand
     <Controller
       name="phase"
       control={control as Control<FieldValues>}
-      render={({ field: { value, onChange, onBlur }, fieldState: { isDirty } }) => (
+      render={({ field: { value, onChange, onBlur } }) => (
         <div data-testid="project-card-phase">
           <Select
             label={null}
             value={value}
+            onBlur={onBlur}
             icon={icon}
             placeholder={t('projectPhase') || ''}
-            onBlur={isDirty ? handleSave : onBlur}
             options={options}
             onChange={onChange}
           />

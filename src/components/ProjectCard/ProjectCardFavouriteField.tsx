@@ -4,7 +4,7 @@ import { IconStar, IconStarFill } from 'hds-react/icons';
 import { IconButton } from '../shared';
 import { IProjectCardHeaderFieldProps } from './ProjectCardHeaderForm';
 
-const ProjectCardFavouriteField: FC<IProjectCardHeaderFieldProps> = ({ control, handleSave }) => {
+const ProjectCardFavouriteField: FC<IProjectCardHeaderFieldProps> = ({ control }) => {
   const handleClick = (
     e: MouseEvent<HTMLButtonElement>,
     onChange: (...event: unknown[]) => void,
@@ -12,7 +12,6 @@ const ProjectCardFavouriteField: FC<IProjectCardHeaderFieldProps> = ({ control, 
   ) => {
     e.preventDefault();
     onChange(!value);
-    handleSave && handleSave();
   };
 
   return (

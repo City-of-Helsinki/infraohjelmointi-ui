@@ -20,9 +20,9 @@ const ProjectCardBasicsForm: FC = () => {
   } = formMethods;
 
   const onSubmit = useCallback(
-    (form: IProjectCardBasicsForm) => {
+    async (form: IProjectCardBasicsForm) => {
       const data: IProjectCardRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      projectId && dispatch(silentPatchProjectCardThunk({ id: projectId, data }));
+      projectId && (await dispatch(silentPatchProjectCardThunk({ id: projectId, data })));
     },
     [dirtyFields, projectId, dispatch],
   );

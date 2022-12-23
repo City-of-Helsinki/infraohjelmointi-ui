@@ -1,11 +1,11 @@
 import { FC, useCallback } from 'react';
 import { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { Paragraph, ProgressCircle } from '@/components/shared';
+import { Autosave, Paragraph, ProgressCircle } from '@/components/shared';
 import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
-import { SubmitHandler } from 'react-hook-form';
+import { FieldValues, FormProvider, SubmitHandler } from 'react-hook-form';
 import ProjectCardNameFields from './ProjectCardNameFields';
 import useProjectCardHeaderForm from '@/hooks/useProjectCardHeaderForm';
 import ProjectCardPhaseField from './ProjectCardPhaseField';
@@ -19,7 +19,6 @@ import _ from 'lodash';
 
 export interface IProjectCardHeaderFieldProps {
   control: HookFormControlType;
-  handleSave: any;
 }
 
 const ProjectCardHeaderForm: FC = () => {
@@ -32,7 +31,12 @@ const ProjectCardHeaderForm: FC = () => {
   const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
 
-  const { control, handleSubmit, dirtyFields } = useProjectCardHeaderForm();
+  const { formMethods } = useProjectCardHeaderForm();
+
+  const {
+    formState: { dirtyFields },
+    control,
+  } = formMethods;
 
   const onSubmit: SubmitHandler<IProjectCardHeaderForm> = useCallback(
     async (form: IProjectCardHeaderForm) => {
@@ -52,10 +56,8 @@ const ProjectCardHeaderForm: FC = () => {
     [projectCard?.favPersons, projectId, user?.id, dispatch, dirtyFields],
   );
 
-  const formFieldProps = { control, handleSave: handleSubmit(onSubmit) };
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <FormProvider {...formMethods}>
       <div className="project-card-header-container">
         <div className="left">
           <div className="left-wrapper">
@@ -66,15 +68,15 @@ const ProjectCardHeaderForm: FC = () => {
         </div>
         <div className="center">
           <div className="center-wrapper">
-            <ProjectCardNameFields {...formFieldProps} />
-            <ProjectCardPhaseField {...formFieldProps} />
+            <ProjectCardNameFields control={control} />
+            <ProjectCardPhaseField control={control} />
           </div>
         </div>
         <div className="right">
           <div className="right-wrapper">
             <div className="right-wrapper-inner">
               <div className="favourite-button-container">
-                <ProjectCardFavouriteField {...formFieldProps} />
+                <ProjectCardFavouriteField control={control} />
               </div>
               <Paragraph color="white" size="m" text={'inGroup'} />
               <Paragraph color="white" size="l" fontWeight="bold" text={group} />
@@ -82,7 +84,8 @@ const ProjectCardHeaderForm: FC = () => {
           </div>
         </div>
       </div>
-    </form>
+      <Autosave onSubmit={onSubmit as SubmitHandler<FieldValues>} />
+    </FormProvider>
   );
 };
 

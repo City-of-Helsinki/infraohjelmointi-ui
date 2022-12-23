@@ -7,10 +7,9 @@ import { IconButton, Paragraph, Title } from '../shared';
 
 interface IProjectCardNameFormProps {
   control: HookFormControlType;
-  handleSave: any;
 }
 
-const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control, handleSave }) => {
+const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control }) => {
   const [editing, setEditing] = useState(false);
   const handleSetEditing = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -23,14 +22,12 @@ const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control, handleSav
         <Controller
           name="name"
           control={control as Control<FieldValues>}
-          render={({ field: { name, onChange, value, onBlur }, fieldState: { isDirty } }) =>
+          render={({ field }) =>
             editing ? (
               <>
                 <TextInput
-                  id={name}
-                  value={value}
-                  onChange={onChange}
-                  onBlur={isDirty ? handleSave : onBlur}
+                  id={field.name}
+                  {...field}
                   className="edit-name-input"
                   placeholder={'Nimi'}
                   aria-label="project-card-name"
@@ -38,7 +35,7 @@ const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control, handleSav
                 <br />
               </>
             ) : (
-              <Title size="m" color="white" text={value} />
+              <Title size="m" color="white" text={field.value} />
             )
           }
         />
@@ -46,19 +43,17 @@ const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control, handleSav
         <Controller
           name="address"
           control={control as Control<FieldValues>}
-          render={({ field: { name, onChange, value, onBlur }, fieldState: { isDirty } }) =>
+          render={({ field }) =>
             editing ? (
               <TextInput
-                id={name}
-                onChange={onChange}
-                value={value}
-                onBlur={isDirty ? handleSave : onBlur}
+                id={field.name}
+                {...field}
                 className="edit-address-input"
                 placeholder={'Osoite'}
                 aria-label="project-card-address"
               />
             ) : (
-              <Paragraph size="m" color="white" text={value} />
+              <Paragraph size="m" color="white" text={field.value} />
             )
           }
         />

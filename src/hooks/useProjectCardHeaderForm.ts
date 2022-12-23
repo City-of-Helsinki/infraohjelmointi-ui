@@ -46,12 +46,12 @@ const useProjectCardHeaderValues = () => {
 const useProjectCardHeaderForm = () => {
   const { formValues, projectCard } = useProjectCardHeaderValues();
 
-  const { control, handleSubmit, reset, formState } = useForm<IProjectCardHeaderForm>({
+  const formMethods = useForm<IProjectCardHeaderForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'all',
   });
 
-  const { dirtyFields } = formState;
+  const { control, reset } = formMethods;
 
   // Updates
   useEffect(() => {
@@ -61,7 +61,7 @@ const useProjectCardHeaderForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectCard, formValues]);
 
-  return { handleSubmit, control, dirtyFields };
+  return { formMethods, control };
 };
 
 export default useProjectCardHeaderForm;
