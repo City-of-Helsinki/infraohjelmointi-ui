@@ -6,9 +6,9 @@ import { FieldValues, FormProvider, SubmitHandler } from 'react-hook-form';
 import { Autosave, FormFieldCreator } from '../shared';
 import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
-import './basicsFormStyles.css';
 import { RootState } from '@/store';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
+import './basicsFormStyles.css';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();

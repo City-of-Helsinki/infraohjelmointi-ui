@@ -6,11 +6,14 @@ import { setupStore } from '@/store';
 import mockProjectCard from '@/mocks/mockProjectCard';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import { matchExact } from '@/utils/common';
+import { waitFor } from '@testing-library/react';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+const AUTOSAVE_TIMEOUT = 3500;
 
 describe('ProjectCardHeaderForm', () => {
   const store = setupStore({
@@ -93,8 +96,13 @@ describe('ProjectCardHeaderForm', () => {
     await user.click(getByRole('button', { name: /edit-project-name/i }));
     expect(queryByRole('textbox')).toBeNull();
 
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
-    expect(formPatchRequest.name).toEqual(expectedValue);
-    expect(getByText(matchExact(expectedValue))).toBeInTheDocument();
+    await waitFor(
+      () => {
+        const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+        expect(formPatchRequest.name).toEqual(expectedValue);
+        expect(getByText(matchExact(expectedValue))).toBeInTheDocument();
+      },
+      { timeout: AUTOSAVE_TIMEOUT },
+    );
   });
 });

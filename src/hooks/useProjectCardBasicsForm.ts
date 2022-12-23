@@ -164,7 +164,7 @@ const useProjectCardBasicsForm = () => {
 
   const formMethods = useForm<IProjectCardBasicsForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
-    mode: 'all',
+    mode: 'onBlur',
   });
 
   const { control, reset } = formMethods;
