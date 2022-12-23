@@ -148,7 +148,7 @@
   grid-column: var(--grid-col-xs-right);
 }
 
-.basic-info-form #realizedCosts {
+.basic-info-form #realizedCostsLabel {
   grid-column: var(--grid-col-full);
 }
 
@@ -158,4 +158,16 @@
 
 .basic-info-form #preliminaryBudgetDivision {
   grid-column: var(--grid-col-full);
+}
+
+@media (max-width: 1400px) {
+  .basic-info-form {
+    width: 95%;
+  }
+}
+
+@media (min-width: 2000px) {
+  .basic-info-form {
+    width: 60%;
+  }
 }

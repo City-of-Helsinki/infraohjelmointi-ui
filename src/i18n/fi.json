@@ -102,9 +102,15 @@
     "constructionCostForecast": "Hankkeen kustannus ja laatutaso",
     "constructionQuality": "Laatutaso",
     "constructionWorkQuantity": "Suoritemäärä",
-    "realizedCosts": "Toteumatiedot",
     "overrunRight": "Ylitysoikeus",
-    "preliminaryBudgetDivision": "kustannusarvion alustava jakautuminen"
+    "budget": "Budjetti",
+    "realizedCostsLabel": "Toteumatiedot",
+    "realizedCosts": "Toteuma",
+    "comittedCosts": "Sitoumukset",
+    "spentCosts": "Käytetty",
+    "budgetOverrunYear": "Ylitysoikeus",
+    "budgetOverrunAmount": "Ylitysoikeuden määrä",
+    "preliminaryBudgetDivision": "Kustannusarvion alustava jakautuminen"
   },
   "notification": {
     "title": {

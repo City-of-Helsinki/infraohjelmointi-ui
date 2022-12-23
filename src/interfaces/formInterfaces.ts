@@ -5,11 +5,11 @@ export enum FormField {
   Select,
   Text,
   Number,
-  ListField,
   TagsForm,
   Title,
   FieldSet,
   Date,
+  ListField,
 }
 
 export interface IForm {

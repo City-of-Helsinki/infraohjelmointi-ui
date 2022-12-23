@@ -106,8 +106,24 @@ const buildProjectCardBasicsFormFields = (
     { name: 'constructionCostForecast', type: FormField.Number, tooltip: 'keur' },
     { name: 'constructionPhase', type: FormField.Select, hideLabel: true },
     { name: 'constructionWorkQuantity', type: FormField.Number, tooltip: 'm2' },
-    { name: 'realizedCosts', type: FormField.ListField },
-    { name: 'overrunRight', type: FormField.ListField, readOnly: true },
+    {
+      name: 'realizedCostsLabel',
+      type: FormField.ListField,
+      fieldSet: [
+        { name: 'budget', type: FormField.Number },
+        { name: 'realizedCosts', type: FormField.Number, readOnly: true },
+        { name: 'comittedCosts', type: FormField.Number, readOnly: true },
+        { name: 'spentCosts', type: FormField.Number, readOnly: true },
+      ],
+    },
+    {
+      name: 'overrunRight',
+      type: FormField.ListField,
+      fieldSet: [
+        { name: 'budgetOverrunYear', type: FormField.Number },
+        { name: 'budgetOverrunAmount', type: FormField.Number },
+      ],
+    },
     { name: 'preliminaryBudgetDivision', type: FormField.ListField, readOnly: true },
   ];
 
@@ -165,6 +181,10 @@ const useProjectCardBasicsValues = () => {
       constructionCostForecast: projectCard?.constructionCostForecast || '',
       constructionPhase: listItemToOption(projectCard?.constructionPhase, t),
       constructionWorkQuantity: projectCard?.constructionWorkQuantity || '',
+      budget: projectCard?.budget || '',
+      realizedCosts: projectCard?.realizedCost || '',
+      comittedCosts: projectCard?.comittedCost || '',
+      spentCosts: projectCard?.spentCost || '',
       budgetOverrunYear: projectCard?.budgetOverrunYear || '',
       budgetOverrunAmount: projectCard?.budgetOverrunAmount || '',
     }),

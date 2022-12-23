@@ -20,6 +20,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
       {form?.map((f) => {
         const { type, ...formValues } = f;
         const formProps = { ...formValues, key: f.name };
+        const listFormProps = { form: f, key: f.name };
         const listName = f.name as ListType;
         switch (type) {
           case FormField.Select:
@@ -31,11 +32,11 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
           case FormField.Title:
             return <FormSectionTitle {...formProps} />;
           case FormField.ListField:
-            return <ListField {...formProps} />;
+            return <ListField {...listFormProps} />;
           case FormField.TagsForm:
             return <HashTagsForm {...formProps} />;
           case FormField.FieldSet:
-            return <FieldSetCreator key={f.name} form={f} />;
+            return <FieldSetCreator {...listFormProps} />;
           case FormField.Date:
             return <DateField {...formProps} />;
           default:
