@@ -2,13 +2,13 @@ import useProjectCardBasicsForm from '@/hooks/useProjectCardBasicsForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback } from 'react';
-import { FieldValues, FormProvider, SubmitHandler } from 'react-hook-form';
-import { Autosave, FormFieldCreator } from '../shared';
+import { FormFieldCreator } from '../shared';
 import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { RootState } from '@/store';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import './basicsFormStyles.css';
+import { FieldValues, SubmitHandler } from 'react-hook-form';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
@@ -16,25 +16,30 @@ const ProjectCardBasicsForm: FC = () => {
   const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
 
   const {
-    formState: { dirtyFields },
+    formState: { dirtyFields, isDirty },
+    handleSubmit,
   } = formMethods;
 
   const onSubmit = useCallback(
-    async (form: IProjectCardBasicsForm) => {
-      const data: IProjectCardRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      projectId && (await dispatch(silentPatchProjectCardThunk({ id: projectId, data })));
+    (form: IProjectCardBasicsForm) => {
+      if (isDirty) {
+        const data: IProjectCardRequest = dirtyFieldsToRequestObject(
+          dirtyFields,
+          form as IAppForms,
+        );
+        projectId && dispatch(silentPatchProjectCardThunk({ id: projectId, data }));
+      }
     },
-    [dirtyFields, projectId, dispatch],
+    [dirtyFields, projectId, dispatch, isDirty],
   );
 
   return (
     <div className="basics-form">
-      <FormProvider {...formMethods}>
+      <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
         <div className="basic-info-form">
           {formFields && <FormFieldCreator form={formFields} />}
         </div>
-        <Autosave onSubmit={onSubmit as SubmitHandler<FieldValues>} />
-      </FormProvider>
+      </form>
     </div>
   );
 };

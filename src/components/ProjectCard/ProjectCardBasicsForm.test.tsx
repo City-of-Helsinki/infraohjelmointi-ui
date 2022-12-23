@@ -9,13 +9,12 @@ import { mockProjectAreas, mockProjectPhases, mockProjectTypes } from '@/mocks/m
 import { mockTags } from '@/mocks/common';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-const AUTOSAVE_TIMEOUT = 3500;
 
 // These tests started taking very long after the form got fieldSets, could they maybe the optimized better?
 // Currently allowing a long timeout for this test file
@@ -206,7 +205,7 @@ describe('ProjectCardBasicsForm', () => {
   // });
 
   it('can autosave patch a field', async () => {
-    const { user, getByDisplayValue } = renderResult;
+    const { user, getByDisplayValue, container } = renderResult;
     const expectedValue = 'New description';
     const projectCard = mockProjectCard.data;
     const responseProjectCard: IProjectCard = {
@@ -217,17 +216,14 @@ describe('ProjectCardBasicsForm', () => {
     mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
 
     const descriptionField = screen.getByRole('textbox', { name: getFormField('description *') });
+    const parentContainer = container.getElementsByClassName('basics-form')[0];
 
     await user.clear(descriptionField);
     await user.type(descriptionField, expectedValue);
+    await user.click(parentContainer);
 
-    await waitFor(
-      () => {
-        const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
-        expect(formPatchRequest.description).toEqual(expectedValue);
-        expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
-      },
-      { timeout: AUTOSAVE_TIMEOUT },
-    );
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+    expect(formPatchRequest.description).toEqual(expectedValue);
+    expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 });

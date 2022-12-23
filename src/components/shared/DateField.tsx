@@ -13,18 +13,19 @@ interface IDateFieldProps {
 
 const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly }) => {
   const required = rules?.required ? true : false;
-
   return (
     <Controller
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState: { error } }) => {
+      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
             <HDSDateInput
               className="input-m"
-              {...field}
+              onChange={onChange}
+              value={value}
+              onBlur={onBlur}
               placeholder={''}
               label={label}
               language="fi"

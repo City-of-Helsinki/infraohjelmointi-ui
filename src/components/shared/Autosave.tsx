@@ -6,6 +6,7 @@ import useDeepCompareEffect from 'use-deep-compare-effect';
 
 interface IAutosaveProps {
   onSubmit: SubmitHandler<FieldValues>;
+  isBlurred?: boolean;
 }
 
 /**
@@ -14,7 +15,7 @@ interface IAutosaveProps {
  *
  * @param onSubmit react-hook-forms onSubmit function
  */
-const Autosave: FC<IAutosaveProps> = ({ onSubmit }) => {
+const Autosave: FC<IAutosaveProps> = ({ onSubmit, isBlurred }) => {
   const formMethods = useFormContext();
   const {
     control,
@@ -27,7 +28,7 @@ const Autosave: FC<IAutosaveProps> = ({ onSubmit }) => {
   const debouncedSave = useCallback(
     debounce(() => {
       handleSubmit(onSubmit)();
-    }, 3000),
+    }, 500),
     [dirtyFields],
   );
 
@@ -38,7 +39,7 @@ const Autosave: FC<IAutosaveProps> = ({ onSubmit }) => {
 
   // Call debounceSave() if form is dirty
   useDeepCompareEffect(() => {
-    isDirty && debouncedSave();
+    isDirty && isBlurred && debouncedSave();
   }, [watchedData]);
 
   return null;
