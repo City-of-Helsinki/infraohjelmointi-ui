@@ -96,7 +96,7 @@ describe('ProjectCardBasicsForm', () => {
     expect(getByText('projectCardBasicsForm.description')).toBeInTheDocument();
   });
 
-  it('renders hashTags modal and can edit hashTags', async () => {
+  it('renders hashTags modal and can autosave patch hashTags', async () => {
     const { getByText, getByRole, user, getAllByTestId, store } = renderResult;
     const expectedValues = ['pyöräily', 'uudisrakentaminen', 'pohjoinensuurpiiri'];
     const projectCard = store.getState().projectCard.selectedProjectCard as IProjectCard;
@@ -131,80 +131,76 @@ describe('ProjectCardBasicsForm', () => {
     expectedValues.forEach((h) => expect(getByText(h)).toBeInTheDocument());
   });
 
-  // it('can use a NumberField', async () => {
-  //   const { user, getByDisplayValue } = renderResult;
-  //   const expectedValue = '1234';
-  //   const projectCard = mockProjectCard.data;
-  //   const responseProjectCard: IProjectCard = {
-  //     ...projectCard,
-  //     hkrId: expectedValue,
-  //   };
+  it('can autosave patch a NumberField', async () => {
+    const { user, getByDisplayValue, container } = renderResult;
+    const expectedValue = '1234';
+    const projectCard = mockProjectCard.data;
+    const responseProjectCard: IProjectCard = {
+      ...projectCard,
+      hkrId: expectedValue,
+    };
 
-  //   mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
+    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
 
-  //   const hkrIdField = screen.getByRole('spinbutton', { name: getFormField('hkrId') });
+    const parentContainer = container.getElementsByClassName('basics-form')[0];
 
-  //   await user.clear(hkrIdField);
-  //   await user.type(hkrIdField, expectedValue);
+    const hkrIdField = screen.getByRole('spinbutton', { name: getFormField('hkrId') });
 
-  //   expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
-  // });
+    await user.clear(hkrIdField);
+    await user.type(hkrIdField, expectedValue);
+    await user.click(parentContainer);
 
-  // it('can use a SelectField', async () => {
-  //   const { user, getByRole, getByText } = renderResult;
-  //   const expectedValue = { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' };
-  //   const projectCard = mockProjectCard.data;
-  //   const responseProjectCard: IProjectCard = {
-  //     ...projectCard,
-  //     area: expectedValue,
-  //   };
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+    expect(formPatchRequest.hkrId).toEqual(expectedValue);
+    expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
+  });
 
-  //   mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
+  it('can autosave patch a SelectField', async () => {
+    const { user, getByRole, getByText, container } = renderResult;
+    const expectedValue = { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' };
+    const projectCard = mockProjectCard.data;
+    const responseProjectCard: IProjectCard = {
+      ...projectCard,
+      area: expectedValue,
+    };
 
-  //   await user.click(getByRole('button', { name: 'projectCardBasicsForm.area' }));
-  //   await user.click(getByText(matchExact('enums.lansisatama')));
+    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
 
-  //   expect(getByText(matchExact(expectedValue.value))).toBeInTheDocument();
-  // });
+    const parentContainer = container.getElementsByClassName('basics-form')[0];
 
-  // it('can use a DateField', async () => {
-  //   const { user, getByRole, getByDisplayValue } = renderResult;
-  //   const expectedValue = '13.12.2022';
-  //   const projectCard = mockProjectCard.data;
-  //   const responseProjectCard: IProjectCard = {
-  //     ...projectCard,
-  //     estPlanningStart: expectedValue,
-  //   };
+    await user.click(getByRole('button', { name: 'projectCardBasicsForm.area' }));
+    await user.click(getByText(matchExact('enums.lansisatama')));
+    await user.click(parentContainer);
 
-  //   mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+    expect(formPatchRequest.area).toEqual(expectedValue.id);
+    expect(getByText(matchExact(expectedValue.value))).toBeInTheDocument();
+  });
 
-  //   const estPlanningStart = getByRole('textbox', { name: getFormField('estPlanningStart') });
+  it('can autosave patch a DateField', async () => {
+    const { user, getByRole, getByDisplayValue, container } = renderResult;
+    const expectedValue = '13.12.2022';
+    const projectCard = mockProjectCard.data;
+    const responseProjectCard: IProjectCard = {
+      ...projectCard,
+      estPlanningStart: expectedValue,
+    };
 
-  //   await user.clear(estPlanningStart);
-  //   await user.type(estPlanningStart, expectedValue);
+    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
 
-  //   expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
-  // });
+    const parentContainer = container.getElementsByClassName('basics-form')[0];
+    const estPlanningStart = getByRole('textbox', { name: getFormField('estPlanningStart') });
 
-  // it('can autosave patch HashTags', async () => {
-  //   const { user, getByRole, getByText } = renderResult;
-  //   const expectedValues = ['pyöräily', 'uudisrakentaminen', 'pohjoinensuurpiiri'];
-  //   const projectCard = mockProjectCard.data;
-  //   const responseProjectCard: IProjectCard = {
-  //     ...projectCard,
-  //     hashTags: expectedValues,
-  //   };
+    await user.clear(estPlanningStart);
+    await user.type(estPlanningStart, expectedValue);
+    await user.click(parentContainer);
 
-  //   mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+    expect(formPatchRequest.estPlanningStart).toEqual(expectedValue);
+    expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
+  });
 
-  //   await user.click(getByRole('button', { name: matchExact('projectCardBasicsForm.hashTags') }));
-  //   await user.click(getByText('pohjoinensuurpiiri'));
-  //   await user.click(getByRole('button', { name: matchExact('save') }));
-
-  //   expectedValues.forEach((h) => expect(getByText(h)).toBeInTheDocument());
-  // });
-
-  it('can autosave patch a field', async () => {
+  it('can autosave patch a TextField', async () => {
     const { user, getByDisplayValue, container } = renderResult;
     const expectedValue = 'New description';
     const projectCard = mockProjectCard.data;
