@@ -17,13 +17,14 @@ interface IHashTagsDialogProps {
   name: string;
   label: string;
   value: Array<string>;
+  onChange: (tags: Array<string>) => void;
 }
 /**
  * We still don't know how this should work when editing,
  * so this doesn't have its own generic form-component yet.
  */
 const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
-  ({ name, label, value }, ref: Ref<HTMLDivElement>) => {
+  ({ name, label, value, onChange }, ref: Ref<HTMLDivElement>) => {
     const [tags, setTags] = useState<Array<string>>(value);
     const [allTags, setAllTags] = useState(mockTags);
     const [isOpen, setIsOpen] = useState(false);
@@ -71,7 +72,8 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
     const onSaveTags = useCallback(() => {
       dispatch(silentPatchProjectCardThunk({ data: { hashTags: tags }, id: projectId }));
       onChangeOpen();
-    }, [dispatch, onChangeOpen, projectId, tags]);
+      onChange(tags);
+    }, [dispatch, onChangeOpen, projectId, tags, onChange]);
 
     return (
       <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
