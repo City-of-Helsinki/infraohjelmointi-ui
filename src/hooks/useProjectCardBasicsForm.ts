@@ -118,10 +118,10 @@ const buildProjectCardBasicsFormFields = (
     },
     {
       name: 'overrunRight',
-      type: FormField.ListField,
+      type: FormField.OverrunRight,
       fieldSet: [
-        { name: 'budgetOverrunYear', type: FormField.Number },
-        { name: 'budgetOverrunAmount', type: FormField.Number },
+        { name: 'budgetOverrunYear', type: FormField.Number, hideLabel: true },
+        { name: 'budgetOverrunAmount', type: FormField.Number, hideLabel: true },
       ],
     },
     { name: 'preliminaryBudgetDivision', type: FormField.ListField, readOnly: true },

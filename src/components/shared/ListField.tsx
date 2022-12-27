@@ -1,7 +1,7 @@
 import { FormField, IForm } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
 import { FC, memo, MouseEvent, useState } from 'react';
-import { Control, Controller, FieldValues, Noop } from 'react-hook-form';
+import { Control, Controller, FieldValues } from 'react-hook-form';
 import FormFieldLabel from './FormFieldLabel';
 
 interface IListFieldProps {
@@ -11,12 +11,6 @@ interface IListFieldProps {
 const ListField: FC<IListFieldProps> = ({ form }) => {
   const { label, readOnly, name } = form;
   const [editing, setEditing] = useState(false);
-  const [year, setYear] = useState('');
-
-  const handleBlur = (onBlur: Noop, name: string, value: string) => {
-    onBlur();
-    name === 'overrunRight' && setYear(value);
-  };
 
   const handleSetEditing = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -27,10 +21,7 @@ const ListField: FC<IListFieldProps> = ({ form }) => {
     <div className="input-wrapper" id={name} data-testid={name}>
       <div className="display-flex-col">
         <div style={{ marginBottom: '1rem' }}>
-          <FormFieldLabel
-            text={`${label} ${year && year}`}
-            onClick={readOnly ? undefined : handleSetEditing}
-          />
+          <FormFieldLabel text={label} onClick={readOnly ? undefined : handleSetEditing} />
         </div>
         {form.fieldSet?.map((f) => (
           <Controller
@@ -45,7 +36,6 @@ const ListField: FC<IListFieldProps> = ({ form }) => {
                     <NumberInput
                       className="list-field-input"
                       {...field}
-                      onBlur={() => handleBlur(field.onBlur, name, field.value)}
                       label={''}
                       hideLabel={true}
                       id={field.name}

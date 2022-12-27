@@ -10,6 +10,7 @@ export enum FormField {
   FieldSet,
   Date,
   ListField,
+  OverrunRight,
 }
 
 export interface IForm {
