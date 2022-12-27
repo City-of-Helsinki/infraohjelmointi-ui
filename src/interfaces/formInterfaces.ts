@@ -21,7 +21,6 @@ export interface IForm {
   required?: boolean;
   readOnly?: boolean;
   fieldSet?: Array<IForm>;
-  dateFormat?: string;
 }
 
 export interface IProjectCardHeaderForm {
