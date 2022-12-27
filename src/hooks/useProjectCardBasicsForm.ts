@@ -76,20 +76,20 @@ const buildProjectCardBasicsFormFields = (
       name: 'planning',
       type: FormField.FieldSet,
       fieldSet: [
-        { name: 'estPlanningStart', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'estPlanningEnd', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'presenceStart', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'presenceEnd', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'visibilityEnd', type: FormField.Date },
+        { name: 'estPlanningStart', type: FormField.Date },
+        { name: 'estPlanningEnd', type: FormField.Date },
+        { name: 'presenceStart', type: FormField.Date },
+        { name: 'presenceEnd', type: FormField.Date },
         { name: 'visibilityStart', type: FormField.Date },
+        { name: 'visibilityEnd', type: FormField.Date },
       ],
     },
     {
       name: 'construction',
       type: FormField.FieldSet,
       fieldSet: [
-        { name: 'estConstructionStart', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'estConstructionEnd', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'estConstructionStart', type: FormField.Date },
+        { name: 'estConstructionEnd', type: FormField.Date },
       ],
     },
   ];
