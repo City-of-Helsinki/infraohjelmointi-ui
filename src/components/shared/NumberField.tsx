@@ -25,6 +25,7 @@ const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readO
           <HDSNumberInput
             className={`input-l`}
             {...field}
+            value={field.value || ''}
             label={label}
             id={label}
             readOnly={readOnly}

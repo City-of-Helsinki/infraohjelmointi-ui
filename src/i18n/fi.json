@@ -108,7 +108,7 @@
     "realizedCosts": "Toteuma",
     "comittedCosts": "Sitoumukset",
     "spentCosts": "Käytetty",
-    "budgetOverrunYear": "Ylitysoikeus",
+    "budgetOverrunYear": "Ylitysoikeus vuosi",
     "budgetOverrunAmount": "Ylitysoikeuden määrä",
     "preliminaryBudgetDivision": "Kustannusarvion alustava jakautuminen"
   },
