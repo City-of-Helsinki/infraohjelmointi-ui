@@ -1,31 +1,39 @@
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { mockTags } from '@/mocks/common';
+import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
+import { RootState } from '@/store';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
-import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo } from 'react';
+import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
 import TagsContainer from './TagsContainer';
 import Title from './Title';
+import _ from 'lodash';
 
 interface IHashTagsDialogProps {
   name: string;
   label: string;
   value: Array<string>;
-  onChange: (tags: Array<string>) => void;
 }
 /**
  * We still don't know how this should work when editing,
  * so this doesn't have its own generic form-component yet.
  */
 const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
-  ({ name, label, value, onChange }, ref: Ref<HTMLDivElement>) => {
+  ({ name, label, value }, ref: Ref<HTMLDivElement>) => {
     const [tags, setTags] = useState<Array<string>>(value);
     const [allTags, setAllTags] = useState(mockTags);
     const [isOpen, setIsOpen] = useState(false);
     const { t } = useTranslation();
     const { Header, Content, ActionButtons } = Dialog;
+    const dispatch = useAppDispatch();
+    const projectId = useAppSelector(
+      (state: RootState) => state.projectCard.selectedProjectCard?.id,
+      _.isEqual,
+    );
 
     // Update tags with changes in value
     useEffect(() => {
@@ -35,30 +43,35 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
     }, [value]);
 
     useEffect(() => {
-      setAllTags(allTags.filter((tag) => tags.indexOf(tag) === -1));
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setAllTags((currentAllTags) => currentAllTags.filter((tag) => tags.indexOf(tag) === -1));
     }, [tags]);
 
-    const onTagDelete = (t: string) => {
-      setTags(tags.filter((tag) => tag !== t));
-      setAllTags([...allTags, t]);
-    };
+    const onTagDelete = useCallback(
+      (t: string) => {
+        setTags((currentTags) => currentTags.filter((tag) => tag !== t));
+        setAllTags([...allTags, t]);
+      },
+      [allTags],
+    );
 
-    const onEdit = (e: MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      setIsOpen(!isOpen);
-    };
+    const onChangeOpen = useCallback(() => setIsOpen((currentState) => !currentState), []);
 
-    const onTagClick = (tag: string) => {
-      setTags([...tags, tag]);
-    };
+    const onEdit = useCallback(
+      (e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        onChangeOpen();
+      },
+      [onChangeOpen],
+    );
 
-    const onSaveTags = () => {
-      onChange(tags);
-      setIsOpen(!isOpen);
-    };
+    const onTagClick = useCallback((tag: string) => {
+      setTags((currentTags) => [...currentTags, tag]);
+    }, []);
 
-    const onChangeOpen = () => setIsOpen(!isOpen);
+    const onSaveTags = useCallback(() => {
+      dispatch(silentPatchProjectCardThunk({ data: { hashTags: tags }, id: projectId }));
+      onChangeOpen();
+    }, [dispatch, onChangeOpen, projectId, tags]);
 
     return (
       <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
@@ -103,7 +116,9 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
           </Dialog>
 
           {/* Displayed on form */}
-          <FormFieldLabel text={t(`projectCardBasicsForm.${name}`)} onClick={onEdit} />
+          <div style={{ marginBottom: '0.5rem' }}>
+            <FormFieldLabel text={t(`projectCardBasicsForm.${name}`)} onClick={onEdit} />
+          </div>
           <TagsContainer tags={value} />
         </div>
       </div>
