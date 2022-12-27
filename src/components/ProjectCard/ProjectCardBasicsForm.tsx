@@ -9,11 +9,15 @@ import { RootState } from '@/store';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import './basicsFormStyles.css';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
+import _ from 'lodash';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
   const { formFields, formMethods } = useProjectCardBasicsForm();
-  const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
+  const projectId = useAppSelector(
+    (state: RootState) => state.projectCard.selectedProjectCard?.id,
+    _.isEqual,
+  );
 
   const {
     formState: { dirtyFields, isDirty },

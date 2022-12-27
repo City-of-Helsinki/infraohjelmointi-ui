@@ -47,13 +47,10 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
       setAllTags((currentAllTags) => currentAllTags.filter((tag) => tags.indexOf(tag) === -1));
     }, [tags]);
 
-    const onTagDelete = useCallback(
-      (t: string) => {
-        setTags((currentTags) => currentTags.filter((tag) => tag !== t));
-        setAllTags([...allTags, t]);
-      },
-      [allTags],
-    );
+    const onTagDelete = useCallback((t: string) => {
+      setTags((currentTags) => currentTags.filter((tag) => tag !== t));
+      setAllTags((currentTags) => [...currentTags, t]);
+    }, []);
 
     const onChangeOpen = useCallback(() => setIsOpen((currentState) => !currentState), []);
 
