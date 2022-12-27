@@ -15,4 +15,3 @@ export { default as FormFieldLabel } from './FormFieldLabel';
 export { default as NetworkNumbers } from './NetworkNumbers';
 export { default as HashTags } from './HashTagsForm';
 export { default as Toolbar } from './Toolbar';
-export { default as Autosave } from './Autosave';

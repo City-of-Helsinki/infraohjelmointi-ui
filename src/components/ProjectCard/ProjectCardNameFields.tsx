@@ -1,7 +1,8 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { TextInput } from 'hds-react/components/TextInput';
 import { IconPenLine } from 'hds-react/icons';
-import { FC, MouseEvent, useState } from 'react';
+import { t } from 'i18next';
+import { FC, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { IconButton, Paragraph, Title } from '../shared';
 
@@ -11,10 +12,12 @@ interface IProjectCardNameFormProps {
 
 const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control }) => {
   const [editing, setEditing] = useState(false);
-  const handleSetEditing = (e: MouseEvent<HTMLButtonElement>) => {
+
+  const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setEditing(!editing);
-  };
+    setEditing((currentState) => !currentState);
+  }, []);
+
   return (
     <div className="edit-name-form">
       <div>
@@ -29,7 +32,7 @@ const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control }) => {
                   id={field.name}
                   {...field}
                   className="edit-name-input"
-                  placeholder={'Nimi'}
+                  placeholder={t('name') || ''}
                   aria-label="project-card-name"
                 />
                 <br />
@@ -49,7 +52,7 @@ const ProjectCardNameForm: FC<IProjectCardNameFormProps> = ({ control }) => {
                 id={field.name}
                 {...field}
                 className="edit-address-input"
-                placeholder={'Osoite'}
+                placeholder={t('address') || ''}
                 aria-label="project-card-address"
               />
             ) : (

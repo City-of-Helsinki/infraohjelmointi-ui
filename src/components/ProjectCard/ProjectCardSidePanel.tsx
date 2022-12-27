@@ -26,10 +26,9 @@ const ProjectCardSidePanel: FC = () => {
       {updated && (
         <div className="label-container">
           <div className="side-nav">
-            <StatusLabel
-              type="success"
-              iconLeft={<IconSaveDiskette />}
-            >{`Tallennettu: ${updated}`}</StatusLabel>
+            <StatusLabel type="success" iconLeft={<IconSaveDiskette />}>
+              {t('savedTime', { time: updated })}
+            </StatusLabel>
           </div>
         </div>
       )}

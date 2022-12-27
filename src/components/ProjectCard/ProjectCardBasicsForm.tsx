@@ -37,7 +37,7 @@ const ProjectCardBasicsForm: FC = () => {
     <div className="basics-form">
       <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
         <div className="basic-info-form">
-          {formFields && <FormFieldCreator form={formFields} />}
+          <FormFieldCreator form={formFields} />
         </div>
       </form>
     </div>
