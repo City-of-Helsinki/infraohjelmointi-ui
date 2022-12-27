@@ -26,20 +26,15 @@ const ProjectCardBasicsForm: FC = () => {
 
   const onSubmit = useCallback(
     (form: IProjectCardBasicsForm) => {
-      if (isDirty) {
-        const data: IProjectCardRequest = dirtyFieldsToRequestObject(
-          dirtyFields,
-          form as IAppForms,
-        );
-        projectId && dispatch(silentPatchProjectCardThunk({ id: projectId, data }));
-      }
+      const data: IProjectCardRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+      projectId && dispatch(silentPatchProjectCardThunk({ id: projectId, data }));
     },
-    [dirtyFields, projectId, dispatch, isDirty],
+    [dirtyFields, projectId, dispatch],
   );
 
   return (
     <div className="basics-form">
-      <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
+      <form onBlur={isDirty ? (handleSubmit(onSubmit) as SubmitHandler<FieldValues>) : undefined}>
         <div className="basic-info-form">
           <FormFieldCreator form={formFields} />
         </div>
