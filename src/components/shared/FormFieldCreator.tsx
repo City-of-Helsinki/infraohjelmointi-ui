@@ -26,24 +26,53 @@ const OverrunRightField = ({ form }: { form: any }) => {
       <Controller
         name="budgetOverrunYear"
         control={form.control as Control<FieldValues>}
-        render={({ field }) => (
-          <FormFieldLabel text={`Ylitysoikeus ${field.value}`} onClick={handleSetEditing} />
-        )}
-      />
-      <Controller
-        name="budgetOverrunAmount"
-        control={form.control as Control<FieldValues>}
-        render={({ field }) => (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+        render={({ field }) =>
+          !editing ? (
+            <FormFieldLabel text={`Ylitysoikeus ${field.value}`} onClick={handleSetEditing} />
+          ) : (
             <NumberInput
               className="list-field-input"
-              style={{ width: !editing ? '1.5rem' : '8rem' }}
               {...field}
               label={''}
               hideLabel={true}
               id={field.name}
               readOnly={!editing || form.readOnly}
             />
+          )
+        }
+      />
+      <Controller
+        name="budgetOverrunAmount"
+        control={form.control as Control<FieldValues>}
+        render={({ field }) => (
+          <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+            <div
+              style={{
+                position: 'absolute',
+                background: 'black',
+                height: '0.9rem',
+                width: '0.9rem',
+                borderRadius: '50%',
+                fontSize: '0.6rem',
+                lineHeight: '0.7rem',
+                color: 'white',
+                textAlign: 'center',
+              }}
+            >
+              y
+            </div>
+            <div style={{ marginLeft: '2rem' }}>
+              <NumberInput
+                className="list-field-input"
+                style={{ width: !editing ? '1.5rem' : '8rem' }}
+                {...field}
+                label={''}
+                hideLabel={true}
+                id={field.name}
+                readOnly={!editing || form.readOnly}
+              />
+            </div>
+
             <span style={{ display: editing ? 'none' : '' }}>keur</span>
           </div>
         )}
