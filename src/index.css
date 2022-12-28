@@ -83,6 +83,11 @@ table p {
   display: flex;
 }
 
+.flex-row-center {
+  display: flex;
+  align-items: center;
+}
+
 .display-flex-col {
   flex-direction: column;
 }

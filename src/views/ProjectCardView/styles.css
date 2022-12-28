@@ -135,6 +135,10 @@
   height: 2rem !important;
 }
 
+#overrunRight .list-field-input {
+  margin: 0.5rem 0;
+}
+
 .pen-and-label-text {
   font-weight: 500;
   width: auto !important;

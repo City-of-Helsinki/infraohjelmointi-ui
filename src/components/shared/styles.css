@@ -158,3 +158,23 @@
 .toolbar-container .display-flex button {
   margin-left: var(--spacing-s);
 }
+
+.bubble-icon {
+  background: black;
+  height: 0.9rem;
+  width: 0.9rem;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  line-height: 0.7rem;
+  color: white;
+  text-align: center;
+  margin-right: 1rem;
+}
+
+.overrun-label-container {
+  margin-bottom: 0.75rem;
+}
+
+.overrun-amount-container {
+  margin-right: 0.2rem;
+}

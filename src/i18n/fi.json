@@ -155,5 +155,8 @@
   "send:": "Lähetä",
   "savedTime": "Tallennettu: {{time}}",
   "address": "Osoite",
-  "name": "nimi"
+  "name": "nimi",
+  "overrunRightValue": "Ylitysoikeus {{value}}",
+  "budgetOverrunYear": "Ylitysoikeus vuosi",
+  "budgetOverrunAmount": "Ylitysoikeuden määrä"
 }

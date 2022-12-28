@@ -41,6 +41,7 @@ const ListField: FC<IListFieldProps> = ({ form }) => {
                       id={field.name}
                       readOnly={!editing || f.readOnly}
                     />
+                    €
                   </div>
                 );
               } else {
