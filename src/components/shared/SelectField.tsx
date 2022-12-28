@@ -11,9 +11,10 @@ interface ISelectFieldProps {
   options?: Array<IOption>;
   control: HookFormControlType;
   rules?: HookFormRulesType;
+  hideLabel?: boolean;
 }
 
-const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => {
+const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, hideLabel }) => {
   const required = rules?.required ? true : false;
   const { options } = useOptions(name);
 
@@ -29,12 +30,13 @@ const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => 
               value={value}
               onChange={onChange}
               onBlur={onBlur}
-              label={label || ''}
+              label={!hideLabel && label}
               id={label}
               invalid={error ? true : false}
               error={error?.message}
               options={options}
               required={required}
+              style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
             />
           </div>
         );

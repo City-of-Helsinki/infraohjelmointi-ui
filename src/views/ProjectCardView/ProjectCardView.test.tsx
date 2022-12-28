@@ -1,21 +1,30 @@
 import mockI18next from '@/mocks/mockI18next';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import mockProjectCard from '@/mocks/mockProjectCard';
 import ProjectCardView from './ProjectCardView';
 import { getProjectCardThunk } from '@/reducers/projectCardSlice';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
-import { mockProjectAreas, mockProjectPhases, mockProjectTypes } from '@/mocks/mockLists';
 import {
+  mockConstructionPhases,
+  mockPlanningPhases,
+  mockProjectAreas,
+  mockProjectPhases,
+  mockProjectQualityLevels,
+  mockProjectTypes,
+} from '@/mocks/mockLists';
+import {
+  getConstructionPhasesThunk,
+  getPlanningPhasesThunk,
   getProjectAreasThunk,
   getProjectPhasesThunk,
+  getProjectQualityLevelsThunk,
   getProjectTypesThunk,
 } from '@/reducers/listsSlice';
 import { RenderResult } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
-import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -38,6 +47,15 @@ describe('ProjectCardView', () => {
 
     mockedAxios.get.mockResolvedValue(mockProjectPhases);
     await store.dispatch(getProjectPhasesThunk());
+
+    mockedAxios.get.mockResolvedValue(mockProjectQualityLevels);
+    await store.dispatch(getProjectQualityLevelsThunk());
+
+    mockedAxios.get.mockResolvedValue(mockPlanningPhases);
+    await store.dispatch(getPlanningPhasesThunk());
+
+    mockedAxios.get.mockResolvedValue(mockConstructionPhases);
+    await store.dispatch(getConstructionPhasesThunk());
 
     await act(async () => (renderResult = renderWithProviders(<ProjectCardView />, { store })));
   });
@@ -100,9 +118,36 @@ describe('ProjectCardView', () => {
     expect(storeError.status).toBe(mockError.status);
   });
 
-  it('catches a failed area fetch', async () => {
+  it('catches a failed area list fetch', async () => {
     mockedAxios.get.mockRejectedValue(mockError);
     await store.dispatch(getProjectAreasThunk());
+
+    const storeError = store.getState().lists.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed projectQualityLevel list fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getProjectQualityLevelsThunk());
+
+    const storeError = store.getState().lists.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed planningPhase list fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getPlanningPhasesThunk());
+
+    const storeError = store.getState().lists.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed constructionPhase list fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getConstructionPhasesThunk());
 
     const storeError = store.getState().lists.error as IError;
     expect(storeError.message).toBe(mockError.message);

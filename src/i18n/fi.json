@@ -18,7 +18,8 @@
     "login": "Kirjaudu sisään",
     "basics": "Hankkeen perustiedot",
     "navigateToForm": "Navigoi lomakkeeseen",
-    "schedule": "Hankkeen aikataulu"
+    "schedule": "Hankkeen aikataulu",
+    "financial": "Hankkeen kustannustiedot"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -47,7 +48,25 @@
     "malminLentokenttaalue": "Malmin lentokenttäalue",
     "pasila": "Pasila",
     "ostersundom": "Östersundom",
-    "kruunuvuorenranta": "Kruunuvuorenranta"
+    "kruunuvuorenranta": "Kruunuvuorenranta",
+    "1class": "1 luokka",
+    "2class": "2 luokka",
+    "3class": "3 luokka",
+    "A1": "A1",
+    "A2": "A2",
+    "A3": "A3",
+    "B": "B",
+    "C": "C",
+    "projectPlanning": "Hankesuunnittelu",
+    "generalDesign": "Yleissuunnittelu",
+    "parkPlaning": "Puistosuunnittelu",
+    "trafficPlanning": "Liikennesuunnittelu",
+    "streetDesign": "Katusuunnittelu",
+    "buildingDesign": "Rakennussuunnittelu",
+    "planning": "Suunnitteluvaiheen",
+    "contractCalculation": "Urakkalaskentavaiheen",
+    "additionalWork": "Urakkavaiheen sis. lisätyöt",
+    "reception": "Vastaanottovaiheen"
   },
   "projectCardBasicsForm": {
     "basics": "Hankkeen perustiedot",
@@ -69,7 +88,29 @@
     "visibilityStart": "Nähtävilläolo päättyy",
     "construction": "Rakentaminen",
     "estConstructionStart": "Alkaa",
-    "estConstructionEnd": "Päättyy"
+    "estConstructionEnd": "Päättyy",
+    "financial": "Hankkeen kustannustiedot",
+    "masterClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka",
+    "projectCostForecast": "Hankkeen kustannus ja laatutaso",
+    "projectQualityLevel": "Laatutaso",
+    "projectWorkQuantity": "Suoritemäärä",
+    "planningCostForecast": "Hankkeen kustannus ja laatutaso",
+    "planningPhase": "Laatutaso",
+    "planningWorkQuantity": "Suoritemäärä",
+    "constructionCostForecast": "Hankkeen kustannus ja laatutaso",
+    "constructionQuality": "Laatutaso",
+    "constructionWorkQuantity": "Suoritemäärä",
+    "overrunRight": "Ylitysoikeus",
+    "budget": "Budjetti",
+    "realizedCostLabel": "Toteumatiedot",
+    "realizedCost": "Toteuma",
+    "comittedCost": "Sitoumukset",
+    "spentCost": "Käytetty",
+    "budgetOverrunYear": "Ylitysoikeus vuosi",
+    "budgetOverrunAmount": "Ylitysoikeuden määrä",
+    "preliminaryBudgetDivision": "Kustannusarvion alustava jakautuminen"
   },
   "notification": {
     "title": {
@@ -114,5 +155,8 @@
   "send:": "Lähetä",
   "savedTime": "Tallennettu: {{time}}",
   "address": "Osoite",
-  "name": "nimi"
+  "name": "nimi",
+  "overrunRightValue": "Ylitysoikeus {{value}}",
+  "budgetOverrunYear": "Ylitysoikeus vuosi",
+  "budgetOverrunAmount": "Ylitysoikeuden määrä"
 }

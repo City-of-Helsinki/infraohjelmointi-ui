@@ -15,6 +15,7 @@ const ProjectCardSidePanel: FC = () => {
       label: t('nav.basics'),
     },
     { route: '#schedule', label: t('nav.schedule') },
+    { route: '#financial', label: t('nav.financial') },
   ];
 
   return (

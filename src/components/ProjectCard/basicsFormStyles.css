@@ -4,16 +4,16 @@
   --grid-col-half-right: 13/25;
   --grid-col-small-left: 1/8;
   --grid-col-small-right: 8/15;
-  --grid-col-xs-right: 1/4;
+  --grid-col-xs-left: 1/4;
   --grid-col-xs-middle: 4/11;
-  --grid-col-xs-left: 11/14;
+  --grid-col-xs-right: 11/14;
 }
 
 .basic-info-form {
   display: grid;
   grid-template-columns: repeat(24, 1fr); /* repeat 24 rows with 1fr (fractional unit) */
   grid-auto-flow: row;
-  gap: 0rem var(--spacing-layout-s);
+  gap: 0rem var(--spacing-s);
   width: 85%;
   margin: 0 var(--spacing-2-xl) 0 0;
 }
@@ -98,4 +98,76 @@
 
 .basic-info-form #estConstructionEnd {
   grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #masterClass {
+  grid-column: var(--grid-col-half-left);
+}
+
+.basic-info-form #class {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #subClass {
+  grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #projectCostForecast {
+  grid-column: var(--grid-col-xs-left);
+}
+
+.basic-info-form #projectQualityLevel {
+  grid-column: var(--grid-col-xs-middle);
+}
+
+.basic-info-form #projectWorkQuantity {
+  grid-column: var(--grid-col-xs-right);
+}
+
+.basic-info-form #planningCostForecast {
+  grid-column: var(--grid-col-xs-left);
+}
+
+.basic-info-form #planningPhase {
+  grid-column: var(--grid-col-xs-middle);
+}
+
+.basic-info-form #planningWorkQuantity {
+  grid-column: var(--grid-col-xs-right);
+}
+
+.basic-info-form #constructionCostForecast {
+  grid-column: var(--grid-col-xs-left);
+}
+
+.basic-info-form #constructionPhase {
+  grid-column: var(--grid-col-xs-middle);
+}
+
+.basic-info-form #constructionWorkQuantity {
+  grid-column: var(--grid-col-xs-right);
+}
+
+.basic-info-form #realizedCostLabel {
+  grid-column: var(--grid-col-full);
+}
+
+.basic-info-form #overrunRight {
+  grid-column: var(--grid-col-full);
+}
+
+.basic-info-form #preliminaryBudgetDivision {
+  grid-column: var(--grid-col-full);
+}
+
+@media (max-width: 1400px) {
+  .basic-info-form {
+    width: 95%;
+  }
+}
+
+@media (min-width: 2000px) {
+  .basic-info-form {
+    width: 60%;
+  }
 }

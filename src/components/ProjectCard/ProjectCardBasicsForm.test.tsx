@@ -5,7 +5,14 @@ import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectCardBasicsForm from './ProjectCardBasicsForm';
 import { matchExact } from '@/utils/common';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
-import { mockProjectAreas, mockProjectPhases, mockProjectTypes } from '@/mocks/mockLists';
+import {
+  mockConstructionPhases,
+  mockPlanningPhases,
+  mockProjectAreas,
+  mockProjectPhases,
+  mockProjectQualityLevels,
+  mockProjectTypes,
+} from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
@@ -43,6 +50,12 @@ describe('ProjectCardBasicsForm', () => {
               area: mockProjectAreas.data,
               phase: mockProjectPhases.data,
               type: mockProjectTypes.data,
+              masterClass: [],
+              class: [],
+              subClass: [],
+              projectQualityLevel: mockProjectQualityLevels.data,
+              planningPhase: mockPlanningPhases.data,
+              constructionPhase: mockConstructionPhases.data,
               error: {},
             },
           },
@@ -63,13 +76,21 @@ describe('ProjectCardBasicsForm', () => {
   it('fills the fields with existing project card data', async () => {
     const { getByDisplayValue, getByText } = renderResult;
     const projectCard = mockProjectCard.data;
-
+    const euroFormat = (value: string) => `${value} €`;
     const expectDisplayValue = (value: string) =>
       expect(getByDisplayValue(matchExact(value))).toBeInTheDocument();
 
     expect(getByText(`enums.${projectCard?.area?.value}`)).toBeInTheDocument();
     expect(getByText(`enums.${projectCard?.type?.value}`)).toBeInTheDocument();
-
+    expect(getByText(`enums.${projectCard?.projectQualityLevel?.value}`)).toBeInTheDocument();
+    expect(getByText(`enums.${projectCard?.planningPhase?.value}`)).toBeInTheDocument();
+    expect(getByText(`enums.${projectCard?.constructionPhase?.value}`)).toBeInTheDocument();
+    expect(getByText(euroFormat(projectCard?.budget || ''))).toBeInTheDocument();
+    expect(getByText(euroFormat(projectCard?.realizedCost || ''))).toBeInTheDocument();
+    expect(getByText(euroFormat(projectCard?.comittedCost || ''))).toBeInTheDocument();
+    expect(getByText(euroFormat(projectCard?.spentCost || ''))).toBeInTheDocument();
+    expect(getByText('overrunRightValue' || '')).toBeInTheDocument();
+    expect(getByText(`${projectCard?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();
     expectDisplayValue(projectCard?.description);
     expectDisplayValue(projectCard?.entityName);
     expectDisplayValue(projectCard?.hkrId);
@@ -81,6 +102,12 @@ describe('ProjectCardBasicsForm', () => {
     expectDisplayValue(projectCard?.visibilityEnd || '');
     expectDisplayValue(projectCard?.estConstructionStart || '');
     expectDisplayValue(projectCard?.estConstructionEnd || '');
+    expectDisplayValue(projectCard?.projectWorkQuantity || '');
+    expectDisplayValue(projectCard?.projectCostForecast || '');
+    expectDisplayValue(projectCard?.planningCostForecast || '');
+    expectDisplayValue(projectCard?.planningWorkQuantity || '');
+    expectDisplayValue(projectCard?.constructionCostForecast || '');
+    expectDisplayValue(projectCard?.constructionWorkQuantity || '');
 
     expect(projectCard?.hashTags?.length).toBe(2);
     projectCard?.hashTags?.forEach((h) => {

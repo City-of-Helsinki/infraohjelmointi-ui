@@ -10,8 +10,11 @@ import ProjectCardHeader from '@/components/ProjectCard/ProjectCardHeaderForm';
 import ProjectCardToolbar from '@/components/ProjectCard/ProjectCardToolbar';
 import './styles.css';
 import {
+  getConstructionPhasesThunk,
+  getPlanningPhasesThunk,
   getProjectAreasThunk,
   getProjectPhasesThunk,
+  getProjectQualityLevelsThunk,
   getProjectTypesThunk,
 } from '@/reducers/listsSlice';
 
@@ -25,6 +28,9 @@ const ProjectCardView = () => {
     dispatch(getProjectTypesThunk());
     dispatch(getProjectPhasesThunk());
     dispatch(getProjectAreasThunk());
+    dispatch(getProjectQualityLevelsThunk());
+    dispatch(getPlanningPhasesThunk());
+    dispatch(getConstructionPhasesThunk());
   }, [dispatch, projectId]);
 
   const navItems: Array<INavigationItem> = [

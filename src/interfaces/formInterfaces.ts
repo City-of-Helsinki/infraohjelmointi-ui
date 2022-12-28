@@ -5,11 +5,12 @@ export enum FormField {
   Select,
   Text,
   Number,
-  NetworkNumbers,
   TagsForm,
   Title,
   FieldSet,
   Date,
+  ListField,
+  OverrunRight,
 }
 
 export interface IForm {
@@ -21,6 +22,8 @@ export interface IForm {
   required?: boolean;
   readOnly?: boolean;
   fieldSet?: Array<IForm>;
+  tooltip?: string;
+  hideLabel?: boolean;
 }
 
 export interface IProjectCardHeaderForm {

@@ -83,6 +83,11 @@ table p {
   display: flex;
 }
 
+.flex-row-center {
+  display: flex;
+  align-items: center;
+}
+
 .display-flex-col {
   flex-direction: column;
 }
@@ -101,6 +106,10 @@ table p {
 
 .input-wrapper {
   margin-bottom: var(--spacing-l);
+}
+
+.input-wrapper label {
+  width: 250px;
 }
 
 .input-l {

@@ -22,7 +22,7 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
       setActive(hash);
       navigate(hash);
       const scrollToElement = document.getElementById(hash.split('#')[1]);
-      window.scrollTo({ top: scrollToElement?.offsetTop, behavior: 'smooth' });
+      window.scrollTo({ top: (scrollToElement?.offsetTop || 0) - 40, behavior: 'smooth' });
     },
     [navigate],
   );

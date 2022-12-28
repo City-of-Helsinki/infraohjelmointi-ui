@@ -114,18 +114,32 @@
   flex-wrap: wrap;
 }
 
-.basics-form .nn-row {
+.basics-form .list-field-row {
+  display: flex;
   margin-bottom: var(--spacing-xs);
 }
 
-.basics-form .nn-label {
+.basics-form .list-field-item-label {
   color: var(--label-color-default, var(--color-black-90));
   font-size: var(--fontsize-body-l);
   font-weight: bold;
-  width: 6.875rem;
+  width: 9rem;
   display: inline-block;
+}
+
+.basics-form .list-field-input {
+  display: flex;
+}
+
+.basics-form .list-field-input input {
+  height: 2rem !important;
+}
+
+#overrunRight .list-field-input {
+  margin: 0.5rem 0;
 }
 
 .pen-and-label-text {
   font-weight: 500;
+  width: auto !important;
 }

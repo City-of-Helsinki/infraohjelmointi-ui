@@ -21,3 +21,24 @@ export const getProjectAreas = async () => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getProjectQualityLevels = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/project-quality-levels/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getPlanningPhases = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/planning-phases/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getConstructionPhases = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/construction-phases/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
