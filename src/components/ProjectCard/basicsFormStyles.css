@@ -148,7 +148,7 @@
   grid-column: var(--grid-col-xs-right);
 }
 
-.basic-info-form #realizedCostsLabel {
+.basic-info-form #realizedCostLabel {
   grid-column: var(--grid-col-full);
 }
 

@@ -1,6 +1,6 @@
 import { IForm } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
-import { useState, MouseEvent } from 'react';
+import { useState, MouseEvent, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import BubbleIcon from './BubbleIcon';
@@ -9,10 +9,11 @@ import FormFieldLabel from './FormFieldLabel';
 const OverrunRightField = ({ form }: { form: IForm }) => {
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
-  const handleSetEditing = (e: MouseEvent<HTMLButtonElement>) => {
+
+  const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setEditing(!editing);
-  };
+    setEditing((currentState) => !currentState);
+  }, []);
 
   return (
     <div className="input-wrapper" id="overrunRight">
