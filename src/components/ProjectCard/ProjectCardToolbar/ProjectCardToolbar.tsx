@@ -1,5 +1,5 @@
 import { IconArrowDown, IconMap, IconPlus } from 'hds-react/icons';
-import { IconButton, Toolbar } from '../shared';
+import { IconButton, Toolbar } from '../../shared';
 
 const ProjectCardToolbar = () => {
   const click = () => console.log('click');

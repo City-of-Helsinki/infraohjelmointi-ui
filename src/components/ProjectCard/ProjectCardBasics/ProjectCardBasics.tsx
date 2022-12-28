@@ -1,5 +1,5 @@
 import ProjectCardBasicsForm from './ProjectCardBasicsForm';
-import ScrollToTop from '../shared/ScrollToTop';
+import ScrollToTop from '../../shared/ScrollToTop';
 import ProjectCardSidePanel from './ProjectCardSidePanel';
 
 const ProjectCardBasics = () => {

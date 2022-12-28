@@ -4,7 +4,7 @@ import { IconPenLine } from 'hds-react/icons';
 import { t } from 'i18next';
 import { FC, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
-import { IconButton, Paragraph, Title } from '../shared';
+import { IconButton, Paragraph, Title } from '../../shared';
 
 interface IProjectCardNameFormProps {
   control: HookFormControlType;

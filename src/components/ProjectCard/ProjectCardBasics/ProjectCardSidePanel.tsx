@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { StatusLabel } from 'hds-react/components/StatusLabel';
 import { IconSaveDiskette } from 'hds-react/icons';
-import { SideNavigation } from '../shared';
+import { SideNavigation } from '../../shared';
 import { useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import { useTranslation } from 'react-i18next';

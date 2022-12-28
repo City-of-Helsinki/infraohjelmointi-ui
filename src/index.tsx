@@ -7,11 +7,12 @@ import './i18n';
 
 import App from '@/App';
 import ProjectCardView from '@/views/ProjectCardView';
-import { ProjectCardBasics } from '@/components/ProjectCard';
+import { ProjectCardBasics } from '@/components/ProjectCard/ProjectCardBasics';
 import ErrorView from '@/views/ErrorView';
 import AuthGuard from '@/components/AuthGuard';
 import { injectStore } from '@/utils/interceptors';
 import PlanningListView from '@/views/PlanningListView';
+import { ProjectCardNotes } from '@/components/ProjectCard/ProjectCardNotes';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
             path: 'basics',
             element: <ProjectCardBasics />,
           },
+          { path: 'notes', element: <ProjectCardNotes /> },
         ],
       },
       {

@@ -1,7 +1,7 @@
 import { FC, MouseEvent } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { IconStar, IconStarFill } from 'hds-react/icons';
-import { IconButton } from '../shared';
+import { IconButton } from '../../shared';
 import { IProjectCardHeaderFieldProps } from './ProjectCardHeaderForm';
 
 const ProjectCardFavouriteField: FC<IProjectCardHeaderFieldProps> = ({ control }) => {

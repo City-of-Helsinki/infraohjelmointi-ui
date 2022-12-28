@@ -2,13 +2,13 @@ import useProjectCardBasicsForm from '@/hooks/useProjectCardBasicsForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback } from 'react';
-import { FormFieldCreator } from '../shared';
+import { FormFieldCreator } from '../../shared';
 import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
 import { RootState } from '@/store';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
-import './basicsFormStyles.css';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
+import './styles.css';
 import _ from 'lodash';
 
 const ProjectCardBasicsForm: FC = () => {
