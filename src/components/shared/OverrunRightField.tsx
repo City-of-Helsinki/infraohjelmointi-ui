@@ -1,6 +1,6 @@
 import { IForm } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
-import { useState, MouseEvent, useCallback } from 'react';
+import { useState, MouseEvent, useCallback, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import BubbleIcon from './BubbleIcon';
@@ -75,4 +75,4 @@ const OverrunRightField = ({ form }: { form: IForm }) => {
   );
 };
 
-export default OverrunRightField;
+export default memo(OverrunRightField);

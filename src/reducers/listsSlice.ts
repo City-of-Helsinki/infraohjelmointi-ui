@@ -150,7 +150,7 @@ export const listsSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
-    // GET PLANNING PHASES
+    // GET CONSTRUCTION PHASES
     builder.addCase(
       getConstructionPhasesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
