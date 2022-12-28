@@ -1,9 +1,11 @@
 import { IError } from '@/interfaces/common';
 import {
+  INote,
   IProjectCard,
   IProjectCardRequestObject,
   IProjectCardsResponse,
 } from '@/interfaces/projectCardInterfaces';
+import { getNotesByProjectCard } from '@/services/notesServices';
 import {
   getProjectCard,
   getProjectCards,
@@ -18,6 +20,7 @@ import { notifySuccess } from './notificationSlice';
 interface IProjectCardState {
   selectedProjectCard: IProjectCard | null;
   projectCards: Array<IProjectCard>;
+  notes: Array<INote>;
   count: number | null;
   page: number;
   error: IError | null | unknown;
@@ -27,6 +30,7 @@ interface IProjectCardState {
 const initialState: IProjectCardState = {
   selectedProjectCard: null,
   projectCards: [],
+  notes: [],
   count: null,
   error: null,
   page: 0,
@@ -89,6 +93,15 @@ export const patchProjectCardThunk = createAsyncThunk(
         );
         return res;
       })
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getNotesByProjectCardThunk = createAsyncThunk(
+  'notesByProjectCard/get',
+  async (projectId: string, thunkAPI) => {
+    return await getNotesByProjectCard(projectId)
+      .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
@@ -167,6 +180,19 @@ export const projectCardSlice = createSlice({
     );
     builder.addCase(
       silentPatchProjectCardThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // NOTES GET
+    builder.addCase(
+      getNotesByProjectCardThunk.fulfilled,
+      (state, action: PayloadAction<Array<INote>>) => {
+        return { ...state, notes: action.payload };
+      },
+    );
+    builder.addCase(
+      getNotesByProjectCardThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

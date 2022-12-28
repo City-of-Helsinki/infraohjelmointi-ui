@@ -1,6 +1,5 @@
 import { FontWeightType, TextColorType } from '@/interfaces/common';
 import { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 
 /**
  * Using the hds-core helper classes for predefined fonts
@@ -20,13 +19,12 @@ interface ISpanProps {
 }
 
 const Span: FC<ISpanProps> = ({ size, text, color, fontWeight, id }) => {
-  const { t } = useTranslation();
   return (
     <span
       data-testid={id}
       className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}
     >
-      {t(text)}
+      {text}
     </span>
   );
 };

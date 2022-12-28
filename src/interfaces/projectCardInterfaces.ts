@@ -208,3 +208,10 @@ export interface IProjectCardsResponse {
   results: Array<IProjectCard>;
   count: number;
 }
+
+export interface INote {
+  id: string;
+  content: string;
+  updatedBy: string;
+  project: string;
+}
