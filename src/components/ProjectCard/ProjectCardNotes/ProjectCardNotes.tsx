@@ -28,11 +28,9 @@ const ProjectCardNotes = () => {
       {/* note form */}
       <ProjectCardNoteForm />
       {/* notes */}
-      <div>
-        {notes?.map((n) => (
-          <ProjectCardNote key={n.id} />
-        ))}
-      </div>
+      {notes?.map((n) => (
+        <ProjectCardNote key={n.id} />
+      ))}
     </div>
   );
 };
