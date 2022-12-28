@@ -111,5 +111,8 @@
   "keur": "keur",
   "basicInfoKA": ">< Perustiedot <> KA ja ohj.",
   "inProgressUntil": "Käynnissä {{planningListInfo.date}} asti",
-  "send:": "Lähetä"
+  "send:": "Lähetä",
+  "savedTime": "Tallennettu: {{time}}",
+  "address": "Osoite",
+  "name": "nimi"
 }

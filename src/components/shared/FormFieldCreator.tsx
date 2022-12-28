@@ -18,24 +18,26 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
   return (
     <>
       {form?.map((f) => {
-        const { type, name, ...formProps } = f;
+        const { type, ...formValues } = f;
+        const formProps = { ...formValues, key: f.name };
+        const listName = f.name as ListType;
         switch (type) {
           case FormField.Select:
-            return <SelectField key={name} name={name as ListType} {...formProps} />;
+            return <SelectField {...formProps} name={listName} />;
           case FormField.Text:
-            return <TextField key={name} name={name} {...formProps} />;
+            return <TextField {...formProps} />;
           case FormField.Number:
-            return <NumberField key={name} name={name} {...formProps} />;
+            return <NumberField {...formProps} />;
           case FormField.Title:
-            return <FormSectionTitle key={name} name={name} label={f.label} />;
+            return <FormSectionTitle {...formProps} />;
           case FormField.NetworkNumbers:
-            return <NetworkNumbers key={name} name={name} {...formProps} />;
+            return <NetworkNumbers {...formProps} />;
           case FormField.TagsForm:
-            return <HashTagsForm key={name} name={name} {...formProps} />;
+            return <HashTagsForm {...formProps} />;
           case FormField.FieldSet:
-            return <FieldSetCreator key={name} form={f} />;
+            return <FieldSetCreator key={f.name} form={f} />;
           case FormField.Date:
-            return <DateField key={name} name={name} {...formProps} />;
+            return <DateField {...formProps} />;
           default:
             return null;
         }

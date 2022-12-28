@@ -2,8 +2,8 @@ import { FC, memo } from 'react';
 import Title from './Title';
 
 interface IFormSectionTitleProps {
-  name: string;
-  label: string;
+  name?: string;
+  label?: string;
 }
 const FormSectionTitle: FC<IFormSectionTitleProps> = ({ label, name }) => {
   return (

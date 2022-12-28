@@ -76,20 +76,20 @@ const buildProjectCardBasicsFormFields = (
       name: 'planning',
       type: FormField.FieldSet,
       fieldSet: [
-        { name: 'estPlanningStart', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'estPlanningEnd', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'presenceStart', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'presenceEnd', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'visibilityEnd', type: FormField.Date },
+        { name: 'estPlanningStart', type: FormField.Date },
+        { name: 'estPlanningEnd', type: FormField.Date },
+        { name: 'presenceStart', type: FormField.Date },
+        { name: 'presenceEnd', type: FormField.Date },
         { name: 'visibilityStart', type: FormField.Date },
+        { name: 'visibilityEnd', type: FormField.Date },
       ],
     },
     {
       name: 'construction',
       type: FormField.FieldSet,
       fieldSet: [
-        { name: 'estConstructionStart', type: FormField.Date, dateFormat: 'YYYY' },
-        { name: 'estConstructionEnd', type: FormField.Date, dateFormat: 'YYYY' },
+        { name: 'estConstructionStart', type: FormField.Date },
+        { name: 'estConstructionEnd', type: FormField.Date },
       ],
     },
   ];
@@ -155,17 +155,22 @@ const useProjectCardBasicsValues = () => {
  * It will also return formFields, which can be passed to the FormFieldCreator component to generate
  * the visual form.
  *
- * @returns handleSubmit, reset, formFields
+ * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectCardBasicsForm = () => {
   const { t } = useTranslation();
+  const projectCard = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard);
+  const { formValues } = useProjectCardBasicsValues();
 
-  const { formValues, projectCard } = useProjectCardBasicsValues();
-
-  const { control, handleSubmit, reset } = useForm<IProjectCardBasicsForm>({
-    defaultValues: formValues,
-    mode: 'all',
+  const formMethods = useForm<IProjectCardBasicsForm>({
+    defaultValues: useMemo(() => formValues, [formValues]),
+    mode: 'onBlur',
   });
+
+  const { control, reset } = formMethods;
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const formFields = useMemo(() => buildProjectCardBasicsFormFields(control, t), [control]);
 
   // Updates
   useEffect(() => {
@@ -175,10 +180,7 @@ const useProjectCardBasicsForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectCard, formValues]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const formFields = useMemo(() => buildProjectCardBasicsFormFields(control, t), [control]);
-
-  return { handleSubmit, reset, formFields };
+  return { formFields, formMethods };
 };
 
 export default useProjectCardBasicsForm;

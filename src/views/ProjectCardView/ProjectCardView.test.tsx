@@ -15,6 +15,7 @@ import { RenderResult } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
+import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());

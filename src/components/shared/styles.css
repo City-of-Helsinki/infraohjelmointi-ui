@@ -68,6 +68,10 @@
   max-width: 16.5rem;
 }
 
+.side-nav li:last-child {
+  border-bottom: 0.0625rem solid var(--color-black-20);
+}
+
 .error-text-container {
   display: inline;
 }

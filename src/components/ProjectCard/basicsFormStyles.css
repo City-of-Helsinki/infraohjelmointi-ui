@@ -85,11 +85,11 @@
 
 .basic-info-form #visibilityStart {
   grid-row: 3;
-  grid-column: var(--grid-col-small-left);
+  grid-column: var(--grid-col-small-right);
 }
 .basic-info-form #visibilityEnd {
   grid-row: 3;
-  grid-column: var(--grid-col-small-right);
+  grid-column: var(--grid-col-small-left);
 }
 
 .basic-info-form #estConstructionStart {

@@ -2,7 +2,7 @@ import { IOption, ListType } from '@/interfaces/common';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { Select } from 'hds-react/components/Select';
+import { Select as HDSSelect } from 'hds-react/components/Select';
 import { useOptions } from '@/hooks/useOptions';
 
 interface ISelectFieldProps {
@@ -21,20 +21,22 @@ const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules }) => 
     <Controller
       name={name}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState }) => {
+      render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
         return (
-          <Select
-            className="input-l"
-            label={label || ''}
-            id={label}
-            invalid={fieldState.error ? true : false}
-            error={fieldState.error?.message}
-            onBlur={field.onBlur}
-            onChange={field.onChange}
-            value={field.value}
-            options={options}
-            required={required}
-          ></Select>
+          <div className="input-wrapper" id={name} data-testid={name}>
+            <HDSSelect
+              className="input-l"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              label={label || ''}
+              id={label}
+              invalid={error ? true : false}
+              error={error?.message}
+              options={options}
+              required={required}
+            />
+          </div>
         );
       }}
       rules={rules}

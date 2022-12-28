@@ -2,46 +2,42 @@ import useProjectCardBasicsForm from '@/hooks/useProjectCardBasicsForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectCardBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback } from 'react';
-import { SubmitHandler } from 'react-hook-form';
 import { FormFieldCreator } from '../shared';
-import { Button } from 'hds-react/components/Button';
-import { patchProjectCardThunk } from '@/reducers/projectCardSlice';
+import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
 import { IProjectCardRequest } from '@/interfaces/projectCardInterfaces';
-import './basicsFormStyles.css';
 import { RootState } from '@/store';
-import { emptyStringsToNull, getOptionId } from '@/utils/common';
+import { dirtyFieldsToRequestObject } from '@/utils/common';
+import './basicsFormStyles.css';
+import { FieldValues, SubmitHandler } from 'react-hook-form';
+import _ from 'lodash';
 
 const ProjectCardBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
-  const { handleSubmit, formFields } = useProjectCardBasicsForm();
-  const projectId = useAppSelector((state: RootState) => state.projectCard.selectedProjectCard)?.id;
+  const { formFields, formMethods } = useProjectCardBasicsForm();
+  const projectId = useAppSelector(
+    (state: RootState) => state.projectCard.selectedProjectCard?.id,
+    _.isEqual,
+  );
 
-  const onSubmit: SubmitHandler<IProjectCardBasicsForm> = useCallback(
-    async (form: IProjectCardBasicsForm) => {
-      const { type, area, ...formData } = emptyStringsToNull(
-        form as IAppForms,
-      ) as IProjectCardBasicsForm;
+  const {
+    formState: { dirtyFields, isDirty },
+    handleSubmit,
+  } = formMethods;
 
-      const data: IProjectCardRequest = {
-        ...formData,
-        type: getOptionId(type),
-        area: getOptionId(area),
-      };
-
-      if (projectId) {
-        dispatch(patchProjectCardThunk({ id: projectId, data }));
-      }
+  const onSubmit = useCallback(
+    (form: IProjectCardBasicsForm) => {
+      const data: IProjectCardRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+      projectId && dispatch(silentPatchProjectCardThunk({ id: projectId, data }));
     },
-    [dispatch, projectId],
+    [dirtyFields, projectId, dispatch],
   );
 
   return (
     <div className="basics-form">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onBlur={isDirty ? (handleSubmit(onSubmit) as SubmitHandler<FieldValues>) : undefined}>
         <div className="basic-info-form">
           <FormFieldCreator form={formFields} />
         </div>
-        <Button type="submit">Tallenna perustiedot</Button>
       </form>
     </div>
   );

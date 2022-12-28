@@ -21,7 +21,6 @@ export interface IForm {
   required?: boolean;
   readOnly?: boolean;
   fieldSet?: Array<IForm>;
-  dateFormat?: string;
 }
 
 export interface IProjectCardHeaderForm {
@@ -29,7 +28,6 @@ export interface IProjectCardHeaderForm {
   favourite: boolean;
   name: string;
   address?: string;
-  group: string;
 }
 
 export interface IProjectCardBasicsForm {
@@ -60,3 +58,5 @@ export type HookFormRulesType = Omit<
   RegisterOptions<FieldValues, FieldPath<FieldValues>>,
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
+
+export type IFormValueType = string | boolean | IOption | string[] | undefined;

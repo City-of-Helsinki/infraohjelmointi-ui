@@ -16,24 +16,22 @@ const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readO
   return (
     <Controller
       name={name}
+      rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState }) => (
+      render={({ field, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
             className={`input-l`}
+            {...field}
             label={label}
             id={label}
-            value={field.value || ''}
             readOnly={readOnly}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
             required={required}
-            invalid={fieldState.error ? true : false}
-            errorText={fieldState.error?.message}
+            invalid={error ? true : false}
+            errorText={error?.message}
           />
         </div>
       )}
-      rules={rules}
     />
   );
 };

@@ -11,6 +11,7 @@ import {
   postProjectCard,
 } from '@/services/projectCardServices';
 import { RootState } from '@/store';
+import { getCurrentTime } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
 
@@ -20,6 +21,7 @@ interface IProjectCardState {
   count: number | null;
   page: number;
   error: IError | null | unknown;
+  updated: string | null;
 }
 
 const initialState: IProjectCardState = {
@@ -28,6 +30,7 @@ const initialState: IProjectCardState = {
   count: null,
   error: null,
   page: 0,
+  updated: null,
 };
 
 export const getProjectCardsThunk = createAsyncThunk(
@@ -58,6 +61,15 @@ export const postProjectCardThunk = createAsyncThunk(
   'projectCard/post',
   async (request: IProjectCardRequestObject, thunkAPI) => {
     return await postProjectCard(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const silentPatchProjectCardThunk = createAsyncThunk(
+  'projectCard/silent-patch',
+  async (request: IProjectCardRequestObject, thunkAPI) => {
+    return await patchProjectCard(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -142,6 +154,19 @@ export const projectCardSlice = createSlice({
     );
     builder.addCase(
       patchProjectCardThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // SILENT PATCH
+    builder.addCase(
+      silentPatchProjectCardThunk.fulfilled,
+      (state, action: PayloadAction<IProjectCard>) => {
+        return { ...state, selectedProjectCard: action.payload, updated: getCurrentTime() };
+      },
+    );
+    builder.addCase(
+      silentPatchProjectCardThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },
