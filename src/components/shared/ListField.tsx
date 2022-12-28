@@ -1,4 +1,4 @@
-import { FormField, IForm } from '@/interfaces/formInterfaces';
+import { IForm } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
 import { FC, memo, MouseEvent, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
@@ -28,11 +28,13 @@ const ListField: FC<IListFieldProps> = ({ form }) => {
             key={f.name}
             name={f.name}
             control={f.control as Control<FieldValues>}
-            render={({ field }) => {
-              if (f.type === FormField.Number) {
-                return (
-                  <div className="list-field-row" key={f.label}>
-                    <label className="list-field-item-label">{f.label}</label>
+            render={({ field }) => (
+              <div className="list-field-row" key={f.label}>
+                <label className="list-field-item-label">{f.label}</label>
+                {!editing ? (
+                  <span>{`${field.value} €`}</span>
+                ) : (
+                  <>
                     <NumberInput
                       className="list-field-input"
                       {...field}
@@ -41,13 +43,10 @@ const ListField: FC<IListFieldProps> = ({ form }) => {
                       id={field.name}
                       readOnly={!editing || f.readOnly}
                     />
-                    €
-                  </div>
-                );
-              } else {
-                return <></>;
-              }
-            }}
+                  </>
+                )}
+              </div>
+            )}
           />
         ))}
       </div>

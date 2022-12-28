@@ -64,8 +64,7 @@ const OverrunRightField = ({ form }: { form: IForm }) => {
               <div className="flex-row-center">
                 {/* display */}
                 <BubbleIcon value={'y'} />
-                <span className="overrun-amount-container">{field.value}</span>
-                <span>keur</span>
+                <span className="overrun-amount-container">{`${field.value} keur`}</span>
               </div>
             )}
           </>
