@@ -23,7 +23,7 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
           <div className="input-wrapper" id={name} data-testid={name}>
             <HDSDateInput
               className="input-m"
-              onChange={(val) => onChange(val)}
+              onChange={onChange}
               value={value}
               onBlur={onBlur}
               placeholder={''}
