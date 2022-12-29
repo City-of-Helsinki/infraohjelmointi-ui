@@ -40,9 +40,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control
                 id={`${name}-${i}`}
                 label={o.label}
                 value={o.value}
-                onChange={function customChange(e) {
-                  onChange(optionToBoolean(e));
-                }}
+                onChange={(e) => onChange(optionToBoolean(e))}
                 onBlur={onBlur}
                 checked={valueToString(value) === o.value}
               />
