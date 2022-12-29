@@ -7,7 +7,8 @@ import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DeleteNoteForm from './DeleteNoteForm';
 import EditNoteForm from './EditNoteForm';
-import ProjectNotesEditInfo from './ProjectNotesEditInfo';
+import ProjectNoteHistoryRow from './ProjectNoteHistoryRow';
+import { stringToDateTime } from '@/utils/common';
 
 interface IProjectNoteProps {
   note: INote;
@@ -18,6 +19,8 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openModifiedInfo, setOpenModifiedInfo] = useState(false);
+  const author = `${note.updatedBy.firstName} ${note.updatedBy.lastName}`;
+  const hasHistory = note.history?.length > 0;
 
   const handleOpenDeleteDialog = useCallback(
     () => setOpenDeleteDialog((currentState) => !currentState),
@@ -38,27 +41,27 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
     <div className="note-container">
       <div className="note-header-container">
         <div>
-          {/* TODO: get updated date and author from BE */}
-          <Span text={'23.11.2022 8:05'} size="s" fontWeight="light" />
-          <FormFieldLabel text="Mikko Mallikas" />
+          <Span text={stringToDateTime(note.createdDate)} size="s" fontWeight="light" />
+          <FormFieldLabel text={author} />
         </div>
-        {/* TODO: modify note label should only display when the note is modified */}
-        <div>
-          <StatusLabel type="alert">{t('modified')}</StatusLabel>
-        </div>
+        <div>{hasHistory && <StatusLabel type="alert">{t('modified')}</StatusLabel>}</div>
       </div>
       <div className="note-content-container">
         <p>{note.content}</p>
       </div>
       <div className="note-footer-container">
-        <Button
-          size="small"
-          variant="supplementary"
-          iconRight={openModifiedInfo ? <IconAngleUp /> : <IconAngleDown />}
-          onClick={handleOpenModifiedInfo}
-        >
-          {t('modificationHistory')}
-        </Button>
+        <div>
+          {hasHistory && (
+            <Button
+              size="small"
+              variant="supplementary"
+              iconRight={openModifiedInfo ? <IconAngleUp /> : <IconAngleDown />}
+              onClick={handleOpenModifiedInfo}
+            >
+              {t('modificationHistory')}
+            </Button>
+          )}
+        </div>
         <div>
           <Button
             size="small"
@@ -78,7 +81,8 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
           </Button>
         </div>
       </div>
-      {openModifiedInfo && <ProjectNotesEditInfo />}
+      {openModifiedInfo &&
+        note.history?.map((h) => <ProjectNoteHistoryRow key={h.history_id} history={h} />)}
       <DeleteNoteForm isOpen={openDeleteDialog} close={handleOpenDeleteDialog} noteId={note.id} />
       <EditNoteForm isOpen={openEditDialog} close={handleOpenEditDialog} note={note} />
     </div>

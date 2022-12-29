@@ -39,19 +39,41 @@
   padding: 0 var(--spacing-xs) var(--spacing-s) var(--spacing-xs);
 }
 
-.note-edit-info-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 0 var(--spacing-m) var(--spacing-m) var(--spacing-m);
+.note-history {
+  padding-bottom: 1.25rem;
 }
 
-.note-edit-info-container #modifiedDate {
+.note-history:last-child {
+  padding-bottom: 0;
+}
+
+/* adds a border with padding to each element */
+.note-history:after {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 93%;
+  border-bottom: 1px solid var(--color-black-20);
+}
+
+/* last history row will not have a border */
+.note-history:last-child:after {
+  border-bottom: none;
+}
+
+.note-history-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0 var(--spacing-m) var(--spacing-s) var(--spacing-m);
+}
+
+.note-history-container #modifiedDate {
   grid-column: 1;
 }
-.note-edit-info-container #title {
+.note-history-container #title {
   grid-column: 2/3;
 }
-.note-edit-info-container #modifiedBy {
+.note-history-container #modifiedBy {
   grid-row: 2;
   grid-column: 2/3;
 }

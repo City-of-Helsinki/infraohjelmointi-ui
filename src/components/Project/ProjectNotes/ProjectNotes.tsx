@@ -29,9 +29,11 @@ const ProjectNotes = () => {
       {/* note form */}
       <NewNoteForm />
       {/* notes */}
-      {notes?.map((n) => (
-        <ProjectNote key={n.id} note={n} />
-      ))}
+      {[...notes]
+        ?.sort((a, b) => new Date(a.createdDate).valueOf() - new Date(b.createdDate).valueOf())
+        .map((n) => (
+          <ProjectNote key={n.id} note={n} />
+        ))}
     </div>
   );
 };
