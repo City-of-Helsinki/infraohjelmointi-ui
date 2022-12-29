@@ -28,7 +28,6 @@ const mockProjectCard: { data: IProjectCard } = {
     address: 'Address 1B 12',
     description: 'Hakaniementori description',
     programmed: true,
-    constructionPhaseDetail: '',
     estPlanningStart: '01.12.2022',
     estPlanningEnd: '02.12.2022',
     estConstructionStart: '03.12.2022',
@@ -67,11 +66,25 @@ const mockProjectCard: { data: IProjectCard } = {
     neighborhood: 'Kamppi',
     tiedCurrYear: '800.00',
     riskAssess: '50',
+    constructionPhaseDetail: { id: '3f72b5bd-4a32-4db9-b8bf-399c1de574cd', value: 'firstPhase' },
+    riskAssessment: {
+      id: '8fd009ef-ab34-492e-889c-9062a2b3fce8',
+      value: 'Placeholder risk',
+    },
+    category: {
+      id: '05b71287-bfab-4616-bdb5-94171722756b',
+      value: 'K1',
+    },
     locked: false,
     comments: '',
     delays: '',
     hashTags: ['pyöräily', 'uudisrakentaminen'],
     favPersons: ['9d6a0854-a784-44b0-ad35-ca5e8b8f0e90'],
+    louhi: false,
+    gravel: false,
+    effectHousing: false,
+    constructionEndYear: '2056',
+    planningStartYear: '2089',
   },
 };
 

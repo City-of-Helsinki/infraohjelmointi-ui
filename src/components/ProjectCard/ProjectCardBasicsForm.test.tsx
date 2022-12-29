@@ -6,11 +6,14 @@ import ProjectCardBasicsForm from './ProjectCardBasicsForm';
 import { matchExact } from '@/utils/common';
 import { IProjectCard } from '@/interfaces/projectCardInterfaces';
 import {
+  mockConstructionPhaseDetails,
   mockConstructionPhases,
   mockPlanningPhases,
   mockProjectAreas,
+  mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
+  mockProjectRisks,
   mockProjectTypes,
 } from '@/mocks/mockLists';
 import { mockTags } from '@/mocks/common';
@@ -50,6 +53,9 @@ describe('ProjectCardBasicsForm', () => {
               area: mockProjectAreas.data,
               phase: mockProjectPhases.data,
               type: mockProjectTypes.data,
+              constructionPhaseDetail: mockConstructionPhaseDetails.data,
+              category: mockProjectCategories.data,
+              riskAssessment: mockProjectRisks.data,
               masterClass: [],
               class: [],
               subClass: [],
@@ -74,17 +80,28 @@ describe('ProjectCardBasicsForm', () => {
   });
 
   it('fills the fields with existing project card data', async () => {
-    const { getByDisplayValue, getByText } = renderResult;
+    const { getByDisplayValue, getByText, getByTestId } = renderResult;
     const projectCard = mockProjectCard.data;
     const euroFormat = (value: string) => `${value} €`;
-    const expectDisplayValue = (value: string) =>
-      expect(getByDisplayValue(matchExact(value))).toBeInTheDocument();
+    const expectDisplayValue = (value: string | undefined) =>
+      expect(getByDisplayValue(matchExact(value || ''))).toBeInTheDocument();
+    const expectOption = (option: string | undefined) =>
+      expect(getByText(`enums.${option || ''}`)).toBeInTheDocument();
+    const expectRadioBoolean = (testId: string, value: boolean) =>
+      expect((getByTestId(testId) as HTMLInputElement).checked).toBe(value);
 
-    expect(getByText(`enums.${projectCard?.area?.value}`)).toBeInTheDocument();
-    expect(getByText(`enums.${projectCard?.type?.value}`)).toBeInTheDocument();
-    expect(getByText(`enums.${projectCard?.projectQualityLevel?.value}`)).toBeInTheDocument();
-    expect(getByText(`enums.${projectCard?.planningPhase?.value}`)).toBeInTheDocument();
-    expect(getByText(`enums.${projectCard?.constructionPhase?.value}`)).toBeInTheDocument();
+    expectOption(projectCard?.area?.value);
+    expectOption(projectCard?.type?.value);
+    expectOption(projectCard?.projectQualityLevel?.value);
+    expectOption(projectCard?.planningPhase?.value);
+    expectOption(projectCard?.constructionPhase?.value);
+    expectOption(projectCard?.constructionPhaseDetail?.value);
+    expectOption(projectCard?.category?.value);
+    expectOption(projectCard?.riskAssessment?.value);
+    expectRadioBoolean('programmed-0', true);
+    expectRadioBoolean('louhi-0', false);
+    expectRadioBoolean('gravel-0', false);
+    expectRadioBoolean('effectHousing-0', false);
     expect(getByText(euroFormat(projectCard?.budget || ''))).toBeInTheDocument();
     expect(getByText(euroFormat(projectCard?.realizedCost || ''))).toBeInTheDocument();
     expect(getByText(euroFormat(projectCard?.comittedCost || ''))).toBeInTheDocument();
@@ -94,20 +111,22 @@ describe('ProjectCardBasicsForm', () => {
     expectDisplayValue(projectCard?.description);
     expectDisplayValue(projectCard?.entityName);
     expectDisplayValue(projectCard?.hkrId);
-    expectDisplayValue(projectCard?.estPlanningStart || '');
-    expectDisplayValue(projectCard?.estPlanningEnd || '');
-    expectDisplayValue(projectCard?.presenceStart || '');
-    expectDisplayValue(projectCard?.presenceEnd || '');
-    expectDisplayValue(projectCard?.visibilityStart || '');
-    expectDisplayValue(projectCard?.visibilityEnd || '');
-    expectDisplayValue(projectCard?.estConstructionStart || '');
-    expectDisplayValue(projectCard?.estConstructionEnd || '');
-    expectDisplayValue(projectCard?.projectWorkQuantity || '');
-    expectDisplayValue(projectCard?.projectCostForecast || '');
-    expectDisplayValue(projectCard?.planningCostForecast || '');
-    expectDisplayValue(projectCard?.planningWorkQuantity || '');
-    expectDisplayValue(projectCard?.constructionCostForecast || '');
-    expectDisplayValue(projectCard?.constructionWorkQuantity || '');
+    expectDisplayValue(projectCard?.planningStartYear);
+    expectDisplayValue(projectCard?.constructionEndYear);
+    expectDisplayValue(projectCard?.estPlanningStart);
+    expectDisplayValue(projectCard?.estPlanningEnd);
+    expectDisplayValue(projectCard?.presenceStart);
+    expectDisplayValue(projectCard?.presenceEnd);
+    expectDisplayValue(projectCard?.visibilityStart);
+    expectDisplayValue(projectCard?.visibilityEnd);
+    expectDisplayValue(projectCard?.estConstructionStart);
+    expectDisplayValue(projectCard?.estConstructionEnd);
+    expectDisplayValue(projectCard?.projectWorkQuantity);
+    expectDisplayValue(projectCard?.projectCostForecast);
+    expectDisplayValue(projectCard?.planningCostForecast);
+    expectDisplayValue(projectCard?.planningWorkQuantity);
+    expectDisplayValue(projectCard?.constructionCostForecast);
+    expectDisplayValue(projectCard?.constructionWorkQuantity);
 
     expect(projectCard?.hashTags?.length).toBe(2);
     projectCard?.hashTags?.forEach((h) => {
@@ -248,5 +267,27 @@ describe('ProjectCardBasicsForm', () => {
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
     expect(formPatchRequest.description).toEqual(expectedValue);
     expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
+  });
+
+  it('can autosave patch a RadioCheckboxField', async () => {
+    const { user, container, getByTestId } = renderResult;
+    const expectedValue = true;
+    const projectCard = mockProjectCard.data;
+    const responseProjectCard: IProjectCard = {
+      ...projectCard,
+      louhi: expectedValue,
+    };
+
+    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProjectCard));
+
+    const louhiField = getByTestId('louhi-0') as HTMLInputElement;
+    const parentContainer = container.getElementsByClassName('basics-form')[0];
+
+    await user.click(louhiField);
+    await user.click(parentContainer);
+
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProjectCard;
+    expect(formPatchRequest.louhi).toEqual(expectedValue);
+    expect(louhiField.checked).toBe(expectedValue);
   });
 });

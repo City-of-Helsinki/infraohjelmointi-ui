@@ -68,6 +68,72 @@ const buildProjectCardBasicsFormFields = (
       name: 'hashTags',
       type: FormField.TagsForm,
     },
+    // Status
+    {
+      name: 'status',
+      type: FormField.Title,
+    },
+    {
+      name: 'phase',
+      type: FormField.Select,
+      rules: { required: 'Vaihe on pakollinen tieto.' },
+    },
+    {
+      name: 'constructionPhaseDetail',
+      type: FormField.Select,
+    },
+    {
+      name: 'programmed',
+      type: FormField.RadioCheckbox,
+    },
+    {
+      name: 'planningStartYear',
+      type: FormField.Number,
+      rules: {
+        min: {
+          value: 0,
+          message: 'Arvon on oltava suurempi tai yhtä suuri kuin 0',
+        },
+        max: {
+          value: 3000,
+          message: 'Arvon on oltava pienempi tai yhtä suuri kuin 3000',
+        },
+      },
+    },
+    {
+      name: 'constructionEndYear',
+      type: FormField.Number,
+      rules: {
+        min: {
+          value: 0,
+          message: 'Arvon on oltava suurempi tai yhtä suuri kuin 0',
+        },
+        max: {
+          value: 3000,
+          message: 'Arvon on oltava pienempi tai yhtä suuri kuin 3000',
+        },
+      },
+    },
+    {
+      name: 'louhi',
+      type: FormField.RadioCheckbox,
+    },
+    {
+      name: 'gravel',
+      type: FormField.RadioCheckbox,
+    },
+    {
+      name: 'category',
+      type: FormField.Select,
+    },
+    {
+      name: 'effectHousing',
+      type: FormField.RadioCheckbox,
+    },
+    {
+      name: 'riskAssessment',
+      type: FormField.Select,
+    },
     // Schedule
     {
       name: 'schedule',
@@ -172,6 +238,16 @@ const useProjectCardBasicsValues = () => {
       presenceEnd: projectCard?.presenceEnd || '',
       visibilityStart: projectCard?.visibilityStart || '',
       visibilityEnd: projectCard?.visibilityEnd || '',
+      phase: listItemToOption(projectCard?.phase, t),
+      programmed: projectCard?.programmed || false,
+      constructionPhaseDetail: listItemToOption(projectCard?.constructionPhaseDetail, t),
+      louhi: projectCard?.louhi || false,
+      gravel: projectCard?.gravel || false,
+      category: listItemToOption(projectCard?.category, t),
+      effectHousing: projectCard?.effectHousing || false,
+      riskAssessment: listItemToOption(projectCard?.riskAssessment, t),
+      constructionEndYear: projectCard?.constructionEndYear || '',
+      planningStartYear: projectCard?.planningStartYear || '',
       projectWorkQuantity: projectCard?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(projectCard?.projectQualityLevel, t),
       projectCostForecast: projectCard?.projectCostForecast,

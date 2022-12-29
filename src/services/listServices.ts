@@ -22,6 +22,27 @@ export const getProjectAreas = async () => {
     .catch((err: IError) => Promise.reject(err));
 };
 
+export const getConstructionPhaseDetails = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/construction-phase-details/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getProjectCategories = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/project-categories/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getProjectRisks = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/project-risks/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
 export const getProjectQualityLevels = async () => {
   return axios
     .get(`${process.env.REACT_APP_API_URL}/project-quality-levels/`)

@@ -6,6 +6,9 @@ import {
   getProjectPhases,
   getProjectQualityLevels,
   getProjectTypes,
+  getConstructionPhaseDetails,
+  getProjectCategories,
+  getProjectRisks,
 } from '@/services/listServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -13,6 +16,9 @@ export interface IListState {
   type: Array<IListItem>;
   phase: Array<IListItem>;
   area: Array<IListItem>;
+  constructionPhaseDetail: Array<IListItem>;
+  category: Array<IListItem>;
+  riskAssessment: Array<IListItem>;
   masterClass: Array<IListItem>;
   class: Array<IListItem>;
   subClass: Array<IListItem>;
@@ -26,6 +32,9 @@ const initialState: IListState = {
   type: [],
   phase: [],
   area: [],
+  constructionPhaseDetail: [],
+  category: [],
+  riskAssessment: [],
   masterClass: [],
   class: [],
   subClass: [],
@@ -53,6 +62,15 @@ export const getProjectAreasThunk = createAsyncThunk('projectAreas/get', async (
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
 
+export const getConstructionPhaseDetailsThunk = createAsyncThunk(
+  'constructionPhaseDetails/get',
+  async (_, thunkAPI) => {
+    return await getConstructionPhaseDetails()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
 export const getProjectQualityLevelsThunk = createAsyncThunk(
   'projectQualityLevels/get',
   async (_, thunkAPI) => {
@@ -79,6 +97,21 @@ export const getConstructionPhasesThunk = createAsyncThunk(
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
+
+export const getProjectCategoriesThunk = createAsyncThunk(
+  'projectCategories/get',
+  async (_, thunkAPI) => {
+    return await getProjectCategories()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getProjectRisksThunk = createAsyncThunk('projectRisks/get', async (_, thunkAPI) => {
+  return await getProjectRisks()
+    .then((res) => res)
+    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+});
 
 export const listsSlice = createSlice({
   name: 'lists',
@@ -120,6 +153,45 @@ export const listsSlice = createSlice({
     );
     builder.addCase(
       getProjectAreasThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // GET CONSTRUCTION PHASE DETAILS
+    builder.addCase(
+      getConstructionPhaseDetailsThunk.fulfilled,
+      (state, action: PayloadAction<Array<IListItem>>) => {
+        return { ...state, constructionPhaseDetail: action.payload };
+      },
+    );
+    builder.addCase(
+      getConstructionPhaseDetailsThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // GET PROJECT CATEGORIES
+    builder.addCase(
+      getProjectCategoriesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IListItem>>) => {
+        return { ...state, category: action.payload };
+      },
+    );
+    builder.addCase(
+      getProjectCategoriesThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // GET PROJECT RISKS
+    builder.addCase(
+      getProjectRisksThunk.fulfilled,
+      (state, action: PayloadAction<Array<IListItem>>) => {
+        return { ...state, riskAssessment: action.payload };
+      },
+    );
+    builder.addCase(
+      getProjectRisksThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

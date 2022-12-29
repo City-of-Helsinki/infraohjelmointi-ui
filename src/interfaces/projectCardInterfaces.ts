@@ -13,7 +13,7 @@ export interface IProjectCard {
   description: string;
   phase: IListItem;
   programmed: boolean;
-  constructionPhaseDetail: string;
+  constructionPhaseDetail: IListItem;
   estPlanningStart?: string;
   estPlanningEnd?: string;
   estConstructionStart?: string;
@@ -43,6 +43,7 @@ export interface IProjectCard {
   neighborhood: string;
   tiedCurrYear: string;
   riskAssess: string;
+  riskAssessment: IListItem;
   priority: IListItem;
   locked: boolean;
   comments: string;
@@ -71,6 +72,12 @@ export interface IProjectCard {
   preliminaryCurrentYearPlus8?: string;
   preliminaryCurrentYearPlus9?: string;
   preliminaryCurrentYearPlus10?: string;
+  louhi: boolean;
+  gravel: boolean;
+  category: IListItem;
+  effectHousing: boolean;
+  constructionEndYear: string;
+  planningStartYear: string;
 }
 
 export interface IProjectCardRequest {
@@ -94,6 +101,10 @@ export interface IProjectCardRequest {
   presenceEnd?: string;
   visibilityStart?: string;
   visibilityEnd?: string;
+  constructionPhaseDetail?: string | null;
+  louhi?: boolean;
+  programmed?: boolean;
+  gravel?: boolean;
   favourite?: boolean;
   projectWorkQuantity?: string;
   projectCostForecast?: string;
@@ -110,6 +121,11 @@ export interface IProjectCardRequest {
   spentCost?: string;
   budgetOverrunYear?: string;
   budgetOverrunAmount?: string;
+  category?: string | null;
+  effectHousing?: boolean;
+  riskAssessment?: string | null;
+  constructionEndYear?: string;
+  planningStartYear?: string;
 }
 
 export interface IProjectCardRequestObject {

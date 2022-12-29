@@ -14,6 +14,7 @@ export interface INavigationItem {
 export interface IOption {
   label: string;
   value: string;
+  name?: string;
 }
 
 export interface INotification {
@@ -29,7 +30,7 @@ export interface IListItem {
   value: string;
 }
 
-export type ListType = 'type' | 'phase' | 'area';
+export type ListType = 'type' | 'phase' | 'area' | 'phaseDetail' | 'category';
 
 export type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

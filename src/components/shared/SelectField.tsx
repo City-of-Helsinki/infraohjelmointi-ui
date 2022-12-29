@@ -1,4 +1,4 @@
-import { IOption, ListType } from '@/interfaces/common';
+import { ListType } from '@/interfaces/common';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
@@ -8,7 +8,6 @@ import { useOptions } from '@/hooks/useOptions';
 interface ISelectFieldProps {
   name: ListType;
   label: string;
-  options?: Array<IOption>;
   control: HookFormControlType;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
