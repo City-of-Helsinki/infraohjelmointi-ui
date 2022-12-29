@@ -115,6 +115,81 @@ export const mockProjectAreas: { data: Array<IListItem> } = {
   ],
 };
 
+export const mockConstructionPhaseDetails: { data: Array<IListItem> } = {
+  data: [
+    {
+      id: '4f9f98f1-0bec-4cf4-b09f-208521d2b70d',
+      value: 'preConstruction',
+    },
+    {
+      id: '57903f81-15ff-46ff-b55e-b74c4a833af8',
+      value: 'firstPhase',
+    },
+    {
+      id: 'e73a7646-83d2-4256-bb69-c7dca2d7b269',
+      value: 'firstPhaseComplete',
+    },
+    {
+      id: '04b350dd-dd7a-44f6-bfe4-20a5715173ea',
+      value: 'secondPhase',
+    },
+  ],
+};
+
+export const mockProjectCategories: { data: Array<IListItem> } = {
+  data: [
+    {
+      id: '92f4ed03-be85-4a37-a907-23a780f25eae',
+      value: 'K1',
+    },
+    {
+      id: '3fd9bba4-1276-460b-a200-fccf47e6540b',
+      value: 'K2',
+    },
+    {
+      id: 'df6514ab-f8a4-429c-abb6-27f0884f70b8',
+      value: 'K3',
+    },
+    {
+      id: '1f6670c9-7e0c-411a-8284-185d9a80bb06',
+      value: 'K4',
+    },
+    {
+      id: 'd2585121-c729-41bc-b081-cee29a81addb',
+      value: 'K5',
+    },
+    {
+      id: 'c9381886-36d7-4eaf-ab52-f0c9785f7536',
+      value: 'K5.1',
+    },
+    {
+      id: '93732fc6-0d28-43c9-b384-2a3f705a1248',
+      value: 'K5.2',
+    },
+    {
+      id: '706e3533-945b-4e1a-9493-ac89142b9bb7',
+      value: 'K5.3',
+    },
+    {
+      id: 'c8d3b985-c5fc-41ba-9d1c-7308e7564845',
+      value: 'K5.4',
+    },
+    {
+      id: '25efdebb-c57e-46a9-abd8-5387861bddef',
+      value: 'K5.5',
+    },
+  ],
+};
+
+export const mockProjectRisks: { data: Array<IListItem> } = {
+  data: [
+    {
+      id: 'ec49d5ad-95db-460d-bc8b-0823e234a739',
+      value: 'placeholderRisk',
+    },
+  ],
+};
+
 export const mockProjectQualityLevels: { data: Array<IListItem> } = {
   data: [
     {

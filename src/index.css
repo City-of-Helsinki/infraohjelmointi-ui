@@ -112,6 +112,10 @@ table p {
   width: 250px;
 }
 
+#radio-checkbox label {
+  width: auto !important;
+}
+
 .input-l {
   max-width: 22.5rem;
 }

@@ -229,11 +229,10 @@ export const listsSlice = createSlice({
         return { ...state, constructionPhase: action.payload };
       },
     );
-    // GET CONSTRUCTION PHASES
     builder.addCase(
-      getConstructionPhasesThunk.fulfilled,
-      (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, constructionPhase: action.payload };
+      getConstructionPhasesThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
       },
     );
   },
