@@ -5,8 +5,8 @@ import { IconAngleDown, IconAngleUp, IconPenLine, IconTrash } from 'hds-react/ic
 import { INote } from '@/interfaces/noteInterfaces';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ProjectDeleteNoteForm from './ProjectDeleteNoteForm';
-import ProjectEditNoteForm from './ProjectEditNoteForm';
+import DeleteNoteForm from './DeleteNoteForm';
+import EditNoteForm from './EditNoteForm';
 import ProjectNotesEditInfo from './ProjectNotesEditInfo';
 
 interface IProjectNoteProps {
@@ -79,12 +79,8 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
         </div>
       </div>
       {openModifiedInfo && <ProjectNotesEditInfo />}
-      <ProjectDeleteNoteForm
-        isOpen={openDeleteDialog}
-        close={handleOpenDeleteDialog}
-        noteId={note.id}
-      />
-      <ProjectEditNoteForm isOpen={openEditDialog} close={handleOpenEditDialog} note={note} />
+      <DeleteNoteForm isOpen={openDeleteDialog} close={handleOpenDeleteDialog} noteId={note.id} />
+      <EditNoteForm isOpen={openEditDialog} close={handleOpenEditDialog} note={note} />
     </div>
   );
 };

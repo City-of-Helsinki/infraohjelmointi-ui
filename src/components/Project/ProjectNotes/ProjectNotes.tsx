@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import { useEffect } from 'react';
 import ProjectNote from './ProjectNote';
-import ProjectNewNoteForm from './ProjectNewNoteForm';
+import NewNoteForm from './NewNoteForm';
 import { getNotesByProjectThunk } from '@/reducers/noteSlice';
 import _ from 'lodash';
 import './styles.css';
@@ -27,7 +27,7 @@ const ProjectNotes = () => {
       <Title size="m" text="notes" />
       <Paragraph size="m" text={t('newNoteInfo')} />
       {/* note form */}
-      <ProjectNewNoteForm />
+      <NewNoteForm />
       {/* notes */}
       {notes?.map((n) => (
         <ProjectNote key={n.id} note={n} />

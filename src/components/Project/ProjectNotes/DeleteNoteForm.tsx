@@ -5,6 +5,7 @@ import { Dialog } from 'hds-react/components/Dialog';
 import { useAppDispatch } from '@/hooks/common';
 import { deleteNoteThunk } from '@/reducers/noteSlice';
 import { useTranslation } from 'react-i18next';
+import DialogWrapper from '@/components/shared/DialogWrapper';
 
 interface IProjectDeleteNoteFormProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ interface IProjectDeleteNoteFormProps {
 }
 
 const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close, noteId }) => {
-  const { Header, Content, ActionButtons } = Dialog;
+  const { Content, ActionButtons } = Dialog;
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
@@ -24,17 +25,13 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
   };
 
   return (
-    <Dialog
-      id="delete-note-dialog"
-      aria-labelledby="delete-note-dialog"
+    <DialogWrapper
       isOpen={isOpen}
+      name="delete-note"
+      title={t('deleteNoteConfirm')}
+      icon={<IconAlertCircle aria-hidden="true" />}
       variant="danger"
     >
-      <Header
-        id="delete-note-dialog-header"
-        title={t('deleteNoteConfirm')}
-        iconLeft={<IconAlertCircle aria-hidden="true" />}
-      />
       <Content>
         <p>{t('deleteNoteInfo')}</p>
       </Content>
@@ -50,7 +47,7 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
           {t('deleteNote')}
         </Button>
       </ActionButtons>
-    </Dialog>
+    </DialogWrapper>
   );
 };
 

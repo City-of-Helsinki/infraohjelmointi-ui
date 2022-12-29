@@ -9,6 +9,7 @@ import { TextArea } from 'hds-react/components/Textarea';
 import { useTranslation } from 'react-i18next';
 import useProjectNoteForm from '@/hooks/useNoteForm';
 import { patchNoteThunk } from '@/reducers/noteSlice';
+import DialogWrapper from '@/components/shared/DialogWrapper';
 
 interface IProjectEditNoteFormProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ interface IProjectEditNoteFormProps {
 }
 
 const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, note }) => {
-  const { Header, Content, ActionButtons } = Dialog;
+  const { Content, ActionButtons } = Dialog;
   const { formMethods } = useProjectNoteForm(note);
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -30,17 +31,13 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
   };
 
   return (
-    <Dialog
-      id="modify-note-dialog"
-      aria-labelledby="modify-note-dialog"
+    <DialogWrapper
       isOpen={isOpen}
-      className="big-dialog"
+      name="modify-note"
+      title={t('modifyNote')}
+      icon={<IconPenLine aria-hidden="true" />}
+      size="l"
     >
-      <Header
-        id="modify-note-dialog-header"
-        title={t('modifyNote')}
-        iconLeft={<IconPenLine aria-hidden="true" />}
-      />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Content>
           <Controller
@@ -58,7 +55,7 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
           </Button>
         </ActionButtons>
       </form>
-    </Dialog>
+    </DialogWrapper>
   );
 };
 
