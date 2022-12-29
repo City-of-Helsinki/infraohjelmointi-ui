@@ -143,14 +143,6 @@
   grid-column: var(--grid-col-small-right);
 }
 
-.basic-info-form #programmed {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #phase {
-  grid-column: var(--grid-col-small-left);
-}
-
 .basic-info-form #masterClass {
   grid-column: var(--grid-col-half-left);
 }
