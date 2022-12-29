@@ -18,8 +18,8 @@ describe('SideBar', () => {
 
   const navItems: Array<INavigationItem> = [
     {
-      route: 'project-card',
-      label: 'projectCard',
+      route: 'project',
+      label: 'project',
     },
     {
       route: 'planning-list',
@@ -51,7 +51,7 @@ describe('SideBar', () => {
   });
 
   // FIXME: tests with routes don't work yet
-  it.skip('adds the correct projectId as the route to ProjectCardView', async () => {
+  it.skip('adds the correct projectId as the route to ProjectView', async () => {
     const { getByRole, user, getByText } = renderWithProviders(<SideBar />, { store });
     await user.click(getByRole('button', { name: matchExact(navItems[0].label) }));
     expect(getByText(matchExact('Hakaniementori'))).toBeInTheDocument();

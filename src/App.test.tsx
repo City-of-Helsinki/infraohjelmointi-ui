@@ -4,8 +4,8 @@ import { screen, waitFor } from '@testing-library/react';
 import { renderWithProviders } from './utils/testUtils';
 import App from './App';
 import { setupStore } from './store';
-import mockProjectCards from './mocks/mockProjectCards';
-import { getProjectCardsThunk } from './reducers/projectCardSlice';
+import mockProjects from './mocks/mockProjects';
+import { getProjectsThunk } from './reducers/projectSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -16,8 +16,8 @@ describe('App', () => {
   const store = setupStore();
 
   beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockProjectCards);
-    await store.dispatch(getProjectCardsThunk(1));
+    mockedAxios.get.mockResolvedValue(mockProjects);
+    await store.dispatch(getProjectsThunk(1));
   });
 
   it('renders TopBar', () => {

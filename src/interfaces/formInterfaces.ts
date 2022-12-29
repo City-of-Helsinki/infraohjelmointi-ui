@@ -27,14 +27,14 @@ export interface IForm {
   hideLabel?: boolean;
 }
 
-export interface IProjectCardHeaderForm {
+export interface IProjectHeaderForm {
   phase: IOption;
   favourite: boolean;
   name: string;
   address?: string;
 }
 
-export interface IProjectCardBasicsForm {
+export interface IProjectBasicsForm {
   type: IOption;
   entityName: string;
   description: string;
@@ -55,11 +55,11 @@ export interface IProjectCardBasicsForm {
   planningStartYear: string;
 }
 
-export interface IProjectCardNoteForm {
+export interface IProjectNoteForm {
   content: string;
 }
 
-export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}
+export interface IAppForms extends IProjectHeaderForm, IProjectBasicsForm {}
 
 export interface ISomeOtherForm {
   name: string;
@@ -68,8 +68,8 @@ export interface ISomeOtherForm {
 
 export type HookFormControlType =
   | Control<FieldValues>
-  | Control<IProjectCardBasicsForm>
-  | Control<IProjectCardHeaderForm>
+  | Control<IProjectBasicsForm>
+  | Control<IProjectHeaderForm>
   | undefined;
 
 export type HookFormRulesType = Omit<

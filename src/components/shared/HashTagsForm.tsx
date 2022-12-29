@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { mockTags } from '@/mocks/common';
-import { silentPatchProjectCardThunk } from '@/reducers/projectCardSlice';
+import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { RootState } from '@/store';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
@@ -32,7 +32,7 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const dispatch = useAppDispatch();
     const projectId = useAppSelector(
-      (state: RootState) => state.projectCard.selectedProjectCard?.id,
+      (state: RootState) => state.project.selectedProject?.id,
       _.isEqual,
     );
 
@@ -67,7 +67,7 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
     }, []);
 
     const onSaveTags = useCallback(() => {
-      dispatch(silentPatchProjectCardThunk({ data: { hashTags: tags }, id: projectId }));
+      dispatch(silentPatchProjectThunk({ data: { hashTags: tags }, id: projectId }));
       onChangeOpen();
       onChange(tags);
     }, [dispatch, onChangeOpen, projectId, tags, onChange]);
@@ -89,9 +89,9 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
             <Content>
               <div className="hashtags-content-container">
                 <div className="added-hashtags-title-container">
-                  <Title size="xs" text={t('projectCardHashTags') || ''} />
+                  <Title size="xs" text={t('projectHashTags') || ''} />
                 </div>
-                <TagsContainer tags={tags} onDelete={onTagDelete} id={'project-card-hashtags'} />
+                <TagsContainer tags={tags} onDelete={onTagDelete} id={'project-hashtags'} />
               </div>
             </Content>
             <hr />
@@ -116,7 +116,7 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
 
           {/* Displayed on form */}
           <div style={{ marginBottom: '0.5rem' }}>
-            <FormFieldLabel text={t(`projectCardBasicsForm.${name}`)} onClick={onEdit} />
+            <FormFieldLabel text={t(`projectBasicsForm.${name}`)} onClick={onEdit} />
           </div>
           <TagsContainer tags={value} />
         </div>

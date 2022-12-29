@@ -3,8 +3,8 @@
     "404": "404",
     "pageNotFound": "Sidan hittades inte"
   },
-  "projectCard": {
-    "projectCard": "Projektkort",
+  "project": {
+    "project": "Projektkort",
     "basicInfo": "Basinfromation",
     "tasks": "Uppgifter"
   },

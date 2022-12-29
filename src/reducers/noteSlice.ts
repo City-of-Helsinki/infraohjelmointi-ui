@@ -1,6 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
-import { deleteNote, getNotesByProjectCard, patchNote, postNote } from '@/services/notesServices';
+import { deleteNote, getNotesByProject, patchNote, postNote } from '@/services/noteServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
 
@@ -14,10 +14,10 @@ const initialState: INotesState = {
   error: null,
 };
 
-export const getNotesByProjectCardThunk = createAsyncThunk(
-  'notesByProjectCard/get',
+export const getNotesByProjectThunk = createAsyncThunk(
+  'notesByProject/get',
   async (projectId: string, thunkAPI) => {
-    return await getNotesByProjectCard(projectId)
+    return await getNotesByProject(projectId)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -72,13 +72,13 @@ export const noteSlice = createSlice({
   extraReducers: (builder) => {
     // NOTES GET
     builder.addCase(
-      getNotesByProjectCardThunk.fulfilled,
+      getNotesByProjectThunk.fulfilled,
       (state, action: PayloadAction<Array<INote>>) => {
         return { ...state, notes: action.payload };
       },
     );
     builder.addCase(
-      getNotesByProjectCardThunk.rejected,
+      getNotesByProjectThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

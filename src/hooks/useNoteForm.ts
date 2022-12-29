@@ -1,4 +1,4 @@
-import { IProjectCardNoteForm } from '@/interfaces/formInterfaces';
+import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { RootState } from '@/store';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { INote } from '@/interfaces/noteInterfaces';
 const useNoteValues = (note?: INote) => {
   const userId = useAppSelector((state: RootState) => state.auth.user?.id, _.isEqual);
   const projectId = useAppSelector(
-    (state: RootState) => state.projectCard.selectedProjectCard?.id,
+    (state: RootState) => state.project.selectedProject?.id,
     _.isEqual,
   );
 
@@ -25,10 +25,10 @@ const useNoteValues = (note?: INote) => {
   return { formValues, projectId, userId };
 };
 
-const useProjectCardNoteForm = (note?: INote) => {
+const useProjectNoteForm = (note?: INote) => {
   const { formValues, projectId, userId } = useNoteValues(note);
 
-  const formMethods = useForm<IProjectCardNoteForm>({
+  const formMethods = useForm<IProjectNoteForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onBlur',
   });
@@ -46,4 +46,4 @@ const useProjectCardNoteForm = (note?: INote) => {
   return { formMethods, formValues };
 };
 
-export default useProjectCardNoteForm;
+export default useProjectNoteForm;

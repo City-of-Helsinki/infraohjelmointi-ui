@@ -36,8 +36,8 @@ const PlanningListProjectsTableHeader: FC<IPlanningListProjectsTableHeaderProps>
       </th>
       {/**
        * TODO:
-       * These cell values should listen to the current project card values for that year from redux:
-       * 1. We patch the project card each time the user types a value
+       * These cell values should listen to the current project values for that year from redux:
+       * 1. We patch the project each time the user types a value
        * 2. The value will change in redux with the response
        * 3. We calculate the sum and display it for the user when a change in redux state is detected
        */}

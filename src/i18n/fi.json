@@ -86,7 +86,7 @@
     "additionalWork": "Urakkavaiheen sis. lisätyöt",
     "reception": "Vastaanottovaiheen"
   },
-  "projectCardBasicsForm": {
+  "projectBasicsForm": {
     "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
     "entityName": "Hankekokonaisuuden nimi",
@@ -163,7 +163,7 @@
     }
   },
   "appTitle": "Infraohjelmointi UI",
-  "projectCard": "Hankekortti",
+  "project": "Hankekortti",
   "planningList": "Ohjelmointinäkymä",
   "basicInfo": "Perustiedot",
   "notes": "Muistiinpanot",
@@ -179,7 +179,7 @@
   "removeHashTag": "Poista tunniste",
   "closeHashTagsWindow": "Sulje tunnisteikkuna",
   "manageHashTags": "Hallitse tunnisteita",
-  "projectCardHashTags": "Hankkeen tunnisteet",
+  "projectHashTags": "Hankkeen tunnisteet",
   "addHashTagsToProject": "Lisää hankkeelle uusi tunniste",
   "modifyGeneralMode": "Muokkaa yleistilaa",
   "getHashTagsOrCreateNew": "Hae tunnisteita tai luo uusi",

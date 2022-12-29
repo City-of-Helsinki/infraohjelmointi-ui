@@ -1,4 +1,4 @@
-import { IProjectCard } from '@/interfaces/projectCardInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 import { planListProjectValues } from '@/mocks/common';
 import {
   IconDocument,
@@ -23,7 +23,7 @@ import PlanningListProjectsTableCell from './PlanningListProjectsTableCell';
  */
 
 interface IPlanningListProjectsTableProps {
-  project: IProjectCard;
+  project: IProject;
 }
 
 const CircleIcon = ({ value }: { value: string }) => (
@@ -38,7 +38,7 @@ const CircleIcon = ({ value }: { value: string }) => (
  */
 const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ project }) => {
   const navigate = useNavigate();
-  const navigateToProjectCard = () => navigate(`/project-card/${project.id}/basics`);
+  const navigateToProject = () => navigate(`/project/${project.id}/basics`);
   return (
     <tr>
       {/* HEADER */}
@@ -48,7 +48,7 @@ const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ pro
           <div className="left">
             <IconMenuDots size="xs" />
             <IconDocument size="xs" />
-            <button className="project-name-button" onClick={navigateToProjectCard}>
+            <button className="project-name-button" onClick={navigateToProject}>
               {project.name}
             </button>
           </div>

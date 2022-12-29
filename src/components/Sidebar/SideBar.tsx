@@ -13,19 +13,19 @@ import './styles.css';
 const SideBar = () => {
   const navigate = useNavigate();
   const path = useLocation().pathname;
-  const projectCards = useAppSelector((state: RootState) => state.projectCard.projectCards);
+  const projects = useAppSelector((state: RootState) => state.project.projects);
   const [projectId, setProjectId] = useState('');
   const { t } = useTranslation();
 
-  // Set the project card ID to the first in the list if found
+  // Set the project ID to the first in the list if found
   useEffect(() => {
-    setProjectId((projectCards?.length > 0 && projectCards[0].id) || '');
-  }, [projectCards]);
+    setProjectId((projects?.length > 0 && projects[0].id) || '');
+  }, [projects]);
 
   const navItems: Array<INavigationItem> = [
     {
-      route: `/project-card/${projectId}/basics`,
-      label: t('projectCard'),
+      route: `/project/${projectId}/basics`,
+      label: t('project'),
       component: <IconPenLine />,
     },
     {
