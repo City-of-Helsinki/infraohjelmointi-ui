@@ -1,7 +1,7 @@
 import { Span } from '@/components/shared';
 import { INoteHistory } from '@/interfaces/noteInterfaces';
 import { stringToDateTime } from '@/utils/common';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IProjectNoteHistoryRowProps {
@@ -28,4 +28,4 @@ const ProjectNoteHistoryRow: FC<IProjectNoteHistoryRowProps> = ({ history }) => 
   );
 };
 
-export default ProjectNoteHistoryRow;
+export default memo(ProjectNoteHistoryRow);

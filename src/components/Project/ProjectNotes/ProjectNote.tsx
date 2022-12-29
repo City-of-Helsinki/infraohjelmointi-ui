@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import DeleteNoteForm from './DeleteNoteForm';
 import EditNoteForm from './EditNoteForm';
 import ProjectNoteHistoryRow from './ProjectNoteHistoryRow';
-import { stringToDateTime } from '@/utils/common';
+import { sortArrayByDates, stringToDateTime } from '@/utils/common';
 
 interface IProjectNoteProps {
   note: INote;
@@ -35,6 +35,11 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
   const handleOpenModifiedInfo = useCallback(
     () => setOpenModifiedInfo((currentState) => !currentState),
     [],
+  );
+
+  const sortedHistory = useCallback(
+    () => sortArrayByDates(note.history, 'updatedDate', true),
+    [note.history],
   );
 
   return (
@@ -86,10 +91,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
       </div>
       {/* history (sorted by updated) */}
       {openModifiedInfo &&
-        hasHistory &&
-        [...note.history]
-          .sort((a, b) => new Date(a.updatedDate).valueOf() - new Date(b.updatedDate).valueOf())
-          .map((h) => <ProjectNoteHistoryRow key={h.history_id} history={h} />)}
+        sortedHistory()?.map((h) => <ProjectNoteHistoryRow key={h.history_id} history={h} />)}
       <DeleteNoteForm isOpen={openDeleteDialog} close={handleOpenDeleteDialog} noteId={note.id} />
       <EditNoteForm isOpen={openEditDialog} close={handleOpenEditDialog} note={note} />
     </div>

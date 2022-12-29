@@ -1,13 +1,14 @@
 import { Paragraph, Title } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import ProjectNote from './ProjectNote';
 import NewNoteForm from './NewNoteForm';
 import { getNotesByProjectThunk } from '@/reducers/noteSlice';
 import _ from 'lodash';
 import './styles.css';
 import { t } from 'i18next';
+import { sortArrayByDates } from '@/utils/common';
 
 const ProjectNotes = () => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,8 @@ const ProjectNotes = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
+  const sortedNotes = useCallback(() => sortArrayByDates(notes, 'createdDate', true), [notes]);
+
   return (
     <div className="notes-page-container">
       <Title size="m" text="notes" />
@@ -29,11 +32,9 @@ const ProjectNotes = () => {
       {/* note form */}
       <NewNoteForm />
       {/* notes (sorted by created) */}
-      {[...notes]
-        ?.sort((a, b) => new Date(a.createdDate).valueOf() - new Date(b.createdDate).valueOf())
-        .map((n) => (
-          <ProjectNote key={n.id} note={n} />
-        ))}
+      {sortedNotes()?.map((n) => (
+        <ProjectNote key={n.id} note={n} />
+      ))}
     </div>
   );
 };
