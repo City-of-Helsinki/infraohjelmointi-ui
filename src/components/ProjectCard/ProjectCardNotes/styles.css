@@ -20,6 +20,7 @@
 
 .note-container {
   background: var(--color-silver-light);
+  margin-bottom: var(--spacing-m);
 }
 
 .note-header-container {
@@ -36,4 +37,21 @@
   display: flex;
   justify-content: space-between;
   padding: 0 var(--spacing-xs) var(--spacing-s) var(--spacing-xs);
+}
+
+.note-edit-info-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0 var(--spacing-m) var(--spacing-m) var(--spacing-m);
+}
+
+.note-edit-info-container #modifiedDate {
+  grid-column: 1;
+}
+.note-edit-info-container #title {
+  grid-column: 2/3;
+}
+.note-edit-info-container #modifiedBy {
+  grid-row: 2;
+  grid-column: 2/3;
 }

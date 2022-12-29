@@ -55,6 +55,10 @@ export interface IProjectCardBasicsForm {
   planningStartYear: string;
 }
 
+export interface IProjectCardNoteForm {
+  content: string;
+}
+
 export interface IAppForms extends IProjectCardHeaderForm, IProjectCardBasicsForm {}
 
 export interface ISomeOtherForm {

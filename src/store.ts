@@ -4,6 +4,7 @@ import authReducer from '@/reducers/authSlice';
 import notificationReducer from '@/reducers/notificationSlice';
 import loadingSlice from './reducers/loadingSlice';
 import listsSlice from './reducers/listsSlice';
+import noteSlice from './reducers/noteSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
@@ -12,6 +13,7 @@ export const storeItems = {
   notifications: notificationReducer,
   loading: loadingSlice,
   lists: listsSlice,
+  note: noteSlice,
 };
 
 const rootReducer = combineReducers(storeItems);

@@ -82,7 +82,7 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
             isOpen={isOpen}
             close={onChangeOpen}
             closeButtonLabelText={t('closeHashTagsWindow')}
-            className="hashtags-dialog"
+            className="big-dialog"
           >
             <Header id={label} title={t('manageHashTags')} />
             <hr />

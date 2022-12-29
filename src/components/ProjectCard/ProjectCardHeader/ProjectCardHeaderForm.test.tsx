@@ -17,7 +17,6 @@ describe('ProjectCardHeaderForm', () => {
     projectCard: {
       projectCards: [mockProjectCard.data as IProjectCard],
       selectedProjectCard: mockProjectCard.data as IProjectCard,
-      notes: [],
       count: 1,
       error: {},
       page: 1,

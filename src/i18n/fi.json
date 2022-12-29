@@ -147,12 +147,16 @@
   "notification": {
     "title": {
       "sendSuccess": "Lähetys onnistui",
+      "patchSuccess": "Muokkaus onnistui",
+      "deleteSuccess": "Poisto onnistui",
       "404": "Virhe, resurssia ei löytynyt",
       "400": "Vääränlainen pyyntö",
       "500": "Palvelinvirhe"
     },
     "message": {
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
+      "noteDeleteSuccess": "Muistiinpano poistettu onnistuneesti",
+      "notePatchSuccess": "Muistiinpano muokattu onnistuneesti",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
       "Request failed with status code 404": "Pyyntö epäonnistui virhekoodilla 404",
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500"
@@ -191,5 +195,17 @@
   "name": "nimi",
   "overrunRightValue": "Ylitysoikeus {{value}}",
   "budgetOverrunYear": "Ylitysoikeus vuosi",
-  "budgetOverrunAmount": "Ylitysoikeuden määrä"
+  "budgetOverrunAmount": "Ylitysoikeuden määrä",
+  "writeNote": "Kirjoita muistiinpano",
+  "modified": "Muokattu",
+  "modificationHistory": "Muokkaushistoria",
+  "delete": "Poista",
+  "modify": "Muokkaa",
+  "cancel": "Peruuta",
+  "modifyNote": "Muokkaa muistiinpanoa",
+  "deleteNote": "Poista muistiinpano",
+  "deleteNoteConfirm": "Oletko varma että haluat poistaa tämän muistiinpanon?",
+  "deleteNoteInfo": "Muistiinpano poistetaan heti. Muistiinpanon poistaminen on pysyvää eikä sitä voida enää palauttaa.",
+  "newNoteInfo": "Tallenna hankkeeseen liittyvät muistiinpanot tähän.",
+  "noteModified": "Muistiinpanoa muokattu"
 }
