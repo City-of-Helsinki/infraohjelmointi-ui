@@ -28,7 +28,7 @@ const ProjectNotes = () => {
       <Paragraph size="m" text={t('newNoteInfo')} />
       {/* note form */}
       <NewNoteForm />
-      {/* notes */}
+      {/* notes (sorted by created) */}
       {[...notes]
         ?.sort((a, b) => new Date(a.createdDate).valueOf() - new Date(b.createdDate).valueOf())
         .map((n) => (

@@ -39,6 +39,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
 
   return (
     <div className="note-container">
+      {/* header */}
       <div className="note-header-container">
         <div>
           <Span text={stringToDateTime(note.createdDate)} size="s" fontWeight="light" />
@@ -46,9 +47,11 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
         </div>
         <div>{hasHistory && <StatusLabel type="alert">{t('modified')}</StatusLabel>}</div>
       </div>
+      {/* content */}
       <div className="note-content-container">
         <p>{note.content}</p>
       </div>
+      {/* footer (buttons) */}
       <div className="note-footer-container">
         <div>
           {hasHistory && (
@@ -81,8 +84,12 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
           </Button>
         </div>
       </div>
+      {/* history (sorted by updated) */}
       {openModifiedInfo &&
-        note.history?.map((h) => <ProjectNoteHistoryRow key={h.history_id} history={h} />)}
+        hasHistory &&
+        [...note.history]
+          .sort((a, b) => new Date(a.updatedDate).valueOf() - new Date(b.updatedDate).valueOf())
+          .map((h) => <ProjectNoteHistoryRow key={h.history_id} history={h} />)}
       <DeleteNoteForm isOpen={openDeleteDialog} close={handleOpenDeleteDialog} noteId={note.id} />
       <EditNoteForm isOpen={openEditDialog} close={handleOpenEditDialog} note={note} />
     </div>
