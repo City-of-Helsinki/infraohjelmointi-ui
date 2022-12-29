@@ -1,7 +1,7 @@
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { SelectionGroup } from 'hds-react/components/SelectionGroup';
 import { RadioButton as HDSRadioButton } from 'hds-react/components/RadioButton';
-import { ChangeEvent, FC } from 'react';
+import { ChangeEvent, FC, memo, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 
 interface IRadioCheckboxFieldProps {
@@ -13,12 +13,17 @@ interface IRadioCheckboxFieldProps {
 }
 
 const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control, rules }) => {
-  const optionToBoolean = (e: ChangeEvent<HTMLInputElement>) => e.target.value === 'yes';
-  const valueToString = (val: boolean) => (val ? 'yes' : 'no');
   const options = [
     { value: 'yes', label: 'Kyllä' },
     { value: 'no', label: 'Ei' },
   ];
+
+  const optionToBoolean = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => e.target.value === 'yes',
+    [],
+  );
+
+  const valueToString = useCallback((val: boolean) => (val ? 'yes' : 'no'), []);
 
   return (
     <Controller
@@ -47,4 +52,4 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control
   );
 };
 
-export default RadioCheckboxField;
+export default memo(RadioCheckboxField);
