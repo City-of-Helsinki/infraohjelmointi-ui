@@ -89,7 +89,6 @@ export const sortArrayByDates = (array: Array<any>, dateProperty: string, revers
     [...array]?.sort(
       (a, b) => new Date(a[dateProperty]).valueOf() - new Date(b[dateProperty]).valueOf(),
     );
-  const reversedArray = sortedArray?.reverse();
 
-  return reversed ? reversedArray : sortedArray;
+  return reversed ? [...sortedArray]?.reverse() : sortedArray;
 };

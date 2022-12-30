@@ -13,9 +13,10 @@ import {
 } from '@/reducers/noteSlice';
 import { getProjectThunk } from '@/reducers/projectSlice';
 import { stringToDateTime } from '@/utils/common';
-import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
+import { INote } from '@/interfaces/noteInterfaces';
 import { mockError } from '@/mocks/mockError';
 import { IError } from '@/interfaces/common';
+import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -100,10 +101,10 @@ describe('ProjectNotes', () => {
   it.skip('can submit a new note', async () => {
     const { user, getByRole, getByText } = renderResult;
 
-    const responseNote: INoteRequest = {
+    const responseNote: INote = {
+      ...mockNotes.data[1],
       id: '9bddd912-fe41-4e01-82a5-cca4f15a15b7',
       content: 'Third note',
-      project: mockProject.data.id,
     };
 
     mockedAxios.post.mockResolvedValue(async () => await Promise.resolve(responseNote));
@@ -111,16 +112,17 @@ describe('ProjectNotes', () => {
     const textarea = getByRole('textbox', { name: 'writeNote' });
 
     await user.type(textarea, 'Third note');
-
     await user.click(getByRole('button', { name: 'save' }));
 
     const formPatchRequest = mockedAxios.post.mock.lastCall[1] as INote;
+
+    debug(formPatchRequest);
 
     expect(formPatchRequest.content).toEqual(responseNote.content);
     expect(getByText('Third note')).toBeInTheDocument();
   });
 
-  /** test fails cause the payload doesn't include an id after clicking the deleteNote button */
+  /** test fails cause the payload is undefined after clicking the delete button */
   it.skip('can delete a note', async () => {
     const { user, getByRole, container, getAllByRole } = renderResult;
 
