@@ -42,7 +42,6 @@ export const deleteNoteThunk = createAsyncThunk('note/delete', async (id: string
           type: 'toast',
         }),
       );
-      console.log('Response from THUNK: ', res);
       return res;
     })
     .catch((err: IError) => thunkAPI.rejectWithValue(err));

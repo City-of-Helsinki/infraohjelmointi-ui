@@ -127,10 +127,11 @@ describe('ProjectNotes', () => {
     const { user, getByRole, container, getAllByRole } = renderResult;
 
     mockedAxios.delete.mockResolvedValue(
-      async () =>
-        await Promise.resolve({
+      Promise.resolve({
+        data: {
           id: '9bddd905-fe41-4e01-82a5-cca4f30a15b7',
-        }),
+        },
+      }),
     );
 
     await user.click(getAllByRole('button', { name: 'delete' })[1]);

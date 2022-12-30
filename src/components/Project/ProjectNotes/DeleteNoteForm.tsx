@@ -18,10 +18,8 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const handleDeleteNote = () => {
-    console.log('Deleting note with ID: ', noteId);
-    dispatch(deleteNoteThunk(noteId));
-    close();
+  const handleDeleteNote = async () => {
+    await dispatch(deleteNoteThunk(noteId)).then(() => close());
   };
 
   return (
