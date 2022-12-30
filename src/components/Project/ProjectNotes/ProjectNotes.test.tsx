@@ -97,7 +97,6 @@ describe('ProjectNotes', () => {
     });
   });
 
-  /** test fails cause the backend is suppoed to return an id but the test returns it empty */
   it('can POST a note', async () => {
     const { user, getByRole, getByText } = renderResult;
 
@@ -121,7 +120,6 @@ describe('ProjectNotes', () => {
     await waitFor(() => expect(getByText(responseNote.data.content)).toBeInTheDocument());
   });
 
-  /** test fails cause the payload is undefined after clicking the delete button */
   it('can DELETE a note', async () => {
     const { user, getByRole, container, getAllByRole } = renderResult;
 
