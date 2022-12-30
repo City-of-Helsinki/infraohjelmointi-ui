@@ -19,6 +19,7 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
   const dispatch = useAppDispatch();
 
   const handleDeleteNote = () => {
+    console.log('Deleting note with ID: ', noteId);
     dispatch(deleteNoteThunk(noteId));
     close();
   };

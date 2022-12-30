@@ -123,7 +123,7 @@ describe('ProjectNotes', () => {
   });
 
   /** test fails cause the payload is undefined after clicking the delete button */
-  it.skip('can delete a note', async () => {
+  it('can delete a note', async () => {
     const { user, getByRole, container, getAllByRole } = renderResult;
 
     mockedAxios.delete.mockResolvedValue(
