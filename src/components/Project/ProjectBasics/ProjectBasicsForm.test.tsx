@@ -41,8 +41,8 @@ describe('ProjectBasicsForm', () => {
         (renderResult = renderWithProviders(<ProjectBasicsForm />, {
           preloadedState: {
             project: {
-              projects: [mockProject.data as IProject],
-              selectedProject: mockProject.data as IProject,
+              projects: [mockProject.data],
+              selectedProject: mockProject.data,
               count: 1,
               error: {},
               page: 1,

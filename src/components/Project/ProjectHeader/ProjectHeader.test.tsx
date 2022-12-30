@@ -15,8 +15,8 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 describe('ProjectHeader', () => {
   const store = setupStore({
     project: {
-      projects: [mockProject.data as IProject],
-      selectedProject: mockProject.data as IProject,
+      projects: [mockProject.data],
+      selectedProject: mockProject.data,
       count: 1,
       error: {},
       page: 1,

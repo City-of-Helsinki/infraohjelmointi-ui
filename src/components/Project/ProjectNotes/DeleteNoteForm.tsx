@@ -19,7 +19,6 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
   const dispatch = useAppDispatch();
 
   const handleDeleteNote = () => {
-    // TODO: delete should return an id to filter out the old with
     dispatch(deleteNoteThunk(noteId));
     close();
   };
