@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { INote } from '@/interfaces/noteInterfaces';
 
 const useNoteValues = (note?: INote) => {
-  const userId = useAppSelector((state: RootState) => state.auth.user?.id, _.isEqual);
+  const user = useAppSelector((state: RootState) => state.auth.user?.id, _.isEqual);
   const projectId = useAppSelector(
     (state: RootState) => state.project.selectedProject?.id,
     _.isEqual,
@@ -16,17 +16,17 @@ const useNoteValues = (note?: INote) => {
   const formValues = useMemo(
     () => ({
       id: note?.id || '',
-      updatedBy: userId || '',
+      updatedBy: user || '',
       content: note?.content || '',
       project: projectId || '',
     }),
-    [projectId, userId, note],
+    [projectId, user, note],
   );
-  return { formValues, projectId, userId };
+  return { formValues, projectId, user };
 };
 
 const useProjectNoteForm = (note?: INote) => {
-  const { formValues, projectId, userId } = useNoteValues(note);
+  const { formValues, projectId, user } = useNoteValues(note);
 
   const formMethods = useForm<IProjectNoteForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -41,7 +41,7 @@ const useProjectNoteForm = (note?: INote) => {
       reset(formValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, formValues, userId]);
+  }, [projectId, formValues, user]);
 
   return { formMethods, formValues };
 };

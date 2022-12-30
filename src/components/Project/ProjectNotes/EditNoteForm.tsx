@@ -33,8 +33,8 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
   return (
     <DialogWrapper
       isOpen={isOpen}
-      name="modify-note"
-      title={t('modifyNote')}
+      name="edit-note"
+      title={t('editNote')}
       icon={<IconPenLine aria-hidden="true" />}
       size="l"
     >

@@ -19,7 +19,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openModifiedInfo, setOpenModifiedInfo] = useState(false);
-  const author = `${note.updatedBy.firstName} ${note.updatedBy.lastName}`;
+  const author = `${note.updatedBy?.firstName} ${note.updatedBy?.lastName}`;
   const hasHistory = note.history?.length > 0;
 
   const handleOpenDeleteDialog = useCallback(
@@ -66,7 +66,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
               iconRight={openModifiedInfo ? <IconAngleUp /> : <IconAngleDown />}
               onClick={handleOpenModifiedInfo}
             >
-              {t('modificationHistory')}
+              {t('editHistory')}
             </Button>
           )}
         </div>
@@ -85,7 +85,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
             iconLeft={<IconPenLine />}
             onClick={handleOpenEditDialog}
           >
-            {t('modify')}
+            {t('edit')}
           </Button>
         </div>
       </div>

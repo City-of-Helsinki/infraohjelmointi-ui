@@ -10,7 +10,7 @@ interface IProjectNoteHistoryRowProps {
 
 const ProjectNoteHistoryRow: FC<IProjectNoteHistoryRowProps> = ({ history }) => {
   const { t } = useTranslation();
-  const author = `${history.updatedBy.firstName} ${history.updatedBy.lastName}`;
+  const author = `${history.updatedBy?.firstName} ${history.updatedBy?.lastName}`;
   return (
     <div className="note-history">
       <div className="note-history-container">

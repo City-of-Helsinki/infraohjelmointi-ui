@@ -1,9 +1,7 @@
-import { IPerson } from './projectInterfaces';
-
 export interface INote {
   id: string;
   content: string;
-  updatedBy: IPerson;
+  updatedBy: INotePerson;
   project: string;
   createdDate: string;
   history: Array<INoteHistory>;
@@ -12,12 +10,18 @@ export interface INote {
 export interface INoteRequest {
   id?: string;
   content?: string;
-  updatedBy?: string;
+  updatedBy?: INotePerson;
   project?: string;
 }
 
 export interface INoteHistory {
   updatedDate: string;
-  updatedBy: IPerson;
+  updatedBy: INotePerson;
   history_id: string;
+}
+
+interface INotePerson {
+  id: string;
+  firstName: string;
+  lastName: string;
 }
