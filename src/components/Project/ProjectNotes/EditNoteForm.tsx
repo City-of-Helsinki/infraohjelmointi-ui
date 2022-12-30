@@ -25,8 +25,8 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
 
   const { handleSubmit, control } = formMethods;
 
-  const onSubmit = (form: INoteRequest) => {
-    dispatch(patchNoteThunk(form));
+  const onSubmit = async (form: INoteRequest) => {
+    await dispatch(patchNoteThunk(form));
     close();
   };
 
@@ -44,12 +44,20 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
             name="content"
             control={control}
             render={({ field }) => (
-              <TextArea {...field} id="textarea" label={t('writeNote')} required />
+              <TextArea
+                {...field}
+                id="textarea"
+                label={t('writeNote')}
+                data-testid="edit-note-textarea"
+                required
+              />
             )}
           />
         </Content>
         <ActionButtons>
-          <Button type="submit">{t('save')}</Button>
+          <Button type="submit" data-testid="edit-note-save">
+            {t('save')}
+          </Button>
           <Button onClick={close} variant="secondary">
             {t('cancel')}
           </Button>

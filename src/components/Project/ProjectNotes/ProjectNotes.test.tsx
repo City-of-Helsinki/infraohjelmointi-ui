@@ -16,7 +16,6 @@ import { stringToDateTime } from '@/utils/common';
 import { INote } from '@/interfaces/noteInterfaces';
 import { mockError } from '@/mocks/mockError';
 import { IError } from '@/interfaces/common';
-import { debug } from 'console';
 import { waitFor } from '@testing-library/react';
 
 jest.mock('axios');
@@ -138,6 +137,36 @@ describe('ProjectNotes', () => {
     await user.click(getByRole('button', { name: 'deleteNote' }));
 
     expect(container.getElementsByClassName('note-container').length).toBe(1);
+  });
+
+  it('can PATCH a note', async () => {
+    const { user, queryByText, container, getAllByRole, getByTestId, getByText } = renderResult;
+
+    const responseNote = {
+      data: {
+        ...mockNotes.data[1],
+        content: 'Note edit.',
+      },
+    };
+
+    mockedAxios.patch.mockResolvedValue(Promise.resolve(responseNote));
+
+    await user.click(getAllByRole('button', { name: 'edit' })[1]);
+
+    const textarea = getByTestId('edit-note-textarea');
+
+    await user.clear(textarea);
+    await user.type(textarea, responseNote.data.content);
+    await user.click(getByTestId('edit-note-save'));
+
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as INote;
+
+    await waitFor(() => {
+      expect(container.getElementsByClassName('note-container').length).toBe(2);
+      expect(formPatchRequest.content).toEqual(responseNote.data.content);
+      expect(getByText(responseNote.data.content)).toBeInTheDocument();
+      expect(queryByText(mockNotes.data[1].content)).toBeNull();
+    });
   });
 
   it('catches a bad notes GET request', async () => {
