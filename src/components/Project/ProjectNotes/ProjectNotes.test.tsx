@@ -17,6 +17,7 @@ import { INote } from '@/interfaces/noteInterfaces';
 import { mockError } from '@/mocks/mockError';
 import { IError } from '@/interfaces/common';
 import { debug } from 'console';
+import { waitFor } from '@testing-library/react';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -98,32 +99,31 @@ describe('ProjectNotes', () => {
   });
 
   /** test fails cause the backend is suppoed to return an id but the test returns it empty */
-  it.skip('can submit a new note', async () => {
+  it('can POST a note', async () => {
     const { user, getByRole, getByText } = renderResult;
 
-    const responseNote: INote = {
-      ...mockNotes.data[1],
-      id: '9bddd912-fe41-4e01-82a5-cca4f15a15b7',
-      content: 'Third note',
+    const responseNote = {
+      data: {
+        ...mockNotes.data[1],
+        id: '9bddd912-fe41-4e01-82a5-cca4f15a15b7',
+        content: 'Third note',
+      },
     };
-
-    mockedAxios.post.mockResolvedValue(async () => await Promise.resolve(responseNote));
+    mockedAxios.post.mockResolvedValue(Promise.resolve(responseNote));
 
     const textarea = getByRole('textbox', { name: 'writeNote' });
 
-    await user.type(textarea, 'Third note');
+    await user.type(textarea, responseNote.data.content);
     await user.click(getByRole('button', { name: 'save' }));
 
     const formPatchRequest = mockedAxios.post.mock.lastCall[1] as INote;
 
-    debug(formPatchRequest);
-
-    expect(formPatchRequest.content).toEqual(responseNote.content);
-    expect(getByText('Third note')).toBeInTheDocument();
+    expect(formPatchRequest.content).toEqual(responseNote.data.content);
+    await waitFor(() => expect(getByText(responseNote.data.content)).toBeInTheDocument());
   });
 
   /** test fails cause the payload is undefined after clicking the delete button */
-  it('can delete a note', async () => {
+  it('can DELETE a note', async () => {
     const { user, getByRole, container, getAllByRole } = renderResult;
 
     mockedAxios.delete.mockResolvedValue(

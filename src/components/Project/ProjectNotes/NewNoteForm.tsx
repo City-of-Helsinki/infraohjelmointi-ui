@@ -13,8 +13,8 @@ const ProjectNewNoteForm = () => {
   const { handleSubmit, control, reset } = formMethods;
   const dispatch = useAppDispatch();
 
-  const onSubmit = (form: INoteRequest) =>
-    dispatch(postNoteThunk(form)).then(() => reset(formValues));
+  const onSubmit = async (form: INoteRequest) =>
+    await dispatch(postNoteThunk(form)).then(() => reset(formValues));
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
