@@ -88,7 +88,7 @@ describe('ProjectNotes', () => {
 
     expect(container.getElementsByClassName('note-history').length).toBe(2);
 
-    mockNotes.data[0].history.map((h) => {
+    mockNotes.data[0].history.forEach((h) => {
       const author = `${h.updatedBy.firstName} ${h.updatedBy.lastName}`;
 
       expect(getByText(stringToDateTime(h.updatedDate))).toBeInTheDocument();
