@@ -58,7 +58,10 @@ export interface IProjectBasicsForm {
 }
 
 export interface IProjectNoteForm {
+  id: string;
+  updatedBy: string;
   content: string;
+  project: string;
 }
 
 export interface IAppForms extends IProjectHeaderForm, IProjectBasicsForm {}
