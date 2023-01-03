@@ -10,14 +10,18 @@ import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import './styles.css';
 import _ from 'lodash';
+import useProjectClassListFilter from '@/hooks/useProjectClassListFilter';
 
 const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
   const { formFields, formMethods } = useProjectBasicsForm();
+
   const projectId = useAppSelector(
-    (state: RootState) => state.project.selectedProject?.id,
+    (state: RootState) => state.project.selectedProject,
     _.isEqual,
-  );
+  )?.id;
+
+  useProjectClassListFilter();
 
   const {
     formState: { dirtyFields, isDirty },

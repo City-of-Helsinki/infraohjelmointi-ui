@@ -78,6 +78,7 @@ export interface IProject {
   effectHousing: boolean;
   constructionEndYear: string;
   planningStartYear: string;
+  projectClass?: string;
 }
 
 export interface IProjectRequest {
@@ -108,12 +109,12 @@ export interface IProjectRequest {
   favourite?: boolean;
   projectWorkQuantity?: string;
   projectCostForecast?: string;
-  projectQualityLevel?: IListItem;
+  projectQualityLevel?: string | null;
   planningCostForecast?: string;
-  planningPhase?: IListItem;
+  planningPhase?: string | null;
   planningWorkQuantity?: string;
   constructionCostForecast?: string;
-  constructionPhase?: IListItem;
+  constructionPhase?: string | null;
   constructionWorkQuantity?: string;
   budget?: string;
   realizedCost?: string;
@@ -126,6 +127,7 @@ export interface IProjectRequest {
   riskAssessment?: string | null;
   constructionEndYear?: string;
   planningStartYear?: string;
+  projectClass?: string | null;
 }
 
 export interface IProjectRequestObject {
