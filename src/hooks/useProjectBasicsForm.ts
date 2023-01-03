@@ -12,6 +12,9 @@ import { useAppSelector } from './common';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
 import _ from 'lodash';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { IListItem } from '@/interfaces/common';
+import { IClass } from '@/interfaces/classInterfaces';
 
 /**
  * Creates form fields for the project, in order for the labels to work the 'fi.json'-translations need
@@ -219,8 +222,38 @@ const buildProjectBasicsFormFields = (
  */
 const useProjectBasicsValues = () => {
   const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
+
+  const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
+  const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
+  const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
+
   const { t } = useTranslation();
   const value = (value: string | undefined) => value || '';
+
+  /**
+   * There are three project classes, but only one id is saved. We create a list item of each class based on the id.
+   */
+  const getProjectClassFields = (project: IProject | null) => {
+    const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
+      id: projectClass?.id || '',
+      value: projectClass?.name || '',
+    });
+
+    const selectedSubClass = subClasses.find((sc) => sc.id === project?.projectClass);
+
+    const selectedClass = classes.find(
+      (c) => c.id === (selectedSubClass ? selectedSubClass.parent : project?.projectClass),
+    );
+    const selectedMasterClass = masterClasses.find(
+      (mc) => mc.id === (selectedClass ? selectedClass.parent : project?.projectClass),
+    );
+
+    return {
+      masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
+      class: listItemToOption(classAsListItem(selectedClass) || []),
+      subClass: listItemToOption(classAsListItem(selectedSubClass) || []),
+    };
+  };
 
   const formValues: IProjectBasicsForm = useMemo(
     () => ({
@@ -250,6 +283,7 @@ const useProjectBasicsValues = () => {
       riskAssessment: listItemToOption(project?.riskAssessment, t),
       constructionEndYear: value(project?.constructionEndYear),
       planningStartYear: value(project?.planningStartYear),
+      ...getProjectClassFields(project),
       projectWorkQuantity: project?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(project?.projectQualityLevel, t),
       projectCostForecast: project?.projectCostForecast,

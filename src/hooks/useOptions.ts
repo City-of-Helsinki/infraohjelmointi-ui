@@ -23,8 +23,13 @@ export const useOptions = (name?: ListType) => {
     _.isEqual,
   ) as Array<IListItem>;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const options = useMemo(() => optionsList.map((i) => listItemToOption(i, t)), [optionsList]);
+  const isClassList = name === 'masterClass' || name === 'class' || name === 'subClass';
+
+  const options = useMemo(
+    () => optionsList.map((i) => listItemToOption(i, isClassList ? undefined : t)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [optionsList],
+  );
 
   return { options };
 };

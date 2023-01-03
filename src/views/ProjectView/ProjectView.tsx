@@ -23,6 +23,12 @@ import { ProjectNotes } from '@/components/Project/ProjectNotes';
 // FIXME: the import statement for ProjectHeader index.ts doesn't work for some reason
 // webpack gives an error from a row that doesn't exist
 import ProjectHeader from '@/components/Project/ProjectHeader/ProjectHeader';
+import {
+  getClassesThunk,
+  setClasses,
+  setMasterClasses,
+  setSubClasses,
+} from '@/reducers/classSlice';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
@@ -40,6 +46,11 @@ const ProjectView = () => {
     dispatch(getProjectQualityLevelsThunk());
     dispatch(getPlanningPhasesThunk());
     dispatch(getConstructionPhasesThunk());
+    dispatch(getClassesThunk()).then(() => {
+      dispatch(setMasterClasses());
+      dispatch(setClasses());
+      dispatch(setSubClasses());
+    });
   }, [dispatch, projectId]);
 
   const navItems: Array<INavigationItem> = [

@@ -1,3 +1,4 @@
+import { IClass } from '@/interfaces/classInterfaces';
 import { IError, IListItem } from '@/interfaces/common';
 import {
   getConstructionPhases,
@@ -43,6 +44,12 @@ const initialState: IListState = {
   constructionPhase: [],
   error: null,
 };
+
+const classesToListItems = (classes: Array<IClass>): Array<IListItem> =>
+  classes.map((mc) => ({
+    id: mc.id,
+    value: mc.name,
+  }));
 
 export const getProjectTypesThunk = createAsyncThunk('projectTypes/get', async (_, thunkAPI) => {
   return await getProjectTypes()
@@ -116,7 +123,17 @@ export const getProjectRisksThunk = createAsyncThunk('projectRisks/get', async (
 export const listsSlice = createSlice({
   name: 'lists',
   initialState,
-  reducers: {},
+  reducers: {
+    setMasterClassList(state, action: PayloadAction<Array<IClass>>) {
+      return { ...state, masterClass: classesToListItems(action.payload) };
+    },
+    setClassList(state, action: PayloadAction<Array<IClass>>) {
+      return { ...state, class: classesToListItems(action.payload) };
+    },
+    setSubClassList(state, action: PayloadAction<Array<IClass>>) {
+      return { ...state, subClass: classesToListItems(action.payload) };
+    },
+  },
   extraReducers: (builder) => {
     // GET PROJECT TYPES
     builder.addCase(
@@ -237,5 +254,7 @@ export const listsSlice = createSlice({
     );
   },
 });
+
+export const { setMasterClassList, setClassList, setSubClassList } = listsSlice.actions;
 
 export default listsSlice.reducer;
