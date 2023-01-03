@@ -89,6 +89,16 @@ describe('ProjectView', () => {
     expect(store.getState().lists.area.length).toBeGreaterThan(0);
     expect(store.getState().lists.type.length).toBeGreaterThan(0);
     expect(store.getState().lists.phase.length).toBeGreaterThan(0);
+    expect(store.getState().lists.category.length).toBeGreaterThan(0);
+    expect(store.getState().lists.constructionPhaseDetail.length).toBeGreaterThan(0);
+    expect(store.getState().lists.riskAssessment.length).toBeGreaterThan(0);
+    expect(store.getState().lists.projectQualityLevel.length).toBeGreaterThan(0);
+    expect(store.getState().lists.constructionPhase.length).toBeGreaterThan(0);
+    expect(store.getState().lists.planningPhase.length).toBeGreaterThan(0);
+    expect(store.getState().class.allClasses.length).toBeGreaterThan(0);
+    expect(store.getState().class.masterClasses.length).toBeGreaterThan(0);
+    expect(store.getState().class.classes.length).toBeGreaterThan(0);
+    expect(store.getState().class.subClasses.length).toBeGreaterThan(0);
   });
 
   it('renders the parent container', () => {
