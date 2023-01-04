@@ -6,6 +6,7 @@ import loadingReducer from './reducers/loadingSlice';
 import listsReducer from './reducers/listsSlice';
 import noteReducer from './reducers/noteSlice';
 import classReducer from './reducers/classSlice';
+import locationReducer from './reducers/locationSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
@@ -16,6 +17,7 @@ export const storeItems = {
   lists: listsReducer,
   note: noteReducer,
   class: classReducer,
+  location: locationReducer,
 };
 
 const rootReducer = combineReducers(storeItems);
