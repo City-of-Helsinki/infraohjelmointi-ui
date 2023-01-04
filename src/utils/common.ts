@@ -68,7 +68,11 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
 
   for (const key in dirtyFields) {
     const parsedKey =
-      key === 'masterClass' || key === 'class' || key === 'subClass' ? 'projectClass' : key;
+      key === 'masterClass' || key === 'class' || key === 'subClass'
+        ? 'projectClass'
+        : key === 'district' || key === 'division' || key === 'subDivision'
+        ? 'projectLocation'
+        : key;
 
     Object.assign(data, { [parsedKey]: parseValue(form[key as keyof IAppForms]) });
   }

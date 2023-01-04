@@ -203,6 +203,18 @@
   grid-column: var(--grid-col-full);
 }
 
+.basic-info-form #district {
+  grid-column: var(--grid-col-half-left);
+}
+
+.basic-info-form #division {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #subDivision {
+  grid-column: var(--grid-col-small-right);
+}
+
 @media (max-width: 1400px) {
   .basic-info-form {
     width: 95%;

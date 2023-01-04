@@ -1,42 +1,55 @@
-import { setClassList, setMasterClassList, setSubClassList } from '@/reducers/listsSlice';
+import { setDistrictList, setDivisionList, setSubDivisionList } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 
 const useProjectLocationListFilter = () => {
-  //   const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
-  //   const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
-  //   const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
-  //   const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
-  //   const dispatch = useAppDispatch();
-  //   useEffect(() => {
-  //     dispatch(setMasterClassList(masterClasses));
-  //     const selectedMasterClass = masterClasses.find((mc) => mc.id === project?.projectClass);
-  //     const selectedClass = classes.find((c) => c.id === project?.projectClass);
-  //     const selectedSubClass = subClasses.find((sc) => sc.id === project?.projectClass);
-  //     if (project?.projectClass) {
-  //       /* If selected is a masterClass, we need to find all classes that have that masterClass as their parent */
-  //       if (selectedMasterClass) {
-  //         dispatch(setClassList(classes.filter((c) => c.parent === project?.projectClass)));
-  //       }
-  //       /* If selected is a class, we need to find the master class and find all classes for that master class */
-  //       if (selectedClass) {
-  //         const masterClassForClass = masterClasses.find((mc) => mc.id === selectedClass?.parent);
-  //         dispatch(setClassList(classes.filter((c) => c.parent === masterClassForClass?.id)));
-  //         dispatch(setSubClassList(subClasses.filter((sc) => sc.parent === project?.projectClass)));
-  //       }
-  //       /* If selected is a subClass, we need to find the class and masterClass and find which classes belong to that masterClass
-  //           and which subClasses belong to that class */
-  //       if (selectedSubClass) {
-  //         const classForSubClass = classes.find((c) => c.id === selectedSubClass?.parent);
-  //         const masterClassForClass = masterClasses.find((mc) => mc.id === classForSubClass?.parent);
-  //         dispatch(setSubClassList(subClasses.filter((sc) => sc.parent === classForSubClass?.id)));
-  //         dispatch(setClassList(classes.filter((c) => c.parent === masterClassForClass?.id)));
-  //       }
-  //     }
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [masterClasses, project, classes, subClasses]);
+  const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
+  const districts = useAppSelector((state: RootState) => state.location.districts, _.isEqual);
+  const divisions = useAppSelector((state: RootState) => state.location.divisions, _.isEqual);
+  const subDivisions = useAppSelector((state: RootState) => state.location.subDivisions, _.isEqual);
+  const districtsList = useAppSelector((state: RootState) => state.lists.district);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const selectedDistrict = districts.find((d) => d.id === project?.projectLocation);
+    const selectedDivision = divisions.find((d) => d.id === project?.projectLocation);
+    const selectedSubDivision = subDivisions.find((sd) => sd.id === project?.projectLocation);
+
+    if (districtsList.length <= 0) {
+      dispatch(setDistrictList(districts));
+    }
+
+    if (project?.projectLocation) {
+      /* If selected is a district, we need to find all divisions that have that district as their parent */
+      if (selectedDistrict) {
+        dispatch(setDivisionList(divisions.filter((d) => d.parent === project?.projectLocation)));
+      }
+
+      /* If selected is a division, we need to find the district and find all divisions for that district */
+      if (selectedDivision) {
+        const districtForDivision = districts.find((d) => d.id === selectedDivision?.parent);
+
+        dispatch(setDivisionList(divisions.filter((d) => d.parent === districtForDivision?.id)));
+        dispatch(
+          setSubDivisionList(subDivisions.filter((sd) => sd.parent === project?.projectLocation)),
+        );
+      }
+
+      /* If selected is a subDivision, we need to find the division and district and find which divisions belong to that 
+        district and which subDivisions belong to that division */
+      if (selectedSubDivision) {
+        const divForSubDiv = divisions.find((c) => c.id === selectedSubDivision?.parent);
+        const districtForDivision = districts.find((d) => d.id === divForSubDiv?.parent);
+
+        dispatch(setSubDivisionList(subDivisions.filter((sd) => sd.parent === divForSubDiv?.id)));
+        dispatch(setDivisionList(divisions.filter((d) => d.parent === districtForDivision?.id)));
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [districts, project, divisions, subDivisions]);
 };
 
 export default useProjectLocationListFilter;

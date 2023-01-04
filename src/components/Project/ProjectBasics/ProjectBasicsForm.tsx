@@ -11,6 +11,7 @@ import { FieldValues, SubmitHandler } from 'react-hook-form';
 import './styles.css';
 import _ from 'lodash';
 import useProjectClassListFilter from '@/hooks/useProjectClassListFilter';
+import useProjectLocationListFilter from '@/hooks/useProjectLocationListFilter';
 
 const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ const ProjectBasicsForm: FC = () => {
   )?.id;
 
   useProjectClassListFilter();
+  useProjectLocationListFilter();
 
   const {
     formState: { dirtyFields, isDirty },

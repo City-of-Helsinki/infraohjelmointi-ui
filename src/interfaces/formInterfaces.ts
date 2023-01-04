@@ -25,6 +25,7 @@ export interface IForm {
   fieldSet?: Array<IForm>;
   tooltip?: string;
   hideLabel?: boolean;
+  icon?: string;
 }
 
 export interface IProjectHeaderForm {
