@@ -15,6 +15,7 @@ import _ from 'lodash';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 /**
  * Creates form fields for the project, in order for the labels to work the 'fi.json'-translations need
@@ -198,6 +199,9 @@ const buildProjectBasicsFormFields = (
       ],
     },
     { name: 'preliminaryBudgetDivision', type: FormField.ListField, readOnly: true },
+    { name: 'district', type: FormField.Select, icon: 'location' },
+    { name: 'division', type: FormField.Select, icon: 'location' },
+    { name: 'subDivision', type: FormField.Select, icon: 'location' },
   ];
 
   const projectBasicsFormFields = formFields.map((formField) => ({
@@ -227,6 +231,10 @@ const useProjectBasicsValues = () => {
   const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
   const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
 
+  const districts = useAppSelector((state: RootState) => state.location.districts, _.isEqual);
+  const divisions = useAppSelector((state: RootState) => state.location.divisions, _.isEqual);
+  const subDivisions = useAppSelector((state: RootState) => state.location.subDivisions, _.isEqual);
+
   const { t } = useTranslation();
   const value = (value: string | undefined) => value || '';
 
@@ -252,6 +260,30 @@ const useProjectBasicsValues = () => {
       masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
       class: listItemToOption(classAsListItem(selectedClass) || []),
       subClass: listItemToOption(classAsListItem(selectedSubClass) || []),
+    };
+  };
+
+  /**
+   * There are three project locations, but only one id is saved. We create a list item of each location based on the id.
+   */
+  const getProjectLocationFields = (project: IProject | null) => {
+    const locationAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
+      id: projectLocation?.id || '',
+      value: projectLocation?.name || '',
+    });
+
+    const selectedSubDivision = subDivisions.find((sd) => sd.id === project?.projectLocation);
+    const selectedDivision = divisions.find(
+      (d) => d.id === (selectedSubDivision ? selectedSubDivision.parent : project?.projectLocation),
+    );
+    const selectedDistrict = districts.find(
+      (d) => d.id === (selectedDivision ? selectedDivision.parent : project?.projectLocation),
+    );
+
+    return {
+      district: listItemToOption(locationAsListItem(selectedDistrict) || []),
+      division: listItemToOption(locationAsListItem(selectedDivision) || []),
+      subDivision: listItemToOption(locationAsListItem(selectedSubDivision) || []),
     };
   };
 
@@ -284,6 +316,7 @@ const useProjectBasicsValues = () => {
       constructionEndYear: value(project?.constructionEndYear),
       planningStartYear: value(project?.planningStartYear),
       ...getProjectClassFields(project),
+      ...getProjectLocationFields(project),
       projectWorkQuantity: project?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(project?.projectQualityLevel, t),
       projectCostForecast: project?.projectCostForecast,

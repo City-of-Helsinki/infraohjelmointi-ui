@@ -4,6 +4,7 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select as HDSSelect } from 'hds-react/components/Select';
 import { useOptions } from '@/hooks/useOptions';
+import { IconLocation } from 'hds-react/icons';
 
 interface ISelectFieldProps {
   name: ListType;
@@ -11,9 +12,10 @@ interface ISelectFieldProps {
   control: HookFormControlType;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
+  icon?: string;
 }
 
-const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, hideLabel }) => {
+const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, hideLabel, icon }) => {
   const required = rules?.required ? true : false;
   const { options } = useOptions(name);
 
@@ -36,6 +38,7 @@ const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, hideL
               options={options}
               required={required}
               style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
+              icon={icon === 'location' && <IconLocation />}
             />
           </div>
         );

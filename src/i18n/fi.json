@@ -142,7 +142,10 @@
     "spentCost": "Käytetty",
     "budgetOverrunYear": "Ylitysoikeus vuosi",
     "budgetOverrunAmount": "Ylitysoikeuden määrä",
-    "preliminaryBudgetDivision": "Kustannusarvion alustava jakautuminen"
+    "preliminaryBudgetDivision": "Kustannusarvion alustava jakautuminen",
+    "district": "Suurpiiri",
+    "division": "Kaupunginosa",
+    "subDivision": "Osa-alue"
   },
   "notification": {
     "title": {
