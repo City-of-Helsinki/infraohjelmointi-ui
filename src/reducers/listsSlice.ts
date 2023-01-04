@@ -1,5 +1,6 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError, IListItem } from '@/interfaces/common';
+import { ILocation } from '@/interfaces/locationInterfaces';
 import {
   getConstructionPhases,
   getPlanningPhases,
@@ -26,6 +27,9 @@ export interface IListState {
   projectQualityLevel: Array<IListItem>;
   planningPhase: Array<IListItem>;
   constructionPhase: Array<IListItem>;
+  district: Array<IListItem>;
+  division: Array<IListItem>;
+  subDivision: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -42,6 +46,9 @@ const initialState: IListState = {
   projectQualityLevel: [],
   planningPhase: [],
   constructionPhase: [],
+  district: [],
+  division: [],
+  subDivision: [],
   error: null,
 };
 
@@ -132,6 +139,15 @@ export const listsSlice = createSlice({
     },
     setSubClassList(state, action: PayloadAction<Array<IClass>>) {
       return { ...state, subClass: classesToListItems(action.payload) };
+    },
+    setDistrictList(state, action: PayloadAction<Array<ILocation>>) {
+      return { ...state, district: classesToListItems(action.payload) };
+    },
+    setDivisionList(state, action: PayloadAction<Array<ILocation>>) {
+      return { ...state, division: classesToListItems(action.payload) };
+    },
+    setSubDivisionList(state, action: PayloadAction<Array<ILocation>>) {
+      return { ...state, subDivision: classesToListItems(action.payload) };
     },
   },
   extraReducers: (builder) => {
@@ -255,6 +271,13 @@ export const listsSlice = createSlice({
   },
 });
 
-export const { setMasterClassList, setClassList, setSubClassList } = listsSlice.actions;
+export const {
+  setMasterClassList,
+  setClassList,
+  setSubClassList,
+  setDistrictList,
+  setDivisionList,
+  setSubDivisionList,
+} = listsSlice.actions;
 
 export default listsSlice.reducer;

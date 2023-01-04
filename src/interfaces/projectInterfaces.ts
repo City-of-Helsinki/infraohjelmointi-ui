@@ -79,6 +79,7 @@ export interface IProject {
   constructionEndYear: string;
   planningStartYear: string;
   projectClass?: string;
+  projectLocation?: string;
 }
 
 export interface IProjectRequest {
@@ -128,6 +129,7 @@ export interface IProjectRequest {
   constructionEndYear?: string;
   planningStartYear?: string;
   projectClass?: string | null;
+  projectLocation?: string | null;
 }
 
 export interface IProjectRequestObject {
