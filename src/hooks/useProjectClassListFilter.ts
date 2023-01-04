@@ -7,15 +7,19 @@ import { useAppDispatch, useAppSelector } from './common';
 const useProjectClassListFilter = () => {
   const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
   const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
+  const masterClassList = useAppSelector((state: RootState) => state.lists.masterClass);
   const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
   const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setMasterClassList(masterClasses));
     const selectedMasterClass = masterClasses.find((mc) => mc.id === project?.projectClass);
     const selectedClass = classes.find((c) => c.id === project?.projectClass);
     const selectedSubClass = subClasses.find((sc) => sc.id === project?.projectClass);
+
+    if (masterClassList.length <= 0) {
+      dispatch(setMasterClassList(masterClasses));
+    }
 
     if (project?.projectClass) {
       /* If selected is a masterClass, we need to find all classes that have that masterClass as their parent */
