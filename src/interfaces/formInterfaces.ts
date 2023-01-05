@@ -12,6 +12,7 @@ export enum FormField {
   RadioCheckbox,
   ListField,
   OverrunRight,
+  TextArea,
 }
 
 export interface IForm {

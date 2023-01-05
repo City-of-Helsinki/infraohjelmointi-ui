@@ -199,10 +199,19 @@ const buildProjectBasicsFormFields = (
       ],
     },
     { name: 'preliminaryBudgetDivision', type: FormField.ListField, readOnly: true },
+    {
+      name: 'location',
+      type: FormField.Title,
+    },
     { name: 'regionalResponsibility', type: FormField.Select },
     { name: 'district', type: FormField.Select, icon: 'location' },
     { name: 'division', type: FormField.Select, icon: 'location' },
     { name: 'subDivision', type: FormField.Select, icon: 'location' },
+    { name: 'masterPlanAreaNumber', type: FormField.Text },
+    { name: 'trafficPlanNumber', type: FormField.Text },
+    { name: 'bridgeNumber', type: FormField.Text },
+    { name: 'longDescriptionTitle', type: FormField.Title },
+    { name: 'longDescription', type: FormField.TextArea },
   ];
 
   const projectBasicsFormFields = formFields.map((formField) => ({
@@ -341,6 +350,10 @@ const useProjectBasicsValues = () => {
       budgetOverrunYear: value(project?.budgetOverrunYear),
       budgetOverrunAmount: value(project?.budgetOverrunAmount),
       regionalResponsibility: [],
+      masterPlanAreaNumber: '',
+      trafficPlanNumber: '',
+      bridgeNumber: '',
+      longDescription: '',
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [project],

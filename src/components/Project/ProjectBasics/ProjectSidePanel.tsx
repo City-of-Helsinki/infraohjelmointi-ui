@@ -17,6 +17,8 @@ const ProjectSidePanel: FC = () => {
     { route: '#status', label: t('nav.status') },
     { route: '#schedule', label: t('nav.schedule') },
     { route: '#financial', label: t('nav.financial') },
+    { route: '#location', label: t('nav.location') },
+    { route: '#longDescription', label: t('nav.longDescription') },
   ];
 
   return (
