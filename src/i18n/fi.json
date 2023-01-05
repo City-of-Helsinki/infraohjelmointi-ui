@@ -162,6 +162,14 @@
     "longDescription": "Hankkeen kuvaus",
     "longDescriptionTitle": "Hankkeen kuvaus"
   },
+  "searchForm": {
+    "searchWord": "Mitä haet?",
+    "masterClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka",
+    "category": "Kategoria",
+    "personPlanning": "Vastuuhenkilö"
+  },
   "notification": {
     "title": {
       "sendSuccess": "Lähetys onnistui",

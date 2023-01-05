@@ -64,6 +64,16 @@ export interface IProjectNoteForm {
   project: string;
 }
 
+export interface ISearchForm {
+  searchWord: string;
+  masterClass: string;
+  Class: string;
+  subClass: string;
+  category: string;
+  programmed: boolean;
+  personPlanning: string;
+}
+
 export interface IAppForms extends IProjectHeaderForm, IProjectBasicsForm {}
 
 export interface ISomeOtherForm {
@@ -75,6 +85,7 @@ export type HookFormControlType =
   | Control<FieldValues>
   | Control<IProjectBasicsForm>
   | Control<IProjectHeaderForm>
+  | Control<ISearchForm>
   | undefined;
 
 export type HookFormRulesType = Omit<
