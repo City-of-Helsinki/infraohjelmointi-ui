@@ -27,7 +27,7 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
   const { handleSubmit, control } = formMethods;
 
   const onSubmit = async (form: IProjectNoteForm) => {
-    await dispatch(patchNoteThunk({ content: form.content }));
+    await dispatch(patchNoteThunk({ content: form.content, id: form.id }));
     close();
   };
 

@@ -11,7 +11,12 @@ import { useTranslation } from 'react-i18next';
 const ProjectNewNoteForm = () => {
   const { formMethods, formValues } = useProjectNoteForm();
   const { t } = useTranslation();
-  const { handleSubmit, control, reset } = formMethods;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isDirty },
+  } = formMethods;
   const dispatch = useAppDispatch();
 
   const onSubmit = async (form: IProjectNoteForm) =>
@@ -27,7 +32,7 @@ const ProjectNewNoteForm = () => {
             render={({ field }) => <TextArea {...field} id="textarea" label={t('writeNote')} />}
           />
         </div>
-        <Button size="small" type="submit">
+        <Button size="small" type="submit" disabled={!isDirty}>
           {t('save')}
         </Button>
       </div>
