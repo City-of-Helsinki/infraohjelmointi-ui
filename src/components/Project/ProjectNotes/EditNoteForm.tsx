@@ -3,13 +3,14 @@ import { IconPenLine } from 'hds-react/icons';
 import { FC, memo } from 'react';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useAppDispatch } from '@/hooks/common';
-import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
+import { INote } from '@/interfaces/noteInterfaces';
 import { Controller } from 'react-hook-form';
 import { TextArea } from 'hds-react/components/Textarea';
 import { useTranslation } from 'react-i18next';
 import useProjectNoteForm from '@/hooks/useNoteForm';
 import { patchNoteThunk } from '@/reducers/noteSlice';
 import DialogWrapper from '@/components/shared/DialogWrapper';
+import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 
 interface IProjectEditNoteFormProps {
   isOpen: boolean;
@@ -25,8 +26,8 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
 
   const { handleSubmit, control } = formMethods;
 
-  const onSubmit = async (form: INoteRequest) => {
-    await dispatch(patchNoteThunk(form));
+  const onSubmit = async (form: IProjectNoteForm) => {
+    await dispatch(patchNoteThunk({ content: form.content }));
     close();
   };
 

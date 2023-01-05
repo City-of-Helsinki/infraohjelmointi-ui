@@ -1,5 +1,6 @@
 import { useAppDispatch } from '@/hooks/common';
 import useProjectNoteForm from '@/hooks/useNoteForm';
+import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { INoteRequest } from '@/interfaces/noteInterfaces';
 import { postNoteThunk } from '@/reducers/noteSlice';
 import { Button } from 'hds-react/components/Button';
@@ -13,8 +14,8 @@ const ProjectNewNoteForm = () => {
   const { handleSubmit, control, reset } = formMethods;
   const dispatch = useAppDispatch();
 
-  const onSubmit = async (form: INoteRequest) =>
-    await dispatch(postNoteThunk(form)).then(() => reset(formValues));
+  const onSubmit = async (form: IProjectNoteForm) =>
+    await dispatch(postNoteThunk(form as INoteRequest)).then(() => reset(formValues));
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
