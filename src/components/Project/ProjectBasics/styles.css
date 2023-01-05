@@ -219,6 +219,26 @@
   grid-column: var(--grid-col-small-right);
 }
 
+.basic-info-form #masterPlanAreaNumber {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #trafficPlanNumber {
+  grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #bridgeNumber {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #longDescription {
+  grid-column: var(--grid-col-full);
+}
+
+.basic-info-form #longDescription textarea {
+  width: 70%;
+}
+
 @media (max-width: 1400px) {
   .basic-info-form {
     width: 95%;

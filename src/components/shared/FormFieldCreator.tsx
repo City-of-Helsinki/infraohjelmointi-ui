@@ -10,6 +10,7 @@ import NumberField from './NumberField';
 import OverrunRightField from './OverrunRightField';
 import RadioCheckboxField from './RadioCheckboxField';
 import SelectField from './SelectField';
+import TextAreaField from './TextAreaField';
 import TextField from './TextField';
 
 interface IFormFieldCreatorProps {
@@ -45,6 +46,8 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <RadioCheckboxField {...formProps} />;
           case FormField.OverrunRight:
             return <OverrunRightField key={f.name} form={f} />;
+          case FormField.TextArea:
+            return <TextAreaField {...formProps} />;
           default:
             return null;
         }
