@@ -5,6 +5,7 @@ import { INoteRequest } from '@/interfaces/noteInterfaces';
 import { postNoteThunk } from '@/reducers/noteSlice';
 import { Button } from 'hds-react/components/Button';
 import { TextArea } from 'hds-react/components/Textarea';
+import { memo, useCallback } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -19,8 +20,11 @@ const ProjectNewNoteForm = () => {
   } = formMethods;
   const dispatch = useAppDispatch();
 
-  const onSubmit = async (form: IProjectNoteForm) =>
-    await dispatch(postNoteThunk(form as INoteRequest)).then(() => reset(formValues));
+  const onSubmit = useCallback(
+    async (form: IProjectNoteForm) =>
+      await dispatch(postNoteThunk(form as INoteRequest)).then(() => reset(formValues)),
+    [dispatch, formValues, reset],
+  );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -40,4 +44,4 @@ const ProjectNewNoteForm = () => {
   );
 };
 
-export default ProjectNewNoteForm;
+export default memo(ProjectNewNoteForm);

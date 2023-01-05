@@ -1,6 +1,6 @@
 import { Button } from 'hds-react/components/Button';
 import { IconPenLine } from 'hds-react/icons';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useAppDispatch } from '@/hooks/common';
 import { INote } from '@/interfaces/noteInterfaces';
@@ -26,10 +26,13 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
 
   const { handleSubmit, control } = formMethods;
 
-  const onSubmit = async (form: IProjectNoteForm) => {
-    await dispatch(patchNoteThunk({ content: form.content, id: form.id }));
-    close();
-  };
+  const onSubmit = useCallback(
+    async (form: IProjectNoteForm) => {
+      await dispatch(patchNoteThunk({ content: form.content, id: form.id }));
+      close();
+    },
+    [close, dispatch],
+  );
 
   return (
     <DialogWrapper

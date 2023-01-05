@@ -1,6 +1,6 @@
 import { Button } from 'hds-react/components/Button';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useAppDispatch } from '@/hooks/common';
 import { deleteNoteThunk } from '@/reducers/noteSlice';
@@ -18,9 +18,9 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const handleDeleteNote = async () => {
+  const handleDeleteNote = useCallback(async () => {
     await dispatch(deleteNoteThunk(noteId)).then(() => close());
-  };
+  }, [close, dispatch, noteId]);
 
   return (
     <DialogWrapper
