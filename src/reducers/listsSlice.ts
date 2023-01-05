@@ -27,6 +27,7 @@ export interface IListState {
   projectQualityLevel: Array<IListItem>;
   planningPhase: Array<IListItem>;
   constructionPhase: Array<IListItem>;
+  regionalResponsibility: Array<IListItem>;
   district: Array<IListItem>;
   division: Array<IListItem>;
   subDivision: Array<IListItem>;
@@ -46,6 +47,7 @@ const initialState: IListState = {
   projectQualityLevel: [],
   planningPhase: [],
   constructionPhase: [],
+  regionalResponsibility: [],
   district: [],
   division: [],
   subDivision: [],
