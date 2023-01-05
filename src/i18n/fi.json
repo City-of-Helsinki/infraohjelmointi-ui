@@ -168,7 +168,8 @@
     "class": "Luokka",
     "subClass": "Alaluokka",
     "category": "Kategoria",
-    "personPlanning": "Vastuuhenkilö"
+    "personPlanning": "Vastuuhenkilö",
+    "filter": "Rajaa hakua"
   },
   "notification": {
     "title": {

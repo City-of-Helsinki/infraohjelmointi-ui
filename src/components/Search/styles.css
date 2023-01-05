@@ -25,6 +25,10 @@
   border-bottom: 0.09rem solid var(--color-black);
 }
 
+.search-form .search-form-content:last-child {
+  border-bottom: none;
+}
+
 .search-form .search-form-content .input-l {
   max-width: 100% !important;
 }
@@ -32,6 +36,11 @@
 .search-form .search-form-content .input-wrapper:first-child {
   padding-bottom: 0.8rem;
   border-bottom: 0.09rem solid var(--color-black-40);
+  margin-bottom: 0.6rem;
+}
+
+.search-form .search-form-content .input-wrapper:nth-child(2) {
+  margin-bottom: 1.5rem;
 }
 
 .search-form .search-form-content button {

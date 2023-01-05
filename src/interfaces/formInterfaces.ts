@@ -27,6 +27,7 @@ export interface IForm {
   tooltip?: string;
   hideLabel?: boolean;
   icon?: string;
+  placeholder?: string;
 }
 
 export interface IProjectHeaderForm {

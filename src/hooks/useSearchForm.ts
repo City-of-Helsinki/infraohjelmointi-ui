@@ -14,25 +14,31 @@ const buildSearchFormFields = (
       type: FormField.Text,
       tooltip: 'Etsi hakusanalla, esim. nimen, ryhmän, hashtagin mukaan',
     },
+    { name: 'filter', type: FormField.ListField, readOnly: true },
     {
       name: 'masterClass',
-      type: FormField.Text,
+      type: FormField.Select,
+      placeholder: 'Valitse',
     },
     {
       name: 'class',
-      type: FormField.Text,
+      type: FormField.Select,
+      placeholder: 'Valitse',
     },
     {
       name: 'subClass',
-      type: FormField.Text,
+      type: FormField.Select,
+      placeholder: 'Valitse',
     },
     {
       name: 'category',
-      type: FormField.Text,
+      type: FormField.Select,
+      placeholder: 'Valitse',
     },
     {
       name: 'personPlanning',
-      type: FormField.Text,
+      type: FormField.Select,
+      placeholder: 'Valitse',
     },
   ];
 
