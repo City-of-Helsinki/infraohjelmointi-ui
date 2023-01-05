@@ -10,7 +10,7 @@ export interface INote {
 export interface INoteRequest {
   id?: string;
   content?: string;
-  updatedBy?: INotePerson;
+  updatedBy?: string;
   project?: string;
 }
 
