@@ -199,6 +199,7 @@ const buildProjectBasicsFormFields = (
       ],
     },
     { name: 'preliminaryBudgetDivision', type: FormField.ListField, readOnly: true },
+    { name: 'regionalResponsibility', type: FormField.Select },
     { name: 'district', type: FormField.Select, icon: 'location' },
     { name: 'division', type: FormField.Select, icon: 'location' },
     { name: 'subDivision', type: FormField.Select, icon: 'location' },
@@ -339,6 +340,7 @@ const useProjectBasicsValues = () => {
       spentCost: value(project?.spentCost),
       budgetOverrunYear: value(project?.budgetOverrunYear),
       budgetOverrunAmount: value(project?.budgetOverrunAmount),
+      regionalResponsibility: [],
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [project],

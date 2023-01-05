@@ -65,6 +65,7 @@ describe('ProjectBasicsForm', () => {
               district: [],
               division: [],
               subDivision: [],
+              regionalResponsibility: [],
               error: {},
             },
           },

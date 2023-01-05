@@ -11,7 +11,7 @@ const TopBar: FC = () => {
   const { Dropdown, Actions, Search, User, Item } = Navigation;
 
   return (
-    <div data-testid="top-bar">
+    <div data-testid="top-bar" className="top-bar">
       <Navigation
         title={t('enums.programming')}
         menuToggleAriaLabel="menu"

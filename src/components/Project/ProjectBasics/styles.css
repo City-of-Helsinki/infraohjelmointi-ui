@@ -203,6 +203,10 @@
   grid-column: var(--grid-col-full);
 }
 
+.basic-info-form #regionalResponsibility {
+  grid-column: var(--grid-col-half-left);
+}
+
 .basic-info-form #district {
   grid-column: var(--grid-col-half-left);
 }
