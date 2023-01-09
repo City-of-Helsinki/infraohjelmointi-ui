@@ -239,14 +239,19 @@ const useProjectBasicsValues = () => {
       value: projectClass?.name || '',
     });
 
-    const selectedSubClass = subClasses.find((sc) => sc.id === project?.projectClass);
-
-    const selectedClass = classes.find(
-      (c) => c.id === (selectedSubClass ? selectedSubClass.parent : project?.projectClass),
-    );
-    const selectedMasterClass = masterClasses.find(
-      (mc) => mc.id === (selectedClass ? selectedClass.parent : project?.projectClass),
-    );
+    const selectedSubClass = project
+      ? subClasses.find((sc) => sc.id === project.projectClass)
+      : undefined;
+    const selectedClass = project
+      ? classes.find(
+          (c) => c.id === (selectedSubClass ? selectedSubClass.parent : project.projectClass),
+        )
+      : undefined;
+    const selectedMasterClass = project
+      ? masterClasses.find(
+          (mc) => mc.id === (selectedClass ? selectedClass.parent : project.projectClass),
+        )
+      : undefined;
 
     return {
       masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
