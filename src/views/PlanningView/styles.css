@@ -125,21 +125,22 @@
   padding: 0.5rem 1.25rem;
   color: white;
   min-width: 24.3rem;
+  border-bottom: 0.07rem solid var(--color-white);
 }
 
-.class-header-cell.class-1 {
+.class-header-cell.masterClass {
   background: var(--color-bus);
 }
 
-.class-header-cell.class-2 {
+.class-header-cell.class {
   background: rgb(0, 0, 163);
 }
 
-.class-header-cell.class-3 {
+.class-header-cell.subClass {
   background: rgb(0, 0, 129);
 }
 
-.class-header-cell.class-4 {
+.class-header-cell.project {
   background: rgb(0, 0, 102);
 }
 
@@ -154,6 +155,7 @@
   text-align: right;
   max-width: 4.875rem;
   min-width: 4.875rem;
+  border-bottom: 0.07rem solid var(--color-white);
 }
 
 .class-cell .class-cell-container {
@@ -177,19 +179,19 @@
   padding-right: var(--spacing-s);
 }
 
-.class-cell.class-1 {
+.class-cell.masterClass {
   background: var(--color-bus);
 }
 
-.class-cell.class-2 {
+.class-cell.class {
   background: rgb(0, 0, 163);
 }
 
-.class-cell.class-3 {
+.class-cell.subClass {
   background: rgb(0, 0, 129);
 }
 
-.class-cell.class-4 {
+.class-cell.project {
   background: rgb(0, 0, 102);
 }
 
@@ -198,19 +200,19 @@
   align-items: center;
 }
 
-.class-header-content.class-1 {
+.class-header-content.masterClass {
   padding-left: 0;
 }
 
-.class-header-content.class-2 {
+.class-header-content.class {
   padding-left: 2rem;
 }
 
-.class-header-content.class-3 {
+.class-header-content.subClass {
   padding-left: 4rem;
 }
 
-.class-header-content.class-4 {
+.class-header-content.project {
   padding-left: 6rem;
 }
 
