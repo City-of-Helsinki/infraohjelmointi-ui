@@ -109,7 +109,7 @@ table p {
 }
 
 .input-wrapper label {
-  width: 250px;
+  width: 15.625rem;
 }
 
 #radio-checkbox label {
@@ -130,4 +130,8 @@ table p {
   font-size: var(--fontsize-body-m);
   font-weight: 500;
   margin-bottom: var(--spacing-m);
+}
+
+.big-dialog {
+  width: 65% !important;
 }

@@ -76,3 +76,19 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
 
 export const getCurrentTime = () =>
   new Intl.DateTimeFormat('en-GB', { timeStyle: 'medium' }).format(new Date());
+
+export const stringToDateTime = (date: string) =>
+  new Intl.DateTimeFormat('fi-FI', { dateStyle: 'short', timeStyle: 'short' }).format(
+    new Date(date),
+  );
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const sortArrayByDates = (array: Array<any>, dateProperty: string, reversed?: boolean) => {
+  const sortedArray =
+    array &&
+    [...array]?.sort(
+      (a, b) => new Date(a[dateProperty]).valueOf() - new Date(b[dateProperty]).valueOf(),
+    );
+
+  return reversed ? [...sortedArray]?.reverse() : sortedArray;
+};

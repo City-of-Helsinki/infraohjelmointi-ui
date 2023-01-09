@@ -1,0 +1,64 @@
+import { IProjectHeaderForm } from '@/interfaces/formInterfaces';
+import { useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { useAppSelector } from './common';
+import { RootState } from '@/store';
+import { listItemToOption } from '@/utils/common';
+import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
+
+/**
+ * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
+ * project which can be needed to check for updates.
+ *
+ * @returns formValues, project
+ */
+const useProjectHeaderValues = () => {
+  const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
+  const user = useAppSelector((state: RootState) => state.auth.user, _.isEqual);
+
+  const { t } = useTranslation();
+
+  const formValues = useMemo(
+    () => ({
+      favourite: (user && project?.favPersons?.includes(user.id)) || false,
+      phase: listItemToOption(project?.phase, t) || [],
+      name: project?.name || '',
+      address: project?.address || '',
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [project, user],
+  );
+
+  return { formValues, project };
+};
+
+/**
+ * This hook initializes a react-hook-form control for a project header form. It will keep the
+ * form up to date with the selectedProject from redux and return all needed functions to handle
+ * the form.
+ *
+ * @returns handleSubmit, control, dirtyFields
+ */
+const useProjectHeaderForm = () => {
+  const { formValues, project } = useProjectHeaderValues();
+
+  const formMethods = useForm<IProjectHeaderForm>({
+    defaultValues: useMemo(() => formValues, [formValues]),
+    mode: 'onBlur',
+  });
+
+  const { control, reset } = formMethods;
+
+  // Updates
+  useEffect(() => {
+    if (project) {
+      reset(formValues);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project, formValues]);
+
+  return { formMethods, control };
+};
+
+export default useProjectHeaderForm;

@@ -1,0 +1,84 @@
+.notes-page-container {
+  width: 80%;
+  max-width: 40.5rem;
+  margin: var(--spacing-layout-l) var(--spacing-layout-xl);
+}
+
+.notes-page-container p:nth-child(2) {
+  margin-top: var(--spacing-s) !important;
+}
+
+.note-form-container {
+  border: 0.125rem solid rgb(204, 204, 204);
+  padding: var(--spacing-m);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: var(--spacing-m) 0;
+}
+
+.note-form-textarea {
+  width: 100%;
+  margin: 0 0 var(--spacing-m) 0;
+}
+
+.note-container {
+  background: var(--color-silver-light);
+  margin-bottom: var(--spacing-m);
+  border-radius: 0.25rem;
+}
+
+.note-header-container {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-m) var(--spacing-m) 0 var(--spacing-m);
+}
+
+.note-content-container {
+  padding: 0 var(--spacing-m) var(--spacing-l) var(--spacing-m);
+}
+
+.note-footer-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--spacing-xs) var(--spacing-s) var(--spacing-xs);
+}
+
+.note-history {
+  padding-bottom: 1.25rem;
+}
+
+.note-history:last-child {
+  padding-bottom: 0;
+}
+
+/* adds a border with padding to each element */
+.note-history:after {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 93%;
+  border-bottom: 1px solid var(--color-black-20);
+}
+
+/* last history row will not have a border */
+.note-history:last-child:after {
+  border-bottom: none;
+}
+
+.note-history-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0 var(--spacing-m) var(--spacing-s) var(--spacing-m);
+}
+
+.note-history-container #modifiedDate {
+  grid-column: 1;
+}
+.note-history-container #title {
+  grid-column: 2/3;
+}
+.note-history-container #modifiedBy {
+  grid-row: 2;
+  grid-column: 2/3;
+}

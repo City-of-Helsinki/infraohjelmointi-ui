@@ -6,12 +6,13 @@ import './index.css';
 import './i18n';
 
 import App from '@/App';
-import ProjectCardView from '@/views/ProjectCardView';
-import { ProjectCardBasics } from '@/components/ProjectCard';
+import ProjectView from '@/views/ProjectView';
+import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import ErrorView from '@/views/ErrorView';
 import AuthGuard from '@/components/AuthGuard';
 import { injectStore } from '@/utils/interceptors';
 import PlanningListView from '@/views/PlanningListView';
+import { ProjectNotes } from './components/Project/ProjectNotes';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -33,13 +34,14 @@ const router = createBrowserRouter([
     errorElement: <ErrorView />,
     children: [
       {
-        path: 'project-card/:projectId',
-        element: <ProjectCardView />,
+        path: 'project/:projectId',
+        element: <ProjectView />,
         children: [
           {
             path: 'basics',
-            element: <ProjectCardBasics />,
+            element: <ProjectBasics />,
           },
+          { path: 'notes', element: <ProjectNotes /> },
         ],
       },
       {
