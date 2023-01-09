@@ -23,7 +23,7 @@ export const useOptions = (name?: ListType) => {
     _.isEqual,
   ) as Array<IListItem>;
 
-  const isClassList = name === 'masterClass' || name === 'class' || name === 'subClass';
+  const isClassList = ['masterClass', 'class', 'subClass'].includes(name as ListType);
 
   const options = useMemo(
     () => optionsList.map((i) => listItemToOption(i, isClassList ? undefined : t)),
