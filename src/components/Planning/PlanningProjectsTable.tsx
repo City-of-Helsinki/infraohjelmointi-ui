@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/hooks/common';
 import useProjectsList from '@/hooks/useProjectsList';
-import { classSums, classValue, planClasses } from '@/mocks/common';
+import { classSums, classValue } from '@/mocks/common';
 import { RootState } from '@/store';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -58,30 +58,64 @@ const PlanningProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) =>
   return (
     <>
       <table className="planning-projects-table" cellSpacing={0}>
-        <thead>
-          {isClassView ? (
-            masterClasses.map((c, i) => (
-              <PlanningClassTableRow
-                key={i}
-                name={c.name}
-                sums={classSums}
-                value={classValue}
-                isVisible={true}
-                handleClick={() => console.log('click')}
+        {isClassView ? (
+          <thead>
+            {masterClasses.map((mc) => (
+              <>
+                <PlanningClassTableRow
+                  key={mc.id}
+                  name={mc.name}
+                  sums={classSums}
+                  value={classValue}
+                  isVisible={true}
+                  type="masterClass"
+                  handleClick={() => console.log('click')}
+                />
+                {[...classes.filter((c) => c.parent === mc.id)].map((c) => (
+                  <>
+                    <PlanningClassTableRow
+                      key={c.id}
+                      name={c.name}
+                      sums={classSums}
+                      value={classValue}
+                      isVisible={true}
+                      type="class"
+                      handleClick={() => console.log('click')}
+                    />
+                    {[...subClasses.filter((sc) => sc.parent === c.id)].map((sc) => (
+                      <>
+                        <PlanningClassTableRow
+                          key={sc.id}
+                          name={sc.name}
+                          sums={classSums}
+                          value={classValue}
+                          isVisible={true}
+                          type="subClass"
+                          handleClick={() => console.log('click')}
+                        />
+                      </>
+                    ))}
+                  </>
+                ))}
+              </>
+            ))}
+          </thead>
+        ) : (
+          <>
+            {/* GROUP VIEW */}
+            <thead>
+              <PlanningProjectsTableGroupHeader
+                group={group}
+                isProjectsVisible={projectsVisible}
+                handleProjectsVisible={handleProjectsVisible}
               />
-            ))
-          ) : (
-            <PlanningProjectsTableGroupHeader
-              group={group}
-              isProjectsVisible={projectsVisible}
-              handleProjectsVisible={handleProjectsVisible}
-            />
-          )}
-        </thead>
-        <tbody>
-          {projectsVisible &&
-            projects.map((p, i) => <PlanningProjectsTableRow key={i} project={p} />)}
-        </tbody>
+            </thead>
+            <tbody>
+              {projectsVisible &&
+                projects.map((p, i) => <PlanningProjectsTableRow key={i} project={p} />)}
+            </tbody>
+          </>
+        )}
       </table>
       <div data-testid="fetch-projects-trigger" ref={ref} />
     </>
