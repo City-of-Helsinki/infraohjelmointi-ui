@@ -15,6 +15,22 @@ export const planGroups = [
   },
 ];
 
+export const classSums = [
+  '800',
+  '280',
+  '500',
+  '640',
+  null,
+  null,
+  '530',
+  '450',
+  '460',
+  '300',
+  '100',
+];
+
+export const classValue = '830';
+
 export const planClasses = [
   {
     name: 'Mock Class 1',

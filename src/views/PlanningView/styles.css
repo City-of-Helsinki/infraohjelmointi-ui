@@ -223,10 +223,12 @@
   font-weight: 300;
 }
 
-/* Second cell in the projects table header */
+/* Second cell in the projects table header (The first data-cell used to have centered text, remove this if not needed) */
+/* 
 .planning-projects-table thead tr th:nth-child(2) {
   text-align: center;
-}
+} 
+*/
 
 .planning-projects-table thead tr th:nth-child(2) span {
   padding-right: 0;
