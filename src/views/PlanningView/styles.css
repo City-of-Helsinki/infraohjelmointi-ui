@@ -1,4 +1,4 @@
-.planning-list-table-container {
+.planning-table-container {
   margin: var(--spacing-layout-s);
   font-size: var(--fontsize-body-s);
   white-space: nowrap;
@@ -7,16 +7,16 @@
   overflow-y: hidden;
 }
 
-.planning-list-years-table {
+.planning-years-table {
   text-align: center;
   width: 70%;
 }
 
-.planning-list-years-table span {
+.planning-years-table span {
   display: block;
 }
 
-.planning-list-years-table .row-1-cell {
+.planning-years-table .row-1-cell {
   background: var(--color-bus);
   color: white;
   padding: 0.5rem 0.25rem;
@@ -25,11 +25,11 @@
   min-width: 4.875rem;
 }
 
-.planning-list-projects-table {
+.planning-projects-table {
   width: 100%;
 }
 
-.planning-list-info-panel {
+.planning-info-panel {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* repeat 2 rows with 1fr (fractional unit) */
   grid-auto-flow: row;
@@ -39,35 +39,35 @@
   min-width: 26rem;
 }
 
-.planning-list-info-panel span {
+.planning-info-panel span {
   display: block;
 }
-.planning-list-info-panel #planningListTitle {
+.planning-info-panel #planningTitle {
   grid-column: 1/3;
 }
 
-#planningListTitle .info-icon {
+#planningTitle .info-icon {
   transform: translate(0.8rem, 0.15rem);
 }
 
-#planningListTitle div {
+#planningTitle div {
   display: flex;
 }
 
-.planning-list-info-panel #planningListGroupInfo {
+.planning-info-panel #planningGroupInfo {
   text-align: right;
 }
 
-#planningListGroupInfo .group-info-text {
+#planningGroupInfo .group-info-text {
   font-weight: bold;
 }
 
-#planningListButton button {
+#planningButton button {
   height: 2.75rem !important;
   width: 14.9375rem !important;
 }
 
-.planning-list-info-panel #planningListBasicInfo {
+.planning-info-panel #planningBasicInfo {
   font-weight: bold;
   grid-column: 2/3;
   text-align: right;
@@ -224,11 +224,11 @@
 }
 
 /* Second cell in the projects table header */
-.planning-list-projects-table thead tr th:nth-child(2) {
+.planning-projects-table thead tr th:nth-child(2) {
   text-align: center;
 }
 
-.planning-list-projects-table thead tr th:nth-child(2) span {
+.planning-projects-table thead tr th:nth-child(2) span {
   padding-right: 0;
 }
 
@@ -334,7 +334,7 @@
 }
 
 @media (max-width: 1490px) {
-  .planning-list-table-container {
+  .planning-table-container {
     margin-right: 5rem;
   }
 }

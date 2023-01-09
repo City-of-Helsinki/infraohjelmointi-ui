@@ -11,7 +11,7 @@ import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import ErrorView from '@/views/ErrorView';
 import AuthGuard from '@/components/AuthGuard';
 import { injectStore } from '@/utils/interceptors';
-import PlanningListView from '@/views/PlanningListView';
+import PlanningView from '@/views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -45,15 +45,15 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'planning-list',
+        path: 'planning',
         children: [
           {
             path: 'planner',
-            element: <PlanningListView />,
+            element: <PlanningView />,
           },
           {
             path: 'coordinator',
-            element: <PlanningListView />,
+            element: <PlanningView />,
           },
         ],
       },

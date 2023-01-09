@@ -15,11 +15,11 @@ import { ChangeEvent, FC, useState } from 'react';
  * borderBottom: '4px solid var(--color-black-80)'
  */
 
-interface IPlanningListProjectsTableCellProps {
+interface IPlanningProjectsTableCellProps {
   value: number;
 }
 
-const PlanningListProjectsTableCell: FC<IPlanningListProjectsTableCellProps> = ({ value }) => {
+const PlanningProjectsTableCell: FC<IPlanningProjectsTableCellProps> = ({ value }) => {
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState(value);
 
@@ -56,4 +56,4 @@ const PlanningListProjectsTableCell: FC<IPlanningListProjectsTableCellProps> = (
   );
 };
 
-export default PlanningListProjectsTableCell;
+export default PlanningProjectsTableCell;

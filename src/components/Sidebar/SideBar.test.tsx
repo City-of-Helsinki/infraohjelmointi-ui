@@ -22,8 +22,8 @@ describe('SideBar', () => {
       label: 'project',
     },
     {
-      route: 'planning-list',
-      label: 'planningList',
+      route: 'planning',
+      label: 'planning',
     },
   ];
 

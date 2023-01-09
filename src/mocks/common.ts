@@ -1,12 +1,12 @@
 export const projectAddress = 'Hämeentie 1, 00530 Helsinki';
 export const mockTags = ['uudisrakentaminen', 'pyöräily', 'pohjoinensuurpiiri'];
 
-export const planningListInfo = {
+export const planningInfo = {
   group: 'Uudisrak. Pohj.SP',
   date: '20.6.2020',
 };
 
-export const planListGroups = [
+export const planGroups = [
   {
     name: 'Mock Group 1',
     value1: '3 400',
@@ -15,7 +15,7 @@ export const planListGroups = [
   },
 ];
 
-export const planListClasses = [
+export const planClasses = [
   {
     name: 'Mock Class 1',
     value: '830',
@@ -38,14 +38,14 @@ export const planListClasses = [
   },
 ];
 
-export const planListProjectValues = {
+export const planProjectValues = {
   readiness: '1',
   value1: '3 400',
   value2: '2 700',
   sums: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 };
 
-export const planningListYearsTableData = [
+export const planningYearsTableData = [
   {
     title: 'kuluva TA',
     year: new Date().getFullYear().toString(),

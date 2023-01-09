@@ -2,7 +2,7 @@ import { IconAngleDown, IconAngleUp, IconCopy, IconMenuDots } from 'hds-react/ic
 import { IconButton, Span } from '../shared';
 import { FC } from 'react';
 
-interface IPlanningListProjectsTableClassesHeaderProps {
+interface IPlanningProjectsTableClassesHeaderProps {
   name: string;
   index: string;
   value: string | null;
@@ -11,7 +11,7 @@ interface IPlanningListProjectsTableClassesHeaderProps {
   isVisible: boolean;
 }
 
-const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClassesHeaderProps> = ({
+const PlanningProjectsTableClassesHeader: FC<IPlanningProjectsTableClassesHeaderProps> = ({
   name,
   index,
   value,
@@ -50,7 +50,7 @@ const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClass
 
       {/**
        * TODO:
-       * These cell values should listen to the current project card values for that year from redux:
+       * These cell values should en to the current project card values for that year from redux:
        * 1. We patch the project card each time the user types a value
        * 2. The value will change in redux with the response
        * 3. We calculate the sum and display it for the user when a change in redux state is detected
@@ -70,4 +70,4 @@ const PlanningListProjectsTableClassesHeader: FC<IPlanningListProjectsTableClass
   ) : null;
 };
 
-export default PlanningListProjectsTableClassesHeader;
+export default PlanningProjectsTableClassesHeader;
