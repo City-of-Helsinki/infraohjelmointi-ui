@@ -30,8 +30,8 @@ const SideBar = () => {
       component: <IconBooks style={iconStyles} />,
     },
     {
-      route: `planning-list/planner`,
-      label: t('planningList'),
+      route: `planning/planner`,
+      label: t('planning'),
       component: <IconStickyNotes style={iconStyles} />,
     },
   ];

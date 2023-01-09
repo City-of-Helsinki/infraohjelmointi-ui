@@ -2,7 +2,7 @@ import { Button } from 'hds-react/components/Button';
 import { useLocation, useNavigate } from 'react-router';
 import { Toolbar } from '../shared';
 
-const PlanningListToolbar = () => {
+const PlanningToolbar = () => {
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
   const changeCoordinatorView = () => {
@@ -19,4 +19,4 @@ const PlanningListToolbar = () => {
   );
 };
 
-export default PlanningListToolbar;
+export default PlanningToolbar;

@@ -1,15 +1,15 @@
 import useProjectsList from '@/hooks/useProjectsList';
-import { planListClasses } from '@/mocks/common';
+import { planClasses } from '@/mocks/common';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation } from 'react-router';
-import PlanningListProjectsTableClassesHeader from './PlanningListProjectsTableClassesHeader';
-import PlanningListProjectsTableGroupHeader from './PlanningListProjectsTableGroupHeader';
-import PlanningListProjectsTableRow from './PlanningListProjectsTableRow';
+import PlanningProjectsTableClassesHeader from './PlanningProjectsTableClassesHeader';
+import PlanningProjectsTableGroupHeader from './PlanningProjectsTableGroupHeader';
+import PlanningProjectsTableRow from './PlanningProjectsTableRow';
 
 // FIXME: this any will be removed ones we get the actual group model
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) => {
+const PlanningProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) => {
   const { projects, fetchNext } = useProjectsList();
   const pathname = useLocation().pathname;
 
@@ -138,11 +138,11 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
 
   return (
     <>
-      <table className="planning-list-projects-table" cellSpacing={0}>
+      <table className="planning-projects-table" cellSpacing={0}>
         <thead>
           {isClassView ? (
-            planListClasses.map((c, i) => (
-              <PlanningListProjectsTableClassesHeader
+            planClasses.map((c, i) => (
+              <PlanningProjectsTableClassesHeader
                 key={i}
                 name={c.name}
                 sums={c.sums}
@@ -153,7 +153,7 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
               />
             ))
           ) : (
-            <PlanningListProjectsTableGroupHeader
+            <PlanningProjectsTableGroupHeader
               group={group}
               isProjectsVisible={projectsVisible}
               handleProjectsVisible={handleProjectsVisible}
@@ -162,7 +162,7 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
         </thead>
         <tbody>
           {projectsVisible &&
-            projects.map((p, i) => <PlanningListProjectsTableRow key={i} project={p} />)}
+            projects.map((p, i) => <PlanningProjectsTableRow key={i} project={p} />)}
         </tbody>
       </table>
       <div data-testid="fetch-projects-trigger" ref={ref} />
@@ -170,4 +170,4 @@ const PlanningListProjectsTable: FC<{ group: any }> = ({ group }: { group: any }
   );
 };
 
-export default PlanningListProjectsTable;
+export default PlanningProjectsTable;
