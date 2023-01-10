@@ -1,13 +1,12 @@
 import { useAppSelector } from '@/hooks/common';
 import useProjectsList from '@/hooks/useProjectsList';
-import { classSums, classValue } from '@/mocks/common';
 import { RootState } from '@/store';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation } from 'react-router';
-import PlanningClassTableRow from './PlanningClassTableRow';
 import PlanningProjectsTableGroupHeader from './PlanningProjectsTableGroupHeader';
 import PlanningProjectsTableRow from './PlanningProjectsTableRow';
+import PlanningClassTableRow from './PlanningClassTableRow';
 
 // FIXME: this any will be removed ones we get the actual group model
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,47 +58,22 @@ const PlanningProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) =>
     <>
       <table className="planning-projects-table" cellSpacing={0}>
         {isClassView ? (
-          <thead>
+          <tbody>
+            {/* Master classes */}
             {masterClasses.map((mc) => (
-              <>
-                <PlanningClassTableRow
-                  key={mc.id}
-                  name={mc.name}
-                  sums={classSums}
-                  value={classValue}
-                  isVisible={true}
-                  type="masterClass"
-                  handleClick={() => console.log('click')}
-                />
+              <PlanningClassTableRow key={mc.id} projectClass={mc} type="masterClass">
+                {/* Classes */}
                 {[...classes.filter((c) => c.parent === mc.id)].map((c) => (
-                  <>
-                    <PlanningClassTableRow
-                      key={c.id}
-                      name={c.name}
-                      sums={classSums}
-                      value={classValue}
-                      isVisible={true}
-                      type="class"
-                      handleClick={() => console.log('click')}
-                    />
+                  <PlanningClassTableRow key={c.id} projectClass={c} type="class">
+                    {/* Sub classes */}
                     {[...subClasses.filter((sc) => sc.parent === c.id)].map((sc) => (
-                      <>
-                        <PlanningClassTableRow
-                          key={sc.id}
-                          name={sc.name}
-                          sums={classSums}
-                          value={classValue}
-                          isVisible={true}
-                          type="subClass"
-                          handleClick={() => console.log('click')}
-                        />
-                      </>
+                      <PlanningClassTableRow key={sc.id} projectClass={sc} type="subClass" />
                     ))}
-                  </>
+                  </PlanningClassTableRow>
                 ))}
-              </>
+              </PlanningClassTableRow>
             ))}
-          </thead>
+          </tbody>
         ) : (
           <>
             {/* GROUP VIEW */}
@@ -123,3 +97,35 @@ const PlanningProjectsTable: FC<{ group: any }> = ({ group }: { group: any }) =>
 };
 
 export default PlanningProjectsTable;
+
+/**
+ *           <tbody>
+            {masterClasses.map((mc) => (
+              <>
+                <PlanningClassTableRow
+                  {...getPlanningProps(mc, 'masterClass')}
+                  expanded={true}
+                  handleClick={() => console.log('open classes')}
+                />
+                {[...classes.filter((c) => c.parent === mc.id)].map((c) => (
+                  <>
+                    <PlanningClassTableRow
+                      {...getPlanningProps(c, 'class')}
+                      expanded={true}
+                      handleClick={() => console.log('open sub classes')}
+                    />
+                    {[...subClasses.filter((sc) => sc.parent === c.id)].map((sc) => (
+                      <>
+                        <PlanningClassTableRow
+                          {...getPlanningProps(sc, 'subClass')}
+                          // isOpen={true}
+                          handleClick={() => console.log('open projects')}
+                        />
+                      </>
+                    ))}
+                  </>
+                ))}
+              </>
+            ))}
+          </tbody>
+ */
