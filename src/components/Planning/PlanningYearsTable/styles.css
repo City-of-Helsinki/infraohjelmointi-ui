@@ -6,6 +6,7 @@
 
 .planning-years-table span {
   display: block;
+  transform: translateX(-15%);
 }
 
 /* First cell for years table including the sums and dark blue background */
@@ -16,7 +17,6 @@
   font-size: 0.875rem;
   max-width: 4.875rem;
   min-width: 4.875rem;
-  padding-right: 1rem;
 }
 
 /* First cell of the row-1 cells is lighter than the rest */
@@ -27,5 +27,4 @@
   font-size: 0.875rem;
   max-width: 4.875rem;
   min-width: 4.875rem;
-  padding-right: 1rem;
 }

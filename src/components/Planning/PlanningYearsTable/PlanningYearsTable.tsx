@@ -26,7 +26,9 @@ const PlanningYearsTable: FC = () => {
         </tr>
         <tr>
           {planningYearsTableData.map((o, i) => (
-            <td key={i}>{o.otherVal3}</td>
+            <td key={i}>
+              <Span text={o.otherVal3 || ''} fontWeight="light" size="s" />
+            </td>
           ))}
         </tr>
         <tr>
