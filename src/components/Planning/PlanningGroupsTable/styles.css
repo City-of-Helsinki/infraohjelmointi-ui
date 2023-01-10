@@ -1,6 +1,5 @@
 .group-header-cell {
   width: 30.6%;
-  text-align: left;
   background: var(--color-bus);
   padding: 0.5rem 1.25rem;
   color: white;
@@ -40,8 +39,9 @@
 }
 
 .group-cell span {
+  display: block;
+  transform: translateX(-15%);
   font-weight: 300;
-  padding-right: var(--spacing-s);
 }
 
 .project-header-cell {
@@ -95,7 +95,7 @@
 }
 
 .project-cell {
-  text-align: center;
+  text-align: right;
   background: var(--color-bus-light);
   border-bottom: 0.05rem solid var(--color-bus-medium-light);
   border-collapse: collapse;

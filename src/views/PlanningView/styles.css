@@ -12,11 +12,6 @@
   text-align: right;
 }
 
-/* All td:s have right margin so that for the right aligned text */
-.planning-view-container td {
-  padding-right: 1rem;
-}
-
 @media (max-width: 1490px) {
   .planning-view-container {
     margin-right: 5rem;
