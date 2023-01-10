@@ -1,5 +1,5 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
-import { IconButton, Span } from '../../shared';
+import { BubbleIcon, IconButton, Span } from '../../shared';
 import { FC, memo, ReactNode, useCallback, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
@@ -57,7 +57,7 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
             <div className="class-cell-container">
               <span>{rn}</span>
               <span>{rn}</span>
-              <span>{i === 0 && rn}</span>
+              <span>{i === 0 && `${rn}`}</span>
             </div>
           </td>
         ))}
