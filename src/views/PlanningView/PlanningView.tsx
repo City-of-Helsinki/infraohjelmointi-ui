@@ -1,5 +1,4 @@
 import { FC, useEffect } from 'react';
-// import { PlanningTable, PlanningToolbar } from '@/components/Planning';
 import { useAppDispatch } from '@/hooks/common';
 import {
   getClassesThunk,
@@ -9,7 +8,7 @@ import {
 } from '@/reducers/classSlice';
 import './styles.css';
 import PlanningToolbar from '@/components/Planning/PlanningToolbar';
-import PlanningTable from '@/components/Planning/PlanningTable';
+import { PlanningInfoPanel, PlanningTable, PlanningYearsTable } from '@/components/Planning';
 
 const PlanningView: FC = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +25,13 @@ const PlanningView: FC = () => {
   return (
     <>
       <PlanningToolbar />
-      <PlanningTable />
+      <div className="planning-table-container">
+        <div className="display-flex">
+          <PlanningInfoPanel />
+          <PlanningYearsTable />
+        </div>
+        <PlanningTable />
+      </div>
     </>
   );
 };
