@@ -1,72 +1,70 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { IconButton, Span } from '../shared';
-import { FC } from 'react';
+import { FC, memo, ReactNode, useCallback, useState } from 'react';
+import { IClass } from '@/interfaces/classInterfaces';
+import { classSums } from '@/mocks/common';
 
-type ClassType = 'masterClass' | 'class' | 'subClass';
+export type ClassType = 'masterClass' | 'class' | 'subClass';
 
 interface IPlanningClassTableRowProps {
-  name: string;
-  value: string | null;
-  sums: Array<string | null>;
-  handleClick: any;
-  isVisible: boolean;
+  projectClass: IClass;
   type: ClassType;
+  children?: ReactNode;
 }
 
 const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
-  name,
-  value,
-  sums,
-  handleClick,
-  isVisible,
+  projectClass,
   type,
+  children,
 }) => {
-  return isVisible ? (
-    <tr>
-      <th className={`class-header-cell ${type}`}>
-        <div style={{ display: 'flex' }}>
-          <div className="class-header-content-item value-container">
-            <span>{value}</span>
-          </div>
-          <div className={`class-header-content ${type}`}>
-            <div className="class-header-content-item">
-              <IconButton
-                icon={isVisible ? IconAngleUp : IconAngleDown}
-                color="white"
-                onClick={handleClick}
-              />
-            </div>
-            <div className="class-header-content-item">
-              <IconMenuDots size="xs" />
-            </div>
-            <div className="class-header-content-item">
-              <span></span>
-              <Span fontWeight="bold" size="s" text={name} color="white" />{' '}
-            </div>
-          </div>
-        </div>
-      </th>
+  const [expandChildren, setExpandChildren] = useState(false);
 
-      {/**
-       * TODO:
-       * These cell values should en to the current project card values for that year from redux:
-       * 1. We patch the project card each time the user types a value
-       * 2. The value will change in redux with the response
-       * 3. We calculate the sum and display it for the user when a change in redux state is detected
-       */}
-      {/* FIXME: this any will be removed ones we get the actual group model */}
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
-      {sums.map((rn: any, i: number) => (
-        <th key={i} className={`class-cell ${type}`}>
-          <div className="class-cell-container">
-            <span>{rn}</span>
-            <span>{rn}</span>
-            <span>{i === 0 && rn}</span>
+  const handleExpandChildren = useCallback(() => {
+    setExpandChildren((current) => !current);
+  }, []);
+
+  return (
+    <>
+      <tr>
+        {/* Header with cell name */}
+        <th className={`class-header-cell ${type}`}>
+          <div className="display-flex">
+            <div className="class-header-content-item value-container">
+              <span>{180}</span>
+            </div>
+            <div className={`class-header-content ${type}`}>
+              <div className="class-header-content-item">
+                <IconButton
+                  icon={expandChildren ? IconAngleUp : IconAngleDown}
+                  color="white"
+                  onClick={handleExpandChildren}
+                />
+              </div>
+              <div className="class-header-content-item">
+                <IconMenuDots size="xs" />
+              </div>
+              <div className="class-header-content-item">
+                <span></span>
+                <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />{' '}
+              </div>
+            </div>
           </div>
         </th>
-      ))}
-    </tr>
-  ) : null;
+
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
+        {classSums.map((rn: any, i: number) => (
+          <td key={i} className={`class-cell ${type}`}>
+            <div className="class-cell-container">
+              <span>{rn}</span>
+              <span>{rn}</span>
+              <span>{i === 0 && rn}</span>
+            </div>
+          </td>
+        ))}
+      </tr>
+      {expandChildren && children}
+    </>
+  );
 };
 
-export default PlanningClassTableRow;
+export default memo(PlanningClassTableRow);

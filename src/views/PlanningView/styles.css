@@ -64,7 +64,7 @@
 
 #planningButton button {
   height: 2.75rem !important;
-  width: 14.9375rem !important;
+  width: 15rem !important;
 }
 
 .planning-info-panel #planningBasicInfo {
@@ -126,6 +126,8 @@
   color: white;
   min-width: 24.3rem;
   border-bottom: 0.07rem solid var(--color-white);
+  max-width: 30.6%;
+  overflow-x: hidden;
 }
 
 .class-header-cell.masterClass {
@@ -150,9 +152,9 @@
 
 .class-cell {
   color: white;
-  padding: 0.35rem 0.25rem;
+  padding: 0.35rem 0;
   font-size: 0.875rem;
-  text-align: right;
+  text-align: center;
   max-width: 4.875rem;
   min-width: 4.875rem;
   border-bottom: 0.07rem solid var(--color-white);
@@ -176,7 +178,6 @@
 
 .class-cell span {
   font-weight: 300;
-  padding-right: var(--spacing-s);
 }
 
 .class-cell.masterClass {
@@ -198,6 +199,8 @@
 .class-header-cell .class-header-content {
   display: flex;
   align-items: center;
+  overflow: hidden;
+  max-width: 16.5rem;
 }
 
 .class-header-content.masterClass {
