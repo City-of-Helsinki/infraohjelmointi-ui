@@ -31,6 +31,8 @@ import { RenderResult } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
+import mockProjectClasses from '@/mocks/mockClasses';
+import { getClassesThunk } from '@/reducers/classSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -72,6 +74,9 @@ describe('ProjectView', () => {
     mockedAxios.get.mockResolvedValue(mockConstructionPhases);
     await store.dispatch(getConstructionPhasesThunk());
 
+    mockedAxios.get.mockResolvedValue(mockProjectClasses);
+    await store.dispatch(getClassesThunk());
+
     await act(async () => (renderResult = renderWithProviders(<ProjectView />, { store })));
   });
 
@@ -84,6 +89,16 @@ describe('ProjectView', () => {
     expect(store.getState().lists.area.length).toBeGreaterThan(0);
     expect(store.getState().lists.type.length).toBeGreaterThan(0);
     expect(store.getState().lists.phase.length).toBeGreaterThan(0);
+    expect(store.getState().lists.category.length).toBeGreaterThan(0);
+    expect(store.getState().lists.constructionPhaseDetail.length).toBeGreaterThan(0);
+    expect(store.getState().lists.riskAssessment.length).toBeGreaterThan(0);
+    expect(store.getState().lists.projectQualityLevel.length).toBeGreaterThan(0);
+    expect(store.getState().lists.constructionPhase.length).toBeGreaterThan(0);
+    expect(store.getState().lists.planningPhase.length).toBeGreaterThan(0);
+    expect(store.getState().class.allClasses.length).toBeGreaterThan(0);
+    expect(store.getState().class.masterClasses.length).toBeGreaterThan(0);
+    expect(store.getState().class.classes.length).toBeGreaterThan(0);
+    expect(store.getState().class.subClasses.length).toBeGreaterThan(0);
   });
 
   it('renders the parent container', () => {
@@ -192,6 +207,15 @@ describe('ProjectView', () => {
     await store.dispatch(getConstructionPhasesThunk());
 
     const storeError = store.getState().lists.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed classes fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getClassesThunk());
+
+    const storeError = store.getState().class.error as IError;
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
   });

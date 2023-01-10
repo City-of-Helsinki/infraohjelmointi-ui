@@ -2,18 +2,20 @@ import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolki
 import projectReducer from '@/reducers/projectSlice';
 import authReducer from '@/reducers/authSlice';
 import notificationReducer from '@/reducers/notificationSlice';
-import loadingSlice from './reducers/loadingSlice';
-import listsSlice from './reducers/listsSlice';
-import noteSlice from './reducers/noteSlice';
+import loadingReducer from './reducers/loadingSlice';
+import listsReducer from './reducers/listsSlice';
+import noteReducer from './reducers/noteSlice';
+import classReducer from './reducers/classSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
   project: projectReducer,
   auth: authReducer,
   notifications: notificationReducer,
-  loading: loadingSlice,
-  lists: listsSlice,
-  note: noteSlice,
+  loading: loadingReducer,
+  lists: listsReducer,
+  note: noteReducer,
+  class: classReducer,
 };
 
 const rootReducer = combineReducers(storeItems);
