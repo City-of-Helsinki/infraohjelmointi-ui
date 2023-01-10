@@ -55,6 +55,11 @@
   font-size: 14px !important;
 }
 
+.class-cell .class-cell-container span:nth-child(3) {
+  font-weight: bold;
+  color: var(--color-suomenlinna-dark);
+}
+
 .class-cell span {
   font-weight: 300;
   transform: translateX(-15%);
