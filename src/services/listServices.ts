@@ -63,3 +63,10 @@ export const getConstructionPhases = async () => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getResponsibleZones = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/responsible-zones/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};

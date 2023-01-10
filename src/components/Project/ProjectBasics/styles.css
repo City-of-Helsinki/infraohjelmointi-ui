@@ -203,7 +203,7 @@
   grid-column: var(--grid-col-full);
 }
 
-.basic-info-form #regionalResponsibility {
+.basic-info-form #responsibleZone {
   grid-column: var(--grid-col-half-left);
 }
 

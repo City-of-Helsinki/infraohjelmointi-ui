@@ -17,6 +17,7 @@ import {
   getConstructionPhaseDetailsThunk,
   getProjectCategoriesThunk,
   getProjectRisksThunk,
+  getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
@@ -52,6 +53,7 @@ const ProjectView = () => {
     dispatch(getProjectQualityLevelsThunk());
     dispatch(getPlanningPhasesThunk());
     dispatch(getConstructionPhasesThunk());
+    dispatch(getResponsibleZonesThunk());
     dispatch(getClassesThunk()).then(() => {
       dispatch(setMasterClasses());
       dispatch(setClasses());

@@ -15,6 +15,7 @@ import {
   mockProjectQualityLevels,
   mockProjectRisks,
   mockProjectTypes,
+  mockResponsibleZones,
 } from '@/mocks/mockLists';
 import {
   getConstructionPhaseDetailsThunk,
@@ -26,6 +27,7 @@ import {
   getProjectQualityLevelsThunk,
   getProjectRisksThunk,
   getProjectTypesThunk,
+  getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
 import { RenderResult } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
@@ -82,6 +84,9 @@ describe('ProjectView', () => {
     mockedAxios.get.mockResolvedValue(mockLocations);
     await store.dispatch(getLocationsThunk());
 
+    mockedAxios.get.mockResolvedValue(mockResponsibleZones);
+    await store.dispatch(getResponsibleZonesThunk());
+
     await act(async () => (renderResult = renderWithProviders(<ProjectView />, { store })));
   });
 
@@ -108,6 +113,7 @@ describe('ProjectView', () => {
     expect(store.getState().location.districts.length).toBeGreaterThan(0);
     expect(store.getState().location.divisions.length).toBeGreaterThan(0);
     expect(store.getState().location.subDivisions.length).toBeGreaterThan(0);
+    expect(store.getState().lists.responsibleZone.length).toBeGreaterThan(0);
   });
 
   it('renders the parent container', () => {
@@ -234,6 +240,15 @@ describe('ProjectView', () => {
     await store.dispatch(getLocationsThunk());
 
     const storeError = store.getState().location.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed responsible zones fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getResponsibleZonesThunk());
+
+    const storeError = store.getState().lists.error as IError;
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
   });

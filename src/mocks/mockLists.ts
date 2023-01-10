@@ -276,3 +276,20 @@ export const mockConstructionPhases: { data: Array<IListItem> } = {
     },
   ],
 };
+
+export const mockResponsibleZones: { data: Array<IListItem> } = {
+  data: [
+    {
+      id: 'effee0b7-f93b-496d-93b2-444f5f7ef8bf',
+      value: 'east',
+    },
+    {
+      id: '5b5e316b-c6f5-434c-bc75-e17166b6297d',
+      value: 'west',
+    },
+    {
+      id: 'c87c5738-af53-4c01-8aa1-edf2019c290a',
+      value: 'north',
+    },
+  ],
+};

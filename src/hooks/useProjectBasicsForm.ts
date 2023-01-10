@@ -203,7 +203,7 @@ const buildProjectBasicsFormFields = (
       name: 'location',
       type: FormField.Title,
     },
-    { name: 'regionalResponsibility', type: FormField.Select },
+    { name: 'responsibleZone', type: FormField.Select },
     { name: 'district', type: FormField.Select, icon: 'location' },
     { name: 'division', type: FormField.Select, icon: 'location' },
     { name: 'subDivision', type: FormField.Select, icon: 'location' },
@@ -289,13 +289,19 @@ const useProjectBasicsValues = () => {
       value: projectLocation?.name || '',
     });
 
-    const selectedSubDivision = subDivisions.find((sd) => sd.id === project?.projectLocation);
-    const selectedDivision = divisions.find(
-      (d) => d.id === (selectedSubDivision ? selectedSubDivision.parent : project?.projectLocation),
-    );
-    const selectedDistrict = districts.find(
-      (d) => d.id === (selectedDivision ? selectedDivision.parent : project?.projectLocation),
-    );
+    const selectedSubDivision = project
+      ? subDivisions.find((sd) => sd.id === project.projectLocation)
+      : undefined;
+
+    const projectLocationId = selectedSubDivision?.parent || project?.projectLocation;
+
+    const selectedDivision = projectLocationId
+      ? divisions.find(({ id }) => id === projectLocationId)
+      : undefined;
+
+    const districtId = selectedDivision?.parent || project?.projectClass;
+
+    const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
 
     return {
       district: listItemToOption(locationAsListItem(selectedDistrict) || []),
@@ -349,7 +355,7 @@ const useProjectBasicsValues = () => {
       spentCost: value(project?.spentCost),
       budgetOverrunYear: value(project?.budgetOverrunYear),
       budgetOverrunAmount: value(project?.budgetOverrunAmount),
-      regionalResponsibility: [],
+      responsibleZone: [],
       masterPlanAreaNumber: '',
       trafficPlanNumber: '',
       bridgeNumber: '',

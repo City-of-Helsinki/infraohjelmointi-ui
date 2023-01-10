@@ -14,8 +14,6 @@ const useProjectLocationListFilter = () => {
 
   useEffect(() => {
     const selectedDistrict = districts.find((d) => d.id === project?.projectLocation);
-    const selectedDivision = divisions.find((d) => d.id === project?.projectLocation);
-    const selectedSubDivision = subDivisions.find((sd) => sd.id === project?.projectLocation);
 
     if (districtsList.length <= 0) {
       dispatch(setDistrictList(districts));
@@ -27,6 +25,7 @@ const useProjectLocationListFilter = () => {
         dispatch(setDivisionList(divisions.filter((d) => d.parent === project?.projectLocation)));
       }
 
+      const selectedDivision = divisions.find((d) => d.id === project?.projectLocation);
       /* If selected is a division, we need to find the district and find all divisions for that district */
       if (selectedDivision) {
         const districtForDivision = districts.find((d) => d.id === selectedDivision?.parent);
@@ -37,6 +36,7 @@ const useProjectLocationListFilter = () => {
         );
       }
 
+      const selectedSubDivision = subDivisions.find((sd) => sd.id === project?.projectLocation);
       /* If selected is a subDivision, we need to find the division and district and find which divisions belong to that 
         district and which subDivisions belong to that division */
       if (selectedSubDivision) {

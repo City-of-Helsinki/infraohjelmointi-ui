@@ -11,6 +11,7 @@ import {
   getConstructionPhaseDetails,
   getProjectCategories,
   getProjectRisks,
+  getResponsibleZones,
 } from '@/services/listServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -27,10 +28,10 @@ export interface IListState {
   projectQualityLevel: Array<IListItem>;
   planningPhase: Array<IListItem>;
   constructionPhase: Array<IListItem>;
-  regionalResponsibility: Array<IListItem>;
   district: Array<IListItem>;
   division: Array<IListItem>;
   subDivision: Array<IListItem>;
+  responsibleZone: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -47,10 +48,10 @@ const initialState: IListState = {
   projectQualityLevel: [],
   planningPhase: [],
   constructionPhase: [],
-  regionalResponsibility: [],
   district: [],
   division: [],
   subDivision: [],
+  responsibleZone: [],
   error: null,
 };
 
@@ -128,6 +129,15 @@ export const getProjectRisksThunk = createAsyncThunk('projectRisks/get', async (
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
+
+export const getResponsibleZonesThunk = createAsyncThunk(
+  'responsibleZones/get',
+  async (_, thunkAPI) => {
+    return await getResponsibleZones()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
 
 export const listsSlice = createSlice({
   name: 'lists',
@@ -266,6 +276,19 @@ export const listsSlice = createSlice({
     );
     builder.addCase(
       getConstructionPhasesThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // GET RESPONSIBLE ZONES
+    builder.addCase(
+      getResponsibleZonesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IListItem>>) => {
+        return { ...state, responsibleZone: action.payload };
+      },
+    );
+    builder.addCase(
+      getResponsibleZonesThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

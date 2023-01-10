@@ -41,7 +41,8 @@ export type ListType =
   | 'subClass'
   | 'district'
   | 'division'
-  | 'subDivision';
+  | 'subDivision'
+  | 'responsibleZone';
 
 export type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';
