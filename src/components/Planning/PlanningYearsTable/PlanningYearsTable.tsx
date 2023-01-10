@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { planningYearsTableData } from '@/mocks/common';
-import { Span } from '../shared';
+import { Span } from '../../shared';
+import './styles.css';
 
 const PlanningYearsTable: FC = () => {
   return (

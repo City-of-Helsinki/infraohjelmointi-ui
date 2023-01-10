@@ -2,7 +2,8 @@ import { planningInfo } from '@/mocks/common';
 import { IconInfoCircleFill } from 'hds-react/icons';
 import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
-import { Title } from '../shared';
+import { Title } from '../../shared';
+import './styles.css';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();

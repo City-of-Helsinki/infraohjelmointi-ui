@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import PlanningGroupsTableGroupHeader from './PlanningGroupsTableHeader';
 import PlanningGroupsTableRow from './PlanningGroupsTableRow';
+import './styles.css';
 
 // FIXME: this any will be removed ones we get the actual group model
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,15 +30,13 @@ const PlanningGroupsTable = () => {
 
   return (
     <>
-      <table className="planning-projects-table" cellSpacing={0}>
+      <table className="planning-table" cellSpacing={0}>
         {/* GROUP VIEW */}
-        <thead>
-          <PlanningGroupsTableGroupHeader
-            group={planGroups[0]}
-            isProjectsVisible={projectsVisible}
-            handleProjectsVisible={handleProjectsVisible}
-          />
-        </thead>
+        <PlanningGroupsTableGroupHeader
+          group={planGroups[0]}
+          isProjectsVisible={projectsVisible}
+          handleProjectsVisible={handleProjectsVisible}
+        />
         <tbody>
           {projectsVisible &&
             projects.map((p, i) => <PlanningGroupsTableRow key={i} project={p} />)}

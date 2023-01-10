@@ -1,0 +1,7 @@
+.planning-table {
+  width: 100%;
+}
+
+.planning-table thead tr th:nth-child(2) span {
+  padding-right: 0;
+}
