@@ -30,7 +30,7 @@
     "use-deep-compare-effect": "^1.8.1"
   },
   "scripts": {
-    "start": "craco start",
+    "start": "PORT=4000 craco start",
     "build": "craco build",
     "test": "react-scripts test",
     "test:coverage": "yarn test --coverage .",
