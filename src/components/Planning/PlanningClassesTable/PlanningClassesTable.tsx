@@ -2,6 +2,7 @@ import { useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import _ from 'lodash';
 import PlanningClassesTableRow from './PlanningClassesTableRow';
+import './styles.css';
 
 // FIXME: this any will be removed ones we get the actual group model
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,7 +12,7 @@ const PlanningClassesTable = () => {
   const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
 
   return (
-    <table className="planning-projects-table" cellSpacing={0}>
+    <table className="planning-table" cellSpacing={0}>
       <tbody>
         {/* Master classes */}
         {masterClasses.map((mc) => (

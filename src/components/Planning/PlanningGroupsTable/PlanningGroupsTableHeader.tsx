@@ -1,5 +1,5 @@
 import { IconAngleDown, IconAngleUp, IconCopy, IconMenuDots } from 'hds-react/icons';
-import { IconButton, Title } from '../shared';
+import { IconButton, Title } from '../../shared';
 import { FC, MouseEventHandler } from 'react';
 
 interface IPlanningGroupsTableHeaderProps {

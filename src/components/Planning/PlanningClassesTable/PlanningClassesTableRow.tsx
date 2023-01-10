@@ -1,5 +1,5 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
-import { IconButton, Span } from '../shared';
+import { IconButton, Span } from '../../shared';
 import { FC, memo, ReactNode, useCallback, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
@@ -28,7 +28,7 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
       <tr>
         {/* Header with cell name */}
         <th className={`class-header-cell ${type}`}>
-          <div className="display-flex">
+          <div>
             <div className="class-header-content-item value-container">
               <span>{180}</span>
             </div>
@@ -45,7 +45,7 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
               </div>
               <div className="class-header-content-item">
                 <span></span>
-                <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />{' '}
+                <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />
               </div>
             </div>
           </div>

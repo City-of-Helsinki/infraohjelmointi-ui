@@ -1,0 +1,31 @@
+.planning-years-table {
+  text-align: right;
+  /* width 70% since the info-panel is 30% */
+  width: 70%;
+}
+
+.planning-years-table span {
+  display: block;
+}
+
+/* First cell for years table including the sums and dark blue background */
+.planning-years-table .row-1-cell {
+  background: var(--color-bus-dark);
+  color: white;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.875rem;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
+  padding-right: 1rem;
+}
+
+/* First cell of the row-1 cells is lighter than the rest */
+.planning-years-table .row-1-cell:first-child {
+  background: var(--color-bus);
+  color: white;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.875rem;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
+  padding-right: 1rem;
+}

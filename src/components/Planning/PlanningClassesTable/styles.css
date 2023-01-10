@@ -1,0 +1,110 @@
+.class-header-cell {
+  width: 30.6%;
+  padding: 0 1.25rem;
+  color: white;
+  min-width: 24.3rem;
+  border-bottom: 0.07rem solid var(--color-white);
+}
+
+.class-header-cell > div {
+  display: flex;
+  align-items: center;
+}
+
+.class-header-cell.masterClass {
+  background: var(--color-bus);
+}
+
+.class-header-cell.class {
+  background: rgb(0, 0, 163);
+}
+
+.class-header-cell.subClass {
+  background: rgb(0, 0, 129);
+}
+
+.class-header-cell.project {
+  background: rgb(0, 0, 102);
+}
+
+.class-header-content-item.value-container {
+  width: 2rem;
+}
+
+.class-cell {
+  color: white;
+  padding: 0.25rem 0 0.1rem 0;
+  font-size: 0.875rem;
+  max-width: 4.875rem;
+  min-width: 4.875rem;
+  border-bottom: 0.07rem solid var(--color-white);
+}
+
+.class-cell .class-cell-container {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.class-cell .class-cell-container span:first-child {
+  font-size: 16px !important;
+  font-weight: bold;
+}
+
+.class-cell .class-cell-container span {
+  font-size: 14px !important;
+}
+
+.class-cell span {
+  font-weight: 300;
+}
+
+.class-cell.masterClass {
+  background: var(--color-bus);
+}
+
+.class-cell.class {
+  background: rgb(0, 0, 163);
+}
+
+.class-cell.subClass {
+  background: rgb(0, 0, 129);
+}
+
+.class-cell.project {
+  background: rgb(0, 0, 102);
+}
+
+.class-header-cell .class-header-content {
+  display: flex;
+  align-items: center;
+  /* Class names can be very long, so we restrict the max length and hide any overflow */
+  overflow: hidden;
+  max-width: 17.5rem;
+  text-overflow: ellipsis;
+}
+
+.class-header-content.masterClass {
+  padding-left: 0;
+}
+
+.class-header-content.class {
+  padding-left: 2rem;
+}
+
+.class-header-content.subClass {
+  padding-left: 4rem;
+}
+
+.class-header-content.project {
+  padding-left: 6rem;
+}
+
+.class-header-content-item {
+  display: flex;
+  margin-right: 0.5rem;
+}
+
+.class-header-content-item span:first-child {
+  font-weight: 300;
+}

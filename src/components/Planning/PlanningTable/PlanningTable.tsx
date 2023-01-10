@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
-import PlanningClassesTable from './PlanningClassesTable';
-import PlanningGroupsTable from './PlanningGroupsTable';
+import { PlanningClassesTable } from '../PlanningClassesTable';
+import { PlanningGroupsTable } from '../PlanningGroupsTable';
+import './styles.css';
 
 // FIXME: this any will be removed ones we get the actual group model
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

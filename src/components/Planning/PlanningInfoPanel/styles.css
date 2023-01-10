@@ -1,0 +1,38 @@
+.planning-info-panel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* repeat 2 rows with 1fr (fractional unit) */
+  grid-auto-flow: row;
+  overflow-x: visible;
+  margin: 0 var(--spacing-xs) 0 0;
+  width: 30%;
+  min-width: 26rem;
+}
+
+.planning-info-panel span {
+  display: block;
+}
+.planning-info-panel #planningTitle {
+  grid-column: 1/3;
+}
+
+#planningTitle .info-icon {
+  transform: translate(0.8rem, 0.15rem);
+}
+
+#planningTitle div {
+  display: flex;
+}
+
+#planningGroupInfo .group-info-text {
+  font-weight: bold;
+}
+
+#planningButton button {
+  height: 2.75rem !important;
+  width: 15rem !important;
+}
+
+.planning-info-panel #planningBasicInfo {
+  font-weight: bold;
+  grid-column: 2/3;
+}
