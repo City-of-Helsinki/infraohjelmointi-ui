@@ -240,17 +240,19 @@ const useProjectBasicsValues = () => {
     });
 
     const selectedSubClass = project
-      ? subClasses.find((sc) => sc.id === project.projectClass)
+      ? subClasses.find(({ id }) => id === project.projectClass)
       : undefined;
-    const selectedClass = project
-      ? classes.find(
-          (c) => c.id === (selectedSubClass ? selectedSubClass.parent : project.projectClass),
-        )
+
+    const projectClassId = selectedSubClass?.parent || project?.projectClass;
+
+    const selectedClass = projectClassId
+      ? classes.find(({ id }) => id === projectClassId)
       : undefined;
-    const selectedMasterClass = project
-      ? masterClasses.find(
-          (mc) => mc.id === (selectedClass ? selectedClass.parent : project.projectClass),
-        )
+
+    const masterClassId = selectedClass?.parent || project?.projectClass;
+
+    const selectedMasterClass = masterClassId
+      ? masterClasses.find(({ id }) => id === masterClassId)
       : undefined;
 
     return {
