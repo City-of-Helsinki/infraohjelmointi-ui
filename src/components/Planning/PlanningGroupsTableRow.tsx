@@ -8,7 +8,7 @@ import {
 } from 'hds-react/icons';
 import { FC } from 'react';
 import { useNavigate } from 'react-router';
-import PlanningProjectsTableCell from './PlanningProjectsTableCell';
+import PlanningGroupsTableCell from './PlanningGroupsTableCell';
 
 /**
  * RED CELLS
@@ -36,7 +36,7 @@ const CircleIcon = ({ value }: { value: string }) => (
 /**
  * We're only mapping the project name here for now since the values aren't yet implemented
  */
-const PlanningProjectsTableRow: FC<IPlanningProjectsTableProps> = ({ project }) => {
+const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({ project }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
 
@@ -78,10 +78,10 @@ const PlanningProjectsTableRow: FC<IPlanningProjectsTableProps> = ({ project }) 
         </div>
       </th>
       {planProjectValues.sums.map((p, i) => (
-        <PlanningProjectsTableCell key={i} value={p} />
+        <PlanningGroupsTableCell key={i} value={p} />
       ))}
     </tr>
   );
 };
 
-export default PlanningProjectsTableRow;
+export default PlanningGroupsTableRow;

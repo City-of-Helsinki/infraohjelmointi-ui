@@ -1,21 +1,25 @@
-import { FC } from 'react';
-import PlanningInfoPanel from './PlanningInfoPanel';
-import PlanningYearsTable from './PlanningYearsTable';
-import PlanningProjectsTable from './PlanningProjectsTable';
-import { planGroups } from '@/mocks/common';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
+import PlanningClassesTable from './PlanningClassesTable';
+import PlanningGroupsTable from './PlanningGroupsTable';
 
-const PlanningTable: FC = () => {
-  return (
-    <div className="planning-table-container">
-      <div className="display-flex">
-        <PlanningInfoPanel />
-        <PlanningYearsTable />
-      </div>
-      {planGroups.map((g) => (
-        <PlanningProjectsTable key={g.name} group={g} />
-      ))}
-    </div>
-  );
+// FIXME: this any will be removed ones we get the actual group model
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PlanningProjectsTable = () => {
+  const pathname = useLocation().pathname;
+
+  const [isClassView, setIsClassView] = useState(false);
+
+  // Check if there is a need to change between planner / coordinator view
+  useEffect(() => {
+    if (pathname.includes('planner')) {
+      setIsClassView(false);
+    } else if (pathname.includes('coordinator')) {
+      setIsClassView(true);
+    }
+  }, [pathname]);
+
+  return <>{isClassView ? <PlanningClassesTable /> : <PlanningGroupsTable />}</>;
 };
 
-export default PlanningTable;
+export default PlanningProjectsTable;
