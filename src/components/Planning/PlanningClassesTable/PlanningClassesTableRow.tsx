@@ -12,12 +12,13 @@ interface IPlanningClassTableRowProps {
   children?: ReactNode;
 }
 
-const OverrunSum = ({ value }: { value: string }) => (
-  <div className="flex-row-end">
+// eslint-disable-next-line react/display-name
+const OverrunSum = memo(({ value }: { value: string }) => (
+  <span>
     <BubbleIcon value="y" color="white" size="s" />
-    <span>{`+${value}`}</span>
-  </div>
-);
+    {`+${value}`}
+  </span>
+));
 
 const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
   projectClass,
@@ -37,7 +38,8 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
         <th className={`class-header-cell ${type}`}>
           <div>
             <div className="class-header-content-item value-container">
-              <span>{180}</span>
+              {/* TODO: class code/number here */}
+              <span>{}</span>
             </div>
             <div className={`class-header-content ${type}`}>
               <div className="class-header-content-item">
