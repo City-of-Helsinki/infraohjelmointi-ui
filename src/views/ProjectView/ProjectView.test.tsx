@@ -78,14 +78,14 @@ describe('ProjectView', () => {
     mockedAxios.get.mockResolvedValue(mockConstructionPhases);
     await store.dispatch(getConstructionPhasesThunk());
 
+    mockedAxios.get.mockResolvedValue(mockResponsibleZones);
+    await store.dispatch(getResponsibleZonesThunk());
+
     mockedAxios.get.mockResolvedValue(mockProjectClasses);
     await store.dispatch(getClassesThunk());
 
     mockedAxios.get.mockResolvedValue(mockLocations);
     await store.dispatch(getLocationsThunk());
-
-    mockedAxios.get.mockResolvedValue(mockResponsibleZones);
-    await store.dispatch(getResponsibleZonesThunk());
 
     await act(async () => (renderResult = renderWithProviders(<ProjectView />, { store })));
   });
@@ -95,25 +95,29 @@ describe('ProjectView', () => {
   });
 
   it('adds all needed data to store', async () => {
+    const lists = store.getState().lists;
+    const classes = store.getState().class;
+    const locations = store.getState().location;
+
     expect(store.getState().project.selectedProject).toBeDefined();
-    expect(store.getState().lists.area.length).toBeGreaterThan(0);
-    expect(store.getState().lists.type.length).toBeGreaterThan(0);
-    expect(store.getState().lists.phase.length).toBeGreaterThan(0);
-    expect(store.getState().lists.category.length).toBeGreaterThan(0);
-    expect(store.getState().lists.constructionPhaseDetail.length).toBeGreaterThan(0);
-    expect(store.getState().lists.riskAssessment.length).toBeGreaterThan(0);
-    expect(store.getState().lists.projectQualityLevel.length).toBeGreaterThan(0);
-    expect(store.getState().lists.constructionPhase.length).toBeGreaterThan(0);
-    expect(store.getState().lists.planningPhase.length).toBeGreaterThan(0);
-    expect(store.getState().class.allClasses.length).toBeGreaterThan(0);
-    expect(store.getState().class.masterClasses.length).toBeGreaterThan(0);
-    expect(store.getState().class.classes.length).toBeGreaterThan(0);
-    expect(store.getState().class.subClasses.length).toBeGreaterThan(0);
-    expect(store.getState().location.allLocations.length).toBeGreaterThan(0);
-    expect(store.getState().location.districts.length).toBeGreaterThan(0);
-    expect(store.getState().location.divisions.length).toBeGreaterThan(0);
-    expect(store.getState().location.subDivisions.length).toBeGreaterThan(0);
-    expect(store.getState().lists.responsibleZone.length).toBeGreaterThan(0);
+    expect(lists.area.length).toBeGreaterThan(0);
+    expect(lists.type.length).toBeGreaterThan(0);
+    expect(lists.phase.length).toBeGreaterThan(0);
+    expect(lists.category.length).toBeGreaterThan(0);
+    expect(lists.constructionPhaseDetail.length).toBeGreaterThan(0);
+    expect(lists.riskAssessment.length).toBeGreaterThan(0);
+    expect(lists.projectQualityLevel.length).toBeGreaterThan(0);
+    expect(lists.constructionPhase.length).toBeGreaterThan(0);
+    expect(lists.planningPhase.length).toBeGreaterThan(0);
+    expect(lists.responsibleZone.length).toBeGreaterThan(0);
+    expect(classes.allClasses.length).toBeGreaterThan(0);
+    expect(classes.masterClasses.length).toBeGreaterThan(0);
+    expect(classes.classes.length).toBeGreaterThan(0);
+    expect(classes.subClasses.length).toBeGreaterThan(0);
+    expect(locations.allLocations.length).toBeGreaterThan(0);
+    expect(locations.districts.length).toBeGreaterThan(0);
+    expect(locations.divisions.length).toBeGreaterThan(0);
+    expect(locations.subDivisions.length).toBeGreaterThan(0);
   });
 
   it('renders the parent container', () => {

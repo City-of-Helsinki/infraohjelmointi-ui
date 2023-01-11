@@ -120,10 +120,6 @@ table p {
   max-width: 22.5rem;
 }
 
-.input-m {
-  max-width: 16.5rem;
-}
-
 .legend-margin {
   color: var(--label-color-default, var(--color-black-90));
   display: block;
