@@ -356,9 +356,9 @@ const useProjectBasicsValues = () => {
       budgetOverrunYear: value(project?.budgetOverrunYear),
       budgetOverrunAmount: value(project?.budgetOverrunAmount),
       responsibleZone: listItemToOption(project?.responsibleZone, t),
-      masterPlanAreaNumber: '',
-      trafficPlanNumber: '',
-      bridgeNumber: '',
+      masterPlanAreaNumber: value(project?.masterPlanAreaNumber),
+      trafficPlanNumber: value(project?.trafficPlanNumber),
+      bridgeNumber: value(project?.bridgeNumber),
       projectProgram: value(project?.projectProgram),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

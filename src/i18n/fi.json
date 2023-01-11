@@ -22,7 +22,7 @@
     "financial": "Hankkeen kustannustiedot",
     "status": "Hankkeen tila",
     "location": "Hankkeen sijainti",
-    "projectProgram": "Hankkeen kuvaus"
+    "projectProgram": "Hankeohjelma"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -156,8 +156,8 @@
     "trafficPlanNumber": "Liikennesuunnitelman numero",
     "bridgeNumber": "Siltanumero",
     "location": "Hankkeen sijainti",
-    "projectProgram": "Hankkeen kuvaus",
-    "projectProgramTitle": "Hankkeen kuvaus"
+    "projectProgram": "Hankeohjelma",
+    "projectProgramTitle": "Hankeohjelma"
   },
   "notification": {
     "title": {
