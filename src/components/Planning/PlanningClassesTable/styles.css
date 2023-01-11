@@ -53,6 +53,7 @@
 
 .class-cell .class-cell-container span {
   font-size: 14px !important;
+  width: 100%;
 }
 
 .class-cell .class-cell-container span:nth-child(3) {

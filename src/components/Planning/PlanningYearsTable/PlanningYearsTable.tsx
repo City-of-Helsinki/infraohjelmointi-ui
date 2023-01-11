@@ -1,7 +1,14 @@
 import { FC } from 'react';
 import { planningYearsTableData } from '@/mocks/common';
-import { Span } from '../../shared';
+import { BubbleIcon, Span } from '../../shared';
 import './styles.css';
+
+const OverrunSum = ({ value }: { value: string }) => (
+  <div className="flex-row-end">
+    <BubbleIcon value="y" color="black" size="s" />
+    <span>{`+${value}`}</span>
+  </div>
+);
 
 const PlanningYearsTable: FC = () => {
   return (
@@ -34,7 +41,13 @@ const PlanningYearsTable: FC = () => {
         <tr>
           {planningYearsTableData.map((o, i) => (
             <td key={i}>
-              <Span text={o.otherVal1} fontWeight="light" size="s" />
+              {i === 0 ? (
+                // Overrun sum for first cell
+                <OverrunSum value={o.otherVal1} />
+              ) : (
+                <Span text={o.otherVal1} fontWeight="light" size="s" />
+              )}
+
               <Span text={o.otherVal2} fontWeight="light" size="s" />
             </td>
           ))}
