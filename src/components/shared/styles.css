@@ -155,16 +155,41 @@
   margin-left: var(--spacing-s);
 }
 
-.bubble-icon {
-  background: black;
+.bubble-icon-m {
   height: 0.9rem;
   width: 0.9rem;
   border-radius: 50%;
   font-size: 0.6rem;
   line-height: 0.7rem;
-  color: white;
   text-align: center;
   margin-right: 1rem;
+}
+
+.bubble-icon-s {
+  height: 0.65rem;
+  width: 0.65rem;
+  left: 0;
+  border-radius: 50%;
+  font-size: 0.5rem;
+  line-height: 0.55rem;
+  text-align: center;
+  font-weight: bold;
+  transform: translate(0, 0.25rem);
+}
+
+.bubble-icon-s.black {
+  background: black;
+  color: white;
+}
+
+.bubble-icon-m.black {
+  background: black;
+  color: white;
+}
+
+.bubble-icon-s.white {
+  background: white;
+  color: var(--color-bus);
 }
 
 .overrun-label-container {

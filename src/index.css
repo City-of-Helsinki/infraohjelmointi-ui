@@ -90,6 +90,11 @@ table p {
   align-items: center;
 }
 
+.flex-row-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .display-flex-col {
   flex-direction: column;
 }

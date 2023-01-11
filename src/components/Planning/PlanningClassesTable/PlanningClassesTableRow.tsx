@@ -12,6 +12,13 @@ interface IPlanningClassTableRowProps {
   children?: ReactNode;
 }
 
+const OverrunSum = ({ value }: { value: string }) => (
+  <div className="flex-row-end">
+    <BubbleIcon value="y" color="white" size="s" />
+    <span>{`+${value}`}</span>
+  </div>
+);
+
 const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
   projectClass,
   type,
@@ -56,7 +63,14 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
           <td key={i} className={`class-cell ${type}`}>
             <div className="class-cell-container">
               <span>{rn}</span>
-              <span>{rn}</span>
+              {i === 0 ? (
+                // Add overright icon for the first cell of every row
+                <OverrunSum value={rn} />
+              ) : (
+                // Only display the value for the rest of the cells
+                <span>{rn}</span>
+              )}
+
               <span>{i === 0 && `${rn}`}</span>
             </div>
           </td>
