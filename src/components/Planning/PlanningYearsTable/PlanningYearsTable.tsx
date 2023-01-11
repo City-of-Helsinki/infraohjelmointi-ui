@@ -1,14 +1,15 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { planningYearsTableData } from '@/mocks/common';
 import { BubbleIcon, Span } from '../../shared';
 import './styles.css';
 
-const OverrunSum = ({ value }: { value: string }) => (
-  <div className="flex-row-end">
+// eslint-disable-next-line react/display-name
+const OverrunSum = memo(({ value }: { value: string }) => (
+  <span>
     <BubbleIcon value="y" color="black" size="s" />
-    <span>{`+${value}`}</span>
-  </div>
-);
+    {`+${value}`}
+  </span>
+));
 
 const PlanningYearsTable: FC = () => {
   return (
