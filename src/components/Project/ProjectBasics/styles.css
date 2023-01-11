@@ -231,11 +231,11 @@
   grid-column: var(--grid-col-small-left);
 }
 
-.basic-info-form #longDescription {
+.basic-info-form #projectProgram {
   grid-column: var(--grid-col-full);
 }
 
-.basic-info-form #longDescription textarea {
+.basic-info-form #projectProgram textarea {
   width: 70%;
 }
 

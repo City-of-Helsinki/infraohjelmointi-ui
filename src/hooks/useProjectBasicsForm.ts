@@ -210,8 +210,8 @@ const buildProjectBasicsFormFields = (
     { name: 'masterPlanAreaNumber', type: FormField.Text },
     { name: 'trafficPlanNumber', type: FormField.Text },
     { name: 'bridgeNumber', type: FormField.Text },
-    { name: 'longDescriptionTitle', type: FormField.Title },
-    { name: 'longDescription', type: FormField.TextArea },
+    { name: 'projectProgramTitle', type: FormField.Title },
+    { name: 'projectProgram', type: FormField.TextArea },
   ];
 
   const projectBasicsFormFields = formFields.map((formField) => ({
@@ -290,7 +290,7 @@ const useProjectBasicsValues = () => {
     });
 
     const selectedSubDivision = project
-      ? subDivisions.find((sd) => sd.id === project.projectLocation)
+      ? subDivisions.find(({ id }) => id === project.projectLocation)
       : undefined;
 
     const projectLocationId = selectedSubDivision?.parent || project?.projectLocation;
@@ -299,7 +299,7 @@ const useProjectBasicsValues = () => {
       ? divisions.find(({ id }) => id === projectLocationId)
       : undefined;
 
-    const districtId = selectedDivision?.parent || project?.projectClass;
+    const districtId = selectedDivision?.parent || project?.projectLocation;
 
     const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
 
@@ -355,11 +355,11 @@ const useProjectBasicsValues = () => {
       spentCost: value(project?.spentCost),
       budgetOverrunYear: value(project?.budgetOverrunYear),
       budgetOverrunAmount: value(project?.budgetOverrunAmount),
-      responsibleZone: [],
+      responsibleZone: listItemToOption(project?.responsibleZone, t),
       masterPlanAreaNumber: '',
       trafficPlanNumber: '',
       bridgeNumber: '',
-      longDescription: '',
+      projectProgram: value(project?.projectProgram),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [project],

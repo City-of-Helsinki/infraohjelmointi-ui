@@ -54,11 +54,13 @@ const ProjectView = () => {
     dispatch(getPlanningPhasesThunk());
     dispatch(getConstructionPhasesThunk());
     dispatch(getResponsibleZonesThunk());
+    // Get classes and filter them into categories
     dispatch(getClassesThunk()).then(() => {
       dispatch(setMasterClasses());
       dispatch(setClasses());
       dispatch(setSubClasses());
     });
+    // Get locations and filter them into categories
     dispatch(getLocationsThunk()).then(() => {
       dispatch(setDistricts());
       dispatch(setDivisions());

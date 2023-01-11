@@ -22,7 +22,7 @@
     "financial": "Hankkeen kustannustiedot",
     "status": "Hankkeen tila",
     "location": "Hankkeen sijainti",
-    "longDescription": "Hankkeen kuvaus"
+    "projectProgram": "Hankkeen kuvaus"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -86,7 +86,10 @@
     "planning": "Suunnitteluvaiheen",
     "contractCalculation": "Urakkalaskentavaiheen",
     "additionalWork": "Urakkavaiheen sis. lisätyöt",
-    "reception": "Vastaanottovaiheen"
+    "reception": "Vastaanottovaiheen",
+    "east": "Itä",
+    "west": "Länsi",
+    "north": "Pohjoinen"
   },
   "projectBasicsForm": {
     "basics": "Hankkeen perustiedot",
@@ -153,8 +156,8 @@
     "trafficPlanNumber": "Liikennesuunnitelman numero",
     "bridgeNumber": "Siltanumero",
     "location": "Hankkeen sijainti",
-    "longDescription": "Hankkeen kuvaus",
-    "longDescriptionTitle": "Hankkeen kuvaus"
+    "projectProgram": "Hankkeen kuvaus",
+    "projectProgramTitle": "Hankkeen kuvaus"
   },
   "notification": {
     "title": {

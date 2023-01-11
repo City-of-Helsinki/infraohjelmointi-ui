@@ -80,6 +80,8 @@ export interface IProject {
   planningStartYear: string;
   projectClass?: string;
   projectLocation?: string;
+  projectProgram?: string;
+  responsibleZone?: IListItem;
 }
 
 export interface IProjectRequest {
@@ -130,6 +132,8 @@ export interface IProjectRequest {
   planningStartYear?: string;
   projectClass?: string | null;
   projectLocation?: string | null;
+  projectProgram?: string | null;
+  responsibleZone?: string | null;
 }
 
 export interface IProjectRequestObject {
