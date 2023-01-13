@@ -79,6 +79,12 @@ export interface IProject {
   constructionEndYear: string;
   planningStartYear: string;
   projectClass?: string;
+  projectLocation?: string;
+  projectProgram?: string;
+  responsibleZone?: IListItem;
+  masterPlanAreaNumber?: string;
+  trafficPlanNumber?: string;
+  bridgeNumber?: string;
 }
 
 export interface IProjectRequest {
@@ -128,6 +134,12 @@ export interface IProjectRequest {
   constructionEndYear?: string;
   planningStartYear?: string;
   projectClass?: string | null;
+  projectLocation?: string | null;
+  projectProgram?: string | null;
+  responsibleZone?: string | null;
+  masterPlanAreaNumber?: string | null;
+  trafficPlanNumber?: string | null;
+  bridgeNumber?: string | null;
 }
 
 export interface IProjectRequestObject {

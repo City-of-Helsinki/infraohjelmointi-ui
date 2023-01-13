@@ -38,7 +38,11 @@ export type ListType =
   | 'category'
   | 'masterClass'
   | 'class'
-  | 'subClass';
+  | 'subClass'
+  | 'district'
+  | 'division'
+  | 'subDivision'
+  | 'responsibleZone';
 
 export type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

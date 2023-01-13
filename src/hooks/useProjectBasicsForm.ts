@@ -15,6 +15,7 @@ import _ from 'lodash';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 /**
  * Creates form fields for the project, in order for the labels to work the 'fi.json'-translations need
@@ -198,6 +199,19 @@ const buildProjectBasicsFormFields = (
       ],
     },
     { name: 'preliminaryBudgetDivision', type: FormField.ListField, readOnly: true },
+    {
+      name: 'location',
+      type: FormField.Title,
+    },
+    { name: 'responsibleZone', type: FormField.Select },
+    { name: 'district', type: FormField.Select, icon: 'location' },
+    { name: 'division', type: FormField.Select, icon: 'location' },
+    { name: 'subDivision', type: FormField.Select, icon: 'location' },
+    { name: 'masterPlanAreaNumber', type: FormField.Text },
+    { name: 'trafficPlanNumber', type: FormField.Text },
+    { name: 'bridgeNumber', type: FormField.Text },
+    { name: 'projectProgramTitle', type: FormField.Title },
+    { name: 'projectProgram', type: FormField.TextArea },
   ];
 
   const projectBasicsFormFields = formFields.map((formField) => ({
@@ -226,6 +240,10 @@ const useProjectBasicsValues = () => {
   const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
   const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
   const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
+
+  const districts = useAppSelector((state: RootState) => state.location.districts, _.isEqual);
+  const divisions = useAppSelector((state: RootState) => state.location.divisions, _.isEqual);
+  const subDivisions = useAppSelector((state: RootState) => state.location.subDivisions, _.isEqual);
 
   const { t } = useTranslation();
   const value = (value: string | undefined) => value || '';
@@ -262,6 +280,36 @@ const useProjectBasicsValues = () => {
     };
   };
 
+  /**
+   * There are three project locations, but only one id is saved. We create a list item of each location based on the id.
+   */
+  const getProjectLocationFields = (project: IProject | null) => {
+    const locationAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
+      id: projectLocation?.id || '',
+      value: projectLocation?.name || '',
+    });
+
+    const selectedSubDivision = project
+      ? subDivisions.find(({ id }) => id === project.projectLocation)
+      : undefined;
+
+    const projectLocationId = selectedSubDivision?.parent || project?.projectLocation;
+
+    const selectedDivision = projectLocationId
+      ? divisions.find(({ id }) => id === projectLocationId)
+      : undefined;
+
+    const districtId = selectedDivision?.parent || project?.projectLocation;
+
+    const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
+
+    return {
+      district: listItemToOption(locationAsListItem(selectedDistrict) || []),
+      division: listItemToOption(locationAsListItem(selectedDivision) || []),
+      subDivision: listItemToOption(locationAsListItem(selectedSubDivision) || []),
+    };
+  };
+
   const formValues: IProjectBasicsForm = useMemo(
     () => ({
       type: listItemToOption(project?.type, t),
@@ -291,6 +339,7 @@ const useProjectBasicsValues = () => {
       constructionEndYear: value(project?.constructionEndYear),
       planningStartYear: value(project?.planningStartYear),
       ...getProjectClassFields(project),
+      ...getProjectLocationFields(project),
       projectWorkQuantity: project?.projectWorkQuantity,
       projectQualityLevel: listItemToOption(project?.projectQualityLevel, t),
       projectCostForecast: project?.projectCostForecast,
@@ -306,6 +355,11 @@ const useProjectBasicsValues = () => {
       spentCost: value(project?.spentCost),
       budgetOverrunYear: value(project?.budgetOverrunYear),
       budgetOverrunAmount: value(project?.budgetOverrunAmount),
+      responsibleZone: listItemToOption(project?.responsibleZone, t),
+      masterPlanAreaNumber: value(project?.masterPlanAreaNumber),
+      trafficPlanNumber: value(project?.trafficPlanNumber),
+      bridgeNumber: value(project?.bridgeNumber),
+      projectProgram: value(project?.projectProgram),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [project],
