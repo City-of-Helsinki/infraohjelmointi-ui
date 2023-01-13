@@ -54,6 +54,12 @@ const router = createBrowserRouter([
           {
             path: 'coordinator',
             element: <PlanningView />,
+            children: [
+              {
+                path: ':classId',
+                element: <PlanningView />,
+              },
+            ],
           },
         ],
       },

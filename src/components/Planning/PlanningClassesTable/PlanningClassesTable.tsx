@@ -1,6 +1,8 @@
 import { useAppSelector } from '@/hooks/common';
+import { setSelectedMasterClass } from '@/reducers/classSlice';
 import { RootState } from '@/store';
 import _ from 'lodash';
+import { useEffect } from 'react';
 import PlanningClassesTableRow from './PlanningClassesTableRow';
 import './styles.css';
 
@@ -10,6 +12,9 @@ const PlanningClassesTable = () => {
   const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
   const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
   const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
+  const selectedMasterClass = useAppSelector((state: RootState) => state.class.selectedMasterClass);
+
+  console.log('selectedMasterClass: ', selectedMasterClass);
 
   return (
     <table className="planning-table" cellSpacing={0}>

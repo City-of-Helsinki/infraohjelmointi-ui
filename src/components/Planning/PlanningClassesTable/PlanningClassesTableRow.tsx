@@ -3,6 +3,9 @@ import { BubbleIcon, IconButton, Span } from '../../shared';
 import { FC, memo, ReactNode, useCallback, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
+import { useNavigate } from 'react-router';
+import { useAppDispatch } from '@/hooks/common';
+import { setSelectedMasterClass } from '@/reducers/classSlice';
 
 export type ClassType = 'masterClass' | 'class' | 'subClass';
 
@@ -25,11 +28,17 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
   type,
   children,
 }) => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [expandChildren, setExpandChildren] = useState(false);
 
   const handleExpandChildren = useCallback(() => {
+    if (type === 'masterClass') {
+      navigate(projectClass.id);
+      dispatch(setSelectedMasterClass(projectClass));
+    }
     setExpandChildren((current) => !current);
-  }, []);
+  }, [dispatch, navigate, projectClass, type]);
 
   return (
     <>
