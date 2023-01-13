@@ -34,7 +34,11 @@ const useProjectLocationListFilter = () => {
       if (selectedDivision) {
         const districtForDivision = districts.find((d) => d.id === selectedDivision.parent);
 
-        dispatch(setDivisionList(divisions.filter((d) => d.parent === districtForDivision?.id)));
+        dispatch(
+          setDivisionList(
+            districtForDivision ? divisions.filter((d) => d.parent === districtForDivision.id) : [],
+          ),
+        );
         dispatch(setSubDivisionList(subDivisions.filter((sd) => sd.parent === projectLocation)));
       }
 
