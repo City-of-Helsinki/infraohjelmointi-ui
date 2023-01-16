@@ -56,8 +56,20 @@ const router = createBrowserRouter([
             element: <PlanningView />,
             children: [
               {
-                path: ':classId',
+                path: ':masterClassId',
                 element: <PlanningView />,
+                children: [
+                  {
+                    path: ':classId',
+                    element: <PlanningView />,
+                    children: [
+                      {
+                        path: ':subClassId',
+                        element: <PlanningView />,
+                      },
+                    ],
+                  },
+                ],
               },
             ],
           },

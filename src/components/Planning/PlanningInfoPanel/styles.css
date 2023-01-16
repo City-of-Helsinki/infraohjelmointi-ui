@@ -29,7 +29,7 @@
 
 #planningButton button {
   height: 2.75rem !important;
-  width: 15rem !important;
+  width: 100% !important;
 }
 
 .planning-info-panel #planningBasicInfo {

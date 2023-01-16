@@ -11,6 +11,7 @@ import { PlanningToolbar } from '@/components/Planning/PlanningToolbar';
 import { PlanningInfoPanel } from '@/components/Planning/PlanningInfoPanel';
 import { PlanningYearsTable } from '@/components/Planning/PlanningYearsTable';
 import { PlanningTable } from '@/components/Planning/PlanningTable';
+import { PlanningBreadcrumbs } from '@/components/Planning/PlanningBreadcrumbs';
 
 const PlanningView: FC = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +27,7 @@ const PlanningView: FC = () => {
 
   return (
     <>
+      <PlanningBreadcrumbs />
       <PlanningToolbar />
       <div className="planning-view-container">
         <div className="display-flex">

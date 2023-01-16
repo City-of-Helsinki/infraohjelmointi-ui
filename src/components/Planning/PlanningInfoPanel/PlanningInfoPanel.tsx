@@ -4,9 +4,17 @@ import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
 import { Title } from '../../shared';
 import './styles.css';
+import { useAppSelector } from '@/hooks/common';
+import { RootState } from '@/store';
+import _ from 'lodash';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
+  const selectedMasterClass = useAppSelector(
+    (state: RootState) => state.class.selectedMasterClass,
+    _.isEqual,
+  );
+
   return (
     <div className="planning-info-panel">
       <div id="planningTitle">
@@ -21,8 +29,12 @@ const PlanningInfoPanel = () => {
       </div>
 
       <div id="planningGroupInfo">
-        <span className="group-info-text">{planningInfo.group}</span>
-        <span>{t('keur')}</span>
+        {selectedMasterClass && (
+          <>
+            <span className="group-info-text">{selectedMasterClass.name}</span>
+            <span>{t('keur')}</span>
+          </>
+        )}
       </div>
 
       <div id="planningBasicInfo">

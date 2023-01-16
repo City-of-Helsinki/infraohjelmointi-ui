@@ -1,0 +1,18 @@
+.breadcrumbs-container {
+  border-bottom: 0.09rem solid var(--color-black-20);
+  padding: 0.25rem 0;
+}
+
+.breadcrumbs-container ul {
+  list-style: none;
+  display: flex;
+}
+
+.breadcrumbs-container ul > li > button {
+  text-decoration: underline !important;
+  margin-right: 0.2rem !important;
+}
+
+.breadcrumbs-container svg {
+  margin-right: 0.2rem;
+}

@@ -3,9 +3,8 @@ import { BubbleIcon, IconButton, Span } from '../../shared';
 import { FC, memo, ReactNode, useCallback, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
-import { useNavigate } from 'react-router';
-import { useAppDispatch } from '@/hooks/common';
-import { setSelectedMasterClass } from '@/reducers/classSlice';
+import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 
 export type ClassType = 'masterClass' | 'class' | 'subClass';
 
@@ -28,17 +27,21 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
   type,
   children,
 }) => {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const { masterClassId, classId } = useParams();
   const [expandChildren, setExpandChildren] = useState(false);
 
-  const handleExpandChildren = useCallback(() => {
-    if (type === 'masterClass') {
-      navigate(projectClass.id);
-      dispatch(setSelectedMasterClass(projectClass));
+  const handleExpandChildren = useCallback(() => setExpandChildren((current) => !current), []);
+
+  const buildLink = () => {
+    switch (type) {
+      case 'masterClass':
+        return projectClass.id;
+      case 'class':
+        return `${masterClassId}/${projectClass.id}`;
+      case 'subClass':
+        return `${masterClassId}/${classId}/${projectClass.id}`;
     }
-    setExpandChildren((current) => !current);
-  }, [dispatch, navigate, projectClass, type]);
+  };
 
   return (
     <>
@@ -52,11 +55,13 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
             </div>
             <div className={`class-header-content ${type}`}>
               <div className="class-header-content-item">
-                <IconButton
-                  icon={expandChildren ? IconAngleUp : IconAngleDown}
-                  color="white"
-                  onClick={handleExpandChildren}
-                />
+                <Link to={buildLink()} className="display-flex">
+                  <IconButton
+                    icon={expandChildren ? IconAngleUp : IconAngleDown}
+                    color="white"
+                    onClick={handleExpandChildren}
+                  />
+                </Link>
               </div>
               <div className="class-header-content-item">
                 <IconMenuDots size="xs" />

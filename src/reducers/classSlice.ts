@@ -9,6 +9,8 @@ interface IClassState {
   classes: Array<IClass>;
   subClasses: Array<IClass>;
   selectedMasterClass: IClass | null;
+  selectedClass: IClass | null;
+  selectedSubClass: IClass | null;
   error: IError | null | unknown;
 }
 
@@ -18,6 +20,8 @@ const initialState: IClassState = {
   classes: [],
   subClasses: [],
   selectedMasterClass: null,
+  selectedClass: null,
+  selectedSubClass: null,
   error: null,
 };
 
@@ -54,8 +58,14 @@ export const classSlice = createSlice({
           : [],
       };
     },
-    setSelectedMasterClass(state, action: PayloadAction<IClass>) {
+    setSelectedMasterClass(state, action: PayloadAction<IClass | null>) {
       return { ...state, selectedMasterClass: action.payload };
+    },
+    setSelectedClass(state, action: PayloadAction<IClass | null>) {
+      return { ...state, selectedClass: action.payload };
+    },
+    setSelectedSubClass(state, action: PayloadAction<IClass | null>) {
+      return { ...state, selectedSubClass: action.payload };
     },
   },
   extraReducers: (builder) => {
@@ -69,7 +79,13 @@ export const classSlice = createSlice({
   },
 });
 
-export const { setMasterClasses, setClasses, setSubClasses, setSelectedMasterClass } =
-  classSlice.actions;
+export const {
+  setMasterClasses,
+  setClasses,
+  setSubClasses,
+  setSelectedMasterClass,
+  setSelectedClass,
+  setSelectedSubClass,
+} = classSlice.actions;
 
 export default classSlice.reducer;
