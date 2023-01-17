@@ -50,6 +50,21 @@ const PlanningClassesTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subClassId, subClasses]);
 
+  const allMasterClassRows = () =>
+    masterClasses.map((mc) => (
+      <PlanningClassesTableRow key={mc.id} projectClass={mc} type="masterClass" />
+    ));
+
+  const allClassRows = () =>
+    [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
+      <PlanningClassesTableRow key={c.id} projectClass={c} type="class" />
+    ));
+
+  const allSubClassRows = () =>
+    [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
+      <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
+    ));
+
   return (
     <table className="planning-table" cellSpacing={0}>
       <tbody>
@@ -59,6 +74,7 @@ const PlanningClassesTable = () => {
             <PlanningClassesTableRow
               key={selectedMasterClass.id}
               projectClass={selectedMasterClass}
+              initiallyExpanded={true}
               type="masterClass"
             >
               {
@@ -67,28 +83,23 @@ const PlanningClassesTable = () => {
                   <PlanningClassesTableRow
                     key={selectedClass.id}
                     projectClass={selectedClass}
+                    initiallyExpanded={true}
                     type="class"
                   >
                     {
                       // Always render all subClasses
-                      [...subClasses.filter((sc) => sc.parent === selectedClass.id)].map((sc) => (
-                        <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
-                      ))
+                      allSubClassRows()
                     }
                   </PlanningClassesTableRow>
                 ) : (
                   // When no class is selected, render all classes
-                  [...classes.filter((c) => c.parent === selectedMasterClass.id)].map((c) => (
-                    <PlanningClassesTableRow key={c.id} projectClass={c} type="class" />
-                  ))
+                  allClassRows()
                 )
               }
             </PlanningClassesTableRow>
           ) : (
             // When no masterClass is selected, render all masterClasses
-            masterClasses.map((mc) => (
-              <PlanningClassesTableRow key={mc.id} projectClass={mc} type="masterClass" />
-            ))
+            allMasterClassRows()
           )
         }
       </tbody>
@@ -97,22 +108,3 @@ const PlanningClassesTable = () => {
 };
 
 export default PlanningClassesTable;
-
-/**
- * 
- *     <table className="planning-table" cellSpacing={0}>
-      <tbody>
-        {masterClasses.map((mc) => (
-          <PlanningClassesTableRow key={mc.id} projectClass={mc} type="masterClass">
-            {[...classes.filter((c) => c.parent === mc.id)].map((c) => (
-              <PlanningClassesTableRow key={c.id} projectClass={c} type="class">
-                {[...subClasses.filter((sc) => sc.parent === c.id)].map((sc) => (
-                  <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
-                ))}
-              </PlanningClassesTableRow>
-            ))}
-          </PlanningClassesTableRow>
-        ))}
-      </tbody>
-    </table>
- */

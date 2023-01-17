@@ -1,6 +1,6 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { BubbleIcon, IconButton, Span } from '../../shared';
-import { FC, memo, ReactNode, useCallback, useState } from 'react';
+import { FC, memo, ReactNode, useCallback, useEffect, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
 import { useParams } from 'react-router';
@@ -12,6 +12,7 @@ interface IPlanningClassTableRowProps {
   projectClass: IClass;
   type: ClassType;
   children?: ReactNode;
+  initiallyExpanded?: true;
 }
 
 // eslint-disable-next-line react/display-name
@@ -26,11 +27,16 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
   projectClass,
   type,
   children,
+  initiallyExpanded,
 }) => {
   const { masterClassId, classId } = useParams();
-  const [expandChildren, setExpandChildren] = useState(false);
+  const [expanded, setExpanded] = useState(initiallyExpanded || false);
 
-  const handleExpandChildren = useCallback(() => setExpandChildren((current) => !current), []);
+  const handleExpanded = useCallback(() => setExpanded((current) => !current), []);
+
+  useEffect(() => {
+    setExpanded(initiallyExpanded || false);
+  }, [initiallyExpanded]);
 
   const buildLink = () => {
     switch (type) {
@@ -50,16 +56,16 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
         <th className={`class-header-cell ${type}`}>
           <div>
             <div className="class-header-content-item value-container">
-              {/* TODO: class code/number here */}
+              {/* class code/number here */}
               <span>{}</span>
             </div>
             <div className={`class-header-content ${type}`}>
               <div className="class-header-content-item">
                 <Link to={buildLink()} className="display-flex">
                   <IconButton
-                    icon={expandChildren ? IconAngleUp : IconAngleDown}
+                    icon={expanded ? IconAngleUp : IconAngleDown}
                     color="white"
-                    onClick={handleExpandChildren}
+                    onClick={handleExpanded}
                   />
                 </Link>
               </div>
@@ -92,7 +98,7 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
           </td>
         ))}
       </tr>
-      {expandChildren && children}
+      {expanded && children}
     </>
   );
 };

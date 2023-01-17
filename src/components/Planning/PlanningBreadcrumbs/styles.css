@@ -8,9 +8,15 @@
   display: flex;
 }
 
-.breadcrumbs-container ul > li > button {
-  text-decoration: underline !important;
+.breadcrumbs-container ul > li > a {
+  text-decoration: underline;
   margin-right: 0.2rem !important;
+  color: var(--color-black);
+}
+
+.breadcrumbs-container li:last-child {
+  font-weight: bold !important;
+  text-decoration: none !important;
 }
 
 .breadcrumbs-container svg {
