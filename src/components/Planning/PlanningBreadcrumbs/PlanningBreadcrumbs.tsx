@@ -55,4 +55,4 @@ const PlanningBreadcrumbs = () => {
   );
 };
 
-export default PlanningBreadcrumbs;
+export default memo(PlanningBreadcrumbs);

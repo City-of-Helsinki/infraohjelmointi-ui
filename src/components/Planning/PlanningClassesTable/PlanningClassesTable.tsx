@@ -7,7 +7,7 @@ import {
 } from '@/reducers/classSlice';
 import { RootState } from '@/store';
 import _ from 'lodash';
-import { useEffect } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 import PlanningClassesTableRow from './PlanningClassesTableRow';
 import './styles.css';
@@ -50,20 +50,29 @@ const PlanningClassesTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subClassId, subClasses]);
 
-  const allMasterClassRows = () =>
-    masterClasses.map((mc) => (
-      <PlanningClassesTableRow key={mc.id} projectClass={mc} type="masterClass" />
-    ));
+  const allMasterClassRows = useCallback(
+    () =>
+      masterClasses.map((mc) => (
+        <PlanningClassesTableRow key={mc.id} projectClass={mc} type="masterClass" />
+      )),
+    [masterClasses],
+  );
 
-  const allClassRows = () =>
-    [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
-      <PlanningClassesTableRow key={c.id} projectClass={c} type="class" />
-    ));
+  const allClassRows = useCallback(
+    () =>
+      [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
+        <PlanningClassesTableRow key={c.id} projectClass={c} type="class" />
+      )),
+    [classes, selectedMasterClass],
+  );
 
-  const allSubClassRows = () =>
-    [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
-      <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
-    ));
+  const allSubClassRows = useCallback(
+    () =>
+      [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
+        <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
+      )),
+    [subClasses, selectedClass],
+  );
 
   return (
     <table className="planning-table" cellSpacing={0}>
@@ -107,4 +116,4 @@ const PlanningClassesTable = () => {
   );
 };
 
-export default PlanningClassesTable;
+export default memo(PlanningClassesTable);

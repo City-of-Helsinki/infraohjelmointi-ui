@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 export type ClassType = 'masterClass' | 'class' | 'subClass';
 
-interface IPlanningClassTableRowProps {
+interface IPlanningClassesTableRowProps {
   projectClass: IClass;
   type: ClassType;
   children?: ReactNode;
@@ -23,7 +23,7 @@ const OverrunSum = memo(({ value }: { value: string }) => (
   </span>
 ));
 
-const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
+const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
   projectClass,
   type,
   children,
@@ -38,7 +38,7 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
     setExpanded(initiallyExpanded || false);
   }, [initiallyExpanded]);
 
-  const buildLink = () => {
+  const buildLink = useCallback(() => {
     switch (type) {
       case 'masterClass':
         return projectClass.id;
@@ -47,7 +47,7 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
       case 'subClass':
         return `${masterClassId}/${classId}/${projectClass.id}`;
     }
-  };
+  }, [projectClass.id, masterClassId, classId, type]);
 
   return (
     <>
@@ -102,4 +102,4 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
   );
 };
 
-export default memo(PlanningClassTableRow);
+export default memo(PlanningClassesTableRow);
