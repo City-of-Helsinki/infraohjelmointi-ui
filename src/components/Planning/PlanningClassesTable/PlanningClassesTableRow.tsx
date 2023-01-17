@@ -73,7 +73,6 @@ const PlanningClassTableRow: FC<IPlanningClassTableRowProps> = ({
                 <IconMenuDots size="xs" />
               </div>
               <div className="class-header-content-item">
-                <span></span>
                 <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />
               </div>
             </div>

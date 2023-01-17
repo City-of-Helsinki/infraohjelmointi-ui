@@ -110,8 +110,12 @@
 .class-header-content-item {
   display: flex;
   margin-right: 0.5rem;
+  overflow: hidden;
 }
 
-.class-header-content-item span:first-child {
-  font-weight: 300;
+/* hide too long class names */
+.class-header-content-item span:nth-child(1) {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
