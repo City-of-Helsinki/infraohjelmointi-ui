@@ -31,8 +31,19 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
 }) => {
   const { masterClassId, classId } = useParams();
   const [expanded, setExpanded] = useState(initiallyExpanded || false);
+  const [isHovering, setIsHovering] = useState(false);
 
-  const handleExpanded = useCallback(() => setExpanded((current) => !current), []);
+  const handleMouseOver = useCallback(() => {
+    setIsHovering(true);
+  }, []);
+
+  const handleMouseOut = useCallback(() => {
+    setIsHovering(false);
+  }, []);
+
+  const handleExpanded = useCallback(() => {
+    setExpanded((current) => !current);
+  }, []);
 
   useEffect(() => {
     setExpanded(initiallyExpanded || false);
@@ -54,7 +65,7 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
       <tr>
         {/* Header with cell name */}
         <th className={`class-header-cell ${type}`}>
-          <div>
+          <div style={{ position: 'relative' }}>
             <div className="class-header-content-item value-container">
               {/* class code/number here */}
               <span>{}</span>
@@ -69,11 +80,25 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
                   />
                 </Link>
               </div>
-              <div className="class-header-content-item">
+              <div className="class-header-content-dots">
                 <IconMenuDots size="xs" />
               </div>
-              <div className="class-header-content-item">
-                <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />
+              <div
+                className="class-header-content-item"
+                onMouseOver={handleMouseOver}
+                onMouseOut={handleMouseOut}
+              >
+                <div className="class-title-container">
+                  <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />
+                </div>
+                {isHovering && (
+                  // tooltip will be displayed on hover, this could be refactored to its own component
+                  // if needed elsewhere
+                  <section className="tooltip-container">
+                    {projectClass.name}
+                    <div className="tooltip-arrow" />
+                  </section>
+                )}
               </div>
             </div>
           </div>
