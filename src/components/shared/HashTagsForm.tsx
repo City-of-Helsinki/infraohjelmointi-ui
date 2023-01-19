@@ -1,17 +1,22 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { HookFormControlType } from '@/interfaces/formInterfaces';
+import { HookFormControlType, IHashTagsForm } from '@/interfaces/formInterfaces';
 import { mockTags } from '@/mocks/common';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { RootState } from '@/store';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo, useCallback } from 'react';
-import { Control, Controller, FieldValues } from 'react-hook-form';
+import { Control, Controller, FieldValues, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
 import TagsContainer from './TagsContainer';
 import Title from './Title';
 import _ from 'lodash';
+import { SearchInput } from 'hds-react/components/SearchInput';
+import Paragraph from './Paragraph';
+import { IconPlus } from 'hds-react/icons';
+import TextField from './TextField';
+import { TextInput } from 'hds-react/components/TextInput';
 
 interface IHashTagsDialogProps {
   name: string;
@@ -28,6 +33,7 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
     const [tags, setTags] = useState<Array<string>>(value);
     const [allTags, setAllTags] = useState(mockTags);
     const [isOpen, setIsOpen] = useState(false);
+    const [createNewMode, setCreateNewMode] = useState(false);
     const { t } = useTranslation();
     const { Header, Content, ActionButtons } = Dialog;
     const dispatch = useAppDispatch();
@@ -35,6 +41,12 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
       (state: RootState) => state.project.selectedProject?.id,
       _.isEqual,
     );
+
+    const { control, handleSubmit, reset } = useForm<IHashTagsForm>({
+      defaultValues: {
+        hashTag: '',
+      },
+    });
 
     // Update tags with changes in value
     useEffect(() => {
@@ -72,6 +84,12 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
       onChange(tags);
     }, [dispatch, onChangeOpen, projectId, tags, onChange]);
 
+    const handleCreateNewMode = useCallback(() => setCreateNewMode((current) => !current), []);
+
+    const submitNewHashTag = async (form: IHashTagsForm) => {
+      console.log('Submit form: ', form);
+    };
+
     return (
       <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
         {/* Displayed in dialog */}
@@ -84,12 +102,13 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
             closeButtonLabelText={t('closeHashTagsWindow')}
             className="big-dialog"
           >
+            {/* TODO: add projet name to title */}
             <Header id={label} title={t('manageHashTags')} />
             <hr />
             <Content>
               <div className="hashtags-content-container">
                 <div className="added-hashtags-title-container">
-                  <Title size="xs" text={t('projectHashTags') || ''} />
+                  <Paragraph fontWeight="bold" text={t('projectHashTags') || ''} />
                 </div>
                 <TagsContainer tags={tags} onDelete={onTagDelete} id={'project-hashtags'} />
               </div>
@@ -97,20 +116,69 @@ const HashTagsDialog: FC<IHashTagsDialogProps> = forwardRef(
             <hr />
             <Content>
               <div className="hashtags-content-container">
-                <div className="all-hashtags-title-container">
-                  <Title size="xs" text={t('addHashTagsToProject') || ''} />
-                  <button className="text-button">{t('modifyGeneralMode')}</button>
+                {/* Popular hashtags */}
+                <div className="hashtags-title-container">
+                  <Paragraph fontWeight="bold" text={t('popularHashTags') || ''} />
                 </div>
-                <div className="all-hashtags-container">
-                  <Button onClick={close} variant="secondary">
-                    {t('getHashTagsOrCreateNew')}
-                  </Button>
+                <div style={{ marginBottom: 'var(--spacing-m)' }}>
+                  <TagsContainer tags={allTags} onClick={onTagClick} id={'all-hashtags'} />
                 </div>
-                <TagsContainer tags={allTags} onClick={onTagClick} id={'all-hashtags'} />
+                {/* TODO: Add existing hashtags */}
+                <div className="hashtags-title-container">
+                  <Title size="xs" text={'Lisää hankkeelle tunnisteita'} />
+                </div>
+                <div style={{ marginBottom: 'var(--spacing-m)' }}>
+                  <SearchInput
+                    label="Lisää tunniste"
+                    onSubmit={(submittedValue) => console.log('Submitted value:', submittedValue)}
+                  />
+                </div>
+                {/* TODO: Add new hashtags (admin) */}
+                <div className="hashtags-title-container">
+                  <Title size="xs" text={'Etkö löydä tunnistetta?'} />
+                </div>
+                <div style={{ marginBottom: 'var(--spacing-m)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Button
+                      variant="secondary"
+                      iconLeft={<IconPlus />}
+                      onClick={handleCreateNewMode}
+                      style={{ height: '3.5rem' }}
+                    >
+                      {'Luo uusi tunniste'}
+                    </Button>
+                    {createNewMode && (
+                      <div style={{ display: 'flex' }}>
+                        <TextField control={control} name="hashTag" label="Luo uusi tunniste" />
+                        <Button
+                          style={{ height: '3.5rem' }}
+                          onClick={handleSubmit(submitNewHashTag)}
+                        >
+                          {'Luo tunniste'}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </Content>
+            <hr />
             <ActionButtons>
-              <Button onClick={onSaveTags}>{t('save')}</Button>
+              <div
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                }}
+              >
+                <Button onClick={onSaveTags}>{t('save')}</Button>
+              </div>
             </ActionButtons>
           </Dialog>
 

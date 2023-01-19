@@ -64,17 +64,21 @@ export interface IProjectNoteForm {
   project: string;
 }
 
-export interface IAppForms extends IProjectHeaderForm, IProjectBasicsForm {}
-
-export interface ISomeOtherForm {
-  name: string;
-  phone: number;
+export interface IHashTagsForm {
+  hashTag: string;
 }
+
+export interface IAppForms
+  extends IProjectHeaderForm,
+    IProjectBasicsForm,
+    IProjectNoteForm,
+    IHashTagsForm {}
 
 export type HookFormControlType =
   | Control<FieldValues>
   | Control<IProjectBasicsForm>
   | Control<IProjectHeaderForm>
+  | Control<IHashTagsForm>
   | undefined;
 
 export type HookFormRulesType = Omit<
