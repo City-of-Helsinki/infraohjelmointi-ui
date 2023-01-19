@@ -224,5 +224,7 @@
   "createNewHashTag": "Luo uusi tunniste",
   "createHashTag": "Luo tunniste",
   "addHashTagsToProject": "Lisää hankkeelle tunnisteita",
-  "addHashTag": "Lisää tunniste"
+  "addHashTag": "Lisää tunniste",
+  "hashTagCreated": "Tunniste '{{responseHashTag}}' luotu",
+  "addToProject": "Lisää hankkeelle?"
 }

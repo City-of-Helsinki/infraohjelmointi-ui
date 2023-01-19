@@ -62,6 +62,25 @@
   gap: var(--spacing-m);
 }
 
+.dialog-section .new-hashtags-input .hashtag-created {
+  gap: 3rem;
+}
+
+.hashtag-created .hashtag-created-text {
+  display: flex;
+  height: 3.5rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hashtag-created-text button {
+  font-weight: 500;
+  text-decoration: underline;
+  color: var(--color-bus);
+  line-height: 0;
+}
+
 .dialog-section .new-hashtags-form input {
   width: 22.5rem;
 }
