@@ -88,57 +88,6 @@
   font-size: var(--fontsize-body-m);
 }
 
-.tags-container {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: auto;
-  flex-wrap: wrap;
-}
-
-#hashtags-dialog h2 {
-  font-size: var(--fontsize-heading-s);
-  font-weight: 500;
-  margin: var(--spacing-2-xs) 0 var(--spacing-m) 0;
-}
-
-#hashtags-dialog .hashtags-content-container {
-  display: flex;
-  flex-direction: column;
-  padding: var(--spacing-m) 0 var(--spacing-xs) 0;
-}
-
-#hashtags-dialog .added-hashtags-title-container {
-  margin-bottom: var(--spacing-s);
-}
-
-#hashtags-dialog .hashtags-title-container {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-m);
-}
-
-#hashtags-dialog .all-hashtags-container {
-  display: flex;
-  justify-content: center;
-  margin: var(--spacing-l) 0;
-}
-
-#hashtags-dialog .text-button {
-  font-weight: bold;
-  text-decoration: underline;
-  color: var(--color-bus);
-}
-
-#hashtags-dialog hr {
-  border-top: 0.0625rem solid var(--color-black-20);
-  margin: 0;
-}
-
-.tags-container .tag-wrapper {
-  margin: 0 var(--spacing-xs) var(--spacing-xs) 0;
-}
-
 /* TOOLBAR */
 .toolbar-container {
   height: var(--spacing-3-xl);

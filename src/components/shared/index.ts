@@ -13,7 +13,6 @@ export { default as FormFieldCreator } from './FormFieldCreator';
 export { default as FormSectionTitle } from './FormSectionTitle';
 export { default as FormFieldLabel } from './FormFieldLabel';
 export { default as ListField } from './ListField';
-export { default as HashTags } from './HashTagsForm';
 export { default as Toolbar } from './Toolbar';
 export { default as BubbleIcon } from './BubbleIcon';
 export { default as OverrunRightField } from './OverrunRightField';

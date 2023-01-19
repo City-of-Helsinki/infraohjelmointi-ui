@@ -190,7 +190,6 @@
   "addFavourite": "Lisää suosikkeihin",
   "inGroup": "Kuuluu ryhmään",
   "closeNotification": "Sulje ilmoitus",
-  "addHashTag": "Lisää tunniste",
   "removeHashTag": "Poista tunniste",
   "closeHashTagsWindow": "Sulje tunnisteikkuna",
   "manageHashTags": "Hallitse tunnisteita",
@@ -220,5 +219,10 @@
   "deleteNoteConfirm": "Oletko varma että haluat poistaa tämän muistiinpanon?",
   "deleteNoteInfo": "Muistiinpano poistetaan heti. Muistiinpanon poistaminen on pysyvää eikä sitä voida enää palauttaa.",
   "newNoteInfo": "Tallenna hankkeeseen liittyvät muistiinpanot tähän.",
-  "noteModified": "Muistiinpanoa muokattu"
+  "noteModified": "Muistiinpanoa muokattu",
+  "cantFindHashTag": "Etkö löydä tunnisteita",
+  "createNewHashTag": "Luo uusi tunniste",
+  "createHashTag": "Luo tunniste",
+  "addHashTagsToProject": "Lisää hankkeelle tunnisteita",
+  "addHashTag": "Lisää tunniste"
 }

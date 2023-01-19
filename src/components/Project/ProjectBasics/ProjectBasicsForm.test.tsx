@@ -172,7 +172,7 @@ describe('ProjectBasicsForm', () => {
     expect(getByText('manageHashTags')).toBeInTheDocument();
     expect(getByText('projectHashTags')).toBeInTheDocument();
     expect(getAllByTestId('project-hashtags').length).toBe(projectTagsLength);
-    expect(getAllByTestId('all-hashtags').length).toBe(availableTagsLength);
+    expect(getAllByTestId('popular-hashtags').length).toBe(availableTagsLength);
 
     // Click on a hashtag
     await user.click(getByText('pohjoinensuurpiiri'));

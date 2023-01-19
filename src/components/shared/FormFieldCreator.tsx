@@ -1,10 +1,10 @@
 import { ListType } from '@/interfaces/common';
 import { FormField, IForm } from '@/interfaces/formInterfaces';
 import { FC } from 'react';
+import { ProjectHashTags } from '../Project/ProjectHashTags';
 import DateField from './DateField';
 import FieldSetCreator from './FieldSetCreator';
 import FormSectionTitle from './FormSectionTitle';
-import HashTagsForm from './HashTagsForm';
 import ListField from './ListField';
 import NumberField from './NumberField';
 import OverrunRightField from './OverrunRightField';
@@ -37,7 +37,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
           case FormField.ListField:
             return <ListField {...listFormProps} />;
           case FormField.TagsForm:
-            return <HashTagsForm {...formProps} />;
+            return <ProjectHashTags {...formProps} />;
           case FormField.FieldSet:
             return <FieldSetCreator {...listFormProps} />;
           case FormField.Date:
