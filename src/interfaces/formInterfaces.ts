@@ -27,6 +27,7 @@ export interface IForm {
   tooltip?: string;
   hideLabel?: boolean;
   icon?: string;
+  placeholder?: string;
 }
 
 export interface IProjectHeaderForm {
@@ -57,6 +58,16 @@ export interface IProjectBasicsForm {
   planningStartYear: string;
 }
 
+export interface ISearchForm {
+  searchWord: string;
+  masterClass: string;
+  Class: string;
+  subClass: string;
+  category: string;
+  programmed: boolean;
+  personPlanning: string;
+}
+
 export interface IProjectNoteForm {
   id: string;
   updatedBy: string;
@@ -84,6 +95,7 @@ export type HookFormControlType =
   | Control<IProjectHeaderForm>
   | Control<IHashTagsForm>
   | Control<IPhaseForm>
+  | Control<ISearchForm>
   | undefined;
 
 export type HookFormRulesType = Omit<

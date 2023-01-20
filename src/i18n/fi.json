@@ -165,6 +165,15 @@
     "personProgramming": "Ohjelmoija",
     "otherPersons": "Muut vastuuhenkilöt"
   },
+  "searchForm": {
+    "searchWord": "Mitä haet?",
+    "masterClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka",
+    "category": "Kategoria",
+    "personPlanning": "Vastuuhenkilö",
+    "filter": "Rajaa hakua"
+  },
   "notification": {
     "title": {
       "sendSuccess": "Lähetys onnistui",

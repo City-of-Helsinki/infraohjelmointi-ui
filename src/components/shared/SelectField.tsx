@@ -13,9 +13,18 @@ interface ISelectFieldProps {
   rules?: HookFormRulesType;
   hideLabel?: boolean;
   icon?: string;
+  placeholder?: string;
 }
 
-const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, hideLabel, icon }) => {
+const SelectField: FC<ISelectFieldProps> = ({
+  name,
+  label,
+  control,
+  rules,
+  hideLabel,
+  icon,
+  placeholder,
+}) => {
   const required = rules?.required ? true : false;
   const { options } = useOptions(name);
 
@@ -38,6 +47,7 @@ const SelectField: FC<ISelectFieldProps> = ({ name, label, control, rules, hideL
               options={options}
               required={required}
               style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
+              placeholder={placeholder}
               icon={
                 icon === 'location' ? (
                   <IconLocation />
