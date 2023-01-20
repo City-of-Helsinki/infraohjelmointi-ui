@@ -9,11 +9,6 @@ const buildSearchFormFields = (
   translate: TFunction<'translation', undefined>,
 ): Array<IForm> => {
   const formFields = [
-    {
-      name: 'searchWord',
-      type: FormField.Text,
-      tooltip: 'Etsi hakusanalla, esim. nimen, ryhmän, hashtagin mukaan',
-    },
     { name: 'filter', type: FormField.ListField, readOnly: true },
     {
       name: 'masterClass',
