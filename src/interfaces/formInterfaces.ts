@@ -13,6 +13,7 @@ export enum FormField {
   ListField,
   OverrunRight,
   TextArea,
+  Checkbox,
 }
 
 export interface IForm {
@@ -64,7 +65,7 @@ export interface ISearchForm {
   Class: string;
   subClass: string;
   category: string;
-  programmed: boolean;
+  programmed: Array<boolean>;
   personPlanning: string;
 }
 

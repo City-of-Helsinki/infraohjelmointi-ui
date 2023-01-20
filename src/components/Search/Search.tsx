@@ -1,8 +1,8 @@
 import useSearchForm from '@/hooks/useSearchForm';
 import { ISearchForm } from '@/interfaces/formInterfaces';
 import { Button } from 'hds-react/components/Button';
-import { IconCross } from 'hds-react/icons';
-import { FormFieldCreator, Title } from '../shared';
+import { Dialog } from 'hds-react/components/Dialog';
+import { FormFieldCreator } from '../shared';
 import './styles.css';
 
 const Search = () => {
@@ -14,22 +14,29 @@ const Search = () => {
   };
 
   return (
-    <form className="search-form" onSubmit={handleSubmit(onSubmit)}>
-      {/* Header */}
-      <div className="search-form-header">
-        <Title size="s" text="Hae projekteja" />
-        <IconCross />
-      </div>
-      {/* Form */}
-      <div className="search-form-content">
-        <FormFieldCreator form={formFields} />
-      </div>
-      {/* Buttons */}
-      <div className="search-form-content">
-        <Button type="submit">Hae</Button>
-        <Button variant="secondary">Peruuta</Button>
-      </div>
-    </form>
+    <Dialog
+      id="terms-dialog"
+      aria-labelledby={'123'}
+      aria-describedby={'123'}
+      isOpen={true}
+      scrollable
+      style={{ position: 'absolute', right: '0', minHeight: '100vh' }}
+    >
+      <Dialog.Header id={'234'} title="Hae projekteja" />
+      <Dialog.Content>
+        <form className="search-form" onSubmit={handleSubmit(onSubmit)}>
+          <div className="search-form-content">
+            <FormFieldCreator form={formFields} />
+          </div>
+        </form>
+      </Dialog.Content>
+      <Dialog.ActionButtons>
+        <Button onClick={close}>Hae</Button>
+        <Button onClick={close} variant="secondary">
+          Peruuta
+        </Button>
+      </Dialog.ActionButtons>
+    </Dialog>
   );
 };
 

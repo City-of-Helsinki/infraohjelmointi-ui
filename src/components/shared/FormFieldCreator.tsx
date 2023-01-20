@@ -2,6 +2,7 @@ import { ListType } from '@/interfaces/common';
 import { FormField, IForm } from '@/interfaces/formInterfaces';
 import { FC } from 'react';
 import { ProjectHashTags } from '../Project/ProjectHashTags';
+import CheckboxField from './CheckboxField';
 import DateField from './DateField';
 import FieldSetCreator from './FieldSetCreator';
 import FormSectionTitle from './FormSectionTitle';
@@ -48,6 +49,8 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <OverrunRightField key={f.name} form={f} />;
           case FormField.TextArea:
             return <TextAreaField {...formProps} />;
+          case FormField.Checkbox:
+            return <CheckboxField {...formProps} />;
           default:
             return null;
         }

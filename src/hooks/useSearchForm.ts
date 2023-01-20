@@ -35,6 +35,10 @@ const buildSearchFormFields = (
       type: FormField.Select,
       placeholder: 'Valitse',
     },
+    {
+      name: 'programmed',
+      type: FormField.Checkbox,
+    },
     // {
     //   name: 'personPlanning',
     //   type: FormField.Select,
@@ -60,7 +64,7 @@ const useSearchForm = () => {
     Class: '',
     subClass: '',
     category: '',
-    programmed: false,
+    programmed: [false],
     personPlanning: '',
   };
 
