@@ -9,12 +9,16 @@
 }
 
 .breadcrumbs-container ul > li > a {
-  text-decoration: underline;
+  text-decoration: none;
   margin-right: 0.2rem !important;
   color: var(--color-black);
 }
 
-.breadcrumbs-container li:last-child {
+.breadcrumbs-container ul > li {
+  text-decoration: underline;
+}
+
+.breadcrumbs-container ul > li:last-child {
   font-weight: bold !important;
   text-decoration: none !important;
 }
