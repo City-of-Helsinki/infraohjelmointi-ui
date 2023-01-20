@@ -41,15 +41,11 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
   }, [initiallyExpanded]);
 
   const buildLink = useCallback(() => {
-    switch (type) {
-      case 'masterClass':
-        return projectClass.id;
-      case 'class':
-        return `${masterClassId}/${projectClass.id}`;
-      case 'subClass':
-        return `${masterClassId}/${classId}/${projectClass.id}`;
-    }
-  }, [projectClass.id, masterClassId, classId, type]);
+    return [masterClassId, classId, projectClass.id]
+      .join('/')
+      .replace(/(\/\/)/gm, '/') // replace double // with one in case of one of values is undefined/null
+      .replace(/(^\/)|(\/+$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
+  }, [projectClass.id, masterClassId, classId]);
 
   return (
     <>
