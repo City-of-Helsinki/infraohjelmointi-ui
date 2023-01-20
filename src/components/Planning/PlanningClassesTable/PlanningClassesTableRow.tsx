@@ -31,15 +31,6 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
 }) => {
   const { masterClassId, classId } = useParams();
   const [expanded, setExpanded] = useState(initiallyExpanded || false);
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseOver = useCallback(() => {
-    setIsHovering(true);
-  }, []);
-
-  const handleMouseOut = useCallback(() => {
-    setIsHovering(false);
-  }, []);
 
   const handleExpanded = useCallback(() => {
     setExpanded((current) => !current);
@@ -83,22 +74,15 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
               <div className="class-header-content-dots">
                 <IconMenuDots size="xs" />
               </div>
-              <div
-                className="class-header-content-item"
-                onMouseOver={handleMouseOver}
-                onMouseOut={handleMouseOut}
-              >
+              <div className="class-header-content-item">
                 <div className="class-title-container">
                   <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />
                 </div>
-                {isHovering && (
-                  // tooltip will be displayed on hover, this could be refactored to its own component
-                  // if needed elsewhere
-                  <section className="tooltip-container">
-                    {projectClass.name}
-                    <div className="tooltip-arrow" />
-                  </section>
-                )}
+                {/* Tooltip (visible if the header-content-item container is hovered) */}
+                <section className="tooltip-container">
+                  {projectClass.name}
+                  <div className="tooltip-arrow" />
+                </section>
               </div>
             </div>
           </div>

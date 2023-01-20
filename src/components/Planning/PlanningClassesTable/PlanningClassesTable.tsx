@@ -60,17 +60,21 @@ const PlanningClassesTable = () => {
 
   const allClassRows = useCallback(
     () =>
-      [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
-        <PlanningClassesTableRow key={c.id} projectClass={c} type="class" />
-      )),
+      selectedMasterClass
+        ? [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
+            <PlanningClassesTableRow key={c.id} projectClass={c} type="class" />
+          ))
+        : null,
     [classes, selectedMasterClass],
   );
 
   const allSubClassRows = useCallback(
     () =>
-      [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
-        <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
-      )),
+      selectedClass
+        ? [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
+            <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
+          ))
+        : null,
     [subClasses, selectedClass],
   );
 
