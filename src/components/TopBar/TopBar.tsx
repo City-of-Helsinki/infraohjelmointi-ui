@@ -1,14 +1,19 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { Navigation } from 'hds-react/components/Navigation';
 import { useTranslation } from 'react-i18next';
-import { IconBell } from 'hds-react/icons';
-import { useAppSelector } from '@/hooks/common';
+import { IconBell, IconSearch } from 'hds-react/icons';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
+import { toggleSearch } from '@/reducers/searchSlice';
+import { Button } from 'hds-react/components/Button';
 
 const TopBar: FC = () => {
   const user = useAppSelector((state: RootState) => state.auth.user);
   const { t } = useTranslation();
-  const { Dropdown, Actions, Search, User, Item } = Navigation;
+  const { Dropdown, Actions, User, Item } = Navigation;
+
+  const dispatch = useAppDispatch();
+  const handleOpenSearch = useCallback(() => dispatch(toggleSearch()), [dispatch]);
 
   return (
     <div data-testid="top-bar" className="top-bar">
@@ -20,7 +25,14 @@ const TopBar: FC = () => {
       >
         <Actions>
           {/* search */}
-          <Search searchLabel={t('nav.search')} searchPlaceholder={t('nav.searchPage') || ''} />
+          <Button
+            variant="supplementary"
+            iconLeft={<IconSearch />}
+            onClick={handleOpenSearch}
+            style={{ color: 'var(--color-black-80)', fontWeight: '300', padding: '0' }}
+          >
+            Haku
+          </Button>
           {/* user */}
           <User
             label={t('nav.login')}

@@ -7,20 +7,16 @@ import Loader from '@/components/Loader';
 import { Search } from '@/components/Search';
 
 const App: FC = () => {
-  const isSearchOpen = false;
-
   return (
     <div>
       <Search />
-      <div className={isSearchOpen ? 'app-overlay' : ''}>
-        <Notification />
-        <TopBar />
-        <div className="app-content">
-          <SideBar />
-          <div className="w-100-p" data-testid="app-outlet">
-            <Loader />
-            <Outlet />
-          </div>
+      <Notification />
+      <TopBar />
+      <div className="app-content">
+        <SideBar />
+        <div className="w-100-p" data-testid="app-outlet">
+          <Loader />
+          <Outlet />
         </div>
       </div>
     </div>

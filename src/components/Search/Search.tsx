@@ -4,9 +4,12 @@ import { Tag } from 'hds-react/components/Tag';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FormFieldCreator } from '../shared';
 import './styles.css';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { RootState } from '@/store';
+import { toggleSearch } from '@/reducers/searchSlice';
 
 const NameSearch = () => {
   const mockFreeSearchResponse = {
@@ -86,17 +89,23 @@ const NameSearch = () => {
 const Search = () => {
   const { formMethods, formFields } = useSearchForm();
   const { handleSubmit } = formMethods;
+  const open = useAppSelector((state: RootState) => state.search.open);
+  const dispatch = useAppDispatch();
 
   const onSubmit = (form: ISearchForm) => {
     console.log('Form: ', form);
   };
+
+  const handleClose = useCallback(() => dispatch(toggleSearch()), [dispatch]);
 
   return (
     <Dialog
       id="terms-dialog"
       aria-labelledby={'123'}
       aria-describedby={'123'}
-      isOpen={true}
+      isOpen={open}
+      close={handleClose}
+      closeButtonLabelText="Close search dialog"
       scrollable
       style={{ position: 'absolute', right: '0', minHeight: '100vh' }}
     >

@@ -65,7 +65,8 @@ export interface ISearchForm {
   Class: string;
   subClass: string;
   category: string;
-  programmed: Array<boolean>;
+  programmedYes: boolean;
+  programmedNo: boolean;
   personPlanning: string;
 }
 

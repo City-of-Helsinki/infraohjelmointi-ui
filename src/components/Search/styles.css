@@ -6,11 +6,28 @@
   max-width: 100% !important;
 }
 
-.search-form .search-form-content .input-wrapper:first-child {
+/* Title of the search form (filter) */
+.search-form .search-form-content .input-wrapper#filter {
   padding-bottom: 0.8rem;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0;
 }
 
 .search-form .search-form-content .input-wrapper:nth-child(2) {
   margin-bottom: 1.5rem;
+}
+
+/* programmed fieldset legend same properties as the labels */
+.search-form .search-form-content #programmed legend {
+  color: var(--color-black-90);
+  display: block;
+  font-size: var(--fontsize-body-m);
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+/* programmed fieldset flex to get the checkboxes next to eachother */
+.search-form .search-form-content fieldset#programmed {
+  display: flex;
+  gap: var(--spacing-l);
+  padding-bottom: 0;
 }

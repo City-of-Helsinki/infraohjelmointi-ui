@@ -172,7 +172,10 @@
     "subClass": "Alaluokka",
     "category": "Kategoria",
     "personPlanning": "Vastuuhenkilö",
-    "filter": "Rajaa projekteja"
+    "filter": "Rajaa projekteja",
+    "programmed": "Ohjelmoitu",
+    "programmedYes": "Kyllä",
+    "programmedNo": "Ei"
   },
   "notification": {
     "title": {

@@ -32,19 +32,28 @@ const buildSearchFormFields = (
     },
     {
       name: 'programmed',
-      type: FormField.Checkbox,
+      type: FormField.FieldSet,
+      fieldSet: [
+        { name: 'programmedYes', type: FormField.Checkbox },
+        { name: 'programmedNo', type: FormField.Checkbox },
+      ],
     },
-    // {
-    //   name: 'personPlanning',
-    //   type: FormField.Select,
-    //   placeholder: 'Valitse',
-    // },
+    {
+      name: 'personPlanning',
+      type: FormField.Text,
+      placeholder: 'Valitse',
+    },
   ];
 
   const projectBasicsFormFields = formFields.map((formField) => ({
     ...formField,
     control,
     label: translate(`searchForm.${formField.name}`),
+    fieldSet: formField.fieldSet?.map((fieldSetField) => ({
+      ...fieldSetField,
+      control,
+      label: translate(`searchForm.${fieldSetField.name}`),
+    })),
   }));
 
   return projectBasicsFormFields;
@@ -59,7 +68,8 @@ const useSearchForm = () => {
     Class: '',
     subClass: '',
     category: '',
-    programmed: [false],
+    programmedYes: false,
+    programmedNo: false,
     personPlanning: '',
   };
 
