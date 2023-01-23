@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IClass } from '@/interfaces/classInterfaces';
+import { ClassTableHierarchy } from '@/interfaces/common';
 import {
   setSelectedClass,
   setSelectedMasterClass,
@@ -25,6 +26,10 @@ const PlanningClassesTable = () => {
     _.isEqual,
   );
   const selectedClass = useAppSelector((state: RootState) => state.class.selectedClass, _.isEqual);
+  const selectedSubClass = useAppSelector(
+    (state: RootState) => state.class.selectedSubClass,
+    _.isEqual,
+  );
 
   /**
    * set selected classes to redux according to url, if their url param id is removed, then they will
@@ -53,7 +58,11 @@ const PlanningClassesTable = () => {
   const allMasterClassRows = useCallback(
     () =>
       masterClasses.map((mc) => (
-        <PlanningClassesTableRow key={mc.id} projectClass={mc} type="masterClass" />
+        <PlanningClassesTableRow
+          key={mc.id}
+          projectClass={mc}
+          hierarchy={ClassTableHierarchy.First}
+        />
       )),
     [masterClasses],
   );
@@ -62,7 +71,11 @@ const PlanningClassesTable = () => {
     () =>
       selectedMasterClass
         ? [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
-            <PlanningClassesTableRow key={c.id} projectClass={c} type="class" />
+            <PlanningClassesTableRow
+              key={c.id}
+              projectClass={c}
+              hierarchy={ClassTableHierarchy.Second}
+            />
           ))
         : null,
     [classes, selectedMasterClass],
@@ -72,7 +85,11 @@ const PlanningClassesTable = () => {
     () =>
       selectedClass
         ? [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
-            <PlanningClassesTableRow key={sc.id} projectClass={sc} type="subClass" />
+            <PlanningClassesTableRow
+              key={sc.id}
+              projectClass={sc}
+              hierarchy={ClassTableHierarchy.Third}
+            />
           ))
         : null,
     [subClasses, selectedClass],
@@ -82,37 +99,48 @@ const PlanningClassesTable = () => {
     <table className="planning-table" cellSpacing={0}>
       <tbody>
         {
-          // When a masterClass is selected, render only that masterClass
-          selectedMasterClass ? (
-            <PlanningClassesTableRow
-              key={selectedMasterClass.id}
-              projectClass={selectedMasterClass}
-              initiallyExpanded={true}
-              type="masterClass"
-            >
-              {
-                // When a class is selected, render only that class
-                selectedClass ? (
-                  <PlanningClassesTableRow
-                    key={selectedClass.id}
-                    projectClass={selectedClass}
-                    initiallyExpanded={true}
-                    type="class"
-                  >
-                    {
-                      // Always render all subClasses
-                      allSubClassRows()
-                    }
-                  </PlanningClassesTableRow>
-                ) : (
-                  // When no class is selected, render all classes
-                  allClassRows()
-                )
-              }
-            </PlanningClassesTableRow>
+          // Render all classes if no subClass is selected
+          !selectedSubClass ? (
+            // When a masterClass is selected, render only that masterClass
+            selectedMasterClass ? (
+              <PlanningClassesTableRow
+                key={selectedMasterClass.id}
+                projectClass={selectedMasterClass}
+                initiallyExpanded={true}
+                hierarchy={ClassTableHierarchy.First}
+              >
+                {
+                  // When a class is selected, render only that class
+                  selectedClass ? (
+                    <PlanningClassesTableRow
+                      key={selectedClass.id}
+                      projectClass={selectedClass}
+                      initiallyExpanded={true}
+                      hierarchy={ClassTableHierarchy.Second}
+                    >
+                      {
+                        // When no subClass is selected, render all subClasses
+                        allSubClassRows()
+                      }
+                    </PlanningClassesTableRow>
+                  ) : (
+                    // When no class is selected, render all classes
+                    allClassRows()
+                  )
+                }
+              </PlanningClassesTableRow>
+            ) : (
+              // When no masterClass is selected, render all masterClasses
+              allMasterClassRows()
+            )
           ) : (
-            // When no masterClass is selected, render all masterClasses
-            allMasterClassRows()
+            // Render only the selectedSubClass and the projects associated with it if selected
+            <PlanningClassesTableRow
+              key={selectedSubClass.id}
+              projectClass={selectedSubClass}
+              initiallyExpanded={true}
+              hierarchy={ClassTableHierarchy.First}
+            />
           )
         }
       </tbody>

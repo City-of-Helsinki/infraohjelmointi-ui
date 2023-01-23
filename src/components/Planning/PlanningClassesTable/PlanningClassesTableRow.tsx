@@ -5,12 +5,11 @@ import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-
-export type ClassType = 'masterClass' | 'class' | 'subClass';
+import { ClassTableHierarchy } from '@/interfaces/common';
 
 interface IPlanningClassesTableRowProps {
   projectClass: IClass;
-  type: ClassType;
+  hierarchy: ClassTableHierarchy;
   children?: ReactNode;
   initiallyExpanded?: true;
 }
@@ -25,7 +24,7 @@ const OverrunSum = memo(({ value }: { value: string }) => (
 
 const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
   projectClass,
-  type,
+  hierarchy,
   children,
   initiallyExpanded,
 }) => {
@@ -51,13 +50,13 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
     <>
       <tr>
         {/* Header with cell name */}
-        <th className={`class-header-cell ${type}`}>
+        <th className={`class-header-cell ${hierarchy}`}>
           <div style={{ position: 'relative' }}>
             <div className="class-header-content-item value-container">
               {/* class code/number here */}
               <span>{}</span>
             </div>
-            <div className={`class-header-content ${type}`}>
+            <div className={`class-header-content ${hierarchy}`}>
               <div className="class-header-content-item">
                 <Link to={buildLink()} className="display-flex">
                   <IconButton
@@ -86,7 +85,7 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
 
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {classSums.map((rn: any, i: number) => (
-          <td key={i} className={`class-cell ${type}`}>
+          <td key={i} className={`class-cell ${hierarchy}`}>
             <div className="class-cell-container">
               <span>{rn}</span>
               {i === 0 ? (
