@@ -14,6 +14,7 @@ export enum FormField {
   OverrunRight,
   TextArea,
   Checkbox,
+  MultiSelect,
 }
 
 export interface IForm {
@@ -62,9 +63,9 @@ export interface IProjectBasicsForm {
 export interface ISearchForm {
   searchWord: string;
   masterClass: string;
-  Class: string;
-  subClass: string;
-  category: string;
+  class: Array<IOption>;
+  subClass: Array<IOption>;
+  category: Array<IOption>;
   programmedYes: boolean;
   programmedNo: boolean;
   personPlanning: string;

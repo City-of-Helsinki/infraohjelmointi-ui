@@ -9,20 +9,24 @@ const buildSearchFormFields = (
   translate: TFunction<'translation', undefined>,
 ): Array<IForm> => {
   const formFields = [
-    { name: 'filter', type: FormField.ListField, readOnly: true },
+    {
+      name: 'filter',
+      type: FormField.ListField,
+      readOnly: true,
+    },
     {
       name: 'masterClass',
-      type: FormField.Select,
+      type: FormField.MultiSelect,
       placeholder: 'Valitse',
     },
     {
       name: 'class',
-      type: FormField.Select,
+      type: FormField.MultiSelect,
       placeholder: 'Valitse',
     },
     {
       name: 'subClass',
-      type: FormField.Select,
+      type: FormField.MultiSelect,
       placeholder: 'Valitse',
     },
     {
@@ -65,9 +69,9 @@ const useSearchForm = () => {
   const formValues: ISearchForm = {
     searchWord: '',
     masterClass: '',
-    Class: '',
-    subClass: '',
-    category: '',
+    class: [],
+    subClass: [],
+    category: [],
     programmedYes: false,
     programmedNo: false,
     personPlanning: '',

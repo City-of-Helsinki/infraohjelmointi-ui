@@ -7,6 +7,7 @@ import DateField from './DateField';
 import FieldSetCreator from './FieldSetCreator';
 import FormSectionTitle from './FormSectionTitle';
 import ListField from './ListField';
+import MultiSelectField from './MultiSelectField';
 import NumberField from './NumberField';
 import OverrunRightField from './OverrunRightField';
 import RadioCheckboxField from './RadioCheckboxField';
@@ -51,6 +52,8 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <TextAreaField {...formProps} />;
           case FormField.Checkbox:
             return <CheckboxField {...formProps} />;
+          case FormField.MultiSelect:
+            return <MultiSelectField {...formProps} key={i} name={listName} />;
           default:
             return null;
         }
