@@ -30,8 +30,8 @@ interface IProjectHashTagsDialogProps {
 interface IFormState {
   hashTagsObject: IHashTagsObject;
   hashTagsForSearch: Array<IListItem>;
-  hashTagsForSubmit: Array<string>;
-  popularHashTags: Array<string>;
+  hashTagsForSubmit: Array<IListItem>;
+  popularHashTags: Array<IListItem>;
   isOpen: boolean;
 }
 
@@ -84,9 +84,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       if (projectHashTags && allHashTags) {
         setFormState((current) => ({
           ...current,
-          hashTagsForSubmit: allHashTags
-            .filter(({ id }) => projectHashTags.indexOf(id) !== -1)
-            .map((v) => v.value),
+          hashTagsForSubmit: allHashTags.filter(({ id }) => projectHashTags.indexOf(id) !== -1),
         }));
       }
     }, [projectHashTags, allHashTags]);
@@ -96,17 +94,17 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     useEffect(() => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSearch: allHashTags.filter((ah) => hashTagsForSubmit.indexOf(ah.value) === -1),
+        hashTagsForSearch: allHashTags.filter((ah) => hashTagsForSubmit.indexOf(ah) === -1),
         popularHashTags: current.popularHashTags.filter(
           (ph) => hashTagsForSubmit.indexOf(ph) === -1,
         ),
       }));
     }, [allHashTags, hashTagsForSubmit]);
 
-    const onHashTagDelete = useCallback((hashTag: string) => {
+    const onHashTagDelete = useCallback((value: string) => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSubmit: current.hashTagsForSubmit.filter((hv) => hv !== hashTag),
+        hashTagsForSubmit: current.hashTagsForSubmit.filter((hv) => hv.value !== value),
       }));
     }, []);
 
@@ -114,7 +112,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       (value: string) => {
         setFormState((current) => ({
           ...current,
-          hashTagsForSubmit: [...current.hashTagsForSubmit, hashTagsObject[value].value],
+          hashTagsForSubmit: [...current.hashTagsForSubmit, hashTagsObject[value]],
         }));
       },
       [hashTagsObject],
@@ -137,12 +135,12 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const onSubmit = useCallback(() => {
       dispatch(
         silentPatchProjectThunk({
-          data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h].id) },
+          data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
           id: projectId,
         }),
       );
       handleSetOpen();
-      onChange(hashTagsForSubmit);
+      onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
     }, [dispatch, hashTagsForSubmit, projectId, handleSetOpen, onChange, hashTagsObject]);
 
     return (

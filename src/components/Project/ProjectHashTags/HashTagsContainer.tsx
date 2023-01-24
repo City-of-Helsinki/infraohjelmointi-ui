@@ -1,9 +1,10 @@
+import { IListItem } from '@/interfaces/common';
 import { Tag } from 'hds-react/components/Tag';
 import { FC, memo, MouseEvent, KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IHashTagsProps {
-  tags: Array<string>;
+  tags: Array<IListItem>;
   onClick?: (tag: string) => void;
   onDelete?: (tag: string) => void;
   id?: string;
@@ -36,12 +37,12 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) 
             <div
               key={`${t}-${i}`}
               className="hashtags-wrapper"
-              aria-label={getAriaLabel(tag)}
+              aria-label={getAriaLabel(tag.value)}
               data-testid={id}
-              id={tag}
+              id={tag.value}
             >
-              <Tag {...handlers} id={tag}>
-                {tag}
+              <Tag {...handlers} id={tag.id}>
+                {tag.value}
               </Tag>
             </div>
           );
