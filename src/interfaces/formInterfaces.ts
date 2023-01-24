@@ -5,7 +5,7 @@ export enum FormField {
   Select,
   Text,
   Number,
-  TagsForm,
+  HashTagsForm,
   Title,
   FieldSet,
   Date,

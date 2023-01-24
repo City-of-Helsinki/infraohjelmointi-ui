@@ -1,6 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { mockTags } from '@/mocks/common';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { RootState } from '@/store';
 import { Button } from 'hds-react/components/Button';
@@ -14,25 +13,29 @@ import _ from 'lodash';
 import Paragraph from '../../shared/Paragraph';
 import './styles.css';
 import NewHashTagsForm from './NewHashTagsForm';
-import ExistingHashTagsForm from './ExistingHashTagsForm';
+import HashTagSearch from './HashTagSearch';
+import { IListItem } from '@/interfaces/common';
+
+export interface IHashTagsObject {
+  [key: string]: { value: string; id: string };
+}
 
 interface IProjectHashTagsDialogProps {
   name: string;
   label: string;
-  value: Array<string>;
+  projectHashTags: Array<string>;
   onChange: (tags: Array<string>) => void;
 }
 /**
- * We still don't know how this should work when editing,
- * so this doesn't have its own generic form-component yet.
+ * The hashtags endpoint returns hashTags in {value, id} format, while the hashTags for each project
+ * are just an ID reference to that hashTag. The HDSSearchInput component, which is used for searching
+ * all hashTags, only returns the displayed (string) value when selecting a hashTag.
+ *
  */
 const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
-  ({ name, label, value, onChange }, ref: Ref<HTMLDivElement>) => {
-    const [tags, setTags] = useState<Array<string>>(value);
-    const [allTags, setAllTags] = useState(mockTags);
-    const [isOpen, setIsOpen] = useState(false);
-    const { t } = useTranslation();
+  ({ name, label, projectHashTags, onChange }, ref: Ref<HTMLDivElement>) => {
     const { Header, Content, ActionButtons } = Dialog;
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const projectId = useAppSelector(
       (state: RootState) => state.project.selectedProject?.id,
@@ -43,41 +46,83 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       _.isEqual,
     );
 
-    // Update tags with changes in value
+    // HashTags as list items
+    const allHashTags = useAppSelector((state: RootState) => state.lists.hashTags, _.isEqual);
+    // HashTags object to easily get the id from the search result
+    const [hashTagsObject, setHashTagsObject] = useState<IHashTagsObject>({});
+    // Displayed hashTag value (this value is also used when submitting with the hashTags object)
+    const [hashTagValues, setHashTagValues] = useState<Array<string>>(projectHashTags);
+    // HashTags for search results
+    const [hashTagsForSearch, setHashTagsForSearch] = useState<Array<IListItem>>([]);
+    const [popularHashTags, setPopularHashTags] = useState<Array<string>>([]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Create an object from the hashtags to not need to iterate when the user
+    // chooses a hashtag from the search form
     useEffect(() => {
-      if (value) {
-        setTags(value);
+      setHashTagsObject(
+        Object.fromEntries(
+          allHashTags.map((h) => [
+            h.value,
+            {
+              value: h.value,
+              id: h.id,
+            },
+          ]),
+        ),
+      );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [allHashTags]);
+
+    // Add the projectHashTags to hashTagValues
+    useEffect(() => {
+      if (projectHashTags && allHashTags) {
+        setHashTagValues(
+          allHashTags.filter(({ id }) => projectHashTags.indexOf(id) !== -1).map((v) => v.value),
+        );
       }
-    }, [value]);
+    }, [projectHashTags, allHashTags]);
 
+    // Remove hashTags from popularHashTags and hashTagsForSearch
+    // that are already added to the project for submission
     useEffect(() => {
-      setAllTags((currentAllTags) => currentAllTags.filter((tag) => tags.indexOf(tag) === -1));
-    }, [tags]);
+      setPopularHashTags((current) => current.filter((c) => hashTagValues.indexOf(c) === -1));
+      setHashTagsForSearch(allHashTags.filter((c) => hashTagValues.indexOf(c.value) === -1));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [allHashTags, hashTagValues]);
 
-    const onTagDelete = useCallback((t: string) => {
-      setTags((currentTags) => currentTags.filter((tag) => tag !== t));
-      setAllTags((currentTags) => [...currentTags, t]);
+    const onTagDelete = useCallback((tag: string) => {
+      setHashTagValues((current) => current.filter((t) => t !== tag));
     }, []);
 
-    const onChangeOpen = useCallback(() => setIsOpen((currentState) => !currentState), []);
+    const handleSetOpen = useCallback(() => setIsOpen((currentState) => !currentState), []);
 
     const onEdit = useCallback(
       (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        onChangeOpen();
+        handleSetOpen();
       },
-      [onChangeOpen],
+      [handleSetOpen],
     );
 
-    const onTagClick = useCallback((tag: string) => {
-      setTags((currentTags) => [...currentTags, tag]);
-    }, []);
+    const addHashTagForSubmit = useCallback(
+      (value: string) => {
+        setHashTagValues((current) => [...current, hashTagsObject[value].value]);
+      },
+      [hashTagsObject],
+    );
 
-    const onSaveTags = useCallback(() => {
-      dispatch(silentPatchProjectThunk({ data: { hashTags: tags }, id: projectId }));
-      onChangeOpen();
-      onChange(tags);
-    }, [dispatch, onChangeOpen, projectId, tags, onChange]);
+    // Submit hashTagValues and close the dialog
+    const onSubmit = useCallback(() => {
+      dispatch(
+        silentPatchProjectThunk({
+          data: { hashTags: hashTagValues.map((h) => hashTagsObject[h].id) },
+          id: projectId,
+        }),
+      );
+      handleSetOpen();
+      onChange(hashTagValues);
+    }, [dispatch, hashTagValues, projectId, handleSetOpen, onChange, hashTagsObject]);
 
     return (
       <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
@@ -87,18 +132,22 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             id="hashtags-dialog"
             aria-labelledby={label}
             isOpen={isOpen}
-            close={onChangeOpen}
+            close={handleSetOpen}
             closeButtonLabelText={t('closeHashTagsWindow')}
             className="big-dialog"
           >
             {/* Header */}
             <Header id={label} title={`${projectName} - ${t('manageHashTags')}`} />
             <hr />
-            {/* Section 1 (Added hashtags )*/}
+            {/* Section 1 (Added hashtags ) */}
             <Content>
               <div className="content-container">
                 <Paragraph fontWeight="bold" text={t('projectHashTags') || ''} />
-                <HashTagsContainer tags={tags} onDelete={onTagDelete} id={'project-hashtags'} />
+                <HashTagsContainer
+                  tags={hashTagValues}
+                  onDelete={onTagDelete}
+                  id={'project-hashtags'}
+                />
               </div>
             </Content>
             <hr />
@@ -107,9 +156,13 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
               <div className="content-container">
                 <div className="dialog-section">
                   <Paragraph fontWeight="bold" text={t('popularHashTags') || ''} />
-                  <HashTagsContainer tags={allTags} onClick={onTagClick} id={'popular-hashtags'} />
+                  <HashTagsContainer
+                    tags={popularHashTags}
+                    onClick={addHashTagForSubmit}
+                    id={'popular-hashtags'}
+                  />
                 </div>
-                <ExistingHashTagsForm />
+                <HashTagSearch onHashTagClick={addHashTagForSubmit} hashTags={hashTagsForSearch} />
                 <NewHashTagsForm />
               </div>
             </Content>
@@ -117,7 +170,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             {/* Footer (Save button) */}
             <ActionButtons>
               <div className="dialog-footer">
-                <Button onClick={onSaveTags}>{t('save')}</Button>
+                <Button onClick={onSubmit}>{t('save')}</Button>
               </div>
             </ActionButtons>
           </Dialog>
@@ -127,7 +180,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             <FormFieldLabel text={t(`projectBasicsForm.${name}`)} onClick={onEdit} />
           </div>
           {/* Displayed on form (Project hashtags) */}
-          <HashTagsContainer tags={value} />
+          <HashTagsContainer tags={hashTagValues} />
         </div>
       </div>
     );
@@ -146,7 +199,12 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control }) =>
       name={name}
       control={control as Control<FieldValues>}
       render={({ field, fieldState }) => (
-        <ProjectHashTagsDialog {...field} {...fieldState} label={label} />
+        <ProjectHashTagsDialog
+          {...field}
+          {...fieldState}
+          projectHashTags={field.value}
+          label={label}
+        />
       )}
     />
   );

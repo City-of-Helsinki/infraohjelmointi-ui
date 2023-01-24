@@ -66,6 +66,7 @@ describe('ProjectBasicsForm', () => {
               division: [],
               subDivision: [],
               responsibleZone: [],
+              hashTags: [],
               error: {},
             },
           },

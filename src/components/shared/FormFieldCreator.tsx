@@ -36,7 +36,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
             return <FormSectionTitle {...formProps} />;
           case FormField.ListField:
             return <ListField {...listFormProps} />;
-          case FormField.TagsForm:
+          case FormField.HashTagsForm:
             return <ProjectHashTags {...formProps} />;
           case FormField.FieldSet:
             return <FieldSetCreator {...listFormProps} />;
