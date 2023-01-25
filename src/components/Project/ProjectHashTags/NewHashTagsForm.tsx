@@ -33,6 +33,7 @@ const NewHashTagsForm = () => {
   const submitNewHashTag = async (form: IHashTagsForm) => {
     postHashTag({ value: form.hashTag })
       .then((res) => {
+        // GET all hashTags to get redux up-to-date with the backend
         dispatch(getHashTagsThunk());
         setResponseHashTag(res);
         reset(formValues);
@@ -52,8 +53,6 @@ const NewHashTagsForm = () => {
       ).then(() => setResponseHashTag(null));
     }
   };
-
-  console.log(responseHashTag);
 
   return isAdmin ? (
     <div className="dialog-section">

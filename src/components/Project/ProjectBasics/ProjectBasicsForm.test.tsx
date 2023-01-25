@@ -8,6 +8,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
+  mockHashTags,
   mockPlanningPhases,
   mockProjectAreas,
   mockProjectCategories,
@@ -16,10 +17,11 @@ import {
   mockProjectRisks,
   mockProjectTypes,
 } from '@/mocks/mockLists';
-import { mockTags } from '@/mocks/common';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { IListItem } from '@/interfaces/common';
+import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -66,7 +68,7 @@ describe('ProjectBasicsForm', () => {
               division: [],
               subDivision: [],
               responsibleZone: [],
-              hashTags: [],
+              hashTags: mockHashTags.data,
               error: {},
             },
           },
@@ -134,8 +136,11 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.constructionWorkQuantity);
 
     expect(project?.hashTags?.length).toBe(2);
-    project?.hashTags?.forEach((h) => {
-      expect(getByText(matchExact(h))).toBeInTheDocument();
+    const projectHashTags = mockHashTags.data.filter(
+      (h) => project?.hashTags?.indexOf(h.id) !== -1,
+    );
+    projectHashTags?.forEach((h) => {
+      expect(getByText(matchExact(h.value))).toBeInTheDocument();
     });
   });
 
@@ -147,22 +152,19 @@ describe('ProjectBasicsForm', () => {
     expect(getByText('projectBasicsForm.description')).toBeInTheDocument();
   });
 
-  it('renders hashTags modal and can autosave patch hashTags', async () => {
+  it('renders hashTags modal and can search and patch hashTags', async () => {
     const { getByText, getByRole, user, getAllByTestId, store } = renderResult;
-    const expectedValues = ['pyöräily', 'uudisrakentaminen', 'pohjoinensuurpiiri'];
+    const expectedValues = [
+      ...(mockProject.data.hashTags as Array<string>),
+      '816cc173-6340-45ed-9b49-4b4976b2a48b',
+    ];
     const project = store.getState().project.selectedProject as IProject;
-    const projectTags = store.getState().project.selectedProject?.hashTags;
-    const availableTags = mockTags.filter((tag) => projectTags?.indexOf(tag) === -1);
-    const projectTagsLength = projectTags?.length || 0;
-    const availableTagsLength = availableTags.length || 0;
+    const projectHashTags = store.getState().project.selectedProject?.hashTags;
+    const projectHashTagsLength = projectHashTags?.length || 0;
     const responseProject: IProject = {
       ...project,
       hashTags: expectedValues,
     };
-
-    projectTags?.forEach((t) => {
-      expect(getByText(matchExact(t))).toBeInTheDocument();
-    });
 
     // Open modal
     await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
@@ -170,16 +172,78 @@ describe('ProjectBasicsForm', () => {
     mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
 
     // Expect all elements
-    expect(getByText('manageHashTags')).toBeInTheDocument();
+    expect(getByText(`${project.name} - manageHashTags`)).toBeInTheDocument();
     expect(getByText('projectHashTags')).toBeInTheDocument();
-    expect(getAllByTestId('project-hashtags').length).toBe(projectTagsLength);
-    expect(getAllByTestId('popular-hashtags').length).toBe(availableTagsLength);
+    expect(getByText('popularHashTags')).toBeInTheDocument();
+    expect(getByText('addHashTagsToProject')).toBeInTheDocument();
+    expect(getByText('cantFindHashTag')).toBeInTheDocument();
+    expect(getByRole('button', { name: 'createNewHashTag' }));
+    expect(getAllByTestId('project-hashtags').length).toBe(projectHashTagsLength);
 
-    // Click on a hashtag
-    await user.click(getByText('pohjoinensuurpiiri'));
+    // Search for a hashTag and click on the search result
+    await user.type(getByRole('combobox', { name: 'addHashTag' }), 'hul');
+    await waitFor(async () => await user.click(getByText('hulevesi')));
     await user.click(getByRole('button', { name: matchExact('save') }));
 
-    expectedValues.forEach((h) => expect(getByText(h)).toBeInTheDocument());
+    const hashTagsAfterSubmit = mockHashTags.data.filter(
+      (h) => expectedValues.indexOf(h.id) !== -1,
+    );
+
+    expect(hashTagsAfterSubmit.length).toBe(3);
+    hashTagsAfterSubmit.forEach((h) => expect(getByText(h.value)).toBeInTheDocument());
+  });
+
+  it('can create new hashtags with the hashtags form', async () => {
+    const mockPostResponse = { data: { value: 'liikenne', id: '123456789' } };
+    const mockGetResponse = {
+      data: [...mockHashTags.data, mockPostResponse.data],
+    };
+    const mockPatchProjectResponse: IProject = {
+      ...mockProject.data,
+      hashTags: [...(mockProject.data.hashTags as Array<string>), mockPostResponse.data.id],
+    };
+
+    // Mock all needed requests, to be able to POST a hashTag, GET all hashTags
+    // and PATCH the project with the newly created hashTag
+    mockedAxios.post.mockResolvedValue(Promise.resolve(mockPostResponse));
+    mockedAxios.get.mockResolvedValue(Promise.resolve(mockGetResponse));
+    mockedAxios.patch.mockResolvedValue(Promise.resolve(mockPatchProjectResponse));
+
+    const { getByRole, user } = renderResult;
+
+    // Open modal
+    await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
+
+    // Open the textbox and submit a new hashtag
+    await user.click(getByRole('button', { name: 'createNewHashTag' }));
+    await user.type(getByRole('textbox', { name: 'createNewHashTag' }), 'liikenne');
+    await user.click(getByRole('button', { name: 'createHashTag' }));
+
+    // Click the 'add to project' button to patch the project with the new hashtag
+    await user.click(getByRole('button', { name: 'addToProject' }));
+
+    const formPostRequest = mockedAxios.post.mock.lastCall[1] as IListItem;
+    const formGetRequest = mockedAxios.get.mock.lastCall[1];
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1];
+
+    debug('POST hashTag axios mock', formPostRequest);
+    debug('GET hashTags axios mock', formGetRequest);
+    debug('PATCH project axios mock', formPatchRequest);
+
+    expect(formPostRequest.value).toEqual(mockPostResponse.data.value);
+
+    /* 
+    
+    FIXME: check that the hashTag gets added to the project and rendered when the user chooses to add it to the project
+
+    const expectedHashTags = mockHashTags.data.filter(
+      (h) => mockProject.data.hashTags?.indexOf(h.id) !== -1,
+    );
+
+    expectedHashTags.push(mockPostResponse.data);
+
+    expectedHashTags.forEach((h) => expect(queryAllByText(h.value)[0]).toBeInTheDocument());
+     */
   });
 
   it('can autosave patch a NumberField', async () => {
