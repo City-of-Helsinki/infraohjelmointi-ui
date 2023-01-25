@@ -18,7 +18,7 @@ ENV YARN_VERSION 1.22.19
 # UID=1001 && GID=0
 # UID=<any>&& GID=0
 # UID=1001 && GID=<any>
-RUN apk add --update nano nginx nodejs yarn && \
+RUN apk add --update nano nginx nodejs yarn bash && \
   rm -rf /var/cache/apk/* && \
   chown -R 1001:0 /var/lib/nginx /var/log/nginx /run && \
   chmod -R ug+rwX /var/lib/nginx /var/log/nginx /run && \
@@ -33,4 +33,4 @@ RUN apk add --update nano nginx nodejs yarn && \
 EXPOSE 4000
 # start nginx service
 USER 1001
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["./docker-entrypoint.sh"]

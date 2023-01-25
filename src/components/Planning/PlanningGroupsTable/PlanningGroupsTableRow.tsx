@@ -1,5 +1,5 @@
 import { IProject } from '@/interfaces/projectInterfaces';
-import { planListProjectValues } from '@/mocks/common';
+import { planProjectValues } from '@/mocks/common';
 import {
   IconDocument,
   IconMenuDots,
@@ -8,7 +8,7 @@ import {
 } from 'hds-react/icons';
 import { FC } from 'react';
 import { useNavigate } from 'react-router';
-import PlanningListProjectsTableCell from './PlanningListProjectsTableCell';
+import PlanningGroupsTableCell from './PlanningGroupsTableCell';
 
 /**
  * RED CELLS
@@ -22,7 +22,7 @@ import PlanningListProjectsTableCell from './PlanningListProjectsTableCell';
  * ?
  */
 
-interface IPlanningListProjectsTableProps {
+interface IPlanningProjectsTableProps {
   project: IProject;
 }
 
@@ -36,9 +36,10 @@ const CircleIcon = ({ value }: { value: string }) => (
 /**
  * We're only mapping the project name here for now since the values aren't yet implemented
  */
-const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ project }) => {
+const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({ project }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
+
   return (
     <tr>
       {/* HEADER */}
@@ -55,22 +56,22 @@ const PlanningListProjectsTableRow: FC<IPlanningListProjectsTableProps> = ({ pro
           {/* RIGHT */}
           <div className="right">
             <div className="project-header-left">
-              <CircleIcon value={planListProjectValues.readiness} />
+              <CircleIcon value={planProjectValues.readiness} />
               <IconPlaybackRecord size="xs" />
               <IconSpeechbubbleText size="xs" />
             </div>
             <div className="project-header-right">
-              <span>{planListProjectValues.value1}</span>
-              <span>{planListProjectValues.value2}</span>
+              <span>{planProjectValues.value1}</span>
+              <span>{planProjectValues.value2}</span>
             </div>
           </div>
         </div>
       </th>
-      {planListProjectValues.sums.map((p, i) => (
-        <PlanningListProjectsTableCell key={i} value={p} />
+      {planProjectValues.sums.map((p, i) => (
+        <PlanningGroupsTableCell key={i} value={p} />
       ))}
     </tr>
   );
 };
 
-export default PlanningListProjectsTableRow;
+export default PlanningGroupsTableRow;

@@ -11,7 +11,7 @@ import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import ErrorView from '@/views/ErrorView';
 import AuthGuard from '@/components/AuthGuard';
 import { injectStore } from '@/utils/interceptors';
-import PlanningListView from '@/views/PlanningListView';
+import PlanningView from '@/views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -45,8 +45,35 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'planning-list',
-        element: <PlanningListView />,
+        path: 'planning',
+        children: [
+          {
+            path: 'planner',
+            element: <PlanningView />,
+          },
+          {
+            path: 'coordinator',
+            element: <PlanningView />,
+            children: [
+              {
+                path: ':masterClassId',
+                element: <PlanningView />,
+                children: [
+                  {
+                    path: ':classId',
+                    element: <PlanningView />,
+                    children: [
+                      {
+                        path: ':subClassId',
+                        element: <PlanningView />,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
     ],
   },

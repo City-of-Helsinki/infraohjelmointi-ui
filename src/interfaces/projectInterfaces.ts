@@ -147,6 +147,7 @@ export interface IProjectRequestObject {
   data: IProjectRequest;
 }
 
+// These will be used to render the icons for projects in the planning view list
 export enum ProjectType {
   ProjectComplex = 'projectComplex',
   Street = 'street',
@@ -157,6 +158,7 @@ export enum ProjectType {
   Park = 'park',
 }
 
+// These will be used in order to render the icons for project header phase field
 export enum ProjectPhase {
   Proposal = 'proposal',
   Design = 'design',

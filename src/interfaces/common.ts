@@ -51,3 +51,9 @@ export type TextColorType = 'black' | 'white';
 export type FontWeightType = 'bold' | 'light';
 export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';
 export type InputSizeType = 'l' | 'm';
+
+export enum ClassTableHierarchy {
+  First = 'first',
+  Second = 'second',
+  Third = 'third',
+}

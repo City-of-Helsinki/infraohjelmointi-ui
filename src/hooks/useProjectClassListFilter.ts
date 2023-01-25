@@ -13,14 +13,13 @@ const useProjectClassListFilter = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const selectedMasterClass = masterClasses.find((mc) => mc.id === project?.projectClass);
-
     if (masterClassList.length <= 0) {
       dispatch(setMasterClassList(masterClasses));
     }
 
     if (project?.projectClass) {
       /* If selected is a masterClass, we need to find all classes that have that masterClass as their parent */
+      const selectedMasterClass = masterClasses.find((mc) => mc.id === project?.projectClass);
       if (selectedMasterClass) {
         dispatch(setClassList(classes.filter((c) => c.parent === project.projectClass)));
       }

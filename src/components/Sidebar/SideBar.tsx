@@ -1,7 +1,8 @@
 import { useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
 import { RootState } from '@/store';
-import { IconPenLine, IconTicket } from 'hds-react/icons';
+import { ReactComponent as IconBooks } from '@/assets/icons/books.svg';
+import { ReactComponent as IconStickyNotes } from '@/assets/icons/sticky-notes.svg';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -17,7 +18,7 @@ const SideBar = () => {
   const [projectId, setProjectId] = useState('');
   const { t } = useTranslation();
 
-  // Set the project ID to the first in the list if found
+  const iconStyles = { height: '1.5rem', width: '1.5rem' };
   useEffect(() => {
     setProjectId((projects?.length > 0 && projects[0].id) || '');
   }, [projects]);
@@ -26,12 +27,12 @@ const SideBar = () => {
     {
       route: `/project/${projectId}/basics`,
       label: t('project'),
-      component: <IconPenLine />,
+      component: <IconBooks style={iconStyles} />,
     },
     {
-      route: `planning-list`,
-      label: t('planningList'),
-      component: <IconTicket />,
+      route: `planning/planner`,
+      label: t('planning'),
+      component: <IconStickyNotes style={iconStyles} />,
     },
   ];
 
