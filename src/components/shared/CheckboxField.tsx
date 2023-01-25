@@ -1,6 +1,6 @@
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Checkbox as HDSCheckbox } from 'hds-react/components/Checkbox';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 
 interface ICheckboxFieldProps {
@@ -12,6 +12,10 @@ interface ICheckboxFieldProps {
 }
 
 const CheckboxField: FC<ICheckboxFieldProps> = ({ name, label, control, rules }) => {
+  const handleChange = useCallback((value: boolean, onChange: (...event: unknown[]) => void) => {
+    onChange(!value);
+  }, []);
+
   return (
     <Controller
       name={name}
@@ -22,9 +26,11 @@ const CheckboxField: FC<ICheckboxFieldProps> = ({ name, label, control, rules })
           <HDSCheckbox
             data-testid={name}
             id={name}
+            name={name}
             label={label}
             value={value}
-            onChange={onChange}
+            checked={value}
+            onChange={() => handleChange(value, onChange)}
             onBlur={onBlur}
           />
         </div>
