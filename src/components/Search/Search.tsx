@@ -7,7 +7,7 @@ import { FormFieldCreator } from '../shared';
 import './styles.css';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
-import { toggleSearch } from '@/reducers/searchSlice';
+import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
 import NameSearchForm from './NameSearchForm';
 import { IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
@@ -55,7 +55,10 @@ const Search = () => {
   const onSubmit = async (form: ISearchForm) => {
     const searchParams = buildSearchParams(form);
     getProjectsWithParams(searchParams)
-      .then(() => console.log('projects fetched'))
+      .then(() => {
+        console.log('projects fetched');
+        dispatch(setSearchForm(form));
+      })
       .catch((e) => console.log('error getting projects with params: ', e));
   };
 

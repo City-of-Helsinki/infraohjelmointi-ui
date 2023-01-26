@@ -32,7 +32,7 @@ const MultiSelectField: FC<IMultiSelectFieldProps> = ({
     <Controller
       name={name}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, onBlur }, fieldState: { error } }) => {
+      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
             <HDSSelect
@@ -43,6 +43,7 @@ const MultiSelectField: FC<IMultiSelectFieldProps> = ({
               placeholder={placeholder}
               helper="Assistive text"
               options={options}
+              value={value || []}
               clearButtonAriaLabel="Clear all selections"
               selectedItemRemoveButtonAriaLabel="Remove ${value}"
               onBlur={onBlur}

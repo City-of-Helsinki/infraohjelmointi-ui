@@ -1,7 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { ISearchForm } from '@/interfaces/formInterfaces';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ISearchState {
   open: boolean;
+  form: ISearchForm;
 }
 
 /**
@@ -11,6 +13,16 @@ interface ISearchState {
  */
 const initialState: ISearchState = {
   open: false,
+  form: {
+    searchWord: '',
+    masterClass: '',
+    class: [],
+    subClass: [],
+    category: { value: '', label: '' },
+    programmedYes: false,
+    programmedNo: false,
+    personPlanning: '',
+  },
 };
 
 export const searchSlice = createSlice({
@@ -20,9 +32,12 @@ export const searchSlice = createSlice({
     toggleSearch(state) {
       return { ...state, open: !state.open };
     },
+    setSearchForm(state, action: PayloadAction<ISearchForm>) {
+      return { ...state, form: { ...state.form, ...action.payload } };
+    },
   },
 });
 
-export const { toggleSearch } = searchSlice.actions;
+export const { toggleSearch, setSearchForm } = searchSlice.actions;
 
 export default searchSlice.reducer;

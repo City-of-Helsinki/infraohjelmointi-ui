@@ -1,8 +1,10 @@
 import { FormField, HookFormControlType, IForm, ISearchForm } from '@/interfaces/formInterfaces';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
+import { useAppSelector } from './common';
+import { RootState } from '@/store';
 
 const buildSearchFormFields = (
   control: HookFormControlType,
@@ -66,23 +68,19 @@ const buildSearchFormFields = (
 const useSearchForm = () => {
   const { t } = useTranslation();
 
-  const formValues: ISearchForm = {
-    searchWord: '',
-    masterClass: '',
-    class: [],
-    subClass: [],
-    category: { value: '', label: '' },
-    programmedYes: false,
-    programmedNo: false,
-    personPlanning: '',
-  };
+  const formValues = useAppSelector((state: RootState) => state.search.form);
 
   const formMethods = useForm<ISearchForm>({
     defaultValues: formValues,
     mode: 'onBlur',
   });
 
-  const { control } = formMethods;
+  const { control, reset } = formMethods;
+
+  useEffect(() => {
+    reset(formValues);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formValues]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const formFields = useMemo(() => buildSearchFormFields(control, t), [control]);
