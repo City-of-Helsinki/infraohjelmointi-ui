@@ -28,7 +28,11 @@ const NewHashTagsForm = () => {
   );
   const projectHashTags =
     useAppSelector((state: RootState) => state.project.selectedProject?.hashTags, _.isEqual) || [];
-  const handleCreateNewMode = useCallback(() => setCreateNewMode((current) => !current), []);
+
+  const handleCreateNewMode = useCallback(() => {
+    setCreateNewMode((current) => !current);
+    responseHashTag && setResponseHashTag(null);
+  }, [responseHashTag]);
 
   const submitNewHashTag = async (form: IHashTagsForm) => {
     postHashTag({ value: form.hashTag })
