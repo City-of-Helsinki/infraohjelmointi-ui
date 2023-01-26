@@ -108,12 +108,15 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       }));
     }, []);
 
+    // Set a hashtag to be submitted, make sure that the hashtag exists
     const onHashTagClick = useCallback(
       (value: string) => {
-        setFormState((current) => ({
-          ...current,
-          hashTagsForSubmit: [...current.hashTagsForSubmit, hashTagsObject[value]],
-        }));
+        if (Object.prototype.hasOwnProperty.call(hashTagsObject, value)) {
+          setFormState((current) => ({
+            ...current,
+            hashTagsForSubmit: [...current.hashTagsForSubmit, hashTagsObject[value]],
+          }));
+        }
       },
       [hashTagsObject],
     );

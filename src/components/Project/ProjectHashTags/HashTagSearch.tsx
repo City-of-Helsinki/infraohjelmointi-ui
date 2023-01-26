@@ -36,7 +36,6 @@ const HashTagSearch: FC<IHashTagSearchProps> = ({ onHashTagClick, hashTags }) =>
         getSuggestions={getSuggestions}
         clearButtonAriaLabel="Clear search field"
         searchButtonAriaLabel="Search"
-        hideSearchButton
         suggestionLabelField="value"
         value={value}
         onChange={handleValueChange}
