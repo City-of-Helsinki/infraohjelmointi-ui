@@ -10,7 +10,7 @@ import { RootState } from '@/store';
 import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
 import NameSearchForm from './NameSearchForm';
 import { IOption } from '@/interfaces/common';
-import { getProjectsWithParams } from '@/services/projectServices';
+import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
 
 const Search = () => {
   const { formMethods, formFields } = useSearchForm();
@@ -54,12 +54,7 @@ const Search = () => {
 
   const onSubmit = async (form: ISearchForm) => {
     const searchParams = buildSearchParams(form);
-    getProjectsWithParams(searchParams)
-      .then(() => {
-        console.log('projects fetched');
-        dispatch(setSearchForm(form));
-      })
-      .catch((e) => console.log('error getting projects with params: ', e));
+    dispatch(getProjectsWithParamsThunk(searchParams)).then(() => dispatch(setSearchForm(form)));
   };
 
   const handleClose = useCallback(
