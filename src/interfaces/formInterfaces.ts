@@ -65,7 +65,7 @@ export interface ISearchForm {
   masterClass: string;
   class: Array<IOption>;
   subClass: Array<IOption>;
-  category: Array<IOption>;
+  category: IOption;
   programmedYes: boolean;
   programmedNo: boolean;
   personPlanning: string;

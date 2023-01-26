@@ -38,3 +38,10 @@ export const patchProject = async (request: IProjectRequestObject): Promise<IPro
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getProjectsWithParams = async (params: string): Promise<Array<IProject>> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/projects/?${params}`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};

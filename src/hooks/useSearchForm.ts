@@ -71,7 +71,7 @@ const useSearchForm = () => {
     masterClass: '',
     class: [],
     subClass: [],
-    category: [],
+    category: { value: '', label: '' },
     programmedYes: false,
     programmedNo: false,
     personPlanning: '',
