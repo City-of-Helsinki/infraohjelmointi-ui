@@ -62,7 +62,13 @@ const Search = () => {
       .catch((e) => console.log('error getting projects with params: ', e));
   };
 
-  const handleClose = useCallback(() => dispatch(toggleSearch()), [dispatch]);
+  const handleClose = useCallback(
+    (form: ISearchForm) => {
+      dispatch(toggleSearch());
+      dispatch(setSearchForm(form));
+    },
+    [dispatch],
+  );
 
   return (
     <Dialog
@@ -70,7 +76,7 @@ const Search = () => {
       aria-labelledby="project-search-dialog"
       aria-describedby="project-search-dialog"
       isOpen={open}
-      close={handleClose}
+      close={handleSubmit(handleClose)}
       closeButtonLabelText="Close search dialog"
       scrollable
       style={{ position: 'absolute', right: '0', minHeight: '100vh' }}
@@ -86,7 +92,7 @@ const Search = () => {
       </Dialog.Content>
       <Dialog.ActionButtons>
         <Button onClick={handleSubmit(onSubmit)}>Hae</Button>
-        <Button onClick={handleClose} variant="secondary">
+        <Button onClick={handleSubmit(handleClose)} variant="secondary">
           Peruuta
         </Button>
       </Dialog.ActionButtons>
