@@ -146,6 +146,14 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
     }, [dispatch, hashTagsForSubmit, projectId, handleSetOpen, onChange, hashTagsObject]);
 
+    const handleClose = useCallback(() => {
+      setFormState((current) => ({
+        ...current,
+        hashTagsForSubmit: allHashTags.filter(({ id }) => projectHashTags.indexOf(id) !== -1),
+      }));
+      handleSetOpen();
+    }, [allHashTags, handleSetOpen, projectHashTags]);
+
     return (
       <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
         {/* Dialog */}
@@ -154,7 +162,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             id="hashtags-dialog"
             aria-labelledby={label}
             isOpen={isOpen}
-            close={handleSetOpen}
+            close={handleClose}
             closeButtonLabelText={t('closeHashTagsWindow')}
             className="big-dialog"
           >
