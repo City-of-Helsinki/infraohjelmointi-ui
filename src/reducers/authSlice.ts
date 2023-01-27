@@ -1,15 +1,15 @@
 import { IError } from '@/interfaces/common';
-import { IUser } from '@/interfaces/userInterfaces';
-import { getUsers } from '@/services/userServices';
+import { IPerson } from '@/interfaces/userInterfaces';
+import { getPersons } from '@/services/personServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IUserState {
-  user: IUser | null;
+  user: IPerson | null;
   error: IError | null | unknown;
 }
 
-export const getUsersThunk = createAsyncThunk('auth/getUsers', async (_, thunkAPI) => {
-  return await getUsers()
+export const getUserThunk = createAsyncThunk('auth/getUsers', async (_, thunkAPI) => {
+  return await getPersons()
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
@@ -24,10 +24,10 @@ export const authSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getUsersThunk.fulfilled, (state, action: PayloadAction<Array<IUser>>) => {
+    builder.addCase(getUserThunk.fulfilled, (state, action: PayloadAction<Array<IPerson>>) => {
       return { ...state, user: action.payload[0] };
     });
-    builder.addCase(getUsersThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getUserThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
   },

@@ -4,7 +4,7 @@ import TopBar from './TopBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
 import { setupStore } from '@/store';
-import { getUsersThunk } from '@/reducers/authSlice';
+import { getUserThunk } from '@/reducers/authSlice';
 import mockUser from '@/mocks/mockUser';
 import mockUsers from '@/mocks/mockUsers';
 
@@ -17,7 +17,7 @@ describe('TopBar', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockUsers);
-    store.dispatch(getUsersThunk());
+    store.dispatch(getUserThunk());
   });
 
   it('renders component wrapper', () => {

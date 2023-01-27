@@ -7,7 +7,7 @@ import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
 import mockUsers from '@/mocks/mockUsers';
-import { getUsersThunk } from '@/reducers/authSlice';
+import { getUserThunk } from '@/reducers/authSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -19,7 +19,7 @@ describe('Notification', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUsersThunk());
+    await store.dispatch(getUserThunk());
   });
 
   it('does not render the parent container if no notification is given', () => {

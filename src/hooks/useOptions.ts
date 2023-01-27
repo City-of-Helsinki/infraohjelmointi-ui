@@ -18,22 +18,29 @@ import _ from 'lodash';
 export const useOptions = (name?: ListType) => {
   const { t } = useTranslation();
 
-  const optionsList = useAppSelector(
-    (state: RootState) => state.lists[name as keyof IListState],
-    _.isEqual,
-  ) as Array<IListItem>;
+  const isPersonList = ['personPlanning', 'personConstruction', 'personProgramming'].includes(
+    name as ListType,
+  );
 
-  const isClassList = [
+  const parsedName = isPersonList ? 'responsiblePersons' : name;
+
+  const shouldNotTranslate = [
     'masterClass',
     'class',
     'subClass',
     'district',
     'division',
     'subDivision',
-  ].includes(name as ListType);
+    'responsiblePersons',
+  ].includes(parsedName as ListType);
+
+  const optionsList = useAppSelector(
+    (state: RootState) => state.lists[parsedName as keyof IListState],
+    _.isEqual,
+  ) as Array<IListItem>;
 
   const options = useMemo(
-    () => optionsList.map((i) => listItemToOption(i, isClassList ? undefined : t)),
+    () => optionsList.map((i) => listItemToOption(i, shouldNotTranslate ? undefined : t)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [optionsList],
   );

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import mockUsers from '@/mocks/mockUsers';
-import { getUsersThunk } from '@/reducers/authSlice';
+import { getUserThunk } from '@/reducers/authSlice';
 import { clearLoading, setLoading } from '@/reducers/loadingSlice';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
@@ -18,7 +18,7 @@ describe('Loader', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUsersThunk());
+    await store.dispatch(getUserThunk());
   });
 
   it('does not render Loader if isLoading is false', () => {

@@ -243,6 +243,22 @@
   width: 70%;
 }
 
+.basic-info-form #personPlanning {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #personConstruction {
+  grid-column: var(--grid-col-small-right);
+}
+
+.basic-info-form #personProgramming {
+  grid-column: var(--grid-col-small-left);
+}
+
+.basic-info-form #otherPersons {
+  grid-column: var(--grid-col-small-right);
+}
+
 @media (max-width: 1400px) {
   .basic-info-form {
     width: 95%;

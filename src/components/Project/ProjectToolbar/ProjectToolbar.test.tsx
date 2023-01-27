@@ -5,7 +5,7 @@ import ProjectToolbar from './ProjectToolbar';
 import { setupStore } from '@/store';
 import axios from 'axios';
 import mockUsers from '@/mocks/mockUsers';
-import { getUsersThunk } from '@/reducers/authSlice';
+import { getUserThunk } from '@/reducers/authSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -17,7 +17,7 @@ describe('ProjectToolbar', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUsersThunk());
+    await store.dispatch(getUserThunk());
   });
 
   it('renders component wrapper', () => {

@@ -69,6 +69,7 @@ describe('ProjectBasicsForm', () => {
               subDivision: [],
               responsibleZone: [],
               hashTags: mockHashTags.data,
+              responsiblePersons: [],
               error: {},
             },
           },
