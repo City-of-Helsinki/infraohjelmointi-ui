@@ -4,7 +4,7 @@ import mockProject from '@/mocks/mockProject';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectBasicsForm from './ProjectBasicsForm';
 import { matchExact } from '@/utils/common';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
@@ -16,6 +16,7 @@ import {
   mockProjectQualityLevels,
   mockProjectRisks,
   mockProjectTypes,
+  mockResponsiblePersons,
 } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
@@ -69,7 +70,7 @@ describe('ProjectBasicsForm', () => {
               subDivision: [],
               responsibleZone: [],
               hashTags: mockHashTags.data,
-              responsiblePersons: [],
+              responsiblePersons: mockResponsiblePersons.data,
               error: {},
             },
           },
@@ -97,6 +98,8 @@ describe('ProjectBasicsForm', () => {
       expect(getByText(`enums.${option || ''}`)).toBeInTheDocument();
     const expectRadioBoolean = (testId: string, value: boolean) =>
       expect((getByTestId(testId) as HTMLInputElement).checked).toBe(value);
+    const expectPersonOption = (person: IPerson) =>
+      expect(getByText(`${person.firstName} ${person.lastName}`)).toBeInTheDocument();
 
     expectOption(project?.area?.value);
     expectOption(project?.type?.value);
@@ -106,6 +109,9 @@ describe('ProjectBasicsForm', () => {
     expectOption(project?.constructionPhaseDetail?.value);
     expectOption(project?.category?.value);
     expectOption(project?.riskAssessment?.value);
+    expectPersonOption(project?.personPlanning as IPerson);
+    expectPersonOption(project?.personConstruction as IPerson);
+    expectPersonOption(project?.personProgramming as IPerson);
     expectRadioBoolean('programmed-0', true);
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);

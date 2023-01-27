@@ -322,3 +322,24 @@ export const mockHashTags: { data: Array<IListItem> } = {
     },
   ],
 };
+
+export const mockResponsiblePersons: { data: Array<IListItem> } = {
+  data: [
+    {
+      value: 'E Sihvonen',
+      id: 'afc609b0-9e7b-49c8-8e01-a940d720667b',
+    },
+    {
+      value: 'Joonas Hakkila',
+      id: '3f4cc542-64aa-4e1a-9a2e-1d3f0a9251ca',
+    },
+    {
+      value: 'Matti Tarkkala',
+      id: '7460ec24-4650-47fc-b52f-0f55ae2b7ac3',
+    },
+    {
+      value: 'Matti Kaalikoski',
+      id: '92521a1d-b1b4-41c6-be4b-11d526112d15',
+    },
+  ],
+};

@@ -152,7 +152,7 @@ export const getHashTagsThunk = createAsyncThunk('hashTags/get', async (_, thunk
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
 
-export const getPersonsThunk = createAsyncThunk('persons/get', async (_, thunkAPI) => {
+export const getResponsiblePersonsThunk = createAsyncThunk('persons/get', async (_, thunkAPI) => {
   return await getPersons()
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
@@ -323,19 +323,25 @@ export const listsSlice = createSlice({
       return { ...state, error: action.payload };
     });
     // GET PERSONS
-    builder.addCase(getPersonsThunk.fulfilled, (state, action: PayloadAction<Array<IPerson>>) => {
-      const personsAsListItems: Array<IListItem> = [];
+    builder.addCase(
+      getResponsiblePersonsThunk.fulfilled,
+      (state, action: PayloadAction<Array<IPerson>>) => {
+        const personsAsListItems: Array<IListItem> = [];
 
-      // build persons response into IListItems
-      action.payload.forEach(({ firstName, lastName, id }) => {
-        personsAsListItems.push({ value: `${firstName} ${lastName}`, id });
-      });
+        // build persons response into IListItems
+        action.payload.forEach(({ firstName, lastName, id }) => {
+          personsAsListItems.push({ value: `${firstName} ${lastName}`, id });
+        });
 
-      return { ...state, responsiblePersons: personsAsListItems };
-    });
-    builder.addCase(getPersonsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
-      return { ...state, error: action.payload };
-    });
+        return { ...state, responsiblePersons: personsAsListItems };
+      },
+    );
+    builder.addCase(
+      getResponsiblePersonsThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 
