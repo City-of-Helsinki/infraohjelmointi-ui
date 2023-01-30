@@ -12,6 +12,10 @@
   display: flex;
 }
 
+.basic-info-form .input-wrapper {
+  margin-bottom: var(--spacing-l);
+}
+
 .basic-info-form {
   display: grid;
   grid-template-columns: repeat(24, 1fr); /* repeat 24 rows with 1fr (fractional unit) */

@@ -12,6 +12,7 @@ import {
   getProjectCategories,
   getProjectRisks,
   getResponsibleZones,
+  getHashTags,
 } from '@/services/listServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -32,6 +33,7 @@ export interface IListState {
   division: Array<IListItem>;
   subDivision: Array<IListItem>;
   responsibleZone: Array<IListItem>;
+  hashTags: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -52,6 +54,7 @@ const initialState: IListState = {
   division: [],
   subDivision: [],
   responsibleZone: [],
+  hashTags: [],
   error: null,
 };
 
@@ -138,6 +141,12 @@ export const getResponsibleZonesThunk = createAsyncThunk(
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
+
+export const getHashTagsThunk = createAsyncThunk('hashTags/get', async (_, thunkAPI) => {
+  return await getHashTags()
+    .then((res) => res)
+    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+});
 
 export const listsSlice = createSlice({
   name: 'lists',
@@ -293,6 +302,16 @@ export const listsSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
+    // GET HASHTAGS
+    builder.addCase(
+      getHashTagsThunk.fulfilled,
+      (state, action: PayloadAction<Array<IListItem>>) => {
+        return { ...state, hashTags: action.payload };
+      },
+    );
+    builder.addCase(getHashTagsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+      return { ...state, error: action.payload };
+    });
   },
 });
 

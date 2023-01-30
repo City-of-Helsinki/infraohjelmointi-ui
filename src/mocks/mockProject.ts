@@ -78,7 +78,7 @@ const mockProject: { data: IProject } = {
     locked: false,
     comments: '',
     delays: '',
-    hashTags: ['pyöräily', 'uudisrakentaminen'],
+    hashTags: ['9d6d4ccb-db3d-4335-8bf6-6d542ebf3eba', 'b8f172d3-a92f-4c51-b3f9-58f5e1a48b75'],
     favPersons: ['9d6a0854-a784-44b0-ad35-ca5e8b8f0e90'],
     louhi: false,
     gravel: false,

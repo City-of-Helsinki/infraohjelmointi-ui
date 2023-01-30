@@ -74,7 +74,7 @@ const buildProjectBasicsFormFields = (
     },
     {
       name: 'hashTags',
-      type: FormField.TagsForm,
+      type: FormField.HashTagsForm,
     },
     // Status
     {

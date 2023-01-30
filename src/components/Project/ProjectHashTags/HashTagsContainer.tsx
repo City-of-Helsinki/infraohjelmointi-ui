@@ -1,15 +1,16 @@
+import { IListItem } from '@/interfaces/common';
 import { Tag } from 'hds-react/components/Tag';
 import { FC, memo, MouseEvent, KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface ITagsProps {
-  tags: Array<string>;
+interface IHashTagsProps {
+  tags: Array<IListItem>;
   onClick?: (tag: string) => void;
   onDelete?: (tag: string) => void;
   id?: string;
 }
 
-const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
+const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) => {
   const { t } = useTranslation();
   const getAriaLabel = (tag: string) =>
     t(onDelete ? `removeHashTag ${tag}` : onClick ? `addHashTag ${tag}` : '');
@@ -29,19 +30,19 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
   };
 
   return (
-    <div className="tags-container">
+    <div className="hashtags-container">
       {tags.map((tag, i) => {
         if (t) {
           return (
             <div
               key={`${t}-${i}`}
-              className="tag-wrapper"
-              aria-label={getAriaLabel(tag)}
+              className="hashtags-wrapper"
+              aria-label={getAriaLabel(tag.value)}
               data-testid={id}
-              id={tag}
+              id={tag.value}
             >
-              <Tag {...handlers} id={tag}>
-                {tag}
+              <Tag {...handlers} id={tag.id}>
+                {tag.value}
               </Tag>
             </div>
           );
@@ -51,4 +52,4 @@ const TagsContainer: FC<ITagsProps> = ({ tags, onClick, onDelete, id }) => {
   );
 };
 
-export default memo(TagsContainer);
+export default memo(HashTagsContainer);

@@ -111,10 +111,6 @@ table p {
   text-align: right;
 }
 
-.input-wrapper {
-  margin-bottom: var(--spacing-l);
-}
-
 .input-wrapper label {
   width: 15.625rem;
 }

@@ -11,18 +11,18 @@ import { FC } from 'react';
 type SizeType = 'xl' | 'l' | 'm' | 's';
 
 interface ISpanProps {
-  size: SizeType;
   text: string;
   color?: TextColorType;
   fontWeight?: FontWeightType;
   id?: string;
+  size?: SizeType;
 }
 
 const Span: FC<ISpanProps> = ({ size, text, color, fontWeight, id }) => {
   return (
     <span
       data-testid={id}
-      className={`font-${size} text-${color || 'black'} text-${fontWeight || 'medium'}`}
+      className={`font-${size || 'm'} text-${color || 'black'} text-${fontWeight || 'medium'}`}
     >
       {text}
     </span>
