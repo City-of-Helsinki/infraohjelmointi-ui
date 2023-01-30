@@ -21,6 +21,7 @@
     "schedule": "Hankkeen aikataulu",
     "financial": "Hankkeen kustannustiedot",
     "status": "Hankkeen tila",
+    "responsiblePersons": "Hankkeen vastuuhenkilöt",
     "location": "Hankkeen sijainti",
     "projectProgram": "Hankeohjelma"
   },

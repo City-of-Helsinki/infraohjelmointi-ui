@@ -374,7 +374,7 @@ const useProjectBasicsValues = () => {
       personPlanning: personToOption(project?.personPlanning),
       personConstruction: personToOption(project?.personConstruction),
       personProgramming: personToOption(project?.personProgramming),
-      otherPersons: '',
+      otherPersons: value(project?.otherPersons),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [project],
