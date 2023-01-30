@@ -9,7 +9,7 @@ import {
   IconPlaybackRecord,
   IconSpeechbubbleText,
 } from 'hds-react/icons';
-import { FC, useCallback, useState, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PlanningGroupsTableCell from './PlanningGroupsTableCell';
 import StatusDialog from './StatusDialog';
@@ -28,8 +28,9 @@ import StatusDialog from './StatusDialog';
 
 interface IPlanningProjectsTableProps {
   project: IProject;
-  showStatusDialog: boolean;
-  toggleStatusDialog: () => void;
+  selectStatusDialog: (projectName: string) => void;
+  closeStatusDialog: () => void;
+  selectedDialog: string;
 }
 
 const CircleIcon = ({ value }: { value: string }) => (
@@ -44,8 +45,9 @@ const CircleIcon = ({ value }: { value: string }) => (
  */
 const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
   project,
-  showStatusDialog,
-  toggleStatusDialog,
+  selectStatusDialog,
+  selectedDialog,
+  closeStatusDialog,
 }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -64,8 +66,14 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
         <div className="project-header-cell-container">
           {/* LEFT */}
           <div className="left">
-            <IconMenuDots size="xs" style={{ cursor: 'pointer' }} onClick={toggleStatusDialog} />
-            {showStatusDialog && <StatusDialog project={project} phases={phases} />}
+            <IconMenuDots
+              size="xs"
+              style={{ cursor: 'pointer' }}
+              onClick={() => selectStatusDialog(project?.name)}
+            />
+            {selectedDialog === project?.name && (
+              <StatusDialog project={project} phases={phases} close={closeStatusDialog} />
+            )}
             <IconDocument size="xs" />
             <button className="project-name-button" onClick={navigateToProject}>
               {project.name}

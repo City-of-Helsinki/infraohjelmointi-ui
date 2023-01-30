@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 interface IStatusDialogProps {
   project: IProject;
   phases: Array<IListItem>;
+  close: () => void;
 }
 
-const StatusDialog: FC<IStatusDialogProps> = ({ project, phases }) => {
+const StatusDialog: FC<IStatusDialogProps> = ({ project, phases, close }) => {
   const { t } = useTranslation();
 
   return (
@@ -20,9 +21,6 @@ const StatusDialog: FC<IStatusDialogProps> = ({ project, phases }) => {
         background: 'var(--color-white)',
         border: '0.1rem solid var(--color-black)',
         zIndex: '999',
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
         transform: 'translateX(1.5rem)',
       }}
     >
@@ -35,15 +33,18 @@ const StatusDialog: FC<IStatusDialogProps> = ({ project, phases }) => {
           flexDirection: 'row',
           alignItems: 'center',
           padding: '0.3rem 0',
+          overflow: 'hidden',
         }}
       >
-        <div>
-          <p style={{ paddingLeft: '0.6rem' }}>{project.name}</p>
+        <div style={{ overflow: 'hidden' }}>
+          <p style={{ paddingLeft: '0.6rem', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            {project.name}
+          </p>
           <p style={{ fontWeight: 'bold', paddingLeft: '0.6rem' }}>Nykystatus</p>
         </div>
         <IconCross
-          style={{ paddingRight: '0.6rem', cursor: 'pointer' }}
-          onClick={() => console.log('close status dialog')}
+          style={{ paddingRight: '0.6rem', cursor: 'pointer', minWidth: '1.5rem' }}
+          onClick={close}
         />
       </div>
 

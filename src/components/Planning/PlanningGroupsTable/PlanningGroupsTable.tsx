@@ -6,19 +6,31 @@ import PlanningGroupsTableGroupHeader from './PlanningGroupsTableHeader';
 import PlanningGroupsTableRow from './PlanningGroupsTableRow';
 import './styles.css';
 
-// FIXME: this any will be removed ones we get the actual group model
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningGroupsTable = () => {
   const { projects, fetchNext } = useProjectsList();
-  const [showStatusDialog, setShowStatusDialog] = useState(false);
-  const toggleStatusDialog = useCallback(() => setShowStatusDialog((current) => !current), []);
-
   const { ref, inView } = useInView();
+  const [tableState, setTableState] = useState({
+    selectedStatusDialog: '',
+    projectsVisible: true,
+  });
 
-  const [projectsVisible, setProjectsVisible] = useState(true);
+  const { selectedStatusDialog, projectsVisible } = tableState;
+
+  // Set the selectedStatusDialog to the project name
+  const handleSelectStatusDialog = useCallback(
+    (projectName: string) =>
+      setTableState((current) => ({ ...current, selectedStatusDialog: projectName })),
+    [],
+  );
+
+  // Clear the projectName from the selectedStatusDialog
+  const handleCloseStatusDialog = useCallback(
+    () => setTableState((current) => ({ ...current, selectedStatusDialog: '' })),
+    [],
+  );
 
   const handleProjectsVisible = useCallback(
-    () => setProjectsVisible((currentState) => !currentState),
+    () => setTableState((current) => ({ ...current, projectsVisible: !current.projectsVisible })),
     [],
   );
 
@@ -45,8 +57,9 @@ const PlanningGroupsTable = () => {
               <PlanningGroupsTableRow
                 key={i}
                 project={p}
-                showStatusDialog={showStatusDialog}
-                toggleStatusDialog={toggleStatusDialog}
+                selectedDialog={selectedStatusDialog}
+                selectStatusDialog={handleSelectStatusDialog}
+                closeStatusDialog={handleCloseStatusDialog}
               />
             ))}
         </tbody>
