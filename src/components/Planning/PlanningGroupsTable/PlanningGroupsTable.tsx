@@ -10,6 +10,8 @@ import './styles.css';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningGroupsTable = () => {
   const { projects, fetchNext } = useProjectsList();
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const toggleStatusDialog = useCallback(() => setShowStatusDialog((current) => !current), []);
 
   const { ref, inView } = useInView();
 
@@ -39,7 +41,14 @@ const PlanningGroupsTable = () => {
         />
         <tbody>
           {projectsVisible &&
-            projects.map((p, i) => <PlanningGroupsTableRow key={i} project={p} />)}
+            projects.map((p, i) => (
+              <PlanningGroupsTableRow
+                key={i}
+                project={p}
+                showStatusDialog={showStatusDialog}
+                toggleStatusDialog={toggleStatusDialog}
+              />
+            ))}
         </tbody>
       </table>
       <div data-testid="fetch-projects-trigger" ref={ref} />
