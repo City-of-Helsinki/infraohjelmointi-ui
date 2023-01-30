@@ -1,6 +1,7 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError, IListItem } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import { IPerson } from '@/interfaces/projectInterfaces';
 import {
   getConstructionPhases,
   getPlanningPhases,
@@ -14,6 +15,7 @@ import {
   getResponsibleZones,
   getHashTags,
 } from '@/services/listServices';
+import { getPersons } from '@/services/personServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface IListState {
@@ -34,6 +36,7 @@ export interface IListState {
   subDivision: Array<IListItem>;
   responsibleZone: Array<IListItem>;
   hashTags: Array<IListItem>;
+  responsiblePersons: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -55,6 +58,7 @@ const initialState: IListState = {
   subDivision: [],
   responsibleZone: [],
   hashTags: [],
+  responsiblePersons: [],
   error: null,
 };
 
@@ -144,6 +148,12 @@ export const getResponsibleZonesThunk = createAsyncThunk(
 
 export const getHashTagsThunk = createAsyncThunk('hashTags/get', async (_, thunkAPI) => {
   return await getHashTags()
+    .then((res) => res)
+    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+});
+
+export const getResponsiblePersonsThunk = createAsyncThunk('persons/get', async (_, thunkAPI) => {
+  return await getPersons()
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
@@ -312,6 +322,26 @@ export const listsSlice = createSlice({
     builder.addCase(getHashTagsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
+    // GET PERSONS
+    builder.addCase(
+      getResponsiblePersonsThunk.fulfilled,
+      (state, action: PayloadAction<Array<IPerson>>) => {
+        const personsAsListItems: Array<IListItem> = [];
+
+        // build persons response into IListItems
+        action.payload.forEach(({ firstName, lastName, id }) => {
+          personsAsListItems.push({ value: `${firstName} ${lastName}`, id });
+        });
+
+        return { ...state, responsiblePersons: personsAsListItems };
+      },
+    );
+    builder.addCase(
+      getResponsiblePersonsThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 

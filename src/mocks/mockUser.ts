@@ -1,6 +1,6 @@
-import { IUser } from '@/interfaces/userInterfaces';
+import { IPerson } from '@/interfaces/userInterfaces';
 
-const mockUser: IUser = {
+const mockUser: IPerson = {
   id: '9990de74-96ac-4896-bd5f-f4bb506da38f',
   firstName: 'John',
   lastName: 'Doe',

@@ -42,7 +42,10 @@ export type ListType =
   | 'district'
   | 'division'
   | 'subDivision'
-  | 'responsibleZone';
+  | 'responsibleZone'
+  | 'personPlanning'
+  | 'personConstruction'
+  | 'personProgramming';
 
 export type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

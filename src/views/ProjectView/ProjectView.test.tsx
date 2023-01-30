@@ -20,6 +20,7 @@ import {
 import {
   getConstructionPhaseDetailsThunk,
   getConstructionPhasesThunk,
+  getResponsiblePersonsThunk,
   getPlanningPhasesThunk,
   getProjectAreasThunk,
   getProjectCategoriesThunk,
@@ -37,6 +38,7 @@ import mockProjectClasses from '@/mocks/mockClasses';
 import { getClassesThunk } from '@/reducers/classSlice';
 import { mockLocations } from '@/mocks/mockLocations';
 import { getLocationsThunk } from '@/reducers/locationSlice';
+import mockPersons from '@/mocks/mockPersons';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -81,6 +83,9 @@ describe('ProjectView', () => {
     mockedAxios.get.mockResolvedValue(mockResponsibleZones);
     await store.dispatch(getResponsibleZonesThunk());
 
+    mockedAxios.get.mockResolvedValue(mockPersons);
+    await store.dispatch(getResponsiblePersonsThunk());
+
     mockedAxios.get.mockResolvedValue(mockProjectClasses);
     await store.dispatch(getClassesThunk());
 
@@ -110,6 +115,7 @@ describe('ProjectView', () => {
     expect(lists.constructionPhase.length).toBeGreaterThan(0);
     expect(lists.planningPhase.length).toBeGreaterThan(0);
     expect(lists.responsibleZone.length).toBeGreaterThan(0);
+    expect(lists.responsiblePersons.length).toBeGreaterThan(0);
     expect(classes.allClasses.length).toBeGreaterThan(0);
     expect(classes.masterClasses.length).toBeGreaterThan(0);
     expect(classes.classes.length).toBeGreaterThan(0);
@@ -251,6 +257,15 @@ describe('ProjectView', () => {
   it('catches a failed responsible zones fetch', async () => {
     mockedAxios.get.mockRejectedValue(mockError);
     await store.dispatch(getResponsibleZonesThunk());
+
+    const storeError = store.getState().lists.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed responsible persons fetch', async () => {
+    mockedAxios.get.mockRejectedValue(mockError);
+    await store.dispatch(getResponsiblePersonsThunk());
 
     const storeError = store.getState().lists.error as IError;
     expect(storeError.message).toBe(mockError.message);

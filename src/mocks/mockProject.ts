@@ -85,6 +85,30 @@ const mockProject: { data: IProject } = {
     effectHousing: false,
     constructionEndYear: '2056',
     planningStartYear: '2089',
+    personPlanning: {
+      id: 'afc609b0-9e7b-49c8-8e01-a940d720667b',
+      firstName: 'E',
+      lastName: 'Sihvonen',
+      email: 'placeholder@blank.com',
+      title: 'Not Assigned',
+      phone: '000000',
+    },
+    personProgramming: {
+      id: '3f4cc542-64aa-4e1a-9a2e-1d3f0a9251ca',
+      firstName: 'Joonas',
+      lastName: 'Hakkila',
+      email: 'placeholder@blank.com',
+      title: 'Not Assigned',
+      phone: '000000',
+    },
+    personConstruction: {
+      id: '7460ec24-4650-47fc-b52f-0f55ae2b7ac3',
+      firstName: 'Matti',
+      lastName: 'Tarkkala',
+      email: 'placeholder@blank.com',
+      title: 'Not Assigned',
+      phone: '000000',
+    },
   },
 };
 

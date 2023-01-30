@@ -12,8 +12,8 @@ import { useAppSelector } from './common';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
 import _ from 'lodash';
-import { IProject } from '@/interfaces/projectInterfaces';
-import { IListItem } from '@/interfaces/common';
+import { IPerson, IProject } from '@/interfaces/projectInterfaces';
+import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 
@@ -167,6 +167,7 @@ const buildProjectBasicsFormFields = (
         { name: 'estConstructionEnd', type: FormField.Date },
       ],
     },
+    // Financial Information
     { name: 'financial', type: FormField.Title },
     { name: 'masterClass', type: FormField.Select },
     { name: 'class', type: FormField.Select },
@@ -199,10 +200,14 @@ const buildProjectBasicsFormFields = (
       ],
     },
     { name: 'preliminaryBudgetDivision', type: FormField.ListField, readOnly: true },
-    {
-      name: 'location',
-      type: FormField.Title,
-    },
+    // Responsible Persons
+    { name: 'responsiblePersons', type: FormField.Title },
+    { name: 'personPlanning', type: FormField.Select, icon: 'person' },
+    { name: 'personConstruction', type: FormField.Select, icon: 'person' },
+    { name: 'personProgramming', type: FormField.Select, icon: 'person' },
+    { name: 'otherPersons', type: FormField.Text },
+    // Location
+    { name: 'location', type: FormField.Title },
     { name: 'responsibleZone', type: FormField.Select },
     { name: 'district', type: FormField.Select, icon: 'location' },
     { name: 'division', type: FormField.Select, icon: 'location' },
@@ -210,6 +215,7 @@ const buildProjectBasicsFormFields = (
     { name: 'masterPlanAreaNumber', type: FormField.Text },
     { name: 'trafficPlanNumber', type: FormField.Text },
     { name: 'bridgeNumber', type: FormField.Text },
+    // Project Program
     { name: 'projectProgramTitle', type: FormField.Title },
     { name: 'projectProgram', type: FormField.TextArea },
   ];
@@ -310,6 +316,11 @@ const useProjectBasicsValues = () => {
     };
   };
 
+  const personToOption = (person?: IPerson): IOption => ({
+    label: person ? `${person.firstName} ${person.lastName}` : '',
+    value: person ? person.id : '',
+  });
+
   const formValues: IProjectBasicsForm = useMemo(
     () => ({
       type: listItemToOption(project?.type, t),
@@ -360,6 +371,10 @@ const useProjectBasicsValues = () => {
       trafficPlanNumber: value(project?.trafficPlanNumber),
       bridgeNumber: value(project?.bridgeNumber),
       projectProgram: value(project?.projectProgram),
+      personPlanning: personToOption(project?.personPlanning),
+      personConstruction: personToOption(project?.personConstruction),
+      personProgramming: personToOption(project?.personProgramming),
+      otherPersons: value(project?.otherPersons),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [project],

@@ -1,7 +1,7 @@
-import { IUser } from '@/interfaces/userInterfaces';
+import { IPerson } from '@/interfaces/userInterfaces';
 import mockUser from './mockUser';
 
-const mockUsers: { data: Array<IUser> } = {
+const mockUsers: { data: Array<IPerson> } = {
   data: [mockUser],
 };
 

@@ -21,6 +21,7 @@
     "schedule": "Hankkeen aikataulu",
     "financial": "Hankkeen kustannustiedot",
     "status": "Hankkeen tila",
+    "responsiblePersons": "Hankkeen vastuuhenkilöt",
     "location": "Hankkeen sijainti",
     "projectProgram": "Hankeohjelma"
   },
@@ -157,7 +158,12 @@
     "bridgeNumber": "Siltanumero",
     "location": "Hankkeen sijainti",
     "projectProgram": "Hankeohjelma",
-    "projectProgramTitle": "Hankeohjelma"
+    "projectProgramTitle": "Hankeohjelma",
+    "responsiblePersons": "Vastuuhenkilöt",
+    "personPlanning": "Vastuuhenkilö",
+    "personConstruction": "Rakennuttamisen vastuuhenkilö",
+    "personProgramming": "Ohjelmoija",
+    "otherPersons": "Muut vastuuhenkilöt"
   },
   "notification": {
     "title": {

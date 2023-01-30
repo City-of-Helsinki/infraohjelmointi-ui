@@ -1,7 +1,7 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import mockUser from '@/mocks/mockUser';
-import { getUsersThunk } from '@/reducers/authSlice';
+import { getUserThunk } from '@/reducers/authSlice';
 import { setupStore } from '@/store';
 import mockUsers from '@/mocks/mockUsers';
 import { mockError } from '@/mocks/mockError';
@@ -17,7 +17,7 @@ describe('AuthGuard', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockUsers);
-    store.dispatch(getUsersThunk());
+    store.dispatch(getUserThunk());
   });
 
   it('adds a user to store if found', async () => {
@@ -31,7 +31,7 @@ describe('AuthGuard', () => {
 
   it('catches a failed users fetch', async () => {
     mockedAxios.get.mockRejectedValue(mockError);
-    await store.dispatch(getUsersThunk());
+    await store.dispatch(getUserThunk());
 
     const storeError = store.getState().auth.error as IError;
     expect(storeError.message).toBe(mockError.message);

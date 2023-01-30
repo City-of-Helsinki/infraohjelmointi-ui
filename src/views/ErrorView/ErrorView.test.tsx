@@ -1,7 +1,7 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import mockUsers from '@/mocks/mockUsers';
-import { getUsersThunk } from '@/reducers/authSlice';
+import { getUserThunk } from '@/reducers/authSlice';
 import { setupStore } from '@/store';
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../../utils/testUtils';
@@ -17,7 +17,7 @@ describe('ErrorView', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUsersThunk());
+    await store.dispatch(getUserThunk());
   });
 
   it('renders the title and paragraph', () => {

@@ -19,6 +19,7 @@ import {
   getProjectRisksThunk,
   getResponsibleZonesThunk,
   getHashTagsThunk,
+  getResponsiblePersonsThunk,
 } from '@/reducers/listsSlice';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
@@ -56,6 +57,7 @@ const ProjectView = () => {
     dispatch(getConstructionPhasesThunk());
     dispatch(getResponsibleZonesThunk());
     dispatch(getHashTagsThunk());
+    dispatch(getResponsiblePersonsThunk());
     // Get classes and filter them into categories
     dispatch(getClassesThunk()).then(() => {
       dispatch(setMasterClasses());

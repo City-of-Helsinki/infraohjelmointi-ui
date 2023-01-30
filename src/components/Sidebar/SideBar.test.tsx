@@ -6,7 +6,7 @@ import { INavigationItem } from '@/interfaces/common';
 import { setupStore } from '@/store';
 import { matchExact } from '@/utils/common';
 import mockUsers from '@/mocks/mockUsers';
-import { getUsersThunk } from '@/reducers/authSlice';
+import { getUserThunk } from '@/reducers/authSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -29,7 +29,7 @@ describe('SideBar', () => {
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUsersThunk());
+    await store.dispatch(getUserThunk());
   });
 
   afterEach(async () => {
