@@ -1,18 +1,16 @@
 import { useAppDispatch } from '@/hooks/common';
 import useClickOutsideRef from '@/hooks/useClickOutsideRef';
+import usePhaseForm from '@/forms/usePhaseForm';
 import { IListItem } from '@/interfaces/common';
+import { IPhaseForm } from '@/interfaces/formInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross, IconPlaybackRecord } from 'hds-react/icons';
-import { FC, useCallback, useEffect, useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { FC, useCallback, useRef } from 'react';
+import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
-
-interface IProjectPhaseForm {
-  phase: string;
-}
 
 interface IPhaseDialogProps {
   project: IProject;
@@ -30,18 +28,13 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
   const phase = project?.phase?.id;
   const name = project?.name;
   const id = project?.id;
-  const formValues = { phase: phase || '' };
-  const { control, reset, handleSubmit } = useForm({ defaultValues: formValues });
-
-  useEffect(() => {
-    phase && reset(formValues);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
+  const { formMethods } = usePhaseForm(phase);
+  const { control, handleSubmit } = formMethods;
 
   useClickOutsideRef(dialogRef, close);
 
   const onSubmit = useCallback(
-    async (form: IProjectPhaseForm) => {
+    async (form: IPhaseForm) => {
       id && dispatch(patchProjectThunk({ data: form, id: id }));
     },
     [dispatch, id],

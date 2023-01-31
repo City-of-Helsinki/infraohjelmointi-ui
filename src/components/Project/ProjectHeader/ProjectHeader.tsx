@@ -8,7 +8,7 @@ import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
-import useProjectHeaderForm from '@/hooks/useProjectHeaderForm';
+import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import ProjectPhaseField from './ProjectPhaseField';
 import ProjectFavouriteField from './ProjectFavouriteField';
 import _ from 'lodash';

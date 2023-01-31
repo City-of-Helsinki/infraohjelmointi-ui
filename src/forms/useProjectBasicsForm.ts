@@ -8,7 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
-import { useAppSelector } from './common';
+import { useAppSelector } from '../hooks/common';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
 import _ from 'lodash';

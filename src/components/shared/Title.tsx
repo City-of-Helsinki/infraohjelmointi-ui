@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useWindowSize } from '@/hooks/common';
+import useWindowSize from '@/hooks/useWindowSize';
 import { useTranslation } from 'react-i18next';
 import { TextColorType } from '@/interfaces/common';
 

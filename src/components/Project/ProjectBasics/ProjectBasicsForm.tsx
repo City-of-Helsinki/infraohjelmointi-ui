@@ -1,4 +1,4 @@
-import useProjectBasicsForm from '@/hooks/useProjectBasicsForm';
+import useProjectBasicsForm from '@/forms/useProjectBasicsForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback } from 'react';
