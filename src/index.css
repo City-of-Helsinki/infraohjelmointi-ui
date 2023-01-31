@@ -134,3 +134,7 @@ table p {
 .big-dialog {
   width: 65% !important;
 }
+
+.hide-overflow {
+  overflow: hidden;
+}

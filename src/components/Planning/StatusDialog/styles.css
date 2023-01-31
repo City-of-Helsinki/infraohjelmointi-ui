@@ -1,0 +1,85 @@
+.status-dialog-container {
+  position: absolute;
+  max-width: 16rem;
+  background: var(--color-white);
+  border: 0.1rem solid var(--color-black);
+  z-index: 999;
+  transform: translateX(1.5rem);
+}
+
+.status-dialog-header {
+  width: 100%;
+  border-bottom: 0.08rem solid var(--color-black-20);
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.3rem 0;
+  overflow: hidden;
+}
+
+.status-dialog-header .title {
+  padding-left: 0.6rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.status-dialog-header .description {
+  font-weight: bold;
+  padding-left: 0.6rem;
+}
+
+.status-dialog-header .close-icon {
+  padding-right: 0.6rem;
+  cursor: pointer;
+  min-width: 1.5rem;
+}
+
+.status-dialog-list {
+  border-bottom: 0.08rem solid var(--color-black-20);
+  display: flex;
+  flex-direction: column;
+  padding: 0.7rem 0 0 0;
+  margin: 0;
+}
+
+.status-dialog-list .list-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  background: var(--color-white);
+}
+
+.status-dialog-list .list-item.selected {
+  background: var(--color-bus-medium-light);
+}
+
+.status-dialog-list .list-item .inner {
+  display: flex;
+  padding-left: 0.7rem;
+  align-items: center;
+  gap: 0.7rem;
+  overflow: hidden;
+}
+
+.status-dialog-list .list-item .icon-width {
+  min-width: 1.5rem;
+}
+
+.status-dialog-list .list-item .check-icon {
+  padding-right: 0.7rem;
+}
+
+.status-dialog-list .list-item .item-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: normal;
+  padding-right: 2rem;
+}
+
+.status-dialog-list .list-item .item-text.selected {
+  font-weight: bold;
+  padding-right: 0;
+}

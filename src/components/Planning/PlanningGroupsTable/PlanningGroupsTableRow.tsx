@@ -12,7 +12,7 @@ import {
 import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PlanningGroupsTableCell from './PlanningGroupsTableCell';
-import StatusDialog from './StatusDialog';
+import { StatusDialog } from '../StatusDialog';
 
 /**
  * RED CELLS
