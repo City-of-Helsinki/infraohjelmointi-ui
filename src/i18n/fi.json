@@ -232,5 +232,6 @@
   "addHashTagsToProject": "Lisää hankkeelle tunnisteita",
   "addHashTag": "Lisää tunniste",
   "hashTagCreated": "Tunniste '{{responseHashTag}}' luotu",
-  "addToProject": "Lisää hankkeelle?"
+  "addToProject": "Lisää hankkeelle?",
+  "currentStatus": "Nykystatus"
 }

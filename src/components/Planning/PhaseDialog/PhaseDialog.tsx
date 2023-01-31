@@ -14,7 +14,7 @@ interface IProjectPhaseForm {
   phase: string;
 }
 
-interface IStatusDialogProps {
+interface IPhaseDialogProps {
   project: IProject;
   phases: Array<IListItem>;
   close: () => void;
@@ -23,7 +23,7 @@ interface IStatusDialogProps {
 /**
  * Refactor this component when more small dialogs are needed.
  * */
-const StatusDialog: FC<IStatusDialogProps> = ({ project, phases, close }) => {
+const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
   const { t } = useTranslation();
   const dialogRef = useRef(null);
   const dispatch = useAppDispatch();
@@ -47,16 +47,12 @@ const StatusDialog: FC<IStatusDialogProps> = ({ project, phases, close }) => {
     [dispatch, id],
   );
 
-  console.log('Project ID: ', id);
-  console.log('Project Phase: ', phase);
-  console.log('Project Name: ', name);
-
   return (
-    <div ref={dialogRef} className="status-dialog-container">
-      <div className="status-dialog-header">
+    <div ref={dialogRef} className="phase-dialog-container">
+      <div className="phase-dialog-header">
         <div className="hide-overflow">
           <p className="title">{name}</p>
-          <p className="description">Nykystatus</p>
+          <p className="description">{t('currentStatus')}</p>
         </div>
         <IconCross className="close-icon" onClick={close} />
       </div>
@@ -64,7 +60,7 @@ const StatusDialog: FC<IStatusDialogProps> = ({ project, phases, close }) => {
         control={control}
         name="phase"
         render={({ field: { value, onChange } }) => (
-          <ul className="status-dialog-list">
+          <ul className="phase-dialog-list">
             {phases.map((p) => (
               <li key={p.id} className={`list-item ${value === p.id && 'selected'}`}>
                 <button className="selection-button" onClick={() => onChange(p.id)}>
@@ -79,13 +75,13 @@ const StatusDialog: FC<IStatusDialogProps> = ({ project, phases, close }) => {
           </ul>
         )}
       />
-      <div className="status-dialog-footer">
+      <div className="phase-dialog-footer">
         <Button size="small" onClick={handleSubmit(onSubmit)}>
-          Tallenna
+          {t('save')}
         </Button>
       </div>
     </div>
   );
 };
 
-export default StatusDialog;
+export default PhaseDialog;

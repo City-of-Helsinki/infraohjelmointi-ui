@@ -1,4 +1,4 @@
-.status-dialog-container {
+.phase-dialog-container {
   position: absolute;
   max-width: 16rem;
   background: var(--color-white);
@@ -7,7 +7,7 @@
   transform: translateX(1.5rem);
 }
 
-.status-dialog-header {
+.phase-dialog-header {
   width: 100%;
   border-bottom: 0.08rem solid var(--color-black-20);
   display: flex;
@@ -18,24 +18,24 @@
   overflow: hidden;
 }
 
-.status-dialog-header .title {
+.phase-dialog-header .title {
   padding-left: 0.6rem;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.status-dialog-header .description {
+.phase-dialog-header .description {
   font-weight: bold;
   padding-left: 0.6rem;
 }
 
-.status-dialog-header .close-icon {
+.phase-dialog-header .close-icon {
   padding-right: 0.6rem;
   cursor: pointer;
   min-width: 1.5rem;
 }
 
-.status-dialog-list {
+.phase-dialog-list {
   border-bottom: 0.08rem solid var(--color-black-20);
   display: flex;
   flex-direction: column;
@@ -43,18 +43,18 @@
   margin: 0;
 }
 
-.status-dialog-list .list-item {
+.phase-dialog-list .list-item {
   width: 100%;
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
   background: var(--color-white);
 }
-.status-dialog-list .list-item.selected {
+.phase-dialog-list .list-item.selected {
   background: var(--color-bus-medium-light);
 }
 
-.status-dialog-list .list-item .selection-button {
+.phase-dialog-list .list-item .selection-button {
   display: flex;
   padding-left: 0.7rem;
   align-items: center;
@@ -62,15 +62,15 @@
   overflow: hidden;
 }
 
-.status-dialog-list .list-item .icon-width {
+.phase-dialog-list .list-item .icon-width {
   min-width: 1.5rem;
 }
 
-.status-dialog-list .list-item .check-icon {
+.phase-dialog-list .list-item .check-icon {
   padding-right: 0.7rem;
 }
 
-.status-dialog-list .list-item .item-text {
+.phase-dialog-list .list-item .item-text {
   text-overflow: ellipsis;
   overflow: hidden;
   font-size: 14px;
@@ -78,18 +78,18 @@
   padding-right: 2rem;
 }
 
-.status-dialog-list .list-item .item-text.selected {
+.phase-dialog-list .list-item .item-text.selected {
   font-weight: bold;
   padding-right: 0;
 }
 
-.status-dialog-footer {
+.phase-dialog-footer {
   padding: 0.4rem;
   display: flex;
   justify-content: flex-end;
 }
 
-.status-dialog-footer button {
+.phase-dialog-footer button {
   min-height: 2.5rem !important;
   max-height: 2.5rem !important;
 }

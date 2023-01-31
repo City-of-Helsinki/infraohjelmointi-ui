@@ -9,7 +9,7 @@ import {
 import { FC } from 'react';
 import { useNavigate } from 'react-router';
 import PlanningGroupsTableCell from './PlanningGroupsTableCell';
-import { StatusDialog } from '../StatusDialog';
+import { PhaseDialog } from '../PhaseDialog';
 import { IListItem } from '@/interfaces/common';
 
 /**
@@ -28,8 +28,8 @@ interface IPlanningProjectsTableProps {
   project: IProject;
   phases: Array<IListItem>;
   selectedDialog: string;
-  selectStatusDialog: (projectName: string) => void;
-  closeStatusDialog: () => void;
+  selectPhaseDialog: (projectName: string) => void;
+  closePhaseDialog: () => void;
 }
 
 const CircleIcon = ({ value }: { value: string }) => (
@@ -45,9 +45,9 @@ const CircleIcon = ({ value }: { value: string }) => (
 const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
   project,
   phases,
-  selectStatusDialog,
+  selectPhaseDialog,
   selectedDialog,
-  closeStatusDialog,
+  closePhaseDialog,
 }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
@@ -62,10 +62,10 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
             <IconMenuDots
               size="xs"
               style={{ cursor: 'pointer' }}
-              onClick={() => selectStatusDialog(project?.name)}
+              onClick={() => selectPhaseDialog(project?.name)}
             />
             {selectedDialog === project?.name && (
-              <StatusDialog project={project} phases={phases} close={closeStatusDialog} />
+              <PhaseDialog project={project} phases={phases} close={closePhaseDialog} />
             )}
             <IconDocument size="xs" />
             <button className="project-name-button" onClick={navigateToProject}>

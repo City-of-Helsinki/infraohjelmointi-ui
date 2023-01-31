@@ -16,22 +16,22 @@ const PlanningGroupsTable = () => {
   const dispatch = useAppDispatch();
   const phases = useAppSelector((state: RootState) => state.lists.phase, _.isEqual);
   const [tableState, setTableState] = useState({
-    selectedStatusDialog: '',
+    selectedPhaseDialog: '',
     projectsVisible: true,
   });
 
-  const { selectedStatusDialog, projectsVisible } = tableState;
+  const { selectedPhaseDialog, projectsVisible } = tableState;
 
-  // Set the selectedStatusDialog to the project name
-  const handleSelectStatusDialog = useCallback(
+  // Set the selectedPhaseDialog to the project name
+  const handleSelectPhaseDialog = useCallback(
     (projectName: string) =>
-      setTableState((current) => ({ ...current, selectedStatusDialog: projectName })),
+      setTableState((current) => ({ ...current, selectedPhaseDialog: projectName })),
     [],
   );
 
-  // Clear the projectName from the selectedStatusDialog
-  const handleCloseStatusDialog = useCallback(
-    () => setTableState((current) => ({ ...current, selectedStatusDialog: '' })),
+  // Clear the projectName from the selectedPhaseDialog
+  const handleClosePhaseDialog = useCallback(
+    () => setTableState((current) => ({ ...current, selectedPhaseDialog: '' })),
     [],
   );
 
@@ -70,9 +70,9 @@ const PlanningGroupsTable = () => {
                 key={i}
                 project={p}
                 phases={phases}
-                selectedDialog={selectedStatusDialog}
-                selectStatusDialog={handleSelectStatusDialog}
-                closeStatusDialog={handleCloseStatusDialog}
+                selectedDialog={selectedPhaseDialog}
+                selectPhaseDialog={handleSelectPhaseDialog}
+                closePhaseDialog={handleClosePhaseDialog}
               />
             ))}
         </tbody>
