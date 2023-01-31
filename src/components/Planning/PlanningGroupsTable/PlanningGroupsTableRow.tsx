@@ -1,18 +1,16 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
-import { getProjectPhasesThunk } from '@/reducers/listsSlice';
-import { RootState } from '@/store';
 import {
   IconDocument,
   IconMenuDots,
   IconPlaybackRecord,
   IconSpeechbubbleText,
 } from 'hds-react/icons';
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useNavigate } from 'react-router';
 import PlanningGroupsTableCell from './PlanningGroupsTableCell';
 import { StatusDialog } from '../StatusDialog';
+import { IListItem } from '@/interfaces/common';
 
 /**
  * RED CELLS
@@ -28,9 +26,10 @@ import { StatusDialog } from '../StatusDialog';
 
 interface IPlanningProjectsTableProps {
   project: IProject;
+  phases: Array<IListItem>;
+  selectedDialog: string;
   selectStatusDialog: (projectName: string) => void;
   closeStatusDialog: () => void;
-  selectedDialog: string;
 }
 
 const CircleIcon = ({ value }: { value: string }) => (
@@ -45,19 +44,13 @@ const CircleIcon = ({ value }: { value: string }) => (
  */
 const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
   project,
+  phases,
   selectStatusDialog,
   selectedDialog,
   closeStatusDialog,
 }) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
-  const phases = useAppSelector((state: RootState) => state.lists.phase);
-
-  useEffect(() => {
-    dispatch(getProjectPhasesThunk());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <tr>

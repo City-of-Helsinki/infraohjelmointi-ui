@@ -50,12 +50,11 @@
   padding: 0.5rem 0;
   background: var(--color-white);
 }
-
 .status-dialog-list .list-item.selected {
   background: var(--color-bus-medium-light);
 }
 
-.status-dialog-list .list-item .inner {
+.status-dialog-list .list-item .selection-button {
   display: flex;
   padding-left: 0.7rem;
   align-items: center;
@@ -82,4 +81,15 @@
 .status-dialog-list .list-item .item-text.selected {
   font-weight: bold;
   padding-right: 0;
+}
+
+.status-dialog-footer {
+  padding: 0.4rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.status-dialog-footer button {
+  min-height: 2.5rem !important;
+  max-height: 2.5rem !important;
 }

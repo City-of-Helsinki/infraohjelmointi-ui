@@ -9,15 +9,15 @@ import { useEffect, RefObject } from 'react';
 const useClickOutsideRef = (ref: RefObject<HTMLDivElement>, callback: () => unknown) => {
   useEffect(() => {
     // Function that triggers when user clicks outside of ref
-    const handleClickOutside = (e: any) => {
-      if (ref.current && !ref.current.contains(e.target)) {
+    const handleClickOutside = ({ target }: MouseEvent) => {
+      if (ref.current && !ref.current.contains(target as Node)) {
         callback && callback();
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mouseup', handleClickOutside);
     return () => {
       // Event listener needs to be removed on cleanup
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mouseup', handleClickOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref]);
