@@ -126,7 +126,15 @@ export const projectSlice = createSlice({
     });
     // PATCH
     builder.addCase(patchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
-      return { ...state, selectedProject: action.payload };
+      // All projects also need to be updated to get changes into the planning list
+      const updatedProjectList: Array<IProject> = state.projects.map((p) =>
+        p.id === action.payload.id ? action.payload : p,
+      );
+      return {
+        ...state,
+        selectedProject: action.payload,
+        projects: [...updatedProjectList],
+      };
     });
     builder.addCase(
       patchProjectThunk.rejected,

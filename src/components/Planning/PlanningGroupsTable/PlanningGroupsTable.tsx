@@ -1,22 +1,52 @@
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import useProjectsList from '@/hooks/useProjectsList';
 import { planGroups } from '@/mocks/common';
-import { useCallback, useEffect, useState } from 'react';
+import { getProjectPhasesThunk } from '@/reducers/listsSlice';
+import { RootState } from '@/store';
+import _ from 'lodash';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { PhaseDialog } from '../PhaseDialog';
 import PlanningGroupsTableGroupHeader from './PlanningGroupsTableHeader';
 import PlanningGroupsTableRow from './PlanningGroupsTableRow';
 import './styles.css';
 
-// FIXME: this any will be removed ones we get the actual group model
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningGroupsTable = () => {
   const { projects, fetchNext } = useProjectsList();
-
   const { ref, inView } = useInView();
+  const dispatch = useAppDispatch();
+  const phases = useAppSelector((state: RootState) => state.lists.phase, _.isEqual);
+  const [tableState, setTableState] = useState<{
+    selectedProjectId: string;
+    projectsVisible: boolean;
+    atElement: Element;
+  }>({
+    selectedProjectId: '',
+    projectsVisible: true,
+    atElement: null as unknown as Element,
+  });
 
-  const [projectsVisible, setProjectsVisible] = useState(true);
+  const projectsMap = useMemo(() => _.keyBy(projects, 'id'), [projects]);
+
+  const { projectsVisible, selectedProjectId, atElement } = tableState;
+
+  // Set the selectedPhaseDialog to the project name
+  const handleOnProjectMenuClick = useCallback((projectId: string, e: MouseEvent) => {
+    setTableState((current) => ({
+      ...current,
+      selectedProjectId: projectId,
+      atElement: e.target as unknown as Element,
+    }));
+  }, []);
+
+  // Clear the projectName from the selectedPhaseDialog
+  const handleClosePhaseDialog = useCallback(
+    () => setTableState((current) => ({ ...current, selectedProjectId: '' })),
+    [],
+  );
 
   const handleProjectsVisible = useCallback(
-    () => setProjectsVisible((currentState) => !currentState),
+    () => setTableState((current) => ({ ...current, projectsVisible: !current.projectsVisible })),
     [],
   );
 
@@ -27,6 +57,12 @@ const PlanningGroupsTable = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
+
+  // Get phases list
+  useEffect(() => {
+    dispatch(getProjectPhasesThunk());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -39,9 +75,23 @@ const PlanningGroupsTable = () => {
         />
         <tbody>
           {projectsVisible &&
-            projects.map((p, i) => <PlanningGroupsTableRow key={i} project={p} />)}
+            projects.map((p, i) => (
+              <PlanningGroupsTableRow
+                key={i}
+                project={p}
+                onProjectMenuClick={handleOnProjectMenuClick}
+              />
+            ))}
         </tbody>
       </table>
+      {selectedProjectId && (
+        <PhaseDialog
+          close={handleClosePhaseDialog}
+          phases={phases}
+          project={projectsMap[selectedProjectId]}
+          atElement={atElement as unknown as Element}
+        />
+      )}
       <div data-testid="fetch-projects-trigger" ref={ref} />
     </>
   );

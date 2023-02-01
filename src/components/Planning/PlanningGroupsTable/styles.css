@@ -17,6 +17,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
   gap: 0.5rem;
 }
 
@@ -63,6 +64,10 @@
   width: 60%;
   text-align: left;
   gap: 0.5rem;
+}
+
+.project-header-cell .left .dots-icon {
+  cursor: pointer;
 }
 
 .project-header-cell .right {

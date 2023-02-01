@@ -68,6 +68,10 @@ export interface IHashTagsForm {
   hashTag: string;
 }
 
+export interface IPhaseForm {
+  phase: string;
+}
+
 export interface IAppForms
   extends IProjectHeaderForm,
     IProjectBasicsForm,
@@ -79,6 +83,7 @@ export type HookFormControlType =
   | Control<IProjectBasicsForm>
   | Control<IProjectHeaderForm>
   | Control<IHashTagsForm>
+  | Control<IPhaseForm>
   | undefined;
 
 export type HookFormRulesType = Omit<

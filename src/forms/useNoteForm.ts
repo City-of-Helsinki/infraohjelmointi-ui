@@ -2,7 +2,7 @@ import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { RootState } from '@/store';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAppSelector } from './common';
+import { useAppSelector } from '../hooks/common';
 import _ from 'lodash';
 import { INote } from '@/interfaces/noteInterfaces';
 

@@ -1,6 +1,6 @@
 import { Paragraph, Span, TextField } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import useHashTagsForm from '@/hooks/useHashTagsForm';
+import useHashTagsForm from '@/forms/useHashTagsForm';
 import { IListItem } from '@/interfaces/common';
 import { IHashTagsForm } from '@/interfaces/formInterfaces';
 import { getHashTagsThunk } from '@/reducers/listsSlice';

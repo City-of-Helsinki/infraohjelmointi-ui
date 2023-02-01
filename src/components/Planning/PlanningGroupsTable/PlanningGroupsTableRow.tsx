@@ -6,9 +6,11 @@ import {
   IconPlaybackRecord,
   IconSpeechbubbleText,
 } from 'hds-react/icons';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useNavigate } from 'react-router';
 import PlanningGroupsTableCell from './PlanningGroupsTableCell';
+
+import { IListItem } from '@/interfaces/common';
 
 /**
  * RED CELLS
@@ -24,6 +26,8 @@ import PlanningGroupsTableCell from './PlanningGroupsTableCell';
 
 interface IPlanningProjectsTableProps {
   project: IProject;
+  phases?: Array<IListItem>;
+  onProjectMenuClick: (projectId: string, elementPosition: MouseEvent) => void;
 }
 
 const CircleIcon = ({ value }: { value: string }) => (
@@ -36,7 +40,10 @@ const CircleIcon = ({ value }: { value: string }) => (
 /**
  * We're only mapping the project name here for now since the values aren't yet implemented
  */
-const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({ project }) => {
+const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
+  project,
+  onProjectMenuClick,
+}) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
 
@@ -47,7 +54,12 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({ project }) =>
         <div className="project-header-cell-container">
           {/* LEFT */}
           <div className="left">
-            <IconMenuDots size="xs" />
+            <IconMenuDots
+              size="xs"
+              className="dots-icon"
+              onClick={(e) => onProjectMenuClick(project.id, e as unknown as MouseEvent)}
+            />
+
             <IconDocument size="xs" />
             <button className="project-name-button" onClick={navigateToProject}>
               {project.name}
@@ -74,4 +86,4 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({ project }) =>
   );
 };
 
-export default PlanningGroupsTableRow;
+export default memo(PlanningGroupsTableRow);

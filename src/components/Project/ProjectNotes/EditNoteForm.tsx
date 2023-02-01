@@ -7,7 +7,7 @@ import { INote } from '@/interfaces/noteInterfaces';
 import { Controller } from 'react-hook-form';
 import { TextArea } from 'hds-react/components/Textarea';
 import { useTranslation } from 'react-i18next';
-import useProjectNoteForm from '@/hooks/useNoteForm';
+import useProjectNoteForm from '@/forms/useNoteForm';
 import { patchNoteThunk } from '@/reducers/noteSlice';
 import DialogWrapper from '@/components/shared/DialogWrapper';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
