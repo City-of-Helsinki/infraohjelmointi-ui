@@ -66,6 +66,10 @@
   gap: 0.5rem;
 }
 
+.project-header-cell .left .dots-icon {
+  cursor: pointer;
+}
+
 .project-header-cell .right {
   display: flex;
   width: 40%;

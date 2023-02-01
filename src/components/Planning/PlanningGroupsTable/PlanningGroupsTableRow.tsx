@@ -61,7 +61,7 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
           <div className="left">
             <IconMenuDots
               size="xs"
-              style={{ cursor: 'pointer' }}
+              className="dots-icon"
               onClick={() => selectPhaseDialog(project?.name)}
             />
             {selectedDialog === project?.name && (

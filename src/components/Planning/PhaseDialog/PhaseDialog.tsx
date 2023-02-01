@@ -7,10 +7,11 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross, IconPlaybackRecord } from 'hds-react/icons';
-import { FC, useCallback, useRef } from 'react';
+import { FC, memo, useCallback, useRef } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
+import useIsInViewPort from '@/hooks/useIsInViewport';
 
 interface IPhaseDialogProps {
   project: IProject;
@@ -33,6 +34,8 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
 
   useClickOutsideRef(dialogRef, close);
 
+  const { isInViewPort, dimensions } = useIsInViewPort(dialogRef);
+
   const onSubmit = useCallback(
     async (form: IPhaseForm) => {
       id && dispatch(patchProjectThunk({ data: form, id: id }));
@@ -40,8 +43,23 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
     [dispatch, id],
   );
 
+  const isElementOutOfView = !!(!isInViewPort && dimensions);
+
+  const translatePixels =
+    dimensions && dimensions.top > 0
+      ? `-${Math.abs(dimensions.bottom - window.innerHeight) + 20}px`
+      : dimensions
+      ? `${Math.abs(dimensions.top) + 20}px`
+      : '0px';
+
   return (
-    <div ref={dialogRef} className="phase-dialog-container">
+    <div
+      ref={dialogRef}
+      className="phase-dialog-container"
+      style={{
+        transform: `translate(1.5rem, ${isElementOutOfView && translatePixels})`,
+      }}
+    >
       <div className="phase-dialog-header">
         <div className="hide-overflow">
           <p className="title">{name}</p>
@@ -77,4 +95,4 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
   );
 };
 
-export default PhaseDialog;
+export default memo(PhaseDialog);
