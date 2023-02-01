@@ -42,6 +42,7 @@ describe('ProjectBasicsForm', () => {
             project: {
               projects: [mockProject.data],
               selectedProject: mockProject.data,
+              searchedProjects: [],
               count: 1,
               error: {},
               page: 1,

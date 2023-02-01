@@ -45,3 +45,10 @@ export const getProjectsWithParams = async (params: string): Promise<Array<IProj
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getProjectsWithFreeSearch = async (searchWord: string): Promise<Array<IProject>> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/projects/?freeSearch=${searchWord}`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};

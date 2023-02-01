@@ -2,6 +2,7 @@ import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { memo, useState } from 'react';
 import './styles.css';
+import { getProjectsWithFreeSearch } from '@/services/projectServices';
 
 const NameSearchForm = () => {
   const mockFreeSearchResponse = {
@@ -52,7 +53,13 @@ const NameSearchForm = () => {
   const [searchWord, setSearchWord] = useState<string>('');
 
   const getSuggestions = (inputValue: string) =>
-    new Promise<{ value: string }[]>((resolve) => {
+    new Promise<{ value: string }[]>((resolve, reject) => {
+      getProjectsWithFreeSearch(inputValue)
+        .then((res) => {
+          console.log('res: ', res);
+        })
+        .catch(() => reject([]));
+
       const filteredItems = allResults.filter((allResults) => {
         return allResults.value.toLowerCase().indexOf(inputValue.toLowerCase()) > -1;
       });
