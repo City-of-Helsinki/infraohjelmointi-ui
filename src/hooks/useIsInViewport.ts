@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { RefObject, useEffect, useMemo, useState } from 'react';
 
-const useIsInViewPort = (ref: any) => {
+const useIsInViewPort = (ref: RefObject<HTMLElement>) => {
   const [isInViewPort, setIsInViewPort] = useState(false);
   const [dimensions, setDimensions] = useState<DOMRectReadOnly>();
 
@@ -23,7 +23,7 @@ const useIsInViewPort = (ref: any) => {
   );
 
   useEffect(() => {
-    observer.observe(ref.current);
+    observer.observe(ref.current as HTMLElement);
     // Clean up observer
     return () => observer.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
