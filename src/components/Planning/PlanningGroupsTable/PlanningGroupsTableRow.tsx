@@ -6,10 +6,10 @@ import {
   IconPlaybackRecord,
   IconSpeechbubbleText,
 } from 'hds-react/icons';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useNavigate } from 'react-router';
 import PlanningGroupsTableCell from './PlanningGroupsTableCell';
-import { PhaseDialog } from '../PhaseDialog';
+
 import { IListItem } from '@/interfaces/common';
 
 /**
@@ -26,10 +26,8 @@ import { IListItem } from '@/interfaces/common';
 
 interface IPlanningProjectsTableProps {
   project: IProject;
-  phases: Array<IListItem>;
-  selectedDialog: string;
-  selectPhaseDialog: (projectName: string) => void;
-  closePhaseDialog: () => void;
+  phases?: Array<IListItem>;
+  onProjectMenuClick: (projectId: string, elementPosition: MouseEvent) => void;
 }
 
 const CircleIcon = ({ value }: { value: string }) => (
@@ -44,10 +42,7 @@ const CircleIcon = ({ value }: { value: string }) => (
  */
 const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
   project,
-  phases,
-  selectPhaseDialog,
-  selectedDialog,
-  closePhaseDialog,
+  onProjectMenuClick,
 }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
@@ -62,11 +57,9 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
             <IconMenuDots
               size="xs"
               className="dots-icon"
-              onClick={() => selectPhaseDialog(project?.name)}
+              onClick={(e) => onProjectMenuClick(project.id, e as unknown as MouseEvent)}
             />
-            {selectedDialog === project?.name && (
-              <PhaseDialog project={project} phases={phases} close={closePhaseDialog} />
-            )}
+
             <IconDocument size="xs" />
             <button className="project-name-button" onClick={navigateToProject}>
               {project.name}
@@ -93,4 +86,4 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
   );
 };
 
-export default PlanningGroupsTableRow;
+export default memo(PlanningGroupsTableRow);

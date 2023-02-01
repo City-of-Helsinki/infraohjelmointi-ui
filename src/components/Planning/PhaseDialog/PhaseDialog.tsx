@@ -7,7 +7,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross, IconPlaybackRecord } from 'hds-react/icons';
-import { FC, memo, useCallback, useRef } from 'react';
+import { FC, memo, useCallback, useMemo, useRef } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
@@ -16,13 +16,14 @@ import useIsInViewPort from '@/hooks/useIsInViewport';
 interface IPhaseDialogProps {
   project: IProject;
   phases: Array<IListItem>;
+  atElement: Element;
   close: () => void;
 }
 
 /**
  * Refactor this component when more small dialogs are needed.
  * */
-const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
+const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement }) => {
   const { t } = useTranslation();
   const dialogRef = useRef(null);
   const dispatch = useAppDispatch();
@@ -33,6 +34,8 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
   const { control, handleSubmit } = formMethods;
 
   useClickOutsideRef(dialogRef, close);
+
+  const { left, bottom } = useMemo(() => atElement.getBoundingClientRect(), [atElement]);
 
   const { isInViewPort, dimensions } = useIsInViewPort(dialogRef);
 
@@ -57,6 +60,9 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close }) => {
       ref={dialogRef}
       className="phase-dialog-container"
       style={{
+        visibility: dimensions ? 'visible' : 'hidden',
+        left: left,
+        top: bottom,
         transform: `translate(1.5rem, ${isElementOutOfView && translatePixels})`,
       }}
     >

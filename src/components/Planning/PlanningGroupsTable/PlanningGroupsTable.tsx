@@ -4,8 +4,9 @@ import { planGroups } from '@/mocks/common';
 import { getProjectPhasesThunk } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import _ from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { PhaseDialog } from '../PhaseDialog';
 import PlanningGroupsTableGroupHeader from './PlanningGroupsTableHeader';
 import PlanningGroupsTableRow from './PlanningGroupsTableRow';
 import './styles.css';
@@ -15,23 +16,32 @@ const PlanningGroupsTable = () => {
   const { ref, inView } = useInView();
   const dispatch = useAppDispatch();
   const phases = useAppSelector((state: RootState) => state.lists.phase, _.isEqual);
-  const [tableState, setTableState] = useState({
-    selectedPhaseDialog: '',
+  const [tableState, setTableState] = useState<{
+    selectedProjectId: string;
+    projectsVisible: boolean;
+    atElement: Element;
+  }>({
+    selectedProjectId: '',
     projectsVisible: true,
+    atElement: null as unknown as Element,
   });
 
-  const { selectedPhaseDialog, projectsVisible } = tableState;
+  const projectsMap = useMemo(() => _.keyBy(projects, 'id'), [projects]);
+
+  const { projectsVisible, selectedProjectId, atElement } = tableState;
 
   // Set the selectedPhaseDialog to the project name
-  const handleSelectPhaseDialog = useCallback(
-    (projectName: string) =>
-      setTableState((current) => ({ ...current, selectedPhaseDialog: projectName })),
-    [],
-  );
+  const handleOnProjectMenuClick = useCallback((projectId: string, e: MouseEvent) => {
+    setTableState((current) => ({
+      ...current,
+      selectedProjectId: projectId,
+      atElement: e.target as unknown as Element,
+    }));
+  }, []);
 
   // Clear the projectName from the selectedPhaseDialog
   const handleClosePhaseDialog = useCallback(
-    () => setTableState((current) => ({ ...current, selectedPhaseDialog: '' })),
+    () => setTableState((current) => ({ ...current, selectedProjectId: '' })),
     [],
   );
 
@@ -69,14 +79,19 @@ const PlanningGroupsTable = () => {
               <PlanningGroupsTableRow
                 key={i}
                 project={p}
-                phases={phases}
-                selectedDialog={selectedPhaseDialog}
-                selectPhaseDialog={handleSelectPhaseDialog}
-                closePhaseDialog={handleClosePhaseDialog}
+                onProjectMenuClick={handleOnProjectMenuClick}
               />
             ))}
         </tbody>
       </table>
+      {selectedProjectId && (
+        <PhaseDialog
+          close={handleClosePhaseDialog}
+          phases={phases}
+          project={projectsMap[selectedProjectId]}
+          atElement={atElement as unknown as Element}
+        />
+      )}
       <div data-testid="fetch-projects-trigger" ref={ref} />
     </>
   );

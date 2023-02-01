@@ -1,7 +1,7 @@
 import { IError } from '@/interfaces/common';
 import { getProjectsThunk } from '@/reducers/projectSlice';
 import { RootState } from '@/store';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import _ from 'lodash';
 
@@ -14,13 +14,12 @@ const useProjectsList = () => {
   const [isFetchings, setIsFetchings] = useState(false);
   const dispatch = useAppDispatch();
 
-  const fetchNext = () => {
+  const fetchNext = useCallback(() => {
     if (!isLastProjectsFetched && !isFetchings && !error?.message) {
       setIsFetchings(true);
       dispatch(getProjectsThunk(page + 1)).finally(() => setIsFetchings(false));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  };
+  }, [dispatch, error?.message, isFetchings, isLastProjectsFetched, page]);
 
   const projects = useMemo(() => projectsFromRedux, [projectsFromRedux]);
 
