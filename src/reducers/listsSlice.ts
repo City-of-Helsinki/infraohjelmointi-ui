@@ -1,5 +1,6 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError, IListItem } from '@/interfaces/common';
+import { IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/projectInterfaces';
 import {
@@ -18,6 +19,8 @@ import {
 import { getPersons } from '@/services/personServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+
+
 export interface IListState {
   type: Array<IListItem>;
   phase: Array<IListItem>;
@@ -35,7 +38,7 @@ export interface IListState {
   division: Array<IListItem>;
   subDivision: Array<IListItem>;
   responsibleZone: Array<IListItem>;
-  hashTags: Array<IListItem>;
+  hashTags: IHashTagsResponse;
   responsiblePersons: Array<IListItem>;
   error: IError | null | unknown;
 }
@@ -57,7 +60,7 @@ const initialState: IListState = {
   division: [],
   subDivision: [],
   responsibleZone: [],
-  hashTags: [],
+  hashTags: {hashTags:[],popularHashTags: []},
   responsiblePersons: [],
   error: null,
 };
@@ -315,7 +318,7 @@ export const listsSlice = createSlice({
     // GET HASHTAGS
     builder.addCase(
       getHashTagsThunk.fulfilled,
-      (state, action: PayloadAction<Array<IListItem>>) => {
+      (state, action: PayloadAction<IHashTagsResponse>) => {
         return { ...state, hashTags: action.payload };
       },
     );

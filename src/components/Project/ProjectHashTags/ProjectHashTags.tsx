@@ -63,18 +63,20 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
 
     // Create an object from the hashtags to not need to iterate when the user
     // chooses a hashtag from the search form
+    // Populates popularHashTags list
     useEffect(() => {
       setFormState((current) => ({
         ...current,
         hashTagsObject: Object.fromEntries(
-          allHashTags.map(({ value, id }) => [
+          allHashTags.hashTags.map(({ value, id }) => [
             value,
             {
-              value,
               id,
+              value,
             },
           ]),
         ),
+        popularHashTags: allHashTags.popularHashTags,
       }));
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [allHashTags]);
@@ -84,7 +86,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       if (projectHashTags && allHashTags) {
         setFormState((current) => ({
           ...current,
-          hashTagsForSubmit: allHashTags.filter(({ id }) => projectHashTags.indexOf(id) !== -1),
+          hashTagsForSubmit: allHashTags.hashTags.filter(
+            ({ id }) => projectHashTags.indexOf(id) !== -1,
+          ),
         }));
       }
     }, [projectHashTags, allHashTags]);
@@ -94,9 +98,11 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     useEffect(() => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSearch: allHashTags.filter((ah) => hashTagsForSubmit.indexOf(ah) === -1),
-        popularHashTags: current.popularHashTags.filter(
-          (ph) => hashTagsForSubmit.indexOf(ph) === -1,
+        hashTagsForSearch: allHashTags.hashTags.filter(
+          (ah) => hashTagsForSubmit.findIndex((item) => item.id === ah.id) === -1,
+        ),
+        popularHashTags: allHashTags.popularHashTags.filter(
+          (ph) => hashTagsForSubmit.findIndex((item) => item.id === ph.id) === -1,
         ),
       }));
     }, [allHashTags, hashTagsForSubmit]);
@@ -149,7 +155,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const handleClose = useCallback(() => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSubmit: allHashTags.filter(({ id }) => projectHashTags.indexOf(id) !== -1),
+        hashTagsForSubmit: allHashTags.hashTags.filter(
+          ({ id }) => projectHashTags.indexOf(id) !== -1,
+        ),
       }));
       handleSetOpen();
     }, [allHashTags, handleSetOpen, projectHashTags]);
