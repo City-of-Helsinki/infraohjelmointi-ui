@@ -175,7 +175,11 @@
     "filter": "Rajaa projekteja",
     "programmed": "Ohjelmoitu",
     "programmedYes": "Kyllä",
-    "programmedNo": "Ei"
+    "programmedNo": "Ei",
+    "district": "Suurpiiri",
+    "division": "Kaupunginosa",
+    "subDivision": "Osa-alue",
+    "responsiblePersons": "Vastuuhenkilö"
   },
   "notification": {
     "title": {

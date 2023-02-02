@@ -10,8 +10,8 @@ import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import './styles.css';
 import _ from 'lodash';
-import useProjectClassListFilter from '@/hooks/useProjectClassListFilter';
-import useProjectLocationListFilter from '@/hooks/useProjectLocationListFilter';
+import useClassList from '@/hooks/useClassList';
+import useLocationList from '@/hooks/useLocationList';
 
 const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
@@ -22,8 +22,8 @@ const ProjectBasicsForm: FC = () => {
     _.isEqual,
   )?.id;
 
-  useProjectClassListFilter();
-  useProjectLocationListFilter();
+  useClassList(true);
+  useLocationList(true);
 
   const {
     formState: { dirtyFields, isDirty },

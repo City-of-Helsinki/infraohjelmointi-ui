@@ -32,11 +32,6 @@ const buildSearchFormFields = (
       placeholder: 'Valitse',
     },
     {
-      name: 'category',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-    },
-    {
       name: 'programmed',
       type: FormField.FieldSet,
       fieldSet: [
@@ -45,8 +40,17 @@ const buildSearchFormFields = (
       ],
     },
     {
-      name: 'personPlanning',
-      type: FormField.Text,
+      name: 'responsiblePersons',
+      type: FormField.Select,
+      icon: 'person',
+      placeholder: 'Valitse',
+    },
+    { name: 'district', type: FormField.Select, placeholder: 'Valitse', icon: 'location' },
+    { name: 'division', type: FormField.Select, placeholder: 'Valitse', icon: 'location' },
+    { name: 'subDivision', type: FormField.Select, placeholder: 'Valitse', icon: 'location' },
+    {
+      name: 'category',
+      type: FormField.Select,
       placeholder: 'Valitse',
     },
   ];

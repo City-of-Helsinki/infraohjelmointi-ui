@@ -11,12 +11,17 @@ import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
 import NameSearchForm from './NameSearchForm';
 import { IOption } from '@/interfaces/common';
 import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
+import useClassList from '@/hooks/useClassList';
+import useLocationList from '@/hooks/useLocationList';
 
 const Search = () => {
   const { formMethods, formFields } = useSearchForm();
   const { handleSubmit } = formMethods;
   const open = useAppSelector((state: RootState) => state.search.open);
   const dispatch = useAppDispatch();
+
+  useClassList(false);
+  useLocationList(false);
 
   const buildSearchParams = (form: ISearchForm) => {
     const searchParams = [];

@@ -12,8 +12,12 @@
   margin-bottom: 0;
 }
 
-.search-form .search-form-content .input-wrapper:nth-child(2) {
+.search-form .search-form-content .input-wrapper {
   margin-bottom: 1.5rem;
+}
+
+.search-form .search-form-content #programmed {
+  margin: 2rem 0 0.3rem 0;
 }
 
 /* programmed fieldset legend same properties as the labels */

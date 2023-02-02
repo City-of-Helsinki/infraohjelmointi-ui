@@ -41,7 +41,6 @@ const MultiSelectField: FC<IMultiSelectFieldProps> = ({
               className="input-l"
               label={!hideLabel && label}
               placeholder={placeholder}
-              helper="Assistive text"
               options={options}
               value={value || []}
               clearButtonAriaLabel="Clear all selections"
