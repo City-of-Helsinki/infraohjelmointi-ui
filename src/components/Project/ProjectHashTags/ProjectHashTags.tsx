@@ -99,10 +99,10 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       setFormState((current) => ({
         ...current,
         hashTagsForSearch: allHashTags.hashTags.filter(
-          (ah) => hashTagsForSubmit.findIndex((item) => item.id === ah.id) === -1,
+          (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
         ),
         popularHashTags: allHashTags.popularHashTags.filter(
-          (ph) => hashTagsForSubmit.findIndex((item) => item.id === ph.id) === -1,
+          (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
         ),
       }));
     }, [allHashTags, hashTagsForSubmit]);
@@ -120,7 +120,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       (value: string) => {
         if (
           Object.prototype.hasOwnProperty.call(hashTagsObject, value) &&
-          hashTagsForSubmit.findIndex((item) => item.value === value) === -1
+          hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
         ) {
           setFormState((current) => ({
             ...current,
