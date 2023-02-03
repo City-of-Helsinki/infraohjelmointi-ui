@@ -167,6 +167,7 @@
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
+    "freeSearchDescription": "Etsi hakusanalla, esim. nimen, ryhmän, hashtagin mukaan",
     "masterClass": "Pääluokka",
     "class": "Luokka",
     "subClass": "Alaluokka",

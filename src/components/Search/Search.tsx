@@ -8,7 +8,7 @@ import './styles.css';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
-import NameSearchForm from './NameSearchForm';
+import FreeSearchForm from './FreeSearchForm';
 import { IOption } from '@/interfaces/common';
 import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
 import useClassList from '@/hooks/useClassList';
@@ -83,7 +83,7 @@ const Search = () => {
     >
       <Dialog.Header id="search-dialog-header" title="Hae projekteja" />
       <Dialog.Content>
-        <NameSearchForm />
+        <FreeSearchForm />
         <form className="search-form" onSubmit={handleSubmit(onSubmit)}>
           <div className="search-form-content">
             <FormFieldCreator form={formFields} />

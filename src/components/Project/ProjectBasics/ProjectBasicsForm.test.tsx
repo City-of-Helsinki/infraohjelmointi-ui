@@ -89,7 +89,7 @@ describe('ProjectBasicsForm', () => {
     expect(container.getElementsByClassName('basics-form').length).toBe(1);
   });
 
-  it('fills the fields with existing project  data', async () => {
+  it('fills the fields with existing project data', async () => {
     const { getByDisplayValue, getByText, getByTestId } = renderResult;
     const project = mockProject.data;
     const euroFormat = (value: string) => `${value} €`;
@@ -392,6 +392,8 @@ describe('ProjectBasicsForm', () => {
     await user.click(parentContainer);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+
+    debug(formPatchRequest);
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
   });
