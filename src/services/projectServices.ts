@@ -1,4 +1,4 @@
-import { IError } from '@/interfaces/common';
+import { IError, IListItem } from '@/interfaces/common';
 import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
 import axios from 'axios';
 
@@ -46,7 +46,13 @@ export const getProjectsWithParams = async (params: string): Promise<Array<IProj
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const getProjectsWithFreeSearch = async (searchWord: string): Promise<Array<IProject>> => {
+interface IFreeSearchResult {
+  hashtags?: Array<IListItem>;
+  projects?: Array<IListItem>;
+  groups?: Array<IListItem>;
+}
+
+export const getProjectsWithFreeSearch = async (searchWord: string): Promise<IFreeSearchResult> => {
   return axios
     .get(`${REACT_APP_API_URL}/projects/?freeSearch=${searchWord}`)
     .then((res) => res.data)

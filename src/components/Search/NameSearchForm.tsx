@@ -3,68 +3,35 @@ import { SearchInput } from 'hds-react/components/SearchInput';
 import { memo, useState } from 'react';
 import './styles.css';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
+import { listItemToOption } from '@/utils/common';
 
 const NameSearchForm = () => {
-  const mockFreeSearchResponse = {
-    groups: [
-      { value: 'Hakaniemi', id: '123' },
-      { value: 'Lauttasaari', id: '123' },
-      { value: 'Pohjoinen suurpiiri', id: '123' },
-      { value: 'Itäkeskus', id: '123' },
-    ],
-    hashtags: [
-      { value: 'pyöräily', id: '123' },
-      { value: 'puistot', id: '123' },
-      { value: 'rannat', id: '123' },
-      { value: 'uudisrakentaminen', id: '123' },
-      { value: 'hds', id: '123' },
-      { value: 'kadut', id: '123' },
-    ],
-    projects: [
-      { value: 'Uudisraivaajanpolku', id: '123' },
-      { value: 'Tukkipolku', id: '123' },
-      { value: 'Alviontie', id: '123' },
-      { value: 'Kalasatama', id: '123' },
-      { value: 'Hapero', id: '123' },
-    ],
-  };
-
-  /**
-   *   TODO: build an object like this from the API response and use it to get the needed type & id for
-   *  the final search request (reqUrl?groups=''&hashtags=''&projects='')
-   *
-   *  const mockFreeSearchResponse = {
-   *   'Hakaniemi': { value: 'Hakaniemi', type: 'group', id: '123' },
-   *   'Lauttasaari': { value: 'Lauttasaari', type: 'group', id: '311'  },
-   *   'Pohjoinen suurpiiri': { value: 'Pohjoinen suurpiiri', type: 'group', id: '345'  },
-   *   'Itäkeskus': { value: 'Itäkeskus', type: 'group', id: '456'  },
-   *   'pyöräily': { value: 'pyöräily', type: 'hashtag', id: '376' },
-   *  };
-   *
-   */
-
-  const allResults = [
-    ...mockFreeSearchResponse.projects.map((p) => ({ value: p.value, type: 'project' })),
-    ...mockFreeSearchResponse.hashtags.map((h) => ({ value: h.value, type: 'hashtag' })),
-    ...mockFreeSearchResponse.groups.map((g) => ({ value: g.value, type: 'group' })),
-  ];
-
   const [words, setWords] = useState<string[]>([]);
   const [searchWord, setSearchWord] = useState<string>('');
 
   const getSuggestions = (inputValue: string) =>
-    new Promise<{ value: string }[]>((resolve, reject) => {
+    new Promise<{ value: string; label: string }[]>((resolve, reject) => {
       getProjectsWithFreeSearch(inputValue)
         .then((res) => {
-          console.log('res: ', res);
-        })
-        .catch(() => reject([]));
+          const resultList = [];
+          if (res) {
+            console.log(res);
 
-      const filteredItems = allResults.filter((allResults) => {
-        return allResults.value.toLowerCase().indexOf(inputValue.toLowerCase()) > -1;
-      });
-      console.log('Filtered suggested items in promise: ', filteredItems);
-      resolve(filteredItems);
+            res.projects && resultList.push(...res.projects);
+            res.groups && resultList.push(...res.groups);
+            res.hashtags &&
+              resultList.push(...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}` })));
+
+            const resultListAsOption = resultList ? resultList.map((r) => listItemToOption(r)) : [];
+
+            resolve(resultListAsOption);
+          }
+          resolve([]);
+        })
+        .catch((err) => {
+          console.log(err);
+          return reject([]);
+        });
     });
 
   const handleSubmit = (value: string) => {
@@ -80,8 +47,7 @@ const NameSearchForm = () => {
         label="Mitä haet?"
         helperText="Etsi hakusanalla, esim. nimen, ryhmän, hashtagin mukaan"
         searchButtonAriaLabel="Search"
-        suggestionLabelField="value"
-        highlightSuggestions
+        suggestionLabelField="label"
         getSuggestions={getSuggestions}
         value={searchWord}
         onChange={(v) => setSearchWord(v)}
