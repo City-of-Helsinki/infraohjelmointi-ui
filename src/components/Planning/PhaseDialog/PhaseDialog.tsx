@@ -7,7 +7,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross, IconPlaybackRecord } from 'hds-react/icons';
-import { FC, memo, useCallback, useMemo, useRef } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
@@ -34,9 +34,18 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement 
   const { control, handleSubmit } = formMethods;
 
   useClickOutsideRef(dialogRef, close);
+  useEffect(() => {
+    const onScroll = () => {
+      close && close();
+    };
+    document.addEventListener('scroll', onScroll);
 
-  const { left, bottom } = useMemo(() => atElement.getBoundingClientRect(), [atElement]);
+    return () => {
+      document.removeEventListener('scroll', onScroll);
+    };
+  }, [close]);
 
+  const { left, top } = useMemo(() => atElement.getBoundingClientRect(), [atElement]);
   const { isInViewPort, dimensions } = useIsInViewPort(dialogRef);
 
   const onSubmit = useCallback(
@@ -62,7 +71,7 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement 
       style={{
         visibility: dimensions ? 'visible' : 'hidden',
         left: left,
-        top: bottom,
+        top: top,
         transform: `translate(1.5rem, ${isElementOutOfView && translatePixels})`,
       }}
     >

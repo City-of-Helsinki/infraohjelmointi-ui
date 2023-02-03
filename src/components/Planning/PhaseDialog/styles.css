@@ -1,5 +1,5 @@
 .phase-dialog-container {
-  position: absolute;
+  position: fixed;
   max-width: 16rem;
   background: var(--color-white);
   border: 0.1rem solid var(--color-black);
