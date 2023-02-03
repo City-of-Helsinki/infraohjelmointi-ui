@@ -20,9 +20,10 @@ import {
 } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
-import { screen, waitFor } from '@testing-library/react';
+import { getAllByText, screen, waitFor } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import { debug } from 'console';
+import exp from 'constants';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -143,7 +144,7 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.constructionWorkQuantity);
 
     expect(project?.hashTags?.length).toBe(2);
-    const projectHashTags = mockHashTags.data.filter(
+    const projectHashTags = mockHashTags.data.hashTags.filter(
       (h) => project?.hashTags?.indexOf(h.id) !== -1,
     );
     projectHashTags?.forEach((h) => {
@@ -192,7 +193,7 @@ describe('ProjectBasicsForm', () => {
     await waitFor(async () => await user.click(getByText('hulevesi')));
     await user.click(getByRole('button', { name: matchExact('save') }));
 
-    const hashTagsAfterSubmit = mockHashTags.data.filter(
+    const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter(
       (h) => expectedValues.indexOf(h.id) !== -1,
     );
 
@@ -203,7 +204,10 @@ describe('ProjectBasicsForm', () => {
   it('can create new hashtags with the hashtags form', async () => {
     const mockPostResponse = { data: { value: 'liikenne', id: '123456789' } };
     const mockGetResponse = {
-      data: [...mockHashTags.data, mockPostResponse.data],
+      data: {
+        hashTags: [...mockHashTags.data.hashTags, mockPostResponse.data],
+        popularHashTags: [],
+      },
     };
     const mockPatchProjectResponse: IProject = {
       ...mockProject.data,
@@ -251,6 +255,51 @@ describe('ProjectBasicsForm', () => {
 
     expectedHashTags.forEach((h) => expect(queryAllByText(h.value)[0]).toBeInTheDocument());
      */
+  });
+  it('can use popular hashtags from the hashtags form', async () => {
+    const { getByText, getByRole, user, queryByTestId, getAllByText } = renderResult;
+    const expectedValues = [
+      ...(mockProject.data.hashTags as Array<string>),
+      mockHashTags.data.popularHashTags[0].id,
+    ];
+    const mockPatchProjectResponse: IProject = {
+      ...mockProject.data,
+      hashTags: expectedValues,
+    };
+
+    // Mock all needed requests, to be able to
+    // PATCH the project with the popular hashtag
+    mockedAxios.patch.mockResolvedValue(async () => Promise.resolve(mockPatchProjectResponse));
+    // Open modal
+    await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
+
+    // popular hashtag exists in the container
+    expect(getByText('raidejokeri')).toBeInTheDocument();
+
+    // Click the popular hashtag
+    await user.click(getByText('raidejokeri'));
+
+    // popular hashtag removed from the popular hashtags list
+
+    expect(queryByTestId('popular-hashtags')).not.toHaveTextContent('raidejokeri');
+
+    await user.click(getByRole('button', { name: matchExact('save') }));
+
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) => {
+      return expectedValues.indexOf(h.id) !== -1;
+    });
+
+    expect(formPatchRequest.hashTags?.length).toBe(3);
+    hashTagsAfterSubmit.forEach((h) => expect(getByText(h.value)).toBeInTheDocument());
+
+    // Open modal
+    await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
+    // Reading the whole page
+    // 1 Instance in the project form & 1 Instance inside the modal under project hashtags
+    expect(getAllByText('raidejokeri').length).toBe(2);
+
+    debug('PATCH project axios mock', formPatchRequest);
   });
 
   it('can autosave patch a NumberField', async () => {
