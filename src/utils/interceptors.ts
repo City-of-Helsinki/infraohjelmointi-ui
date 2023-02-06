@@ -2,7 +2,7 @@ import { IError } from '@/interfaces/common';
 import { clearLoading, setLoading } from '@/reducers/loadingSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 let store: AppStore;
 
@@ -30,7 +30,7 @@ axios.interceptors.response.use(
   (error) => handleError(error),
 );
 
-const handleRequest = (req: AxiosRequestConfig) => {
+const handleRequest = (req: InternalAxiosRequestConfig) => {
   if (!store.getState().loading.isLoading) {
     store.dispatch(setLoading('Loading request'));
   }
