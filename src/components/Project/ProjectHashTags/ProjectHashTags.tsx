@@ -40,7 +40,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const allHashTags = useAppSelector((state: RootState) => state.lists.hashTags, _.isEqual);
+    const allHashTags = useAppSelector((state: RootState) => state.hashTags, _.isEqual);
     const projectId = useAppSelector(
       (state: RootState) => state.project.selectedProject?.id,
       _.isEqual,

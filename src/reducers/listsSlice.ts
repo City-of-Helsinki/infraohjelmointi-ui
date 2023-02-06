@@ -1,6 +1,5 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError, IListItem } from '@/interfaces/common';
-import { IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/projectInterfaces';
 import {
@@ -14,12 +13,9 @@ import {
   getProjectCategories,
   getProjectRisks,
   getResponsibleZones,
-  getHashTags,
 } from '@/services/listServices';
 import { getPersons } from '@/services/personServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-
 
 export interface IListState {
   type: Array<IListItem>;
@@ -38,7 +34,6 @@ export interface IListState {
   division: Array<IListItem>;
   subDivision: Array<IListItem>;
   responsibleZone: Array<IListItem>;
-  hashTags: IHashTagsResponse;
   responsiblePersons: Array<IListItem>;
   error: IError | null | unknown;
 }
@@ -60,7 +55,6 @@ const initialState: IListState = {
   division: [],
   subDivision: [],
   responsibleZone: [],
-  hashTags: {hashTags:[],popularHashTags: []},
   responsiblePersons: [],
   error: null,
 };
@@ -148,12 +142,6 @@ export const getResponsibleZonesThunk = createAsyncThunk(
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
-
-export const getHashTagsThunk = createAsyncThunk('hashTags/get', async (_, thunkAPI) => {
-  return await getHashTags()
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
-});
 
 export const getResponsiblePersonsThunk = createAsyncThunk('persons/get', async (_, thunkAPI) => {
   return await getPersons()
@@ -315,16 +303,6 @@ export const listsSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
-    // GET HASHTAGS
-    builder.addCase(
-      getHashTagsThunk.fulfilled,
-      (state, action: PayloadAction<IHashTagsResponse>) => {
-        return { ...state, hashTags: action.payload };
-      },
-    );
-    builder.addCase(getHashTagsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
-      return { ...state, error: action.payload };
-    });
     // GET PERSONS
     builder.addCase(
       getResponsiblePersonsThunk.fulfilled,

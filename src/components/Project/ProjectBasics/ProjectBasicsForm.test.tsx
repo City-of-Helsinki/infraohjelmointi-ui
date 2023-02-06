@@ -8,7 +8,6 @@ import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
-  mockHashTags,
   mockPlanningPhases,
   mockProjectAreas,
   mockProjectCategories,
@@ -18,6 +17,7 @@ import {
   mockProjectTypes,
   mockResponsiblePersons,
 } from '@/mocks/mockLists';
+import { mockHashTags } from '@/mocks/mockHashTags';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
 import { getAllByText, screen, waitFor } from '@testing-library/react';
@@ -70,8 +70,12 @@ describe('ProjectBasicsForm', () => {
               division: [],
               subDivision: [],
               responsibleZone: [],
-              hashTags: mockHashTags.data,
               responsiblePersons: mockResponsiblePersons.data,
+              error: {},
+            },
+            hashTags: {
+              hashTags: mockHashTags.data.hashTags,
+              popularHashTags: mockHashTags.data.popularHashTags,
               error: {},
             },
           },

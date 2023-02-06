@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import useHashTagsForm from '@/forms/useHashTagsForm';
 import { IListItem } from '@/interfaces/common';
 import { IHashTagsForm } from '@/interfaces/formInterfaces';
-import { getHashTagsThunk } from '@/reducers/listsSlice';
+import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { postHashTag } from '@/services/hashTagsService';
 import { RootState } from '@/store';

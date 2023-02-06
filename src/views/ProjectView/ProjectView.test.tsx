@@ -3,6 +3,8 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from './ProjectView';
 import { getProjectThunk } from '@/reducers/projectSlice';
+import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
+import { mockHashTags } from '@/mocks/mockHashTags';
 import { renderWithProviders } from '@/utils/testUtils';
 import { setupStore } from '@/store';
 import {
@@ -30,7 +32,7 @@ import {
   getProjectTypesThunk,
   getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
-import { RenderResult } from '@testing-library/react';
+import { RenderResult, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
@@ -39,6 +41,7 @@ import { getClassesThunk } from '@/reducers/classSlice';
 import { mockLocations } from '@/mocks/mockLocations';
 import { getLocationsThunk } from '@/reducers/locationSlice';
 import mockPersons from '@/mocks/mockPersons';
+import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -52,6 +55,11 @@ describe('ProjectView', () => {
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue(mockProject);
     await store.dispatch(getProjectThunk(mockProject.data.id));
+
+    // await waitFor(async () => {
+    //   mockedAxios.get.mockResolvedValue(() => mockHashTags);
+    //   await store.dispatch(getHashTagsThunk());
+    // });
 
     mockedAxios.get.mockResolvedValue(mockProjectTypes);
     await store.dispatch(getProjectTypesThunk());
@@ -103,7 +111,7 @@ describe('ProjectView', () => {
     const lists = store.getState().lists;
     const classes = store.getState().class;
     const locations = store.getState().location;
-
+    debug(store.getState());
     expect(store.getState().project.selectedProject).toBeDefined();
     expect(lists.area.length).toBeGreaterThan(0);
     expect(lists.type.length).toBeGreaterThan(0);

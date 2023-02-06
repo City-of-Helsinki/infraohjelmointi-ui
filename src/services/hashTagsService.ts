@@ -7,3 +7,12 @@ export const postHashTag = async (request: { value: string }) => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+export const getHashTags = async () => {
+  return axios
+    .get(`${process.env.REACT_APP_API_URL}/project-hashtags/`)
+    .then((res) => {
+      console.log(res, 'FROM getHashTags');
+      return res.data;
+    })
+    .catch((err: IError) => Promise.reject(err));
+};

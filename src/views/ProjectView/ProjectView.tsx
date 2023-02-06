@@ -18,7 +18,6 @@ import {
   getProjectCategoriesThunk,
   getProjectRisksThunk,
   getResponsibleZonesThunk,
-  getHashTagsThunk,
   getResponsiblePersonsThunk,
 } from '@/reducers/listsSlice';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
@@ -38,6 +37,7 @@ import {
   setDivisions,
   setSubDivisions,
 } from '@/reducers/locationSlice';
+import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
@@ -46,6 +46,7 @@ const ProjectView = () => {
 
   useEffect(() => {
     dispatch(getProjectThunk(projectId || ''));
+    dispatch(getHashTagsThunk());
     dispatch(getProjectTypesThunk());
     dispatch(getProjectPhasesThunk());
     dispatch(getProjectAreasThunk());
@@ -56,7 +57,7 @@ const ProjectView = () => {
     dispatch(getPlanningPhasesThunk());
     dispatch(getConstructionPhasesThunk());
     dispatch(getResponsibleZonesThunk());
-    dispatch(getHashTagsThunk());
+
     dispatch(getResponsiblePersonsThunk());
     // Get classes and filter them into categories
     dispatch(getClassesThunk()).then(() => {
