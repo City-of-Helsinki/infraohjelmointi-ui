@@ -146,7 +146,7 @@ export const projectSlice = createSlice({
     builder.addCase(silentPatchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
       // All projects also need to be updated to get changes into the planning list
       const updatedProjectList: Array<IProject> = state.projects.map((p) =>
-        p.id === action.payload.id ? action.payload : p,
+        p.id === action.payload?.id ? action.payload : p,
       );
       return {
         ...state,
