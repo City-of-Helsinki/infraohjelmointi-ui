@@ -4,7 +4,7 @@ import usePhaseForm from '@/forms/usePhaseForm';
 import { IListItem } from '@/interfaces/common';
 import { IPhaseForm } from '@/interfaces/formInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { patchProjectThunk } from '@/reducers/projectSlice';
+import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross, IconPlaybackRecord } from 'hds-react/icons';
 import { FC, memo, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -50,9 +50,9 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement 
 
   const onSubmit = useCallback(
     async (form: IPhaseForm) => {
-      id && dispatch(patchProjectThunk({ data: form, id: id }));
+      id && dispatch(silentPatchProjectThunk({ data: form, id: id })).then(() => close());
     },
-    [dispatch, id],
+    [close, dispatch, id],
   );
 
   const isElementOutOfView = !!(!isInViewPort && dimensions);

@@ -144,7 +144,16 @@ export const projectSlice = createSlice({
     );
     // SILENT PATCH
     builder.addCase(silentPatchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
-      return { ...state, selectedProject: action.payload, updated: getCurrentTime() };
+      // All projects also need to be updated to get changes into the planning list
+      const updatedProjectList: Array<IProject> = state.projects.map((p) =>
+        p.id === action.payload.id ? action.payload : p,
+      );
+      return {
+        ...state,
+        selectedProject: action.payload,
+        projects: [...updatedProjectList],
+        updated: getCurrentTime(),
+      };
     });
     builder.addCase(
       silentPatchProjectThunk.rejected,
