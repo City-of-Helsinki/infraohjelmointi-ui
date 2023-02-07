@@ -20,19 +20,13 @@ import {
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { act } from 'react-dom/test-utils';
 import mockUser from '@/mocks/mockUser';
-import { getAllByText, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
-import { debug } from 'console';
-import exp from 'constants';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-// These tests started taking very long after the form got fieldSets, could they maybe the optimized better?
-// Currently allowing a long timeout for this test file
-jest.setTimeout(40000);
 
 describe('ProjectBasicsForm', () => {
   let renderResult: CustomRenderResult;
@@ -238,12 +232,6 @@ describe('ProjectBasicsForm', () => {
     await user.click(getByRole('button', { name: 'addToProject' }));
 
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IListItem;
-    const formGetRequest = mockedAxios.get.mock.lastCall[1];
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1];
-
-    debug('POST hashTag axios mock', formPostRequest);
-    debug('GET hashTags axios mock', formGetRequest);
-    debug('PATCH project axios mock', formPatchRequest);
 
     expect(formPostRequest.value).toEqual(mockPostResponse.data.value);
 
@@ -302,8 +290,6 @@ describe('ProjectBasicsForm', () => {
     // Reading the whole page
     // 1 Instance in the project form & 1 Instance inside the modal under project hashtags
     expect(getAllByText('raidejokeri').length).toBe(2);
-
-    debug('PATCH project axios mock', formPatchRequest);
   });
 
   it('can autosave patch a NumberField', async () => {
