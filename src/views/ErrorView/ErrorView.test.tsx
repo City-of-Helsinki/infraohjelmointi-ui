@@ -1,34 +1,34 @@
-import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
-import mockUsers from '@/mocks/mockUsers';
-import { getUserThunk } from '@/reducers/authSlice';
-import { setupStore } from '@/store';
-import { screen } from '@testing-library/react';
-import { renderWithProviders } from '../../utils/testUtils';
+import mockPersons from '@/mocks/mockPersons';
+import { act } from '@testing-library/react';
+import { CustomRenderResult, renderWithProviders } from '../../utils/testUtils';
 import ErrorView from './ErrorView';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 describe('ErrorView', () => {
-  const store = setupStore();
+  let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockUsers);
-    await store.dispatch(getUserThunk());
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<ErrorView />, {
+          preloadedState: {
+            auth: { user: mockPersons.data[0], error: {} },
+          },
+        })),
+    );
   });
 
   it('renders the title and paragraph', () => {
-    renderWithProviders(<ErrorView />, { store });
-    expect(screen.getByText(/error.404/i)).toBeInTheDocument();
-    expect(screen.getByText(/error.pageNotFound/i)).toBeInTheDocument();
+    const { getByText } = renderResult;
+    expect(getByText(/error.404/i)).toBeInTheDocument();
+    expect(getByText(/error.pageNotFound/i)).toBeInTheDocument();
   });
 
-  // FIXME: can't get this because it's a HDS-component
-  it.skip('renders a return to previous page button', () => {
-    renderWithProviders(<ErrorView />, { store });
-    expect(screen.getByText(/error.returnToPrevious/i)).toBeInTheDocument();
+  it('renders a return to previous page button', () => {
+    const { getByTestId } = renderResult;
+    expect(getByTestId('return-to-previous-btn')).toBeInTheDocument();
   });
 });

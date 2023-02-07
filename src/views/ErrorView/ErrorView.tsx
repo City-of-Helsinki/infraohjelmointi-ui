@@ -16,7 +16,12 @@ const ErrorView = () => {
         <div className="error-spacer">
           <Paragraph size="xl" text="error.pageNotFound" />
         </div>
-        <Button iconLeft={<IconArrowLeft />} size="small" onClick={() => navigate(-1)}>
+        <Button
+          iconLeft={<IconArrowLeft />}
+          size="small"
+          onClick={() => navigate(-1)}
+          data-testid="return-to-previous-btn"
+        >
           {t('error.returnToPrevious')}
         </Button>
       </div>

@@ -1,48 +1,54 @@
 import mockI18next from '@/mocks/mockI18next';
-import axios from 'axios';
-import { screen, waitFor } from '@testing-library/react';
-import { renderWithProviders } from './utils/testUtils';
+import { act, screen, waitFor } from '@testing-library/react';
+import { CustomRenderResult, renderWithProviders } from './utils/testUtils';
 import App from './App';
-import { setupStore } from './store';
-import mockProjects from './mocks/mockProjects';
-import { getProjectsThunk } from './reducers/projectSlice';
+import mockProject from './mocks/mockProject';
 
-jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 describe('App', () => {
-  const store = setupStore();
+  let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockProjects);
-    await store.dispatch(getProjectsThunk(1));
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<App />, {
+          preloadedState: {
+            project: {
+              projects: [mockProject.data],
+              selectedProject: null,
+              count: 1,
+              error: {},
+              page: 1,
+              updated: null,
+            },
+          },
+        })),
+    );
   });
-
   it('renders TopBar', () => {
-    renderWithProviders(<App />, { store });
-    expect(screen.getByTestId('top-bar')).toBeInTheDocument();
+    const { getByTestId } = renderResult;
+    expect(getByTestId('top-bar')).toBeInTheDocument();
   });
 
   it('renders SideBar', async () => {
-    const { container } = renderWithProviders(<App />, { store });
+    const { container } = renderResult;
     expect(container.getElementsByClassName('sidebar-container').length).toBe(1);
   });
 
   it('renders app-content', () => {
-    const { container } = renderWithProviders(<App />, { store });
+    const { container } = renderResult;
     expect(container.getElementsByClassName('app-content').length).toBe(1);
     expect(screen.getByTestId('app-outlet')).toBeInTheDocument();
   });
 
   it('does not render Loader', () => {
-    const { container } = renderWithProviders(<App />, { store });
+    const { container } = renderResult;
     expect(container.getElementsByClassName('loader-overlay').length).toBe(0);
   });
 
   it('does not render Notification', () => {
-    const { container } = renderWithProviders(<App />, { store });
+    const { container } = renderResult;
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
   });
 

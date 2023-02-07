@@ -1,4 +1,3 @@
-import { setupStore } from '@/store';
 import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
@@ -13,7 +12,6 @@ import mockProjectClasses from '@/mocks/mockClasses';
 import { getClassesThunk } from '@/reducers/classSlice';
 import { mockLocations } from '@/mocks/mockLocations';
 import { getLocationsThunk } from '@/reducers/locationSlice';
-import mockPersons from '@/mocks/mockPersons';
 import { act } from 'react-dom/test-utils';
 import {
   mockConstructionPhaseDetails,
@@ -41,6 +39,7 @@ import {
   getProjectTypesThunk,
   getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -51,48 +50,8 @@ describe('ProjectView', () => {
   let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
-    const store = setupStore();
-
-    mockedAxios.get.mockImplementation((url) => {
-      url = url.replace('undefined', '');
-
-      switch (url) {
-        case '/projects/':
-          return Promise.resolve(mockProject);
-        case '/project-hashtags/':
-          return Promise.resolve(mockHashTags);
-        case '/project-types/':
-          return Promise.resolve(mockProjectTypes);
-        case '/project-phases/':
-          return Promise.resolve(mockProjectPhases);
-        case '/project-areas/':
-          return Promise.resolve(mockProjectAreas);
-        case '/construction-phase-details/':
-          return Promise.resolve(mockConstructionPhaseDetails);
-        case '/project-categories/':
-          return Promise.resolve(mockProjectCategories);
-        case '/project-risks/':
-          return Promise.resolve(mockProjectRisks);
-        case '/project-quality-levels/':
-          return Promise.resolve(mockProjectQualityLevels);
-        case '/planning-phases/':
-          return Promise.resolve(mockPlanningPhases);
-        case '/construction-phases/':
-          return Promise.resolve(mockConstructionPhases);
-        case '/responsible-zones/':
-          return Promise.resolve(mockResponsibleZones);
-        case '/persons/':
-          return Promise.resolve(mockPersons);
-        case '/project-classes/':
-          return Promise.resolve(mockProjectClasses);
-        case '/project-locations/':
-          return Promise.resolve(mockLocations);
-        default:
-          return Promise.reject(new Error('not found'));
-      }
-    });
-
-    await act(async () => (renderResult = renderWithProviders(<ProjectView />, { store })));
+    mockGetResponseProvider();
+    await act(async () => (renderResult = renderWithProviders(<ProjectView />)));
   });
 
   afterEach(async () => {

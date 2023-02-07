@@ -1,11 +1,11 @@
 import mockI18next from '@/mocks/mockI18next';
-import { renderWithProviders } from '@/utils/testUtils';
+import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectHeader from './ProjectHeader';
 import axios from 'axios';
-import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { matchExact } from '@/utils/common';
+import { act } from 'react-dom/test-utils';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -13,23 +13,31 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('ProjectHeader', () => {
-  const store = setupStore({
-    project: {
-      projects: [mockProject.data],
-      selectedProject: mockProject.data,
-      count: 1,
-      error: {},
-      page: 1,
-      updated: null,
-    },
-  });
+  let renderResult: CustomRenderResult;
 
+  beforeEach(async () => {
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<ProjectHeader />, {
+          preloadedState: {
+            project: {
+              projects: [],
+              selectedProject: mockProject.data,
+              count: 1,
+              error: {},
+              page: 1,
+              updated: null,
+            },
+          },
+        })),
+    );
+  });
   afterEach(async () => {
     jest.clearAllMocks();
   });
 
   it('renders all component wrappers', () => {
-    const { container } = renderWithProviders(<ProjectHeader />, { store });
+    const { container } = renderResult;
 
     expect(container.getElementsByClassName('project-header-container').length).toBe(1);
     expect(container.getElementsByClassName('left').length).toBe(1);
@@ -41,7 +49,7 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all left side elements', async () => {
-    const { getByRole, getByText } = renderWithProviders(<ProjectHeader />, { store });
+    const { getByRole, getByText, store } = renderResult;
 
     const project = store.getState().project.selectedProject as IProject;
     const { projectReadiness, name, phase, address } = project;
@@ -54,9 +62,7 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all right side elements', async () => {
-    const { getByRole, getByText, container } = renderWithProviders(<ProjectHeader />, {
-      store,
-    });
+    const { getByRole, getByText, container } = renderResult;
 
     expect(container.getElementsByClassName('favourite-button-container').length).toBe(1);
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
@@ -65,9 +71,7 @@ describe('ProjectHeader', () => {
   });
 
   it('can autosave patch a form value', async () => {
-    const { queryByRole, getByRole, user, getByText } = renderWithProviders(<ProjectHeader />, {
-      store,
-    });
+    const { queryByRole, getByRole, user, getByText } = renderResult;
     const expectedValue = 'New name';
     const project = mockProject.data;
 

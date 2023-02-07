@@ -4,19 +4,18 @@ import mockProject from '@/mocks/mockProject';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectNotes from './ProjectNotes';
 import mockNotes from '@/mocks/mockNotes';
-import { setupStore } from '@/store';
 import {
   deleteNoteThunk,
   getNotesByProjectThunk,
   patchNoteThunk,
   postNoteThunk,
 } from '@/reducers/noteSlice';
-import { getProjectThunk } from '@/reducers/projectSlice';
 import { stringToDateTime } from '@/utils/common';
 import { INote } from '@/interfaces/noteInterfaces';
 import { mockError } from '@/mocks/mockError';
 import { IError } from '@/interfaces/common';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -24,17 +23,26 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('ProjectNotes', () => {
-  const store = setupStore();
   let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockProject);
-    await store.dispatch(getProjectThunk(mockProject.data.id));
+    mockGetResponseProvider();
 
-    mockedAxios.get.mockResolvedValue(mockNotes);
-    await store.dispatch(getNotesByProjectThunk(mockProject.data.id));
-
-    renderResult = renderWithProviders(<ProjectNotes />, { store });
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<ProjectNotes />, {
+          preloadedState: {
+            project: {
+              projects: [],
+              selectedProject: mockProject.data,
+              count: 1,
+              error: {},
+              page: 1,
+              updated: null,
+            },
+          },
+        })),
+    );
   });
 
   afterEach(async () => {
@@ -168,7 +176,9 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes GET request', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getNotesByProjectThunk(''));
 
     const storeError = store.getState().note.error as IError;
@@ -177,7 +187,9 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes PATCH request', async () => {
-    mockedAxios.patch.mockRejectedValue(mockError);
+    const { store } = renderResult;
+
+    mockedAxios.patch.mockRejectedValueOnce(mockError);
     await store.dispatch(patchNoteThunk({}));
 
     const storeError = store.getState().note.error as IError;
@@ -186,7 +198,9 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes DELETE request', async () => {
-    mockedAxios.delete.mockRejectedValue(mockError);
+    const { store } = renderResult;
+
+    mockedAxios.delete.mockRejectedValueOnce(mockError);
     await store.dispatch(deleteNoteThunk(''));
 
     const storeError = store.getState().note.error as IError;
@@ -195,7 +209,8 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes POST request', async () => {
-    mockedAxios.post.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.post.mockRejectedValueOnce(mockError);
     await store.dispatch(postNoteThunk({}));
 
     const storeError = store.getState().note.error as IError;

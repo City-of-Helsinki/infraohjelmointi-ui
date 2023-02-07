@@ -1,18 +1,12 @@
 import mockI18next from '@/mocks/mockI18next';
-
-import mockUser from '@/mocks/mockUser';
-
-import { setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectBasics from './ProjectBasics';
-import { waitFor } from '@testing-library/react';
+import { act } from '@testing-library/react';
+import mockPersons from '@/mocks/mockPersons';
 
 jest.mock('react-i18next', () => mockI18next());
 
 describe('ProjectBasics', () => {
-  const store = setupStore({
-    auth: { user: mockUser, error: {} },
-  });
   let renderResult: CustomRenderResult;
 
   const spyScrollTo = jest.fn();
@@ -21,19 +15,15 @@ describe('ProjectBasics', () => {
   beforeEach(async () => {
     spyScrollTo.mockClear();
 
-    await waitFor(() => (renderResult = renderWithProviders(<ProjectBasics />, { store })));
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<ProjectBasics />, {
+          preloadedState: {
+            auth: { user: mockPersons.data[0], error: {} },
+          },
+        })),
+    );
   });
-
-  const navItems = [
-    {
-      route: '#basics',
-      label: 'nav.basics',
-    },
-    {
-      route: '#schedule',
-      label: 'nav.schedule',
-    },
-  ];
 
   it('renders all component wrappers', async () => {
     const { container } = renderResult;
@@ -44,12 +34,23 @@ describe('ProjectBasics', () => {
 
   it('renders SideNavigation and links', () => {
     const { container, getByRole } = renderResult;
+
+    const navItems = [
+      'nav.basics',
+      'nav.status',
+      'nav.schedule',
+      'nav.financial',
+      'nav.responsiblePersons',
+      'nav.location',
+      'nav.projectProgram',
+    ];
+
     expect(container.getElementsByClassName('side-nav').length).toBe(1);
 
     navItems.forEach((n) => {
       expect(
         getByRole('link', {
-          name: n.label,
+          name: n,
         }),
       ).toBeInTheDocument();
     });

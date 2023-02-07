@@ -16,12 +16,13 @@ import {
   mockProjectRisks,
   mockProjectTypes,
   mockResponsiblePersons,
+  mockResponsibleZones,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { act } from 'react-dom/test-utils';
-import mockUser from '@/mocks/mockUser';
 import { screen, waitFor } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
+import mockPersons from '@/mocks/mockPersons';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -46,7 +47,7 @@ describe('ProjectBasicsForm', () => {
               page: 1,
               updated: null,
             },
-            auth: { user: mockUser, error: {} },
+            auth: { user: mockPersons.data[0], error: {} },
             lists: {
               area: mockProjectAreas.data,
               phase: mockProjectPhases.data,
@@ -63,7 +64,7 @@ describe('ProjectBasicsForm', () => {
               district: [],
               division: [],
               subDivision: [],
-              responsibleZone: [],
+              responsibleZone: mockResponsibleZones.data,
               responsiblePersons: mockResponsiblePersons.data,
               error: {},
             },
@@ -152,8 +153,6 @@ describe('ProjectBasicsForm', () => {
 
   it('has all required fields as required', () => {
     const { getByText } = renderResult;
-
-    // Hack to check required for now... since HDS always adds the star to the input label
     expect(getByText('projectBasicsForm.type')).toBeInTheDocument();
     expect(getByText('projectBasicsForm.description')).toBeInTheDocument();
   });
@@ -167,15 +166,14 @@ describe('ProjectBasicsForm', () => {
     const project = store.getState().project.selectedProject as IProject;
     const projectHashTags = store.getState().project.selectedProject?.hashTags;
     const projectHashTagsLength = projectHashTags?.length || 0;
-    const responseProject: IProject = {
-      ...project,
-      hashTags: expectedValues,
+    const responseProject: { data: IProject } = {
+      data: { ...project, hashTags: expectedValues },
     };
 
     // Open modal
     await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
 
-    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     // Expect all elements
     expect(getByText(`${project.name} - manageHashTags`)).toBeInTheDocument();
@@ -207,18 +205,20 @@ describe('ProjectBasicsForm', () => {
         popularHashTags: [],
       },
     };
-    const mockPatchProjectResponse: IProject = {
-      ...mockProject.data,
-      hashTags: [...(mockProject.data.hashTags as Array<string>), mockPostResponse.data.id],
+    const mockPatchProjectResponse: { data: IProject } = {
+      data: {
+        ...mockProject.data,
+        hashTags: [...(mockProject.data.hashTags as Array<string>), mockPostResponse.data.id],
+      },
     };
 
     // Mock all needed requests, to be able to POST a hashTag, GET all hashTags
     // and PATCH the project with the newly created hashTag
-    mockedAxios.post.mockResolvedValue(Promise.resolve(mockPostResponse));
-    mockedAxios.get.mockResolvedValue(Promise.resolve(mockGetResponse));
-    mockedAxios.patch.mockResolvedValue(Promise.resolve(mockPatchProjectResponse));
+    mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
+    mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
+    mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
 
-    const { getByRole, user } = renderResult;
+    const { getByRole, user, queryAllByText } = renderResult;
 
     // Open modal
     await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
@@ -235,33 +235,26 @@ describe('ProjectBasicsForm', () => {
 
     expect(formPostRequest.value).toEqual(mockPostResponse.data.value);
 
-    /* 
-    
-    FIXME: check that the hashTag gets added to the project and rendered when the user chooses to add it to the project
-
-    const expectedHashTags = mockHashTags.data.filter(
+    const expectedHashTags = mockHashTags.data.hashTags.filter(
       (h) => mockProject.data.hashTags?.indexOf(h.id) !== -1,
     );
 
-    expectedHashTags.push(mockPostResponse.data);
-
     expectedHashTags.forEach((h) => expect(queryAllByText(h.value)[0]).toBeInTheDocument());
-     */
   });
+
   it('can use popular hashtags from the hashtags form', async () => {
     const { getByText, getByRole, user, queryByTestId, getAllByText } = renderResult;
     const expectedValues = [
       ...(mockProject.data.hashTags as Array<string>),
       mockHashTags.data.popularHashTags[0].id,
     ];
-    const mockPatchProjectResponse: IProject = {
-      ...mockProject.data,
-      hashTags: expectedValues,
+    const mockPatchProjectResponse: { data: IProject } = {
+      data: { ...mockProject.data, hashTags: expectedValues },
     };
 
     // Mock all needed requests, to be able to
     // PATCH the project with the popular hashtag
-    mockedAxios.patch.mockResolvedValue(async () => Promise.resolve(mockPatchProjectResponse));
+    mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
     // Open modal
     await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
 
@@ -296,12 +289,11 @@ describe('ProjectBasicsForm', () => {
     const { user, getByDisplayValue, container } = renderResult;
     const expectedValue = '1234';
     const project = mockProject.data;
-    const responseProject: IProject = {
-      ...project,
-      hkrId: expectedValue,
+    const responseProject: { data: IProject } = {
+      data: { ...project, hkrId: expectedValue },
     };
 
-    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     const parentContainer = container.getElementsByClassName('basics-form')[0];
 
@@ -320,12 +312,11 @@ describe('ProjectBasicsForm', () => {
     const { user, getByRole, getByText, container } = renderResult;
     const expectedValue = { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' };
     const project = mockProject.data;
-    const responseProject: IProject = {
-      ...project,
-      area: expectedValue,
+    const responseProject: { data: IProject } = {
+      data: { ...project, area: expectedValue },
     };
 
-    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     const parentContainer = container.getElementsByClassName('basics-form')[0];
 
@@ -342,12 +333,11 @@ describe('ProjectBasicsForm', () => {
     const { user, getByRole, getByDisplayValue, container } = renderResult;
     const expectedValue = '13.12.2022';
     const project = mockProject.data;
-    const responseProject: IProject = {
-      ...project,
-      estPlanningStart: expectedValue,
+    const responseProject: { data: IProject } = {
+      data: { ...project, estPlanningStart: expectedValue },
     };
 
-    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     const parentContainer = container.getElementsByClassName('basics-form')[0];
     const estPlanningStart = getByRole('textbox', { name: getFormField('estPlanningStart') });
@@ -365,12 +355,11 @@ describe('ProjectBasicsForm', () => {
     const { user, getByDisplayValue, container } = renderResult;
     const expectedValue = 'New description';
     const project = mockProject.data;
-    const responseProject: IProject = {
-      ...project,
-      description: expectedValue,
+    const responseProject: { data: IProject } = {
+      data: { ...project, description: expectedValue },
     };
 
-    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     const descriptionField = screen.getByRole('textbox', { name: getFormField('description *') });
     const parentContainer = container.getElementsByClassName('basics-form')[0];
@@ -388,12 +377,11 @@ describe('ProjectBasicsForm', () => {
     const { user, container, getByTestId } = renderResult;
     const expectedValue = true;
     const project = mockProject.data;
-    const responseProject: IProject = {
-      ...project,
-      louhi: expectedValue,
+    const responseProject: { data: IProject } = {
+      data: { ...project, louhi: expectedValue },
     };
 
-    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     const louhiField = getByTestId('louhi-0') as HTMLInputElement;
     const parentContainer = container.getElementsByClassName('basics-form')[0];
