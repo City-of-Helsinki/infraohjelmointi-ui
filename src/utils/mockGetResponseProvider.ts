@@ -35,9 +35,11 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 export const mockGetResponseProvider = () =>
   mockedAxios.get.mockImplementation((url) => {
     url = url.replace('undefined', '');
-
+    console.log('url: ', url);
     switch (url) {
       case '/projects/':
+        return Promise.resolve(mockProject);
+      case `/project/${mockProject.data.id}`:
         return Promise.resolve(mockProject);
       case '/project-hashtags/':
         return Promise.resolve(mockHashTags);
