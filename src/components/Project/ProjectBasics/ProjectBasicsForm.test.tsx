@@ -393,7 +393,6 @@ describe('ProjectBasicsForm', () => {
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
 
-    debug(formPatchRequest);
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
   });

@@ -3,29 +3,41 @@ import { act, screen, waitFor } from '@testing-library/react';
 import { CustomRenderResult, renderWithProviders } from './utils/testUtils';
 import App from './App';
 import mockProject from './mocks/mockProject';
+import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
+import mockProjectClasses from './mocks/mockClasses';
+import { mockLocations } from './mocks/mockLocations';
+import { mockProjectCategories, mockResponsiblePersons } from './mocks/mockLists';
 
+jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 describe('App', () => {
   let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<App />, {
-          preloadedState: {
-            project: {
-              projects: [mockProject.data],
-              selectedProject: null,
-              count: 1,
-              error: {},
-              page: 1,
-              updated: null,
-            },
-          },
-        })),
-    );
+    mockGetResponseProvider();
+    await act(async () => (renderResult = renderWithProviders(<App />)));
   });
+
+  it('adds all needed data to store', async () => {
+    const { store } = renderResult;
+
+    const classes = store.getState().class;
+    const locations = store.getState().location;
+    const lists = store.getState().lists;
+
+    expect(lists.category).toStrictEqual(mockProjectCategories.data);
+    expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
+    expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
+    expect(classes.masterClasses.length).toBeGreaterThan(0);
+    expect(classes.classes.length).toBeGreaterThan(0);
+    expect(classes.subClasses.length).toBeGreaterThan(0);
+    expect(locations.allLocations).toStrictEqual(mockLocations.data);
+    expect(locations.districts.length).toBeGreaterThan(0);
+    expect(locations.divisions.length).toBeGreaterThan(0);
+    expect(locations.subDivisions.length).toBeGreaterThan(0);
+  });
+
   it('renders TopBar', () => {
     const { getByTestId } = renderResult;
     expect(getByTestId('top-bar')).toBeInTheDocument();
