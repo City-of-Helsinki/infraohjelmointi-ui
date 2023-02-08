@@ -21,6 +21,7 @@ import axios from 'axios';
 jest.mock('axios');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+const { REACT_APP_API_URL } = process.env;
 
 /**
  * This function checks the URL that axios is trying to GET data from and provides the correct
@@ -34,11 +35,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
  */
 export const mockGetResponseProvider = () =>
   mockedAxios.get.mockImplementation((url) => {
-    url = url.includes('https://infraohjelmointi-api-dev.agw.arodevtest.hel.fi')
-      ? url.replace('https://infraohjelmointi-api-dev.agw.arodevtest.hel.fi', '')
-      : url.includes('undefined')
-      ? url.replace('undefined', '')
-      : url;
+    url = url.replace(`${REACT_APP_API_URL}`, '');
     switch (url) {
       case '/projects/':
         return Promise.resolve(mockProject);
