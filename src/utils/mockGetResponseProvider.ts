@@ -34,12 +34,15 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
  */
 export const mockGetResponseProvider = () =>
   mockedAxios.get.mockImplementation((url) => {
-    url = url.replace('undefined', '');
-    console.log('url: ', url);
+    url = url.includes('https://infraohjelmointi-api-dev.agw.arodevtest.hel.fi')
+      ? url.replace('https://infraohjelmointi-api-dev.agw.arodevtest.hel.fi', '')
+      : url.includes('undefined')
+      ? url.replace('undefined', '')
+      : url;
     switch (url) {
       case '/projects/':
         return Promise.resolve(mockProject);
-      case `/project/${mockProject.data.id}`:
+      case `/projects/${mockProject.data.id}`:
         return Promise.resolve(mockProject);
       case '/project-hashtags/':
         return Promise.resolve(mockHashTags);
