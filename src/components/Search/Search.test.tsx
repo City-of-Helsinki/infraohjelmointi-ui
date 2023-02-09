@@ -28,7 +28,7 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('ProjectBasicsForm', () => {
+describe('Search', () => {
   let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
@@ -69,7 +69,7 @@ describe('ProjectBasicsForm', () => {
     expect(queryByTestId('project-search-form')).toBeNull();
   });
 
-  it('should be display if the search open state is true and all elements should be rendered', async () => {
+  it('should render if the search open state is true and all elements should be rendered', async () => {
     const { store, getByTestId, getByText, getByLabelText } = renderResult;
     await waitFor(() => store.dispatch(toggleSearch()));
     expect(getByTestId('project-search-form')).toBeInTheDocument();
