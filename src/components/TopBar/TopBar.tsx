@@ -29,6 +29,7 @@ const TopBar: FC = () => {
             variant="supplementary"
             iconLeft={<IconSearch />}
             onClick={handleOpenSearch}
+            data-testid="search-projects"
             style={{ color: 'var(--color-black-80)', fontWeight: '300', padding: '0' }}
           >
             {t('nav.search')}

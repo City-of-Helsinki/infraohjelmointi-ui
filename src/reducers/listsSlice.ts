@@ -15,6 +15,7 @@ import {
   getResponsibleZones,
 } from '@/services/listServices';
 import { getPersons } from '@/services/personServices';
+import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface IListState {
@@ -38,16 +39,6 @@ export interface IListState {
   programmedYears: Array<IListItem>;
   error: IError | null | unknown;
 }
-
-const setProgrammedYears = () => {
-  const currentYear = new Date().getFullYear();
-  const years: Array<IListItem> = [];
-
-  for (let i = currentYear - 10; i <= currentYear + 10; i++) {
-    years.push({ id: i.toString(), value: i.toString() });
-  }
-  return years;
-};
 
 const initialState: IListState = {
   type: [],

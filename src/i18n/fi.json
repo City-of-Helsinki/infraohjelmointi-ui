@@ -253,5 +253,6 @@
   "hashTagCreated": "Tunniste '{{responseHashTag}}' luotu",
   "addToProject": "Lisää hankkeelle?",
   "currentStatus": "Nykystatus",
-  "search": "Hae"
+  "search": "Hae",
+  "searchProjects": "Hae projekteja"
 }

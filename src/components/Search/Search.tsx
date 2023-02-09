@@ -104,18 +104,24 @@ const Search = () => {
       closeButtonLabelText="Close search dialog"
       scrollable
     >
-      <Dialog.Header id="search-dialog-header" title="Hae projekteja" />
+      <Dialog.Header id="search-dialog-header" title={t('searchProjects')} />
       <Dialog.Content>
         <FreeSearchForm />
-        <form className="search-form" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="search-form"
+          onSubmit={handleSubmit(onSubmit)}
+          data-testid="project-search-form"
+        >
           <div className="search-form-content">
             <FormFieldCreator form={formFields} />
           </div>
         </form>
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <Button onClick={handleSubmit(onSubmit)}>{t('search')}</Button>
-        <Button onClick={handleSubmit(handleClose)} variant="secondary">
+        <Button onClick={handleSubmit(onSubmit)} data-testid="search-projects-button">
+          {t('search')}
+        </Button>
+        <Button onClick={handleSubmit(handleClose)} variant="secondary" data-testid="cancel-search">
           {t('cancel')}
         </Button>
       </Dialog.ActionButtons>

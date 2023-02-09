@@ -78,7 +78,7 @@ const FreeSearchForm = () => {
   );
 
   return (
-    <div className="free-search">
+    <div className="free-search" data-testid="free-search">
       <SearchInput
         label={t('searchForm.searchWord')}
         helperText={t('searchForm.freeSearchDescription') || ''}

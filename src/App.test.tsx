@@ -2,7 +2,6 @@ import mockI18next from '@/mocks/mockI18next';
 import { act, screen, waitFor } from '@testing-library/react';
 import { CustomRenderResult, renderWithProviders } from './utils/testUtils';
 import App from './App';
-import mockProject from './mocks/mockProject';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
 import mockProjectClasses from './mocks/mockClasses';
 import { mockLocations } from './mocks/mockLocations';
