@@ -14,14 +14,20 @@ interface ISearchState {
 const initialState: ISearchState = {
   open: false,
   form: {
-    searchWord: '',
-    masterClass: '',
+    masterClass: [],
     class: [],
     subClass: [],
-    category: { value: '', label: '' },
     programmedYes: false,
     programmedNo: false,
     personPlanning: '',
+    programmedYearMin: '',
+    programmedYearMax: '',
+    phase: { value: '', label: '' },
+    responsiblePerson: { value: '', label: '' },
+    district: [],
+    division: [],
+    subDivision: [],
+    category: { value: '', label: '' },
   },
 };
 

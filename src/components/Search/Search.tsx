@@ -4,7 +4,6 @@ import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useCallback } from 'react';
 import { FormFieldCreator } from '../shared';
-import './styles.css';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
@@ -13,16 +12,20 @@ import { IOption } from '@/interfaces/common';
 import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
 import useClassList from '@/hooks/useClassList';
 import useLocationList from '@/hooks/useLocationList';
+import './styles.css';
+import { useTranslation } from 'react-i18next';
 
 const Search = () => {
   const { formMethods, formFields } = useSearchForm();
   const { handleSubmit } = formMethods;
+  const { t } = useTranslation();
   const open = useAppSelector((state: RootState) => state.search.open);
   const dispatch = useAppDispatch();
 
   useClassList(false);
   useLocationList(false);
 
+  // Build a search parameter with all the choices from the search form
   const buildSearchParams = (form: ISearchForm) => {
     const searchParams = [];
     for (const [key, value] of Object.entries(form)) {
@@ -38,17 +41,38 @@ const Search = () => {
           value.length > 0 &&
             value.forEach((v: IOption) => searchParams.push(`subClass=${v.value}`));
           break;
-        case 'category':
-          value.value && searchParams.push(`category=${value.value}`);
-          break;
-        case 'responsiblePerson':
-          value && searchParams.push(`responsiblePerson=${value}`);
-          break;
         case 'programmedYes':
           value && searchParams.push(`programmed=${value}`);
           break;
         case 'programmedNo':
           !value && searchParams.push(`programmed=${value}`);
+          break;
+        case 'programmedYearMin':
+          value && searchParams.push(`programmedYearMin=${value}`);
+          break;
+        case 'programmedYearMax':
+          value && searchParams.push(`programmedYearMax=${value}`);
+          break;
+        case 'phase':
+          value.value && searchParams.push(`category=${value.value}`);
+          break;
+        case 'personPlanning':
+          value.value && searchParams.push(`personPlanning=${value.value}`);
+          break;
+        case 'district':
+          value.length > 0 &&
+            value.forEach((v: IOption) => searchParams.push(`district=${v.value}`));
+          break;
+        case 'division':
+          value.length > 0 &&
+            value.forEach((v: IOption) => searchParams.push(`division=${v.value}`));
+          break;
+        case 'subDivision':
+          value.length > 0 &&
+            value.forEach((v: IOption) => searchParams.push(`subDivision=${v.value}`));
+          break;
+        case 'category':
+          value.value && searchParams.push(`category=${value.value}`);
           break;
         default:
           break;
@@ -79,7 +103,6 @@ const Search = () => {
       close={handleSubmit(handleClose)}
       closeButtonLabelText="Close search dialog"
       scrollable
-      style={{ position: 'absolute', right: '0', minHeight: '100vh' }}
     >
       <Dialog.Header id="search-dialog-header" title="Hae projekteja" />
       <Dialog.Content>
@@ -91,9 +114,9 @@ const Search = () => {
         </form>
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <Button onClick={handleSubmit(onSubmit)}>Hae</Button>
+        <Button onClick={handleSubmit(onSubmit)}>{t('search')}</Button>
         <Button onClick={handleSubmit(handleClose)} variant="secondary">
-          Peruuta
+          {t('cancel')}
         </Button>
       </Dialog.ActionButtons>
     </Dialog>

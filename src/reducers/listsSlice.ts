@@ -35,8 +35,19 @@ export interface IListState {
   subDivision: Array<IListItem>;
   responsibleZone: Array<IListItem>;
   responsiblePersons: Array<IListItem>;
+  programmedYears: Array<IListItem>;
   error: IError | null | unknown;
 }
+
+const setProgrammedYears = () => {
+  const currentYear = new Date().getFullYear();
+  const years: Array<IListItem> = [];
+
+  for (let i = currentYear - 10; i <= currentYear + 10; i++) {
+    years.push({ id: i.toString(), value: i.toString() });
+  }
+  return years;
+};
 
 const initialState: IListState = {
   type: [],
@@ -56,6 +67,7 @@ const initialState: IListState = {
   subDivision: [],
   responsibleZone: [],
   responsiblePersons: [],
+  programmedYears: setProgrammedYears(),
   error: null,
 };
 

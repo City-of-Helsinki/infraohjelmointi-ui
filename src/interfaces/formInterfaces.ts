@@ -61,14 +61,20 @@ export interface IProjectBasicsForm {
 }
 
 export interface ISearchForm {
-  searchWord: string;
-  masterClass: string;
+  masterClass: Array<IOption>;
   class: Array<IOption>;
   subClass: Array<IOption>;
-  category: IOption;
   programmedYes: boolean;
   programmedNo: boolean;
   personPlanning: string;
+  programmedYearMin: string;
+  programmedYearMax: string;
+  phase: IOption;
+  responsiblePerson: IOption;
+  district: Array<IOption>;
+  division: Array<IOption>;
+  subDivision: Array<IOption>;
+  category: IOption;
 }
 
 export interface IProjectNoteForm {

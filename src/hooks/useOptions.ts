@@ -22,7 +22,15 @@ export const useOptions = (name?: ListType) => {
     name as ListType,
   );
 
-  const parsedName = isPersonList ? 'responsiblePersons' : name;
+  const isProgrammedYearsList = ['programmedYearsMin', 'programmedYearsMax'].includes(
+    name as ListType,
+  );
+
+  const parsedName = isPersonList
+    ? 'responsiblePersons'
+    : isProgrammedYearsList
+    ? 'programmedYears'
+    : name;
 
   const shouldNotTranslate = [
     'masterClass',
@@ -32,6 +40,7 @@ export const useOptions = (name?: ListType) => {
     'division',
     'subDivision',
     'responsiblePersons',
+    'programmedYears',
   ].includes(parsedName as ListType);
 
   const optionsList = useAppSelector(

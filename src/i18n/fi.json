@@ -180,7 +180,9 @@
     "district": "Suurpiiri",
     "division": "Kaupunginosa",
     "subDivision": "Osa-alue",
-    "responsiblePersons": "Vastuuhenkilö"
+    "phase": "Vaihe",
+    "programmedYearsMin": "Ohjelmoitu vuosi min",
+    "programmedYearsMax": "Ohjelmoitu vuosi max"
   },
   "notification": {
     "title": {
@@ -250,5 +252,6 @@
   "addHashTag": "Lisää tunniste",
   "hashTagCreated": "Tunniste '{{responseHashTag}}' luotu",
   "addToProject": "Lisää hankkeelle?",
-  "currentStatus": "Nykystatus"
+  "currentStatus": "Nykystatus",
+  "search": "Hae"
 }

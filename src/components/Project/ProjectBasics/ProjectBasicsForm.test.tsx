@@ -67,6 +67,7 @@ describe('ProjectBasicsForm', () => {
               subDivision: [],
               responsibleZone: mockResponsibleZones.data,
               responsiblePersons: mockResponsiblePersons.data,
+              programmedYears: [],
               error: {},
             },
             hashTags: {

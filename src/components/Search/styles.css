@@ -1,5 +1,18 @@
+#search-dialog {
+  position: absolute;
+  right: 0;
+  min-height: 100vh;
+}
+
 .search-form .search-form-content {
   padding: var(--spacing-s) 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.search-form .search-form-content .input-wrapper {
+  grid-column: 1/3;
+  width: calc(100% - 10px);
 }
 
 .search-form .search-form-content .input-l {
@@ -16,10 +29,6 @@
   margin-bottom: 1.5rem;
 }
 
-.search-form .search-form-content #programmed {
-  margin: 2rem 0 0.3rem 0;
-}
-
 /* programmed fieldset legend same properties as the labels */
 .search-form .search-form-content #programmed legend {
   color: var(--color-black-90);
@@ -34,6 +43,7 @@
   display: flex;
   gap: var(--spacing-l);
   padding-bottom: 0;
+  width: 0;
 }
 
 .free-search {
@@ -46,4 +56,16 @@
   gap: 0.5rem;
   margin: 0.5rem 0;
   flex-wrap: wrap;
+}
+
+.search-form .search-form-content .input-wrapper#programmedYearsMin {
+  grid-column: 1/2;
+  grid-row: 6;
+  margin-right: 10px;
+  width: calc(100% - 20px);
+}
+
+.search-form .search-form-content .input-wrapper#programmedYearsMax {
+  grid-column: 2/3;
+  grid-row: 6;
 }

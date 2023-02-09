@@ -40,14 +40,29 @@ const buildSearchFormFields = (
       ],
     },
     {
-      name: 'responsiblePersons',
+      name: 'programmedYearsMin',
+      type: FormField.Select,
+      placeholder: 'Valitse',
+    },
+    {
+      name: 'programmedYearsMax',
+      type: FormField.Select,
+      placeholder: 'Valitse',
+    },
+    {
+      name: 'phase',
+      type: FormField.Select,
+      placeholder: 'Valitse',
+    },
+    {
+      name: 'personPlanning',
       type: FormField.Select,
       icon: 'person',
       placeholder: 'Valitse',
     },
-    { name: 'district', type: FormField.Select, placeholder: 'Valitse', icon: 'location' },
-    { name: 'division', type: FormField.Select, placeholder: 'Valitse', icon: 'location' },
-    { name: 'subDivision', type: FormField.Select, placeholder: 'Valitse', icon: 'location' },
+    { name: 'district', type: FormField.MultiSelect, placeholder: 'Valitse', icon: 'location' },
+    { name: 'division', type: FormField.MultiSelect, placeholder: 'Valitse', icon: 'location' },
+    { name: 'subDivision', type: FormField.MultiSelect, placeholder: 'Valitse', icon: 'location' },
     {
       name: 'category',
       type: FormField.Select,
