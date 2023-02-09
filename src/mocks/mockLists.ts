@@ -294,48 +294,19 @@ export const mockResponsibleZones: { data: Array<IListItem> } = {
   ],
 };
 
-export const mockHashTags: { data: Array<IListItem> } = {
-  data: [
-    {
-      id: '9d6d4ccb-db3d-4335-8bf6-6d542ebf3eba',
-      value: 'leikkipaikka',
-    },
-    {
-      id: 'b8f172d3-a92f-4c51-b3f9-58f5e1a48b75',
-      value: 'leikkipuisto',
-    },
-    {
-      id: '816cc173-6340-45ed-9b49-4b4976b2a48b',
-      value: 'hulevesi',
-    },
-    {
-      id: '8346d18f-f836-4179-b0e7-74ee43cb65b0',
-      value: 'aukio/tori',
-    },
-    {
-      id: '83c3124f-839c-4ea4-86cc-614a8036eee7',
-      value: 'raidejokeri',
-    },
-    {
-      id: '630f8b95-66db-4f9a-89f9-6ceb7563fe8e',
-      value: 'viima-ratiotie',
-    },
-  ],
-};
-
 export const mockResponsiblePersons: { data: Array<IListItem> } = {
   data: [
     {
-      value: 'E Sihvonen',
-      id: 'afc609b0-9e7b-49c8-8e01-a940d720667b',
+      value: 'Matti Meikäläinen',
+      id: 'd53239df-b105-4ef0-9b20-a6f5a0281f7b',
     },
     {
-      value: 'Joonas Hakkila',
-      id: '3f4cc542-64aa-4e1a-9a2e-1d3f0a9251ca',
+      value: 'Matti Kimari',
+      id: '63e71910-07de-4ba3-814f-f54315432d97',
     },
     {
-      value: 'Matti Tarkkala',
-      id: '7460ec24-4650-47fc-b52f-0f55ae2b7ac3',
+      value: 'Matti Nn',
+      id: 'c60f6c51-8ccd-4414-ad00-b10e3e624fed',
     },
     {
       value: 'Matti Kaalikoski',

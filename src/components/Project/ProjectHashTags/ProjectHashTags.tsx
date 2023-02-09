@@ -40,7 +40,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const allHashTags = useAppSelector((state: RootState) => state.lists.hashTags, _.isEqual);
+    const allHashTags = useAppSelector((state: RootState) => state.hashTags, _.isEqual);
     const projectId = useAppSelector(
       (state: RootState) => state.project.selectedProject?.id,
       _.isEqual,
@@ -63,18 +63,20 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
 
     // Create an object from the hashtags to not need to iterate when the user
     // chooses a hashtag from the search form
+    // Populates popularHashTags list
     useEffect(() => {
       setFormState((current) => ({
         ...current,
         hashTagsObject: Object.fromEntries(
-          allHashTags.map(({ value, id }) => [
+          allHashTags.hashTags.map(({ value, id }) => [
             value,
             {
-              value,
               id,
+              value,
             },
           ]),
         ),
+        popularHashTags: allHashTags.popularHashTags,
       }));
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [allHashTags]);
@@ -84,7 +86,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       if (projectHashTags && allHashTags) {
         setFormState((current) => ({
           ...current,
-          hashTagsForSubmit: allHashTags.filter(({ id }) => projectHashTags.indexOf(id) !== -1),
+          hashTagsForSubmit: allHashTags.hashTags.filter(
+            ({ id }) => projectHashTags.indexOf(id) !== -1,
+          ),
         }));
       }
     }, [projectHashTags, allHashTags]);
@@ -94,9 +98,11 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     useEffect(() => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSearch: allHashTags.filter((ah) => hashTagsForSubmit.indexOf(ah) === -1),
-        popularHashTags: current.popularHashTags.filter(
-          (ph) => hashTagsForSubmit.indexOf(ph) === -1,
+        hashTagsForSearch: allHashTags.hashTags.filter(
+          (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
+        ),
+        popularHashTags: allHashTags.popularHashTags.filter(
+          (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
         ),
       }));
     }, [allHashTags, hashTagsForSubmit]);
@@ -109,16 +115,20 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     }, []);
 
     // Set a hashtag to be submitted, make sure that the hashtag exists
+    // Make sure the value doesn't already exist in hashTagsForSubmit
     const onHashTagClick = useCallback(
       (value: string) => {
-        if (Object.prototype.hasOwnProperty.call(hashTagsObject, value)) {
+        if (
+          Object.prototype.hasOwnProperty.call(hashTagsObject, value) &&
+          hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
+        ) {
           setFormState((current) => ({
             ...current,
             hashTagsForSubmit: [...current.hashTagsForSubmit, hashTagsObject[value]],
           }));
         }
       },
-      [hashTagsObject],
+      [hashTagsObject, hashTagsForSubmit],
     );
 
     const handleSetOpen = useCallback(
@@ -149,7 +159,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const handleClose = useCallback(() => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSubmit: allHashTags.filter(({ id }) => projectHashTags.indexOf(id) !== -1),
+        hashTagsForSubmit: allHashTags.hashTags.filter(
+          ({ id }) => projectHashTags.indexOf(id) !== -1,
+        ),
       }));
       handleSetOpen();
     }, [allHashTags, handleSetOpen, projectHashTags]);
@@ -200,14 +212,20 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             {/* Footer (Save button) */}
             <ActionButtons>
               <div className="dialog-footer">
-                <Button onClick={onSubmit}>{t('save')}</Button>
+                <div data-testid="save-hash-tags-to-project">
+                  <Button onClick={onSubmit}>{t('save')}</Button>
+                </div>
               </div>
             </ActionButtons>
           </Dialog>
 
           {/* Displayed on form (Open dialog button) */}
           <div className="hashtags-label">
-            <FormFieldLabel text={t(`projectBasicsForm.${name}`)} onClick={onOpenHashTagsForm} />
+            <FormFieldLabel
+              dataTestId="open-hash-tag-dialog-button"
+              text={t(`projectBasicsForm.${name}`)}
+              onClick={onOpenHashTagsForm}
+            />
           </div>
           {/* Displayed on form (Project hashtags) */}
           <HashTagsContainer tags={hashTagsForSubmit} />

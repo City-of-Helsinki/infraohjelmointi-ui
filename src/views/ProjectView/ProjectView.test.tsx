@@ -3,8 +3,16 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from './ProjectView';
 import { getProjectThunk } from '@/reducers/projectSlice';
-import { renderWithProviders } from '@/utils/testUtils';
-import { setupStore } from '@/store';
+import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
+import { mockHashTags } from '@/mocks/mockHashTags';
+import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { IError } from '@/interfaces/common';
+import { mockError } from '@/mocks/mockError';
+import mockProjectClasses from '@/mocks/mockClasses';
+import { getClassesThunk } from '@/reducers/classSlice';
+import { mockLocations } from '@/mocks/mockLocations';
+import { getLocationsThunk } from '@/reducers/locationSlice';
+import { act } from 'react-dom/test-utils';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
@@ -15,6 +23,7 @@ import {
   mockProjectQualityLevels,
   mockProjectRisks,
   mockProjectTypes,
+  mockResponsiblePersons,
   mockResponsibleZones,
 } from '@/mocks/mockLists';
 import {
@@ -30,15 +39,7 @@ import {
   getProjectTypesThunk,
   getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
-import { RenderResult } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
-import { IError } from '@/interfaces/common';
-import { mockError } from '@/mocks/mockError';
-import mockProjectClasses from '@/mocks/mockClasses';
-import { getClassesThunk } from '@/reducers/classSlice';
-import { mockLocations } from '@/mocks/mockLocations';
-import { getLocationsThunk } from '@/reducers/locationSlice';
-import mockPersons from '@/mocks/mockPersons';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -46,53 +47,11 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('ProjectView', () => {
-  const store = setupStore();
-  let renderResult: RenderResult;
+  let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
-    mockedAxios.get.mockResolvedValue(mockProject);
-    await store.dispatch(getProjectThunk(mockProject.data.id));
-
-    mockedAxios.get.mockResolvedValue(mockProjectTypes);
-    await store.dispatch(getProjectTypesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectAreas);
-    await store.dispatch(getProjectAreasThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectPhases);
-    await store.dispatch(getProjectPhasesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockConstructionPhaseDetails);
-    await store.dispatch(getConstructionPhaseDetailsThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectCategories);
-    await store.dispatch(getProjectCategoriesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectRisks);
-    await store.dispatch(getProjectRisksThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectQualityLevels);
-    await store.dispatch(getProjectQualityLevelsThunk());
-
-    mockedAxios.get.mockResolvedValue(mockPlanningPhases);
-    await store.dispatch(getPlanningPhasesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockConstructionPhases);
-    await store.dispatch(getConstructionPhasesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockResponsibleZones);
-    await store.dispatch(getResponsibleZonesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockPersons);
-    await store.dispatch(getResponsiblePersonsThunk());
-
-    mockedAxios.get.mockResolvedValue(mockProjectClasses);
-    await store.dispatch(getClassesThunk());
-
-    mockedAxios.get.mockResolvedValue(mockLocations);
-    await store.dispatch(getLocationsThunk());
-
-    await act(async () => (renderResult = renderWithProviders(<ProjectView />, { store })));
+    mockGetResponseProvider();
+    await act(async () => (renderResult = renderWithProviders(<ProjectView />)));
   });
 
   afterEach(async () => {
@@ -100,27 +59,32 @@ describe('ProjectView', () => {
   });
 
   it('adds all needed data to store', async () => {
+    const { store } = renderResult;
+
     const lists = store.getState().lists;
     const classes = store.getState().class;
     const locations = store.getState().location;
+    const hashTags = store.getState().hashTags;
 
-    expect(store.getState().project.selectedProject).toBeDefined();
-    expect(lists.area.length).toBeGreaterThan(0);
-    expect(lists.type.length).toBeGreaterThan(0);
-    expect(lists.phase.length).toBeGreaterThan(0);
-    expect(lists.category.length).toBeGreaterThan(0);
-    expect(lists.constructionPhaseDetail.length).toBeGreaterThan(0);
-    expect(lists.riskAssessment.length).toBeGreaterThan(0);
-    expect(lists.projectQualityLevel.length).toBeGreaterThan(0);
-    expect(lists.constructionPhase.length).toBeGreaterThan(0);
-    expect(lists.planningPhase.length).toBeGreaterThan(0);
-    expect(lists.responsibleZone.length).toBeGreaterThan(0);
-    expect(lists.responsiblePersons.length).toBeGreaterThan(0);
-    expect(classes.allClasses.length).toBeGreaterThan(0);
+    expect(store.getState().project.selectedProject).toStrictEqual(mockProject.data);
+    expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
+    expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
+    expect(lists.area).toStrictEqual(mockProjectAreas.data);
+    expect(lists.type).toStrictEqual(mockProjectTypes.data);
+    expect(lists.phase).toStrictEqual(mockProjectPhases.data);
+    expect(lists.category).toStrictEqual(mockProjectCategories.data);
+    expect(lists.constructionPhaseDetail).toStrictEqual(mockConstructionPhaseDetails.data);
+    expect(lists.riskAssessment).toStrictEqual(mockProjectRisks.data);
+    expect(lists.projectQualityLevel).toStrictEqual(mockProjectQualityLevels.data);
+    expect(lists.constructionPhase).toStrictEqual(mockConstructionPhases.data);
+    expect(lists.planningPhase).toStrictEqual(mockPlanningPhases.data);
+    expect(lists.responsibleZone).toStrictEqual(mockResponsibleZones.data);
+    expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
+    expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
     expect(classes.masterClasses.length).toBeGreaterThan(0);
     expect(classes.classes.length).toBeGreaterThan(0);
     expect(classes.subClasses.length).toBeGreaterThan(0);
-    expect(locations.allLocations.length).toBeGreaterThan(0);
+    expect(locations.allLocations).toStrictEqual(mockLocations.data);
     expect(locations.districts.length).toBeGreaterThan(0);
     expect(locations.divisions.length).toBeGreaterThan(0);
     expect(locations.subDivisions.length).toBeGreaterThan(0);
@@ -147,7 +111,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed project  fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectThunk(mockProject.data.id));
 
     const storeError = store.getState().project.error as IError;
@@ -156,7 +121,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed phase list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectPhasesThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -165,7 +131,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed type list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectTypesThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -174,7 +141,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed area list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectAreasThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -183,7 +151,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed constructionPhaseDetails list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getConstructionPhaseDetailsThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -192,7 +161,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed projectCategories list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectCategoriesThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -201,7 +171,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed projectRisks list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectRisksThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -210,7 +181,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed projectQualityLevel list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectQualityLevelsThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -219,7 +191,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed planningPhase list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getPlanningPhasesThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -228,7 +201,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed constructionPhase list fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getConstructionPhasesThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -237,7 +211,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed classes fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getClassesThunk());
 
     const storeError = store.getState().class.error as IError;
@@ -246,7 +221,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed locations fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getLocationsThunk());
 
     const storeError = store.getState().location.error as IError;
@@ -255,7 +231,8 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed responsible zones fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getResponsibleZonesThunk());
 
     const storeError = store.getState().lists.error as IError;
@@ -264,10 +241,21 @@ describe('ProjectView', () => {
   });
 
   it('catches a failed responsible persons fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getResponsiblePersonsThunk());
 
     const storeError = store.getState().lists.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed hashtags fetch', async () => {
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
+    await store.dispatch(getHashTagsThunk());
+
+    const storeError = store.getState().hashTags.error as IError;
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
   });

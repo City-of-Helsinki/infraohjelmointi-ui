@@ -5,13 +5,14 @@ interface IFormFieldLabel {
   text: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
+  dataTestId?: string;
 }
 
 /**
  * Some fields in the forms use this button for editing arrays of strings,
  * could be made more generic?
  */
-const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled }) => {
+const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled, dataTestId }) => {
   return (
     <div className="display-flex">
       <label className="pen-and-label-text">{text}</label>
@@ -22,6 +23,7 @@ const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled }) => {
           style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
           name={text}
           aria-label={text}
+          data-testid={dataTestId}
         >
           <IconPenLine style={{ transform: 'translate(1.25rem, -0.18rem)' }} />
         </button>

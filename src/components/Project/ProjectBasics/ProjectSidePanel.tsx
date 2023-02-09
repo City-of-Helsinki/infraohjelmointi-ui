@@ -10,10 +10,7 @@ const ProjectSidePanel: FC = () => {
   const updated = useAppSelector((state: RootState) => state.project.updated);
   const { t } = useTranslation();
   const navItems = [
-    {
-      route: '#basics',
-      label: t('nav.basics'),
-    },
+    { route: '#basics', label: t('nav.basics') },
     { route: '#status', label: t('nav.status') },
     { route: '#schedule', label: t('nav.schedule') },
     { route: '#financial', label: t('nav.financial') },

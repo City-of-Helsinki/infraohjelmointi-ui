@@ -3,7 +3,7 @@ import mockProject from './mockProject';
 
 const mockProjects: { data: IProjectsResponse } = {
   data: {
-    count: 200,
+    count: 1,
     results: [mockProject.data],
   },
 };
