@@ -31,7 +31,7 @@ const TopBar: FC = () => {
             onClick={handleOpenSearch}
             style={{ color: 'var(--color-black-80)', fontWeight: '300', padding: '0' }}
           >
-            Haku
+            {t('nav.search')}
           </Button>
           {/* user */}
           <User
