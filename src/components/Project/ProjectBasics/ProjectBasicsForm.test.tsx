@@ -205,6 +205,7 @@ describe('ProjectBasicsForm', () => {
         popularHashTags: [],
       },
     };
+
     const mockPatchProjectResponse: { data: IProject } = {
       data: {
         ...mockProject.data,
@@ -218,28 +219,28 @@ describe('ProjectBasicsForm', () => {
     mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
     mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
 
-    const { getByRole, user, queryAllByText } = renderResult;
+    const { user, queryAllByText, getByTestId } = renderResult;
 
     // Open modal
-    await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
+    await user.click(getByTestId('open-hash-tag-dialog-button'));
 
     // Open the textbox and submit a new hashtag
-    await user.click(getByRole('button', { name: 'createNewHashTag' }));
-    await user.type(getByRole('textbox', { name: 'createNewHashTag' }), 'liikenne');
-    await user.click(getByRole('button', { name: 'createHashTag' }));
+    await user.click(getByTestId('create-new-hash-tag-button').children[0]);
+    await user.type(getByTestId('hashTag').getElementsByTagName('input')[0], 'liikenne');
+    await user.click(getByTestId('create-hash-tag-button').children[0]);
 
     // Click the 'add to project' button to patch the project with the new hashtag
-    await user.click(getByRole('button', { name: 'addToProject' }));
-
+    await user.click(getByTestId('add-new-hash-tag-to-project'));
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IListItem;
 
     expect(formPostRequest.value).toEqual(mockPostResponse.data.value);
 
-    const expectedHashTags = mockHashTags.data.hashTags.filter(
+    const expectedHashTags = mockGetResponse.data.hashTags.filter(
       (h) => mockProject.data.hashTags?.indexOf(h.id) !== -1,
     );
-
-    expectedHashTags.forEach((h) => expect(queryAllByText(h.value)[0]).toBeInTheDocument());
+    expectedHashTags.forEach((h) => {
+      return expect(queryAllByText(h.value)[0]).toBeInTheDocument();
+    });
   });
 
   it('can use popular hashtags from the hashtags form', async () => {

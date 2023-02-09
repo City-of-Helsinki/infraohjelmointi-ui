@@ -62,9 +62,11 @@ const NewHashTagsForm = () => {
     <div className="dialog-section">
       <Paragraph fontWeight="bold" text={t('cantFindHashTag')} />
       <div className="new-hashtags-form">
-        <Button variant="secondary" iconLeft={<IconPlus />} onClick={handleCreateNewMode}>
-          {t('createNewHashTag')}
-        </Button>
+        <div data-testid="create-new-hash-tag-button">
+          <Button variant="secondary" iconLeft={<IconPlus />} onClick={handleCreateNewMode}>
+            {t('createNewHashTag')}
+          </Button>
+        </div>
         {createNewMode &&
           // If a hashtag is successfully created and edit mode it true,
           // allow admin to add it straight to the project
@@ -75,14 +77,18 @@ const NewHashTagsForm = () => {
                 <Span text={t('hashTagCreated', { responseHashTag: responseHashTag.value })} />
               </div>
               <div className="hashtag-created-text">
-                <button onClick={addToProject}>{t('addToProject')}</button>
+                <button onClick={addToProject} data-testid="add-new-hash-tag-to-project">
+                  {t('addToProject')}
+                </button>
               </div>
             </div>
           ) : (
             // If a hashtag isn't created and edit mode is true
             <div className="new-hashtags-input">
               <TextField control={control} name="hashTag" label={t('createNewHashTag')} />
-              <Button onClick={handleSubmit(submitNewHashTag)}>{t('createHashTag')}</Button>
+              <div data-testid="create-hash-tag-button">
+                <Button onClick={handleSubmit(submitNewHashTag)}>{t('createHashTag')}</Button>
+              </div>
             </div>
           ))}
       </div>

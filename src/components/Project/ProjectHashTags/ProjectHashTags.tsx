@@ -212,14 +212,20 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             {/* Footer (Save button) */}
             <ActionButtons>
               <div className="dialog-footer">
-                <Button onClick={onSubmit}>{t('save')}</Button>
+                <div data-testid="save-hash-tags-to-project">
+                  <Button onClick={onSubmit}>{t('save')}</Button>
+                </div>
               </div>
             </ActionButtons>
           </Dialog>
 
           {/* Displayed on form (Open dialog button) */}
           <div className="hashtags-label">
-            <FormFieldLabel text={t(`projectBasicsForm.${name}`)} onClick={onOpenHashTagsForm} />
+            <FormFieldLabel
+              dataTestId="open-hash-tag-dialog-button"
+              text={t(`projectBasicsForm.${name}`)}
+              onClick={onOpenHashTagsForm}
+            />
           </div>
           {/* Displayed on form (Project hashtags) */}
           <HashTagsContainer tags={hashTagsForSubmit} />

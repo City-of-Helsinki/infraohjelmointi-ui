@@ -29,7 +29,7 @@ const HashTagSearch: FC<IHashTagSearchProps> = ({ onHashTagClick, hashTags }) =>
   };
 
   return (
-    <div className="dialog-section">
+    <div className="dialog-section" data-testid="search-hash-tag-field-section">
       <Paragraph fontWeight="bold" text={t('addHashTagsToProject')} />
       <SearchInput
         label={t('addHashTag')}
