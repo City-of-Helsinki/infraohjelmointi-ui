@@ -1,3 +1,4 @@
+import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import {
@@ -18,9 +19,14 @@ import { setProgrammedYears } from '@/utils/common';
 import { mockLocations } from '@/mocks/mockLocations';
 import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
 import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
+import { mockError } from '@/mocks/mockError';
+import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
+import { IError } from '@/interfaces/common';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
+
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('ProjectBasicsForm', () => {
   let renderResult: CustomRenderResult;
@@ -131,5 +137,33 @@ describe('ProjectBasicsForm', () => {
     expect(lists.category).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
     expect(lists.programmedYears).toStrictEqual(setProgrammedYears());
+  });
+
+  it('cancel button should close the search form and keep changes in redux', async () => {
+    const { user, store, getByText, getByTestId, queryByTestId } = renderResult;
+    await waitFor(() => store.dispatch(toggleSearch()));
+
+    // check that programmed is false in redux
+    expect(store.getState().search.form.programmedYes).toBe(false);
+
+    await user.click(getByText('searchForm.programmedYes'));
+    await user.click(getByTestId('cancel-search'));
+
+    // check that search form disappeared, but redux state remained
+    expect(queryByTestId('project-search-form')).toBeNull();
+    expect(store.getState().search.form.programmedYes).toBe(true);
+  });
+
+  // TODO: test free search
+  // TODO: test that search button creates proper search params
+
+  it('catches a bad search request', async () => {
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
+    await store.dispatch(getProjectsWithParamsThunk('123'));
+
+    const storeError = store.getState().project.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
   });
 });
