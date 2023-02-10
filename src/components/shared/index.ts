@@ -12,3 +12,4 @@ export { default as ListField } from './ListField';
 export { default as Toolbar } from './Toolbar';
 export { default as BubbleIcon } from './BubbleIcon';
 export { default as OverrunRightField } from './OverrunRightField';
+export { default as CustomTag } from './CustomTag';

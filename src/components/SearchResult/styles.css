@@ -1,0 +1,92 @@
+/* Search terms */
+.search-terms-container {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+.search-terms-container .search-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  height: auto;
+  margin: 0 var(--spacing-m) var(--spacing-m) 0;
+}
+
+.search-terms-container .search-terms > div {
+  height: 1rem;
+}
+
+.empty-all-btn {
+  background: transparent !important;
+  background-color: transparent !important;
+  white-space: nowrap;
+  height: 1rem;
+}
+
+/* Search filter */
+.search-filter-container {
+  width: 20%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.search-filter-container button {
+  width: 9.5rem;
+  height: 3rem;
+}
+
+/* Search result card */
+.search-result-card {
+  border: 0.13rem solid var(--color-black);
+  padding: var(--spacing-m) var(--spacing-l);
+  background: var(--color-white);
+  margin-bottom: var(--spacing-s);
+}
+
+.search-result-card .search-result-title-container {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-s);
+  display: flex;
+  justify-content: space-between;
+}
+
+.search-result-card .search-result-title-container .search-result-title {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.search-result-card .search-result-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+/* Search result pagination */
+.search-result-pagination-container {
+  padding: var(--spacing-layout-l) 0 var(--spacing-s) 0;
+}
+
+/* Search result list */
+.search-result-list-container {
+  background: var(--color-silver-light);
+  padding: var(--spacing-layout-l) var(--spacing-layout-xl) var(--spacing-layout-l)
+    var(--spacing-layout-l);
+}
+
+/* Search result header */
+.search-result-header-container {
+  padding: var(--spacing-layout-l) var(--spacing-layout-xl) var(--spacing-layout-xs)
+    var(--spacing-layout-l);
+}
+
+.search-result-header-container .search-result-page-title {
+  margin-bottom: var(--spacing-layout-s);
+}
+
+.search-result-header-container .search-result-terms-and-filters-container {
+  display: flex;
+  justify-content: space-between;
+}
