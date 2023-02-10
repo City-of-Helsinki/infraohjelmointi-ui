@@ -13,7 +13,15 @@ interface ISearchState {
   searchWord: string;
   resultObject: any;
 }
-const FreeSearchForm = () => {
+
+type FreeSearchFormParams = {
+  onFreeSearchSelection: (item: FreeSearchFormItem) => void;
+  onFreeSearchRemoval: (item: string) => void;
+};
+
+export type FreeSearchFormItem = IOption & { type: string };
+
+const FreeSearchForm = ({ onFreeSearchSelection, onFreeSearchRemoval }: FreeSearchFormParams) => {
   const { t } = useTranslation();
   const [searchState, setSearchState] = useState<ISearchState>({
     selections: [],
@@ -23,54 +31,82 @@ const FreeSearchForm = () => {
 
   const { selections, searchWord } = searchState;
 
-  const getSuggestions = (inputValue: string) =>
-    new Promise<{ value: string; label: string }[]>((resolve, reject) => {
-      getProjectsWithFreeSearch(inputValue)
-        .then((res) => {
-          const resultList = [];
-          if (res) {
-            res.projects && resultList.push(...res.projects);
-            res.groups && resultList.push(...res.groups);
-            res.hashtags &&
-              resultList.push(...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}` })));
+  const getSuggestions = useCallback(
+    (inputValue: string) =>
+      new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+        getProjectsWithFreeSearch(inputValue)
+          .then((res) => {
+            const resultList = [];
+            if (res) {
+              res.projects &&
+                resultList.push(
+                  ...res.projects.map((project) => ({ ...project, type: 'project' })),
+                );
+              res.groups &&
+                resultList.push(...res.groups.map((group) => ({ ...group, type: 'group' })));
+              res.hashtags &&
+                resultList.push(
+                  ...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}`, type: 'hashtag' })),
+                );
 
-            const resultListAsOption: Array<IOption> | [] = resultList
-              ? resultList.map((r) => listItemToOption(r))
-              : [];
+              const resultListAsOption: Array<FreeSearchFormItem> | [] = resultList
+                ? resultList.map((r) => ({ ...listItemToOption(r), type: r.type }))
+                : [];
 
-            // TODO: add search results to resultListAsOption to be able to grab the ID when submitting the values
-            // if (resultListAsOption.length > 0) {
-            //   setSearchState((current) => ({
-            //     ...current,
-            //     resultObject: Object.fromEntries(
-            //       resultListAsOption.map(({ value, label }) => [label, [value]]),
-            //     ),
-            //   }));
-            // }
+              // add search results to resultListAsOption to be able to grab the ID when submitting the values
+              if (resultListAsOption.length > 0) {
+                setSearchState((current) => ({
+                  ...current,
+                  resultObject: resultListAsOption.reduce((accumulator, current) => {
+                    accumulator[current['label'] as unknown as string] = {
+                      value: current['value'],
+                      label: current['label'],
+                      type: current['type'],
+                    };
+                    return accumulator;
+                  }, {} as { [k: string]: { [k: string]: string } }),
+                }));
+              }
+              resolve(resultListAsOption);
+            }
+            resolve([]);
+          })
+          .catch(() => reject([]));
+      }),
+    [],
+  );
 
-            resolve(resultListAsOption);
-          }
-          resolve([]);
-        })
-        .catch(() => reject([]));
-    });
+  const handleSubmit = useCallback(
+    (value: string) => {
+      console.log('selected: ', value);
 
-  const handleSubmit = useCallback((value: string) => {
-    setSearchState((current) => ({
-      ...current,
-      selections: [...current.selections, value],
-      searchWord: '',
-    }));
-  }, []);
+      setSearchState((current) => {
+        onFreeSearchSelection(current.resultObject[value]);
+        return {
+          ...current,
+          selections: [...current.selections, value],
+          searchWord: '',
+        };
+      });
+    },
+    [onFreeSearchSelection],
+  );
 
   /* Get the <span>-elements value and remove it from selections-hook when deleting a value */
-  const onSelectionDelete = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    const elementValue = (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText;
-    return setSearchState((current) => ({
-      ...current,
-      selections: current.selections.filter((v) => v !== elementValue),
-    }));
-  }, []);
+  const onSelectionDelete = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      const elementValue = (e.currentTarget as HTMLButtonElement)?.parentElement
+        ?.innerText as string;
+      onFreeSearchRemoval(elementValue);
+      return setSearchState((current) => {
+        return {
+          ...current,
+          selections: current.selections.filter((v) => v !== elementValue),
+        };
+      });
+    },
+    [onFreeSearchRemoval],
+  );
 
   const handleSetSearchWord = useCallback(
     (value: string) => setSearchState((current) => ({ ...current, searchWord: value })),

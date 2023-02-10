@@ -2,12 +2,12 @@ import useSearchForm from '@/hooks/useSearchForm';
 import { ISearchForm } from '@/interfaces/formInterfaces';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FormFieldCreator } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
-import FreeSearchForm from './FreeSearchForm';
+import FreeSearchForm, { FreeSearchFormItem } from './FreeSearchForm';
 import { IOption } from '@/interfaces/common';
 import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
 import useClassList from '@/hooks/useClassList';
@@ -21,6 +21,8 @@ const Search = () => {
   const { t } = useTranslation();
   const open = useAppSelector((state: RootState) => state.search.open);
   const dispatch = useAppDispatch();
+
+  const freeSearchParams: { [k: string]: { [k: string]: string } } = useMemo(() => ({}), []);
 
   useClassList(false);
   useLocationList(false);
@@ -94,6 +96,21 @@ const Search = () => {
     [dispatch],
   );
 
+  const onFreeSearchSelection = useCallback(
+    ({ value, label, type }: FreeSearchFormItem) => {
+      freeSearchParams[label] = { value, type, label };
+      console.log(freeSearchParams);
+    },
+    [freeSearchParams],
+  );
+
+  const onFreeSearchRemoval = useCallback(
+    (item: string) => {
+      delete freeSearchParams[item];
+    },
+    [freeSearchParams],
+  );
+
   return (
     <Dialog
       id="search-dialog"
@@ -106,7 +123,10 @@ const Search = () => {
     >
       <Dialog.Header id="search-dialog-header" title={t('searchProjects')} />
       <Dialog.Content>
-        <FreeSearchForm />
+        <FreeSearchForm
+          onFreeSearchSelection={onFreeSearchSelection}
+          onFreeSearchRemoval={onFreeSearchRemoval}
+        />
         <form
           className="search-form"
           onSubmit={handleSubmit(onSubmit)}
