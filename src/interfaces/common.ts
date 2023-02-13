@@ -60,3 +60,11 @@ export enum ClassTableHierarchy {
   Second = 'second',
   Third = 'third',
 }
+
+export interface IFreeSearchResult {
+  hashtags?: Array<IListItem>;
+  projects?: Array<IListItem>;
+  groups?: Array<IListItem>;
+}
+
+export type FreeSearchFormItem = IOption & { type: string };

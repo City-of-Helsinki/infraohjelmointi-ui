@@ -1,27 +1,30 @@
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { memo, useCallback, useState, MouseEvent } from 'react';
-import './styles.css';
+import { memo, useCallback, useState, MouseEvent, FC } from 'react';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
 import { listItemToOption } from '@/utils/common';
-import './styles.css';
-import { IOption } from '@/interfaces/common';
+import { FreeSearchFormItem, IFreeSearchResult, IListItem } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
+import './styles.css';
+
+type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
+type FreeSearchFormListItem = IListItem & { type: string };
 
 interface ISearchState {
   selections: Array<string>;
   searchWord: string;
-  resultObject: any;
+  resultObject: FreeSearchFormObject;
 }
 
-type FreeSearchFormParams = {
+interface IFreeSearchFormProps {
   onFreeSearchSelection: (item: FreeSearchFormItem) => void;
   onFreeSearchRemoval: (item: string) => void;
-};
+}
 
-export type FreeSearchFormItem = IOption & { type: string };
-
-const FreeSearchForm = ({ onFreeSearchSelection, onFreeSearchRemoval }: FreeSearchFormParams) => {
+const FreeSearchForm: FC<IFreeSearchFormProps> = ({
+  onFreeSearchSelection,
+  onFreeSearchRemoval,
+}) => {
   const { t } = useTranslation();
   const [searchState, setSearchState] = useState<ISearchState>({
     selections: [],
@@ -31,43 +34,54 @@ const FreeSearchForm = ({ onFreeSearchSelection, onFreeSearchRemoval }: FreeSear
 
   const { selections, searchWord } = searchState;
 
+  /**
+   * Create a list of FreeSearchFormListItems from a IFreeSearchResult
+   */
+  const freeSearchResultToList = (res: IFreeSearchResult): Array<FreeSearchFormListItem> => {
+    const resultList = [];
+
+    res.projects &&
+      resultList.push(...res.projects.map((project) => ({ ...project, type: 'project' })));
+    res.groups && resultList.push(...res.groups.map((group) => ({ ...group, type: 'group' })));
+    res.hashtags &&
+      resultList.push(
+        ...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}`, type: 'hashtag' })),
+      );
+    return resultList;
+  };
+
+  /**
+   * Create a FreeSearchFormObject from a list of FreeSearchFormItems
+   * @returns
+   */
+  const freeSearchFormItemsToResultObject = (freeSearchFormItems: Array<FreeSearchFormItem>) =>
+    freeSearchFormItems.reduce((accumulator, current) => {
+      accumulator[current['label'] as unknown as string] = current;
+      return accumulator;
+    }, {} as FreeSearchFormObject);
+
   const getSuggestions = useCallback(
     (inputValue: string) =>
       new Promise<{ value: string; label: string }[]>((resolve, reject) => {
         getProjectsWithFreeSearch(inputValue)
           .then((res) => {
-            const resultList = [];
             if (res) {
-              res.projects &&
-                resultList.push(
-                  ...res.projects.map((project) => ({ ...project, type: 'project' })),
-                );
-              res.groups &&
-                resultList.push(...res.groups.map((group) => ({ ...group, type: 'group' })));
-              res.hashtags &&
-                resultList.push(
-                  ...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}`, type: 'hashtag' })),
-                );
+              const resultList = freeSearchResultToList(res);
 
-              const resultListAsOption: Array<FreeSearchFormItem> | [] = resultList
+              // Convert the resultList to options for the suggestion dropdown
+              const freeSearchFormItemList: Array<FreeSearchFormItem> | [] = resultList
                 ? resultList.map((r) => ({ ...listItemToOption(r), type: r.type }))
                 : [];
 
-              // add search results to resultListAsOption to be able to grab the ID when submitting the values
-              if (resultListAsOption.length > 0) {
+              // This resultObject is needed to be able to add the type, value and name of the selected option,
+              // since the callback for selecting an option only returns the displayed value instead of the mapped object.
+              if (freeSearchFormItemList.length > 0) {
                 setSearchState((current) => ({
                   ...current,
-                  resultObject: resultListAsOption.reduce((accumulator, current) => {
-                    accumulator[current['label'] as unknown as string] = {
-                      value: current['value'],
-                      label: current['label'],
-                      type: current['type'],
-                    };
-                    return accumulator;
-                  }, {} as { [k: string]: { [k: string]: string } }),
+                  resultObject: freeSearchFormItemsToResultObject(freeSearchFormItemList),
                 }));
               }
-              resolve(resultListAsOption);
+              resolve(freeSearchFormItemList);
             }
             resolve([]);
           })
@@ -76,10 +90,11 @@ const FreeSearchForm = ({ onFreeSearchSelection, onFreeSearchRemoval }: FreeSear
     [],
   );
 
+  /**
+   * Gets the selectedValue and uses the resultObject to get the id and type for the selectedValue
+   */
   const handleSubmit = useCallback(
     (value: string) => {
-      console.log('selected: ', value);
-
       setSearchState((current) => {
         onFreeSearchSelection(current.resultObject[value]);
         return {
@@ -92,7 +107,9 @@ const FreeSearchForm = ({ onFreeSearchSelection, onFreeSearchRemoval }: FreeSear
     [onFreeSearchSelection],
   );
 
-  /* Get the <span>-elements value and remove it from selections-hook when deleting a value */
+  /**
+   * Get the <span>-elements value and remove it from selections-hook when deleting a value
+   */
   const onSelectionDelete = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       const elementValue = (e.currentTarget as HTMLButtonElement)?.parentElement

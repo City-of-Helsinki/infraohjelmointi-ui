@@ -7,13 +7,13 @@ import { FormFieldCreator } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
-import FreeSearchForm, { FreeSearchFormItem } from './FreeSearchForm';
-import { IOption } from '@/interfaces/common';
+import { FreeSearchFormItem, IOption } from '@/interfaces/common';
 import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
 import useClassList from '@/hooks/useClassList';
 import useLocationList from '@/hooks/useLocationList';
-import './styles.css';
 import { useTranslation } from 'react-i18next';
+import FreeSearchForm from './FreeSearchForm';
+import './styles.css';
 
 const Search = () => {
   const { formMethods, formFields } = useSearchForm();
@@ -80,6 +80,22 @@ const Search = () => {
           break;
       }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const [_, value] of Object.entries(freeSearchParams)) {
+      switch (true) {
+        case value.type === 'group':
+          searchParams.push(`projectGroup=${value.value}`);
+          break;
+        case value.type === 'project':
+          searchParams.push(`project=${value.value}`);
+          break;
+        case value.type === 'hashtag':
+          searchParams.push(`hashTags=${value.value}`);
+          break;
+      }
+    }
+
     return searchParams.join('&');
   };
 
@@ -99,7 +115,6 @@ const Search = () => {
   const onFreeSearchSelection = useCallback(
     ({ value, label, type }: FreeSearchFormItem) => {
       freeSearchParams[label] = { value, type, label };
-      console.log(freeSearchParams);
     },
     [freeSearchParams],
   );
