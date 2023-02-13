@@ -7,7 +7,7 @@ import { FormFieldCreator } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
 import { getSearchResultsThunk, setSearchForm, toggleSearch } from '@/reducers/searchSlice';
-import { FreeSearchFormItem, IOption } from '@/interfaces/common';
+import { FreeSearchFormItem, FreeSearchFormObject, IOption } from '@/interfaces/common';
 import useClassList from '@/hooks/useClassList';
 import useLocationList from '@/hooks/useLocationList';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,7 @@ const Search = () => {
   const open = useAppSelector((state: RootState) => state.search.open);
   const dispatch = useAppDispatch();
 
-  const freeSearchParams: { [k: string]: { [k: string]: string } } = useMemo(() => ({}), []);
+  const freeSearchParams: FreeSearchFormObject = useMemo(() => ({}), []);
 
   useClassList(false);
   useLocationList(false);

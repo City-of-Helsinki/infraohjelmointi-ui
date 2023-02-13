@@ -20,7 +20,9 @@ import { mockLocations } from '@/mocks/mockLocations';
 import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
 import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
 import { mockError } from '@/mocks/mockError';
-import { IError } from '@/interfaces/common';
+import { IError, IFreeSearchResult } from '@/interfaces/common';
+import { ISearchResult } from '@/interfaces/searchInterfaces';
+import { mockFreeSearchResult, mockSearchResult } from '@/mocks/mockSearch';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -153,8 +155,66 @@ describe('Search', () => {
     expect(store.getState().search.form.programmedYes).toBe(true);
   });
 
-  // TODO: test free search
-  // TODO: test that search button creates proper search params
+  it('can use the free search field to get suggestions and add selections to search params', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockFreeSearchResult);
+
+    const { user, store, getByText, queryByText, getByTestId } = renderResult;
+
+    await waitFor(() => store.dispatch(toggleSearch()));
+
+    // type an 'l'
+    await user.type(getByText('searchForm.searchWord'), 'l');
+
+    // check that the full search response is rendered
+    await waitFor(async () => {
+      mockFreeSearchResult.data.projects?.forEach((p) => {
+        expect(getByText(p.value)).toBeInTheDocument();
+      });
+      mockFreeSearchResult.data.hashtags?.forEach((h) => {
+        expect(getByText(`#${h.value}`)).toBeInTheDocument();
+      });
+      mockFreeSearchResult.data.groups?.forEach((g) => {
+        expect(getByText(g.value)).toBeInTheDocument();
+      });
+      await user.click(getByText('#leikkipuisto'));
+    });
+
+    const getRequest = mockedAxios.get.mock;
+
+    // Check that the freeSearch url was called
+    expect(getRequest.calls[0][0]).toBe('localhost:4000/projects/?freeSearch=l');
+
+    // Check that the get response is correct and that only the clicked selection is in the document
+    await Promise.resolve(getRequest.results[0].value).then((res: { data: IFreeSearchResult }) => {
+      expect(res.data).toStrictEqual(mockFreeSearchResult.data);
+      expect(getByText('#leikkipuisto')).toBeInTheDocument();
+      expect(queryByText('#leikkipaikka')).toBeNull();
+    });
+
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
+
+    await user.click(getByTestId('search-projects-button'));
+
+    // Check that the search param was added correctly
+    expect(getRequest.calls[1][0].includes('&hashTags=123')).toBe(true);
+  });
+
+  it('adds search results to redux with a successful GET request', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
+
+    const { user, getByTestId, store } = renderResult;
+
+    await waitFor(() => store.dispatch(toggleSearch()));
+
+    await user.click(getByTestId('search-projects-button'));
+
+    const getRequest = mockedAxios.get.mock.results[0].value;
+
+    await Promise.resolve(getRequest).then((res: { data: ISearchResult }) => {
+      expect(res.data).toStrictEqual(mockSearchResult.data);
+      expect(store.getState().search.searchResults).toStrictEqual(mockSearchResult.data);
+    });
+  });
 
   it('catches a bad search request', async () => {
     const { store } = renderResult;

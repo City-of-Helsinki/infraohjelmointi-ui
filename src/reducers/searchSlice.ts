@@ -1,13 +1,13 @@
 import { IError } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { ISearchResults } from '@/interfaces/searchInterfaces';
+import { ISearchResult } from '@/interfaces/searchInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ISearchState {
   open: boolean;
   form: ISearchForm;
-  searchResults: ISearchResults | null;
+  searchResults: ISearchResult | null;
   error: IError | null | unknown;
 }
 
@@ -57,7 +57,7 @@ export const searchSlice = createSlice({
     // GET SEARCH RESULTS
     builder.addCase(
       getSearchResultsThunk.fulfilled,
-      (state, action: PayloadAction<ISearchResults>) => {
+      (state, action: PayloadAction<ISearchResult>) => {
         return { ...state, searchResults: action.payload };
       },
     );

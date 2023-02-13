@@ -2,12 +2,16 @@ import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { memo, useCallback, useState, MouseEvent, FC } from 'react';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
-import { listItemToOption } from '@/utils/common';
-import { FreeSearchFormItem, IFreeSearchResult, IListItem } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
+import { arrayHasValue, listItemToOption, objectHasProperty } from '@/utils/common';
+import {
+  FreeSearchFormItem,
+  FreeSearchFormObject,
+  IFreeSearchResult,
+  IListItem,
+} from '@/interfaces/common';
 import './styles.css';
 
-type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 type FreeSearchFormListItem = IListItem & { type: string };
 
 interface ISearchState {
@@ -26,13 +30,14 @@ const FreeSearchForm: FC<IFreeSearchFormProps> = ({
   onFreeSearchRemoval,
 }) => {
   const { t } = useTranslation();
+
   const [searchState, setSearchState] = useState<ISearchState>({
     selections: [],
     searchWord: '',
     resultObject: {},
   });
 
-  const { selections, searchWord } = searchState;
+  const { selections, searchWord, resultObject } = searchState;
 
   /**
    * Create a list of FreeSearchFormListItems from a IFreeSearchResult
@@ -66,7 +71,10 @@ const FreeSearchForm: FC<IFreeSearchFormProps> = ({
         getProjectsWithFreeSearch(inputValue)
           .then((res) => {
             if (res) {
-              const resultList = freeSearchResultToList(res);
+              // Create a combined list of all results and filter already selected values
+              const resultList = freeSearchResultToList(res).filter(
+                (f) => !arrayHasValue(selections, f.value),
+              );
 
               // Convert the resultList to options for the suggestion dropdown
               const freeSearchFormItemList: Array<FreeSearchFormItem> | [] = resultList
@@ -81,30 +89,34 @@ const FreeSearchForm: FC<IFreeSearchFormProps> = ({
                   resultObject: freeSearchFormItemsToResultObject(freeSearchFormItemList),
                 }));
               }
+
               resolve(freeSearchFormItemList);
             }
             resolve([]);
           })
           .catch(() => reject([]));
       }),
-    [],
+    [selections],
   );
 
   /**
-   * Gets the selectedValue and uses the resultObject to get the id and type for the selectedValue
+   * Gets the selectedValue and uses the resultObject to get the id and type for the
+   * selectedValue, if it exists in resultObject and isn't already added as a selection
    */
   const handleSubmit = useCallback(
     (value: string) => {
-      setSearchState((current) => {
-        onFreeSearchSelection(current.resultObject[value]);
-        return {
-          ...current,
-          selections: [...current.selections, value],
-          searchWord: '',
-        };
-      });
+      if (!arrayHasValue(selections, value) && objectHasProperty(resultObject, value)) {
+        setSearchState((current) => {
+          onFreeSearchSelection(current.resultObject[value]);
+          return {
+            ...current,
+            selections: [...current.selections, value],
+            searchWord: '',
+          };
+        });
+      }
     },
-    [onFreeSearchSelection],
+    [onFreeSearchSelection, selections, resultObject],
   );
 
   /**

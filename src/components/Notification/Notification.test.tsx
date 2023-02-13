@@ -1,16 +1,12 @@
 import mockI18next from '@/mocks/mockI18next';
 import Notification from './Notification';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
-import { setupStore } from '@/store';
 import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
 import mockPersons from '@/mocks/mockPersons';
 import { act } from 'react-dom/test-utils';
 import { waitFor } from '@testing-library/react';
-import { INotification } from '@/interfaces/common';
-import { debug } from 'console';
-
 jest.mock('react-i18next', () => mockI18next());
 
 describe('Notification', () => {

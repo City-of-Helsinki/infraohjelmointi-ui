@@ -107,3 +107,6 @@ export const setProgrammedYears = () => {
   }
   return years;
 };
+
+export const arrayHasValue = (arr: Array<unknown> | undefined, value: string) =>
+  arr && arr.indexOf(value) !== -1;

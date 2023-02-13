@@ -15,6 +15,7 @@ import './styles.css';
 import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
 import { IListItem } from '@/interfaces/common';
+import { arrayHasValue, objectHasProperty } from '@/utils/common';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -86,8 +87,8 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       if (projectHashTags && allHashTags) {
         setFormState((current) => ({
           ...current,
-          hashTagsForSubmit: allHashTags.hashTags.filter(
-            ({ id }) => projectHashTags.indexOf(id) !== -1,
+          hashTagsForSubmit: allHashTags.hashTags.filter(({ id }) =>
+            arrayHasValue(projectHashTags, id),
           ),
         }));
       }
@@ -119,7 +120,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const onHashTagClick = useCallback(
       (value: string) => {
         if (
-          Object.prototype.hasOwnProperty.call(hashTagsObject, value) &&
+          objectHasProperty(hashTagsObject, value) &&
           hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
         ) {
           setFormState((current) => ({
@@ -159,8 +160,8 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const handleClose = useCallback(() => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSubmit: allHashTags.hashTags.filter(
-          ({ id }) => projectHashTags.indexOf(id) !== -1,
+        hashTagsForSubmit: allHashTags.hashTags.filter(({ id }) =>
+          arrayHasValue(projectHashTags, id),
         ),
       }));
       handleSetOpen();

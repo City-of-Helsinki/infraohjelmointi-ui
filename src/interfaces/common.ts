@@ -68,3 +68,4 @@ export interface IFreeSearchResult {
 }
 
 export type FreeSearchFormItem = IOption & { type: string };
+export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };

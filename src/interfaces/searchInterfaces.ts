@@ -6,7 +6,7 @@ export interface ISearchResultItem {
   path: string;
 }
 
-export interface ISearchResults {
+export interface ISearchResult {
   groups: Array<ISearchResultItem>;
   classes: Array<ISearchResultItem>;
   locations: Array<ISearchResultItem>;
