@@ -35,7 +35,6 @@ describe('ProjectNotes', () => {
             project: {
               projects: [],
               selectedProject: mockProject.data,
-              searchedProjects: [],
               count: 1,
               error: {},
               page: 1,

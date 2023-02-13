@@ -6,9 +6,8 @@ import { useCallback, useMemo } from 'react';
 import { FormFieldCreator } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { RootState } from '@/store';
-import { setSearchForm, toggleSearch } from '@/reducers/searchSlice';
+import { getSearchResultsThunk, setSearchForm, toggleSearch } from '@/reducers/searchSlice';
 import { FreeSearchFormItem, IOption } from '@/interfaces/common';
-import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
 import useClassList from '@/hooks/useClassList';
 import useLocationList from '@/hooks/useLocationList';
 import { useTranslation } from 'react-i18next';
@@ -101,7 +100,7 @@ const Search = () => {
 
   const onSubmit = async (form: ISearchForm) => {
     const searchParams = buildSearchParams(form);
-    dispatch(getProjectsWithParamsThunk(searchParams)).then(() => dispatch(setSearchForm(form)));
+    dispatch(getSearchResultsThunk(searchParams)).then(() => dispatch(setSearchForm(form)));
   };
 
   const handleClose = useCallback(

@@ -1,16 +1,16 @@
+import { IError } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ISearchResults } from '@/interfaces/searchInterfaces';
+import { getProjectsWithParams } from '@/services/projectServices';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ISearchState {
   open: boolean;
   form: ISearchForm;
+  searchResults: ISearchResults | null;
+  error: IError | null | unknown;
 }
 
-/**
- * TODO:
- * The search options should be stored, since the user is supposed to be able to return to the
- * search dialog/form and continue adding or removing the current criterias
- */
 const initialState: ISearchState = {
   open: false,
   form: {
@@ -29,7 +29,18 @@ const initialState: ISearchState = {
     subDivision: [],
     category: { value: '', label: '' },
   },
+  searchResults: null,
+  error: null,
 };
+
+export const getSearchResultsThunk = createAsyncThunk(
+  'search/getSearchResults',
+  async (params: string, thunkAPI) => {
+    return await getProjectsWithParams(params)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
 
 export const searchSlice = createSlice({
   name: 'search',
@@ -41,6 +52,21 @@ export const searchSlice = createSlice({
     setSearchForm(state, action: PayloadAction<ISearchForm>) {
       return { ...state, form: { ...state.form, ...action.payload } };
     },
+  },
+  extraReducers: (builder) => {
+    // GET SEARCH RESULTS
+    builder.addCase(
+      getSearchResultsThunk.fulfilled,
+      (state, action: PayloadAction<ISearchResults>) => {
+        return { ...state, searchResults: action.payload };
+      },
+    );
+    builder.addCase(
+      getSearchResultsThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 

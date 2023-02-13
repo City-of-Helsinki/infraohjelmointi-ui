@@ -1,5 +1,6 @@
 import { IError, IFreeSearchResult } from '@/interfaces/common';
 import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
+import { ISearchResults } from '@/interfaces/searchInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
@@ -39,7 +40,7 @@ export const patchProject = async (request: IProjectRequestObject): Promise<IPro
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const getProjectsWithParams = async (params: string): Promise<Array<IProject>> => {
+export const getProjectsWithParams = async (params: string): Promise<ISearchResults> => {
   return axios
     .get(`${REACT_APP_API_URL}/projects/?${params}`)
     .then((res) => res.data)

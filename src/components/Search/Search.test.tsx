@@ -14,13 +14,12 @@ import Search from './Search';
 import mockProjectClasses from '@/mocks/mockClasses';
 import { setupStore } from '@/store';
 import { waitFor } from '@testing-library/react';
-import { toggleSearch } from '@/reducers/searchSlice';
+import { getSearchResultsThunk, toggleSearch } from '@/reducers/searchSlice';
 import { setProgrammedYears } from '@/utils/common';
 import { mockLocations } from '@/mocks/mockLocations';
 import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
 import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
 import { mockError } from '@/mocks/mockError';
-import { getProjectsWithParamsThunk } from '@/reducers/projectSlice';
 import { IError } from '@/interfaces/common';
 
 jest.mock('axios');
@@ -160,9 +159,9 @@ describe('Search', () => {
   it('catches a bad search request', async () => {
     const { store } = renderResult;
     mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getProjectsWithParamsThunk('123'));
+    await store.dispatch(getSearchResultsThunk('123'));
 
-    const storeError = store.getState().project.error as IError;
+    const storeError = store.getState().search.error as IError;
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
   });

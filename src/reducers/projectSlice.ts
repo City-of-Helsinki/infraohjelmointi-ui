@@ -1,12 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
-import {
-  getProject,
-  getProjects,
-  getProjectsWithParams,
-  patchProject,
-  postProject,
-} from '@/services/projectServices';
+import { getProject, getProjects, patchProject, postProject } from '@/services/projectServices';
 import { RootState } from '@/store';
 import { getCurrentTime } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -15,7 +9,6 @@ import { notifySuccess } from './notificationSlice';
 interface IProjectState {
   selectedProject: IProject | null;
   projects: Array<IProject>;
-  searchedProjects: Array<IProject>;
   count: number | null;
   page: number;
   error: IError | null | unknown;
@@ -25,7 +18,6 @@ interface IProjectState {
 const initialState: IProjectState = {
   selectedProject: null,
   projects: [],
-  searchedProjects: [],
   count: null,
   error: null,
   page: 0,
@@ -85,15 +77,6 @@ export const patchProjectThunk = createAsyncThunk(
         );
         return res;
       })
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
-export const getProjectsWithParamsThunk = createAsyncThunk(
-  'project/getWithParams',
-  async (params: string, thunkAPI) => {
-    return await getProjectsWithParams(params)
-      .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
@@ -174,19 +157,6 @@ export const projectSlice = createSlice({
     });
     builder.addCase(
       silentPatchProjectThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
-    // GET WITH PARAMS
-    builder.addCase(
-      getProjectsWithParamsThunk.fulfilled,
-      (state, action: PayloadAction<Array<IProject>>) => {
-        return { ...state, searchedProjects: action.payload };
-      },
-    );
-    builder.addCase(
-      getProjectsWithParamsThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },
