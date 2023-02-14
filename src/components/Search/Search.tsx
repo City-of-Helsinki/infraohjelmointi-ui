@@ -43,10 +43,10 @@ const Search = () => {
             value.forEach((v: IOption) => searchParams.push(`subClass=${v.value}`));
           break;
         case 'programmedYes':
-          value && searchParams.push(`programmed=${value}`);
+          value && searchParams.push('programmed=true');
           break;
         case 'programmedNo':
-          !value && searchParams.push(`programmed=${value}`);
+          value && searchParams.push('programmed=false');
           break;
         case 'programmedYearMin':
           value && searchParams.push(`programmedYearMin=${value}`);
