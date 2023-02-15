@@ -17,19 +17,17 @@ import { useAppSelector } from './common';
 export const useOptions = (name?: ListType) => {
   const { t } = useTranslation();
 
-  const isPersonList = ['personPlanning', 'personConstruction', 'personProgramming'].includes(
+  const personName = ['personPlanning', 'personConstruction', 'personProgramming'].includes(
     name as ListType,
-  );
-
-  const isProgrammedYearsList = ['programmedYearMin', 'programmedYearMax'].includes(
-    name as ListType,
-  );
-
-  const parsedName = isPersonList
+  )
     ? 'responsiblePersons'
-    : isProgrammedYearsList
+    : '';
+
+  const programmedYearName = ['programmedYearMin', 'programmedYearMax'].includes(name as ListType)
     ? 'programmedYears'
-    : name;
+    : '';
+
+  const parsedName = personName || programmedYearName || name;
 
   const shouldNotTranslate = [
     'masterClass',
