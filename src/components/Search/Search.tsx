@@ -73,14 +73,14 @@ const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormOb
   if (freeSearchParams) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [_, value] of Object.entries(freeSearchParams)) {
-      switch (true) {
-        case value.type === 'group':
+      switch (value.type) {
+        case 'group':
           searchParams.push(`projectGroup=${value.value}`);
           break;
-        case value.type === 'project':
+        case 'project':
           searchParams.push(`project=${value.value}`);
           break;
-        case value.type === 'hashtag':
+        case 'hashtag':
           searchParams.push(`hashTags=${value.value}`);
           break;
       }
