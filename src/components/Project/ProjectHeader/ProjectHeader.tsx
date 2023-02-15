@@ -1,10 +1,9 @@
 import { FC, useCallback } from 'react';
-import { RootState } from '@/store';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { Paragraph, ProgressCircle } from '@/components/shared';
 import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
@@ -12,15 +11,16 @@ import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import ProjectPhaseField from './ProjectPhaseField';
 import ProjectFavouriteField from './ProjectFavouriteField';
 import _ from 'lodash';
+import { selectUser } from '@/reducers/authSlice';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
 }
 
 const ProjectHeader: FC = () => {
-  const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
+  const project = useAppSelector(selectProject, _.isEqual);
   const projectId = project?.id;
-  const user = useAppSelector((state: RootState) => state.auth.user, _.isEqual);
+  const user = useAppSelector(selectUser, _.isEqual);
   const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
 

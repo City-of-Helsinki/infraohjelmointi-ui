@@ -3,12 +3,12 @@ import { Navigation } from 'hds-react/components/Navigation';
 import { useTranslation } from 'react-i18next';
 import { IconBell, IconSearch } from 'hds-react/icons';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { RootState } from '@/store';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { Button } from 'hds-react/components/Button';
+import { selectUser } from '@/reducers/authSlice';
 
 const TopBar: FC = () => {
-  const user = useAppSelector((state: RootState) => state.auth.user);
+  const user = useAppSelector(selectUser);
   const { t } = useTranslation();
   const { Dropdown, Actions, User, Item } = Navigation;
 

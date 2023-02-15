@@ -15,6 +15,7 @@ import {
   getResponsibleZones,
 } from '@/services/listServices';
 import { getPersons } from '@/services/personServices';
+import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -328,6 +329,10 @@ export const listsSlice = createSlice({
     );
   },
 });
+
+export const selectPhaseList = (state: RootState) => state.lists.phase;
+export const selectMasterClassList = (state: RootState) => state.lists.masterClass;
+export const selectDistrictList = (state: RootState) => state.lists.district;
 
 export const {
   setMasterClassList,

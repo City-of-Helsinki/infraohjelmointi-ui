@@ -164,6 +164,12 @@ export const projectSlice = createSlice({
   },
 });
 
+export const selectProject = (state: RootState) => state.project.selectedProject;
+export const selectProjects = (state: RootState) => state.project.projects;
+export const selectCount = (state: RootState) => state.project.count;
+export const selectPage = (state: RootState) => state.project.page;
+export const selectUpdated = (state: RootState) => state.project.updated;
+
 export const { setPage, resetProjects } = projectSlice.actions;
 
 export default projectSlice.reducer;

@@ -1,15 +1,15 @@
 import { IError } from '@/interfaces/common';
-import { getProjectsThunk } from '@/reducers/projectSlice';
+import { getProjectsThunk, selectCount, selectPage, selectProjects } from '@/reducers/projectSlice';
 import { RootState } from '@/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import _ from 'lodash';
 
 const useProjectsList = () => {
-  const projectsFromRedux = useAppSelector((state: RootState) => state.project.projects, _.isEqual);
-  const projectsCount = useAppSelector((state: RootState) => state.project.count, _.isEqual);
+  const projectsFromRedux = useAppSelector(selectProjects, _.isEqual);
+  const projectsCount = useAppSelector(selectCount, _.isEqual);
   const error = useAppSelector((state: RootState) => state.project.error, _.isEqual) as IError;
-  const page = useAppSelector((state: RootState) => state.project.page, _.isEqual);
+  const page = useAppSelector(selectPage, _.isEqual);
   const [isLastProjectsFetched, setIsLastProjectsFetched] = useState(false);
   const [isFetchings, setIsFetchings] = useState(false);
   const dispatch = useAppDispatch();

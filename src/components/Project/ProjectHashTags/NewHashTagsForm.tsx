@@ -4,9 +4,8 @@ import useHashTagsForm from '@/forms/useHashTagsForm';
 import { IListItem } from '@/interfaces/common';
 import { IHashTagsForm } from '@/interfaces/formInterfaces';
 import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { postHashTag } from '@/services/hashTagsService';
-import { RootState } from '@/store';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconPlus } from 'hds-react/icons';
 import _ from 'lodash';
@@ -22,12 +21,8 @@ const NewHashTagsForm = () => {
   const { control, reset, handleSubmit } = formMethods;
   const [createNewMode, setCreateNewMode] = useState(false);
   const [responseHashTag, setResponseHashTag] = useState<IListItem | null>(null);
-  const projectId = useAppSelector(
-    (state: RootState) => state.project.selectedProject?.id,
-    _.isEqual,
-  );
-  const projectHashTags =
-    useAppSelector((state: RootState) => state.project.selectedProject?.hashTags, _.isEqual) || [];
+  const project = useAppSelector(selectProject, _.isEqual);
+  const projectHashTags = useAppSelector(selectProject, _.isEqual)?.hashTags || [];
 
   const handleCreateNewMode = useCallback(() => {
     setCreateNewMode((current) => !current);
@@ -48,10 +43,10 @@ const NewHashTagsForm = () => {
   };
 
   const addToProject = () => {
-    if (responseHashTag && projectId) {
+    if (responseHashTag && project?.id) {
       dispatch(
         silentPatchProjectThunk({
-          id: projectId,
+          id: project?.id,
           data: { hashTags: [...projectHashTags, responseHashTag.id] },
         }),
       ).then(() => setResponseHashTag(null));

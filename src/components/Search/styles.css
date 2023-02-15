@@ -58,14 +58,14 @@
   flex-wrap: wrap;
 }
 
-.search-form .search-form-content .input-wrapper#programmedYearsMin {
+.search-form .search-form-content .input-wrapper#programmedYearMin {
   grid-column: 1/2;
   grid-row: 6;
   margin-right: 10px;
   width: calc(100% - 20px);
 }
 
-.search-form .search-form-content .input-wrapper#programmedYearsMax {
+.search-form .search-form-content .input-wrapper#programmedYearMax {
   grid-column: 2/3;
   grid-row: 6;
 }

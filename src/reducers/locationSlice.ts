@@ -1,6 +1,7 @@
 import { IError } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { getLocations } from '@/services/locationService';
+import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ILocationState {
@@ -69,6 +70,11 @@ export const locationSlice = createSlice({
     );
   },
 });
+
+export const selectAllLocations = (state: RootState) => state.location.allLocations;
+export const selectDistricts = (state: RootState) => state.location.districts;
+export const selectDivisions = (state: RootState) => state.location.divisions;
+export const selectSubDivisions = (state: RootState) => state.location.subDivisions;
 
 export const { setDistricts, setDivisions, setSubDivisions } = locationSlice.actions;
 

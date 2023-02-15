@@ -1,3 +1,4 @@
+import { RootState } from '@/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ILoadingState {
@@ -22,6 +23,9 @@ export const loadingSlice = createSlice({
     },
   },
 });
+
+export const selectIsLoading = (state: RootState) => state.loading.isLoading;
+export const selectLoadingText = (state: RootState) => state.loading.text;
 
 export const { setLoading, clearLoading } = loadingSlice.actions;
 export default loadingSlice.reducer;

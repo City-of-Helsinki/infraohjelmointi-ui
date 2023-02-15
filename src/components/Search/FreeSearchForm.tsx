@@ -1,6 +1,6 @@
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { memo, useCallback, useState, MouseEvent, FC } from 'react';
+import { memo, useCallback, useState, MouseEvent, useEffect } from 'react';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
 import { useTranslation } from 'react-i18next';
 import { arrayHasValue, listItemToOption, objectHasProperty } from '@/utils/common';
@@ -11,8 +11,41 @@ import {
   IListItem,
 } from '@/interfaces/common';
 import './styles.css';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import {
+  removeFreeSearchParam,
+  selectFreeSearchParams,
+  setFreeSearchParams,
+} from '@/reducers/searchSlice';
+import _ from 'lodash';
 
 type FreeSearchFormListItem = IListItem & { type: string };
+
+/**
+ * Create a list of FreeSearchFormListItems from a IFreeSearchResult
+ */
+const freeSearchResultToList = (res: IFreeSearchResult): Array<FreeSearchFormListItem> => {
+  const resultList = [];
+
+  res.projects &&
+    resultList.push(...res.projects.map((project) => ({ ...project, type: 'project' })));
+  res.groups && resultList.push(...res.groups.map((group) => ({ ...group, type: 'group' })));
+  res.hashtags &&
+    resultList.push(
+      ...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}`, type: 'hashtag' })),
+    );
+  return resultList;
+};
+
+/**
+ * Create a FreeSearchFormObject from a list of FreeSearchFormItems
+ * @returns
+ */
+const freeSearchFormItemsToResultObject = (freeSearchFormItems: Array<FreeSearchFormItem>) =>
+  freeSearchFormItems.reduce((accumulator, current) => {
+    accumulator[current['label'] as unknown as string] = current;
+    return accumulator;
+  }, {} as FreeSearchFormObject);
 
 interface ISearchState {
   selections: Array<string>;
@@ -20,50 +53,24 @@ interface ISearchState {
   resultObject: FreeSearchFormObject;
 }
 
-interface IFreeSearchFormProps {
-  onFreeSearchSelection: (item: FreeSearchFormItem) => void;
-  onFreeSearchRemoval: (item: string) => void;
-}
-
-const FreeSearchForm: FC<IFreeSearchFormProps> = ({
-  onFreeSearchSelection,
-  onFreeSearchRemoval,
-}) => {
+const FreeSearchForm = () => {
   const { t } = useTranslation();
-
+  const dispatch = useAppDispatch();
+  const freeSearchParams = useAppSelector(selectFreeSearchParams, _.isEqual);
   const [searchState, setSearchState] = useState<ISearchState>({
     selections: [],
     searchWord: '',
     resultObject: {},
   });
 
+  useEffect(() => {
+    setSearchState((current) => ({
+      ...current,
+      selections: !_.isEmpty(freeSearchParams) ? Object.keys(freeSearchParams) : [],
+    }));
+  }, [freeSearchParams]);
+
   const { selections, searchWord, resultObject } = searchState;
-
-  /**
-   * Create a list of FreeSearchFormListItems from a IFreeSearchResult
-   */
-  const freeSearchResultToList = (res: IFreeSearchResult): Array<FreeSearchFormListItem> => {
-    const resultList = [];
-
-    res.projects &&
-      resultList.push(...res.projects.map((project) => ({ ...project, type: 'project' })));
-    res.groups && resultList.push(...res.groups.map((group) => ({ ...group, type: 'group' })));
-    res.hashtags &&
-      resultList.push(
-        ...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}`, type: 'hashtag' })),
-      );
-    return resultList;
-  };
-
-  /**
-   * Create a FreeSearchFormObject from a list of FreeSearchFormItems
-   * @returns
-   */
-  const freeSearchFormItemsToResultObject = (freeSearchFormItems: Array<FreeSearchFormItem>) =>
-    freeSearchFormItems.reduce((accumulator, current) => {
-      accumulator[current['label'] as unknown as string] = current;
-      return accumulator;
-    }, {} as FreeSearchFormObject);
 
   const getSuggestions = useCallback(
     (inputValue: string) =>
@@ -106,35 +113,30 @@ const FreeSearchForm: FC<IFreeSearchFormProps> = ({
   const handleSubmit = useCallback(
     (value: string) => {
       if (!arrayHasValue(selections, value) && objectHasProperty(resultObject, value)) {
+        dispatch(setFreeSearchParams({ [resultObject[value].label]: resultObject[value] }));
         setSearchState((current) => {
-          onFreeSearchSelection(current.resultObject[value]);
           return {
             ...current,
-            selections: [...current.selections, value],
             searchWord: '',
           };
         });
       }
     },
-    [onFreeSearchSelection, selections, resultObject],
+    [selections, resultObject, dispatch],
   );
 
   /**
-   * Get the <span>-elements value and remove it from selections-hook when deleting a value
+   * Get the <span>-elements value and use the value to remove the key from redux
    */
   const onSelectionDelete = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
-      const elementValue = (e.currentTarget as HTMLButtonElement)?.parentElement
-        ?.innerText as string;
-      onFreeSearchRemoval(elementValue);
-      return setSearchState((current) => {
-        return {
-          ...current,
-          selections: current.selections.filter((v) => v !== elementValue),
-        };
-      });
+      dispatch(
+        removeFreeSearchParam(
+          (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string,
+        ),
+      );
     },
-    [onFreeSearchRemoval],
+    [dispatch],
   );
 
   const handleSetSearchWord = useCallback(
@@ -155,9 +157,9 @@ const FreeSearchForm: FC<IFreeSearchFormProps> = ({
         onSubmit={handleSubmit}
       />
       <div className="search-selections">
-        {selections.map((w) => (
-          <Tag key={w} onDelete={onSelectionDelete}>
-            {w}
+        {selections.map((s) => (
+          <Tag key={s} onDelete={onSelectionDelete}>
+            {s}
           </Tag>
         ))}
       </div>

@@ -2,6 +2,7 @@ import { IError } from '@/interfaces/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
 import { getHashTags } from '@/services/hashTagsService';
+import { RootState } from '@/store';
 
 interface IHashTagState extends IHashTagsResponse {
   error: IError | null | unknown;
@@ -42,5 +43,7 @@ export const hashTagSlice = createSlice({
     });
   },
 });
+
+export const selectHashTags = (state: RootState) => state.hashTags;
 
 export default hashTagSlice.reducer;

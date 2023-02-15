@@ -22,7 +22,7 @@ export const useOptions = (name?: ListType) => {
     name as ListType,
   );
 
-  const isProgrammedYearsList = ['programmedYearsMin', 'programmedYearsMax'].includes(
+  const isProgrammedYearsList = ['programmedYearMin', 'programmedYearMax'].includes(
     name as ListType,
   );
 

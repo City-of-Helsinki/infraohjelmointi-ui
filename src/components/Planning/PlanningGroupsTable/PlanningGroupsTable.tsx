@@ -1,8 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import useProjectsList from '@/hooks/useProjectsList';
 import { planGroups } from '@/mocks/common';
-import { getProjectPhasesThunk } from '@/reducers/listsSlice';
-import { RootState } from '@/store';
+import { getProjectPhasesThunk, selectPhaseList } from '@/reducers/listsSlice';
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -15,7 +14,7 @@ const PlanningGroupsTable = () => {
   const { projects, fetchNext } = useProjectsList();
   const { ref, inView } = useInView();
   const dispatch = useAppDispatch();
-  const phases = useAppSelector((state: RootState) => state.lists.phase, _.isEqual);
+  const phases = useAppSelector(selectPhaseList, _.isEqual);
   const [tableState, setTableState] = useState<{
     selectedProjectId: string;
     projectsVisible: boolean;

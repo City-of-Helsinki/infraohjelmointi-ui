@@ -1,10 +1,17 @@
 import { FormField, HookFormControlType, IForm, ISearchForm } from '@/interfaces/formInterfaces';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
-import { useAppSelector } from './common';
-import { RootState } from '@/store';
+import { useAppDispatch, useAppSelector } from './common';
+import _ from 'lodash';
+import {
+  initialState,
+  selectFreeSearchParams,
+  selectOpen,
+  selectSearchForm,
+  setSearchForm,
+} from '@/reducers/searchSlice';
 
 const buildSearchFormFields = (
   control: HookFormControlType,
@@ -40,12 +47,12 @@ const buildSearchFormFields = (
       ],
     },
     {
-      name: 'programmedYearsMin',
+      name: 'programmedYearMin',
       type: FormField.Select,
       placeholder: 'Valitse',
     },
     {
-      name: 'programmedYearsMax',
+      name: 'programmedYearMax',
       type: FormField.Select,
       placeholder: 'Valitse',
     },
@@ -86,20 +93,61 @@ const buildSearchFormFields = (
 
 const useSearchForm = () => {
   const { t } = useTranslation();
-
-  const formValues = useAppSelector((state: RootState) => state.search.form);
-
+  const dispatch = useAppDispatch();
+  const storeFormValues = useAppSelector(selectSearchForm, _.isEqual);
+  const open = useAppSelector(selectOpen, _.isEqual);
+  const freeSearchParams = useAppSelector(selectFreeSearchParams, _.isEqual);
   const formMethods = useForm<ISearchForm>({
-    defaultValues: formValues,
+    defaultValues: useMemo(() => storeFormValues, [storeFormValues]),
     mode: 'onBlur',
   });
 
-  const { control, reset } = formMethods;
+  const {
+    control,
+    reset,
+    getValues,
+    setValue,
+    formState: { dirtyFields },
+  } = formMethods;
 
+  const currentFormValues = getValues();
+
+  const formHasDefaultValues =
+    JSON.stringify(currentFormValues) === JSON.stringify(initialState.form);
+
+  /**
+   * hack solution to set the form dirty manually by switching a form value to dirty,
+   * currently react-hook-form doesn't provide a better way
+   */
+  const setFormDirty = useCallback(() => {
+    const programmedYesValue = getValues('programmedYes');
+    setValue('programmedYes', !programmedYesValue, { shouldDirty: true });
+    setValue('programmedYes', programmedYesValue);
+  }, [getValues, setValue]);
+
+  /**
+   * Make the form dirty manually if freeSearchParams has values, and reset the form
+   * with its current values if freeSearchParams are empty
+   */
   useEffect(() => {
-    reset(formValues);
+    if (!_.isEmpty(freeSearchParams) && _.isEmpty(dirtyFields)) {
+      setFormDirty();
+    } else if (_.isEmpty(freeSearchParams) && formHasDefaultValues) {
+      dispatch(setSearchForm(currentFormValues));
+      reset(currentFormValues);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues]);
+  }, [freeSearchParams, open]);
+
+  /**
+   * Set the form to dirty if there are no empty fields and freeSearchParams has values when opening the form
+   */
+  useEffect(() => {
+    if (formHasDefaultValues && !_.isEmpty(freeSearchParams) && _.isEmpty(dirtyFields)) {
+      setFormDirty();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFormValues]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const formFields = useMemo(() => buildSearchFormFields(control, t), [control]);

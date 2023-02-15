@@ -1,14 +1,13 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { Notification as HDSNotification } from 'hds-react/components/Notification';
-import { RootState } from '@/store';
 import { FC } from 'react';
-import { clearNotification } from '@/reducers/notificationSlice';
+import { clearNotification, selectNotification } from '@/reducers/notificationSlice';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 
 const Notification: FC = () => {
   const dispatch = useAppDispatch();
-  const notifications = useAppSelector((state: RootState) => state.notifications);
+  const notifications = useAppSelector(selectNotification);
   const { t } = useTranslation();
 
   return (

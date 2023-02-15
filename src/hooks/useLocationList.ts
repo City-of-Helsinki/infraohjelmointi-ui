@@ -1,5 +1,11 @@
-import { setDistrictList, setDivisionList, setSubDivisionList } from '@/reducers/listsSlice';
-import { RootState } from '@/store';
+import {
+  selectDistrictList,
+  setDistrictList,
+  setDivisionList,
+  setSubDivisionList,
+} from '@/reducers/listsSlice';
+import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
+import { selectProject } from '@/reducers/projectSlice';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
@@ -11,11 +17,11 @@ import { useAppDispatch, useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useLocationList = (withFilter: boolean) => {
-  const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
-  const districts = useAppSelector((state: RootState) => state.location.districts, _.isEqual);
-  const divisions = useAppSelector((state: RootState) => state.location.divisions, _.isEqual);
-  const subDivisions = useAppSelector((state: RootState) => state.location.subDivisions, _.isEqual);
-  const districtsList = useAppSelector((state: RootState) => state.lists.district, _.isEqual);
+  const project = useAppSelector(selectProject, _.isEqual);
+  const districts = useAppSelector(selectDistricts, _.isEqual);
+  const divisions = useAppSelector(selectDivisions, _.isEqual);
+  const subDivisions = useAppSelector(selectSubDivisions, _.isEqual);
+  const districtsList = useAppSelector(selectDistrictList, _.isEqual);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

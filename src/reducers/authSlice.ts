@@ -1,6 +1,7 @@
 import { IError } from '@/interfaces/common';
 import { IPerson } from '@/interfaces/userInterfaces';
 import { getPersons } from '@/services/personServices';
+import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IUserState {
@@ -32,5 +33,7 @@ export const authSlice = createSlice({
     });
   },
 });
+
+export const selectUser = (state: RootState) => state.auth.user;
 
 export default authSlice.reducer;

@@ -3,16 +3,21 @@ import { ISearchForm } from '@/interfaces/formInterfaces';
 import { ISearchResult } from '@/interfaces/searchInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { FreeSearchFormObject } from '@/interfaces/common';
+import produce from 'immer';
+import { RootState } from '@/store';
 
 interface ISearchState {
   open: boolean;
   form: ISearchForm;
+  freeSearchParams: FreeSearchFormObject | null;
   searchResults: ISearchResult | null;
   error: IError | null | unknown;
 }
 
-const initialState: ISearchState = {
+export const initialState: ISearchState = {
   open: false,
+  freeSearchParams: null,
   form: {
     masterClass: [],
     class: [],
@@ -52,6 +57,14 @@ export const searchSlice = createSlice({
     setSearchForm(state, action: PayloadAction<ISearchForm>) {
       return { ...state, form: { ...state.form, ...action.payload } };
     },
+    setFreeSearchParams(state, action: PayloadAction<FreeSearchFormObject>) {
+      return { ...state, freeSearchParams: { ...state.freeSearchParams, ...action.payload } };
+    },
+    removeFreeSearchParam(state, action: PayloadAction<string>) {
+      produce(state, () => {
+        state.freeSearchParams && delete state.freeSearchParams[action.payload];
+      });
+    },
   },
   extraReducers: (builder) => {
     // GET SEARCH RESULTS
@@ -70,6 +83,12 @@ export const searchSlice = createSlice({
   },
 });
 
-export const { toggleSearch, setSearchForm } = searchSlice.actions;
+export const selectOpen = (state: RootState) => state.search.open;
+export const selectFreeSearchParams = (state: RootState) => state.search.freeSearchParams;
+export const selectSearchForm = (state: RootState) => state.search.form;
+export const selectSearchResults = (state: RootState) => state.search.searchResults;
+
+export const { toggleSearch, setSearchForm, setFreeSearchParams, removeFreeSearchParam } =
+  searchSlice.actions;
 
 export default searchSlice.reducer;

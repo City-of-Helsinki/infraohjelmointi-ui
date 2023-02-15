@@ -1,6 +1,7 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError } from '@/interfaces/common';
 import { getClasses } from '@/services/classService';
+import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IClassState {
@@ -78,6 +79,14 @@ export const classSlice = createSlice({
     });
   },
 });
+
+export const selectAllClasses = (state: RootState) => state.class.allClasses;
+export const selectMasterClasses = (state: RootState) => state.class.masterClasses;
+export const selectClasses = (state: RootState) => state.class.classes;
+export const selectSubClasses = (state: RootState) => state.class.subClasses;
+export const selectSelectedMasterClass = (state: RootState) => state.class.selectedMasterClass;
+export const selectSelectedClass = (state: RootState) => state.class.selectedClass;
+export const selectSelectedSubClass = (state: RootState) => state.class.selectedSubClass;
 
 export const {
   setMasterClasses,

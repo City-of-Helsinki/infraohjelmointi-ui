@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
-import { RootState } from '@/store';
+import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo, useCallback } from 'react';
@@ -16,6 +15,7 @@ import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
 import { IListItem } from '@/interfaces/common';
 import { arrayHasValue, objectHasProperty } from '@/utils/common';
+import { selectHashTags } from '@/reducers/hashTagsSlice';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -41,15 +41,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const allHashTags = useAppSelector((state: RootState) => state.hashTags, _.isEqual);
-    const projectId = useAppSelector(
-      (state: RootState) => state.project.selectedProject?.id,
-      _.isEqual,
-    );
-    const projectName = useAppSelector(
-      (state: RootState) => state.project.selectedProject?.name,
-      _.isEqual,
-    );
+    const allHashTags = useAppSelector(selectHashTags, _.isEqual);
+    const projectId = useAppSelector(selectProject, _.isEqual)?.id;
+    const projectName = useAppSelector(selectProject, _.isEqual)?.name;
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},

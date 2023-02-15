@@ -3,9 +3,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback } from 'react';
 import { FormFieldCreator } from '../../shared';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { RootState } from '@/store';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import './styles.css';
@@ -17,10 +16,7 @@ const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
   const { formFields, formMethods } = useProjectBasicsForm();
 
-  const projectId = useAppSelector(
-    (state: RootState) => state.project.selectedProject,
-    _.isEqual,
-  )?.id;
+  const projectId = useAppSelector(selectProject, _.isEqual)?.id;
 
   useClassList(true);
   useLocationList(true);

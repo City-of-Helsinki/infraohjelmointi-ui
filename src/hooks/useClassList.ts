@@ -1,5 +1,11 @@
-import { setClassList, setMasterClassList, setSubClassList } from '@/reducers/listsSlice';
-import { RootState } from '@/store';
+import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
+import {
+  selectMasterClassList,
+  setClassList,
+  setMasterClassList,
+  setSubClassList,
+} from '@/reducers/listsSlice';
+import { selectProject } from '@/reducers/projectSlice';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
@@ -11,11 +17,11 @@ import { useAppDispatch, useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useClassList = (withFilter: boolean) => {
-  const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
-  const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
-  const masterClassList = useAppSelector((state: RootState) => state.lists.masterClass, _.isEqual);
-  const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
-  const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
+  const project = useAppSelector(selectProject, _.isEqual);
+  const masterClasses = useAppSelector(selectMasterClasses, _.isEqual);
+  const masterClassList = useAppSelector(selectMasterClassList, _.isEqual);
+  const classes = useAppSelector(selectClasses, _.isEqual);
+  const subClasses = useAppSelector(selectSubClasses, _.isEqual);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

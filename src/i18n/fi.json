@@ -181,8 +181,8 @@
     "division": "Kaupunginosa",
     "subDivision": "Osa-alue",
     "phase": "Vaihe",
-    "programmedYearsMin": "Ohjelmoitu vuosi min",
-    "programmedYearsMax": "Ohjelmoitu vuosi max"
+    "programmedYearMin": "Ohjelmoitu vuosi min",
+    "programmedYearMax": "Ohjelmoitu vuosi max"
   },
   "notification": {
     "title": {

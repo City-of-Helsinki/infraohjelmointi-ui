@@ -5,15 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { Title } from '../../shared';
 import './styles.css';
 import { useAppSelector } from '@/hooks/common';
-import { RootState } from '@/store';
 import _ from 'lodash';
+import { selectSelectedMasterClass } from '@/reducers/classSlice';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
-  const selectedMasterClass = useAppSelector(
-    (state: RootState) => state.class.selectedMasterClass,
-    _.isEqual,
-  );
+  const selectedMasterClass = useAppSelector(selectSelectedMasterClass, _.isEqual);
 
   return (
     <div className="planning-info-panel">

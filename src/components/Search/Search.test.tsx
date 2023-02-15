@@ -88,8 +88,8 @@ describe('Search', () => {
     expect(getByText('searchForm.programmed')).toBeInTheDocument();
     expect(getByText('searchForm.programmedYes')).toBeInTheDocument();
     expect(getByText('searchForm.programmedNo')).toBeInTheDocument();
-    expect(getByTestId('programmedYearsMin')).toBeInTheDocument();
-    expect(getByTestId('programmedYearsMax')).toBeInTheDocument();
+    expect(getByTestId('programmedYearMin')).toBeInTheDocument();
+    expect(getByTestId('programmedYearMax')).toBeInTheDocument();
     expect(getByTestId('phase')).toBeInTheDocument();
     expect(getByTestId('personPlanning')).toBeInTheDocument();
     expect(getByTestId('district')).toBeInTheDocument();
@@ -155,6 +155,22 @@ describe('Search', () => {
     expect(store.getState().search.form.programmedYes).toBe(true);
   });
 
+  it('submit button should be disabled if no value has been given', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
+
+    const { user, getByTestId, store, getByText } = renderResult;
+
+    await waitFor(() => store.dispatch(toggleSearch()));
+
+    const submitButton = getByTestId('search-projects-button');
+
+    expect(submitButton).toBeDisabled();
+
+    await user.click(getByText('searchForm.programmedYes'));
+
+    expect(submitButton).not.toBeDisabled();
+  });
+
   it('can use the free search field to get suggestions and add selections to search params', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockFreeSearchResult);
 
@@ -196,17 +212,22 @@ describe('Search', () => {
     await user.click(getByTestId('search-projects-button'));
 
     // Check that the search param was added correctly
-    expect(getRequest.calls[1][0].includes('&hashTags=123')).toBe(true);
+    expect(getRequest.calls[1][0].includes('hashTags=123')).toBe(true);
   });
 
   it('adds search results to redux with a successful GET request', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
 
-    const { user, getByTestId, store } = renderResult;
+    const { user, getByTestId, store, getByText } = renderResult;
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
-    await user.click(getByTestId('search-projects-button'));
+    const submitButton = getByTestId('search-projects-button');
+
+    expect(submitButton).toBeDisabled();
+
+    await user.click(getByText('searchForm.programmedYes'));
+    await user.click(submitButton);
 
     const getRequest = mockedAxios.get.mock.results[0].value;
 
