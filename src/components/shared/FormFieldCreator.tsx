@@ -53,7 +53,7 @@ const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
           case FormField.Checkbox:
             return <CheckboxField {...formProps} />;
           case FormField.MultiSelect:
-            return <MultiSelectField {...formProps} key={i} name={listName} />;
+            return <MultiSelectField {...formProps} name={listName} />;
           default:
             return null;
         }

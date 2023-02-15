@@ -5,7 +5,6 @@ import { listItemToOption } from '@/utils/common';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from './common';
-import _ from 'lodash';
 
 /**
  * This hook creates an options list and returns a function to convert a IListItem to an option.

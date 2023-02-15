@@ -56,7 +56,7 @@ const FreeSearchForm = () => {
   useEffect(() => {
     setSearchState((current) => ({
       ...current,
-      selections: !_.isEmpty(freeSearchParams) ? Object.keys(freeSearchParams) : [],
+      selections: Object.keys(freeSearchParams || {}),
     }));
   }, [freeSearchParams]);
 

@@ -1,9 +1,8 @@
-import { IError } from '@/interfaces/common';
+import { IError, FreeSearchFormObject } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
 import { ISearchResult } from '@/interfaces/searchInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FreeSearchFormObject } from '@/interfaces/common';
 import produce from 'immer';
 import { RootState } from '@/store';
 
