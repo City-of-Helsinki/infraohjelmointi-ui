@@ -25,14 +25,12 @@ const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormOb
   for (const [key, value] of Object.entries(form)) {
     switch (key) {
       case 'masterClass':
-        value.length > 0 &&
-          value.forEach((v: IOption) => searchParams.push(`masterClass=${v.value}`));
-        break;
       case 'class':
-        value.length > 0 && value.forEach((v: IOption) => searchParams.push(`class=${v.value}`));
-        break;
       case 'subClass':
-        value.length > 0 && value.forEach((v: IOption) => searchParams.push(`subClass=${v.value}`));
+      case 'district':
+      case 'division':
+      case 'subDivision':
+        value.length > 0 && value.forEach((v: IOption) => searchParams.push(`${key}=${v.value}`));
         break;
       case 'programmedYes':
         value && searchParams.push('programmed=true');
@@ -41,29 +39,13 @@ const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormOb
         value && searchParams.push('programmed=false');
         break;
       case 'programmedYearMin':
-        value && searchParams.push(`programmedYearMin=${value}`);
-        break;
       case 'programmedYearMax':
-        value && searchParams.push(`programmedYearMax=${value}`);
+        value && searchParams.push(`${key}=${value}`);
         break;
       case 'phase':
-        value.value && searchParams.push(`category=${value.value}`);
-        break;
       case 'personPlanning':
-        value.value && searchParams.push(`personPlanning=${value.value}`);
-        break;
-      case 'district':
-        value.length > 0 && value.forEach((v: IOption) => searchParams.push(`district=${v.value}`));
-        break;
-      case 'division':
-        value.length > 0 && value.forEach((v: IOption) => searchParams.push(`division=${v.value}`));
-        break;
-      case 'subDivision':
-        value.length > 0 &&
-          value.forEach((v: IOption) => searchParams.push(`subDivision=${v.value}`));
-        break;
       case 'category':
-        value.value && searchParams.push(`category=${value.value}`);
+        value.value && searchParams.push(`${key}=${value.value}`);
         break;
       default:
         break;
@@ -82,6 +64,8 @@ const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormOb
           break;
         case 'hashtag':
           searchParams.push(`hashTags=${value.value}`);
+          break;
+        default:
           break;
       }
     }
