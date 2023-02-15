@@ -6,10 +6,9 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { Button } from 'hds-react/components/Button';
 import { selectUser } from '@/reducers/authSlice';
-import _ from 'lodash';
 
 const TopBar: FC = () => {
-  const user = useAppSelector(selectUser, _.isEqual);
+  const user = useAppSelector(selectUser);
   const { t } = useTranslation();
   const { Dropdown, Actions, User, Item } = Navigation;
 

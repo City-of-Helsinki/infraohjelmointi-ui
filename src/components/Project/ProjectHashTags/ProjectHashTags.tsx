@@ -8,7 +8,6 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from '../../shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
-import _ from 'lodash';
 import Paragraph from '../../shared/Paragraph';
 import './styles.css';
 import NewHashTagsForm from './NewHashTagsForm';
@@ -41,9 +40,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const allHashTags = useAppSelector(selectHashTags, _.isEqual);
-    const projectId = useAppSelector(selectProject, _.isEqual)?.id;
-    const projectName = useAppSelector(selectProject, _.isEqual)?.name;
+    const allHashTags = useAppSelector(selectHashTags);
+    const projectId = useAppSelector(selectProject)?.id;
+    const projectName = useAppSelector(selectProject)?.name;
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},

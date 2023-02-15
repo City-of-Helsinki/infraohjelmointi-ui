@@ -14,7 +14,7 @@ const PlanningGroupsTable = () => {
   const { projects, fetchNext } = useProjectsList();
   const { ref, inView } = useInView();
   const dispatch = useAppDispatch();
-  const phases = useAppSelector(selectPhaseList, _.isEqual);
+  const phases = useAppSelector(selectPhaseList);
   const [tableState, setTableState] = useState<{
     selectedProjectId: string;
     projectsVisible: boolean;

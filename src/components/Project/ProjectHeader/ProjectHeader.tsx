@@ -10,7 +10,6 @@ import ProjectNameFields from './ProjectNameFields';
 import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import ProjectPhaseField from './ProjectPhaseField';
 import ProjectFavouriteField from './ProjectFavouriteField';
-import _ from 'lodash';
 import { selectUser } from '@/reducers/authSlice';
 
 export interface IProjectHeaderFieldProps {
@@ -18,9 +17,9 @@ export interface IProjectHeaderFieldProps {
 }
 
 const ProjectHeader: FC = () => {
-  const project = useAppSelector(selectProject, _.isEqual);
+  const project = useAppSelector(selectProject);
   const projectId = project?.id;
-  const user = useAppSelector(selectUser, _.isEqual);
+  const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
 

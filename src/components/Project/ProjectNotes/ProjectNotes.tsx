@@ -4,7 +4,6 @@ import { useCallback, useEffect } from 'react';
 import ProjectNote from './ProjectNote';
 import NewNoteForm from './NewNoteForm';
 import { getNotesByProjectThunk, selectNotes } from '@/reducers/noteSlice';
-import _ from 'lodash';
 import './styles.css';
 import { t } from 'i18next';
 import { sortArrayByDates } from '@/utils/common';
@@ -12,8 +11,8 @@ import { selectProject } from '@/reducers/projectSlice';
 
 const ProjectNotes = () => {
   const dispatch = useAppDispatch();
-  const projectId = useAppSelector(selectProject, _.isEqual)?.id;
-  const notes = useAppSelector(selectNotes, _.isEqual);
+  const projectId = useAppSelector(selectProject)?.id;
+  const notes = useAppSelector(selectNotes);
 
   useEffect(() => {
     if (projectId) dispatch(getNotesByProjectThunk(projectId));

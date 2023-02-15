@@ -12,23 +12,20 @@ import {
   setSelectedMasterClass,
   setSelectedSubClass,
 } from '@/reducers/classSlice';
-import _ from 'lodash';
 import { memo, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 import PlanningClassesTableRow from './PlanningClassesTableRow';
 import './styles.css';
 
-// FIXME: this any will be removed ones we get the actual group model
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningClassesTable = () => {
   const { masterClassId, classId, subClassId } = useParams();
   const dispatch = useAppDispatch();
-  const masterClasses = useAppSelector(selectMasterClasses, _.isEqual);
-  const classes = useAppSelector(selectClasses, _.isEqual);
-  const subClasses = useAppSelector(selectSubClasses, _.isEqual);
-  const selectedMasterClass = useAppSelector(selectSelectedMasterClass, _.isEqual);
-  const selectedClass = useAppSelector(selectSelectedClass, _.isEqual);
-  const selectedSubClass = useAppSelector(selectSelectedSubClass, _.isEqual);
+  const masterClasses = useAppSelector(selectMasterClasses);
+  const classes = useAppSelector(selectClasses);
+  const subClasses = useAppSelector(selectSubClasses);
+  const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
+  const selectedClass = useAppSelector(selectSelectedClass);
+  const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
   /**
    * set selected classes to redux according to url, if their url param id is removed, then they will

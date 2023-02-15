@@ -3,7 +3,6 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
-import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { selectProject } from '@/reducers/projectSlice';
 import { selectUser } from '@/reducers/authSlice';
@@ -15,8 +14,8 @@ import { selectUser } from '@/reducers/authSlice';
  * @returns formValues, project
  */
 const useProjectHeaderValues = () => {
-  const project = useAppSelector(selectProject, _.isEqual);
-  const user = useAppSelector(selectUser, _.isEqual);
+  const project = useAppSelector(selectProject);
+  const user = useAppSelector(selectUser);
 
   const { t } = useTranslation();
 

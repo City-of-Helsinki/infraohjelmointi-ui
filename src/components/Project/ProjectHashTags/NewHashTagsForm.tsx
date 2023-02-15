@@ -8,7 +8,6 @@ import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice'
 import { postHashTag } from '@/services/hashTagsService';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconPlus } from 'hds-react/icons';
-import _ from 'lodash';
 import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,8 +20,8 @@ const NewHashTagsForm = () => {
   const { control, reset, handleSubmit } = formMethods;
   const [createNewMode, setCreateNewMode] = useState(false);
   const [responseHashTag, setResponseHashTag] = useState<IListItem | null>(null);
-  const project = useAppSelector(selectProject, _.isEqual);
-  const projectHashTags = useAppSelector(selectProject, _.isEqual)?.hashTags || [];
+  const project = useAppSelector(selectProject);
+  const projectHashTags = useAppSelector(selectProject)?.hashTags || [];
 
   const handleCreateNewMode = useCallback(() => {
     setCreateNewMode((current) => !current);

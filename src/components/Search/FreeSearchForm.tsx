@@ -37,16 +37,6 @@ const freeSearchResultToList = (res: IFreeSearchResult): Array<FreeSearchFormLis
   return resultList;
 };
 
-/**
- * Create a FreeSearchFormObject from a list of FreeSearchFormItems
- * @returns
- */
-const freeSearchFormItemsToResultObject = (freeSearchFormItems: Array<FreeSearchFormItem>) =>
-  freeSearchFormItems.reduce((accumulator, current) => {
-    accumulator[current['label'] as unknown as string] = current;
-    return accumulator;
-  }, {} as FreeSearchFormObject);
-
 interface ISearchState {
   selections: Array<string>;
   searchWord: string;
@@ -56,7 +46,7 @@ interface ISearchState {
 const FreeSearchForm = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const freeSearchParams = useAppSelector(selectFreeSearchParams, _.isEqual);
+  const freeSearchParams = useAppSelector(selectFreeSearchParams);
   const [searchState, setSearchState] = useState<ISearchState>({
     selections: [],
     searchWord: '',
@@ -93,7 +83,7 @@ const FreeSearchForm = () => {
               if (freeSearchFormItemList.length > 0) {
                 setSearchState((current) => ({
                   ...current,
-                  resultObject: freeSearchFormItemsToResultObject(freeSearchFormItemList),
+                  resultObject: _.keyBy(freeSearchFormItemList, 'label'),
                 }));
               }
 

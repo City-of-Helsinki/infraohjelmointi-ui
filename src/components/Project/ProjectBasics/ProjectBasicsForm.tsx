@@ -7,16 +7,15 @@ import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice'
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
-import './styles.css';
-import _ from 'lodash';
 import useClassList from '@/hooks/useClassList';
 import useLocationList from '@/hooks/useLocationList';
+import './styles.css';
 
 const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
   const { formFields, formMethods } = useProjectBasicsForm();
 
-  const projectId = useAppSelector(selectProject, _.isEqual)?.id;
+  const projectId = useAppSelector(selectProject)?.id;
 
   useClassList(true);
   useLocationList(true);

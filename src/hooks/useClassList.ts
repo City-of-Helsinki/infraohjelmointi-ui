@@ -6,7 +6,6 @@ import {
   setSubClassList,
 } from '@/reducers/listsSlice';
 import { selectProject } from '@/reducers/projectSlice';
-import _ from 'lodash';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 
@@ -17,11 +16,11 @@ import { useAppDispatch, useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useClassList = (withFilter: boolean) => {
-  const project = useAppSelector(selectProject, _.isEqual);
-  const masterClasses = useAppSelector(selectMasterClasses, _.isEqual);
-  const masterClassList = useAppSelector(selectMasterClassList, _.isEqual);
-  const classes = useAppSelector(selectClasses, _.isEqual);
-  const subClasses = useAppSelector(selectSubClasses, _.isEqual);
+  const project = useAppSelector(selectProject);
+  const masterClasses = useAppSelector(selectMasterClasses);
+  const masterClassList = useAppSelector(selectMasterClassList);
+  const classes = useAppSelector(selectClasses);
+  const subClasses = useAppSelector(selectSubClasses);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

@@ -94,9 +94,9 @@ const buildSearchFormFields = (
 const useSearchForm = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const storeFormValues = useAppSelector(selectSearchForm, _.isEqual);
-  const open = useAppSelector(selectOpen, _.isEqual);
-  const freeSearchParams = useAppSelector(selectFreeSearchParams, _.isEqual);
+  const storeFormValues = useAppSelector(selectSearchForm);
+  const open = useAppSelector(selectOpen);
+  const freeSearchParams = useAppSelector(selectFreeSearchParams);
   const formMethods = useForm<ISearchForm>({
     defaultValues: useMemo(() => storeFormValues, [storeFormValues]),
     mode: 'onBlur',

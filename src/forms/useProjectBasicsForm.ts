@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
-import _ from 'lodash';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
@@ -243,15 +242,15 @@ const buildProjectBasicsFormFields = (
  * @returns formValues, project
  */
 const useProjectBasicsValues = () => {
-  const project = useAppSelector(selectProject, _.isEqual);
+  const project = useAppSelector(selectProject);
 
-  const masterClasses = useAppSelector(selectMasterClasses, _.isEqual);
-  const classes = useAppSelector(selectClasses, _.isEqual);
-  const subClasses = useAppSelector(selectSubClasses, _.isEqual);
+  const masterClasses = useAppSelector(selectMasterClasses);
+  const classes = useAppSelector(selectClasses);
+  const subClasses = useAppSelector(selectSubClasses);
 
-  const districts = useAppSelector(selectDistricts, _.isEqual);
-  const divisions = useAppSelector(selectDivisions, _.isEqual);
-  const subDivisions = useAppSelector(selectSubDivisions, _.isEqual);
+  const districts = useAppSelector(selectDistricts);
+  const divisions = useAppSelector(selectDivisions);
+  const subDivisions = useAppSelector(selectSubDivisions);
 
   const { t } = useTranslation();
   const value = (value: string | undefined) => value || '';

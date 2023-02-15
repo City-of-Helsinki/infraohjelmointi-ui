@@ -6,7 +6,6 @@ import {
 } from '@/reducers/listsSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import { selectProject } from '@/reducers/projectSlice';
-import _ from 'lodash';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 
@@ -17,11 +16,11 @@ import { useAppDispatch, useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useLocationList = (withFilter: boolean) => {
-  const project = useAppSelector(selectProject, _.isEqual);
-  const districts = useAppSelector(selectDistricts, _.isEqual);
-  const divisions = useAppSelector(selectDivisions, _.isEqual);
-  const subDivisions = useAppSelector(selectSubDivisions, _.isEqual);
-  const districtsList = useAppSelector(selectDistrictList, _.isEqual);
+  const project = useAppSelector(selectProject);
+  const districts = useAppSelector(selectDistricts);
+  const divisions = useAppSelector(selectDivisions);
+  const subDivisions = useAppSelector(selectSubDivisions);
+  const districtsList = useAppSelector(selectDistrictList);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

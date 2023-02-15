@@ -18,7 +18,6 @@ import useLocationList from '@/hooks/useLocationList';
 import { useTranslation } from 'react-i18next';
 import FreeSearchForm from './FreeSearchForm';
 import './styles.css';
-import _ from 'lodash';
 
 // Build a search parameter with all the choices from the search form
 const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormObject | null) => {
@@ -94,8 +93,8 @@ const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormOb
 const Search = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const open = useAppSelector(selectOpen, _.isEqual);
-  const freeSearchParams = useAppSelector(selectFreeSearchParams, _.isEqual);
+  const open = useAppSelector(selectOpen);
+  const freeSearchParams = useAppSelector(selectFreeSearchParams);
 
   const { formMethods, formFields } = useSearchForm();
 

@@ -45,7 +45,6 @@ export const useOptions = (name?: ListType) => {
 
   const optionsList = useAppSelector(
     (state: RootState) => state.lists[parsedName as keyof IListState],
-    _.isEqual,
   ) as Array<IListItem>;
 
   const options = useMemo(
