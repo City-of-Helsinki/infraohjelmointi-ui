@@ -90,7 +90,10 @@
     "reception": "Vastaanottovaiheen",
     "east": "Itä",
     "west": "Länsi",
-    "north": "Pohjoinen"
+    "north": "Pohjoinen",
+    "cityRenewal": "Suuret liikennehankeet",
+    "bigTrafficProjects": "Suuret liikennehankeet",
+    "spesialityStructures": "Taitorakenne"
   },
   "projectBasicsForm": {
     "basics": "Hankkeen perustiedot",
