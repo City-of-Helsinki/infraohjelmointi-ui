@@ -22,14 +22,14 @@ interface IFormFieldCreatorProps {
 const FormFieldCreator: FC<IFormFieldCreatorProps> = ({ form }) => {
   return (
     <>
-      {form?.map((f, i) => {
+      {form?.map((f) => {
         const { type, ...formValues } = f;
         const formProps = { ...formValues, key: f.name };
         const listFormProps = { form: f, key: f.name };
         const listName = f.name as ListType;
         switch (type) {
           case FormField.Select:
-            return <SelectField {...formProps} key={i} name={listName} />;
+            return <SelectField {...formProps} name={listName} />;
           case FormField.Text:
             return <TextField {...formProps} />;
           case FormField.Number:
