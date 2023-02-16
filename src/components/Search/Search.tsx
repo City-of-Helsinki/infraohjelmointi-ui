@@ -16,6 +16,7 @@ import { FreeSearchFormObject, IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import FreeSearchForm from './FreeSearchForm';
 import './styles.css';
+import { useNavigate } from 'react-router';
 import MultiSelectField from '../shared/MultiSelectField';
 import CheckboxField from '../shared/CheckboxField';
 import { Fieldset } from 'hds-react/components/Fieldset';
@@ -81,6 +82,7 @@ const Search = () => {
   const dispatch = useAppDispatch();
   const open = useAppSelector(selectOpen);
   const freeSearchParams = useAppSelector(selectFreeSearchParams);
+  const navigate = useNavigate();
 
   const { formMethods } = useSearchForm();
 
@@ -110,9 +112,10 @@ const Search = () => {
       dispatch(getSearchResultsThunk(searchParams)).then(() => {
         dispatch(setSearchForm(form));
         reset(form);
+        navigate('/search-result');
       });
     },
-    [dispatch, freeSearchParams, reset],
+    [dispatch, freeSearchParams, navigate, reset],
   );
 
   const handleClose = useCallback(() => {
