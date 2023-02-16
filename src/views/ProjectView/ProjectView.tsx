@@ -11,7 +11,6 @@ import {
   getConstructionPhasesThunk,
   getPlanningPhasesThunk,
   getProjectAreasThunk,
-  getProjectPhasesThunk,
   getProjectQualityLevelsThunk,
   getProjectTypesThunk,
   getConstructionPhaseDetailsThunk,
@@ -20,9 +19,7 @@ import {
 } from '@/reducers/listsSlice';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
-// FIXME: the import statement for ProjectHeader index.ts doesn't work for some reason
-// webpack gives an error from a row that doesn't exist
-import ProjectHeader from '@/components/Project/ProjectHeader/ProjectHeader';
+import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
 
 const ProjectView = () => {
@@ -34,7 +31,6 @@ const ProjectView = () => {
     dispatch(getProjectThunk(projectId || ''));
     dispatch(getHashTagsThunk());
     dispatch(getProjectTypesThunk());
-    dispatch(getProjectPhasesThunk());
     dispatch(getProjectAreasThunk());
     dispatch(getConstructionPhaseDetailsThunk());
     dispatch(getProjectRisksThunk());

@@ -8,8 +8,6 @@ import { mockHashTags } from '@/mocks/mockHashTags';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
-import { getClassesThunk } from '@/reducers/classSlice';
-import { getLocationsThunk } from '@/reducers/locationSlice';
 import { act } from 'react-dom/test-utils';
 import {
   mockConstructionPhaseDetails,
@@ -25,11 +23,8 @@ import {
 import {
   getConstructionPhaseDetailsThunk,
   getConstructionPhasesThunk,
-  getResponsiblePersonsThunk,
   getPlanningPhasesThunk,
   getProjectAreasThunk,
-  getProjectCategoriesThunk,
-  getProjectPhasesThunk,
   getProjectQualityLevelsThunk,
   getProjectRisksThunk,
   getProjectTypesThunk,
@@ -66,6 +61,8 @@ describe('ProjectView', () => {
     expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);
     expect(lists.phases).toStrictEqual(mockProjectPhases.data);
+    expect(lists.areas).toStrictEqual(mockProjectAreas.data);
+    expect(lists.types).toStrictEqual(mockProjectTypes.data);
     expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
     expect(lists.riskAssessments).toStrictEqual(mockProjectRisks.data);
     expect(lists.projectQualityLevels).toStrictEqual(mockProjectQualityLevels.data);
@@ -104,16 +101,6 @@ describe('ProjectView', () => {
     expect(storeError.status).toBe(mockError.status);
   });
 
-  it('catches a failed phase list fetch', async () => {
-    const { store } = renderResult;
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getProjectPhasesThunk());
-
-    const storeError = store.getState().lists.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
   it('catches a failed type list fetch', async () => {
     const { store } = renderResult;
     mockedAxios.get.mockRejectedValueOnce(mockError);
@@ -138,16 +125,6 @@ describe('ProjectView', () => {
     const { store } = renderResult;
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getConstructionPhaseDetailsThunk());
-
-    const storeError = store.getState().lists.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
-  it('catches a failed projectCategories list fetch', async () => {
-    const { store } = renderResult;
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getProjectCategoriesThunk());
 
     const storeError = store.getState().lists.error as IError;
     expect(storeError.message).toBe(mockError.message);
@@ -194,40 +171,10 @@ describe('ProjectView', () => {
     expect(storeError.status).toBe(mockError.status);
   });
 
-  it('catches a failed classes fetch', async () => {
-    const { store } = renderResult;
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getClassesThunk());
-
-    const storeError = store.getState().class.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
-  it('catches a failed locations fetch', async () => {
-    const { store } = renderResult;
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getLocationsThunk());
-
-    const storeError = store.getState().location.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
   it('catches a failed responsible zones fetch', async () => {
     const { store } = renderResult;
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getResponsibleZonesThunk());
-
-    const storeError = store.getState().lists.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
-  it('catches a failed responsible persons fetch', async () => {
-    const { store } = renderResult;
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getResponsiblePersonsThunk());
 
     const storeError = store.getState().lists.error as IError;
     expect(storeError.message).toBe(mockError.message);

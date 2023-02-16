@@ -15,6 +15,7 @@ import {
   setMasterClassList,
   setSubClassList,
   setSubDivisionList,
+  getProjectPhasesThunk,
 } from './reducers/listsSlice';
 import {
   getClassesThunk,
@@ -55,6 +56,7 @@ const App: FC = () => {
   useEffect(() => {
     dispatch(getProjectCategoriesThunk());
     dispatch(getResponsiblePersonsThunk());
+    dispatch(getProjectPhasesThunk());
     // Get classes and filter them into categories
     dispatch(getClassesThunk()).then(() => {
       dispatch(setMasterClasses());
