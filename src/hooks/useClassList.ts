@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useClassList = (withFilter: boolean) => {
-  const project = useAppSelector(selectProject);
+  const projectClass = useAppSelector(selectProject)?.projectClass;
   const masterClasses = useAppSelector(selectMasterClasses);
   const masterClassList = useAppSelector(selectMasterClassList);
   const classes = useAppSelector(selectClasses);
@@ -24,38 +24,36 @@ const useClassList = (withFilter: boolean) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (masterClassList.length <= 0) {
+    if (masterClassList.length === 0) {
       dispatch(setMasterClassList(masterClasses));
     }
 
     if (withFilter) {
-      if (project?.projectClass) {
-        /* If selected is a masterClass, we need to find all classes that have that masterClass as their parent */
-        const selectedMasterClass = masterClasses.find((mc) => mc.id === project?.projectClass);
+      // The parents for each class/subClass should always be found, but typescript doesn't know that, so we
+      // need to add ? (null/undefined checks to each filter)
+      if (projectClass) {
+        // If projectClass is a masterClass, we need to find all classes that have that masterClass as their parent
+        const selectedMasterClass = masterClasses.find((mc) => mc.id === projectClass);
         if (selectedMasterClass) {
-          dispatch(setClassList(classes.filter((c) => c.parent === project.projectClass)));
+          dispatch(setClassList(classes.filter((c) => c.parent === projectClass)));
         }
 
-        const selectedClass = classes.find((c) => c.id === project?.projectClass);
-        /* If selected is a class, we need to find the master class and find all classes for that master class */
+        // If the projectClass is a class, we filter the lists to include every class that shares the same parent masterClass.
+        const selectedClass = classes.find((c) => c.id === projectClass);
         if (selectedClass) {
-          const masterClassForClass = masterClasses.find((mc) => mc.id === selectedClass.parent);
-
-          dispatch(setClassList(classes.filter((c) => c.parent === masterClassForClass?.id)));
-          dispatch(setSubClassList(subClasses.filter((sc) => sc.parent === project.projectClass)));
+          const classParent = masterClasses.find((mc) => mc.id === selectedClass.parent);
+          dispatch(setClassList(classes.filter((c) => c.parent === classParent?.id)));
+          dispatch(setSubClassList(subClasses.filter((sc) => sc.parent === projectClass)));
         }
 
-        const selectedSubClass = subClasses.find((sc) => sc.id === project?.projectClass);
-        /* If selected is a subClass, we need to find the class and masterClass and find which classes belong to that masterClass
-            and which subClasses belong to that class */
+        // If projectClass is a subClass, we filter the lists to include every class and subClass
+        // that have the same parents
+        const selectedSubClass = subClasses.find((sc) => sc.id === projectClass);
         if (selectedSubClass) {
-          const classForSubClass = classes.find((c) => c.id === selectedSubClass.parent);
-          const masterClassForClass = masterClasses.find(
-            (mc) => mc.id === classForSubClass?.parent,
-          );
-
-          dispatch(setSubClassList(subClasses.filter((sc) => sc.parent === classForSubClass?.id)));
-          dispatch(setClassList(classes.filter((c) => c.parent === masterClassForClass?.id)));
+          const subClassParent = classes.find((c) => c.id === selectedSubClass.parent);
+          const classParent = masterClasses.find((mc) => mc.id === subClassParent?.parent);
+          dispatch(setSubClassList(subClasses.filter((sc) => sc.parent === subClassParent?.id)));
+          dispatch(setClassList(classes.filter((c) => c.parent === classParent?.id)));
         }
       }
     } else {
@@ -64,7 +62,7 @@ const useClassList = (withFilter: boolean) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [masterClasses, project, classes, subClasses, withFilter]);
+  }, [masterClasses, projectClass, classes, subClasses, withFilter]);
 };
 
 export default useClassList;

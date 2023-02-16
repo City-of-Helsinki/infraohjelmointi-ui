@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useLocationList = (withFilter: boolean) => {
-  const project = useAppSelector(selectProject);
+  const projectLocation = useAppSelector(selectProject)?.projectLocation;
   const districts = useAppSelector(selectDistricts);
   const divisions = useAppSelector(selectDivisions);
   const subDivisions = useAppSelector(selectSubDivisions);
@@ -24,57 +24,36 @@ const useLocationList = (withFilter: boolean) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const selectedDistrict = project
-      ? districts.find((d) => d.id === project.projectLocation)
-      : undefined;
-
-    if (districtsList.length <= 0) {
+    if (districtsList.length === 0) {
       dispatch(setDistrictList(districts));
     }
 
     if (withFilter) {
-      const projectLocation = project?.projectLocation;
-
+      // The parents for each division/subDivision should always be found, but typescript doesn't know that, so we
+      // need to add ? (null/undefined checks to each filter)
       if (projectLocation) {
-        /* If selected is a district, we need to find all divisions that have that district as their parent */
+        // If projectLocation is a district, we need to find all divisions that have that district as their parent
+        const selectedDistrict = districts.find((d) => d.id === projectLocation);
         if (selectedDistrict) {
           dispatch(setDivisionList(divisions.filter((d) => d.parent === projectLocation)));
         }
 
+        // If projectLocation is a division, we filter the lists to include every division that shares the same district
         const selectedDivision = divisions.find((d) => d.id === projectLocation);
-        /* If selected is a division, we need to find the district and find all divisions for that district */
         if (selectedDivision) {
-          const districtForDivision = districts.find((d) => d.id === selectedDivision.parent);
-
-          dispatch(
-            setDivisionList(
-              districtForDivision
-                ? divisions.filter((d) => d.parent === districtForDivision.id)
-                : [],
-            ),
-          );
+          const divParent = districts.find((d) => d.id === selectedDivision.parent);
+          dispatch(setDivisionList(divisions.filter((d) => d.parent === divParent?.id)));
           dispatch(setSubDivisionList(subDivisions.filter((sd) => sd.parent === projectLocation)));
         }
 
+        // If projectLocation is a subDivision, we filter the lists to include every division and subDivision
+        // that have the same parents
         const selectedSubDivision = subDivisions.find((sd) => sd.id === projectLocation);
-        /* If selected is a subDivision, we need to find the division and district and find which divisions belong to that 
-          district and which subDivisions belong to that division */
         if (selectedSubDivision) {
-          const divForSubDiv = divisions.find((c) => c.id === selectedSubDivision.parent);
-          const districtForDivision = districts.find((d) => d.id === divForSubDiv?.parent);
-
-          dispatch(
-            setSubDivisionList(
-              divForSubDiv ? subDivisions.filter((sd) => sd.parent === divForSubDiv.id) : [],
-            ),
-          );
-          dispatch(
-            setDivisionList(
-              districtForDivision
-                ? divisions.filter((d) => d.parent === districtForDivision.id)
-                : [],
-            ),
-          );
+          const subDivParent = divisions.find((c) => c.id === selectedSubDivision.parent);
+          const divParent = districts.find((d) => d.id === subDivParent?.parent);
+          dispatch(setSubDivisionList(subDivisions.filter((sd) => sd.parent === subDivParent?.id)));
+          dispatch(setDivisionList(divisions.filter((d) => d.parent === divParent?.id)));
         }
       }
     } else {
@@ -83,7 +62,7 @@ const useLocationList = (withFilter: boolean) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [districts, project, divisions, subDivisions]);
+  }, [districts, divisions, subDivisions, projectLocation]);
 };
 
 export default useLocationList;

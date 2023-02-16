@@ -30,7 +30,7 @@ const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormOb
       case 'district':
       case 'division':
       case 'subDivision':
-        value.length > 0 && value.forEach((v: IOption) => searchParams.push(`${key}=${v.value}`));
+        value.forEach((v: IOption) => searchParams.push(`${key}=${v.value}`));
         break;
       case 'programmedYes':
         value && searchParams.push('programmed=true');

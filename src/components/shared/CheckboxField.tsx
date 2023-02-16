@@ -22,7 +22,7 @@ const CheckboxField: FC<ICheckboxFieldProps> = ({ name, label, control, rules })
       rules={rules}
       control={control as Control<FieldValues>}
       render={({ field: { onChange, onBlur, value } }) => (
-        <div className="input-wrapper" id="checkbox" data-testid={name}>
+        <div className="input-wrapper" data-testid={name}>
           <HDSCheckbox
             data-testid={name}
             id={name}
