@@ -90,3 +90,49 @@
   display: flex;
   justify-content: space-between;
 }
+
+.result-list-options-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-layout-l);
+  align-items: flex-end;
+}
+
+.page-dropdown-container {
+  display: flex;
+  align-items: center;
+}
+
+.page-dropdown-container > span {
+  margin-right: 1rem;
+}
+
+.page-dropdown {
+  width: 3.5rem;
+  margin: 0 0.5rem 0 0;
+}
+
+.page-dropdown > div {
+  min-height: 2rem;
+}
+
+.page-dropdown > div > button {
+  padding: 0 0.4rem;
+  justify-content: space-between;
+  color: var(--color-black-60);
+  min-height: 100% !important;
+}
+
+.page-dropdown > div > button > svg {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.page-dropdown > div > button > span {
+  padding: 0;
+}
+
+.result-order-dropdown {
+  width: 20rem;
+}
