@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
-import { useAppDispatch, useAppSelector } from './common';
+import { useAppDispatch, useAppSelector } from '../hooks/common';
 import _ from 'lodash';
 import {
   initialState,

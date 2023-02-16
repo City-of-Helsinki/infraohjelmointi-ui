@@ -1,4 +1,4 @@
-import useSearchForm from '@/hooks/useSearchForm';
+import useSearchForm from '@/forms/useSearchForm';
 import { ISearchForm } from '@/interfaces/formInterfaces';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
