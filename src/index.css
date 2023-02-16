@@ -119,7 +119,7 @@ table p {
   width: auto !important;
 }
 
-#checkbox label {
+.checkbox-field label {
   width: auto !important;
 }
 
