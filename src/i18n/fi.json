@@ -90,7 +90,10 @@
     "reception": "Vastaanottovaiheen",
     "east": "Itä",
     "west": "Länsi",
-    "north": "Pohjoinen"
+    "north": "Pohjoinen",
+    "cityRenewal": "Suuret liikennehankeet",
+    "bigTrafficProjects": "Suuret liikennehankeet",
+    "spesialtyStructures": "Taitorakenne"
   },
   "projectBasicsForm": {
     "basics": "Hankkeen perustiedot",
@@ -165,6 +168,25 @@
     "personProgramming": "Ohjelmoija",
     "otherPersons": "Muut vastuuhenkilöt"
   },
+  "searchForm": {
+    "searchWord": "Mitä haet?",
+    "freeSearchDescription": "Etsi hakusanalla, hankkeen nimen, ryhmän tai hashtagin mukaan.",
+    "masterClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka",
+    "category": "Kategoria",
+    "personPlanning": "Vastuuhenkilö",
+    "filter": "Rajaa projekteja",
+    "programmed": "Ohjelmoitu",
+    "programmedYes": "Kyllä",
+    "programmedNo": "Ei",
+    "district": "Suurpiiri",
+    "division": "Kaupunginosa",
+    "subDivision": "Osa-alue",
+    "phase": "Vaihe",
+    "programmedYearMin": "Ohjelmoitu vuosi min",
+    "programmedYearMax": "Ohjelmoitu vuosi max"
+  },
   "notification": {
     "title": {
       "sendSuccess": "Lähetys onnistui",
@@ -233,5 +255,7 @@
   "addHashTag": "Lisää tunniste",
   "hashTagCreated": "Tunniste '{{responseHashTag}}' luotu",
   "addToProject": "Lisää hankkeelle?",
-  "currentStatus": "Nykystatus"
+  "currentStatus": "Nykystatus",
+  "search": "Hae",
+  "searchProjects": "Hae projekteja"
 }

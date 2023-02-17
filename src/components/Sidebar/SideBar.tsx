@@ -1,12 +1,12 @@
 import { useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
-import { RootState } from '@/store';
 import { ReactComponent as IconBooks } from '@/assets/icons/books.svg';
 import { ReactComponent as IconStickyNotes } from '@/assets/icons/sticky-notes.svg';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
+import { selectProjects } from '@/reducers/projectSlice';
 
 /**
  * Custom Sidebar, since the HDS sidebar wasn't suited for our needs
@@ -14,7 +14,7 @@ import './styles.css';
 const SideBar = () => {
   const navigate = useNavigate();
   const path = useLocation().pathname;
-  const projects = useAppSelector((state: RootState) => state.project.projects);
+  const projects = useAppSelector(selectProjects);
   const [projectId, setProjectId] = useState('');
   const { t } = useTranslation();
 

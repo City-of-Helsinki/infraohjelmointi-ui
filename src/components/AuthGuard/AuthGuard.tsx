@@ -1,13 +1,12 @@
 import { FC, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { getUserThunk } from '@/reducers/authSlice';
-import { RootState } from '@/store';
+import { getUserThunk, selectUser } from '@/reducers/authSlice';
 
 /**
  * Component to handle authentication stuff
  */
 const AuthGuard: FC = () => {
-  const user = useAppSelector((state: RootState) => state.auth.user);
+  const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
 
   // Check if user exists

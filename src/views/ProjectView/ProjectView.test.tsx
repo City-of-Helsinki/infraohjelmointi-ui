@@ -8,9 +8,7 @@ import { mockHashTags } from '@/mocks/mockHashTags';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
-import mockProjectClasses from '@/mocks/mockClasses';
 import { getClassesThunk } from '@/reducers/classSlice';
-import { mockLocations } from '@/mocks/mockLocations';
 import { getLocationsThunk } from '@/reducers/locationSlice';
 import { act } from 'react-dom/test-utils';
 import {
@@ -18,12 +16,10 @@ import {
   mockConstructionPhases,
   mockPlanningPhases,
   mockProjectAreas,
-  mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
   mockProjectRisks,
   mockProjectTypes,
-  mockResponsiblePersons,
   mockResponsibleZones,
 } from '@/mocks/mockLists';
 import {
@@ -62,8 +58,6 @@ describe('ProjectView', () => {
     const { store } = renderResult;
 
     const lists = store.getState().lists;
-    const classes = store.getState().class;
-    const locations = store.getState().location;
     const hashTags = store.getState().hashTags;
 
     expect(store.getState().project.selectedProject).toStrictEqual(mockProject.data);
@@ -72,22 +66,12 @@ describe('ProjectView', () => {
     expect(lists.area).toStrictEqual(mockProjectAreas.data);
     expect(lists.type).toStrictEqual(mockProjectTypes.data);
     expect(lists.phase).toStrictEqual(mockProjectPhases.data);
-    expect(lists.category).toStrictEqual(mockProjectCategories.data);
     expect(lists.constructionPhaseDetail).toStrictEqual(mockConstructionPhaseDetails.data);
     expect(lists.riskAssessment).toStrictEqual(mockProjectRisks.data);
     expect(lists.projectQualityLevel).toStrictEqual(mockProjectQualityLevels.data);
     expect(lists.constructionPhase).toStrictEqual(mockConstructionPhases.data);
     expect(lists.planningPhase).toStrictEqual(mockPlanningPhases.data);
     expect(lists.responsibleZone).toStrictEqual(mockResponsibleZones.data);
-    expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
-    expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
-    expect(classes.masterClasses.length).toBeGreaterThan(0);
-    expect(classes.classes.length).toBeGreaterThan(0);
-    expect(classes.subClasses.length).toBeGreaterThan(0);
-    expect(locations.allLocations).toStrictEqual(mockLocations.data);
-    expect(locations.districts.length).toBeGreaterThan(0);
-    expect(locations.divisions.length).toBeGreaterThan(0);
-    expect(locations.subDivisions.length).toBeGreaterThan(0);
   });
 
   it('renders the parent container', () => {

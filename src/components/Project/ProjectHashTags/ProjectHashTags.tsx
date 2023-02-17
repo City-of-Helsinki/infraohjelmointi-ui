@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
-import { RootState } from '@/store';
+import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo, useCallback } from 'react';
@@ -9,12 +8,13 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from '../../shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
-import _ from 'lodash';
 import Paragraph from '../../shared/Paragraph';
 import './styles.css';
 import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
 import { IListItem } from '@/interfaces/common';
+import { arrayHasValue, objectHasProperty } from '@/utils/common';
+import { selectHashTags } from '@/reducers/hashTagsSlice';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -40,15 +40,9 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const allHashTags = useAppSelector((state: RootState) => state.hashTags, _.isEqual);
-    const projectId = useAppSelector(
-      (state: RootState) => state.project.selectedProject?.id,
-      _.isEqual,
-    );
-    const projectName = useAppSelector(
-      (state: RootState) => state.project.selectedProject?.name,
-      _.isEqual,
-    );
+    const allHashTags = useAppSelector(selectHashTags);
+    const projectId = useAppSelector(selectProject)?.id;
+    const projectName = useAppSelector(selectProject)?.name;
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
@@ -86,8 +80,8 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       if (projectHashTags && allHashTags) {
         setFormState((current) => ({
           ...current,
-          hashTagsForSubmit: allHashTags.hashTags.filter(
-            ({ id }) => projectHashTags.indexOf(id) !== -1,
+          hashTagsForSubmit: allHashTags.hashTags.filter(({ id }) =>
+            arrayHasValue(projectHashTags, id),
           ),
         }));
       }
@@ -119,7 +113,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const onHashTagClick = useCallback(
       (value: string) => {
         if (
-          Object.prototype.hasOwnProperty.call(hashTagsObject, value) &&
+          objectHasProperty(hashTagsObject, value) &&
           hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
         ) {
           setFormState((current) => ({
@@ -159,8 +153,8 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const handleClose = useCallback(() => {
       setFormState((current) => ({
         ...current,
-        hashTagsForSubmit: allHashTags.hashTags.filter(
-          ({ id }) => projectHashTags.indexOf(id) !== -1,
+        hashTagsForSubmit: allHashTags.hashTags.filter(({ id }) =>
+          arrayHasValue(projectHashTags, id),
         ),
       }));
       handleSetOpen();

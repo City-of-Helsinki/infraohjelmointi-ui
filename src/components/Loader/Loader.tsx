@@ -1,5 +1,5 @@
 import { useAppSelector } from '@/hooks/common';
-import { RootState } from '@/store';
+import { selectIsLoading, selectLoadingText } from '@/reducers/loadingSlice';
 import { LoadingSpinner } from 'hds-react/components/LoadingSpinner';
 import { FC } from 'react';
 import './styles.css';
@@ -9,14 +9,15 @@ import './styles.css';
  * The loading state is triggered in the axios interceptor.
  */
 const Loader: FC = () => {
-  const loading = useAppSelector((state: RootState) => state.loading);
+  const isLoading = useAppSelector(selectIsLoading);
+  const text = useAppSelector(selectLoadingText);
 
   return (
     <>
-      {loading.isLoading && (
+      {isLoading && (
         <div className="loader-overlay">
           <div className="loader-container">
-            <LoadingSpinner loadingText={loading.text || ''} />
+            <LoadingSpinner loadingText={text || ''} />
           </div>
         </div>
       )}

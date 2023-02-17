@@ -1,8 +1,11 @@
 import { useAppSelector } from '@/hooks/common';
-import { RootState } from '@/store';
+import {
+  selectSelectedClass,
+  selectSelectedMasterClass,
+  selectSelectedSubClass,
+} from '@/reducers/classSlice';
 import { IconAngleRight } from 'hds-react/icons';
 import { t } from 'i18next';
-import _ from 'lodash';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import './styles.css';
@@ -19,15 +22,9 @@ const BreadCrumb = memo(({ value, path }: { value: string; path: string }) => (
 BreadCrumb.displayName = 'BreadCrumb';
 
 const PlanningBreadcrumbs = () => {
-  const selectedMasterClass = useAppSelector(
-    (state: RootState) => state.class.selectedMasterClass,
-    _.isEqual,
-  );
-  const selectedClass = useAppSelector((state: RootState) => state.class.selectedClass, _.isEqual);
-  const selectedSubClass = useAppSelector(
-    (state: RootState) => state.class.selectedSubClass,
-    _.isEqual,
-  );
+  const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
+  const selectedClass = useAppSelector(selectSelectedClass);
+  const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
   return (
     <div className="breadcrumbs-container">

@@ -15,6 +15,8 @@ import {
   getResponsibleZones,
 } from '@/services/listServices';
 import { getPersons } from '@/services/personServices';
+import { RootState } from '@/store';
+import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface IListState {
@@ -35,6 +37,7 @@ export interface IListState {
   subDivision: Array<IListItem>;
   responsibleZone: Array<IListItem>;
   responsiblePersons: Array<IListItem>;
+  programmedYears: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -56,6 +59,7 @@ const initialState: IListState = {
   subDivision: [],
   responsibleZone: [],
   responsiblePersons: [],
+  programmedYears: setProgrammedYears(),
   error: null,
 };
 
@@ -325,6 +329,10 @@ export const listsSlice = createSlice({
     );
   },
 });
+
+export const selectPhaseList = (state: RootState) => state.lists.phase;
+export const selectMasterClassList = (state: RootState) => state.lists.masterClass;
+export const selectDistrictList = (state: RootState) => state.lists.district;
 
 export const {
   setMasterClassList,

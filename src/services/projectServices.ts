@@ -1,5 +1,6 @@
-import { IError } from '@/interfaces/common';
+import { IError, IFreeSearchResult } from '@/interfaces/common';
 import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
+import { ISearchResult } from '@/interfaces/searchInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
@@ -35,6 +36,20 @@ export const deleteProject = async (id: string): Promise<void> => {
 export const patchProject = async (request: IProjectRequestObject): Promise<IProject> => {
   return axios
     .patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getProjectsWithParams = async (params: string): Promise<ISearchResult> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/projects/?${params}`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getProjectsWithFreeSearch = async (searchWord: string): Promise<IFreeSearchResult> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/projects/?freeSearch=${searchWord}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

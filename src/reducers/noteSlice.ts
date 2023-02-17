@@ -1,6 +1,7 @@
 import { IError } from '@/interfaces/common';
 import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
 import { deleteNote, getNotesByProject, patchNote, postNote } from '@/services/noteServices';
+import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
 
@@ -108,5 +109,7 @@ export const noteSlice = createSlice({
     });
   },
 });
+
+export const selectNotes = (state: RootState) => state.note.notes;
 
 export default noteSlice.reducer;

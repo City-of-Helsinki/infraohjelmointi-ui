@@ -2,10 +2,10 @@ import { IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
-import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
-import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
+import { selectProject } from '@/reducers/projectSlice';
+import { selectUser } from '@/reducers/authSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -14,8 +14,8 @@ import { useTranslation } from 'react-i18next';
  * @returns formValues, project
  */
 const useProjectHeaderValues = () => {
-  const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
-  const user = useAppSelector((state: RootState) => state.auth.user, _.isEqual);
+  const project = useAppSelector(selectProject);
+  const user = useAppSelector(selectUser);
 
   const { t } = useTranslation();
 

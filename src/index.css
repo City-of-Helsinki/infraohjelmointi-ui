@@ -119,6 +119,10 @@ table p {
   width: auto !important;
 }
 
+.checkbox-field label {
+  width: auto !important;
+}
+
 .input-l {
   max-width: 22.5rem;
 }
@@ -137,4 +141,8 @@ table p {
 
 .hide-overflow {
   overflow: hidden;
+}
+
+input {
+  z-index: 1 !important;
 }

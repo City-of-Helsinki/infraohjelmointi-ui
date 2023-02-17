@@ -5,7 +5,6 @@ import { listItemToOption } from '@/utils/common';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from './common';
-import _ from 'lodash';
 
 /**
  * This hook creates an options list and returns a function to convert a IListItem to an option.
@@ -18,11 +17,17 @@ import _ from 'lodash';
 export const useOptions = (name?: ListType) => {
   const { t } = useTranslation();
 
-  const isPersonList = ['personPlanning', 'personConstruction', 'personProgramming'].includes(
+  const personName = ['personPlanning', 'personConstruction', 'personProgramming'].includes(
     name as ListType,
-  );
+  )
+    ? 'responsiblePersons'
+    : '';
 
-  const parsedName = isPersonList ? 'responsiblePersons' : name;
+  const programmedYearName = ['programmedYearMin', 'programmedYearMax'].includes(name as ListType)
+    ? 'programmedYears'
+    : '';
+
+  const parsedName = personName || programmedYearName || name;
 
   const shouldNotTranslate = [
     'masterClass',
@@ -32,11 +37,11 @@ export const useOptions = (name?: ListType) => {
     'division',
     'subDivision',
     'responsiblePersons',
+    'programmedYears',
   ].includes(parsedName as ListType);
 
   const optionsList = useAppSelector(
     (state: RootState) => state.lists[parsedName as keyof IListState],
-    _.isEqual,
   ) as Array<IListItem>;
 
   const options = useMemo(

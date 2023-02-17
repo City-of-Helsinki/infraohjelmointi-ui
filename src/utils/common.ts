@@ -97,3 +97,16 @@ export const sortArrayByDates = (array: Array<any>, dateProperty: string, revers
 
   return reversed ? [...sortedArray]?.reverse() : sortedArray;
 };
+
+export const setProgrammedYears = () => {
+  const currentYear = new Date().getFullYear();
+  const years: Array<IListItem> = [];
+
+  for (let i = currentYear - 10; i <= currentYear + 10; i++) {
+    years.push({ id: i.toString(), value: i.toString() });
+  }
+  return years;
+};
+
+export const arrayHasValue = (arr: Array<unknown> | undefined, value: string) =>
+  arr && arr.indexOf(value) !== -1;

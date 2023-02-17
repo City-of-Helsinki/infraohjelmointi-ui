@@ -1,4 +1,5 @@
 import { INotification, NotificationColorType } from '@/interfaces/common';
+import { RootState } from '@/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface INotificationState extends INotification {
@@ -35,6 +36,8 @@ export const notificationSlice = createSlice({
     },
   },
 });
+
+export const selectNotification = (state: RootState) => state.notifications;
 
 export const { notifySuccess, notifyError, notifyInfo, clearNotification } =
   notificationSlice.actions;

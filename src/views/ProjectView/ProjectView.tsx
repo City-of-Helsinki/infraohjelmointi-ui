@@ -15,28 +15,14 @@ import {
   getProjectQualityLevelsThunk,
   getProjectTypesThunk,
   getConstructionPhaseDetailsThunk,
-  getProjectCategoriesThunk,
   getProjectRisksThunk,
   getResponsibleZonesThunk,
-  getResponsiblePersonsThunk,
 } from '@/reducers/listsSlice';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 // FIXME: the import statement for ProjectHeader index.ts doesn't work for some reason
 // webpack gives an error from a row that doesn't exist
 import ProjectHeader from '@/components/Project/ProjectHeader/ProjectHeader';
-import {
-  getClassesThunk,
-  setClasses,
-  setMasterClasses,
-  setSubClasses,
-} from '@/reducers/classSlice';
-import {
-  getLocationsThunk,
-  setDistricts,
-  setDivisions,
-  setSubDivisions,
-} from '@/reducers/locationSlice';
 import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
 
 const ProjectView = () => {
@@ -51,26 +37,11 @@ const ProjectView = () => {
     dispatch(getProjectPhasesThunk());
     dispatch(getProjectAreasThunk());
     dispatch(getConstructionPhaseDetailsThunk());
-    dispatch(getProjectCategoriesThunk());
     dispatch(getProjectRisksThunk());
     dispatch(getProjectQualityLevelsThunk());
     dispatch(getPlanningPhasesThunk());
     dispatch(getConstructionPhasesThunk());
     dispatch(getResponsibleZonesThunk());
-
-    dispatch(getResponsiblePersonsThunk());
-    // Get classes and filter them into categories
-    dispatch(getClassesThunk()).then(() => {
-      dispatch(setMasterClasses());
-      dispatch(setClasses());
-      dispatch(setSubClasses());
-    });
-    // Get locations and filter them into categories
-    dispatch(getLocationsThunk()).then(() => {
-      dispatch(setDistricts());
-      dispatch(setDivisions());
-      dispatch(setSubDivisions());
-    });
   }, [dispatch, projectId]);
 
   const navItems: Array<INavigationItem> = [

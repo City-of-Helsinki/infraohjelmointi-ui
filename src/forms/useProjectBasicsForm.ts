@@ -9,13 +9,14 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import { useAppSelector } from '../hooks/common';
-import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
-import _ from 'lodash';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import { selectProject } from '@/reducers/projectSlice';
+import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
+import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
 
 /**
  * Creates form fields for the project, in order for the labels to work the 'fi.json'-translations need
@@ -241,15 +242,15 @@ const buildProjectBasicsFormFields = (
  * @returns formValues, project
  */
 const useProjectBasicsValues = () => {
-  const project = useAppSelector((state: RootState) => state.project.selectedProject, _.isEqual);
+  const project = useAppSelector(selectProject);
 
-  const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
-  const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
-  const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
+  const masterClasses = useAppSelector(selectMasterClasses);
+  const classes = useAppSelector(selectClasses);
+  const subClasses = useAppSelector(selectSubClasses);
 
-  const districts = useAppSelector((state: RootState) => state.location.districts, _.isEqual);
-  const divisions = useAppSelector((state: RootState) => state.location.divisions, _.isEqual);
-  const subDivisions = useAppSelector((state: RootState) => state.location.subDivisions, _.isEqual);
+  const districts = useAppSelector(selectDistricts);
+  const divisions = useAppSelector(selectDivisions);
+  const subDivisions = useAppSelector(selectSubDivisions);
 
   const { t } = useTranslation();
   const value = (value: string | undefined) => value || '';
@@ -395,7 +396,7 @@ const useProjectBasicsValues = () => {
  */
 const useProjectBasicsForm = () => {
   const { t } = useTranslation();
-  const project = useAppSelector((state: RootState) => state.project.selectedProject);
+  const project = useAppSelector(selectProject);
   const { formValues } = useProjectBasicsValues();
 
   const formMethods = useForm<IProjectBasicsForm>({

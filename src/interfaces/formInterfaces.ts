@@ -13,6 +13,8 @@ export enum FormField {
   ListField,
   OverrunRight,
   TextArea,
+  Checkbox,
+  MultiSelect,
 }
 
 export interface IForm {
@@ -27,6 +29,7 @@ export interface IForm {
   tooltip?: string;
   hideLabel?: boolean;
   icon?: string;
+  placeholder?: string;
 }
 
 export interface IProjectHeaderForm {
@@ -57,6 +60,23 @@ export interface IProjectBasicsForm {
   planningStartYear: string;
 }
 
+export interface ISearchForm {
+  masterClass: Array<IOption>;
+  class: Array<IOption>;
+  subClass: Array<IOption>;
+  programmedYes: boolean;
+  programmedNo: boolean;
+  personPlanning: string;
+  programmedYearMin: string;
+  programmedYearMax: string;
+  phase: IOption;
+  responsiblePerson: IOption;
+  district: Array<IOption>;
+  division: Array<IOption>;
+  subDivision: Array<IOption>;
+  category: IOption;
+}
+
 export interface IProjectNoteForm {
   id: string;
   updatedBy: string;
@@ -84,6 +104,7 @@ export type HookFormControlType =
   | Control<IProjectHeaderForm>
   | Control<IHashTagsForm>
   | Control<IPhaseForm>
+  | Control<ISearchForm>
   | undefined;
 
 export type HookFormRulesType = Omit<

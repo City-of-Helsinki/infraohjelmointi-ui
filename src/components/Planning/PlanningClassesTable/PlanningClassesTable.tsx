@@ -2,34 +2,30 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ClassTableHierarchy } from '@/interfaces/common';
 import {
+  selectClasses,
+  selectMasterClasses,
+  selectSelectedClass,
+  selectSelectedMasterClass,
+  selectSelectedSubClass,
+  selectSubClasses,
   setSelectedClass,
   setSelectedMasterClass,
   setSelectedSubClass,
 } from '@/reducers/classSlice';
-import { RootState } from '@/store';
-import _ from 'lodash';
 import { memo, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 import PlanningClassesTableRow from './PlanningClassesTableRow';
 import './styles.css';
 
-// FIXME: this any will be removed ones we get the actual group model
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningClassesTable = () => {
   const { masterClassId, classId, subClassId } = useParams();
   const dispatch = useAppDispatch();
-  const masterClasses = useAppSelector((state: RootState) => state.class.masterClasses, _.isEqual);
-  const classes = useAppSelector((state: RootState) => state.class.classes, _.isEqual);
-  const subClasses = useAppSelector((state: RootState) => state.class.subClasses, _.isEqual);
-  const selectedMasterClass = useAppSelector(
-    (state: RootState) => state.class.selectedMasterClass,
-    _.isEqual,
-  );
-  const selectedClass = useAppSelector((state: RootState) => state.class.selectedClass, _.isEqual);
-  const selectedSubClass = useAppSelector(
-    (state: RootState) => state.class.selectedSubClass,
-    _.isEqual,
-  );
+  const masterClasses = useAppSelector(selectMasterClasses);
+  const classes = useAppSelector(selectClasses);
+  const subClasses = useAppSelector(selectSubClasses);
+  const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
+  const selectedClass = useAppSelector(selectSelectedClass);
+  const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
   /**
    * set selected classes to redux according to url, if their url param id is removed, then they will

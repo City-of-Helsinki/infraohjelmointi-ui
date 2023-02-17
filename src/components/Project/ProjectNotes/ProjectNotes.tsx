@@ -1,22 +1,18 @@
 import { Paragraph, Title } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { RootState } from '@/store';
 import { useCallback, useEffect } from 'react';
 import ProjectNote from './ProjectNote';
 import NewNoteForm from './NewNoteForm';
-import { getNotesByProjectThunk } from '@/reducers/noteSlice';
-import _ from 'lodash';
+import { getNotesByProjectThunk, selectNotes } from '@/reducers/noteSlice';
 import './styles.css';
 import { t } from 'i18next';
 import { sortArrayByDates } from '@/utils/common';
+import { selectProject } from '@/reducers/projectSlice';
 
 const ProjectNotes = () => {
   const dispatch = useAppDispatch();
-  const projectId = useAppSelector(
-    (state: RootState) => state.project.selectedProject?.id,
-    _.isEqual,
-  );
-  const notes = useAppSelector((state: RootState) => state.note.notes, _.isEqual);
+  const projectId = useAppSelector(selectProject)?.id;
+  const notes = useAppSelector(selectNotes);
 
   useEffect(() => {
     if (projectId) dispatch(getNotesByProjectThunk(projectId));

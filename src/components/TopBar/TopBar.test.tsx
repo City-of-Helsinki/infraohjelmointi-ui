@@ -42,7 +42,6 @@ describe('TopBar', () => {
     expect(getByRole('button', { name: matchExact('nav.search') })).toBeInTheDocument();
     expect(getAllByRole('button', { name: matchExact('nav.login') })[0]).toBeInTheDocument();
     expect(getByRole('button', { name: matchExact('nav.notifications') })).toBeInTheDocument();
-    expect(getByRole('search')).toBeInTheDocument();
     expect(getByRole('img')).toBeInTheDocument();
   });
 

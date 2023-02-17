@@ -3,7 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectBasicsForm from './ProjectBasicsForm';
-import { matchExact } from '@/utils/common';
+import { arrayHasValue, matchExact } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
@@ -66,6 +66,7 @@ describe('ProjectBasicsForm', () => {
               subDivision: [],
               responsibleZone: mockResponsibleZones.data,
               responsiblePersons: mockResponsiblePersons.data,
+              programmedYears: [],
               error: {},
             },
             hashTags: {
@@ -88,7 +89,7 @@ describe('ProjectBasicsForm', () => {
     expect(container.getElementsByClassName('basics-form').length).toBe(1);
   });
 
-  it('fills the fields with existing project  data', async () => {
+  it('fills the fields with existing project data', async () => {
     const { getByDisplayValue, getByText, getByTestId } = renderResult;
     const project = mockProject.data;
     const euroFormat = (value: string) => `${value} €`;
@@ -143,8 +144,8 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.constructionWorkQuantity);
 
     expect(project?.hashTags?.length).toBe(2);
-    const projectHashTags = mockHashTags.data.hashTags.filter(
-      (h) => project?.hashTags?.indexOf(h.id) !== -1,
+    const projectHashTags = mockHashTags.data.hashTags.filter((h) =>
+      arrayHasValue(project?.hashTags, h.id),
     );
     projectHashTags?.forEach((h) => {
       expect(getByText(matchExact(h.value))).toBeInTheDocument();
@@ -189,8 +190,8 @@ describe('ProjectBasicsForm', () => {
     await waitFor(async () => await user.click(getByText('hulevesi')));
     await user.click(getByRole('button', { name: matchExact('save') }));
 
-    const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter(
-      (h) => expectedValues.indexOf(h.id) !== -1,
+    const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
+      arrayHasValue(expectedValues, h.id),
     );
 
     expect(hashTagsAfterSubmit.length).toBe(3);
@@ -235,8 +236,8 @@ describe('ProjectBasicsForm', () => {
 
     expect(formPostRequest.value).toEqual(mockPostResponse.data.value);
 
-    const expectedHashTags = mockGetResponse.data.hashTags.filter(
-      (h) => mockProject.data.hashTags?.indexOf(h.id) !== -1,
+    const expectedHashTags = mockGetResponse.data.hashTags.filter((h) =>
+      arrayHasValue(mockProject.data.hashTags, h.id),
     );
     expectedHashTags.forEach((h) => {
       return expect(queryAllByText(h.value)[0]).toBeInTheDocument();
@@ -272,9 +273,9 @@ describe('ProjectBasicsForm', () => {
     await user.click(getByRole('button', { name: matchExact('save') }));
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
-    const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) => {
-      return expectedValues.indexOf(h.id) !== -1;
-    });
+    const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
+      arrayHasValue(expectedValues, h.id),
+    );
 
     expect(formPatchRequest.hashTags?.length).toBe(3);
     hashTagsAfterSubmit.forEach((h) => expect(getByText(h.value)).toBeInTheDocument());
@@ -391,6 +392,7 @@ describe('ProjectBasicsForm', () => {
     await user.click(parentContainer);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
   });

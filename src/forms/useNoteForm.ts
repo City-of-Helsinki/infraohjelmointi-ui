@@ -1,17 +1,14 @@
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
-import { RootState } from '@/store';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
-import _ from 'lodash';
 import { INote } from '@/interfaces/noteInterfaces';
+import { selectProject } from '@/reducers/projectSlice';
+import { selectUser } from '@/reducers/authSlice';
 
 const useNoteValues = (note?: INote) => {
-  const user = useAppSelector((state: RootState) => state.auth.user?.id, _.isEqual);
-  const projectId = useAppSelector(
-    (state: RootState) => state.project.selectedProject?.id,
-    _.isEqual,
-  );
+  const user = useAppSelector(selectUser)?.id;
+  const projectId = useAppSelector(selectProject)?.id;
 
   const formValues = useMemo(
     () => ({
