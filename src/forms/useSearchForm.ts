@@ -40,7 +40,6 @@ const useSearchForm = () => {
     watch,
     formState: { isDirty },
   } = formMethods;
-
   /**
    * Listens to form changes and checks if form has any added values and sets submitDisabled
    */

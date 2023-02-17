@@ -71,7 +71,7 @@ export const getSearchResultsThunk = createAsyncThunk(
 
 export const searchSlice = createSlice({
   name: 'search',
-  initialState,
+  initialState: initialState,
   reducers: {
     toggleSearch(state) {
       return { ...state, open: !state.open };
