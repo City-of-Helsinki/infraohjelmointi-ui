@@ -54,6 +54,9 @@ export const searchSlice = createSlice({
     setSearchForm(state, action: PayloadAction<ISearchForm>) {
       return { ...state, form: { ...state.form, ...action.payload } };
     },
+    clearSearchForm(state) {
+      return { ...state, form: initialSearchState.form };
+    },
   },
   extraReducers: (builder) => {
     // GET SEARCH RESULTS
@@ -76,6 +79,6 @@ export const selectOpen = (state: RootState) => state.search.open;
 export const selectSearchForm = (state: RootState) => state.search.form;
 export const selectSearchResult = (state: RootState) => state.search.searchResult;
 
-export const { toggleSearch, setSearchForm } = searchSlice.actions;
+export const { toggleSearch, setSearchForm, clearSearchForm } = searchSlice.actions;
 
 export default searchSlice.reducer;

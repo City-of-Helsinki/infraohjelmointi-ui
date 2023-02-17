@@ -183,9 +183,7 @@
     "district": "Suurpiiri",
     "division": "Kaupunginosa",
     "subDivision": "Osa-alue",
-    "phase": "Vaihe",
-    "programmedYearMin": "Ohjelmoitu vuosi min",
-    "programmedYearMax": "Ohjelmoitu vuosi max"
+    "phase": "Vaihe"
   },
   "notification": {
     "title": {
@@ -204,6 +202,21 @@
       "Request failed with status code 404": "Pyyntö epäonnistui virhekoodilla 404",
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500"
     }
+  },
+  "searchTag": {
+    "groups": "Ryhmä",
+    "classes": "Luokat",
+    "locations": "Sijainnit",
+    "masterClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka",
+    "district": "Suurpiiri",
+    "division": "Kaupunginosa",
+    "subDivision": "Osa-alue",
+    "programmedNo": "Ohjelmoitu: ei",
+    "programmedYes": "Ohjelmoitu: kyllä",
+    "programmedYearMin": "Ohjelmoitu vuosi min {{label}}",
+    "programmedYearMax": "Ohjelmoitu vuosi max {{label}}"
   },
   "appTitle": "Infraohjelmointi UI",
   "project": "Hankekortti",

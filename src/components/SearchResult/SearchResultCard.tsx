@@ -28,7 +28,7 @@ const SearchResultCard: FC<ISearchResultListItem> = ({
               <CustomTag
                 color={'var(--color-bus-medium-light	)'}
                 icon={<IconLayers size="xs" />}
-                text={t(type)}
+                text={t(`searchTag.${type}`)}
               />
             )}
           </div>
@@ -42,7 +42,6 @@ const SearchResultCard: FC<ISearchResultListItem> = ({
         </div>
         {/* Breadcrumbs */}
         <div className="search-result-breadcrumbs">
-          {/* FIXME: temporary use of array index as key because there are duplicate results for some reason */}
           {breadCrumbs?.map((b, i) => (
             <div key={b}>
               <span>{b}</span>
