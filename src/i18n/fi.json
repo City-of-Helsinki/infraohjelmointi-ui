@@ -262,5 +262,10 @@
   "required": "{{value}} on pakollinen tieto.",
   "maxLength": "Maksimipituus on {{value}} merkkiä.",
   "minValue": "Arvon on oltava suurempi tai yhtä suuri kuin {{value}}",
-  "maxValue": "Arvon on oltava pienempi tai yhtä suuri kuin {{value}}"
+  "maxValue": "Arvon on oltava pienempi tai yhtä suuri kuin {{value}}",
+  "groups": "Ryhmä",
+  "classes": "Luokat",
+  "locations": "Sijainnit",
+  "searchResultsNotFoundTitle": "Haullasi ei valitettavasti löytynyt yhtään osumaa.",
+  "searchResultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia."
 }

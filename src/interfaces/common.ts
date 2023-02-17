@@ -66,9 +66,9 @@ export enum ClassTableHierarchy {
 }
 
 export interface IFreeSearchResult {
-  hashtags?: Array<IListItem>;
-  projects?: Array<IListItem>;
-  groups?: Array<IListItem>;
+  hashtags: Array<IListItem>;
+  projects: Array<IListItem>;
+  groups: Array<IListItem>;
 }
 
 export type FreeSearchFormItem = IOption & { type: string };

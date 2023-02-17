@@ -30,8 +30,10 @@ axios.interceptors.response.use(
   (error) => handleError(error),
 );
 
+// Add urls here that shouldn't have loading indicator
 const handleRequest = (req: InternalAxiosRequestConfig) => {
-  if (!store.getState().loading.isLoading) {
+  // disable loading if using freeSearch, refactor this if more urls are needed
+  if (!store.getState().loading.isLoading && !req.url?.includes('projects/?freeSearch')) {
     store.dispatch(setLoading('Loading request'));
   }
   return req;

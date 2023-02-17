@@ -14,7 +14,7 @@ import Search from './Search';
 import mockProjectClasses from '@/mocks/mockClasses';
 import { setupStore } from '@/store';
 import { waitFor } from '@testing-library/react';
-import { getSearchResultsThunk, toggleSearch } from '@/reducers/searchSlice';
+import { getSearchResultThunk, toggleSearch } from '@/reducers/searchSlice';
 import { setProgrammedYears } from '@/utils/common';
 import { mockLocations } from '@/mocks/mockLocations';
 import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
@@ -253,14 +253,14 @@ describe('Search', () => {
 
     await Promise.resolve(getRequest).then((res: { data: ISearchResult }) => {
       expect(res.data).toStrictEqual(mockSearchResult.data);
-      expect(store.getState().search.searchResults).toStrictEqual(mockSearchResult.data);
+      expect(store.getState().search.searchResult).toStrictEqual(mockSearchResult.data);
     });
   });
 
   it('catches a bad search request', async () => {
     const { store } = renderResult;
     mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getSearchResultsThunk('123'));
+    await store.dispatch(getSearchResultThunk('123'));
 
     const storeError = store.getState().search.error as IError;
     expect(storeError.message).toBe(mockError.message);

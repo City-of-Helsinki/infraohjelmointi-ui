@@ -5,25 +5,25 @@ import { Dialog } from 'hds-react/components/Dialog';
 import { useCallback } from 'react';
 import { FormFieldLabel, SelectField } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import {
-  getSearchResultsThunk,
-  selectFreeSearchParams,
-  selectOpen,
-  setSearchForm,
-  toggleSearch,
-} from '@/reducers/searchSlice';
 import { FreeSearchFormObject, IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import FreeSearchForm from './FreeSearchForm';
-import './styles.css';
 import { useNavigate } from 'react-router';
 import MultiSelectField from '../shared/MultiSelectField';
 import CheckboxField from '../shared/CheckboxField';
 import { Fieldset } from 'hds-react/components/Fieldset';
 import { useOptions } from '@/hooks/useOptions';
+import {
+  getSearchResultThunk,
+  selectOpen,
+  setSearchForm,
+  toggleSearch,
+} from '@/reducers/searchSlice';
+import _ from 'lodash';
+import './styles.css';
 
 // Build a search parameter with all the choices from the search form
-const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormObject | null) => {
+const buildSearchParams = (form: ISearchForm) => {
   const searchParams = [];
   for (const [key, value] of Object.entries(form)) {
     switch (key) {
@@ -50,27 +50,23 @@ const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormOb
       case 'category':
         value.value && searchParams.push(`${key}=${value.value}`);
         break;
+      case 'freeSearchParams':
+        for (const [_, v] of Object.entries(value as FreeSearchFormObject)) {
+          switch (v.type) {
+            case 'groups':
+              searchParams.push(`projectGroup=${v.value}`);
+              break;
+            case 'projects':
+              searchParams.push(`project=${v.value}`);
+              break;
+            case 'hashtags':
+              searchParams.push(`hashTags=${v.value}`);
+              break;
+          }
+        }
+        break;
       default:
         break;
-    }
-  }
-
-  if (freeSearchParams) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [_, value] of Object.entries(freeSearchParams)) {
-      switch (value.type) {
-        case 'group':
-          searchParams.push(`projectGroup=${value.value}`);
-          break;
-        case 'project':
-          searchParams.push(`project=${value.value}`);
-          break;
-        case 'hashtag':
-          searchParams.push(`hashTags=${value.value}`);
-          break;
-        default:
-          break;
-      }
     }
   }
 
@@ -81,18 +77,12 @@ const Search = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const open = useAppSelector(selectOpen);
-  const freeSearchParams = useAppSelector(selectFreeSearchParams);
+
   const navigate = useNavigate();
 
-  const { formMethods } = useSearchForm();
+  const { formMethods, submitDisabled } = useSearchForm();
 
-  const {
-    handleSubmit,
-    getValues,
-    formState: { isDirty },
-    reset,
-    control,
-  } = formMethods;
+  const { handleSubmit, getValues, control } = formMethods;
 
   const phases = useOptions('phases');
   const masterClasses = useOptions('masterClasses', true);
@@ -108,14 +98,14 @@ const Search = () => {
 
   const onSubmit = useCallback(
     async (form: ISearchForm) => {
-      const searchParams = buildSearchParams(form, freeSearchParams);
-      dispatch(getSearchResultsThunk(searchParams)).then(() => {
+      const searchParams = buildSearchParams(form);
+      navigate('/search-result');
+      dispatch(toggleSearch());
+      dispatch(getSearchResultThunk(searchParams)).then(() => {
         dispatch(setSearchForm(form));
-        reset(form);
-        navigate('/search-result');
       });
     },
-    [dispatch, freeSearchParams, navigate, reset],
+    [dispatch, navigate],
   );
 
   const handleClose = useCallback(() => {
@@ -146,12 +136,8 @@ const Search = () => {
     >
       <Dialog.Header id="search-dialog-header" title={t('searchProjects')} />
       <Dialog.Content>
-        <FreeSearchForm />
-        <form
-          className="search-form"
-          onSubmit={handleSubmit(onSubmit)}
-          data-testid="project-search-form"
-        >
+        <form className="search-form" data-testid="project-search-form">
+          <FreeSearchForm control={control} getValues={getValues} />
           <div className="search-form-content">
             <div className="mb-4 pb-3">
               <FormFieldLabel text="searchForm.filter" />
@@ -207,7 +193,7 @@ const Search = () => {
         <Button
           onClick={handleSubmit(onSubmit)}
           data-testid="search-projects-button"
-          disabled={!isDirty}
+          disabled={submitDisabled}
         >
           {t('search')}
         </Button>

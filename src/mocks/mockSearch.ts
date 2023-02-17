@@ -75,6 +75,6 @@ export const mockSearchResult: { data: ISearchResult } = {
         path: '123/456/789',
       },
     ],
-    projects: [mockProject.data],
+    projects: [{ path: '123/456/789', project: mockProject.data }],
   },
 };

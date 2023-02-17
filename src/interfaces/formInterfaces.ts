@@ -1,5 +1,5 @@
 import { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
-import { IOption } from './common';
+import { FreeSearchFormObject, IOption } from './common';
 
 export enum FormField {
   Select,
@@ -61,6 +61,7 @@ export interface IProjectBasicsForm {
 }
 
 export interface ISearchForm {
+  freeSearchParams: FreeSearchFormObject | object;
   masterClass: Array<IOption>;
   class: Array<IOption>;
   subClass: Array<IOption>;

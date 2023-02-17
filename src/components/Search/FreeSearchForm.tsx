@@ -1,23 +1,19 @@
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { memo, useCallback, useState, MouseEvent, useEffect } from 'react';
+import { memo, useCallback, useState, MouseEvent } from 'react';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
 import { useTranslation } from 'react-i18next';
 import { arrayHasValue, listItemToOption, objectHasProperty } from '@/utils/common';
+import { HookFormControlType, ISearchForm } from '@/interfaces/formInterfaces';
+import { Control, Controller, FieldValues, UseFormGetValues } from 'react-hook-form';
 import {
   FreeSearchFormItem,
   FreeSearchFormObject,
   IFreeSearchResult,
   IListItem,
 } from '@/interfaces/common';
-import './styles.css';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import {
-  removeFreeSearchParam,
-  selectFreeSearchParams,
-  setFreeSearchParams,
-} from '@/reducers/searchSlice';
 import _ from 'lodash';
+import './styles.css';
 
 type FreeSearchFormListItem = IListItem & { type: string };
 
@@ -26,41 +22,38 @@ type FreeSearchFormListItem = IListItem & { type: string };
  */
 const freeSearchResultToList = (res: IFreeSearchResult): Array<FreeSearchFormListItem> => {
   const resultList = [];
-
-  res.projects &&
-    resultList.push(...res.projects.map((project) => ({ ...project, type: 'project' })));
-  res.groups && resultList.push(...res.groups.map((group) => ({ ...group, type: 'group' })));
-  res.hashtags &&
+  for (const [key, value] of Object.entries(res)) {
     resultList.push(
-      ...res.hashtags.map((h) => ({ id: h.id, value: `#${h.value}`, type: 'hashtag' })),
+      ...value.map((v: IListItem) => ({
+        id: v.id,
+        value: `${key === 'hashtags' ? '#' : ''}${v.value}`,
+        type: key,
+      })),
     );
+  }
   return resultList;
 };
 
 interface ISearchState {
-  selections: Array<string>;
   searchWord: string;
   resultObject: FreeSearchFormObject;
 }
 
-const FreeSearchForm = () => {
+const FreeSearchForm = ({
+  control,
+  getValues,
+}: {
+  control: HookFormControlType;
+  getValues: UseFormGetValues<ISearchForm>;
+}) => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
-  const freeSearchParams = useAppSelector(selectFreeSearchParams);
+
   const [searchState, setSearchState] = useState<ISearchState>({
-    selections: [],
     searchWord: '',
     resultObject: {},
   });
 
-  useEffect(() => {
-    setSearchState((current) => ({
-      ...current,
-      selections: Object.keys(freeSearchParams || {}),
-    }));
-  }, [freeSearchParams]);
-
-  const { selections, searchWord, resultObject } = searchState;
+  const { searchWord, resultObject } = searchState;
 
   const getSuggestions = useCallback(
     (inputValue: string) =>
@@ -68,9 +61,10 @@ const FreeSearchForm = () => {
         getProjectsWithFreeSearch(inputValue)
           .then((res) => {
             if (res) {
-              // Create a combined list of all results and filter already selected values
+              const formValue = getValues('freeSearchParams');
+              // Create a combined list of all results and filter already added values
               const resultList = freeSearchResultToList(res).filter(
-                (f) => !arrayHasValue(selections, f.value),
+                (f) => !arrayHasValue(Object.keys(formValue), f.value),
               );
 
               // Convert the resultList to options for the suggestion dropdown
@@ -93,40 +87,53 @@ const FreeSearchForm = () => {
           })
           .catch(() => reject([]));
       }),
-    [selections],
+    [],
   );
 
   /**
    * Gets the selectedValue and uses the resultObject to get the id and type for the
-   * selectedValue, if it exists in resultObject and isn't already added as a selection
+   * selectedValue, if it exists in resultObject and isn't already an added value
    */
   const handleSubmit = useCallback(
-    (value: string) => {
-      if (!arrayHasValue(selections, value) && objectHasProperty(resultObject, value)) {
-        dispatch(setFreeSearchParams({ [resultObject[value].label]: resultObject[value] }));
+    (value: string, onChange: (...event: unknown[]) => void) => {
+      const formValue = getValues('freeSearchParams');
+      if (!arrayHasValue(Object.keys(formValue), value) && objectHasProperty(resultObject, value)) {
+        const nextChange = {
+          ...formValue,
+          [resultObject[value].label]: resultObject[value],
+        };
+        onChange(nextChange);
         setSearchState((current) => {
           return {
             ...current,
             searchWord: '',
+            selections: Object.keys(nextChange),
           };
         });
       }
     },
-    [selections, resultObject, dispatch],
+    [resultObject],
   );
 
   /**
-   * Get the <span>-elements value and use the value to remove the key from redux
+   * Get the <span>-elements value and use the value to remove the key from the form value
    */
   const onSelectionDelete = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      dispatch(
-        removeFreeSearchParam(
-          (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string,
-        ),
-      );
+    (e: MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
+      const formValue = getValues('freeSearchParams') as FreeSearchFormObject;
+      // Copy everything except the chosen value to a new object, since react-hook-forms freezes the object
+      const {
+        [(e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string]: _,
+        ...nextChange
+      } = formValue;
+
+      onChange(nextChange);
+      setSearchState((current) => ({
+        ...current,
+        selections: Object.keys(nextChange || {}),
+      }));
     },
-    [dispatch],
+    [],
   );
 
   const handleSetSearchWord = useCallback(
@@ -136,23 +143,31 @@ const FreeSearchForm = () => {
 
   return (
     <div className="free-search" data-testid="free-search">
-      <SearchInput
-        label={t('searchForm.searchWord')}
-        helperText={t('searchForm.freeSearchDescription') || ''}
-        searchButtonAriaLabel="Search"
-        suggestionLabelField="label"
-        getSuggestions={getSuggestions}
-        value={searchWord}
-        onChange={handleSetSearchWord}
-        onSubmit={handleSubmit}
+      <Controller
+        name="freeSearchParams"
+        control={control as Control<FieldValues>}
+        render={({ field: { onChange, value } }) => (
+          <>
+            <SearchInput
+              label={t('searchForm.searchWord')}
+              helperText={t('searchForm.freeSearchDescription') || ''}
+              searchButtonAriaLabel="Search"
+              suggestionLabelField="label"
+              getSuggestions={getSuggestions}
+              value={searchWord}
+              onChange={handleSetSearchWord}
+              onSubmit={(v) => handleSubmit(v, onChange)}
+            />
+            <div className="search-selections">
+              {Object.keys(value || {}).map((s) => (
+                <Tag key={s} onDelete={(e) => onSelectionDelete(e, onChange)}>
+                  {s}
+                </Tag>
+              ))}
+            </div>
+          </>
+        )}
       />
-      <div className="search-selections">
-        {selections.map((s) => (
-          <Tag key={s} onDelete={onSelectionDelete}>
-            {s}
-          </Tag>
-        ))}
-      </div>
     </div>
   );
 };

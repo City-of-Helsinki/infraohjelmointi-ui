@@ -1,36 +1,57 @@
-import { IconAngleRight, IconPaperclip } from 'hds-react/icons';
+import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
+import { IconAngleRight, IconLayers, IconPaperclip } from 'hds-react/icons';
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { CustomTag } from '../shared';
 import './styles.css';
 
-interface ISearchResultCardProps {
-  title: string;
-}
+const SearchResultCard: FC<ISearchResultListItem> = ({
+  name,
+  path,
+  type,
+  hashTag,
+  phase,
+  breadCrumbs,
+}) => {
+  const { t } = useTranslation();
 
-const SearchResultCard: FC<ISearchResultCardProps> = ({ title }) => {
   return (
-    <div className="search-result-card">
-      {/* Title */}
-      <div className="search-result-title-container">
-        <div className="search-result-title">
-          {title}
-          <CustomTag text={'#tunniste'} />
+    <Link to={`/planning/coordinator/${path}`} className="search-result-card-wrapper">
+      <div className="search-result-card">
+        {/* Title */}
+        <div className="search-result-title-container">
+          <div className="search-result-title">
+            {name}
+            {hashTag && <CustomTag text={hashTag} color={'var(--color-gold-medium-light	)'} />}
+            {type !== 'projects' && (
+              <CustomTag
+                color={'var(--color-bus-medium-light	)'}
+                icon={<IconLayers size="xs" />}
+                text={t(type)}
+              />
+            )}
+          </div>
+          {phase && (
+            <CustomTag
+              icon={<IconPaperclip size="xs" />}
+              text={t(`enums.${phase}`)}
+              color={'var(--color-suomenlinna-medium-light)'}
+            />
+          )}
         </div>
-        <CustomTag
-          icon={<IconPaperclip size="xs" />}
-          text={'Suunnittelussa'}
-          color={'var(--color-suomenlinna-medium-light)'}
-        />
+        {/* Breadcrumbs */}
+        <div className="search-result-breadcrumbs">
+          {/* FIXME: temporary use of array index as key because there are duplicate results for some reason */}
+          {breadCrumbs?.map((b, i) => (
+            <div key={b}>
+              <span>{b}</span>
+              {breadCrumbs.length > i + 1 && <IconAngleRight size="xs" />}
+            </div>
+          ))}
+        </div>
       </div>
-      {/* Breadcrumbs */}
-      <div className="search-result-breadcrumbs">
-        <span>{'803 Kadut, liikenneväylät'}</span>
-        <IconAngleRight size="xs" />
-        <span>{'Uudisrakentaminen'}</span>
-        <IconAngleRight size="xs" />
-        <span>{'Pohjoinen suurpiiri'}</span>
-      </div>
-    </div>
+    </Link>
   );
 };
 
