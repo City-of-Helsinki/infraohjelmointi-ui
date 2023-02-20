@@ -41,6 +41,7 @@ import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
 import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
+import { getHashTagsThunk } from './reducers/hashTagsSlice';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
@@ -57,6 +58,7 @@ const App: FC = () => {
     dispatch(getProjectCategoriesThunk());
     dispatch(getResponsiblePersonsThunk());
     dispatch(getProjectPhasesThunk());
+    dispatch(getHashTagsThunk());
     // Get classes and filter them into categories
     dispatch(getClassesThunk()).then(() => {
       dispatch(setMasterClasses());

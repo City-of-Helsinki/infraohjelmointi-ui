@@ -232,7 +232,7 @@ describe('Search', () => {
     await user.click(getByTestId('search-projects-button'));
 
     // Check that the search param was added correctly
-    expect(getRequest.calls[1][0].includes('hashTags=123')).toBe(true);
+    expect(getRequest.calls[1][0].includes('hashtag=123')).toBe(true);
   });
 
   it('adds search results to redux with a successful GET request', async () => {

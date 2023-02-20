@@ -39,7 +39,7 @@ const buildSearchParams = (form: ISearchForm) => {
               searchParams.push(`project=${v.value}`);
               break;
             case 'hashtags':
-              searchParams.push(`hashTags=${v.value}`);
+              searchParams.push(`hashtag=${v.value}`);
               break;
           }
         }

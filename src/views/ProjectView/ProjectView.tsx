@@ -20,7 +20,6 @@ import {
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
-import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +28,6 @@ const ProjectView = () => {
 
   useEffect(() => {
     dispatch(getProjectThunk(projectId || ''));
-    dispatch(getHashTagsThunk());
     dispatch(getProjectTypesThunk());
     dispatch(getProjectAreasThunk());
     dispatch(getConstructionPhaseDetailsThunk());

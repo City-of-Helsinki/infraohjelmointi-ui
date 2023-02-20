@@ -203,6 +203,12 @@
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500"
     }
   },
+  "searchOrder": {
+    "new": "Uusin ensin",
+    "old": "Vanhin ensin",
+    "hashTag": "Hashtag ensin",
+    "group": "Ryhmät ensin"
+  },
   "searchTag": {
     "groups": "Ryhmä",
     "classes": "Luokat",
@@ -281,5 +287,6 @@
   "locations": "Sijainnit",
   "searchResultsNotFoundTitle": "Haullasi ei valitettavasti löytynyt yhtään osumaa.",
   "searchResultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia.",
-  "emptyTerms": "Tyhjennä hakuehdot"
+  "emptyTerms": "Tyhjennä hakuehdot",
+  "order": "Järjestys"
 }

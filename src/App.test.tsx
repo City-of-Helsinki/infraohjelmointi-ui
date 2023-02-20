@@ -20,6 +20,8 @@ import {
 import { IError } from './interfaces/common';
 import { getClassesThunk } from './reducers/classSlice';
 import { getLocationsThunk } from './reducers/locationSlice';
+import { mockHashTags } from './mocks/mockHashTags';
+import { getHashTagsThunk } from './reducers/hashTagsSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -41,10 +43,13 @@ describe('App', () => {
     const classes = store.getState().class;
     const locations = store.getState().location;
     const lists = store.getState().lists;
+    const hashTags = store.getState().hashTags;
 
     expect(lists.categories).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
     expect(lists.phase).toStrictEqual(mockProjectPhases.data);
+    expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
+    expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
     expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
     expect(classes.masterClasses.length).toBeGreaterThan(0);
     expect(classes.classes.length).toBeGreaterThan(0);
@@ -137,6 +142,16 @@ describe('App', () => {
     await store.dispatch(getLocationsThunk());
 
     const storeError = store.getState().location.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed hashtags fetch', async () => {
+    const { store } = renderResult;
+    mockedAxios.get.mockRejectedValueOnce(mockError);
+    await store.dispatch(getHashTagsThunk());
+
+    const storeError = store.getState().hashTags.error as IError;
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
   });

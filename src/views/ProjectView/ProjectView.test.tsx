@@ -3,8 +3,6 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from './ProjectView';
 import { getProjectThunk } from '@/reducers/projectSlice';
-import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
-import { mockHashTags } from '@/mocks/mockHashTags';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
@@ -31,6 +29,7 @@ import {
   getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { mockHashTags } from '@/mocks/mockHashTags';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -177,16 +176,6 @@ describe('ProjectView', () => {
     await store.dispatch(getResponsibleZonesThunk());
 
     const storeError = store.getState().lists.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
-  it('catches a failed hashtags fetch', async () => {
-    const { store } = renderResult;
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getHashTagsThunk());
-
-    const storeError = store.getState().hashTags.error as IError;
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
   });

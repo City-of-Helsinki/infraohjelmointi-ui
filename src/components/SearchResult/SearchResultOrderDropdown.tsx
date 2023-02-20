@@ -1,20 +1,23 @@
 import { IOption } from '@/interfaces/common';
 import { Select } from 'hds-react/components/Select';
+import { useTranslation } from 'react-i18next';
 
 const SearchResultOrderDropdown = () => {
-  // Mock data
-  const resultOrder: Array<IOption> = [
-    { value: '1', label: 'Uusin ensin' },
-    { value: '2', label: 'Vanhin ensin' },
-    { value: '3', label: 'Hashtag ensin' },
-    { value: '4', label: 'Ryhmät ensin' },
+  const { t } = useTranslation();
+
+  const order: Array<IOption> = [
+    { value: '1', label: t('searchOrder.new') },
+    { value: '2', label: t('searchOrder.old') },
+    { value: '3', label: t('searchOrder.hashTag') },
+    { value: '4', label: t('searchOrder.group') },
   ];
+
   return (
     <Select
-      label="Järjestys"
+      label={t('order')}
       placeholder="Placeholder"
-      options={resultOrder}
-      className="result-order-dropdown "
+      options={order}
+      className="result-order-dropdown"
     />
   );
 };
