@@ -5,7 +5,6 @@ import { Dialog } from 'hds-react/components/Dialog';
 import { useCallback } from 'react';
 import { FormFieldLabel, SelectField } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { FreeSearchFormObject, IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import FreeSearchForm from './FreeSearchForm';
 import { useNavigate } from 'react-router';
@@ -21,57 +20,7 @@ import {
 } from '@/reducers/searchSlice';
 import _ from 'lodash';
 import './styles.css';
-
-// Build a search parameter with all the choices from the search form
-const buildSearchParams = (form: ISearchForm) => {
-  const searchParams = [];
-  for (const [key, value] of Object.entries(form)) {
-    switch (key) {
-      case 'masterClass':
-      case 'class':
-      case 'subClass':
-      case 'district':
-      case 'division':
-      case 'subDivision':
-        value.forEach((v: IOption) => searchParams.push(`${key}=${v.value}`));
-        break;
-      case 'programmedYes':
-        value && searchParams.push('programmed=true');
-        break;
-      case 'programmedNo':
-        value && searchParams.push('programmed=false');
-        break;
-      case 'programmedYearMin':
-      case 'programmedYearMax':
-        value && searchParams.push(`${key}=${value}`);
-        break;
-      case 'phase':
-      case 'personPlanning':
-      case 'category':
-        value.value && searchParams.push(`${key}=${value.value}`);
-        break;
-      case 'freeSearchParams':
-        for (const [_, v] of Object.entries(value as FreeSearchFormObject)) {
-          switch (v.type) {
-            case 'groups':
-              searchParams.push(`projectGroup=${v.value}`);
-              break;
-            case 'projects':
-              searchParams.push(`project=${v.value}`);
-              break;
-            case 'hashtags':
-              searchParams.push(`hashTags=${v.value}`);
-              break;
-          }
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  return searchParams.join('&');
-};
+import buildSearchParams from '@/utils/buildSearchParams';
 
 const Search = () => {
   const { t } = useTranslation();

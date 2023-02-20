@@ -280,5 +280,6 @@
   "classes": "Luokat",
   "locations": "Sijainnit",
   "searchResultsNotFoundTitle": "Haullasi ei valitettavasti löytynyt yhtään osumaa.",
-  "searchResultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia."
+  "searchResultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia.",
+  "emptyTerms": "Tyhjennä hakuehdot"
 }
