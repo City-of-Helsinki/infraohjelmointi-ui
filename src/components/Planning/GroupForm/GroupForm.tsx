@@ -28,7 +28,6 @@ const GroupForm: FC = () => {
   const subClasses = useAppSelector(selectSubClasses);
 
   const onProjectClick = useCallback((value: IOption | undefined) => {
-    console.log(value);
     if (value) {
       setFormState((current) => ({
         ...current,
@@ -36,6 +35,7 @@ const GroupForm: FC = () => {
       }));
     }
   }, []);
+
   const getReverseClassHierarchy = useCallback(
     (subClassId: string | undefined) => {
       const classAsListItem = (projectClass: IClass | undefined): IListItem => ({

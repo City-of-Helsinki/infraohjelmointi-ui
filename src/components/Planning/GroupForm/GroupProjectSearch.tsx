@@ -2,7 +2,7 @@ import { Paragraph } from '@/components/shared';
 import { FreeSearchFormItem, IFreeSearchResult, IListItem, IOption } from '@/interfaces/common';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
 import { arrayHasValue, listItemToOption } from '@/utils/common';
-import { Tag } from 'hds-react';
+import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import _ from 'lodash';
 import { FC, memo, useCallback, useState } from 'react';
@@ -60,7 +60,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ onProjectClick, projectsF
    * Get the name and delete from local state
    */
   const onSelectionDelete = useCallback((e: any) => {
-    console.log(e);
+    console.log(e.target);
   }, []);
   return (
     <div className="dialog-section" data-testid="search-project-field-section">
@@ -74,13 +74,13 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ onProjectClick, projectsF
         onChange={handleValueChange}
         onSubmit={handleSubmit}
       />
-      {/* <div className="search-selections">
+      <div className="search-selections">
         {projectsForSubmit.map((s) => (
-          <Tag key={s} onDelete={onSelectionDelete}>
-            {s}
+          <Tag key={s.label} onDelete={onSelectionDelete}>
+            {s.label}
           </Tag>
         ))}
-      </div> */}
+      </div>
     </div>
   );
 };
