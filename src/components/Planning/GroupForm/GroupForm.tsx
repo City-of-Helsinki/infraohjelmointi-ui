@@ -12,12 +12,14 @@ import useGroupForm from '@/forms/useGroupForm';
 import useClassList from '@/hooks/useClassList';
 import { selectMasterClasses, selectClasses, selectSubClasses } from '@/reducers/classSlice';
 import { listItemToOption } from '@/utils/common';
-import { IListItem } from '@/interfaces/common';
+import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
+import GroupProjectSearch from './GroupProjectSearch';
 
 interface IFormState {
   isOpen: boolean;
   selectedClass: string | undefined;
+  projectsForSubmit: Array<IOption>;
 }
 
 const GroupForm: FC = () => {
@@ -25,6 +27,15 @@ const GroupForm: FC = () => {
   const classes = useAppSelector(selectClasses);
   const subClasses = useAppSelector(selectSubClasses);
 
+  const onProjectClick = useCallback((value: IOption | undefined) => {
+    console.log(value);
+    if (value) {
+      setFormState((current) => ({
+        ...current,
+        projectsForSubmit: [...current.projectsForSubmit, value],
+      }));
+    }
+  }, []);
   const getReverseClassHierarchy = useCallback(
     (subClassId: string | undefined) => {
       const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
@@ -64,6 +75,7 @@ const GroupForm: FC = () => {
   const [formState, setFormState] = useState<IFormState>({
     isOpen: false,
     selectedClass: '',
+    projectsForSubmit: [],
   });
 
   useEffect(() => {
@@ -87,7 +99,7 @@ const GroupForm: FC = () => {
     });
     return () => subscription.unsubscribe();
   }, [watch, setValue, getReverseClassHierarchy]);
-  const { isOpen, selectedClass } = formState;
+  const { isOpen, selectedClass, projectsForSubmit } = formState;
   useClassList(true, selectedClass);
 
   const onSubmit = useCallback(
@@ -149,7 +161,12 @@ const GroupForm: FC = () => {
               </div>
             </form>
           </Content>
-
+          <Content>
+            <GroupProjectSearch
+              projectsForSubmit={projectsForSubmit}
+              onProjectClick={onProjectClick}
+            />
+          </Content>
           <ActionButtons>
             <Button
               onClick={handleSubmit(onSubmit)}
