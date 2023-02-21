@@ -189,6 +189,13 @@
     "programmedYearMin": "Ohjelmoitu vuosi min",
     "programmedYearMax": "Ohjelmoitu vuosi max"
   },
+  "groupForm": {
+    "name": "Ryhman nimi",
+    "masterClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka"
+  }
+  ,
   "notification": {
     "title": {
       "sendSuccess": "Lähetys onnistui",

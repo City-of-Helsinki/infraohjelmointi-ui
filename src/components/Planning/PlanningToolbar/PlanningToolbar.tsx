@@ -1,5 +1,5 @@
 import { Toolbar } from '../../shared';
-import { GroupDialog } from '../GroupDialog';
+import { GroupForm } from '../GroupForm';
 
 const PlanningToolbar = () => {
   return <Toolbar />;

@@ -1,0 +1,4 @@
+#group-form-dialog hr {
+    border-top: 0.0625rem solid var(--color-black-20);
+    margin: 0;
+}

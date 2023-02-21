@@ -3,7 +3,6 @@ import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
-
 export const postGroup = async (request: IGroupRequest) => {
   return axios
     .post(`${REACT_APP_API_URL}/project-groups/`, request)
