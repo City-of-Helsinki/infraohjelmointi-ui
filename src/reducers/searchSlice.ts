@@ -17,7 +17,7 @@ export const initialSearchState: ISearchState = {
   form: {
     freeSearchParams: {},
     masterClass: [],
-    class: [],
+    classes: [],
     subClass: [],
     programmedYes: false,
     programmedNo: false,

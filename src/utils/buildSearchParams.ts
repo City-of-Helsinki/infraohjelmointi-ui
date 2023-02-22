@@ -7,7 +7,7 @@ const buildSearchParams = (form: ISearchForm) => {
   for (const [key, value] of Object.entries(form)) {
     switch (key) {
       case 'masterClass':
-      case 'class':
+      case 'classes':
       case 'subClass':
       case 'district':
       case 'division':

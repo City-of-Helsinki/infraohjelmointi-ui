@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { initialSearchState, selectSearchForm } from '@/reducers/searchSlice';
-import { IOption } from '@/interfaces/common';
 import useMultiClassList from '@/hooks/useMultiClassList';
+import useMultiLocationList from '@/hooks/useMultiLocationList';
+import _ from 'lodash';
 
 const useSearchForm = () => {
   const storeFormValues = useAppSelector(selectSearchForm);
@@ -14,11 +15,19 @@ const useSearchForm = () => {
     mode: 'onBlur',
   });
 
-  const [selectMasterClasses, setSelectedMasterClasses] = useState<Array<IOption>>([]);
-  const [selectedClasses, setSelectedClasses] = useState<Array<IOption>>([]);
-  const [selectedSubClasses, setSelectedSubClasses] = useState<Array<IOption>>([]);
+  const [formState, setFormState] = useState({
+    masterClass: [],
+    classes: [],
+    subClass: [],
+    district: [],
+    division: [],
+    subDivision: [],
+  });
 
-  useMultiClassList(selectMasterClasses, selectedClasses, selectedSubClasses);
+  const { masterClass, classes, subClass, district, division, subDivision } = formState;
+
+  useMultiLocationList(district, division, subDivision);
+  useMultiClassList(masterClass, classes, subClass);
 
   const {
     reset,
@@ -31,10 +40,18 @@ const useSearchForm = () => {
   useEffect(() => {
     if (!isDirty) {
       const subscription = watch((value, { name }) => {
-        name === 'masterClass' && setSelectedMasterClasses(value.masterClass as Array<IOption>);
-        name === 'class' && setSelectedClasses(value.class as Array<IOption>);
-        name === 'subClass' && setSelectedSubClasses(value.subClass as Array<IOption>);
-
+        switch (name) {
+          case 'classes':
+          case 'masterClass':
+          case 'subClass':
+          case 'district':
+          case 'division':
+          case 'subDivision':
+            setFormState((current) => ({ ...current, [name]: value[name] }));
+            break;
+          default:
+            break;
+        }
         setSubmitDisabled(JSON.stringify(value) === JSON.stringify(initialSearchState.form));
       });
       return () => subscription.unsubscribe();

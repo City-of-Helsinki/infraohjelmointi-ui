@@ -1,14 +1,17 @@
 import { IOption } from '@/interfaces/common';
 import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
 import { setClassList, setMasterClassList, setSubClassList } from '@/reducers/listsSlice';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
+import _ from 'lodash';
 
 /**
- * Creates lists of masterClasses, classes and subClasses. If filtering is used, then all
- * classes and subClasses will be filtered according to their parent.
+ * Populates the masterClass, class and subClass lists. Filters the available options of the lists
+ * to only include "sibling" classes.
  *
- * @param withFilter boolean if filtering should be used
+ * @param masterClasses selected masterClass options
+ * @param classes selected class options
+ * @param subClasses selected subClass options
  */
 const useMultiClassList = (
   masterClasses: Array<IOption>,
@@ -21,108 +24,44 @@ const useMultiClassList = (
 
   const dispatch = useAppDispatch();
 
-  const populateAllLists = useCallback(() => {
+  // Populate lists when classes get populated to redux
+  useEffect(() => {
     dispatch(setMasterClassList(allMasterClasses));
     dispatch(setClassList(allClasses));
     dispatch(setSubClassList(allSubClasses));
-  }, [dispatch, allMasterClasses, allClasses, allSubClasses]);
-
-  // Populate lists when classes get fetched to redux
-  useEffect(() => {
-    populateAllLists();
   }, [allMasterClasses, allClasses, allSubClasses]);
 
-  // Populate lists when all selections are empty
   useEffect(() => {
-    populateAllLists();
+    const selectedClassParents = allClasses
+      .filter((ac) => classes.findIndex((c) => c.value === ac.id) !== -1)
+      .map((c) => c.parent);
+
+    const selectedSubClassParents = allSubClasses
+      .filter((asc) => subClasses.findIndex((sc) => sc.value === asc.id) !== -1)
+      .map((sc) => sc.parent);
+
+    const nextClasses = !_.isEmpty(subClasses)
+      ? allClasses.filter((c) => selectedSubClassParents.findIndex((sc) => sc === c.id) !== -1)
+      : !_.isEmpty(masterClasses)
+      ? allClasses.filter((c) => masterClasses.findIndex((mc) => mc.value === c.parent) !== -1)
+      : allClasses;
+
+    const nextSubClasses = !_.isEmpty(classes)
+      ? allSubClasses.filter((sc) => classes.findIndex((fc) => sc.parent === fc.value) !== -1)
+      : !_.isEmpty(masterClasses)
+      ? allSubClasses.filter((sc) => nextClasses.findIndex((fc) => sc.parent === fc.id) !== -1)
+      : allSubClasses;
+
+    const nextMasterClasses = !_.isEmpty(classes)
+      ? allMasterClasses.filter((mc) => selectedClassParents.findIndex((c) => c === mc.id) !== -1)
+      : !_.isEmpty(subClasses)
+      ? allMasterClasses.filter((mc) => nextClasses.findIndex((sc) => sc.parent === mc.id) !== -1)
+      : allMasterClasses;
+
+    dispatch(setMasterClassList(nextMasterClasses));
+    dispatch(setSubClassList(nextSubClasses));
+    dispatch(setClassList(nextClasses));
   }, [masterClasses, classes, subClasses]);
-
-  // Set class and subClass list that belong to the selected masterClasses
-  useEffect(() => {
-    if (masterClasses.length > 0) {
-      const filteredClasses = allClasses.filter(
-        (c) => masterClasses.findIndex((mc) => mc.value === c.parent) !== -1,
-      );
-      const filteredSubClasses = allSubClasses.filter(
-        (sc) => filteredClasses.findIndex((fc) => sc.parent === fc.id) !== -1,
-      );
-      dispatch(setClassList(filteredClasses));
-      dispatch(setSubClassList(filteredSubClasses));
-    } else {
-      if (classes.length === 0) {
-        dispatch(setClassList(allClasses));
-      }
-      if (subClasses.length === 0) {
-        const filteredSubClasses =
-          classes.length > 0
-            ? allSubClasses.filter((sc) => classes.findIndex((fc) => sc.parent === fc.value) !== -1)
-            : allSubClasses;
-        dispatch(setSubClassList(filteredSubClasses));
-      }
-    }
-  }, [masterClasses]);
-
-  // Set subClass and masterClass list that belong to the selected classes
-  useEffect(() => {
-    // if (classes.length > 0) {
-    // }
-    if (classes.length > 0) {
-      const classParents = allClasses
-        .filter((ac) => classes.findIndex((c) => c.value === ac.id) !== -1)
-        .map((c) => c.parent);
-
-      const filteredSubClasses = allSubClasses.filter(
-        (sc) => classes.findIndex((c) => c.value === sc.parent) !== -1,
-      );
-
-      const filteredMasterClasses = allMasterClasses.filter(
-        (mc) => classParents.findIndex((cp) => cp === mc.id) !== -1,
-      );
-
-      dispatch(setSubClassList(filteredSubClasses));
-      dispatch(setMasterClassList(filteredMasterClasses));
-    } else {
-      if (masterClasses.length !== 0) {
-        const filteredClasses = allClasses.filter(
-          (c) => masterClasses.findIndex((mc) => mc.value === c.parent) !== -1,
-        );
-        const filteredSubClasses = allSubClasses.filter(
-          (sc) => filteredClasses.findIndex((fc) => sc.parent === fc.id) !== -1,
-        );
-        dispatch(setSubClassList(filteredSubClasses));
-      }
-    }
-  }, [classes]);
-
-  // Set class and masterClass list that belong to the selected subClasses
-  useEffect(() => {
-    if (subClasses.length > 0) {
-      const subClassParents = allSubClasses
-        .filter((asc) => subClasses.findIndex((sc) => sc.value === asc.id) !== -1)
-        .map((sc) => sc.parent);
-
-      const classParents = allClasses
-        .filter((ac) => subClassParents.findIndex((scp) => scp === ac.id) !== -1)
-        .map((cp) => cp.parent);
-
-      const filteredClasses = allClasses.filter(
-        (ac) => subClassParents.findIndex((scp) => scp === ac.id) !== -1,
-      );
-
-      const filteredMasterClasses = allMasterClasses.filter(
-        (mc) => classParents.findIndex((cp) => cp === mc.id) !== -1,
-      );
-      dispatch(setClassList(filteredClasses));
-      dispatch(setMasterClassList(filteredMasterClasses));
-    } else {
-      if (masterClasses.length !== 0) {
-        const filteredClasses = allClasses.filter(
-          (c) => masterClasses.findIndex((mc) => mc.value === c.parent) !== -1,
-        );
-        dispatch(setClassList(filteredClasses));
-      }
-    }
-  }, [subClasses]);
 };
 
 export default useMultiClassList;

@@ -59,7 +59,7 @@ const useProjectBasicsValues = () => {
 
     return {
       masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
-      class: listItemToOption(classAsListItem(selectedClass) || []),
+      classes: listItemToOption(classAsListItem(selectedClass) || []),
       subClass: listItemToOption(classAsListItem(selectedSubClass) || []),
     };
   };

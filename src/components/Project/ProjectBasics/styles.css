@@ -151,7 +151,7 @@
   grid-column: var(--grid-col-half-left);
 }
 
-.basic-info-form #class {
+.basic-info-form #classes {
   grid-column: var(--grid-col-small-left);
 }
 

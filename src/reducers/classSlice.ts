@@ -63,6 +63,8 @@ export const classSlice = createSlice({
       return { ...state, selectedMasterClass: action.payload };
     },
     setSelectedClass(state, action: PayloadAction<IClass | null>) {
+      console.log(action.payload);
+
       return { ...state, selectedClass: action.payload };
     },
     setSelectedSubClass(state, action: PayloadAction<IClass | null>) {

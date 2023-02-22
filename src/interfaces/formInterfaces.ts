@@ -63,7 +63,7 @@ export interface IProjectBasicsForm {
 export interface ISearchForm {
   freeSearchParams: FreeSearchFormObject | object;
   masterClass: Array<IOption>;
-  class: Array<IOption>;
+  classes: Array<IOption>;
   subClass: Array<IOption>;
   programmedYes: boolean;
   programmedNo: boolean;

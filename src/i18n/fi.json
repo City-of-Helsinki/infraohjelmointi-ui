@@ -132,7 +132,7 @@
     "phaseDetail": "Rakentamisvaiheen tarkenne",
     "financial": "Hankkeen kustannustiedot",
     "masterClass": "Pääluokka",
-    "class": "Luokka",
+    "classes": "Luokka",
     "subClass": "Alaluokka",
     "projectCostForecast": "Hankkeenkustannus ja laatutaso",
     "projectQualityLevel": "Laatutaso",
@@ -172,7 +172,7 @@
     "searchWord": "Mitä haet?",
     "freeSearchDescription": "Etsi hakusanalla, hankkeen nimen, ryhmän tai hashtagin mukaan.",
     "masterClass": "Pääluokka",
-    "class": "Luokka",
+    "classes": "Luokka",
     "subClass": "Alaluokka",
     "category": "Kategoria",
     "personPlanning": "Vastuuhenkilö",
@@ -183,7 +183,9 @@
     "district": "Suurpiiri",
     "division": "Kaupunginosa",
     "subDivision": "Osa-alue",
-    "phase": "Vaihe"
+    "phase": "Vaihe",
+    "programmedYearMin": "Ohjelmoitu vuosi min",
+    "programmedYearMax": "Ohjelmoitu vuosi max"
   },
   "notification": {
     "title": {
@@ -211,10 +213,10 @@
   },
   "searchTag": {
     "groups": "Ryhmä",
-    "classes": "Luokat",
+    "class": "Luokat",
     "locations": "Sijainnit",
     "masterClass": "Pääluokka",
-    "class": "Luokka",
+    "classes": "Luokka",
     "subClass": "Alaluokka",
     "district": "Suurpiiri",
     "division": "Kaupunginosa",
