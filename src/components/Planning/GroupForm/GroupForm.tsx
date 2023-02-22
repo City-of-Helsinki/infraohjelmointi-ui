@@ -15,10 +15,14 @@ import { listItemToOption } from '@/utils/common';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import GroupProjectSearch from './GroupProjectSearch';
+import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
+import { ILocation } from '@/interfaces/locationInterfaces';
+import useLocationList from '@/hooks/useLocationList';
 
 interface IFormState {
   isOpen: boolean;
   selectedClass: string | undefined;
+  selectedLocation: string | undefined;
   projectsForSubmit: Array<IOption>;
 }
 
@@ -26,6 +30,32 @@ const GroupForm: FC = () => {
   const masterClasses = useAppSelector(selectMasterClasses);
   const classes = useAppSelector(selectClasses);
   const subClasses = useAppSelector(selectSubClasses);
+  const districts = useAppSelector(selectDistricts);
+  const divisions = useAppSelector(selectDivisions);
+  const subDivisions = useAppSelector(selectSubDivisions);
+
+  const getReverseLocationHierarchy = useCallback(
+    (subDivisionId: string | undefined) => {
+      const classAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
+        id: projectLocation?.id || '',
+        value: projectLocation?.name || '',
+      });
+
+      const selectedSubDivision = subDivisions.find((sd) => sd.id === subDivisionId);
+
+      const selectedDivision = divisions.find((d) => d.id === selectedSubDivision?.parent);
+
+      const selectedDistrict = districts.find(
+        (D) => D.id === selectedDivision?.parent && D.parent === null,
+      );
+      return {
+        division: listItemToOption(classAsListItem(selectedDivision) || []),
+        subDivision: listItemToOption(classAsListItem(selectedSubDivision) || []),
+        district: listItemToOption(classAsListItem(selectedDistrict) || []),
+      };
+    },
+    [divisions, districts, subDivisions],
+  );
 
   const getReverseClassHierarchy = useCallback(
     (subClassId: string | undefined) => {
@@ -67,6 +97,7 @@ const GroupForm: FC = () => {
     isOpen: false,
     selectedClass: '',
     projectsForSubmit: [],
+    selectedLocation: '',
   });
 
   useEffect(() => {
@@ -90,8 +121,35 @@ const GroupForm: FC = () => {
     });
     return () => subscription.unsubscribe();
   }, [watch, setValue, getReverseClassHierarchy]);
-  const { isOpen, selectedClass, projectsForSubmit } = formState;
+
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === 'district' && value.district?.value) {
+        setFormState((current) => ({ ...current, selectedLocation: value.district?.value }));
+        setValue('division', { label: '', value: '' });
+        setValue('subDivision', { label: '', value: '' });
+      } else if (name === 'division' && value.division?.value) {
+        setFormState((current) => ({ ...current, selectedLocation: value.division?.value }));
+        setValue('subDivision', { label: '', value: '' });
+      } else if (name === 'subDivision' && value.subDivision?.value) {
+        setFormState((current) => ({ ...current, selectedLocation: value.subDivision?.value }));
+        if (!value.class?.value || !value.district?.value) {
+          const { division, subDivision, district } = getReverseLocationHierarchy(
+            value.subDivision?.value,
+          );
+          setValue('district', district);
+          setValue('division', division);
+          setValue('subDivision', subDivision);
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setValue, getReverseLocationHierarchy]);
+
+  const { isOpen, selectedClass, selectedLocation, projectsForSubmit } = formState;
+
   useClassList(true, selectedClass);
+  useLocationList(true, selectedLocation);
 
   const onSubmit = useCallback(
     async (form: IGroupForm) => console.log(form),
@@ -140,54 +198,68 @@ const GroupForm: FC = () => {
       {/* Dialog */}
       <div className="display-flex-col">
         <Dialog
-          id="group-form-dialog"
+          id="group-create-dialog"
           aria-labelledby={'group-form-dialog-label'}
           isOpen={isOpen}
           close={handleClose}
           closeButtonLabelText={t('closeGroupFormWindow')}
           className="big-dialog"
+          scrollable
         >
           {/* Header */}
           <Header id={'group-form-dialog-label'} title={t(`createSummingGroups`)} />
-          <hr />
-          {/* Section 1 (Added hashtags ) */}
+
           <Content>
             <div className="content-container">
               <Paragraph text={'Add text here later'} />
             </div>
+
+            <div>
+              <form
+                className="search-form"
+                onSubmit={handleSubmit(onSubmit)}
+                data-testid="group-create-form"
+              >
+                <div>
+                  {/* Basic fields */}
+                  <div className="search-form-content">
+                    <FormFieldCreator form={formFields.basic} />
+                  </div>
+                  {/* Divider to click */}
+                  <div className="advance-search-button">
+                    <Paragraph size="l" fontWeight="bold" text={t(`groupForm.openAdvanceSearch`)} />
+                  </div>
+                  {/* Advance fields */}
+                  <div className="search-form-content">
+                    <FormFieldCreator form={formFields.advance} />
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div>
+              <GroupProjectSearch
+                projectsForSubmit={projectsForSubmit}
+                onProjectClick={onProjectClick}
+                onProjectSelectionDelete={onProjectSelectionDelete}
+              />
+            </div>
           </Content>
 
-          {/* Form starts here */}
-          <Content>
-            <form
-              className="search-form"
-              onSubmit={handleSubmit(onSubmit)}
-              data-testid="project-search-form"
-            >
-              <div className="search-form-content">
-                <FormFieldCreator form={formFields} />
-              </div>
-            </form>
-          </Content>
-          <Content>
-            <GroupProjectSearch
-              projectsForSubmit={projectsForSubmit}
-              onProjectClick={onProjectClick}
-              onProjectSelectionDelete={onProjectSelectionDelete}
-            />
-          </Content>
-          <ActionButtons>
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              data-testid="search-projects-button"
-              disabled={!isDirty}
-            >
-              {t('search')}
-            </Button>
-            <Button onClick={handleClose} variant="secondary" data-testid="cancel-search">
-              {t('cancel')}
-            </Button>
-          </ActionButtons>
+          <div>
+            <ActionButtons>
+              <Button
+                onClick={handleSubmit(onSubmit)}
+                data-testid="search-projects-button"
+                disabled={!isDirty}
+              >
+                {t('search')}
+              </Button>
+              <Button onClick={handleClose} variant="secondary" data-testid="cancel-search">
+                {t('cancel')}
+              </Button>
+            </ActionButtons>
+          </div>
         </Dialog>
 
         {/* Displayed on form (Open dialog button) */}

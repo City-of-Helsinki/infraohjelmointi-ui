@@ -4,44 +4,74 @@ import { useForm } from 'react-hook-form';
 
 import { t, TFunction } from 'i18next';
 import { useMemo } from 'react';
+import { If2 } from 'reselect/es/types';
+
+interface IGroupFormFieldsSplit {
+  basic: Array<IForm>;
+  advance: Array<IForm>;
+}
 
 const buildGroupFormFields = (
   control: HookFormControlType,
   translate: TFunction<'translation', undefined>,
-): Array<IForm> => {
-  const formFields = [
-    {
-      name: 'name',
-      type: FormField.Text,
-      rules: { required: 'This field is required' },
-    },
-    {
-      name: 'masterClass',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-      rules: { required: 'This field is required' },
-    },
-    {
-      name: 'class',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-      rules: { required: 'This field is required' },
-    },
-    {
-      name: 'subClass',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-    
-    },
-  ];
+): IGroupFormFieldsSplit => {
+  const formFields = {
+    basic: [
+      {
+        name: 'name',
+        type: FormField.Text,
+        rules: { required: 'This field is required' },
+      },
+      {
+        name: 'masterClass',
+        type: FormField.Select,
+        placeholder: 'Valitse',
+        rules: { required: 'This field is required' },
+      },
+      {
+        name: 'class',
+        type: FormField.Select,
+        placeholder: 'Valitse',
+        rules: { required: 'This field is required' },
+      },
+      {
+        name: 'subClass',
+        type: FormField.Select,
+        placeholder: 'Valitse',
+      },
+    ],
+    advance: [
+      {
+        name: 'district',
+        type: FormField.Select,
+        placeholder: 'Valitse',
+      },
+      {
+        name: 'division',
+        type: FormField.Select,
+        placeholder: 'Valitse',
+      },
+      {
+        name: 'subDivision',
+        type: FormField.Select,
+        placeholder: 'Valitse',
+      },
+    ],
+  };
 
-  const GroupFormFields = formFields.map((formField) => ({
+  const basicFields = formFields.basic.map((formField) => ({
+    ...formField,
+    control,
+    label: translate(`groupForm.${formField.name}`),
+  }));
+  const advanceFields = formFields.advance.map((formField) => ({
     ...formField,
     control,
     label: translate(`groupForm.${formField.name}`),
   }));
 
-  return GroupFormFields;
+  const groupFormFields = { basic: basicFields, advance: advanceFields };
+  return groupFormFields;
 };
 
 const useGroupValues = () => {
@@ -84,6 +114,9 @@ const useGroupValues = () => {
       masterClass: {},
       class: {},
       subClass: {},
+      district: {},
+      division: {},
+      subDivision: {},
     }),
     [],
   );

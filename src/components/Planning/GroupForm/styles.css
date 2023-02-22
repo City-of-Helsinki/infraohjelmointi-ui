@@ -1,4 +1,22 @@
-#group-form-dialog hr {
-    border-top: 0.0625rem solid var(--color-black-20);
-    margin: 0;
+#group-create-dialog hr {
+  border-top: 0.0625rem solid var(--color-black-20);
+  margin: 0;
+}
+
+#group-create-dialog {
+  min-height: 100vh;
+  max-width: 65vh;
+
+}
+
+.input-wrapper {
+  grid-column: 1/3;
+  width: calc(100% - 10px);
+  margin-bottom: 1.5rem;
+}
+
+.search-form-content {
+  padding: var(--spacing-s) 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }

@@ -88,9 +88,12 @@ export interface IProjectNoteForm {
 export interface IGroupForm {
  
   name: string;
-  masterClass: IOption,
-  class: IOption,
-  subClass: IOption
+  masterClass: IOption;
+  class: IOption;
+  subClass: IOption;
+  district: IOption;
+  division: IOption;
+  subDivision: IOption;
 }
 
 

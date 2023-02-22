@@ -193,7 +193,11 @@
     "name": "Ryhman nimi",
     "masterClass": "Pääluokka",
     "class": "Luokka",
-    "subClass": "Alaluokka"
+    "subClass": "Alaluokka",
+    "district": "Suurpiiri",
+    "division": "Kaupunginosa",
+    "subDivision": "Osa-alue",
+    "openAdvanceSearch":"Avaa tarkennettu haku"
   }
   ,
   "notification": {
