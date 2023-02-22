@@ -52,9 +52,10 @@
 .search-result-card .search-result-title-container {
   font-size: 1.5rem;
   font-weight: 500;
-  margin-bottom: var(--spacing-s);
+  margin-bottom: 0.25rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .search-result-card .search-result-title-container .search-result-title {
@@ -66,6 +67,7 @@
 .search-result-card .search-result-breadcrumbs {
   display: flex;
   gap: 0.2rem;
+  margin-bottom: 0.25rem;
 }
 
 .search-result-card .search-result-breadcrumbs > div {
@@ -75,6 +77,11 @@
 
 .search-result-card .search-result-breadcrumbs > div > svg {
   transform: translateY(0.08rem);
+}
+
+.search-result-card .search-result-hashtags {
+  display: flex;
+  margin-top: 0.75rem;
 }
 
 /* Search result pagination */

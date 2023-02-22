@@ -47,7 +47,6 @@ const handleResponse = (res: AxiosResponse) => {
 };
 
 const handleError = (error: AxiosError): Promise<IError> => {
-  console.log('error in interceptor: ', error);
   const parsedError: IError = {
     status: error.response?.status,
     message: error.message || 'Unknown error',

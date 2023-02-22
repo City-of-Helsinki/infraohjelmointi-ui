@@ -22,17 +22,17 @@ const buildSearchResultList = (
   searchResult: ISearchResult | null,
   classes: Array<IClass>,
   hashTagTermIds: Array<string>,
-  hashTags: Array<IListItem>,
+  allHashTags: Array<IListItem>,
 ): Array<ISearchResultListItem> => {
   const resultList = [];
 
-  // Since projects only have hashTag id:s we check if the project has a hashTag with the given
-  // search term and get the display value from hashTags with that index
-  const getHashTag = (project: IProject): string => {
-    const index = hashTags.findIndex(
-      (h) => h.id === project.hashTags?.filter((h) => hashTagTermIds.includes(h))[0],
-    );
-    return index !== -1 ? `#${hashTags[index]?.value}` : '';
+  // Since projects only have hashTag id:s we check if the project hashTags that match the
+  // search terms hashTags
+  const getHashTags = (project: IProject): Array<IListItem> => {
+    const projectHashTags = project.hashTags?.filter((h) => hashTagTermIds.includes(h));
+    return projectHashTags
+      ? allHashTags.filter((h) => projectHashTags.findIndex((ph) => ph === h.id) !== -1)
+      : [];
   };
 
   if (searchResult) {
@@ -56,7 +56,7 @@ const buildSearchResultList = (
             return {
               path: path,
               type: key,
-              hashTag: getHashTag(project),
+              hashTags: getHashTags(project),
               name: project.name,
               id: project.id,
               phase: project.phase?.value,

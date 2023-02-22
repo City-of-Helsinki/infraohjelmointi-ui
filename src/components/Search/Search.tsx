@@ -18,9 +18,9 @@ import {
   setSearchForm,
   toggleSearch,
 } from '@/reducers/searchSlice';
+import buildSearchParams from '@/utils/buildSearchParams';
 import _ from 'lodash';
 import './styles.css';
-import buildSearchParams from '@/utils/buildSearchParams';
 
 const Search = () => {
   const { t } = useTranslation();

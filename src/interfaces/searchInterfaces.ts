@@ -1,3 +1,4 @@
+import { IListItem } from './common';
 import { IProject } from './projectInterfaces';
 
 export interface ISearchResultItem {
@@ -26,6 +27,6 @@ export interface ISearchResultListItem {
   path: string;
   type: ISearchResultType;
   breadCrumbs: Array<string>;
-  hashTag?: string;
+  hashTags?: Array<IListItem>;
   phase?: string;
 }

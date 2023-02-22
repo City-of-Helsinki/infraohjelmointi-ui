@@ -10,7 +10,7 @@ const SearchResultCard: FC<ISearchResultListItem> = ({
   name,
   path,
   type,
-  hashTag,
+  hashTags,
   phase,
   breadCrumbs,
 }) => {
@@ -23,7 +23,6 @@ const SearchResultCard: FC<ISearchResultListItem> = ({
         <div className="search-result-title-container">
           <div className="search-result-title">
             {name}
-            {hashTag && <CustomTag text={hashTag} color={'var(--color-gold-medium-light	)'} />}
             {type !== 'projects' && (
               <CustomTag
                 color={'var(--color-bus-medium-light	)'}
@@ -49,6 +48,13 @@ const SearchResultCard: FC<ISearchResultListItem> = ({
             </div>
           ))}
         </div>
+        {hashTags && hashTags.length > 0 && (
+          <div className="search-result-hashtags">
+            {hashTags?.map((h) => (
+              <CustomTag key={h.id} text={`#${h.value}`} color={'var(--color-gold-medium-light	)'} />
+            ))}
+          </div>
+        )}
       </div>
     </Link>
   );
