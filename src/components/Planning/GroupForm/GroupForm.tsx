@@ -26,6 +26,33 @@ interface IFormState {
   projectsForSubmit: Array<IOption>;
 }
 
+const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroupRequest => {
+  // submit Class or subclass if present, submit division or subDivision if present, submit a name, submit projects
+
+  const payload: IGroupRequest = {
+    name: '',
+    classRelation: '',
+    districtRelation: '',
+    projects: [],
+  };
+
+  payload.name = form.name;
+  if (form.subClass && form.subClass?.value !== '') {
+    payload.classRelation = form.subClass.value;
+  } else if (form.class && form.class?.value !== '') {
+    payload.classRelation = form.class.value;
+  }
+
+  if (form.subDivision && form.subDivision?.value !== '') {
+    payload.districtRelation = form.subDivision.value;
+  } else if (form.division && form.division?.value !== '') {
+    payload.districtRelation = form.division.value;
+  }
+  payload.projects = projects.length > 0 ? projects.map((p) => p.value) : [];
+
+  return payload;
+};
+
 const GroupForm: FC = () => {
   const masterClasses = useAppSelector(selectMasterClasses);
   const classes = useAppSelector(selectClasses);
@@ -133,7 +160,7 @@ const GroupForm: FC = () => {
         setValue('subDivision', { label: '', value: '' });
       } else if (name === 'subDivision' && value.subDivision?.value) {
         setFormState((current) => ({ ...current, selectedLocation: value.subDivision?.value }));
-        if (!value.class?.value || !value.district?.value) {
+        if (!value.division?.value || !value.district?.value) {
           const { division, subDivision, district } = getReverseLocationHierarchy(
             value.subDivision?.value,
           );
@@ -152,8 +179,9 @@ const GroupForm: FC = () => {
   useLocationList(true, selectedLocation);
 
   const onSubmit = useCallback(
-    async (form: IGroupForm) => console.log(form),
-    [dispatch, formValues, reset],
+    async (form: IGroupForm) => console.log(buildRequestPayload(form, projectsForSubmit)),
+
+    [projectsForSubmit],
   );
   const onProjectClick = useCallback((value: IOption | undefined) => {
     if (value) {
@@ -191,6 +219,7 @@ const GroupForm: FC = () => {
   const handleClose = useCallback(() => {
     handleSetOpen();
     reset(formValues);
+    // Also populate class and location lists back to full values
   }, [handleSetOpen, reset, formValues]);
 
   return (
