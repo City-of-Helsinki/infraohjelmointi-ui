@@ -27,15 +27,6 @@ const GroupForm: FC = () => {
   const classes = useAppSelector(selectClasses);
   const subClasses = useAppSelector(selectSubClasses);
 
-  const onProjectClick = useCallback((value: IOption | undefined) => {
-    if (value) {
-      setFormState((current) => ({
-        ...current,
-        projectsForSubmit: [...current.projectsForSubmit, value],
-      }));
-    }
-  }, []);
-
   const getReverseClassHierarchy = useCallback(
     (subClassId: string | undefined) => {
       const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
@@ -106,6 +97,23 @@ const GroupForm: FC = () => {
     async (form: IGroupForm) => console.log(form),
     [dispatch, formValues, reset],
   );
+  const onProjectClick = useCallback((value: IOption | undefined) => {
+    if (value) {
+      setFormState((current) => ({
+        ...current,
+        projectsForSubmit: [...current.projectsForSubmit, value],
+      }));
+    }
+  }, []);
+
+  const onProjectSelectionDelete = useCallback((projectName: string) => {
+    setFormState((current) => ({
+      ...current,
+      projectsForSubmit: current.projectsForSubmit.filter((p) => {
+        return p.label !== projectName;
+      }),
+    }));
+  }, []);
 
   const handleSetOpen = useCallback(
     () =>
@@ -165,6 +173,7 @@ const GroupForm: FC = () => {
             <GroupProjectSearch
               projectsForSubmit={projectsForSubmit}
               onProjectClick={onProjectClick}
+              onProjectSelectionDelete={onProjectSelectionDelete}
             />
           </Content>
           <ActionButtons>

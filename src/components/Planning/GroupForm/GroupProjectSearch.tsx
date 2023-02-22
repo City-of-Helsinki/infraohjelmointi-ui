@@ -11,9 +11,14 @@ import { useTranslation } from 'react-i18next';
 interface IProjectSearchProps {
   onProjectClick: (value: IOption | undefined) => void;
   projectsForSubmit: Array<IOption>;
+  onProjectSelectionDelete: (projectName: string) => void;
 }
 
-const GroupProjectSearch: FC<IProjectSearchProps> = ({ onProjectClick, projectsForSubmit }) => {
+const GroupProjectSearch: FC<IProjectSearchProps> = ({
+  onProjectClick,
+  projectsForSubmit,
+  onProjectSelectionDelete,
+}) => {
   const { t } = useTranslation();
   const [value, setValue] = useState('');
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
@@ -56,12 +61,12 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ onProjectClick, projectsF
     value && onProjectClick(searchedProjects.find((p) => p.label === value));
     setValue('');
   };
-  /**
-   * Get the name and delete from local state
-   */
-  const onSelectionDelete = useCallback((e: any) => {
-    console.log(e.target);
-  }, []);
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    onProjectSelectionDelete(
+      (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string,
+    );
+  };
   return (
     <div className="dialog-section" data-testid="search-project-field-section">
       <SearchInput
@@ -76,7 +81,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ onProjectClick, projectsF
       />
       <div className="search-selections">
         {projectsForSubmit.map((s) => (
-          <Tag key={s.label} onDelete={onSelectionDelete}>
+          <Tag key={s.label} onDelete={handleDelete}>
             {s.label}
           </Tag>
         ))}
