@@ -208,7 +208,7 @@
   "searchOrder": {
     "new": "Uusin ensin",
     "old": "Vanhin ensin",
-    "hashTag": "Hashtag ensin",
+    "project": "Hankkeet ensin",
     "group": "Ryhmät ensin"
   },
   "searchTag": {
