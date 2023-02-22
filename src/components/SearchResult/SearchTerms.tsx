@@ -19,9 +19,11 @@ const SearchTerms = () => {
       </div>
       {/* delete all search terms */}
       <div>
-        <Tag className="empty-all-btn" onDelete={deleteAllTerms}>
-          {t('emptyTerms')}
-        </Tag>
+        {searchTerms.length > 0 && (
+          <Tag className="empty-all-btn" onDelete={deleteAllTerms}>
+            {t('emptyTerms')}
+          </Tag>
+        )}
       </div>
     </div>
   );

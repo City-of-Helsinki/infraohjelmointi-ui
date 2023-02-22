@@ -10,7 +10,7 @@ import {
 } from '@/interfaces/searchInterfaces';
 import { selectAllClasses } from '@/reducers/classSlice';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
-import { selectSearchForm, selectSearchResult } from '@/reducers/searchSlice';
+import { selectSearchResult, selectSubmittedSearchForm } from '@/reducers/searchSlice';
 import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from './common';
 
@@ -73,7 +73,7 @@ const buildSearchResultList = (
  * Get a memoized list of all search terms id:s that are hashtags
  */
 const useHashTagTermIds = () => {
-  const freeSearchParams = useAppSelector(selectSearchForm).freeSearchParams;
+  const freeSearchParams = useAppSelector(selectSubmittedSearchForm).freeSearchParams;
   const hashTagTermIds = useMemo(
     () =>
       Object.keys(freeSearchParams)

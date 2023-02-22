@@ -3,9 +3,9 @@ import { ISearchForm } from '@/interfaces/formInterfaces';
 import {
   clearSearchForm,
   getSearchResultThunk,
-  initialSearchState,
-  selectSearchForm,
-  setSearchForm,
+  initialSearchForm,
+  selectSubmittedSearchForm,
+  setSubmittedSearchForm,
 } from '@/reducers/searchSlice';
 import buildSearchParams from '@/utils/buildSearchParams';
 import { TFunction } from 'i18next';
@@ -95,7 +95,6 @@ const getSearchTerms = (
 const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISearchForm => {
   const { type, value, id } = term;
   const form = { ...searchForm };
-  const initialForm = initialSearchState.form;
   const removeFreeSearchParam = (value: string, form: FreeSearchFormObject) => {
     const { [value]: _, ...next } = form;
     return next;
@@ -120,7 +119,7 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
     case 'phase':
     case 'personPlanning':
     case 'category':
-      (form[type] as string | boolean | IOption) = initialForm[type];
+      (form[type] as string | boolean | IOption) = initialSearchForm[type];
       break;
     case 'freeSearchParams':
       form[type] = removeFreeSearchParam(value, form[type] as FreeSearchFormObject);
@@ -138,7 +137,7 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
  */
 const useSearchTerms = () => {
   const { t } = useTranslation();
-  const searchForm = useAppSelector(selectSearchForm);
+  const searchForm = useAppSelector(selectSubmittedSearchForm);
   const dispatch = useAppDispatch();
   const [searchTerms, setSearchTerms] = useState<Array<ISearchTerm>>([]);
 
@@ -147,7 +146,7 @@ const useSearchTerms = () => {
       const formAfterDelete = deleteSearchFormValue(searchForm, term);
       const searchParams = buildSearchParams(formAfterDelete);
       dispatch(getSearchResultThunk(searchParams)).then(() =>
-        dispatch(setSearchForm(formAfterDelete)),
+        dispatch(setSubmittedSearchForm(formAfterDelete)),
       );
     },
     [dispatch, searchForm],

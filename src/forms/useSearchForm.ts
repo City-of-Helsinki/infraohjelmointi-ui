@@ -2,7 +2,7 @@ import { ISearchForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
-import { initialSearchState, selectSearchForm } from '@/reducers/searchSlice';
+import { initialSearchForm, selectSearchForm } from '@/reducers/searchSlice';
 import useMultiClassList from '@/hooks/useMultiClassList';
 import useMultiLocationList from '@/hooks/useMultiLocationList';
 import _ from 'lodash';
@@ -52,7 +52,7 @@ const useSearchForm = () => {
           default:
             break;
         }
-        setSubmitDisabled(JSON.stringify(value) === JSON.stringify(initialSearchState.form));
+        setSubmitDisabled(JSON.stringify(value) === JSON.stringify(initialSearchForm));
       });
       return () => subscription.unsubscribe();
     }

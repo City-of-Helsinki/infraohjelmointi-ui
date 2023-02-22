@@ -16,6 +16,7 @@ import {
   getSearchResultThunk,
   selectOpen,
   setSearchForm,
+  setSubmittedSearchForm,
   toggleSearch,
 } from '@/reducers/searchSlice';
 import buildSearchParams from '@/utils/buildSearchParams';
@@ -51,7 +52,7 @@ const Search = () => {
       navigate('/search-result');
       dispatch(toggleSearch());
       dispatch(getSearchResultThunk(searchParams)).then(() => {
-        dispatch(setSearchForm(form));
+        dispatch(setSubmittedSearchForm(form));
       });
     },
     [dispatch, navigate],

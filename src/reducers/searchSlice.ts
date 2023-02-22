@@ -8,29 +8,33 @@ import { RootState } from '@/store';
 interface ISearchState {
   open: boolean;
   form: ISearchForm;
+  submittedForm: ISearchForm;
   searchResult: ISearchResult | null;
   error: IError | null | unknown;
 }
 
-export const initialSearchState: ISearchState = {
+export const initialSearchForm = {
+  freeSearchParams: {},
+  masterClass: [],
+  classes: [],
+  subClass: [],
+  programmedYes: false,
+  programmedNo: false,
+  personPlanning: '',
+  programmedYearMin: '',
+  programmedYearMax: '',
+  phase: { value: '', label: '' },
+  responsiblePerson: { value: '', label: '' },
+  district: [],
+  division: [],
+  subDivision: [],
+  category: { value: '', label: '' },
+};
+
+const initialState: ISearchState = {
   open: false,
-  form: {
-    freeSearchParams: {},
-    masterClass: [],
-    classes: [],
-    subClass: [],
-    programmedYes: false,
-    programmedNo: false,
-    personPlanning: '',
-    programmedYearMin: '',
-    programmedYearMax: '',
-    phase: { value: '', label: '' },
-    responsiblePerson: { value: '', label: '' },
-    district: [],
-    division: [],
-    subDivision: [],
-    category: { value: '', label: '' },
-  },
+  form: initialSearchForm,
+  submittedForm: initialSearchForm,
   searchResult: null,
   error: null,
 };
@@ -46,7 +50,7 @@ export const getSearchResultThunk = createAsyncThunk(
 
 export const searchSlice = createSlice({
   name: 'search',
-  initialState: initialSearchState,
+  initialState,
   reducers: {
     toggleSearch(state) {
       return { ...state, open: !state.open };
@@ -55,7 +59,14 @@ export const searchSlice = createSlice({
       return { ...state, form: { ...state.form, ...action.payload } };
     },
     clearSearchForm(state) {
-      return { ...state, form: initialSearchState.form };
+      return { ...state, form: initialSearchForm, submittedForm: initialSearchForm };
+    },
+    setSubmittedSearchForm(state, action: PayloadAction<ISearchForm>) {
+      return {
+        ...state,
+        form: { ...state.form, ...action.payload },
+        submittedForm: { ...state.form, ...action.payload },
+      };
     },
   },
   extraReducers: (builder) => {
@@ -78,7 +89,9 @@ export const searchSlice = createSlice({
 export const selectOpen = (state: RootState) => state.search.open;
 export const selectSearchForm = (state: RootState) => state.search.form;
 export const selectSearchResult = (state: RootState) => state.search.searchResult;
+export const selectSubmittedSearchForm = (state: RootState) => state.search.submittedForm;
 
-export const { toggleSearch, setSearchForm, clearSearchForm } = searchSlice.actions;
+export const { toggleSearch, setSearchForm, clearSearchForm, setSubmittedSearchForm } =
+  searchSlice.actions;
 
 export default searchSlice.reducer;
