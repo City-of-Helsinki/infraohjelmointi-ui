@@ -14,9 +14,8 @@ import { selectSearchForm, selectSearchResult } from '@/reducers/searchSlice';
 import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from './common';
 
-// TODO: not sure if locations have a different path...?
 const buildBreadCrumbs = (path: string, type: ISearchResultType, classes: Array<IClass>) =>
-  type !== 'locations' ? path.split('/').map((p) => classes.find((c) => c.id === p)?.name) : [];
+  path.split('/').map((p) => classes.find((c) => c.id === p)?.name);
 
 const buildSearchResultList = (
   searchResult: ISearchResult | null,

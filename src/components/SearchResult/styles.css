@@ -64,6 +64,10 @@
   align-items: center;
 }
 
+.search-result-card-wrapper:hover .search-result-title > span {
+  text-decoration: underline;
+}
+
 .search-result-card .search-result-breadcrumbs {
   display: flex;
   gap: 0.2rem;

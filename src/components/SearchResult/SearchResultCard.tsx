@@ -22,7 +22,7 @@ const SearchResultCard: FC<ISearchResultListItem> = ({
         {/* Title */}
         <div className="search-result-title-container">
           <div className="search-result-title">
-            {name}
+            <span>{name}</span>
             {type !== 'projects' && (
               <CustomTag
                 color={'var(--color-bus-medium-light	)'}
