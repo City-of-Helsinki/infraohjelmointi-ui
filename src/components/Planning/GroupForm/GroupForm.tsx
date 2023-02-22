@@ -18,6 +18,7 @@ import GroupProjectSearch from './GroupProjectSearch';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import useLocationList from '@/hooks/useLocationList';
+import { postGroupThunk } from '@/reducers/groupSlice';
 
 interface IFormState {
   isOpen: boolean;
@@ -179,9 +180,13 @@ const GroupForm: FC = () => {
   useLocationList(true, selectedLocation);
 
   const onSubmit = useCallback(
-    async (form: IGroupForm) => console.log(buildRequestPayload(form, projectsForSubmit)),
+    async (form: IGroupForm) => {
+      dispatch(postGroupThunk(buildRequestPayload(form, projectsForSubmit))).then(() => {
+        reset(formValues);
+      });
+    },
 
-    [projectsForSubmit],
+    [projectsForSubmit, dispatch, reset, formValues],
   );
   const onProjectClick = useCallback((value: IOption | undefined) => {
     if (value) {
