@@ -33,10 +33,10 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
             if (res) {
               // Filter out only the projects which haven't yet been added to be the submitted list from the result
               const resultList = res.projects?.filter(
-                (f) =>
+                (project) =>
                   !arrayHasValue(
                     projectsForSubmit.map((p) => p.value),
-                    f.id,
+                    project.id,
                   ),
               );
 

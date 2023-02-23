@@ -4,7 +4,7 @@ import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 import Paragraph from '../../shared/Paragraph';
 import './styles.css';
-import { FormFieldCreator } from '@/components/shared';
+import { FormFieldCreator, Icon } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { IGroupRequest } from '@/interfaces/groupInterfaces';
@@ -19,12 +19,15 @@ import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers
 import { ILocation } from '@/interfaces/locationInterfaces';
 import useLocationList from '@/hooks/useLocationList';
 import { postGroupThunk } from '@/reducers/groupSlice';
+import { IconAngleDown, IconAngleUp } from 'hds-react/icons';
+import { is } from 'immer/dist/internal';
 
 interface IFormState {
   isOpen: boolean;
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
   projectsForSubmit: Array<IOption>;
+  showAdvanceFields: boolean;
 }
 
 const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroupRequest => {
@@ -38,15 +41,16 @@ const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroup
   };
 
   payload.name = form.name;
-  if (form.subClass && form.subClass?.value !== '') {
+  if (form.subClass && form.subClass?.value) {
+    console.log(form.subClass.value);
     payload.classRelation = form.subClass.value;
-  } else if (form.class && form.class?.value !== '') {
+  } else if (form.class && form.class?.value) {
     payload.classRelation = form.class.value;
   }
 
-  if (form.subDivision && form.subDivision?.value !== '') {
+  if (form.subDivision && form.subDivision?.value) {
     payload.districtRelation = form.subDivision.value;
-  } else if (form.division && form.division?.value !== '') {
+  } else if (form.division && form.division?.value) {
     payload.districtRelation = form.division.value;
   }
   payload.projects = projects.length > 0 ? projects.map((p) => p.value) : [];
@@ -126,7 +130,13 @@ const GroupForm: FC = () => {
     selectedClass: '',
     projectsForSubmit: [],
     selectedLocation: '',
+    showAdvanceFields: false,
   });
+  const { isOpen, selectedClass, selectedLocation, projectsForSubmit, showAdvanceFields } =
+    formState;
+
+  useClassList(true, selectedClass);
+  useLocationList(true, selectedLocation);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
@@ -146,12 +156,7 @@ const GroupForm: FC = () => {
           setValue('subClass', subClass);
         }
       }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, setValue, getReverseClassHierarchy]);
 
-  useEffect(() => {
-    const subscription = watch((value, { name }) => {
       if (name === 'district' && value.district?.value) {
         setFormState((current) => ({ ...current, selectedLocation: value.district?.value }));
         setValue('division', { label: '', value: '' });
@@ -172,18 +177,15 @@ const GroupForm: FC = () => {
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setValue, getReverseLocationHierarchy]);
-
-  const { isOpen, selectedClass, selectedLocation, projectsForSubmit } = formState;
-
-  useClassList(true, selectedClass);
-  useLocationList(true, selectedLocation);
+  }, [watch, setValue, getReverseClassHierarchy, getReverseLocationHierarchy]);
 
   const onSubmit = useCallback(
     async (form: IGroupForm) => {
-      dispatch(postGroupThunk(buildRequestPayload(form, projectsForSubmit))).then(() => {
-        reset(formValues);
-      });
+      console.log();
+      console.log(buildRequestPayload(form, projectsForSubmit));
+      // dispatch(postGroupThunk(buildRequestPayload(form, projectsForSubmit))).then(() => {
+      //   reset(formValues);
+      // });
     },
 
     [projectsForSubmit, dispatch, reset, formValues],
@@ -205,12 +207,18 @@ const GroupForm: FC = () => {
       }),
     }));
   }, []);
-
+  const toggleAdvanceFields = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setFormState((current) => ({ ...current, showAdvanceFields: !current.showAdvanceFields }));
+  };
   const handleSetOpen = useCallback(
     () =>
       setFormState((current) => ({
         ...current,
         isOpen: !current.isOpen,
+        showAdvanceFields: false,
+        projectsForSubmit: [],
+        fieldsPopulated: false,
       })),
     [],
   );
@@ -244,12 +252,15 @@ const GroupForm: FC = () => {
           <Header id={'group-form-dialog-label'} title={t(`createSummingGroups`)} />
 
           <Content>
-            <div className="content-container">
-              <Paragraph text={'Add text here later'} />
+            <br />
+            <div>
+              <Paragraph text={t(`groupForm.groupCreationDescription1`)} />
+              <Paragraph text={t(`groupForm.groupCreationDescription2`)} />
             </div>
 
             <div>
               <form
+                id="group-create-form"
                 className="search-form"
                 onSubmit={handleSubmit(onSubmit)}
                 data-testid="group-create-form"
@@ -259,13 +270,19 @@ const GroupForm: FC = () => {
                   <div className="search-form-content">
                     <FormFieldCreator form={formFields.basic} />
                   </div>
-                  {/* Divider to click */}
-                  <div className="advance-search-button">
-                    <Paragraph size="l" fontWeight="bold" text={t(`groupForm.openAdvanceSearch`)} />
-                  </div>
                   {/* Advance fields */}
-                  <div className="search-form-content">
-                    <FormFieldCreator form={formFields.advance} />
+                  {showAdvanceFields && (
+                    <div className="search-form-content">
+                      <FormFieldCreator form={formFields.advance} />
+                    </div>
+                  )}
+
+                  {/* Divider to click */}
+                  <div className="advance-fields-button">
+                    <button onClick={toggleAdvanceFields}>
+                      {t(`groupForm.openAdvanceSearch`)}
+                    </button>
+                    {showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />}
                   </div>
                 </div>
               </form>

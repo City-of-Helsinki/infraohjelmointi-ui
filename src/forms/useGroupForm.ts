@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { t, TFunction } from 'i18next';
 import { useMemo } from 'react';
 import { If2 } from 'reselect/es/types';
-
+import { IOption } from '@/interfaces/common';
 interface IGroupFormFieldsSplit {
   basic: Array<IForm>;
   advance: Array<IForm>;
@@ -26,13 +26,13 @@ const buildGroupFormFields = (
         name: 'masterClass',
         type: FormField.Select,
         placeholder: 'Valitse',
-        rules: { required: 'This field is required' },
+        rules: { required: 'This field is required', validate: {isPopulated: (mc: IOption)=> Object.keys(mc).includes('value') && mc.value!=='' ? true : 'This field is required'}},
       },
       {
         name: 'class',
         type: FormField.Select,
         placeholder: 'Valitse',
-        rules: { required: 'This field is required' },
+        rules: { required: 'This field is required' , validate: {isPopulated: (c: IOption)=> Object.keys(c).includes('value') && c.value!=='' ? true : 'This field is required'}},
       },
       {
         name: 'subClass',
@@ -75,39 +75,6 @@ const buildGroupFormFields = (
 };
 
 const useGroupValues = () => {
-  // const masterClasses = useAppSelector(selectMasterClasses);
-  // const classes = useAppSelector(selectClasses);
-  // const subClasses = useAppSelector(selectSubClasses);
-
-  // const getGroupClassFields = (group?: IGroup ) => {
-  //     const classAsListItem = (classRelation: IClass | undefined): IListItem => ({
-  //       id: classRelation?.id || '',
-  //       value: classRelation?.name || '',
-  //     });
-
-  //     const selectedSubClass = group
-  //       ? subClasses.find(({ id }) => id === group.classRelation)
-  //       : undefined;
-
-  //     const groupClassId = selectedSubClass?.parent || group?.classRelation;
-
-  //     const selectedClass = groupClassId
-  //       ? classes.find(({ id }) => id === groupClassId)
-  //       : undefined;
-
-  //     const masterClassId = selectedClass?.parent || group?.classRelation;
-
-  //     const selectedMasterClass = masterClassId
-  //       ? masterClasses.find(({ id }) => id === masterClassId)
-  //       : undefined;
-
-  //     return {
-  //       masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
-  //       class: listItemToOption(classAsListItem(selectedClass) || []),
-  //       subClass: listItemToOption(classAsListItem(selectedSubClass) || []),
-  //     };
-  //   };
-
   const formValues = useMemo(
     () => ({
       name: '',

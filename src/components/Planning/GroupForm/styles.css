@@ -1,12 +1,18 @@
+#group-create-dialog {
+  min-height: fit-content;
+  max-width: 65vh;
+}
 #group-create-dialog hr {
   border-top: 0.0625rem solid var(--color-black-20);
   margin: 0;
 }
 
-#group-create-dialog {
-  min-height: 100vh;
-  max-width: 65vh;
-
+#group-create-dialog #group-create-form .advance-fields-button {
+  color: var(--color-bus);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
 }
 
 .input-wrapper {
