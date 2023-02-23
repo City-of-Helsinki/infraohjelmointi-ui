@@ -7,17 +7,21 @@ import { SearchInput } from 'hds-react/components/SearchInput';
 import _ from 'lodash';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { UseFormGetValues } from 'react-hook-form';
+import { IGroupForm } from '@/interfaces/formInterfaces';
 
 interface IProjectSearchProps {
   onProjectClick: (value: IOption | undefined) => void;
   projectsForSubmit: Array<IOption>;
   onProjectSelectionDelete: (projectName: string) => void;
+  getValues: UseFormGetValues<IGroupForm>;
 }
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({
   onProjectClick,
   projectsForSubmit,
   onProjectSelectionDelete,
+  getValues,
 }) => {
   const { t } = useTranslation();
   const [value, setValue] = useState('');
@@ -28,6 +32,12 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   const getSuggestions = useCallback(
     (inputValue: string) =>
       new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+        // printing out search params for later
+        console.log(
+          `masterClass=${getValues().masterClass.value}&class=${getValues().class.value}&subClass=${
+            getValues().subClass.value
+          }&programmed=true`,
+        );
         getProjectsWithFreeSearch(inputValue)
           .then((res) => {
             if (res) {

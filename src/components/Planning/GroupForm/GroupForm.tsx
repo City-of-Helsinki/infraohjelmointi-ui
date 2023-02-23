@@ -42,7 +42,6 @@ const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroup
 
   payload.name = form.name;
   if (form.subClass && form.subClass?.value) {
-    console.log(form.subClass.value);
     payload.classRelation = form.subClass.value;
   } else if (form.class && form.class?.value) {
     payload.classRelation = form.class.value;
@@ -119,6 +118,7 @@ const GroupForm: FC = () => {
     formState: { dirtyFields, isDirty },
     watch,
     setValue,
+    getValues,
   } = formMethods;
 
   const dispatch = useAppDispatch();
@@ -181,7 +181,6 @@ const GroupForm: FC = () => {
 
   const onSubmit = useCallback(
     async (form: IGroupForm) => {
-      console.log();
       console.log(buildRequestPayload(form, projectsForSubmit));
       // dispatch(postGroupThunk(buildRequestPayload(form, projectsForSubmit))).then(() => {
       //   reset(formValues);
@@ -293,6 +292,7 @@ const GroupForm: FC = () => {
                 projectsForSubmit={projectsForSubmit}
                 onProjectClick={onProjectClick}
                 onProjectSelectionDelete={onProjectSelectionDelete}
+                getValues={getValues}
               />
             </div>
           </Content>
