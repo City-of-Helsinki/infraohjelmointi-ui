@@ -323,5 +323,6 @@
   "opensExternalWebsite":"Avaa toisen verkkosivuston",
   "opensInNewTab":"Avautuu uuteen välilehteen",
   "searchForProjects":"Etsi hankkeita",
-  "createSummingGroups": "Luo uusi summaava ryhmä"
+  "createSummingGroups": "Luo uusi summaava ryhmä",
+  "fieldRequiredWarning": "Tämä kenttä on täytettävä"
 }
