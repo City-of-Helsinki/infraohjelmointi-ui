@@ -5,7 +5,6 @@ import { useAppSelector } from '../hooks/common';
 import { initialSearchForm, selectSearchForm } from '@/reducers/searchSlice';
 import useMultiClassList from '@/hooks/useMultiClassList';
 import useMultiLocationList from '@/hooks/useMultiLocationList';
-import _ from 'lodash';
 
 const useSearchForm = () => {
   const storeFormValues = useAppSelector(selectSearchForm);

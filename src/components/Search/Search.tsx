@@ -20,7 +20,6 @@ import {
   toggleSearch,
 } from '@/reducers/searchSlice';
 import buildSearchParams from '@/utils/buildSearchParams';
-import _ from 'lodash';
 import './styles.css';
 
 const Search = () => {

@@ -39,13 +39,14 @@ const getSearchTerms = (
       case 'district':
       case 'division':
       case 'subDivision':
-        value.forEach((v: IOption) =>
-          searchTerms.push({
-            value: `${translate(`searchTag.${key}`)}: ${v.label}`,
+        value.forEach((v: IOption) => {
+          const termLabel = translate(`searchTag.${key}`);
+          return searchTerms.push({
+            value: `${termLabel}: ${v.label}`,
             type: key,
             id: v.value,
-          }),
-        );
+          });
+        });
         break;
       case 'programmedYes':
       case 'programmedNo':

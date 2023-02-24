@@ -1,7 +1,7 @@
 import { IOption } from '@/interfaces/common';
 import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
 import { setClassList, setMasterClassList, setSubClassList } from '@/reducers/listsSlice';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import _ from 'lodash';
 
@@ -31,36 +31,66 @@ const useMultiClassList = (
     dispatch(setSubClassList(allSubClasses));
   }, [allMasterClasses, allClasses, allSubClasses]);
 
+  const selectedClassParents = useMemo(
+    () =>
+      allClasses
+        .filter((ac) => classes.findIndex((c) => c.value === ac.id) !== -1)
+        .map((c) => c.parent),
+    [allClasses, classes],
+  );
+
+  const selectedSubClassParents = useMemo(
+    () =>
+      allSubClasses
+        .filter((asc) => subClasses.findIndex((sc) => sc.value === asc.id) !== -1)
+        .map((sc) => sc.parent),
+    [allSubClasses, subClasses],
+  );
+
+  const getNextClasses = useCallback(() => {
+    if (!_.isEmpty(subClasses)) {
+      return allClasses.filter(
+        (c) => selectedSubClassParents.findIndex((sc) => sc === c.id) !== -1,
+      );
+    } else if (!_.isEmpty(masterClasses)) {
+      return allClasses.filter(
+        (c) => masterClasses.findIndex((mc) => mc.value === c.parent) !== -1,
+      );
+    } else {
+      return allClasses;
+    }
+  }, [allClasses, masterClasses, selectedSubClassParents, subClasses]);
+
+  const getNextSubClasses = useCallback(() => {
+    if (!_.isEmpty(classes)) {
+      return allSubClasses.filter((sc) => classes.findIndex((fc) => sc.parent === fc.value) !== -1);
+    } else if (!_.isEmpty(masterClasses)) {
+      return allSubClasses.filter(
+        (sc) => getNextClasses().findIndex((fc) => sc.parent === fc.id) !== -1,
+      );
+    } else {
+      return allSubClasses;
+    }
+  }, [allSubClasses, classes, getNextClasses, masterClasses]);
+
+  const getNextMasterClasses = useCallback(() => {
+    if (!_.isEmpty(classes)) {
+      return allMasterClasses.filter(
+        (mc) => selectedClassParents.findIndex((c) => c === mc.id) !== -1,
+      );
+    } else if (!_.isEmpty(subClasses)) {
+      return allMasterClasses.filter(
+        (mc) => getNextClasses().findIndex((sc) => sc.parent === mc.id) !== -1,
+      );
+    } else {
+      return allMasterClasses;
+    }
+  }, [allMasterClasses, classes, getNextClasses, selectedClassParents, subClasses]);
+
   useEffect(() => {
-    const selectedClassParents = allClasses
-      .filter((ac) => classes.findIndex((c) => c.value === ac.id) !== -1)
-      .map((c) => c.parent);
-
-    const selectedSubClassParents = allSubClasses
-      .filter((asc) => subClasses.findIndex((sc) => sc.value === asc.id) !== -1)
-      .map((sc) => sc.parent);
-
-    const nextClasses = !_.isEmpty(subClasses)
-      ? allClasses.filter((c) => selectedSubClassParents.findIndex((sc) => sc === c.id) !== -1)
-      : !_.isEmpty(masterClasses)
-      ? allClasses.filter((c) => masterClasses.findIndex((mc) => mc.value === c.parent) !== -1)
-      : allClasses;
-
-    const nextSubClasses = !_.isEmpty(classes)
-      ? allSubClasses.filter((sc) => classes.findIndex((fc) => sc.parent === fc.value) !== -1)
-      : !_.isEmpty(masterClasses)
-      ? allSubClasses.filter((sc) => nextClasses.findIndex((fc) => sc.parent === fc.id) !== -1)
-      : allSubClasses;
-
-    const nextMasterClasses = !_.isEmpty(classes)
-      ? allMasterClasses.filter((mc) => selectedClassParents.findIndex((c) => c === mc.id) !== -1)
-      : !_.isEmpty(subClasses)
-      ? allMasterClasses.filter((mc) => nextClasses.findIndex((sc) => sc.parent === mc.id) !== -1)
-      : allMasterClasses;
-
-    dispatch(setMasterClassList(nextMasterClasses));
-    dispatch(setSubClassList(nextSubClasses));
-    dispatch(setClassList(nextClasses));
+    dispatch(setMasterClassList(getNextMasterClasses()));
+    dispatch(setClassList(getNextClasses()));
+    dispatch(setSubClassList(getNextSubClasses()));
   }, [masterClasses, classes, subClasses]);
 };
 

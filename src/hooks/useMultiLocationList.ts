@@ -1,7 +1,7 @@
 import { IOption } from '@/interfaces/common';
 import { setDistrictList, setDivisionList, setSubDivisionList } from '@/reducers/listsSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import _ from 'lodash';
 
@@ -31,36 +31,66 @@ const useMultiLocationList = (
     dispatch(setSubDivisionList(allSubDivisions));
   }, [allDistricts, allDivisions, allSubDivisions]);
 
+  const selectedDivisionParent = useMemo(
+    () =>
+      allDivisions
+        .filter((ac) => divisions.findIndex((c) => c.value === ac.id) !== -1)
+        .map((c) => c.parent),
+    [allDivisions, divisions],
+  );
+
+  const selectedSubDivisionParent = useMemo(
+    () =>
+      allSubDivisions
+        .filter((asc) => subDivisions.findIndex((sc) => sc.value === asc.id) !== -1)
+        .map((sc) => sc.parent),
+    [allSubDivisions, subDivisions],
+  );
+
+  const getNextDivisions = useCallback(() => {
+    if (!_.isEmpty(subDivisions)) {
+      return allDivisions.filter(
+        (c) => selectedSubDivisionParent.findIndex((sc) => sc === c.id) !== -1,
+      );
+    } else if (!_.isEmpty(districts)) {
+      return allDivisions.filter((c) => districts.findIndex((mc) => mc.value === c.parent) !== -1);
+    } else {
+      return allDivisions;
+    }
+  }, [allDivisions, districts, selectedSubDivisionParent, subDivisions]);
+
+  const getNextSubDivision = useCallback(() => {
+    if (!_.isEmpty(divisions)) {
+      return allSubDivisions.filter(
+        (sc) => divisions.findIndex((fc) => sc.parent === fc.value) !== -1,
+      );
+    } else if (!_.isEmpty(districts)) {
+      return allSubDivisions.filter(
+        (sc) => getNextDivisions().findIndex((fc) => sc.parent === fc.id) !== -1,
+      );
+    } else {
+      return allSubDivisions;
+    }
+  }, [allSubDivisions, districts, divisions, getNextDivisions]);
+
+  const getNextDistrict = useCallback(() => {
+    if (!_.isEmpty(divisions)) {
+      return allDistricts.filter(
+        (mc) => selectedDivisionParent.findIndex((c) => c === mc.id) !== -1,
+      );
+    } else if (!_.isEmpty(subDivisions)) {
+      return allDistricts.filter(
+        (mc) => getNextDivisions().findIndex((sc) => sc.parent === mc.id) !== -1,
+      );
+    } else {
+      return allDistricts;
+    }
+  }, [allDistricts, divisions, getNextDivisions, selectedDivisionParent, subDivisions]);
+
   useEffect(() => {
-    const selectedDivisionParent = allDivisions
-      .filter((ac) => divisions.findIndex((c) => c.value === ac.id) !== -1)
-      .map((c) => c.parent);
-
-    const selectedSubDivisionParent = allSubDivisions
-      .filter((asc) => subDivisions.findIndex((sc) => sc.value === asc.id) !== -1)
-      .map((sc) => sc.parent);
-
-    const nextdivisions = !_.isEmpty(subDivisions)
-      ? allDivisions.filter((c) => selectedSubDivisionParent.findIndex((sc) => sc === c.id) !== -1)
-      : !_.isEmpty(districts)
-      ? allDivisions.filter((c) => districts.findIndex((mc) => mc.value === c.parent) !== -1)
-      : allDivisions;
-
-    const nextsubDivisions = !_.isEmpty(divisions)
-      ? allSubDivisions.filter((sc) => divisions.findIndex((fc) => sc.parent === fc.value) !== -1)
-      : !_.isEmpty(districts)
-      ? allSubDivisions.filter((sc) => nextdivisions.findIndex((fc) => sc.parent === fc.id) !== -1)
-      : allSubDivisions;
-
-    const nextdistricts = !_.isEmpty(divisions)
-      ? allDistricts.filter((mc) => selectedDivisionParent.findIndex((c) => c === mc.id) !== -1)
-      : !_.isEmpty(subDivisions)
-      ? allDistricts.filter((mc) => nextdivisions.findIndex((sc) => sc.parent === mc.id) !== -1)
-      : allDistricts;
-
-    dispatch(setDistrictList(nextdistricts));
-    dispatch(setDivisionList(nextsubDivisions));
-    dispatch(setSubDivisionList(nextdivisions));
+    dispatch(setDistrictList(getNextDistrict()));
+    dispatch(setDivisionList(getNextDivisions()));
+    dispatch(setSubDivisionList(getNextSubDivision()));
   }, [districts, divisions, subDivisions]);
 };
 

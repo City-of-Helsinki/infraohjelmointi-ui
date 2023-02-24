@@ -19,7 +19,7 @@ const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size }) => {
         background: color || 'var(--color-silver)',
       }}
     >
-      {icon && icon}
+      {icon}
       <span style={{ fontSize: size === 'm' ? '1rem' : '0.875rem' }}>{text}</span>
     </div>
   );
