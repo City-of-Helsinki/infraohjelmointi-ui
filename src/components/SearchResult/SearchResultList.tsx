@@ -20,16 +20,14 @@ const SearchResultList = () => {
         {resultLength > 0 && <SearchResultOrderDropdown />}
       </div>
       {!isLoading && resultLength > 0 ? (
-        <>
+        <div data-testid="search-result-list">
           {searchResultList.map((r) => (
             <SearchResultCard key={r.id} {...r} />
           ))}
           <SearchResultPagination />
-        </>
-      ) : !isLoading ? (
-        <SearchResultsNotFound />
+        </div>
       ) : (
-        <></>
+        <SearchResultsNotFound />
       )}
     </div>
   );

@@ -289,6 +289,13 @@
   "locations": "Sijainnit",
   "searchResultsNotFoundTitle": "Haullasi ei valitettavasti löytynyt yhtään osumaa.",
   "searchResultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia.",
+  "resultsNotFoundTitle": "Haullasi ei valitettavasti löytynyt yhtään osumaa.",
+  "resultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia.",
+  "adviceSearchTitle": "Et ole vielä etsinyt mitään.",
+  "adviceSearchText": "Avaa haku etsiäksesi projekteja.",
   "emptyTerms": "Tyhjennä hakuehdot",
-  "order": "Järjestys"
+  "order": "Järjestys",
+  "searchResults": "Hakutulokset",
+  "resultsForSearch": "hakutulosta",
+  "filterSearch": "Rajaa hakua"
 }

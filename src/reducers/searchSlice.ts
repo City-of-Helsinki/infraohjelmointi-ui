@@ -58,8 +58,13 @@ export const searchSlice = createSlice({
     setSearchForm(state, action: PayloadAction<ISearchForm>) {
       return { ...state, form: { ...state.form, ...action.payload } };
     },
-    clearSearchForm(state) {
-      return { ...state, form: initialSearchForm, submittedForm: initialSearchForm };
+    clearSearchState(state) {
+      return {
+        ...state,
+        form: initialSearchForm,
+        submittedForm: initialSearchForm,
+        searchResult: null,
+      };
     },
     setSubmittedSearchForm(state, action: PayloadAction<ISearchForm>) {
       return {
@@ -91,7 +96,7 @@ export const selectSearchForm = (state: RootState) => state.search.form;
 export const selectSearchResult = (state: RootState) => state.search.searchResult;
 export const selectSubmittedSearchForm = (state: RootState) => state.search.submittedForm;
 
-export const { toggleSearch, setSearchForm, clearSearchForm, setSubmittedSearchForm } =
+export const { toggleSearch, setSearchForm, clearSearchState, setSubmittedSearchForm } =
   searchSlice.actions;
 
 export default searchSlice.reducer;

@@ -1,7 +1,7 @@
 import { FreeSearchFormObject, IOption } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
 import {
-  clearSearchForm,
+  clearSearchState,
   getSearchResultThunk,
   initialSearchForm,
   selectSubmittedSearchForm,
@@ -21,6 +21,7 @@ interface ISearchTerm {
 
 /**
  * Build a search param with all the choices from the search form
+ *
  * @param form (ISearchForm)
  * @param translate (i18next translate function)
  * @returns a list of ISearchTerm
@@ -109,8 +110,7 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
     case 'district':
     case 'division':
     case 'subDivision':
-      form[type] = [...form[type]];
-      delete form[type][searchForm[type].findIndex((v) => v.value === id)];
+      form[type] = searchForm[type].filter((v) => v.value !== id);
       break;
     case 'programmedYes':
     case 'programmedNo':
@@ -137,28 +137,32 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
  */
 const useSearchTerms = () => {
   const { t } = useTranslation();
-  const searchForm = useAppSelector(selectSubmittedSearchForm);
   const dispatch = useAppDispatch();
+  const submittedForm = useAppSelector(selectSubmittedSearchForm);
   const [searchTerms, setSearchTerms] = useState<Array<ISearchTerm>>([]);
 
   const deleteTerm = useCallback(
     (term: ISearchTerm) => {
-      const formAfterDelete = deleteSearchFormValue(searchForm, term);
+      const formAfterDelete = deleteSearchFormValue(submittedForm, term);
       const searchParams = buildSearchParams(formAfterDelete);
-      dispatch(getSearchResultThunk(searchParams)).then(() =>
-        dispatch(setSubmittedSearchForm(formAfterDelete)),
-      );
+      if (searchParams) {
+        dispatch(getSearchResultThunk(searchParams)).then(() =>
+          dispatch(setSubmittedSearchForm(formAfterDelete)),
+        );
+      } else {
+        dispatch(clearSearchState());
+      }
     },
-    [dispatch, searchForm],
+    [dispatch, submittedForm],
   );
 
   const deleteAllTerms = useCallback(() => {
-    dispatch(getSearchResultThunk('')).then(() => dispatch(clearSearchForm()));
+    dispatch(clearSearchState());
   }, [dispatch]);
 
   useEffect(() => {
-    setSearchTerms(getSearchTerms(searchForm, t));
-  }, [searchForm]);
+    setSearchTerms(getSearchTerms(submittedForm, t));
+  }, [submittedForm]);
 
   return { searchTerms, deleteTerm, deleteAllTerms };
 };

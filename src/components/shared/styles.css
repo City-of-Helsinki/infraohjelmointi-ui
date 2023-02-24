@@ -91,4 +91,5 @@
 
 .custom-tag-container span {
   margin: 0 0.2rem;
+  white-space: nowrap;
 }

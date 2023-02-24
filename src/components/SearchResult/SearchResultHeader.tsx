@@ -6,14 +6,16 @@ import { IconSliders } from 'hds-react/icons';
 import { useAppDispatch } from '@/hooks/common';
 import { useCallback } from 'react';
 import { toggleSearch } from '@/reducers/searchSlice';
+import { useTranslation } from 'react-i18next';
 
 const SearchResultHeader = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const handleOpenSearch = useCallback(() => dispatch(toggleSearch()), [dispatch]);
   return (
     <div className="search-result-header-container">
       <div className="search-result-page-title">
-        <Title size="l" text="Hakutulokset" />
+        <Title size="l" text="searchResults" />
       </div>
       <div className="search-result-terms-and-filters-container">
         <SearchTerms />
@@ -21,10 +23,11 @@ const SearchResultHeader = () => {
           <Button
             variant="secondary"
             size="small"
+            data-testid="filterSearchBtn"
             iconLeft={<IconSliders />}
             onClick={handleOpenSearch}
           >
-            Rajaa hakua
+            {t('filterSearch')}
           </Button>
         </div>
       </div>

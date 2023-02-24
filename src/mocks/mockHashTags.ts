@@ -4,11 +4,11 @@ export const mockHashTags: { data: IHashTagsResponse } = {
   data: {
     hashTags: [
       {
-        id: '9d6d4ccb-db3d-4335-8bf6-6d542ebf3eba',
+        id: 'ccf89105-ee58-49f1-be0a-2cffca8711ab',
         value: 'leikkipaikka',
       },
       {
-        id: 'b8f172d3-a92f-4c51-b3f9-58f5e1a48b75',
+        id: '50fe7a50-fe4d-4fe2-97b2-44d34a4ce8b4',
         value: 'leikkipuisto',
       },
       {

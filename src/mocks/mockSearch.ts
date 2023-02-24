@@ -39,42 +39,20 @@ export const mockFreeSearchResult: { data: IFreeSearchResult } = {
 
 export const mockSearchResult: { data: ISearchResult } = {
   data: {
-    groups: [
-      {
-        id: '123456789',
-        name: 'Kalasatama',
-        path: '123/456/789',
-      },
-      {
-        id: '123456789',
-        name: 'Koirapuisto',
-        path: '123/456/789',
-      },
-    ],
+    groups: [],
     classes: [
       {
-        id: '123456789',
-        name: 'Meluesteet',
-        path: '123/456/789',
-      },
-      {
-        id: '123456789',
-        name: 'Keskinen suurpiiri',
-        path: '123/456/789',
+        id: 'f2ffb57e-d7a4-49d1-b7bf-3fa4f9c2b1df',
+        name: 'Muu esirakentaminen',
+        path: '41d6bd7b-4a86-4ea4-95b7-4bff4f179095/354edbb1-f257-432c-b5bf-4a7e4f02aeba/f2ffb57e-d7a4-49d1-b7bf-3fa4f9c2b1df',
       },
     ],
-    locations: [
+    projects: [
       {
-        id: '123456789',
-        name: 'Hakaniemi',
-        path: '123/456/789',
-      },
-      {
-        id: '123456789',
-        name: 'Lauttasaari',
-        path: '123/456/789',
+        path: '41d6bd7b-4a86-4ea4-95b7-4bff4f179095/354edbb1-f257-432c-b5bf-4a7e4f02aeba/f2ffb57e-d7a4-49d1-b7bf-3fa4f9c2b1df',
+        project: mockProject.data,
       },
     ],
-    projects: [{ path: '123/456/789', project: mockProject.data }],
+    locations: [],
   },
 };
