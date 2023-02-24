@@ -132,6 +132,7 @@ const GroupForm: FC = () => {
     selectedLocation: '',
     showAdvanceFields: false,
   });
+
   const { isOpen, selectedClass, selectedLocation, projectsForSubmit, showAdvanceFields } =
     formState;
 
@@ -182,9 +183,14 @@ const GroupForm: FC = () => {
   const onSubmit = useCallback(
     async (form: IGroupForm) => {
       console.log(buildRequestPayload(form, projectsForSubmit));
-      // dispatch(postGroupThunk(buildRequestPayload(form, projectsForSubmit))).then(() => {
-      //   reset(formValues);
-      // });
+      dispatch(postGroupThunk(buildRequestPayload(form, projectsForSubmit))).then(() => {
+        reset(formValues);
+        setFormState((current) => ({
+          ...current,
+          showAdvanceFields: false,
+          projectsForSubmit: [],
+        }));
+      });
     },
 
     [projectsForSubmit, dispatch, reset, formValues],
@@ -217,7 +223,6 @@ const GroupForm: FC = () => {
         isOpen: !current.isOpen,
         showAdvanceFields: false,
         projectsForSubmit: [],
-        fieldsPopulated: false,
       })),
     [],
   );
