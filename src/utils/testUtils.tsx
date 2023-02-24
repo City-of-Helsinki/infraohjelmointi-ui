@@ -53,12 +53,14 @@ export const renderWithProviders = (
 
   const WrappedWithReduxProvider = ReduxProvider(store)({ children: ui });
 
+  const renderResult = render(WrappedWithReduxProvider, {
+    wrapper: BrowserRouter,
+    ...renderOptions,
+  });
+
   return {
     store,
     user: userEvent.setup(),
-    ...(render(WrappedWithReduxProvider, {
-      wrapper: BrowserRouter,
-      ...renderOptions,
-    }) as RenderResult),
+    ...renderResult,
   };
 };

@@ -12,8 +12,11 @@ interface IHashTagsProps {
 
 const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) => {
   const { t } = useTranslation();
-  const getAriaLabel = (tag: string) =>
-    t(onDelete ? `removeHashTag ${tag}` : onClick ? `addHashTag ${tag}` : '');
+  const getAriaLabel = (tag: string) => {
+    const deleteTag = onDelete && `removeHashTag ${tag}`;
+    const addTag = onClick && `addHashTag ${tag}`;
+    return t(deleteTag || addTag || '');
+  };
 
   const handleOnClick = (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
     onClick && onClick((e.currentTarget as HTMLDivElement).parentElement?.id || '');
@@ -31,11 +34,11 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) 
 
   return (
     <div className="hashtags-container">
-      {tags.map((tag, i) => {
-        if (t) {
+      {tags.map((tag) => {
+        if (tag) {
           return (
             <div
-              key={`${t}-${i}`}
+              key={tag.id}
               className="hashtags-wrapper"
               aria-label={getAriaLabel(tag.value)}
               data-testid={id}

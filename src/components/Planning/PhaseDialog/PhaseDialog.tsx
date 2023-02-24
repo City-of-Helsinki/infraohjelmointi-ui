@@ -13,6 +13,16 @@ import { useTranslation } from 'react-i18next';
 import './styles.css';
 import useIsInViewPort from '@/hooks/useIsInViewport';
 
+const getTranslatedPixels = (dimensions: DOMRectReadOnly) => {
+  if (dimensions && dimensions.top > 0) {
+    return `-${Math.abs(dimensions.bottom - window.innerHeight) + 20}px`;
+  } else if (dimensions) {
+    return `${Math.abs(dimensions.top) + 20}px`;
+  } else {
+    return '0px';
+  }
+};
+
 interface IPhaseDialogProps {
   project: IProject;
   phases: Array<IOption>;
@@ -57,13 +67,6 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement 
 
   const isElementOutOfView = !!(!isInViewPort && dimensions);
 
-  const translatePixels =
-    dimensions && dimensions.top > 0
-      ? `-${Math.abs(dimensions.bottom - window.innerHeight) + 20}px`
-      : dimensions
-      ? `${Math.abs(dimensions.top) + 20}px`
-      : '0px';
-
   return (
     <div
       ref={dialogRef}
@@ -72,7 +75,7 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement 
         visibility: dimensions ? 'visible' : 'hidden',
         left: left,
         top: top,
-        transform: `translate(1.5rem, ${isElementOutOfView && translatePixels})`,
+        transform: `translate(1.5rem, ${isElementOutOfView && getTranslatedPixels(dimensions)})`,
       }}
     >
       <div className="phase-dialog-header">
