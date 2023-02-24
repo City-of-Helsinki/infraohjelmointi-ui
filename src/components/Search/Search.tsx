@@ -13,7 +13,7 @@ import CheckboxField from '../shared/CheckboxField';
 import { Fieldset } from 'hds-react/components/Fieldset';
 import { useOptions } from '@/hooks/useOptions';
 import {
-  getSearchResultThunk,
+  getSearchResultsThunk,
   selectOpen,
   setSearchForm,
   setSubmittedSearchForm,
@@ -51,7 +51,7 @@ const Search = () => {
       const searchParams = buildSearchParams(form);
       navigate('/search-result');
       dispatch(toggleSearch());
-      dispatch(getSearchResultThunk(searchParams)).then(() => {
+      dispatch(getSearchResultsThunk(searchParams)).then(() => {
         dispatch(setSubmittedSearchForm(form));
       });
     },

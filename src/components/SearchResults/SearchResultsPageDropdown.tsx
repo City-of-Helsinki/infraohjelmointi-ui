@@ -3,11 +3,11 @@ import { Select } from 'hds-react/components/Select';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface ISearchResultPageDropdownProps {
+interface ISearchResultsPageDropdownProps {
   resultLength: number;
 }
 
-const SearchResultPageDropdown: FC<ISearchResultPageDropdownProps> = ({ resultLength }) => {
+const SearchResultsPageDropdown: FC<ISearchResultsPageDropdownProps> = ({ resultLength }) => {
   const { t } = useTranslation();
   const pages: Array<IOption> = [
     { label: '10', value: '10' },
@@ -30,4 +30,4 @@ const SearchResultPageDropdown: FC<ISearchResultPageDropdownProps> = ({ resultLe
   );
 };
 
-export default SearchResultPageDropdown;
+export default SearchResultsPageDropdown;

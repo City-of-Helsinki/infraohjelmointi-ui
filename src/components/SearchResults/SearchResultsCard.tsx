@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { CustomTag } from '../shared';
 import './styles.css';
 
-const SearchResultCard: FC<ISearchResultListItem> = ({
+const SearchResultsCard: FC<ISearchResultListItem> = ({
   name,
   path,
   type,
@@ -60,4 +60,4 @@ const SearchResultCard: FC<ISearchResultListItem> = ({
   );
 };
 
-export default SearchResultCard;
+export default SearchResultsCard;

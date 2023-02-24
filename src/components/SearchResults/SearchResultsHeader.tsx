@@ -8,7 +8,7 @@ import { useCallback } from 'react';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { useTranslation } from 'react-i18next';
 
-const SearchResultHeader = () => {
+const SearchResultsHeader = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const handleOpenSearch = useCallback(() => dispatch(toggleSearch()), [dispatch]);
@@ -35,4 +35,4 @@ const SearchResultHeader = () => {
   );
 };
 
-export default SearchResultHeader;
+export default SearchResultsHeader;

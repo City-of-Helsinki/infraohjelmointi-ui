@@ -2,23 +2,23 @@ import { IClass } from '@/interfaces/classInterfaces';
 import { FreeSearchFormObject, IListItem } from '@/interfaces/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
-  ISearchResult,
+  ISearchResults,
   ISearchResultItem,
   ISearchResultListItem,
-  ISearchResultProject,
-  ISearchResultType,
+  ISearchResultsProject,
+  ISearchResultsType,
 } from '@/interfaces/searchInterfaces';
 import { selectAllClasses } from '@/reducers/classSlice';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
-import { selectSearchResult, selectSubmittedSearchForm } from '@/reducers/searchSlice';
+import { selectSearchResults, selectSubmittedSearchForm } from '@/reducers/searchSlice';
 import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from './common';
 
-const buildBreadCrumbs = (path: string, type: ISearchResultType, classes: Array<IClass>) =>
+const buildBreadCrumbs = (path: string, type: ISearchResultsType, classes: Array<IClass>) =>
   path.split('/').map((p) => classes.find((c) => c.id === p)?.name);
 
-const buildSearchResultList = (
-  searchResult: ISearchResult | null,
+const buildSearchResultsList = (
+  searchResults: ISearchResults | null,
   classes: Array<IClass>,
   hashTagTermIds: Array<string>,
   allHashTags: Array<IListItem>,
@@ -34,8 +34,8 @@ const buildSearchResultList = (
       : [];
   };
 
-  if (searchResult) {
-    for (const [key, value] of Object.entries(searchResult)) {
+  if (searchResults) {
+    for (const [key, value] of Object.entries(searchResults)) {
       if (['classes', 'groups', 'locations'].includes(key)) {
         resultList.push(
           ...value.map((v: ISearchResultItem) => ({
@@ -51,7 +51,7 @@ const buildSearchResultList = (
       }
       if (key === 'projects') {
         resultList.push(
-          ...value.map(({ path, project }: ISearchResultProject) => {
+          ...value.map(({ path, project }: ISearchResultsProject) => {
             return {
               path: path,
               type: key,
@@ -86,22 +86,22 @@ const useHashTagTermIds = () => {
 
 /**
  * Builds a list of ISearchResultListItems to be used for displayed search results in the
- * SearchResultsView.
+ * SearchResultssView.
  *
  * @returns a list of ISearchResultListItems
  */
-const useSearchResultList = () => {
+const useSearchResultsList = () => {
   const classes = useAppSelector(selectAllClasses);
-  const searchResult = useAppSelector(selectSearchResult);
+  const searchResults = useAppSelector(selectSearchResults);
   const hashTags = useAppSelector(selectHashTags).hashTags;
-  const [searchResultList, setSearchResultList] = useState<Array<ISearchResultListItem>>([]);
+  const [searchResultsList, setSearchResultsList] = useState<Array<ISearchResultListItem>>([]);
   const { hashTagTermIds } = useHashTagTermIds();
 
   useEffect(() => {
-    setSearchResultList(buildSearchResultList(searchResult, classes, hashTagTermIds, hashTags));
-  }, [classes, searchResult, hashTagTermIds]);
+    setSearchResultsList(buildSearchResultsList(searchResults, classes, hashTagTermIds, hashTags));
+  }, [classes, searchResults, hashTagTermIds]);
 
-  return { searchResultList };
+  return { searchResultsList };
 };
 
-export default useSearchResultList;
+export default useSearchResultsList;

@@ -1,6 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { ISearchResult } from '@/interfaces/searchInterfaces';
+import { ISearchResults } from '@/interfaces/searchInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
@@ -9,7 +9,7 @@ interface ISearchState {
   open: boolean;
   form: ISearchForm;
   submittedForm: ISearchForm;
-  searchResult: ISearchResult | null;
+  searchResults: ISearchResults | null;
   error: IError | null | unknown;
 }
 
@@ -35,12 +35,12 @@ const initialState: ISearchState = {
   open: false,
   form: initialSearchForm,
   submittedForm: initialSearchForm,
-  searchResult: null,
+  searchResults: null,
   error: null,
 };
 
-export const getSearchResultThunk = createAsyncThunk(
-  'search/getSearchResult',
+export const getSearchResultsThunk = createAsyncThunk(
+  'search/getSearchResults',
   async (params: string, thunkAPI) => {
     return await getProjectsWithParams(params)
       .then((res) => res)
@@ -63,7 +63,7 @@ export const searchSlice = createSlice({
         ...state,
         form: initialSearchForm,
         submittedForm: initialSearchForm,
-        searchResult: null,
+        searchResults: null,
       };
     },
     setSubmittedSearchForm(state, action: PayloadAction<ISearchForm>) {
@@ -77,13 +77,13 @@ export const searchSlice = createSlice({
   extraReducers: (builder) => {
     // GET SEARCH RESULTS
     builder.addCase(
-      getSearchResultThunk.fulfilled,
-      (state, action: PayloadAction<ISearchResult>) => {
-        return { ...state, searchResult: action.payload };
+      getSearchResultsThunk.fulfilled,
+      (state, action: PayloadAction<ISearchResults>) => {
+        return { ...state, searchResults: action.payload };
       },
     );
     builder.addCase(
-      getSearchResultThunk.rejected,
+      getSearchResultsThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },
@@ -93,7 +93,7 @@ export const searchSlice = createSlice({
 
 export const selectOpen = (state: RootState) => state.search.open;
 export const selectSearchForm = (state: RootState) => state.search.form;
-export const selectSearchResult = (state: RootState) => state.search.searchResult;
+export const selectSearchResults = (state: RootState) => state.search.searchResults;
 export const selectSubmittedSearchForm = (state: RootState) => state.search.submittedForm;
 
 export const { toggleSearch, setSearchForm, clearSearchState, setSubmittedSearchForm } =

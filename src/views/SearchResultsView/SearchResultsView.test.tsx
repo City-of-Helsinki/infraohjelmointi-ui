@@ -5,8 +5,8 @@ import { initialSearchForm } from '@/reducers/searchSlice';
 import { setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { act } from 'react-dom/test-utils';
-import SearchResultView from './SearchResultView';
-import { mockSearchResult } from '@/mocks/mockSearch';
+import SearchResultsView from './SearchResultsView';
+import { mockSearchResults } from '@/mocks/mockSearch';
 import { waitFor } from '@testing-library/react';
 import { mockHashTags } from '@/mocks/mockHashTags';
 
@@ -40,7 +40,7 @@ const searchActiveState = {
     open: false,
     form: filledSearchForm,
     submittedForm: filledSearchForm,
-    searchResult: mockSearchResult.data,
+    searchResults: mockSearchResults.data,
     error: null,
   },
   class: {
@@ -54,7 +54,7 @@ const searchActiveState = {
   },
 };
 
-describe('SearchResultView', () => {
+describe('SearchResultsView', () => {
   let renderResult: CustomRenderResult;
 
   const getByClass = (name: string) => {
@@ -63,14 +63,14 @@ describe('SearchResultView', () => {
   };
 
   beforeEach(async () => {
-    await act(async () => (renderResult = renderWithProviders(<SearchResultView />)));
+    await act(async () => (renderResult = renderWithProviders(<SearchResultsView />)));
   });
 
   afterEach(async () => {
     jest.clearAllMocks();
   });
 
-  describe('SearchResultHeader', () => {
+  describe('SearchResultsHeader', () => {
     it('renders elements', async () => {
       const { getByText, getByTestId } = renderResult;
       expect(getByClass('search-result-header-container')).toBe(1);
@@ -94,7 +94,7 @@ describe('SearchResultView', () => {
     });
 
     it('renders empty button if there are search terms and resets the store if clicked', async () => {
-      renderResult = renderWithProviders(<SearchResultView />, {
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
       const { user, store, getAllByRole, getAllByTestId, queryAllByTestId } = renderResult;
@@ -111,8 +111,8 @@ describe('SearchResultView', () => {
     });
 
     it('renders all terms and sends a new GET request if a term is removed', async () => {
-      mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
-      renderResult = renderWithProviders(<SearchResultView />, {
+      mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
       const { getAllByTestId, getByText, getAllByText, user, getAllByRole, store } = renderResult;
@@ -140,7 +140,7 @@ describe('SearchResultView', () => {
     });
   });
 
-  describe('SearchResultList', () => {
+  describe('SearchResultsList', () => {
     it('renders elements', async () => {
       const { getByTestId } = renderResult;
       expect(getByClass('search-result-list-container')).toBe(1);
@@ -156,7 +156,7 @@ describe('SearchResultView', () => {
     });
 
     it('renders the list and all search results if there are results', () => {
-      renderResult = renderWithProviders(<SearchResultView />, {
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
       const { getByTestId } = renderResult;
@@ -166,7 +166,7 @@ describe('SearchResultView', () => {
     });
   });
 
-  describe('SearchResultPageDropdown', () => {
+  describe('SearchResultsPageDropdown', () => {
     it('renders elements and 0 results if there are no results', () => {
       const { getByText } = renderResult;
       expect(getByClass('page-dropdown-container')).toBe(1);
@@ -175,7 +175,7 @@ describe('SearchResultView', () => {
     });
 
     it('renders page dropdown and result amount if there are results', async () => {
-      renderResult = renderWithProviders(<SearchResultView />, {
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
       const { container, user, getByText, getByRole, getAllByText, queryByText } = renderResult;
@@ -206,9 +206,9 @@ describe('SearchResultView', () => {
     });
   });
 
-  describe('SearchResultOrderDropdown', () => {
+  describe('SearchResultsOrderDropdown', () => {
     it('renders if there are search results and can choose order options', async () => {
-      renderResult = renderWithProviders(<SearchResultView />, {
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
 
@@ -233,9 +233,9 @@ describe('SearchResultView', () => {
     });
   });
 
-  describe('SearchResultCard', () => {
+  describe('SearchResultsCard', () => {
     it('renders all elements if there are results', () => {
-      renderResult = renderWithProviders(<SearchResultView />, {
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
       const { container, getAllByText } = renderResult;
@@ -285,7 +285,7 @@ describe('SearchResultView', () => {
     });
   });
 
-  describe('SearchResultNotFound', () => {
+  describe('SearchResultsNotFound', () => {
     it('advices the user to search if there are no results and there are searchTerms', () => {
       const { getByTestId, getByText } = renderResult;
       expect(getByTestId('result-not-found')).toBeInTheDocument();
@@ -294,10 +294,10 @@ describe('SearchResultView', () => {
     });
 
     it('advices the user to edit search filters if there are no search results and there are searchTerms', async () => {
-      renderResult = renderWithProviders(<SearchResultView />, {
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: {
           ...searchActiveState,
-          search: { ...searchActiveState.search, searchResult: null },
+          search: { ...searchActiveState.search, searchResults: null },
         },
       });
       const { getByText } = renderResult;
@@ -307,7 +307,7 @@ describe('SearchResultView', () => {
     });
 
     it('doesnt render if there are results', async () => {
-      renderResult = renderWithProviders(<SearchResultView />, {
+      renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
       expect(getByClass('flex-col-center')).toBe(0);

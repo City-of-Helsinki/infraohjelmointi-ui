@@ -9,7 +9,7 @@ import { Control, Controller, FieldValues, UseFormGetValues } from 'react-hook-f
 import {
   FreeSearchFormItem,
   FreeSearchFormObject,
-  IFreeSearchResult,
+  IFreeSearchResults,
   IListItem,
 } from '@/interfaces/common';
 import _ from 'lodash';
@@ -18,9 +18,9 @@ import './styles.css';
 type FreeSearchFormListItem = IListItem & { type: string };
 
 /**
- * Create a list of FreeSearchFormListItems from a IFreeSearchResult
+ * Create a list of FreeSearchFormListItems from a IFreeSearchResults
  */
-const freeSearchResultToList = (res: IFreeSearchResult): Array<FreeSearchFormListItem> => {
+const freeSearchResultsToList = (res: IFreeSearchResults): Array<FreeSearchFormListItem> => {
   const resultList = [];
   for (const [key, value] of Object.entries(res)) {
     resultList.push(
@@ -63,7 +63,7 @@ const FreeSearchForm = ({
             if (res) {
               const formValue = getValues('freeSearchParams');
               // Create a combined list of all results and filter already added values
-              const resultList = freeSearchResultToList(res).filter(
+              const resultList = freeSearchResultsToList(res).filter(
                 (f) => !arrayHasValue(Object.keys(formValue), f.value),
               );
 

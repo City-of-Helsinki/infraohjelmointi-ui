@@ -65,7 +65,7 @@ export enum ClassTableHierarchy {
   Third = 'third',
 }
 
-export interface IFreeSearchResult {
+export interface IFreeSearchResults {
   hashtags: Array<IListItem>;
   projects: Array<IListItem>;
   groups: Array<IListItem>;

@@ -2,7 +2,7 @@ import { IOption } from '@/interfaces/common';
 import { Select } from 'hds-react/components/Select';
 import { useTranslation } from 'react-i18next';
 
-const SearchResultOrderDropdown = () => {
+const SearchResultsOrderDropdown = () => {
   const { t } = useTranslation();
 
   const order: Array<IOption> = [
@@ -22,4 +22,4 @@ const SearchResultOrderDropdown = () => {
   );
 };
 
-export default SearchResultOrderDropdown;
+export default SearchResultsOrderDropdown;

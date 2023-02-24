@@ -2,7 +2,7 @@ import { Pagination } from 'hds-react/components/Pagination';
 import { useState } from 'react';
 import './styles.css';
 
-const SearchResultPagination = () => {
+const SearchResultsPagination = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
   return (
@@ -23,4 +23,4 @@ const SearchResultPagination = () => {
   );
 };
 
-export default SearchResultPagination;
+export default SearchResultsPagination;

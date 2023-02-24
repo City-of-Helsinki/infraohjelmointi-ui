@@ -7,25 +7,25 @@ export interface ISearchResultItem {
   path: string;
 }
 
-export interface ISearchResultProject {
+export interface ISearchResultsProject {
   project: IProject;
   path: string;
 }
 
-export interface ISearchResult {
+export interface ISearchResults {
   groups: Array<ISearchResultItem>;
   classes: Array<ISearchResultItem>;
   locations: Array<ISearchResultItem>;
-  projects: Array<ISearchResultProject>;
+  projects: Array<ISearchResultsProject>;
 }
 
-export type ISearchResultType = 'groups' | 'classes' | 'locations' | 'projects';
+export type ISearchResultsType = 'groups' | 'classes' | 'locations' | 'projects';
 
 export interface ISearchResultListItem {
   name: string;
   id: string;
   path: string;
-  type: ISearchResultType;
+  type: ISearchResultsType;
   breadCrumbs: Array<string>;
   hashTags?: Array<IListItem>;
   phase?: string;

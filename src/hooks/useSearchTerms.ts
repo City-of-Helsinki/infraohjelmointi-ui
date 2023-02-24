@@ -2,7 +2,7 @@ import { FreeSearchFormObject, IOption } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
 import {
   clearSearchState,
-  getSearchResultThunk,
+  getSearchResultsThunk,
   initialSearchForm,
   selectSubmittedSearchForm,
   setSubmittedSearchForm,
@@ -146,7 +146,7 @@ const useSearchTerms = () => {
       const formAfterDelete = deleteSearchFormValue(submittedForm, term);
       const searchParams = buildSearchParams(formAfterDelete);
       if (searchParams) {
-        dispatch(getSearchResultThunk(searchParams)).then(() =>
+        dispatch(getSearchResultsThunk(searchParams)).then(() =>
           dispatch(setSubmittedSearchForm(formAfterDelete)),
         );
       } else {

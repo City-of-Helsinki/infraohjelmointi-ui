@@ -1,8 +1,8 @@
-import { IFreeSearchResult } from '@/interfaces/common';
-import { ISearchResult } from '@/interfaces/searchInterfaces';
+import { IFreeSearchResults } from '@/interfaces/common';
+import { ISearchResults } from '@/interfaces/searchInterfaces';
 import mockProject from './mockProject';
 
-export const mockFreeSearchResult: { data: IFreeSearchResult } = {
+export const mockFreeSearchResults: { data: IFreeSearchResults } = {
   data: {
     hashtags: [
       {
@@ -37,7 +37,7 @@ export const mockFreeSearchResult: { data: IFreeSearchResult } = {
   },
 };
 
-export const mockSearchResult: { data: ISearchResult } = {
+export const mockSearchResults: { data: ISearchResults } = {
   data: {
     groups: [],
     classes: [
