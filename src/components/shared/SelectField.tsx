@@ -48,7 +48,7 @@ const SelectField: FC<ISelectFieldProps> = ({
               options={options || []}
               required={required}
               style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-              placeholder={placeholder}
+              placeholder={(placeholder && t(placeholder || '')) || ''}
               icon={
                 icon === 'location' ? (
                   <IconLocation />

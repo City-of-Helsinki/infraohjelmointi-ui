@@ -26,7 +26,6 @@ const useIsInViewPort = (ref: RefObject<HTMLElement>) => {
     observer.observe(ref.current as HTMLElement);
     // Clean up observer
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { isInViewPort, dimensions };

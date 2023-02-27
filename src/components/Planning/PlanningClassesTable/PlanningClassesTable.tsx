@@ -36,19 +36,16 @@ const PlanningClassesTable = () => {
       ? (masterClasses.find((mc) => mc.id === masterClassId) as IClass)
       : null;
     dispatch(setSelectedMasterClass(masterClass));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [masterClassId, masterClasses]);
 
   useEffect(() => {
     const projectClass = classId ? (classes.find((c) => c.id === classId) as IClass) : null;
     dispatch(setSelectedClass(projectClass));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, classes]);
 
   useEffect(() => {
     const subClass = subClassId ? (subClasses.find((sc) => sc.id === subClassId) as IClass) : null;
     dispatch(setSelectedSubClass(subClass));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subClassId, subClasses]);
 
   const allMasterClassRows = useCallback(

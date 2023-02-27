@@ -37,7 +37,6 @@ const useProjectNoteForm = (note?: INote) => {
     if (projectId) {
       reset(formValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, formValues, user]);
 
   return { formMethods, formValues };

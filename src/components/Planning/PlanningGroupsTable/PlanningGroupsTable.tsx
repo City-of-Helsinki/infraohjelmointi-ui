@@ -55,13 +55,11 @@ const PlanningGroupsTable = () => {
     if (inView && projectsVisible) {
       fetchNext();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   // Get phases list
   useEffect(() => {
     dispatch(getProjectPhasesThunk());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

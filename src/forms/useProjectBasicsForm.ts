@@ -1,13 +1,7 @@
-import {
-  // FormField,
-  // HookFormControlType,
-  // IForm,
-  IProjectBasicsForm,
-} from '@/interfaces/formInterfaces';
+import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-// import { TFunction } from 'i18next';
 import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
@@ -160,7 +154,7 @@ const useProjectBasicsValues = () => {
       personProgramming: personToOption(project?.personProgramming),
       otherPersons: value(project?.otherPersons),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [project],
   );
 
@@ -191,7 +185,6 @@ const useProjectBasicsForm = () => {
     if (project) {
       reset(formValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project, formValues]);
 
   // formFields,

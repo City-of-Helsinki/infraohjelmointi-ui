@@ -54,7 +54,6 @@ const useSearchForm = () => {
       dispatch(setSearchForm(currentFormValues));
       reset(currentFormValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freeSearchParams, open]);
 
   /**
@@ -64,7 +63,6 @@ const useSearchForm = () => {
     if (formHasDefaultValues && !_.isEmpty(freeSearchParams) && _.isEmpty(dirtyFields)) {
       setFormDirty();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFormValues]);
 
   return { formMethods };

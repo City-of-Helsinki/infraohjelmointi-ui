@@ -13,7 +13,6 @@ interface IListFieldProps {
 }
 
 const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
-  // const { label, readOnly, name } = form;
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {

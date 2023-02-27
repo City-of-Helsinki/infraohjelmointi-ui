@@ -120,6 +120,17 @@ const Search = () => {
     dispatch(setSearchForm(getValues()));
   }, [dispatch, getValues]);
 
+  const formProps = useCallback(
+    (name: string) => {
+      return {
+        name: name,
+        label: `searchForm.${name}`,
+        control: control,
+      };
+    },
+    [control],
+  );
+
   return (
     <Dialog
       id="search-dialog"
@@ -143,24 +154,14 @@ const Search = () => {
               <FormFieldLabel text="searchForm.filter" />
             </div>
             <MultiSelectField
-              name="masterClass"
-              label="searchForm.masterClass"
-              control={control}
-              placeholder="Valitse"
+              {...formProps('masterClass')}
+              placeholder="choose"
               options={masterClasses}
             />
+            <MultiSelectField {...formProps('class')} placeholder="choose" options={classes} />
             <MultiSelectField
-              name="class"
-              label="searchForm.class"
-              control={control}
-              placeholder="Valitse"
-              options={classes}
-            />
-            <MultiSelectField
-              name="subClass"
-              label="searchForm.subClass"
-              control={control}
-              placeholder="Valitse"
+              {...formProps('subClass')}
+              placeholder="choose"
               options={subClasses}
             />
             <Fieldset
@@ -168,74 +169,34 @@ const Search = () => {
               className="custom-fieldset"
               id="programmed"
             >
-              <CheckboxField
-                name="programmedYes"
-                label="searchForm.programmedYes"
-                control={control}
-              />
-              <CheckboxField
-                name="programmedNo"
-                label="searchForm.programmedNo"
-                control={control}
-              />
+              <CheckboxField {...formProps('programmedYes')} />
+              <CheckboxField {...formProps('programmedNo')} />
             </Fieldset>
             <SelectField
-              name="programmedYearMin"
-              label="searchForm.programmedYearMin"
-              control={control}
-              placeholder="Valitse"
+              {...formProps('programmedYearMin')}
+              placeholder="choose"
               options={programmedYearMin}
             />
             <SelectField
-              name="programmedYearMax"
-              label="searchForm.programmedYearMax"
-              control={control}
-              placeholder="Valitse"
+              {...formProps('programmedYearMax')}
+              placeholder="choose"
               options={programmedYearMax}
             />
+            <SelectField {...formProps('phase')} placeholder="choose" options={phases} />
             <SelectField
-              name="phase"
-              label="searchForm.phase"
-              control={control}
-              placeholder="Valitse"
-              options={phases}
-            />
-            <SelectField
-              name="personPlanning"
-              label="searchForm.personPlanning"
-              control={control}
-              placeholder="Valitse"
+              {...formProps('personPlanning')}
+              placeholder="choose"
               icon="person"
               options={personPlanning}
             />
+            <MultiSelectField {...formProps('district')} placeholder="choose" options={districts} />
+            <MultiSelectField {...formProps('division')} placeholder="choose" options={divisions} />
             <MultiSelectField
-              name="district"
-              label="searchForm.district"
-              control={control}
-              placeholder="Valitse"
-              options={districts}
-            />
-            <MultiSelectField
-              name="division"
-              label="searchForm.division"
-              control={control}
-              placeholder="Valitse"
-              options={divisions}
-            />
-            <MultiSelectField
-              name="subDivision"
-              label="searchForm.subDivision"
-              control={control}
-              placeholder="Valitse"
+              {...formProps('subDivision')}
+              placeholder="choose"
               options={subDivisions}
             />
-            <SelectField
-              name="category"
-              label="searchForm.category"
-              control={control}
-              placeholder="Valitse"
-              options={categories}
-            />
+            <SelectField {...formProps('category')} placeholder="choose" options={categories} />
           </div>
         </form>
       </Dialog.Content>

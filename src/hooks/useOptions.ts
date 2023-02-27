@@ -23,7 +23,6 @@ export const useOptions = (name?: ListType, shouldNotTranslate?: boolean) => {
 
   const options = useMemo(
     () => optionsList.map((i) => listItemToOption(i, shouldNotTranslate ? undefined : t)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [optionsList],
   );
 

@@ -61,23 +61,30 @@ const ProjectBasicsForm: FC = () => {
     [dirtyFields, projectId, dispatch],
   );
 
+  const formProps = useCallback(
+    (name: string) => {
+      return {
+        name: name,
+        label: `projectBasicsForm.${name}`,
+        control: control,
+      };
+    },
+    [control],
+  );
+
   return (
     <div className="basics-form">
       <form onBlur={isDirty ? (handleSubmit(onSubmit) as SubmitHandler<FieldValues>) : undefined}>
         <div className="basic-info-form">
           {/* SECTION 1 - BASIC INFO */}
-          <FormSectionTitle name="basics" label="projectBasicsForm.basics" />
+          <FormSectionTitle {...formProps('basics')} />
           <SelectField
-            name="type"
-            label="projectBasicsForm.type"
+            {...formProps('type')}
             rules={{ required: 'Hankkeen tyyppi on pakollinen tieto.' }}
-            control={control}
             options={types}
           />
           <NumberField
-            name="hkrId"
-            label="projectBasicsForm.hkrId"
-            control={control}
+            {...formProps('hkrId')}
             rules={{
               maxLength: {
                 value: '9223372036854775807'.length - 1,
@@ -86,50 +93,31 @@ const ProjectBasicsForm: FC = () => {
             }}
           />
           <TextField
-            name="entityName"
-            label="projectBasicsForm.entityName"
+            {...formProps('entityName')}
             rules={{ maxLength: { value: 30, message: 'Nimi voi olla enintään 30 merkkiä.' } }}
-            control={control}
           />
-          <TextField name="sapProject" label="projectBasicsForm.sapProject" control={control} />
+          <TextField {...formProps('sapProject')} control={control} />
           <TextField
-            name="description"
-            label="projectBasicsForm.description"
-            control={control}
+            {...formProps('description')}
             rules={{ required: 'Kuvaus on pakollinen tieto.' }}
           />
-          <ListField name="sapNetwork" label="projectBasicsForm.sapNetwork" readOnly={true} />
-          <SelectField
-            name="area"
-            label="projectBasicsForm.area"
-            control={control}
-            options={areas}
-          />
-          <ProjectHashTags name="hashTags" label="projectBasicsForm.hashTags" control={control} />
+          <ListField {...formProps('sapNetwork')} readOnly={true} />
+          <SelectField {...formProps('area')} options={areas} />
+          <ProjectHashTags {...formProps('hashTags')} control={control} />
           {/* SECTION 2 - STATUS */}
-          <FormSectionTitle name="status" label="projectBasicsForm.status" />
+          <FormSectionTitle {...formProps('status')} />
           <SelectField
-            name="phase"
-            label="projectBasicsForm.phase"
-            control={control}
+            {...formProps('phase')}
             rules={{ required: 'Vaihe on pakollinen tieto.' }}
             options={phases}
           />
           <SelectField
-            name="constructionPhaseDetail"
-            label="projectBasicsForm.constructionPhaseDetail"
-            control={control}
+            {...formProps('constructionPhaseDetail')}
             options={constructionPhaseDetails}
           />
-          <RadioCheckboxField
-            name="programmed"
-            label="projectBasicsForm.programmed"
-            control={control}
-          />
+          <RadioCheckboxField {...formProps('programmed')} />
           <NumberField
-            name="planningStartYear"
-            label="projectBasicsForm.planningStartYear"
-            control={control}
+            {...formProps('planningStartYear')}
             rules={{
               min: {
                 value: 0,
@@ -142,9 +130,7 @@ const ProjectBasicsForm: FC = () => {
             }}
           />
           <NumberField
-            name="constructionEndYear"
-            label="projectBasicsForm.constructionEndYear"
-            control={control}
+            {...formProps('constructionEndYear')}
             rules={{
               min: {
                 value: 0,
@@ -156,260 +142,106 @@ const ProjectBasicsForm: FC = () => {
               },
             }}
           />
-          <RadioCheckboxField name="louhi" label="projectBasicsForm.louhi" control={control} />
-          <RadioCheckboxField name="gravel" label="projectBasicsForm.gravel" control={control} />
-          <SelectField
-            name="category"
-            label="projectBasicsForm.category"
-            control={control}
-            options={categories}
-          />
-          <RadioCheckboxField
-            name="effectHousing"
-            label="projectBasicsForm.effectHousing"
-            control={control}
-          />
-          <SelectField
-            name="riskAssessment"
-            label="projectBasicsForm.riskAssessment"
-            control={control}
-            options={riskAssessments}
-          />
+          <RadioCheckboxField {...formProps('louhi')} />
+          <RadioCheckboxField {...formProps('gravel')} />
+          <SelectField {...formProps('category')} options={categories} />
+          <RadioCheckboxField {...formProps('effectHousing')} />
+          <SelectField {...formProps('riskAssessment')} options={riskAssessments} />
           {/* SECTION 3 - SCHEDULE */}
-          <FormSectionTitle name="schedule" label="projectBasicsForm.schedule" />
+          <FormSectionTitle {...formProps('schedule')} />
           <Fieldset
             heading={t('projectBasicsForm.planning')}
             className="custom-fieldset"
             id="planning"
           >
-            <DateField
-              name="estPlanningStart"
-              label="projectBasicsForm.estPlanningStart"
-              control={control}
-            />
-            <DateField
-              name="estPlanningEnd"
-              label="projectBasicsForm.estPlanningEnd"
-              control={control}
-            />
-            <DateField
-              name="presenceStart"
-              label="projectBasicsForm.presenceStart"
-              control={control}
-            />
-            <DateField name="presenceEnd" label="projectBasicsForm.presenceEnd" control={control} />
-            <DateField
-              name="visibilityStart"
-              label="projectBasicsForm.visibilityStart"
-              control={control}
-            />
-            <DateField
-              name="visibilityEnd"
-              label="projectBasicsForm.visibilityEnd"
-              control={control}
-            />
+            <DateField {...formProps('estPlanningStart')} />
+            <DateField {...formProps('estPlanningEnd')} />
+            <DateField {...formProps('presenceStart')} />
+            <DateField {...formProps('presenceEnd')} />
+            <DateField {...formProps('visibilityStart')} />
+            <DateField {...formProps('visibilityEnd')} />
           </Fieldset>
           <Fieldset
             heading={t('projectBasicsForm.construction')}
             className="custom-fieldset"
             id="construction"
           >
-            <DateField
-              name="estConstructionStart"
-              label="projectBasicsForm.estConstructionStart"
-              control={control}
-            />
-            <DateField
-              name="estConstructionEnd"
-              label="projectBasicsForm.estConstructionEnd"
-              control={control}
-            />
+            <DateField {...formProps('estConstructionStart')} />
+            <DateField {...formProps('estConstructionEnd')} />
           </Fieldset>
           {/* SECTION 4 - FINANCIALS */}
-          <FormSectionTitle name="financial" label="projectBasicsForm.financial" />
+          <FormSectionTitle {...formProps('financial')} />
+          <SelectField {...formProps('masterClass')} options={masterClasses} />
+          <SelectField {...formProps('class')} options={classes} />
+          <SelectField {...formProps('subClass')} options={subClasses} />
+          <NumberField {...formProps('projectCostForecast')} tooltip="keur" />
           <SelectField
-            name="masterClass"
-            label="projectBasicsForm.masterClass"
-            control={control}
-            options={masterClasses}
-          />
-          <SelectField
-            name="class"
-            label="projectBasicsForm.class"
-            control={control}
-            options={classes}
-          />
-          <SelectField
-            name="subClass"
-            label="projectBasicsForm.subClass"
-            control={control}
-            options={subClasses}
-          />
-          <NumberField
-            name="projectCostForecast"
-            label="projectBasicsForm.projectCostForecast"
-            control={control}
-            tooltip="keur"
-          />
-          <SelectField
-            name="projectQualityLevel"
-            label="projectBasicsForm.projectQualityLevel"
-            control={control}
+            {...formProps('projectQualityLevel')}
             hideLabel={true}
             options={projectQualityLevels}
           />
-          <NumberField
-            name="projectWorkQuantity"
-            label="projectBasicsForm.projectWorkQuantity"
-            control={control}
-            tooltip="keur"
-          />
-          <NumberField
-            name="planningCostForecast"
-            label="projectBasicsForm.planningCostForecast"
-            control={control}
-            tooltip="keur"
-          />
+          <NumberField {...formProps('projectWorkQuantity')} tooltip="keur" />
+          <NumberField {...formProps('planningCostForecast')} tooltip="keur" />
+          <SelectField {...formProps('planningPhase')} hideLabel={true} options={planningPhases} />
+          <NumberField {...formProps('planningWorkQuantity')} tooltip="keur" />
+          <NumberField {...formProps('constructionCostForecast')} tooltip="keur" />
           <SelectField
-            name="planningPhase"
-            label="projectBasicsForm.planningPhase"
-            control={control}
-            hideLabel={true}
-            options={planningPhases}
-          />
-          <NumberField
-            name="planningWorkQuantity"
-            label="projectBasicsForm.planningWorkQuantity"
-            control={control}
-            tooltip="keur"
-          />
-          <NumberField
-            name="constructionCostForecast"
-            label="projectBasicsForm.constructionCostForecast"
-            control={control}
-            tooltip="keur"
-          />
-          <SelectField
-            name="constructionPhase"
-            label="projectBasicsForm.constructionPhase"
-            control={control}
+            {...formProps('constructionPhase')}
             hideLabel={true}
             options={constructionPhases}
           />
-          <NumberField
-            name="constructionWorkQuantity"
-            label="projectBasicsForm.constructionWorkQuantity"
-            control={control}
-            tooltip="keur"
-          />
+          <NumberField {...formProps('constructionWorkQuantity')} tooltip="keur" />
           <ListField
-            name="realizedCostLabel"
-            label="projectBasicsForm.realizedCostLabel"
+            {...formProps('realizedCostLabel')}
             fields={[
-              { name: 'budget', control: control, label: 'projectBasicsForm.budget' },
+              { ...formProps('budget') },
               {
-                name: 'realizedCost',
-                control: control,
-                label: 'projectBasicsForm.realizedCost',
+                ...formProps('realizedCost'),
                 readOnly: true,
               },
               {
-                name: 'comittedCost',
-                control: control,
-                label: 'projectBasicsForm.comittedCost',
+                ...formProps('comittedCost'),
                 readOnly: true,
               },
               {
-                name: 'spentCost',
-                control: control,
-                label: 'projectBasicsForm.spentCost',
+                ...formProps('spentCost'),
                 readOnly: true,
               },
             ]}
           />
           <OverrunRightField control={control} />
-          <ListField
-            name="preliminaryBudgetDivision"
-            label="projectBasicsForm.preliminaryBudgetDivision"
-            readOnly={true}
-          />
+          <ListField {...formProps('preliminaryBudgetDivision')} readOnly={true} />
           {/* SECTION 5 - RESPONSIBLE PERSONS */}
-          <FormSectionTitle
-            name="responsiblePersons"
-            label="projectBasicsForm.responsiblePersons"
-          />
+          <FormSectionTitle {...formProps('responsiblePersons')} />
           <SelectField
-            name="personPlanning"
-            label="projectBasicsForm.personPlanning"
-            control={control}
+            {...formProps('personPlanning')}
             icon="person"
             options={responsiblePersons}
           />
           <SelectField
-            name="personConstruction"
-            label="projectBasicsForm.personConstruction"
-            control={control}
+            {...formProps('personConstruction')}
             icon="person"
             options={responsiblePersons}
           />
           <SelectField
-            name="personProgramming"
-            label="projectBasicsForm.personProgramming"
-            control={control}
+            {...formProps('personProgramming')}
             icon="person"
             options={responsiblePersons}
           />
-          <TextField name="otherPersons" label="projectBasicsForm.otherPersons" control={control} />
+
+          <TextField {...formProps('otherPersons')} />
           {/* SECTION 6 - LOCATION */}
-          <FormSectionTitle name="location" label="projectBasicsForm.location" />
-          <SelectField
-            name="responsibleZone"
-            label="projectBasicsForm.responsibleZone"
-            control={control}
-            options={responsibleZones}
-          />
-          <SelectField
-            name="district"
-            label="projectBasicsForm.district"
-            control={control}
-            icon="location"
-            options={districts}
-          />
-          <SelectField
-            name="division"
-            label="projectBasicsForm.division"
-            control={control}
-            icon="location"
-            options={divisions}
-          />
-          <SelectField
-            name="subDivision"
-            label="projectBasicsForm.subDivision"
-            control={control}
-            icon="location"
-            options={subDivisions}
-          />
-          <TextField
-            name="masterPlanAreaNumber"
-            label="projectBasicsForm.masterPlanAreaNumber"
-            control={control}
-          />
-          <TextField
-            name="trafficPlanNumber"
-            label="projectBasicsForm.trafficPlanNumber"
-            control={control}
-          />
-          <TextField name="bridgeNumber" label="projectBasicsForm.bridgeNumber" control={control} />
+          <FormSectionTitle {...formProps('location')} />
+          <SelectField {...formProps('responsibleZone')} options={responsibleZones} />
+          <SelectField {...formProps('district')} icon="location" options={districts} />
+          <SelectField {...formProps('division')} icon="location" options={divisions} />
+          <SelectField {...formProps('subDivision')} icon="location" options={subDivisions} />
+          <TextField {...formProps('masterPlanAreaNumber')} />
+          <TextField {...formProps('trafficPlanNumber')} />
+          <TextField {...formProps('bridgeNumber')} />
           {/* SECTION 7 - PROJECT PROGRAM */}
-          <FormSectionTitle
-            name="projectProgramTitle"
-            label="projectBasicsForm.projectProgramTitle"
-          />
-          <TextAreaField
-            name="projectProgram"
-            label="projectBasicsForm.projectProgram"
-            control={control}
-          />
+          <FormSectionTitle {...formProps('projectProgramTitle')} />
+          <TextAreaField {...formProps('projectProgram')} />
         </div>
       </form>
     </div>

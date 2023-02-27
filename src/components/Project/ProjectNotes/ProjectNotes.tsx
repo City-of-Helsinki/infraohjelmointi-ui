@@ -16,7 +16,6 @@ const ProjectNotes = () => {
 
   useEffect(() => {
     if (projectId) dispatch(getNotesByProjectThunk(projectId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
   const sortedNotes = useCallback(() => sortArrayByDates(notes, 'createdDate', true), [notes]);
