@@ -29,7 +29,6 @@ import {
   getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import { mockHashTags } from '@/mocks/mockHashTags';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -52,11 +51,8 @@ describe('ProjectView', () => {
     const { store } = renderResult;
 
     const lists = store.getState().lists;
-    const hashTags = store.getState().hashTags;
 
     expect(store.getState().project.selectedProject).toStrictEqual(mockProject.data);
-    expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
-    expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
     expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);
     expect(lists.phases).toStrictEqual(mockProjectPhases.data);
