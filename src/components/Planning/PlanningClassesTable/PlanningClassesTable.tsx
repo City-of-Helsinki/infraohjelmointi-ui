@@ -12,6 +12,7 @@ import {
   setSelectedMasterClass,
   setSelectedSubClass,
 } from '@/reducers/classSlice';
+import { selectDistricts } from '@/reducers/locationSlice';
 import { memo, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 import PlanningClassesTableRow from './PlanningClassesTableRow';
@@ -27,25 +28,28 @@ const PlanningClassesTable = () => {
   const selectedClass = useAppSelector(selectSelectedClass);
   const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
+  const mockDistrict = useAppSelector(selectDistricts)[0];
   /**
    * set selected classes to redux according to url, if their url param id is removed, then they will
    * be set to null (i.e, the user navigates back)
    */
   useEffect(() => {
-    const masterClass = masterClassId
+    const selectedMasterClass = masterClassId
       ? (masterClasses.find((mc) => mc.id === masterClassId) as IClass)
       : null;
-    dispatch(setSelectedMasterClass(masterClass));
+    dispatch(setSelectedMasterClass(selectedMasterClass));
   }, [masterClassId, masterClasses]);
 
   useEffect(() => {
-    const projectClass = classId ? (classes.find((c) => c.id === classId) as IClass) : null;
-    dispatch(setSelectedClass(projectClass));
+    const selectedClass = classId ? (classes.find((c) => c.id === classId) as IClass) : null;
+    dispatch(setSelectedClass(selectedClass));
   }, [classId, classes]);
 
   useEffect(() => {
-    const subClass = subClassId ? (subClasses.find((sc) => sc.id === subClassId) as IClass) : null;
-    dispatch(setSelectedSubClass(subClass));
+    const selectedSubClass = subClassId
+      ? (subClasses.find((sc) => sc.id === subClassId) as IClass)
+      : null;
+    dispatch(setSelectedSubClass(selectedSubClass));
   }, [subClassId, subClasses]);
 
   const allMasterClassRows = useCallback(
@@ -53,8 +57,9 @@ const PlanningClassesTable = () => {
       masterClasses.map((mc) => (
         <PlanningClassesTableRow
           key={mc.id}
-          projectClass={mc}
+          item={mc}
           hierarchy={ClassTableHierarchy.First}
+          type="class"
         />
       )),
     [masterClasses],
@@ -66,8 +71,9 @@ const PlanningClassesTable = () => {
         ? [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
             <PlanningClassesTableRow
               key={c.id}
-              projectClass={c}
+              item={c}
               hierarchy={ClassTableHierarchy.Second}
+              type="class"
             />
           ))
         : null,
@@ -80,8 +86,9 @@ const PlanningClassesTable = () => {
         ? [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
             <PlanningClassesTableRow
               key={sc.id}
-              projectClass={sc}
+              item={sc}
               hierarchy={ClassTableHierarchy.Third}
+              type="class"
             />
           ))
         : null,
@@ -98,7 +105,8 @@ const PlanningClassesTable = () => {
             selectedMasterClass ? (
               <PlanningClassesTableRow
                 key={selectedMasterClass.id}
-                projectClass={selectedMasterClass}
+                item={selectedMasterClass}
+                type="class"
                 initiallyExpanded={true}
                 hierarchy={ClassTableHierarchy.First}
               >
@@ -107,7 +115,8 @@ const PlanningClassesTable = () => {
                   selectedClass ? (
                     <PlanningClassesTableRow
                       key={selectedClass.id}
-                      projectClass={selectedClass}
+                      item={selectedClass}
+                      type="class"
                       initiallyExpanded={true}
                       hierarchy={ClassTableHierarchy.Second}
                     >
@@ -129,11 +138,33 @@ const PlanningClassesTable = () => {
           ) : (
             // Render only the selectedSubClass and the projects associated with it if selected
             <PlanningClassesTableRow
-              key={selectedSubClass.id}
-              projectClass={selectedSubClass}
+              item={selectedSubClass}
+              type="class"
               initiallyExpanded={true}
               hierarchy={ClassTableHierarchy.First}
-            />
+            >
+              {mockDistrict && (
+                <>
+                  {/* District */}
+                  <PlanningClassesTableRow
+                    item={mockDistrict}
+                    type="location"
+                    initiallyExpanded={true}
+                    hierarchy={ClassTableHierarchy.Second}
+                  >
+                    {/* Division */}
+                    <PlanningClassesTableRow
+                      item={mockDistrict}
+                      type="location"
+                      initiallyExpanded={true}
+                      hierarchy={ClassTableHierarchy.Third}
+                    >
+                      {/* TODO: populate projects/groups here */}
+                    </PlanningClassesTableRow>
+                  </PlanningClassesTableRow>
+                </>
+              )}
+            </PlanningClassesTableRow>
           )
         }
       </tbody>

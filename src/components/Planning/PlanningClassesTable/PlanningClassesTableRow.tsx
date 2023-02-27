@@ -6,10 +6,12 @@ import { classSums } from '@/mocks/common';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { ClassTableHierarchy } from '@/interfaces/common';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface IPlanningClassesTableRowProps {
-  projectClass: IClass;
+  item: IClass | ILocation;
   hierarchy: ClassTableHierarchy;
+  type: 'class' | 'location';
   children?: ReactNode;
   initiallyExpanded?: true;
 }
@@ -23,8 +25,9 @@ const OverrunSum = memo(({ value }: { value: string }) => (
 ));
 
 const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
-  projectClass,
+  item,
   hierarchy,
+  type,
   children,
   initiallyExpanded,
 }) => {
@@ -40,42 +43,46 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
   }, [initiallyExpanded]);
 
   const buildLink = useCallback(() => {
-    return [masterClassId, classId, projectClass.id]
+    return [masterClassId, classId, item.id]
       .join('/')
       .replace(/(\/\/)/gm, '/') // replace double // with one in case of one of values is undefined/null
       .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
-  }, [projectClass.id, masterClassId, classId]);
+  }, [item.id, masterClassId, classId]);
 
   return (
     <>
       <tr>
         {/* Header with cell name */}
-        <th className={`class-header-cell ${hierarchy}`}>
+        <th className={`table-header-cell ${type} ${hierarchy}`}>
           <div style={{ position: 'relative' }}>
-            <div className="class-header-content-item">
-              {/* class code/number here */}
-              <span>{}</span>
-            </div>
-            <div className={`class-header-content ${hierarchy}`}>
-              <div className="class-header-content-item">
+            <div className={`table-header-content ${hierarchy}`}>
+              <div className={`table-header-content-item`}>
                 <Link to={buildLink()} className="flex">
                   <IconButton
                     icon={expanded ? IconAngleUp : IconAngleDown}
-                    color="white"
+                    color={type === 'class' ? 'white' : 'black'}
                     onClick={handleExpanded}
                   />
                 </Link>
               </div>
-              <div className="class-header-content-dots">
-                <IconMenuDots size="xs" />
-              </div>
-              <div className="class-header-content-item">
-                <div className="class-title-container">
-                  <span className="font-bold text-white">{projectClass.name}</span>
+              {/* hide dots menu from districts */}
+              {type !== 'location' && hierarchy !== ClassTableHierarchy.Second && (
+                <div className={`table-header-content-dots`}>
+                  <IconMenuDots size="xs" />
+                </div>
+              )}
+              <div className={`table-header-content-item`}>
+                <div className={`table-title-container`}>
+                  {/* <Span
+                    fontWeight={type === 'class' ? 'bold' : 'medium'}
+                    text={item.name}
+                    color={type === 'class' ? 'white' : 'black'}
+                  /> */}
+                  <span className="font-bold text-white">{item.name}</span>
                 </div>
                 {/* Tooltip (visible if the header-content-item container is hovered) */}
                 <section className="tooltip-container">
-                  {projectClass.name}
+                  {item.name}
                   <div className="tooltip-arrow" />
                 </section>
               </div>
@@ -85,8 +92,8 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
 
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {classSums.map((rn: any, i: number) => (
-          <td key={i} className={`class-cell ${hierarchy}`}>
-            <div className="class-cell-container">
+          <td key={i} className={`table-cell ${type} ${hierarchy}`}>
+            <div className={`table-cell-container`}>
               <span>{rn}</span>
               {i === 0 ? (
                 // Add overright icon for the first cell of every row

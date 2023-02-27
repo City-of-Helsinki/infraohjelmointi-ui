@@ -2,97 +2,160 @@
   @apply w-[35%] min-w-[26.75rem] border-b border-white px-6 text-white;
 }
 
-.class-header-cell > div {
-  @apply flex items-center;
+.table-header-cell.location {
+  width: 30.6%;
+  padding: 0 1.5rem;
+  min-width: 23.8rem;
+  border-bottom: 0.07rem solid var(--color-white);
+  height: 44px;
 }
 
-.class-header-cell.first {
-  @apply bg-bus;
+.table-header-cell > div {
+  display: flex;
+  align-items: center;
 }
 
-.class-header-cell.second {
+.table-header-cell.class.first {
+  background: var(--color-bus);
+}
+
+.table-header-cell.class.second {
   background: rgb(0, 0, 163);
 }
 
-.class-header-cell.third {
+.table-header-cell.class.third {
   background: rgb(0, 0, 129);
 }
 
-.class-header-cell.project {
+.table-header-cell.location.second {
+  background: var(--color-fog-medium-light);
+}
+
+.table-header-cell.location.third {
+  background: var(--color-coat-of-arms-medium-light);
+}
+
+.table-header-cell.project {
   background: rgb(0, 0, 102);
 }
 
-.class-cell {
-  @apply min-w-[var(--table-cell-width)] max-w-[var(--table-cell-width)] border-b border-white 
-  pt-1 pb-[0.1rem] text-white;
+.table-cell.class {
+  color: white;
+  padding: 0.25rem 0 0.1rem 0;
+  font-size: 0.875rem;
+  max-width: 5.37rem;
+  min-width: 5.37rem;
+  border-bottom: 0.07rem solid var(--color-white);
 }
 
-.class-cell .class-cell-container {
-  @apply grid grid-flow-row grid-rows-3;
+.table-cell.location {
+  padding: 0.25rem 0 0.1rem 0;
+  font-size: 0.875rem;
+  max-width: 5.37rem;
+  min-width: 5.37rem;
+  border-bottom: 0.07rem solid var(--color-white);
 }
 
-.class-cell .class-cell-container span:first-child {
-  @apply font-bold;
+.table-cell .table-cell-container {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: repeat(3, 1fr);
 }
 
-.class-cell .class-cell-container span {
-  @apply w-full;
+.table-cell .table-cell-container span:first-child {
+  font-size: 16px !important;
+  font-weight: bold;
 }
 
-.class-cell .class-cell-container span:nth-child(3) {
-  @apply text-suomenlinna font-bold;
+.table-cell .table-cell-container span {
+  font-size: 14px !important;
+  width: 100%;
+  @apply font-bold text-suomenlinna;
 }
 
-.class-cell span {
-  @apply translate-x-[-15%] font-light;
+.table-cell .table-cell-container span:nth-child(3) {
+  font-weight: bold;
+  color: var(--color-suomenlinna-dark);
 }
 
-.class-cell.first {
-  @apply bg-bus;
+.table-cell span {
+  font-weight: 300;
+  transform: translateX(-15%);
 }
 
-.class-cell.second {
+.table-cell.class.first {
+  background: var(--color-bus);
+}
+
+.table-cell.class.second {
   background: rgb(0, 0, 163);
 }
 
-.class-cell.third {
+.table-cell.class.third {
   background: rgb(0, 0, 129);
 }
 
-.class-cell.project {
+.table-cell.location.second {
+  background: var(--color-fog-medium-light);
+}
+
+.table-cell.location.third {
+  background: var(--color-coat-of-arms-medium-light);
+}
+
+.table-cell.project {
   background: rgb(0, 0, 102);
 }
 
-.class-header-cell .class-header-content {
-  @apply flex items-center overflow-ellipsis;
+.table-header-cell .table-header-content {
+  display: flex;
+  align-items: center;
+  text-overflow: ellipsis;
 }
 
-.class-header-content.first {
-  @apply pl-0;
+.table-header-content.first {
+  padding-left: 0;
 }
 
-.class-header-content.second {
-  @apply pl-8;
+.table-header-content.second {
+  padding-left: 2rem;
 }
 
-.class-header-content.third {
-  @apply pl-16;
+.table-header-content.third {
+  padding-left: 4rem;
 }
 
-.class-header-content.project {
-  @apply pl-24;
+.table-header-content.project {
+  padding-left: 6rem;
 }
 
-.class-header-content-dots {
-  @apply mr-2 flex;
+.table-header-content-dots {
+  display: flex;
+  margin-right: 0.5rem;
 }
 
-.class-header-content-item {
-  @apply relative mr-2 flex;
+.table-header-content-item {
+  display: flex;
+  margin-right: 0.5rem;
+  position: relative;
 }
 
-.class-header-content-item:hover {
-  @apply cursor-pointer;
+.table-header-content-item:hover {
+  cursor: pointer;
+}
+
+.custom-tooltip button {
+  width: 14rem !important;
+  position: absolute;
+  left: 12rem;
+}
+
+.custom-tooltip section {
+  color: black !important;
+}
+
+.custom-tooltip svg {
+  color: transparent;
 }
 
 .tooltip-container {
@@ -106,19 +169,22 @@
   @apply absolute bottom-[var(--arrow-pos)] mx-auto hidden border-8 border-transparent border-t-coat-of-arms;
 }
 
-.class-title-container {
-  @apply max-w-[15rem];
+.table-title-container {
+  max-width: 15rem;
 }
 
 /* hide too long class names */
-.class-title-container span {
-  @apply block overflow-hidden overflow-ellipsis whitespace-nowrap;
+.table-title-container span {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
 }
 
-.class-header-content-item:hover .tooltip-container {
-  @apply block;
+.table-header-content-item:hover .tooltip-container {
+  display: block;
 }
 
-.class-header-content-item:hover .tooltip-arrow {
-  @apply block;
+.table-header-content-item:hover .tooltip-arrow {
+  display: block;
 }
