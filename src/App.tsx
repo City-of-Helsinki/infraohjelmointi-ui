@@ -4,33 +4,21 @@ import SideBar from '@/components/Sidebar';
 import Notification from '@/components/Notification';
 import Loader from '@/components/Loader';
 import { Search } from '@/components/Search';
-import { useAppDispatch, useAppSelector } from './hooks/common';
+import { useAppDispatch } from './hooks/common';
 import { Route, Routes } from 'react-router-dom';
 import {
   getProjectCategoriesThunk,
   getResponsiblePersonsThunk,
-  setClassList,
-  setDistrictList,
-  setDivisionList,
-  setMasterClassList,
-  setSubClassList,
-  setSubDivisionList,
   getProjectPhasesThunk,
 } from './reducers/listsSlice';
 import {
   getClassesThunk,
-  selectClasses,
-  selectMasterClasses,
-  selectSubClasses,
   setClasses,
   setMasterClasses,
   setSubClasses,
 } from './reducers/classSlice';
 import {
   getLocationsThunk,
-  selectDistricts,
-  selectDivisions,
-  selectSubDivisions,
   setDistricts,
   setDivisions,
   setSubDivisions,
@@ -45,13 +33,6 @@ import { getHashTagsThunk } from './reducers/hashTagsSlice';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
-  const masterClasses = useAppSelector(selectMasterClasses);
-  const classes = useAppSelector(selectClasses);
-  const subClasses = useAppSelector(selectSubClasses);
-
-  const districts = useAppSelector(selectDistricts);
-  const divisions = useAppSelector(selectDivisions);
-  const subDivisions = useAppSelector(selectSubDivisions);
 
   // Initialize lists that are used everywhere in the app
   useEffect(() => {
@@ -72,20 +53,6 @@ const App: FC = () => {
       dispatch(setSubDivisions());
     });
   }, []);
-
-  // Set class lists
-  useEffect(() => {
-    dispatch(setMasterClassList(masterClasses));
-    dispatch(setClassList(classes));
-    dispatch(setSubClassList(subClasses));
-  }, [masterClasses, classes, subClasses]);
-
-  // Set location lists
-  useEffect(() => {
-    dispatch(setDistrictList(districts));
-    dispatch(setDivisionList(divisions));
-    dispatch(setSubDivisionList(subDivisions));
-  }, [districts, divisions, subDivisions]);
 
   return (
     <div>

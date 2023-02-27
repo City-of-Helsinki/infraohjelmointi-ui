@@ -20,14 +20,6 @@ import { mockLocations } from '@/mocks/mockLocations';
 import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
 import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
 import { mockError } from '@/mocks/mockError';
-import {
-  setClassList,
-  setDistrictList,
-  setDivisionList,
-  setMasterClassList,
-  setSubClassList,
-  setSubDivisionList,
-} from '@/reducers/listsSlice';
 import { IError, IFreeSearchResults } from '@/interfaces/common';
 import { ISearchResults } from '@/interfaces/searchInterfaces';
 import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
@@ -121,18 +113,6 @@ describe('Search', () => {
 
     const classes = store.getState().class;
     const locations = store.getState().location;
-
-    // populate class lists (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setMasterClassList(classes.masterClasses)));
-    await waitFor(() => store.dispatch(setClassList(classes.classes)));
-    await waitFor(() => store.dispatch(setSubClassList(classes.subClasses)));
-
-    // populate location lists (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setDistrictList(locations.districts)));
-    await waitFor(() => store.dispatch(setDivisionList(locations.divisions)));
-    await waitFor(() => store.dispatch(setSubDivisionList(locations.subDivisions)));
-
-    // const classes = store.getState().class;
     const lists = store.getState().lists;
 
     // Class store
@@ -146,12 +126,6 @@ describe('Search', () => {
     expect(locations.divisions.length).toBeGreaterThan(0);
     expect(locations.subDivisions.length).toBeGreaterThan(0);
     // List store
-    expect(lists.masterClasses.length).toBeGreaterThan(0);
-    expect(lists.classes.length).toBeGreaterThan(0);
-    expect(lists.subClasses.length).toBeGreaterThan(0);
-    expect(lists.districts.length).toBeGreaterThan(0);
-    expect(lists.divisions.length).toBeGreaterThan(0);
-    expect(lists.subDivisions.length).toBeGreaterThan(0);
     expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);
     expect(lists.phases).toStrictEqual(mockProjectPhases.data);
