@@ -34,7 +34,7 @@ const getSearchTerms = (
   for (const [key, value] of Object.entries(form)) {
     switch (key) {
       case 'masterClass':
-      case 'classes':
+      case 'class':
       case 'subClass':
       case 'district':
       case 'division':
@@ -106,7 +106,7 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
   // being almost as long
   switch (type) {
     case 'masterClass':
-    case 'classes':
+    case 'class':
     case 'subClass':
     case 'district':
     case 'division':

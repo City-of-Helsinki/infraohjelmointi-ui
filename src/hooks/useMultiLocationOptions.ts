@@ -1,9 +1,9 @@
 import { IOption } from '@/interfaces/common';
-import { setDistrictList, setDivisionList, setSubDivisionList } from '@/reducers/listsSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from './common';
+import { useCallback, useMemo } from 'react';
+import { useAppSelector } from './common';
 import _ from 'lodash';
+import { classesToOptions } from '@/utils/common';
 
 /**
  * Populates the district, division and subDivision lists. Filters the available options of the lists
@@ -13,7 +13,7 @@ import _ from 'lodash';
  * @param divisions selected division options
  * @param subDivisions selected subDivision options
  */
-const useMultiLocationList = (
+const useMultiLocationOptions = (
   districts: Array<IOption>,
   divisions: Array<IOption>,
   subDivisions: Array<IOption>,
@@ -21,15 +21,6 @@ const useMultiLocationList = (
   const allDistricts = useAppSelector(selectDistricts);
   const allDivisions = useAppSelector(selectDivisions);
   const allSubDivisions = useAppSelector(selectSubDivisions);
-
-  const dispatch = useAppDispatch();
-
-  // Populate lists when divisions get populated to redux
-  useEffect(() => {
-    dispatch(setDistrictList(allDistricts));
-    dispatch(setDivisionList(allDivisions));
-    dispatch(setSubDivisionList(allSubDivisions));
-  }, [allDistricts, allDivisions, allSubDivisions]);
 
   const selectedDivisionParent = useMemo(
     () =>
@@ -59,7 +50,7 @@ const useMultiLocationList = (
     }
   }, [allDivisions, districts, selectedSubDivisionParent, subDivisions]);
 
-  const getNextSubDivision = useCallback(() => {
+  const getNextSubDivisions = useCallback(() => {
     if (!_.isEmpty(divisions)) {
       return allSubDivisions.filter(
         (sc) => divisions.findIndex((fc) => sc.parent === fc.value) !== -1,
@@ -73,7 +64,7 @@ const useMultiLocationList = (
     }
   }, [allSubDivisions, districts, divisions, getNextDivisions]);
 
-  const getNextDistrict = useCallback(() => {
+  const getNextDistricts = useCallback(() => {
     if (!_.isEmpty(divisions)) {
       return allDistricts.filter(
         (mc) => selectedDivisionParent.findIndex((c) => c === mc.id) !== -1,
@@ -87,11 +78,11 @@ const useMultiLocationList = (
     }
   }, [allDistricts, divisions, getNextDivisions, selectedDivisionParent, subDivisions]);
 
-  useEffect(() => {
-    dispatch(setDistrictList(getNextDistrict()));
-    dispatch(setDivisionList(getNextDivisions()));
-    dispatch(setSubDivisionList(getNextSubDivision()));
-  }, [districts, divisions, subDivisions]);
+  return {
+    districts: classesToOptions(getNextDistricts()),
+    divisions: classesToOptions(getNextDivisions()),
+    subDivisions: classesToOptions(getNextSubDivisions()),
+  };
 };
 
-export default useMultiLocationList;
+export default useMultiLocationOptions;

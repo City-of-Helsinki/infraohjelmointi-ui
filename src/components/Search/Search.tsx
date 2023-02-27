@@ -29,17 +29,20 @@ const Search = () => {
 
   const navigate = useNavigate();
 
-  const { formMethods, submitDisabled } = useSearchForm();
+  const {
+    formMethods,
+    submitDisabled,
+    masterClasses,
+    classes,
+    subClasses,
+    districts,
+    divisions,
+    subDivisions,
+  } = useSearchForm();
 
   const { handleSubmit, getValues, control } = formMethods;
 
   const phases = useOptions('phases');
-  const masterClasses = useOptions('masterClasses', true);
-  const classes = useOptions('classes', true);
-  const subClasses = useOptions('subClasses', true);
-  const districts = useOptions('districts', true);
-  const divisions = useOptions('divisions', true);
-  const subDivisions = useOptions('subDivisions', true);
   const programmedYearMin = useOptions('programmedYears', true);
   const programmedYearMax = useOptions('programmedYears', true);
   const personPlanning = useOptions('responsiblePersons', true);

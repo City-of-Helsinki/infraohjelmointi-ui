@@ -12,7 +12,6 @@ import {
   mockConstructionPhases,
   mockPlanningPhases,
   mockProjectAreas,
-  mockProjectPhases,
   mockProjectQualityLevels,
   mockProjectRisks,
   mockProjectTypes,
@@ -55,7 +54,6 @@ describe('ProjectView', () => {
     expect(store.getState().project.selectedProject).toStrictEqual(mockProject.data);
     expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);
-    expect(lists.phases).toStrictEqual(mockProjectPhases.data);
     expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);
     expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);

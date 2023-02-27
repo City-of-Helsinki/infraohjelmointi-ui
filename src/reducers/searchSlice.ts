@@ -16,7 +16,7 @@ interface ISearchState {
 export const initialSearchForm = {
   freeSearchParams: {},
   masterClass: [],
-  classes: [],
+  class: [],
   subClass: [],
   programmedYes: false,
   programmedNo: false,

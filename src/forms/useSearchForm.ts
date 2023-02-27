@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { initialSearchForm, selectSearchForm } from '@/reducers/searchSlice';
-import useMultiClassList from '@/hooks/useMultiClassList';
-import useMultiLocationList from '@/hooks/useMultiLocationList';
+import useMultiClassOptions from '@/hooks/useMultiClassOptions';
+import useMultiLocationOptions from '@/hooks/useMultiLocationOptions';
 
 const useSearchForm = () => {
   const storeFormValues = useAppSelector(selectSearchForm);
@@ -16,23 +16,31 @@ const useSearchForm = () => {
 
   const [formState, setFormState] = useState({
     masterClass: [],
-    classes: [],
+    class: [],
     subClass: [],
     district: [],
     division: [],
     subDivision: [],
   });
 
-  const { masterClass, classes, subClass, district, division, subDivision } = formState;
+  const { districts, divisions, subDivisions } = useMultiLocationOptions(
+    formState.district,
+    formState.division,
+    formState.subDivision,
+  );
 
-  useMultiLocationList(district, division, subDivision);
-  useMultiClassList(masterClass, classes, subClass);
+  const { masterClasses, classes, subClasses } = useMultiClassOptions(
+    formState.masterClass,
+    formState.class,
+    formState.subClass,
+  );
 
   const {
     reset,
     watch,
     formState: { isDirty },
   } = formMethods;
+
   /**
    * Listens to form changes and checks if form has any added values and sets submitDisabled
    */
@@ -40,7 +48,7 @@ const useSearchForm = () => {
     if (!isDirty) {
       const subscription = watch((value, { name }) => {
         switch (name) {
-          case 'classes':
+          case 'class':
           case 'masterClass':
           case 'subClass':
           case 'district':
@@ -61,7 +69,16 @@ const useSearchForm = () => {
     reset(storeFormValues);
   }, [storeFormValues]);
 
-  return { formMethods, submitDisabled };
+  return {
+    formMethods,
+    submitDisabled,
+    masterClasses,
+    classes,
+    subClasses,
+    districts,
+    divisions,
+    subDivisions,
+  };
 };
 
 export default useSearchForm;

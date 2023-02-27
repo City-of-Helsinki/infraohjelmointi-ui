@@ -47,7 +47,7 @@ describe('App', () => {
 
     expect(lists.categories).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
-    expect(lists.phase).toStrictEqual(mockProjectPhases.data);
+    expect(lists.phases).toStrictEqual(mockProjectPhases.data);
     expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
     expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
     expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);

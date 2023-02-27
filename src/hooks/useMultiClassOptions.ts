@@ -1,9 +1,9 @@
 import { IOption } from '@/interfaces/common';
 import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
-import { setClassList, setMasterClassList, setSubClassList } from '@/reducers/listsSlice';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from './common';
+import { useCallback, useMemo } from 'react';
+import { useAppSelector } from './common';
 import _ from 'lodash';
+import { classesToOptions } from '@/utils/common';
 
 /**
  * Populates the masterClass, class and subClass lists. Filters the available options of the lists
@@ -13,7 +13,7 @@ import _ from 'lodash';
  * @param classes selected class options
  * @param subClasses selected subClass options
  */
-const useMultiClassList = (
+const useMultiClassOptions = (
   masterClasses: Array<IOption>,
   classes: Array<IOption>,
   subClasses: Array<IOption>,
@@ -21,15 +21,6 @@ const useMultiClassList = (
   const allMasterClasses = useAppSelector(selectMasterClasses);
   const allClasses = useAppSelector(selectClasses);
   const allSubClasses = useAppSelector(selectSubClasses);
-
-  const dispatch = useAppDispatch();
-
-  // Populate lists when classes get populated to redux
-  useEffect(() => {
-    dispatch(setMasterClassList(allMasterClasses));
-    dispatch(setClassList(allClasses));
-    dispatch(setSubClassList(allSubClasses));
-  }, [allMasterClasses, allClasses, allSubClasses]);
 
   const selectedClassParents = useMemo(
     () =>
@@ -87,11 +78,11 @@ const useMultiClassList = (
     }
   }, [allMasterClasses, classes, getNextClasses, selectedClassParents, subClasses]);
 
-  useEffect(() => {
-    dispatch(setMasterClassList(getNextMasterClasses()));
-    dispatch(setClassList(getNextClasses()));
-    dispatch(setSubClassList(getNextSubClasses()));
-  }, [masterClasses, classes, subClasses]);
+  return {
+    masterClasses: classesToOptions(getNextMasterClasses()),
+    classes: classesToOptions(getNextClasses()),
+    subClasses: classesToOptions(getNextSubClasses()),
+  };
 };
 
-export default useMultiClassList;
+export default useMultiClassOptions;
