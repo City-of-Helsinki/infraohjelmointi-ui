@@ -156,6 +156,7 @@ const useProjectBasicsValues = () => {
       personProgramming: personToOption(project?.personProgramming),
       otherPersons: value(project?.otherPersons),
     }),
+
     [project],
   );
 
@@ -178,6 +179,7 @@ const useProjectBasicsForm = () => {
     mode: 'onBlur',
   });
 
+  // control,
   const { reset } = formMethods;
 
   const classOptions = useClassOptions(project?.projectClass);
