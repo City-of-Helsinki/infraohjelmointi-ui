@@ -21,13 +21,11 @@ import DateField from '@/components/shared/DateField';
 import { useTranslation } from 'react-i18next';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { useOptions } from '@/hooks/useOptions';
-import useClassOptions from '@/hooks/useClassOptions';
-import useLocationOptions from '@/hooks/useLocationOptions';
 import './styles.css';
 
 const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
-  const { formMethods } = useProjectBasicsForm();
+  const { formMethods, classOptions, locationOptions } = useProjectBasicsForm();
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
   const [formSaved, setFormSaved] = useState(false);
@@ -49,8 +47,8 @@ const ProjectBasicsForm: FC = () => {
   const constructionPhases = useOptions('constructionPhases');
   const responsibleZones = useOptions('responsibleZones');
   const responsiblePersons = useOptions('responsiblePersons');
-  const { masterClasses, classes, subClasses } = useClassOptions(project?.projectClass);
-  const { districts, divisions, subDivisions } = useLocationOptions(project?.projectLocation);
+  const { masterClasses, classes, subClasses } = classOptions;
+  const { districts, divisions, subDivisions } = locationOptions;
 
   const handleSetFormSaved = useCallback((value: boolean) => {
     setFormSaved(value);

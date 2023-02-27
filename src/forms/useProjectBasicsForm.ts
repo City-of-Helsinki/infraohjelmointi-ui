@@ -11,6 +11,8 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectProject } from '@/reducers/projectSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
+import useClassOptions from '@/hooks/useClassOptions';
+import useLocationOptions from '@/hooks/useLocationOptions';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -59,7 +61,7 @@ const useProjectBasicsValues = () => {
 
     return {
       masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
-      classes: listItemToOption(classAsListItem(selectedClass) || []),
+      class: listItemToOption(classAsListItem(selectedClass) || []),
       subClass: listItemToOption(classAsListItem(selectedSubClass) || []),
     };
   };
@@ -154,6 +156,7 @@ const useProjectBasicsValues = () => {
       personProgramming: personToOption(project?.personProgramming),
       otherPersons: value(project?.otherPersons),
     }),
+
     [project],
   );
 
@@ -176,7 +179,11 @@ const useProjectBasicsForm = () => {
     mode: 'onBlur',
   });
 
+  // control,
   const { reset } = formMethods;
+
+  const classOptions = useClassOptions(project?.projectClass);
+  const locationOptions = useLocationOptions(project?.projectLocation);
 
   // Updates
   useEffect(() => {
@@ -186,7 +193,7 @@ const useProjectBasicsForm = () => {
   }, [project, formValues]);
 
   // formFields,
-  return { formMethods };
+  return { formMethods, classOptions, locationOptions };
 };
 
 export default useProjectBasicsForm;

@@ -29,16 +29,7 @@ const Search = () => {
 
   const navigate = useNavigate();
 
-  const {
-    formMethods,
-    submitDisabled,
-    masterClasses,
-    classes,
-    subClasses,
-    districts,
-    divisions,
-    subDivisions,
-  } = useSearchForm();
+  const { formMethods, submitDisabled, classOptions, locationOptions } = useSearchForm();
 
   const { handleSubmit, getValues, control } = formMethods;
 
@@ -47,6 +38,8 @@ const Search = () => {
   const programmedYearMax = useOptions('programmedYears', true);
   const personPlanning = useOptions('responsiblePersons', true);
   const categories = useOptions('categories');
+  const { masterClasses, classes, subClasses } = classOptions;
+  const { districts, divisions, subDivisions } = locationOptions;
 
   const onSubmit = useCallback(
     async (form: ISearchForm) => {

@@ -213,10 +213,10 @@
   },
   "searchTag": {
     "groups": "Ryhmä",
-    "class": "Luokat",
+    "classes": "Luokat",
     "locations": "Sijainnit",
     "masterClass": "Pääluokka",
-    "classes": "Luokka",
+    "class": "Luokka",
     "subClass": "Alaluokka",
     "district": "Suurpiiri",
     "division": "Kaupunginosa",

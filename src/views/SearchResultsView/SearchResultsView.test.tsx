@@ -32,7 +32,7 @@ const filledSearchForm = {
     },
   },
   masterClass: [{ label: '801 Esirakentaminen', value: '41d6bd7b-4a86-4ea4-95b7-4bff4f179095' }],
-  classes: [{ label: 'Esirakentaminen', value: '354edbb1-f257-432c-b5bf-4a7e4f02aeba' }],
+  class: [{ label: 'Esirakentaminen', value: '354edbb1-f257-432c-b5bf-4a7e4f02aeba' }],
 };
 
 const searchActiveState = {
@@ -97,6 +97,7 @@ describe('SearchResultsView', () => {
       renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
+
       const { user, store, getAllByRole, getAllByTestId, queryAllByTestId } = renderResult;
       expect(getAllByTestId('search-term').length).toBe(4);
       // Since I couldn't find out how to click the HDS-tag delete button, we're getting by index
@@ -124,9 +125,7 @@ describe('SearchResultsView', () => {
       expect(
         getByText(`searchTag.masterClass: ${filledSearchForm.masterClass[0].label}`),
       ).toBeInTheDocument();
-      expect(
-        getByText(`searchTag.classes: ${filledSearchForm.classes[0].label}`),
-      ).toBeInTheDocument();
+      expect(getByText(`searchTag.class: ${filledSearchForm.class[0].label}`)).toBeInTheDocument();
 
       const firstTerm = getAllByRole('button')[1];
 

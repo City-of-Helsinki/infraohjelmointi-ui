@@ -91,7 +91,7 @@ describe('Search', () => {
     expect(getByText('searchForm.freeSearchDescription')).toBeInTheDocument();
     expect(getByText('searchForm.filter')).toBeInTheDocument();
     expect(getByTestId('masterClass')).toBeInTheDocument();
-    expect(getByTestId('classes')).toBeInTheDocument();
+    expect(getByTestId('class')).toBeInTheDocument();
     expect(getByTestId('subClass')).toBeInTheDocument();
     expect(getByText('searchForm.programmed')).toBeInTheDocument();
     expect(getByText('searchForm.programmedYes')).toBeInTheDocument();

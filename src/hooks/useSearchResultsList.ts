@@ -6,7 +6,6 @@ import {
   ISearchResultItem,
   ISearchResultListItem,
   ISearchResultsProject,
-  ISearchResultsType,
 } from '@/interfaces/searchInterfaces';
 import { selectAllClasses } from '@/reducers/classSlice';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
@@ -14,7 +13,7 @@ import { selectSearchResults, selectSubmittedSearchForm } from '@/reducers/searc
 import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from './common';
 
-const buildBreadCrumbs = (path: string, type: ISearchResultsType, classes: Array<IClass>) =>
+const buildBreadCrumbs = (path: string, classes: Array<IClass>) =>
   path.split('/').map((p) => classes.find((c) => c.id === p)?.name);
 
 const buildSearchResultsList = (
@@ -41,11 +40,7 @@ const buildSearchResultsList = (
           ...value.map((v: ISearchResultItem) => ({
             ...v,
             type: key,
-            breadCrumbs: buildBreadCrumbs(
-              v.path,
-              key as 'classes' | 'groups' | 'locations',
-              classes,
-            ),
+            breadCrumbs: buildBreadCrumbs(v.path, classes),
           })),
         );
       }
@@ -59,7 +54,7 @@ const buildSearchResultsList = (
               name: project.name,
               id: project.id,
               phase: project.phase?.value,
-              breadCrumbs: buildBreadCrumbs(path, key, classes),
+              breadCrumbs: buildBreadCrumbs(path, classes),
             };
           }),
         );

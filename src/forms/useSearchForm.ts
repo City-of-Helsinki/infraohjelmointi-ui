@@ -14,7 +14,7 @@ const useSearchForm = () => {
     mode: 'onBlur',
   });
 
-  const [formState, setFormState] = useState({
+  const [multiListsState, setMultiListsState] = useState({
     masterClass: [],
     class: [],
     subClass: [],
@@ -23,16 +23,16 @@ const useSearchForm = () => {
     subDivision: [],
   });
 
-  const { districts, divisions, subDivisions } = useMultiLocationOptions(
-    formState.district,
-    formState.division,
-    formState.subDivision,
+  const locationOptions = useMultiLocationOptions(
+    multiListsState.district,
+    multiListsState.division,
+    multiListsState.subDivision,
   );
 
-  const { masterClasses, classes, subClasses } = useMultiClassOptions(
-    formState.masterClass,
-    formState.class,
-    formState.subClass,
+  const classOptions = useMultiClassOptions(
+    multiListsState.masterClass,
+    multiListsState.class,
+    multiListsState.subClass,
   );
 
   const {
@@ -45,24 +45,24 @@ const useSearchForm = () => {
    * Listens to form changes and checks if form has any added values and sets submitDisabled
    */
   useEffect(() => {
-    if (!isDirty) {
-      const subscription = watch((value, { name }) => {
-        switch (name) {
-          case 'class':
-          case 'masterClass':
-          case 'subClass':
-          case 'district':
-          case 'division':
-          case 'subDivision':
-            setFormState((current) => ({ ...current, [name]: value[name] }));
-            break;
-          default:
-            break;
-        }
+    const subscription = watch((value, { name }) => {
+      switch (name) {
+        case 'class':
+        case 'masterClass':
+        case 'subClass':
+        case 'district':
+        case 'division':
+        case 'subDivision':
+          setMultiListsState((current) => ({ ...current, [name]: value[name] }));
+          break;
+        default:
+          break;
+      }
+      if (!isDirty) {
         setSubmitDisabled(JSON.stringify(value) === JSON.stringify(initialSearchForm));
-      });
-      return () => subscription.unsubscribe();
-    }
+      }
+    });
+    return () => subscription.unsubscribe();
   }, [watch]);
 
   useEffect(() => {
@@ -72,12 +72,8 @@ const useSearchForm = () => {
   return {
     formMethods,
     submitDisabled,
-    masterClasses,
-    classes,
-    subClasses,
-    districts,
-    divisions,
-    subDivisions,
+    classOptions,
+    locationOptions,
   };
 };
 
