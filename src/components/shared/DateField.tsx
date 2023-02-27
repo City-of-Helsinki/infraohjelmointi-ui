@@ -2,6 +2,7 @@ import { DateInput as HDSDateInput } from 'hds-react/components/DateInput';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
+import { useTranslation } from 'react-i18next';
 
 interface IDateFieldProps {
   name: string;
@@ -13,6 +14,7 @@ interface IDateFieldProps {
 
 const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly }) => {
   const required = rules?.required ? true : false;
+  const { t } = useTranslation();
   return (
     <Controller
       name={name}
@@ -27,7 +29,7 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
               value={value}
               onBlur={onBlur}
               placeholder={''}
-              label={label}
+              label={t(label)}
               language="fi"
               id={label}
               readOnly={readOnly}

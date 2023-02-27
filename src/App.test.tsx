@@ -25,7 +25,7 @@ describe('App', () => {
     const locations = store.getState().location;
     const lists = store.getState().lists;
 
-    expect(lists.category).toStrictEqual(mockProjectCategories.data);
+    expect(lists.categories).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
     expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
     expect(classes.masterClasses.length).toBeGreaterThan(0);

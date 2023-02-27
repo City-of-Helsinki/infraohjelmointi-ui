@@ -1,7 +1,7 @@
 import { useAppDispatch } from '@/hooks/common';
 import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import usePhaseForm from '@/forms/usePhaseForm';
-import { IListItem } from '@/interfaces/common';
+import { IOption } from '@/interfaces/common';
 import { IPhaseForm } from '@/interfaces/formInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
@@ -15,7 +15,7 @@ import useIsInViewPort from '@/hooks/useIsInViewport';
 
 interface IPhaseDialogProps {
   project: IProject;
-  phases: Array<IListItem>;
+  phases: Array<IOption>;
   atElement: Element;
   close: () => void;
 }
@@ -88,14 +88,12 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement 
         render={({ field: { value, onChange } }) => (
           <ul className="phase-dialog-list">
             {phases.map((p) => (
-              <li key={p.id} className={`list-item ${value === p.id && 'selected'}`}>
-                <button className="selection-button" onClick={() => onChange(p.id)}>
+              <li key={p.value} className={`list-item ${value === p.value && 'selected'}`}>
+                <button className="selection-button" onClick={() => onChange(p.value)}>
                   <IconPlaybackRecord className="icon-width" />
-                  <p className={`item-text ${value === p.id && 'selected'}`}>
-                    {t(`enums.${p.value}`)}
-                  </p>
+                  <p className={`item-text ${value === p.value && 'selected'}`}>{p.label}</p>
                 </button>
-                {value === p.id && <IconCheck className="icon-width check-icon" />}
+                {value === p.value && <IconCheck className="icon-width check-icon" />}
               </li>
             ))}
           </ul>

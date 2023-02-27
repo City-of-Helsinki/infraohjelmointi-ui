@@ -23,6 +23,14 @@ import { mockError } from '@/mocks/mockError';
 import { IError, IFreeSearchResult } from '@/interfaces/common';
 import { ISearchResult } from '@/interfaces/searchInterfaces';
 import { mockFreeSearchResult, mockSearchResult } from '@/mocks/mockSearch';
+import {
+  setClassList,
+  setDistrictList,
+  setDivisionList,
+  setMasterClassList,
+  setSubClassList,
+  setSubDivisionList,
+} from '@/reducers/listsSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -49,10 +57,10 @@ describe('Search', () => {
             },
             lists: {
               ...store.getState().lists,
-              area: mockProjectAreas.data,
-              phase: mockProjectPhases.data,
-              type: mockProjectTypes.data,
-              category: mockProjectCategories.data,
+              areas: mockProjectAreas.data,
+              phases: mockProjectPhases.data,
+              types: mockProjectTypes.data,
+              categories: mockProjectCategories.data,
               responsiblePersons: mockResponsiblePersons.data,
               programmedYears: setProgrammedYears(),
             },
@@ -81,7 +89,7 @@ describe('Search', () => {
     expect(getByTestId('free-search')).toBeInTheDocument();
     expect(getByText('searchForm.searchWord')).toBeInTheDocument();
     expect(getByText('searchForm.freeSearchDescription')).toBeInTheDocument();
-    expect(getByTestId('filter')).toBeInTheDocument();
+    expect(getByText('searchForm.filter')).toBeInTheDocument();
     expect(getByTestId('masterClass')).toBeInTheDocument();
     expect(getByTestId('class')).toBeInTheDocument();
     expect(getByTestId('subClass')).toBeInTheDocument();
@@ -113,6 +121,18 @@ describe('Search', () => {
 
     const classes = store.getState().class;
     const locations = store.getState().location;
+
+    // populate class lists (this happens in App.tsx)
+    await waitFor(() => store.dispatch(setMasterClassList(classes.masterClasses)));
+    await waitFor(() => store.dispatch(setClassList(classes.classes)));
+    await waitFor(() => store.dispatch(setSubClassList(classes.subClasses)));
+
+    // populate location lists (this happens in App.tsx)
+    await waitFor(() => store.dispatch(setDistrictList(locations.districts)));
+    await waitFor(() => store.dispatch(setDivisionList(locations.divisions)));
+    await waitFor(() => store.dispatch(setSubDivisionList(locations.subDivisions)));
+
+    // const classes = store.getState().class;
     const lists = store.getState().lists;
 
     // Class store
@@ -126,16 +146,16 @@ describe('Search', () => {
     expect(locations.divisions.length).toBeGreaterThan(0);
     expect(locations.subDivisions.length).toBeGreaterThan(0);
     // List store
-    expect(lists.masterClass.length).toBeGreaterThan(0);
-    expect(lists.class.length).toBeGreaterThan(0);
-    expect(lists.subClass.length).toBeGreaterThan(0);
-    expect(lists.district.length).toBeGreaterThan(0);
-    expect(lists.division.length).toBeGreaterThan(0);
-    expect(lists.subDivision.length).toBeGreaterThan(0);
-    expect(lists.area).toStrictEqual(mockProjectAreas.data);
-    expect(lists.type).toStrictEqual(mockProjectTypes.data);
-    expect(lists.phase).toStrictEqual(mockProjectPhases.data);
-    expect(lists.category).toStrictEqual(mockProjectCategories.data);
+    expect(lists.masterClasses.length).toBeGreaterThan(0);
+    expect(lists.classes.length).toBeGreaterThan(0);
+    expect(lists.subClasses.length).toBeGreaterThan(0);
+    expect(lists.districts.length).toBeGreaterThan(0);
+    expect(lists.divisions.length).toBeGreaterThan(0);
+    expect(lists.subDivisions.length).toBeGreaterThan(0);
+    expect(lists.areas).toStrictEqual(mockProjectAreas.data);
+    expect(lists.types).toStrictEqual(mockProjectTypes.data);
+    expect(lists.phases).toStrictEqual(mockProjectPhases.data);
+    expect(lists.categories).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
     expect(lists.programmedYears).toStrictEqual(setProgrammedYears());
   });

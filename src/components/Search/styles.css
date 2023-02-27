@@ -4,6 +4,10 @@
   min-height: 100vh;
 }
 
+.search-form-filter-label {
+  margin-bottom: 1rem;
+}
+
 .search-form .search-form-content {
   padding: var(--spacing-s) 0;
   display: grid;

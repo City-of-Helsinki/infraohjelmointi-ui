@@ -5,16 +5,31 @@ import SideBar from '@/components/Sidebar';
 import Notification from '@/components/Notification';
 import Loader from '@/components/Loader';
 import { Search } from '@/components/Search';
-import { useAppDispatch } from './hooks/common';
-import { getProjectCategoriesThunk, getResponsiblePersonsThunk } from './reducers/listsSlice';
+import { useAppDispatch, useAppSelector } from './hooks/common';
+import {
+  getProjectCategoriesThunk,
+  getResponsiblePersonsThunk,
+  setClassList,
+  setDistrictList,
+  setDivisionList,
+  setMasterClassList,
+  setSubClassList,
+  setSubDivisionList,
+} from './reducers/listsSlice';
 import {
   getClassesThunk,
+  selectClasses,
+  selectMasterClasses,
+  selectSubClasses,
   setClasses,
   setMasterClasses,
   setSubClasses,
 } from './reducers/classSlice';
 import {
   getLocationsThunk,
+  selectDistricts,
+  selectDivisions,
+  selectSubDivisions,
   setDistricts,
   setDivisions,
   setSubDivisions,
@@ -22,6 +37,13 @@ import {
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
+  const masterClasses = useAppSelector(selectMasterClasses);
+  const classes = useAppSelector(selectClasses);
+  const subClasses = useAppSelector(selectSubClasses);
+
+  const districts = useAppSelector(selectDistricts);
+  const divisions = useAppSelector(selectDivisions);
+  const subDivisions = useAppSelector(selectSubDivisions);
 
   // Initialize lists that are used everywhere in the app
   useEffect(() => {
@@ -39,8 +61,21 @@ const App: FC = () => {
       dispatch(setDivisions());
       dispatch(setSubDivisions());
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Set class lists
+  useEffect(() => {
+    dispatch(setMasterClassList(masterClasses));
+    dispatch(setClassList(classes));
+    dispatch(setSubClassList(subClasses));
+  }, [masterClasses, classes, subClasses]);
+
+  // Set location lists
+  useEffect(() => {
+    dispatch(setDistrictList(districts));
+    dispatch(setDivisionList(divisions));
+    dispatch(setSubDivisionList(subDivisions));
+  }, [districts, divisions, subDivisions]);
 
   return (
     <div>

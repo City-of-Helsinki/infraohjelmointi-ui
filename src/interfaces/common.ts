@@ -31,21 +31,25 @@ export interface IListItem {
 }
 
 export type ListType =
-  | 'type'
-  | 'phase'
-  | 'area'
-  | 'phaseDetail'
-  | 'category'
-  | 'masterClass'
-  | 'class'
-  | 'subClass'
-  | 'district'
-  | 'division'
-  | 'subDivision'
-  | 'responsibleZone'
-  | 'personPlanning'
-  | 'personConstruction'
-  | 'personProgramming';
+  | 'types'
+  | 'phases'
+  | 'areas'
+  | 'phaseDetails'
+  | 'categories'
+  | 'masterClasses'
+  | 'classes'
+  | 'subClasses'
+  | 'districts'
+  | 'divisions'
+  | 'subDivisions'
+  | 'responsibleZones'
+  | 'responsiblePersons'
+  | 'constructionPhaseDetails'
+  | 'riskAssessments'
+  | 'projectQualityLevels'
+  | 'planningPhases'
+  | 'constructionPhases'
+  | 'programmedYears';
 
 export type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

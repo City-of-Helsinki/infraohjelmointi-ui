@@ -2,6 +2,7 @@ import { TextInput as HDSTextInput } from 'hds-react/components/TextInput';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
+import { useTranslation } from 'react-i18next';
 
 interface ITextFieldProps {
   name: string;
@@ -23,6 +24,7 @@ const TextField: FC<ITextFieldProps> = ({
   tooltip,
 }) => {
   const required = rules?.required ? true : false;
+  const { t } = useTranslation();
   return (
     <Controller
       name={name}
@@ -33,7 +35,7 @@ const TextField: FC<ITextFieldProps> = ({
           <HDSTextInput
             className="input-l"
             {...field}
-            label={label}
+            label={t(label)}
             hideLabel={hideLabel}
             id={label}
             readOnly={readOnly}

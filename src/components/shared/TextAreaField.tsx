@@ -2,6 +2,7 @@ import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { TextArea as HDSTextArea } from 'hds-react/components/Textarea';
+import { useTranslation } from 'react-i18next';
 
 interface ITextAreaFieldProps {
   name: string;
@@ -21,6 +22,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
   hideLabel,
 }) => {
   const required = rules?.required ? true : false;
+  const { t } = useTranslation();
   return (
     <Controller
       name={name}
@@ -30,7 +32,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
             {...field}
-            label={label}
+            label={t(label)}
             hideLabel={hideLabel}
             id={label}
             readOnly={readOnly}
