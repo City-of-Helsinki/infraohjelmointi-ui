@@ -97,12 +97,13 @@ const ProjectBasicsForm: FC = () => {
             rules={{ maxLength: { value: 30, message: 'Nimi voi olla enintään 30 merkkiä.' } }}
           />
           <TextField {...formProps('sapProject')} control={control} />
-          <TextField
-            {...formProps('description')}
-            rules={{ required: 'Kuvaus on pakollinen tieto.' }}
-          />
           <ListField {...formProps('sapNetwork')} readOnly={true} />
           <SelectField {...formProps('area')} options={areas} />
+          <TextAreaField
+            {...formProps('description')}
+            size="l"
+            rules={{ required: 'Kuvaus on pakollinen tieto.' }}
+          />
           <ProjectHashTags {...formProps('hashTags')} control={control} />
           {/* SECTION 2 - STATUS */}
           <FormSectionTitle {...formProps('status')} />

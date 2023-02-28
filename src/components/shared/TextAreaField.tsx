@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC, KeyboardEvent, memo, useEffect, useRef } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { TextArea as HDSTextArea } from 'hds-react/components/Textarea';
@@ -11,6 +11,7 @@ interface ITextAreaFieldProps {
   rules?: HookFormRulesType;
   readOnly?: boolean;
   hideLabel?: boolean;
+  size?: 'l' | 'xl';
 }
 
 const TextAreaField: FC<ITextAreaFieldProps> = ({
@@ -20,18 +21,43 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
   rules,
   readOnly,
   hideLabel,
+  size,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const setTextAreaHeight = (element: HTMLTextAreaElement) => {
+    const height = element.scrollHeight;
+    element.style.cssText = 'height: inherit !important';
+    element.style.cssText = `height: ${height}px !important`;
+  };
+
+  const handleResize = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    setTextAreaHeight(e.target as HTMLTextAreaElement);
+  };
+
+  useEffect(() => {
+    if (textAreaRef && textAreaRef.current) {
+      setTextAreaHeight(textAreaRef.current);
+    }
+  }, [textAreaRef]);
+
   return (
     <Controller
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState: { error } }) => (
-        <div className="input-wrapper" id={name} data-testid={name}>
+      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+        <div className={`input-wrapper`} id={name} data-testid={name}>
           <HDSTextArea
-            {...field}
+            ref={textAreaRef}
+            onKeyDown={handleResize}
+            onSelect={handleResize}
+            onChange={onChange}
+            onBlur={onBlur}
+            value={value}
+            className={`textarea-field input-${size || 'xl'}`}
             label={t(label)}
             hideLabel={hideLabel}
             id={label}

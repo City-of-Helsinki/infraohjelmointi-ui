@@ -65,6 +65,16 @@ table p {
   max-width: 22.5rem;
 }
 
+.input-xl {
+  max-width: 100%;
+}
+
+.textarea-field textarea {
+  max-height: 27rem !important;
+  min-height: 3.5rem !important;
+  resize: none !important;
+}
+
 .legend-margin {
   display: block;
   font-size: var(--fontsize-body-m);
