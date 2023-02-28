@@ -1,8 +1,9 @@
-import { FC, KeyboardEvent, memo, useEffect, useRef } from 'react';
+import { FC, memo, useEffect, useRef } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { TextArea as HDSTextArea } from 'hds-react/components/Textarea';
 import { useTranslation } from 'react-i18next';
+import autosize from 'autosize';
 
 interface ITextAreaFieldProps {
   name: string;
@@ -27,19 +28,12 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
   const { t } = useTranslation();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const setTextAreaHeight = (element: HTMLTextAreaElement) => {
-    const height = element.scrollHeight;
-    element.style.cssText = 'height: inherit !important';
-    element.style.cssText = `height: ${height}px !important`;
-  };
-
-  const handleResize = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    setTextAreaHeight(e.target as HTMLTextAreaElement);
-  };
-
+  // Autosize the textarea
   useEffect(() => {
     if (textAreaRef && textAreaRef.current) {
-      setTextAreaHeight(textAreaRef.current);
+      const element = textAreaRef.current;
+      autosize(element);
+      element.style.overflow = 'visible';
     }
   }, [textAreaRef]);
 
@@ -49,11 +43,9 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
       rules={rules}
       control={control as Control<FieldValues>}
       render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-        <div className={`input-wrapper`} id={name} data-testid={name}>
+        <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
             ref={textAreaRef}
-            onKeyDown={handleResize}
-            onSelect={handleResize}
             onChange={onChange}
             onBlur={onBlur}
             value={value}

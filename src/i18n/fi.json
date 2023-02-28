@@ -258,5 +258,9 @@
   "currentStatus": "Nykystatus",
   "search": "Hae",
   "searchProjects": "Hae projekteja",
-  "choose": "Valitse"
+  "choose": "Valitse",
+  "required": "{{value}} on pakollinen tieto.",
+  "maxLength": "Maksimipituus on {{value}} merkkiä.",
+  "minValue": "Arvon on oltava suurempi tai yhtä suuri kuin {{value}}",
+  "maxValue": "Arvon on oltava pienempi tai yhtä suuri kuin {{value}}"
 }

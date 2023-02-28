@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 
 interface ISelectFieldProps {
   name: string;
-  label: string;
   control: HookFormControlType;
   options: Array<IOption>;
+  label?: string;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
   icon?: string;
@@ -42,7 +42,7 @@ const SelectField: FC<ISelectFieldProps> = ({
               value={value}
               onChange={onChange}
               onBlur={onBlur}
-              label={!hideLabel && t(label)}
+              label={!hideLabel && label && t(label)}
               invalid={error ? true : false}
               error={error?.message}
               options={options || []}
