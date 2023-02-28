@@ -1,6 +1,9 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ClassTableHierarchy } from '@/interfaces/common';
+import { selectDistricts, selectDivisions } from '@/reducers/locationSlice';
+import { memo, useCallback, useEffect } from 'react';
+import { useParams } from 'react-router';
 import {
   selectClasses,
   selectMasterClasses,
@@ -12,11 +15,8 @@ import {
   setSelectedMasterClass,
   setSelectedSubClass,
 } from '@/reducers/classSlice';
-import { selectDistricts, selectDivisions } from '@/reducers/locationSlice';
-import { memo, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
-import { PlanningClassesTableRow } from './PlanningClassesTableRow';
 import './styles.css';
+import PlanningClassesRow from './PlanningClassesRow/PlanningClassesRow';
 
 const PlanningClassesTable = () => {
   const { masterClassId, classId, subClassId } = useParams();
@@ -56,7 +56,7 @@ const PlanningClassesTable = () => {
   const allMasterClassRows = useCallback(
     () =>
       masterClasses.map((mc) => (
-        <PlanningClassesTableRow
+        <PlanningClassesRow
           key={mc.id}
           item={mc}
           hierarchy={ClassTableHierarchy.First}
@@ -70,7 +70,7 @@ const PlanningClassesTable = () => {
     () =>
       selectedMasterClass
         ? [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
-            <PlanningClassesTableRow
+            <PlanningClassesRow
               key={c.id}
               item={c}
               hierarchy={ClassTableHierarchy.Second}
@@ -85,7 +85,7 @@ const PlanningClassesTable = () => {
     () =>
       selectedClass
         ? [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
-            <PlanningClassesTableRow
+            <PlanningClassesRow
               key={sc.id}
               item={sc}
               hierarchy={ClassTableHierarchy.Third}
@@ -104,7 +104,7 @@ const PlanningClassesTable = () => {
           !selectedSubClass ? (
             // When a masterClass is selected, render only that masterClass
             selectedMasterClass ? (
-              <PlanningClassesTableRow
+              <PlanningClassesRow
                 key={selectedMasterClass.id}
                 item={selectedMasterClass}
                 type="class"
@@ -114,7 +114,7 @@ const PlanningClassesTable = () => {
                 {
                   // When a class is selected, render only that class
                   selectedClass ? (
-                    <PlanningClassesTableRow
+                    <PlanningClassesRow
                       key={selectedClass.id}
                       item={selectedClass}
                       type="class"
@@ -125,20 +125,20 @@ const PlanningClassesTable = () => {
                         // When no subClass is selected, render all subClasses
                         allSubClassRows()
                       }
-                    </PlanningClassesTableRow>
+                    </PlanningClassesRow>
                   ) : (
                     // When no class is selected, render all classes
                     allClassRows()
                   )
                 }
-              </PlanningClassesTableRow>
+              </PlanningClassesRow>
             ) : (
               // When no masterClass is selected, render all masterClasses
               allMasterClassRows()
             )
           ) : (
             // Render only the selectedSubClass and the projects associated with it if selected
-            <PlanningClassesTableRow
+            <PlanningClassesRow
               item={selectedSubClass}
               type="class"
               initiallyExpanded={true}
@@ -147,7 +147,7 @@ const PlanningClassesTable = () => {
               {/* District */}
               {mockDistrict && (
                 <>
-                  <PlanningClassesTableRow
+                  <PlanningClassesRow
                     item={mockDistrict}
                     type="location"
                     initiallyExpanded={true}
@@ -155,19 +155,19 @@ const PlanningClassesTable = () => {
                   >
                     {/* Division */}
                     {mockDivision && (
-                      <PlanningClassesTableRow
+                      <PlanningClassesRow
                         item={mockDivision}
                         type="location"
                         initiallyExpanded={true}
                         hierarchy={ClassTableHierarchy.Third}
                       >
                         {/* TODO: populate projects/groups here */}
-                      </PlanningClassesTableRow>
+                      </PlanningClassesRow>
                     )}
-                  </PlanningClassesTableRow>
+                  </PlanningClassesRow>
                 </>
               )}
-            </PlanningClassesTableRow>
+            </PlanningClassesRow>
           )
         }
       </tbody>

@@ -3,7 +3,7 @@ import { FC, memo } from 'react';
 import { ClassTableHierarchy } from '@/interfaces/common';
 import './styles.css';
 
-interface IPlanningClassesTableRowProps {
+interface IPlanningClassesCellProps {
   sum: string;
   position: number;
   hierarchy: ClassTableHierarchy;
@@ -18,12 +18,7 @@ const OverrunSum = memo(({ value }: { value: string }) => (
   </span>
 ));
 
-const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
-  sum,
-  position,
-  hierarchy,
-  type,
-}) => {
+const PlanningClassesCell: FC<IPlanningClassesCellProps> = ({ sum, position, hierarchy, type }) => {
   // Hide values from districts, just a mock implementation to display things correctly for now
   const hideValues = hierarchy === 'second' && type === 'location';
   return (
@@ -45,4 +40,4 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
   );
 };
 
-export default memo(PlanningClassesTableRow);
+export default memo(PlanningClassesCell);
