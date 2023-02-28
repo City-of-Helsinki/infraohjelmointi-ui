@@ -20,6 +20,7 @@ const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled, dataTest
       <label className="pen-and-label-text">{t(text)}</label>
       {onClick && (
         <button
+          type="button"
           onClick={onClick}
           disabled={disabled}
           style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
