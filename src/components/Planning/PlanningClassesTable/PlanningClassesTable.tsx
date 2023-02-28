@@ -12,10 +12,10 @@ import {
   setSelectedMasterClass,
   setSelectedSubClass,
 } from '@/reducers/classSlice';
-import { selectDistricts } from '@/reducers/locationSlice';
+import { selectDistricts, selectDivisions } from '@/reducers/locationSlice';
 import { memo, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
-import PlanningClassesTableRow from './PlanningClassesTableRow';
+import { PlanningClassesTableRow } from './PlanningClassesTableRow';
 import './styles.css';
 
 const PlanningClassesTable = () => {
@@ -29,6 +29,7 @@ const PlanningClassesTable = () => {
   const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
   const mockDistrict = useAppSelector(selectDistricts)[0];
+  const mockDivision = useAppSelector(selectDivisions)[0];
   /**
    * set selected classes to redux according to url, if their url param id is removed, then they will
    * be set to null (i.e, the user navigates back)
@@ -143,9 +144,9 @@ const PlanningClassesTable = () => {
               initiallyExpanded={true}
               hierarchy={ClassTableHierarchy.First}
             >
+              {/* District */}
               {mockDistrict && (
                 <>
-                  {/* District */}
                   <PlanningClassesTableRow
                     item={mockDistrict}
                     type="location"
@@ -153,14 +154,16 @@ const PlanningClassesTable = () => {
                     hierarchy={ClassTableHierarchy.Second}
                   >
                     {/* Division */}
-                    <PlanningClassesTableRow
-                      item={mockDistrict}
-                      type="location"
-                      initiallyExpanded={true}
-                      hierarchy={ClassTableHierarchy.Third}
-                    >
-                      {/* TODO: populate projects/groups here */}
-                    </PlanningClassesTableRow>
+                    {mockDivision && (
+                      <PlanningClassesTableRow
+                        item={mockDivision}
+                        type="location"
+                        initiallyExpanded={true}
+                        hierarchy={ClassTableHierarchy.Third}
+                      >
+                        {/* TODO: populate projects/groups here */}
+                      </PlanningClassesTableRow>
+                    )}
                   </PlanningClassesTableRow>
                 </>
               )}
