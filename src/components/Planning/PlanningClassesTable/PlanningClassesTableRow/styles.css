@@ -1,0 +1,187 @@
+:root {
+  --color-class-first: var(--color-bus);
+  --color-class-second: rgb(0, 0, 163);
+  --color-class-third: rgb(0, 0, 129);
+
+  --color-location-second: var(--color-fog-medium-light);
+  --color-location-third: var(--color-fog-light);
+}
+
+.table-header-cell {
+  width: 30.6%;
+  padding: 0 1.5rem;
+  min-width: 23.8rem;
+  /* this works like min-height, because it will grow bigger if there is content in the cells */
+  height: 3rem;
+}
+
+.table-header-cell.class {
+  color: white;
+  border-bottom: 0.07rem solid var(--color-white);
+}
+
+.table-header-cell > div {
+  display: flex;
+  align-items: center;
+}
+
+/* CLASS TABLE HEADER */
+.table-header-cell.class.first {
+  background: var(--color-class-first);
+}
+
+.table-header-cell.class.second {
+  background: var(--color-class-second);
+}
+
+.table-header-cell.class.third {
+  background: var(--color-class-third);
+}
+
+/* LOCATION TABLE HEADER */
+.table-header-cell.location.second {
+  background: var(--color-location-second);
+}
+
+.table-header-cell.location.third {
+  background: var(--color-location-third);
+}
+
+.table-header-cell.project {
+  background: rgb(0, 0, 102);
+}
+
+.table-cell {
+  padding: 0.25rem 0 0.1rem 0;
+  font-size: 0.875rem;
+  max-width: 5.37rem;
+  min-width: 5.37rem;
+}
+
+.table-cell.class {
+  color: white;
+  border-bottom: 0.07rem solid var(--color-white);
+}
+
+.table-cell .table-cell-container {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.table-cell .table-cell-container span:first-child {
+  font-size: 16px !important;
+  font-weight: bold;
+}
+
+.table-cell .table-cell-container span {
+  font-size: 14px !important;
+  width: 100%;
+}
+
+.table-cell .table-cell-container span:nth-child(3) {
+  font-weight: bold;
+  color: var(--color-suomenlinna-dark);
+}
+
+.table-cell span {
+  font-weight: 300;
+  transform: translateX(-15%);
+}
+
+/* CLASS TABLE CELL */
+.table-cell.class.first {
+  background: var(--color-class-first);
+}
+
+.table-cell.class.second {
+  background: var(--color-class-second);
+}
+
+.table-cell.class.third {
+  background: var(--color-class-third);
+}
+
+/* LOCATION TABLE CELL */
+.table-cell.location.second {
+  background: var(--color-location-second);
+}
+
+.table-cell.location.third {
+  background: var(--color-location-third);
+}
+
+.table-cell.project {
+  background: rgb(0, 0, 102);
+}
+
+.table-header-cell .table-header-content {
+  display: flex;
+  align-items: center;
+  text-overflow: ellipsis;
+}
+
+.table-header-content.first {
+  padding-left: 0;
+}
+
+.table-header-content.second {
+  padding-left: 2rem;
+}
+
+.table-header-content.third {
+  padding-left: 4rem;
+}
+
+.table-header-content.project {
+  padding-left: 6rem;
+}
+
+.table-header-content-dots {
+  display: flex;
+  margin-right: 0.5rem;
+}
+
+.table-header-content-item {
+  display: flex;
+  margin-right: 0.5rem;
+  position: relative;
+}
+
+.table-header-content-item:hover {
+  cursor: pointer;
+}
+
+.custom-tooltip button {
+  width: 14rem !important;
+  position: absolute;
+  left: 12rem;
+}
+
+.custom-tooltip section {
+  color: black !important;
+}
+
+.custom-tooltip svg {
+  color: transparent;
+}
+
+.table-title-container {
+  max-width: 15rem;
+}
+
+/* hide too long class names */
+.table-title-container span {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+}
+
+.table-header-content-item:hover .tooltip-container {
+  display: block;
+}
+
+.table-header-content-item:hover .tooltip-arrow {
+  display: block;
+}
