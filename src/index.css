@@ -1,6 +1,10 @@
 @import '~hds-core/lib/utils/helpers.css';
 @import 'fonts.css';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
 }

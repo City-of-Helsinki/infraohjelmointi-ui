@@ -27,7 +27,7 @@ const PlanningGroupsTableHeader: FC<IPlanningGroupsTableHeaderProps> = ({
                 onClick={handleProjectsVisible}
               />
               <IconMenuDots />
-              <Title size="s" text={group.name} color="white" /> <IconCopy />
+              <h4 className="text-heading-s text-white">{group.name}</h4>
             </div>
             <div className="right">
               <span>{group.value1}</span>

@@ -1,4 +1,4 @@
-import { Paragraph, Title } from '@/components/shared';
+import { Paragraph } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { useCallback, useEffect } from 'react';
 import ProjectNote from './ProjectNote';
@@ -22,7 +22,7 @@ const ProjectNotes = () => {
 
   return (
     <div className="notes-page-container">
-      <Title size="m" text="notes" />
+      <h1 className="text-heading-m">Muistiinpanot</h1>
       <Paragraph size="m" text={t('newNoteInfo')} />
       {/* note form */}
       <NewNoteForm />

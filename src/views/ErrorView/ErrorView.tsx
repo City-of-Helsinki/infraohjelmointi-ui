@@ -1,18 +1,17 @@
-import { Paragraph, Title } from '@/components/shared';
+import { Paragraph } from '@/components/shared';
 import { Button } from 'hds-react/components/Button';
 import { IconArrowLeft } from 'hds-react/icons';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import './styles.css';
 
 const ErrorView = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <div className="error-page-container">
       <div className="error-column">
-        <div className="error-spacer">
-          <Title size="xl" text="error.404" />
-        </div>
+        <h1 className="text-heading-xl">{t('error.404')}</h1>
         <div className="error-spacer">
           <Paragraph size="xl" text="error.pageNotFound" />
         </div>
