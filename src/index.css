@@ -1,4 +1,4 @@
-@import '~hds-core/lib/utils/helpers.css';
+/* @import '~hds-core/lib/utils/helpers.css'; */
 @import 'fonts.css';
 
 /* New to tailwind? check out this cheat sheet: https://nerdcave.com/tailwind-cheat-sheet */
@@ -20,10 +20,8 @@ body {
   margin: 0;
   width: 100%;
   font-family: var(--infra-font-default);
-  font-size: var(--fontsize-body-m);
-  color: var(--color-black-90);
-  line-height: var(--lineheight-l);
   overflow-x: hidden;
+  @apply text-black-90;
 }
 
 /* completely remove styling from the default button */
@@ -47,40 +45,12 @@ table p {
   margin: 0;
 }
 
-/* COLORS: https://hds.hel.fi/foundation/design-tokens/colour */
-/* BREAKPOINTS: https://hds.hel.fi/foundation/design-tokens/breakpoints */
-
-/* FONTS: https://hds.hel.fi/foundation/design-tokens/typography */
-.font-xl {
-  font-size: var(--fontsize-body-xl);
-}
-
-.font-l {
-  font-size: var(--fontsize-body-l);
-}
-
-.font-m {
-  font-size: var(--fontsize-body-m);
-}
-
-.font-s {
-  font-size: var(--fontsize-body-s);
-}
-
 /* Margin to fit the sidebar, not final values */
 .app-content {
   width: 100%;
   display: flex;
   /* Hacky calc, since the TopBar has a 1px border bottom */
   min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
-}
-
-.text-black {
-  color: var(--color-black);
-}
-
-.text-white {
-  color: var(--color-white);
 }
 
 .margin-0 {
@@ -134,11 +104,11 @@ table p {
 }
 
 .legend-margin {
-  color: var(--label-color-default, var(--color-black-90));
   display: block;
   font-size: var(--fontsize-body-m);
   font-weight: 500;
   margin-bottom: var(--spacing-m);
+  @apply text-black-90;
 }
 
 .big-dialog {

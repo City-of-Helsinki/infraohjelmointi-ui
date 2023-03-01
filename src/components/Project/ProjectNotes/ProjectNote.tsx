@@ -1,4 +1,4 @@
-import { FormFieldLabel, Span } from '@/components/shared';
+import { FormFieldLabel } from '@/components/shared';
 import { StatusLabel } from 'hds-react/components/StatusLabel';
 import { Button } from 'hds-react/components/Button';
 import { IconAngleDown, IconAngleUp, IconPenLine, IconTrash } from 'hds-react/icons';
@@ -47,7 +47,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
       {/* header */}
       <div className="note-header-container">
         <div>
-          <Span text={stringToDateTime(note.createdDate)} size="s" fontWeight="light" />
+          <span className="text-sm font-light">{stringToDateTime(note.createdDate)}</span>
           <FormFieldLabel text={author} />
         </div>
         <div>{hasHistory && <StatusLabel type="alert">{t('modified')}</StatusLabel>}</div>

@@ -1,11 +1,9 @@
 .breadcrumbs-list {
-  @apply flex items-center h-16 p-8 border-b border-[var(--color-black-20)] list-none;
+  @apply flex items-center h-16 p-8 border-b border-gray list-none;
 }
 
 .breadcrumbs-list > li > a {
-  text-decoration: none;
-  margin-right: 0.2rem !important;
-  color: var(--color-black);
+  @apply text-black mr-1 no-underline;
 }
 
 .breadcrumbs-list > li {

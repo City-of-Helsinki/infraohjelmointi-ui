@@ -150,7 +150,7 @@ const Search = () => {
           data-testid="project-search-form"
         >
           <div className="search-form-content">
-            <div className="search-form-filter-label">
+            <div className="mb-4 pb-3">
               <FormFieldLabel text="searchForm.filter" />
             </div>
             <MultiSelectField

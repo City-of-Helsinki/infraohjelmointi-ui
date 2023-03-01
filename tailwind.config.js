@@ -6,6 +6,7 @@ module.exports = {
     fontSize: {
       sm: '0.875rem',
       base: '1rem',
+      l: '1.125rem',
       xl: '1.25rem',
       '2xl': '1.5rem',
       '3xl': '2rem',
@@ -22,7 +23,6 @@ module.exports = {
       'heading-m': [
         'var(--fontsize-heading-m)',
         {
-          // fontSize: 'var(--fontsize-heading-m)',
           fontWeight: '500',
           letterSpacing: '-0.2px',
           lineHeight: '32px',
@@ -31,7 +31,6 @@ module.exports = {
       'heading-xl': [
         'var(--fontsize-heading-xl)',
         {
-          // fontSize: 'var(--fontsize-heading-m)',
           fontWeight: '400',
           letterSpacing: '-1.0px',
           lineHeight: 'var(--lineheight-s)',
@@ -39,18 +38,24 @@ module.exports = {
       ],
     },
     colors: {
-      // Configure your color palette here
+      black: 'var(--color-black)',
+      'black-90': 'var(--color-black-90)',
+      'black-80': 'var(--color-black-80)',
+      gray: 'var(--color-black-20)',
+      white: 'var(--color-white)',
       fog: 'var(--color-fog)',
+      bus: 'var(--color-bus)',
+      'bus-m': 'var(--color-bus-medium-light)',
+      'bus-l': 'var(--color-bus-light)',
+      'bus-d': 'var(--color-bus-dark)',
+      transparent: 'transparent',
+      error: 'var(--color-error)',
+      'coat-of-arms': 'var(--color-coat-of-arms)',
+      'coat-of-arms-l': 'var(--color-coat-of-arms-light)',
+      'suomenlinna-d': 'var(--color-suomenlinna-dark)',
+      silver: 'var(--color-silver)',
+      'silver-l': 'var(--color-silver-light)',
     },
-    // heading: {
-    //   m: {
-    //     fontSize: '200px',
-    //     fontWeight: '500',
-    //     letterSpacing: '-0.2px',
-    //     lineHeight: '32px',
-    //   },
-    // },
-    lineHeight: {},
     extend: {},
   },
   plugins: [],

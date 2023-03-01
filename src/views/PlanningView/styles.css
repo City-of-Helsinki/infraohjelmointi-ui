@@ -1,6 +1,5 @@
 .planning-view-container {
   margin: var(--spacing-layout-s);
-  font-size: var(--fontsize-body-s);
   white-space: nowrap;
   line-height: 1.15rem;
   overflow-x: scroll;

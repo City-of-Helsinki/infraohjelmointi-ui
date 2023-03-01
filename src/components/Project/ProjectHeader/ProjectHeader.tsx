@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { Paragraph, ProgressCircle } from '@/components/shared';
+import { ProgressCircle } from '@/components/shared';
 import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
@@ -11,6 +11,7 @@ import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import ProjectPhaseField from './ProjectPhaseField';
 import ProjectFavouriteField from './ProjectFavouriteField';
 import { selectUser } from '@/reducers/authSlice';
+import { useTranslation } from 'react-i18next';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -22,6 +23,7 @@ const ProjectHeader: FC = () => {
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
+  const { t } = useTranslation();
 
   const { formMethods } = useProjectHeaderForm();
 
@@ -73,8 +75,8 @@ const ProjectHeader: FC = () => {
               <div className="favourite-button-container">
                 <ProjectFavouriteField control={control} />
               </div>
-              <Paragraph color="white" size="m" text={'inGroup'} />
-              <Paragraph color="white" size="l" fontWeight="bold" text={group} />
+              <p className="text-white">{t('inGroup')}</p>
+              <p className="text-white font-bold text-l">{group}</p>
             </div>
           </div>
         </div>

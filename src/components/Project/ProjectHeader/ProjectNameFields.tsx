@@ -4,7 +4,7 @@ import { IconPenLine } from 'hds-react/icons';
 import { t } from 'i18next';
 import { FC, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
-import { IconButton, Paragraph, Title } from '../../shared';
+import { IconButton } from '../../shared';
 
 interface IProjectNameFormProps {
   control: HookFormControlType;
@@ -38,7 +38,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
                 <br />
               </>
             ) : (
-              <Title size="m" color="white" text={field.value} />
+              <h3 className="text-heading-m text-white">{field.value}</h3>
             )
           }
         />
@@ -56,7 +56,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
                 aria-label="project-address"
               />
             ) : (
-              <Paragraph size="m" color="white" text={field.value} />
+              <p className="text-white">{field.value}</p>
             )
           }
         />

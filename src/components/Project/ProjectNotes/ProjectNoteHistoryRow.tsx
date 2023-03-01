@@ -1,4 +1,3 @@
-import { Span } from '@/components/shared';
 import { INoteHistory } from '@/interfaces/noteInterfaces';
 import { stringToDateTime } from '@/utils/common';
 import { FC, memo } from 'react';
@@ -15,13 +14,13 @@ const ProjectNoteHistoryRow: FC<IProjectNoteHistoryRowProps> = ({ history }) => 
     <div className="note-history">
       <div className="note-history-container">
         <div id="modifiedDate">
-          <Span text={stringToDateTime(history.updatedDate)} size="s" fontWeight="light" />
+          <span className="text-sm font-light">{stringToDateTime(history.updatedDate)}</span>
         </div>
         <div id="title">
-          <Span text={t('noteModified')} size="m" fontWeight="bold" />
+          <span className="font-bold">{t('noteModified')}</span>
         </div>
         <div id="modifiedBy">
-          <Span text={author} size="m" fontWeight="light" />
+          <span className="font-light">{author}</span>
         </div>
       </div>
     </div>

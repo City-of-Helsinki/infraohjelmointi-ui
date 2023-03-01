@@ -60,7 +60,7 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
               onClick={(e) => onProjectMenuClick(project.id, e as unknown as MouseEvent)}
             />
 
-            <IconDocument size="xs" />
+            <IconDocument />
             <button className="project-name-button" onClick={navigateToProject}>
               {project.name}
             </button>
@@ -69,12 +69,12 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
           <div className="right">
             <div className="project-header-left">
               <CircleIcon value={planProjectValues.readiness} />
-              <IconPlaybackRecord size="xs" />
-              <IconSpeechbubbleText size="xs" />
+              <IconPlaybackRecord />
+              <IconSpeechbubbleText />
             </div>
             <div className="project-header-right">
               <span>{planProjectValues.value1}</span>
-              <span>{planProjectValues.value2}</span>
+              <span className="text-sm">{planProjectValues.value2}</span>
             </div>
           </div>
         </div>

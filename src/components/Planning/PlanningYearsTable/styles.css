@@ -12,17 +12,14 @@
 
 /* First cell for years table including the sums and dark blue background */
 .planning-years-table .row-1-cell {
-  background: var(--color-bus-dark);
-  color: white;
-  padding: 0.5rem 0.25rem;
-  font-size: 0.875rem;
   max-width: 4.875rem;
   min-width: 4.875rem;
+  @apply text-white bg-bus-d py-2 px-1;
 }
 
 /* First cell of the row-1 cells is lighter than the rest */
 .planning-years-table .row-1-cell:first-child {
-  background: var(--color-bus);
+  @apply bg-bus;
 }
 
 .years-table-cell {

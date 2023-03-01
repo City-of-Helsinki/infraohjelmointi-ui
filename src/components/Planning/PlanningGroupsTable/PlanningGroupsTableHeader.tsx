@@ -31,7 +31,7 @@ const PlanningGroupsTableHeader: FC<IPlanningGroupsTableHeaderProps> = ({
             </div>
             <div className="right">
               <span>{group.value1}</span>
-              <span>{group.value2}</span>
+              <span className="text-sm">{group.value2}</span>
             </div>
           </div>
         </th>

@@ -23,10 +23,6 @@
   display: flex;
 }
 
-#planningGroupInfo .group-info-text {
-  font-weight: bold;
-}
-
 #planningButton button {
   height: 2.75rem !important;
   width: 100% !important;

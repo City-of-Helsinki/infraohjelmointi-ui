@@ -14,27 +14,17 @@
 }
 
 .sidebar-button {
-  margin: 0.4rem auto 0 auto;
-  padding: 0.25rem 0.4rem;
-  cursor: pointer;
+  @apply cursor-pointer p-2 mt-2 mr-auto mb-0 ml-auto;
 }
 
 .sidebar-button:first-child {
-  margin: var(--spacing-xs) auto 0 auto;
+  @apply mt-3 mr-auto mb-0 ml-auto;
 }
 
 .sidebar-button:hover {
-  border-radius: 0.125rem;
-  background: var(--color-silver);
-  transition: 0.4s ease-in-out;
+  @apply bg-silver rounded-sm duration-300;
 }
 
 .sidebar-button.selected {
-  border-radius: 0.07rem;
-  background: var(--color-silver);
-  transition: 0.4s ease-in-out;
-}
-
-.sidebar-button svg {
-  transform: translateY(0.125rem);
+  @apply bg-silver rounded-sm duration-300;
 }

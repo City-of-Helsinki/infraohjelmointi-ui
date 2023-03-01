@@ -1,7 +1,7 @@
 #hashtags-dialog h2 {
-  font-size: var(--fontsize-heading-s);
   font-weight: 500;
   margin: var(--spacing-2-xs) 0 var(--spacing-m) 0;
+  @apply text-heading-s;
 }
 
 #hashtags-dialog .content-container {
@@ -23,12 +23,12 @@
 #hashtags-dialog .text-button {
   font-weight: bold;
   text-decoration: underline;
-  color: var(--color-bus);
+  @apply text-bus;
 }
 
 #hashtags-dialog hr {
-  border-top: 0.0625rem solid var(--color-black-20);
   margin: 0;
+  @apply border-t border-gray;
 }
 
 #hashtags-dialog .dialog-footer {
@@ -77,8 +77,8 @@
 .hashtag-created-text button {
   font-weight: 500;
   text-decoration: underline;
-  color: var(--color-bus);
   line-height: 0;
+  @apply text-bus;
 }
 
 .dialog-section .new-hashtags-form input {

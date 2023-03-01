@@ -1,11 +1,11 @@
 import { FC, memo } from 'react';
 import { planningYearsTableData } from '@/mocks/common';
-import { BubbleIcon, Span } from '../../shared';
+import { BubbleIcon } from '../../shared';
 import './styles.css';
 
 // eslint-disable-next-line react/display-name
 const OverrunSum = memo(({ value }: { value: string }) => (
-  <span>
+  <span className="text-sm">
     <BubbleIcon value="y" color="black" size="s" />
     {`+${value}`}
   </span>
@@ -18,8 +18,8 @@ const PlanningYearsTable: FC = () => {
         <tr>
           {planningYearsTableData.map((o, i) => (
             <td key={i} className="years-table-cell">
-              <Span text={o.title} fontWeight="light" size="s" />
-              <Span text={`<> ${o.year}`} fontWeight="bold" size="s" />
+              <span className="font-light text-sm">{o.title}</span>
+              <span className="font-bold text-sm">{`<> ${o.year}`}</span>
             </td>
           ))}
         </tr>
@@ -28,14 +28,14 @@ const PlanningYearsTable: FC = () => {
         <tr>
           {planningYearsTableData.map((o, i) => (
             <td key={i} className="row-1-cell">
-              <Span text={o.sum} fontWeight="light" size="s" color="white" />
+              <span className="font-light text-white text-sm">{o.sum}</span>
             </td>
           ))}
         </tr>
         <tr>
           {planningYearsTableData.map((o, i) => (
             <td key={i}>
-              <Span text={o.otherVal3 || ''} fontWeight="light" size="s" />
+              <span className="font-light text-sm pt-1">{o.otherVal3 || ''}</span>
             </td>
           ))}
         </tr>
@@ -46,10 +46,9 @@ const PlanningYearsTable: FC = () => {
                 // Overrun sum for first cell
                 <OverrunSum value={o.otherVal1} />
               ) : (
-                <Span text={o.otherVal1} fontWeight="light" size="s" />
+                <span className="font-light text-sm">{o.otherVal1}</span>
               )}
-
-              <Span text={o.otherVal2} fontWeight="light" size="s" />
+              <span className="font-light text-sm pb-1">{o.otherVal2}</span>
             </td>
           ))}
         </tr>

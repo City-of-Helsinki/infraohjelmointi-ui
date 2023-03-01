@@ -1,10 +1,10 @@
 .phase-dialog-container {
   position: fixed;
   max-width: 16rem;
-  background: var(--color-white);
   border: 0.1rem solid var(--color-black);
   z-index: 999;
   transform: translateX(1.5rem);
+  @apply bg-white;
 }
 
 .phase-dialog-container p {
@@ -13,13 +13,13 @@
 
 .phase-dialog-header {
   width: 100%;
-  border-bottom: 0.08rem solid var(--color-black-20);
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
   padding: 0.1rem 0;
   overflow: hidden;
+  @apply border-b border-gray;
 }
 
 .phase-dialog-header .title {
@@ -42,11 +42,11 @@
 }
 
 .phase-dialog-list {
-  border-bottom: 0.08rem solid var(--color-black-20);
   display: flex;
   flex-direction: column;
   padding: 0.35rem 0 0.35rem 0;
   margin: 0;
+  @apply border-b border-gray;
 }
 
 .phase-dialog-list .list-item {
@@ -55,10 +55,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 0;
-  background: var(--color-white);
+  @apply bg-white;
 }
 .phase-dialog-list .list-item.selected {
-  background: var(--color-bus-medium-light);
+  @apply bg-bus-m;
 }
 
 .phase-dialog-list .list-item .selection-button {

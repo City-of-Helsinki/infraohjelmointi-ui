@@ -26,6 +26,7 @@
   background: var(--color-silver-light);
   margin-bottom: var(--spacing-m);
   border-radius: 0.25rem;
+  @apply rounded-md mb-8 bg-silver-l border-none;
 }
 
 .note-header-container {
@@ -58,7 +59,7 @@
   display: block;
   margin: 0 auto;
   width: 93%;
-  border-bottom: 1px solid var(--color-black-20);
+  @apply border-t border-gray;
 }
 
 /* last history row will not have a border */

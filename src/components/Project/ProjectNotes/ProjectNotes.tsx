@@ -1,4 +1,3 @@
-import { Paragraph } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { useCallback, useEffect } from 'react';
 import ProjectNote from './ProjectNote';
@@ -23,7 +22,7 @@ const ProjectNotes = () => {
   return (
     <div className="notes-page-container">
       <h1 className="text-heading-m">Muistiinpanot</h1>
-      <Paragraph size="m" text={t('newNoteInfo')} />
+      <p>{t('newNoteInfo')}</p>
       {/* note form */}
       <NewNoteForm />
       {/* notes (sorted by created) */}

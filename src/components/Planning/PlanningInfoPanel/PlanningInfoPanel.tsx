@@ -2,7 +2,6 @@ import { planningInfo } from '@/mocks/common';
 import { IconInfoCircleFill } from 'hds-react/icons';
 import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
-import { Title } from '../../shared';
 import './styles.css';
 import { useAppSelector } from '@/hooks/common';
 import { selectSelectedMasterClass } from '@/reducers/classSlice';
@@ -15,20 +14,20 @@ const PlanningInfoPanel = () => {
     <div className="planning-info-panel">
       <div id="planningTitle">
         <div>
-          <Title text="budgetProposalPreparation" size="s" />
+          <h4 className="heading-s">{t('budgetProposalPreparation')}</h4>
           <IconInfoCircleFill className="info-icon" />
         </div>
       </div>
       <div id="planningButton">
         <Button variant="success">{t('allocationPreparation')}</Button>
-        <span>{t('inProgressUntil', { planningInfo })}</span>
+        <span className="text-sm">{t('inProgressUntil', { planningInfo })}</span>
       </div>
 
       <div id="planningGroupInfo">
         {selectedMasterClass && (
           <>
-            <span className="group-info-text">{selectedMasterClass.name}</span>
-            <span>{t('keur')}</span>
+            <span className="font-bold text-sm">{selectedMasterClass.name}</span>
+            <span className="text-sm">{t('keur')}</span>
           </>
         )}
       </div>

@@ -1,9 +1,8 @@
 .class-header-cell {
   width: 30.6%;
   padding: 0 1.5rem;
-  color: white;
   min-width: 26.75rem;
-  border-bottom: 0.07rem solid var(--color-white);
+  @apply text-white border-b border-white;
 }
 
 .class-header-cell > div {
@@ -12,7 +11,7 @@
 }
 
 .class-header-cell.first {
-  background: var(--color-bus);
+  @apply bg-bus;
 }
 
 .class-header-cell.second {
@@ -27,17 +26,11 @@
   background: rgb(0, 0, 102);
 }
 
-.class-header-content-item.value-container {
-  width: 2rem;
-}
-
 .class-cell {
-  color: white;
   padding: 0.25rem 0 0.1rem 0;
-  font-size: 0.875rem;
   max-width: var(--table-cell-width);
   min-width: var(--table-cell-width);
-  border-bottom: 0.07rem solid var(--color-white);
+  @apply text-white border-b border-white;
 }
 
 .class-cell .class-cell-container {
@@ -47,18 +40,15 @@
 }
 
 .class-cell .class-cell-container span:first-child {
-  font-size: 16px !important;
   font-weight: bold;
 }
 
 .class-cell .class-cell-container span {
-  font-size: 14px !important;
   width: 100%;
 }
 
 .class-cell .class-cell-container span:nth-child(3) {
-  font-weight: bold;
-  color: var(--color-suomenlinna-dark);
+  @apply text-suomenlinna-d font-bold;
 }
 
 .class-cell span {
@@ -67,7 +57,7 @@
 }
 
 .class-cell.first {
-  background: var(--color-bus);
+  @apply bg-bus;
 }
 
 .class-cell.second {
@@ -126,37 +116,22 @@
 }
 
 .custom-tooltip section {
-  color: black !important;
+  @apply text-black;
 }
 
 .custom-tooltip svg {
-  color: transparent;
+  @apply text-transparent;
 }
 
 .tooltip-container {
-  position: absolute;
   inset: auto auto 0px 0px;
-  transform: translate(0, -2rem);
-  border-bottom: 8px solid var(--color-coat-of-arms);
-  color: black !important;
-  max-width: 21.875rem;
-  background-color: var(--color-coat-of-arms-light);
-  padding: var(--spacing-s);
-  font-size: var(--fontsize-body-s);
-  line-height: 24px;
-  z-index: 1000;
-  font-weight: 400;
-  display: none;
+  @apply bg-coat-of-arms-l border-b-8 border-coat-of-arms text-black absolute 
+  -translate-y-8 hidden font-normal z-[1000] leading-normal text-sm p-4 max-w-[21.875rem];
 }
 
 .tooltip-arrow {
-  position: absolute;
-  margin-left: auto;
-  margin-right: auto;
-  bottom: calc(-1 * var(--spacing-s) - 8px);
-  border: 8px solid transparent;
-  border-top: 8px solid var(--color-coat-of-arms);
-  display: none;
+  --arrow-pos: calc(-1 * var(--spacing-s) - 8px);
+  @apply hidden absolute mx-auto bottom-[var(--arrow-pos)] border-transparent border-t-coat-of-arms border-8;
 }
 
 .class-title-container {

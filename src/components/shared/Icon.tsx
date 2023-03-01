@@ -16,7 +16,7 @@ const Icon: FC<IIconProps> = ({ size, text, icon, color, fontWeight }) => {
   const FCIcon = icon;
   const iconSize = size === 'xs' ? '1rem' : '1.5rem';
   return (
-    <div className="label-icon-container">
+    <div className="flex items-center">
       <FCIcon
         size={size}
         aria-hidden={text ? 'true' : 'false'}
@@ -26,9 +26,7 @@ const Icon: FC<IIconProps> = ({ size, text, icon, color, fontWeight }) => {
 
       {text && (
         <span
-          className={`label-icon-text text-${color || 'black'} text-${
-            fontWeight ? fontWeight : ''
-          }`}
+          className={`text-sm ml-1 text-${color || 'black'} text-${fontWeight ? fontWeight : ''}`}
         >
           {t(text)}
         </span>

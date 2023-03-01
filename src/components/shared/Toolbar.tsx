@@ -7,11 +7,11 @@ interface IToolbarProps {
 
 const Toolbar: FC<IToolbarProps> = ({ left, right }) => {
   return (
-    <div className="toolbar-container">
+    <div className="h-14 flex items-center justify-between px-6">
       {/* left (new & share) */}
-      <div className="display-flex">{left}</div>
+      <div className="flex">{left}</div>
       {/* right (map) */}
-      <div className="display-flex">{right}</div>
+      <div className="flex">{right}</div>
     </div>
   );
 };
