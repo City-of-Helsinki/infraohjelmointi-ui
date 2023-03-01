@@ -14,8 +14,14 @@ const Loader: FC = () => {
   return (
     <>
       {isLoading && (
-        <div className="h-full w-full fixed z-[9] overflow-hidden -mt-20">
-          <div className="absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2">
+        <div
+          className="h-full w-full fixed z-[9] overflow-hidden -mt-20"
+          data-testid="loader-wrapper"
+        >
+          <div
+            className="absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2"
+            data-testid="loader"
+          >
             <LoadingSpinner loadingText={text || ''} />
           </div>
         </div>

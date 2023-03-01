@@ -80,8 +80,8 @@ describe('ProjectView', () => {
   });
 
   it('renders the ProjectToolbar', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('toolbar-container').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('toolbar')).toBeInTheDocument();
   });
 
   it('renders the ProjectHeader', () => {

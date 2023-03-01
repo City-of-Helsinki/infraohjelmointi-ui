@@ -22,18 +22,18 @@ describe('Loader', () => {
   });
 
   it('does not render Loader if isLoading is false', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('loader-container').length).toBe(0);
+    const { queryByTestId } = renderResult;
+    expect(queryByTestId('loader-wrapper')).toBeNull();
   });
 
   it('renders Loader when isLoading is true', async () => {
-    const { container, getByText, store } = renderResult;
+    const { getByText, store, getByTestId } = renderResult;
 
     await waitFor(() => store.dispatch(setLoading('Testing loader')));
 
     expect(getByText(/Testing loader/i)).toBeInTheDocument();
-    expect(container.getElementsByClassName('loader-overlay').length).toBe(1);
-    expect(container.getElementsByClassName('loader-container').length).toBe(1);
+    expect(getByTestId('loader-wrapper')).toBeInTheDocument();
+    expect(getByTestId('loader')).toBeInTheDocument();
   });
 
   it('hides Loader when isLoading is becomes false', async () => {
