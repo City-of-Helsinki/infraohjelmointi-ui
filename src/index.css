@@ -1,12 +1,14 @@
 @import '~hds-core/lib/utils/helpers.css';
 @import 'fonts.css';
 
+/* New to tailwind? check out this cheat sheet: https://nerdcave.com/tailwind-cheat-sheet */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
+  --table-cell-width: 5.5rem;
 }
 
 html {

@@ -3,7 +3,7 @@
   background: var(--color-bus);
   padding: 0.5rem 1.25rem;
   color: white;
-  min-width: 24.3rem;
+  min-width: 26.74rem;
 }
 
 .group-header-cell-content {
@@ -35,8 +35,8 @@
   color: white;
   padding: 0.5rem 0.25rem;
   font-size: 0.875rem;
-  max-width: 4.875rem;
-  min-width: 4.875rem;
+  max-width: var(--table-cell-width);
+  min-width: var(--table-cell-width);
 }
 
 .group-cell span {

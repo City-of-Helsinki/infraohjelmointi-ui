@@ -2,7 +2,7 @@
   width: 30.6%;
   padding: 0 1.5rem;
   color: white;
-  min-width: 23.8rem;
+  min-width: 26.75rem;
   border-bottom: 0.07rem solid var(--color-white);
 }
 
@@ -35,8 +35,8 @@
   color: white;
   padding: 0.25rem 0 0.1rem 0;
   font-size: 0.875rem;
-  max-width: 5.37rem;
-  min-width: 5.37rem;
+  max-width: var(--table-cell-width);
+  min-width: var(--table-cell-width);
   border-bottom: 0.07rem solid var(--color-white);
 }
 

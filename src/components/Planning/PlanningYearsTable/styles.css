@@ -24,3 +24,8 @@
 .planning-years-table .row-1-cell:first-child {
   background: var(--color-bus);
 }
+
+.years-table-cell {
+  max-width: var(--table-cell-width);
+  min-width: var(--table-cell-width);
+}
