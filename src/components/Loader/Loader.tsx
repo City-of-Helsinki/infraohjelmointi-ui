@@ -15,7 +15,7 @@ const Loader: FC = () => {
     <>
       {isLoading && (
         <div
-          className="h-full w-full fixed z-[9] overflow-hidden -mt-20"
+          className="fixed z-[9] -mt-20 h-full w-full overflow-hidden"
           data-testid="loader-wrapper"
         >
           <div

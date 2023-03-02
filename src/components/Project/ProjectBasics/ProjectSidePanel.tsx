@@ -5,6 +5,7 @@ import { SideNavigation } from '../../shared';
 import { useAppSelector } from '@/hooks/common';
 import { useTranslation } from 'react-i18next';
 import { selectUpdated } from '@/reducers/projectSlice';
+import './styles.css';
 
 const ProjectSidePanel: FC = () => {
   const updated = useAppSelector(selectUpdated);
@@ -20,15 +21,15 @@ const ProjectSidePanel: FC = () => {
   ];
 
   return (
-    <div className="side-panel-container">
-      <div className="nav-container">
+    <div className="flex w-full flex-col">
+      <div className="flex justify-center">
         <SideNavigation navItems={navItems} />
       </div>
 
       {updated && (
-        <div className="label-container">
+        <div className="mt-4 flex justify-center">
           <div className="side-nav">
-            <StatusLabel type="success" iconLeft={<IconSaveDiskette />}>
+            <StatusLabel className="save-icon" type="success" iconLeft={<IconSaveDiskette />}>
               {t('savedTime', { time: updated })}
             </StatusLabel>
           </div>

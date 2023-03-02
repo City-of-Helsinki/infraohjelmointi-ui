@@ -1,20 +1,19 @@
 .breadcrumbs-list {
-  @apply flex items-center h-16 p-8 border-b border-gray list-none;
+  @apply flex h-16 list-none items-center border-b border-gray p-8;
 }
 
 .breadcrumbs-list > li > a {
-  @apply text-black mr-1 no-underline;
+  @apply mr-1 text-black no-underline;
 }
 
 .breadcrumbs-list > li {
-  text-decoration: underline;
+  @apply underline;
 }
 
 .breadcrumbs-list > li:last-child {
-  font-weight: bold !important;
-  text-decoration: none !important;
+  @apply font-bold no-underline;
 }
 
 .breadcrumbs-list svg {
-  margin-right: 0.2rem;
+  @apply mr-1;
 }

@@ -46,8 +46,8 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
     <div className="note-container">
       {/* header */}
       <div className="note-header-container">
-        <div>
-          <span className="text-sm font-light">{stringToDateTime(note.createdDate)}</span>
+        <div className="flex flex-col">
+          <span className="mb-1 text-sm font-light">{stringToDateTime(note.createdDate)}</span>
           <FormFieldLabel text={author} />
         </div>
         <div>{hasHistory && <StatusLabel type="alert">{t('modified')}</StatusLabel>}</div>

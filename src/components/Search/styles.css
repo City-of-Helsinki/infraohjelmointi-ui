@@ -3,11 +3,11 @@
 }
 
 .search-form .search-form-content {
-  @apply py-4 grid grid-cols-2;
+  @apply grid grid-cols-2 py-4;
 }
 
 .search-form .search-form-content .input-wrapper {
-  @apply w-full mb-6 col-span-2;
+  @apply col-span-2 mb-6 w-full;
 }
 
 .search-form .search-form-content .input-l {
@@ -16,20 +16,20 @@
 
 /* programmed fieldset legend same properties as the labels */
 .search-form .search-form-content #programmed legend {
-  @apply text-black-90 block font-medium mb-3;
+  @apply mb-3 block font-medium text-black-90;
 }
 
 /* programmed fieldset flex to get the checkboxes next to eachother */
 .search-form .search-form-content fieldset#programmed {
-  @apply flex gap-8 pb-0 w-0;
+  @apply flex w-0 gap-8 pb-0;
 }
 
 .free-search {
-  @apply border-b border-gray mt-4;
+  @apply mt-4 border-b border-gray;
 }
 
 .free-search .search-selections {
-  @apply flex gap-2 my-2 flex-wrap;
+  @apply my-2 flex flex-wrap gap-2;
 }
 
 .search-form .search-form-content .input-wrapper#programmedYearMin {
@@ -38,5 +38,5 @@
 }
 
 .search-form .search-form-content .input-wrapper#programmedYearMax {
-  @apply row-start-6 col-span-1;
+  @apply col-span-1 row-start-6;
 }

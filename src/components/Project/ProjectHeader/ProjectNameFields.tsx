@@ -19,7 +19,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
   }, []);
 
   return (
-    <div className="edit-name-form">
+    <div className="mb-6 flex justify-between">
       <div>
         {/* Name */}
         <Controller
@@ -31,7 +31,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
                 <TextInput
                   id={field.name}
                   {...field}
-                  className="edit-name-input"
+                  className="w-80"
                   placeholder={t('name') || ''}
                   aria-label="project-name"
                 />

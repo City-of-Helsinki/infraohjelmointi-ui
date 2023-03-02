@@ -1,11 +1,10 @@
 .notes-page-container {
-  width: 80%;
-  max-width: 40.5rem;
-  margin: var(--spacing-layout-l) var(--spacing-layout-xl);
+  @apply my-16 mx-24 w-[80%] max-w-[40.5rem];
 }
 
 .notes-page-container p:nth-child(2) {
   margin-top: var(--spacing-s) !important;
+  @apply mt-4;
 }
 
 .note-form-container {
@@ -26,7 +25,7 @@
   background: var(--color-silver-light);
   margin-bottom: var(--spacing-m);
   border-radius: 0.25rem;
-  @apply rounded-md mb-8 bg-silver-l border-none;
+  @apply mb-8 rounded-md border-none bg-silver-l;
 }
 
 .note-header-container {

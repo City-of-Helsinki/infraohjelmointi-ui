@@ -17,9 +17,9 @@ const PlanningYearsTable: FC = () => {
       <thead>
         <tr>
           {planningYearsTableData.map((o, i) => (
-            <td key={i} className="years-table-cell">
-              <span className="font-light text-sm">{o.title}</span>
-              <span className="font-bold text-sm">{`<> ${o.year}`}</span>
+            <td key={i} className="min-w-[var(--table-cell-width)] max-w-[var(--table-cell-width)]">
+              <span className="text-sm font-light">{o.title}</span>
+              <span className="text-sm font-bold">{`<> ${o.year}`}</span>
             </td>
           ))}
         </tr>
@@ -27,15 +27,15 @@ const PlanningYearsTable: FC = () => {
       <tbody>
         <tr>
           {planningYearsTableData.map((o, i) => (
-            <td key={i} className="row-1-cell">
-              <span className="font-light text-white text-sm">{o.sum}</span>
+            <td key={i} className="bg-bus-d py-2 px-1 text-white first:bg-bus">
+              <span className="text-sm font-light text-white">{o.sum}</span>
             </td>
           ))}
         </tr>
         <tr>
           {planningYearsTableData.map((o, i) => (
             <td key={i}>
-              <span className="font-light text-sm pt-1">{o.otherVal3 || ''}</span>
+              <span className="pt-1 text-sm font-light">{o.otherVal3 || ''}</span>
             </td>
           ))}
         </tr>
@@ -46,9 +46,9 @@ const PlanningYearsTable: FC = () => {
                 // Overrun sum for first cell
                 <OverrunSum value={o.otherVal1} />
               ) : (
-                <span className="font-light text-sm">{o.otherVal1}</span>
+                <span className="text-sm font-light">{o.otherVal1}</span>
               )}
-              <span className="font-light text-sm pb-1">{o.otherVal2}</span>
+              <span className="pb-1 text-sm font-light">{o.otherVal2}</span>
             </td>
           ))}
         </tr>

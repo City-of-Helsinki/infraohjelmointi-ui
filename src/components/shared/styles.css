@@ -7,7 +7,7 @@
 }
 
 .progress-circle {
-  @apply -rotate-90 h-full w-full;
+  @apply h-full w-full -rotate-90;
 }
 
 .progress-circle .circle {
@@ -24,7 +24,7 @@
 }
 
 .progress-circle .percent-text {
-  @apply fill-white text-xl rotate-90;
+  @apply rotate-90 fill-white text-xl;
 }
 
 @keyframes progress {
@@ -39,24 +39,24 @@
 /* TABS */
 
 .side-nav {
-  @apply max-w-[16.5rem] w-[65%];
+  @apply w-[65%] max-w-[16.5rem];
 }
 
 .side-nav li:last-child {
-  @apply border-t border-gray;
+  @apply border-b border-gray;
 }
 
 .bubble-icon-m {
-  @apply h-4 w-4 rounded-full text-[0.6rem] leading-3 text-center mr-4;
+  @apply mr-4 h-4 w-4 rounded-full text-center text-[0.6rem] leading-3;
 }
 
 .bubble-icon-s {
-  @apply h-3 w-3 rounded-full text-[0.5rem] leading-[0.6rem] text-center mr-4 translate-x-2 -translate-y-[0.1rem] inline-block font-bold;
+  @apply mr-4 inline-block h-3 w-3 translate-x-2 -translate-y-[0.1rem] rounded-full text-center text-[0.5rem] font-bold leading-[0.6rem];
 }
 
 .bubble-icon-s.black,
 .bubble-icon-m.black {
-  @apply text-white bg-black;
+  @apply bg-black text-white;
 }
 
 .bubble-icon-s.white {

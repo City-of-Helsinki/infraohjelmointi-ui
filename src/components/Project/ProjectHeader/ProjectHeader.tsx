@@ -55,28 +55,28 @@ const ProjectHeader: FC = () => {
 
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
-      <div className="project-header-container">
-        <div className="left">
-          <div className="left-wrapper">
-            <div className="readiness-container">
+      <div className="flex flex-wrap bg-bus py-8" data-testid="project-header">
+        <div className="flex-1" data-testid="project-header-left">
+          <div className="flex h-full justify-end">
+            <div className=" h-full max-w-[6rem]">
               <ProgressCircle color={'--color-engel'} percent={project?.projectReadiness} />
             </div>
           </div>
         </div>
-        <div className="center">
-          <div className="center-wrapper">
+        <div className="flex-[3]" data-testid="project-header-center">
+          <div className="ml-8 w-96">
             <ProjectNameFields control={control} />
             <ProjectPhaseField control={control} />
           </div>
         </div>
-        <div className="right">
-          <div className="right-wrapper">
-            <div className="right-wrapper-inner">
-              <div className="favourite-button-container">
+        <div className="mr-3 flex-1" data-testid="project-header-right">
+          <div className="flex h-full flex-col">
+            <div className="mr-auto text-right">
+              <div className="mb-8" data-testid="project-favourite">
                 <ProjectFavouriteField control={control} />
               </div>
               <p className="text-white">{t('inGroup')}</p>
-              <p className="text-white font-bold text-l">{group}</p>
+              <p className="text-l font-bold text-white">{group}</p>
             </div>
           </div>
         </div>

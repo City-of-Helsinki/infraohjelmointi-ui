@@ -73,7 +73,7 @@ const ProjectBasicsForm: FC = () => {
   );
 
   return (
-    <div className="basics-form">
+    <div className="flex w-full flex-col flex-wrap" data-testid="project-basics-form">
       <form onBlur={isDirty ? (handleSubmit(onSubmit) as SubmitHandler<FieldValues>) : undefined}>
         <div className="basic-info-form">
           {/* SECTION 1 - BASIC INFO */}

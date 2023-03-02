@@ -4,12 +4,15 @@ import ProjectSidePanel from './ProjectSidePanel';
 
 const ProjectBasics = () => {
   return (
-    <div className="project-content-container">
+    <div className="flex h-full w-full flex-wrap" data-testid="project-basics">
       <ScrollToTop />
-      <div className="side-panel">
+      <div
+        className="sticky top-0 flex flex-1 translate-y-[4rem] justify-center"
+        data-testid="side-panel"
+      >
         <ProjectSidePanel />
       </div>
-      <div className="form-panel">
+      <div className=" my-16 flex flex-[2]" data-testid="form-panel">
         <ProjectBasicsForm />
       </div>
     </div>

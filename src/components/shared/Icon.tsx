@@ -26,7 +26,7 @@ const Icon: FC<IIconProps> = ({ size, text, icon, color, fontWeight }) => {
 
       {text && (
         <span
-          className={`text-sm ml-1 text-${color || 'black'} text-${fontWeight ? fontWeight : ''}`}
+          className={`ml-1 text-sm text-${color || 'black'} text-${fontWeight ? fontWeight : ''}`}
         >
           {t(text)}
         </span>

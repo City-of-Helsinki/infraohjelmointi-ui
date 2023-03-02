@@ -43,8 +43,8 @@ describe('App', () => {
   });
 
   it('renders SideBar', async () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('sidebar-container').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('sidebar')).toBeInTheDocument();
   });
 
   it('renders app-content', () => {

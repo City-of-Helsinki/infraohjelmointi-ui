@@ -259,6 +259,10 @@
   grid-column: var(--grid-col-small-right);
 }
 
+.save-icon > span {
+  height: auto;
+}
+
 @media (max-width: 1400px) {
   .basic-info-form {
     width: 95%;

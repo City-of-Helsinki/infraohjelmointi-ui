@@ -41,6 +41,10 @@ p {
   margin: var(--spacing-2-xs) 0;
 }
 
+span {
+  line-height: var(--lineheight-l);
+}
+
 table p {
   margin: 0;
 }
@@ -121,6 +125,27 @@ table p {
 
 input {
   z-index: 1 !important;
+}
+
+.list-field-input {
+  @apply flex;
+}
+
+.list-field-input input {
+  height: 2rem !important;
+}
+
+#overrunRight .list-field-input {
+  @apply my-2;
+}
+
+.pen-and-label-text {
+  width: auto !important;
+  @apply font-medium;
+}
+
+.input-wrapper label {
+  @apply min-h-[1.4rem];
 }
 
 .input-wrapper button {

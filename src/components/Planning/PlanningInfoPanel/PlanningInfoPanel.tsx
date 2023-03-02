@@ -26,7 +26,7 @@ const PlanningInfoPanel = () => {
       <div id="planningGroupInfo">
         {selectedMasterClass && (
           <>
-            <span className="font-bold text-sm">{selectedMasterClass.name}</span>
+            <span className="text-sm font-bold">{selectedMasterClass.name}</span>
             <span className="text-sm">{t('keur')}</span>
           </>
         )}

@@ -84,9 +84,8 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('renders the component wrappers', async () => {
-    const { container } = renderResult;
-
-    expect(container.getElementsByClassName('basics-form').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('project-basics-form')).toBeInTheDocument();
   });
 
   it('fills the fields with existing project data', async () => {
@@ -288,7 +287,7 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a NumberField', async () => {
-    const { user, getByDisplayValue, container } = renderResult;
+    const { user, getByDisplayValue, getByTestId } = renderResult;
     const expectedValue = '1234';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -297,7 +296,7 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const parentContainer = container.getElementsByClassName('basics-form')[0];
+    const parentContainer = getByTestId('project-basics-form');
 
     const hkrIdField = screen.getByRole('spinbutton', { name: getFormField('hkrId') });
 
@@ -311,7 +310,7 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a SelectField', async () => {
-    const { user, getByRole, getByText, container } = renderResult;
+    const { user, getByRole, getByText, getByTestId } = renderResult;
     const expectedValue = { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' };
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -320,7 +319,7 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const parentContainer = container.getElementsByClassName('basics-form')[0];
+    const parentContainer = getByTestId('project-basics-form');
 
     await user.click(getByRole('button', { name: 'projectBasicsForm.area' }));
     await user.click(getByText(matchExact('enums.lansisatama')));
@@ -332,7 +331,7 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a DateField', async () => {
-    const { user, getByRole, getByDisplayValue, container } = renderResult;
+    const { user, getByRole, getByDisplayValue, getByTestId } = renderResult;
     const expectedValue = '13.12.2022';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -341,7 +340,7 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const parentContainer = container.getElementsByClassName('basics-form')[0];
+    const parentContainer = getByTestId('project-basics-form');
     const estPlanningStart = getByRole('textbox', { name: getFormField('estPlanningStart') });
 
     await user.clear(estPlanningStart);
@@ -354,7 +353,7 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a TextField', async () => {
-    const { user, getByDisplayValue, container } = renderResult;
+    const { user, getByDisplayValue, getByTestId } = renderResult;
     const expectedValue = 'New description';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -364,7 +363,7 @@ describe('ProjectBasicsForm', () => {
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     const descriptionField = screen.getByRole('textbox', { name: getFormField('description *') });
-    const parentContainer = container.getElementsByClassName('basics-form')[0];
+    const parentContainer = getByTestId('project-basics-form');
 
     await user.clear(descriptionField);
     await user.type(descriptionField, expectedValue);
@@ -376,7 +375,7 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a RadioCheckboxField', async () => {
-    const { user, container, getByTestId } = renderResult;
+    const { user, getByTestId } = renderResult;
     const expectedValue = true;
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -386,7 +385,7 @@ describe('ProjectBasicsForm', () => {
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     const louhiField = getByTestId('louhi-0') as HTMLInputElement;
-    const parentContainer = container.getElementsByClassName('basics-form')[0];
+    const parentContainer = getByTestId('project-basics-form');
 
     await user.click(louhiField);
     await user.click(parentContainer);

@@ -32,8 +32,10 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
             name={f.name}
             control={f.control as Control<FieldValues>}
             render={({ field }) => (
-              <div className="list-field-row" key={f.label}>
-                <label className="list-field-item-label">{t(f.label)}</label>
+              <div className="mb-3 flex" key={f.label}>
+                <label className="inline-block w-36 text-l font-bold text-black-90">
+                  {t(f.label)}
+                </label>
                 {!editing ? (
                   <span>{`${field.value} €`}</span>
                 ) : (

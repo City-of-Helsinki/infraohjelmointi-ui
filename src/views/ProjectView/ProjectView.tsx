@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { useTranslation } from 'react-i18next';
-import './styles.css';
+
 import {
   getConstructionPhasesThunk,
   getPlanningPhasesThunk,
@@ -50,7 +50,7 @@ const ProjectView = () => {
   ];
 
   return (
-    <div className="project-container">
+    <div className="w-full" data-testid="project-view">
       <ProjectToolbar />
       <ProjectHeader />
       <TabList navItems={navItems} />
