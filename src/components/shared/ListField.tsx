@@ -22,7 +22,7 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
 
   return (
     <div className="input-wrapper" id={name} data-testid={name}>
-      <div className="display-flex-col">
+      <div className="flex flex-col">
         <div style={{ marginBottom: '1rem' }}>
           <FormFieldLabel text={label} onClick={readOnly ? undefined : handleSetEditing} />
         </div>
@@ -33,9 +33,7 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
             control={f.control as Control<FieldValues>}
             render={({ field }) => (
               <div className="mb-3 flex" key={f.label}>
-                <label className="inline-block w-36 text-l font-bold text-black-90">
-                  {t(f.label)}
-                </label>
+                <label className="list-field-label">{t(f.label)}</label>
                 {!editing ? (
                   <span>{`${field.value} €`}</span>
                 ) : (

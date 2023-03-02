@@ -12,6 +12,7 @@ import ProjectPhaseField from './ProjectPhaseField';
 import ProjectFavouriteField from './ProjectFavouriteField';
 import { selectUser } from '@/reducers/authSlice';
 import { useTranslation } from 'react-i18next';
+import './styles.css';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -55,7 +56,7 @@ const ProjectHeader: FC = () => {
 
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
-      <div className="flex flex-wrap bg-bus py-8" data-testid="project-header">
+      <div className="project-header-container" data-testid="project-header">
         <div className="flex-1" data-testid="project-header-left">
           <div className="flex h-full justify-end">
             <div className=" h-full max-w-[6rem]">

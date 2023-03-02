@@ -1,0 +1,7 @@
+.loader-container {
+  @apply fixed z-[9] -mt-20 h-full w-full overflow-hidden;
+}
+
+.loader-wrapper {
+  @apply absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2;
+}

@@ -28,7 +28,7 @@ const ProjectNewNoteForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-6 flex flex-col items-end border-[0.125rem] border-gray p-6">
+      <div className="new-note-form-container">
         <div className="mb-6 w-full" data-testid="new-note-textarea">
           <Controller
             name="content"

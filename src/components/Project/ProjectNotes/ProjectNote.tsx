@@ -43,9 +43,9 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
   );
 
   return (
-    <div className="mb-6 rounded-md border-none bg-silver-l" data-testid="note-container">
+    <div className="note-container" data-testid="note-container">
       {/* header */}
-      <div className="flex justify-between px-6 pt-6">
+      <div className="note-header-container">
         <div className="flex flex-col">
           <span className="mb-1 text-sm font-light">{stringToDateTime(note.createdDate)}</span>
           <FormFieldLabel text={author} />
@@ -57,7 +57,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
         <p>{note.content}</p>
       </div>
       {/* footer (buttons) */}
-      <div className="flex justify-between px-3 pb-4">
+      <div className="note-footer">
         <div>
           {hasHistory && (
             <Button

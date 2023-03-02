@@ -27,7 +27,7 @@ const PlanningYearsTable: FC = () => {
       <tbody>
         <tr>
           {planningYearsTableData.map((o, i) => (
-            <td key={i} className="bg-bus-d py-2 px-1 text-white first:bg-bus">
+            <td key={i} className="years-table-first-cell">
               <span className="text-sm font-light text-white">{o.sum}</span>
             </td>
           ))}

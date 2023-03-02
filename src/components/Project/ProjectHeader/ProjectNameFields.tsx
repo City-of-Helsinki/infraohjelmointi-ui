@@ -5,6 +5,7 @@ import { t } from 'i18next';
 import { FC, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { IconButton } from '../../shared';
+import './styles.css';
 
 interface IProjectNameFormProps {
   control: HookFormControlType;
@@ -19,7 +20,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
   }, []);
 
   return (
-    <div className="mb-6 flex justify-between">
+    <div className="project-name-form">
       <div>
         {/* Name */}
         <Controller

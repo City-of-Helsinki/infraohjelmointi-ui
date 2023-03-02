@@ -21,7 +21,7 @@ const ProjectSidePanel: FC = () => {
   ];
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="project-side-panel">
       <div className="flex justify-center">
         <SideNavigation navItems={navItems} />
       </div>

@@ -29,3 +29,23 @@
 .note-history-container #modifiedBy {
   @apply col-span-3 row-span-2;
 }
+
+.notes-page {
+  @apply my-16 mx-24 w-[80%] max-w-[40.5rem];
+}
+
+.note-container {
+  @apply mb-6 rounded-md border-none bg-silver-l;
+}
+
+.note-header-container {
+  @apply flex justify-between px-6 pt-6;
+}
+
+.note-footer {
+  @apply flex justify-between px-3 pb-4;
+}
+
+.new-note-form-container {
+  @apply my-6 flex flex-col items-end border-[0.125rem] border-gray p-6;
+}

@@ -20,7 +20,7 @@ const ProjectNotes = () => {
   const sortedNotes = useCallback(() => sortArrayByDates(notes, 'createdDate', true), [notes]);
 
   return (
-    <div className="my-16 mx-24 w-[80%] max-w-[40.5rem]" data-testid="notes-page">
+    <div className="notes-page" data-testid="notes-page">
       <h1 className="text-heading-m">Muistiinpanot</h1>
       <p>{t('newNoteInfo')}</p>
       {/* note form */}
