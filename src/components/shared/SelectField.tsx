@@ -1,15 +1,16 @@
-import { ListType } from '@/interfaces/common';
+import { IOption } from '@/interfaces/common';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select as HDSSelect } from 'hds-react/components/Select';
-import { useOptions } from '@/hooks/useOptions';
 import { IconLocation, IconUser } from 'hds-react/icons';
+import { useTranslation } from 'react-i18next';
 
 interface ISelectFieldProps {
-  name: ListType;
+  name: string;
   label: string;
   control: HookFormControlType;
+  options: Array<IOption>;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
   icon?: string;
@@ -20,13 +21,14 @@ const SelectField: FC<ISelectFieldProps> = ({
   name,
   label,
   control,
+  options,
   rules,
   hideLabel,
   icon,
   placeholder,
 }) => {
   const required = rules?.required ? true : false;
-  const { options } = useOptions(name);
+  const { t } = useTranslation();
 
   return (
     <Controller
@@ -40,13 +42,13 @@ const SelectField: FC<ISelectFieldProps> = ({
               value={value}
               onChange={onChange}
               onBlur={onBlur}
-              label={!hideLabel && label}
+              label={!hideLabel && t(label)}
               invalid={error ? true : false}
               error={error?.message}
-              options={options}
+              options={options || []}
               required={required}
               style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-              placeholder={placeholder}
+              placeholder={(placeholder && t(placeholder || '')) || ''}
               icon={
                 icon === 'location' ? (
                   <IconLocation />

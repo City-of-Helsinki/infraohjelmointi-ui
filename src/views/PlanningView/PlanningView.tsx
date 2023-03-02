@@ -22,7 +22,6 @@ const PlanningView: FC = () => {
       dispatch(setClasses());
       dispatch(setSubClasses());
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

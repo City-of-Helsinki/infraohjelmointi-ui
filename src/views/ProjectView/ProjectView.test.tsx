@@ -63,15 +63,15 @@ describe('ProjectView', () => {
     expect(store.getState().project.selectedProject).toStrictEqual(mockProject.data);
     expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
     expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
-    expect(lists.area).toStrictEqual(mockProjectAreas.data);
-    expect(lists.type).toStrictEqual(mockProjectTypes.data);
-    expect(lists.phase).toStrictEqual(mockProjectPhases.data);
-    expect(lists.constructionPhaseDetail).toStrictEqual(mockConstructionPhaseDetails.data);
-    expect(lists.riskAssessment).toStrictEqual(mockProjectRisks.data);
-    expect(lists.projectQualityLevel).toStrictEqual(mockProjectQualityLevels.data);
-    expect(lists.constructionPhase).toStrictEqual(mockConstructionPhases.data);
-    expect(lists.planningPhase).toStrictEqual(mockPlanningPhases.data);
-    expect(lists.responsibleZone).toStrictEqual(mockResponsibleZones.data);
+    expect(lists.areas).toStrictEqual(mockProjectAreas.data);
+    expect(lists.types).toStrictEqual(mockProjectTypes.data);
+    expect(lists.phases).toStrictEqual(mockProjectPhases.data);
+    expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
+    expect(lists.riskAssessments).toStrictEqual(mockProjectRisks.data);
+    expect(lists.projectQualityLevels).toStrictEqual(mockProjectQualityLevels.data);
+    expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);
+    expect(lists.planningPhases).toStrictEqual(mockPlanningPhases.data);
+    expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
   });
 
   it('renders the parent container', () => {

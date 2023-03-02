@@ -72,7 +72,6 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
         ),
         popularHashTags: allHashTags.popularHashTags,
       }));
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [allHashTags]);
 
     // Add the existing projectHashTags to hashTagsForSubmit

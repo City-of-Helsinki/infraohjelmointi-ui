@@ -2,6 +2,7 @@ import { NumberInput as HDSNumberInput } from 'hds-react/components/NumberInput'
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
+import { useTranslation } from 'react-i18next';
 
 interface INumberFieldProps {
   name: string;
@@ -15,6 +16,7 @@ interface INumberFieldProps {
 
 const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readOnly, tooltip }) => {
   const required = rules?.required ? true : false;
+  const { t } = useTranslation();
   return (
     <Controller
       name={name}
@@ -26,7 +28,7 @@ const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readO
             className={`input-l`}
             {...field}
             value={field.value || ''}
-            label={label}
+            label={t(label)}
             id={label}
             readOnly={readOnly}
             required={required}

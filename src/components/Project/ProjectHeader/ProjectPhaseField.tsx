@@ -9,7 +9,7 @@ import { IProjectHeaderFieldProps } from './ProjectHeader';
 const ProjectPhaseField: FC<IProjectHeaderFieldProps> = ({ control }) => {
   const { t } = useTranslation();
   const icon = useMemo(() => <IconFaceSmile />, []);
-  const { options } = useOptions('phase');
+  const phases = useOptions('phases');
 
   return (
     <Controller
@@ -23,7 +23,7 @@ const ProjectPhaseField: FC<IProjectHeaderFieldProps> = ({ control }) => {
             onBlur={onBlur}
             icon={icon}
             placeholder={t('projectPhase') || ''}
-            options={options}
+            options={phases}
             onChange={onChange}
           />
         </div>

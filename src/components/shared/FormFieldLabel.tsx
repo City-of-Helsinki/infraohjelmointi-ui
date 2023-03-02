@@ -1,5 +1,6 @@
 import { IconPenLine } from 'hds-react/icons';
 import { FC, MouseEventHandler } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface IFormFieldLabel {
   text: string;
@@ -13,9 +14,10 @@ interface IFormFieldLabel {
  * could be made more generic?
  */
 const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled, dataTestId }) => {
+  const { t } = useTranslation();
   return (
     <div className="display-flex">
-      <label className="pen-and-label-text">{text}</label>
+      <label className="pen-and-label-text">{t(text)}</label>
       {onClick && (
         <button
           onClick={onClick}

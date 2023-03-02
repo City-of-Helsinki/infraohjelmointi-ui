@@ -26,7 +26,7 @@ const useProjectHeaderValues = () => {
       name: project?.name || '',
       address: project?.address || '',
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [project, user],
   );
 
@@ -55,7 +55,6 @@ const useProjectHeaderForm = () => {
     if (project) {
       reset(formValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project, formValues]);
 
   return { formMethods, control };

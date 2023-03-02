@@ -1,15 +1,16 @@
-import { ListType } from '@/interfaces/common';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select as HDSSelect } from 'hds-react/components/Select';
-import { useOptions } from '@/hooks/useOptions';
 import { IconLocation } from 'hds-react/icons';
+import { useTranslation } from 'react-i18next';
+import { IOption } from '@/interfaces/common';
 
 interface IMultiSelectFieldProps {
-  name: ListType;
+  name: string;
   label: string;
   control: HookFormControlType;
+  options: Array<IOption>;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
   icon?: string;
@@ -20,14 +21,14 @@ const MultiSelectField: FC<IMultiSelectFieldProps> = ({
   name,
   label,
   control,
+  options,
   rules,
   hideLabel,
   icon,
   placeholder,
 }) => {
   const required = rules?.required ? true : false;
-  const { options } = useOptions(name);
-
+  const { t } = useTranslation();
   return (
     <Controller
       name={name}
@@ -39,8 +40,8 @@ const MultiSelectField: FC<IMultiSelectFieldProps> = ({
               onChange={onChange}
               multiselect
               className="input-l"
-              label={!hideLabel && label}
-              placeholder={placeholder}
+              label={!hideLabel && t(label)}
+              placeholder={(placeholder && t(placeholder || '')) || ''}
               options={options}
               value={value || []}
               clearButtonAriaLabel="Clear all selections"

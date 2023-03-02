@@ -14,41 +14,17 @@ import { useAppSelector } from './common';
  * @param name a ListType, restricted to the lists that we have in redux
  * @returns options & listItemToOption
  */
-export const useOptions = (name?: ListType) => {
+export const useOptions = (name?: ListType, shouldNotTranslate?: boolean) => {
   const { t } = useTranslation();
 
-  const personName = ['personPlanning', 'personConstruction', 'personProgramming'].includes(
-    name as ListType,
-  )
-    ? 'responsiblePersons'
-    : '';
-
-  const programmedYearName = ['programmedYearMin', 'programmedYearMax'].includes(name as ListType)
-    ? 'programmedYears'
-    : '';
-
-  const parsedName = personName || programmedYearName || name;
-
-  const shouldNotTranslate = [
-    'masterClass',
-    'class',
-    'subClass',
-    'district',
-    'division',
-    'subDivision',
-    'responsiblePersons',
-    'programmedYears',
-  ].includes(parsedName as ListType);
-
   const optionsList = useAppSelector(
-    (state: RootState) => state.lists[parsedName as keyof IListState],
+    (state: RootState) => state.lists[name as keyof IListState],
   ) as Array<IListItem>;
 
   const options = useMemo(
     () => optionsList.map((i) => listItemToOption(i, shouldNotTranslate ? undefined : t)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [optionsList],
   );
 
-  return { options };
+  return options;
 };

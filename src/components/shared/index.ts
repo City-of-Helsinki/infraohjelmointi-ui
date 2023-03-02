@@ -9,7 +9,6 @@ export { default as SideNavigation } from './SideNavigation';
 export { default as TextField } from './TextField';
 export { default as SelectField } from './SelectField';
 export { default as NumberField } from './NumberField';
-export { default as FormFieldCreator } from './FormFieldCreator';
 export { default as FormSectionTitle } from './FormSectionTitle';
 export { default as FormFieldLabel } from './FormFieldLabel';
 export { default as ListField } from './ListField';

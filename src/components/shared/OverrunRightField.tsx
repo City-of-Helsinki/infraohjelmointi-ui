@@ -1,12 +1,16 @@
-import { IForm } from '@/interfaces/formInterfaces';
+import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
-import { useState, MouseEvent, useCallback, memo } from 'react';
+import { useState, MouseEvent, useCallback, memo, FC } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import BubbleIcon from './BubbleIcon';
 import FormFieldLabel from './FormFieldLabel';
 
-const OverrunRightField = ({ form }: { form: IForm }) => {
+interface IOverrunRightField {
+  control: HookFormControlType;
+  readOnly?: boolean;
+}
+const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
 
@@ -19,7 +23,7 @@ const OverrunRightField = ({ form }: { form: IForm }) => {
     <div className="input-wrapper" id="overrunRight">
       <Controller
         name="budgetOverrunYear"
-        control={form.control as Control<FieldValues>}
+        control={control as Control<FieldValues>}
         render={({ field }) => (
           <>
             <div className="overrun-label-container">
@@ -37,7 +41,7 @@ const OverrunRightField = ({ form }: { form: IForm }) => {
                   {...field}
                   label={''}
                   id={field.name}
-                  readOnly={!editing || form.readOnly}
+                  readOnly={!editing || readOnly}
                 />
               </>
             )}
@@ -46,7 +50,7 @@ const OverrunRightField = ({ form }: { form: IForm }) => {
       />
       <Controller
         name="budgetOverrunAmount"
-        control={form.control as Control<FieldValues>}
+        control={control as Control<FieldValues>}
         render={({ field }) => (
           <>
             {editing ? (
@@ -58,7 +62,7 @@ const OverrunRightField = ({ form }: { form: IForm }) => {
                   {...field}
                   label={''}
                   id={field.name}
-                  readOnly={!editing || form.readOnly}
+                  readOnly={!editing || readOnly}
                 />
               </>
             ) : (

@@ -257,5 +257,6 @@
   "addToProject": "Lisää hankkeelle?",
   "currentStatus": "Nykystatus",
   "search": "Hae",
-  "searchProjects": "Hae projekteja"
+  "searchProjects": "Hae projekteja",
+  "choose": "Valitse"
 }

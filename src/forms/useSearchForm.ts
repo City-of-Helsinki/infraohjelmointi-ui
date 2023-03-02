@@ -1,8 +1,6 @@
-import { FormField, HookFormControlType, IForm, ISearchForm } from '@/interfaces/formInterfaces';
+import { ISearchForm } from '@/interfaces/formInterfaces';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { TFunction } from 'i18next';
 import { useAppDispatch, useAppSelector } from '../hooks/common';
 import _ from 'lodash';
 import {
@@ -13,86 +11,7 @@ import {
   setSearchForm,
 } from '@/reducers/searchSlice';
 
-const buildSearchFormFields = (
-  control: HookFormControlType,
-  translate: TFunction<'translation', undefined>,
-): Array<IForm> => {
-  const formFields = [
-    {
-      name: 'filter',
-      type: FormField.ListField,
-      readOnly: true,
-    },
-    {
-      name: 'masterClass',
-      type: FormField.MultiSelect,
-      placeholder: 'Valitse',
-    },
-    {
-      name: 'class',
-      type: FormField.MultiSelect,
-      placeholder: 'Valitse',
-    },
-    {
-      name: 'subClass',
-      type: FormField.MultiSelect,
-      placeholder: 'Valitse',
-    },
-    {
-      name: 'programmed',
-      type: FormField.FieldSet,
-      fieldSet: [
-        { name: 'programmedYes', type: FormField.Checkbox },
-        { name: 'programmedNo', type: FormField.Checkbox },
-      ],
-    },
-    {
-      name: 'programmedYearMin',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-    },
-    {
-      name: 'programmedYearMax',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-    },
-    {
-      name: 'phase',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-    },
-    {
-      name: 'personPlanning',
-      type: FormField.Select,
-      icon: 'person',
-      placeholder: 'Valitse',
-    },
-    { name: 'district', type: FormField.MultiSelect, placeholder: 'Valitse', icon: 'location' },
-    { name: 'division', type: FormField.MultiSelect, placeholder: 'Valitse', icon: 'location' },
-    { name: 'subDivision', type: FormField.MultiSelect, placeholder: 'Valitse', icon: 'location' },
-    {
-      name: 'category',
-      type: FormField.Select,
-      placeholder: 'Valitse',
-    },
-  ];
-
-  const projectBasicsFormFields = formFields.map((formField) => ({
-    ...formField,
-    control,
-    label: translate(`searchForm.${formField.name}`),
-    fieldSet: formField.fieldSet?.map((fieldSetField) => ({
-      ...fieldSetField,
-      control,
-      label: translate(`searchForm.${fieldSetField.name}`),
-    })),
-  }));
-
-  return projectBasicsFormFields;
-};
-
 const useSearchForm = () => {
-  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const storeFormValues = useAppSelector(selectSearchForm);
   const open = useAppSelector(selectOpen);
@@ -103,7 +22,6 @@ const useSearchForm = () => {
   });
 
   const {
-    control,
     reset,
     getValues,
     setValue,
@@ -136,7 +54,6 @@ const useSearchForm = () => {
       dispatch(setSearchForm(currentFormValues));
       reset(currentFormValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freeSearchParams, open]);
 
   /**
@@ -146,13 +63,9 @@ const useSearchForm = () => {
     if (formHasDefaultValues && !_.isEmpty(freeSearchParams) && _.isEmpty(dirtyFields)) {
       setFormDirty();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFormValues]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const formFields = useMemo(() => buildSearchFormFields(control, t), [control]);
-
-  return { formFields, formMethods };
+  return { formMethods };
 };
 
 export default useSearchForm;

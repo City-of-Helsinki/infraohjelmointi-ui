@@ -1,7 +1,8 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppDispatch } from '@/hooks/common';
+import { useOptions } from '@/hooks/useOptions';
 import useProjectsList from '@/hooks/useProjectsList';
 import { planGroups } from '@/mocks/common';
-import { getProjectPhasesThunk, selectPhaseList } from '@/reducers/listsSlice';
+import { getProjectPhasesThunk } from '@/reducers/listsSlice';
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -14,7 +15,7 @@ const PlanningGroupsTable = () => {
   const { projects, fetchNext } = useProjectsList();
   const { ref, inView } = useInView();
   const dispatch = useAppDispatch();
-  const phases = useAppSelector(selectPhaseList);
+  const phases = useOptions('phases');
   const [tableState, setTableState] = useState<{
     selectedProjectId: string;
     projectsVisible: boolean;
@@ -54,13 +55,11 @@ const PlanningGroupsTable = () => {
     if (inView && projectsVisible) {
       fetchNext();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   // Get phases list
   useEffect(() => {
     dispatch(getProjectPhasesThunk());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

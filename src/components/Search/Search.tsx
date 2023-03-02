@@ -3,7 +3,7 @@ import { ISearchForm } from '@/interfaces/formInterfaces';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useCallback } from 'react';
-import { FormFieldCreator } from '../shared';
+import { FormFieldLabel, SelectField } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   getSearchResultsThunk,
@@ -13,11 +13,13 @@ import {
   toggleSearch,
 } from '@/reducers/searchSlice';
 import { FreeSearchFormObject, IOption } from '@/interfaces/common';
-import useClassList from '@/hooks/useClassList';
-import useLocationList from '@/hooks/useLocationList';
 import { useTranslation } from 'react-i18next';
 import FreeSearchForm from './FreeSearchForm';
 import './styles.css';
+import MultiSelectField from '../shared/MultiSelectField';
+import CheckboxField from '../shared/CheckboxField';
+import { Fieldset } from 'hds-react/components/Fieldset';
+import { useOptions } from '@/hooks/useOptions';
 
 // Build a search parameter with all the choices from the search form
 const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormObject | null) => {
@@ -80,17 +82,27 @@ const Search = () => {
   const open = useAppSelector(selectOpen);
   const freeSearchParams = useAppSelector(selectFreeSearchParams);
 
-  const { formMethods, formFields } = useSearchForm();
+  const { formMethods } = useSearchForm();
 
   const {
     handleSubmit,
     getValues,
     formState: { isDirty },
     reset,
+    control,
   } = formMethods;
 
-  useClassList(false);
-  useLocationList(false);
+  const phases = useOptions('phases');
+  const masterClasses = useOptions('masterClasses', true);
+  const classes = useOptions('classes', true);
+  const subClasses = useOptions('subClasses', true);
+  const districts = useOptions('districts', true);
+  const divisions = useOptions('divisions', true);
+  const subDivisions = useOptions('subDivisions', true);
+  const programmedYearMin = useOptions('programmedYears', true);
+  const programmedYearMax = useOptions('programmedYears', true);
+  const personPlanning = useOptions('responsiblePersons', true);
+  const categories = useOptions('categories');
 
   const onSubmit = useCallback(
     async (form: ISearchForm) => {
@@ -107,6 +119,17 @@ const Search = () => {
     dispatch(toggleSearch());
     dispatch(setSearchForm(getValues()));
   }, [dispatch, getValues]);
+
+  const formProps = useCallback(
+    (name: string) => {
+      return {
+        name: name,
+        label: `searchForm.${name}`,
+        control: control,
+      };
+    },
+    [control],
+  );
 
   return (
     <Dialog
@@ -127,7 +150,53 @@ const Search = () => {
           data-testid="project-search-form"
         >
           <div className="search-form-content">
-            <FormFieldCreator form={formFields} />
+            <div className="search-form-filter-label">
+              <FormFieldLabel text="searchForm.filter" />
+            </div>
+            <MultiSelectField
+              {...formProps('masterClass')}
+              placeholder="choose"
+              options={masterClasses}
+            />
+            <MultiSelectField {...formProps('class')} placeholder="choose" options={classes} />
+            <MultiSelectField
+              {...formProps('subClass')}
+              placeholder="choose"
+              options={subClasses}
+            />
+            <Fieldset
+              heading={t('searchForm.programmed')}
+              className="custom-fieldset"
+              id="programmed"
+            >
+              <CheckboxField {...formProps('programmedYes')} />
+              <CheckboxField {...formProps('programmedNo')} />
+            </Fieldset>
+            <SelectField
+              {...formProps('programmedYearMin')}
+              placeholder="choose"
+              options={programmedYearMin}
+            />
+            <SelectField
+              {...formProps('programmedYearMax')}
+              placeholder="choose"
+              options={programmedYearMax}
+            />
+            <SelectField {...formProps('phase')} placeholder="choose" options={phases} />
+            <SelectField
+              {...formProps('personPlanning')}
+              placeholder="choose"
+              icon="person"
+              options={personPlanning}
+            />
+            <MultiSelectField {...formProps('district')} placeholder="choose" options={districts} />
+            <MultiSelectField {...formProps('division')} placeholder="choose" options={divisions} />
+            <MultiSelectField
+              {...formProps('subDivision')}
+              placeholder="choose"
+              options={subDivisions}
+            />
+            <SelectField {...formProps('category')} placeholder="choose" options={categories} />
           </div>
         </form>
       </Dialog.Content>

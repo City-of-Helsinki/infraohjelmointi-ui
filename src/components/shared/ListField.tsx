@@ -2,16 +2,19 @@ import { IForm } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
 import { FC, memo, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
 
 interface IListFieldProps {
-  form: IForm;
+  name: string;
+  label: string;
+  fields?: Array<IForm>;
+  readOnly?: boolean;
 }
 
-const ListField: FC<IListFieldProps> = ({ form }) => {
-  const { label, readOnly, name } = form;
+const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
   const [editing, setEditing] = useState(false);
-
+  const { t } = useTranslation();
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setEditing((currentState) => !currentState);
@@ -23,14 +26,14 @@ const ListField: FC<IListFieldProps> = ({ form }) => {
         <div style={{ marginBottom: '1rem' }}>
           <FormFieldLabel text={label} onClick={readOnly ? undefined : handleSetEditing} />
         </div>
-        {form.fieldSet?.map((f) => (
+        {fields?.map((f) => (
           <Controller
             key={f.name}
             name={f.name}
             control={f.control as Control<FieldValues>}
             render={({ field }) => (
               <div className="list-field-row" key={f.label}>
-                <label className="list-field-item-label">{f.label}</label>
+                <label className="list-field-item-label">{t(f.label)}</label>
                 {!editing ? (
                   <span>{`${field.value} €`}</span>
                 ) : (

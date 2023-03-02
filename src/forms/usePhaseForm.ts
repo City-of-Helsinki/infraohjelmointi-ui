@@ -17,7 +17,6 @@ const usePhaseForm = (projectPhase: string) => {
   // Updates
   useEffect(() => {
     projectPhase && reset(formValues);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectPhase]);
 
   return { formMethods };

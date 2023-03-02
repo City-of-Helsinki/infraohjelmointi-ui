@@ -16,58 +16,52 @@ import {
 } from '@/services/listServices';
 import { getPersons } from '@/services/personServices';
 import { RootState } from '@/store';
-import { setProgrammedYears } from '@/utils/common';
+import { classesToListItems, setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface IListState {
-  type: Array<IListItem>;
-  phase: Array<IListItem>;
-  area: Array<IListItem>;
-  constructionPhaseDetail: Array<IListItem>;
-  category: Array<IListItem>;
-  riskAssessment: Array<IListItem>;
-  masterClass: Array<IListItem>;
-  class: Array<IListItem>;
-  subClass: Array<IListItem>;
-  projectQualityLevel: Array<IListItem>;
-  planningPhase: Array<IListItem>;
-  constructionPhase: Array<IListItem>;
-  district: Array<IListItem>;
-  division: Array<IListItem>;
-  subDivision: Array<IListItem>;
-  responsibleZone: Array<IListItem>;
+  types: Array<IListItem>;
+  phases: Array<IListItem>;
+  areas: Array<IListItem>;
+  constructionPhaseDetails: Array<IListItem>;
+  categories: Array<IListItem>;
+  riskAssessments: Array<IListItem>;
+  masterClasses: Array<IListItem>;
+  classes: Array<IListItem>;
+  subClasses: Array<IListItem>;
+  projectQualityLevels: Array<IListItem>;
+  planningPhases: Array<IListItem>;
+  constructionPhases: Array<IListItem>;
+  districts: Array<IListItem>;
+  divisions: Array<IListItem>;
+  subDivisions: Array<IListItem>;
+  responsibleZones: Array<IListItem>;
   responsiblePersons: Array<IListItem>;
   programmedYears: Array<IListItem>;
   error: IError | null | unknown;
 }
 
 const initialState: IListState = {
-  type: [],
-  phase: [],
-  area: [],
-  constructionPhaseDetail: [],
-  category: [],
-  riskAssessment: [],
-  masterClass: [],
-  class: [],
-  subClass: [],
-  projectQualityLevel: [],
-  planningPhase: [],
-  constructionPhase: [],
-  district: [],
-  division: [],
-  subDivision: [],
-  responsibleZone: [],
+  types: [],
+  phases: [],
+  areas: [],
+  constructionPhaseDetails: [],
+  categories: [],
+  riskAssessments: [],
+  masterClasses: [],
+  classes: [],
+  subClasses: [],
+  projectQualityLevels: [],
+  planningPhases: [],
+  constructionPhases: [],
+  districts: [],
+  divisions: [],
+  subDivisions: [],
+  responsibleZones: [],
   responsiblePersons: [],
   programmedYears: setProgrammedYears(),
   error: null,
 };
-
-const classesToListItems = (classes: Array<IClass>): Array<IListItem> =>
-  classes.map((mc) => ({
-    id: mc.id,
-    value: mc.name,
-  }));
 
 export const getProjectTypesThunk = createAsyncThunk('projectTypes/get', async (_, thunkAPI) => {
   return await getProjectTypes()
@@ -158,22 +152,22 @@ export const listsSlice = createSlice({
   initialState,
   reducers: {
     setMasterClassList(state, action: PayloadAction<Array<IClass>>) {
-      return { ...state, masterClass: classesToListItems(action.payload) };
+      return { ...state, masterClasses: classesToListItems(action.payload) };
     },
     setClassList(state, action: PayloadAction<Array<IClass>>) {
-      return { ...state, class: classesToListItems(action.payload) };
+      return { ...state, classes: classesToListItems(action.payload) };
     },
     setSubClassList(state, action: PayloadAction<Array<IClass>>) {
-      return { ...state, subClass: classesToListItems(action.payload) };
+      return { ...state, subClasses: classesToListItems(action.payload) };
     },
     setDistrictList(state, action: PayloadAction<Array<ILocation>>) {
-      return { ...state, district: classesToListItems(action.payload) };
+      return { ...state, districts: classesToListItems(action.payload) };
     },
     setDivisionList(state, action: PayloadAction<Array<ILocation>>) {
-      return { ...state, division: classesToListItems(action.payload) };
+      return { ...state, divisions: classesToListItems(action.payload) };
     },
     setSubDivisionList(state, action: PayloadAction<Array<ILocation>>) {
-      return { ...state, subDivision: classesToListItems(action.payload) };
+      return { ...state, subDivisions: classesToListItems(action.payload) };
     },
   },
   extraReducers: (builder) => {
@@ -181,7 +175,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectTypesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, type: action.payload };
+        return { ...state, types: action.payload };
       },
     );
     builder.addCase(
@@ -194,7 +188,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectPhasesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, phase: action.payload };
+        return { ...state, phases: action.payload };
       },
     );
     builder.addCase(
@@ -207,7 +201,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectAreasThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, area: action.payload };
+        return { ...state, areas: action.payload };
       },
     );
     builder.addCase(
@@ -220,7 +214,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getConstructionPhaseDetailsThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, constructionPhaseDetail: action.payload };
+        return { ...state, constructionPhaseDetails: action.payload };
       },
     );
     builder.addCase(
@@ -233,7 +227,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectCategoriesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, category: action.payload };
+        return { ...state, categories: action.payload };
       },
     );
     builder.addCase(
@@ -246,7 +240,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectRisksThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, riskAssessment: action.payload };
+        return { ...state, riskAssessments: action.payload };
       },
     );
     builder.addCase(
@@ -259,7 +253,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getProjectQualityLevelsThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, projectQualityLevel: action.payload };
+        return { ...state, projectQualityLevels: action.payload };
       },
     );
     builder.addCase(
@@ -272,7 +266,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getPlanningPhasesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, planningPhase: action.payload };
+        return { ...state, planningPhases: action.payload };
       },
     );
     builder.addCase(
@@ -285,7 +279,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getConstructionPhasesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, constructionPhase: action.payload };
+        return { ...state, constructionPhases: action.payload };
       },
     );
     builder.addCase(
@@ -298,7 +292,7 @@ export const listsSlice = createSlice({
     builder.addCase(
       getResponsibleZonesThunk.fulfilled,
       (state, action: PayloadAction<Array<IListItem>>) => {
-        return { ...state, responsibleZone: action.payload };
+        return { ...state, responsibleZones: action.payload };
       },
     );
     builder.addCase(
@@ -330,10 +324,31 @@ export const listsSlice = createSlice({
   },
 });
 
-export const selectPhaseList = (state: RootState) => state.lists.phase;
-export const selectMasterClassList = (state: RootState) => state.lists.masterClass;
-export const selectDistrictList = (state: RootState) => state.lists.district;
+export const selectPhasesList = (state: RootState) => state.lists.phases;
 
+export const selectMasterClassesList = (state: RootState) => state.lists.masterClasses;
+export const selectClassesList = (state: RootState) => state.lists.classes;
+export const selectSubClassesList = (state: RootState) => state.lists.subClasses;
+
+export const selectDistrictsList = (state: RootState) => state.lists.districts;
+export const selectDivisionsList = (state: RootState) => state.lists.divisions;
+export const selectSubDivisionsList = (state: RootState) => state.lists.subDivisions;
+
+/*
+  riskAssessments: [],
+  masterClasses: [],
+  classes: [],
+  subClasses: [],
+  projectQualityLevels: [],
+  planningPhases: [],
+  constructionPhases: [],
+  districts: [],
+  divisions: [],
+  subDivisions: [],
+  responsibleZones: [],
+  responsiblePersons: [],
+  programmedYears: setProgrammedYears(),
+*/
 export const {
   setMasterClassList,
   setClassList,

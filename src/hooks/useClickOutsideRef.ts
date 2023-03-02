@@ -19,7 +19,6 @@ const useClickOutsideRef = (ref: RefObject<HTMLDivElement>, callback: () => unkn
       // Event listener needs to be removed on cleanup
       document.removeEventListener('mouseup', handleClickOutside);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref]);
 };
 

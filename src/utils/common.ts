@@ -1,3 +1,4 @@
+import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IAppForms, IFormValueType } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
@@ -110,3 +111,15 @@ export const setProgrammedYears = () => {
 
 export const arrayHasValue = (arr: Array<unknown> | undefined, value: string) =>
   arr && arr.indexOf(value) !== -1;
+
+export const classesToListItems = (classes: Array<IClass>): Array<IListItem> =>
+  classes.map((mc) => ({
+    id: mc.id,
+    value: mc.name,
+  }));
+
+export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
+  classes.map((mc) => ({
+    value: mc.id,
+    label: mc.name,
+  }));
