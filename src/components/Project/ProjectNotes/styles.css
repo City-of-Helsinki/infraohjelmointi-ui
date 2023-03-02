@@ -27,5 +27,5 @@
   @apply col-span-2;
 }
 .note-history-container #modifiedBy {
-  @apply col-span3 row-span-2;
+  @apply col-span-3 row-span-2;
 }
