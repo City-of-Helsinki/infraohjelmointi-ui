@@ -1,20 +1,7 @@
-.notifications-container {
-  width: 21.875rem;
-  position: -webkit-sticky;
-  position: sticky;
-  margin-left: auto;
-  left: 0;
-  right: 0;
-  top: 0;
-  z-index: 999;
-  margin-right: auto;
-  height: 0;
-}
-
 .notification-wrapper {
-  padding-top: var(--spacing-xs);
+  @apply pt-3;
 }
 
 .notification-wrapper:first-child {
-  padding-top: var(--spacing-l);
+  @apply pt-8;
 }

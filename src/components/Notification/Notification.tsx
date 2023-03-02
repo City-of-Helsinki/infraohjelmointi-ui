@@ -13,7 +13,10 @@ const Notification: FC = () => {
   return (
     <>
       {notifications.length > 0 && (
-        <div className="notifications-container">
+        <div
+          className="sticky left-0 right-0 top-0 z-[999] mx-auto h-0 w-[22rem]"
+          data-testid="notifications-container"
+        >
           {notifications.map((n) => (
             <div key={n.id} className="notification-wrapper">
               <HDSNotification

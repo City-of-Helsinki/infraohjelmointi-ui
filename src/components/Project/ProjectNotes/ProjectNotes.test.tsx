@@ -50,15 +50,15 @@ describe('ProjectNotes', () => {
   });
 
   it('renders the component wrappers', async () => {
-    const { container } = renderResult;
+    const { getByTestId } = renderResult;
 
-    expect(container.getElementsByClassName('notes-page-container').length).toBe(1);
+    expect(getByTestId('notes-page')).toBeInTheDocument();
   });
 
   it('renders the new note form', async () => {
-    const { container, getByLabelText, getByRole } = renderResult;
+    const { getByTestId, getByLabelText, getByRole } = renderResult;
 
-    expect(container.getElementsByClassName('note-form-textarea').length).toBe(1);
+    expect(getByTestId('new-note-textarea')).toBeInTheDocument();
     expect(getByLabelText('writeNote')).toBeInTheDocument();
     expect(getByRole('textbox', { name: 'writeNote' })).toBeInTheDocument();
     expect(getByRole('button', { name: 'save' })).toBeInTheDocument();
@@ -129,7 +129,7 @@ describe('ProjectNotes', () => {
   });
 
   it('can DELETE a note', async () => {
-    const { user, getByRole, container, getAllByRole } = renderResult;
+    const { user, getByRole, getByTestId, getAllByRole } = renderResult;
 
     mockedAxios.delete.mockResolvedValue(
       Promise.resolve({
@@ -142,11 +142,12 @@ describe('ProjectNotes', () => {
     await user.click(getAllByRole('button', { name: 'delete' })[1]);
     await user.click(getByRole('button', { name: 'deleteNote' }));
 
-    expect(container.getElementsByClassName('note-container').length).toBe(1);
+    expect(getByTestId('note-container')).toBeInTheDocument();
   });
 
   it('can PATCH a note', async () => {
-    const { user, queryByText, container, getAllByRole, getByTestId, getByText } = renderResult;
+    const { user, queryByText, getAllByRole, getByTestId, getByText, getAllByTestId } =
+      renderResult;
 
     const responseNote = {
       data: {
@@ -168,7 +169,7 @@ describe('ProjectNotes', () => {
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as INote;
 
     await waitFor(() => {
-      expect(container.getElementsByClassName('note-container').length).toBe(2);
+      expect(getAllByTestId('note-container').length).toBe(2);
       expect(formPatchRequest.content).toEqual(responseNote.data.content);
       expect(getByText(responseNote.data.content)).toBeInTheDocument();
       expect(queryByText(mockNotes.data[1].content)).toBeNull();

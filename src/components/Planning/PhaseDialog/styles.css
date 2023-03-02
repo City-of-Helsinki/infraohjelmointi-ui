@@ -1,102 +1,62 @@
 .phase-dialog-container {
-  position: fixed;
-  max-width: 16rem;
-  border: 0.1rem solid var(--color-black);
-  z-index: 999;
-  transform: translateX(1.5rem);
-  @apply bg-white;
+  @apply fixed z-[999] max-w-[16rem] translate-x-6 border border-black bg-white;
 }
 
 .phase-dialog-container p {
-  margin: 0.2rem 0;
+  @apply my-1;
 }
 
 .phase-dialog-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  align-items: center;
-  padding: 0.1rem 0;
-  overflow: hidden;
-  @apply border-b border-gray;
+  @apply flex w-full items-center justify-between overflow-hidden border-b border-gray py-1;
 }
 
 .phase-dialog-header .title {
-  padding-left: 0.95rem;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 12rem;
+  @apply max-w-[12rem] overflow-hidden overflow-ellipsis pl-4;
 }
 
 .phase-dialog-header .description {
-  font-weight: bold;
-  padding-left: 0.95rem;
-  font-size: 1rem;
+  @apply pl-4 font-bold;
 }
 
 .phase-dialog-header .close-icon {
-  padding-right: 0.5rem;
-  cursor: pointer;
-  min-width: 1.5rem;
+  @apply min-w-[1.5rem] cursor-pointer pr-2;
 }
 
 .phase-dialog-list {
-  display: flex;
-  flex-direction: column;
-  padding: 0.35rem 0 0.35rem 0;
-  margin: 0;
-  @apply border-b border-gray;
+  @apply m-0 flex flex-col border-b border-gray py-1;
 }
 
 .phase-dialog-list .list-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  @apply bg-white;
+  @apply flex w-full items-center justify-between bg-white py-2;
 }
 .phase-dialog-list .list-item.selected {
   @apply bg-bus-m;
 }
 
 .phase-dialog-list .list-item .selection-button {
-  display: flex;
-  padding-left: 0.7rem;
-  align-items: center;
-  gap: 0.35rem;
-  overflow: hidden;
+  @apply flex items-center gap-1 overflow-hidden pl-3;
 }
 
 .phase-dialog-list .list-item .icon-width {
-  min-width: 1.5rem;
+  @apply min-w-[1.5rem];
 }
 
 .phase-dialog-list .list-item .check-icon {
-  padding-right: 0.7rem;
+  @apply -translate-x-3;
 }
 
 .phase-dialog-list .list-item .item-text {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  font-size: 14px;
-  font-weight: normal;
-  padding-right: 2rem;
+  @apply overflow-hidden text-ellipsis pr-8 text-sm;
 }
 
 .phase-dialog-list .list-item .item-text.selected {
-  font-weight: bold;
-  padding-right: 0;
+  @apply w-[80%] pr-2 font-bold;
 }
 
 .phase-dialog-footer {
-  padding: 0.4rem;
-  display: flex;
-  justify-content: flex-end;
+  @apply flex justify-end p-2;
 }
 
 .phase-dialog-footer button {
-  min-height: 2.5rem !important;
-  max-height: 2.5rem !important;
+  @apply min-h-[2-5rem] min-w-[2.5rem];
 }

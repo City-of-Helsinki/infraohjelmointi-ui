@@ -29,7 +29,7 @@ const PlanningView: FC = () => {
       <PlanningBreadcrumbs />
       <PlanningToolbar />
       <div className="planning-view-container">
-        <div className="display-flex">
+        <div className="flex">
           <PlanningInfoPanel />
           <PlanningYearsTable />
         </div>

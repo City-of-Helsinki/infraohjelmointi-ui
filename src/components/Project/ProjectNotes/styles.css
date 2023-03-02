@@ -1,84 +1,31 @@
-.notes-page-container {
-  @apply my-16 mx-24 w-[80%] max-w-[40.5rem];
-}
-
-.notes-page-container p:nth-child(2) {
-  margin-top: var(--spacing-s) !important;
-  @apply mt-4;
-}
-
-.note-form-container {
-  border: 0.125rem solid rgb(204, 204, 204);
-  padding: var(--spacing-m);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin: var(--spacing-m) 0;
-}
-
-.note-form-textarea {
-  width: 100%;
-  margin: 0 0 var(--spacing-m) 0;
-}
-
-.note-container {
-  background: var(--color-silver-light);
-  margin-bottom: var(--spacing-m);
-  border-radius: 0.25rem;
-  @apply mb-8 rounded-md border-none bg-silver-l;
-}
-
-.note-header-container {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-m) var(--spacing-m) 0 var(--spacing-m);
-}
-
-.note-content-container {
-  padding: 0 var(--spacing-m) var(--spacing-l) var(--spacing-m);
-}
-
-.note-footer-container {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 var(--spacing-xs) var(--spacing-s) var(--spacing-xs);
-}
-
 .note-history {
-  padding-bottom: 1.25rem;
+  @apply pb-5;
 }
 
 .note-history:last-child {
-  padding-bottom: 0;
+  @apply pb-0;
 }
 
 /* adds a border with padding to each element */
 .note-history:after {
-  content: '';
-  display: block;
-  margin: 0 auto;
-  width: 93%;
-  @apply border-t border-gray;
+  @apply my-0 mx-auto block w-[93%] border-t border-gray content-[''];
 }
 
 /* last history row will not have a border */
 .note-history:last-child:after {
-  border-bottom: none;
+  @apply border-none;
 }
 
 .note-history-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 0 var(--spacing-m) var(--spacing-s) var(--spacing-m);
+  @apply grid grid-cols-3 px-6 pb-4;
 }
 
 .note-history-container #modifiedDate {
-  grid-column: 1;
+  @apply col-span-1;
 }
 .note-history-container #title {
-  grid-column: 2/3;
+  @apply col-span-2;
 }
 .note-history-container #modifiedBy {
-  grid-row: 2;
-  grid-column: 2/3;
+  @apply col-span3 row-span-2;
 }
