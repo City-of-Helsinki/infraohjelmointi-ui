@@ -49,7 +49,7 @@ const ProjectBasicsForm: FC = () => {
   const planningPhases = useOptions('planningPhases');
   const constructionPhases = useOptions('constructionPhases');
   const responsibleZones = useOptions('responsibleZones');
-  const responsiblePersons = useOptions('responsiblePersons');
+  const responsiblePersons = useOptions('responsiblePersons', true);
   const { masterClasses, classes, subClasses } = useClassOptions(projectClass);
   const { districts, divisions, subDivisions } = useLocationOptions(projectLocation);
 
