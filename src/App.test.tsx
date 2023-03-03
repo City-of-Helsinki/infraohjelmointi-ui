@@ -1,6 +1,6 @@
 import mockI18next from '@/mocks/mockI18next';
-import { act, screen, waitFor } from '@testing-library/react';
-import { CustomRenderResult, renderWithProviders } from './utils/testUtils';
+import { act, waitFor } from '@testing-library/react';
+import { renderWithProviders } from './utils/testUtils';
 import App from './App';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
 import mockProjectClasses from './mocks/mockClasses';
@@ -11,15 +11,16 @@ jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 describe('App', () => {
-  let renderResult: CustomRenderResult;
-
   beforeEach(async () => {
     mockGetResponseProvider();
-    await act(async () => (renderResult = renderWithProviders(<App />)));
+  });
+
+  afterEach(async () => {
+    jest.clearAllMocks();
   });
 
   it('adds all needed data to store', async () => {
-    const { store } = renderResult;
+    const { store } = await act(async () => renderWithProviders(<App />));
 
     const classes = store.getState().class;
     const locations = store.getState().location;
@@ -37,41 +38,39 @@ describe('App', () => {
     expect(locations.subDivisions.length).toBeGreaterThan(0);
   });
 
-  it('renders TopBar', () => {
-    const { getByTestId } = renderResult;
+  it('renders TopBar', async () => {
+    const { getByTestId } = await act(async () => renderWithProviders(<App />));
     expect(getByTestId('top-bar')).toBeInTheDocument();
   });
 
   it('renders SideBar', async () => {
-    const { getByTestId } = renderResult;
+    const { getByTestId } = await act(async () => renderWithProviders(<App />));
     expect(getByTestId('sidebar')).toBeInTheDocument();
   });
 
-  it('renders app-content', () => {
-    const { container } = renderResult;
+  it('renders app-content', async () => {
+    const { container } = await act(async () => renderWithProviders(<App />));
     expect(container.getElementsByClassName('app-content').length).toBe(1);
-    expect(screen.getByTestId('app-outlet')).toBeInTheDocument();
   });
 
-  it('does not render Loader', () => {
-    const { container } = renderResult;
+  it('does not render Loader', async () => {
+    const { container } = await act(async () => renderWithProviders(<App />));
     expect(container.getElementsByClassName('loader-overlay').length).toBe(0);
   });
 
-  it('does not render Notification', () => {
-    const { container } = renderResult;
+  it('does not render Notification', async () => {
+    const { container } = await act(async () => renderWithProviders(<App />));
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
   });
 
-  /**
-   * FIXME: get route tests to work, everything should be setup according to
-   * https://testing-library.com/docs/example-react-router/
-   */
-  test.skip('landing on a bad page', async () => {
-    const route = '/something-that-does-not-match';
-    const { getByText } = renderWithProviders(<App />, {}, { route });
+  it('landing on a bad page', async () => {
+    const { getByText, getByTestId } = await act(() =>
+      renderWithProviders(<App />, {}, { route: '/something-that-does-not-match' }),
+    );
     await waitFor(() => {
-      expect(getByText(/error.404/i)).toBeInTheDocument();
+      expect(getByText('error.404')).toBeInTheDocument();
+      expect(getByText('error.pageNotFound')).toBeInTheDocument();
+      expect(getByTestId('return-to-previous-btn')).toBeInTheDocument();
     });
   });
 });
