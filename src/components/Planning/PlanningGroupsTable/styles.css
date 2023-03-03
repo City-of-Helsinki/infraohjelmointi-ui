@@ -1,9 +1,5 @@
 .group-header-cell {
-  width: 30.6%;
-  background: var(--color-bus);
-  padding: 0.5rem 1.25rem;
-  color: white;
-  min-width: 24.3rem;
+  @apply w-[30.6%] min-w-[26.74rem] bg-bus py-2 px-5 text-white;
 }
 
 .group-header-cell-content {
@@ -31,12 +27,7 @@
 }
 
 .group-cell {
-  background: var(--color-bus);
-  color: white;
-  padding: 0.5rem 0.25rem;
-  font-size: 0.875rem;
-  max-width: 4.875rem;
-  min-width: 4.875rem;
+  @apply min-h-[var(--table-cell-width)] min-w-[var(--table-cell-width)] bg-bus py-2 px-1 align-text-top text-white;
 }
 
 .group-cell span {
@@ -46,10 +37,7 @@
 }
 
 .project-header-cell {
-  text-align: left;
-  padding: 0.1rem 1.25rem;
-  border-bottom: 0.05rem solid var(--color-bus-medium-light);
-  border-left: 0.05rem solid var(--color-bus-medium-light);
+  @apply border-b-[0.05rem] border-l-[0.05rem] border-bus-m py-1 px-5;
 }
 
 .project-header-cell-container {
@@ -93,47 +81,24 @@
 }
 
 /* Hide too long project names */
-.project-header-cell .project-name-button {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 8.125rem;
+.project-header-cell .left .project-name-button {
+  @apply max-w-[10.5rem] overflow-hidden overflow-ellipsis text-sm;
 }
 
 .project-cell {
-  text-align: right;
-  background: var(--color-bus-light);
-  border-bottom: 0.05rem solid var(--color-bus-medium-light);
-  border-collapse: collapse;
+  @apply border-collapse bg-bus-l text-right;
 }
 
 .project-cell:last-child {
-  border-right: 0.05rem solid var(--color-bus-medium-light);
-  border-collapse: collapse;
+  @apply border-collapse border-r-[0.05rem] border-bus-m;
 }
 
 .circle-number-icon {
-  background: gray;
-  border-radius: 50%;
-  height: 1.5rem;
-  width: 1.5rem;
-  text-align: center;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+  @apply relative flex h-6 w-6 items-center justify-center rounded-full bg-[gray] text-center text-white;
 }
 
 .circle-number-icon-indicator {
-  position: absolute;
-  background: black;
-  height: 0.8rem;
-  width: 0.8rem;
-  border-radius: 50%;
-  font-size: 0.6rem;
-  line-height: 0.85rem;
-  bottom: 0rem;
-  right: -0.3125rem;
+  @apply absolute bottom-0 -right-1 h-3 w-3 rounded-full bg-black text-[0.6rem] leading-3;
 }
 
 .table-input input {

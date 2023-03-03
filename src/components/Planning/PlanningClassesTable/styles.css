@@ -1,18 +1,13 @@
 .class-header-cell {
-  width: 30.6%;
-  padding: 0 1.5rem;
-  color: white;
-  min-width: 23.8rem;
-  border-bottom: 0.07rem solid var(--color-white);
+  @apply w-[30.6%] min-w-[26.75rem] border-b border-white px-6 text-white;
 }
 
 .class-header-cell > div {
-  display: flex;
-  align-items: center;
+  @apply flex items-center;
 }
 
 .class-header-cell.first {
-  background: var(--color-bus);
+  @apply bg-bus;
 }
 
 .class-header-cell.second {
@@ -27,47 +22,33 @@
   background: rgb(0, 0, 102);
 }
 
-.class-header-content-item.value-container {
-  width: 2rem;
-}
-
 .class-cell {
-  color: white;
-  padding: 0.25rem 0 0.1rem 0;
-  font-size: 0.875rem;
-  max-width: 5.37rem;
-  min-width: 5.37rem;
-  border-bottom: 0.07rem solid var(--color-white);
+  @apply min-w-[var(--table-cell-width)] max-w-[var(--table-cell-width)] border-b border-white 
+  pt-1 pb-[0.1rem] text-white;
 }
 
 .class-cell .class-cell-container {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-rows: repeat(3, 1fr);
+  @apply grid grid-flow-row grid-rows-3;
 }
 
 .class-cell .class-cell-container span:first-child {
-  font-size: 16px !important;
-  font-weight: bold;
+  @apply font-bold;
 }
 
 .class-cell .class-cell-container span {
-  font-size: 14px !important;
-  width: 100%;
+  @apply w-full;
 }
 
 .class-cell .class-cell-container span:nth-child(3) {
-  font-weight: bold;
-  color: var(--color-suomenlinna-dark);
+  @apply font-bold text-suomenlinna-d;
 }
 
 .class-cell span {
-  font-weight: 300;
-  transform: translateX(-15%);
+  @apply translate-x-[-15%] font-light;
 }
 
 .class-cell.first {
-  background: var(--color-bus);
+  @apply bg-bus;
 }
 
 .class-cell.second {
@@ -83,98 +64,61 @@
 }
 
 .class-header-cell .class-header-content {
-  display: flex;
-  align-items: center;
-  text-overflow: ellipsis;
+  @apply flex items-center overflow-ellipsis;
 }
 
 .class-header-content.first {
-  padding-left: 0;
+  @apply pl-0;
 }
 
 .class-header-content.second {
-  padding-left: 2rem;
+  @apply pl-8;
 }
 
 .class-header-content.third {
-  padding-left: 4rem;
+  @apply pl-16;
 }
 
 .class-header-content.project {
-  padding-left: 6rem;
+  @apply pl-24;
 }
 
 .class-header-content-dots {
-  display: flex;
-  margin-right: 0.5rem;
+  @apply mr-2 flex;
 }
 
 .class-header-content-item {
-  display: flex;
-  margin-right: 0.5rem;
-  position: relative;
+  @apply relative mr-2 flex;
 }
 
 .class-header-content-item:hover {
-  cursor: pointer;
-}
-
-.custom-tooltip button {
-  width: 14rem !important;
-  position: absolute;
-  left: 12rem;
-}
-
-.custom-tooltip section {
-  color: black !important;
-}
-
-.custom-tooltip svg {
-  color: transparent;
+  @apply cursor-pointer;
 }
 
 .tooltip-container {
-  position: absolute;
   inset: auto auto 0px 0px;
-  transform: translate(0, -2rem);
-  border-bottom: 8px solid var(--color-coat-of-arms);
-  color: black !important;
-  max-width: 21.875rem;
-  background-color: var(--color-coat-of-arms-light);
-  padding: var(--spacing-s);
-  font-size: var(--fontsize-body-s);
-  line-height: 24px;
-  z-index: 1000;
-  font-weight: 400;
-  display: none;
+  @apply absolute z-[1000] hidden max-w-[21.875rem] -translate-y-8 
+  border-b-8 border-coat-of-arms bg-coat-of-arms-l p-4 text-sm font-normal leading-normal text-black;
 }
 
 .tooltip-arrow {
-  position: absolute;
-  margin-left: auto;
-  margin-right: auto;
-  bottom: calc(-1 * var(--spacing-s) - 8px);
-  border: 8px solid transparent;
-  border-top: 8px solid var(--color-coat-of-arms);
-  display: none;
+  --arrow-pos: calc(-1 * var(--spacing-s) - 8px);
+  @apply absolute bottom-[var(--arrow-pos)] mx-auto hidden border-8 border-transparent border-t-coat-of-arms;
 }
 
 .class-title-container {
-  max-width: 15rem;
+  @apply max-w-[15rem];
 }
 
 /* hide too long class names */
 .class-title-container span {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  display: block;
+  @apply block overflow-hidden overflow-ellipsis whitespace-nowrap;
 }
 
 .class-header-content-item:hover .tooltip-container {
-  display: block;
+  @apply block;
 }
 
 .class-header-content-item:hover .tooltip-arrow {
-  display: block;
+  @apply block;
 }

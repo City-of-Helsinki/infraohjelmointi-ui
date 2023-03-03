@@ -1,5 +1,5 @@
-import { IconAngleDown, IconAngleUp, IconCopy, IconMenuDots } from 'hds-react/icons';
-import { IconButton, Title } from '../../shared';
+import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
+import { IconButton } from '../../shared';
 import { FC, MouseEventHandler } from 'react';
 
 interface IPlanningGroupsTableHeaderProps {
@@ -27,11 +27,11 @@ const PlanningGroupsTableHeader: FC<IPlanningGroupsTableHeaderProps> = ({
                 onClick={handleProjectsVisible}
               />
               <IconMenuDots />
-              <Title size="s" text={group.name} color="white" /> <IconCopy />
+              <h4 className="text-heading-s text-white">{group.name}</h4>
             </div>
             <div className="right">
               <span>{group.value1}</span>
-              <span>{group.value2}</span>
+              <span className="text-sm">{group.value2}</span>
             </div>
           </div>
         </th>

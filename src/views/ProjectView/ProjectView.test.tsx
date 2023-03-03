@@ -75,18 +75,18 @@ describe('ProjectView', () => {
   });
 
   it('renders the parent container', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('project-container').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('project-view')).toBeInTheDocument();
   });
 
   it('renders the ProjectToolbar', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('toolbar-container').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('toolbar')).toBeInTheDocument();
   });
 
   it('renders the ProjectHeader', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('project-header-container').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('project-header')).toBeInTheDocument();
   });
 
   it('renders the ProjectTabs', async () => {

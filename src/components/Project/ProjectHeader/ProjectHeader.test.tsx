@@ -37,15 +37,12 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all component wrappers', () => {
-    const { container } = renderResult;
+    const { getByTestId } = renderResult;
 
-    expect(container.getElementsByClassName('project-header-container').length).toBe(1);
-    expect(container.getElementsByClassName('left').length).toBe(1);
-    expect(container.getElementsByClassName('left-wrapper').length).toBe(1);
-    expect(container.getElementsByClassName('center').length).toBe(1);
-    expect(container.getElementsByClassName('center-wrapper').length).toBe(1);
-    expect(container.getElementsByClassName('right').length).toBe(1);
-    expect(container.getElementsByClassName('right-wrapper').length).toBe(1);
+    expect(getByTestId('project-header')).toBeInTheDocument();
+    expect(getByTestId('project-header-left')).toBeInTheDocument();
+    expect(getByTestId('project-header-center')).toBeInTheDocument();
+    expect(getByTestId('project-header-right')).toBeInTheDocument();
   });
 
   it('renders all left side elements', async () => {
@@ -62,9 +59,9 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all right side elements', async () => {
-    const { getByRole, getByText, container } = renderResult;
+    const { getByRole, getByText, getByTestId } = renderResult;
 
-    expect(container.getElementsByClassName('favourite-button-container').length).toBe(1);
+    expect(getByTestId('project-favourite')).toBeInTheDocument();
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
     expect(getByText(/inGroup/i)).toBeInTheDocument();
     expect(getByText(matchExact('Hakaniemi'))).toBeInTheDocument();

@@ -1,4 +1,3 @@
-import { Paragraph, Title } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { useCallback, useEffect } from 'react';
 import ProjectNote from './ProjectNote';
@@ -21,9 +20,9 @@ const ProjectNotes = () => {
   const sortedNotes = useCallback(() => sortArrayByDates(notes, 'createdDate', true), [notes]);
 
   return (
-    <div className="notes-page-container">
-      <Title size="m" text="notes" />
-      <Paragraph size="m" text={t('newNoteInfo')} />
+    <div className="notes-page" data-testid="notes-page">
+      <h1 className="text-heading-m">Muistiinpanot</h1>
+      <p>{t('newNoteInfo')}</p>
       {/* note form */}
       <NewNoteForm />
       {/* notes (sorted by created) */}

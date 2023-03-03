@@ -27,28 +27,26 @@ const PlanningBreadcrumbs = () => {
   const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
   return (
-    <div className="breadcrumbs-container">
-      <ul>
-        <li>
-          <Link to="">{t('enums.programming')}</Link>
-        </li>
-        {selectedMasterClass && (
-          <BreadCrumb path={`${selectedMasterClass?.id}`} value={selectedMasterClass.name} />
-        )}
-        {selectedClass && (
-          <BreadCrumb
-            path={`${selectedMasterClass?.id}/${selectedClass?.id}`}
-            value={selectedClass.name}
-          />
-        )}
-        {selectedSubClass && (
-          <BreadCrumb
-            path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass.id}`}
-            value={selectedSubClass.name}
-          />
-        )}
-      </ul>
-    </div>
+    <ul className="breadcrumbs-list">
+      <li>
+        <Link to="">{t('enums.programming')}</Link>
+      </li>
+      {selectedMasterClass && (
+        <BreadCrumb path={`${selectedMasterClass?.id}`} value={selectedMasterClass.name} />
+      )}
+      {selectedClass && (
+        <BreadCrumb
+          path={`${selectedMasterClass?.id}/${selectedClass?.id}`}
+          value={selectedClass.name}
+        />
+      )}
+      {selectedSubClass && (
+        <BreadCrumb
+          path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass.id}`}
+          value={selectedSubClass.name}
+        />
+      )}
+    </ul>
   );
 };
 

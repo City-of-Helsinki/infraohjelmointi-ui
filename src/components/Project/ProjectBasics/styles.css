@@ -259,6 +259,25 @@
   grid-column: var(--grid-col-small-right);
 }
 
+.save-icon > span {
+  height: auto;
+}
+
+.side-panel-container {
+  @apply sticky top-0 flex flex-1 translate-y-[4rem] justify-center;
+}
+.project-side-panel {
+  @apply flex w-full flex-col;
+}
+
+.basic-form-container {
+  @apply flex w-full flex-col flex-wrap;
+}
+
+.project-basics-container {
+  @apply flex h-full w-full flex-wrap;
+}
+
 @media (max-width: 1400px) {
   .basic-info-form {
     width: 95%;

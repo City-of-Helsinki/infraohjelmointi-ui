@@ -1,4 +1,3 @@
-import { Paragraph } from '@/components/shared';
 import { IListItem } from '@/interfaces/common';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useState } from 'react';
@@ -30,7 +29,7 @@ const HashTagSearch: FC<IHashTagSearchProps> = ({ onHashTagClick, hashTags }) =>
 
   return (
     <div className="dialog-section" data-testid="search-hash-tag-field-section">
-      <Paragraph fontWeight="bold" text={t('addHashTagsToProject')} />
+      <p className="text-normal font-bold">{t('addHashTagsToProject')}</p>
       <SearchInput
         label={t('addHashTag')}
         getSuggestions={getSuggestions}

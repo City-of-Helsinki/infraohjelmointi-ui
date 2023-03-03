@@ -1,5 +1,5 @@
 import mockI18next from '@/mocks/mockI18next';
-import { act, screen } from '@testing-library/react';
+import { act } from '@testing-library/react';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectToolbar from './ProjectToolbar';
 import mockPersons from '@/mocks/mockPersons';
@@ -20,26 +20,13 @@ describe('ProjectToolbar', () => {
     );
   });
 
-  it('renders component wrapper', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('toolbar-container').length).toBe(1);
-  });
-
-  it('renders two containers', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('display-flex').length).toBe(2);
-  });
-
-  it('renders all right left elements', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('display-flex')[0].childElementCount).toBe(2);
-    expect(screen.getByRole('button', { name: /new/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /shareProject/i })).toBeInTheDocument();
-  });
-
-  it('renders all left side elements', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('display-flex')[1].childElementCount).toBe(1);
-    expect(screen.getByTestId('test')).toBeInTheDocument();
+  it('renders all items', () => {
+    const { getByTestId, getByRole } = renderResult;
+    expect(getByTestId('toolbar')).toBeInTheDocument();
+    expect(getByTestId('toolbar-left')).toBeInTheDocument();
+    expect(getByTestId('toolbar-right')).toBeInTheDocument();
+    expect(getByTestId('toolbar-left').childElementCount).toBe(2);
+    expect(getByRole('button', { name: /new/i })).toBeInTheDocument();
+    expect(getByRole('button', { name: /shareProject/i })).toBeInTheDocument();
   });
 });

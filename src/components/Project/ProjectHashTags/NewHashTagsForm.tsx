@@ -1,4 +1,4 @@
-import { Paragraph, Span, TextField } from '@/components/shared';
+import { TextField } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import useHashTagsForm from '@/forms/useHashTagsForm';
 import { IListItem } from '@/interfaces/common';
@@ -54,7 +54,7 @@ const NewHashTagsForm = () => {
 
   return isAdmin ? (
     <div className="dialog-section">
-      <Paragraph fontWeight="bold" text={t('cantFindHashTag')} />
+      <p className="text-normal font-bold">{t('cantFindHashTag')}</p>
       <div className="new-hashtags-form">
         <div data-testid="create-new-hash-tag-button">
           <Button variant="secondary" iconLeft={<IconPlus />} onClick={handleCreateNewMode}>
@@ -68,7 +68,7 @@ const NewHashTagsForm = () => {
             <div className="new-hashtags-input hashtag-created">
               <div className="hashtag-created-text">
                 <IconCheck color={'var(--color-success)'} />
-                <Span text={t('hashTagCreated', { responseHashTag: responseHashTag.value })} />
+                <span>{t('hashTagCreated', { responseHashTag: responseHashTag.value })}</span>
               </div>
               <div className="hashtag-created-text">
                 <button onClick={addToProject} data-testid="add-new-hash-tag-to-project">

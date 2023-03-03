@@ -1,4 +1,5 @@
 import { FC, ReactNode } from 'react';
+import './styles.css';
 
 interface IToolbarProps {
   left?: ReactNode;
@@ -7,11 +8,15 @@ interface IToolbarProps {
 
 const Toolbar: FC<IToolbarProps> = ({ left, right }) => {
   return (
-    <div className="toolbar-container">
+    <div className="toolbar-container" data-testid="toolbar">
       {/* left (new & share) */}
-      <div className="display-flex">{left}</div>
+      <div className="flex" data-testid="toolbar-left">
+        {left}
+      </div>
       {/* right (map) */}
-      <div className="display-flex">{right}</div>
+      <div className="flex" data-testid="toolbar-right">
+        {right}
+      </div>
     </div>
   );
 };

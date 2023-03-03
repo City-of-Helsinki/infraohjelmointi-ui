@@ -76,7 +76,7 @@ const PhaseDialog: FC<IPhaseDialogProps> = ({ project, phases, close, atElement 
       }}
     >
       <div className="phase-dialog-header">
-        <div className="hide-overflow">
+        <div className="overflow-hidden">
           <p className="title">{name}</p>
           <p className="description">{t('currentStatus')}</p>
         </div>

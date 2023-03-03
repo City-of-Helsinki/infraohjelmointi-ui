@@ -26,7 +26,7 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
         control={control as Control<FieldValues>}
         render={({ field }) => (
           <>
-            <div className="overrun-label-container">
+            <div className="mb-3">
               <FormFieldLabel
                 text={t('overrunRightValue', { value: field.value })}
                 onClick={handleSetEditing}
@@ -66,10 +66,10 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
                 />
               </>
             ) : (
-              <div className="flex-row-center">
+              <div className="flex items-center">
                 {/* display */}
                 <BubbleIcon value={'y'} />
-                <span className="overrun-amount-container">{`${field.value} keur`}</span>
+                <span className="mr-1">{`${field.value} keur`}</span>
               </div>
             )}
           </>

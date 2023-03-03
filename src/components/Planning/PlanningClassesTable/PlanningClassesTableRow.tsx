@@ -1,5 +1,5 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
-import { BubbleIcon, IconButton, Span } from '../../shared';
+import { BubbleIcon, IconButton } from '../../shared';
 import { FC, memo, ReactNode, useCallback, useEffect, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
@@ -16,7 +16,7 @@ interface IPlanningClassesTableRowProps {
 
 // eslint-disable-next-line react/display-name
 const OverrunSum = memo(({ value }: { value: string }) => (
-  <span>
+  <span className="text-sm">
     <BubbleIcon value="y" color="white" size="s" />
     {`+${value}`}
   </span>
@@ -52,13 +52,13 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
         {/* Header with cell name */}
         <th className={`class-header-cell ${hierarchy}`}>
           <div style={{ position: 'relative' }}>
-            <div className="class-header-content-item value-container">
+            <div className="class-header-content-item">
               {/* class code/number here */}
               <span>{}</span>
             </div>
             <div className={`class-header-content ${hierarchy}`}>
               <div className="class-header-content-item">
-                <Link to={buildLink()} className="display-flex">
+                <Link to={buildLink()} className="flex">
                   <IconButton
                     icon={expanded ? IconAngleUp : IconAngleDown}
                     color="white"
@@ -71,7 +71,7 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
               </div>
               <div className="class-header-content-item">
                 <div className="class-title-container">
-                  <Span fontWeight="bold" size="s" text={projectClass.name} color="white" />
+                  <span className="font-bold text-white">{projectClass.name}</span>
                 </div>
                 {/* Tooltip (visible if the header-content-item container is hovered) */}
                 <section className="tooltip-container">
@@ -93,10 +93,10 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
                 <OverrunSum value={rn} />
               ) : (
                 // Only display the value for the rest of the cells
-                <span>{rn}</span>
+                <span className="text-sm">{rn}</span>
               )}
 
-              <span>{i === 0 && `${rn}`}</span>
+              <span className="text-sm">{i === 0 && `${rn}`}</span>
             </div>
           </td>
         ))}

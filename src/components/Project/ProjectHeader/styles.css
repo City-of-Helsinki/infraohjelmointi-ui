@@ -1,0 +1,7 @@
+.project-name-form {
+  @apply mb-6 flex justify-between;
+}
+
+.project-header-container {
+  @apply flex flex-wrap bg-bus py-16;
+}

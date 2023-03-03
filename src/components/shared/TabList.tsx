@@ -25,7 +25,7 @@ const TabList: FC<ITabListProps> = ({ navItems }) => {
     <div data-testid="tabs-list">
       <Tabs initiallyActiveTab={getActiveTab()} theme={tabThemeOverrides}>
         {/* tabs */}
-        <Tabs.TabList className="custom-tab-list">
+        <Tabs.TabList className="tab-list">
           {navItems.map((n) => (
             <Tabs.Tab key={n.route} onClick={() => navigate(n.route)}>
               {n.label}

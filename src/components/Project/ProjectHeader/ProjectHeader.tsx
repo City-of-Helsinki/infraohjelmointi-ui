@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { Paragraph, ProgressCircle } from '@/components/shared';
+import { ProgressCircle } from '@/components/shared';
 import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
@@ -11,6 +11,8 @@ import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import ProjectPhaseField from './ProjectPhaseField';
 import ProjectFavouriteField from './ProjectFavouriteField';
 import { selectUser } from '@/reducers/authSlice';
+import { useTranslation } from 'react-i18next';
+import './styles.css';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -22,6 +24,7 @@ const ProjectHeader: FC = () => {
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
+  const { t } = useTranslation();
 
   const { formMethods } = useProjectHeaderForm();
 
@@ -53,28 +56,28 @@ const ProjectHeader: FC = () => {
 
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
-      <div className="project-header-container">
-        <div className="left">
-          <div className="left-wrapper">
-            <div className="readiness-container">
+      <div className="project-header-container" data-testid="project-header">
+        <div className="flex-1" data-testid="project-header-left">
+          <div className="flex h-full justify-end">
+            <div className=" h-full max-w-[6rem]">
               <ProgressCircle color={'--color-engel'} percent={project?.projectReadiness} />
             </div>
           </div>
         </div>
-        <div className="center">
-          <div className="center-wrapper">
+        <div className="flex-[3]" data-testid="project-header-center">
+          <div className="ml-8 w-96">
             <ProjectNameFields control={control} />
             <ProjectPhaseField control={control} />
           </div>
         </div>
-        <div className="right">
-          <div className="right-wrapper">
-            <div className="right-wrapper-inner">
-              <div className="favourite-button-container">
+        <div className="mr-3 flex-1" data-testid="project-header-right">
+          <div className="flex h-full flex-col">
+            <div className="mr-auto text-right">
+              <div className="mb-8" data-testid="project-favourite">
                 <ProjectFavouriteField control={control} />
               </div>
-              <Paragraph color="white" size="m" text={'inGroup'} />
-              <Paragraph color="white" size="l" fontWeight="bold" text={group} />
+              <p className="text-white">{t('inGroup')}</p>
+              <p className="text-l font-bold text-white">{group}</p>
             </div>
           </div>
         </div>

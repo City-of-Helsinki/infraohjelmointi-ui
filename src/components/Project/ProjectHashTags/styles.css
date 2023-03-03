@@ -1,108 +1,69 @@
 #hashtags-dialog h2 {
-  font-size: var(--fontsize-heading-s);
-  font-weight: 500;
-  margin: var(--spacing-2-xs) 0 var(--spacing-m) 0;
+  @apply mt-2 mb-6 text-heading-s font-medium;
 }
 
 #hashtags-dialog .content-container {
-  display: flex;
-  flex-direction: column;
-  padding: var(--spacing-m) 0 var(--spacing-xs) 0;
-}
-
-#hashtags-dialog .added-hashtags-title-container {
-  margin-bottom: var(--spacing-s);
-}
-
-#hashtags-dialog .popular-hashtags-container {
-  display: flex;
-  justify-content: center;
-  margin: var(--spacing-l) 0;
-}
-
-#hashtags-dialog .text-button {
-  font-weight: bold;
-  text-decoration: underline;
-  color: var(--color-bus);
+  @apply mt-6 mb-3 flex flex-col;
 }
 
 #hashtags-dialog hr {
-  border-top: 0.0625rem solid var(--color-black-20);
-  margin: 0;
+  @apply m-0 border-t border-gray;
 }
 
 #hashtags-dialog .dialog-footer {
-  width: 100%;
-  display: flex;
-  align-items: flex-end;
-  flex-direction: column;
+  @apply flex w-full flex-col items-end;
 }
 
 #hashtags-dialog p {
-  margin-bottom: var(--spacing-m);
+  @apply mb-6;
 }
 
 .dialog-section {
-  margin-bottom: var(--spacing-m);
+  @apply mb-6;
 }
 
 .dialog-section button {
-  max-height: 3.5rem;
+  @apply max-h-14;
 }
 
 .dialog-section .new-hashtags-form {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  @apply flex items-end justify-between;
 }
 
 .dialog-section .new-hashtags-input {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--spacing-m);
+  @apply flex items-end gap-6;
 }
 
 .dialog-section .new-hashtags-input .hashtag-created {
-  gap: 3rem;
+  @apply gap-12;
 }
 
 .hashtag-created .hashtag-created-text {
-  display: flex;
-  height: 3.5rem;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+  @apply flex h-14 items-center justify-center gap-2;
 }
 
 .hashtag-created-text button {
-  font-weight: 500;
-  text-decoration: underline;
-  color: var(--color-bus);
-  line-height: 0;
+  @apply font-medium leading-[0] text-bus underline;
 }
 
 .dialog-section .new-hashtags-form input {
-  width: 22.5rem;
+  @apply w-96;
 }
 
 .hashtags-container {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: auto;
-  flex-wrap: wrap;
+  @apply flex h-auto w-full flex-wrap;
 }
 
 .hashtags-container .hashtags-wrapper {
-  margin: 0 var(--spacing-xs) var(--spacing-xs) 0;
+  @apply mr-3 mb-3;
 }
 
 .hashtags-label {
-  margin-bottom: 0.5rem;
+  @apply mb-2;
 }
 
 @media (max-width: 1300px) {
   .dialog-section .new-hashtags-form input {
-    width: 100%;
+    @apply w-full;
   }
 }

@@ -1,28 +1,19 @@
-.breadcrumbs-container {
-  border-bottom: 0.09rem solid var(--color-black-20);
-  padding: 0.25rem 0;
+.breadcrumbs-list {
+  @apply flex h-16 list-none items-center border-b border-gray p-8;
 }
 
-.breadcrumbs-container ul {
-  list-style: none;
-  display: flex;
+.breadcrumbs-list > li > a {
+  @apply mr-1 text-black no-underline;
 }
 
-.breadcrumbs-container ul > li > a {
-  text-decoration: none;
-  margin-right: 0.2rem !important;
-  color: var(--color-black);
+.breadcrumbs-list > li {
+  @apply underline;
 }
 
-.breadcrumbs-container ul > li {
-  text-decoration: underline;
+.breadcrumbs-list > li:last-child {
+  @apply font-bold no-underline;
 }
 
-.breadcrumbs-container ul > li:last-child {
-  font-weight: bold !important;
-  text-decoration: none !important;
-}
-
-.breadcrumbs-container svg {
-  margin-right: 0.2rem;
+.breadcrumbs-list svg {
+  @apply mr-1;
 }

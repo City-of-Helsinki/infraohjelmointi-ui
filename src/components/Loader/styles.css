@@ -1,16 +1,7 @@
 .loader-container {
-  /* position the div in center */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  @apply fixed z-[9] -mt-20 h-full w-full overflow-hidden;
 }
 
-.loader-overlay {
-  height: 100%;
-  width: 100%;
-  position: fixed;
-  z-index: 9; /* this makes the overlay one index under the top bar*/
-  overflow: hidden;
-  margin-top: -4.6875rem; /* this makes the overlay extend under the topbar to fill the whole page */
+.loader-wrapper {
+  @apply absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2;
 }

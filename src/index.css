@@ -1,8 +1,14 @@
-@import '~hds-core/lib/utils/helpers.css';
+/* @import '~hds-core/lib/utils/helpers.css'; */
 @import 'fonts.css';
+
+/* New to tailwind? check out this cheat sheet: https://nerdcave.com/tailwind-cheat-sheet */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
+  --table-cell-width: 5.5rem;
 }
 
 html {
@@ -14,10 +20,8 @@ body {
   margin: 0;
   width: 100%;
   font-family: var(--infra-font-default);
-  font-size: var(--fontsize-body-m);
-  color: var(--color-black-90);
-  line-height: var(--lineheight-l);
   overflow-x: hidden;
+  @apply text-black-90;
 }
 
 /* completely remove styling from the default button */
@@ -34,93 +38,27 @@ input[type='reset'] {
 }
 
 p {
-  margin: var(--spacing-2-xs) 0;
+  @apply my-2;
+}
+
+span {
+  @apply leading-[var(--lineheight-l)];
 }
 
 table p {
-  margin: 0;
-}
-
-/* COLORS: https://hds.hel.fi/foundation/design-tokens/colour */
-/* BREAKPOINTS: https://hds.hel.fi/foundation/design-tokens/breakpoints */
-
-/* FONTS: https://hds.hel.fi/foundation/design-tokens/typography */
-.font-xl {
-  font-size: var(--fontsize-body-xl);
-}
-
-.font-l {
-  font-size: var(--fontsize-body-l);
-}
-
-.font-m {
-  font-size: var(--fontsize-body-m);
-}
-
-.font-s {
-  font-size: var(--fontsize-body-s);
+  @apply m-0;
 }
 
 /* Margin to fit the sidebar, not final values */
 .app-content {
-  width: 100%;
-  display: flex;
   /* Hacky calc, since the TopBar has a 1px border bottom */
-  min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
+  --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
+  @apply min-h-[var(--app-min-height)] flex w-full;
 }
 
-.text-black {
-  color: var(--color-black);
-}
-
-.text-white {
-  color: var(--color-white);
-}
-
-.margin-0 {
-  margin: 0;
-}
-
-.display-flex {
-  display: flex;
-}
-
-.flex-row-center {
-  display: flex;
-  align-items: center;
-}
-
-.flex-row-end {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.display-flex-col {
-  flex-direction: column;
-}
-
-.pos-relative {
-  position: relative;
-}
-
-.w-100-p {
-  width: 100%;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.input-wrapper label {
-  width: 15.625rem;
-}
-
-#radio-checkbox label {
-  width: auto !important;
-}
-
+#radio-checkbox label,
 .checkbox-field label {
-  width: auto !important;
+  @apply w-auto;
 }
 
 .input-l {
@@ -128,25 +66,49 @@ table p {
 }
 
 .legend-margin {
-  color: var(--label-color-default, var(--color-black-90));
   display: block;
   font-size: var(--fontsize-body-m);
   font-weight: 500;
   margin-bottom: var(--spacing-m);
+  @apply text-black-90;
 }
 
 .big-dialog {
-  width: 65% !important;
-}
-
-.hide-overflow {
-  overflow: hidden;
+  @apply w-[65%];
 }
 
 input {
-  z-index: 1 !important;
+  @apply z-[1];
+}
+
+.list-field-input {
+  @apply flex;
+}
+
+.list-field-input input {
+  @apply !h-8;
+}
+
+#overrunRight .list-field-input {
+  @apply my-2;
+}
+
+.pen-and-label-text {
+  @apply font-medium !w-auto;
+}
+
+.input-wrapper label {
+  @apply min-h-[1.4rem] w-[15.625rem];
 }
 
 .input-wrapper button {
-  z-index: 1;
+  @apply z-[1];
+}
+
+/* 
+  box-sizing: border-box causes the HDS-Select dropdown list to be too small, this sets
+  the list to its intended size
+*/
+.input-wrapper ul {
+  @apply !w-[101%];
 }

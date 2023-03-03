@@ -15,8 +15,8 @@ const Loader: FC = () => {
   return (
     <>
       {isLoading && (
-        <div className="loader-overlay">
-          <div className="loader-container">
+        <div className="loader-container" data-testid="loader-wrapper">
+          <div className="loader-wrapper" data-testid="loader">
             <LoadingSpinner loadingText={text || ''} />
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { Button } from 'hds-react/components/Button';
 import { selectUser } from '@/reducers/authSlice';
+import './styles.css';
 
 const TopBar: FC = () => {
   const user = useAppSelector(selectUser);
@@ -30,7 +31,7 @@ const TopBar: FC = () => {
             iconLeft={<IconSearch />}
             onClick={handleOpenSearch}
             data-testid="search-projects"
-            style={{ color: 'var(--color-black-80)', fontWeight: '300', padding: '0' }}
+            className="search-button"
           >
             {t('nav.search')}
           </Button>

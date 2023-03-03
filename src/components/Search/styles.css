@@ -1,72 +1,42 @@
 #search-dialog {
-  position: absolute;
-  right: 0;
-  min-height: 100vh;
-}
-
-.search-form-filter-label {
-  margin-bottom: 1rem;
+  @apply absolute right-0 min-h-screen;
 }
 
 .search-form .search-form-content {
-  padding: var(--spacing-s) 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  @apply grid grid-cols-2 py-4;
 }
 
 .search-form .search-form-content .input-wrapper {
-  grid-column: 1/3;
-  width: calc(100% - 10px);
-  margin-bottom: 1.5rem;
+  @apply col-span-2 mb-6 w-full;
 }
 
 .search-form .search-form-content .input-l {
-  max-width: 100% !important;
-}
-
-/* Title of the search form (filter) */
-.search-form .search-form-content .input-wrapper#filter {
-  padding-bottom: 0.8rem;
-  margin-bottom: 0;
+  @apply max-w-full;
 }
 
 /* programmed fieldset legend same properties as the labels */
 .search-form .search-form-content #programmed legend {
-  color: var(--color-black-90);
-  display: block;
-  font-size: var(--fontsize-body-m);
-  font-weight: 500;
-  margin-bottom: var(--spacing-xs);
+  @apply mb-3 block font-medium text-black-90;
 }
 
 /* programmed fieldset flex to get the checkboxes next to eachother */
 .search-form .search-form-content fieldset#programmed {
-  display: flex;
-  gap: var(--spacing-l);
-  padding-bottom: 0;
-  width: 0;
+  @apply flex w-0 gap-8 pb-0;
 }
 
 .free-search {
-  border-bottom: 1px solid var(--color-black-20);
-  margin-top: 1rem;
+  @apply mt-4 border-b border-gray;
 }
 
 .free-search .search-selections {
-  display: flex;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-  flex-wrap: wrap;
+  @apply my-2 flex flex-wrap gap-2;
 }
 
 .search-form .search-form-content .input-wrapper#programmedYearMin {
-  grid-column: 1/2;
-  grid-row: 6;
-  margin-right: 10px;
-  width: calc(100% - 20px);
+  --input-width: calc(100% - 20px);
+  @apply col-span-1 row-start-6 mr-10 w-[var(--input-width)];
 }
 
 .search-form .search-form-content .input-wrapper#programmedYearMax {
-  grid-column: 2/3;
-  grid-row: 6;
+  @apply col-span-1 row-start-6;
 }

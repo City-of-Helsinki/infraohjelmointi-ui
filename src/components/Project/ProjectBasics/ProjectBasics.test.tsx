@@ -26,10 +26,10 @@ describe('ProjectBasics', () => {
   });
 
   it('renders all component wrappers', async () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('project-content-container').length).toBe(1);
-    expect(container.getElementsByClassName('side-panel').length).toBe(1);
-    expect(container.getElementsByClassName('form-panel').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('project-basics')).toBeInTheDocument();
+    expect(getByTestId('side-panel')).toBeInTheDocument();
+    expect(getByTestId('form-panel')).toBeInTheDocument();
   });
 
   it('renders SideNavigation and links', () => {
@@ -57,7 +57,7 @@ describe('ProjectBasics', () => {
   });
 
   it('renders ProjectBasicsForm', () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('basics-form').length).toBe(1);
+    const { getByTestId } = renderResult;
+    expect(getByTestId('project-basics-form')).toBeInTheDocument();
   });
 });

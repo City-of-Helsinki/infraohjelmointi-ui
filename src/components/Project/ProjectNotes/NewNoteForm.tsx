@@ -28,8 +28,8 @@ const ProjectNewNoteForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="note-form-container">
-        <div className="note-form-textarea">
+      <div className="new-note-form-container">
+        <div className="mb-6 w-full" data-testid="new-note-textarea">
           <Controller
             name="content"
             control={control}

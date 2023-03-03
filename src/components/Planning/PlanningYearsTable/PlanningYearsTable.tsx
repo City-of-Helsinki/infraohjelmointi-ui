@@ -1,11 +1,11 @@
 import { FC, memo } from 'react';
 import { planningYearsTableData } from '@/mocks/common';
-import { BubbleIcon, Span } from '../../shared';
+import { BubbleIcon } from '../../shared';
 import './styles.css';
 
 // eslint-disable-next-line react/display-name
 const OverrunSum = memo(({ value }: { value: string }) => (
-  <span>
+  <span className="text-sm">
     <BubbleIcon value="y" color="black" size="s" />
     {`+${value}`}
   </span>
@@ -17,9 +17,9 @@ const PlanningYearsTable: FC = () => {
       <thead>
         <tr>
           {planningYearsTableData.map((o, i) => (
-            <td key={i} className="years-table-cell">
-              <Span text={o.title} fontWeight="light" size="s" />
-              <Span text={`<> ${o.year}`} fontWeight="bold" size="s" />
+            <td key={i} className="min-w-[var(--table-cell-width)] max-w-[var(--table-cell-width)]">
+              <span className="text-sm font-light">{o.title}</span>
+              <span className="text-sm font-bold">{`<> ${o.year}`}</span>
             </td>
           ))}
         </tr>
@@ -27,15 +27,15 @@ const PlanningYearsTable: FC = () => {
       <tbody>
         <tr>
           {planningYearsTableData.map((o, i) => (
-            <td key={i} className="row-1-cell">
-              <Span text={o.sum} fontWeight="light" size="s" color="white" />
+            <td key={i} className="years-table-first-cell">
+              <span className="text-sm font-light text-white">{o.sum}</span>
             </td>
           ))}
         </tr>
         <tr>
           {planningYearsTableData.map((o, i) => (
             <td key={i}>
-              <Span text={o.otherVal3 || ''} fontWeight="light" size="s" />
+              <span className="pt-1 text-sm font-light">{o.otherVal3 || ''}</span>
             </td>
           ))}
         </tr>
@@ -46,10 +46,9 @@ const PlanningYearsTable: FC = () => {
                 // Overrun sum for first cell
                 <OverrunSum value={o.otherVal1} />
               ) : (
-                <Span text={o.otherVal1} fontWeight="light" size="s" />
+                <span className="text-sm font-light">{o.otherVal1}</span>
               )}
-
-              <Span text={o.otherVal2} fontWeight="light" size="s" />
+              <span className="pb-1 text-sm font-light">{o.otherVal2}</span>
             </td>
           ))}
         </tr>

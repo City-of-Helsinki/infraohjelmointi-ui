@@ -24,16 +24,16 @@ describe('Notification', () => {
   });
 
   it('does not render the parent container if no notification is given', async () => {
-    const { container } = renderResult;
-    expect(container.getElementsByClassName('notifications-container').length).toBe(0);
+    const { queryByTestId } = renderResult;
+    expect(queryByTestId('notifications-container')).toBeNull();
   });
 
   it('renders a notification if dispatched', async () => {
-    const { container, getByText, getByRole, store } = renderResult;
+    const { getByTestId, getByText, getByRole, store } = renderResult;
 
     await waitFor(() => store.dispatch(notifyInfo(mockNotification)));
 
-    expect(container.getElementsByClassName('notifications-container').length).toBe(1);
+    expect(getByTestId('notifications-container')).toBeInTheDocument();
     expect(getByRole('button', { name: matchExact('closeNotification') })).toBeInTheDocument();
 
     Object.values(mockNotification).forEach((n) => {

@@ -1,14 +1,17 @@
 import { FC, memo } from 'react';
-import Title from './Title';
+import { useTranslation } from 'react-i18next';
 
 interface IFormSectionTitleProps {
   name?: string;
   label?: string;
 }
 const FormSectionTitle: FC<IFormSectionTitleProps> = ({ label, name }) => {
+  const { t } = useTranslation();
   return (
     <div className="input-wrapper" id={'formTitle'}>
-      <Title size="m" text={label} id={name} />
+      <h3 className="text-heading-m" id={name}>
+        {t(label || '')}
+      </h3>
     </div>
   );
 };

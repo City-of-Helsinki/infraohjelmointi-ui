@@ -5,7 +5,6 @@ import { ReactComponent as IconStickyNotes } from '@/assets/icons/sticky-notes.s
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import './styles.css';
 import { selectProjects } from '@/reducers/projectSlice';
 
 /**
@@ -37,10 +36,16 @@ const SideBar = () => {
   ];
 
   return (
-    <div className="sidebar-container" data-testid="sidebar">
+    <div
+      className="sticky top-0 mr-auto flex h-screen w-12 min-w-[3rem] flex-col shadow-2xl"
+      data-testid="sidebar"
+    >
       {navItems.map((n) => (
         <button
-          className={`sidebar-button ${path.includes(n.route) ? 'selected' : ''}`}
+          className={`mt-2 mr-auto mb-0 ml-auto cursor-pointer p-2 duration-300 
+          first:mt-3 hover:rounded-md hover:bg-silver ${
+            path.includes(n.route) ? 'rounded-sm bg-silver duration-300' : ''
+          }`}
           onClick={() => navigate(n.route)}
           aria-label={n.label}
           key={n.route}

@@ -8,7 +8,6 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from '../../shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
-import Paragraph from '../../shared/Paragraph';
 import './styles.css';
 import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
@@ -162,7 +161,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     return (
       <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
         {/* Dialog */}
-        <div className="display-flex-col">
+        <div className="flex flex-col">
           <Dialog
             id="hashtags-dialog"
             aria-labelledby={label}
@@ -177,7 +176,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             {/* Section 1 (Added hashtags ) */}
             <Content>
               <div className="content-container">
-                <Paragraph fontWeight="bold" text={t('projectHashTags') || ''} />
+                <p className="font-bold">{t('projectHashTags')}</p>
                 <HashTagsContainer
                   tags={hashTagsForSubmit}
                   onDelete={onHashTagDelete}
@@ -190,7 +189,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             <Content>
               <div className="content-container">
                 <div className="dialog-section">
-                  <Paragraph fontWeight="bold" text={t('popularHashTags') || ''} />
+                  <p className="font-bold">{t('popularHashTags')}</p>
                   <HashTagsContainer
                     tags={popularHashTags}
                     onClick={onHashTagClick}
