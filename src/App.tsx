@@ -30,6 +30,7 @@ import { ProjectNotes } from './components/Project/ProjectNotes';
 import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
+import SearchResultsView from './views/SearchResultsView';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
@@ -86,6 +87,7 @@ const App: FC = () => {
                 </Route>
               </Route>
             </Route>
+            <Route path="/search-results" element={<SearchResultsView />} />
             <Route path="*" element={<ErrorView />} />
           </Routes>
         </div>

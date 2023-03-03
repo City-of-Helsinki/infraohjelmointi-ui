@@ -28,6 +28,14 @@ module.exports = {
           lineHeight: '32px',
         },
       ],
+      'heading-l': [
+        'var(--fontsize-heading-l)',
+        {
+          fontWeight: '400',
+          letterSpacing: '-0.4px',
+          lineHeight: '1',
+        },
+      ],
       'heading-xl': [
         'var(--fontsize-heading-xl)',
         {

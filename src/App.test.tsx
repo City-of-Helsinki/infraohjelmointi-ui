@@ -97,7 +97,7 @@ describe('App', () => {
   });
 
   it('catches a failed phase list fetch', async () => {
-    const { store } = renderResult;
+    const { store } = await act(async () => renderWithProviders(<App />));
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectPhasesThunk());
 
@@ -107,7 +107,7 @@ describe('App', () => {
   });
 
   it('catches a failed projectCategories list fetch', async () => {
-    const { store } = renderResult;
+    const { store } = await act(async () => renderWithProviders(<App />));
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectCategoriesThunk());
 
@@ -117,7 +117,7 @@ describe('App', () => {
   });
 
   it('catches a failed responsible persons fetch', async () => {
-    const { store } = renderResult;
+    const { store } = await act(async () => renderWithProviders(<App />));
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getResponsiblePersonsThunk());
 
@@ -127,7 +127,7 @@ describe('App', () => {
   });
 
   it('catches a failed classes fetch', async () => {
-    const { store } = renderResult;
+    const { store } = await act(async () => renderWithProviders(<App />));
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getClassesThunk());
 
@@ -137,7 +137,7 @@ describe('App', () => {
   });
 
   it('catches a failed locations fetch', async () => {
-    const { store } = renderResult;
+    const { store } = await act(async () => renderWithProviders(<App />));
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getLocationsThunk());
 
@@ -147,7 +147,7 @@ describe('App', () => {
   });
 
   it('catches a failed hashtags fetch', async () => {
-    const { store } = renderResult;
+    const { store } = await act(async () => renderWithProviders(<App />));
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getHashTagsThunk());
 

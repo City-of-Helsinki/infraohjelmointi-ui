@@ -1,4 +1,3 @@
-import { Title } from '@/components/shared';
 import SearchTerms from './SearchTerms';
 import './styles.css';
 import { Button } from 'hds-react/components/Button';
@@ -15,7 +14,7 @@ const SearchResultsHeader = () => {
   return (
     <div className="search-result-header-container">
       <div className="search-result-page-title">
-        <Title size="l" text="searchResults" />
+        <h1 className="text-heading-l">{t('searchResults')}</h1>
       </div>
       <div className="search-result-terms-and-filters-container">
         <SearchTerms />
