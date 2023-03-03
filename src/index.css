@@ -56,10 +56,6 @@ table p {
   @apply min-h-[var(--app-min-height)] flex w-full;
 }
 
-.input-wrapper label {
-  @apply min-h-[1.4rem] w-[15.625rem];
-}
-
 #radio-checkbox label,
 .checkbox-field label {
   @apply w-auto;
@@ -101,6 +97,18 @@ input {
   @apply font-medium !w-auto;
 }
 
+.input-wrapper label {
+  @apply min-h-[1.4rem] w-[15.625rem];
+}
+
 .input-wrapper button {
   @apply z-[1];
+}
+
+/* 
+  box-sizing: border-box causes the HDS-Select dropdown list to be too small, this sets
+  the list to its intended size
+*/
+.input-wrapper ul {
+  @apply !w-[101%];
 }
