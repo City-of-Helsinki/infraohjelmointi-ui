@@ -17,7 +17,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
   const { t } = useTranslation();
 
   return (
-    <Link to={`/planning/coordinator/${path}`} className="search-result-card-wrapper">
+    <Link to={`/planning/coordinator/${path}`} className="color-black no-underline">
       <div className="search-result-card">
         {/* Title */}
         <div className="search-result-title-container">
@@ -49,7 +49,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
           ))}
         </div>
         {hashTags && hashTags.length > 0 && (
-          <div className="search-result-hashtags">
+          <div className="mt-3 flex" data-testid="search-result-hashtags">
             {hashTags?.map((h) => (
               <CustomTag key={h.id} text={`#${h.value}`} color={'var(--color-gold-medium-light	)'} />
             ))}

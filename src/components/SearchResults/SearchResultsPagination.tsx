@@ -6,7 +6,7 @@ const SearchResultsPagination = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
   return (
-    <div className="search-result-pagination-container">
+    <div className="pt-16 pb-4" id="custom-pagination">
       <Pagination
         language="fi"
         onChange={(event, index) => {

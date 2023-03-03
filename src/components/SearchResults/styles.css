@@ -1,164 +1,104 @@
 /* Search terms */
 .search-terms-container {
-  display: flex;
-  flex-direction: column;
-  width: 80%;
+  @apply flex w-[80%] flex-col;
 }
 
-.search-terms-container .search-terms {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  height: auto;
-  margin: 0 var(--spacing-m) var(--spacing-m) 0;
+.search-terms {
+  @apply mr-6 mb-6 flex h-auto flex-wrap gap-2;
 }
 
-.search-terms-container .search-terms > div {
-  height: 1rem;
-}
-
-.empty-all-btn {
-  background: transparent !important;
-  background-color: transparent !important;
-  white-space: nowrap;
-  height: 1rem;
+/* Tag container (can't be given classes or styles) */
+.search-terms > div {
+  @apply h-4;
 }
 
 /* Search filter */
 .search-filter-container {
-  width: 20%;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.search-filter-container button {
-  width: 9.5rem;
-  height: 3rem;
-}
-
-/* Search result card */
-.search-result-card-wrapper {
-  color: var(--color-black);
-  text-decoration: none;
+  @apply flex w-[20%] justify-end;
 }
 
 .search-result-card {
-  border: 0.13rem solid var(--color-black);
-  padding: var(--spacing-m) var(--spacing-l);
-  background: var(--color-white);
-  margin-bottom: var(--spacing-s);
+  @apply mb-3 border-2 border-black bg-white py-6 px-8;
 }
 
 .search-result-card .search-result-title-container {
-  font-size: 1.5rem;
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @apply mb-1 flex items-center justify-between text-2xl font-medium;
 }
 
 .search-result-card .search-result-title-container .search-result-title {
-  display: flex;
-  gap: var(--spacing-xs);
-  align-items: center;
+  @apply flex items-center gap-3;
 }
 
 .search-result-card-wrapper:hover .search-result-title > span {
-  text-decoration: underline;
+  @apply underline;
 }
 
-.search-result-card .search-result-breadcrumbs {
-  display: flex;
-  gap: 0.2rem;
-  margin-bottom: 0.25rem;
+.search-result-breadcrumbs {
+  @apply mb-1 flex;
 }
 
-.search-result-card .search-result-breadcrumbs > div {
-  display: flex;
-  align-items: center;
+.search-result-breadcrumbs > div {
+  @apply flex text-center;
 }
 
-.search-result-card .search-result-breadcrumbs > div > svg {
-  transform: translateY(0.08rem);
-}
-
-.search-result-card .search-result-hashtags {
-  display: flex;
-  margin-top: 0.75rem;
-}
-
-/* Search result pagination */
-.search-result-pagination-container {
-  padding: var(--spacing-layout-l) 0 var(--spacing-s) 0;
+.search-result-breadcrumbs > div > svg {
+  @apply w-6 translate-y-[0.3rem];
 }
 
 /* Search result list */
 .search-result-list-container {
-  background: var(--color-silver-light);
-  min-height: 60vh;
-  padding: var(--spacing-layout-l) var(--spacing-layout-xl) var(--spacing-layout-l)
-    var(--spacing-layout-l);
+  @apply min-h-[60vh] py-16 pl-16 pr-24;
 }
 
 /* Search result header */
 .search-result-header-container {
-  padding: var(--spacing-layout-l) var(--spacing-layout-xl) var(--spacing-layout-xs)
-    var(--spacing-layout-l);
+  @apply pt-16 pl-16 pr-24 pb-6;
 }
 
 .search-result-header-container .search-result-page-title {
-  margin-bottom: var(--spacing-layout-s);
+  @apply mb-8;
 }
 
 .search-result-header-container .search-result-terms-and-filters-container {
-  display: flex;
-  justify-content: space-between;
+  @apply flex justify-between;
 }
 
 .result-list-options-container {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-layout-l);
-  align-items: flex-end;
+  @apply mb-16 flex items-end justify-between;
 }
 
 .page-dropdown-container {
-  display: flex;
-  align-items: center;
+  @apply flex items-center;
 }
 
 .page-dropdown-container > span {
-  margin-right: 1rem;
-  font-size: 20px;
+  @apply mr-4 text-xl;
 }
 
+/* Style the select component into a small version (the amount per page selection) */
 .page-dropdown {
-  width: 3.5rem;
-  margin: 0 0.5rem 0 0;
+  @apply mr-2 w-14;
 }
 
 .page-dropdown > div {
-  min-height: 2rem;
+  @apply min-h-[2rem];
 }
 
 .page-dropdown > div > button {
+  /* HDS overwrites this if set with tailwind classes */
   padding: 0 0.4rem;
-  justify-content: space-between;
-  color: var(--color-black-60);
-  min-height: 100% !important;
+  @apply !min-h-full justify-between text-black-60;
 }
 
 .page-dropdown > div > button > svg {
-  position: absolute;
-  top: 0;
-  right: 0;
+  @apply absolute top-0 right-0;
 }
 
 .page-dropdown > div > button > span {
-  padding: 0;
+  @apply p-0;
 }
 
-.result-order-dropdown {
-  width: 20rem;
+/* restores the inteded look for HDS pagination with box-sizing: border-box; */
+#custom-pagination a {
+  @apply min-w-[2.5rem];
 }

@@ -49,6 +49,7 @@ module.exports = {
       black: 'var(--color-black)',
       'black-90': 'var(--color-black-90)',
       'black-80': 'var(--color-black-80)',
+      'black-60': 'var(--color-black-60)',
       gray: 'var(--color-black-20)',
       white: 'var(--color-white)',
       fog: 'var(--color-fog)',

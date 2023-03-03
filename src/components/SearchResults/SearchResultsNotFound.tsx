@@ -8,7 +8,7 @@ const SearchResultsNotFound = () => {
   const { searchTerms } = useSearchTerms();
   const isLoading = useAppSelector(selectIsLoading);
   return (
-    <div className="flex-col-center" data-testid="result-not-found">
+    <div className="flex flex-col items-center" data-testid="result-not-found">
       {!isLoading && (
         <>
           <h1 className="text-heading-l">

@@ -9,6 +9,7 @@
 :root {
   --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
   --table-cell-width: 5.5rem;
+  --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
 }
 
 html {
@@ -52,8 +53,7 @@ table p {
 /* Margin to fit the sidebar, not final values */
 .app-content {
   /* Hacky calc, since the TopBar has a 1px border bottom */
-  --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
-  @apply min-h-[var(--app-min-height)] flex w-full;
+  @apply flex min-h-[var(--app-min-height)] w-full;
 }
 
 #radio-checkbox label,
@@ -116,7 +116,7 @@ input {
 }
 
 .pen-and-label-text {
-  @apply font-medium !w-auto;
+  @apply !w-auto font-medium;
 }
 
 .input-wrapper label {

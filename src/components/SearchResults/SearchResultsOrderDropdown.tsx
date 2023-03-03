@@ -13,12 +13,9 @@ const SearchResultsOrderDropdown = () => {
   ];
 
   return (
-    <Select
-      label={t('order')}
-      placeholder="Placeholder"
-      options={order}
-      className="result-order-dropdown"
-    />
+    <div data-testid="search-order-dropdown">
+      <Select label={t('order')} placeholder="Placeholder" options={order} className="w-80" />
+    </div>
   );
 };
 

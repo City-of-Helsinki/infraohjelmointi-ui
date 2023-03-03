@@ -22,6 +22,7 @@ const SearchResultsHeader = () => {
           <Button
             variant="secondary"
             size="small"
+            className="h-12 w-40"
             data-testid="filterSearchBtn"
             iconLeft={<IconSliders />}
             onClick={handleOpenSearch}

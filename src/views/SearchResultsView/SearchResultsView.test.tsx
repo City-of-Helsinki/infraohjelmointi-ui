@@ -150,7 +150,7 @@ describe('SearchResultsView', () => {
     it('doesnt render elements if there are no results', () => {
       const { queryByTestId } = renderResult;
       expect(queryByTestId('search-result-list')).toBeNull();
-      expect(getByClass('result-order-dropdown')).toBe(0);
+      expect(queryByTestId('search-order-dropdown')).toBeNull();
       expect(getByClass('search-result-card')).toBe(0);
     });
 
@@ -161,7 +161,7 @@ describe('SearchResultsView', () => {
       const { getByTestId } = renderResult;
       expect(getByTestId('search-result-list')).toBeInTheDocument();
       expect(getByClass('search-result-card')).toBe(2);
-      expect(getByClass('result-order-dropdown')).toBe(1);
+      expect(getByTestId('search-order-dropdown')).toBeInTheDocument();
     });
   });
 
@@ -217,9 +217,9 @@ describe('SearchResultsView', () => {
         'searchOrder.project',
         'searchOrder.group',
       ];
-      const { user, getByRole, getByText, queryByText } = renderResult;
+      const { user, getByRole, getByText, queryByText, getByTestId } = renderResult;
 
-      expect(getByClass('result-order-dropdown')).toBe(1);
+      expect(getByTestId('search-order-dropdown')).toBeInTheDocument();
 
       await user.click(getByRole('button', { name: 'order' }));
 
@@ -237,7 +237,7 @@ describe('SearchResultsView', () => {
       renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
-      const { container, getAllByText } = renderResult;
+      const { container, getAllByText, getByTestId } = renderResult;
 
       expect(getByClass('search-result-card')).toBe(2);
       expect(getByClass('search-result-breadcrumbs')).toBe(2);
@@ -257,7 +257,7 @@ describe('SearchResultsView', () => {
       expect(projectChildren[1]).toHaveTextContent('Muu esirakentaminen');
 
       // Both hashTags to renders under project card
-      expect(getByClass('search-result-hashtags')).toBe(1);
+      expect(getByTestId('search-result-hashtags')).toBeInTheDocument();
       expect(projectChildren[2]).toHaveTextContent('#leikkipaikka');
       expect(projectChildren[2]).toHaveTextContent('#leikkipuisto');
       // Link rendered around project card
@@ -300,7 +300,7 @@ describe('SearchResultsView', () => {
         },
       });
       const { getByText } = renderResult;
-      expect(getByClass('flex-col-center')).toBe(1);
+      expect(getByClass('flex flex-col items-center')).toBe(1);
       expect(getByText('resultsNotFoundTitle')).toBeInTheDocument();
       expect(getByText('resultsNotFoundText')).toBeInTheDocument();
     });

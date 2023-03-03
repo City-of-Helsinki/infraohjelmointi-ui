@@ -2,7 +2,7 @@ import { SearchResultsHeader, SearchResultsList } from '@/components/SearchResul
 
 const SearchResultsView = () => {
   return (
-    <div>
+    <div className="h-full bg-silver-l">
       <SearchResultsHeader />
       <SearchResultsList />
     </div>

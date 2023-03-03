@@ -81,12 +81,7 @@
 
 /* custom tag */
 .custom-tag-container {
-  display: flex;
-  align-items: center;
-  margin: 0 0.4rem 0 0;
-  padding: 0.2rem 0.6rem 0.2rem 0.6rem;
-  border-radius: 2rem;
-  height: 1.5rem;
+  @apply flex items-center mr-2 rounded-full h-8 px-2;
 }
 
 .custom-tag-container span {

@@ -44,7 +44,7 @@ const Search = () => {
   const onSubmit = useCallback(
     async (form: ISearchForm) => {
       const searchParams = buildSearchParams(form);
-      navigate('/search-result');
+      navigate('/search-results');
       dispatch(toggleSearch());
       dispatch(getSearchResultsThunk(searchParams)).then(() => {
         dispatch(setSubmittedSearchForm(form));
