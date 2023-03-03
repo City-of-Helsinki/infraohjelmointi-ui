@@ -3,5 +3,5 @@
 }
 
 .project-header-container {
-  @apply flex flex-wrap bg-bus py-8;
+  @apply flex flex-wrap bg-bus py-16;
 }
