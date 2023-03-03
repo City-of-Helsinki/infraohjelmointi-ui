@@ -38,69 +38,31 @@ input[type='reset'] {
 }
 
 p {
-  margin: var(--spacing-2-xs) 0;
+  @apply my-2;
 }
 
 span {
-  line-height: var(--lineheight-l);
+  @apply leading-[var(--lineheight-l)];
 }
 
 table p {
-  margin: 0;
+  @apply m-0;
 }
 
 /* Margin to fit the sidebar, not final values */
 .app-content {
-  width: 100%;
-  display: flex;
   /* Hacky calc, since the TopBar has a 1px border bottom */
-  min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
-}
-
-.margin-0 {
-  margin: 0;
-}
-
-.display-flex {
-  display: flex;
-}
-
-.flex-row-center {
-  display: flex;
-  align-items: center;
-}
-
-.flex-row-end {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.display-flex-col {
-  flex-direction: column;
-}
-
-.pos-relative {
-  position: relative;
-}
-
-.w-100-p {
-  width: 100%;
-}
-
-.text-right {
-  text-align: right;
+  --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
+  @apply min-h-[var(--app-min-height)] flex w-full;
 }
 
 .input-wrapper label {
-  width: 15.625rem;
+  @apply min-h-[1.4rem] w-[15.625rem];
 }
 
-#radio-checkbox label {
-  width: auto !important;
-}
-
+#radio-checkbox label,
 .checkbox-field label {
-  width: auto !important;
+  @apply w-auto;
 }
 
 .input-l {
@@ -116,15 +78,11 @@ table p {
 }
 
 .big-dialog {
-  width: 65% !important;
-}
-
-.hide-overflow {
-  overflow: hidden;
+  @apply w-[65%];
 }
 
 input {
-  z-index: 1 !important;
+  @apply z-[1];
 }
 
 .list-field-input {
@@ -132,7 +90,7 @@ input {
 }
 
 .list-field-input input {
-  height: 2rem !important;
+  @apply !h-8;
 }
 
 #overrunRight .list-field-input {
@@ -140,14 +98,9 @@ input {
 }
 
 .pen-and-label-text {
-  width: auto !important;
-  @apply font-medium;
-}
-
-.input-wrapper label {
-  @apply min-h-[1.4rem];
+  @apply font-medium !w-auto;
 }
 
 .input-wrapper button {
-  z-index: 1;
+  @apply z-[1];
 }

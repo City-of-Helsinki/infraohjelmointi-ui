@@ -66,7 +66,7 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
                 />
               </>
             ) : (
-              <div className="flex-row-center">
+              <div className="flex items-center">
                 {/* display */}
                 <BubbleIcon value={'y'} />
                 <span className="mr-1">{`${field.value} keur`}</span>

@@ -58,7 +58,7 @@ const PlanningClassesTableRow: FC<IPlanningClassesTableRowProps> = ({
             </div>
             <div className={`class-header-content ${hierarchy}`}>
               <div className="class-header-content-item">
-                <Link to={buildLink()} className="display-flex">
+                <Link to={buildLink()} className="flex">
                   <IconButton
                     icon={expanded ? IconAngleUp : IconAngleDown}
                     color="white"

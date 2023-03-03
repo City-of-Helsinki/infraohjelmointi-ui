@@ -16,7 +16,7 @@ interface IFormFieldLabel {
 const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled, dataTestId }) => {
   const { t } = useTranslation();
   return (
-    <div className="display-flex">
+    <div className="flex">
       <label className="pen-and-label-text">{t(text)}</label>
       {onClick && (
         <button

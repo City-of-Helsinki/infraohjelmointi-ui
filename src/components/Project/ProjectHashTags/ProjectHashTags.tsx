@@ -161,7 +161,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     return (
       <div className="input-wrapper" id={name} ref={ref} data-testid={name}>
         {/* Dialog */}
-        <div className="display-flex-col">
+        <div className="flex flex-col">
           <Dialog
             id="hashtags-dialog"
             aria-labelledby={label}
