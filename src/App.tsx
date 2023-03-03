@@ -91,7 +91,7 @@ const App: FC = () => {
       <TopBar />
       <div className="app-content">
         <SideBar />
-        <div className="w-100-p">
+        <div className="w-full">
           <Loader />
           <Routes>
             <Route path="/project/:projectId?" element={<ProjectView />}>
