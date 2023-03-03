@@ -1,3 +1,7 @@
+#hashtags-dialog {
+  @apply !w-[65%];
+}
+
 #hashtags-dialog h2 {
   @apply mt-2 mb-6 text-heading-s font-medium;
 }
