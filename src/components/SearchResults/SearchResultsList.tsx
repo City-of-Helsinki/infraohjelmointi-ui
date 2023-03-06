@@ -10,7 +10,7 @@ import './styles.css';
 
 const SearchResultsList = () => {
   const isLoading = useAppSelector(selectIsLoading);
-  const { searchResultsList } = useSearchResultsList();
+  const { searchResultsList, next, previous, count } = useSearchResultsList();
   const resultLength = searchResultsList.length;
 
   return (
@@ -24,7 +24,7 @@ const SearchResultsList = () => {
           {searchResultsList.map((r) => (
             <SearchResultsCard key={r.id} {...r} />
           ))}
-          <SearchResultsPagination />
+          <SearchResultsPagination next={next} previous={previous} count={count} />
         </div>
       ) : (
         <SearchResultsNotFound />

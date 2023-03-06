@@ -9,9 +9,16 @@ interface ISearchState {
   open: boolean;
   form: ISearchForm;
   submittedForm: ISearchForm;
-  searchResults: ISearchResults | null;
+  searchResults: ISearchResults;
   error: IError | null | unknown;
 }
+
+const initialSearchResults = {
+  next: null,
+  previous: null,
+  count: 0,
+  results: [],
+};
 
 export const initialSearchForm = {
   freeSearchParams: {},
@@ -35,7 +42,7 @@ const initialState: ISearchState = {
   open: false,
   form: initialSearchForm,
   submittedForm: initialSearchForm,
-  searchResults: null,
+  searchResults: initialSearchResults,
   error: null,
 };
 
@@ -63,7 +70,7 @@ export const searchSlice = createSlice({
         ...state,
         form: initialSearchForm,
         submittedForm: initialSearchForm,
-        searchResults: null,
+        searchResults: initialSearchResults,
       };
     },
     setSubmittedSearchForm(state, action: PayloadAction<ISearchForm>) {

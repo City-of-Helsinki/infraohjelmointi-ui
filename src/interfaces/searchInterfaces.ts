@@ -1,10 +1,20 @@
 import { IListItem } from './common';
 import { IProject } from './projectInterfaces';
 
-export interface ISearchResultItem {
+export type ISearchResultsType = 'groups' | 'classes' | 'locations' | 'projects';
+
+export interface ISearchResultPayloadItem {
   id: string;
   name: string;
   path: string;
+  type: ISearchResultsType;
+  hashTags: Array<IListItem>;
+  phase: IListItem | null;
+}
+
+export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'phase'> {
+  breadCrumbs: Array<string>;
+  phase: string | null;
 }
 
 export interface ISearchResultsProject {
@@ -13,20 +23,8 @@ export interface ISearchResultsProject {
 }
 
 export interface ISearchResults {
-  groups: Array<ISearchResultItem>;
-  classes: Array<ISearchResultItem>;
-  locations: Array<ISearchResultItem>;
-  projects: Array<ISearchResultsProject>;
-}
-
-export type ISearchResultsType = 'groups' | 'classes' | 'locations' | 'projects';
-
-export interface ISearchResultListItem {
-  name: string;
-  id: string;
-  path: string;
-  type: ISearchResultsType;
-  breadCrumbs: Array<string>;
-  hashTags?: Array<IListItem>;
-  phase?: string;
+  next: number | null;
+  previous: number | null;
+  count: number;
+  results: Array<ISearchResultPayloadItem>;
 }
