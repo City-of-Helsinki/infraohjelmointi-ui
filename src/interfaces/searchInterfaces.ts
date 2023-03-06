@@ -23,8 +23,17 @@ export interface ISearchResultsProject {
 }
 
 export interface ISearchResults {
-  next: number | null;
-  previous: number | null;
+  next: string | null;
+  previous: string | null;
   count: number;
   results: Array<ISearchResultPayloadItem>;
 }
+
+export interface ISearchRequest {
+  params?: string;
+  fullPath?: string;
+  limit?: string;
+  page?: number;
+}
+
+export type SearchLimit = '10' | '20' | '30';

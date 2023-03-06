@@ -234,7 +234,7 @@ describe('Search', () => {
   it('catches a bad search request', async () => {
     const { store } = renderResult;
     mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getSearchResultsThunk('123'));
+    await store.dispatch(getSearchResultsThunk({ params: '123' }));
 
     const storeError = store.getState().search.error as IError;
     expect(storeError.message).toBe(mockError.message);

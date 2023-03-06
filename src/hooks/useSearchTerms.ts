@@ -5,6 +5,7 @@ import {
   getSearchResultsThunk,
   initialSearchForm,
   selectSubmittedSearchForm,
+  setLastSearchParams,
   setSubmittedSearchForm,
 } from '@/reducers/searchSlice';
 import buildSearchParams from '@/utils/buildSearchParams';
@@ -147,9 +148,10 @@ const useSearchTerms = () => {
       const formAfterDelete = deleteSearchFormValue(submittedForm, term);
       const searchParams = buildSearchParams(formAfterDelete);
       if (searchParams) {
-        dispatch(getSearchResultsThunk(searchParams)).then(() =>
-          dispatch(setSubmittedSearchForm(formAfterDelete)),
-        );
+        dispatch(getSearchResultsThunk({ params: searchParams })).then(() => {
+          dispatch(setSubmittedSearchForm(formAfterDelete));
+          dispatch(setLastSearchParams(searchParams));
+        });
       } else {
         dispatch(clearSearchState());
       }

@@ -15,6 +15,7 @@ import { useOptions } from '@/hooks/useOptions';
 import {
   getSearchResultsThunk,
   selectOpen,
+  setLastSearchParams,
   setSearchForm,
   setSubmittedSearchForm,
   toggleSearch,
@@ -46,8 +47,9 @@ const Search = () => {
       const searchParams = buildSearchParams(form);
       navigate('/search-results');
       dispatch(toggleSearch());
-      dispatch(getSearchResultsThunk(searchParams)).then(() => {
+      dispatch(getSearchResultsThunk({ params: searchParams })).then(() => {
         dispatch(setSubmittedSearchForm(form));
+        dispatch(setLastSearchParams(searchParams));
       });
     },
     [dispatch, navigate],
