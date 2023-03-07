@@ -1,4 +1,4 @@
-import { FC, memo, useEffect, useRef } from 'react';
+import { FC, memo, useCallback, useEffect, useRef } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { TextArea as HDSTextArea } from 'hds-react/components/Textarea';
@@ -37,17 +37,29 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
     }
   }, [textAreaRef]);
 
+  // Autosize the text area "async" after blurring the field
+  // if saving takes too long in production this will not work
+  const autoSizeTextAreaOnBlur = useCallback(() => {
+    if (textAreaRef && textAreaRef.current) {
+      const element = textAreaRef.current;
+      setTimeout(() => {
+        element.style.height = 'auto';
+        element.style.height = `${element.scrollHeight}px`;
+      }, 300);
+    }
+  }, []);
+
   return (
     <Controller
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
             ref={textAreaRef}
             onChange={onChange}
-            onBlur={onBlur}
+            onBlur={autoSizeTextAreaOnBlur}
             value={value}
             className={`textarea-field input-${size || 'xl'}`}
             label={t(label)}
