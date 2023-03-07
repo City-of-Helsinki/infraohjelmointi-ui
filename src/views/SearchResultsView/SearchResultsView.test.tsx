@@ -42,7 +42,8 @@ const searchActiveState = {
     form: filledSearchForm,
     submittedForm: filledSearchForm,
     searchResults: mockSearchResults.data,
-    lastSearchParams: '',
+    lastSearchParams:
+      'hashtag=ccf89105-ee58-49f1-be0a-2cffca8711ab&hashtag=50fe7a50-fe4d-4fe2-97b2-44d34a4ce8b4&masterClass=41d6bd7b-4a86-4ea4-95b7-4bff4f179095&class=354edbb1-f257-432c-b5bf-4a7e4f02aeba',
     searchLimit: '10' as SearchLimit,
     searchOrder: 'new' as SearchOrder,
     error: null,
@@ -169,70 +170,78 @@ describe('SearchResultsView', () => {
     });
   });
 
-  describe('SearchResultsPageDropdown', () => {
+  describe('SearchLimitDropdown', () => {
     it('renders elements and 0 results if there are no results', () => {
       const { getByText } = renderResult;
-      expect(getByClass('page-dropdown-container')).toBe(1);
+      expect(getByClass('limit-dropdown-container')).toBe(1);
       expect(getByText('0')).toBeInTheDocument();
       expect(getByText('resultsForSearch')).toBeInTheDocument();
     });
 
-    it('renders page dropdown and result amount if there are results', async () => {
+    it('renders limit dropdown and can select a new search limit and sends a GET request when changed', async () => {
+      mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
       renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
       const { container, user, getByText, getByRole, getAllByText, queryByText } = renderResult;
-      const pageDropdown = container.getElementsByClassName('page-dropdown-container')[0];
-      const pageSelectOptions = ['10', '20', '30'];
-      expect(pageDropdown.childNodes[0]).toHaveTextContent('2');
-      expect(pageDropdown.childNodes[0]).toHaveTextContent('resultsForSearch');
 
-      const pageSelect = getByRole('button', { name: pageSelectOptions[0] });
+      const limitDropdown = container.getElementsByClassName('limit-dropdown-container')[0];
 
-      expect(pageSelect).toBeInTheDocument();
+      expect(limitDropdown.childNodes[0]).toHaveTextContent('2');
+      expect(limitDropdown.childNodes[0]).toHaveTextContent('resultsForSearch');
 
-      // await user.click(pageSelect);
-      await user.click(pageSelect);
+      const limitOptions = ['10', '20', '30'];
 
-      pageSelectOptions.forEach((pso) => {
-        if (pso === pageSelectOptions[0]) {
-          expect(getAllByText(pso).length).toBe(2);
+      const limitSelect = getByRole('button', { name: limitOptions[0] });
+
+      expect(limitSelect).toBeInTheDocument();
+
+      await user.click(limitSelect);
+
+      limitOptions.forEach((lo) => {
+        if (lo === limitOptions[0]) {
+          expect(getAllByText(lo).length).toBe(2);
         } else {
-          expect(getByText(pso)).toBeInTheDocument();
+          expect(getByText(lo)).toBeInTheDocument();
         }
       });
 
-      await user.click(getByText(pageSelectOptions[2]));
+      await user.click(getByText(limitOptions[2]));
 
-      expect(getByText(pageSelectOptions[2])).toBeInTheDocument();
-      expect(queryByText(pageSelectOptions[0])).toBeNull();
+      expect(getByText(limitOptions[2])).toBeInTheDocument();
+      expect(queryByText(limitOptions[0])).toBeNull();
+      expect(mockedAxios.get.mock.lastCall[0].includes(`&limit=${limitOptions[2]}`)).toBe(true);
     });
   });
 
   describe('SearchResultsOrderDropdown', () => {
-    it('renders if there are search results and can choose order options', async () => {
+    it('renders if there are search results and can choose order options and send a new GET request when changed', async () => {
+      mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+
       renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
 
-      const orderItems = [
+      const orderOptions = [
         'searchOrder.new',
         'searchOrder.old',
         'searchOrder.project',
         'searchOrder.group',
+        'searchOrder.phase',
       ];
-      const { user, getByRole, getByText, queryByText, getByTestId } = renderResult;
+      const { user, getByRole, getByText, queryByText, getByTestId, getAllByText } = renderResult;
 
       expect(getByTestId('search-order-dropdown')).toBeInTheDocument();
 
       await user.click(getByRole('button', { name: 'order' }));
 
-      orderItems.forEach((oi) => expect(getByText(oi)).toBeInTheDocument());
+      orderOptions.forEach((oo) => expect(getAllByText(oo)[0]).toBeInTheDocument());
 
       await user.click(getByText('searchOrder.project'));
 
       expect(queryByText('searchOrder.group')).toBeNull();
       expect(getByText('searchOrder.project')).toBeInTheDocument();
+      expect(mockedAxios.get.mock.lastCall[0].includes('&order=project')).toBe(true);
     });
   });
 
@@ -247,14 +256,14 @@ describe('SearchResultsView', () => {
       expect(getByClass('search-result-breadcrumbs')).toBe(2);
       expect(getByClass('search-result-title-container')).toBe(2);
       expect(getByClass('search-result-title')).toBe(2);
-      expect(getByClass('custom-tag-container')).toBe(4);
+      expect(getByClass('custom-tag-container')).toBe(3);
 
-      const projectCard = container.getElementsByClassName('search-result-card')[1];
+      const projectCard = container.getElementsByClassName('search-result-card')[0];
       const projectChildren = projectCard.childNodes;
 
       // Title and status tag
-      expect(projectChildren[0]).toHaveTextContent('Hakaniementori');
-      expect(projectChildren[0]).toHaveTextContent('enums.draftInitiation');
+      expect(projectChildren[0]).toHaveTextContent('Yhteiskouluntie ja aukio');
+      expect(projectChildren[0]).toHaveTextContent('enums.warrantyPeriod');
       // Breadcrumbs
       expect(projectChildren[1]).toHaveTextContent('801 Esirakentaminen');
       expect(projectChildren[1]).toHaveTextContent('Esirakentaminen');
@@ -263,14 +272,13 @@ describe('SearchResultsView', () => {
       // Both hashTags to renders under project card
       expect(getByTestId('search-result-hashtags')).toBeInTheDocument();
       expect(projectChildren[2]).toHaveTextContent('#leikkipaikka');
-      expect(projectChildren[2]).toHaveTextContent('#leikkipuisto');
       // Link rendered around project card
-      expect(getAllByText('Hakaniementori')[0].closest('a')).toHaveAttribute(
+      expect(getAllByText('Yhteiskouluntie ja aukio')[0].closest('a')).toHaveAttribute(
         'href',
         '/planning/coordinator/41d6bd7b-4a86-4ea4-95b7-4bff4f179095/354edbb1-f257-432c-b5bf-4a7e4f02aeba/f2ffb57e-d7a4-49d1-b7bf-3fa4f9c2b1df',
       );
 
-      const classCard = container.getElementsByClassName('search-result-card')[0];
+      const classCard = container.getElementsByClassName('search-result-card')[1];
       const classChildren = classCard.childNodes;
 
       // Title and class tag
@@ -296,24 +304,29 @@ describe('SearchResultsView', () => {
       expect(getByText('adviceSearchText')).toBeInTheDocument();
     });
 
-    // it('advices the user to edit search filters if there are no search results and there are searchTerms', async () => {
-    //   renderResult = renderWithProviders(<SearchResultsView />, {
-    //     preloadedState: {
-    //       ...searchActiveState,
-    //       search: { ...searchActiveState.search, searchResults: null },
-    //     },
-    //   });
-    //   const { getByText } = renderResult;
-    //   expect(getByClass('flex flex-col items-center')).toBe(1);
-    //   expect(getByText('resultsNotFoundTitle')).toBeInTheDocument();
-    //   expect(getByText('resultsNotFoundText')).toBeInTheDocument();
-    // });
+    it('advices the user to edit search filters if there are no search results and there are searchTerms', async () => {
+      renderResult = renderWithProviders(<SearchResultsView />, {
+        preloadedState: {
+          ...searchActiveState,
+          search: {
+            ...searchActiveState.search,
+            searchResults: { ...searchActiveState.search.searchResults, results: [], count: 0 },
+          },
+        },
+      });
+
+      const { getByText } = renderResult;
+
+      expect(getByClass('flex flex-col items-center')).toBe(1);
+      expect(getByText('resultsNotFoundTitle')).toBeInTheDocument();
+      expect(getByText('resultsNotFoundText')).toBeInTheDocument();
+    });
 
     it('doesnt render if there are results', async () => {
       renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: searchActiveState,
       });
-      expect(getByClass('flex-col-center')).toBe(0);
+      expect(getByClass('flex flex-col items-center')).toBe(0);
     });
   });
 
