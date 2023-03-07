@@ -134,3 +134,8 @@ input {
 .input-wrapper ul {
   @apply !w-[101%];
 }
+
+/* display block to center check-marks in HDS-MultiSelect components */
+ul > li > span > svg {
+  @apply !block;
+}

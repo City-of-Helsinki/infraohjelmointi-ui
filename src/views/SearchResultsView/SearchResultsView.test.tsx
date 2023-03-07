@@ -43,7 +43,6 @@ const searchActiveState = {
     searchResults: mockSearchResults.data,
     lastSearchParams: '',
     searchLimit: '10' as '10' | '20' | '30',
-    searchPage: 1,
     error: null,
   },
   class: {

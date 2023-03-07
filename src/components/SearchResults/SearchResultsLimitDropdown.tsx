@@ -1,7 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IOption } from '@/interfaces/common';
 import { SearchLimit } from '@/interfaces/searchInterfaces';
-import { getSearchResultsThunk, selectSearchLimit, setSearchLimit } from '@/reducers/searchSlice';
+import {
+  getSearchResultsThunk,
+  selectLastSearchParams,
+  selectSearchLimit,
+  setSearchLimit,
+} from '@/reducers/searchSlice';
 import { Select } from 'hds-react/components/Select';
 import { FC, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +19,7 @@ const SearchResultsLimitDropdown: FC<ISearchResultsLimitDropdownProps> = ({ resu
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const searchLimit = useAppSelector(selectSearchLimit);
+  const lastSearchParams = useAppSelector(selectLastSearchParams);
 
   const limits: Array<IOption> = [
     { label: '10', value: '10' },
@@ -24,9 +30,9 @@ const SearchResultsLimitDropdown: FC<ISearchResultsLimitDropdownProps> = ({ resu
   const handleLimitChange = useCallback(
     (value: IOption) => {
       dispatch(setSearchLimit(value.value as SearchLimit));
-      return dispatch(getSearchResultsThunk({}));
+      return dispatch(getSearchResultsThunk({ params: lastSearchParams }));
     },
-    [dispatch],
+    [dispatch, lastSearchParams],
   );
 
   return (

@@ -12,7 +12,6 @@ interface ISearchState {
   searchResults: ISearchResults;
   lastSearchParams: string;
   searchLimit: SearchLimit;
-  searchPage: number;
   error: IError | null | unknown;
 }
 
@@ -48,7 +47,6 @@ const initialState: ISearchState = {
   searchResults: initialSearchResults,
   lastSearchParams: '',
   searchLimit: '10',
-  searchPage: 1,
   error: null,
 };
 
@@ -56,10 +54,8 @@ export const getSearchResultsThunk = createAsyncThunk(
   'search/getSearchResults',
   async (req: ISearchRequest, thunkAPI) => {
     const searchLimit = (thunkAPI.getState() as RootState).search.searchLimit;
-    const searchPage = (thunkAPI.getState() as RootState).search.searchPage;
     const lastSearchParams = (thunkAPI.getState() as RootState).search.lastSearchParams;
     req.limit = searchLimit;
-    req.page = searchPage;
     req.params = req.params || lastSearchParams;
     return await getProjectsWithParams(req)
       .then((res) => res)
@@ -82,9 +78,6 @@ export const searchSlice = createSlice({
     },
     setSearchLimit(state, action: PayloadAction<SearchLimit>) {
       return { ...state, searchLimit: action.payload };
-    },
-    setSearchPage(state, action: PayloadAction<number>) {
-      return { ...state, searchPage: action.payload };
     },
     clearSearchState(state) {
       return {
@@ -127,7 +120,6 @@ export const selectSearchResults = (state: RootState) => state.search.searchResu
 export const selectSubmittedSearchForm = (state: RootState) => state.search.submittedForm;
 export const selectLastSearchParams = (state: RootState) => state.search.lastSearchParams;
 export const selectSearchLimit = (state: RootState) => state.search.searchLimit;
-export const selectSearchPage = (state: RootState) => state.search.searchPage;
 
 export const {
   toggleSearch,
@@ -136,7 +128,6 @@ export const {
   setSubmittedSearchForm,
   setLastSearchParams,
   setSearchLimit,
-  setSearchPage,
 } = searchSlice.actions;
 
 export default searchSlice.reducer;
