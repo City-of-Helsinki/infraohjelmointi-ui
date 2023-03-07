@@ -1,4 +1,3 @@
-import { Paragraph } from '@/components/shared';
 import { FreeSearchFormItem, IFreeSearchResult, IListItem, IOption } from '@/interfaces/common';
 import { getProjectsWithFreeSearch, getProjectsWithParams } from '@/services/projectServices';
 import { arrayHasValue, listItemToOption } from '@/utils/common';
@@ -14,16 +13,7 @@ import { IGroupForm } from '@/interfaces/formInterfaces';
 const buildQueryParamString = (state: IQueryParamsState, projectName: string): string => {
   const searchParams = [];
   for (const [key, value] of Object.entries(state)) {
-    switch (key) {
-      case 'masterClass':
-      case 'class':
-      case 'subClass':
-      case 'district':
-      case 'division':
-      case 'subDivision':
-        value && searchParams.push(`${key}=${value}`);
-        break;
-    }
+    value && searchParams.push(`${key}=${value}`);
   }
   searchParams.push(`projectName=${projectName}`);
   searchParams.push('inGroup=false');
@@ -67,7 +57,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   });
 
   useEffect(() => {
-    console.log('firing');
     setQueryParams((current) => ({
       ...current,
       masterClass: getValues().masterClass?.value ? getValues().masterClass?.value : '',
@@ -90,6 +79,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
         getProjectsWithParams(queryString)
           .then((res) => {
             if (res) {
+              console.log(res);
               // Filter out only the projects which haven't yet been added to be the submitted list from the result
               const resultList = res.projects?.filter(
                 ({ project }) =>

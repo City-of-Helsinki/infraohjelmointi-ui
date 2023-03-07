@@ -2,14 +2,11 @@ import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo, useCallback
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
-import Paragraph from '../../shared/Paragraph';
 import './styles.css';
-import { FormFieldCreator, Icon } from '@/components/shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import useGroupForm from '@/forms/useGroupForm';
-import useClassList from '@/hooks/useClassList';
 import { selectMasterClasses, selectClasses, selectSubClasses } from '@/reducers/classSlice';
 import { listItemToOption } from '@/utils/common';
 import { IListItem, IOption } from '@/interfaces/common';
@@ -17,10 +14,12 @@ import { IClass } from '@/interfaces/classInterfaces';
 import GroupProjectSearch from './GroupProjectSearch';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import useLocationList from '@/hooks/useLocationList';
 import { postGroupThunk } from '@/reducers/groupSlice';
 import { IconAngleDown, IconAngleUp } from 'hds-react/icons';
 import { is } from 'immer/dist/internal';
+import useClassOptions from '@/hooks/useClassOptions';
+import useLocationOptions from '@/hooks/useLocationOptions';
+import { SelectField, TextField } from '@/components/shared';
 
 interface IFormState {
   isOpen: boolean;
@@ -58,12 +57,12 @@ const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroup
 };
 
 const GroupForm: FC = () => {
-  const masterClasses = useAppSelector(selectMasterClasses);
-  const classes = useAppSelector(selectClasses);
-  const subClasses = useAppSelector(selectSubClasses);
-  const districts = useAppSelector(selectDistricts);
-  const divisions = useAppSelector(selectDivisions);
-  const subDivisions = useAppSelector(selectSubDivisions);
+  const allMasterClasses = useAppSelector(selectMasterClasses);
+  const allClasses = useAppSelector(selectClasses);
+  const allSubClasses = useAppSelector(selectSubClasses);
+  const allDistricts = useAppSelector(selectDistricts);
+  const allDivisions = useAppSelector(selectDivisions);
+  const allSubDivisions = useAppSelector(selectSubDivisions);
 
   const getReverseLocationHierarchy = useCallback(
     (subDivisionId: string | undefined) => {
@@ -72,11 +71,11 @@ const GroupForm: FC = () => {
         value: projectLocation?.name || '',
       });
 
-      const selectedSubDivision = subDivisions.find((sd) => sd.id === subDivisionId);
+      const selectedSubDivision = allSubDivisions.find((sd) => sd.id === subDivisionId);
 
-      const selectedDivision = divisions.find((d) => d.id === selectedSubDivision?.parent);
+      const selectedDivision = allDivisions.find((d) => d.id === selectedSubDivision?.parent);
 
-      const selectedDistrict = districts.find(
+      const selectedDistrict = allDistricts.find(
         (D) => D.id === selectedDivision?.parent && D.parent === null,
       );
       return {
@@ -85,7 +84,7 @@ const GroupForm: FC = () => {
         district: listItemToOption(classAsListItem(selectedDistrict) || []),
       };
     },
-    [divisions, districts, subDivisions],
+    [allDivisions, allDistricts, allSubDivisions],
   );
 
   const getReverseClassHierarchy = useCallback(
@@ -95,11 +94,11 @@ const GroupForm: FC = () => {
         value: projectClass?.name || '',
       });
 
-      const selectedSubClass = subClasses.find((sc) => sc.id === subClassId);
+      const selectedSubClass = allSubClasses.find((sc) => sc.id === subClassId);
 
-      const selectedClass = classes.find((c) => c.id === selectedSubClass?.parent);
+      const selectedClass = allClasses.find((c) => c.id === selectedSubClass?.parent);
 
-      const selectedMasterClass = masterClasses.find(
+      const selectedMasterClass = allMasterClasses.find(
         (mc) => mc.id === selectedClass?.parent && mc.parent === null,
       );
       return {
@@ -108,10 +107,10 @@ const GroupForm: FC = () => {
         masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
       };
     },
-    [classes, masterClasses, subClasses],
+    [allClasses, allMasterClasses, allSubClasses],
   );
 
-  const { formMethods, formValues, formFields } = useGroupForm();
+  const { formMethods, formValues } = useGroupForm();
   const {
     handleSubmit,
     reset,
@@ -119,6 +118,7 @@ const GroupForm: FC = () => {
     watch,
     setValue,
     getValues,
+    control,
   } = formMethods;
 
   const dispatch = useAppDispatch();
@@ -135,9 +135,10 @@ const GroupForm: FC = () => {
 
   const { isOpen, selectedClass, selectedLocation, projectsForSubmit, showAdvanceFields } =
     formState;
-
-  useClassList(true, selectedClass);
-  useLocationList(true, selectedLocation);
+  const { masterClasses, classes, subClasses } = useClassOptions(selectedClass);
+  const { districts, divisions, subDivisions } = useLocationOptions(selectedLocation);
+  // useClassList(true, selectedClass);
+  // useLocationList(true, selectedLocation);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
@@ -238,6 +239,16 @@ const GroupForm: FC = () => {
     reset(formValues);
     // Also populate class and location lists back to full values
   }, [handleSetOpen, reset, formValues]);
+  const formProps = useCallback(
+    (name: string) => {
+      return {
+        name: name,
+        label: `groupForm.${name}`,
+        control: control,
+      };
+    },
+    [control],
+  );
 
   return (
     <div className="input-wrapper">
@@ -258,8 +269,8 @@ const GroupForm: FC = () => {
           <Content>
             <br />
             <div>
-              <Paragraph text={t(`groupForm.groupCreationDescription1`)} />
-              <Paragraph text={t(`groupForm.groupCreationDescription2`)} />
+              <p className="font-bold">{t(`groupForm.groupCreationDescription1`)}</p>
+              <p className="font-bold">{t(`groupForm.groupCreationDescription2`)}</p>
             </div>
 
             <div>
@@ -272,12 +283,81 @@ const GroupForm: FC = () => {
                 <div>
                   {/* Basic fields */}
                   <div className="search-form-content">
-                    <FormFieldCreator form={formFields.basic} />
+                    <TextField
+                      {...formProps('name')}
+                      rules={{ required: 'Tämä kenttä on täytettävä' }}
+                    />
+                    <SelectField
+                      {...formProps('masterClass')}
+                      rules={{
+                        required: 'Tämä kenttä on täytettävä',
+                        validate: {
+                          isPopulated: (mc: IOption) =>
+                            Object.keys(mc).includes('value') && mc.value !== ''
+                              ? true
+                              : 'Tämä kenttä on täytettävä',
+                        },
+                      }}
+                      options={masterClasses}
+                    />
+                    <SelectField
+                      {...formProps('class')}
+                      rules={{
+                        required: 'Tämä kenttä on täytettävä',
+                        validate: {
+                          isPopulated: (c: IOption) =>
+                            Object.keys(c).includes('value') && c.value !== ''
+                              ? true
+                              : 'Tämä kenttä on täytettävä',
+                        },
+                      }}
+                      options={classes}
+                    />
+                    <SelectField {...formProps('subClass')} options={subClasses} />
+                    {/* <FormFieldCreator form={formFields.basic} /> */}
                   </div>
                   {/* Advance fields */}
                   {showAdvanceFields && (
                     <div className="search-form-content">
-                      <FormFieldCreator form={formFields.advance} />
+                      <SelectField
+                        {...formProps('district')}
+                        rules={{
+                          required: 'Tämä kenttä on täytettävä',
+                          validate: {
+                            isPopulated: (d: IOption) =>
+                              Object.keys(d).includes('value') && d.value !== ''
+                                ? true
+                                : 'Tämä kenttä on täytettävä',
+                          },
+                        }}
+                        options={districts}
+                      />
+                      <SelectField
+                        {...formProps('division')}
+                        rules={{
+                          required: 'Tämä kenttä on täytettävä',
+                          validate: {
+                            isPopulated: (d: IOption) =>
+                              Object.keys(d).includes('value') && d.value !== ''
+                                ? true
+                                : 'Tämä kenttä on täytettävä',
+                          },
+                        }}
+                        options={divisions}
+                      />
+                      <SelectField
+                        {...formProps('subDivision')}
+                        rules={{
+                          required: 'Tämä kenttä on täytettävä',
+                          validate: {
+                            isPopulated: (sd: IOption) =>
+                              Object.keys(sd).includes('value') && sd.value !== ''
+                                ? true
+                                : 'Tämä kenttä on täytettävä',
+                          },
+                        }}
+                        options={subDivisions}
+                      />
                     </div>
                   )}
 
