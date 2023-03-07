@@ -94,6 +94,7 @@ export interface IGroupForm {
   district: IOption;
   division: IOption;
   subDivision: IOption;
+  projectsForSubmit: Array<string>;
 }
 
 

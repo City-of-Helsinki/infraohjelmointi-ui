@@ -6,27 +6,16 @@ import { SearchInput } from 'hds-react/components/SearchInput';
 import _ from 'lodash';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UseFormGetValues } from 'react-hook-form';
+import { Control, Controller, FieldValues, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 // Build a search parameter with all the choices from the search form
-
-const buildQueryParamString = (state: IQueryParamsState, projectName: string): string => {
-  const searchParams = [];
-  for (const [key, value] of Object.entries(state)) {
-    value && searchParams.push(`${key}=${value}`);
-  }
-  searchParams.push(`projectName=${projectName}`);
-  searchParams.push('inGroup=false');
-  searchParams.push('programmed=true');
-
-  return searchParams.join('&');
-};
 
 interface IProjectSearchProps {
   onProjectClick: (value: IOption | undefined) => void;
   projectsForSubmit: Array<IOption>;
   onProjectSelectionDelete: (projectName: string) => void;
   getValues: UseFormGetValues<IGroupForm>;
+  control: Control<IGroupForm, any>;
 }
 
 interface IQueryParamsState {
@@ -43,37 +32,31 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   projectsForSubmit,
   onProjectSelectionDelete,
   getValues,
+  control,
 }) => {
-  const { t } = useTranslation();
-  const [value, setValue] = useState('');
-  const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
-  const [queryParams, setQueryParams] = useState<IQueryParamsState>({
-    masterClass: '',
-    class: '',
-    subClass: '',
-    district: '',
-    division: '',
-    subDivision: '',
-  });
+  const buildQueryParamString = (projectName: string): string => {
+    const searchParams = [];
+    for (const [key, value] of Object.entries(getValues())) {
+      value?.value && searchParams.push(`${key}=${value?.value}`);
+    }
+    searchParams.push(`projectName=${projectName}`);
+    searchParams.push(`limit=30`);
+    // searchParams.push('inGroup=false');
+    // searchParams.push('programmed=true');
 
-  useEffect(() => {
-    setQueryParams((current) => ({
-      ...current,
-      masterClass: getValues().masterClass?.value ? getValues().masterClass?.value : '',
-      class: getValues().class?.value ? getValues().class?.value : '',
-      subClass: getValues().subClass?.value ? getValues().subClass?.value : '',
-      district: getValues().district?.value ? getValues().district?.value : '',
-      division: getValues().division?.value ? getValues().division?.value : '',
-      subDivision: getValues().subDivision?.value ? getValues().subDivision?.value : '',
-    }));
-  }, [getValues]);
-  const handleValueChange = useCallback((value: string) => setValue(value), []);
+    return searchParams.join('&');
+  };
+  const { t } = useTranslation();
+  const [searchWord, setSearchWord] = useState('');
+  const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
+
+  const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
 
   const getSuggestions = useCallback(
     (inputValue: string) =>
       new Promise<{ value: string; label: string }[]>((resolve, reject) => {
         // printing out search params for later
-        const queryString = buildQueryParamString(queryParams, inputValue);
+        const queryString = buildQueryParamString(inputValue);
         console.log(queryString);
 
         getProjectsWithParams(queryString)
@@ -81,12 +64,9 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
             if (res) {
               console.log(res);
               // Filter out only the projects which haven't yet been added to be the submitted list from the result
+              const projectsIdList = projectsForSubmit.map((p) => p.value);
               const resultList = res.projects?.filter(
-                ({ project }) =>
-                  !arrayHasValue(
-                    projectsForSubmit.map((p) => p.value),
-                    project.id,
-                  ),
+                ({ project }) => !arrayHasValue(projectsIdList, project.id),
               );
               console.log(resultList);
 
@@ -109,35 +89,53 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     [projectsForSubmit, getValues],
   );
 
-  const handleSubmit = (value: string) => {
-    value && onProjectClick(searchedProjects.find((p) => p.label === value));
-    setValue('');
-  };
+  const handleSubmit = useCallback((value: string, onChange: (...event: unknown[]) => void) => {
+    const selectedProject = searchedProjects.find((p) => p.label === value);
+    if (value) {
+      onProjectClick(selectedProject);
+      onChange(projectsForSubmit);
+    }
+    // value && onProjectClick(searchedProjects.find((p) => p.label === value));
+    setSearchWord('');
+  }, []);
 
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
-    onProjectSelectionDelete(
-      (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string,
-    );
-  };
+  const handleDelete = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
+      onProjectSelectionDelete(
+        (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string,
+      );
+      onChange(projectsForSubmit);
+    },
+    [],
+  );
   return (
     <div className="dialog-section" data-testid="search-project-field-section">
-      <SearchInput
-        label={t('searchForProjects')}
-        getSuggestions={getSuggestions}
-        clearButtonAriaLabel="Clear search field"
-        searchButtonAriaLabel="Search"
-        suggestionLabelField="label"
-        value={value}
-        onChange={handleValueChange}
-        onSubmit={handleSubmit}
+      <Controller
+        name="projectsForSubmit"
+        control={control as Control<IGroupForm, any>}
+        render={({ field: { onChange, value } }) => (
+          <>
+            <SearchInput
+              label={t('searchForProjects')}
+              getSuggestions={getSuggestions}
+              clearButtonAriaLabel="Clear search field"
+              searchButtonAriaLabel="Search"
+              suggestionLabelField="label"
+              value={searchWord}
+              onChange={handleValueChange}
+              onSubmit={(v) => handleSubmit(v, onChange)}
+            />
+
+            <div className="search-selections">
+              {projectsForSubmit.map((s) => (
+                <Tag key={s.label} onDelete={(e) => handleDelete(e, onChange)}>
+                  {s.label}
+                </Tag>
+              ))}
+            </div>
+          </>
+        )}
       />
-      <div className="search-selections">
-        {projectsForSubmit.map((s) => (
-          <Tag key={s.label} onDelete={handleDelete}>
-            {s.label}
-          </Tag>
-        ))}
-      </div>
     </div>
   );
 };
