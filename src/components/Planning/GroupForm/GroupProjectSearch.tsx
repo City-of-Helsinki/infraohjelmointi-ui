@@ -41,8 +41,8 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     }
     searchParams.push(`projectName=${projectName}`);
     searchParams.push(`limit=30`);
-    // searchParams.push('inGroup=false');
-    // searchParams.push('programmed=true');
+    searchParams.push('inGroup=false');
+    searchParams.push('programmed=true');
 
     return searchParams.join('&');
   };
