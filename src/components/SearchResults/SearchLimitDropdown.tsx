@@ -8,14 +8,14 @@ import {
   setSearchLimit,
 } from '@/reducers/searchSlice';
 import { Select } from 'hds-react/components/Select';
-import { FC, useCallback } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface ISearchResultsLimitDropdownProps {
+interface ISearchLimitDropdownProps {
   resultLength: number;
 }
 
-const SearchResultsLimitDropdown: FC<ISearchResultsLimitDropdownProps> = ({ resultLength }) => {
+const SearchLimitDropdown: FC<ISearchLimitDropdownProps> = ({ resultLength }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const searchLimit = useAppSelector(selectSearchLimit);
@@ -36,7 +36,7 @@ const SearchResultsLimitDropdown: FC<ISearchResultsLimitDropdownProps> = ({ resu
   );
 
   return (
-    <div className="page-dropdown-container">
+    <div className="limit-dropdown-container">
       <span>
         <b>{`${resultLength} `}</b>
         {t('resultsForSearch')}
@@ -47,7 +47,7 @@ const SearchResultsLimitDropdown: FC<ISearchResultsLimitDropdownProps> = ({ resu
             label=""
             defaultValue={limits[limits.findIndex((l) => l.value === searchLimit)]}
             options={limits}
-            className="page-dropdown"
+            className="custom-select limit-dropdown"
             onChange={handleLimitChange}
           />
           <span>kpl sivulla</span>
@@ -57,4 +57,4 @@ const SearchResultsLimitDropdown: FC<ISearchResultsLimitDropdownProps> = ({ resu
   );
 };
 
-export default SearchResultsLimitDropdown;
+export default memo(SearchLimitDropdown);

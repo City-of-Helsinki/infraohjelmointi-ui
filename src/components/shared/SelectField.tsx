@@ -48,7 +48,7 @@ const SelectField: FC<ISelectFieldProps> = ({
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
             <HDSSelect
-              className="input-l"
+              className="input-l custom-select"
               value={value}
               onChange={onChange}
               onBlur={onBlur}

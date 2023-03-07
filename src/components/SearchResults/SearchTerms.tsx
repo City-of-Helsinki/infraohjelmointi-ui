@@ -1,5 +1,6 @@
 import useSearchTerms from '@/hooks/useSearchTerms';
 import { Tag } from 'hds-react/components/Tag';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 
@@ -29,4 +30,4 @@ const SearchTerms = () => {
   );
 };
 
-export default SearchTerms;
+export default memo(SearchTerms);

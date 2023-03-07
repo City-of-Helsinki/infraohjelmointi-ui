@@ -42,7 +42,10 @@ export const patchProject = async (request: IProjectRequestObject): Promise<IPro
 
 export const getProjectsWithParams = async (req: ISearchRequest): Promise<ISearchResults> => {
   return axios
-    .get(req.fullPath || `${REACT_APP_API_URL}/projects/?${req.params}&limit=${req.limit}`)
+    .get(
+      req.fullPath ||
+        `${REACT_APP_API_URL}/projects/?${req.params}&limit=${req.limit}&order=${req.order}`,
+    )
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

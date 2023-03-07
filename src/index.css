@@ -131,7 +131,7 @@ input {
   box-sizing: border-box causes the HDS-Select dropdown list to be too small, this sets
   the list to its intended size
 */
-.input-wrapper ul {
+.custom-select ul {
   @apply !w-[101%];
 }
 

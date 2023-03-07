@@ -1,6 +1,6 @@
 import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
 import { IconAngleRight, IconLayers, IconPaperclip } from 'hds-react/icons';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CustomTag } from '../shared';
@@ -60,4 +60,4 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
   );
 };
 
-export default SearchResultsCard;
+export default memo(SearchResultsCard);

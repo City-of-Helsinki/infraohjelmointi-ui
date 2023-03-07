@@ -3,10 +3,11 @@ import { selectIsLoading } from '@/reducers/loadingSlice';
 import useSearchResultsList from '@/hooks/useSearchResultsList';
 import SearchResultsCard from './SearchResultsCard';
 import SearchResultsNotFound from './SearchResultsNotFound';
-import SearchResultsOrderDropdown from './SearchResultsOrderDropdown';
-import SearchResultsLimitDropdown from './SearchResultsLimitDropdown';
+import SearchOrderDropdown from './SearchOrderDropdown';
+import SearchLimitDropdown from './SearchLimitDropdown';
 import SearchResultsPagination from './SearchResultsPagination';
 import './styles.css';
+import { memo } from 'react';
 
 const SearchResultsList = () => {
   const isLoading = useAppSelector(selectIsLoading);
@@ -15,8 +16,8 @@ const SearchResultsList = () => {
   return (
     <div className="search-result-list-container">
       <div className="result-list-options-container">
-        <SearchResultsLimitDropdown resultLength={count} />
-        {count > 0 && <SearchResultsOrderDropdown />}
+        <SearchLimitDropdown resultLength={count} />
+        {count > 0 && <SearchOrderDropdown />}
       </div>
       {!isLoading && count > 0 ? (
         <div data-testid="search-result-list">
@@ -32,4 +33,4 @@ const SearchResultsList = () => {
   );
 };
 
-export default SearchResultsList;
+export default memo(SearchResultsList);

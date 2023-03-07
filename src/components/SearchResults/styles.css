@@ -67,34 +67,38 @@
   @apply mb-16 flex items-end justify-between;
 }
 
-.page-dropdown-container {
+.limit-dropdown-container {
   @apply flex items-center;
 }
 
-.page-dropdown-container > span {
+.limit-dropdown-container > span {
   @apply mr-4 text-xl;
 }
 
 /* Style the select component into a small version (the amount per page selection) */
-.page-dropdown {
+.limit-dropdown {
   @apply mr-2 w-14;
 }
 
-.page-dropdown > div {
+.limit-dropdown > div {
   @apply min-h-[2rem];
 }
 
-.page-dropdown > div > button {
+.limit-dropdown ul {
+  @apply !w-[107%];
+}
+
+.limit-dropdown > div > button {
   /* HDS overwrites this if set with tailwind classes */
   padding: 0 0.4rem;
   @apply !min-h-full justify-between text-black-60;
 }
 
-.page-dropdown > div > button > svg {
+.limit-dropdown > div > button > svg {
   @apply absolute top-0 right-0;
 }
 
-.page-dropdown > div > button > span {
+.limit-dropdown > div > button > span {
   @apply p-0;
 }
 

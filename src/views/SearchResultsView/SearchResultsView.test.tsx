@@ -9,6 +9,7 @@ import SearchResultsView from './SearchResultsView';
 import { mockSearchResults } from '@/mocks/mockSearch';
 import { waitFor } from '@testing-library/react';
 import { mockHashTags } from '@/mocks/mockHashTags';
+import { SearchLimit, SearchOrder } from '@/interfaces/searchInterfaces';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -42,7 +43,8 @@ const searchActiveState = {
     submittedForm: filledSearchForm,
     searchResults: mockSearchResults.data,
     lastSearchParams: '',
-    searchLimit: '10' as '10' | '20' | '30',
+    searchLimit: '10' as SearchLimit,
+    searchOrder: 'new' as SearchOrder,
     error: null,
   },
   class: {

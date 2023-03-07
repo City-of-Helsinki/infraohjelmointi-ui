@@ -209,7 +209,8 @@
     "new": "Uusin ensin",
     "old": "Vanhin ensin",
     "project": "Hankkeet ensin",
-    "group": "Ryhmät ensin"
+    "group": "Ryhmät ensin",
+    "phase": "Vaiheen mukaan"
   },
   "searchTag": {
     "groups": "Ryhmä",

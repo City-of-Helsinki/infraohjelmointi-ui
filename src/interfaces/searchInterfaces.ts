@@ -33,6 +33,8 @@ export interface ISearchRequest {
   params?: string;
   fullPath?: string;
   limit?: string;
+  order?: string;
 }
 
 export type SearchLimit = '10' | '20' | '30';
+export type SearchOrder = 'new' | 'old' | 'project' | 'group' | 'phase';

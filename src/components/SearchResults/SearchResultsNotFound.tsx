@@ -1,6 +1,7 @@
 import { useAppSelector } from '@/hooks/common';
 import useSearchTerms from '@/hooks/useSearchTerms';
 import { selectIsLoading } from '@/reducers/loadingSlice';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const SearchResultsNotFound = () => {
@@ -23,4 +24,4 @@ const SearchResultsNotFound = () => {
   );
 };
 
-export default SearchResultsNotFound;
+export default memo(SearchResultsNotFound);

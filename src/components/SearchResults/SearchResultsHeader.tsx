@@ -3,7 +3,7 @@ import './styles.css';
 import { Button } from 'hds-react/components/Button';
 import { IconSliders } from 'hds-react/icons';
 import { useAppDispatch } from '@/hooks/common';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { useTranslation } from 'react-i18next';
 
@@ -35,4 +35,4 @@ const SearchResultsHeader = () => {
   );
 };
 
-export default SearchResultsHeader;
+export default memo(SearchResultsHeader);

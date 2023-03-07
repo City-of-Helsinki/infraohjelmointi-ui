@@ -3,9 +3,10 @@ import {
   getSearchResultsThunk,
   selectLastSearchParams,
   selectSearchLimit,
+  selectSearchOrder,
 } from '@/reducers/searchSlice';
 import { Pagination } from 'hds-react/components/Pagination';
-import { FC, useCallback, useMemo, MouseEvent, useEffect, useState } from 'react';
+import { FC, useCallback, useMemo, MouseEvent, useEffect, useState, memo } from 'react';
 import './styles.css';
 
 interface ISearchResultsPagination {
@@ -24,6 +25,7 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
   const [searchPage, setSearchPage] = useState(1);
   const searchLimit = useAppSelector(selectSearchLimit);
   const lastSearchParams = useAppSelector(selectLastSearchParams);
+  const searchOrder = useAppSelector(selectSearchOrder);
 
   const pageCount = useMemo(
     () => Math.floor(count / parseInt(searchLimit)) + 1,
@@ -34,10 +36,10 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
     setSearchPage(value);
   }, []);
 
-  // Reset pagination every time a new search is done
+  // Reset pagination every time a new search is done or the order is changed
   useEffect(() => {
     handlePageChange(1);
-  }, [pageCount]);
+  }, [pageCount, searchOrder]);
 
   const handleGetSearchResults = useCallback(
     (event: MouseEvent<HTMLAnchorElement> | MouseEvent<HTMLButtonElement>) => {
@@ -60,7 +62,7 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
         const buttonNumber = parseInt(buttonText);
         handlePageChange(buttonNumber);
         return dispatch(
-          getSearchResultsThunk({ params: `${lastSearchParams}&page)=${buttonNumber}` }),
+          getSearchResultsThunk({ params: `${lastSearchParams}&page=${buttonNumber}` }),
         );
       }
     },
@@ -84,4 +86,4 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
   );
 };
 
-export default SearchResultsPagination;
+export default memo(SearchResultsPagination);
