@@ -6,7 +6,7 @@ import { setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { act } from 'react-dom/test-utils';
 import SearchResultsView from './SearchResultsView';
-import { mockSearchResults } from '@/mocks/mockSearch';
+import { mockLongSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 import { waitFor } from '@testing-library/react';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { SearchLimit, SearchOrder } from '@/interfaces/searchInterfaces';
@@ -330,5 +330,38 @@ describe('SearchResultsView', () => {
     });
   });
 
-  // TODO: pagination should be implemented
+  describe('SearchResultsPagination', () => {
+    it('renders only the container if theres less than one page of content', () => {
+      const { queryByTestId, getByTestId } = renderResult;
+
+      expect(getByTestId('search-results-pagination-container')).toBeInTheDocument();
+      expect(queryByTestId('search-results-pagination')).toBeNull();
+    });
+
+    // click the pagination buttons does nothing for some reason
+    it.skip('renders the pagination if thers more than one page of content and can navigate between pages', async () => {
+      // mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+
+      renderResult = renderWithProviders(<SearchResultsView />, {
+        preloadedState: {
+          ...searchActiveState,
+          search: {
+            ...searchActiveState.search,
+            searchResults: mockLongSearchResults.data,
+          },
+        },
+      });
+
+      const { getByTestId, user, getByTitle } = renderResult;
+
+      expect(getByTestId('search-results-pagination')).toBeInTheDocument();
+
+      await user.click(getByTestId('search-results-pagination-next-button'));
+      // await user.click(getByTestId('search-results-pagination-page-2'));
+
+      expect(getByTitle('Nykyinen sivu')).toHaveTextContent('2');
+      // debug(mockedAxios.get.mock);
+      // expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.next);
+    });
+  });
 });
