@@ -1,7 +1,7 @@
 import useProjectBasicsForm from '@/forms/useProjectBasicsForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectBasicsForm } from '@/interfaces/formInterfaces';
-import { FC, memo, useCallback } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import {
   FormSectionTitle,
   ListField,
@@ -30,6 +30,7 @@ const ProjectBasicsForm: FC = () => {
   const { formMethods } = useProjectBasicsForm();
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
+  const [formSaved, setFormSaved] = useState(false);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -51,12 +52,23 @@ const ProjectBasicsForm: FC = () => {
   const { masterClasses, classes, subClasses } = useClassOptions(project?.projectClass);
   const { districts, divisions, subDivisions } = useLocationOptions(project?.projectLocation);
 
+  const handleSetFormSaved = useCallback((value: boolean) => {
+    setFormSaved(value);
+  }, []);
+
   const onSubmit = useCallback(
     (form: IProjectBasicsForm) => {
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      project?.id && dispatch(silentPatchProjectThunk({ id: project.id, data }));
+      project?.id &&
+        dispatch(silentPatchProjectThunk({ id: project.id, data })).then((res) => {
+          // Set form saved to true if action is successfull, queue it to false async
+          handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
+          setTimeout(() => {
+            handleSetFormSaved(false);
+          }, 0);
+        });
     },
-    [dirtyFields, project?.id, dispatch],
+    [dirtyFields, project?.id, dispatch, handleSetFormSaved],
   );
 
   const formProps = useCallback(
@@ -96,6 +108,7 @@ const ProjectBasicsForm: FC = () => {
             {...formProps('description')}
             size="l"
             rules={{ required: t('required', { value: 'Kuvaus' }) || '' }}
+            formSaved={formSaved}
           />
           <ProjectHashTags {...formProps('hashTags')} control={control} />
           {/* SECTION 2 - STATUS */}

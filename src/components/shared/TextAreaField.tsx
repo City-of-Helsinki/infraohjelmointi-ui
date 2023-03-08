@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useEffect, useRef } from 'react';
+import { FC, memo, useEffect, useRef } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { TextArea as HDSTextArea } from 'hds-react/components/Textarea';
@@ -13,6 +13,7 @@ interface ITextAreaFieldProps {
   readOnly?: boolean;
   hideLabel?: boolean;
   size?: 'l' | 'xl';
+  formSaved?: boolean;
 }
 
 const TextAreaField: FC<ITextAreaFieldProps> = ({
@@ -23,6 +24,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
   readOnly,
   hideLabel,
   size,
+  formSaved,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
@@ -37,17 +39,15 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
     }
   }, [textAreaRef]);
 
-  // Autosize the text area "async" after blurring the field
-  // if saving takes too long in production this will not work
-  const autoSizeTextAreaOnBlur = useCallback(() => {
-    if (textAreaRef && textAreaRef.current) {
+  // Autosize the textarea if form is saved successfully, this helps with resizing
+  // since the backend will remove all empty rows
+  useEffect(() => {
+    if (formSaved && textAreaRef && textAreaRef.current) {
       const element = textAreaRef.current;
-      setTimeout(() => {
-        element.style.height = 'auto';
-        element.style.height = `${element.scrollHeight}px`;
-      }, 300);
+      element.style.height = 'auto';
+      element.style.height = `${element.scrollHeight}px`;
     }
-  }, []);
+  }, [formSaved]);
 
   return (
     <Controller
@@ -59,7 +59,6 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
           <HDSTextArea
             ref={textAreaRef}
             onChange={onChange}
-            onBlur={autoSizeTextAreaOnBlur}
             value={value}
             className={`textarea-field input-${size || 'xl'}`}
             label={t(label)}
