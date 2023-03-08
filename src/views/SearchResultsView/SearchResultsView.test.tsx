@@ -214,7 +214,7 @@ describe('SearchResultsView', () => {
     });
   });
 
-  describe('SearchResultsOrderDropdown', () => {
+  describe('SearchOrderDropdown', () => {
     it('renders if there are search results and can choose order options and send a new GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
