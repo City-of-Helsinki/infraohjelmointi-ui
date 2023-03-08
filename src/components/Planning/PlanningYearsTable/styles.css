@@ -1,6 +1,6 @@
 .planning-years-table {
-  /* width 70% since the info-panel is 30% */
-  @apply w-[70%] text-right;
+  /* width 65% since the info-panel is 30% */
+  @apply w-[65%] text-right;
 }
 
 .planning-years-table span {

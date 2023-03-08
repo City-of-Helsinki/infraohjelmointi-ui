@@ -5,13 +5,14 @@ interface ICustomTagProps {
   icon?: ReactNode;
   color?: string;
   size?: string;
+  weight?: string;
 }
 
 /**
  * A rounded border tag like a HDS tag, but it fits an icon better and is easily customizeable
  * by us.
  */
-const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size }) => {
+const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size, weight }) => {
   return (
     <div
       className="custom-tag-container"
@@ -20,7 +21,12 @@ const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size }) => {
       }}
     >
       {icon}
-      <span style={{ fontSize: size === 'm' ? '1rem' : '0.875rem' }}>{text}</span>
+      <span
+        className={`font-${weight ? weight : 'bold'}`}
+        style={{ fontSize: size === 'm' ? '1rem' : '0.875rem' }}
+      >
+        {text}
+      </span>
     </div>
   );
 };
