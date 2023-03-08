@@ -1,8 +1,9 @@
-import { FC, memo } from 'react';
+import { FC, memo, useEffect, useRef } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { TextArea as HDSTextArea } from 'hds-react/components/Textarea';
 import { useTranslation } from 'react-i18next';
+import autosize from 'autosize';
 
 interface ITextAreaFieldProps {
   name: string;
@@ -11,6 +12,8 @@ interface ITextAreaFieldProps {
   rules?: HookFormRulesType;
   readOnly?: boolean;
   hideLabel?: boolean;
+  size?: 'l' | 'xl';
+  formSaved?: boolean;
 }
 
 const TextAreaField: FC<ITextAreaFieldProps> = ({
@@ -20,18 +23,44 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
   rules,
   readOnly,
   hideLabel,
+  size,
+  formSaved,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Autosize the textarea
+  useEffect(() => {
+    if (textAreaRef && textAreaRef.current) {
+      const element = textAreaRef.current;
+      autosize(element);
+      element.style.overflow = 'visible';
+    }
+  }, [textAreaRef]);
+
+  // Autosize the textarea if form is saved successfully, this helps with resizing
+  // since the backend will remove all empty rows
+  useEffect(() => {
+    if (formSaved && textAreaRef && textAreaRef.current) {
+      const element = textAreaRef.current;
+      element.style.height = 'auto';
+      element.style.height = `${element.scrollHeight}px`;
+    }
+  }, [formSaved]);
+
   return (
     <Controller
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState: { error } }) => (
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
-            {...field}
+            ref={textAreaRef}
+            onChange={onChange}
+            value={value}
+            className={`textarea-field input-${size || 'xl'}`}
             label={t(label)}
             hideLabel={hideLabel}
             id={label}

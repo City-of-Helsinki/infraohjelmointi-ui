@@ -65,6 +65,28 @@ table p {
   max-width: 22.5rem;
 }
 
+/* hide overflow from all selects used with the SelectField-component */
+.input-l > div > button > span {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.input-xl {
+  max-width: 100%;
+}
+
+.textarea-field textarea {
+  max-height: 27rem !important;
+  min-height: 3.5rem !important;
+  resize: none !important;
+}
+
+.textarea-field.input-l textarea {
+  /* overwrite the HDS textarea height token, since setting height with important will force it to always be that height */
+  --textarea-height: 3.5rem !important;
+}
+
 .legend-margin {
   display: block;
   font-size: var(--fontsize-body-m);

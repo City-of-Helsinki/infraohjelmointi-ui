@@ -9,6 +9,8 @@
     "@types/node": "^16.18.3",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
+    "@types/autosize": "^4.0.1",
+    "autosize": "^6.0.1",
     "axios": "^1.1.3",
     "craco": "^0.0.3",
     "hds-core": "^2.6.0",

@@ -1,7 +1,7 @@
 import useProjectBasicsForm from '@/forms/useProjectBasicsForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectBasicsForm } from '@/interfaces/formInterfaces';
-import { FC, memo, useCallback } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import {
   FormSectionTitle,
   ListField,
@@ -29,9 +29,8 @@ const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
   const { formMethods } = useProjectBasicsForm();
   const { t } = useTranslation();
-  const projectId = useAppSelector(selectProject)?.id;
-  const projectClass = useAppSelector(selectProject)?.projectClass;
-  const projectLocation = useAppSelector(selectProject)?.projectLocation;
+  const project = useAppSelector(selectProject);
+  const [formSaved, setFormSaved] = useState(false);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -49,16 +48,27 @@ const ProjectBasicsForm: FC = () => {
   const planningPhases = useOptions('planningPhases');
   const constructionPhases = useOptions('constructionPhases');
   const responsibleZones = useOptions('responsibleZones');
-  const responsiblePersons = useOptions('responsiblePersons', true);
-  const { masterClasses, classes, subClasses } = useClassOptions(projectClass);
-  const { districts, divisions, subDivisions } = useLocationOptions(projectLocation);
+  const responsiblePersons = useOptions('responsiblePersons');
+  const { masterClasses, classes, subClasses } = useClassOptions(project?.projectClass);
+  const { districts, divisions, subDivisions } = useLocationOptions(project?.projectLocation);
+
+  const handleSetFormSaved = useCallback((value: boolean) => {
+    setFormSaved(value);
+  }, []);
 
   const onSubmit = useCallback(
     (form: IProjectBasicsForm) => {
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      projectId && dispatch(silentPatchProjectThunk({ id: projectId, data }));
+      project?.id &&
+        dispatch(silentPatchProjectThunk({ id: project.id, data })).then((res) => {
+          // Set form saved to true if action is successfull, queue it to false async
+          handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
+          setTimeout(() => {
+            handleSetFormSaved(false);
+          }, 0);
+        });
     },
-    [dirtyFields, projectId, dispatch],
+    [dirtyFields, project?.id, dispatch, handleSetFormSaved],
   );
 
   const formProps = useCallback(
@@ -80,35 +90,32 @@ const ProjectBasicsForm: FC = () => {
           <FormSectionTitle {...formProps('basics')} />
           <SelectField
             {...formProps('type')}
-            rules={{ required: 'Hankkeen tyyppi on pakollinen tieto.' }}
             options={types}
+            rules={{ required: t('required', { value: 'Hankkeen tyyppi' }) || '' }}
           />
           <NumberField
             {...formProps('hkrId')}
-            rules={{
-              maxLength: {
-                value: '9223372036854775807'.length - 1,
-                message: 'Maksimipituus on 18 numeroa',
-              },
-            }}
+            rules={{ maxLength: { value: 18, message: t('maxLength', { value: '18' }) } }}
           />
           <TextField
             {...formProps('entityName')}
-            rules={{ maxLength: { value: 30, message: 'Nimi voi olla enintään 30 merkkiä.' } }}
+            rules={{ maxLength: { value: 30, message: t('maxLength', { value: '30' }) } }}
           />
           <TextField {...formProps('sapProject')} control={control} />
-          <TextField
-            {...formProps('description')}
-            rules={{ required: 'Kuvaus on pakollinen tieto.' }}
-          />
           <ListField {...formProps('sapNetwork')} readOnly={true} />
           <SelectField {...formProps('area')} options={areas} />
+          <TextAreaField
+            {...formProps('description')}
+            size="l"
+            rules={{ required: t('required', { value: 'Kuvaus' }) || '' }}
+            formSaved={formSaved}
+          />
           <ProjectHashTags {...formProps('hashTags')} control={control} />
           {/* SECTION 2 - STATUS */}
           <FormSectionTitle {...formProps('status')} />
           <SelectField
             {...formProps('phase')}
-            rules={{ required: 'Vaihe on pakollinen tieto.' }}
+            rules={{ required: t('required', { value: 'Vaihe' }) || '' }}
             options={phases}
           />
           <SelectField
@@ -121,11 +128,11 @@ const ProjectBasicsForm: FC = () => {
             rules={{
               min: {
                 value: 0,
-                message: 'Arvon on oltava suurempi tai yhtä suuri kuin 0',
+                message: t('minValue', { value: '0' }),
               },
               max: {
                 value: 3000,
-                message: 'Arvon on oltava pienempi tai yhtä suuri kuin 3000',
+                message: t('maxValue', { value: '3000' }),
               },
             }}
           />
@@ -134,11 +141,11 @@ const ProjectBasicsForm: FC = () => {
             rules={{
               min: {
                 value: 0,
-                message: 'Arvon on oltava suurempi tai yhtä suuri kuin 0',
+                message: t('minValue', { value: '0' }),
               },
               max: {
                 value: 3000,
-                message: 'Arvon on oltava pienempi tai yhtä suuri kuin 3000',
+                message: t('maxValue', { value: '3000' }),
               },
             }}
           />
@@ -232,7 +239,11 @@ const ProjectBasicsForm: FC = () => {
           <TextField {...formProps('otherPersons')} />
           {/* SECTION 6 - LOCATION */}
           <FormSectionTitle {...formProps('location')} />
-          <SelectField {...formProps('responsibleZone')} options={responsibleZones} />
+          <SelectField
+            {...formProps('responsibleZone')}
+            options={responsibleZones}
+            rules={{ required: t('required', { value: 'Alueen vastuujaon mukaan' }) || '' }}
+          />
           <SelectField {...formProps('district')} icon="location" options={districts} />
           <SelectField {...formProps('division')} icon="location" options={divisions} />
           <SelectField {...formProps('subDivision')} icon="location" options={subDivisions} />

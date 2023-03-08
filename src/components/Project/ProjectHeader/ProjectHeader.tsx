@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { ProgressCircle } from '@/components/shared';
+import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
@@ -8,11 +8,10 @@ import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
 import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
-import ProjectPhaseField from './ProjectPhaseField';
 import ProjectFavouriteField from './ProjectFavouriteField';
 import { selectUser } from '@/reducers/authSlice';
+import { useOptions } from '@/hooks/useOptions';
 import { useTranslation } from 'react-i18next';
-import './styles.css';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -33,6 +32,8 @@ const ProjectHeader: FC = () => {
     control,
     handleSubmit,
   } = formMethods;
+
+  const phases = useOptions('phases');
 
   const onSubmit: SubmitHandler<IProjectHeaderForm> = useCallback(
     async (form: IProjectHeaderForm) => {
@@ -67,7 +68,7 @@ const ProjectHeader: FC = () => {
         <div className="flex-[3]" data-testid="project-header-center">
           <div className="ml-8 w-96">
             <ProjectNameFields control={control} />
-            <ProjectPhaseField control={control} />
+            <SelectField name="phase" control={control} options={phases} />;
           </div>
         </div>
         <div className="mr-3 flex-1" data-testid="project-header-right">

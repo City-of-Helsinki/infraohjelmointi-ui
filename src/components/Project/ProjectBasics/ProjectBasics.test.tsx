@@ -3,12 +3,15 @@ import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectBasics from './ProjectBasics';
 import { act } from '@testing-library/react';
 import mockPersons from '@/mocks/mockPersons';
+import { setupStore } from '@/store';
+import mockProject from '@/mocks/mockProject';
 
 jest.mock('react-i18next', () => mockI18next());
 
 describe('ProjectBasics', () => {
   let renderResult: CustomRenderResult;
 
+  const store = setupStore();
   const spyScrollTo = jest.fn();
   Object.defineProperty(global.window, 'scrollTo', { value: spyScrollTo });
 
@@ -20,6 +23,10 @@ describe('ProjectBasics', () => {
         (renderResult = renderWithProviders(<ProjectBasics />, {
           preloadedState: {
             auth: { user: mockPersons.data[0], error: {} },
+            project: {
+              ...store.getState().project,
+              selectedProject: mockProject.data,
+            },
           },
         })),
     );
