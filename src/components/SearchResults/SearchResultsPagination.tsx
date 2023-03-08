@@ -44,7 +44,10 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
   const handleGetSearchResults = useCallback(
     (event: MouseEvent<HTMLAnchorElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      const buttonText = event.currentTarget.innerText;
+      const buttonText = event.currentTarget.textContent;
+
+      console.log('getting next results: ', buttonText);
+
       // Call next url
       if (buttonText === ButtonText.next && next) {
         return dispatch(getSearchResultsThunk({ fullPath: next })).then(() =>

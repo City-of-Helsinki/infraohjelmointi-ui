@@ -339,9 +339,7 @@ describe('SearchResultsView', () => {
     });
 
     // click the pagination buttons does nothing for some reason
-    it.skip('renders the pagination if thers more than one page of content and can navigate between pages', async () => {
-      // mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-
+    it('renders the pagination correctly with a search limit of 10', async () => {
       renderResult = renderWithProviders(<SearchResultsView />, {
         preloadedState: {
           ...searchActiveState,
@@ -352,16 +350,85 @@ describe('SearchResultsView', () => {
         },
       });
 
-      const { getByTestId, user, getByTitle } = renderResult;
+      const pageCount = Math.floor(mockLongSearchResults.data.count / 10) + 1;
+
+      const { getByTestId } = renderResult;
 
       expect(getByTestId('search-results-pagination')).toBeInTheDocument();
+      expect(getByTestId('search-results-pagination-next-button')).toBeInTheDocument();
+      expect(getByTestId('search-results-pagination-previous-button')).toBeInTheDocument();
+      expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
 
+      for (let i = 1; i < 8; i++) {
+        expect(getByTestId(`search-results-pagination-page-${i}`)).toBeInTheDocument();
+      }
+    });
+
+    it('renders the pagination correctly with a search limit of 20', async () => {
+      renderResult = renderWithProviders(<SearchResultsView />, {
+        preloadedState: {
+          ...searchActiveState,
+          search: {
+            ...searchActiveState.search,
+            searchResults: mockLongSearchResults.data,
+            searchLimit: '20',
+          },
+        },
+      });
+
+      const pageCount = Math.floor(mockLongSearchResults.data.count / 20) + 1;
+
+      const { getByTestId } = renderResult;
+
+      expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
+    });
+
+    it('renders the pagination correctly with a search limit of 30', async () => {
+      renderResult = renderWithProviders(<SearchResultsView />, {
+        preloadedState: {
+          ...searchActiveState,
+          search: {
+            ...searchActiveState.search,
+            searchResults: mockLongSearchResults.data,
+            searchLimit: '30',
+          },
+        },
+      });
+
+      const pageCount = Math.floor(mockLongSearchResults.data.count / 30) + 1;
+
+      const { getByTestId } = renderResult;
+
+      expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
+    });
+
+    it('can navigate to the next, previous and any number page and sends a GET request for searchResults', async () => {
+      renderResult = renderWithProviders(<SearchResultsView />, {
+        preloadedState: {
+          ...searchActiveState,
+          search: {
+            ...searchActiveState.search,
+            searchResults: mockLongSearchResults.data,
+          },
+        },
+      });
+
+      const { getByTestId, user } = renderResult;
+
+      // Next page
+      mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(getByTestId('search-results-pagination-next-button'));
-      // await user.click(getByTestId('search-results-pagination-page-2'));
+      expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.next);
 
-      expect(getByTitle('Nykyinen sivu')).toHaveTextContent('2');
-      // debug(mockedAxios.get.mock);
-      // expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.next);
+      // Previous page
+      mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
+      await user.click(getByTestId('search-results-pagination-previous-button'));
+      expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.previous);
+
+      // Page 4
+      mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
+      await user.click(getByTestId('search-results-pagination-page-4'));
+      expect(mockedAxios.get.mock.lastCall[0].includes('page=4')).toBe(true);
     });
   });
 });

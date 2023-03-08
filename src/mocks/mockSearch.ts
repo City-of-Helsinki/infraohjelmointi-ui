@@ -73,7 +73,8 @@ export const mockSearchResults: { data: ISearchResults } = {
 export const mockLongSearchResults: { data: ISearchResults } = {
   data: {
     next: 'http://localhost:8000/projects/?limit=10&masterClass=fa3ac589-816e-47cb-a2f9-0c6956e85913&order=new&page=2',
-    previous: null,
+    previous:
+      'http://localhost:8000/projects/?limit=10&masterClass=fa3ac589-816e-47cb-a2f9-0c6956e85913&order=new&page=1',
     count: 1548,
     results: [
       {
