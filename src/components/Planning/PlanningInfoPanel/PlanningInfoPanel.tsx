@@ -1,39 +1,44 @@
-import { planningInfo } from '@/mocks/common';
-import { IconInfoCircleFill } from 'hds-react/icons';
 import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { useAppSelector } from '@/hooks/common';
 import { selectSelectedMasterClass } from '@/reducers/classSlice';
+import { IconAngleLeft } from 'hds-react/icons';
+import { useNavigate } from 'react-router';
+import { useCallback } from 'react';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
   const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
+  const navigate = useNavigate();
+
+  const navigateBack = useCallback(() => {
+    navigate(-1);
+  }, []);
 
   return (
     <div className="planning-info-panel">
-      <div id="planningTitle">
-        <div>
-          <h4 className="heading-s">{t('budgetProposalPreparation')}</h4>
-          <IconInfoCircleFill className="info-icon" />
-        </div>
-      </div>
       <div id="planningButton">
-        <Button variant="success">{t('allocationPreparation')}</Button>
-        <span className="text-sm">{t('inProgressUntil', { planningInfo })}</span>
+        <Button className="h-11" variant="success">
+          {t('planning')}
+        </Button>
       </div>
 
-      <div id="planningGroupInfo">
+      <div id="selectedClass">
         {selectedMasterClass && (
           <>
-            <span className="text-sm font-bold">{selectedMasterClass.name}</span>
-            <span className="text-sm">{t('keur')}</span>
+            <span className="block text-sm font-bold">{selectedMasterClass.name}</span>
+            <span className="block text-sm">{t('keur')}</span>
           </>
         )}
       </div>
 
-      <div id="planningBasicInfo">
-        <span>{t('basicInfoKA')}</span>
+      <div id="previousButton">
+        {selectedMasterClass && (
+          <Button onClick={navigateBack} variant="supplementary" iconLeft={<IconAngleLeft />}>
+            {t('previous')}
+          </Button>
+        )}
       </div>
     </div>
   );

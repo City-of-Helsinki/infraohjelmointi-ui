@@ -298,5 +298,6 @@
   "order": "Järjestys",
   "searchResults": "Hakutulokset",
   "resultsForSearch": "hakutulosta",
-  "filterSearch": "Rajaa hakua"
+  "filterSearch": "Rajaa hakua",
+  "previous": "Edellinen"
 }
