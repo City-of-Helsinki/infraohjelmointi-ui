@@ -65,3 +65,22 @@
   top: -1.25rem;
   left: 0.25rem;
 }
+
+.project-cell {
+  border-bottom: 0.05rem solid var(--color-bus-medium-light);
+  @apply bg-bus-l;
+}
+
+.project-cell.planningAndConstruction {
+  @apply bg-white;
+}
+
+.project-cell.planning {
+  border-bottom: 4px solid var(--color-suomenlinna);
+  @apply bg-white;
+}
+
+.project-cell.construction {
+  border-bottom: 4px solid var(--color-copper);
+  @apply bg-white;
+}
