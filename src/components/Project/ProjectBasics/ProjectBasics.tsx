@@ -9,13 +9,16 @@ const ProjectBasics = () => {
   return (
     <div className="project-basics-container" data-testid="project-basics">
       <ScrollToTop />
-      <div className="side-panel-container" data-testid="side-panel">
-        <ProjectSidePanel />
-      </div>
       {project && (
-        <div className=" my-16 flex flex-[2]" data-testid="form-panel">
-          <ProjectBasicsForm />
-        </div>
+        <>
+          <div className="side-panel-container" data-testid="side-panel">
+            <ProjectSidePanel />
+          </div>
+
+          <div className=" my-16 flex flex-[2]" data-testid="form-panel">
+            <ProjectBasicsForm />
+          </div>
+        </>
       )}
     </div>
   );
