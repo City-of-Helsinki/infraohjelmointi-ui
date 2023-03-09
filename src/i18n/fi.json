@@ -199,7 +199,8 @@
     "subDivision": "Osa-alue",
     "openAdvanceSearch":"Avaa tarkennettu haku",
     "groupCreationDescription1": "Ryhmään voi valita vain Ohjelmoituja hankkeita.",
-    "groupCreationDescription2": "Tähdellä (*) merkityt kentat ovat pakolissia."
+    "groupCreationDescription2": "Tähdellä (*) merkityt kentat ovat pakolissia.",
+    "suggestionHelperText": "dsda"
   }
   ,
   "notification": {

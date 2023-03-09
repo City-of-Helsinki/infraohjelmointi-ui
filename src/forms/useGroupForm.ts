@@ -15,7 +15,7 @@ import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 
 interface ISelectionState {
-  selectedClass: string |undefined;
+  selectedClass: string | undefined;
   selectedLocation: string | undefined;
 }
 const useGroupValues = () => {
@@ -28,7 +28,7 @@ const useGroupValues = () => {
       district: {},
       division: {},
       subDivision: {},
-      projectsForSubmit: []
+      projectsForSubmit: [],
     }),
     [],
   );
@@ -36,7 +36,6 @@ const useGroupValues = () => {
 };
 
 const useGroupForm = () => {
-
   const allMasterClasses = useAppSelector(selectMasterClasses);
   const allClasses = useAppSelector(selectClasses);
   const allSubClasses = useAppSelector(selectSubClasses);
@@ -93,7 +92,7 @@ const useGroupForm = () => {
     selectedClass: '',
     selectedLocation: '',
   });
-  const {selectedClass,selectedLocation} = selections;
+  const { selectedClass, selectedLocation } = selections;
   const { masterClasses, classes, subClasses } = useClassOptions(selectedClass);
   const { districts, divisions, subDivisions } = useLocationOptions(selectedLocation);
   const { formValues } = useGroupValues();
@@ -103,7 +102,7 @@ const useGroupForm = () => {
     mode: 'onSubmit',
   });
 
-  const { control , watch, setValue} = formMethods;
+  const { control, watch, setValue } = formMethods;
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name === 'masterClass' && value.masterClass?.value) {
@@ -145,8 +144,16 @@ const useGroupForm = () => {
     return () => subscription.unsubscribe();
   }, [watch, setValue, getReverseClassHierarchy, getReverseLocationHierarchy]);
 
-
-  return { formMethods, formValues, masterClasses,classes,subClasses,districts,divisions,subDivisions };
+  return {
+    formMethods,
+    formValues,
+    masterClasses,
+    classes,
+    subClasses,
+    districts,
+    divisions,
+    subDivisions,
+  };
 };
 
 export default useGroupForm;

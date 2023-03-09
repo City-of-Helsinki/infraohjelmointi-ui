@@ -42,7 +42,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     searchParams.push(`projectName=${projectName}`);
     searchParams.push(`limit=30`);
     searchParams.push('inGroup=false');
-    searchParams.push('programmed=true');
+    // searchParams.push('programmed=true');
 
     return searchParams.join('&');
   };
@@ -79,7 +79,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
               if (searchProjectsItemList.length > 0) {
                 setSearchedProjects(searchProjectsItemList);
               }
-
+              console.log(searchProjectsItemList);
               resolve(searchProjectsItemList);
             }
             resolve([]);
@@ -113,14 +113,31 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       <Controller
         name="projectsForSubmit"
         control={control as Control<IGroupForm, any>}
+        rules={{
+          validate: {
+            subClassExists: (_) =>
+              getValues('subClass')?.value && getValues('subClass').value !== ''
+                ? true
+                : 'Populate subClass first',
+          },
+        }}
         render={({ field: { onChange, value } }) => (
           <>
             <SearchInput
               label={t('searchForProjects')}
-              getSuggestions={getSuggestions}
+              getSuggestions={
+                getValues('class')?.value || getValues('subClass').value
+                  ? getSuggestions
+                  : (_) =>
+                      new Promise<{ value: string; label: string }[]>((resolve, reject) =>
+                        resolve([]),
+                      )
+              }
               clearButtonAriaLabel="Clear search field"
               searchButtonAriaLabel="Search"
               suggestionLabelField="label"
+              helperText="Täytä pakolliset kentät saadaksesi ehdotuksia"
+              hideSearchButton={true}
               value={searchWord}
               onChange={handleValueChange}
               onSubmit={(v) => handleSubmit(v, onChange)}
