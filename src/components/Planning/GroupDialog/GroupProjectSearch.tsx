@@ -16,15 +16,7 @@ interface IProjectSearchProps {
   onProjectSelectionDelete: (projectName: string) => void;
   getValues: UseFormGetValues<IGroupForm>;
   control: Control<IGroupForm, any>;
-}
-
-interface IQueryParamsState {
-  masterClass: string;
-  class: string;
-  subClass: string;
-  district: string;
-  division: string;
-  subDivision: string;
+  showAdvanceFields: boolean;
 }
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({
@@ -33,6 +25,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   onProjectSelectionDelete,
   getValues,
   control,
+  showAdvanceFields,
 }) => {
   const buildQueryParamString = (projectName: string): string => {
     const searchParams = [];
@@ -53,40 +46,48 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
 
   const getSuggestions = useCallback(
-    (inputValue: string) =>
-      new Promise<{ value: string; label: string }[]>((resolve, reject) => {
-        // printing out search params for later
-        const queryString = buildQueryParamString(inputValue);
-        console.log(queryString);
+    (inputValue: string) => {
+      if (
+        (!showAdvanceFields && getValues('class')?.value) ||
+        (showAdvanceFields && getValues('division')?.value && getValues('class')?.value)
+      ) {
+        return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+          // printing out search params for later
+          const queryString = buildQueryParamString(inputValue);
+          console.log(queryString);
 
-        getProjectsWithParams(queryString)
-          .then((res) => {
-            if (res) {
-              console.log(res);
-              // Filter out only the projects which haven't yet been added to be the submitted list from the result
-              const projectsIdList = projectsForSubmit.map((p) => p.value);
-              const resultList = res.projects?.filter(
-                ({ project }) => !arrayHasValue(projectsIdList, project.id),
-              );
-              console.log(resultList);
+          getProjectsWithParams(queryString)
+            .then((res) => {
+              if (res) {
+                console.log(res);
+                // Filter out only the projects which haven't yet been added to be the submitted list from the result
+                const projectsIdList = projectsForSubmit.map((p) => p.value);
+                const resultList = res.projects?.filter(
+                  ({ project }) => !arrayHasValue(projectsIdList, project.id),
+                );
+                console.log(resultList);
 
-              // Convert the resultList to options for the suggestion dropdown
-              const searchProjectsItemList: Array<IOption> | [] = resultList
-                ? resultList.map(({ project }) => ({
-                    ...listItemToOption({ id: project.id, value: project.name }),
-                  }))
-                : [];
-              if (searchProjectsItemList.length > 0) {
-                setSearchedProjects(searchProjectsItemList);
+                // Convert the resultList to options for the suggestion dropdown
+                const searchProjectsItemList: Array<IOption> | [] = resultList
+                  ? resultList.map(({ project }) => ({
+                      ...listItemToOption({ id: project.id, value: project.name }),
+                    }))
+                  : [];
+                if (searchProjectsItemList.length > 0) {
+                  setSearchedProjects(searchProjectsItemList);
+                }
+                console.log(searchProjectsItemList);
+                resolve(searchProjectsItemList);
               }
-              console.log(searchProjectsItemList);
-              resolve(searchProjectsItemList);
-            }
-            resolve([]);
-          })
-          .catch(() => reject([]));
-      }),
-    [projectsForSubmit, getValues],
+              resolve([]);
+            })
+            .catch(() => reject([]));
+        });
+      } else {
+        return new Promise<{ value: string; label: string }[]>((resolve, reject) => resolve([]));
+      }
+    },
+    [projectsForSubmit, getValues, showAdvanceFields],
   );
 
   const handleSubmit = useCallback((value: string, onChange: (...event: unknown[]) => void) => {
@@ -113,26 +114,19 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       <Controller
         name="projectsForSubmit"
         control={control as Control<IGroupForm, any>}
-        rules={{
-          validate: {
-            subClassExists: (_) =>
-              getValues('subClass')?.value && getValues('subClass').value !== ''
-                ? true
-                : 'Populate subClass first',
-          },
-        }}
+        // rules={{
+        //   validate: {
+        //     subClassExists: (_) =>
+        //       getValues('subClass')?.value && getValues('subClass').value !== ''
+        //         ? true
+        //         : 'Populate subClass first',
+        //   },
+        // }}
         render={({ field: { onChange, value } }) => (
           <>
             <SearchInput
               label={t('searchForProjects')}
-              getSuggestions={
-                getValues('class')?.value || getValues('subClass').value
-                  ? getSuggestions
-                  : (_) =>
-                      new Promise<{ value: string; label: string }[]>((resolve, reject) =>
-                        resolve([]),
-                      )
-              }
+              getSuggestions={getSuggestions}
               clearButtonAriaLabel="Clear search field"
               searchButtonAriaLabel="Search"
               suggestionLabelField="label"

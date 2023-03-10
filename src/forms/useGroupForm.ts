@@ -43,51 +43,6 @@ const useGroupForm = () => {
   const allDivisions = useAppSelector(selectDivisions);
   const allSubDivisions = useAppSelector(selectSubDivisions);
 
-  const getReverseLocationHierarchy = useCallback(
-    (subDivisionId: string | undefined) => {
-      const classAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
-        id: projectLocation?.id || '',
-        value: projectLocation?.name || '',
-      });
-
-      const selectedSubDivision = allSubDivisions.find((sd) => sd.id === subDivisionId);
-
-      const selectedDivision = allDivisions.find((d) => d.id === selectedSubDivision?.parent);
-
-      const selectedDistrict = allDistricts.find(
-        (D) => D.id === selectedDivision?.parent && D.parent === null,
-      );
-      return {
-        division: listItemToOption(classAsListItem(selectedDivision) || []),
-        subDivision: listItemToOption(classAsListItem(selectedSubDivision) || []),
-        district: listItemToOption(classAsListItem(selectedDistrict) || []),
-      };
-    },
-    [allDivisions, allDistricts, allSubDivisions],
-  );
-
-  const getReverseClassHierarchy = useCallback(
-    (subClassId: string | undefined) => {
-      const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
-        id: projectClass?.id || '',
-        value: projectClass?.name || '',
-      });
-
-      const selectedSubClass = allSubClasses.find((sc) => sc.id === subClassId);
-
-      const selectedClass = allClasses.find((c) => c.id === selectedSubClass?.parent);
-
-      const selectedMasterClass = allMasterClasses.find(
-        (mc) => mc.id === selectedClass?.parent && mc.parent === null,
-      );
-      return {
-        _class: listItemToOption(classAsListItem(selectedClass) || []),
-        subClass: listItemToOption(classAsListItem(selectedSubClass) || []),
-        masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
-      };
-    },
-    [allClasses, allMasterClasses, allSubClasses],
-  );
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: '',
     selectedLocation: '',
@@ -102,47 +57,58 @@ const useGroupForm = () => {
     mode: 'onSubmit',
   });
 
-  const { control, watch, setValue } = formMethods;
+
+  const { watch, setValue } = formMethods;
   useEffect(() => {
     const subscription = watch((value, { name }) => {
-      if (name === 'masterClass' && value.masterClass?.value) {
-        setSelections((current) => ({ ...current, selectedClass: value.masterClass?.value }));
-        setValue('class', { label: '', value: '' });
-        setValue('subClass', { label: '', value: '' });
-      } else if (name === 'class' && value.class?.value) {
-        setSelections((current) => ({ ...current, selectedClass: value.class?.value }));
-        setValue('subClass', { label: '', value: '' });
-      } else if (name === 'subClass' && value.subClass?.value) {
-        setSelections((current) => ({ ...current, selectedClass: value.subClass?.value }));
-        if (!value.class?.value || !value.masterClass?.value) {
-          const { _class, subClass, masterClass } = getReverseClassHierarchy(value.subClass?.value);
-          setValue('masterClass', masterClass);
-          setValue('class', _class);
-          setValue('subClass', subClass);
-        }
-      }
+      switch (name) {
+        case 'masterClass':
+          if (value.masterClass?.value) {
+            setSelections((current) => ({ ...current, selectedClass: value.masterClass?.value }));
+            setValue('class', { label: '', value: '' });
+            setValue('subClass', { label: '', value: '' });
+          }
+          break;
+        case 'class':
+          if (value.class?.value) {
+            setSelections((current) => ({ ...current, selectedClass: value.class?.value }));
+            setValue('subClass', { label: '', value: '' });
+          }
+          break;
+        case 'subClass':
+          if (value.subClass?.value) {
+            setSelections((current) => ({ ...current, selectedClass: value.subClass?.value }));
+          }
+          break;
+        case 'district':
+          if (value.district?.value) {
+            setSelections((current) => ({ ...current, selectedLocation: value.district?.value }));
+            setValue('division', { label: '', value: '' });
+            setValue('subDivision', { label: '', value: '' });
+          }
 
-      if (name === 'district' && value.district?.value) {
-        setSelections((current) => ({ ...current, selectedLocation: value.district?.value }));
-        setValue('division', { label: '', value: '' });
-        setValue('subDivision', { label: '', value: '' });
-      } else if (name === 'division' && value.division?.value) {
-        setSelections((current) => ({ ...current, selectedLocation: value.division?.value }));
-        setValue('subDivision', { label: '', value: '' });
-      } else if (name === 'subDivision' && value.subDivision?.value) {
-        setSelections((current) => ({ ...current, selectedLocation: value.subDivision?.value }));
-        if (!value.division?.value || !value.district?.value) {
-          const { division, subDivision, district } = getReverseLocationHierarchy(
-            value.subDivision?.value,
-          );
-          setValue('district', district);
-          setValue('division', division);
-          setValue('subDivision', subDivision);
-        }
+          break;
+        case 'division':
+          if (value.division?.value) {
+            setSelections((current) => ({ ...current, selectedLocation: value.division?.value }));
+            setValue('subDivision', { label: '', value: '' });
+          }
+
+          break;
+        case 'subDivision':
+          if (value.subDivision?.value) {
+            setSelections((current) => ({
+              ...current,
+              selectedLocation: value.subDivision?.value,
+            }));
+          }
+
+          break;
+        default:
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setValue, getReverseClassHierarchy, getReverseLocationHierarchy]);
+  }, [watch, setValue]);
 
   return {
     formMethods,

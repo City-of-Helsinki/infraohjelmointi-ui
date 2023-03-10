@@ -26,3 +26,10 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
 }
+.dialog-section .form-buttons {
+  @apply flex items-end gap-6 absolute;
+}
+
+.dialog-section .button-container {
+  @apply relative;
+}
