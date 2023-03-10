@@ -7,118 +7,54 @@ import ProjectCell, { IProjectCellProps } from './ProjectCell';
 
 import { IListItem } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
-
-/**
- * RED CELLS
- * background: 'var(--color-suomenlinna-light)'
- * borderBottom: '4px solid var(--color-suomenlinna)'
- *
- * GREEN CELLS
- * ?
- *
- * BLUE CELLS
- * ?
- */
-
-// switch (key) {
-//   case 'budgetProposalCurrentYearPlus1':
-//     columns.push(getColumn(value, key, new Date().getFullYear()));
-//     break;
-//   case 'budgetProposalCurrentYearPlus2':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 1));
-//     break;
-//   case 'preliminaryCurrentYearPlus3':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 2));
-//     break;
-//   case 'preliminaryCurrentYearPlus4':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 3));
-//     break;
-//   case 'preliminaryCurrentYearPlus5':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 4));
-//     break;
-//   case 'preliminaryCurrentYearPlus6':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 5));
-//     break;
-//   case 'preliminaryCurrentYearPlus7':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 6));
-//     break;
-//   case 'preliminaryCurrentYearPlus8':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 7));
-//     break;
-//   case 'preliminaryCurrentYearPlus9':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 8));
-//     break;
-//   case 'preliminaryCurrentYearPlus10':
-//     columns.push(getColumn(value, key, new Date().getFullYear() + 9));
-//     break;
-//   default:
-//     break;
-
-//   /*
-//   budgetProposalCurrentYearPlus1,
-//   budgetProposalCurrentYearPlus2,
-//   preliminaryCurrentYearPlus3,
-//   preliminaryCurrentYearPlus4,
-//   preliminaryCurrentYearPlus5,
-//   preliminaryCurrentYearPlus6,
-//   preliminaryCurrentYearPlus7,
-//   preliminaryCurrentYearPlus8,
-//   preliminaryCurrentYearPlus9,
-//   preliminaryCurrentYearPlus10,
-//   */
-// }
-
-interface IPlanningProjectsTableProps {
-  project: IProject;
-  phases?: Array<IListItem>;
-  onProjectMenuClick: (projectId: string, elementPosition: MouseEvent) => void;
-}
-
-const isYearBetween = (
-  year: number,
-  startDate: string | undefined,
-  endDate: string | undefined,
-): boolean => {
-  const startYear = parseInt(startDate?.split('.').pop() || '0');
-  const endYear = parseInt(endDate?.split('.').pop() || '0');
-
-  return startYear && endYear ? year >= startYear && year <= endYear : false;
-};
+import { isInYearRange } from '@/utils/common';
 
 const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
-  const cells = [];
+  const getCellType = (year: number) => {
+    const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } = project;
+    const isPlanning = isInYearRange(year, estPlanningStart, estPlanningEnd);
+    const isConstruction = isInYearRange(year, estConstructionStart, estConstructionEnd);
 
-  const getCells = (value: string, key: string, year: number) => {
-    const cell = {} as IProjectCellProps;
-    cell.value = value;
-    cell.isPlanning = isYearBetween(year, project.estPlanningStart, project.estPlanningEnd);
-    cell.isConstruction = isYearBetween(
-      year,
-      project.estConstructionStart,
-      project.estConstructionEnd,
-    );
-    cell.objectKey = key;
-    cell.id = project.id;
-    return cell;
+    if (isPlanning && isConstruction) return 'planningAndConstruction';
+    if (isPlanning) return 'planning';
+    if (isConstruction) return 'construction';
+    return 'none';
   };
+
+  const getCells = (value: string, key: string, year: number): IProjectCellProps => {
+    return {
+      value,
+      type: getCellType(year),
+      objectKey: key,
+      projectId: project.id,
+    };
+  };
+
+  const cells = [];
 
   for (const [key, value] of Object.entries(project)) {
     if (key.includes('budgetProposalCurrentYearPlus')) {
       const keyValue = parseInt(key.split('budgetProposalCurrentYearPlus')[1]);
       cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
-    }
-    if (key.includes('preliminaryCurrentYearPlus')) {
+    } else if (key.includes('preliminaryCurrentYearPlus')) {
       const keyValue = parseInt(key.split('preliminaryCurrentYearPlus')[1]);
       cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
     }
   }
+
   return cells;
 };
+
+interface IPlanningGroupsTableRowProps {
+  project: IProject;
+  phases?: Array<IListItem>;
+  onProjectMenuClick: (projectId: string, elementPosition: MouseEvent) => void;
+}
 
 /**
  * We're only mapping the project name here for now since the values aren't yet implemented
  */
-const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
+const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
   project,
   onProjectMenuClick,
 }) => {
@@ -159,8 +95,8 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
           </div>
         </div>
       </th>
-      {projectCells.map((p, i) => (
-        <ProjectCell key={i} {...p} />
+      {projectCells.map((p) => (
+        <ProjectCell key={p.objectKey} {...p} />
       ))}
     </tr>
   );

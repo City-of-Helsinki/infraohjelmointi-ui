@@ -1,66 +1,49 @@
 import { useAppDispatch } from '@/hooks/common';
-import { IProjectRequestObject } from '@/interfaces/projectInterfaces';
-import { patchProjectThunk, silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { NumberInput } from 'hds-react/components/NumberInput';
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC, useCallback, useState } from 'react';
+
+export type CellType = 'planning' | 'construction' | 'planningAndConstruction' | 'none';
 
 export interface IProjectCellProps {
   value: string;
-  isPlanning: boolean;
-  isConstruction: boolean;
+  type: CellType;
   objectKey: string;
-  id: string;
+  projectId: string;
 }
 
-const PlanningGroupsTableCell: FC<IProjectCellProps> = ({
-  value,
-  isPlanning,
-  isConstruction,
-  objectKey,
-  id,
-}) => {
+const ProjectCell: FC<IProjectCellProps> = ({ value, type, objectKey, projectId }) => {
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<'' | number>(parseInt(value));
 
-  const handleFocus = () => setIsReadOnly(!isReadOnly);
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => setFormValue(parseInt(e.target.value));
-  const handleBlur = () => {
+  const handleFocus = useCallback(() => {
+    setIsReadOnly((current) => !current);
+  }, []);
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setFormValue(parseInt(e.target.value));
+  }, []);
+  const handleBlur = useCallback(() => {
     const data = { [objectKey]: formValue };
     setIsReadOnly(!isReadOnly);
-    dispatch(silentPatchProjectThunk({ id, data }));
-  };
-
-  const getColorClass = () => {
-    if (isPlanning && isConstruction) {
-      return 'planningAndConstruction';
-    }
-    if (isPlanning) {
-      return 'planning';
-    }
-    if (isConstruction) {
-      return 'construction';
-    }
-    return '';
-  };
+    dispatch(silentPatchProjectThunk({ id: projectId, data }));
+  }, [dispatch, formValue, isReadOnly, objectKey, projectId]);
 
   return (
-    <td className={`project-cell ${getColorClass()}`}>
-      <div>
-        <NumberInput
-          value={isPlanning || isConstruction ? formValue : ''}
-          id={`${objectKey}-${id}`}
-          label=""
-          className="table-input"
-          readOnly={isReadOnly}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          onChange={handleChange}
-          disabled={!(isPlanning || isConstruction)}
-        />
-      </div>
+    <td className={`project-cell ${type}`}>
+      <NumberInput
+        value={type !== 'none' ? formValue : ''}
+        id={`${objectKey}-${projectId}`}
+        label=""
+        className="table-input"
+        readOnly={isReadOnly}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        onChange={handleChange}
+        disabled={type === 'none'}
+      />
     </td>
   );
 };
 
-export default PlanningGroupsTableCell;
+export default ProjectCell;
