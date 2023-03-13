@@ -1,16 +1,11 @@
-import { FormField, HookFormControlType, IForm, IGroupForm } from '@/interfaces/formInterfaces';
+import { IGroupForm } from '@/interfaces/formInterfaces';
 
-import { useForm, UseFormGetValues } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
-import { t, TFunction } from 'i18next';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '@/hooks/common';
-import { IClass } from '@/interfaces/classInterfaces';
-import { IListItem } from '@/interfaces/common';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectMasterClasses, selectClasses, selectSubClasses } from '@/reducers/classSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
-import { listItemToOption } from '@/utils/common';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 
