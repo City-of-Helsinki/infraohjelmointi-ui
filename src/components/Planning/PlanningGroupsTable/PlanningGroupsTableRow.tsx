@@ -8,6 +8,7 @@ import ProjectCell, { IProjectCellProps } from './ProjectCell';
 import { IListItem } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
 import { isInYearRange } from '@/utils/common';
+import { CustomContextMenu } from '@/components/CustomContextMenu';
 
 const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
   const getCellType = (year: number) => {
@@ -69,7 +70,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
   );
 
   return (
-    <tr>
+    <tr id="editCellMenu">
       {/* HEADER */}
       <th className="project-header-cell">
         <div className="project-header-cell-container">
@@ -99,6 +100,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
       {projectCells.map((p) => (
         <ProjectCell key={p.objectKey} {...p} />
       ))}
+      <CustomContextMenu targetId="editCellMenu" />
     </tr>
   );
 };
