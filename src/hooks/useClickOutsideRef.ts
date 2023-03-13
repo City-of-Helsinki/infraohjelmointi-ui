@@ -15,9 +15,11 @@ const useClickOutsideRef = (ref: RefObject<HTMLDivElement>, callback: () => unkn
       }
     };
     document.addEventListener('mouseup', handleClickOutside);
+    document.addEventListener('contextmenu', handleClickOutside);
     return () => {
       // Event listener needs to be removed on cleanup
       document.removeEventListener('mouseup', handleClickOutside);
+      document.removeEventListener('contextmenu', handleClickOutside);
     };
   }, [ref]);
 };

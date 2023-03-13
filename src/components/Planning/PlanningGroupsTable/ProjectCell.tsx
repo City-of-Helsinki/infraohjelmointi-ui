@@ -20,9 +20,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, type, objectKey, projectId 
   const handleFocus = useCallback(() => {
     setIsReadOnly((current) => !current);
   }, []);
+
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setFormValue(parseInt(e.target.value));
   }, []);
+
   const handleBlur = useCallback(() => {
     const data = { [objectKey]: formValue };
     setIsReadOnly(!isReadOnly);

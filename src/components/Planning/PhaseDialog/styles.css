@@ -19,7 +19,7 @@
 }
 
 .phase-dialog-header .close-icon {
-  @apply min-w-[1.5rem] cursor-pointer pr-2;
+  @apply mr-2 min-w-[1.5rem] cursor-pointer;
 }
 
 .phase-dialog-list {

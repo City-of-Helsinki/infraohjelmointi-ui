@@ -6,6 +6,7 @@ import { selectSelectedMasterClass } from '@/reducers/classSlice';
 import { IconAngleLeft } from 'hds-react/icons';
 import { useNavigate } from 'react-router';
 import { useCallback } from 'react';
+import { CustomContextMenu } from '@/components/CustomContextMenu';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
@@ -39,6 +40,19 @@ const PlanningInfoPanel = () => {
             {t('previous')}
           </Button>
         )}
+      </div>
+
+      <div
+        id="editCellMenu"
+        style={{
+          background: 'red',
+          height: '100px',
+          width: '100px',
+          gridRow: '1',
+          marginLeft: '10px',
+        }}
+      >
+        <CustomContextMenu targetId="editCellMenu" />
       </div>
     </div>
   );
