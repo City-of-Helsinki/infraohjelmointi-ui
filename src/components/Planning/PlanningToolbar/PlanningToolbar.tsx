@@ -3,9 +3,11 @@ import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
 import { Navigation } from 'hds-react/components/Navigation';
 import { useTranslation } from 'react-i18next';
 import { GroupDialog } from '../GroupDialog';
+import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import './styles.css';
 import { IconCross } from 'hds-react/icons/';
 import { useCallback, useRef } from 'react';
+
 const ProjectToolbar = () => {
   const { Dropdown, Item } = Navigation;
   const dropDownRef = useRef<HTMLDivElement>(null);
