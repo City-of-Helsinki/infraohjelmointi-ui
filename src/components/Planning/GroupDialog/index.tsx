@@ -1,1 +1,1 @@
-export { default as GroupDialogButton } from './GroupDialogButton';
+export { default as GroupDialog } from './GroupDialog';

@@ -44,7 +44,7 @@ const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroup
   return payload;
 };
 
-const GroupDialog: FC<IDialogProps> = ({ isOpen, handleClose }) => {
+const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const [formState, setFormState] = useState<IFormState>({
     projectsForSubmit: [],
     showAdvanceFields: false,
@@ -271,7 +271,7 @@ const GroupDialog: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   );
 };
 
-const GroupDialogButton: FC = () => {
+const GroupDialog: FC = () => {
   const { t } = useTranslation();
   const [DialogButtonState, setDialogButtonState] = useState<IDialogButtonState>({
     isOpen: false,
@@ -297,7 +297,7 @@ const GroupDialogButton: FC = () => {
   }, [handleSetOpen]);
   return (
     <div>
-      {isOpen && <GroupDialog isOpen={isOpen} handleClose={handleClose} />}
+      {isOpen && <DialogContainer isOpen={isOpen} handleClose={handleClose} />}
       <div>
         <div data-testid="open-group-form-dialog-button"></div>
         <Button onClick={onOpenGroupForm} size="small">
@@ -308,4 +308,4 @@ const GroupDialogButton: FC = () => {
   );
 };
 
-export default GroupDialogButton;
+export default GroupDialog;
