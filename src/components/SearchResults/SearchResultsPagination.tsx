@@ -46,8 +46,6 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
       event.preventDefault();
       const buttonText = event.currentTarget.textContent;
 
-      console.log('getting next results: ', buttonText);
-
       // Call next url
       if (buttonText === ButtonText.next && next) {
         return dispatch(getSearchResultsThunk({ fullPath: next })).then(() =>

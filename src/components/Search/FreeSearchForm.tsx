@@ -60,30 +60,26 @@ const FreeSearchForm = ({
       new Promise<{ value: string; label: string }[]>((resolve, reject) => {
         getProjectsWithFreeSearch(inputValue)
           .then((res) => {
-            if (res) {
-              const formValue = getValues('freeSearchParams');
-              // Create a combined list of all results and filter already added values
-              const resultList = freeSearchResultsToList(res).filter(
-                (f) => !arrayHasValue(Object.keys(formValue), f.value),
-              );
+            const formValue = getValues('freeSearchParams');
+            // Create a combined list of all results and filter already added values
+            const resultList = freeSearchResultsToList(res || {}).filter(
+              (f) => !arrayHasValue(Object.keys(formValue), f.value),
+            );
 
-              // Convert the resultList to options for the suggestion dropdown
-              const freeSearchFormItemList: Array<FreeSearchFormItem> | [] = resultList
-                ? resultList.map((r) => ({ ...listItemToOption(r), type: r.type }))
-                : [];
+            // Convert the resultList to options for the suggestion dropdown
+            const freeSearchFormItemList: Array<FreeSearchFormItem> | [] = resultList
+              ? resultList.map((r) => ({ ...listItemToOption(r), type: r.type }))
+              : [];
 
-              // This resultObject is needed to be able to add the type, value and name of the selected option,
-              // since the callback for selecting an option only returns the displayed value instead of the mapped object.
-              if (freeSearchFormItemList.length > 0) {
-                setSearchState((current) => ({
-                  ...current,
-                  resultObject: _.keyBy(freeSearchFormItemList, 'label'),
-                }));
-              }
-
-              resolve(freeSearchFormItemList);
+            // This resultObject is needed to be able to add the type, value and name of the selected option,
+            // since the callback for selecting an option only returns the displayed value instead of the mapped object.
+            if (freeSearchFormItemList.length > 0) {
+              setSearchState((current) => ({
+                ...current,
+                resultObject: _.keyBy(freeSearchFormItemList, 'label'),
+              }));
             }
-            resolve([]);
+            resolve(freeSearchFormItemList || []);
           })
           .catch(() => reject([]));
       }),
