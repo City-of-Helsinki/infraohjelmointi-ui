@@ -4,11 +4,9 @@ import { IconDocument, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, MouseEvent as ReactMouseEvent } from 'react';
 import { useNavigate } from 'react-router';
 import ProjectCell, { IProjectCellProps } from './ProjectCell';
-
 import { IListItem } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
-import { isInYearRange } from '@/utils/common';
-import { CustomContextMenu } from '@/components/CustomContextMenu';
+import { isInYearRange } from '@/utils/dates';
 
 const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
   const getCellType = (year: number) => {
@@ -27,7 +25,8 @@ const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
       value,
       type: getCellType(year),
       objectKey: key,
-      projectId: project.id,
+      project: project,
+      year: year,
     };
   };
 
@@ -70,13 +69,13 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
   );
 
   return (
-    <tr id="editCellMenu">
+    <tr id={`row-${project.id}`}>
       {/* HEADER */}
       <th className="project-header-cell">
         <div className="project-header-cell-container">
           {/* Left (dots & document) */}
           <div className="project-left-icons-container">
-            <IconMenuDots size="xs" className="dots-icon" onClick={handleOnProjectMenuClick} />
+            <IconMenuDots size="xs" className="cursor-pointer" onClick={handleOnProjectMenuClick} />
             <IconDocument />
           </div>
           {/* Center (name button) */}
@@ -100,7 +99,6 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
       {projectCells.map((p) => (
         <ProjectCell key={p.objectKey} {...p} />
       ))}
-      <CustomContextMenu targetId="editCellMenu" />
     </tr>
   );
 };

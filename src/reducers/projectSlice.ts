@@ -2,7 +2,7 @@ import { IError } from '@/interfaces/common';
 import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
 import { getProject, getProjects, patchProject, postProject } from '@/services/projectServices';
 import { RootState } from '@/store';
-import { getCurrentTime } from '@/utils/common';
+import { getCurrentTime } from '@/utils/dates';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
 

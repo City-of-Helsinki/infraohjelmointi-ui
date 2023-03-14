@@ -6,4 +6,5 @@
   position: absolute;
   height: auto;
   width: fit-content;
+  z-index: 999;
 }

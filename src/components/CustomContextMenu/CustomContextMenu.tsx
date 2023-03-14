@@ -1,15 +1,28 @@
+import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
+import { IProject } from '@/interfaces/projectInterfaces';
 import { useState, useEffect, useRef, useLayoutEffect, useMemo } from 'react';
-import { ProjectCellContextMenu } from './ContextMenus';
+import { ProjectCellMenu } from './ContextMenus/ProjectCellMenu';
 import './styles.css';
 
-const CustomContextMenu = ({ targetId }: { targetId: string }) => {
-  const [contextMenuState, setContextMenuState] = useState({
+interface IContextMenuState extends IContextMenuData {
+  isVisible: boolean;
+  posX: number;
+  posY: number;
+}
+
+const CustomContextMenu = () => {
+  const [contextMenuState, setContextMenuState] = useState<IContextMenuState>({
     isVisible: false,
     posX: 0,
     posY: 0,
+    menuType: ContextMenuType.EDIT_PROJECT_CELL,
+    project: {} as IProject,
+    year: 0,
+    cellType: 'planning',
+    objectKey: '',
   });
 
-  const { isVisible, posX, posY } = contextMenuState;
+  const { isVisible, posX, posY, menuType, project, year, cellType, objectKey } = contextMenuState;
 
   const contextRef = useRef<HTMLDivElement>(null);
 
@@ -26,33 +39,34 @@ const CustomContextMenu = ({ targetId }: { targetId: string }) => {
   };
 
   useEffect(() => {
+    if (!contextRef || !contextRef.current) {
+      return;
+    }
+
     const closeContextMenu = (e: MouseEvent) => {
       if (contextRef.current && !contextRef.current.contains(e.target as Node)) {
         handleCloseContextMenu();
       }
     };
 
-    const showContextMenu = (e: MouseEvent) => {
-      const targetElement = document.getElementById(targetId);
-      if (targetElement && targetElement.contains(e.target as Node)) {
-        e.preventDefault();
-        setContextMenuState({
-          isVisible: true,
-          posX: e.clientX,
-          posY: e.clientY,
-        });
-      } else {
-        closeContextMenu(e);
-      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const showContextMenu = (e: any) => {
+      const { event, ...detail } = e.detail;
+      setContextMenuState({
+        isVisible: true,
+        posX: event.pageX,
+        posY: event.pageY,
+        ...detail,
+      });
     };
 
-    document.addEventListener('contextmenu', showContextMenu);
+    contextRef.current.addEventListener('showContextMenu', showContextMenu);
     document.addEventListener('click', closeContextMenu);
     return () => {
-      document.removeEventListener('contextmenu', showContextMenu);
+      contextRef.current?.removeEventListener('showContextMenu', showContextMenu);
       document.removeEventListener('click', closeContextMenu);
     };
-  }, [contextMenuState, targetId]);
+  }, [contextRef]);
 
   // Check if the context menu position overflows the viewport and move it into the viewport
   useLayoutEffect(() => {
@@ -66,15 +80,28 @@ const CustomContextMenu = ({ targetId }: { targetId: string }) => {
       if (posY + contextRef.current.offsetHeight > window.innerHeight) {
         setContextMenuState((current) => ({
           ...current,
-          posY: posY - (contextRef.current?.offsetHeight || 0),
+          // TODO: posY: posY - (contextRef.current?.offsetHeight || 0),
         }));
       }
     }
   }, [posX, posY]);
 
   return (
-    <div ref={contextRef} className="context-menu-container" style={menuPosition}>
-      {isVisible && <ProjectCellContextMenu handleCloseContextMenu={handleCloseContextMenu} />}
+    <div
+      ref={contextRef}
+      id="custom-context-menu"
+      className="context-menu-container"
+      style={menuPosition}
+    >
+      {isVisible && menuType === ContextMenuType.EDIT_PROJECT_CELL && (
+        <ProjectCellMenu
+          handleCloseMenu={handleCloseContextMenu}
+          project={project}
+          year={year}
+          cellType={cellType}
+          objectKey={objectKey}
+        />
+      )}
     </div>
   );
 };

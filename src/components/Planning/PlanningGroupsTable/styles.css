@@ -62,12 +62,12 @@
 
 .project-cell.planning {
   box-shadow: inset 0 -4px 0 var(--color-black-80);
-  @apply bg-white;
+  @apply relative bg-white;
 }
 
 .project-cell.construction {
   box-shadow: inset 0 -4px 0 var(--color-copper);
-  @apply bg-white;
+  @apply relative bg-white;
 }
 
 /* add a left border to cell with the none-class after the last colored cell */
@@ -84,12 +84,53 @@
   border-left: 2px solid var(--color-black-20);
 }
 
+/* add a left border to an ACTIVE cell with the none-class after the last colored cell */
+.construction.active + .none,
+.planning.active + .none,
+.planningAndConstruction.active + .none {
+  border-left: 3px solid var(--color-black-70);
+}
+
+/* add a left border to a colored ACTIVE cell if it's the first colored cell */
+.none + .planning.active,
+.none + .construction.active,
+.none + .planningAndConstruction.active {
+  border-left: 3px solid var(--color-black-70);
+}
+
+.edit-timeline-button {
+  display: none;
+}
+
+/* Show add year button */
+.construction.active .edit-timeline-button + .none,
+.planning.active .edit-timeline-button + .none,
+.planningAndConstruction.active .edit-timeline-button + .none {
+  display: inline-block;
+}
+
+/* Show remove year button */
+.none + .planning.active .edit-timeline-button,
+.none + .construction.active .edit-timeline-button,
+.none + .planningAndConstruction.active .edit-timeline-button {
+  display: inline-block;
+}
+
 /* creates a border bottom with both planning and construction colors with the :before effect */
 .project-cell.planningAndConstruction {
   box-shadow: inset 0 -4px 0 var(--color-copper);
   @apply relative bg-white;
 }
+
 .project-cell.planningAndConstruction:before {
   box-shadow: inset 0 -4px 0 var(--color-black-80);
   @apply absolute bottom-0 left-0 h-[4px] w-[50%] content-[''];
+}
+
+.project-cell .edit-timeline-button {
+  @apply absolute z-[999] h-[0.9rem] w-[0.7rem] -translate-x-2 -translate-y-2 rounded-[1px] bg-[var(--color-black-70)];
+}
+
+.project-cell .edit-timeline-button svg {
+  @apply h-4 w-4 translate-x-[-2px] translate-y-[-3px] text-white;
 }

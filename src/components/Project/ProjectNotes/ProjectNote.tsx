@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import DeleteNoteForm from './DeleteNoteForm';
 import EditNoteForm from './EditNoteForm';
 import ProjectNoteHistoryRow from './ProjectNoteHistoryRow';
-import { sortArrayByDates, stringToDateTime } from '@/utils/common';
+import { sortArrayByDates, stringToDateTime } from '@/utils/dates';
 
 interface IProjectNoteProps {
   note: INote;
