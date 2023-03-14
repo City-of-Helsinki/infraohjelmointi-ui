@@ -7,16 +7,17 @@ import { IconAngleLeft } from 'hds-react/icons';
 import { NumberInput } from 'hds-react/components/NumberInput';
 import { ChangeEvent, FC, useCallback, useState, MouseEvent, useEffect, memo } from 'react';
 import { removeYear } from '@/utils/dates';
+import { addActiveClassToProjectRow } from '@/utils/common';
 
 export interface IProjectCellProps {
   value: string;
-  type: CellType;
-  objectKey: string;
+  cellType: CellType;
+  cellKey: string;
   project: IProject;
   year: number;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ value, type, objectKey, project, year }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, cellKey, project, year }) => {
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<'' | number>(parseInt(value || ''));
@@ -30,22 +31,24 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, type, objectKey, project, y
   }, []);
 
   const handleBlur = useCallback(() => {
-    const data = { [objectKey]: formValue };
+    const data = { [cellKey]: formValue };
     setIsReadOnly(!isReadOnly);
-    dispatch(silentPatchProjectThunk({ id: project.id, data }));
-  }, [dispatch, formValue, isReadOnly, objectKey, project.id]);
+    if (formValue !== parseInt(value)) {
+      dispatch(silentPatchProjectThunk({ id: project.id, data }));
+    }
+  }, [dispatch, formValue, isReadOnly, cellKey, project.id, value]);
 
   const handleOpenContextMenu = useCallback(
     (e: MouseEvent<HTMLElement>) => {
       dispatchContextMenuEvent(e, {
         year,
         project,
-        cellType: type,
+        cellType,
+        cellKey: cellKey,
         menuType: ContextMenuType.EDIT_PROJECT_CELL,
-        objectKey: objectKey,
       });
     },
-    [project],
+    [cellKey, project, cellType, year],
   );
 
   const handleAddYear = useCallback(() => {
@@ -54,30 +57,32 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, type, objectKey, project, y
         id: project.id,
         data: { estPlanningStart: removeYear(project.estPlanningStart) },
       }),
-    );
-  }, [project]);
+    ).then((res) => {
+      res.type === 'project/silent-patch/fulfilled' && addActiveClassToProjectRow(project.id);
+    });
+  }, [dispatch, project.estPlanningStart, project.id]);
 
   useEffect(() => {
-    if (project[objectKey as keyof IProject] as string) {
-      setFormValue(parseInt(project[objectKey as keyof IProject] as string));
+    if (project[cellKey as keyof IProject] as string) {
+      setFormValue(parseInt(project[cellKey as keyof IProject] as string));
     }
   }, [project]);
 
   return (
     <td
-      className={`project-cell ${type}`}
-      onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
+      className={`project-cell ${cellType}`}
+      onContextMenu={cellType !== 'none' ? handleOpenContextMenu : undefined}
     >
       <NumberInput
-        value={type !== 'none' ? formValue : ''}
-        id={`${objectKey}-${project.id}`}
+        value={cellType !== 'none' ? formValue || 0 : ''}
+        id={`${cellKey}-${project.id}`}
         label=""
         className="table-input"
         readOnly={isReadOnly}
         onBlur={handleBlur}
         onFocus={handleFocus}
         onChange={handleChange}
-        disabled={type === 'none'}
+        disabled={cellType === 'none'}
       />
       <button className="edit-timeline-button" onClick={handleAddYear}>
         <IconAngleLeft />

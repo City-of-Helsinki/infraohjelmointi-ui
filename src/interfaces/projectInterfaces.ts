@@ -146,6 +146,21 @@ export interface IProjectRequest {
   personPlanning?: string;
   personProgramming?: string;
   personConstruction?: string;
+  budgetForecast1CurrentYear?: string;
+  budgetForecast2CurrentYear?: string;
+  budgetForecast3CurrentYear?: string;
+  budgetForecast4CurrentYear?: string;
+  budgetProposalCurrentYearPlus0?: string;
+  budgetProposalCurrentYearPlus1?: string;
+  budgetProposalCurrentYearPlus2?: string;
+  preliminaryCurrentYearPlus3?: string;
+  preliminaryCurrentYearPlus4?: string;
+  preliminaryCurrentYearPlus5?: string;
+  preliminaryCurrentYearPlus6?: string;
+  preliminaryCurrentYearPlus7?: string;
+  preliminaryCurrentYearPlus8?: string;
+  preliminaryCurrentYearPlus9?: string;
+  preliminaryCurrentYearPlus10?: string;
 }
 
 export interface IProjectRequestObject {

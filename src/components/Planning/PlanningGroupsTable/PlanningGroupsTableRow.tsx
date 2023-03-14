@@ -23,8 +23,8 @@ const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
   const getCells = (value: string, key: string, year: number): IProjectCellProps => {
     return {
       value,
-      type: getCellType(year),
-      objectKey: key,
+      cellType: getCellType(year),
+      cellKey: key,
       project: project,
       year: year,
     };
@@ -97,7 +97,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
         </div>
       </th>
       {projectCells.map((p) => (
-        <ProjectCell key={p.objectKey} {...p} />
+        <ProjectCell key={p.cellKey} {...p} />
       ))}
     </tr>
   );

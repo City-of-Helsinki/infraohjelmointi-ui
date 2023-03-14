@@ -1,46 +1,49 @@
 import { useAppDispatch } from '@/hooks/common';
 import { CellType, IOption } from '@/interfaces/common';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { addYear, removeYear } from '@/utils/dates';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
-import { useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  addActiveClassToProjectRow,
+  isProjectRowActive,
+  removeActiveClassFromProjectRow,
+} from '@/utils/common';
 import './styles.css';
 
-const getSiblingProperty = (objectKey: string, previous?: boolean) => {
-  const splitKey = objectKey.split('Plus');
+const getSiblingProperty = (cellKey: string, previous?: boolean) => {
+  const splitKey = cellKey.split('Plus');
   const nextNumber = previous ? parseInt(splitKey[1]) - 1 : parseInt(splitKey[1]) + 1;
   const baseKey = `${splitKey[0]}Plus`;
   return { nextNumber, baseKey };
 };
 
-const moveValueToNextProperty = (objectKey: string, project: IProject, previous?: boolean) => {
-  const { nextNumber, baseKey } = getSiblingProperty(objectKey, previous);
-
+const moveValueToNextProperty = (
+  cellKey: string,
+  project: IProject,
+  previous?: boolean,
+): IProjectRequest => {
+  const { nextNumber, baseKey } = getSiblingProperty(cellKey, previous);
+  const req = {} as IProjectRequest;
   if (previous && nextNumber === 2 && baseKey === 'preliminaryCurrentYearPlus') {
-    return {
-      budgetProposalCurrentYearPlus2:
-        parseInt(project.budgetProposalCurrentYearPlus2) +
-        parseInt(project.preliminaryCurrentYearPlus3),
-      [objectKey]: '0',
-    };
-  } else if (!previous && nextNumber > 2 && baseKey === 'budgetProposalCurrentYearPlus') {
-    return {
-      preliminaryCurrentYearPlus3:
-        parseInt(project.budgetProposalCurrentYearPlus2) +
-        parseInt(project.preliminaryCurrentYearPlus3),
-      [objectKey]: '0',
-    };
-  } else {
-    return {
-      [`${baseKey}${nextNumber}`]:
-        parseInt(project[objectKey as keyof IProject] as string) +
-        parseInt(project[`${baseKey}${nextNumber}` as keyof IProject] as string),
-      [objectKey]: '0',
-    };
+    req.budgetProposalCurrentYearPlus2 = (
+      parseInt(project.budgetProposalCurrentYearPlus2) +
+      parseInt(project.preliminaryCurrentYearPlus3)
+    ).toString();
   }
+  if (!previous && nextNumber > 2 && baseKey === 'budgetProposalCurrentYearPlus') {
+    req.preliminaryCurrentYearPlus3 = (
+      parseInt(project.budgetProposalCurrentYearPlus2) +
+      parseInt(project.preliminaryCurrentYearPlus3)
+    ).toString();
+  }
+  return {
+    ...req,
+    [cellKey]: '0',
+  };
 };
 
 const ProjectCellMenu = ({
@@ -48,13 +51,13 @@ const ProjectCellMenu = ({
   project,
   year,
   cellType,
-  objectKey,
+  cellKey,
 }: {
   handleCloseMenu: () => void;
   project: IProject;
   year: number;
   cellType: CellType;
-  objectKey: string;
+  cellKey: string;
 }) => {
   const { t } = useTranslation();
   const [type, setType] = useState(cellType);
@@ -69,20 +72,22 @@ const ProjectCellMenu = ({
     setType(cellType);
   }, [cellType]);
 
-  const handleEditTimeline = () => {
-    Array.from(document.getElementById(`row-${project.id}`)?.children || []).forEach(
-      (c) => c.tagName === 'TD' && c.classList.add('active'),
-    );
-  };
+  const handleEditTimeline = useCallback(() => {
+    if (isProjectRowActive(project.id)) {
+      removeActiveClassFromProjectRow(project.id);
+    } else {
+      addActiveClassToProjectRow(project.id);
+    }
+  }, [project]);
 
-  const handleDeleteYear = () => {
+  const handleDeleteYear = useCallback(() => {
     if (cellType === 'planning') {
       dispatch(
         silentPatchProjectThunk({
           id: project.id,
           data: {
             estPlanningStart: addYear(project.estPlanningStart),
-            ...moveValueToNextProperty(objectKey, project),
+            ...moveValueToNextProperty(cellKey, project),
           },
         }),
       );
@@ -93,12 +98,12 @@ const ProjectCellMenu = ({
           id: project.id,
           data: {
             estConstructionEnd: removeYear(project.estConstructionEnd),
-            ...moveValueToNextProperty(objectKey, project, true),
+            ...moveValueToNextProperty(cellKey, project, true),
           },
         }),
       );
     }
-  };
+  }, [cellType, dispatch, cellKey, project]);
 
   return (
     <div className="project-cell-menu">
@@ -134,4 +139,4 @@ const ProjectCellMenu = ({
   );
 };
 
-export default ProjectCellMenu;
+export default memo(ProjectCellMenu);

@@ -107,3 +107,20 @@ export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
     value: mc.id,
     label: mc.name,
   }));
+
+export const addActiveClassToProjectRow = (projectId: string) => {
+  Array.from(document.getElementById(`row-${projectId}`)?.children || []).forEach(
+    (c) => c.tagName === 'TD' && c.classList.add('active'),
+  );
+};
+
+export const removeActiveClassFromProjectRow = (projectId: string) => {
+  Array.from(document.getElementById(`row-${projectId}`)?.children || []).forEach(
+    (c) => c.tagName === 'TD' && c.classList.remove('active'),
+  );
+};
+
+export const isProjectRowActive = (projectId: string) =>
+  Array.from(document.getElementById(`row-${projectId}`)?.children || [])[1].classList.contains(
+    'active',
+  );

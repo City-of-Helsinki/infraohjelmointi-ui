@@ -73,11 +73,11 @@ export interface IFreeSearchResults {
 }
 
 export interface IContextMenuData {
-  menuType: ContextMenuType;
   project: IProject;
   year: number;
   cellType: CellType;
-  objectKey: string;
+  cellKey: string;
+  menuType: ContextMenuType;
 }
 
 export type FreeSearchFormItem = IOption & { type: string };

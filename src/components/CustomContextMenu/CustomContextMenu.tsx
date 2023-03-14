@@ -1,6 +1,6 @@
 import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { useState, useEffect, useRef, useLayoutEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect, useMemo, memo, useCallback } from 'react';
 import { ProjectCellMenu } from './ContextMenus/ProjectCellMenu';
 import './styles.css';
 
@@ -19,10 +19,10 @@ const CustomContextMenu = () => {
     project: {} as IProject,
     year: 0,
     cellType: 'planning',
-    objectKey: '',
+    cellKey: '',
   });
 
-  const { isVisible, posX, posY, menuType, project, year, cellType, objectKey } = contextMenuState;
+  const { isVisible, posX, posY, menuType, project, year, cellType, cellKey } = contextMenuState;
 
   const contextRef = useRef<HTMLDivElement>(null);
 
@@ -34,17 +34,19 @@ const CustomContextMenu = () => {
     [posX, posY],
   );
 
-  const handleCloseContextMenu = () => {
+  const handleCloseContextMenu = useCallback(() => {
     setContextMenuState((current) => ({ ...current, isVisible: false }));
-  };
+  }, []);
 
   useEffect(() => {
     if (!contextRef || !contextRef.current) {
       return;
     }
 
+    const contextElement = contextRef.current;
+
     const closeContextMenu = (e: MouseEvent) => {
-      if (contextRef.current && !contextRef.current.contains(e.target as Node)) {
+      if (contextElement && !contextElement.contains(e.target as Node)) {
         handleCloseContextMenu();
       }
     };
@@ -60,10 +62,10 @@ const CustomContextMenu = () => {
       });
     };
 
-    contextRef.current.addEventListener('showContextMenu', showContextMenu);
+    contextElement.addEventListener('showContextMenu', showContextMenu);
     document.addEventListener('click', closeContextMenu);
     return () => {
-      contextRef.current?.removeEventListener('showContextMenu', showContextMenu);
+      contextElement.removeEventListener('showContextMenu', showContextMenu);
       document.removeEventListener('click', closeContextMenu);
     };
   }, [contextRef]);
@@ -99,11 +101,11 @@ const CustomContextMenu = () => {
           project={project}
           year={year}
           cellType={cellType}
-          objectKey={objectKey}
+          cellKey={cellKey}
         />
       )}
     </div>
   );
 };
 
-export default CustomContextMenu;
+export default memo(CustomContextMenu);
