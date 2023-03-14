@@ -67,7 +67,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const handleDialogClose = useCallback(() => {
     setFormState((current) => ({ ...current, projectsForSubmit: [] }));
     handleClose();
-  }, []);
+  }, [handleClose]);
 
   return (
     <div>
@@ -83,15 +83,11 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
           scrollable
         >
           {/* Header */}
-          <Header id={'group-form-dialog-label'} title={t(`createSummingGroups`)} />
+          <Header id={'add-project-programmed-header'} title={t(`addProgrammedProject`)} />
 
           <Content>
             <div className="dialog-section">
               <br />
-              <div>
-                <p className="font-bold">{t(`groupForm.groupCreationDescription1`)}</p>
-                <p className="font-bold">{t(`groupForm.groupCreationDescription2`)}</p>
-              </div>
 
               <div>
                 <ProjectProgrammedSearch
@@ -104,7 +100,8 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
           </Content>
           <ActionButtons>
             <Button
-              //   onClick={handleSubmit(onSubmit)}
+              // onClick={onSubmit}
+              disabled={!(projectsForSubmit && projectsForSubmit.length > 0)}
               data-testid="search-projects-button"
             >
               {t('search')}
@@ -147,7 +144,7 @@ const ProjectProgrammedDialog: FC = () => {
     <div>
       {isOpen && <DialogContainer isOpen={isOpen} handleClose={handleClose} />}
       <div>
-        <div data-testid="open-group-form-dialog-button"></div>
+        <div data-testid="open-project-add-dialog-button"></div>
         <Button onClick={onOpenGroupForm} size="small">
           {t(`createSummingGroups`)}
         </Button>

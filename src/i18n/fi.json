@@ -325,7 +325,8 @@
   "pwFolderLinkNotExist":"Dokumenttikansiota ei ole avattu",
   "opensExternalWebsite":"Avaa toisen verkkosivuston",
   "opensInNewTab":"Avautuu uuteen välilehteen",
-  "searchForProjects":"Etsi hankkeita",
   "createSummingGroups": "Luo uusi summaava ryhmä",
-  "fieldRequiredWarning": "Tämä kenttä on täytettävä"
+  "fieldRequiredWarning": "Tämä kenttä on täytettävä",
+  "addProgrammedProject":"Tuo uusi hanke listalle",
+  "searchForProjects":"Etsi hanke"
 }

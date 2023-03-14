@@ -5,6 +5,7 @@ import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useOptions } from '@/hooks/useOptions';
 // Build a search parameter with all the choices from the search form
 
 interface IProjectSearchProps {
@@ -18,16 +19,21 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   projectsForSubmit,
   onProjectSelectionDelete,
 }) => {
-  const buildQueryParamString = (projectName: string): string => {
-    const searchParams = [];
-    searchParams.push(`projectName=${projectName}`);
-    searchParams.push('phase=5a1f7e80-3cc5-4882-a3b4-035bddcc417b');
-
-    return searchParams.join('&');
-  };
-  const { t } = useTranslation();
   const [searchWord, setSearchWord] = useState('');
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
+  const phase = useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
+
+  const buildQueryParamString = useCallback(
+    (projectName: string): string => {
+      const searchParams = [];
+      searchParams.push(`projectName=${projectName}`);
+      searchParams.push(`phase=${phase}`);
+
+      return searchParams.join('&');
+    },
+    [phase],
+  );
+  const { t } = useTranslation();
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
 
@@ -58,7 +64,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
               if (searchProjectsItemList.length > 0) {
                 setSearchedProjects(searchProjectsItemList);
               }
-              console.log(searchProjectsItemList);
+
               resolve(searchProjectsItemList);
             }
             resolve([]);
@@ -66,17 +72,20 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
           .catch(() => reject([]));
       });
     },
-    [projectsForSubmit],
+    [projectsForSubmit, buildQueryParamString],
   );
 
-  const handleSubmit = useCallback((value: string) => {
-    const selectedProject = searchedProjects.find((p) => p.label === value);
-    if (value) {
-      onProjectClick(selectedProject);
-    }
-    // value && onProjectClick(searchedProjects.find((p) => p.label === value));
-    setSearchWord('');
-  }, []);
+  const handleSubmit = useCallback(
+    (value: string) => {
+      const selectedProject = searchedProjects.find((p) => p.label === value);
+      if (value) {
+        onProjectClick(selectedProject);
+      }
+      // value && onProjectClick(searchedProjects.find((p) => p.label === value));
+      setSearchWord('');
+    },
+    [onProjectClick, searchedProjects],
+  );
 
   const handleDelete = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
@@ -85,7 +94,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       );
       onChange(projectsForSubmit);
     },
-    [],
+    [onProjectSelectionDelete, projectsForSubmit],
   );
   return (
     <div className="dialog-section" data-testid="search-project-field-section">
@@ -95,8 +104,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
         clearButtonAriaLabel="Clear search field"
         searchButtonAriaLabel="Search"
         suggestionLabelField="label"
-        helperText="Täytä pakolliset kentät saadaksesi ehdotuksia"
-        hideSearchButton={true}
         value={searchWord}
         onChange={handleValueChange}
         onSubmit={(v) => handleSubmit(v)}
