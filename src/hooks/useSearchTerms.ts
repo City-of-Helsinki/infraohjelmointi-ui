@@ -42,7 +42,7 @@ const getSearchTerms = (
       case 'subDivision':
         value.forEach((v: IOption) => {
           const termLabel = translate(`searchTag.${key}`);
-          return searchTerms.push({
+          searchTerms.push({
             value: `${termLabel}: ${v.label}`,
             type: key,
             id: v.value,

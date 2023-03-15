@@ -27,6 +27,8 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
   const lastSearchParams = useAppSelector(selectLastSearchParams);
   const searchOrder = useAppSelector(selectSearchOrder);
 
+  const pageIndex = useMemo(() => searchPage - 1, [searchPage]);
+  const pageHref = useCallback(() => '#', []);
   const pageCount = useMemo(
     () => Math.floor(count / parseInt(searchLimit)) + 1,
     [count, searchLimit],
@@ -82,8 +84,8 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
           language="fi"
           onChange={handleGetSearchResults}
           pageCount={pageCount}
-          pageHref={() => '#'}
-          pageIndex={searchPage - 1}
+          pageHref={pageHref}
+          pageIndex={pageIndex}
           paginationAriaLabel="Search result pagination"
           siblingCount={2}
         />

@@ -3,7 +3,7 @@ import './styles.css';
 import { Button } from 'hds-react/components/Button';
 import { IconSliders } from 'hds-react/icons';
 import { useAppDispatch } from '@/hooks/common';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +11,8 @@ const SearchResultsHeader = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const handleOpenSearch = useCallback(() => dispatch(toggleSearch()), [dispatch]);
+  const iconSliders = useMemo(() => <IconSliders />, []);
+
   return (
     <div className="search-result-header-container">
       <div className="search-result-page-title">
@@ -24,7 +26,7 @@ const SearchResultsHeader = () => {
             size="small"
             className="h-12 w-40"
             data-testid="filterSearchBtn"
-            iconLeft={<IconSliders />}
+            iconLeft={iconSliders}
             onClick={handleOpenSearch}
           >
             {t('filterSearch')}
