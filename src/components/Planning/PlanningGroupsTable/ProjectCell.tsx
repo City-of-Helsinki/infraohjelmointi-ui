@@ -1,12 +1,12 @@
 import { useAppDispatch } from '@/hooks/common';
 import { CellType, ContextMenuType } from '@/interfaces/common';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectRequestObject } from '@/interfaces/projectInterfaces';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { IconAngleLeft } from 'hds-react/icons';
 import { NumberInput } from 'hds-react/components/NumberInput';
 import { ChangeEvent, FC, useCallback, useState, MouseEvent, useEffect, memo } from 'react';
-import { removeYear } from '@/utils/dates';
+import { addYear, removeYear } from '@/utils/dates';
 import { addActiveClassToProjectRow } from '@/utils/common';
 
 export interface IProjectCellProps {
@@ -15,9 +15,17 @@ export interface IProjectCellProps {
   budgetKey: string;
   project: IProject;
   year: number;
+  cellSibling?: 'left' | 'right' | 'leftAndRight' | 'none';
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, budgetKey, project, year }) => {
+const ProjectCell: FC<IProjectCellProps> = ({
+  value,
+  cellType,
+  budgetKey,
+  project,
+  year,
+  cellSibling,
+}) => {
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<'' | number>(parseInt(value || ''));
@@ -53,15 +61,23 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, budgetKey, projec
   );
 
   const handleAddYear = useCallback(() => {
-    dispatch(
-      silentPatchProjectThunk({
-        id: project.id,
-        data: { estPlanningStart: removeYear(project.estPlanningStart) },
-      }),
-    ).then((res) => {
+    const req: IProjectRequestObject = { id: project.id, data: {} };
+    if (cellSibling === 'left' && cellType === 'construction') {
+      req.data.estConstructionEnd = addYear(project.estConstructionEnd);
+    }
+    if (cellSibling === 'right' && cellType === 'construction') {
+      req.data.estConstructionStart = removeYear(project.estConstructionStart);
+    }
+    if (cellSibling === 'left' && cellType === 'planning') {
+      req.data.estPlanningEnd = addYear(project.estPlanningEnd);
+    }
+    if (cellSibling === 'right' && cellType === 'planning') {
+      req.data.estPlanningStart = removeYear(project.estPlanningStart);
+    }
+    dispatch(silentPatchProjectThunk(req)).then((res) => {
       res.type === 'project/silent-patch/fulfilled' && addActiveClassToProjectRow(project.id);
     });
-  }, [dispatch, project.estPlanningStart, project.id]);
+  }, [dispatch, project.estPlanningStart, project.id, cellSibling, cellType]);
 
   useEffect(() => {
     if (project[budgetKey as keyof IProject] as string) {
@@ -85,9 +101,21 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, budgetKey, projec
         onChange={handleChange}
         disabled={isEmptyCell}
       />
-      <button className="edit-timeline-button" onClick={handleAddYear}>
-        <IconAngleLeft />
-      </button>
+      {cellSibling !== 'none' && (
+        <button className={`edit-timeline-button ${cellSibling}`} onClick={handleAddYear}>
+          <IconAngleLeft />
+        </button>
+      )}
+      {cellSibling === 'leftAndRight' && (
+        <>
+          <button className={`edit-timeline-button left`} onClick={handleAddYear}>
+            <IconAngleLeft />
+          </button>
+          <button className={`edit-timeline-button right`} onClick={handleAddYear}>
+            <IconAngleLeft />
+          </button>
+        </>
+      )}
     </td>
   );
 };

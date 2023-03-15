@@ -111,47 +111,14 @@ export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
 export const addActiveClassToProjectRow = (projectId: string) => {
   const projectRow = document.getElementById(`row-${projectId}`);
   projectRow?.classList.add('active');
-  Array.from(projectRow?.children || []).reduce((prev, curr, i) => {
-    curr.tagName === 'TD' && curr.classList.add('active');
-    i === 1 && curr.classList.add('first');
-
-    if (prev.classList.contains('none') && !curr.classList.contains('none')) {
-      const btns = curr
-        .getElementsByClassName('edit-timeline-button')[0]
-        .classList.add('visible', 'left');
-      console.log(btns);
-    }
-
-    if (
-      !prev.classList.contains('none') &&
-      curr.classList.contains('none') &&
-      !curr.classList.contains('first')
-    ) {
-      const btns = curr
-        .getElementsByClassName('edit-timeline-button')[0]
-        .classList.add('visible', 'right');
-      console.log(btns);
-    }
-
-    return curr;
-  });
 };
 
 export const removeActiveClassFromProjectRow = (projectId: string) => {
   const projectRow = document.getElementById(`row-${projectId}`);
   projectRow?.classList.remove('active');
-  Array.from(projectRow?.children || []).forEach((c) => {
-    c.tagName === 'TD' && c.classList.remove('active');
-    Array.from(projectRow?.children || []).forEach((c) => {
-      c.classList.remove('active');
-      Array.from(c.getElementsByClassName('edit-timeline-button')).forEach((b) => {
-        b.classList.remove('visible');
-      });
-    });
-  });
 };
 
-export const isProjectRowActive = (projectId: string) =>
-  Array.from(document.getElementById(`row-${projectId}`)?.children || [])[1].classList.contains(
-    'active',
-  );
+export const isProjectRowActive = (projectId: string) => {
+  const projectRow = document.getElementById(`row-${projectId}`);
+  return projectRow?.classList.contains('active');
+};

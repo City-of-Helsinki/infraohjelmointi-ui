@@ -20,29 +20,42 @@ const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
     return 'none';
   };
 
-  const getCells = (value: string, key: string, year: number): IProjectCellProps => {
+  const getCells = (value: string, key: string, year: number) => {
     return {
       value,
       cellType: getCellType(year),
       project: project,
       budgetKey: key,
       year: year,
+      cellSibling: 'none',
     };
   };
 
   const cells = [];
 
   for (const [key, value] of Object.entries(project)) {
-    if (key.includes('budgetProposalCurrentYearPlus')) {
-      const keyValue = parseInt(key.split('budgetProposalCurrentYearPlus')[1]);
-      cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
-    } else if (key.includes('preliminaryCurrentYearPlus')) {
-      const keyValue = parseInt(key.split('preliminaryCurrentYearPlus')[1]);
-      cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
+    if (key.includes('CurrentYearPlus')) {
+      cells.push(getCells(value, key, new Date().getFullYear() + parseInt(key.split('Plus')[1])));
     }
   }
 
-  return cells;
+  for (let i = 1; i < cells.length; i++) {
+    const curr = cells[i];
+    const prev = cells[i - 1];
+    const next = cells[i === cells.length - 1 ? i : i + 1];
+
+    if (curr.cellType !== 'none') {
+      if (next.cellType === 'none' && prev.cellType === 'none') {
+        curr.cellSibling = 'leftAndRight';
+      } else if (prev.cellType === 'none') {
+        curr.cellSibling = 'right';
+      } else if (next.cellType === 'none') {
+        curr.cellSibling = 'left';
+      }
+    }
+  }
+
+  return cells as Array<IProjectCellProps>;
 };
 
 interface IPlanningGroupsTableRowProps {
