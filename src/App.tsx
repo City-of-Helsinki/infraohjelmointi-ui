@@ -93,6 +93,7 @@ const App: FC = () => {
           </Routes>
         </div>
       </div>
+      {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}
       <CustomContextMenu />
     </div>
   );

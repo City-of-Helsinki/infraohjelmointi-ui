@@ -76,7 +76,7 @@ export interface IContextMenuData {
   project: IProject;
   year: number;
   cellType: CellType;
-  cellKey: string;
+  budgetKey: string;
   menuType: ContextMenuType;
 }
 

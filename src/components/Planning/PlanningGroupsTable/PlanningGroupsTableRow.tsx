@@ -24,8 +24,8 @@ const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
     return {
       value,
       cellType: getCellType(year),
-      cellKey: key,
       project: project,
+      budgetKey: key,
       year: year,
     };
   };
@@ -51,16 +51,12 @@ interface IPlanningGroupsTableRowProps {
   onProjectMenuClick: (projectId: string, e: MouseEvent) => void;
 }
 
-/**
- * We're only mapping the project name here for now since the values aren't yet implemented
- */
 const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
   project,
   onProjectMenuClick,
 }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
-
   const projectCells = createProjectCells(project);
 
   const handleOnProjectMenuClick = useCallback(
@@ -84,7 +80,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
               {project.name}
             </button>
           </div>
-          {/* Right side (category & sum) */}
+          {/* Right side (category & budget) */}
           <div className="project-right-icons-container">
             <div>
               {project.category && <CustomTag text={project.category.value} weight={'light'} />}
@@ -97,7 +93,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
         </div>
       </th>
       {projectCells.map((p) => (
-        <ProjectCell key={p.cellKey} {...p} />
+        <ProjectCell key={p.budgetKey} {...p} />
       ))}
     </tr>
   );

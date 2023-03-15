@@ -10,6 +10,11 @@ interface IContextMenuState extends IContextMenuData {
   posY: number;
 }
 
+/**
+ * Listens to the custom 'showContextMenu'-event, which will trigger this components visiblity. The event
+ * needs to be given the needed data and renders custom menu's depending on the given ContextMenuType through
+ * the event detail property.
+ */
 const CustomContextMenu = () => {
   const [contextMenuState, setContextMenuState] = useState<IContextMenuState>({
     isVisible: false,
@@ -17,12 +22,12 @@ const CustomContextMenu = () => {
     posY: 0,
     menuType: ContextMenuType.EDIT_PROJECT_CELL,
     project: {} as IProject,
+    budgetKey: '',
     year: 0,
     cellType: 'planning',
-    cellKey: '',
   });
 
-  const { isVisible, posX, posY, menuType, project, year, cellType, cellKey } = contextMenuState;
+  const { isVisible, posX, posY, menuType, project, budgetKey, year, cellType } = contextMenuState;
 
   const contextRef = useRef<HTMLDivElement>(null);
 
@@ -101,7 +106,7 @@ const CustomContextMenu = () => {
           project={project}
           year={year}
           cellType={cellType}
-          cellKey={cellKey}
+          budgetKey={budgetKey}
         />
       )}
     </div>

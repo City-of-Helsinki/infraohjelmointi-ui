@@ -5,7 +5,7 @@ import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { addYear, removeYear } from '@/utils/dates';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   addActiveClassToProjectRow,
@@ -14,50 +14,88 @@ import {
 } from '@/utils/common';
 import './styles.css';
 
-const getSiblingProperty = (cellKey: string, previous?: boolean) => {
-  const splitKey = cellKey.split('Plus');
-  const nextNumber = previous ? parseInt(splitKey[1]) - 1 : parseInt(splitKey[1]) + 1;
+/**
+ * Returns the budget key next to the given key, if the previous parameter is given then the previous
+ * key will be returned, otherwise the next key is returned.
+ *
+ * @param budgetKey the budget key to compare
+ * @param previous optional boolean if the previous year should be used
+ */
+const getNextBudgetKey = (budgetKey: string, previous?: boolean) => {
+  const splitKey = budgetKey.split('Plus');
   const baseKey = `${splitKey[0]}Plus`;
-  return { nextNumber, baseKey };
+  return `${baseKey}${previous ? parseInt(splitKey[1]) - 1 : parseInt(splitKey[1]) + 1}`;
 };
 
-const moveValueToNextProperty = (
-  cellKey: string,
+/**
+ * Moves the value of the given budget key to either the next property or the previous property if the
+ * previous parameter is given.
+ *
+ * @param budgetKey the current budget key which value will be moved
+ * @param project the project to update
+ * @param previous optional boolean if the previous year should be used
+ *
+ * @returns IProjectRequest-object with the given key/properties budget moved to the next property
+ */
+const moveBudgetToNextProperty = (
+  budgetKey: string,
   project: IProject,
   previous?: boolean,
 ): IProjectRequest => {
-  const { nextNumber, baseKey } = getSiblingProperty(cellKey, previous);
+  const nextKey = getNextBudgetKey(budgetKey, previous);
   const req = {} as IProjectRequest;
-  if (previous && nextNumber === 2 && baseKey === 'preliminaryCurrentYearPlus') {
+
+  // The project properties go from budgetProposal...0, 1, 2 and then preliminaryCurrent...3, 4, 5...,
+  // so we need to check if the next property would become a property that doesn't exist
+  // (i.e. budgetProposalCurrentYearPlus3 or preliminaryCurrentYearPlus2)
+  if (nextKey === 'preliminaryCurrentYearPlus2') {
     req.budgetProposalCurrentYearPlus2 = (
       parseInt(project.budgetProposalCurrentYearPlus2) +
       parseInt(project.preliminaryCurrentYearPlus3)
     ).toString();
-  }
-  if (!previous && nextNumber > 2 && baseKey === 'budgetProposalCurrentYearPlus') {
+  } else if (nextKey === 'budgetProposalCurrentYearPlus3') {
     req.preliminaryCurrentYearPlus3 = (
       parseInt(project.budgetProposalCurrentYearPlus2) +
       parseInt(project.preliminaryCurrentYearPlus3)
     ).toString();
+  } else {
+    (req[nextKey as keyof IProjectRequest] as string) = (
+      parseInt(project[budgetKey as keyof IProject] as string) +
+      parseInt(project[nextKey as keyof IProject] as string)
+    ).toString();
   }
   return {
     ...req,
-    [cellKey]: '0',
+    [budgetKey]: '0',
   };
 };
 
-const ProjectCellMenu = ({
+interface IProjectCellMenuProps {
+  handleCloseMenu: () => void;
+  project: IProject;
+  budgetKey: string;
+  year: number;
+  cellType: CellType;
+}
+
+/**
+ * This component relies on the project budget properties for the current year and the next 10 years to be the following,
+ * since it adds/removes values from them dynamically using the number at the end of the key:
+ *
+ * - budgetProposalCurrentYearPlus0 (current year)
+ * - ...
+ * - budgetProposalCurrentYearPlus2
+ * - preliminaryCurrentYearPlus3
+ * - ...
+ * - preliminaryCurrentYearPlus10 (10 years in the future)
+ *
+ */
+const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   handleCloseMenu,
   project,
   year,
   cellType,
-  cellKey,
-}: {
-  handleCloseMenu: () => void;
-  project: IProject;
-  year: number;
-  cellType: CellType;
-  cellKey: string;
+  budgetKey,
 }) => {
   const { t } = useTranslation();
   const [type, setType] = useState(cellType);
@@ -72,38 +110,34 @@ const ProjectCellMenu = ({
     setType(cellType);
   }, [cellType]);
 
+  // Sets or removes an .active css-class to all the TD-elements for the selected project row
   const handleEditTimeline = useCallback(() => {
     if (isProjectRowActive(project.id)) {
       removeActiveClassFromProjectRow(project.id);
     } else {
       addActiveClassToProjectRow(project.id);
     }
+    handleCloseMenu();
   }, [project]);
 
+  // Removes or adds a 1 year to the projects planning/construction start/end and
+  // moves the removed properties budget to the next budget
   const handleDeleteYear = useCallback(() => {
-    if (cellType === 'planning') {
-      dispatch(
-        silentPatchProjectThunk({
-          id: project.id,
-          data: {
-            estPlanningStart: addYear(project.estPlanningStart),
-            ...moveValueToNextProperty(cellKey, project),
-          },
-        }),
-      );
-    }
-    if (cellType === 'construction') {
-      dispatch(
-        silentPatchProjectThunk({
-          id: project.id,
-          data: {
-            estConstructionEnd: removeYear(project.estConstructionEnd),
-            ...moveValueToNextProperty(cellKey, project, true),
-          },
-        }),
-      );
-    }
-  }, [cellType, dispatch, cellKey, project]);
+    const isPlanning = cellType === 'planning';
+    const isConstruction = cellType === 'construction';
+    const { estPlanningStart, estConstructionEnd } = project;
+
+    dispatch(
+      silentPatchProjectThunk({
+        id: project.id,
+        data: {
+          ...(isPlanning && { estPlanningStart: addYear(estPlanningStart) }),
+          ...(isConstruction && { estConstructionEnd: removeYear(estConstructionEnd) }),
+          ...moveBudgetToNextProperty(budgetKey, project, isConstruction),
+        },
+      }),
+    ).then(() => handleCloseMenu());
+  }, [cellType, dispatch, budgetKey, project]);
 
   return (
     <div className="project-cell-menu">

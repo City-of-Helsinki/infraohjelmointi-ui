@@ -12,15 +12,16 @@ import { addActiveClassToProjectRow } from '@/utils/common';
 export interface IProjectCellProps {
   value: string;
   cellType: CellType;
-  cellKey: string;
+  budgetKey: string;
   project: IProject;
   year: number;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, cellKey, project, year }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, budgetKey, project, year }) => {
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<'' | number>(parseInt(value || ''));
+  const isEmptyCell = cellType === 'none';
 
   const handleFocus = useCallback(() => {
     setIsReadOnly((current) => !current);
@@ -31,12 +32,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, cellKey, project,
   }, []);
 
   const handleBlur = useCallback(() => {
-    const data = { [cellKey]: formValue };
+    const data = { [budgetKey]: formValue };
     setIsReadOnly(!isReadOnly);
     if (formValue !== parseInt(value)) {
       dispatch(silentPatchProjectThunk({ id: project.id, data }));
     }
-  }, [dispatch, formValue, isReadOnly, cellKey, project.id, value]);
+  }, [dispatch, formValue, isReadOnly, budgetKey, project.id, value]);
 
   const handleOpenContextMenu = useCallback(
     (e: MouseEvent<HTMLElement>) => {
@@ -44,11 +45,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, cellKey, project,
         year,
         project,
         cellType,
-        cellKey: cellKey,
+        budgetKey: budgetKey,
         menuType: ContextMenuType.EDIT_PROJECT_CELL,
       });
     },
-    [cellKey, project, cellType, year],
+    [budgetKey, project, cellType, year],
   );
 
   const handleAddYear = useCallback(() => {
@@ -63,26 +64,26 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, cellType, cellKey, project,
   }, [dispatch, project.estPlanningStart, project.id]);
 
   useEffect(() => {
-    if (project[cellKey as keyof IProject] as string) {
-      setFormValue(parseInt(project[cellKey as keyof IProject] as string));
+    if (project[budgetKey as keyof IProject] as string) {
+      setFormValue(parseInt(project[budgetKey as keyof IProject] as string));
     }
   }, [project]);
 
   return (
     <td
       className={`project-cell ${cellType}`}
-      onContextMenu={cellType !== 'none' ? handleOpenContextMenu : undefined}
+      onContextMenu={!isEmptyCell ? handleOpenContextMenu : undefined}
     >
       <NumberInput
-        value={cellType !== 'none' ? formValue || 0 : ''}
-        id={`${cellKey}-${project.id}`}
+        value={!isEmptyCell ? formValue || 0 : ''}
+        id={`${budgetKey}-${project.id}`}
         label=""
         className="table-input"
         readOnly={isReadOnly}
         onBlur={handleBlur}
         onFocus={handleFocus}
         onChange={handleChange}
-        disabled={cellType === 'none'}
+        disabled={isEmptyCell}
       />
       <button className="edit-timeline-button" onClick={handleAddYear}>
         <IconAngleLeft />
