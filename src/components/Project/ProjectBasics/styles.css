@@ -264,7 +264,7 @@
 }
 
 .side-panel-container {
-  @apply sticky top-0 flex flex-1 translate-y-[4rem] justify-center;
+  @apply sticky top-0 translate-y-[4rem] justify-center;
 }
 .project-side-panel {
   @apply flex w-full flex-col;

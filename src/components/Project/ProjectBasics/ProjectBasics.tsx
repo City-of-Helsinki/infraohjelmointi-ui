@@ -11,8 +11,10 @@ const ProjectBasics = () => {
       <ScrollToTop />
       {project && (
         <>
-          <div className="side-panel-container" data-testid="side-panel">
-            <ProjectSidePanel />
+          <div className="flex-1">
+            <div className="side-panel-container" data-testid="side-panel">
+              <ProjectSidePanel />
+            </div>
           </div>
 
           <div className=" my-16 flex flex-[2]" data-testid="form-panel">
