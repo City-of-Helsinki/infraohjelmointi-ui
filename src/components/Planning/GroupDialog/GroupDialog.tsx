@@ -119,14 +119,14 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   return (
     <div>
       {/* Dialog */}
-      <div className="display-flex-col">
+      <div>
         <Dialog
           id="group-create-dialog"
           aria-labelledby={'group-form-dialog-label'}
           isOpen={isOpen}
           close={handleDialogClose}
           closeButtonLabelText={t('closeGroupFormWindow')}
-          className="big-dialog"
+          className={showAdvanceFields ? 'expanded' : ''}
           scrollable
         >
           {/* Header */}
@@ -234,6 +234,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
               </div>
             </div>
           </Content>
+
           <ActionButtons>
             <Button
               onClick={handleSubmit(onSubmit)}

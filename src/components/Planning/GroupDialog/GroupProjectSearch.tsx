@@ -4,7 +4,7 @@ import { arrayHasValue, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import _ from 'lodash';
-import { FC, memo, useCallback, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
@@ -18,6 +18,7 @@ interface IProjectSearchProps {
 }
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showAdvanceFields }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const buildQueryParamString = (projectName: string): ISearchRequest => {
     const searchParams = [];
     const reqParamObject = { limit: '30', params: '', order: 'new' };
@@ -35,6 +36,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
+  useEffect(() => {
+    if (searchedProjects.length > 0) {
+      scrollRef.current?.scrollIntoView();
+    }
+  }, [searchedProjects]);
 
   const getSuggestions = useCallback(
     (inputValue: string) => {
@@ -68,9 +74,9 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
                 if (searchProjectsItemList.length > 0) {
                   setSearchedProjects(searchProjectsItemList);
                 }
-
                 resolve(searchProjectsItemList);
               }
+
               resolve([]);
             })
             .catch(() => reject([]));
@@ -126,6 +132,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
               helperText="Täytä pakolliset kentät saadaksesi ehdotuksia"
               hideSearchButton={true}
               value={searchWord}
+              className="search-input"
               onChange={handleValueChange}
               onSubmit={(v) => handleSubmit(v, onChange)}
             />
@@ -137,6 +144,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
                 </div>
               ))}
             </div>
+            <div ref={scrollRef}></div>
           </>
         )}
       />
