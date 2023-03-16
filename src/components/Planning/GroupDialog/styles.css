@@ -7,7 +7,7 @@
   margin: 0;
 }
 
-#group-create-dialog #group-create-form .advance-fields-button {
+#group-create-dialog .search-form .advance-fields-button {
   color: var(--color-bus);
   display: flex;
   justify-content: center;
@@ -27,7 +27,13 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
+.search-selections-container {
+  @apply flex h-auto w-full flex-wrap mt-3;
+}
 
+.search-selections-container .search-selections{
+  @apply mr-3 mb-3;
+}
 
 .dialog-section .button-container {
   @apply fixed;

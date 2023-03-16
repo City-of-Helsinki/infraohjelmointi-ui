@@ -8,6 +8,7 @@ import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
+import { ISearchRequest } from '@/interfaces/searchInterfaces';
 // Build a search parameter with all the choices from the search form
 
 interface IProjectSearchProps {
@@ -27,17 +28,17 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   control,
   showAdvanceFields,
 }) => {
-  const buildQueryParamString = (projectName: string): string => {
+  const buildQueryParamString = (projectName: string): ISearchRequest => {
     const searchParams = [];
+    const reqParamObject = { limit: '30', params: '', order: 'new' };
     for (const [key, value] of Object.entries(getValues())) {
       value?.value && searchParams.push(`${key}=${value?.value}`);
     }
     searchParams.push(`projectName=${projectName}`);
-    searchParams.push(`limit=30`);
     searchParams.push('inGroup=false');
     // searchParams.push('programmed=true');
-
-    return searchParams.join('&');
+    reqParamObject.params = searchParams.join('&');
+    return reqParamObject;
   };
   const { t } = useTranslation();
   const [searchWord, setSearchWord] = useState('');
@@ -53,23 +54,24 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       ) {
         return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
           // printing out search params for later
-          const queryString = buildQueryParamString(inputValue);
-          console.log(queryString);
+          const queryParams = buildQueryParamString(inputValue);
+          console.log(queryParams);
 
-          getProjectsWithParams(queryString)
+          getProjectsWithParams(queryParams)
             .then((res) => {
               if (res) {
                 console.log(res);
                 // Filter out only the projects which haven't yet been added to be the submitted list from the result
                 const projectsIdList = projectsForSubmit.map((p) => p.value);
-                const resultList = res.projects?.filter(
-                  ({ project }) => !arrayHasValue(projectsIdList, project.id),
+                const resultList = res.results?.filter(
+                  (object) =>
+                    object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
                 );
                 console.log(resultList);
 
                 // Convert the resultList to options for the suggestion dropdown
                 const searchProjectsItemList: Array<IOption> | [] = resultList
-                  ? resultList.map(({ project }) => ({
+                  ? resultList.map((project) => ({
                       ...listItemToOption({ id: project.id, value: project.name }),
                     }))
                   : [];
@@ -90,15 +92,19 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     [projectsForSubmit, getValues, showAdvanceFields],
   );
 
-  const handleSubmit = useCallback((value: string, onChange: (...event: unknown[]) => void) => {
-    const selectedProject = searchedProjects.find((p) => p.label === value);
-    if (value) {
-      onProjectClick(selectedProject);
-      onChange(projectsForSubmit);
-    }
-    // value && onProjectClick(searchedProjects.find((p) => p.label === value));
-    setSearchWord('');
-  }, []);
+  const handleSubmit = useCallback(
+    (value: string, onChange: (...event: unknown[]) => void) => {
+      const selectedProject = searchedProjects.find((p) => p.label === value);
+      console.log(selectedProject);
+      if (selectedProject?.label) {
+        onProjectClick(selectedProject);
+        onChange(projectsForSubmit);
+      }
+      // value && onProjectClick(searchedProjects.find((p) => p.label === value));
+      setSearchWord('');
+    },
+    [searchedProjects],
+  );
 
   const handleDelete = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
@@ -137,11 +143,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
               onSubmit={(v) => handleSubmit(v, onChange)}
             />
 
-            <div className="search-selections">
+            <div className="search-selections-container">
               {projectsForSubmit.map((s) => (
-                <Tag key={s.label} onDelete={(e) => handleDelete(e, onChange)}>
-                  {s.label}
-                </Tag>
+                <div key={s.label} className={'search-selections'}>
+                  <Tag onDelete={(e) => handleDelete(e, onChange)}>{s.label}</Tag>
+                </div>
               ))}
             </div>
           </>

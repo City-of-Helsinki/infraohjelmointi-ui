@@ -90,6 +90,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
     [projectsForSubmit, dispatch, reset, formValues],
   );
   const onProjectClick = useCallback((value: IOption | undefined) => {
+    console.log('Project clicked', value);
     if (value) {
       setFormState((current) => ({
         ...current,
@@ -108,7 +109,11 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   }, []);
   const toggleAdvanceFields = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setFormState((current) => ({ ...current, showAdvanceFields: !current.showAdvanceFields }));
+    setFormState((current) => ({
+      ...current,
+      showAdvanceFields: !current.showAdvanceFields,
+      projectsForSubmit: [],
+    }));
     setValue('district', { label: '', value: '' });
     setValue('division', { label: '', value: '' });
     setValue('subDivision', { label: '', value: '' });

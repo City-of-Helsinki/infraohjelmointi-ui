@@ -31,12 +31,7 @@ const useGroupValues = () => {
 };
 
 const useGroupForm = () => {
-  const allMasterClasses = useAppSelector(selectMasterClasses);
-  const allClasses = useAppSelector(selectClasses);
-  const allSubClasses = useAppSelector(selectSubClasses);
-  const allDistricts = useAppSelector(selectDistricts);
-  const allDivisions = useAppSelector(selectDivisions);
-  const allSubDivisions = useAppSelector(selectSubDivisions);
+
 
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: '',
