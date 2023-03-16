@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FC, memo, ReactNode } from 'react';
 
 interface ICustomTagProps {
   text: string;
@@ -31,4 +31,4 @@ const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size, weight }) => 
   );
 };
 
-export default CustomTag;
+export default memo(CustomTag);
