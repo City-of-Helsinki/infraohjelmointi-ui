@@ -1,9 +1,9 @@
 #group-create-dialog {
   height: 100vh;
 }
-/* #group-create-dialog .search-input ul {
-  @apply pb-10;
-} */
+#group-create-dialog .search-input ul {
+  max-height: 200px !important;
+}
 
 #group-create-dialog hr {
   border-top: 0.0625rem solid var(--color-black-20);
