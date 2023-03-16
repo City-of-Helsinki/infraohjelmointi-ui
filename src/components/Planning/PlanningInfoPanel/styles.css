@@ -1,26 +1,29 @@
 .planning-info-panel {
-  @apply mr-3 grid w-[35%] min-w-[26rem] grid-flow-row grid-cols-2 overflow-x-visible;
+  grid-template-rows: repeat(5, 1.7rem);
+  padding: 0.75rem;
+  @apply grid w-[35%] min-w-[26.75rem] grid-cols-2;
 }
 
-.planning-info-panel span {
-  @apply block;
-}
-.planning-info-panel #planningTitle {
-  @apply col-span-2;
+.planning-info-panel #planningButton {
+  @apply col-span-1 row-start-1 row-end-2;
 }
 
-#planningTitle .info-icon {
-  @apply translate-x-[0.8rem] translate-y-[0.15rem];
+.planning-info-panel #selectedClass {
+  @apply col-span-2 row-span-2;
 }
 
-#planningTitle div {
-  @apply flex;
+.planning-info-panel #previousButton {
+  @apply row-start-5 flex items-start;
 }
 
-#planningButton button {
-  @apply h-11 w-full;
+#previousButton button {
+  @apply h-8 min-h-[unset] w-28 min-w-[unset];
 }
 
-.planning-info-panel #planningBasicInfo {
-  @apply col-span-2 font-bold;
+#previousButton button svg {
+  @apply max-w-[unset];
+}
+
+#previousButton button:hover {
+  background-color: none !important;
 }
