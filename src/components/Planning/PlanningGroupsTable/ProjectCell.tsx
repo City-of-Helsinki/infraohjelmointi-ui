@@ -1,7 +1,7 @@
 import { useAppDispatch } from '@/hooks/common';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { NumberInput } from 'hds-react/components/NumberInput';
-import { ChangeEvent, FC, useCallback, useState } from 'react';
+import { ChangeEvent, FC, memo, useCallback, useState } from 'react';
 
 export type CellType = 'planning' | 'construction' | 'planningAndConstruction' | 'none';
 
@@ -46,4 +46,4 @@ const ProjectCell: FC<IProjectCellProps> = ({ value, type, objectKey, projectId 
   );
 };
 
-export default ProjectCell;
+export default memo(ProjectCell);

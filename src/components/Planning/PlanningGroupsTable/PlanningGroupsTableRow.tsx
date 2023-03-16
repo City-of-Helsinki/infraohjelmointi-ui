@@ -1,7 +1,7 @@
 import { IProject } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import ProjectCell, { IProjectCellProps } from './ProjectCell';
 
@@ -48,7 +48,7 @@ const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
 interface IPlanningGroupsTableRowProps {
   project: IProject;
   phases?: Array<IListItem>;
-  onProjectMenuClick: (projectId: string, elementPosition: MouseEvent) => void;
+  onProjectMenuClick: (projectId: string, e: MouseEvent) => void;
 }
 
 /**
@@ -63,6 +63,11 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
 
   const projectCells = createProjectCells(project);
 
+  const handleOnProjectMenuClick = useCallback(
+    (e: MouseEvent) => onProjectMenuClick(project.id, e),
+    [project],
+  );
+
   return (
     <tr>
       {/* HEADER */}
@@ -73,7 +78,9 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
             <IconMenuDots
               size="xs"
               className="dots-icon"
-              onClick={(e) => onProjectMenuClick(project.id, e as unknown as MouseEvent)}
+              // this needs to be called as an arrow function since the type of MouseEvent needs
+              // to be cast from a React MouseEvent to the default MouseEvent interface
+              onClick={(e) => handleOnProjectMenuClick(e as unknown as MouseEvent)}
             />
             <IconDocument />
           </div>
