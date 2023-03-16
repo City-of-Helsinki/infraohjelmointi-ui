@@ -40,6 +40,7 @@ export const getProjectsThunk = createAsyncThunk(
 );
 
 export const getProjectThunk = createAsyncThunk('project/getOne', async (id: string, thunkAPI) => {
+  thunkAPI.dispatch(resetProject());
   return await getProject(id)
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
@@ -96,6 +97,9 @@ export const projectSlice = createSlice({
         ...state,
         projects: initialState.projects,
       };
+    },
+    resetProject(state) {
+      return { ...state, selectedProject: null };
     },
   },
   extraReducers: (builder) => {
@@ -170,6 +174,6 @@ export const selectCount = (state: RootState) => state.project.count;
 export const selectPage = (state: RootState) => state.project.page;
 export const selectUpdated = (state: RootState) => state.project.updated;
 
-export const { setPage, resetProjects } = projectSlice.actions;
+export const { setPage, resetProjects, resetProject } = projectSlice.actions;
 
 export default projectSlice.reducer;
