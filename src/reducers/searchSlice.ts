@@ -1,46 +1,69 @@
-import { IError, FreeSearchFormObject } from '@/interfaces/common';
+import { IError } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { ISearchResult } from '@/interfaces/searchInterfaces';
+import {
+  ISearchRequest,
+  ISearchResults,
+  SearchLimit,
+  SearchOrder,
+} from '@/interfaces/searchInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import produce from 'immer';
 import { RootState } from '@/store';
 
 interface ISearchState {
   open: boolean;
   form: ISearchForm;
-  freeSearchParams: FreeSearchFormObject | null;
-  searchResults: ISearchResult | null;
+  submittedForm: ISearchForm;
+  searchResults: ISearchResults;
+  lastSearchParams: string;
+  searchLimit: SearchLimit;
+  searchOrder: SearchOrder;
   error: IError | null | unknown;
 }
 
-export const initialState: ISearchState = {
+const initialSearchResults = {
+  next: null,
+  previous: null,
+  count: 0,
+  results: [],
+};
+
+export const initialSearchForm = {
+  freeSearchParams: {},
+  masterClass: [],
+  class: [],
+  subClass: [],
+  programmedYes: false,
+  programmedNo: false,
+  personPlanning: '',
+  programmedYearMin: '',
+  programmedYearMax: '',
+  phase: { value: '', label: '' },
+  responsiblePerson: { value: '', label: '' },
+  district: [],
+  division: [],
+  subDivision: [],
+  category: { value: '', label: '' },
+};
+
+const initialState: ISearchState = {
   open: false,
-  freeSearchParams: null,
-  form: {
-    masterClass: [],
-    class: [],
-    subClass: [],
-    programmedYes: false,
-    programmedNo: false,
-    personPlanning: '',
-    programmedYearMin: '',
-    programmedYearMax: '',
-    phase: { value: '', label: '' },
-    responsiblePerson: { value: '', label: '' },
-    district: [],
-    division: [],
-    subDivision: [],
-    category: { value: '', label: '' },
-  },
-  searchResults: null,
+  form: initialSearchForm,
+  submittedForm: initialSearchForm,
+  searchResults: initialSearchResults,
+  lastSearchParams: '',
+  searchLimit: '10',
+  searchOrder: 'new',
   error: null,
 };
 
 export const getSearchResultsThunk = createAsyncThunk(
   'search/getSearchResults',
-  async (params: string, thunkAPI) => {
-    return await getProjectsWithParams(params)
+  async (req: ISearchRequest, thunkAPI) => {
+    req.limit = (thunkAPI.getState() as RootState).search.searchLimit;
+    req.params = req.params || (thunkAPI.getState() as RootState).search.lastSearchParams;
+    req.order = (thunkAPI.getState() as RootState).search.searchOrder;
+    return await getProjectsWithParams(req)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -56,20 +79,38 @@ export const searchSlice = createSlice({
     setSearchForm(state, action: PayloadAction<ISearchForm>) {
       return { ...state, form: { ...state.form, ...action.payload } };
     },
-    setFreeSearchParams(state, action: PayloadAction<FreeSearchFormObject>) {
-      return { ...state, freeSearchParams: { ...state.freeSearchParams, ...action.payload } };
+    setLastSearchParams(state, action: PayloadAction<string>) {
+      return { ...state, lastSearchParams: action.payload };
     },
-    removeFreeSearchParam(state, action: PayloadAction<string>) {
-      produce(state, () => {
-        state.freeSearchParams && delete state.freeSearchParams[action.payload];
-      });
+    setSearchLimit(state, action: PayloadAction<SearchLimit>) {
+      return { ...state, searchLimit: action.payload };
+    },
+    setSearchOrder(state, action: PayloadAction<SearchOrder>) {
+      return { ...state, searchOrder: action.payload };
+    },
+    clearSearchState(state) {
+      return {
+        ...state,
+        form: initialSearchForm,
+        submittedForm: initialSearchForm,
+        searchResults: initialSearchResults,
+        lastSearchParams: initialState.lastSearchParams,
+        searchPage: 1,
+      };
+    },
+    setSubmittedSearchForm(state, action: PayloadAction<ISearchForm>) {
+      return {
+        ...state,
+        form: { ...state.form, ...action.payload },
+        submittedForm: { ...state.form, ...action.payload },
+      };
     },
   },
   extraReducers: (builder) => {
     // GET SEARCH RESULTS
     builder.addCase(
       getSearchResultsThunk.fulfilled,
-      (state, action: PayloadAction<ISearchResult>) => {
+      (state, action: PayloadAction<ISearchResults>) => {
         return { ...state, searchResults: action.payload };
       },
     );
@@ -83,11 +124,21 @@ export const searchSlice = createSlice({
 });
 
 export const selectOpen = (state: RootState) => state.search.open;
-export const selectFreeSearchParams = (state: RootState) => state.search.freeSearchParams;
 export const selectSearchForm = (state: RootState) => state.search.form;
 export const selectSearchResults = (state: RootState) => state.search.searchResults;
+export const selectSubmittedSearchForm = (state: RootState) => state.search.submittedForm;
+export const selectLastSearchParams = (state: RootState) => state.search.lastSearchParams;
+export const selectSearchLimit = (state: RootState) => state.search.searchLimit;
+export const selectSearchOrder = (state: RootState) => state.search.searchOrder;
 
-export const { toggleSearch, setSearchForm, setFreeSearchParams, removeFreeSearchParam } =
-  searchSlice.actions;
+export const {
+  toggleSearch,
+  setSearchForm,
+  clearSearchState,
+  setSubmittedSearchForm,
+  setLastSearchParams,
+  setSearchLimit,
+  setSearchOrder,
+} = searchSlice.actions;
 
 export default searchSlice.reducer;

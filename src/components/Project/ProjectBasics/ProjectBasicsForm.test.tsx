@@ -55,15 +55,9 @@ describe('ProjectBasicsForm', () => {
               constructionPhaseDetails: mockConstructionPhaseDetails.data,
               categories: mockProjectCategories.data,
               riskAssessments: mockProjectRisks.data,
-              masterClasses: [],
-              classes: [],
-              subClasses: [],
               projectQualityLevels: mockProjectQualityLevels.data,
               planningPhases: mockPlanningPhases.data,
               constructionPhases: mockConstructionPhases.data,
-              districts: [],
-              divisions: [],
-              subDivisions: [],
               responsibleZones: mockResponsibleZones.data,
               responsiblePersons: mockResponsiblePersons.data,
               programmedYears: [],
@@ -142,7 +136,7 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.constructionCostForecast);
     expectDisplayValue(project?.constructionWorkQuantity);
 
-    expect(project?.hashTags?.length).toBe(2);
+    expect(project?.hashTags?.length).toBe(8);
     const projectHashTags = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(project?.hashTags, h.id),
     );
@@ -164,8 +158,6 @@ describe('ProjectBasicsForm', () => {
       '816cc173-6340-45ed-9b49-4b4976b2a48b',
     ];
     const project = store.getState().project.selectedProject as IProject;
-    const projectHashTags = store.getState().project.selectedProject?.hashTags;
-    const projectHashTagsLength = projectHashTags?.length || 0;
     const responseProject: { data: IProject } = {
       data: { ...project, hashTags: expectedValues },
     };
@@ -182,7 +174,7 @@ describe('ProjectBasicsForm', () => {
     expect(getByText('addHashTagsToProject')).toBeInTheDocument();
     expect(getByText('cantFindHashTag')).toBeInTheDocument();
     expect(getByRole('button', { name: 'createNewHashTag' }));
-    expect(getAllByTestId('project-hashtags').length).toBe(projectHashTagsLength);
+    expect(getAllByTestId('project-hashtags').length).toBe(2);
 
     // Search for a hashTag and click on the search result
     await user.type(getByRole('combobox', { name: 'addHashTag' }), 'hul');

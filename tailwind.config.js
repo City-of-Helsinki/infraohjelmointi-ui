@@ -28,6 +28,14 @@ module.exports = {
           lineHeight: '32px',
         },
       ],
+      'heading-l': [
+        'var(--fontsize-heading-l)',
+        {
+          fontWeight: '400',
+          letterSpacing: '-0.4px',
+          lineHeight: '1',
+        },
+      ],
       'heading-xl': [
         'var(--fontsize-heading-xl)',
         {
@@ -41,6 +49,7 @@ module.exports = {
       black: 'var(--color-black)',
       'black-90': 'var(--color-black-90)',
       'black-80': 'var(--color-black-80)',
+      'black-60': 'var(--color-black-60)',
       gray: 'var(--color-black-20)',
       white: 'var(--color-white)',
       fog: 'var(--color-fog)',

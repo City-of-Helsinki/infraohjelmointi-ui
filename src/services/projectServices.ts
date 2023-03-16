@@ -1,6 +1,6 @@
-import { IError, IFreeSearchResult } from '@/interfaces/common';
+import { IError, IFreeSearchResults } from '@/interfaces/common';
 import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
-import { ISearchResult } from '@/interfaces/searchInterfaces';
+import { ISearchRequest, ISearchResults } from '@/interfaces/searchInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
@@ -40,14 +40,19 @@ export const patchProject = async (request: IProjectRequestObject): Promise<IPro
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const getProjectsWithParams = async (params: string): Promise<ISearchResult> => {
+export const getProjectsWithParams = async (req: ISearchRequest): Promise<ISearchResults> => {
   return axios
-    .get(`${REACT_APP_API_URL}/projects/?${params}`)
+    .get(
+      req.fullPath ||
+        `${REACT_APP_API_URL}/projects/?${req.params}&limit=${req.limit}&order=${req.order}`,
+    )
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const getProjectsWithFreeSearch = async (searchWord: string): Promise<IFreeSearchResult> => {
+export const getProjectsWithFreeSearch = async (
+  searchWord: string,
+): Promise<IFreeSearchResults> => {
   return axios
     .get(`${REACT_APP_API_URL}/projects/?freeSearch=${searchWord}`)
     .then((res) => res.data)

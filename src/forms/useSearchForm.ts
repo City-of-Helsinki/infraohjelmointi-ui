@@ -1,71 +1,80 @@
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAppDispatch, useAppSelector } from '../hooks/common';
-import _ from 'lodash';
-import {
-  initialState,
-  selectFreeSearchParams,
-  selectOpen,
-  selectSearchForm,
-  setSearchForm,
-} from '@/reducers/searchSlice';
+import { useAppSelector } from '../hooks/common';
+import { initialSearchForm, selectSearchForm } from '@/reducers/searchSlice';
+import useMultiClassOptions from '@/hooks/useMultiClassOptions';
+import useMultiLocationOptions from '@/hooks/useMultiLocationOptions';
 
 const useSearchForm = () => {
-  const dispatch = useAppDispatch();
   const storeFormValues = useAppSelector(selectSearchForm);
-  const open = useAppSelector(selectOpen);
-  const freeSearchParams = useAppSelector(selectFreeSearchParams);
+  const [submitDisabled, setSubmitDisabled] = useState(true);
   const formMethods = useForm<ISearchForm>({
     defaultValues: useMemo(() => storeFormValues, [storeFormValues]),
     mode: 'onBlur',
   });
 
+  const [multiListsState, setMultiListsState] = useState({
+    masterClass: [],
+    class: [],
+    subClass: [],
+    district: [],
+    division: [],
+    subDivision: [],
+  });
+
+  const locationOptions = useMultiLocationOptions(
+    multiListsState.district,
+    multiListsState.division,
+    multiListsState.subDivision,
+  );
+
+  const classOptions = useMultiClassOptions(
+    multiListsState.masterClass,
+    multiListsState.class,
+    multiListsState.subClass,
+  );
+
   const {
     reset,
-    getValues,
-    setValue,
-    formState: { dirtyFields },
+    watch,
+    formState: { isDirty },
   } = formMethods;
 
-  const currentFormValues = getValues();
-
-  const formHasDefaultValues =
-    JSON.stringify(currentFormValues) === JSON.stringify(initialState.form);
-
   /**
-   * hack solution to set the form dirty manually by switching a form value to dirty,
-   * currently react-hook-form doesn't provide a better way
-   */
-  const setFormDirty = useCallback(() => {
-    const programmedYesValue = getValues('programmedYes');
-    setValue('programmedYes', !programmedYesValue, { shouldDirty: true });
-    setValue('programmedYes', programmedYesValue);
-  }, [getValues, setValue]);
-
-  /**
-   * Make the form dirty manually if freeSearchParams has values, and reset the form
-   * with its current values if freeSearchParams are empty
+   * Listens to form changes and checks if form has any added values and sets submitDisabled
    */
   useEffect(() => {
-    if (!_.isEmpty(freeSearchParams) && _.isEmpty(dirtyFields)) {
-      setFormDirty();
-    } else if (_.isEmpty(freeSearchParams) && formHasDefaultValues) {
-      dispatch(setSearchForm(currentFormValues));
-      reset(currentFormValues);
-    }
-  }, [freeSearchParams, open]);
+    const subscription = watch((value, { name }) => {
+      switch (name) {
+        case 'class':
+        case 'masterClass':
+        case 'subClass':
+        case 'district':
+        case 'division':
+        case 'subDivision':
+          setMultiListsState((current) => ({ ...current, [name]: value[name] }));
+          break;
+        default:
+          break;
+      }
+      if (!isDirty) {
+        setSubmitDisabled(JSON.stringify(value) === JSON.stringify(initialSearchForm));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
-  /**
-   * Set the form to dirty if there are no empty fields and freeSearchParams has values when opening the form
-   */
   useEffect(() => {
-    if (formHasDefaultValues && !_.isEmpty(freeSearchParams) && _.isEmpty(dirtyFields)) {
-      setFormDirty();
-    }
-  }, [currentFormValues]);
+    reset(storeFormValues);
+  }, [storeFormValues]);
 
-  return { formMethods };
+  return {
+    formMethods,
+    submitDisabled,
+    classOptions,
+    locationOptions,
+  };
 };
 
 export default useSearchForm;

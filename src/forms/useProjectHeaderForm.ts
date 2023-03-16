@@ -26,7 +26,6 @@ const useProjectHeaderValues = () => {
       name: project?.name || '',
       address: project?.address || '',
     }),
-
     [project, user],
   );
 

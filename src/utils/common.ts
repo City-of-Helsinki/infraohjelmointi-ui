@@ -68,13 +68,16 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
   };
 
   for (const key in dirtyFields) {
-    const parsedKey = ['masterClass', 'class', 'subClass'].includes(key)
-      ? 'projectClass'
-      : ['district', 'division', 'subDivision'].includes(key)
-      ? 'projectLocation'
-      : key;
-
-    Object.assign(data, { [parsedKey]: parseValue(form[key as keyof IAppForms]) });
+    const getKey = () => {
+      if (['masterClass', 'class', 'subClass'].includes(key)) {
+        return 'projectClass';
+      } else if (['district', 'division', 'subDivision'].includes(key)) {
+        return 'projectLocation';
+      } else {
+        return key;
+      }
+    };
+    Object.assign(data, { [getKey()]: parseValue(form[key as keyof IAppForms]) });
   }
 
   return data;

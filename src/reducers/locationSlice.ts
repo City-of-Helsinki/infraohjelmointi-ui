@@ -27,7 +27,7 @@ export const getLocationsThunk = createAsyncThunk('location/getAll', async (_, t
 });
 
 export const locationSlice = createSlice({
-  name: 'class',
+  name: 'locations',
   initialState,
   reducers: {
     setDistricts(state) {

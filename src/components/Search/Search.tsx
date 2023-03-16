@@ -5,114 +5,54 @@ import { Dialog } from 'hds-react/components/Dialog';
 import { useCallback } from 'react';
 import { FormFieldLabel, SelectField } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import {
-  getSearchResultsThunk,
-  selectFreeSearchParams,
-  selectOpen,
-  setSearchForm,
-  toggleSearch,
-} from '@/reducers/searchSlice';
-import { FreeSearchFormObject, IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import FreeSearchForm from './FreeSearchForm';
-import './styles.css';
+import { useNavigate } from 'react-router';
 import MultiSelectField from '../shared/MultiSelectField';
 import CheckboxField from '../shared/CheckboxField';
 import { Fieldset } from 'hds-react/components/Fieldset';
 import { useOptions } from '@/hooks/useOptions';
-
-// Build a search parameter with all the choices from the search form
-const buildSearchParams = (form: ISearchForm, freeSearchParams: FreeSearchFormObject | null) => {
-  const searchParams = [];
-  for (const [key, value] of Object.entries(form)) {
-    switch (key) {
-      case 'masterClass':
-      case 'class':
-      case 'subClass':
-      case 'district':
-      case 'division':
-      case 'subDivision':
-        value.forEach((v: IOption) => searchParams.push(`${key}=${v.value}`));
-        break;
-      case 'programmedYes':
-        value && searchParams.push('programmed=true');
-        break;
-      case 'programmedNo':
-        value && searchParams.push('programmed=false');
-        break;
-      case 'programmedYearMin':
-      case 'programmedYearMax':
-        value && searchParams.push(`${key}=${value}`);
-        break;
-      case 'phase':
-      case 'personPlanning':
-      case 'category':
-        value.value && searchParams.push(`${key}=${value.value}`);
-        break;
-      default:
-        break;
-    }
-  }
-
-  if (freeSearchParams) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [_, value] of Object.entries(freeSearchParams)) {
-      switch (value.type) {
-        case 'group':
-          searchParams.push(`projectGroup=${value.value}`);
-          break;
-        case 'project':
-          searchParams.push(`project=${value.value}`);
-          break;
-        case 'hashtag':
-          searchParams.push(`hashTags=${value.value}`);
-          break;
-        default:
-          break;
-      }
-    }
-  }
-
-  return searchParams.join('&');
-};
+import {
+  getSearchResultsThunk,
+  selectOpen,
+  setLastSearchParams,
+  setSearchForm,
+  setSubmittedSearchForm,
+  toggleSearch,
+} from '@/reducers/searchSlice';
+import buildSearchParams from '@/utils/buildSearchParams';
+import './styles.css';
 
 const Search = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const open = useAppSelector(selectOpen);
-  const freeSearchParams = useAppSelector(selectFreeSearchParams);
 
-  const { formMethods } = useSearchForm();
+  const navigate = useNavigate();
 
-  const {
-    handleSubmit,
-    getValues,
-    formState: { isDirty },
-    reset,
-    control,
-  } = formMethods;
+  const { formMethods, submitDisabled, classOptions, locationOptions } = useSearchForm();
+
+  const { handleSubmit, getValues, control } = formMethods;
 
   const phases = useOptions('phases');
-  const masterClasses = useOptions('masterClasses', true);
-  const classes = useOptions('classes', true);
-  const subClasses = useOptions('subClasses', true);
-  const districts = useOptions('districts', true);
-  const divisions = useOptions('divisions', true);
-  const subDivisions = useOptions('subDivisions', true);
   const programmedYearMin = useOptions('programmedYears', true);
   const programmedYearMax = useOptions('programmedYears', true);
   const personPlanning = useOptions('responsiblePersons', true);
   const categories = useOptions('categories');
+  const { masterClasses, classes, subClasses } = classOptions;
+  const { districts, divisions, subDivisions } = locationOptions;
 
   const onSubmit = useCallback(
     async (form: ISearchForm) => {
-      const searchParams = buildSearchParams(form, freeSearchParams);
-      dispatch(getSearchResultsThunk(searchParams)).then(() => {
-        dispatch(setSearchForm(form));
-        reset(form);
+      const searchParams = buildSearchParams(form);
+      navigate('/search-results');
+      dispatch(toggleSearch());
+      dispatch(getSearchResultsThunk({ params: searchParams })).then(() => {
+        dispatch(setSubmittedSearchForm(form));
+        dispatch(setLastSearchParams(searchParams));
       });
     },
-    [dispatch, freeSearchParams, reset],
+    [dispatch, navigate],
   );
 
   const handleClose = useCallback(() => {
@@ -143,12 +83,8 @@ const Search = () => {
     >
       <Dialog.Header id="search-dialog-header" title={t('searchProjects')} />
       <Dialog.Content>
-        <FreeSearchForm />
-        <form
-          className="search-form"
-          onSubmit={handleSubmit(onSubmit)}
-          data-testid="project-search-form"
-        >
+        <form className="search-form" data-testid="project-search-form">
+          <FreeSearchForm control={control} getValues={getValues} />
           <div className="search-form-content">
             <div className="mb-4 pb-3">
               <FormFieldLabel text="searchForm.filter" />
@@ -204,7 +140,7 @@ const Search = () => {
         <Button
           onClick={handleSubmit(onSubmit)}
           data-testid="search-projects-button"
-          disabled={!isDirty}
+          disabled={submitDisabled}
         >
           {t('search')}
         </Button>

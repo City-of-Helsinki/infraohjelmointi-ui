@@ -11,6 +11,8 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectProject } from '@/reducers/projectSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
+import useClassOptions from '@/hooks/useClassOptions';
+import useLocationOptions from '@/hooks/useLocationOptions';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -180,6 +182,9 @@ const useProjectBasicsForm = () => {
   // control,
   const { reset } = formMethods;
 
+  const classOptions = useClassOptions(project?.projectClass);
+  const locationOptions = useLocationOptions(project?.projectLocation);
+
   // Updates
   useEffect(() => {
     if (project) {
@@ -188,7 +193,7 @@ const useProjectBasicsForm = () => {
   }, [project, formValues]);
 
   // formFields,
-  return { formMethods };
+  return { formMethods, classOptions, locationOptions };
 };
 
 export default useProjectBasicsForm;

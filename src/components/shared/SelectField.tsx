@@ -6,6 +6,16 @@ import { Select as HDSSelect } from 'hds-react/components/Select';
 import { IconLocation, IconUser } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 
+const getIcon = (icon?: string) => {
+  if (icon === 'location') {
+    return <IconLocation />;
+  } else if (icon === 'person') {
+    return <IconUser />;
+  } else {
+    return undefined;
+  }
+};
+
 interface ISelectFieldProps {
   name: string;
   control: HookFormControlType;
@@ -38,7 +48,7 @@ const SelectField: FC<ISelectFieldProps> = ({
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
             <HDSSelect
-              className="input-l"
+              className="input-l custom-select"
               value={value}
               onChange={onChange}
               onBlur={onBlur}
@@ -49,13 +59,7 @@ const SelectField: FC<ISelectFieldProps> = ({
               required={required}
               style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
               placeholder={(placeholder && t(placeholder || '')) || ''}
-              icon={
-                icon === 'location' ? (
-                  <IconLocation />
-                ) : icon === 'person' ? (
-                  <IconUser />
-                ) : undefined
-              }
+              icon={getIcon(icon)}
             />
           </div>
         );

@@ -1,6 +1,4 @@
-import { IClass } from '@/interfaces/classInterfaces';
 import { IError, IListItem } from '@/interfaces/common';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/projectInterfaces';
 import {
   getConstructionPhases,
@@ -15,8 +13,7 @@ import {
   getResponsibleZones,
 } from '@/services/listServices';
 import { getPersons } from '@/services/personServices';
-import { RootState } from '@/store';
-import { classesToListItems, setProgrammedYears } from '@/utils/common';
+import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface IListState {
@@ -26,15 +23,9 @@ export interface IListState {
   constructionPhaseDetails: Array<IListItem>;
   categories: Array<IListItem>;
   riskAssessments: Array<IListItem>;
-  masterClasses: Array<IListItem>;
-  classes: Array<IListItem>;
-  subClasses: Array<IListItem>;
   projectQualityLevels: Array<IListItem>;
   planningPhases: Array<IListItem>;
   constructionPhases: Array<IListItem>;
-  districts: Array<IListItem>;
-  divisions: Array<IListItem>;
-  subDivisions: Array<IListItem>;
   responsibleZones: Array<IListItem>;
   responsiblePersons: Array<IListItem>;
   programmedYears: Array<IListItem>;
@@ -48,15 +39,9 @@ const initialState: IListState = {
   constructionPhaseDetails: [],
   categories: [],
   riskAssessments: [],
-  masterClasses: [],
-  classes: [],
-  subClasses: [],
   projectQualityLevels: [],
   planningPhases: [],
   constructionPhases: [],
-  districts: [],
-  divisions: [],
-  subDivisions: [],
   responsibleZones: [],
   responsiblePersons: [],
   programmedYears: setProgrammedYears(),
@@ -150,26 +135,7 @@ export const getResponsiblePersonsThunk = createAsyncThunk('persons/get', async 
 export const listsSlice = createSlice({
   name: 'lists',
   initialState,
-  reducers: {
-    setMasterClassList(state, action: PayloadAction<Array<IClass>>) {
-      return { ...state, masterClasses: classesToListItems(action.payload) };
-    },
-    setClassList(state, action: PayloadAction<Array<IClass>>) {
-      return { ...state, classes: classesToListItems(action.payload) };
-    },
-    setSubClassList(state, action: PayloadAction<Array<IClass>>) {
-      return { ...state, subClasses: classesToListItems(action.payload) };
-    },
-    setDistrictList(state, action: PayloadAction<Array<ILocation>>) {
-      return { ...state, districts: classesToListItems(action.payload) };
-    },
-    setDivisionList(state, action: PayloadAction<Array<ILocation>>) {
-      return { ...state, divisions: classesToListItems(action.payload) };
-    },
-    setSubDivisionList(state, action: PayloadAction<Array<ILocation>>) {
-      return { ...state, subDivisions: classesToListItems(action.payload) };
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // GET PROJECT TYPES
     builder.addCase(
@@ -323,39 +289,5 @@ export const listsSlice = createSlice({
     );
   },
 });
-
-export const selectPhasesList = (state: RootState) => state.lists.phases;
-
-export const selectMasterClassesList = (state: RootState) => state.lists.masterClasses;
-export const selectClassesList = (state: RootState) => state.lists.classes;
-export const selectSubClassesList = (state: RootState) => state.lists.subClasses;
-
-export const selectDistrictsList = (state: RootState) => state.lists.districts;
-export const selectDivisionsList = (state: RootState) => state.lists.divisions;
-export const selectSubDivisionsList = (state: RootState) => state.lists.subDivisions;
-
-/*
-  riskAssessments: [],
-  masterClasses: [],
-  classes: [],
-  subClasses: [],
-  projectQualityLevels: [],
-  planningPhases: [],
-  constructionPhases: [],
-  districts: [],
-  divisions: [],
-  subDivisions: [],
-  responsibleZones: [],
-  responsiblePersons: [],
-  programmedYears: setProgrammedYears(),
-*/
-export const {
-  setMasterClassList,
-  setClassList,
-  setSubClassList,
-  setDistrictList,
-  setDivisionList,
-  setSubDivisionList,
-} = listsSlice.actions;
 
 export default listsSlice.reducer;

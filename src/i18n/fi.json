@@ -205,6 +205,28 @@
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500"
     }
   },
+  "searchOrder": {
+    "new": "Uusin ensin",
+    "old": "Vanhin ensin",
+    "project": "Hankkeet ensin",
+    "group": "Ryhmät ensin",
+    "phase": "Vaiheen mukaan"
+  },
+  "searchTag": {
+    "groups": "Ryhmä",
+    "classes": "Luokat",
+    "locations": "Sijainnit",
+    "masterClass": "Pääluokka",
+    "class": "Luokka",
+    "subClass": "Alaluokka",
+    "district": "Suurpiiri",
+    "division": "Kaupunginosa",
+    "subDivision": "Osa-alue",
+    "programmedNo": "Ohjelmoitu: ei",
+    "programmedYes": "Ohjelmoitu: kyllä",
+    "programmedYearMin": "Ohjelmoitu vuosi min {{label}}",
+    "programmedYearMax": "Ohjelmoitu vuosi max {{label}}"
+  },
   "appTitle": "Infraohjelmointi UI",
   "project": "Hankekortti",
   "planning": "Ohjelmointinäkymä",
@@ -262,5 +284,19 @@
   "required": "{{value}} on pakollinen tieto.",
   "maxLength": "Maksimipituus on {{value}} merkkiä.",
   "minValue": "Arvon on oltava suurempi tai yhtä suuri kuin {{value}}",
-  "maxValue": "Arvon on oltava pienempi tai yhtä suuri kuin {{value}}"
+  "maxValue": "Arvon on oltava pienempi tai yhtä suuri kuin {{value}}",
+  "groups": "Ryhmä",
+  "classes": "Luokat",
+  "locations": "Sijainnit",
+  "searchResultsNotFoundTitle": "Haullasi ei valitettavasti löytynyt yhtään osumaa.",
+  "searchResultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia.",
+  "resultsNotFoundTitle": "Haullasi ei valitettavasti löytynyt yhtään osumaa.",
+  "resultsNotFoundText": "Kokeile muokata hakuasi tai poistaa rajauksia.",
+  "adviceSearchTitle": "Et ole vielä etsinyt mitään.",
+  "adviceSearchText": "Avaa haku etsiäksesi projekteja.",
+  "emptyTerms": "Tyhjennä hakuehdot",
+  "order": "Järjestys",
+  "searchResults": "Hakutulokset",
+  "resultsForSearch": "hakutulosta",
+  "filterSearch": "Rajaa hakua"
 }

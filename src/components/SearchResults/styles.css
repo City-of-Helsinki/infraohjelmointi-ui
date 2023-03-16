@@ -1,0 +1,108 @@
+/* Search terms */
+.search-terms-container {
+  @apply flex w-[80%] flex-col;
+}
+
+.search-terms {
+  @apply mr-6 mb-6 flex h-auto flex-wrap gap-2;
+}
+
+/* Tag container (can't be given classes or styles) */
+.search-terms > div {
+  @apply h-4;
+}
+
+/* Search filter */
+.search-filter-container {
+  @apply flex w-[20%] justify-end;
+}
+
+.search-result-card {
+  @apply mb-3 border-2 border-black bg-white py-6 px-8;
+}
+
+.search-result-card .search-result-title-container {
+  @apply mb-1 flex items-center justify-between text-2xl font-medium;
+}
+
+.search-result-card .search-result-title-container .search-result-title {
+  @apply flex items-center gap-3;
+}
+
+.search-result-card-wrapper:hover .search-result-title > span {
+  @apply underline;
+}
+
+.search-result-breadcrumbs {
+  @apply mb-1 flex;
+}
+
+.search-result-breadcrumbs > div {
+  @apply flex text-center;
+}
+
+.search-result-breadcrumbs > div > svg {
+  @apply w-6 translate-y-[0.3rem];
+}
+
+/* Search result list */
+.search-result-list-container {
+  @apply min-h-[60vh] py-16 pl-16 pr-24;
+}
+
+/* Search result header */
+.search-result-header-container {
+  @apply pt-16 pl-16 pr-24 pb-6;
+}
+
+.search-result-header-container .search-result-page-title {
+  @apply mb-8;
+}
+
+.search-result-header-container .search-result-terms-and-filters-container {
+  @apply flex justify-between;
+}
+
+.result-list-options-container {
+  @apply mb-16 flex items-end justify-between;
+}
+
+.limit-dropdown-container {
+  @apply flex items-center;
+}
+
+.limit-dropdown-container > span {
+  @apply mr-4 text-xl;
+}
+
+/* Style the select component into a small version (the amount per page selection) */
+.limit-dropdown {
+  @apply mr-2 w-14;
+}
+
+.limit-dropdown > div {
+  @apply min-h-[2rem];
+}
+
+.limit-dropdown ul {
+  @apply !w-[107%];
+}
+
+.limit-dropdown > div > button {
+  /* HDS overwrites this if set with tailwind classes */
+  padding: 0 0.4rem;
+  @apply !min-h-full justify-between text-black-60;
+}
+
+.limit-dropdown > div > button > svg {
+  @apply absolute top-0 right-0;
+}
+
+.limit-dropdown > div > button > span {
+  @apply p-0;
+}
+
+/* restores the inteded look for HDS pagination with box-sizing: border-box; */
+#custom-pagination a {
+  @apply min-w-[2.5rem];
+}

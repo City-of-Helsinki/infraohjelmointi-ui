@@ -40,15 +40,15 @@ const PlanningYearsTable: FC = () => {
           ))}
         </tr>
         <tr>
-          {planningYearsTableData.map((o, i) => (
-            <td key={i}>
+          {planningYearsTableData.map((p, i) => (
+            <td key={p.year}>
               {i === 0 ? (
                 // Overrun sum for first cell
-                <OverrunSum value={o.otherVal1} />
+                <OverrunSum value={p.otherVal1} />
               ) : (
-                <span className="text-sm font-light">{o.otherVal1}</span>
+                <span className="text-sm font-light">{p.otherVal1}</span>
               )}
-              <span className="pb-1 text-sm font-light">{o.otherVal2}</span>
+              <span className="pb-1 text-sm font-light">{p.otherVal2}</span>
             </td>
           ))}
         </tr>

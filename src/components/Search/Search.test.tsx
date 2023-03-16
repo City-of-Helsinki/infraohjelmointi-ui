@@ -20,17 +20,9 @@ import { mockLocations } from '@/mocks/mockLocations';
 import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
 import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
 import { mockError } from '@/mocks/mockError';
-import { IError, IFreeSearchResult } from '@/interfaces/common';
-import { ISearchResult } from '@/interfaces/searchInterfaces';
-import { mockFreeSearchResult, mockSearchResult } from '@/mocks/mockSearch';
-import {
-  setClassList,
-  setDistrictList,
-  setDivisionList,
-  setMasterClassList,
-  setSubClassList,
-  setSubDivisionList,
-} from '@/reducers/listsSlice';
+import { IError, IFreeSearchResults } from '@/interfaces/common';
+import { ISearchResults } from '@/interfaces/searchInterfaces';
+import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -121,18 +113,6 @@ describe('Search', () => {
 
     const classes = store.getState().class;
     const locations = store.getState().location;
-
-    // populate class lists (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setMasterClassList(classes.masterClasses)));
-    await waitFor(() => store.dispatch(setClassList(classes.classes)));
-    await waitFor(() => store.dispatch(setSubClassList(classes.subClasses)));
-
-    // populate location lists (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setDistrictList(locations.districts)));
-    await waitFor(() => store.dispatch(setDivisionList(locations.divisions)));
-    await waitFor(() => store.dispatch(setSubDivisionList(locations.subDivisions)));
-
-    // const classes = store.getState().class;
     const lists = store.getState().lists;
 
     // Class store
@@ -146,12 +126,6 @@ describe('Search', () => {
     expect(locations.divisions.length).toBeGreaterThan(0);
     expect(locations.subDivisions.length).toBeGreaterThan(0);
     // List store
-    expect(lists.masterClasses.length).toBeGreaterThan(0);
-    expect(lists.classes.length).toBeGreaterThan(0);
-    expect(lists.subClasses.length).toBeGreaterThan(0);
-    expect(lists.districts.length).toBeGreaterThan(0);
-    expect(lists.divisions.length).toBeGreaterThan(0);
-    expect(lists.subDivisions.length).toBeGreaterThan(0);
     expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);
     expect(lists.phases).toStrictEqual(mockProjectPhases.data);
@@ -176,7 +150,7 @@ describe('Search', () => {
   });
 
   it('submit button should be disabled if no value has been given', async () => {
-    mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
     const { user, getByTestId, store, getByText } = renderResult;
 
@@ -192,7 +166,7 @@ describe('Search', () => {
   });
 
   it('can use the free search field to get suggestions and add selections to search params', async () => {
-    mockedAxios.get.mockResolvedValueOnce(mockFreeSearchResult);
+    mockedAxios.get.mockResolvedValueOnce(mockFreeSearchResults);
 
     const { user, store, getByText, queryByText, getByTestId } = renderResult;
 
@@ -203,13 +177,13 @@ describe('Search', () => {
 
     // check that the full search response is rendered
     await waitFor(async () => {
-      mockFreeSearchResult.data.projects?.forEach((p) => {
+      mockFreeSearchResults.data.projects?.forEach((p) => {
         expect(getByText(p.value)).toBeInTheDocument();
       });
-      mockFreeSearchResult.data.hashtags?.forEach((h) => {
+      mockFreeSearchResults.data.hashtags?.forEach((h) => {
         expect(getByText(`#${h.value}`)).toBeInTheDocument();
       });
-      mockFreeSearchResult.data.groups?.forEach((g) => {
+      mockFreeSearchResults.data.groups?.forEach((g) => {
         expect(getByText(g.value)).toBeInTheDocument();
       });
       await user.click(getByText('#leikkipuisto'));
@@ -221,22 +195,22 @@ describe('Search', () => {
     expect(getRequest.calls[0][0]).toBe('localhost:4000/projects/?freeSearch=l');
 
     // Check that the get response is correct and that only the clicked selection is in the document
-    await Promise.resolve(getRequest.results[0].value).then((res: { data: IFreeSearchResult }) => {
-      expect(res.data).toStrictEqual(mockFreeSearchResult.data);
+    await Promise.resolve(getRequest.results[0].value).then((res: { data: IFreeSearchResults }) => {
+      expect(res.data).toStrictEqual(mockFreeSearchResults.data);
       expect(getByText('#leikkipuisto')).toBeInTheDocument();
       expect(queryByText('#leikkipaikka')).toBeNull();
     });
 
-    mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
     await user.click(getByTestId('search-projects-button'));
 
     // Check that the search param was added correctly
-    expect(getRequest.calls[1][0].includes('hashTags=123')).toBe(true);
+    expect(getRequest.calls[1][0].includes('hashtag=123')).toBe(true);
   });
 
   it('adds search results to redux with a successful GET request', async () => {
-    mockedAxios.get.mockResolvedValueOnce(mockSearchResult);
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
     const { user, getByTestId, store, getByText } = renderResult;
 
@@ -251,16 +225,16 @@ describe('Search', () => {
 
     const getRequest = mockedAxios.get.mock.results[0].value;
 
-    await Promise.resolve(getRequest).then((res: { data: ISearchResult }) => {
-      expect(res.data).toStrictEqual(mockSearchResult.data);
-      expect(store.getState().search.searchResults).toStrictEqual(mockSearchResult.data);
+    await Promise.resolve(getRequest).then((res: { data: ISearchResults }) => {
+      expect(res.data).toStrictEqual(mockSearchResults.data);
+      expect(store.getState().search.searchResults).toStrictEqual(mockSearchResults.data);
     });
   });
 
   it('catches a bad search request', async () => {
     const { store } = renderResult;
     mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getSearchResultsThunk('123'));
+    await store.dispatch(getSearchResultsThunk({ params: '123' }));
 
     const storeError = store.getState().search.error as IError;
     expect(storeError.message).toBe(mockError.message);
