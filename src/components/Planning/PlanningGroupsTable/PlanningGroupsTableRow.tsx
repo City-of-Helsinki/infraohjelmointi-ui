@@ -1,40 +1,72 @@
 import { IProject } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback, MouseEvent as ReactMouseEvent } from 'react';
 import { useNavigate } from 'react-router';
-import PlanningGroupsTableCell from './PlanningGroupsTableCell';
+import ProjectCell, { IProjectCellProps } from './ProjectCell';
 
 import { IListItem } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
+import { isInYearRange } from '@/utils/common';
 
-/**
- * RED CELLS
- * background: 'var(--color-suomenlinna-light)'
- * borderBottom: '4px solid var(--color-suomenlinna)'
- *
- * GREEN CELLS
- * ?
- *
- * BLUE CELLS
- * ?
- */
+const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
+  const getCellType = (year: number) => {
+    const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } = project;
+    const isPlanning = isInYearRange(year, estPlanningStart, estPlanningEnd);
+    const isConstruction = isInYearRange(year, estConstructionStart, estConstructionEnd);
 
-interface IPlanningProjectsTableProps {
+    if (isPlanning && isConstruction) return 'planningAndConstruction';
+    if (isPlanning) return 'planning';
+    if (isConstruction) return 'construction';
+    return 'none';
+  };
+
+  const getCells = (value: string, key: string, year: number): IProjectCellProps => {
+    return {
+      value,
+      type: getCellType(year),
+      objectKey: key,
+      projectId: project.id,
+    };
+  };
+
+  const cells = [];
+
+  for (const [key, value] of Object.entries(project)) {
+    if (key.includes('budgetProposalCurrentYearPlus')) {
+      const keyValue = parseInt(key.split('budgetProposalCurrentYearPlus')[1]);
+      cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
+    } else if (key.includes('preliminaryCurrentYearPlus')) {
+      const keyValue = parseInt(key.split('preliminaryCurrentYearPlus')[1]);
+      cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
+    }
+  }
+
+  return cells;
+};
+
+interface IPlanningGroupsTableRowProps {
   project: IProject;
   phases?: Array<IListItem>;
-  onProjectMenuClick: (projectId: string, elementPosition: MouseEvent) => void;
+  onProjectMenuClick: (projectId: string, e: MouseEvent) => void;
 }
 
 /**
  * We're only mapping the project name here for now since the values aren't yet implemented
  */
-const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
+const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
   project,
   onProjectMenuClick,
 }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
+
+  const projectCells = createProjectCells(project);
+
+  const handleOnProjectMenuClick = useCallback(
+    (e: ReactMouseEvent) => onProjectMenuClick(project.id, e as unknown as MouseEvent),
+    [project],
+  );
 
   return (
     <tr>
@@ -43,11 +75,7 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
         <div className="project-header-cell-container">
           {/* Left (dots & document) */}
           <div className="project-left-icons-container">
-            <IconMenuDots
-              size="xs"
-              className="dots-icon"
-              onClick={(e) => onProjectMenuClick(project.id, e as unknown as MouseEvent)}
-            />
+            <IconMenuDots size="xs" className="dots-icon" onClick={handleOnProjectMenuClick} />
             <IconDocument />
           </div>
           {/* Center (name button) */}
@@ -68,8 +96,8 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
           </div>
         </div>
       </th>
-      {planProjectValues.sums.map((p, i) => (
-        <PlanningGroupsTableCell key={i} value={p} />
+      {projectCells.map((p) => (
+        <ProjectCell key={p.objectKey} {...p} />
       ))}
     </tr>
   );

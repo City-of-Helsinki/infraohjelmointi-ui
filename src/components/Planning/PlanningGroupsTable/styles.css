@@ -28,7 +28,7 @@
 
 .project-header-cell {
   /* setting max-width: 1rem will cause the table head to not grow bigger than the group table header */
-  @apply max-w-[1rem] border-b-[0.05rem] border-l-[0.05rem] border-bus-m py-1 px-5;
+  @apply max-w-[1rem] border-b-[0.05rem] border-l-[0.05rem] border-r-[0.05rem] border-bus-m py-1 px-5;
 }
 
 .project-header-cell-container {
@@ -53,15 +53,43 @@
 }
 
 .table-input input {
-  text-align: center !important;
-  cursor: pointer !important;
-  border-radius: 0.25rem !important;
-  height: 2.75rem !important;
-  width: 90% !important;
-  font-size: var(--fontsize-body-s) !important;
-  font-weight: 300 !important;
-  position: absolute; /* absolute prevents the form from jumping when a field is selected */
-  bottom: 0;
-  top: -1.25rem;
-  left: 0.25rem;
+  @apply absolute bottom-0 -top-6 left-1 !h-11 !w-full cursor-pointer !rounded-sm  text-center !text-sm font-light;
+}
+
+.project-cell {
+  @apply border-b-[0.05rem] border-bus-m bg-bus-l;
+}
+
+.project-cell.planning {
+  box-shadow: inset 0 -4px 0 var(--color-black-80);
+  @apply bg-white;
+}
+
+.project-cell.construction {
+  box-shadow: inset 0 -4px 0 var(--color-copper);
+  @apply bg-white;
+}
+
+/* add a left border to cell with the none-class after the last colored cell */
+.construction + .none,
+.planning + .none,
+.planningAndConstruction + .none {
+  border-left: 2px solid var(--color-black-20);
+}
+
+/* add a left border to a colored cell if it's the first colored cell */
+.none + .planning,
+.none + .construction,
+.none + .planningAndConstruction {
+  border-left: 2px solid var(--color-black-20);
+}
+
+/* creates a border bottom with both planning and construction colors with the :before effect */
+.project-cell.planningAndConstruction {
+  box-shadow: inset 0 -4px 0 var(--color-copper);
+  @apply relative bg-white;
+}
+.project-cell.planningAndConstruction:before {
+  box-shadow: inset 0 -4px 0 var(--color-black-80);
+  @apply absolute bottom-0 left-0 h-[4px] w-[50%] content-[''];
 }

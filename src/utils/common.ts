@@ -126,3 +126,21 @@ export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
     value: mc.id,
     label: mc.name,
   }));
+
+/**
+ * Checks if a date range is included in a year
+ *
+ * @param year number of the current year
+ * @param startDate a start date as returned from our API in the format dd.mm.yyyy
+ * @param endDate a start date as returned from our API in the format dd.mm.yyyy
+ * @returns boolean
+ */
+export const isInYearRange = (
+  year: number,
+  startDate: string | undefined,
+  endDate: string | undefined,
+): boolean => {
+  const startYear = parseInt(startDate?.split('.').pop() || '0');
+  const endYear = parseInt(endDate?.split('.').pop() || '0');
+  return startYear && endYear ? year >= startYear && year <= endYear : false;
+};
