@@ -1,16 +1,12 @@
 import { IProject } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
-import {
-  IconDocument,
-  IconMenuDots,
-  IconPlaybackRecord,
-  IconSpeechbubbleText,
-} from 'hds-react/icons';
+import { IconDocument, IconMenuDots } from 'hds-react/icons';
 import { FC, memo } from 'react';
 import { useNavigate } from 'react-router';
 import PlanningGroupsTableCell from './PlanningGroupsTableCell';
 
 import { IListItem } from '@/interfaces/common';
+import { CustomTag } from '@/components/shared';
 
 /**
  * RED CELLS
@@ -30,13 +26,6 @@ interface IPlanningProjectsTableProps {
   onProjectMenuClick: (projectId: string, elementPosition: MouseEvent) => void;
 }
 
-const CircleIcon = ({ value }: { value: string }) => (
-  <div className="circle-number-icon">
-    {value}
-    <div className="circle-number-icon-indicator">!</div>
-  </div>
-);
-
 /**
  * We're only mapping the project name here for now since the values aren't yet implemented
  */
@@ -52,29 +41,29 @@ const PlanningGroupsTableRow: FC<IPlanningProjectsTableProps> = ({
       {/* HEADER */}
       <th className="project-header-cell">
         <div className="project-header-cell-container">
-          {/* LEFT */}
-          <div className="left">
+          {/* Left (dots & document) */}
+          <div className="project-left-icons-container">
             <IconMenuDots
               size="xs"
               className="dots-icon"
               onClick={(e) => onProjectMenuClick(project.id, e as unknown as MouseEvent)}
             />
-
             <IconDocument />
+          </div>
+          {/* Center (name button) */}
+          <div className="project-name-container">
             <button className="project-name-button" onClick={navigateToProject}>
               {project.name}
             </button>
           </div>
-          {/* RIGHT */}
-          <div className="right">
-            <div className="project-header-left">
-              <CircleIcon value={planProjectValues.readiness} />
-              <IconPlaybackRecord />
-              <IconSpeechbubbleText />
+          {/* Right side (category & sum) */}
+          <div className="project-right-icons-container">
+            <div>
+              {project.category && <CustomTag text={project.category.value} weight={'light'} />}
             </div>
-            <div className="project-header-right">
+            <div className="flex flex-col">
               <span>{planProjectValues.value1}</span>
-              <span className="text-sm">{planProjectValues.value2}</span>
+              <span className="text-sm font-normal">{planProjectValues.value2}</span>
             </div>
           </div>
         </div>

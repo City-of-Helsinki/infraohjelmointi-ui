@@ -1,5 +1,5 @@
 .planning-info-panel {
-  @apply mr-3 grid w-[30%] min-w-[26rem] grid-flow-row grid-cols-2 overflow-x-visible;
+  @apply mr-3 grid w-[35%] min-w-[26rem] grid-flow-row grid-cols-2 overflow-x-visible;
 }
 
 .planning-info-panel span {

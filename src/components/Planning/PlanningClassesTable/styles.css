@@ -1,5 +1,5 @@
 .class-header-cell {
-  @apply w-[30.6%] min-w-[26.75rem] border-b border-white px-6 text-white;
+  @apply w-[35%] min-w-[26.75rem] border-b border-white px-6 text-white;
 }
 
 .class-header-cell > div {
