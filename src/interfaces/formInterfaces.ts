@@ -94,7 +94,7 @@ export interface IGroupForm {
   district: IOption;
   division: IOption;
   subDivision: IOption;
-  projectsForSubmit: Array<string>;
+  projectsForSubmit: Array<IOption>;
 }
 
 
@@ -106,7 +106,6 @@ export interface IAppForms
   extends IProjectHeaderForm,
     IProjectBasicsForm,
     IProjectNoteForm,
-    IGroupForm,
     IHashTagsForm {}
     
 

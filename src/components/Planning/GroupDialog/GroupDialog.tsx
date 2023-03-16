@@ -20,15 +20,14 @@ interface IDialogProps {
 }
 
 interface IFormState {
-  projectsForSubmit: Array<IOption>;
   showAdvanceFields: boolean;
 }
 interface IDialogButtonState {
   isOpen: boolean;
 }
-const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroupRequest => {
+const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
   // submit Class or subclass if present, submit division or subDivision if present, submit a name, submit projects
-
+  console.log(form);
   const payload: IGroupRequest = {
     name: '',
     classRelation: '',
@@ -39,14 +38,14 @@ const buildRequestPayload = (form: IGroupForm, projects: Array<IOption>): IGroup
   payload.name = form.name;
   payload.classRelation = form.subClass?.value || form.class?.value || '';
   payload.districtRelation = form.subDivision?.value || form.division?.value || '';
-  payload.projects = projects.length > 0 ? projects.map((p) => p.value) : [];
+  payload.projects =
+    form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [];
 
   return payload;
 };
 
 const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const [formState, setFormState] = useState<IFormState>({
-    projectsForSubmit: [],
     showAdvanceFields: false,
   });
 
@@ -72,12 +71,11 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
-  const { projectsForSubmit, showAdvanceFields } = formState;
+  const { showAdvanceFields } = formState;
 
   const onSubmit = useCallback(
     async (form: IGroupForm) => {
-      console.log(buildRequestPayload(form, projectsForSubmit));
-      dispatch(postGroupThunk(buildRequestPayload(form, projectsForSubmit))).then(() => {
+      dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
         reset(formValues);
         setFormState((current) => ({
           ...current,
@@ -87,32 +85,13 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
       });
     },
 
-    [projectsForSubmit, dispatch, reset, formValues],
+    [dispatch, reset, formValues],
   );
-  const onProjectClick = useCallback((value: IOption | undefined) => {
-    console.log('Project clicked', value);
-    if (value) {
-      setFormState((current) => ({
-        ...current,
-        projectsForSubmit: [...current.projectsForSubmit, value],
-      }));
-    }
-  }, []);
 
-  const onProjectSelectionDelete = useCallback((projectName: string) => {
-    setFormState((current) => ({
-      ...current,
-      projectsForSubmit: current.projectsForSubmit.filter((p) => {
-        return p.label !== projectName;
-      }),
-    }));
-  }, []);
   const toggleAdvanceFields = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setFormState((current) => ({
-      ...current,
       showAdvanceFields: !current.showAdvanceFields,
-      projectsForSubmit: [],
     }));
     setValue('district', { label: '', value: '' });
     setValue('division', { label: '', value: '' });
@@ -248,9 +227,6 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
 
               <div>
                 <GroupProjectSearch
-                  projectsForSubmit={projectsForSubmit}
-                  onProjectClick={onProjectClick}
-                  onProjectSelectionDelete={onProjectSelectionDelete}
                   getValues={getValues}
                   control={control}
                   showAdvanceFields={showAdvanceFields}
