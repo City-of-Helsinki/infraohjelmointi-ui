@@ -1,5 +1,6 @@
 import { IListItem } from '@/interfaces/common';
 import { Tag } from 'hds-react/components/Tag';
+import { TFunction } from 'i18next';
 import { FC, memo, MouseEvent, KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,13 +11,19 @@ interface IHashTagsProps {
   id?: string;
 }
 
+const getAriaLabel = (
+  tag: string,
+  translate: TFunction<'translation', undefined>,
+  onDelete?: (e: MouseEvent<HTMLButtonElement>) => void,
+  onClick?: (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => void,
+) => {
+  const deleteTag = onDelete && `removeHashTag ${tag}`;
+  const addTag = onClick && `addHashTag ${tag}`;
+  return translate(deleteTag || addTag || '');
+};
+
 const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) => {
   const { t } = useTranslation();
-  const getAriaLabel = (tag: string) => {
-    const deleteTag = onDelete && `removeHashTag ${tag}`;
-    const addTag = onClick && `addHashTag ${tag}`;
-    return t(deleteTag || addTag || '');
-  };
 
   const handleOnClick = (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
     onClick && onClick((e.currentTarget as HTMLDivElement).parentElement?.id || '');
@@ -40,7 +47,7 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) 
             <div
               key={tag.id}
               className="hashtags-wrapper"
-              aria-label={getAriaLabel(tag.value)}
+              aria-label={getAriaLabel(tag.value, t, handleOnDelete, handleOnClick)}
               data-testid={id}
               id={tag.value}
             >

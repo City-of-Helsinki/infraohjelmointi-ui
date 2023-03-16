@@ -21,17 +21,15 @@ type FreeSearchFormListItem = IListItem & { type: string };
  * Create a list of FreeSearchFormListItems from a IFreeSearchResults
  */
 const freeSearchResultsToList = (res: IFreeSearchResults): Array<FreeSearchFormListItem> => {
-  const resultList = [];
-  for (const [key, value] of Object.entries(res)) {
-    resultList.push(
-      ...value.map((v: IListItem) => ({
-        id: v.id,
-        value: `${key === 'hashtags' ? '#' : ''}${v.value}`,
-        type: key,
-      })),
-    );
-  }
-  return resultList;
+  // concatenate three different arrays
+  return Object.entries(res || {}).flatMap(([key, value]) => {
+    const prefix = key === 'hashtags' ? '#' : '';
+    return value.map((v: IListItem) => ({
+      id: v.id,
+      value: `${prefix}${v.value}`,
+      type: key,
+    }));
+  });
 };
 
 interface ISearchState {
@@ -83,7 +81,7 @@ const FreeSearchForm = ({
           })
           .catch(() => reject([]));
       }),
-    [],
+    [getValues],
   );
 
   /**
@@ -108,7 +106,7 @@ const FreeSearchForm = ({
         });
       }
     },
-    [resultObject],
+    [resultObject, getValues],
   );
 
   /**
@@ -129,7 +127,7 @@ const FreeSearchForm = ({
         selections: Object.keys(nextChange || {}),
       }));
     },
-    [],
+    [getValues],
   );
 
   const handleSetSearchWord = useCallback(

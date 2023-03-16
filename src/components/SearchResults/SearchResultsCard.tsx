@@ -1,6 +1,6 @@
 import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
 import { IconAngleRight, IconLayers, IconPaperclip } from 'hds-react/icons';
-import { FC, memo } from 'react';
+import { FC, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CustomTag } from '../shared';
@@ -15,6 +15,8 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
   breadCrumbs,
 }) => {
   const { t } = useTranslation();
+  const iconLayers = useMemo(() => <IconLayers size="xs" />, []);
+  const iconPaperclip = useMemo(() => <IconPaperclip size="xs" />, []);
 
   return (
     <Link to={`/planning/coordinator/${path}`} className="color-black no-underline">
@@ -26,14 +28,14 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
             {type !== 'projects' && (
               <CustomTag
                 color={'var(--color-bus-medium-light	)'}
-                icon={<IconLayers size="xs" />}
+                icon={iconLayers}
                 text={t(`searchTag.${type}`)}
               />
             )}
           </div>
           {phase && (
             <CustomTag
-              icon={<IconPaperclip size="xs" />}
+              icon={iconPaperclip}
               text={t(`enums.${phase}`)}
               color={'var(--color-suomenlinna-medium-light)'}
             />

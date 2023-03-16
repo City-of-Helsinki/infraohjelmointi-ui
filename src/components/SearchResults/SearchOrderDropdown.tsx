@@ -8,7 +8,7 @@ import {
   setSearchOrder,
 } from '@/reducers/searchSlice';
 import { Select } from 'hds-react/components/Select';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const SearchOrderDropdown = () => {
@@ -25,6 +25,11 @@ const SearchOrderDropdown = () => {
     { value: 'phase', label: t('searchOrder.phase') },
   ];
 
+  const orderBy = useMemo(
+    () => orders[orders.findIndex((o) => o.value === searchOrder)],
+    [searchOrder],
+  );
+
   const handleOrderChange = useCallback(
     (value: IOption) => {
       dispatch(setSearchOrder(value.value as SearchOrder));
@@ -39,7 +44,7 @@ const SearchOrderDropdown = () => {
         className="custom-select w-80"
         label={t('order')}
         options={orders}
-        defaultValue={orders[orders.findIndex((o) => o.value === searchOrder)]}
+        defaultValue={orderBy}
         onChange={handleOrderChange}
       />
     </div>
