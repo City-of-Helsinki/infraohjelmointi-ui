@@ -7,8 +7,13 @@ import './styles.css';
 interface ISelectedProjectCardProps {
   name: string;
   breadCrumbs: Array<string>;
+  handleDelete: (name: string) => void;
 }
-const SelectedProjectCard: FC<ISelectedProjectCardProps> = ({ name, breadCrumbs }) => {
+const SelectedProjectCard: FC<ISelectedProjectCardProps> = ({
+  name,
+  breadCrumbs,
+  handleDelete,
+}) => {
   return (
     <div className="search-result-card">
       {/* Title */}
@@ -16,8 +21,8 @@ const SelectedProjectCard: FC<ISelectedProjectCardProps> = ({ name, breadCrumbs 
         <div className="search-result-title">
           <span>{name}</span>
         </div>
-        <div>
-          <IconCrossCircle />
+        <div className="cross-icon">
+          <IconCrossCircle onClick={() => handleDelete(name)} />
         </div>
       </div>
       {/* Breadcrumbs */}

@@ -85,6 +85,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
           close={handleDialogClose}
           closeButtonLabelText={t('closeGroupFormWindow')}
           className="big-dialog"
+          scrollable
         >
           {/* Header */}
           <Header id={'add-project-programmed-header'} title={t(`addProgrammedProject`)} />

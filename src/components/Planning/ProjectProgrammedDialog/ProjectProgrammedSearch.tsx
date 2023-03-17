@@ -107,10 +107,8 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   );
 
   const handleDelete = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      onProjectSelectionDelete(
-        (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string,
-      );
+    (name: string) => {
+      onProjectSelectionDelete(name);
     },
     [onProjectSelectionDelete, projectsForSubmit],
   );
@@ -129,8 +127,12 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       {/* onDelete={(e) => handleDelete(e, onChange)} */}
       <div className="search-selections">
         {projectsForSubmit.map((s) => (
-          <SelectedProjectCard name={s.label} breadCrumbs={s.breadCrumbs} key={s.label} />
-          // <Tag key={s.label}>{s.label}</Tag>
+          <SelectedProjectCard
+            name={s.label}
+            breadCrumbs={s.breadCrumbs}
+            key={s.label}
+            handleDelete={handleDelete}
+          />
         ))}
       </div>
     </div>
