@@ -1,6 +1,4 @@
-#group-create-dialog {
-  height: 100vh;
-}
+
 #group-create-dialog .search-input ul {
   max-height: 200px !important;
 }
