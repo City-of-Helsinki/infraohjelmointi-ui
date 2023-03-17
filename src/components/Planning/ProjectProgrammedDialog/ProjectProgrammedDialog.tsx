@@ -7,13 +7,18 @@ import { IOption } from '@/interfaces/common';
 import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 
+interface ISuggestionItems {
+  value: string;
+  label: string;
+  breadCrumbs: Array<string>;
+}
 interface IDialogProps {
   handleClose: () => void;
   isOpen: boolean;
 }
 
 interface IFormState {
-  projectsForSubmit: Array<IOption>;
+  projectsForSubmit: Array<ISuggestionItems>;
 }
 interface IDialogButtonState {
   isOpen: boolean;
@@ -43,7 +48,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const onProjectClick = useCallback((value: IOption | undefined) => {
+  const onProjectClick = useCallback((value: ISuggestionItems | undefined) => {
     if (value) {
       setFormState((current) => ({
         ...current,
@@ -80,7 +85,6 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
           close={handleDialogClose}
           closeButtonLabelText={t('closeGroupFormWindow')}
           className="big-dialog"
-          scrollable
         >
           {/* Header */}
           <Header id={'add-project-programmed-header'} title={t(`addProgrammedProject`)} />

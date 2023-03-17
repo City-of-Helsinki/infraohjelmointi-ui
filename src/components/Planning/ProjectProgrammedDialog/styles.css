@@ -1,0 +1,40 @@
+
+#add-project-programmed-dialog .project-search-input .search-selections {
+  @apply mt-5
+}
+#add-project-programmed-dialog  {
+  width: 45vw;
+}
+
+ 
+  .search-result-card {
+    @apply mb-3 border-2 border-black bg-white py-6 px-8;
+  }
+  
+  .search-result-card .search-result-title-container {
+    @apply mb-1 flex items-center justify-between text-2xl font-medium;
+  }
+  
+  .search-result-card .search-result-title-container .search-result-title {
+    @apply flex items-center gap-3 text-l font-normal;
+  }
+  
+  .search-result-card-wrapper:hover .search-result-title > span {
+    @apply underline;
+  }
+  
+  .search-result-breadcrumbs {
+    @apply mb-1 flex text-sm;
+  }
+  
+  .search-result-breadcrumbs > div {
+    @apply flex text-center;
+  }
+  
+  .search-result-breadcrumbs > div > svg {
+    @apply w-6 translate-y-[0.3rem];
+  }
+  
+  
+  
+  
