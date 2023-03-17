@@ -27,7 +27,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
     }
     searchParams.push(`projectName=${projectName}`);
     searchParams.push('inGroup=false');
-    // searchParams.push('programmed=true');
+    searchParams.push('programmed=true');
     reqParamObject.params = searchParams.join('&');
     return reqParamObject;
   };
@@ -51,19 +51,16 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
         return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
           // printing out search params for later
           const queryParams = buildQueryParamString(inputValue);
-          console.log(queryParams);
 
           getProjectsWithParams(queryParams)
             .then((res) => {
               if (res) {
-                console.log(res);
                 // Filter out only the projects which haven't yet been added to be the submitted list from the result
                 const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
                 const resultList = res.results?.filter(
                   (object) =>
                     object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
                 );
-                console.log(resultList);
 
                 // Convert the resultList to options for the suggestion dropdown
                 const searchProjectsItemList: Array<IOption> | [] = resultList

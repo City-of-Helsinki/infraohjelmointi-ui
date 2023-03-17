@@ -27,7 +27,6 @@ interface IDialogButtonState {
 }
 const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
   // submit Class or subclass if present, submit division or subDivision if present, submit a name, submit projects
-  console.log(form);
   const payload: IGroupRequest = {
     name: '',
     classRelation: '',
