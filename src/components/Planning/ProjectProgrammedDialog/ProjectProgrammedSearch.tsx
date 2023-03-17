@@ -6,24 +6,23 @@ import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
-import { ISearchRequest } from '@/interfaces/searchInterfaces';
+import { IProgrammedProjectSuggestions, ISearchRequest } from '@/interfaces/searchInterfaces';
 import { IClass } from '@/interfaces/classInterfaces';
 import { useAppSelector } from '@/hooks/common';
-import { selectAllClasses } from '@/reducers/classSlice';
+import {
+  selectAllClasses,
+  selectSelectedClass,
+  selectSelectedSubClass,
+} from '@/reducers/classSlice';
 import SelectedProjectCard from './SelectedProjectCard';
 // Build a search parameter with all the choices from the search form
 
 interface IProjectSearchProps {
-  onProjectClick: (value: ISuggestionItems | undefined) => void;
-  projectsForSubmit: Array<ISuggestionItems>;
+  onProjectClick: (value: IProgrammedProjectSuggestions | undefined) => void;
+  projectsForSubmit: Array<IProgrammedProjectSuggestions>;
   onProjectSelectionDelete: (projectName: string) => void;
 }
 
-interface ISuggestionItems {
-  value: string;
-  label: string;
-  breadCrumbs: Array<string>;
-}
 const buildBreadCrumbs = (path: string, classes: Array<IClass>): Array<string> =>
   path.split('/').map((p) => classes.find((c) => c.id === p)?.name || '');
 
@@ -32,21 +31,38 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   projectsForSubmit,
   onProjectSelectionDelete,
 }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const classes = useAppSelector(selectAllClasses);
   const [searchWord, setSearchWord] = useState('');
-  const [searchedProjects, setSearchedProjects] = useState<Array<ISuggestionItems>>([]);
+  const [searchedProjects, setSearchedProjects] = useState<Array<IProgrammedProjectSuggestions>>(
+    [],
+  );
   const phase = useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
+  const selectedClass = useAppSelector(selectSelectedClass);
+  const selectedSubClass = useAppSelector(selectSelectedSubClass);
+
+  useEffect(() => {
+    setTimeout(() => {
+      scrollRef.current?.scrollIntoView();
+    }, 2000);
+  }, [searchedProjects]);
 
   const buildQueryParamString = useCallback(
     (projectName: string): ISearchRequest => {
       const reqParamObject = { limit: '30', params: '', order: 'new' };
       const searchParams = [];
       searchParams.push(`projectName=${projectName}`);
+      searchParams.push(`programmed=false`);
+      if (selectedSubClass?.id) {
+        searchParams.push(`subClass=${selectedSubClass.id}`);
+      } else if (selectedClass?.id) {
+        searchParams.push(`class=${selectedClass.id}`);
+      }
       // searchParams.push(`phase=${phase}`);
       reqParamObject.params = searchParams.join('&');
       return reqParamObject;
     },
-    [phase],
+    [phase, selectedSubClass, selectedClass],
   );
 
   const { t } = useTranslation();
@@ -72,7 +88,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
               console.log(resultList);
 
               // Convert the resultList to options for the suggestion dropdown
-              const searchProjectsItemList: Array<ISuggestionItems> | [] = resultList
+              const searchProjectsItemList: Array<IProgrammedProjectSuggestions> | [] = resultList
                 ? resultList.map((project) => ({
                     label: project.name,
                     value: project.id,
@@ -135,6 +151,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
           />
         ))}
       </div>
+      <div ref={scrollRef}></div>
     </div>
   );
 };

@@ -5,6 +5,10 @@
   width: 45vw;
 }
 
+#add-project-programmed-dialog .dialog-search-section{
+  min-height: 20vh;
+}
+
 .search-result-card {
   @apply mb-3 border-2 border-black bg-white py-6 px-8;
 }
