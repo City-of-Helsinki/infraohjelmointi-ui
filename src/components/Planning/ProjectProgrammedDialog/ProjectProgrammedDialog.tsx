@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FC, useCallback } from 'react';
+import { useState, MouseEvent, FC, useCallback, MouseEventHandler } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
@@ -7,9 +7,10 @@ import { IOption } from '@/interfaces/common';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
-import { IProjectRequestObject } from '@/interfaces/projectInterfaces';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { IProjectRequestObject, IProjectsRequestObject } from '@/interfaces/projectInterfaces';
+import { silentPatchMultipleProjectsThunk, silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { selectSelectedClass, selectSelectedSubClass } from '@/reducers/classSlice';
+import { useOptions } from '@/hooks/useOptions';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -22,18 +23,22 @@ interface IFormState {
 interface IDialogButtonState {
   isOpen: boolean;
 }
-const buildRequestPayload = (
-  projects: Array<IProgrammedProjectSuggestions>,
-): Array<IProjectRequestObject> => {
-  // submit Class or subclass if present, submit division or subDivision if present, submit a name, submit projects
-
-  return projects.map((project) => ({ id: project.value, data: { programmed: true } }));
-};
 
 const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const [formState, setFormState] = useState<IFormState>({
     projectsForSubmit: [],
   });
+  const phase =
+    useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
+
+  const buildRequestPayload = useCallback(
+    (projects: Array<IProgrammedProjectSuggestions>): IProjectsRequestObject => {
+      return {
+        data: projects.map((p) => ({ id: p.value, data: { programmed: true, phase: phase } })),
+      };
+    },
+    [phase],
+  );
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -64,19 +69,19 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   }, [handleClose]);
 
   const onSubmit = useCallback(
-    async (projects: Array<IProgrammedProjectSuggestions>) => {
-      buildRequestPayload(projects).forEach((pRequestData) => {
-        dispatch(silentPatchProjectThunk(pRequestData)).then(() => {
+    async (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      dispatch(silentPatchMultipleProjectsThunk(buildRequestPayload(projectsForSubmit))).then(
+        () => {
           setFormState((current) => ({
             ...current,
-            showAdvanceFields: false,
             projectsForSubmit: [],
           }));
-        });
-      });
+        },
+      );
     },
 
-    [dispatch],
+    [dispatch, buildRequestPayload, projectsForSubmit],
   );
 
   return (
@@ -93,7 +98,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
           scrollable
         >
           {/* Header */}
-          <Header id={'add-project-programmed-header'} title={t(`addProgrammedProject`)} />
+          <Header id={'add-project-programmed-header'} title={t(`addProjectsToProgramming`)} />
 
           <Content>
             <div className="dialog-search-section">
@@ -110,7 +115,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
           </Content>
           <ActionButtons>
             <Button
-              // onClick={onSubmit}
+              onClick={onSubmit}
               disabled={!(projectsForSubmit && projectsForSubmit.length > 0)}
               data-testid="search-projects-button"
             >
@@ -162,7 +167,7 @@ const ProjectProgrammedDialog: FC = () => {
           onClick={onOpenGroupForm}
           size="small"
         >
-          {t(`createSummingGroups`)}
+          {t(`addProjectsToProgramming`)}
         </Button>
       </div>
     </div>

@@ -328,5 +328,6 @@
   "createSummingGroups": "Luo uusi summaava ryhmä",
   "fieldRequiredWarning": "Tämä kenttä on täytettävä",
   "addProgrammedProject":"Tuo uusi hanke listalle",
+  "addProjectsToProgramming":"Tuo uusi hanke listalle",
   "searchForProjects":"Etsi hanke"
 }

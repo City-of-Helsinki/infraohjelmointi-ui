@@ -52,13 +52,14 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       const reqParamObject = { limit: '30', params: '', order: 'new' };
       const searchParams = [];
       searchParams.push(`projectName=${projectName}`);
+      searchParams.push(`phase=${phase}`);
       searchParams.push(`programmed=false`);
-      if (selectedSubClass?.id) {
-        searchParams.push(`subClass=${selectedSubClass.id}`);
-      } else if (selectedClass?.id) {
-        searchParams.push(`class=${selectedClass.id}`);
-      }
-      // searchParams.push(`phase=${phase}`);
+      selectedSubClass?.id
+        ? searchParams.push(`subClass=${selectedSubClass.id}`)
+        : selectedClass?.id
+        ? searchParams.push(`class=${selectedClass.id}`)
+        : '';
+
       reqParamObject.params = searchParams.join('&');
       return reqParamObject;
     },
