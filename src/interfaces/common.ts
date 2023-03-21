@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { IProject } from './projectInterfaces';
 
 export interface IError {
   status: number | undefined;
@@ -73,17 +72,19 @@ export interface IFreeSearchResults {
 }
 
 export interface IContextMenuData {
-  project: IProject;
+  title: string;
   year: number;
   cellType: CellType;
-  budgetKey: string;
   menuType: ContextMenuType;
+  onRemoveCell?: () => void;
+  onEditCell?: () => void;
+  isRemoveable: boolean;
 }
 
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 
-export type CellType = 'planning' | 'construction' | 'planningAndConstruction' | 'none';
+export type CellType = 'planning' | 'construction' | 'overlap' | 'none';
 export enum ContextMenuType {
   EDIT_PROJECT_CELL,
 }

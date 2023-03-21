@@ -107,18 +107,3 @@ export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
     value: mc.id,
     label: mc.name,
   }));
-
-export const addActiveClassToProjectRow = (projectId: string) => {
-  const projectRow = document.getElementById(`row-${projectId}`);
-  projectRow?.classList.add('active');
-};
-
-export const removeActiveClassFromProjectRow = (projectId: string) => {
-  const projectRow = document.getElementById(`row-${projectId}`);
-  projectRow?.classList.remove('active');
-};
-
-export const isProjectRowActive = (projectId: string) => {
-  const projectRow = document.getElementById(`row-${projectId}`);
-  return projectRow?.classList.contains('active');
-};

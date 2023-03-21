@@ -18,12 +18,12 @@ const momentFromHDSDate = (date: string | undefined) => moment(date, 'DD.MM.YYYY
  */
 export const isInYearRange = (
   year: number,
-  startDate: string | undefined,
-  endDate: string | undefined,
+  startDate: string | undefined | null,
+  endDate: string | undefined | null,
 ): boolean => {
   // const startYear = parseInt(startDate?.split('.').pop() || '0');
-  const startYear = parseInt(momentFromHDSDate(startDate).format('YYYY'));
-  const endYear = parseInt(momentFromHDSDate(endDate).format('YYYY'));
+  const startYear = startDate ? parseInt(momentFromHDSDate(startDate).format('YYYY')) : 0;
+  const endYear = endDate ? parseInt(momentFromHDSDate(endDate).format('YYYY')) : 0;
   return startYear && endYear ? year >= startYear && year <= endYear : false;
 };
 
@@ -52,8 +52,8 @@ export const sortArrayByDates = (array: Array<any>, dateProperty: string, revers
  * @param date date string in HDS format
  * @returns HDS date with an added year
  */
-export const addYear = (date: string | undefined) =>
-  momentFromHDSDate(date).add(1, 'y').format('DD.MM.YYYY');
+export const addYear = (date: string | undefined | null) =>
+  date ? momentFromHDSDate(date).add(1, 'y').format('DD.MM.YYYY') : null;
 
 /**
  * Removes a year from a HDS date string
@@ -61,5 +61,5 @@ export const addYear = (date: string | undefined) =>
  * @param date date string in HDS format
  * @returns HDS date with a substracted year
  */
-export const removeYear = (date: string | undefined) =>
-  momentFromHDSDate(date).subtract(1, 'y').format('DD.MM.YYYY');
+export const removeYear = (date: string | undefined | null) =>
+  date ? momentFromHDSDate(date).subtract(1, 'y').format('DD.MM.YYYY') : null;

@@ -121,8 +121,8 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.hkrId);
     expectDisplayValue(project?.planningStartYear);
     expectDisplayValue(project?.constructionEndYear);
-    expectDisplayValue(project?.estPlanningStart);
-    expectDisplayValue(project?.estPlanningEnd);
+    expectDisplayValue(project?.estPlanningStart || '');
+    expectDisplayValue(project?.estPlanningEnd || '');
     expectDisplayValue(project?.presenceStart);
     expectDisplayValue(project?.presenceEnd);
     expectDisplayValue(project?.visibilityStart);

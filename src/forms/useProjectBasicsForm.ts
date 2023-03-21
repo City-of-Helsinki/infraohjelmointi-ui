@@ -32,7 +32,7 @@ const useProjectBasicsValues = () => {
   const subDivisions = useAppSelector(selectSubDivisions);
 
   const { t } = useTranslation();
-  const value = (value: string | undefined) => value || '';
+  const value = (value: string | undefined | null) => value || '';
 
   /**
    * There are three project classes, but only one id is saved. We create a list item of each class based on the id.

@@ -14,48 +14,44 @@ const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
     const isPlanning = isInYearRange(year, estPlanningStart, estPlanningEnd);
     const isConstruction = isInYearRange(year, estConstructionStart, estConstructionEnd);
 
-    if (isPlanning && isConstruction) return 'planningAndConstruction';
+    if (isPlanning && isConstruction) return 'overlap';
     if (isPlanning) return 'planning';
     if (isConstruction) return 'construction';
     return 'none';
   };
 
-  const getCells = (value: string, key: string, year: number) => {
+  const getCells = (value: string, key: string, year: number): IProjectCellProps => {
     return {
       value,
       cellType: getCellType(year),
       project: project,
       budgetKey: key,
       year: year,
-      cellSibling: 'none',
+      growDirections: [],
     };
   };
 
-  const cells = [];
+  const cells = Object.entries(project)
+    .filter(([key, _]) => key.includes('CurrentYearPlus'))
+    .map(([key, value]) =>
+      getCells(value, key, new Date().getFullYear() + parseInt(key.split('Plus')[1])),
+    );
 
-  for (const [key, value] of Object.entries(project)) {
-    if (key.includes('CurrentYearPlus')) {
-      cells.push(getCells(value, key, new Date().getFullYear() + parseInt(key.split('Plus')[1])));
-    }
-  }
+  cells.forEach((_, i, arr) => {
+    const firstIndex = i === 0;
+    const lastIndex = i === cells.length - 1;
 
-  for (let i = 1; i < cells.length; i++) {
-    const curr = cells[i];
-    const prev = cells[i - 1];
-    const next = cells[i === cells.length - 1 ? i : i + 1];
+    const curr = arr[i];
+    const prev = arr[firstIndex ? i : i - 1];
+    const next = arr[lastIndex ? i : i + 1];
 
     if (curr.cellType !== 'none') {
-      if (next.cellType === 'none' && prev.cellType === 'none') {
-        curr.cellSibling = 'leftAndRight';
-      } else if (prev.cellType === 'none') {
-        curr.cellSibling = 'right';
-      } else if (next.cellType === 'none') {
-        curr.cellSibling = 'left';
-      }
+      if (firstIndex || prev.cellType === 'none') curr.growDirections?.push('left');
+      if (lastIndex || next.cellType === 'none') curr.growDirections?.push('right');
     }
-  }
+  });
 
-  return cells as Array<IProjectCellProps>;
+  return cells;
 };
 
 interface IPlanningGroupsTableRowProps {
@@ -74,7 +70,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
 
   const handleOnProjectMenuClick = useCallback(
     (e: ReactMouseEvent) => onProjectMenuClick(project.id, e as unknown as MouseEvent),
-    [project],
+    [onProjectMenuClick, project.id],
   );
 
   return (

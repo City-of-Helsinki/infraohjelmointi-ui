@@ -1,5 +1,4 @@
 import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
-import { IProject } from '@/interfaces/projectInterfaces';
 import { useState, useEffect, useRef, useLayoutEffect, useMemo, memo, useCallback } from 'react';
 import { ProjectCellMenu } from './ContextMenus/ProjectCellMenu';
 import './styles.css';
@@ -21,13 +20,24 @@ const CustomContextMenu = () => {
     posX: 0,
     posY: 0,
     menuType: ContextMenuType.EDIT_PROJECT_CELL,
-    project: {} as IProject,
-    budgetKey: '',
+    title: '',
     year: 0,
     cellType: 'planning',
+    isRemoveable: false,
   });
 
-  const { isVisible, posX, posY, menuType, project, budgetKey, year, cellType } = contextMenuState;
+  const {
+    isVisible,
+    posX,
+    posY,
+    menuType,
+    title,
+    year,
+    cellType,
+    onRemoveCell,
+    onEditCell,
+    isRemoveable,
+  } = contextMenuState;
 
   const contextRef = useRef<HTMLDivElement>(null);
 
@@ -102,11 +112,13 @@ const CustomContextMenu = () => {
     >
       {isVisible && menuType === ContextMenuType.EDIT_PROJECT_CELL && (
         <ProjectCellMenu
-          handleCloseMenu={handleCloseContextMenu}
-          project={project}
+          onCloseMenu={handleCloseContextMenu}
+          title={title}
           year={year}
           cellType={cellType}
-          budgetKey={budgetKey}
+          onRemoveCell={onRemoveCell}
+          onEditCell={onEditCell}
+          isRemoveable={isRemoveable}
         />
       )}
     </div>

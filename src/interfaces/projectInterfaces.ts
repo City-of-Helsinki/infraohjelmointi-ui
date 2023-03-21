@@ -14,8 +14,8 @@ export interface IProject {
   phase: IListItem;
   programmed: boolean;
   constructionPhaseDetail: IListItem;
-  estPlanningStart?: string;
-  estPlanningEnd?: string;
+  estPlanningStart?: string | null;
+  estPlanningEnd?: string | null;
   estConstructionStart?: string;
   estConstructionEnd?: string;
   presenceStart?: string;
@@ -102,10 +102,10 @@ export interface IProjectRequest {
   address?: string | null;
   favPersons?: Array<string> | [];
   phase?: string | null;
-  estPlanningStart?: string;
-  estPlanningEnd?: string;
-  estConstructionStart?: string;
-  estConstructionEnd?: string;
+  estPlanningStart?: string | null;
+  estPlanningEnd?: string | null;
+  estConstructionStart?: string | null;
+  estConstructionEnd?: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;
