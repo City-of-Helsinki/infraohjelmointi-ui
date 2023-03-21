@@ -1,14 +1,13 @@
-import { useState, MouseEvent, FC, useCallback, MouseEventHandler } from 'react';
+import { useState, MouseEvent, FC, useCallback } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 
-import { IOption } from '@/interfaces/common';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
-import { IProjectRequestObject, IProjectsRequestObject } from '@/interfaces/projectInterfaces';
-import { silentPatchMultipleProjectsThunk, silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { IProjectsRequestObject } from '@/interfaces/projectInterfaces';
+import { silentPatchMultipleProjectsThunk } from '@/reducers/projectSlice';
 import { selectSelectedClass, selectSelectedSubClass } from '@/reducers/classSlice';
 import { useOptions } from '@/hooks/useOptions';
 

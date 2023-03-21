@@ -1,7 +1,5 @@
-import { IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { arrayHasValue, listItemToOption } from '@/utils/common';
-import { Tag } from 'hds-react/components/Tag';
+import { arrayHasValue } from '@/utils/common';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

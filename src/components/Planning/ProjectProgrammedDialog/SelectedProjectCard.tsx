@@ -1,6 +1,5 @@
-import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
-import { IconAngleRight, IconLayers, IconPaperclip, IconCrossCircle } from 'hds-react/icons';
-import { FC, memo, useMemo } from 'react';
+import { IconAngleRight, IconCrossCircle } from 'hds-react/icons';
+import { FC, memo } from 'react';
 
 import './styles.css';
 
