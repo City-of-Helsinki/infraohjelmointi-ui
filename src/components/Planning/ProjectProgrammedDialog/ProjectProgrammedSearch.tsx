@@ -35,7 +35,10 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   const [searchedProjects, setSearchedProjects] = useState<Array<IProgrammedProjectSuggestions>>(
     [],
   );
-  const phase = useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
+  const phaseProposal =
+    useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
+  const phaseDesign =
+    useOptions('phases', true).find((phase) => phase.label === 'design')?.value || '';
   const selectedClass = useAppSelector(selectSelectedClass);
   const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
@@ -50,7 +53,8 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       const reqParamObject = { limit: '30', params: '', order: 'new' };
       const searchParams = [];
       searchParams.push(`projectName=${projectName}`);
-      searchParams.push(`phase=${phase}`);
+      searchParams.push(`phase=${phaseProposal}`);
+      searchParams.push(`phase=${phaseDesign}`);
       searchParams.push(`programmed=false`);
       selectedSubClass?.id
         ? searchParams.push(`subClass=${selectedSubClass.id}`)
@@ -61,7 +65,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       reqParamObject.params = searchParams.join('&');
       return reqParamObject;
     },
-    [phase, selectedSubClass, selectedClass],
+    [phaseProposal, phaseDesign, selectedSubClass, selectedClass],
   );
 
   const { t } = useTranslation();
