@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { ISearchRequest } from '@/interfaces/searchInterfaces';
-// Build a search parameter with all the choices from the search form
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
@@ -55,7 +54,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
           getProjectsWithParams(queryParams)
             .then((res) => {
               if (res) {
-                // Filter out only the projects which haven't yet been added to be the submitted list from the result
                 const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
                 const resultList = res.results?.filter(
                   (object) =>
@@ -89,7 +87,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
     (value: string, onChange: (...event: unknown[]) => void) => {
       const selectedProject = searchedProjects.find((p) => p.label === value);
       if (selectedProject?.label) {
-        // onProjectClick(selectedProject);
         onChange([...getValues('projectsForSubmit'), selectedProject]);
       }
 
@@ -100,9 +97,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
 
   const handleDelete = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
-      // onProjectSelectionDelete(
-      //   (e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string,
-      // );
       onChange(
         getValues('projectsForSubmit').filter((p) => {
           return (
