@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FC, useCallback } from 'react';
+import { useState, MouseEvent, FC, useCallback, useMemo, memo } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
@@ -19,45 +19,20 @@ interface IDialogProps {
   isOpen: boolean;
 }
 
-interface IFormState {
-  showAdvanceFields: boolean;
-}
-interface IDialogButtonState {
-  isOpen: boolean;
-}
 const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
   // submit Class or subclass if present, submit division or subDivision if present, submit a name, submit projects
-  const payload: IGroupRequest = {
-    name: '',
-    classRelation: '',
-    districtRelation: '',
-    projects: [],
+  return {
+    name: form.name,
+    classRelation: form.subClass?.value || form.class?.value || '',
+    districtRelation: form.subDivision?.value || form.division?.value || '',
+    projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
-
-  payload.name = form.name;
-  payload.classRelation = form.subClass?.value || form.class?.value || '';
-  payload.districtRelation = form.subDivision?.value || form.division?.value || '';
-  payload.projects =
-    form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [];
-
-  return payload;
 };
 
-const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
-  const [formState, setFormState] = useState<IFormState>({
-    showAdvanceFields: false,
-  });
+const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
+  const [showAdvanceFields, setShowAdvanceFields] = useState(false);
 
-  const {
-    formMethods,
-    formValues,
-    masterClasses,
-    classes,
-    subClasses,
-    districts,
-    divisions,
-    subDivisions,
-  } = useGroupForm();
+  const { formMethods, formValues, classOptions, locationOptions } = useGroupForm();
   const {
     handleSubmit,
     reset,
@@ -70,17 +45,11 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
-  const { showAdvanceFields } = formState;
-
   const onSubmit = useCallback(
     async (form: IGroupForm) => {
       dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
         reset(formValues);
-        setFormState((current) => ({
-          ...current,
-          showAdvanceFields: false,
-          projectsForSubmit: [],
-        }));
+        setShowAdvanceFields(false);
       });
     },
 
@@ -89,9 +58,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
 
   const toggleAdvanceFields = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setFormState((current) => ({
-      showAdvanceFields: !current.showAdvanceFields,
-    }));
+    setShowAdvanceFields((current) => !current);
     setValue('district', { label: '', value: '' });
     setValue('division', { label: '', value: '' });
     setValue('subDivision', { label: '', value: '' });
@@ -101,18 +68,28 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const { Header, Content, ActionButtons } = Dialog;
 
   const handleDialogClose = useCallback(() => {
-    setFormState((current) => ({ ...current, showAdvanceFields: false }));
+    setShowAdvanceFields(false);
     handleClose();
   }, []);
   const formProps = useCallback(
-    (name: string) => {
-      return {
-        name: name,
-        label: `groupForm.${name}`,
-        control: control,
-      };
-    },
+    (name: string) => ({
+      name: name,
+      label: `groupForm.${name}`,
+      control: control,
+    }),
     [control],
+  );
+
+  const customValidation = useCallback(
+    (d: IOption, fieldName: string) =>
+      Object.keys(d).includes('value') && d.value !== ''
+        ? true
+        : t('required', { value: fieldName }) || '',
+    [],
+  );
+  const advanceFieldIcons = useMemo(
+    () => (showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />),
+    [showAdvanceFields],
   );
 
   return (
@@ -150,35 +127,29 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
                     <div className="search-form-content">
                       <TextField
                         {...formProps('name')}
-                        rules={{ required: 'Tämä kenttä on täytettävä' }}
+                        rules={{ required: t('required', { value: 'Ryhman nimi' }) || '' }}
                       />
                       <SelectField
                         {...formProps('masterClass')}
                         rules={{
-                          required: 'Tämä kenttä on täytettävä',
+                          required: t('required', { value: 'Pääluokka' }) || '',
                           validate: {
-                            isPopulated: (mc: IOption) =>
-                              Object.keys(mc).includes('value') && mc.value !== ''
-                                ? true
-                                : 'Tämä kenttä on täytettävä',
+                            isPopulated: (mc: IOption) => customValidation(mc, 'Pääluokka'),
                           },
                         }}
-                        options={masterClasses}
+                        options={classOptions.masterClasses}
                       />
                       <SelectField
                         {...formProps('class')}
                         rules={{
-                          required: 'Tämä kenttä on täytettävä',
+                          required: t('required', { value: 'Luokka' }) || '',
                           validate: {
-                            isPopulated: (c: IOption) =>
-                              Object.keys(c).includes('value') && c.value !== ''
-                                ? true
-                                : 'Tämä kenttä on täytettävä',
+                            isPopulated: (c: IOption) => customValidation(c, 'Luokka'),
                           },
                         }}
-                        options={classes}
+                        options={classOptions.classes}
                       />
-                      <SelectField {...formProps('subClass')} options={subClasses} />
+                      <SelectField {...formProps('subClass')} options={classOptions.subClasses} />
                     </div>
                     {/* Advance fields */}
                     {showAdvanceFields && (
@@ -186,30 +157,27 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
                         <SelectField
                           {...formProps('district')}
                           rules={{
-                            required: 'Tämä kenttä on täytettävä',
+                            required: t('required', { value: 'Suurpiiri' }) || '',
                             validate: {
-                              isPopulated: (d: IOption) =>
-                                Object.keys(d).includes('value') && d.value !== ''
-                                  ? true
-                                  : 'Tämä kenttä on täytettävä',
+                              isPopulated: (d: IOption) => customValidation(d, 'Suurpiiri'),
                             },
                           }}
-                          options={districts}
+                          options={locationOptions.districts}
                         />
                         <SelectField
                           {...formProps('division')}
                           rules={{
-                            required: 'Tämä kenttä on täytettävä',
+                            required: t('required', { value: 'Kaupunginosa' }) || '',
                             validate: {
-                              isPopulated: (d: IOption) =>
-                                Object.keys(d).includes('value') && d.value !== ''
-                                  ? true
-                                  : 'Tämä kenttä on täytettävä',
+                              isPopulated: (d: IOption) => customValidation(d, 'Kaupunginosa'),
                             },
                           }}
-                          options={divisions}
+                          options={locationOptions.divisions}
                         />
-                        <SelectField {...formProps('subDivision')} options={subDivisions} />
+                        <SelectField
+                          {...formProps('subDivision')}
+                          options={locationOptions.subDivisions}
+                        />
                       </div>
                     )}
 
@@ -218,7 +186,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
                       <button onClick={toggleAdvanceFields}>
                         {t(`groupForm.openAdvanceSearch`)}
                       </button>
-                      {showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />}
+                      {advanceFieldIcons}
                     </div>
                   </div>
                 </form>
@@ -250,22 +218,15 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
       </div>
     </div>
   );
-};
+});
+
+DialogContainer.displayName = 'Group Dialog';
 
 const GroupDialog: FC = () => {
   const { t } = useTranslation();
-  const [DialogButtonState, setDialogButtonState] = useState<IDialogButtonState>({
-    isOpen: false,
-  });
-  const { isOpen } = DialogButtonState;
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleSetOpen = useCallback(
-    () =>
-      setDialogButtonState((current) => ({
-        isOpen: !current.isOpen,
-      })),
-    [],
-  );
+  const handleSetOpen = useCallback(() => setIsOpen((current) => !current), [setIsOpen]);
   const onOpenGroupForm = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();

@@ -31,22 +31,19 @@ const useGroupValues = () => {
 };
 
 const useGroupForm = () => {
-
-
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: '',
     selectedLocation: '',
   });
   const { selectedClass, selectedLocation } = selections;
-  const { masterClasses, classes, subClasses } = useClassOptions(selectedClass);
-  const { districts, divisions, subDivisions } = useLocationOptions(selectedLocation);
+  const classOptions = useClassOptions(selectedClass);
+  const locationOptions = useLocationOptions(selectedLocation);
   const { formValues } = useGroupValues();
 
   const formMethods = useForm<IGroupForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onSubmit',
   });
-
 
   const { watch, setValue } = formMethods;
   useEffect(() => {
@@ -103,12 +100,8 @@ const useGroupForm = () => {
   return {
     formMethods,
     formValues,
-    masterClasses,
-    classes,
-    subClasses,
-    districts,
-    divisions,
-    subDivisions,
+    classOptions,
+    locationOptions,
   };
 };
 

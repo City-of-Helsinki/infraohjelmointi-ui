@@ -18,25 +18,26 @@ interface IProjectSearchProps {
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showAdvanceFields }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+
   const buildQueryParamString = (projectName: string): ISearchRequest => {
-    const searchParams = [];
-    const reqParamObject = { limit: '30', params: '', order: 'new' };
-    for (const [key, value] of Object.entries(getValues())) {
-      value?.value && searchParams.push(`${key}=${value?.value}`);
-    }
+    const searchParams = Object.entries(getValues())
+      .filter(([_, value]) => value?.value)
+      .map(([key, value]) => `${key}=${value.value}`);
+
     searchParams.push(`projectName=${projectName}`);
     searchParams.push('inGroup=false');
     searchParams.push('programmed=true');
-    reqParamObject.params = searchParams.join('&');
-    return reqParamObject;
+
+    return { limit: '30', params: searchParams.join('&'), order: 'new' };
   };
+
   const { t } = useTranslation();
   const [searchWord, setSearchWord] = useState('');
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
   useEffect(() => {
-    if (searchedProjects.length > 0) {
+    if (searchedProjects.length > 0 && scrollRef.current) {
       scrollRef.current?.scrollIntoView();
     }
   }, [searchedProjects]);
@@ -53,26 +54,21 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
 
           getProjectsWithParams(queryParams)
             .then((res) => {
-              if (res) {
-                const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
-                const resultList = res.results?.filter(
-                  (object) =>
-                    object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
-                );
+              const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
+              const resultList = res.results?.filter(
+                (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
+              );
 
-                // Convert the resultList to options for the suggestion dropdown
-                const searchProjectsItemList: Array<IOption> | [] = resultList
-                  ? resultList.map((project) => ({
-                      ...listItemToOption({ id: project.id, value: project.name }),
-                    }))
-                  : [];
-                if (searchProjectsItemList.length > 0) {
-                  setSearchedProjects(searchProjectsItemList);
-                }
-                resolve(searchProjectsItemList);
+              // Convert the resultList to options for the suggestion dropdown
+              const searchProjectsItemList: Array<IOption> | [] = resultList
+                ? resultList.map((project) => ({
+                    ...listItemToOption({ id: project.id, value: project.name }),
+                  }))
+                : [];
+              if (searchProjectsItemList.length > 0) {
+                setSearchedProjects(searchProjectsItemList);
               }
-
-              resolve([]);
+              resolve(searchProjectsItemList);
             })
             .catch(() => reject([]));
         });
@@ -98,11 +94,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
   const handleDelete = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
       onChange(
-        getValues('projectsForSubmit').filter((p) => {
-          return (
-            p.label !== ((e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string)
-          );
-        }),
+        getValues('projectsForSubmit').filter(
+          (p) =>
+            p.label !==
+            ((e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string),
+        ),
       );
     },
     [onchange, getValues],
@@ -112,7 +108,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
       <Controller
         name="projectsForSubmit"
         control={control as Control<IGroupForm, any>}
-        render={({ field: { onChange, value } }) => (
+        render={({ field: { onChange } }) => (
           <>
             <SearchInput
               label={t('searchForProjects')}
@@ -120,7 +116,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
               clearButtonAriaLabel="Clear search field"
               searchButtonAriaLabel="Search"
               suggestionLabelField="label"
-              helperText="Täytä pakolliset kentät saadaksesi ehdotuksia"
+              helperText={t('groupForm.suggestionHelperText') || ''}
               hideSearchButton={true}
               value={searchWord}
               className="search-input"
