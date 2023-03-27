@@ -14,7 +14,7 @@ const SelectedProjectCard: FC<ISelectedProjectCardProps> = ({
   handleDelete,
 }) => {
   return (
-    <div className="search-result-card">
+    <div className="project-suggestions-card">
       {/* Title */}
       <div className="search-result-title-container">
         <div className="search-result-title">

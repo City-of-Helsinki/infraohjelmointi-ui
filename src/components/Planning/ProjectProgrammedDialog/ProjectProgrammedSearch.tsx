@@ -13,8 +13,11 @@ import {
   selectSelectedSubClass,
 } from '@/reducers/classSlice';
 import SelectedProjectCard from './SelectedProjectCard';
-// Build a search parameter with all the choices from the search form
 
+interface ISearchState {
+  searchWord: string;
+  searchedProjects: Array<IProgrammedProjectSuggestions>;
+}
 interface IProjectSearchProps {
   onProjectClick: (value: IProgrammedProjectSuggestions | undefined) => void;
   projectsForSubmit: Array<IProgrammedProjectSuggestions>;
@@ -31,10 +34,12 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const classes = useAppSelector(selectAllClasses);
-  const [searchWord, setSearchWord] = useState('');
-  const [searchedProjects, setSearchedProjects] = useState<Array<IProgrammedProjectSuggestions>>(
-    [],
-  );
+
+  const [searchState, setSearchState] = useState<ISearchState>({
+    searchWord: '',
+    searchedProjects: [],
+  });
+  const { searchedProjects, searchWord } = searchState;
   const phaseProposal =
     useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
   const phaseDesign =
@@ -56,11 +61,11 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       searchParams.push(`phase=${phaseProposal}`);
       searchParams.push(`phase=${phaseDesign}`);
       searchParams.push(`programmed=false`);
-      selectedSubClass?.id
-        ? searchParams.push(`subClass=${selectedSubClass.id}`)
-        : selectedClass?.id
-        ? searchParams.push(`class=${selectedClass.id}`)
-        : '';
+      if (selectedSubClass?.id) {
+        searchParams.push(`subClass=${selectedSubClass.id}`);
+      } else if (selectedClass?.id) {
+        searchParams.push(`class=${selectedClass.id}`);
+      }
 
       reqParamObject.params = searchParams.join('&');
       return reqParamObject;
@@ -70,7 +75,10 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
 
   const { t } = useTranslation();
 
-  const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
+  const handleValueChange = useCallback(
+    (value: string) => setSearchState((current) => ({ ...current, searchWord: value })),
+    [],
+  );
 
   const getSuggestions = useCallback(
     (inputValue: string) => {
@@ -81,30 +89,28 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
 
         getProjectsWithParams(queryString)
           .then((res) => {
-            if (res) {
-              console.log(res);
-              // Filter out only the projects which haven't yet been added to be the submitted list from the result
-              const projectsIdList = projectsForSubmit.map((p) => p.value);
-              const resultList = res.results.filter(
-                (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
-              );
-              console.log(resultList);
+            // Filter out only the projects which haven't yet been added to be the submitted list from the result
+            const projectsIdList = projectsForSubmit.map((p) => p.value);
+            const resultList = res.results.filter(
+              (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
+            );
 
-              // Convert the resultList to options for the suggestion dropdown
-              const searchProjectsItemList: Array<IProgrammedProjectSuggestions> | [] = resultList
-                ? resultList.map((project) => ({
-                    label: project.name,
-                    value: project.id,
-                    breadCrumbs: buildBreadCrumbs(project.path, classes),
-                  }))
-                : [];
-              if (searchProjectsItemList.length > 0) {
-                setSearchedProjects(searchProjectsItemList);
-              }
-
-              resolve(searchProjectsItemList);
+            // Convert the resultList to options for the suggestion dropdown
+            const searchProjectsItemList: Array<IProgrammedProjectSuggestions> | [] = resultList
+              ? resultList.map((project) => ({
+                  label: project.name,
+                  value: project.id,
+                  breadCrumbs: buildBreadCrumbs(project.path, classes),
+                }))
+              : [];
+            if (searchProjectsItemList.length > 0) {
+              setSearchState((current) => ({
+                ...current,
+                searchedProjects: searchProjectsItemList,
+              }));
             }
-            resolve([]);
+
+            resolve(searchProjectsItemList);
           })
           .catch(() => reject([]));
       });
@@ -115,12 +121,12 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   const handleSubmit = useCallback(
     (value: string) => {
       const selectedProject = searchedProjects.find((p) => p.label === value);
-      console.log(selectedProject);
+
       if (value) {
         onProjectClick(selectedProject);
       }
-      // value && onProjectClick(searchedProjects.find((p) => p.label === value));
-      setSearchWord('');
+
+      setSearchState((current) => ({ ...current, searchWord: '' }));
     },
     [onProjectClick, searchedProjects],
   );
@@ -143,7 +149,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
         onChange={handleValueChange}
         onSubmit={(v) => handleSubmit(v)}
       />
-      {/* onDelete={(e) => handleDelete(e, onChange)} */}
+
       <div className="search-selections">
         {projectsForSubmit.map((s) => (
           <SelectedProjectCard

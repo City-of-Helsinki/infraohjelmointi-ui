@@ -7,26 +7,20 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
 import { IProjectsRequestObject } from '@/interfaces/projectInterfaces';
-import { silentPatchMultipleProjectsThunk } from '@/reducers/projectSlice';
+import { silentPatchProjectsThunk } from '@/reducers/projectSlice';
 import { selectSelectedClass, selectSelectedSubClass } from '@/reducers/classSlice';
 import { useOptions } from '@/hooks/useOptions';
+import { current } from '@reduxjs/toolkit';
 
 interface IDialogProps {
   handleClose: () => void;
   isOpen: boolean;
 }
 
-interface IFormState {
-  projectsForSubmit: Array<IProgrammedProjectSuggestions>;
-}
-interface IDialogButtonState {
-  isOpen: boolean;
-}
-
 const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
-  const [formState, setFormState] = useState<IFormState>({
-    projectsForSubmit: [],
-  });
+  const [projectsForSubmit, setProjectsForSubmit] = useState<Array<IProgrammedProjectSuggestions>>(
+    [],
+  );
   const phase =
     useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
 
@@ -43,41 +37,34 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   const { t } = useTranslation();
   const onProjectClick = useCallback((value: IProgrammedProjectSuggestions | undefined) => {
     if (value) {
-      setFormState((current) => ({
-        ...current,
-        projectsForSubmit: [...current.projectsForSubmit, value],
-      }));
+      setProjectsForSubmit((current) => [...current, value]);
     }
   }, []);
 
   const onProjectSelectionDelete = useCallback((projectName: string) => {
-    setFormState((current) => ({
-      ...current,
-      projectsForSubmit: current.projectsForSubmit.filter((p) => {
+    setProjectsForSubmit((current) =>
+      current.filter((p) => {
         return p.label !== projectName;
       }),
-    }));
+    );
   }, []);
-  const { projectsForSubmit } = formState;
 
   const { Header, Content, ActionButtons } = Dialog;
 
   const handleDialogClose = useCallback(() => {
-    setFormState((current) => ({ ...current, projectsForSubmit: [] }));
+    setProjectsForSubmit((current) => ({ ...current, projectsForSubmit: [] }));
     handleClose();
   }, [handleClose]);
 
   const onSubmit = useCallback(
     async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      dispatch(silentPatchMultipleProjectsThunk(buildRequestPayload(projectsForSubmit))).then(
-        () => {
-          setFormState((current) => ({
-            ...current,
-            projectsForSubmit: [],
-          }));
-        },
-      );
+      dispatch(silentPatchProjectsThunk(buildRequestPayload(projectsForSubmit))).then(() => {
+        setProjectsForSubmit((current) => ({
+          ...current,
+          projectsForSubmit: [],
+        }));
+      });
     },
 
     [dispatch, buildRequestPayload, projectsForSubmit],
@@ -101,8 +88,6 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
 
           <Content>
             <div className="dialog-search-section">
-              <br />
-
               <div>
                 <ProjectProgrammedSearch
                   onProjectClick={onProjectClick}
@@ -134,18 +119,9 @@ const ProjectProgrammedDialog: FC = () => {
   const selectedClass = useAppSelector(selectSelectedClass);
   const selectedSubClass = useAppSelector(selectSelectedSubClass);
   const { t } = useTranslation();
-  const [DialogButtonState, setDialogButtonState] = useState<IDialogButtonState>({
-    isOpen: false,
-  });
-  const { isOpen } = DialogButtonState;
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleSetOpen = useCallback(
-    () =>
-      setDialogButtonState((current) => ({
-        isOpen: !current.isOpen,
-      })),
-    [],
-  );
+  const handleSetOpen = useCallback(() => setIsOpen((current) => !current), []);
   const onOpenGroupForm = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();

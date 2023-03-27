@@ -1,30 +1,34 @@
+
+#add-project-programmed-dialog {
+  width: 45vw;
+}
 #add-project-programmed-dialog .project-search-input .search-selections {
   @apply mt-5;
 }
-#add-project-programmed-dialog {
-  width: 45vw;
+#add-project-programmed-dialog .project-search-input {
+  @apply mt-5;
 }
 
 #add-project-programmed-dialog .dialog-search-section{
   min-height: 20vh;
 }
 
-.search-result-card {
+.project-suggestions-card {
   @apply mb-3 border-2 border-black bg-white py-6 px-8;
 }
 
-.search-result-card .search-result-title-container {
+.project-suggestions-card .search-result-title-container {
   @apply mb-1 flex items-center justify-between text-2xl font-medium;
 }
-.search-result-card .search-result-title-container .cross-icon {
+.project-suggestions-card .search-result-title-container .cross-icon {
   @apply cursor-pointer;
 }
 
-.search-result-card .search-result-title-container .search-result-title {
+.project-suggestions-card .search-result-title-container .search-result-title {
   @apply flex items-center gap-3 text-l font-normal;
 }
 
-.search-result-card-wrapper:hover .search-result-title > span {
+.project-suggestions-card-wrapper:hover .search-result-title > span {
   @apply underline;
 }
 
