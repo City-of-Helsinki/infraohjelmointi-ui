@@ -26,7 +26,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
 
     searchParams.push(`projectName=${projectName}`);
     searchParams.push('inGroup=false');
-    searchParams.push('programmed=true');
+    searchParams.push('programmed=false');
 
     return { limit: '30', params: searchParams.join('&'), order: 'new' };
   };

@@ -50,46 +50,18 @@ const useGroupForm = () => {
     const subscription = watch((value, { name }) => {
       switch (name) {
         case 'masterClass':
-          if (value.masterClass?.value) {
-            setSelections((current) => ({ ...current, selectedClass: value.masterClass?.value }));
-            setValue('class', { label: '', value: '' });
-            setValue('subClass', { label: '', value: '' });
-          }
-          break;
         case 'class':
-          if (value.class?.value) {
-            setSelections((current) => ({ ...current, selectedClass: value.class?.value }));
-            setValue('subClass', { label: '', value: '' });
-          }
-          break;
         case 'subClass':
-          if (value.subClass?.value) {
-            setSelections((current) => ({ ...current, selectedClass: value.subClass?.value }));
-          }
+          if(value[name]?.value) setSelections((current) => ({ ...current, selectedClass: value[name]?.value }));
+          if(name==='masterClass') setValue('class', { label: '', value: '' })
+          if(name==='masterClass' || name==='class') setValue('subClass', { label: '', value: '' })
           break;
         case 'district':
-          if (value.district?.value) {
-            setSelections((current) => ({ ...current, selectedLocation: value.district?.value }));
-            setValue('division', { label: '', value: '' });
-            setValue('subDivision', { label: '', value: '' });
-          }
-
-          break;
         case 'division':
-          if (value.division?.value) {
-            setSelections((current) => ({ ...current, selectedLocation: value.division?.value }));
-            setValue('subDivision', { label: '', value: '' });
-          }
-
-          break;
         case 'subDivision':
-          if (value.subDivision?.value) {
-            setSelections((current) => ({
-              ...current,
-              selectedLocation: value.subDivision?.value,
-            }));
-          }
-
+          if(value[name]?.value) setSelections((current) => ({ ...current, selectedLocation: value[name]?.value }));
+          if(name==='district') setValue('division', { label: '', value: '' })
+          if(name==='district' || name==='division') setValue('subDivision', { label: '', value: '' })
           break;
         default:
       }
