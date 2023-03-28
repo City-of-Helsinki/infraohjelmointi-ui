@@ -63,3 +63,19 @@ export const addYear = (date: string | undefined | null) =>
  */
 export const removeYear = (date: string | undefined | null) =>
   date ? momentFromHDSDate(date).subtract(1, 'y').format('DD.MM.YYYY') : null;
+
+export const isSameYear = (date: string | null | undefined, year: number) => {
+  return getYear(date) === year;
+};
+
+export const getYear = (date: string | undefined | null): number =>
+  date ? parseInt(momentFromHDSDate(date).format('YYYY')) : 0;
+
+export const updateYear = (date: string | undefined | null, year: number | undefined) => {
+  if (date && year) {
+    const moment = momentFromHDSDate(date);
+    moment.set({ year: year, month: moment.month(), day: moment.day() });
+    return moment.format('DD.MM.YYYY');
+  }
+  return null;
+};

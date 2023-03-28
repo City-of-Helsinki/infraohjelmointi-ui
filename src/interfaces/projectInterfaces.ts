@@ -16,8 +16,8 @@ export interface IProject {
   constructionPhaseDetail: IListItem;
   estPlanningStart?: string | null;
   estPlanningEnd?: string | null;
-  estConstructionStart?: string;
-  estConstructionEnd?: string;
+  estConstructionStart?: string | null;
+  estConstructionEnd?: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;

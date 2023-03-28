@@ -127,8 +127,8 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.presenceEnd);
     expectDisplayValue(project?.visibilityStart);
     expectDisplayValue(project?.visibilityEnd);
-    expectDisplayValue(project?.estConstructionStart);
-    expectDisplayValue(project?.estConstructionEnd);
+    expectDisplayValue(project?.estConstructionStart || '');
+    expectDisplayValue(project?.estConstructionEnd || '');
     expectDisplayValue(project?.projectWorkQuantity);
     expectDisplayValue(project?.projectCostForecast);
     expectDisplayValue(project?.planningCostForecast);

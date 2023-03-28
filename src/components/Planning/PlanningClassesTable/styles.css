@@ -40,7 +40,7 @@
 }
 
 .class-cell .class-cell-container span:nth-child(3) {
-  @apply font-bold text-suomenlinna-d;
+  @apply text-suomenlinna font-bold;
 }
 
 .class-cell span {

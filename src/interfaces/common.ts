@@ -78,13 +78,20 @@ export interface IContextMenuData {
   menuType: ContextMenuType;
   onRemoveCell?: () => void;
   onEditCell?: () => void;
-  isRemoveable: boolean;
 }
 
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 
-export type CellType = 'planning' | 'construction' | 'overlap' | 'none';
+export type CellType =
+  | 'planning'
+  | 'construction'
+  | 'overlap'
+  | 'none'
+  | 'estPlanningStart'
+  | 'estPlanningEnd'
+  | 'estConstructionStart'
+  | 'estConstructionEnd';
 export enum ContextMenuType {
   EDIT_PROJECT_CELL,
 }

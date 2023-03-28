@@ -3,56 +3,10 @@ import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, MouseEvent as ReactMouseEvent } from 'react';
 import { useNavigate } from 'react-router';
-import ProjectCell, { IProjectCellProps } from './ProjectCell';
+import ProjectCell from './ProjectCell';
 import { IListItem } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
-import { isInYearRange } from '@/utils/dates';
-
-const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
-  const getCellType = (year: number) => {
-    const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } = project;
-    const isPlanning = isInYearRange(year, estPlanningStart, estPlanningEnd);
-    const isConstruction = isInYearRange(year, estConstructionStart, estConstructionEnd);
-
-    if (isPlanning && isConstruction) return 'overlap';
-    if (isPlanning) return 'planning';
-    if (isConstruction) return 'construction';
-    return 'none';
-  };
-
-  const getCells = (value: string, key: string, year: number): IProjectCellProps => {
-    return {
-      value,
-      cellType: getCellType(year),
-      project: project,
-      budgetKey: key,
-      year: year,
-      growDirections: [],
-    };
-  };
-
-  const cells = Object.entries(project)
-    .filter(([key, _]) => key.includes('CurrentYearPlus'))
-    .map(([key, value]) =>
-      getCells(value, key, new Date().getFullYear() + parseInt(key.split('Plus')[1])),
-    );
-
-  cells.forEach((_, i, arr) => {
-    const firstIndex = i === 0;
-    const lastIndex = i === cells.length - 1;
-
-    const curr = arr[i];
-    const prev = arr[firstIndex ? i : i - 1];
-    const next = arr[lastIndex ? i : i + 1];
-
-    if (curr.cellType !== 'none') {
-      if (firstIndex || prev.cellType === 'none') curr.growDirections?.push('left');
-      if (lastIndex || next.cellType === 'none') curr.growDirections?.push('right');
-    }
-  });
-
-  return cells;
-};
+import useProjectCells from '@/hooks/useProjectCell';
 
 interface IPlanningGroupsTableRowProps {
   project: IProject;
@@ -60,13 +14,16 @@ interface IPlanningGroupsTableRowProps {
   onProjectMenuClick: (projectId: string, e: MouseEvent) => void;
 }
 
+export type ProjectCellGrowDirection = 'left' | 'right';
+
 const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
   project,
   onProjectMenuClick,
 }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
-  const projectCells = createProjectCells(project);
+
+  const projectCells = useProjectCells(project);
 
   const handleOnProjectMenuClick = useCallback(
     (e: ReactMouseEvent) => onProjectMenuClick(project.id, e as unknown as MouseEvent),
@@ -101,8 +58,8 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
           </div>
         </div>
       </th>
-      {projectCells.map((p) => (
-        <ProjectCell key={p.budgetKey} {...p} />
+      {projectCells.map((c) => (
+        <ProjectCell key={c.budgetKey} cell={c} />
       ))}
     </tr>
   );

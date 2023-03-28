@@ -12,7 +12,6 @@ interface IProjectCellMenuProps {
   cellType: CellType;
   onRemoveCell?: () => void;
   onEditCell?: () => void;
-  isRemoveable: boolean;
 }
 
 const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
@@ -22,7 +21,6 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   cellType,
   onRemoveCell,
   onEditCell,
-  isRemoveable,
 }) => {
   const { t } = useTranslation();
   const options: Array<IOption> = [
@@ -63,12 +61,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
         </ul>
       </div>
       <div className="project-cell-menu-footer">
-        <Button
-          variant="supplementary"
-          iconLeft={undefined}
-          onClick={handleRemoveYear}
-          disabled={!isRemoveable}
-        >
+        <Button variant="supplementary" iconLeft={undefined} onClick={handleRemoveYear}>
           {t('removeYearFromTimeline')}
         </Button>
         <Button variant="supplementary" iconLeft={undefined} onClick={handleEditTimeline}>

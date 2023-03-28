@@ -62,6 +62,7 @@ module.exports = {
       'coat-of-arms': 'var(--color-coat-of-arms)',
       'coat-of-arms-l': 'var(--color-coat-of-arms-light)',
       'suomenlinna-d': 'var(--color-suomenlinna-dark)',
+      suomenlinna: 'var(--color-suomenlinna)',
       silver: 'var(--color-silver)',
       'silver-l': 'var(--color-silver-light)',
     },

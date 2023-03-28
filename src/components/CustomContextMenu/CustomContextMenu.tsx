@@ -1,6 +1,6 @@
 import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
 import { useState, useEffect, useRef, useLayoutEffect, useMemo, memo, useCallback } from 'react';
-import { ProjectCellMenu } from './ContextMenus/ProjectCellMenu';
+import { ProjectCellMenu } from './ContextMenus/ProjectCellContextMenu';
 import './styles.css';
 
 interface IContextMenuState extends IContextMenuData {
@@ -23,21 +23,10 @@ const CustomContextMenu = () => {
     title: '',
     year: 0,
     cellType: 'planning',
-    isRemoveable: false,
   });
 
-  const {
-    isVisible,
-    posX,
-    posY,
-    menuType,
-    title,
-    year,
-    cellType,
-    onRemoveCell,
-    onEditCell,
-    isRemoveable,
-  } = contextMenuState;
+  const { isVisible, posX, posY, menuType, title, year, cellType, onRemoveCell, onEditCell } =
+    contextMenuState;
 
   const contextRef = useRef<HTMLDivElement>(null);
 
@@ -118,7 +107,6 @@ const CustomContextMenu = () => {
           cellType={cellType}
           onRemoveCell={onRemoveCell}
           onEditCell={onEditCell}
-          isRemoveable={isRemoveable}
         />
       )}
     </div>
