@@ -80,9 +80,6 @@ export interface IContextMenuData {
   onEditCell?: () => void;
 }
 
-export type FreeSearchFormItem = IOption & { type: string };
-export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
-
 export type CellType =
   | 'planning'
   | 'construction'
@@ -92,6 +89,10 @@ export type CellType =
   | 'estPlanningEnd'
   | 'estConstructionStart'
   | 'estConstructionEnd';
+
+export type FreeSearchFormItem = IOption & { type: string };
+export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
+
 export enum ContextMenuType {
   EDIT_PROJECT_CELL,
 }

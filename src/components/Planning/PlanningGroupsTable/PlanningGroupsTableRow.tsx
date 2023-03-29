@@ -14,8 +14,6 @@ interface IPlanningGroupsTableRowProps {
   onProjectMenuClick: (projectId: string, e: MouseEvent) => void;
 }
 
-export type ProjectCellGrowDirection = 'left' | 'right';
-
 const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
   project,
   onProjectMenuClick,
