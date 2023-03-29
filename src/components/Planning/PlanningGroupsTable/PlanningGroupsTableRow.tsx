@@ -1,12 +1,13 @@
 import { IProject } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
-import { FC, memo, useCallback, MouseEvent as ReactMouseEvent } from 'react';
+import { FC, memo, useCallback, MouseEvent as ReactMouseEvent, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import ProjectCell from './ProjectCell';
 import { IListItem } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
 import useProjectCells from '@/hooks/useProjectCell';
+import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 
 interface IPlanningGroupsTableRowProps {
   project: IProject;
@@ -20,7 +21,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
 }) => {
   const navigate = useNavigate();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
-
+  const tableRowRef = useRef<HTMLTableRowElement>(null);
   const projectCells = useProjectCells(project);
 
   const handleOnProjectMenuClick = useCallback(
@@ -28,8 +29,18 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
     [onProjectMenuClick, project.id],
   );
 
+  // Remove the active css-class from the current row if the user clicks outside of it
+  useClickOutsideRef(
+    tableRowRef,
+    useCallback(() => {
+      if (tableRowRef?.current?.classList.contains('active')) {
+        tableRowRef.current.classList.remove('active');
+      }
+    }, []),
+  );
+
   return (
-    <tr id={`row-${project.id}`}>
+    <tr id={`row-${project.id}`} ref={tableRowRef}>
       {/* HEADER */}
       <th className="project-header-cell">
         <div className="project-header-cell-container">

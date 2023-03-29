@@ -245,3 +245,111 @@ export interface IProjectsResponse {
   results: Array<IProject>;
   count: number;
 }
+
+export type BudgetType =
+  | 'budgetProposalCurrentYearPlus0'
+  | 'budgetProposalCurrentYearPlus1'
+  | 'budgetProposalCurrentYearPlus2'
+  | 'preliminaryCurrentYearPlus3'
+  | 'preliminaryCurrentYearPlus4'
+  | 'preliminaryCurrentYearPlus5'
+  | 'preliminaryCurrentYearPlus6'
+  | 'preliminaryCurrentYearPlus7'
+  | 'preliminaryCurrentYearPlus8'
+  | 'preliminaryCurrentYearPlus9'
+  | 'preliminaryCurrentYearPlus10';
+
+export type CellType =
+  | 'planStart'
+  | 'planEnd'
+  | 'plan'
+  | 'conStart'
+  | 'conEnd'
+  | 'con'
+  | 'overlap'
+  | 'none';
+
+export type ProjectCellGrowDirection = 'left' | 'right';
+
+export interface IProjectCell {
+  /**
+   * Year for the current cell
+   */
+  year: number;
+  /**
+   * Type of the cell (planStart / planEnd / plan / conStart / conEnd / con / overlap / none)
+   */
+  type: CellType;
+  /**
+   * When planning starts (can be used to get the timeline schedule for any cell)
+   */
+  planStart: string | null | undefined;
+  /**
+   * When planning ends (can be used to get the timeline schedule for any cell)
+   */
+  planEnd: string | null | undefined;
+  /**
+   * When construction starts (can be used to get the timeline schedule for any cell)
+   */
+  conStart: string | null | undefined;
+  /**
+   * When construction ends (can be used to get the timeline schedule for any cell)
+   */
+  conEnd: string | null | undefined;
+  /**
+   * Previous cell to the left (used when adding new cells)
+   */
+  prev: IProjectCell | null;
+  /**
+   * Next cell to the right (used when adding new cells)
+   */
+  next: IProjectCell | null;
+  /**
+   * Is the cell the start of the timeline
+   */
+  isStartOfTimeline: boolean;
+  /**
+   * Is the cell the end of the timeline
+   */
+  isEndOfTimeline: boolean;
+  /**
+   * Is the cell the last of its type (i.e. last planning cell)
+   */
+  isLastOfType: boolean;
+  /**
+   * Object key for the budget that the cell represents
+   */
+  budgetKey: BudgetType;
+  /**
+   * Budget (keur value) of the cell
+   */
+  budget: string;
+  /**
+   * Cell that should be updated if this cell is removed (used to set a new budget and update the dates of the timeline)
+   */
+  cellToUpdate: IProjectCell | null;
+  /**
+   * An object that should be added to the delete request, it resets the previously hidden null-values back to '0'
+   */
+  budgetsToReset: { [key: string]: string };
+  /**
+   * Tells which direction the cell can grow, used for rendering the 'left' and 'right' buttons around the cell
+   */
+  growDirections: Array<ProjectCellGrowDirection>;
+  /**
+   * Title of the project (used in the custom context menu when right-clicking a cell)
+   */
+  title: string;
+  /**
+   * Id of the project (used when setting the active css-class to the row )
+   */
+  id: string;
+  /**
+   * Wether the cell is an edge cell, an edge cell is a cell that affects the start/ends dates associated with the timeline
+   */
+  isEdgeCell: boolean;
+  /**
+   * All the budgets with their respective values, this array is needed when moving the timeline by a year
+   */
+  allBudgets: Array<Array<string>>;
+}

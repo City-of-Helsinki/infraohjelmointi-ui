@@ -22,7 +22,7 @@ const CustomContextMenu = () => {
     menuType: ContextMenuType.EDIT_PROJECT_CELL,
     title: '',
     year: 0,
-    cellType: 'planning',
+    cellType: 'plan',
   });
 
   const { isVisible, posX, posY, menuType, title, year, cellType, onRemoveCell, onEditCell } =

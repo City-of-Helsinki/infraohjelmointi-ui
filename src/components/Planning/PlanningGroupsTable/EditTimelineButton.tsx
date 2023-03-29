@@ -1,5 +1,5 @@
 import useDoubleClick from '@/hooks/useDoubleClick';
-import { ProjectCellGrowDirection } from '@/hooks/useProjectCell';
+import { ProjectCellGrowDirection } from '@/interfaces/projectInterfaces';
 import { IconAngleLeft } from 'hds-react/icons';
 import { useRef } from 'react';
 

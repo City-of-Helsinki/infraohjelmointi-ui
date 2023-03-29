@@ -1,12 +1,15 @@
 import { useAppDispatch } from '@/hooks/common';
 import { ContextMenuType } from '@/interfaces/common';
-import { IProjectRequest } from '@/interfaces/projectInterfaces';
+import {
+  IProjectCell,
+  IProjectRequest,
+  ProjectCellGrowDirection,
+} from '@/interfaces/projectInterfaces';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { NumberInput } from 'hds-react/components/NumberInput';
 import { ChangeEvent, FC, useCallback, useState, MouseEvent, useEffect, memo, useRef } from 'react';
 import { addYear, removeYear, updateYear } from '@/utils/dates';
-import { IProjectCell, ProjectCellGrowDirection } from '@/hooks/useProjectCell';
 import _ from 'lodash';
 import EditTimelineButton from './EditTimelineButton';
 
@@ -27,10 +30,12 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     isEndOfTimeline,
     isStartOfTimeline,
     isLastOfType,
-    startForType,
-    endForType,
+    planStart,
+    planEnd,
+    conStart,
+    conEnd,
     cellToUpdate,
-    keysToReset,
+    budgetsToReset,
     budgetKey,
     budget,
     isEdgeCell,
@@ -41,11 +46,11 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   // If it's the last cell of its type (plan/con/overflow)
   if (isLastOfType) {
     switch (type) {
-      case 'estPlanningEnd':
+      case 'planEnd':
         req.estPlanningStart = null;
         req.estPlanningEnd = null;
         break;
-      case 'estConstructionEnd':
+      case 'conEnd':
         req.estConstructionStart = null;
         req.estConstructionEnd = null;
         break;
@@ -63,17 +68,21 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   // Else if it's plan/con start/end or an overlap cell
   else {
     switch (type) {
-      case 'estPlanningStart':
-      case 'estConstructionStart':
-        req[type] = updateYear(startForType, cellToUpdate?.year);
+      case 'planStart':
+        req.estPlanningStart = updateYear(planStart, cellToUpdate?.year);
         break;
-      case 'estPlanningEnd':
-      case 'estConstructionEnd':
-        req[type] = updateYear(endForType, cellToUpdate?.year);
+      case 'planEnd':
+        req.estPlanningEnd = updateYear(planEnd, cellToUpdate?.year);
+        break;
+      case 'conStart':
+        req.estConstructionStart = updateYear(conStart, cellToUpdate?.year);
+        break;
+      case 'conEnd':
+        req.estConstructionEnd = updateYear(conEnd, cellToUpdate?.year);
         break;
       case 'overlap':
-        req.estPlanningEnd = removeYear(endForType);
-        req.estConstructionStart = addYear(startForType);
+        req.estPlanningEnd = removeYear(planEnd);
+        req.estConstructionStart = addYear(conStart);
         break;
     }
   }
@@ -84,36 +93,45 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     const updateBudget = cellToUpdate.budget;
     req[updateKey] = (parseInt(budget || '0') + parseInt(updateBudget || '0')).toString();
   }
-  // If there are keys to reset, use those keys to add '0' values back
-  if (keysToReset.length > 0) {
-    keysToReset.forEach((ktr) => (req[ktr] = '0'));
-  }
 
+  // Set the current cells value to '0' if it's an edge cell, otherwise set it to null to temporarily hide it
   (req[budgetKey as keyof IProjectRequest] as string | null) = isEdgeCell ? '0' : null;
 
-  return req;
+  return { ...req, ...budgetsToReset };
 };
 
-const getAddRequestData = (direction: string, cell: IProjectCell) => {
-  const { type, startForType, endForType, next, prev, isStartOfTimeline, isLastOfType } = cell;
+const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCell) => {
+  const {
+    type,
+    planStart,
+    planEnd,
+    conStart,
+    conEnd,
+    next,
+    prev,
+    isStartOfTimeline,
+    isLastOfType,
+  } = cell;
 
   const req: IProjectRequest = {};
 
-  if (
-    direction === 'left' &&
-    isStartOfTimeline &&
-    (type === 'estPlanningStart' || type === 'estPlanningEnd' || type === 'overlap')
-  ) {
-    req.estPlanningStart = removeYear(startForType);
-  } else if (
-    (direction === 'left' && type === 'estConstructionStart') ||
-    (type === 'estConstructionEnd' && isLastOfType)
-  ) {
-    req.estConstructionStart = removeYear(startForType);
-  } else if (direction === 'right' && type === 'estPlanningEnd') {
-    req.estPlanningEnd = addYear(endForType);
-  } else if (direction === 'right' && (type === 'estConstructionEnd' || type === 'overlap')) {
-    req.estConstructionEnd = addYear(endForType);
+  switch (direction) {
+    case 'left':
+      if (isStartOfTimeline && (type === 'planStart' || type === 'planEnd' || type === 'overlap')) {
+        req.estPlanningStart = removeYear(planStart);
+      }
+      if ((isLastOfType && type === 'conEnd') || type === 'conStart') {
+        req.estConstructionStart = removeYear(conStart);
+      }
+      break;
+    case 'right':
+      if (type === 'planEnd') {
+        req.estPlanningEnd = addYear(planEnd);
+      }
+      if (type === 'conEnd' || type === 'overlap') {
+        req.estConstructionEnd = addYear(conEnd);
+      }
+      break;
   }
 
   if (_.isEmpty(req)) {
@@ -127,28 +145,21 @@ const getAddRequestData = (direction: string, cell: IProjectCell) => {
 };
 
 const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
-  const {
-    isEndOfTimeline,
-    isStartOfTimeline,
-    estPlanningEnd,
-    estPlanningStart,
-    estConstructionEnd,
-    estConstructionStart,
-    allBudgets,
-  } = cell;
+  const { isEndOfTimeline, isStartOfTimeline, planEnd, planStart, conStart, conEnd, allBudgets } =
+    cell;
 
   const req: IProjectRequest = {};
   const nextBudgets = [...allBudgets];
 
   // Move the timeline FORWARD by one year if direction is RIGHT and it's the LAST cell
   if (isEndOfTimeline && direction === 'right') {
-    if (estPlanningEnd) {
-      req.estPlanningStart = addYear(estPlanningStart);
-      req.estPlanningEnd = addYear(estPlanningEnd);
+    if (planStart) {
+      req.estPlanningStart = addYear(planStart);
+      req.estPlanningEnd = addYear(planEnd);
     }
-    if (estConstructionEnd) {
-      req.estConstructionStart = addYear(estConstructionStart);
-      req.estConstructionEnd = addYear(estConstructionEnd);
+    if (conEnd) {
+      req.estConstructionStart = addYear(conStart);
+      req.estConstructionEnd = addYear(conEnd);
     }
 
     for (let i = nextBudgets.length - 1; i >= 0; i--) {
@@ -163,13 +174,13 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
   }
   // Move the timeline BACKWARD by one year if direction is LEFT and it's the FIRST cell
   else if (isStartOfTimeline && direction === 'left') {
-    if (estPlanningEnd) {
-      req.estPlanningStart = removeYear(estPlanningStart);
-      req.estPlanningEnd = removeYear(estPlanningEnd);
+    if (planEnd) {
+      req.estPlanningStart = removeYear(planStart);
+      req.estPlanningEnd = removeYear(planEnd);
     }
-    if (estConstructionEnd) {
-      req.estConstructionStart = removeYear(estConstructionStart);
-      req.estConstructionEnd = removeYear(estConstructionEnd);
+    if (conEnd) {
+      req.estConstructionStart = removeYear(conStart);
+      req.estConstructionEnd = removeYear(conEnd);
     }
 
     for (let i = 1; i < nextBudgets.length; i++) {
@@ -243,6 +254,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     [cell, updateCell],
   );
 
+  // Set the active css-class to the current row using the project id, this will render the edit-buttons and borders
   const onEditCell = useCallback(() => {
     if (isProjectRowActive(id)) {
       removeActiveClassFromProjectRow(id);
@@ -251,12 +263,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     }
   }, [id]);
 
+  // Convert any cell type to 'planning' / 'construction' / 'overlap' / 'none'
   const getCssType = useCallback(() => {
-    if (type.includes('Planning')) return 'planning';
-    else if (type.includes('Construction')) return 'construction';
+    if (type.includes('plan')) return 'plan';
+    else if (type.includes('con')) return 'con';
     else return type;
   }, [type]);
 
+  // Open the custom context menu when right-clicking a cell
   const handleOpenContextMenu = useCallback(
     (e: MouseEvent<HTMLElement>) => {
       dispatchContextMenuEvent(e, {
@@ -271,6 +285,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     [onRemoveCell, onEditCell, getCssType, year, title],
   );
 
+  // Set the budgets value to a number if it exists
   useEffect(() => {
     budget && setFormValue(parseInt(budget));
   }, [budget]);
@@ -278,7 +293,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   return (
     <td
       ref={cellRef}
-      id={`cell-${id}-${budgetKey}`}
       className={`project-cell ${getCssType()}`}
       onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
     >

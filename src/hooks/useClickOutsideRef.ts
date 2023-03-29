@@ -11,7 +11,7 @@ const useClickOutsideRef = (ref: RefObject<HTMLDivElement>, callback: () => unkn
     // Function that triggers when user clicks outside of ref
     const handleClickOutside = ({ target }: MouseEvent) => {
       if (ref.current && !ref.current.contains(target as Node)) {
-        callback && callback();
+        callback();
       }
     };
     document.addEventListener('mouseup', handleClickOutside);

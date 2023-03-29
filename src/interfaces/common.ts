@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { CellType } from './projectInterfaces';
 
 export interface IError {
   status: number | undefined;
@@ -79,16 +80,6 @@ export interface IContextMenuData {
   onRemoveCell?: () => void;
   onEditCell?: () => void;
 }
-
-export type CellType =
-  | 'planning'
-  | 'construction'
-  | 'overlap'
-  | 'none'
-  | 'estPlanningStart'
-  | 'estPlanningEnd'
-  | 'estConstructionStart'
-  | 'estConstructionEnd';
 
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };

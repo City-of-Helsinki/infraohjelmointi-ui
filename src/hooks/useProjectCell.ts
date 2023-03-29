@@ -1,101 +1,79 @@
-import { CellType } from '@/interfaces/common';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { BudgetType, CellType, IProject, IProjectCell } from '@/interfaces/projectInterfaces';
 import { isInYearRange, isSameYear } from '@/utils/dates';
 import { useEffect, useState } from 'react';
 
-type BudgetType =
-  | 'budgetProposalCurrentYearPlus0'
-  | 'budgetProposalCurrentYearPlus1'
-  | 'budgetProposalCurrentYearPlus2'
-  | 'preliminaryCurrentYearPlus3'
-  | 'preliminaryCurrentYearPlus4'
-  | 'preliminaryCurrentYearPlus5'
-  | 'preliminaryCurrentYearPlus6'
-  | 'preliminaryCurrentYearPlus7'
-  | 'preliminaryCurrentYearPlus8'
-  | 'preliminaryCurrentYearPlus9'
-  | 'preliminaryCurrentYearPlus10';
-
-export type ProjectCellGrowDirection = 'left' | 'right';
-
-export interface IProjectCell {
-  year: number; // Year for the cell in question
-  type: CellType; // Type of the cell (planning / construction / overlap / none)
-  startForType: string | null | undefined; // Start of that types timeline (i.e. planning it would be estPlanningStart)
-  endForType: string | null | undefined; // End of that types timeline (i.e. planning it would be estPlanningEnd)
-  estPlanningStart: string | null | undefined;
-  estPlanningEnd: string | null | undefined;
-  estConstructionStart: string | null | undefined;
-  estConstructionEnd: string | null | undefined;
-  prev: IProjectCell | null; // Previous cell (to the left)
-  next: IProjectCell | null; // Next cell (to the right)
-  isStartOfTimeline: boolean; // Is the cell the start of the timeline
-  isEndOfTimeline: boolean; // Is the cell the end of the timeline
-  isLastOfType: boolean; // Is the cell the last of its type (i.e. last planning cell)
-  budgetKey: BudgetType; // Object key for the budget that the cell represents
-  budget: string; // Budget (keur value) of the cell
-  cellToUpdate: IProjectCell | null; // Cell that should be updated if this cell is removed
-  keysToReset: Array<BudgetType>; // List of keys representing budgets that should be reset if this cell is removed
-  growDirections: Array<ProjectCellGrowDirection>; // 'left' and 'right', buttons for adding new cells are rendered based on these
-  title: string; // Title of the project (used in the custom context menu when right-clicking a cell)
-  id: string; // Id of the project
-  isEdgeCell: boolean;
-  allBudgets: Array<Array<string>>;
-}
-
-const getCellToUpdate = (cells: Array<IProjectCell>, cell: IProjectCell, index: number) => {
-  const shrinkLeft = (cell.type === 'estPlanningEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
-  // Find the next available cell backwards if it's the end of the timeline or the planning ends in the middle
-  // next to an empty cell
-  if (shrinkLeft) {
-    for (let i = index - 1; i > 0; i--) {
-      const cell = cells[i] as IProjectCell;
-      if (cell.budget !== null && cell.type !== 'none') {
-        return cell;
-      }
+/**
+ * Gets the cell to update, this cell will be the next cell that isn't a 'none' type
+ */
+const getCellToUpdate = (
+  cells: Array<IProjectCell>,
+  cell: IProjectCell,
+  currentCellIndex: number,
+) => {
+  const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+  // Find the next available cell backwards
+  if (growRight) {
+    for (let i = currentCellIndex - 1; i > 0; i--) {
+      if (cells[i].type !== 'none') return cells[i];
     }
   }
   // Find the next available cell forwards
   else {
-    for (let i = index + 1; i < cells.length; i++) {
-      const cell = cells[i] as IProjectCell;
-      if (cell.budget !== null && cell.type !== 'none') {
-        return cell;
-      }
+    for (let i = currentCellIndex + 1; i < cells.length; i++) {
+      if (cells[i].type !== 'none') return cells[i];
     }
   }
+  return null;
 };
 
-const getKeysToReset = (
+interface IBudgetsToReset {
+  [key: string]: string;
+}
+
+/**
+ * Builds an object of budgets that are between the current cell and the cell
+ * that gets updated if the current cell is removed.
+ *
+ * These budgets are used to reset the values between the current and the cell to be updated to '0'.
+ */
+const getBudgetsToReset = (
   cells: Array<IProjectCell>,
   cell: IProjectCell,
-  cellToUpdate: IProjectCell | null,
-  isEdgeCell: boolean,
-  index: number,
+  currentCellIndex: number,
+  updateCellIndex: number,
 ) => {
-  const shrinkLeft = (cell.type === 'estPlanningEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+  const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
 
-  const keysToReset: Array<BudgetType> = [];
-
-  if (cellToUpdate && isEdgeCell) {
-    const indexOfCellToUpdate = cells.findIndex((c) => c.budgetKey === cellToUpdate?.budgetKey);
-    if (shrinkLeft) {
-      for (let i = 0; i < cells.length; i++) {
-        if (i > indexOfCellToUpdate && i < index) {
-          keysToReset.push(cells[i].budgetKey);
-        }
+  const budgetsToReset = cells.reduce((acc: IBudgetsToReset, curr, i) => {
+    if (growRight) {
+      if (i > updateCellIndex && i < currentCellIndex) {
+        acc[curr.budgetKey] = '0';
       }
     } else {
-      for (let i = 0; i < cells.length; i++) {
-        if (i > index && i < indexOfCellToUpdate) {
-          keysToReset.push(cells[i].budgetKey);
-        }
+      if (i > currentCellIndex && i < updateCellIndex) {
+        acc[curr.budgetKey] = '0';
       }
     }
-  }
+    return acc;
+  }, {});
 
-  return keysToReset;
+  return budgetsToReset;
 };
+
+/**
+ * Returns true if the cell is either:
+ * - a start-cell
+ * - an end-cell
+ * - the last of its type
+ * - the start of the timeline
+ * - the end of the timeline
+ */
+const getIsEdgeCell = (cell: IProjectCell): boolean =>
+  cell.type.includes('Start') ||
+  cell.type.includes('End') ||
+  cell.isLastOfType ||
+  cell.isStartOfTimeline ||
+  cell.isEndOfTimeline;
 
 const getProjectCells = (project: IProject) => {
   const budgetKeys: Array<BudgetType> = [
@@ -140,24 +118,22 @@ const getProjectCells = (project: IProject) => {
     if (isPlanning && isConstruction) {
       type = 'overlap';
     } else if (isPlanning) {
-      if (isCurrentYear(estPlanningEnd)) type = 'estPlanningEnd';
-      else if (isCurrentYear(estPlanningStart)) type = 'estPlanningStart';
-      else if (v[1] !== null) type = 'planning';
+      if (isCurrentYear(estPlanningEnd)) type = 'planEnd';
+      else if (isCurrentYear(estPlanningStart)) type = 'planStart';
+      else if (v[1] !== null) type = 'plan';
     } else if (isConstruction) {
-      if (isCurrentYear(estConstructionEnd)) type = 'estConstructionEnd';
-      else if (isCurrentYear(estConstructionStart)) type = 'estConstructionStart';
-      else if (v[1] !== null) type = 'construction';
+      if (isCurrentYear(estConstructionEnd)) type = 'conEnd';
+      else if (isCurrentYear(estConstructionStart)) type = 'conStart';
+      else if (v[1] !== null) type = 'con';
     }
 
     return {
       year,
       type,
-      startForType: isConstruction ? estConstructionStart : estPlanningStart,
-      endForType: isPlanning ? estPlanningEnd : estConstructionEnd,
-      estPlanningStart,
-      estPlanningEnd,
-      estConstructionStart,
-      estConstructionEnd,
+      planStart: type !== 'none' ? estPlanningStart : null,
+      planEnd: type !== 'none' ? estPlanningEnd : null,
+      conStart: type !== 'none' ? estConstructionStart : null,
+      conEnd: type !== 'none' ? estConstructionEnd : null,
       isLastOfType,
       budgetKey: v[0] as BudgetType,
       budget: v[1],
@@ -170,33 +146,30 @@ const getProjectCells = (project: IProject) => {
       id,
       isEdgeCell: false,
       growDirections: [],
-      keysToReset: [],
+      budgetsToReset: {},
       allBudgets: projectBudgets,
     };
   });
 
-  const cellsWithPrevAndNext = cells.map((c, i) => {
-    const prev = i === 0 ? null : cells[i - 1];
-    const next = i === cells.length - 1 ? null : cells[i + 1];
-    const cellToUpdate =
-      getCellToUpdate(cells as Array<IProjectCell>, c as IProjectCell, i) || null;
+  const projectCells = cells.map((cell, index) => {
+    const prev = index === 0 ? null : cells[index - 1];
+    const next = index === cells.length - 1 ? null : cells[index + 1];
+    const cellToUpdate = cell.type !== 'none' ? getCellToUpdate(cells, cell, index) : null;
 
     // Add grow directions for css buttons to render
-    if (c.type !== 'none') {
-      if (prev && prev.type === 'none') c.growDirections.push('left');
-      if (next && next.type === 'none') c.growDirections.push('right');
+    if (cell.type !== 'none') {
+      if (prev && prev.type === 'none') cell.growDirections.push('left');
+      if (next && next.type === 'none') cell.growDirections.push('right');
     }
 
-    const isEdgeCell =
-      c.type.includes('Start') ||
-      c.type.includes('End') ||
-      c.isLastOfType ||
-      c.isStartOfTimeline ||
-      c.isEndOfTimeline;
+    const updateIndex = cells.findIndex((c) => c.budgetKey === cellToUpdate?.budgetKey);
+
+    const isEdgeCell = getIsEdgeCell(cell);
 
     return {
-      ...c,
-      keysToReset: getKeysToReset(cells as Array<IProjectCell>, c, cellToUpdate, isEdgeCell, i),
+      ...cell,
+      budgetsToReset:
+        isEdgeCell && cellToUpdate ? getBudgetsToReset(cells, cell, index, updateIndex) : {},
       prev,
       next,
       cellToUpdate,
@@ -204,7 +177,7 @@ const getProjectCells = (project: IProject) => {
     };
   });
 
-  return cellsWithPrevAndNext;
+  return projectCells;
 };
 
 /**
@@ -224,9 +197,7 @@ const useProjectCells = (project: IProject) => {
     }
   }, [project]);
 
-  if (projectCells.length > 0) {
-    console.log(projectCells);
-  }
+  // console.log(projectCells);
 
   return projectCells;
 };

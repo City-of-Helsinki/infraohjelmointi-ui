@@ -1,4 +1,5 @@
-import { CellType, IOption } from '@/interfaces/common';
+import { IOption } from '@/interfaces/common';
+import { CellType } from '@/interfaces/projectInterfaces';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
