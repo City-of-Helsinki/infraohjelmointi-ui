@@ -11,8 +11,8 @@ import { dispatchContextMenuEvent } from '@/utils/events';
 import { NumberInput } from 'hds-react/components/NumberInput';
 import { ChangeEvent, FC, useCallback, useState, MouseEvent, useEffect, memo, useRef } from 'react';
 import { addYear, removeYear, updateYear } from '@/utils/dates';
-import _ from 'lodash';
 import EditTimelineButton from './EditTimelineButton';
+import _ from 'lodash';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`row-${projectId}`)?.classList.add('active');
@@ -40,10 +40,10 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     financeKey,
     budget,
     isEdgeCell,
+    startYear,
   } = cell;
 
-  const req: IProjectRequest = {};
-  const finances: IProjectFinancesRequestObject = { year: 2023 };
+  const req: IProjectRequest = { finances: { year: startYear, ...financesToReset } };
 
   // If it's the last cell of its type (plan/con/overflow)
   if (isLastOfType) {
@@ -89,21 +89,23 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     }
   }
 
-  // If there is a cellToUpdate move the deleted cells budget to that cell
-  if (cellToUpdate) {
-    const updateKey = cellToUpdate.financeKey;
-    const updateBudget = cellToUpdate.budget;
-    (finances[updateKey as keyof IProjectFinancesRequestObject] as string) = (
-      parseInt(budget || '0') + parseInt(updateBudget || '0')
-    ).toString();
+  if (req.finances) {
+    // If there is a cellToUpdate move the deleted cells budget to that cell
+    if (cellToUpdate) {
+      const updateKey = cellToUpdate.financeKey;
+      const updateBudget = cellToUpdate.budget;
+      (req.finances[updateKey as keyof IProjectFinancesRequestObject] as string) = (
+        parseInt(budget || '0') + parseInt(updateBudget || '0')
+      ).toString();
+    }
+
+    // Set the current cells value to '0' if it's an edge cell, otherwise set it to null to temporarily hide it
+    (req.finances[financeKey as keyof IProjectFinancesRequestObject] as string | null) = isEdgeCell
+      ? '0'
+      : null;
   }
 
-  // Set the current cells value to '0' if it's an edge cell, otherwise set it to null to temporarily hide it
-  (finances[financeKey as keyof IProjectFinancesRequestObject] as string | null) = isEdgeCell
-    ? '0'
-    : null;
-
-  return { ...req, finances: { ...finances, ...financesToReset } };
+  return req;
 };
 
 const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCell) => {
@@ -117,9 +119,10 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
     prev,
     isStartOfTimeline,
     isLastOfType,
+    startYear,
   } = cell;
 
-  const req: IProjectRequest = {};
+  const req: IProjectRequest = { finances: { year: startYear } };
 
   switch (direction) {
     case 'left':
@@ -140,10 +143,10 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
       break;
   }
 
-  if (_.isEmpty(req)) {
+  if (_.isEmpty(req) && req.finances) {
     const nextBudget = direction === 'right' ? next : prev;
     if (nextBudget !== null) {
-      (req[nextBudget.financeKey as keyof IProjectRequest] as string) = '0';
+      (req.finances[nextBudget.financeKey as keyof IProjectFinancesRequestObject] as string) = '0';
     }
   }
 
@@ -151,11 +154,18 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
 };
 
 const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
-  const { isEndOfTimeline, isStartOfTimeline, planEnd, planStart, conStart, conEnd, financesList } =
-    cell;
+  const {
+    isEndOfTimeline,
+    isStartOfTimeline,
+    planEnd,
+    planStart,
+    conStart,
+    conEnd,
+    financesList,
+    startYear,
+  } = cell;
 
-  const req: IProjectRequest = {};
-  const finances: IProjectFinancesRequestObject = { year: 2023 };
+  const req: IProjectRequest = { finances: { year: startYear } };
   const nextFinances = [...financesList];
 
   // Move the timeline FORWARD by one year if direction is RIGHT and it's the LAST cell
@@ -176,7 +186,10 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
     }
 
     nextFinances.slice(0).forEach((f) => {
-      (finances[f[0] as keyof IProjectFinancesRequestObject] as string | null) = f[1];
+      // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
+      if (req.finances) {
+        (req.finances[f[0] as keyof IProjectFinancesRequestObject] as string | null) = f[1];
+      }
     });
   }
   // Move the timeline BACKWARD by one year if direction is LEFT and it's the FIRST cell
@@ -195,11 +208,14 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
     }
 
     nextFinances.forEach((b) => {
-      (finances[b[0] as keyof IProjectFinancesRequestObject] as string | null) = b[1];
+      // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
+      if (req.finances) {
+        (req.finances[b[0] as keyof IProjectFinancesRequestObject] as string | null) = b[1];
+      }
     });
   }
 
-  return { ...req, finances };
+  return req;
 };
 
 interface IProjectCellProps {

@@ -279,6 +279,10 @@ export interface IProjectCell {
    */
   year: number;
   /**
+   * Start year of the timeline
+   */
+  startYear: number;
+  /**
    * Type of the cell (planStart / planEnd / plan / conStart / conEnd / con / overlap / none)
    */
   type: CellType;

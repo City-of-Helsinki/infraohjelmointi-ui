@@ -121,6 +121,7 @@ const getProjectCells = (project: IProject) => {
 
     return {
       year: cellYear,
+      startYear: year,
       type,
       planStart: type !== 'none' ? estPlanningStart : null,
       planEnd: type !== 'none' ? estPlanningEnd : null,
