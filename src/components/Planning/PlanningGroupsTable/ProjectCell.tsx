@@ -143,11 +143,11 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
       break;
   }
 
-  const nextFinance = direction === 'right' ? next : prev;
+  const nextCell = direction === 'right' ? next : prev;
 
   // Set the next finances sum to 0 if it's null
-  if (req.finances && nextFinance !== null && nextFinance.budget === null) {
-    (req.finances[nextFinance.financeKey as keyof IProjectFinancesRequestObject] as string) = '0';
+  if (req.finances && nextCell && nextCell.budget === null) {
+    (req.finances[nextCell.financeKey as keyof IProjectFinancesRequestObject] as string) = '0';
   }
 
   return req;
