@@ -1,179 +1,172 @@
-import { BudgetType, CellType, IProject, IProjectCell } from '@/interfaces/projectInterfaces';
+import {
+  CellType,
+  IProject,
+  IProjectCell,
+  IProjectFinances,
+  IProjectFinancesRequestObject,
+} from '@/interfaces/projectInterfaces';
 import { isInYearRange, isSameYear } from '@/utils/dates';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 
-/**
- * Gets the cell to update, this cell will be the next cell that isn't a 'none' type
- */
-const getCellToUpdate = (
-  cells: Array<IProjectCell>,
-  cell: IProjectCell,
-  currentCellIndex: number,
-) => {
-  const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
-  // Find the next available cell backwards
-  if (growRight) {
-    for (let i = currentCellIndex - 1; i > 0; i--) {
-      if (cells[i].type !== 'none') return cells[i];
-    }
-  }
-  // Find the next available cell forwards
-  else {
-    for (let i = currentCellIndex + 1; i < cells.length; i++) {
-      if (cells[i].type !== 'none') return cells[i];
-    }
-  }
-  return null;
-};
-
-interface IBudgetsToReset {
-  [key: string]: string;
-}
-
-/**
- * Builds an object of budgets that are between the current cell and the cell
- * that gets updated if the current cell is removed.
- *
- * These budgets are used to reset the values between the current and the cell to be updated to '0'.
- */
-const getBudgetsToReset = (
-  cells: Array<IProjectCell>,
-  cell: IProjectCell,
-  currentCellIndex: number,
-  updateCellIndex: number,
-) => {
-  const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
-
-  const budgetsToReset = cells.reduce((acc: IBudgetsToReset, curr, i) => {
-    if (growRight) {
-      if (i > updateCellIndex && i < currentCellIndex) {
-        acc[curr.budgetKey] = '0';
-      }
-    } else {
-      if (i > currentCellIndex && i < updateCellIndex) {
-        acc[curr.budgetKey] = '0';
-      }
-    }
-    return acc;
-  }, {});
-
-  return budgetsToReset;
-};
-
-/**
- * Returns true if the cell is either:
- * - a start-cell
- * - an end-cell
- * - the last of its type
- * - the start of the timeline
- * - the end of the timeline
- */
-const getIsEdgeCell = (cell: IProjectCell): boolean =>
-  cell.type.includes('Start') ||
-  cell.type.includes('End') ||
-  cell.isLastOfType ||
-  cell.isStartOfTimeline ||
-  cell.isEndOfTimeline;
-
 const getProjectCells = (project: IProject) => {
-  const budgetKeys: Array<BudgetType> = [
-    'budgetProposalCurrentYearPlus0',
-    'budgetProposalCurrentYearPlus1',
-    'budgetProposalCurrentYearPlus2',
-    'preliminaryCurrentYearPlus3',
-    'preliminaryCurrentYearPlus4',
-    'preliminaryCurrentYearPlus5',
-    'preliminaryCurrentYearPlus6',
-    'preliminaryCurrentYearPlus7',
-    'preliminaryCurrentYearPlus8',
-    'preliminaryCurrentYearPlus9',
-    'preliminaryCurrentYearPlus10',
-  ];
-
   const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd, name, id } =
     project;
 
-  const projectBudgets = Object.entries(project).filter(
-    ([key, _]) => budgetKeys.indexOf(key as BudgetType) !== -1,
-  );
+  const { year, ...finances } = project.finances;
 
-  const cells: Array<IProjectCell> = projectBudgets.map((v) => {
-    const year: number = new Date().getFullYear() + parseInt(v[0].split('Plus')[1]);
-    const isCurrentYear = (date: string | null | undefined) => isSameYear(date, year);
-    const isPlanning = isInYearRange(year, estPlanningStart, estPlanningEnd);
-    const isConstruction = isInYearRange(year, estConstructionStart, estConstructionEnd);
+  const financesList = Object.entries(finances).map(([key, value]) => [key, value]);
 
-    const isStartOfTimeline = estPlanningStart
-      ? isCurrentYear(estPlanningStart)
-      : isCurrentYear(estConstructionStart);
-    const isEndOfTimeline = estConstructionEnd
-      ? isCurrentYear(estConstructionEnd)
-      : isCurrentYear(estPlanningEnd);
-    const isLastOfType =
-      (isCurrentYear(estPlanningStart) && isCurrentYear(estPlanningEnd)) ||
-      (isCurrentYear(estConstructionStart) && isCurrentYear(estConstructionEnd));
-
-    let type: CellType = 'none';
+  /**
+   * Gets the type of the cell for the current year
+   */
+  const getType = (cellYear: number, value: string | null): CellType => {
+    const isPlanning = estPlanningEnd
+      ? isInYearRange(cellYear, estPlanningStart, estPlanningEnd)
+      : false;
+    const isConstruction = estConstructionEnd
+      ? isInYearRange(cellYear, estConstructionStart, estConstructionEnd)
+      : false;
 
     if (isPlanning && isConstruction) {
-      type = 'overlap';
+      return 'overlap';
     } else if (isPlanning) {
-      if (isCurrentYear(estPlanningEnd)) type = 'planEnd';
-      else if (isCurrentYear(estPlanningStart)) type = 'planStart';
-      else if (v[1] !== null) type = 'plan';
+      if (isSameYear(estPlanningEnd, cellYear)) return 'planEnd';
+      else if (isSameYear(estPlanningStart, cellYear)) return 'planStart';
+      else if (value !== null) return 'plan';
     } else if (isConstruction) {
-      if (isCurrentYear(estConstructionEnd)) type = 'conEnd';
-      else if (isCurrentYear(estConstructionStart)) type = 'conStart';
-      else if (v[1] !== null) type = 'con';
+      if (isSameYear(estConstructionEnd, cellYear)) return 'conEnd';
+      else if (isSameYear(estConstructionStart, cellYear)) return 'conStart';
+      else if (value !== null) return 'con';
     }
+    return 'none';
+  };
+
+  /**
+   * Builds an object of budgets that are between the current cell and the cell
+   * that gets updated if the current cell is removed.
+   *
+   * These budgets are used to reset the values between the current and the cell to be updated to '0'.
+   */
+  const getFinancesToReset = (
+    cell: IProjectCell,
+    currentCellIndex: number,
+    updateCellIndex: number,
+  ): IProjectFinancesRequestObject | null => {
+    const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+
+    const financesToReset = cells.reduce(
+      (acc: IProjectFinancesRequestObject, curr: IProjectCell, i) => {
+        if (growRight) {
+          if (i > updateCellIndex && i < currentCellIndex) {
+            (acc[curr.financeKey] as string) = '0';
+          }
+        } else {
+          if (i > currentCellIndex && i < updateCellIndex) {
+            (acc[curr.financeKey] as string) = '0';
+          }
+        }
+        return acc;
+      },
+      { year: year },
+    );
+
+    return Object.keys(financesToReset).length > 1 ? financesToReset : null;
+  };
+
+  /**
+   * Gets the cell to update, this cell will be the next cell that isn't a 'none' type
+   */
+  const getCellToUpdate = (cell: IProjectCell, currentCellIndex: number) => {
+    const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+    // Find the next available cell backwards
+    if (growRight) {
+      for (let i = currentCellIndex - 1; i > 0; i--) {
+        if (cells[i].type !== 'none') return cells[i];
+      }
+    }
+    // Find the next available cell forwards
+    else {
+      for (let i = currentCellIndex + 1; i < cells.length; i++) {
+        if (cells[i].type !== 'none') return cells[i];
+      }
+    }
+    return null;
+  };
+
+  // Create cells
+  const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {
+    const cellYear = year + i;
+
+    const type = getType(cellYear, value);
+
+    const isStartOfTimeline = estPlanningStart
+      ? isSameYear(estPlanningStart, cellYear)
+      : isSameYear(estConstructionStart, cellYear);
+
+    const isEndOfTimeline = estConstructionEnd
+      ? isSameYear(estConstructionEnd, cellYear)
+      : isSameYear(estPlanningEnd, cellYear);
+
+    const isLastOfType =
+      (isSameYear(estPlanningStart, cellYear) && isSameYear(estPlanningEnd, cellYear)) ||
+      (isSameYear(estConstructionStart, cellYear) && isSameYear(estConstructionEnd, cellYear));
+
+    const isEdgeCell =
+      type.includes('Start') ||
+      type.includes('End') ||
+      isLastOfType ||
+      isStartOfTimeline ||
+      isEndOfTimeline;
 
     return {
-      year,
+      year: cellYear,
       type,
       planStart: type !== 'none' ? estPlanningStart : null,
       planEnd: type !== 'none' ? estPlanningEnd : null,
       conStart: type !== 'none' ? estConstructionStart : null,
       conEnd: type !== 'none' ? estConstructionEnd : null,
       isLastOfType,
-      budgetKey: v[0] as BudgetType,
-      budget: v[1],
+      financeKey: key as keyof IProjectFinances,
+      budget: value,
       isStartOfTimeline,
       isEndOfTimeline,
       prev: null,
       next: null,
       cellToUpdate: null,
       title: name,
-      id,
-      isEdgeCell: false,
+      id: id,
       growDirections: [],
-      budgetsToReset: {},
-      allBudgets: projectBudgets,
+      financesToReset: null,
+      financesList,
+      isEdgeCell,
     };
   });
 
+  // Add financesToReset, next, prev and cellToUpdate
   const projectCells = cells.map((cell, index) => {
     const prev = index === 0 ? null : cells[index - 1];
     const next = index === cells.length - 1 ? null : cells[index + 1];
-    const cellToUpdate = cell.type !== 'none' ? getCellToUpdate(cells, cell, index) : null;
+    const cellToUpdate = cell.type !== 'none' ? getCellToUpdate(cell, index) : null;
 
-    // Add grow directions for css buttons to render
+    // Populate grow directions for css buttons to render
     if (cell.type !== 'none') {
       if (prev && prev.type === 'none') cell.growDirections.push('left');
       if (next && next.type === 'none') cell.growDirections.push('right');
     }
 
-    const updateIndex = cells.findIndex((c) => c.budgetKey === cellToUpdate?.budgetKey);
+    const updateIndex =
+      cellToUpdate && cells.findIndex((c) => c.financeKey === cellToUpdate?.financeKey);
 
-    const isEdgeCell = getIsEdgeCell(cell);
+    const financesToReset =
+      cell.isEdgeCell && updateIndex ? getFinancesToReset(cell, index, updateIndex) : null;
 
     return {
       ...cell,
-      budgetsToReset:
-        isEdgeCell && cellToUpdate ? getBudgetsToReset(cells, cell, index, updateIndex) : {},
+      financesToReset,
       prev,
       next,
       cellToUpdate,
-      isEdgeCell,
     };
   });
 
@@ -197,7 +190,7 @@ const useProjectCells = (project: IProject) => {
     }
   }, [project]);
 
-  // console.log(projectCells);
+  console.log(projectCells);
 
   return projectCells;
 };

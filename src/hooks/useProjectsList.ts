@@ -16,7 +16,7 @@ const useProjectsList = () => {
   const fetchNext = useCallback(() => {
     if (!isLastProjectsFetched && !isFetchings && !error?.message) {
       setIsFetchings(true);
-      dispatch(getProjectsThunk(page + 1)).finally(() => setIsFetchings(false));
+      dispatch(getProjectsThunk({ page: page + 1 })).finally(() => setIsFetchings(false));
     }
   }, [dispatch, error?.message, isFetchings, isLastProjectsFetched, page]);
 

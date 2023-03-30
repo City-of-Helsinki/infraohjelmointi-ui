@@ -68,7 +68,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
         </div>
       </th>
       {projectCells.map((c) => (
-        <ProjectCell key={c.budgetKey} cell={c} />
+        <ProjectCell key={c.financeKey} cell={c} />
       ))}
     </tr>
   );

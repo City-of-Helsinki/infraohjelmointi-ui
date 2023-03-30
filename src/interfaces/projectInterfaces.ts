@@ -62,17 +62,7 @@ export interface IProject {
   budgetForecast2CurrentYear?: string;
   budgetForecast3CurrentYear?: string;
   budgetForecast4CurrentYear?: string;
-  budgetProposalCurrentYearPlus0: string;
-  budgetProposalCurrentYearPlus1: string;
-  budgetProposalCurrentYearPlus2: string;
-  preliminaryCurrentYearPlus3: string;
-  preliminaryCurrentYearPlus4: string;
-  preliminaryCurrentYearPlus5: string;
-  preliminaryCurrentYearPlus6: string;
-  preliminaryCurrentYearPlus7: string;
-  preliminaryCurrentYearPlus8: string;
-  preliminaryCurrentYearPlus9: string;
-  preliminaryCurrentYearPlus10: string;
+  finances: IProjectFinances;
   louhi: boolean;
   gravel: boolean;
   category: IListItem;
@@ -150,22 +140,17 @@ export interface IProjectRequest {
   budgetForecast2CurrentYear?: string;
   budgetForecast3CurrentYear?: string;
   budgetForecast4CurrentYear?: string;
-  budgetProposalCurrentYearPlus0?: string;
-  budgetProposalCurrentYearPlus1?: string;
-  budgetProposalCurrentYearPlus2?: string;
-  preliminaryCurrentYearPlus3?: string;
-  preliminaryCurrentYearPlus4?: string;
-  preliminaryCurrentYearPlus5?: string;
-  preliminaryCurrentYearPlus6?: string;
-  preliminaryCurrentYearPlus7?: string;
-  preliminaryCurrentYearPlus8?: string;
-  preliminaryCurrentYearPlus9?: string;
-  preliminaryCurrentYearPlus10?: string;
+  finances?: IProjectFinancesRequestObject;
 }
 
-export interface IProjectRequestObject {
+export interface IProjectPatchRequestObject {
   id?: string;
   data: IProjectRequest;
+}
+
+export interface IProjectGetRequestObject {
+  page: number;
+  year?: string;
 }
 
 // These will be used to render the icons for projects in the planning view list
@@ -246,18 +231,35 @@ export interface IProjectsResponse {
   count: number;
 }
 
-export type BudgetType =
-  | 'budgetProposalCurrentYearPlus0'
-  | 'budgetProposalCurrentYearPlus1'
-  | 'budgetProposalCurrentYearPlus2'
-  | 'preliminaryCurrentYearPlus3'
-  | 'preliminaryCurrentYearPlus4'
-  | 'preliminaryCurrentYearPlus5'
-  | 'preliminaryCurrentYearPlus6'
-  | 'preliminaryCurrentYearPlus7'
-  | 'preliminaryCurrentYearPlus8'
-  | 'preliminaryCurrentYearPlus9'
-  | 'preliminaryCurrentYearPlus10';
+export interface IProjectFinancesRequestObject {
+  year: number;
+  budgetProposalCurrentYearPlus0?: string | null;
+  budgetProposalCurrentYearPlus1?: string | null;
+  budgetProposalCurrentYearPlus2?: string | null;
+  preliminaryCurrentYearPlus3?: string | null;
+  preliminaryCurrentYearPlus4?: string | null;
+  preliminaryCurrentYearPlus5?: string | null;
+  preliminaryCurrentYearPlus6?: string | null;
+  preliminaryCurrentYearPlus7?: string | null;
+  preliminaryCurrentYearPlus8?: string | null;
+  preliminaryCurrentYearPlus9?: string | null;
+  preliminaryCurrentYearPlus10?: string | null;
+}
+
+export interface IProjectFinances {
+  year: number;
+  budgetProposalCurrentYearPlus0: string | null;
+  budgetProposalCurrentYearPlus1: string | null;
+  budgetProposalCurrentYearPlus2: string | null;
+  preliminaryCurrentYearPlus3: string | null;
+  preliminaryCurrentYearPlus4: string | null;
+  preliminaryCurrentYearPlus5: string | null;
+  preliminaryCurrentYearPlus6: string | null;
+  preliminaryCurrentYearPlus7: string | null;
+  preliminaryCurrentYearPlus8: string | null;
+  preliminaryCurrentYearPlus9: string | null;
+  preliminaryCurrentYearPlus10: string | null;
+}
 
 export type CellType =
   | 'planStart'
@@ -319,11 +321,11 @@ export interface IProjectCell {
   /**
    * Object key for the budget that the cell represents
    */
-  budgetKey: BudgetType;
+  financeKey: keyof IProjectFinances;
   /**
    * Budget (keur value) of the cell
    */
-  budget: string;
+  budget: string | null;
   /**
    * Cell that should be updated if this cell is removed (used to set a new budget and update the dates of the timeline)
    */
@@ -331,7 +333,7 @@ export interface IProjectCell {
   /**
    * An object that should be added to the delete request, it resets the previously hidden null-values back to '0'
    */
-  budgetsToReset: { [key: string]: string };
+  financesToReset: IProjectFinancesRequestObject | null;
   /**
    * Tells which direction the cell can grow, used for rendering the 'left' and 'right' buttons around the cell
    */
@@ -349,7 +351,7 @@ export interface IProjectCell {
    */
   isEdgeCell: boolean;
   /**
-   * All the budgets with their respective values, this array is needed when moving the timeline by a year
+   * All the finances with their respective values, this array is needed when moving the timeline by a year
    */
-  allBudgets: Array<Array<string>>;
+  financesList: Array<Array<string | null>>;
 }

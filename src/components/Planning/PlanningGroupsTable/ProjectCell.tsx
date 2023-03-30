@@ -2,6 +2,7 @@ import { useAppDispatch } from '@/hooks/common';
 import { ContextMenuType } from '@/interfaces/common';
 import {
   IProjectCell,
+  IProjectFinancesRequestObject,
   IProjectRequest,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
@@ -35,13 +36,14 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     conStart,
     conEnd,
     cellToUpdate,
-    budgetsToReset,
-    budgetKey,
+    financesToReset,
+    financeKey,
     budget,
     isEdgeCell,
   } = cell;
 
   const req: IProjectRequest = {};
+  const finances: IProjectFinancesRequestObject = { year: 2023 };
 
   // If it's the last cell of its type (plan/con/overflow)
   if (isLastOfType) {
@@ -89,15 +91,19 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
   // If there is a cellToUpdate move the deleted cells budget to that cell
   if (cellToUpdate) {
-    const updateKey = cellToUpdate.budgetKey;
+    const updateKey = cellToUpdate.financeKey;
     const updateBudget = cellToUpdate.budget;
-    req[updateKey] = (parseInt(budget || '0') + parseInt(updateBudget || '0')).toString();
+    (finances[updateKey as keyof IProjectFinancesRequestObject] as string) = (
+      parseInt(budget || '0') + parseInt(updateBudget || '0')
+    ).toString();
   }
 
   // Set the current cells value to '0' if it's an edge cell, otherwise set it to null to temporarily hide it
-  (req[budgetKey as keyof IProjectRequest] as string | null) = isEdgeCell ? '0' : null;
+  (finances[financeKey as keyof IProjectFinancesRequestObject] as string | null) = isEdgeCell
+    ? '0'
+    : null;
 
-  return { ...req, ...budgetsToReset };
+  return { ...req, finances: { ...finances, ...financesToReset } };
 };
 
 const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCell) => {
@@ -137,7 +143,7 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
   if (_.isEmpty(req)) {
     const nextBudget = direction === 'right' ? next : prev;
     if (nextBudget !== null) {
-      (req[nextBudget.budgetKey as keyof IProjectRequest] as string) = '0';
+      (req[nextBudget.financeKey as keyof IProjectRequest] as string) = '0';
     }
   }
 
@@ -145,11 +151,12 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
 };
 
 const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
-  const { isEndOfTimeline, isStartOfTimeline, planEnd, planStart, conStart, conEnd, allBudgets } =
+  const { isEndOfTimeline, isStartOfTimeline, planEnd, planStart, conStart, conEnd, financesList } =
     cell;
 
   const req: IProjectRequest = {};
-  const nextBudgets = [...allBudgets];
+  const finances: IProjectFinancesRequestObject = { year: 2023 };
+  const nextFinances = [...financesList];
 
   // Move the timeline FORWARD by one year if direction is RIGHT and it's the LAST cell
   if (isEndOfTimeline && direction === 'right') {
@@ -162,14 +169,14 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
       req.estConstructionEnd = addYear(conEnd);
     }
 
-    for (let i = nextBudgets.length - 1; i >= 0; i--) {
-      if (i !== nextBudgets.length - 1) {
-        nextBudgets[i + 1][1] = nextBudgets[i][1];
+    for (let i = nextFinances.length - 1; i >= 0; i--) {
+      if (i !== nextFinances.length - 1) {
+        nextFinances[i + 1][1] = nextFinances[i][1];
       }
     }
 
-    nextBudgets.slice(0).forEach((b) => {
-      (req[b[0] as keyof IProjectRequest] as string) = b[1];
+    nextFinances.slice(0).forEach((f) => {
+      (finances[f[0] as keyof IProjectFinancesRequestObject] as string | null) = f[1];
     });
   }
   // Move the timeline BACKWARD by one year if direction is LEFT and it's the FIRST cell
@@ -183,16 +190,16 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
       req.estConstructionEnd = removeYear(conEnd);
     }
 
-    for (let i = 1; i < nextBudgets.length; i++) {
-      nextBudgets[i - 1][1] = nextBudgets[i][1];
+    for (let i = 1; i < nextFinances.length; i++) {
+      nextFinances[i - 1][1] = nextFinances[i][1];
     }
 
-    nextBudgets.forEach((b) => {
-      (req[b[0] as keyof IProjectRequest] as string) = b[1];
+    nextFinances.forEach((b) => {
+      (finances[b[0] as keyof IProjectFinancesRequestObject] as string | null) = b[1];
     });
   }
 
-  return req;
+  return { ...req, finances };
 };
 
 interface IProjectCellProps {
@@ -200,7 +207,7 @@ interface IProjectCellProps {
 }
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
-  const { budget, type, budgetKey, year, growDirections, id, title, prev, next } = cell;
+  const { budget, type, financeKey, year, growDirections, id, title, prev, next } = cell;
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<'' | number>(parseInt(budget || ''));
@@ -228,10 +235,15 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   const handleBlur = useCallback(() => {
     setIsReadOnly(!isReadOnly);
-    if (formValue !== parseInt(budget)) {
-      updateCell({ [budgetKey]: formValue });
+    if (formValue !== parseInt(budget || '0')) {
+      updateCell({
+        finances: {
+          year: 2023,
+          [financeKey]: formValue,
+        },
+      });
     }
-  }, [isReadOnly, formValue, budget, updateCell, budgetKey]);
+  }, [isReadOnly, formValue, budget, updateCell, financeKey]);
 
   const onRemoveCell = useCallback(() => {
     updateCell(getRemoveRequestData(cell));
@@ -298,7 +310,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     >
       <NumberInput
         value={type !== 'none' ? formValue || 0 : ''}
-        id={`${budgetKey}-${id}`}
+        id={`${financeKey}-${id}`}
         label=""
         className="table-input"
         readOnly={isReadOnly}

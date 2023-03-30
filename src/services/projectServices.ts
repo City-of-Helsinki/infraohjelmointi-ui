@@ -1,13 +1,19 @@
 import { IError, IFreeSearchResults } from '@/interfaces/common';
-import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
+import {
+  IProject,
+  IProjectGetRequestObject,
+  IProjectPatchRequestObject,
+  IProjectsResponse,
+} from '@/interfaces/projectInterfaces';
 import { ISearchRequest, ISearchResults } from '@/interfaces/searchInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const getProjects = async (page: number): Promise<IProjectsResponse> => {
+export const getProjects = async (req: IProjectGetRequestObject): Promise<IProjectsResponse> => {
+  const year = req.year ? `${req.year}/` : '';
   return axios
-    .get(`${REACT_APP_API_URL}/projects?page=${page}`)
+    .get(`${REACT_APP_API_URL}/projects/${year}?page=${req.page}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
@@ -19,7 +25,7 @@ export const getProject = async (id: string): Promise<IProject> => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const postProject = async (request: IProjectRequestObject): Promise<void> => {
+export const postProject = async (request: IProjectPatchRequestObject): Promise<void> => {
   return axios
     .post(`${REACT_APP_API_URL}/projects/`, request.data)
     .then((res) => res.data)
@@ -33,7 +39,7 @@ export const deleteProject = async (id: string): Promise<void> => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const patchProject = async (request: IProjectRequestObject): Promise<IProject> => {
+export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProject> => {
   return axios
     .patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data)
     .then((res) => res.data)
