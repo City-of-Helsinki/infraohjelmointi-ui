@@ -21,28 +21,25 @@ const getProjectCells = (project: IProject) => {
    * Gets the type of the cell for the current year
    */
   const getType = (cellYear: number, value: string | null): CellType => {
-    const isPlanning = estPlanningEnd
-      ? isInYearRange(cellYear, estPlanningStart, estPlanningEnd)
-      : false;
-    const isConstruction = estConstructionEnd
-      ? isInYearRange(cellYear, estConstructionStart, estConstructionEnd)
-      : false;
+    const isPlanning = isInYearRange(cellYear, estPlanningStart, estPlanningEnd);
+    const isConstruction = isInYearRange(cellYear, estConstructionStart, estConstructionEnd);
+    const isCellYear = (date?: string | null) => isSameYear(date, cellYear);
 
     const setPlanningType = () => {
-      if (isSameYear(estPlanningEnd, cellYear)) {
+      if (isCellYear(estPlanningEnd)) {
         return 'planEnd';
       }
-      if (isSameYear(estPlanningStart, cellYear)) {
+      if (isCellYear(estPlanningStart)) {
         return 'planStart';
       }
       return value !== null ? 'plan' : 'none';
     };
 
     const setConstructionType = () => {
-      if (isSameYear(estConstructionEnd, cellYear)) {
+      if (isCellYear(estConstructionEnd)) {
         return 'conEnd';
       }
-      if (isSameYear(estConstructionStart, cellYear)) {
+      if (isCellYear(estConstructionStart)) {
         return 'conStart';
       }
       return value !== null ? 'con' : 'none';

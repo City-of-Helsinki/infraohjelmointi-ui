@@ -12,7 +12,6 @@ import { NumberInput } from 'hds-react/components/NumberInput';
 import { ChangeEvent, FC, useCallback, useState, MouseEvent, useEffect, memo, useRef } from 'react';
 import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
-import _ from 'lodash';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`row-${projectId}`)?.classList.add('active');
@@ -47,7 +46,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
   const updatePlanEnd = () => {
     if (!isLastOfType) {
-      req.estPlanningEnd = updateYear(planEnd, cellToUpdate?.year);
+      req.estPlanningEnd = updateYear(cellToUpdate?.year, planEnd);
     } else {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
@@ -56,7 +55,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
   const updateConEnd = () => {
     if (!isLastOfType) {
-      req.estConstructionEnd = updateYear(conEnd, cellToUpdate?.year);
+      req.estConstructionEnd = updateYear(cellToUpdate?.year, conEnd);
     } else {
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
@@ -79,13 +78,13 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   const updateDatesIfStartEndOrOverlap = () => {
     switch (type) {
       case 'planStart':
-        req.estPlanningStart = updateYear(planStart, cellToUpdate?.year);
+        req.estPlanningStart = updateYear(cellToUpdate?.year, planStart);
         break;
       case 'planEnd':
         updatePlanEnd();
         break;
       case 'conStart':
-        req.estConstructionStart = updateYear(conStart, cellToUpdate?.year);
+        req.estConstructionStart = updateYear(cellToUpdate?.year, conStart);
         break;
       case 'conEnd':
         updateConEnd();

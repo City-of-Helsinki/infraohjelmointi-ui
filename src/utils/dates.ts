@@ -6,7 +6,7 @@ import moment from 'moment';
  * @param date date string in HDS format
  * @returns
  */
-const momentFromHDSDate = (date: string | undefined) => moment(date, 'DD.MM.YYYY');
+const momentFromHDSDate = (date?: string) => moment(date, 'DD.MM.YYYY');
 
 /**
  * Checks if a date range is included in a year
@@ -18,10 +18,9 @@ const momentFromHDSDate = (date: string | undefined) => moment(date, 'DD.MM.YYYY
  */
 export const isInYearRange = (
   year: number,
-  startDate: string | undefined | null,
-  endDate: string | undefined | null,
+  startDate?: string | null,
+  endDate?: string | null,
 ): boolean => {
-  // const startYear = parseInt(startDate?.split('.').pop() || '0');
   const startYear = startDate ? parseInt(momentFromHDSDate(startDate).format('YYYY')) : 0;
   const endYear = endDate ? parseInt(momentFromHDSDate(endDate).format('YYYY')) : 0;
   return startYear && endYear ? year >= startYear && year <= endYear : false;
@@ -52,7 +51,7 @@ export const sortArrayByDates = (array: Array<any>, dateProperty: string, revers
  * @param date date string in HDS format
  * @returns HDS date with an added year
  */
-export const addYear = (date: string | undefined | null) =>
+export const addYear = (date?: string | null) =>
   date ? momentFromHDSDate(date).add(1, 'y').format('DD.MM.YYYY') : null;
 
 /**
@@ -61,17 +60,17 @@ export const addYear = (date: string | undefined | null) =>
  * @param date date string in HDS format
  * @returns HDS date with a substracted year
  */
-export const removeYear = (date: string | undefined | null) =>
+export const removeYear = (date?: string | null) =>
   date ? momentFromHDSDate(date).subtract(1, 'y').format('DD.MM.YYYY') : null;
 
 export const isSameYear = (date: string | null | undefined, year: number) => {
   return getYear(date) === year;
 };
 
-export const getYear = (date: string | undefined | null): number =>
+export const getYear = (date?: string | null): number =>
   date ? parseInt(momentFromHDSDate(date).format('YYYY')) : 0;
 
-export const updateYear = (date: string | undefined | null, year: number | undefined) => {
+export const updateYear = (year: number | undefined, date?: string | null) => {
   if (date && year) {
     const moment = momentFromHDSDate(date);
     moment.set({ year: year, month: moment.month(), day: moment.day() });
