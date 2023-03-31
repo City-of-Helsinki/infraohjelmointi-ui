@@ -17,13 +17,6 @@ const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`row-${projectId}`)?.classList.add('active');
 };
 
-const removeActiveClassFromProjectRow = (projectId: string) => {
-  document.getElementById(`row-${projectId}`)?.classList.remove('active');
-};
-
-const isProjectRowActive = (projectId: string) =>
-  document.getElementById(`row-${projectId}`)?.classList.contains('active');
-
 const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   const {
     type,
@@ -329,11 +322,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   // Set the active css-class to the current row using the project id, this will render the edit-buttons and borders
   const onEditCell = useCallback(() => {
-    if (isProjectRowActive(id)) {
-      removeActiveClassFromProjectRow(id);
-    } else {
-      addActiveClassToProjectRow(id);
-    }
+    addActiveClassToProjectRow(id);
   }, [id]);
 
   // Convert any cell type to 'planning' / 'construction' / 'overlap' / 'none'
