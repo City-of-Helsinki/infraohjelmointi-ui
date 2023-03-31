@@ -186,75 +186,77 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
   return req;
 };
 
-const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
-  const {
-    isEndOfTimeline,
-    isStartOfTimeline,
-    planEnd,
-    planStart,
-    conStart,
-    conEnd,
-    financesList,
-    startYear,
-  } = cell;
+const moveTimelineForward = (finances: Array<Array<string | null>>, cell: IProjectCell) => {
+  const { planEnd, conEnd, planStart, conStart, startYear } = cell;
 
   const req: IProjectRequest = { finances: { year: startYear } };
+
+  if (planEnd) {
+    req.estPlanningStart = addYear(planStart);
+    req.estPlanningEnd = addYear(planEnd);
+  }
+
+  if (conEnd) {
+    req.estConstructionStart = addYear(conStart);
+    req.estConstructionEnd = addYear(conEnd);
+  }
+
+  for (let i = finances.length - 1; i >= 0; i--) {
+    if (i !== finances.length - 1) {
+      finances[i + 1][1] = finances[i][1];
+    }
+  }
+
+  finances.slice(0).forEach((f) => {
+    // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
+    if (req.finances) {
+      (req.finances[f[0] as keyof IProjectFinancesRequestObject] as string | null) = f[1];
+    }
+  });
+
+  return req;
+};
+
+const moveTimelineBackward = (finances: Array<Array<string | null>>, cell: IProjectCell) => {
+  const { planEnd, conEnd, planStart, conStart, startYear } = cell;
+  const req: IProjectRequest = { finances: { year: startYear } };
+
+  if (planEnd) {
+    req.estPlanningStart = removeYear(planStart);
+    req.estPlanningEnd = removeYear(planEnd);
+  }
+
+  if (conEnd) {
+    req.estConstructionStart = removeYear(conStart);
+    req.estConstructionEnd = removeYear(conEnd);
+  }
+
+  for (let i = 1; i < finances.length; i++) {
+    finances[i - 1][1] = finances[i][1];
+  }
+
+  finances.forEach((b) => {
+    // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
+    if (req.finances) {
+      (req.finances[b[0] as keyof IProjectFinancesRequestObject] as string | null) = b[1];
+    }
+  });
+
+  return req;
+};
+
+const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
+  const { isEndOfTimeline, isStartOfTimeline, financesList } = cell;
+
+  let req: IProjectRequest = {};
   const nextFinances = [...financesList];
-
-  const moveTimelineForward = () => {
-    if (planStart) {
-      req.estPlanningStart = addYear(planStart);
-      req.estPlanningEnd = addYear(planEnd);
-    }
-
-    if (conEnd) {
-      req.estConstructionStart = addYear(conStart);
-      req.estConstructionEnd = addYear(conEnd);
-    }
-
-    for (let i = nextFinances.length - 1; i >= 0; i--) {
-      if (i !== nextFinances.length - 1) {
-        nextFinances[i + 1][1] = nextFinances[i][1];
-      }
-    }
-
-    nextFinances.slice(0).forEach((f) => {
-      // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
-      if (req.finances) {
-        (req.finances[f[0] as keyof IProjectFinancesRequestObject] as string | null) = f[1];
-      }
-    });
-  };
-
-  const moveTimelineBackward = () => {
-    if (planEnd) {
-      req.estPlanningStart = removeYear(planStart);
-      req.estPlanningEnd = removeYear(planEnd);
-    }
-
-    if (conEnd) {
-      req.estConstructionStart = removeYear(conStart);
-      req.estConstructionEnd = removeYear(conEnd);
-    }
-
-    for (let i = 1; i < nextFinances.length; i++) {
-      nextFinances[i - 1][1] = nextFinances[i][1];
-    }
-
-    nextFinances.forEach((b) => {
-      // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
-      if (req.finances) {
-        (req.finances[b[0] as keyof IProjectFinancesRequestObject] as string | null) = b[1];
-      }
-    });
-  };
 
   switch (true) {
     case direction === 'right' && isEndOfTimeline:
-      moveTimelineForward();
+      req = moveTimelineForward(nextFinances, cell);
       break;
     case direction === 'left' && isStartOfTimeline:
-      moveTimelineBackward();
+      req = moveTimelineBackward(nextFinances, cell);
       break;
   }
 
