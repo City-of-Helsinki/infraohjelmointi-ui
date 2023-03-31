@@ -289,19 +289,19 @@ export interface IProjectCell {
   /**
    * When planning starts (can be used to get the timeline schedule for any cell)
    */
-  planStart: string | null | undefined;
+  planStart?: string | null;
   /**
    * When planning ends (can be used to get the timeline schedule for any cell)
    */
-  planEnd: string | null | undefined;
+  planEnd?: string | null;
   /**
    * When construction starts (can be used to get the timeline schedule for any cell)
    */
-  conStart: string | null | undefined;
+  conStart?: string | null;
   /**
    * When construction ends (can be used to get the timeline schedule for any cell)
    */
-  conEnd: string | null | undefined;
+  conEnd?: string | null;
   /**
    * Previous cell to the left (used when adding new cells)
    */

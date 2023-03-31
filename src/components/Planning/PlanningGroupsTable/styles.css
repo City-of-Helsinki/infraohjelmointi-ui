@@ -110,11 +110,7 @@ tr.active .none + .overlap {
 }
 
 .edit-timeline-button {
-  @apply absolute z-[999] h-[0.9rem] w-[0.7rem] -translate-x-2 -translate-y-2 rounded-[1px] bg-[var(--color-black-70)];
-}
-
-.edit-timeline-button {
-  @apply hidden;
+  @apply absolute z-[999] hidden h-[0.9rem] w-[0.7rem] -translate-x-2 -translate-y-2 rounded-[1px] bg-[var(--color-black-70)];
 }
 
 tr.active .edit-timeline-button {

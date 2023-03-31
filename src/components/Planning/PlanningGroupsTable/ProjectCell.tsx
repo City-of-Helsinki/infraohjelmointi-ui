@@ -45,51 +45,64 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
   const req: IProjectRequest = { finances: { year: startYear, ...financesToReset } };
 
-  // If it's the last cell of its type (plan/con/overflow)
-  if (isLastOfType) {
-    switch (type) {
-      case 'planEnd':
-        req.estPlanningStart = null;
-        req.estPlanningEnd = null;
-        break;
-      case 'conEnd':
-        req.estConstructionStart = null;
-        req.estConstructionEnd = null;
-        break;
-      default:
-        if (isStartOfTimeline) {
-          req.estPlanningStart = null;
-          req.estPlanningEnd = null;
-        }
-        if (isEndOfTimeline) {
-          req.estConstructionStart = null;
-          req.estConstructionEnd = null;
-        }
+  const updatePlanEnd = () => {
+    if (!isLastOfType) {
+      req.estPlanningEnd = updateYear(planEnd, cellToUpdate?.year);
+    } else {
+      req.estPlanningStart = null;
+      req.estPlanningEnd = null;
     }
-  }
-  // Else if it's plan/con start/end or an overlap cell
-  else {
+  };
+
+  const updateConEnd = () => {
+    if (!isLastOfType) {
+      req.estConstructionEnd = updateYear(conEnd, cellToUpdate?.year);
+    } else {
+      req.estConstructionStart = null;
+      req.estConstructionEnd = null;
+    }
+  };
+
+  const updateOverlap = () => {
+    if (isStartOfTimeline) {
+      req.estPlanningStart = null;
+      req.estPlanningEnd = null;
+    } else req.estPlanningEnd = removeYear(planEnd);
+    if (isEndOfTimeline) {
+      req.estConstructionStart = null;
+      req.estConstructionEnd = null;
+    } else {
+      req.estConstructionStart = addYear(conStart);
+    }
+  };
+
+  const updateDatesIfStartEndOrOverlap = () => {
     switch (type) {
       case 'planStart':
         req.estPlanningStart = updateYear(planStart, cellToUpdate?.year);
         break;
       case 'planEnd':
-        req.estPlanningEnd = updateYear(planEnd, cellToUpdate?.year);
+        updatePlanEnd();
         break;
       case 'conStart':
         req.estConstructionStart = updateYear(conStart, cellToUpdate?.year);
         break;
       case 'conEnd':
-        req.estConstructionEnd = updateYear(conEnd, cellToUpdate?.year);
+        updateConEnd();
         break;
       case 'overlap':
-        req.estPlanningEnd = removeYear(planEnd);
-        req.estConstructionStart = addYear(conStart);
+        updateOverlap();
         break;
+      default:
+        return;
     }
-  }
+  };
 
-  if (req.finances) {
+  const updateFinances = () => {
+    if (!req.finances) {
+      return;
+    }
+
     // If there is a cellToUpdate move the deleted cells budget to that cell
     if (cellToUpdate) {
       const updateKey = cellToUpdate.financeKey;
@@ -103,7 +116,10 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     (req.finances[financeKey as keyof IProjectFinancesRequestObject] as string | null) = isEdgeCell
       ? '0'
       : null;
-  }
+  };
+
+  updateDatesIfStartEndOrOverlap();
+  updateFinances();
 
   return req;
 };
@@ -117,38 +133,56 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
     conEnd,
     next,
     prev,
-    isStartOfTimeline,
     isLastOfType,
     startYear,
+    isEdgeCell,
+    isStartOfTimeline,
   } = cell;
 
   const req: IProjectRequest = { finances: { year: startYear } };
 
-  switch (direction) {
-    case 'left':
-      if (isStartOfTimeline && (type === 'planStart' || type === 'planEnd' || type === 'overlap')) {
-        req.estPlanningStart = removeYear(planStart);
-      }
-      if ((isLastOfType && type === 'conEnd') || type === 'conStart') {
-        req.estConstructionStart = removeYear(conStart);
-      }
-      break;
-    case 'right':
-      if (type === 'planEnd') {
-        req.estPlanningEnd = addYear(planEnd);
-      }
-      if (type === 'conEnd' || type === 'overlap') {
-        req.estConstructionEnd = addYear(conEnd);
-      }
-      break;
-  }
+  const updateLeft = () => {
+    if (isStartOfTimeline && (type === 'planStart' || type === 'planEnd' || type === 'overlap')) {
+      req.estPlanningStart = removeYear(planStart);
+    } else if ((isLastOfType && type === 'conEnd') || type === 'conStart') {
+      req.estConstructionStart = removeYear(conStart);
+    }
+  };
 
-  const nextCell = direction === 'right' ? next : prev;
+  const updateRight = () => {
+    if (type === 'planEnd') {
+      req.estPlanningEnd = addYear(planEnd);
+    } else if (type === 'conEnd' || type === 'overlap') {
+      req.estConstructionEnd = addYear(conEnd);
+    }
+  };
 
-  // Set the next finances sum to 0 if it's null
-  if (req.finances && nextCell && nextCell.budget === null) {
+  const updateStartOrEndDateIfEdgeCell = () => {
+    if (!isEdgeCell) {
+      return;
+    }
+    switch (direction) {
+      case 'left':
+        updateLeft();
+        break;
+      case 'right':
+        updateRight();
+        break;
+    }
+  };
+
+  const setNextFinanceToZeroIfNull = () => {
+    const nextCell = direction === 'right' ? next : prev;
+
+    if (!req.finances || nextCell?.budget !== null) {
+      return;
+    }
+
     (req.finances[nextCell.financeKey as keyof IProjectFinancesRequestObject] as string) = '0';
-  }
+  };
+
+  updateStartOrEndDateIfEdgeCell();
+  setNextFinanceToZeroIfNull();
 
   return req;
 };
@@ -168,12 +202,12 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
   const req: IProjectRequest = { finances: { year: startYear } };
   const nextFinances = [...financesList];
 
-  // Move the timeline FORWARD by one year if direction is RIGHT and it's the LAST cell
-  if (isEndOfTimeline && direction === 'right') {
+  const moveTimelineForward = () => {
     if (planStart) {
       req.estPlanningStart = addYear(planStart);
       req.estPlanningEnd = addYear(planEnd);
     }
+
     if (conEnd) {
       req.estConstructionStart = addYear(conStart);
       req.estConstructionEnd = addYear(conEnd);
@@ -191,13 +225,14 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
         (req.finances[f[0] as keyof IProjectFinancesRequestObject] as string | null) = f[1];
       }
     });
-  }
-  // Move the timeline BACKWARD by one year if direction is LEFT and it's the FIRST cell
-  else if (isStartOfTimeline && direction === 'left') {
+  };
+
+  const moveTimelineBackward = () => {
     if (planEnd) {
       req.estPlanningStart = removeYear(planStart);
       req.estPlanningEnd = removeYear(planEnd);
     }
+
     if (conEnd) {
       req.estConstructionStart = removeYear(conStart);
       req.estConstructionEnd = removeYear(conEnd);
@@ -213,6 +248,15 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
         (req.finances[b[0] as keyof IProjectFinancesRequestObject] as string | null) = b[1];
       }
     });
+  };
+
+  switch (true) {
+    case direction === 'right' && isEndOfTimeline:
+      moveTimelineForward();
+      break;
+    case direction === 'left' && isStartOfTimeline:
+      moveTimelineBackward();
+      break;
   }
 
   return req;

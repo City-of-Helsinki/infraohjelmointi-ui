@@ -4,9 +4,9 @@ import {
   IProjectCell,
   IProjectFinances,
   IProjectFinancesRequestObject,
+  ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
 import { isInYearRange, isSameYear } from '@/utils/dates';
-import _ from 'lodash';
 import { useEffect, useState } from 'react';
 
 const getProjectCells = (project: IProject) => {
@@ -28,18 +28,36 @@ const getProjectCells = (project: IProject) => {
       ? isInYearRange(cellYear, estConstructionStart, estConstructionEnd)
       : false;
 
-    if (isPlanning && isConstruction) {
-      return 'overlap';
-    } else if (isPlanning) {
-      if (isSameYear(estPlanningEnd, cellYear)) return 'planEnd';
-      else if (isSameYear(estPlanningStart, cellYear)) return 'planStart';
-      else if (value !== null) return 'plan';
-    } else if (isConstruction) {
-      if (isSameYear(estConstructionEnd, cellYear)) return 'conEnd';
-      else if (isSameYear(estConstructionStart, cellYear)) return 'conStart';
-      else if (value !== null) return 'con';
+    const setPlanningType = () => {
+      if (isSameYear(estPlanningEnd, cellYear)) {
+        return 'planEnd';
+      }
+      if (isSameYear(estPlanningStart, cellYear)) {
+        return 'planStart';
+      }
+      return value !== null ? 'plan' : 'none';
+    };
+
+    const setConstructionType = () => {
+      if (isSameYear(estConstructionEnd, cellYear)) {
+        return 'conEnd';
+      }
+      if (isSameYear(estConstructionStart, cellYear)) {
+        return 'conStart';
+      }
+      return value !== null ? 'con' : 'none';
+    };
+
+    switch (true) {
+      case isPlanning && isConstruction:
+        return 'overlap';
+      case isPlanning:
+        return setPlanningType();
+      case isConstruction:
+        return setConstructionType();
+      default:
+        return 'none';
     }
-    return 'none';
   };
 
   /**
@@ -53,11 +71,11 @@ const getProjectCells = (project: IProject) => {
     currentCellIndex: number,
     updateCellIndex: number,
   ): IProjectFinancesRequestObject | null => {
-    const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+    const moveRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
 
     const financesToReset = cells.reduce(
       (acc: IProjectFinancesRequestObject, curr: IProjectCell, i) => {
-        if (growRight) {
+        if (moveRight) {
           if (i > updateCellIndex && i < currentCellIndex) {
             (acc[curr.financeKey] as string) = '0';
           }
@@ -71,6 +89,7 @@ const getProjectCells = (project: IProject) => {
       { year: year },
     );
 
+    // If there is only one key it will be year, return null instead
     return Object.keys(financesToReset).length > 1 ? financesToReset : null;
   };
 
@@ -78,9 +97,10 @@ const getProjectCells = (project: IProject) => {
    * Gets the cell to update, this cell will be the next cell that isn't a 'none' type
    */
   const getCellToUpdate = (cell: IProjectCell, currentCellIndex: number) => {
-    const growRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+    const moveRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+
     // Find the next available cell backwards
-    if (growRight) {
+    if (moveRight) {
       for (let i = currentCellIndex - 1; i > 0; i--) {
         if (cells[i].type !== 'none') return cells[i];
       }
@@ -92,6 +112,29 @@ const getProjectCells = (project: IProject) => {
       }
     }
     return null;
+  };
+
+  /**
+   * Gets the cell grow directions based on the next and prev cells
+   */
+  const getCellGrowDirections = (
+    cell: IProjectCell,
+    prev: IProjectCell | null,
+    next: IProjectCell | null,
+  ) => {
+    const growDirections: Array<ProjectCellGrowDirection> = [];
+
+    if (cell.type === 'none') {
+      return growDirections;
+    }
+    if (prev?.type === 'none') {
+      growDirections.push('left');
+    }
+    if (next?.type === 'none') {
+      growDirections.push('right');
+    }
+
+    return growDirections;
   };
 
   // Create cells
@@ -150,12 +193,6 @@ const getProjectCells = (project: IProject) => {
     const next = index === cells.length - 1 ? null : cells[index + 1];
     const cellToUpdate = cell.type !== 'none' ? getCellToUpdate(cell, index) : null;
 
-    // Populate grow directions for css buttons to render
-    if (cell.type !== 'none') {
-      if (prev && prev.type === 'none') cell.growDirections.push('left');
-      if (next && next.type === 'none') cell.growDirections.push('right');
-    }
-
     const updateIndex =
       cellToUpdate && cells.findIndex((c) => c.financeKey === cellToUpdate?.financeKey);
 
@@ -168,6 +205,7 @@ const getProjectCells = (project: IProject) => {
       prev,
       next,
       cellToUpdate,
+      growDirections: getCellGrowDirections(cell, prev, next),
     };
   });
 
@@ -190,8 +228,6 @@ const useProjectCells = (project: IProject) => {
       setProjectCells(getProjectCells(project));
     }
   }, [project]);
-
-  console.log(projectCells);
 
   return projectCells;
 };

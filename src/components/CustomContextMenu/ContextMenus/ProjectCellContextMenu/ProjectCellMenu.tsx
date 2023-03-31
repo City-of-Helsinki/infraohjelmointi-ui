@@ -25,8 +25,8 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
 }) => {
   const { t } = useTranslation();
   const options: Array<IOption> = [
-    { value: 'planning', label: 'Suunnittelu' },
-    { value: 'construction', label: 'Rakentaminen' },
+    { value: 'plan', label: 'Suunnittelu' },
+    { value: 'con', label: 'Rakentaminen' },
   ];
 
   const handleEditTimeline = useCallback(() => {
