@@ -3,9 +3,6 @@ import { IGroupForm } from '@/interfaces/formInterfaces';
 import { useForm } from 'react-hook-form';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useAppSelector } from '@/hooks/common';
-import { selectMasterClasses, selectClasses, selectSubClasses } from '@/reducers/classSlice';
-import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 

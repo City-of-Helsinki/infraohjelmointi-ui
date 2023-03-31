@@ -3,7 +3,6 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { arrayHasValue, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import _ from 'lodash';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
@@ -26,7 +25,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
 
     searchParams.push(`projectName=${projectName}`);
     searchParams.push('inGroup=false');
-    searchParams.push('programmed=false');
+    searchParams.push('programmed=true');
 
     return { limit: '30', params: searchParams.join('&'), order: 'new' };
   };
@@ -73,7 +72,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
             .catch(() => reject([]));
         });
       } else {
-        return new Promise<{ value: string; label: string }[]>((resolve, reject) => resolve([]));
+        return Promise.resolve([]);
       }
     },
     [getValues, showAdvanceFields],
@@ -107,7 +106,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
     <div className="dialog-section" data-testid="search-project-field-section">
       <Controller
         name="projectsForSubmit"
-        control={control as Control<IGroupForm, any>}
+        control={control}
         render={({ field: { onChange } }) => (
           <>
             <SearchInput
