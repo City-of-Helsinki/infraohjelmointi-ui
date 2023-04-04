@@ -1,15 +1,17 @@
 import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
-import './styles.css';
-import { useAppSelector } from '@/hooks/common';
-import { selectSelectedMasterClass } from '@/reducers/classSlice';
 import { IconAngleLeft } from 'hds-react/icons';
 import { useNavigate } from 'react-router';
-import { useCallback } from 'react';
+import { FC, useCallback } from 'react';
+import { IClass } from '@/interfaces/classInterfaces';
+import './styles.css';
 
-const PlanningInfoPanel = () => {
+interface IPlanningInfoPanelProps {
+  selectedMasterClass: IClass | null;
+}
+
+const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass }) => {
   const { t } = useTranslation();
-  const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
   const navigate = useNavigate();
 
   const navigateBack = useCallback(() => {

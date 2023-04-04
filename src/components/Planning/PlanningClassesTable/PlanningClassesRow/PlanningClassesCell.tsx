@@ -2,12 +2,13 @@ import { BubbleIcon } from '../../../shared';
 import { FC, memo } from 'react';
 import { ClassTableHierarchy } from '@/interfaces/common';
 import './styles.css';
+import { PlanningTableRowType } from '@/hooks/usePlanningTableRows';
 
 interface IPlanningClassesCellProps {
   sum: string;
   position: number;
-  hierarchy: ClassTableHierarchy;
-  type: 'class' | 'location';
+  // hierarchy: ClassTableHierarchy;
+  type: PlanningTableRowType;
 }
 
 // eslint-disable-next-line react/display-name
@@ -18,9 +19,18 @@ const OverrunSum = memo(({ value }: { value: string }) => (
   </span>
 ));
 
-const PlanningClassesCell: FC<IPlanningClassesCellProps> = ({ sum, position, hierarchy, type }) => {
+const PlanningClassesCell: FC<IPlanningClassesCellProps> = ({
+  sum,
+  position,
+  //hierarchy,
+  type,
+}) => {
   // Hide values from districts, just a mock implementation to display things correctly for now
-  const hideValues = hierarchy === 'second' && type === 'location';
+  // const hideValues = hierarchy === 'second' && type === 'location';
+
+  const hideValues = false;
+  const hierarchy = ClassTableHierarchy.First;
+
   return (
     <td className={`table-cell ${type} ${hierarchy}`}>
       {!hideValues && (

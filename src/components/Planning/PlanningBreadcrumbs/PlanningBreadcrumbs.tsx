@@ -1,13 +1,9 @@
-import { useAppSelector } from '@/hooks/common';
-import {
-  selectSelectedClass,
-  selectSelectedMasterClass,
-  selectSelectedSubClass,
-} from '@/reducers/classSlice';
 import { IconAngleRight } from 'hds-react/icons';
 import { t } from 'i18next';
-import { memo } from 'react';
+import { FC, memo } from 'react';
 import { Link } from 'react-router-dom';
+import { IClass } from '@/interfaces/classInterfaces';
+import { ILocation } from '@/interfaces/locationInterfaces';
 import './styles.css';
 
 const BreadCrumb = memo(({ value, path }: { value: string; path: string }) => (
@@ -21,16 +17,23 @@ const BreadCrumb = memo(({ value, path }: { value: string; path: string }) => (
 
 BreadCrumb.displayName = 'BreadCrumb';
 
-const PlanningBreadcrumbs = () => {
-  const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
-  const selectedClass = useAppSelector(selectSelectedClass);
-  const selectedSubClass = useAppSelector(selectSelectedSubClass);
+interface PlanningBreadcrumbs {
+  selections: {
+    selectedMasterClass: IClass | null;
+    selectedClass: IClass | null;
+    selectedSubClass: IClass | null;
+    selectedDistrict: ILocation | null;
+  };
+}
 
+const PlanningBreadcrumbs: FC<PlanningBreadcrumbs> = ({ selections }) => {
+  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
   return (
     <ul className="breadcrumbs-list">
       <li>
         <Link to="">{t('enums.programming')}</Link>
       </li>
+
       {selectedMasterClass && (
         <BreadCrumb path={`${selectedMasterClass?.id}`} value={selectedMasterClass.name} />
       )}
@@ -44,6 +47,12 @@ const PlanningBreadcrumbs = () => {
         <BreadCrumb
           path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass.id}`}
           value={selectedSubClass.name}
+        />
+      )}
+      {selectedDistrict && (
+        <BreadCrumb
+          path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass?.id}/${selectedDistrict.id}`}
+          value={selectedDistrict.name}
         />
       )}
     </ul>

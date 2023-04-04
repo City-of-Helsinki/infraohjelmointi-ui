@@ -9,9 +9,6 @@ interface IClassState {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
-  selectedMasterClass: IClass | null;
-  selectedClass: IClass | null;
-  selectedSubClass: IClass | null;
   error: IError | null | unknown;
 }
 
@@ -20,9 +17,6 @@ const initialState: IClassState = {
   masterClasses: [],
   classes: [],
   subClasses: [],
-  selectedMasterClass: null,
-  selectedClass: null,
-  selectedSubClass: null,
   error: null,
 };
 
@@ -59,15 +53,6 @@ export const classSlice = createSlice({
           : [],
       };
     },
-    setSelectedMasterClass(state, action: PayloadAction<IClass | null>) {
-      return { ...state, selectedMasterClass: action.payload };
-    },
-    setSelectedClass(state, action: PayloadAction<IClass | null>) {
-      return { ...state, selectedClass: action.payload };
-    },
-    setSelectedSubClass(state, action: PayloadAction<IClass | null>) {
-      return { ...state, selectedSubClass: action.payload };
-    },
   },
   extraReducers: (builder) => {
     // GET ALL
@@ -84,17 +69,7 @@ export const selectAllClasses = (state: RootState) => state.class.allClasses;
 export const selectMasterClasses = (state: RootState) => state.class.masterClasses;
 export const selectClasses = (state: RootState) => state.class.classes;
 export const selectSubClasses = (state: RootState) => state.class.subClasses;
-export const selectSelectedMasterClass = (state: RootState) => state.class.selectedMasterClass;
-export const selectSelectedClass = (state: RootState) => state.class.selectedClass;
-export const selectSelectedSubClass = (state: RootState) => state.class.selectedSubClass;
 
-export const {
-  setMasterClasses,
-  setClasses,
-  setSubClasses,
-  setSelectedMasterClass,
-  setSelectedClass,
-  setSelectedSubClass,
-} = classSlice.actions;
+export const { setMasterClasses, setClasses, setSubClasses } = classSlice.actions;
 
 export default classSlice.reducer;

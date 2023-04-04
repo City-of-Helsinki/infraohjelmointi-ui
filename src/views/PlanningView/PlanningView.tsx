@@ -1,39 +1,25 @@
-import { FC, useEffect } from 'react';
-import { useAppDispatch } from '@/hooks/common';
-import {
-  getClassesThunk,
-  setClasses,
-  setMasterClasses,
-  setSubClasses,
-} from '@/reducers/classSlice';
-import './styles.css';
+import { FC } from 'react';
 import { PlanningToolbar } from '@/components/Planning/PlanningToolbar';
 import { PlanningInfoPanel } from '@/components/Planning/PlanningInfoPanel';
 import { PlanningYearsTable } from '@/components/Planning/PlanningYearsTable';
 import { PlanningTable } from '@/components/Planning/PlanningTable';
 import { PlanningBreadcrumbs } from '@/components/Planning/PlanningBreadcrumbs';
+import usePlanningTableRows from '@/hooks/usePlanningTableRows';
+import './styles.css';
 
 const PlanningView: FC = () => {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(getClassesThunk()).then(() => {
-      dispatch(setMasterClasses());
-      dispatch(setClasses());
-      dispatch(setSubClasses());
-    });
-  }, []);
+  const { rows, selections } = usePlanningTableRows();
 
   return (
     <>
-      <PlanningBreadcrumbs />
+      <PlanningBreadcrumbs selections={selections} />
       <PlanningToolbar />
       <div className="planning-view-container">
         <div className="flex">
-          <PlanningInfoPanel />
+          <PlanningInfoPanel selectedMasterClass={selections.selectedMasterClass} />
           <PlanningYearsTable />
         </div>
-        <PlanningTable />
+        <PlanningTable rows={rows} />
       </div>
     </>
   );

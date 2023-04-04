@@ -1,16 +1,14 @@
 import { FC, memo, ReactNode, useCallback, useEffect, useState } from 'react';
-import { IClass } from '@/interfaces/classInterfaces';
 import { classSums } from '@/mocks/common';
-import { ClassTableHierarchy } from '@/interfaces/common';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import PlanningClassesCell from './PlanningClassesCell';
 import PlanningClassesHeader from './PlanningClassesHeader';
+import { PlanningTableRowType } from '@/hooks/usePlanningTableRows';
 import './styles.css';
 
 interface IPlanningClassesRowProps {
-  item: IClass | ILocation;
-  hierarchy: ClassTableHierarchy;
-  type: 'class' | 'location';
+  id: string;
+  name: string;
+  type: PlanningTableRowType;
   children?: ReactNode;
   initiallyExpanded?: true;
 }

@@ -83,7 +83,9 @@ const App: FC = () => {
               <Route path="coordinator" element={<PlanningView />}>
                 <Route path=":masterClassId" element={<PlanningView />}>
                   <Route path=":classId" element={<PlanningView />}>
-                    <Route path=":subClassId" element={<PlanningView />} />
+                    <Route path=":subClassId" element={<PlanningView />}>
+                      <Route path=":districtId" element={<PlanningView />} />
+                    </Route>
                   </Route>
                 </Route>
               </Route>

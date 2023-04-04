@@ -1,175 +1,37 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { IClass } from '@/interfaces/classInterfaces';
-import { ClassTableHierarchy } from '@/interfaces/common';
-import { selectDistricts, selectDivisions } from '@/reducers/locationSlice';
-import { memo, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
-import {
-  selectClasses,
-  selectMasterClasses,
-  selectSelectedClass,
-  selectSelectedMasterClass,
-  selectSelectedSubClass,
-  selectSubClasses,
-  setSelectedClass,
-  setSelectedMasterClass,
-  setSelectedSubClass,
-} from '@/reducers/classSlice';
-import './styles.css';
+/* eslint-disable react/jsx-key */
+import { FC, memo } from 'react';
 import PlanningClassesRow from './PlanningClassesRow/PlanningClassesRow';
+import { IPlanningTableRow } from '@/hooks/usePlanningTableRows';
+import './styles.css';
 
-const PlanningClassesTable = () => {
-  const { masterClassId, classId, subClassId } = useParams();
-  const dispatch = useAppDispatch();
-  const masterClasses = useAppSelector(selectMasterClasses);
-  const classes = useAppSelector(selectClasses);
-  const subClasses = useAppSelector(selectSubClasses);
-  const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
-  const selectedClass = useAppSelector(selectSelectedClass);
-  const selectedSubClass = useAppSelector(selectSelectedSubClass);
+interface IPlanningClassesTableProps {
+  rows: Array<IPlanningTableRow>;
+}
 
-  const mockDistrict = useAppSelector(selectDistricts)[0];
-  const mockDivision = useAppSelector(selectDivisions)[0];
-  /**
-   * set selected classes to redux according to url, if their url param id is removed, then they will
-   * be set to null (i.e, the user navigates back)
-   */
-  useEffect(() => {
-    const selectedMasterClass = masterClassId
-      ? (masterClasses.find((mc) => mc.id === masterClassId) as IClass)
-      : null;
-    dispatch(setSelectedMasterClass(selectedMasterClass));
-  }, [masterClassId, masterClasses]);
-
-  useEffect(() => {
-    const selectedClass = classId ? (classes.find((c) => c.id === classId) as IClass) : null;
-    dispatch(setSelectedClass(selectedClass));
-  }, [classId, classes]);
-
-  useEffect(() => {
-    const selectedSubClass = subClassId
-      ? (subClasses.find((sc) => sc.id === subClassId) as IClass)
-      : null;
-    dispatch(setSelectedSubClass(selectedSubClass));
-  }, [subClassId, subClasses]);
-
-  const allMasterClassRows = useCallback(
-    () =>
-      masterClasses.map((mc) => (
-        <PlanningClassesRow
-          key={mc.id}
-          item={mc}
-          hierarchy={ClassTableHierarchy.First}
-          type="class"
-        />
-      )),
-    [masterClasses],
-  );
-
-  const allClassRows = useCallback(
-    () =>
-      selectedMasterClass
-        ? [...classes.filter((c) => c.parent === selectedMasterClass?.id)].map((c) => (
-            <PlanningClassesRow
-              key={c.id}
-              item={c}
-              hierarchy={ClassTableHierarchy.Second}
-              type="class"
-            />
-          ))
-        : null,
-    [classes, selectedMasterClass],
-  );
-
-  const allSubClassRows = useCallback(
-    () =>
-      selectedClass
-        ? [...subClasses.filter((sc) => sc.parent === selectedClass?.id)].map((sc) => (
-            <PlanningClassesRow
-              key={sc.id}
-              item={sc}
-              hierarchy={ClassTableHierarchy.Third}
-              type="class"
-            />
-          ))
-        : null,
-    [subClasses, selectedClass],
-  );
-
+const PlanningClassesTable: FC<IPlanningClassesTableProps> = ({ rows }) => {
   return (
     <table className="planning-table" cellSpacing={0}>
       <tbody>
-        {
-          // Render all classes if no subClass is selected
-          !selectedSubClass ? (
-            // When a masterClass is selected, render only that masterClass
-            selectedMasterClass ? (
-              <PlanningClassesRow
-                key={selectedMasterClass.id}
-                item={selectedMasterClass}
-                type="class"
-                initiallyExpanded={true}
-                hierarchy={ClassTableHierarchy.First}
-              >
-                {
-                  // When a class is selected, render only that class
-                  selectedClass ? (
-                    <PlanningClassesRow
-                      key={selectedClass.id}
-                      item={selectedClass}
-                      type="class"
-                      initiallyExpanded={true}
-                      hierarchy={ClassTableHierarchy.Second}
-                    >
-                      {
-                        // When no subClass is selected, render all subClasses
-                        allSubClassRows()
-                      }
-                    </PlanningClassesRow>
-                  ) : (
-                    // When no class is selected, render all classes
-                    allClassRows()
-                  )
-                }
-              </PlanningClassesRow>
-            ) : (
-              // When no masterClass is selected, render all masterClasses
-              allMasterClassRows()
-            )
-          ) : (
-            // Render only the selectedSubClass and the projects associated with it if selected
-            <PlanningClassesRow
-              item={selectedSubClass}
-              type="class"
-              initiallyExpanded={true}
-              hierarchy={ClassTableHierarchy.First}
-            >
-              {/* District */}
-              {mockDistrict && (
-                <>
-                  <PlanningClassesRow
-                    item={mockDistrict}
-                    type="location"
-                    initiallyExpanded={true}
-                    hierarchy={ClassTableHierarchy.Second}
-                  >
-                    {/* Division */}
-                    {mockDivision && (
-                      <PlanningClassesRow
-                        item={mockDivision}
-                        type="location"
-                        initiallyExpanded={true}
-                        hierarchy={ClassTableHierarchy.Third}
-                      >
-                        {/* TODO: populate projects/groups here */}
+        {/* The planning table rows have a dynamic length, the first item could be either a masterClass or a district */}
+        {rows.map((one: IPlanningTableRow) => (
+          <PlanningClassesRow {...one}>
+            {one.childRows.map((two) => (
+              <PlanningClassesRow {...two}>
+                {two.childRows.map((three) => (
+                  <PlanningClassesRow {...three}>
+                    {three.childRows.map((four) => (
+                      <PlanningClassesRow {...four}>
+                        {four.childRows.map((five) => (
+                          <PlanningClassesRow {...five} />
+                        ))}
                       </PlanningClassesRow>
-                    )}
+                    ))}
                   </PlanningClassesRow>
-                </>
-              )}
-            </PlanningClassesRow>
-          )
-        }
+                ))}
+              </PlanningClassesRow>
+            ))}
+          </PlanningClassesRow>
+        ))}
       </tbody>
     </table>
   );

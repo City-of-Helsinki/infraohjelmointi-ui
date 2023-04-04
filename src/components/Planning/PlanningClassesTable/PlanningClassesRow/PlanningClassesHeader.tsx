@@ -1,66 +1,57 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
-import { IconButton, Span } from '../../../shared';
 import { FC, memo, useCallback } from 'react';
-import { IClass } from '@/interfaces/classInterfaces';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import { ClassTableHierarchy } from '@/interfaces/common';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import { NameTooltip } from '../NameTooltip';
+import { PlanningTableRowType } from '@/hooks/usePlanningTableRows';
 import './styles.css';
 
 interface IPlanningClassesHeaderProps {
-  item: IClass | ILocation;
-  hierarchy: ClassTableHierarchy;
-  type: 'class' | 'location';
+  id: string;
+  name: string;
+  type: PlanningTableRowType;
   handleExpand: () => void;
   expanded?: boolean;
 }
 
 const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
-  item,
-  hierarchy,
+  id,
+  name,
   type,
   handleExpand,
   expanded,
 }) => {
-  const { masterClassId, classId } = useParams();
+  const { masterClassId, classId, subClassId } = useParams();
 
-  const fontColor = type === 'class' ? 'white' : 'black';
-  const fontWeight = type === 'class' ? 'bold' : 'medium';
-  const hideDots = type === 'location' && hierarchy === ClassTableHierarchy.Second;
+  // const hideDots = type === 'location' && hierarchy === ClassTableHierarchy.Second;
+  const hideDots = false;
 
   const buildLink = useCallback(() => {
-    return [masterClassId, classId, item.id]
+    const link = [masterClassId, classId, subClassId, id]
       .join('/')
-      .replace(/(\/\/)/gm, '/') // replace double // with one in case of one of values is undefined/null
+      .replace(/(\/{2,})/gm, '/') // replace triple /// with one in case of one of values is undefined/null
       .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
-  }, [item.id, masterClassId, classId]);
+
+    return link;
+  }, [id, masterClassId, classId]);
 
   return (
-    <th className={`table-header-cell ${type} ${hierarchy}`}>
-      <div className={`table-header-content ${hierarchy}`}>
-        <div className={`table-header-content-item`}>
-          <Link to={buildLink()} className="display-flex">
-            <IconButton
-              icon={expanded ? IconAngleUp : IconAngleDown}
-              color={fontColor}
-              onClick={handleExpand}
-            />
-          </Link>
-        </div>
+    <th className={`table-header ${type}`}>
+      <div className="table-header-content">
+        <Link to={buildLink()} className="display-flex" onClick={handleExpand}>
+          {expanded ? <IconAngleUp /> : <IconAngleDown />}
+        </Link>
         {/* Dots menu */}
         {!hideDots && (
           <div className={`table-header-content-dots`}>
             <IconMenuDots size="s" />
           </div>
         )}
-        <div className={`table-header-content-item`}>
-          <div className={`table-title-container`}>
-            <Span fontWeight={fontWeight} text={item.name} color={fontColor} />
-          </div>
-          {/* Tooltip (visible if the header-content-item container is hovered) */}
-          <NameTooltip value={item.name} />
+        <div className="table-title-container">
+          {/* <Span fontWeight={fontWeight} text={item.name} color={fontColor} /> */}
+          <span className="table-header-title">{name}</span>
+          {/* FIXME: Tooltip (visible if the header-content-item container is hovered) */}
+          <NameTooltip value={name} />
         </div>
       </div>
     </th>

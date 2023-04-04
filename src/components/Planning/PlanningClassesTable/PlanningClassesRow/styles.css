@@ -1,155 +1,71 @@
 :root {
-  --color-class-first: var(--color-bus);
-  --color-class-second: rgb(0, 0, 163);
-  --color-class-third: rgb(0, 0, 129);
+  --color-masterClass: var(--color-bus);
+  --color-class: rgb(0, 0, 163);
+  --color-subClass: rgb(0, 0, 129);
 
-  --color-location-second: var(--color-fog-medium-light);
-  --color-location-third: var(--color-fog-light);
+  --color-district: var(--color-bus);
+  --color-division: var(--color-fog-medium-light);
+  --color-group: var(--color-fog-light);
 }
 
-.table-header-cell {
-  width: 30.6%;
-  padding: 0 1.5rem;
-  min-width: 23.8rem;
-  /* this works like min-height, because it will grow bigger if there is content in the cells */
-  height: 3rem;
+/* TABLE HEADER */
+.table-header {
+  /* max-width: 1rem makes it so that the header doesn't grow beyond its max width */
+  @apply w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus py-2 px-5 text-white;
 }
 
-.table-header-cell.class {
-  color: white;
-  border-bottom: 0.07rem solid var(--color-white);
+.table-header-content {
+  @apply flex items-center gap-1 overflow-ellipsis;
 }
 
-.table-header-cell > div {
-  display: flex;
-  align-items: center;
+.table-header.masterClass {
+  padding-left: 1rem;
+  background: var(--color-masterClass);
 }
 
-/* CLASS TABLE HEADER */
-.table-header-cell.class.first {
-  background: var(--color-class-first);
+.table-header.class {
+  padding-left: 2.625rem;
+  background: var(--color-class);
 }
 
-.table-header-cell.class.second {
-  background: var(--color-class-second);
+.table-header.subClass {
+  padding-left: 4.1875rem;
+  background: var(--color-subClass);
 }
 
-.table-header-cell.class.third {
-  background: var(--color-class-third);
+.table-header.district {
+  padding-left: 1rem;
+  background: var(--color-district);
+  font-size: 20px !important;
 }
 
-/* LOCATION TABLE HEADER */
-.table-header-cell.location.second {
-  background: var(--color-location-second);
+.table-header.division {
+  padding-left: 2.625rem;
+  background: var(--color-division);
+  font-size: 18px !important;
 }
 
-.table-header-cell.location.third {
-  background: var(--color-location-third);
+.table-header .table-title-container {
+  /* FIXME: remove overflow-hidden to see the tooltip, should fix*/
+  @apply relative flex overflow-hidden;
 }
 
-.table-header-cell.project {
-  background: rgb(0, 0, 102);
+.table-header .table-title-container:hover {
+  @apply cursor-pointer;
 }
 
-.table-cell {
-  padding: 0.25rem 0 0.1rem 0;
-  font-size: 0.875rem;
-  max-width: 5.37rem;
-  min-width: 5.37rem;
+.table-header .table-title-container .table-header-title {
+  @apply w-full  overflow-hidden text-ellipsis text-left;
 }
 
-.table-cell.class {
-  color: white;
-  border-bottom: 0.07rem solid var(--color-white);
+/* FIXME: set custom tooltip to block when table-title-container is hovered */
+.table-title-container:hover .tooltip-container {
+  display: block;
 }
 
-.table-cell .table-cell-container {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-rows: repeat(3, 1fr);
-}
-
-.table-cell .table-cell-container span:first-child {
-  font-size: 16px !important;
-  font-weight: bold;
-}
-
-.table-cell .table-cell-container span {
-  font-size: 14px !important;
-  width: 100%;
-}
-
-.table-cell .table-cell-container span:nth-child(3) {
-  font-weight: bold;
-  color: var(--color-suomenlinna-dark);
-}
-
-.table-cell span {
-  font-weight: 300;
-  transform: translateX(-15%);
-}
-
-/* CLASS TABLE CELL */
-.table-cell.class.first {
-  background: var(--color-class-first);
-}
-
-.table-cell.class.second {
-  background: var(--color-class-second);
-}
-
-.table-cell.class.third {
-  background: var(--color-class-third);
-}
-
-/* LOCATION TABLE CELL */
-.table-cell.location.second {
-  background: var(--color-location-second);
-}
-
-.table-cell.location.third {
-  background: var(--color-location-third);
-}
-
-.table-cell.project {
-  background: rgb(0, 0, 102);
-}
-
-.table-header-cell .table-header-content {
-  display: flex;
-  align-items: center;
-  text-overflow: ellipsis;
-}
-
-.table-header-content.first {
-  padding-left: 0;
-}
-
-.table-header-content.second {
-  padding-left: 2rem;
-}
-
-.table-header-content.third {
-  padding-left: 4rem;
-}
-
-.table-header-content.project {
-  padding-left: 6rem;
-}
-
-.table-header-content-dots {
-  display: flex;
-  margin-right: 0.5rem;
-}
-
-.table-header-content-item {
-  display: flex;
-  margin-right: 0.5rem;
-  position: relative;
-}
-
-.table-header-content-item:hover {
-  cursor: pointer;
+/* FIXME: set custom tooltip to block when table-title-container is hovered */
+.table-title-containerhover .tooltip-arrow {
+  display: block;
 }
 
 .custom-tooltip button {
@@ -166,22 +82,59 @@
   color: transparent;
 }
 
-.table-title-container {
-  max-width: 15rem;
+/* TABLE CELL */
+.table-cell {
+  @apply min-w-[var(--table-cell-width)] border-b border-white bg-bus pb-[4px] pt-[7px] align-text-top text-white;
 }
 
-/* hide too long class names */
-.table-title-container span {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  display: block;
+.table-cell.masterClass {
+  background: var(--color-masterClass);
 }
 
-.table-header-content-item:hover .tooltip-container {
-  display: block;
+.table-cell.class {
+  background: var(--color-class);
 }
 
-.table-header-content-item:hover .tooltip-arrow {
-  display: block;
+.table-cell.subClass {
+  background: var(--color-subClass);
+}
+
+.table-cell.district {
+  background: var(--color-district);
+}
+
+.table-cell.division {
+  background: var(--color-division);
+}
+
+.table-cell .table-cell-container {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.table-cell .table-cell-container span {
+  font-size: 14px !important;
+  width: 100%;
+  line-height: 22px;
+}
+
+.table-cell .table-cell-container span:first-child {
+  font-size: 16px !important;
+  font-weight: bold;
+}
+
+.table-cell .table-cell-container span:nth-child(3) {
+  font-weight: bold;
+  color: var(--color-suomenlinna-dark);
+}
+
+.table-cell span {
+  font-weight: 300;
+  transform: translateX(-15%);
+}
+
+.table-header-content-dots {
+  display: flex;
+  margin-right: 0.5rem;
 }
