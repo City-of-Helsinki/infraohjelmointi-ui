@@ -59,7 +59,9 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     if (isStartOfTimeline) {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
-    } else req.estPlanningEnd = removeYear(planEnd);
+    } else {
+      req.estPlanningEnd = removeYear(planEnd);
+    }
     if (isEndOfTimeline) {
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
@@ -195,7 +197,7 @@ const moveTimelineForward = (finances: Array<Array<string | null>>, cell: IProje
   }
 
   for (let i = finances.length - 1; i >= 0; i--) {
-    if (i !== finances.length - 1) {
+    if (i < finances.length - 1) {
       finances[i + 1][1] = finances[i][1];
     }
   }

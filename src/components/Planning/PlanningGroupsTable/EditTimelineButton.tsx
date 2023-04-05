@@ -1,7 +1,7 @@
 import useDoubleClick from '@/hooks/useDoubleClick';
 import { ProjectCellGrowDirection } from '@/interfaces/projectInterfaces';
 import { IconAngleLeft } from 'hds-react/icons';
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 
 const EditTimelineButton = ({
   direction,
@@ -25,4 +25,4 @@ const EditTimelineButton = ({
   );
 };
 
-export default EditTimelineButton;
+export default memo(EditTimelineButton);
