@@ -34,6 +34,11 @@
   @apply bg-[var(--color-district-preview)] pl-[5.5rem];
 }
 
+.table-header.district-preview {
+  padding-left: 5.875rem;
+  background: var(--color-district-preview);
+}
+
 .table-header.district {
   @apply bg-[var(--color-district)] pl-4 text-xl;
 }
@@ -94,6 +99,10 @@
 
 .table-cell.district-preview {
   @apply bg-[var(--color-district-preview)];
+}
+
+.table-cell.district-preview {
+  background: var(--color-district-preview);
 }
 
 .table-cell.district {

@@ -14,7 +14,15 @@ const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass })
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const navigateBack = useCallback(() => navigate(-1), [navigate]);
+  const navigateBack = useCallback(() => {
+    /**
+     * FIXME:
+     *
+     * navigate('./'); should up one nested path but it removes all...
+     * navigate(-1); goes back in history and can't be used here
+     */
+    navigate(-1);
+  }, []);
 
   return (
     <div className="planning-info-panel">

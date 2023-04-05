@@ -8,6 +8,7 @@ import './styles.css';
 interface IPlanningClassesHeaderProps extends IPlanningTableRow {
   handleExpand: () => void;
   expanded?: boolean;
+  defaultExpanded: boolean;
 }
 
 const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
