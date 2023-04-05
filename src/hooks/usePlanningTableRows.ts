@@ -2,9 +2,6 @@ import {
   getClassesThunk,
   selectClasses,
   selectMasterClasses,
-  // selectSelectedClass,
-  // selectSelectedMasterClass,
-  // selectSelectedSubClass,
   selectSubClasses,
   setClasses,
   setMasterClasses,
@@ -21,6 +18,7 @@ export type PlanningTableRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
+  | 'district-preview'
   | 'district'
   | 'division'
   | 'group'
@@ -33,6 +31,7 @@ export interface IPlanningTableRow {
   childRows: Array<IPlanningTableRow>;
   id: string;
   key: string;
+  defaultExpanded: boolean;
 }
 
 const buildPlanningTableRows = (
@@ -46,67 +45,63 @@ const buildPlanningTableRows = (
   selectedSubClass: IClass | null,
   selectedDistrict: ILocation | null,
 ) => {
-  const getRowProps = (
-    item: IClass | ILocation,
-    type: PlanningTableRowType,
-  ): Omit<IPlanningTableRow, 'childRows'> => ({
-    type,
-    name: item.name,
-    path: item.path,
-    id: item.id,
-    key: item.id,
-  });
-
   const masterClasses = selectedMasterClass ? [selectedMasterClass] : allMasterClasses;
   const classes = selectedClass ? [selectedClass] : allClasses;
   const subClasses = selectedSubClass ? [selectedSubClass] : allSubClasses;
   const districts = selectedDistrict ? [selectedDistrict] : allDistricts;
 
-  // Map master classes
-  const planningTableRows: Array<IPlanningTableRow> = masterClasses.map((masterClass) => ({
-    ...getRowProps(masterClass, 'masterClass'),
+  const getRowProps = (
+    item: IClass | ILocation,
+    type: PlanningTableRowType,
+    defaultExpanded?: boolean,
+  ): Omit<IPlanningTableRow, 'childRows'> => ({
+    type: type,
+    name: item.name,
+    path: item.path,
+    id: item.id,
+    key: item.id,
+    // Show all children to selectedDistrict
+    defaultExpanded: defaultExpanded || false,
+  });
+
+  // Map the class rows going from masterClasses to districts
+  const classRows: Array<IPlanningTableRow> = masterClasses.map((masterClass) => ({
+    ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
     // Map classes
     childRows: classes
       .filter((c) => c.parent === masterClass.id)
       .map((filteredClass) => ({
-        ...getRowProps(filteredClass, 'class'),
+        ...getRowProps(filteredClass, 'class', !!selectedClass),
         // Map sub classes
         childRows: subClasses
           .filter((subClass) => subClass.parent === filteredClass.id)
           .map((filteredSubClass) => ({
-            ...getRowProps(filteredSubClass, 'subClass'),
+            ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
             // Map districts
             childRows: districts
               .filter((district) => district.parentClass === filteredSubClass.id)
               .map((filteredDistrict) => ({
-                ...getRowProps(filteredDistrict, 'district'),
-                // Map divisions
-                childRows: divisions
-                  .filter((division) => division.parent === filteredDistrict.id)
-                  .map((filteredDivision) => ({
-                    ...getRowProps(filteredDivision, 'division'),
-                    childRows: [
-                      /* Groups > Projects */
-                    ],
-                  })),
+                ...getRowProps(filteredDistrict, 'district-preview'),
+                childRows: [],
               })),
           })),
       })),
   }));
 
-  const getDistrictRows = districts.map((district) => ({
-    ...getRowProps(district, 'district'),
+  // Map the selected districts divisions and the groups & projects that belong to those divisions
+  const locationRows = districts.map((district) => ({
+    ...getRowProps(district, 'district', true),
     childRows: divisions
       .filter((division) => division.parent === district.id)
       .map((filteredDivision) => ({
-        ...getRowProps(filteredDivision, 'division'),
+        ...getRowProps(filteredDivision, 'division', true),
         childRows: [
           /* Groups > Projects */
         ],
       })),
   }));
 
-  return districts.length === 1 ? getDistrictRows : planningTableRows;
+  return districts.length === 1 ? locationRows : classRows;
 };
 
 const usePlanningTableRows = () => {
@@ -160,6 +155,8 @@ const usePlanningTableRows = () => {
 
   // set selectedMasterClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
+    console.log('setting master class: ', masterClassId);
+
     setSelectedMasterClass(
       masterClassId ? (masterClasses.find((mc) => mc.id === masterClassId) as IClass) : null,
     );
@@ -167,11 +164,14 @@ const usePlanningTableRows = () => {
 
   // set selectedClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
+    console.log('setting class class: ', classId);
     setSelectedClass(classId ? (classes.find((c) => c.id === classId) as IClass) : null);
   }, [classId, classes]);
 
   // set selectedSubClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
+    console.log('setting sub class: ', subClassId);
+
     setSelectedSubClass(
       subClassId ? (subClasses.find((sc) => sc.id === subClassId) as IClass) : null,
     );
@@ -179,6 +179,8 @@ const usePlanningTableRows = () => {
 
   // set selectedDistrict if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
+    console.log('setting district: ', districtId);
+
     setSelectedDistrict(
       districtId ? (districts.find((d) => d.id === districtId) as ILocation) : null,
     );

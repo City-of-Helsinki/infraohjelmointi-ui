@@ -1,8 +1,8 @@
 :root {
   --color-masterClass: var(--color-bus);
-  --color-class: rgb(0, 0, 163);
-  --color-subClass: rgb(0, 0, 129);
-
+  --color-class: #0000a3; /* color had to be improvised */
+  --color-subClass: #01017f; /* color had to be improvised */
+  --color-district-preview: var(--color-bus-dark);
   --color-district: var(--color-bus);
   --color-division: var(--color-fog-medium-light);
   --color-group: var(--color-fog-light);
@@ -11,7 +11,7 @@
 /* TABLE HEADER */
 .table-header {
   /* max-width: 1rem makes it so that the header doesn't grow beyond its max width */
-  @apply w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus py-2 px-5 text-white;
+  @apply h-11 w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus py-2 px-5 text-white;
 }
 
 .table-header-content {
@@ -33,6 +33,11 @@
   background: var(--color-subClass);
 }
 
+.table-header.district-preview {
+  padding-left: 5.875rem;
+  background: var(--color-district-preview);
+}
+
 .table-header.district {
   padding-left: 1rem;
   background: var(--color-district);
@@ -43,6 +48,12 @@
   padding-left: 2.625rem;
   background: var(--color-division);
   font-size: 18px !important;
+  color: var(--color-black-90);
+  font-weight: 500 !important;
+}
+
+.table-header.division .table-header-content {
+  gap: 1rem;
 }
 
 .table-header .table-title-container {
@@ -99,12 +110,17 @@
   background: var(--color-subClass);
 }
 
+.table-cell.district-preview {
+  background: var(--color-district-preview);
+}
+
 .table-cell.district {
   background: var(--color-district);
 }
 
 .table-cell.division {
   background: var(--color-division);
+  color: var(--color-black-90);
 }
 
 .table-cell .table-cell-container {

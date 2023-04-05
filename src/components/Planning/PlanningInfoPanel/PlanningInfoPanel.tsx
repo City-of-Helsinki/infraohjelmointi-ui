@@ -1,10 +1,10 @@
 import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
+import './styles.css';
 import { IconAngleLeft } from 'hds-react/icons';
 import { useNavigate } from 'react-router';
 import { FC, useCallback } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
-import './styles.css';
 
 interface IPlanningInfoPanelProps {
   selectedMasterClass: IClass | null;
@@ -12,9 +12,16 @@ interface IPlanningInfoPanelProps {
 
 const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass }) => {
   const { t } = useTranslation();
+  // const selectedMasterClass = useAppSelector(selectSelectedMasterClass);
   const navigate = useNavigate();
 
   const navigateBack = useCallback(() => {
+    /**
+     * FIXME:
+     *
+     * navigate('./'); should up one nested path but it removes all...
+     * navigate(-1); goes back in history and can't be used here
+     */
     navigate(-1);
   }, []);
 

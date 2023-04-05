@@ -10,21 +10,21 @@ interface IPlanningClassesRowProps {
   name: string;
   type: PlanningTableRowType;
   children?: ReactNode;
-  initiallyExpanded?: true;
+  defaultExpanded: boolean;
 }
 
 const PlanningClassesRow: FC<IPlanningClassesRowProps> = (props) => {
-  const { initiallyExpanded, children } = props;
+  const { defaultExpanded, children } = props;
 
-  const [expanded, setExpanded] = useState(initiallyExpanded || false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   const handleExpand = useCallback(() => {
     setExpanded((current) => !current);
   }, []);
 
   useEffect(() => {
-    setExpanded(initiallyExpanded || false);
-  }, [initiallyExpanded]);
+    setExpanded(defaultExpanded || false);
+  }, [defaultExpanded]);
 
   return (
     <>
