@@ -60,12 +60,6 @@ export type FontWeightType = 'bold' | 'light' | 'medium';
 export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';
 export type InputSizeType = 'l' | 'm';
 
-export enum ClassTableHierarchy {
-  First = 'first',
-  Second = 'second',
-  Third = 'third',
-}
-
 export interface IFreeSearchResults {
   hashtags: Array<IListItem>;
   projects: Array<IListItem>;
@@ -98,4 +92,25 @@ export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 export enum ContextMenuType {
   EDIT_PROJECT_CELL,
   EDIT_PROJECT_PHASE,
+}
+
+export type PlanningTableRowType =
+  | 'masterClass'
+  | 'class'
+  | 'subClass'
+  | 'district-preview'
+  | 'district'
+  | 'division'
+  | 'group'
+  | 'project';
+
+export interface IPlanningTableRow {
+  type: PlanningTableRowType;
+  name: string;
+  path: string;
+  childRows: Array<IPlanningTableRow>;
+  id: string;
+  key: string;
+  defaultExpanded: boolean;
+  link: string | null;
 }

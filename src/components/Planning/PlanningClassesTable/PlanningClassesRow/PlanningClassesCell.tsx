@@ -1,13 +1,11 @@
 import { BubbleIcon } from '../../../shared';
 import { FC, memo } from 'react';
-import { PlanningTableRowType } from '@/hooks/usePlanningTableRows';
 import './styles.css';
+import { IPlanningTableRow } from '@/interfaces/common';
 
-interface IPlanningClassesCellProps {
+interface IPlanningClassesCellProps extends IPlanningTableRow {
   sum: string;
   position: number;
-  type: PlanningTableRowType;
-  defaultExpanded: boolean;
 }
 
 // eslint-disable-next-line react/display-name

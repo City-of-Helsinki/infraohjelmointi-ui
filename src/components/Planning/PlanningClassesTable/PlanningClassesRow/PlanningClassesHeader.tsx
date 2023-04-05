@@ -1,45 +1,34 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 import { NameTooltip } from '../NameTooltip';
-import { PlanningTableRowType } from '@/hooks/usePlanningTableRows';
+import { IPlanningTableRow } from '@/interfaces/common';
+
 import './styles.css';
 
-interface IPlanningClassesHeaderProps {
-  id: string;
-  name: string;
-  type: PlanningTableRowType;
+interface IPlanningClassesHeaderProps extends IPlanningTableRow {
   handleExpand: () => void;
   expanded?: boolean;
-  defaultExpanded: boolean;
 }
 
 const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
-  id,
+  link,
   name,
   type,
   handleExpand,
   expanded,
 }) => {
   const navigate = useNavigate();
-  const { masterClassId, classId, subClassId } = useParams();
 
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
 
-  const link = useMemo(() => {
-    return [masterClassId, classId, subClassId, id]
-      .join('/')
-      .replace(/(\/{2,})/gm, '/') // replace triple /// with one in case of one of values is undefined/null
-      .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
-  }, [id, masterClassId, classId]);
-
   const onExpand = useCallback(() => {
-    // Navigate to the next nested path if it's not a division or group
-    if (type !== 'division' && type !== 'group') {
+    // Navigate to the next nested path if there's a link
+    if (link) {
       navigate(link);
     }
     handleExpand();
-  }, [link, navigate, type]);
+  }, [handleExpand, link, navigate]);
 
   return (
     <th className={`table-header ${type}`}>

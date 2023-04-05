@@ -1,16 +1,14 @@
+// Disabled jsx-key because eslint doesn't understand that the key is spread through props
+/* eslint-disable react/jsx-key */
 import { FC, memo, ReactNode, useCallback, useEffect, useState } from 'react';
 import { classSums } from '@/mocks/common';
 import PlanningClassesCell from './PlanningClassesCell';
 import PlanningClassesHeader from './PlanningClassesHeader';
-import { PlanningTableRowType } from '@/hooks/usePlanningTableRows';
 import './styles.css';
+import { IPlanningTableRow } from '@/interfaces/common';
 
-interface IPlanningClassesRowProps {
-  id: string;
-  name: string;
-  type: PlanningTableRowType;
+interface IPlanningClassesRowProps extends IPlanningTableRow {
   children?: ReactNode;
-  defaultExpanded: boolean;
 }
 
 const PlanningClassesRow: FC<IPlanningClassesRowProps> = (props) => {
@@ -32,7 +30,7 @@ const PlanningClassesRow: FC<IPlanningClassesRowProps> = (props) => {
         <PlanningClassesHeader handleExpand={handleExpand} expanded={expanded} {...props} />
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {classSums.map((cs: any, i: number) => (
-          <PlanningClassesCell key={i} sum={cs} position={i} {...props} />
+          <PlanningClassesCell sum={cs} position={i} {...props} />
         ))}
       </tr>
       {expanded && children}

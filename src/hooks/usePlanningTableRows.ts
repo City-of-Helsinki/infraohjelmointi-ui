@@ -13,26 +13,7 @@ import { useEffect, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
-
-export type PlanningTableRowType =
-  | 'masterClass'
-  | 'class'
-  | 'subClass'
-  | 'district-preview'
-  | 'district'
-  | 'division'
-  | 'group'
-  | 'project';
-
-export interface IPlanningTableRow {
-  type: PlanningTableRowType;
-  name: string;
-  path: string;
-  childRows: Array<IPlanningTableRow>;
-  id: string;
-  key: string;
-  defaultExpanded: boolean;
-}
+import { IPlanningTableRow, PlanningTableRowType } from '@/interfaces/common';
 
 const buildPlanningTableRows = (
   allMasterClasses: Array<IClass>,
@@ -50,19 +31,49 @@ const buildPlanningTableRows = (
   const subClasses = selectedSubClass ? [selectedSubClass] : allSubClasses;
   const districts = selectedDistrict ? [selectedDistrict] : allDistricts;
 
+  const getLink = (item: IClass | ILocation, type: PlanningTableRowType) => {
+    const shouldNavigate =
+      (type === 'masterClass' && selectedMasterClass === null) ||
+      (type === 'class' && selectedClass === null) ||
+      (type === 'subClass' && selectedSubClass === null) ||
+      (type === 'district-preview' && selectedDistrict === null);
+
+    if (shouldNavigate) {
+      const linkArray = [selectedMasterClass?.id, selectedClass?.id, selectedSubClass?.id];
+
+      const isChildNotSelected =
+        !(selectedMasterClass && type === 'masterClass') &&
+        !(selectedClass && type === 'class') &&
+        !(selectedSubClass && type === 'subClass') &&
+        !(selectedDistrict && type === 'district-preview');
+
+      if (isChildNotSelected) {
+        linkArray.push(item.id);
+      }
+      return linkArray
+        .join('/')
+        .replace(/(\/{2,})/gm, '/') // replace triple /// with one in case of one of values is undefined/null
+        .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
+    } else {
+      return null;
+    }
+  };
+
   const getRowProps = (
     item: IClass | ILocation,
     type: PlanningTableRowType,
     defaultExpanded?: boolean,
-  ): Omit<IPlanningTableRow, 'childRows'> => ({
-    type: type,
-    name: item.name,
-    path: item.path,
-    id: item.id,
-    key: item.id,
-    // Show all children to selectedDistrict
-    defaultExpanded: defaultExpanded || false,
-  });
+  ): Omit<IPlanningTableRow, 'childRows'> => {
+    return {
+      type: type,
+      name: item.name,
+      path: item.path,
+      id: item.id,
+      key: item.id,
+      link: getLink(item, type),
+      defaultExpanded: defaultExpanded || false,
+    };
+  };
 
   // Map the class rows going from masterClasses to districts
   const classRows: Array<IPlanningTableRow> = masterClasses.map((masterClass) => ({
@@ -101,7 +112,7 @@ const buildPlanningTableRows = (
       })),
   }));
 
-  return districts.length === 1 ? locationRows : classRows;
+  return selectedDistrict ? locationRows : classRows;
 };
 
 const usePlanningTableRows = () => {
@@ -155,8 +166,6 @@ const usePlanningTableRows = () => {
 
   // set selectedMasterClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
-    console.log('setting master class: ', masterClassId);
-
     setSelectedMasterClass(
       masterClassId ? (masterClasses.find((mc) => mc.id === masterClassId) as IClass) : null,
     );
@@ -164,23 +173,20 @@ const usePlanningTableRows = () => {
 
   // set selectedClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
-    console.log('setting class class: ', classId);
     setSelectedClass(classId ? (classes.find((c) => c.id === classId) as IClass) : null);
   }, [classId, classes]);
 
   // set selectedSubClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
-    console.log('setting sub class: ', subClassId);
-
     setSelectedSubClass(
       subClassId ? (subClasses.find((sc) => sc.id === subClassId) as IClass) : null,
     );
   }, [subClassId, subClasses]);
 
+  console.log('selected subClass in hook: ', selectedSubClass);
+
   // set selectedDistrict if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {
-    console.log('setting district: ', districtId);
-
     setSelectedDistrict(
       districtId ? (districts.find((d) => d.id === districtId) as ILocation) : null,
     );

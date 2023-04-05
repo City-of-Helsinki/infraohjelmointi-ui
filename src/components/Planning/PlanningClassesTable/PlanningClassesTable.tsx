@@ -1,7 +1,8 @@
+// Disabled jsx-key because eslint doesn't understand that the key is spread through props
 /* eslint-disable react/jsx-key */
 import { FC, memo } from 'react';
 import PlanningClassesRow from './PlanningClassesRow/PlanningClassesRow';
-import { IPlanningTableRow } from '@/hooks/usePlanningTableRows';
+import { IPlanningTableRow } from '@/interfaces/common';
 import './styles.css';
 
 interface IPlanningClassesTableProps {
