@@ -25,7 +25,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
 
     searchParams.push(`projectName=${projectName}`);
     searchParams.push('inGroup=false');
-    searchParams.push('programmed=true');
+    searchParams.push('programmed=false');
 
     return { limit: '30', params: searchParams.join('&'), order: 'new' };
   };
@@ -44,36 +44,39 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
   const getSuggestions = useCallback(
     (inputValue: string) => {
       if (
-        (!showAdvanceFields && getValues('class')?.value) ||
-        (showAdvanceFields && getValues('division')?.value && getValues('class')?.value)
+        (showAdvanceFields &&
+          ((!getValues('division')?.value && !getValues('class')?.value) ||
+            (getValues('division')?.value && !getValues('class')?.value) ||
+            (!getValues('division')?.value && getValues('class')?.value))) ||
+        (!showAdvanceFields && !getValues('class')?.value)
       ) {
-        return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
-          // printing out search params for later
-          const queryParams = buildQueryParamString(inputValue);
-
-          getProjectsWithParams(queryParams)
-            .then((res) => {
-              const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
-              const resultList = res.results?.filter(
-                (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
-              );
-
-              // Convert the resultList to options for the suggestion dropdown
-              const searchProjectsItemList: Array<IOption> | [] = resultList
-                ? resultList.map((project) => ({
-                    ...listItemToOption({ id: project.id, value: project.name }),
-                  }))
-                : [];
-              if (searchProjectsItemList.length > 0) {
-                setSearchedProjects(searchProjectsItemList);
-              }
-              resolve(searchProjectsItemList);
-            })
-            .catch(() => reject([]));
-        });
-      } else {
+        console.log('be true');
         return Promise.resolve([]);
       }
+      return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+        // printing out search params for later
+        const queryParams = buildQueryParamString(inputValue);
+
+        getProjectsWithParams(queryParams)
+          .then((res) => {
+            const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
+            const resultList = res.results?.filter(
+              (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
+            );
+
+            // Convert the resultList to options for the suggestion dropdown
+            const searchProjectsItemList: Array<IOption> | [] = resultList
+              ? resultList.map((project) => ({
+                  ...listItemToOption({ id: project.id, value: project.name }),
+                }))
+              : [];
+            if (searchProjectsItemList.length > 0) {
+              setSearchedProjects(searchProjectsItemList);
+            }
+            resolve(searchProjectsItemList);
+          })
+          .catch(() => reject([]));
+      });
     },
     [getValues, showAdvanceFields],
   );

@@ -226,17 +226,17 @@ const GroupDialog: FC = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSetOpen = useCallback(() => setIsOpen((current) => !current), [setIsOpen]);
+  const toggleSetOpen = useCallback(() => setIsOpen((current) => !current), [setIsOpen]);
   const onOpenGroupForm = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      handleSetOpen();
+      toggleSetOpen();
     },
-    [handleSetOpen],
+    [toggleSetOpen],
   );
   const handleClose = useCallback(() => {
-    handleSetOpen();
-  }, [handleSetOpen]);
+    setIsOpen((current) => !current);
+  }, [setIsOpen]);
   return (
     <div>
       {isOpen && <DialogContainer isOpen={isOpen} handleClose={handleClose} />}
