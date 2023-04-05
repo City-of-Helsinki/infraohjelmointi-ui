@@ -87,11 +87,14 @@ export interface IContextMenuData {
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 
+<<<<<<< HEAD
 export enum ContextMenuType {
   EDIT_PROJECT_CELL,
   EDIT_PROJECT_PHASE,
 }
 
+=======
+>>>>>>> 54c7c8c (only navigate to using rows that have links)
 export type PlanningTableRowType =
   | 'masterClass'
   | 'class'
@@ -106,7 +109,11 @@ export interface IPlanningTableRow {
   type: PlanningTableRowType;
   name: string;
   path: string;
+<<<<<<< HEAD
   children: Array<IPlanningTableRow>;
+=======
+  childRows: Array<IPlanningTableRow>;
+>>>>>>> 54c7c8c (only navigate to using rows that have links)
   id: string;
   key: string;
   defaultExpanded: boolean;
