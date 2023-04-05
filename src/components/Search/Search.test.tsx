@@ -17,8 +17,6 @@ import { waitFor } from '@testing-library/react';
 import { getSearchResultsThunk, toggleSearch } from '@/reducers/searchSlice';
 import { setProgrammedYears } from '@/utils/common';
 import { mockLocations } from '@/mocks/mockLocations';
-import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
-import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
 import { mockError } from '@/mocks/mockError';
 import { IError, IFreeSearchResults } from '@/interfaces/common';
 import { ISearchResults } from '@/interfaces/searchInterfaces';
@@ -102,14 +100,6 @@ describe('Search', () => {
     const { store } = renderResult;
     // open search
     await waitFor(() => store.dispatch(toggleSearch()));
-    // filter classes into categories (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setMasterClasses()));
-    await waitFor(() => store.dispatch(setClasses()));
-    await waitFor(() => store.dispatch(setSubClasses()));
-    // filter locations into categories (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setDistricts()));
-    await waitFor(() => store.dispatch(setDivisions()));
-    await waitFor(() => store.dispatch(setSubDivisions()));
 
     const classes = store.getState().class;
     const locations = store.getState().location;

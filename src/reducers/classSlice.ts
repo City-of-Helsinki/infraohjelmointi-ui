@@ -29,35 +29,18 @@ export const getClassesThunk = createAsyncThunk('class/getAll', async (_, thunkA
 export const classSlice = createSlice({
   name: 'class',
   initialState,
-  reducers: {
-    setMasterClasses(state) {
-      return { ...state, masterClasses: state.allClasses?.filter((c) => !c.parent) };
-    },
-    setClasses(state) {
-      return {
-        ...state,
-        classes: state.masterClasses
-          ? state.allClasses?.filter(
-              (c) => state.masterClasses.findIndex((mc) => mc.id === c.parent) !== -1,
-            )
-          : [],
-      };
-    },
-    setSubClasses(state) {
-      return {
-        ...state,
-        subClasses: state.classes
-          ? state.allClasses?.filter(
-              (c) => state.classes.findIndex((sc) => sc.id === c.parent) !== -1,
-            )
-          : [],
-      };
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // GET ALL
     builder.addCase(getClassesThunk.fulfilled, (state, action: PayloadAction<Array<IClass>>) => {
-      return { ...state, allClasses: [...action.payload] };
+      const masterClasses = action.payload?.filter((c) => !c.parent);
+      const classes = masterClasses
+        ? action.payload?.filter((c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1)
+        : [];
+      const subClasses = classes
+        ? action.payload?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
+        : [];
+      return { ...state, allClasses: [...action.payload], masterClasses, classes, subClasses };
     });
     builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
@@ -69,7 +52,5 @@ export const selectAllClasses = (state: RootState) => state.class.allClasses;
 export const selectMasterClasses = (state: RootState) => state.class.masterClasses;
 export const selectClasses = (state: RootState) => state.class.classes;
 export const selectSubClasses = (state: RootState) => state.class.subClasses;
-
-export const { setMasterClasses, setClasses, setSubClasses } = classSlice.actions;
 
 export default classSlice.reducer;

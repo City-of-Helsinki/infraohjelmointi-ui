@@ -1,13 +1,5 @@
-import {
-  getClassesThunk,
-  selectClasses,
-  selectMasterClasses,
-  selectSubClasses,
-  setClasses,
-  setMasterClasses,
-  setSubClasses,
-} from '@/reducers/classSlice';
-import { useAppDispatch, useAppSelector } from './common';
+import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
+import { useAppSelector } from './common';
 import { selectDistricts, selectDivisions } from '@/reducers/locationSlice';
 import { useEffect, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
@@ -39,18 +31,7 @@ const buildPlanningTableRows = (
       (type === 'district-preview' && selectedDistrict === null);
 
     if (shouldNavigate) {
-      const linkArray = [selectedMasterClass?.id, selectedClass?.id, selectedSubClass?.id];
-
-      const isChildNotSelected =
-        !(selectedMasterClass && type === 'masterClass') &&
-        !(selectedClass && type === 'class') &&
-        !(selectedSubClass && type === 'subClass') &&
-        !(selectedDistrict && type === 'district-preview');
-
-      if (isChildNotSelected) {
-        linkArray.push(item.id);
-      }
-      return linkArray
+      return [selectedMasterClass?.id, selectedClass?.id, selectedSubClass?.id, item.id]
         .join('/')
         .replace(/(\/{2,})/gm, '/') // replace triple /// with one in case of one of values is undefined/null
         .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
@@ -100,7 +81,7 @@ const buildPlanningTableRows = (
   }));
 
   // Map the selected districts divisions and the groups & projects that belong to those divisions
-  const locationRows = districts.map((district) => ({
+  const projectRows = districts.map((district) => ({
     ...getRowProps(district, 'district', true),
     childRows: divisions
       .filter((division) => division.parent === district.id)
@@ -112,11 +93,10 @@ const buildPlanningTableRows = (
       })),
   }));
 
-  return selectedDistrict ? locationRows : classRows;
+  return selectedDistrict ? projectRows : classRows;
 };
 
 const usePlanningTableRows = () => {
-  const dispatch = useAppDispatch();
   const { masterClassId, classId, subClassId, districtId } = useParams();
 
   const [selectedMasterClass, setSelectedMasterClass] = useState<IClass | null>(null);
@@ -131,14 +111,6 @@ const usePlanningTableRows = () => {
   const divisions = useAppSelector(selectDivisions);
 
   const [rows, setRows] = useState<Array<IPlanningTableRow>>([]);
-
-  useEffect(() => {
-    dispatch(getClassesThunk()).then(() => {
-      dispatch(setMasterClasses());
-      dispatch(setClasses());
-      dispatch(setSubClasses());
-    });
-  }, []);
 
   useEffect(() => {
     setRows(
@@ -162,6 +134,9 @@ const usePlanningTableRows = () => {
     selectedClass,
     selectedSubClass,
     selectedDistrict,
+    masterClasses,
+    classes,
+    districts,
   ]);
 
   // set selectedMasterClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
@@ -182,8 +157,6 @@ const usePlanningTableRows = () => {
       subClassId ? (subClasses.find((sc) => sc.id === subClassId) as IClass) : null,
     );
   }, [subClassId, subClasses]);
-
-  console.log('selected subClass in hook: ', selectedSubClass);
 
   // set selectedDistrict if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
   useEffect(() => {

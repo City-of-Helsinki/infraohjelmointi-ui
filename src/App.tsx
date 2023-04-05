@@ -11,18 +11,8 @@ import {
   getResponsiblePersonsThunk,
   getProjectPhasesThunk,
 } from './reducers/listsSlice';
-import {
-  getClassesThunk,
-  setClasses,
-  setMasterClasses,
-  setSubClasses,
-} from './reducers/classSlice';
-import {
-  getLocationsThunk,
-  setDistricts,
-  setDivisions,
-  setSubDivisions,
-} from './reducers/locationSlice';
+import { getClassesThunk } from './reducers/classSlice';
+import { getLocationsThunk } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import { ProjectBasics } from './components/Project/ProjectBasics';
 import PlanningView from './views/PlanningView';
@@ -36,24 +26,14 @@ import { CustomContextMenu } from './components/CustomContextMenu';
 const App: FC = () => {
   const dispatch = useAppDispatch();
 
-  // Initialize lists that are used everywhere in the app
+  // Initialize states that are used everywhere in the app
   useEffect(() => {
     dispatch(getProjectCategoriesThunk());
     dispatch(getResponsiblePersonsThunk());
     dispatch(getProjectPhasesThunk());
     dispatch(getHashTagsThunk());
-    // Get classes and filter them into categories
-    dispatch(getClassesThunk()).then(() => {
-      dispatch(setMasterClasses());
-      dispatch(setClasses());
-      dispatch(setSubClasses());
-    });
-    // Get locations and filter them into categories
-    dispatch(getLocationsThunk()).then(() => {
-      dispatch(setDistricts());
-      dispatch(setDivisions());
-      dispatch(setSubDivisions());
-    });
+    dispatch(getClassesThunk());
+    dispatch(getLocationsThunk());
   }, []);
 
   return (

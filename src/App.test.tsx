@@ -41,9 +41,12 @@ describe('App', () => {
     const { store } = await act(async () => renderWithProviders(<App />));
 
     const classes = store.getState().class;
+
     const locations = store.getState().location;
     const lists = store.getState().lists;
     const hashTags = store.getState().hashTags;
+
+    console.log('All locations: ', locations.subDivisions);
 
     expect(lists.categories).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
