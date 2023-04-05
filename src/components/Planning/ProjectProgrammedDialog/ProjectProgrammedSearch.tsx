@@ -44,6 +44,10 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
     useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
   const phaseDesign =
     useOptions('phases', true).find((phase) => phase.label === 'design')?.value || '';
+
+  // selectedClass and selectedSubClass refer to the class and/or subclass currently selected by the user
+  // in cordinator view
+  // any one of these classes have to be selected by the user to be able to toggle the form
   const selectedClass = useAppSelector(selectSelectedClass);
   const selectedSubClass = useAppSelector(selectSelectedSubClass);
 
@@ -85,7 +89,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
         // printing out search params for later
         const queryString = buildQueryParamString(inputValue);
-        console.log(queryString);
 
         getProjectsWithParams(queryString)
           .then((res) => {
@@ -147,7 +150,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
         suggestionLabelField="label"
         value={searchWord}
         onChange={handleValueChange}
-        onSubmit={(v) => handleSubmit(v)}
+        onSubmit={handleSubmit}
       />
 
       <div className="search-selections">

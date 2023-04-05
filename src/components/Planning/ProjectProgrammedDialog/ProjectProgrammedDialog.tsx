@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FC, useCallback } from 'react';
+import { useState, MouseEvent, FC, useCallback, memo } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ interface IDialogProps {
   isOpen: boolean;
 }
 
-const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
+const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const [projectsForSubmit, setProjectsForSubmit] = useState<Array<IProgrammedProjectSuggestions>>(
     [],
   );
@@ -42,17 +42,13 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
   }, []);
 
   const onProjectSelectionDelete = useCallback((projectName: string) => {
-    setProjectsForSubmit((current) =>
-      current.filter((p) => {
-        return p.label !== projectName;
-      }),
-    );
+    setProjectsForSubmit((current) => current.filter((p) => p.label !== projectName));
   }, []);
 
   const { Header, Content, ActionButtons } = Dialog;
 
   const handleDialogClose = useCallback(() => {
-    setProjectsForSubmit((current) => ({ ...current, projectsForSubmit: [] }));
+    setProjectsForSubmit([]);
     handleClose();
   }, [handleClose]);
 
@@ -60,10 +56,7 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
     async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       dispatch(silentPatchProjectsThunk(buildRequestPayload(projectsForSubmit))).then(() => {
-        setProjectsForSubmit((current) => ({
-          ...current,
-          projectsForSubmit: [],
-        }));
+        setProjectsForSubmit([]);
       });
     },
 
@@ -113,7 +106,9 @@ const DialogContainer: FC<IDialogProps> = ({ isOpen, handleClose }) => {
       </div>
     </div>
   );
-};
+});
+
+DialogContainer.displayName = 'Project Programmed Dialog';
 
 const ProjectProgrammedDialog: FC = () => {
   const selectedClass = useAppSelector(selectSelectedClass);
@@ -121,20 +116,20 @@ const ProjectProgrammedDialog: FC = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSetOpen = useCallback(() => setIsOpen((current) => !current), []);
+  const toggleSetOpen = useCallback(() => setIsOpen((current) => !current), []);
   const onOpenGroupForm = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      handleSetOpen();
+      toggleSetOpen();
     },
-    [handleSetOpen],
+    [toggleSetOpen],
   );
   const handleClose = useCallback(() => {
-    handleSetOpen();
-  }, [handleSetOpen]);
+    setIsOpen(false);
+  }, [toggleSetOpen]);
   return (
     <div>
-      {isOpen && <DialogContainer isOpen={isOpen} handleClose={handleClose} />}
+      <DialogContainer isOpen={isOpen} handleClose={handleClose} />
       <div>
         <div data-testid="open-project-add-dialog-button"></div>
         <Button
