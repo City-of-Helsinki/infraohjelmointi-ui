@@ -50,7 +50,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
             (!getValues('division')?.value && getValues('class')?.value))) ||
         (!showAdvanceFields && !getValues('class')?.value)
       ) {
-        console.log('be true');
         return Promise.resolve([]);
       }
       return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
