@@ -272,7 +272,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   }, []);
 
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setFormValue(parseInt(e.target.value));
+    setFormValue(parseInt(e.target.value || '0'));
   }, []);
 
   const updateCell = useCallback(
