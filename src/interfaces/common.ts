@@ -108,7 +108,7 @@ export interface IPlanningTableRow {
   type: PlanningTableRowType;
   name: string;
   path: string;
-  childRows: Array<IPlanningTableRow>;
+  children: Array<IPlanningTableRow>;
   id: string;
   key: string;
   defaultExpanded: boolean;

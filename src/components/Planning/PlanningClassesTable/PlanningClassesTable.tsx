@@ -13,25 +13,9 @@ const PlanningClassesTable: FC<IPlanningClassesTableProps> = ({ rows }) => {
   return (
     <table className="planning-table" cellSpacing={0}>
       <tbody>
-        {/* The planning table rows have a dynamic length, the first item could be either a masterClass or a district */}
-        {rows.map((one: IPlanningTableRow) => (
-          <PlanningClassesRow {...one}>
-            {one.childRows.map((two) => (
-              <PlanningClassesRow {...two}>
-                {two.childRows.map((three) => (
-                  <PlanningClassesRow {...three}>
-                    {three.childRows.map((four) => (
-                      <PlanningClassesRow {...four}>
-                        {four.childRows.map((five) => (
-                          <PlanningClassesRow {...five} />
-                        ))}
-                      </PlanningClassesRow>
-                    ))}
-                  </PlanningClassesRow>
-                ))}
-              </PlanningClassesRow>
-            ))}
-          </PlanningClassesRow>
+        {/* Rows have a dynamic length, the PlanningClassesRow component renders itself recursively */}
+        {rows.map((row: IPlanningTableRow) => (
+          <PlanningClassesRow {...row} />
         ))}
       </tbody>
     </table>

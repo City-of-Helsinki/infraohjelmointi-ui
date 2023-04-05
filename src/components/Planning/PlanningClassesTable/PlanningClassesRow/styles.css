@@ -19,41 +19,31 @@
 }
 
 .table-header.masterClass {
-  padding-left: 1rem;
-  background: var(--color-masterClass);
+  @apply bg-[var(--color-masterClass)] pl-4;
 }
 
 .table-header.class {
-  padding-left: 2.625rem;
-  background: var(--color-class);
+  @apply bg-[var(--color-class)] pl-10;
 }
 
 .table-header.subClass {
-  padding-left: 4.1875rem;
-  background: var(--color-subClass);
+  @apply bg-[var(--color-subClass)] pl-16;
 }
 
 .table-header.district-preview {
-  padding-left: 5.875rem;
-  background: var(--color-district-preview);
+  @apply bg-[var(--color-district-preview)] pl-[5.5rem];
 }
 
 .table-header.district {
-  padding-left: 1rem;
-  background: var(--color-district);
-  font-size: 20px !important;
+  @apply bg-[var(--color-district)] pl-4 text-xl;
 }
 
 .table-header.division {
-  padding-left: 2.625rem;
-  background: var(--color-division);
-  font-size: 18px !important;
-  color: var(--color-black-90);
-  font-weight: 500 !important;
+  @apply bg-[var(--color-division)] pl-10 text-l font-medium text-black-90;
 }
 
 .table-header.division .table-header-content {
-  gap: 1rem;
+  @apply gap-4;
 }
 
 .table-header .table-title-container {
@@ -71,26 +61,24 @@
 
 /* FIXME: set custom tooltip to block when table-title-container is hovered */
 .table-title-container:hover .tooltip-container {
-  display: block;
+  @apply block;
 }
 
 /* FIXME: set custom tooltip to block when table-title-container is hovered */
 .table-title-containerhover .tooltip-arrow {
-  display: block;
+  @apply block;
 }
 
 .custom-tooltip button {
-  width: 14rem !important;
-  position: absolute;
-  left: 12rem;
+  @apply absolute left-48 w-56;
 }
 
 .custom-tooltip section {
-  color: black !important;
+  @apply text-black;
 }
 
 .custom-tooltip svg {
-  color: transparent;
+  @apply text-transparent;
 }
 
 /* TABLE CELL */
@@ -99,58 +87,49 @@
 }
 
 .table-cell.masterClass {
-  background: var(--color-masterClass);
+  @apply bg-[var(--color-masterClass)];
 }
 
 .table-cell.class {
-  background: var(--color-class);
+  @apply bg-[var(--color-class)];
 }
 
 .table-cell.subClass {
-  background: var(--color-subClass);
+  @apply bg-[var(--color-subClass)];
 }
 
 .table-cell.district-preview {
-  background: var(--color-district-preview);
+  @apply bg-[var(--color-district-preview)];
 }
 
 .table-cell.district {
-  background: var(--color-district);
+  @apply bg-[var(--color-district)];
 }
 
 .table-cell.division {
-  background: var(--color-division);
-  color: var(--color-black-90);
+  @apply bg-[var(--color-division)] text-black-90;
 }
 
 .table-cell .table-cell-container {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-rows: repeat(3, 1fr);
+  @apply grid grid-flow-row grid-rows-3;
 }
 
 .table-cell .table-cell-container span {
-  font-size: 14px !important;
-  width: 100%;
-  line-height: 22px;
+  @apply w-full text-sm leading-[22px];
 }
 
 .table-cell .table-cell-container span:first-child {
-  font-size: 16px !important;
-  font-weight: bold;
+  @apply !text-base font-bold;
 }
 
 .table-cell .table-cell-container span:nth-child(3) {
-  font-weight: bold;
-  color: var(--color-suomenlinna-dark);
+  @apply font-bold text-suomenlinna-d;
 }
 
 .table-cell span {
-  font-weight: 300;
-  transform: translateX(-15%);
+  @apply translate-x-[-15%] font-light;
 }
 
 .table-header-content-dots {
-  display: flex;
-  margin-right: 0.5rem;
+  @apply mr-2 flex;
 }

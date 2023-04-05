@@ -44,7 +44,7 @@ const buildPlanningTableRows = (
     item: IClass | ILocation,
     type: PlanningTableRowType,
     defaultExpanded?: boolean,
-  ): Omit<IPlanningTableRow, 'childRows'> => {
+  ): Omit<IPlanningTableRow, 'children'> => {
     return {
       type: type,
       name: item.name,
@@ -60,21 +60,21 @@ const buildPlanningTableRows = (
   const classRows: Array<IPlanningTableRow> = masterClasses.map((masterClass) => ({
     ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
     // Map classes
-    childRows: classes
+    children: classes
       .filter((c) => c.parent === masterClass.id)
       .map((filteredClass) => ({
         ...getRowProps(filteredClass, 'class', !!selectedClass),
         // Map sub classes
-        childRows: subClasses
+        children: subClasses
           .filter((subClass) => subClass.parent === filteredClass.id)
           .map((filteredSubClass) => ({
             ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
             // Map districts
-            childRows: districts
+            children: districts
               .filter((district) => district.parentClass === filteredSubClass.id)
               .map((filteredDistrict) => ({
                 ...getRowProps(filteredDistrict, 'district-preview'),
-                childRows: [],
+                children: [],
               })),
           })),
       })),
@@ -83,11 +83,11 @@ const buildPlanningTableRows = (
   // Map the selected districts divisions and the groups & projects that belong to those divisions
   const projectRows = districts.map((district) => ({
     ...getRowProps(district, 'district', true),
-    childRows: divisions
+    children: divisions
       .filter((division) => division.parent === district.id)
       .map((filteredDivision) => ({
         ...getRowProps(filteredDivision, 'division', true),
-        childRows: [
+        children: [
           /* Groups > Projects */
         ],
       })),

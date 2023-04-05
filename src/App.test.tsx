@@ -46,8 +46,6 @@ describe('App', () => {
     const lists = store.getState().lists;
     const hashTags = store.getState().hashTags;
 
-    console.log('All locations: ', locations.subDivisions);
-
     expect(lists.categories).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
     expect(lists.phases).toStrictEqual(mockProjectPhases.data);

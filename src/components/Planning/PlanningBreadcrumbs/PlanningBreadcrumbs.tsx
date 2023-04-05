@@ -29,8 +29,6 @@ interface PlanningBreadcrumbs {
 const PlanningBreadcrumbs: FC<PlanningBreadcrumbs> = ({ selections }) => {
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
-  console.log('Selected subclass: ', selectedSubClass);
-
   return (
     <ul className="breadcrumbs-list">
       <li>

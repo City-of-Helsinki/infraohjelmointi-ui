@@ -1,18 +1,14 @@
 // Disabled jsx-key because eslint doesn't understand that the key is spread through props
 /* eslint-disable react/jsx-key */
-import { FC, memo, ReactNode, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { classSums } from '@/mocks/common';
 import PlanningClassesCell from './PlanningClassesCell';
 import PlanningClassesHeader from './PlanningClassesHeader';
-import './styles.css';
 import { IPlanningTableRow } from '@/interfaces/common';
+import './styles.css';
 
-interface IPlanningClassesRowProps extends IPlanningTableRow {
-  children?: ReactNode;
-}
-
-const PlanningClassesRow: FC<IPlanningClassesRowProps> = (props) => {
-  const { defaultExpanded, children } = props;
+const PlanningClassesRow: FC<IPlanningTableRow> = (props) => {
+  const { defaultExpanded } = props;
 
   const [expanded, setExpanded] = useState(defaultExpanded);
 
@@ -33,7 +29,8 @@ const PlanningClassesRow: FC<IPlanningClassesRowProps> = (props) => {
           <PlanningClassesCell sum={cs} position={i} {...props} key={i.toString()} />
         ))}
       </tr>
-      {expanded && children}
+      {/* Render the rows recursively for each childRows */}
+      {expanded && props.children.map((c) => <PlanningClassesRow {...c} />)}
     </>
   );
 };
