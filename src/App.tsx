@@ -22,6 +22,7 @@ import AuthGuard from './components/AuthGuard';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
+import { getGroupsThunk } from './reducers/groupSlice';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ const App: FC = () => {
     dispatch(getHashTagsThunk());
     dispatch(getClassesThunk());
     dispatch(getLocationsThunk());
+    dispatch(getGroupsThunk());
   }, []);
 
   return (
