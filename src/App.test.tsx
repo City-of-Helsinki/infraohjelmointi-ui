@@ -4,7 +4,7 @@ import { act, waitFor } from '@testing-library/react';
 import { renderWithProviders } from './utils/testUtils';
 import App from './App';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
-import mockProjectClasses from './mocks/mockClasses';
+import { mockProjectClasses } from './mocks/mockClasses';
 import { mockLocations } from './mocks/mockLocations';
 import {
   mockProjectCategories,

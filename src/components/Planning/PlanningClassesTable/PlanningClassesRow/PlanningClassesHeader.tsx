@@ -3,7 +3,6 @@ import { FC, memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { NameTooltip } from '../NameTooltip';
 import { IPlanningTableRow } from '@/interfaces/common';
-
 import './styles.css';
 
 interface IPlanningClassesHeaderProps extends IPlanningTableRow {
