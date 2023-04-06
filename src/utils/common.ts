@@ -77,7 +77,13 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
         return key;
       }
     };
+
     Object.assign(data, { [getKey()]: parseValue(form[key as keyof IAppForms]) });
+  }
+
+  // Remove the project location when the class is patched since the relation changes
+  if (Object.keys(data).includes('projectClass')) {
+    Object.assign(data, { projectLocation: null });
   }
 
   return data;

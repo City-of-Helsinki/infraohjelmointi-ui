@@ -183,7 +183,7 @@ const useProjectBasicsForm = () => {
   const { reset } = formMethods;
 
   const classOptions = useClassOptions(project?.projectClass);
-  const locationOptions = useLocationOptions(project?.projectLocation);
+  const locationOptions = useLocationOptions(project?.projectLocation, project?.projectClass);
 
   // Updates
   useEffect(() => {
