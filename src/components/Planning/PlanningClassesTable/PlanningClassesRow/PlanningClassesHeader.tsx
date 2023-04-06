@@ -40,11 +40,12 @@ const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
             <IconMenuDots size="s" />
           </div>
         )}
-        <button className="table-title-container" onClick={onExpand}>
-          <span className="table-header-title">{name}</span>
-          {/* FIXME: Tooltip (visible if the header-content-item container is hovered) */}
+        <div className="table-title-container">
+          <button className="table-title-button" onClick={onExpand}>
+            <span className="table-header-title">{name}</span>
+          </button>
           <NameTooltip value={name} />
-        </button>
+        </div>
       </div>
     </th>
   );

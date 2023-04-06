@@ -46,27 +46,21 @@
   @apply gap-4;
 }
 
-.table-header .table-title-container {
+.table-header .table-title-button {
   /* FIXME: remove overflow-hidden to see the tooltip, should fix*/
-  @apply relative flex overflow-hidden;
+  @apply flex overflow-hidden;
 }
 
-.table-header .table-title-container:hover {
+.table-header .table-title-container {
+  @apply relative flex max-w-[85%];
+}
+
+.table-header .table-title-button:hover {
   @apply cursor-pointer;
 }
 
-.table-header .table-title-container .table-header-title {
-  @apply w-full  overflow-hidden text-ellipsis text-left;
-}
-
-/* FIXME: set custom tooltip to block when table-title-container is hovered */
-.table-title-container:hover .tooltip-container {
-  @apply block;
-}
-
-/* FIXME: set custom tooltip to block when table-title-container is hovered */
-.table-title-containerhover .tooltip-arrow {
-  @apply block;
+.table-header .table-title-button .table-header-title {
+  @apply w-full overflow-hidden text-ellipsis text-left;
 }
 
 .custom-tooltip button {
