@@ -200,7 +200,8 @@
     "openAdvanceSearch":"Avaa tarkennettu haku",
     "groupCreationDescription1": "Ryhmään voi valita vain Ohjelmoituja hankkeita.",
     "groupCreationDescription2": "Tähdellä (*) merkityt kentat ovat pakolissia.",
-    "suggestionHelperText": "Täytä pakolliset kentät saadaksesi ehdotuksia"
+    "suggestionHelperText": "Täytä pakolliset kentät saadaksesi ehdotuksia",
+    "searchForProjects":"Etsi hankkeita"
   }
   ,
   "notification": {

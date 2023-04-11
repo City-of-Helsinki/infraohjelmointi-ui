@@ -56,21 +56,24 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     [dispatch, reset, formValues],
   );
 
-  const toggleAdvanceFields = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setShowAdvanceFields((current) => !current);
-    setValue('district', { label: '', value: '' });
-    setValue('division', { label: '', value: '' });
-    setValue('subDivision', { label: '', value: '' });
-    setValue('projectsForSubmit', []);
-  }, []);
+  const toggleAdvanceFields = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      setShowAdvanceFields((current) => !current);
+      setValue('district', { label: '', value: '' });
+      setValue('division', { label: '', value: '' });
+      setValue('subDivision', { label: '', value: '' });
+      setValue('projectsForSubmit', []);
+    },
+    [setValue],
+  );
 
   const { Header, Content, ActionButtons } = Dialog;
 
   const handleDialogClose = useCallback(() => {
     setShowAdvanceFields(false);
     handleClose();
-  }, []);
+  }, [handleClose]);
   const formProps = useCallback(
     (name: string) => ({
       name: name,
@@ -85,7 +88,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
       Object.keys(d).includes('value') && d.value !== ''
         ? true
         : t('required', { value: fieldName }) || '',
-    [],
+    [t],
   );
   const advanceFieldIcons = useMemo(
     () => (showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />),
@@ -97,6 +100,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
       {/* Dialog */}
       <div>
         <Dialog
+          data-testid="group-create-dialog"
           id="group-create-dialog"
           aria-labelledby={'group-form-dialog-label'}
           isOpen={isOpen}
@@ -205,7 +209,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
           <ActionButtons>
             <Button
               onClick={handleSubmit(onSubmit)}
-              data-testid="search-projects-button"
+              data-testid="create-group-button"
               disabled={!isDirty}
             >
               {t('search')}

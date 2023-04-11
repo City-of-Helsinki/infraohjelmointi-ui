@@ -18,28 +18,31 @@ interface IProjectSearchProps {
 const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showAdvanceFields }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const buildQueryParamString = (projectName: string): ISearchRequest => {
-    const searchParams = Object.entries(getValues())
-      .filter(([_, value]) => value?.value)
-      .map(([key, value]) => `${key}=${value.value}`);
+  const buildQueryParamString = useCallback(
+    (projectName: string): ISearchRequest => {
+      const searchParams = Object.entries(getValues())
+        .filter(([_, value]) => value?.value)
+        .map(([key, value]) => `${key}=${value.value}`);
 
-    searchParams.push(`projectName=${projectName}`);
-    searchParams.push('inGroup=false');
-    searchParams.push('programmed=false');
+      searchParams.push(`projectName=${projectName}`);
+      searchParams.push('inGroup=false');
+      searchParams.push('programmed=true');
 
-    return { limit: '30', params: searchParams.join('&'), order: 'new' };
-  };
+      return { limit: '30', params: searchParams.join('&'), order: 'new' };
+    },
+    [getValues],
+  );
 
   const { t } = useTranslation();
   const [searchWord, setSearchWord] = useState('');
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
-  useEffect(() => {
-    if (searchedProjects.length > 0 && scrollRef.current) {
-      scrollRef.current?.scrollIntoView();
-    }
-  }, [searchedProjects]);
+  // useEffect(() => {
+  //   if (searchedProjects.length > 0 && scrollRef.current) {
+  //     scrollRef.current?.scrollIntoView();
+  //   }
+  // }, [searchedProjects]);
 
   const getSuggestions = useCallback(
     (inputValue: string) => {
@@ -77,7 +80,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
           .catch(() => reject([]));
       });
     },
-    [getValues, showAdvanceFields],
+    [getValues, showAdvanceFields, buildQueryParamString],
   );
 
   const handleSubmit = useCallback(
@@ -89,7 +92,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
 
       setSearchWord('');
     },
-    [searchedProjects, onchange],
+    [searchedProjects, getValues],
   );
 
   const handleDelete = useCallback(
@@ -102,7 +105,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
         ),
       );
     },
-    [onchange, getValues],
+    [getValues],
   );
   return (
     <div className="dialog-section" data-testid="search-project-field-section">
@@ -112,7 +115,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
         render={({ field: { onChange } }) => (
           <>
             <SearchInput
-              label={t('searchForProjects')}
+              label={t('groupForm.searchForProjects')}
               getSuggestions={getSuggestions}
               clearButtonAriaLabel="Clear search field"
               searchButtonAriaLabel="Search"
@@ -127,7 +130,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
 
             <div className="search-selections-container">
               {getValues('projectsForSubmit').map((s) => (
-                <div key={s.label} className={'search-selections'}>
+                <div
+                  key={s.label}
+                  className={'search-selections'}
+                  data-testid={'project-selections'}
+                >
                   <Tag onDelete={(e) => handleDelete(e, onChange)}>{s.label}</Tag>
                 </div>
               ))}
