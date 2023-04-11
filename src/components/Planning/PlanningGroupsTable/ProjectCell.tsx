@@ -263,19 +263,15 @@ interface IProjectCellProps {
 }
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
-  const { budget, type, financeKey, year, growDirections, id, title, prev, next } = cell;
+  const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<'' | number>(parseInt(budget || ''));
   const cellRef = useRef<HTMLTableCellElement>(null);
 
-  const handleFocus = useCallback(() => {
-    setIsReadOnly((current) => !current);
-  }, []);
-
-  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setFormValue(parseInt(e.target.value || '0'));
-  }, []);
+  useEffect(() => {
+    console.log('Form value: ', formValue);
+  }, [formValue]);
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
@@ -289,8 +285,20 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     [dispatch, id],
   );
 
+  // Focusing the input field will activate the input field by switching its readOnly property
+  const handleFocus = useCallback(() => {
+    setIsReadOnly((current) => !current);
+  }, []);
+
+  // Make sure the budget is always at least 0 and remove the first 0 if the user types a number in the field
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setFormValue(parseInt(e.target.value.replace(/^0+/, '') || '0'));
+  }, []);
+
+  // Blurring the input field will patch the current budget
   const handleBlur = useCallback(() => {
-    setIsReadOnly(!isReadOnly);
+    setIsReadOnly((current) => !current);
     if (formValue !== parseInt(budget || '0')) {
       updateCell({
         finances: {
@@ -299,7 +307,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
         },
       });
     }
-  }, [isReadOnly, formValue, budget, updateCell, financeKey]);
+  }, [formValue, budget, updateCell, financeKey]);
 
   const onRemoveCell = useCallback(() => {
     updateCell(getRemoveRequestData(cell));
@@ -361,7 +369,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
       onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
     >
       <NumberInput
-        value={type !== 'none' ? formValue || 0 : ''}
+        value={type !== 'none' ? formValue : ''}
         id={`${financeKey}-${id}`}
         label=""
         className="table-input"
@@ -371,16 +379,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
         onChange={handleChange}
         disabled={type === 'none'}
       />
-      {prev &&
-        next &&
-        growDirections.map((d) => (
-          <EditTimelineButton
-            key={d}
-            direction={d}
-            onSingleClick={onAddYear}
-            onDoubleClick={onMoveTimeline}
-          />
-        ))}
+      {growDirections.map((d) => (
+        <EditTimelineButton
+          key={d}
+          direction={d}
+          onSingleClick={onAddYear}
+          onDoubleClick={onMoveTimeline}
+        />
+      ))}
     </td>
   );
 };

@@ -124,9 +124,19 @@ const getProjectCells = (project: IProject) => {
     if (cell.type === 'none') {
       return growDirections;
     }
+    // If it's the first cell prev will not exist
+    if (!prev && next?.type === 'none') {
+      return ['right'] as Array<ProjectCellGrowDirection>;
+    }
+    // If it's the last cell next will not exist
+    if (!next && prev?.type === 'none') {
+      return ['left'] as Array<ProjectCellGrowDirection>;
+    }
+    // The cell can grow left if the previous cell is a 'none' type
     if (prev?.type === 'none') {
       growDirections.push('left');
     }
+    // The cell can grow right if the next cell is a 'none' type
     if (next?.type === 'none') {
       growDirections.push('right');
     }
