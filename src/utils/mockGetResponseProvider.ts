@@ -1,4 +1,5 @@
 import { mockProjectClasses } from '@/mocks/mockClasses';
+import { mockGroups } from '@/mocks/mockGroups';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import {
   mockConstructionPhaseDetails,
@@ -71,6 +72,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockLocations);
       case `/projects/${mockProject.data.id}/notes/`:
         return Promise.resolve(mockNotes);
+      case `/project-groups/`:
+        return Promise.resolve(mockGroups);
       default:
         return Promise.reject(new Error('not found'));
     }
