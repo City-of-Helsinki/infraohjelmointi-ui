@@ -3,8 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import GroupDialog from './GroupDialog';
-import { arrayHasValue, matchExact } from '@/utils/common';
-import { IPerson, IProject } from '@/interfaces/projectInterfaces';
+import { matchExact } from '@/utils/common';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import {
   mockConstructionPhaseDetails,
@@ -19,10 +18,8 @@ import {
   mockResponsiblePersons,
   mockResponsibleZones,
 } from '@/mocks/mockLists';
-import { mockHashTags } from '@/mocks/mockHashTags';
 import { act } from 'react-dom/test-utils';
-import { screen, waitFor } from '@testing-library/react';
-import { IListItem } from '@/interfaces/common';
+import { waitFor } from '@testing-library/react';
 import mockPersons from '@/mocks/mockPersons';
 import { setupStore } from '@/store';
 import mockProjectClasses from '@/mocks/mockClasses';
@@ -38,8 +35,6 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('GroupDialog', () => {
   let renderResult: CustomRenderResult;
-
-  const getFormField = (name: string) => `GroupForm.${name}`;
 
   beforeEach(async () => {
     const store = setupStore();
@@ -89,13 +84,13 @@ describe('GroupDialog', () => {
     jest.clearAllMocks();
   });
 
-  it.only('renders the component wrappers', async () => {
+  it('renders the component wrappers', async () => {
     const { getByTestId } = renderResult;
     expect(getByTestId('open-group-form-dialog-button')).toBeInTheDocument();
   });
 
-  it.only('renders group creation modal', async () => {
-    const { getByText, getByRole, user, getAllByTestId, getByTestId, store } = renderResult;
+  it('renders group creation modal', async () => {
+    const { getByText, getByRole, user } = renderResult;
 
     // Open modal
     await user.click(getByRole('button', { name: matchExact('createSummingGroups') }));
@@ -121,7 +116,7 @@ describe('GroupDialog', () => {
     expect(getByRole('button', { name: 'cancel' }));
   });
 
-  it.only('can create new group with the groups form', async () => {
+  it('can create new group with the groups form', async () => {
     const mockPostResponse = {
       data: {
         id: 'e39a5f66-8be5-4cd8-9a8a-16f69cc02c18',
