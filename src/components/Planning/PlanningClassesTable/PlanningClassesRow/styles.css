@@ -44,7 +44,7 @@
 }
 
 .table-header.division {
-  @apply bg-[var(--color-division)] pl-10 text-l font-medium text-black-90;
+  @apply border-none bg-[var(--color-division)] pl-10 text-l font-medium text-black-90;
 }
 
 .table-header.division .table-header-content {
@@ -52,7 +52,7 @@
 }
 
 .table-header.group {
-  @apply bg-[#f0f0ff] text-black;
+  @apply border-b border-black bg-[#f0f0ff] font-medium text-black;
 }
 
 /* Group row under a subClass */
@@ -128,11 +128,11 @@
 }
 
 .table-cell.division {
-  @apply bg-[var(--color-division)] text-black-90;
+  @apply border-none bg-[var(--color-division)] text-black-90;
 }
 
 .table-cell.group {
-  @apply bg-[#f0f0ff] text-black;
+  @apply border-b border-black bg-[#f0f0ff] text-black;
 }
 
 .table-cell .table-cell-container {

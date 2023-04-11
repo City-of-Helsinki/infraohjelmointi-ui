@@ -166,7 +166,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
           ...getRowProps(filteredDivision, 'division', true),
           children: [
             ...mapGroups(filteredDivision.id, 'division'),
-            /* Groups > Projects */
+            /* Projects */
           ],
         })),
       // ...mapGroups(district.id, 'district'),
