@@ -22,7 +22,7 @@ const PlanningClassesRow: FC<IPlanningTableRow> = (props) => {
 
   return (
     <>
-      <tr>
+      <tr className={props.type}>
         <PlanningClassesHeader handleExpand={handleExpand} expanded={expanded} {...props} />
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {classSums.map((cs: any, i: number) => (

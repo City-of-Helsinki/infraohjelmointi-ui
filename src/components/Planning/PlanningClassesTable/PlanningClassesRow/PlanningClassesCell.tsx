@@ -23,14 +23,14 @@ const PlanningClassesCell: FC<IPlanningClassesCellProps> = ({ sum, position, typ
       {type !== 'division' && (
         <div className={`table-cell-container`}>
           <span>{sum}</span>
-          {position === 0 ? (
+          {position === 0 && type !== 'group' && type !== 'district' ? (
             // Add overright icon for the first cell of every row
             <OverrunSum value={sum} />
           ) : (
             // Only display the value for the rest of the cells
             <span>{sum}</span>
           )}
-          <span>{position === 0 && `${sum}`}</span>
+          {position === 0 && type !== 'group' && type !== 'district' && <span>{sum}</span>}
         </div>
       )}
     </td>

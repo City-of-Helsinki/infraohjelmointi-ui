@@ -51,8 +51,26 @@
   @apply gap-4;
 }
 
+.table-header.group {
+  @apply bg-[#f0f0ff] text-black;
+}
+
+/* Group row under a subClass */
+.subClass ~ .group .table-header.group {
+  @apply pl-[5.5rem];
+}
+
+/* Group row under a district */
+.district ~ .group .table-header.group {
+  @apply pl-10;
+}
+
+/* Group row under a division */
+.division ~ .group .table-header.group {
+  @apply pl-16;
+}
+
 .table-header .table-title-button {
-  /* FIXME: remove overflow-hidden to see the tooltip, should fix*/
   @apply flex overflow-hidden;
 }
 
@@ -113,8 +131,12 @@
   @apply bg-[var(--color-division)] text-black-90;
 }
 
+.table-cell.group {
+  @apply bg-[#f0f0ff] text-black;
+}
+
 .table-cell .table-cell-container {
-  @apply grid grid-flow-row grid-rows-3;
+  @apply grid grid-flow-row;
 }
 
 .table-cell .table-cell-container span {

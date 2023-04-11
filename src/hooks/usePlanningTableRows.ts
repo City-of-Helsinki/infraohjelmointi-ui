@@ -6,6 +6,8 @@ import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
 import { IPlanningTableRow, PlanningTableRowType } from '@/interfaces/common';
+import { selectGroups } from '@/reducers/groupSlice';
+import { IGroup } from '@/interfaces/groupInterfaces';
 
 interface IPlanningRowLists {
   masterClasses: Array<IClass>;
@@ -13,6 +15,7 @@ interface IPlanningRowLists {
   subClasses: Array<IClass>;
   districts: Array<ILocation>;
   divisions: Array<ILocation>;
+  groups: Array<IGroup>;
 }
 
 interface IPlanningRowSelections {
@@ -57,7 +60,7 @@ const shouldNavigate = (type: PlanningTableRowType, selections: IPlanningRowSele
  * @param type the type that the link is created for
  */
 const getLink = (
-  item: IClass | ILocation,
+  item: IClass | ILocation | IGroup,
   type: PlanningTableRowType,
   selections: IPlanningRowSelections,
 ): string | null => {
@@ -87,23 +90,43 @@ const getLink = (
 const buildPlanningTableRows = (state: IPlanningRowsState) => {
   const {
     selections: { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict },
-    lists: { masterClasses, classes, subClasses, districts, divisions },
+    lists: { masterClasses, classes, subClasses, districts, divisions, groups },
   } = state;
 
   const getRowProps = (
-    item: IClass | ILocation,
+    item: IClass | ILocation | IGroup,
     type: PlanningTableRowType,
     defaultExpanded?: boolean,
   ): Omit<IPlanningTableRow, 'children'> => {
     return {
       type: type,
       name: item.name,
-      path: item.path,
+      path: type !== 'group' ? (item as IClass | ILocation).path : '',
       id: item.id,
       key: item.id,
       link: getLink(item, type, state.selections),
       defaultExpanded: defaultExpanded || false,
     };
+  };
+
+  const mapGroups = (id: string, type: PlanningTableRowType) => {
+    const filteredGroups = [];
+    // Filter groups under subClass only if there are is no districtRelation
+    if (type === 'subClass') {
+      filteredGroups.push(
+        ...groups.filter((group) => !group.districtRelation && group.classRelation === id),
+      );
+    }
+    // Filter groups under division or district
+    else if (type === 'division' || type == 'district') {
+      filteredGroups.push(...groups.filter((group) => group.districtRelation === id));
+    }
+    return filteredGroups.map((group) => ({
+      ...getRowProps(group, 'group'),
+      children: [
+        // Projects
+      ],
+    }));
   };
 
   // Map the class rows going from masterClasses to districts
@@ -119,13 +142,16 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
           .filter((subClass) => subClass.parent === filteredClass.id)
           .map((filteredSubClass) => ({
             ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
-            // Map districts
-            children: districts
-              .filter((district) => district.parentClass === filteredSubClass.id)
-              .map((filteredDistrict) => ({
-                ...getRowProps(filteredDistrict, 'district-preview'),
-                children: [],
-              })),
+            // Map districts & groups
+            children: [
+              ...districts
+                .filter((district) => district.parentClass === filteredSubClass.id)
+                .map((filteredDistrict) => ({
+                  ...getRowProps(filteredDistrict, 'district-preview'),
+                  children: [],
+                })),
+              ...mapGroups(filteredSubClass.id, 'subClass'),
+            ],
           })),
       })),
   }));
@@ -133,14 +159,18 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
   // Map the selected districts divisions and the groups & projects that belong to those divisions
   const projectRows = districts.map((district) => ({
     ...getRowProps(district, 'district', true),
-    children: divisions
-      .filter((division) => division.parent === district.id)
-      .map((filteredDivision) => ({
-        ...getRowProps(filteredDivision, 'division', true),
-        children: [
-          /* Groups > Projects */
-        ],
-      })),
+    children: [
+      ...divisions
+        .filter((division) => division.parent === district.id)
+        .map((filteredDivision) => ({
+          ...getRowProps(filteredDivision, 'division', true),
+          children: [
+            ...mapGroups(filteredDivision.id, 'division'),
+            /* Groups > Projects */
+          ],
+        })),
+      // ...mapGroups(district.id, 'district'),
+    ],
   }));
 
   return selectedDistrict ? projectRows : classRows;
@@ -172,6 +202,7 @@ const usePlanningTableRows = () => {
   const allSubClasses = useAppSelector(selectSubClasses);
   const allDistricts = useAppSelector(selectDistricts);
   const allDivisions = useAppSelector(selectDivisions);
+  const allGroups = useAppSelector(selectGroups);
 
   const [planningRowsState, setPlanningRowsState] = useState<IPlanningRowsState>({
     lists: {
@@ -180,6 +211,7 @@ const usePlanningTableRows = () => {
       subClasses: [],
       districts: [],
       divisions: [],
+      groups: [],
     },
     selections: {
       selectedMasterClass: null,
@@ -285,6 +317,17 @@ const usePlanningTableRows = () => {
       },
     }));
   }, [allDivisions]);
+
+  // React to changes in allGroups
+  useEffect(() => {
+    setPlanningRowsState((current) => ({
+      ...current,
+      lists: {
+        ...current.lists,
+        groups: allGroups,
+      },
+    }));
+  }, [allGroups]);
 
   return {
     rows,

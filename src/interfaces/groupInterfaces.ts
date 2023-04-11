@@ -4,6 +4,7 @@ export interface IGroup {
   classRelation: string;
   districtRelation: string;
 }
+
 export interface IGroupRequest {
   name: string;
   classRelation: string;

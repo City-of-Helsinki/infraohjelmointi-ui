@@ -51,6 +51,6 @@ export const groupSlice = createSlice({
   },
 });
 
-export const selectGroups = (state: RootState) => state.note.notes;
+export const selectGroups = (state: RootState) => state.group.groups;
 
 export default groupSlice.reducer;
