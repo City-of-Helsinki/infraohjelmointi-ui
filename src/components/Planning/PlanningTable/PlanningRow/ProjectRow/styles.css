@@ -1,31 +1,3 @@
-.group-header-cell {
-  @apply w-[35%] min-w-[26.74rem] bg-bus py-2 px-5 text-white;
-}
-
-.group-header-cell-content {
-  @apply flex h-full w-full justify-between;
-}
-
-.group-header-cell .left {
-  @apply relative flex items-center justify-center gap-2;
-}
-
-.group-header-cell .right {
-  @apply flex flex-col;
-}
-
-.group-header-cell .right span:last-child {
-  @apply font-normal;
-}
-
-.group-cell {
-  @apply min-h-[var(--table-cell-width)] min-w-[var(--table-cell-width)] bg-bus py-2 px-1 align-text-top text-white;
-}
-
-.group-cell span {
-  @apply block translate-x-[-15%] font-light;
-}
-
 .project-header-cell {
   /* setting max-width: 1rem will cause the table head to not grow bigger than the group table header */
   @apply max-w-[1rem] border-b-[0.05rem] border-l-[0.05rem] border-r-[0.05rem] border-bus-m py-1 px-5;
@@ -70,32 +42,45 @@
   @apply bg-white;
 }
 
-/* add a left border to cell with the none-class after the last colored cell */
-.con + .none,
-.plan + .none,
-.overlap + .none {
-  border-left: 2px solid var(--color-black-20);
+.con,
+.plan,
+.overlap,
+.none {
+  position: relative;
 }
 
-/* add a left border to a colored cell if it's the first colored cell */
-.none + .plan,
-.none + .con,
-.none + .overlap {
-  border-left: 2px solid var(--color-black-20);
+/* add a left border to cell with the none-class after the last colored cell */
+.con + .none::after,
+.plan + .none::after,
+.overlap + .none::after,
+/* add a left border to a colored cell if it's the first colored cell  */
+.none + .plan::after,
+.none + .con::after,
+.none + .overlap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--color-black-20);
 }
 
 /* add a left border to an ACTIVE cell with the none-class after the last colored cell */
-tr.active .con + .none,
-tr.active .plan + .none,
-tr.active .overlap + .none {
-  border-left: 3px solid var(--color-black-70);
-}
-
+tr.active .con + .none::after,
+tr.active .plan + .none::after,
+tr.active .overlap + .none::after,
 /* add a left border to a colored ACTIVE cell if it's the first colored cell */
-tr.active .none + .plan,
-tr.active .none + .con,
-tr.active .none + .overlap {
-  border-left: 3px solid var(--color-black-70);
+tr.active .none + .plan::after,
+tr.active .none + .con::after,
+tr.active .none + .overlap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--color-black-70);
 }
 
 /* creates a border bottom with both planning and construction colors with the :before effect */
@@ -127,6 +112,10 @@ tr.active .edit-timeline-button {
 
 .edit-timeline-button.right svg {
   @apply rotate-180;
+}
+
+.edit-timeline-button.left {
+  @apply translate-x-[-5px];
 }
 
 .project-cell-input {

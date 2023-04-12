@@ -3,7 +3,7 @@ import { FC, memo } from 'react';
 import './styles.css';
 import { IPlanningTableRow } from '@/interfaces/common';
 
-interface IPlanningClassesCellProps extends IPlanningTableRow {
+interface IPlanningCellProps extends IPlanningTableRow {
   sum: string;
   position: number;
 }
@@ -16,7 +16,7 @@ const OverrunSum = memo(({ value }: { value: string }) => (
   </span>
 ));
 
-const PlanningClassesCell: FC<IPlanningClassesCellProps> = ({ sum, position, type }) => {
+const PlanningCell: FC<IPlanningCellProps> = ({ sum, position, type }) => {
   return (
     <td className={`table-cell ${type}`}>
       {/* temporarily hide mock values if it's division */}
@@ -37,4 +37,4 @@ const PlanningClassesCell: FC<IPlanningClassesCellProps> = ({ sum, position, typ
   );
 };
 
-export default memo(PlanningClassesCell);
+export default memo(PlanningCell);

@@ -5,18 +5,12 @@ import { NameTooltip } from '../NameTooltip';
 import { IPlanningTableRow } from '@/interfaces/common';
 import './styles.css';
 
-interface IPlanningClassesHeaderProps extends IPlanningTableRow {
+interface IPlanningHeaderProps extends IPlanningTableRow {
   handleExpand: () => void;
   expanded?: boolean;
 }
 
-const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
-  link,
-  name,
-  type,
-  handleExpand,
-  expanded,
-}) => {
+const PlanningHeader: FC<IPlanningHeaderProps> = ({ link, name, type, handleExpand, expanded }) => {
   const navigate = useNavigate();
 
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
@@ -51,4 +45,4 @@ const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
   );
 };
 
-export default memo(PlanningClassesHeader);
+export default memo(PlanningHeader);

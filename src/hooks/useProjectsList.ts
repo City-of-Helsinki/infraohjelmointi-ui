@@ -4,6 +4,9 @@ import { RootState } from '@/store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 
+/**
+ * TODO: remove this hook if it ends up being unused in the new planning view structure
+ */
 const useProjectsList = () => {
   const projectsFromRedux = useAppSelector(selectProjects);
   const projectsCount = useAppSelector(selectCount);

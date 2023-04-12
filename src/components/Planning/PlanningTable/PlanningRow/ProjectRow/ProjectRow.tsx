@@ -11,16 +11,17 @@ import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useAppDispatch } from '@/hooks/common';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import './styles.css';
 
-interface IPlanningGroupsTableRowProps {
+interface IProjectRowProps {
   project: IProject;
 }
 
-const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({ project }) => {
+const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
-  const tableRowRef = useRef<HTMLTableRowElement>(null);
+  const projectRowRef = useRef<HTMLTableRowElement>(null);
   const projectCells = useProjectCells(project);
 
   const onSubmitPhase = useCallback(
@@ -47,16 +48,16 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({ project }) =
 
   // Remove the active css-class from the current row if the user clicks outside of it
   useClickOutsideRef(
-    tableRowRef,
+    projectRowRef,
     useCallback(() => {
-      if (tableRowRef?.current?.classList.contains('active')) {
-        tableRowRef.current.classList.remove('active');
+      if (projectRowRef?.current?.classList.contains('active')) {
+        projectRowRef.current.classList.remove('active');
       }
     }, []),
   );
 
   return (
-    <tr id={`row-${project.id}`} ref={tableRowRef}>
+    <tr id={`row-${project.id}`} ref={projectRowRef}>
       {/* HEADER */}
       <th className="project-header-cell">
         <div className="project-header-cell-container">
@@ -91,4 +92,4 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({ project }) =
   );
 };
 
-export default memo(PlanningGroupsTableRow);
+export default memo(ProjectRow);
