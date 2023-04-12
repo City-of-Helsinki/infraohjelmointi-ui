@@ -20,11 +20,11 @@ interface IDialogProps {
 }
 
 const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
-  // submit Class or subclass if present, submit division or subDivision if present, submit a name, submit projects
+  // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
   return {
     name: form.name,
     classRelation: form.subClass?.value || form.class?.value || '',
-    districtRelation: form.subDivision?.value || form.division?.value || '',
+    districtRelation: form.division?.value || form.district?.value || '',
     projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
 };
@@ -179,12 +179,17 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                         />
                         <SelectField
                           {...formProps('division')}
-                          rules={{
-                            required: t('required', { value: 'Kaupunginosa' }) || '',
-                            validate: {
-                              isPopulated: (d: IOption) => customValidation(d, 'Kaupunginosa'),
-                            },
-                          }}
+                          rules={
+                            locationOptions.divisions.length > 0
+                              ? {
+                                  required: t('required', { value: 'Kaupunginosa' }) || '',
+                                  validate: {
+                                    isPopulated: (d: IOption) =>
+                                      customValidation(d, 'Kaupunginosa'),
+                                  },
+                                }
+                              : {}
+                          }
                           options={locationOptions.divisions}
                         />
                         <SelectField
