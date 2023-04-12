@@ -122,7 +122,7 @@ describe('GroupDialog', () => {
         id: 'e39a5f66-8be5-4cd8-9a8a-16f69cc02c18',
         name: 'test-group',
         districtRelation: null,
-        classRelation: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
+        classRelation: 'eac7ec6b-84e1-482f-b745-d2cea2179095',
       },
     };
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
@@ -150,6 +150,9 @@ describe('GroupDialog', () => {
     await user.click(getByRole('button', { name: 'groupForm.class *' }));
     await user.click(getByText(matchExact('Uudisrakentaminen')));
 
+    await user.click(getByRole('button', { name: 'groupForm.subClass *' }));
+    await user.click(getByText(matchExact('Meluesteet')));
+
     await user.type(getByText('groupForm.searchForProjects'), 'Y');
 
     await waitFor(async () => {
@@ -163,7 +166,7 @@ describe('GroupDialog', () => {
 
     // Check that the correct url was called
     expect(getRequest.calls[0][0]).toBe(
-      'localhost:4000/projects/?masterClass=fa3ac589-816e-47cb-a2f9-0c6956e85913&class=c4708dad-d8ea-4873-8916-3fd5d847d459&projectName=Y&inGroup=false&programmed=true&limit=30&order=new',
+      'localhost:4000/projects/?masterClass=fa3ac589-816e-47cb-a2f9-0c6956e85913&class=c4708dad-d8ea-4873-8916-3fd5d847d459&subClass=eac7ec6b-84e1-482f-b745-d2cea2179095&projectName=Y&inGroup=false&programmed=true&limit=30&order=new',
     );
 
     // retype and check the suggestion gets filtered
@@ -184,5 +187,39 @@ describe('GroupDialog', () => {
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
     expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
+  });
+  it('Cannot submit if all required fields are not populated', async () => {
+    const { user, getAllByTestId, getByTestId, getByRole, getByText, store } = renderResult;
+    await waitFor(() => store.dispatch(setMasterClasses()));
+    await waitFor(() => store.dispatch(setClasses()));
+    await waitFor(() => store.dispatch(setSubClasses()));
+    // filter locations into categories (this happens in App.tsx)
+    await waitFor(() => store.dispatch(setDistricts()));
+    await waitFor(() => store.dispatch(setDivisions()));
+    await waitFor(() => store.dispatch(setSubDivisions()));
+    // Open modal
+    await user.click(getByRole('button', { name: matchExact('createSummingGroups') }));
+
+    const submitButton = getByTestId('create-group-button');
+    expect(submitButton).toBeDisabled();
+
+    await user.type(getByText('groupForm.name'), 'test-group');
+
+    await user.click(getByRole('button', { name: 'groupForm.masterClass *' }));
+    await user.click(getByText(matchExact('803 Kadut, liikenneväylät')));
+
+    await user.click(getByRole('button', { name: 'groupForm.class *' }));
+    await user.click(getByText(matchExact('Uudisrakentaminen')));
+
+    await user.click(getByRole('button', { name: matchExact('groupForm.openAdvanceSearch') }));
+
+    expect(submitButton).toBeEnabled();
+
+    // Click the 'add to project' button to patch the project with the new hashtag
+    await user.click(submitButton);
+
+    expect(getByText('Alaluokka on pakollinen tieto.')).toBeInTheDocument();
+    expect(getByText('Suurpiiri on pakollinen tieto.')).toBeInTheDocument();
+    expect(getByText('Kaupunginosa on pakollinen tieto.')).toBeInTheDocument();
   });
 });
