@@ -270,10 +270,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   );
   const cellRef = useRef<HTMLTableCellElement>(null);
 
-  useEffect(() => {
-    console.log('Form value after change: ', formValue);
-  }, [formValue]);
-
   const updateCell = useCallback(
     (req: IProjectRequest) => {
       dispatch(
@@ -353,6 +349,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
         onRemoveCell,
         onEditCell,
         menuType: ContextMenuType.EDIT_PROJECT_CELL,
+        atElement: e.target as unknown as Element,
       });
     },
     [onRemoveCell, onEditCell, getCssType, year, title],

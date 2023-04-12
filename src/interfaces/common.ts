@@ -79,6 +79,7 @@ export interface IContextMenuData {
   menuType: ContextMenuType;
   onRemoveCell?: () => void;
   onEditCell?: () => void;
+  atElement: Element;
 }
 
 export type FreeSearchFormItem = IOption & { type: string };

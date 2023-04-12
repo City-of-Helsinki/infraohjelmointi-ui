@@ -1,12 +1,21 @@
 import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
-import { useState, useEffect, useRef, useLayoutEffect, useMemo, memo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, memo, useCallback } from 'react';
 import { ProjectCellMenu } from './ContextMenus/ProjectCellContextMenu';
 import './styles.css';
+import useIsInViewPort from '@/hooks/useIsInViewport';
+
+const getTranslatedPixels = (dimensions: DOMRectReadOnly) => {
+  if (dimensions && dimensions.top > 0) {
+    return `-${Math.abs(dimensions.bottom - window.innerHeight) + 20}px`;
+  } else if (dimensions) {
+    return `${Math.abs(dimensions.top) + 20}px`;
+  } else {
+    return '0px';
+  }
+};
 
 interface IContextMenuState extends IContextMenuData {
   isVisible: boolean;
-  posX: number;
-  posY: number;
 }
 
 /**
@@ -17,31 +26,35 @@ interface IContextMenuState extends IContextMenuData {
 const CustomContextMenu = () => {
   const [contextMenuState, setContextMenuState] = useState<IContextMenuState>({
     isVisible: false,
-    posX: 0,
-    posY: 0,
     menuType: ContextMenuType.EDIT_PROJECT_CELL,
     title: '',
     year: 0,
     cellType: 'plan',
+    atElement: null as unknown as Element,
   });
 
-  const { isVisible, posX, posY, menuType, title, year, cellType, onRemoveCell, onEditCell } =
+  const { isVisible, menuType, title, year, cellType, onRemoveCell, onEditCell, atElement } =
     contextMenuState;
 
   const contextRef = useRef<HTMLDivElement>(null);
 
-  const menuPosition = useMemo(
-    () => ({
-      left: posX,
-      top: posY,
-    }),
-    [posX, posY],
+  const { isInViewPort, dimensions } = useIsInViewPort(contextRef);
+  const isElementOutOfView = !!(!isInViewPort && dimensions);
+  const { left, top } = useMemo(
+    () => (atElement ? atElement.getBoundingClientRect() : { left: 0, top: 0 }),
+    [atElement],
   );
 
   const handleCloseContextMenu = useCallback(() => {
     setContextMenuState((current) => ({ ...current, isVisible: false }));
   }, []);
 
+  /**
+   * Handle context menu visiblity:
+   * - Show context menu on 'showContextMenu'-event
+   * - Hide context menu on 'scroll'-event
+   * - Hide context menu when clicking outside the context menu container
+   */
   useEffect(() => {
     if (!contextRef || !contextRef.current) {
       return;
@@ -49,7 +62,7 @@ const CustomContextMenu = () => {
 
     const contextElement = contextRef.current;
 
-    const closeContextMenu = (e: MouseEvent) => {
+    const closeContextMenuIfClickOutsideMenu = (e: MouseEvent) => {
       if (contextElement && !contextElement.contains(e.target as Node)) {
         handleCloseContextMenu();
       }
@@ -60,44 +73,32 @@ const CustomContextMenu = () => {
       const { event, ...detail } = e.detail;
       setContextMenuState({
         isVisible: true,
-        posX: event.pageX,
-        posY: event.pageY,
         ...detail,
       });
     };
 
     contextElement.addEventListener('showContextMenu', showContextMenu);
-    document.addEventListener('click', closeContextMenu);
+    document.addEventListener('click', closeContextMenuIfClickOutsideMenu);
+    document.addEventListener('scroll', handleCloseContextMenu);
     return () => {
       contextElement.removeEventListener('showContextMenu', showContextMenu);
-      document.removeEventListener('click', closeContextMenu);
+      document.removeEventListener('click', closeContextMenuIfClickOutsideMenu);
+      document.removeEventListener('scroll', handleCloseContextMenu);
     };
   }, [contextRef]);
-
-  // Check if the context menu position overflows the viewport and move it into the viewport
-  useLayoutEffect(() => {
-    if (contextRef && contextRef.current) {
-      if (posX + contextRef.current.offsetWidth > window.innerWidth) {
-        setContextMenuState((current) => ({
-          ...current,
-          posX: posX - (contextRef.current?.offsetWidth || 0),
-        }));
-      }
-      if (posY + contextRef.current.offsetHeight > window.innerHeight) {
-        setContextMenuState((current) => ({
-          ...current,
-          // TODO: posY: posY - (contextRef.current?.offsetHeight || 0),
-        }));
-      }
-    }
-  }, [posX, posY]);
 
   return (
     <div
       ref={contextRef}
       id="custom-context-menu"
       className="context-menu-container"
-      style={menuPosition}
+      // style={menuPosition}
+      style={{
+        visibility: dimensions ? 'visible' : 'hidden',
+        left: left,
+        top: top,
+        transform: `translate(1.5rem, ${isElementOutOfView && getTranslatedPixels(dimensions)})`,
+      }}
     >
       {isVisible && menuType === ContextMenuType.EDIT_PROJECT_CELL && (
         <ProjectCellMenu
