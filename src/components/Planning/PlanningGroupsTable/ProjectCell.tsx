@@ -8,7 +8,17 @@ import {
 } from '@/interfaces/projectInterfaces';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { dispatchContextMenuEvent } from '@/utils/events';
-import { ChangeEvent, FC, useCallback, useState, MouseEvent, useEffect, memo, useRef } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  useCallback,
+  useState,
+  MouseEvent,
+  useEffect,
+  memo,
+  useRef,
+  useMemo,
+} from 'react';
 import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 
@@ -265,10 +275,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [formValue, setFormValue] = useState<number | undefined>(
-    type !== 'none' && budget ? parseInt(budget) : undefined,
-  );
+  const [formValue, setFormValue] = useState<number | null>(parseInt(budget || '0'));
   const cellRef = useRef<HTMLTableCellElement>(null);
+
+  // Values of cells that have the none type will be empty strings to hide them
+  const formDisplayValue = useMemo(
+    () => (type !== 'none' ? formValue?.toString() : ''),
+    [formValue, type],
+  );
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
@@ -343,12 +357,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   const handleOpenContextMenu = useCallback(
     (e: MouseEvent<HTMLElement>) => {
       dispatchContextMenuEvent(e, {
-        year,
-        title,
-        cellType: getCssType(),
-        onRemoveCell,
-        onEditCell,
         menuType: ContextMenuType.EDIT_PROJECT_CELL,
+        cellMenuProps: {
+          year,
+          title,
+          cellType: getCssType(),
+          onRemoveCell,
+          onEditCell,
+        },
       });
     },
     [onRemoveCell, onEditCell, getCssType, year, title],
@@ -356,8 +372,8 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   // Set the budgets value to a number if it exists
   useEffect(() => {
-    budget && type !== 'none' && setFormValue(parseInt(budget));
-  }, [budget, type]);
+    setFormValue(parseInt(budget || '0'));
+  }, [budget]);
 
   return (
     <td
@@ -367,7 +383,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     >
       <div className="project-cell-input-container">
         <input
-          value={formValue !== undefined ? formValue.toString() : ''}
+          value={formDisplayValue}
           type="number"
           onChange={handleChange}
           onBlur={handleBlur}
@@ -376,15 +392,15 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
           readOnly={isReadOnly}
           className="project-cell-input"
         />
-        {growDirections.map((d) => (
-          <EditTimelineButton
-            key={d}
-            direction={d}
-            onSingleClick={onAddYear}
-            onDoubleClick={onMoveTimeline}
-          />
-        ))}
       </div>
+      {growDirections.map((d) => (
+        <EditTimelineButton
+          key={d}
+          direction={d}
+          onSingleClick={onAddYear}
+          onDoubleClick={onMoveTimeline}
+        />
+      ))}
     </td>
   );
 };

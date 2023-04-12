@@ -1,18 +1,12 @@
-import { IOption } from '@/interfaces/common';
-import { CellType } from '@/interfaces/projectInterfaces';
+import { ICellMenuDetails, IOption } from '@/interfaces/common';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 
-interface IProjectCellMenuProps {
+interface IProjectCellMenuProps extends ICellMenuDetails {
   onCloseMenu: () => void;
-  title: string;
-  year: number;
-  cellType: CellType;
-  onRemoveCell?: () => void;
-  onEditCell?: () => void;
 }
 
 const ProjectCellMenu: FC<IProjectCellMenuProps> = ({

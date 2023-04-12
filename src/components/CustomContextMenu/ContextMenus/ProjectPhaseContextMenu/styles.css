@@ -1,0 +1,62 @@
+.phase-menu-container {
+  @apply max-w-[16rem] border border-black bg-white;
+}
+
+.phase-menu-container p {
+  @apply my-1;
+}
+
+.phase-menu-header {
+  @apply flex w-full items-center justify-between overflow-hidden border-b border-gray py-1;
+}
+
+.phase-menu-header .title {
+  @apply max-w-[12rem] overflow-hidden overflow-ellipsis whitespace-nowrap pl-4;
+}
+
+.phase-menu-header .description {
+  @apply pl-4 font-bold;
+}
+
+.phase-menu-header .close-icon {
+  @apply mr-2 min-w-[1.5rem] cursor-pointer;
+}
+
+.phase-menu-list {
+  @apply m-0 flex flex-col border-b border-gray py-1;
+}
+
+.phase-menu-list .list-item {
+  @apply flex w-full items-center justify-between bg-white py-2;
+}
+.phase-menu-list .list-item.selected {
+  @apply bg-bus-m;
+}
+
+.phase-menu-list .list-item .selection-button {
+  @apply flex items-center gap-1 overflow-hidden pl-3;
+}
+
+.phase-menu-list .list-item .icon-width {
+  @apply min-w-[1.5rem];
+}
+
+.phase-menu-list .list-item .check-icon {
+  @apply -translate-x-3;
+}
+
+.phase-menu-list .list-item .item-text {
+  @apply overflow-hidden text-ellipsis whitespace-nowrap pr-8 text-sm;
+}
+
+.phase-menu-list .list-item .item-text.selected {
+  @apply w-[80%] pr-2 font-bold;
+}
+
+.phase-menu-footer {
+  @apply flex justify-end p-2;
+}
+
+.phase-menu-footer button {
+  @apply min-h-[2-5rem] min-w-[2.5rem];
+}

@@ -9,9 +9,7 @@ const useIsInViewPort = (ref: RefObject<HTMLElement>) => {
     () =>
       new IntersectionObserver(
         ([entry]) => {
-          console.log('entry', entry);
           const bounding = entry.boundingClientRect;
-
           setDimensions(bounding);
           // Set in viewport
           setIsInViewPort(

@@ -114,7 +114,7 @@ tr.active .none + .overlap {
 }
 
 tr.active .edit-timeline-button {
-  @apply inline-block;
+  @apply inline-block translate-y-[-1.75rem];
 }
 
 .project-cell .edit-timeline-button svg {
