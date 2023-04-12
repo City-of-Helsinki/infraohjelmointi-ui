@@ -153,7 +153,16 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                         }}
                         options={classOptions.classes}
                       />
-                      <SelectField {...formProps('subClass')} options={classOptions.subClasses} />
+                      <SelectField
+                        {...formProps('subClass')}
+                        options={classOptions.subClasses}
+                        rules={{
+                          required: t('required', { value: 'Alaluokka' }) || '',
+                          validate: {
+                            isPopulated: (c: IOption) => customValidation(c, 'Alaluokka'),
+                          },
+                        }}
+                      />
                     </div>
                     {/* Advance fields */}
                     {showAdvanceFields && (
