@@ -1,8 +1,8 @@
 import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
 import { useState, useEffect, useRef, useMemo, memo, useCallback } from 'react';
 import { ProjectCellMenu } from './ContextMenus/ProjectCellContextMenu';
-import './styles.css';
 import useIsInViewPort from '@/hooks/useIsInViewport';
+import './styles.css';
 
 const getTranslatedPixels = (dimensions: DOMRectReadOnly) => {
   if (dimensions && dimensions.top > 0) {
@@ -33,17 +33,24 @@ const CustomContextMenu = () => {
     atElement: null as unknown as Element,
   });
 
+  const contextRef = useRef<HTMLDivElement>(null);
+
   const { isVisible, menuType, title, year, cellType, onRemoveCell, onEditCell, atElement } =
     contextMenuState;
 
-  const contextRef = useRef<HTMLDivElement>(null);
-
   const { isInViewPort, dimensions } = useIsInViewPort(contextRef);
+
   const isElementOutOfView = !!(!isInViewPort && dimensions);
+
   const { left, top } = useMemo(
     () => (atElement ? atElement.getBoundingClientRect() : { left: 0, top: 0 }),
     [atElement],
   );
+
+  console.log('LEFT: ', left);
+  console.log('TOP: ', top);
+  console.log('dimensions: ', dimensions);
+  console.log('atElement: ', atElement);
 
   const handleCloseContextMenu = useCallback(() => {
     setContextMenuState((current) => ({ ...current, isVisible: false }));
@@ -92,9 +99,7 @@ const CustomContextMenu = () => {
       ref={contextRef}
       id="custom-context-menu"
       className="context-menu-container"
-      // style={menuPosition}
       style={{
-        visibility: dimensions ? 'visible' : 'hidden',
         left: left,
         top: top,
         transform: `translate(1.5rem, ${isElementOutOfView && getTranslatedPixels(dimensions)})`,
