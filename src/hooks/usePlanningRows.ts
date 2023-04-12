@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
-import { IPlanningTableRow, PlanningTableRowType } from '@/interfaces/common';
+import { IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 
@@ -36,7 +36,7 @@ interface IPlanningRowsState {
  * @param type the type of the row
  * @param selections current row selections for all the rows
  */
-const shouldNavigate = (type: PlanningTableRowType, selections: IPlanningRowSelections) => {
+const shouldNavigate = (type: PlanningRowType, selections: IPlanningRowSelections) => {
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
   switch (type) {
     case 'masterClass':
@@ -61,7 +61,7 @@ const shouldNavigate = (type: PlanningTableRowType, selections: IPlanningRowSele
  */
 const getLink = (
   item: IClass | ILocation | IGroup,
-  type: PlanningTableRowType,
+  type: PlanningRowType,
   selections: IPlanningRowSelections,
 ): string | null => {
   const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
@@ -95,9 +95,9 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
 
   const getRowProps = (
     item: IClass | ILocation | IGroup,
-    type: PlanningTableRowType,
+    type: PlanningRowType,
     defaultExpanded?: boolean,
-  ): IPlanningTableRow => {
+  ): IPlanningRow => {
     return {
       type: type,
       name: item.name,
@@ -111,7 +111,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
   };
 
   // Groups can get mapped under subClasses, districts and divisions
-  const mapGroups = (id: string, type: PlanningTableRowType) => {
+  const mapGroups = (id: string, type: PlanningRowType) => {
     const filteredGroups = [];
     // Filter groups under subClass only if there are is no districtRelation
     if (type === 'subClass') {
@@ -132,7 +132,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
   };
 
   // Map the class rows going from masterClasses to districts
-  const classRows: Array<IPlanningTableRow> = masterClasses.map((masterClass) => ({
+  const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => ({
     ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
     // Map classes
     children: classes
@@ -198,7 +198,7 @@ const getSelectedItemOrNull = (list: Array<IClass | ILocation>, id: string | und
  *
  * @returns rows for the PlanningTable and the currently selected rows
  */
-const usePlanningTableRows = () => {
+const usePlanningRows = () => {
   const { masterClassId, classId, subClassId, districtId } = useParams();
 
   const allMasterClasses = useAppSelector(selectMasterClasses);
@@ -225,7 +225,7 @@ const usePlanningTableRows = () => {
     },
   });
 
-  const [rows, setRows] = useState<Array<IPlanningTableRow>>([]);
+  const [rows, setRows] = useState<Array<IPlanningRow>>([]);
 
   useEffect(() => {
     setRows(buildPlanningTableRows(planningRowsState));
@@ -339,4 +339,4 @@ const usePlanningTableRows = () => {
   };
 };
 
-export default usePlanningTableRows;
+export default usePlanningRows;

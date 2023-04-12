@@ -1,9 +1,9 @@
 import { BubbleIcon } from '../../../shared';
 import { FC, memo } from 'react';
 import './styles.css';
-import { IPlanningTableRow } from '@/interfaces/common';
+import { IPlanningRow } from '@/interfaces/common';
 
-interface IPlanningCellProps extends IPlanningTableRow {
+interface IPlanningCellProps extends IPlanningRow {
   sum: string;
   position: number;
 }

@@ -92,7 +92,7 @@ export enum ContextMenuType {
   EDIT_PROJECT_PHASE,
 }
 
-export type PlanningTableRowType =
+export type PlanningRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
@@ -102,11 +102,11 @@ export type PlanningTableRowType =
   | 'group'
   | 'project';
 
-export interface IPlanningTableRow {
-  type: PlanningTableRowType;
+export interface IPlanningRow {
+  type: PlanningRowType;
   name: string;
   path: string;
-  children: Array<IPlanningTableRow>;
+  children: Array<IPlanningRow>;
   id: string;
   key: string;
   defaultExpanded: boolean;

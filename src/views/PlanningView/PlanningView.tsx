@@ -4,11 +4,11 @@ import { PlanningInfoPanel } from '@/components/Planning/PlanningInfoPanel';
 import { PlanningYearsTable } from '@/components/Planning/PlanningYearsTable';
 import { PlanningBreadcrumbs } from '@/components/Planning/PlanningBreadcrumbs';
 import { PlanningTable } from '@/components/Planning/PlanningTable';
-import usePlanningTableRows from '@/hooks/usePlanningTableRows';
+import usePlanningRows from '@/hooks/usePlanningRows';
 import './styles.css';
 
 const PlanningView: FC = () => {
-  const { rows, selections } = usePlanningTableRows();
+  const { rows, selections } = usePlanningRows();
 
   return (
     <>

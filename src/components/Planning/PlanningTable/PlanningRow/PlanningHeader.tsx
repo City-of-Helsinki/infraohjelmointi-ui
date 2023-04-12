@@ -2,10 +2,10 @@ import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { NameTooltip } from './NameTooltip';
-import { IPlanningTableRow } from '@/interfaces/common';
+import { IPlanningRow } from '@/interfaces/common';
 import './styles.css';
 
-interface IPlanningHeaderProps extends IPlanningTableRow {
+interface IPlanningHeaderProps extends IPlanningRow {
   handleExpand: () => void;
   expanded?: boolean;
 }

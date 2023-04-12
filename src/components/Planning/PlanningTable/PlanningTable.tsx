@@ -2,11 +2,11 @@
 /* eslint-disable react/jsx-key */
 import { FC, memo } from 'react';
 import PlanningRow from './PlanningRow/PlanningRow';
-import { IPlanningTableRow } from '@/interfaces/common';
+import { IPlanningRow } from '@/interfaces/common';
 import './styles.css';
 
 interface IPlanningTableProps {
-  rows: Array<IPlanningTableRow>;
+  rows: Array<IPlanningRow>;
 }
 
 const PlanningTable: FC<IPlanningTableProps> = ({ rows }) => {
@@ -14,7 +14,7 @@ const PlanningTable: FC<IPlanningTableProps> = ({ rows }) => {
     <table className="planning-table" cellSpacing={0}>
       <tbody>
         {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
-        {rows.map((row: IPlanningTableRow) => (
+        {rows.map((row: IPlanningRow) => (
           <PlanningRow {...row} />
         ))}
       </tbody>

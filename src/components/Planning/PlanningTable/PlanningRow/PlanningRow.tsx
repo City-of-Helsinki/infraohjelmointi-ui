@@ -4,13 +4,13 @@ import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { classSums } from '@/mocks/common';
 import PlanningCell from './PlanningCell';
 import PlanningHeader from './PlanningHeader';
-import { IPlanningTableRow } from '@/interfaces/common';
+import { IPlanningRow } from '@/interfaces/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProject } from '@/services/projectServices';
 import ProjectRow from './ProjectRow/ProjectRow';
 import './styles.css';
 
-const PlanningRow: FC<IPlanningTableRow> = (props) => {
+const PlanningRow: FC<IPlanningRow> = (props) => {
   const { defaultExpanded, type } = props;
   const [projects, setProjects] = useState<Array<IProject>>([]);
   const [fetchingProjects, setFetchingProjects] = useState(false);
