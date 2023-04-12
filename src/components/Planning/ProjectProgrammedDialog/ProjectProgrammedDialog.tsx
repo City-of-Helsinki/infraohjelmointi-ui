@@ -77,7 +77,10 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
           scrollable
         >
           {/* Header */}
-          <Header id={'add-project-programmed-header'} title={t(`addProjectsToProgramming`)} />
+          <Header
+            id={'add-project-programmed-header'}
+            title={t(`projectProgrammedForm.addProjectsToProgramming`)}
+          />
 
           <Content>
             <div className="dialog-search-section">
@@ -94,7 +97,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
             <Button
               onClick={onSubmit}
               disabled={!(projectsForSubmit && projectsForSubmit.length > 0)}
-              data-testid="search-projects-button"
+              data-testid="add-projects-button"
             >
               {t('search')}
             </Button>
@@ -126,7 +129,7 @@ const ProjectProgrammedDialog: FC = () => {
   );
   const handleClose = useCallback(() => {
     setIsOpen(false);
-  }, [toggleSetOpen]);
+  }, []);
   return (
     <div>
       <DialogContainer isOpen={isOpen} handleClose={handleClose} />
@@ -137,7 +140,7 @@ const ProjectProgrammedDialog: FC = () => {
           onClick={onOpenGroupForm}
           size="small"
         >
-          {t(`addProjectsToProgramming`)}
+          {t(`projectProgrammedForm.addProjectsToProgramming`)}
         </Button>
       </div>
     </div>

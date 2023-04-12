@@ -247,6 +247,10 @@
     "programmedYearMin": "Ohjelmoitu vuosi min {{label}}",
     "programmedYearMax": "Ohjelmoitu vuosi max {{label}}"
   },
+  "projectProgrammedForm":{
+    "addProjectsToProgramming":"Tuo uusi hanke listalle",
+    "searchForProjects":"Etsi hanke"
+  },
   "appTitle": "Infraohjelmointi UI",
   "project": "Hankekortti",
   "planning": "Ohjelmointinäkymä",

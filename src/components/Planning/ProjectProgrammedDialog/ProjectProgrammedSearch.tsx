@@ -118,7 +118,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
           .catch(() => reject([]));
       });
     },
-    [projectsForSubmit, buildQueryParamString, buildBreadCrumbs, classes],
+    [projectsForSubmit, buildQueryParamString, classes],
   );
 
   const handleSubmit = useCallback(
@@ -138,12 +138,12 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
     (name: string) => {
       onProjectSelectionDelete(name);
     },
-    [onProjectSelectionDelete, projectsForSubmit],
+    [onProjectSelectionDelete],
   );
   return (
     <div className="project-search-input" data-testid="search-project-field-section">
       <SearchInput
-        label={t('searchForProjects')}
+        label={t('projectProgrammedForm.searchForProjects')}
         getSuggestions={getSuggestions}
         clearButtonAriaLabel="Clear search field"
         searchButtonAriaLabel="Search"
