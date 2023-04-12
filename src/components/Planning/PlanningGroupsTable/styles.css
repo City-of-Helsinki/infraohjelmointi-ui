@@ -128,3 +128,28 @@ tr.active .edit-timeline-button {
 .edit-timeline-button.right svg {
   @apply rotate-180;
 }
+
+.project-cell-input {
+  @apply h-10 w-[85%] text-center;
+}
+
+.project-cell-input-container {
+  @apply flex h-full w-full justify-center;
+}
+
+.project-cell-input:focus {
+  outline: none;
+  border-radius: 3px;
+  border: 2px solid var(--color-coat-of-arms);
+}
+/* Hide arrows from number input in Chrome, Safari, Edge, Opera */
+.project-cell-input::-webkit-outer-spin-button,
+.project-cell-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide arrows from number input in Firefox */
+.project-cell-input[type='number'] {
+  -moz-appearance: textfield;
+}

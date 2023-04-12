@@ -8,7 +8,6 @@ import {
 } from '@/interfaces/projectInterfaces';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { dispatchContextMenuEvent } from '@/utils/events';
-import { NumberInput } from 'hds-react/components/NumberInput';
 import { ChangeEvent, FC, useCallback, useState, MouseEvent, useEffect, memo, useRef } from 'react';
 import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
@@ -266,11 +265,13 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [formValue, setFormValue] = useState<'' | number>(parseInt(budget || ''));
+  const [formValue, setFormValue] = useState<number | undefined>(
+    type !== 'none' && budget ? parseInt(budget) : undefined,
+  );
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   useEffect(() => {
-    console.log('Form value: ', formValue);
+    console.log('Form value after change: ', formValue);
   }, [formValue]);
 
   const updateCell = useCallback(
@@ -291,10 +292,10 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   }, []);
 
   // Make sure the budget is always at least 0 and remove the first 0 if the user types a number in the field
-  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setFormValue(parseInt(e.target.value.replace(/^0+/, '') || '0'));
-  }, []);
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => setFormValue(e.target.value ? +e.target.value : 0),
+    [],
+  );
 
   // Blurring the input field will patch the current budget
   const handleBlur = useCallback(() => {
@@ -359,8 +360,8 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   // Set the budgets value to a number if it exists
   useEffect(() => {
-    budget && setFormValue(parseInt(budget));
-  }, [budget]);
+    budget && type !== 'none' && setFormValue(parseInt(budget));
+  }, [budget, type]);
 
   return (
     <td
@@ -368,25 +369,26 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
       className={`project-cell ${getCssType()}`}
       onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
     >
-      <NumberInput
-        value={type !== 'none' ? formValue : ''}
-        id={`${financeKey}-${id}`}
-        label=""
-        className="table-input"
-        readOnly={isReadOnly}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        onChange={handleChange}
-        disabled={type === 'none'}
-      />
-      {growDirections.map((d) => (
-        <EditTimelineButton
-          key={d}
-          direction={d}
-          onSingleClick={onAddYear}
-          onDoubleClick={onMoveTimeline}
+      <div className="project-cell-input-container">
+        <input
+          value={formValue !== undefined ? formValue.toString() : ''}
+          type="number"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          disabled={type === 'none'}
+          readOnly={isReadOnly}
+          className="project-cell-input"
         />
-      ))}
+        {growDirections.map((d) => (
+          <EditTimelineButton
+            key={d}
+            direction={d}
+            onSingleClick={onAddYear}
+            onDoubleClick={onMoveTimeline}
+          />
+        ))}
+      </div>
     </td>
   );
 };
