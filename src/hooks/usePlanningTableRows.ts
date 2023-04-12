@@ -97,7 +97,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
     item: IClass | ILocation | IGroup,
     type: PlanningTableRowType,
     defaultExpanded?: boolean,
-  ): Omit<IPlanningTableRow, 'children'> => {
+  ): IPlanningTableRow => {
     return {
       type: type,
       name: item.name,
@@ -106,9 +106,11 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
       key: item.id,
       link: getLink(item, type, state.selections),
       defaultExpanded: defaultExpanded || false,
+      children: [],
     };
   };
 
+  // Groups can get mapped under subClasses, districts and divisions
   const mapGroups = (id: string, type: PlanningTableRowType) => {
     const filteredGroups = [];
     // Filter groups under subClass only if there are is no districtRelation
@@ -142,13 +144,13 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
           .filter((subClass) => subClass.parent === filteredClass.id)
           .map((filteredSubClass) => ({
             ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
-            // Map districts & groups
+            // Map districts & groups (groups only if they do not belong to a district)
             children: [
               ...districts
                 .filter((district) => district.parentClass === filteredSubClass.id)
                 .map((filteredDistrict) => ({
                   ...getRowProps(filteredDistrict, 'district-preview'),
-                  children: [],
+                  // Clicking a district will render the projectRows-list, so no children are needed
                 })),
               ...mapGroups(filteredSubClass.id, 'subClass'),
             ],
@@ -159,17 +161,19 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
   // Map the selected districts divisions and the groups & projects that belong to those divisions
   const projectRows = districts.map((district) => ({
     ...getRowProps(district, 'district', true),
+    // Map divisions & groups (groups only if there are no divisions)
     children: [
       ...divisions
         .filter((division) => division.parent === district.id)
         .map((filteredDivision) => ({
           ...getRowProps(filteredDivision, 'division', true),
+          // Map projects & groups
           children: [
             ...mapGroups(filteredDivision.id, 'division'),
             /* Projects */
           ],
         })),
-      // ...mapGroups(district.id, 'district'),
+      ...mapGroups(district.id, 'district'),
     ],
   }));
 

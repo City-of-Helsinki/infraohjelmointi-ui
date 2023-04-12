@@ -52,7 +52,7 @@
 }
 
 .table-header.group {
-  @apply border-b border-black bg-[#f0f0ff] font-medium text-black;
+  @apply border-b border-black bg-[var(--color-group)] font-medium text-black;
 }
 
 /* Group row under a subClass */
@@ -132,7 +132,7 @@
 }
 
 .table-cell.group {
-  @apply border-b border-black bg-[#f0f0ff] text-black;
+  @apply border-b border-black bg-[var(--color-group)] text-black;
 }
 
 .table-cell .table-cell-container {
