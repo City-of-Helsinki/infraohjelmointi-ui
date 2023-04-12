@@ -1,7 +1,7 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { NameTooltip } from '../NameTooltip';
+import { NameTooltip } from './NameTooltip';
 import { IPlanningTableRow } from '@/interfaces/common';
 import './styles.css';
 
