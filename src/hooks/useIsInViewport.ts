@@ -7,18 +7,22 @@ const useIsInViewPort = (ref: RefObject<HTMLElement>) => {
   // Memoize observer to avoid creating a new one each time the ref is rendered
   const observer = useMemo(
     () =>
-      new IntersectionObserver(([entry]) => {
-        const bounding = entry.boundingClientRect;
+      new IntersectionObserver(
+        ([entry]) => {
+          console.log('entry', entry);
+          const bounding = entry.boundingClientRect;
 
-        setDimensions(bounding);
-        // Set in viewport
-        setIsInViewPort(
-          bounding.top >= 0 &&
-            bounding.left >= 0 &&
-            bounding.right <= (window.innerWidth || document.documentElement.clientWidth) &&
-            bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight),
-        );
-      }),
+          setDimensions(bounding);
+          // Set in viewport
+          setIsInViewPort(
+            bounding.top >= 0 &&
+              bounding.left >= 0 &&
+              bounding.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+              bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight),
+          );
+        },
+        { threshold: 1 },
+      ),
     [],
   );
 

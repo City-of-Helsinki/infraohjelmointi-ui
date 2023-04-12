@@ -1,21 +1,12 @@
 import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
-import { useState, useEffect, useRef, useMemo, memo, useCallback } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect, useMemo, memo, useCallback } from 'react';
 import { ProjectCellMenu } from './ContextMenus/ProjectCellContextMenu';
-import useIsInViewPort from '@/hooks/useIsInViewport';
 import './styles.css';
-
-const getTranslatedPixels = (dimensions: DOMRectReadOnly) => {
-  if (dimensions && dimensions.top > 0) {
-    return `-${Math.abs(dimensions.bottom - window.innerHeight) + 20}px`;
-  } else if (dimensions) {
-    return `${Math.abs(dimensions.top) + 20}px`;
-  } else {
-    return '0px';
-  }
-};
 
 interface IContextMenuState extends IContextMenuData {
   isVisible: boolean;
+  posX: number;
+  posY: number;
 }
 
 /**
@@ -26,38 +17,33 @@ interface IContextMenuState extends IContextMenuData {
 const CustomContextMenu = () => {
   const [contextMenuState, setContextMenuState] = useState<IContextMenuState>({
     isVisible: false,
+    posX: 0,
+    posY: 0,
     menuType: ContextMenuType.EDIT_PROJECT_CELL,
     title: '',
     year: 0,
     cellType: 'plan',
-    atElement: null as unknown as Element,
   });
+
+  const { isVisible, posX, posY, menuType, title, year, cellType, onRemoveCell, onEditCell } =
+    contextMenuState;
 
   const contextRef = useRef<HTMLDivElement>(null);
 
-  const { isVisible, menuType, title, year, cellType, onRemoveCell, onEditCell, atElement } =
-    contextMenuState;
-
-  const { isInViewPort, dimensions } = useIsInViewPort(contextRef);
-
-  const isElementOutOfView = !!(!isInViewPort && dimensions);
-
-  const { left, top } = useMemo(
-    () => (atElement ? atElement.getBoundingClientRect() : { left: 0, top: 0 }),
-    [atElement],
+  const menuPosition = useMemo(
+    () => ({
+      left: posX,
+      top: posY,
+    }),
+    [posX, posY],
   );
-
-  console.log('LEFT: ', left);
-  console.log('TOP: ', top);
-  console.log('dimensions: ', dimensions);
-  console.log('atElement: ', atElement);
 
   const handleCloseContextMenu = useCallback(() => {
     setContextMenuState((current) => ({ ...current, isVisible: false }));
   }, []);
 
   /**
-   * Handle context menu visiblity:
+   * Listens to events and handle context menu visiblity:
    * - Show context menu on 'showContextMenu'-event
    * - Hide context menu on 'scroll'-event
    * - Hide context menu when clicking outside the context menu container
@@ -67,54 +53,99 @@ const CustomContextMenu = () => {
       return;
     }
 
+    const closeContextMenuOnScroll = () => {
+      handleCloseContextMenu();
+    };
+
     const contextElement = contextRef.current;
 
-    const closeContextMenuIfClickOutsideMenu = (e: MouseEvent) => {
+    const closeContextMenuOnClickOutsideRef = (e: MouseEvent) => {
       if (contextElement && !contextElement.contains(e.target as Node)) {
         handleCloseContextMenu();
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const showContextMenu = (e: any) => {
+    const showContextMenuOnEvent = (e: any) => {
       const { event, ...detail } = e.detail;
+
       setContextMenuState({
         isVisible: true,
+        posX: event.clientX,
+        posY: event.clientY,
         ...detail,
       });
     };
 
-    contextElement.addEventListener('showContextMenu', showContextMenu);
-    document.addEventListener('click', closeContextMenuIfClickOutsideMenu);
-    document.addEventListener('scroll', handleCloseContextMenu);
+    contextElement.addEventListener('showContextMenu', showContextMenuOnEvent);
+    document.addEventListener('click', closeContextMenuOnClickOutsideRef);
+    document.addEventListener('scroll', closeContextMenuOnScroll);
     return () => {
-      contextElement.removeEventListener('showContextMenu', showContextMenu);
-      document.removeEventListener('click', closeContextMenuIfClickOutsideMenu);
-      document.removeEventListener('scroll', handleCloseContextMenu);
+      contextElement.removeEventListener('showContextMenu', showContextMenuOnEvent);
+      document.removeEventListener('click', closeContextMenuOnClickOutsideRef);
+      document.removeEventListener('scroll', closeContextMenuOnScroll);
     };
   }, [contextRef]);
+
+  // Check if the context menu position overflows the viewport and move it into the viewport
+  useLayoutEffect(() => {
+    if (contextRef && contextRef.current) {
+      // If the context menu overflows the windows x-axis, move it into the viewport
+      if (posX + contextRef.current.offsetWidth > window.innerWidth) {
+        setContextMenuState((current) => ({
+          ...current,
+          posX: posX - (contextRef.current?.offsetWidth || 0),
+        }));
+      }
+      // If the context menu overflows the windows y-axis, move it into the viewport
+      if (posY + contextRef.current.offsetHeight > window.innerHeight) {
+        setContextMenuState((current) => ({
+          ...current,
+          posY: posY - (contextRef.current?.offsetHeight || 0),
+        }));
+      }
+    }
+  }, [posX, posY]);
+
+  const renderMenu = useCallback(() => {
+    if (isVisible) {
+      switch (menuType) {
+        case ContextMenuType.EDIT_PROJECT_CELL:
+          return (
+            <ProjectCellMenu
+              onCloseMenu={handleCloseContextMenu}
+              title={title}
+              year={year}
+              cellType={cellType}
+              onRemoveCell={onRemoveCell}
+              onEditCell={onEditCell}
+            />
+          );
+        case ContextMenuType.EDIT_PROJECT_PHASE:
+          return null;
+        default:
+          return null;
+      }
+    }
+  }, [
+    cellType,
+    handleCloseContextMenu,
+    isVisible,
+    menuType,
+    onEditCell,
+    onRemoveCell,
+    title,
+    year,
+  ]);
 
   return (
     <div
       ref={contextRef}
       id="custom-context-menu"
       className="context-menu-container"
-      style={{
-        left: left,
-        top: top,
-        transform: `translate(1.5rem, ${isElementOutOfView && getTranslatedPixels(dimensions)})`,
-      }}
+      style={menuPosition}
     >
-      {isVisible && menuType === ContextMenuType.EDIT_PROJECT_CELL && (
-        <ProjectCellMenu
-          onCloseMenu={handleCloseContextMenu}
-          title={title}
-          year={year}
-          cellType={cellType}
-          onRemoveCell={onRemoveCell}
-          onEditCell={onEditCell}
-        />
-      )}
+      {renderMenu()}
     </div>
   );
 };

@@ -349,7 +349,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
         onRemoveCell,
         onEditCell,
         menuType: ContextMenuType.EDIT_PROJECT_CELL,
-        atElement: e.target as unknown as Element,
       });
     },
     [onRemoveCell, onEditCell, getCssType, year, title],
