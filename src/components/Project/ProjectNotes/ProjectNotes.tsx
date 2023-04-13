@@ -5,8 +5,8 @@ import NewNoteForm from './NewNoteForm';
 import { getNotesByProjectThunk, selectNotes } from '@/reducers/noteSlice';
 import './styles.css';
 import { t } from 'i18next';
-import { sortArrayByDates } from '@/utils/common';
 import { selectProject } from '@/reducers/projectSlice';
+import { sortArrayByDates } from '@/utils/dates';
 
 const ProjectNotes = () => {
   const dispatch = useAppDispatch();

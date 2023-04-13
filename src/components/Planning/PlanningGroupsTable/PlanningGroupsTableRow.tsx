@@ -1,82 +1,70 @@
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
-import { FC, memo, useCallback, MouseEvent as ReactMouseEvent } from 'react';
+import { FC, memo, useCallback, MouseEvent as ReactMouseEvent, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import ProjectCell, { IProjectCellProps } from './ProjectCell';
-
-import { IListItem } from '@/interfaces/common';
+import ProjectCell from './ProjectCell';
+import { ContextMenuType } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
-import { isInYearRange } from '@/utils/common';
-
-const createProjectCells = (project: IProject): Array<IProjectCellProps> => {
-  const getCellType = (year: number) => {
-    const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } = project;
-    const isPlanning = isInYearRange(year, estPlanningStart, estPlanningEnd);
-    const isConstruction = isInYearRange(year, estConstructionStart, estConstructionEnd);
-
-    if (isPlanning && isConstruction) return 'planningAndConstruction';
-    if (isPlanning) return 'planning';
-    if (isConstruction) return 'construction';
-    return 'none';
-  };
-
-  const getCells = (value: string, key: string, year: number): IProjectCellProps => {
-    return {
-      value,
-      type: getCellType(year),
-      objectKey: key,
-      projectId: project.id,
-    };
-  };
-
-  const cells = [];
-
-  for (const [key, value] of Object.entries(project)) {
-    if (key.includes('budgetProposalCurrentYearPlus')) {
-      const keyValue = parseInt(key.split('budgetProposalCurrentYearPlus')[1]);
-      cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
-    } else if (key.includes('preliminaryCurrentYearPlus')) {
-      const keyValue = parseInt(key.split('preliminaryCurrentYearPlus')[1]);
-      cells.push(getCells(value, key, new Date().getFullYear() + keyValue));
-    }
-  }
-
-  return cells;
-};
+import useProjectCells from '@/hooks/useProjectCell';
+import useClickOutsideRef from '@/hooks/useClickOutsideRef';
+import { dispatchContextMenuEvent } from '@/utils/events';
+import { useAppDispatch } from '@/hooks/common';
+import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 
 interface IPlanningGroupsTableRowProps {
   project: IProject;
-  phases?: Array<IListItem>;
-  onProjectMenuClick: (projectId: string, e: MouseEvent) => void;
 }
 
-/**
- * We're only mapping the project name here for now since the values aren't yet implemented
- */
-const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
-  project,
-  onProjectMenuClick,
-}) => {
+const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({ project }) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const navigateToProject = () => navigate(`/project/${project.id}/basics`);
+  const tableRowRef = useRef<HTMLTableRowElement>(null);
+  const projectCells = useProjectCells(project);
 
-  const projectCells = createProjectCells(project);
+  const onSubmitPhase = useCallback(
+    (req: IProjectRequest) => {
+      dispatch(silentPatchProjectThunk({ data: req, id: project.id }));
+    },
+    [dispatch, project.id],
+  );
 
-  const handleOnProjectMenuClick = useCallback(
-    (e: ReactMouseEvent) => onProjectMenuClick(project.id, e as unknown as MouseEvent),
-    [project],
+  // Open the custom context menu for editing the project phase on click
+  const handleOpenPhaseMenu = useCallback(
+    (e: ReactMouseEvent<SVGElement>) => {
+      dispatchContextMenuEvent(e, {
+        menuType: ContextMenuType.EDIT_PROJECT_PHASE,
+        phaseMenuProps: {
+          title: project.name,
+          phase: project.phase?.id,
+          onSubmitPhase,
+        },
+      });
+    },
+    [onSubmitPhase, project.name, project.phase?.id],
+  );
+
+  // Remove the active css-class from the current row if the user clicks outside of it
+  useClickOutsideRef(
+    tableRowRef,
+    useCallback(() => {
+      if (tableRowRef?.current?.classList.contains('active')) {
+        tableRowRef.current.classList.remove('active');
+      }
+    }, []),
   );
 
   return (
-    <tr>
+    <tr id={`row-${project.id}`} ref={tableRowRef}>
       {/* HEADER */}
       <th className="project-header-cell">
         <div className="project-header-cell-container">
           {/* Left (dots & document) */}
           <div className="project-left-icons-container">
-            <IconMenuDots size="xs" className="dots-icon" onClick={handleOnProjectMenuClick} />
+            <IconMenuDots size="xs" className="cursor-pointer" onMouseDown={handleOpenPhaseMenu} />
             <IconDocument />
+            {/* <button className="h-2 w-2 bg-[blue]" onClick={handleOpenPhaseMenu}></button> */}
           </div>
           {/* Center (name button) */}
           <div className="project-name-container">
@@ -84,7 +72,7 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
               {project.name}
             </button>
           </div>
-          {/* Right side (category & sum) */}
+          {/* Right side (category & budget) */}
           <div className="project-right-icons-container">
             <div>
               {project.category && <CustomTag text={project.category.value} weight={'light'} />}
@@ -96,8 +84,8 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({
           </div>
         </div>
       </th>
-      {projectCells.map((p) => (
-        <ProjectCell key={p.objectKey} {...p} />
+      {projectCells.map((c) => (
+        <ProjectCell key={c.financeKey} cell={c} />
       ))}
     </tr>
   );

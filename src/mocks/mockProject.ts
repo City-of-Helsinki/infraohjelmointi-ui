@@ -119,6 +119,20 @@ const mockProject: { data: IProject } = {
       title: 'Not Assigned',
       phone: '000000',
     },
+    finances: {
+      year: 2023,
+      budgetProposalCurrentYearPlus0: '0.00',
+      budgetProposalCurrentYearPlus1: '0.00',
+      budgetProposalCurrentYearPlus2: '0.00',
+      preliminaryCurrentYearPlus3: '0.00',
+      preliminaryCurrentYearPlus4: '0.00',
+      preliminaryCurrentYearPlus5: '0.00',
+      preliminaryCurrentYearPlus6: '0.00',
+      preliminaryCurrentYearPlus7: '0.00',
+      preliminaryCurrentYearPlus8: '0.00',
+      preliminaryCurrentYearPlus9: '0.00',
+      preliminaryCurrentYearPlus10: '0.00',
+    },
   },
 };
 

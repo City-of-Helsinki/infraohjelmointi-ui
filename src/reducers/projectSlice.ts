@@ -1,8 +1,13 @@
 import { IError } from '@/interfaces/common';
-import { IProject, IProjectRequestObject, IProjectsResponse } from '@/interfaces/projectInterfaces';
+import {
+  IProject,
+  IProjectGetRequestObject,
+  IProjectPatchRequestObject,
+  IProjectsResponse,
+} from '@/interfaces/projectInterfaces';
 import { getProject, getProjects, patchProject, postProject } from '@/services/projectServices';
 import { RootState } from '@/store';
-import { getCurrentTime } from '@/utils/common';
+import { getCurrentTime } from '@/utils/dates';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
 
@@ -26,11 +31,11 @@ const initialState: IProjectState = {
 
 export const getProjectsThunk = createAsyncThunk(
   'project/getAll',
-  async (page: number, thunkAPI) => {
-    return await getProjects(page)
+  async (req: IProjectGetRequestObject, thunkAPI) => {
+    return await getProjects(req)
       .then((res) => {
-        thunkAPI.dispatch(setPage(page));
-        if ((thunkAPI.getState() as RootState).project.projects.length > 0 && page === 1) {
+        thunkAPI.dispatch(setPage(req.page));
+        if ((thunkAPI.getState() as RootState).project.projects.length > 0 && req.page === 1) {
           thunkAPI.dispatch(resetProjects());
         }
         return res;
@@ -48,7 +53,7 @@ export const getProjectThunk = createAsyncThunk('project/getOne', async (id: str
 
 export const postProjectThunk = createAsyncThunk(
   'project/post',
-  async (request: IProjectRequestObject, thunkAPI) => {
+  async (request: IProjectPatchRequestObject, thunkAPI) => {
     return await postProject(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
@@ -57,7 +62,7 @@ export const postProjectThunk = createAsyncThunk(
 
 export const silentPatchProjectThunk = createAsyncThunk(
   'project/silent-patch',
-  async (request: IProjectRequestObject, thunkAPI) => {
+  async (request: IProjectPatchRequestObject, thunkAPI) => {
     return await patchProject(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
@@ -66,7 +71,7 @@ export const silentPatchProjectThunk = createAsyncThunk(
 
 export const patchProjectThunk = createAsyncThunk(
   'project/patch',
-  async (request: IProjectRequestObject, thunkAPI) => {
+  async (request: IProjectPatchRequestObject, thunkAPI) => {
     return await patchProject(request)
       .then((res) => {
         thunkAPI.dispatch(

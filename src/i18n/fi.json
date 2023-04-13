@@ -299,5 +299,7 @@
   "searchResults": "Hakutulokset",
   "resultsForSearch": "hakutulosta",
   "filterSearch": "Rajaa hakua",
-  "previous": "Edellinen"
+  "previous": "Edellinen",
+  "removeYearFromTimeline": "Poista vuosi aikajanalta",
+  "editTimeline": "Muokkaa aikajanaa"
 }

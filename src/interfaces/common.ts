@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { CellType, IProjectRequest } from './projectInterfaces';
 
 export interface IError {
   status: number | undefined;
@@ -71,5 +72,30 @@ export interface IFreeSearchResults {
   groups: Array<IListItem>;
 }
 
+export interface ICellMenuDetails {
+  title: string;
+  year: number;
+  cellType: CellType;
+  onRemoveCell: () => void;
+  onEditCell: () => void;
+}
+
+export interface IPhaseMenuDetails {
+  title: string;
+  phase?: string;
+  onSubmitPhase: (req: IProjectRequest) => void;
+}
+
+export interface IContextMenuData {
+  menuType: ContextMenuType;
+  cellMenuProps?: ICellMenuDetails;
+  phaseMenuProps?: IPhaseMenuDetails;
+}
+
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
+
+export enum ContextMenuType {
+  EDIT_PROJECT_CELL,
+  EDIT_PROJECT_PHASE,
+}

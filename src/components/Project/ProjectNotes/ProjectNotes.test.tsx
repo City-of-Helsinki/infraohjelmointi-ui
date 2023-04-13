@@ -10,12 +10,12 @@ import {
   patchNoteThunk,
   postNoteThunk,
 } from '@/reducers/noteSlice';
-import { stringToDateTime } from '@/utils/common';
 import { INote } from '@/interfaces/noteInterfaces';
 import { mockError } from '@/mocks/mockError';
 import { IError } from '@/interfaces/common';
 import { act, waitFor } from '@testing-library/react';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { stringToDateTime } from '@/utils/dates';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());

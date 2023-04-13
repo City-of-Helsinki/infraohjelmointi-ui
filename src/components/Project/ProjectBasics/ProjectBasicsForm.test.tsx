@@ -121,14 +121,14 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.hkrId);
     expectDisplayValue(project?.planningStartYear);
     expectDisplayValue(project?.constructionEndYear);
-    expectDisplayValue(project?.estPlanningStart);
-    expectDisplayValue(project?.estPlanningEnd);
+    expectDisplayValue(project?.estPlanningStart || '');
+    expectDisplayValue(project?.estPlanningEnd || '');
     expectDisplayValue(project?.presenceStart);
     expectDisplayValue(project?.presenceEnd);
     expectDisplayValue(project?.visibilityStart);
     expectDisplayValue(project?.visibilityEnd);
-    expectDisplayValue(project?.estConstructionStart);
-    expectDisplayValue(project?.estConstructionEnd);
+    expectDisplayValue(project?.estConstructionStart || '');
+    expectDisplayValue(project?.estConstructionEnd || '');
     expectDisplayValue(project?.projectWorkQuantity);
     expectDisplayValue(project?.projectCostForecast);
     expectDisplayValue(project?.planningCostForecast);

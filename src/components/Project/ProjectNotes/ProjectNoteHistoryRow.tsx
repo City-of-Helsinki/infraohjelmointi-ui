@@ -1,5 +1,5 @@
 import { INoteHistory } from '@/interfaces/noteInterfaces';
-import { stringToDateTime } from '@/utils/common';
+import { stringToDateTime } from '@/utils/dates';
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 

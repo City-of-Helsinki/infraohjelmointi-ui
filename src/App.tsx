@@ -31,6 +31,7 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import SearchResultsView from './views/SearchResultsView';
+import { CustomContextMenu } from './components/CustomContextMenu';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
@@ -92,6 +93,8 @@ const App: FC = () => {
           </Routes>
         </div>
       </div>
+      {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}
+      <CustomContextMenu />
     </div>
   );
 };

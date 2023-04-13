@@ -83,25 +83,6 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
   return data;
 };
 
-export const getCurrentTime = () =>
-  new Intl.DateTimeFormat('en-GB', { timeStyle: 'medium' }).format(new Date());
-
-export const stringToDateTime = (date: string) =>
-  new Intl.DateTimeFormat('fi-FI', { dateStyle: 'short', timeStyle: 'short' }).format(
-    new Date(date),
-  );
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sortArrayByDates = (array: Array<any>, dateProperty: string, reversed?: boolean) => {
-  const sortedArray =
-    array &&
-    [...array]?.sort(
-      (a, b) => new Date(a[dateProperty]).valueOf() - new Date(b[dateProperty]).valueOf(),
-    );
-
-  return reversed ? [...sortedArray]?.reverse() : sortedArray;
-};
-
 export const setProgrammedYears = () => {
   const currentYear = new Date().getFullYear();
   const years: Array<IListItem> = [];
@@ -126,21 +107,3 @@ export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
     value: mc.id,
     label: mc.name,
   }));
-
-/**
- * Checks if a date range is included in a year
- *
- * @param year number of the current year
- * @param startDate a start date as returned from our API in the format dd.mm.yyyy
- * @param endDate a start date as returned from our API in the format dd.mm.yyyy
- * @returns boolean
- */
-export const isInYearRange = (
-  year: number,
-  startDate: string | undefined,
-  endDate: string | undefined,
-): boolean => {
-  const startYear = parseInt(startDate?.split('.').pop() || '0');
-  const endYear = parseInt(endDate?.split('.').pop() || '0');
-  return startYear && endYear ? year >= startYear && year <= endYear : false;
-};
