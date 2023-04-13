@@ -73,6 +73,17 @@ const getLink = (
   }
 };
 
+/**
+ * Builds a hierarchy-list of IPlanningTableRows, that will either include
+ * - masterClasses, classes, subClasses, groups and districts; if a district isn't selected
+ * - districts, divisions and groups; if a district is selected
+ *
+ * ! Groups will mostly appear under the selected divisions, but they can also appear under
+ * districts and subClasses
+ *
+ * @param state the current state of the planningRows-hook
+ * @returns a list of planning rows for the planning table
+ */
 const buildPlanningTableRows = (state: IPlanningRowsState) => {
   const {
     selections: { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict },
