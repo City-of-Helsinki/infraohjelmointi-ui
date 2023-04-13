@@ -53,7 +53,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
 
   return (
     <>
-      <tr className={props.type}>
+      <tr className={props.type} data-testid={`row-${props.id}`}>
         <PlanningHeader handleExpand={handleExpand} expanded={expanded} {...props} />
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {classSums.map((cs: any, i: number) => (

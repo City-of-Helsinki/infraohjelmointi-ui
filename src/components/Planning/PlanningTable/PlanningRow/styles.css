@@ -70,19 +70,19 @@
   @apply pl-16;
 }
 
-.planning-header .table-title-button {
+.planning-header .planning-title-button {
   @apply flex overflow-hidden;
 }
 
-.planning-header .table-title-container {
+.planning-header .planning-title-container {
   @apply relative flex max-w-[85%];
 }
 
-.planning-header .table-title-button:hover {
+.planning-header .planning-title-button:hover {
   @apply cursor-pointer;
 }
 
-.planning-header .table-title-button .planning-header-title {
+.planning-header .planning-title-button .planning-header-title {
   @apply w-full overflow-hidden text-ellipsis text-left;
 }
 

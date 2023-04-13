@@ -10,7 +10,14 @@ interface IPlanningHeaderProps extends IPlanningRow {
   expanded?: boolean;
 }
 
-const PlanningHeader: FC<IPlanningHeaderProps> = ({ link, name, type, handleExpand, expanded }) => {
+const PlanningHeader: FC<IPlanningHeaderProps> = ({
+  link,
+  name,
+  type,
+  handleExpand,
+  expanded,
+  id,
+}) => {
   const navigate = useNavigate();
 
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
@@ -24,21 +31,21 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({ link, name, type, handleExpa
   }, [handleExpand, link, navigate]);
 
   return (
-    <th className={`planning-header ${type}`}>
+    <th className={`planning-header ${type}`} data-testid={`head-${id}`}>
       <div className="planning-header-content">
-        <button className="display-flex" onClick={onExpand}>
+        <button className="flex" data-testid={`expand-${id}`} onClick={onExpand}>
           {angleIcon}
         </button>
         {type !== 'division' && (
-          <div className={`planning-header-content-dots`}>
+          <div className={`planning-header-content-dots`} data-testid={`show-more-${id}`}>
             <IconMenuDots size="s" />
           </div>
         )}
-        <div className="planning-title-container">
+        <div className="planning-title-container" data-testid={`title-${id}`}>
           <button className="planning-title-button" onClick={onExpand}>
             <span className="planning-header-title">{name}</span>
           </button>
-          <NameTooltip value={name} />
+          <NameTooltip value={name} id={id} />
         </div>
       </div>
     </th>

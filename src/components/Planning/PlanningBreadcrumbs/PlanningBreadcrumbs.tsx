@@ -6,16 +6,16 @@ import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import './styles.css';
 
-const BreadCrumb = memo(({ value, path }: { value: string; path: string }) => (
+const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id: string }) => (
   <>
     <IconAngleRight />
-    <li>
+    <li data-testid={`${id}-breadcrumbs`}>
       <Link to={path}>{value}</Link>
     </li>
   </>
 ));
 
-BreadCrumb.displayName = 'BreadCrumb';
+Breadcrumb.displayName = 'Breadcrumb';
 
 interface PlanningBreadcrumbs {
   selections: {
@@ -31,27 +31,34 @@ const PlanningBreadcrumbs: FC<PlanningBreadcrumbs> = ({ selections }) => {
 
   return (
     <ul className="breadcrumbs-list">
-      <li>
+      <li data-testid="programming-breadcrumb">
         <Link to="">{t('enums.programming')}</Link>
       </li>
 
       {selectedMasterClass && (
-        <BreadCrumb path={`${selectedMasterClass?.id}`} value={selectedMasterClass.name} />
+        <Breadcrumb
+          id="masterClass"
+          path={`${selectedMasterClass?.id}`}
+          value={selectedMasterClass.name}
+        />
       )}
       {selectedClass && (
-        <BreadCrumb
+        <Breadcrumb
+          id="class"
           path={`${selectedMasterClass?.id}/${selectedClass?.id}`}
           value={selectedClass.name}
         />
       )}
       {selectedSubClass && (
-        <BreadCrumb
+        <Breadcrumb
+          id="subClass"
           path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass.id}`}
           value={selectedSubClass.name}
         />
       )}
       {selectedDistrict && (
-        <BreadCrumb
+        <Breadcrumb
+          id="district"
           path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass?.id}/${selectedDistrict.id}`}
           value={selectedDistrict.name}
         />
