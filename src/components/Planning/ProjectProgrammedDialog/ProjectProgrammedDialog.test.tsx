@@ -32,7 +32,7 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('GroupDialog', () => {
+describe('ProjectProgrammedDialog', () => {
   let renderResult: CustomRenderResult;
 
   beforeEach(async () => {
