@@ -7,38 +7,77 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
 import { IPlanningTableRow, PlanningTableRowType } from '@/interfaces/common';
 
-const buildPlanningTableRows = (
-  allMasterClasses: Array<IClass>,
-  allClasses: Array<IClass>,
-  allSubClasses: Array<IClass>,
-  allDistricts: Array<ILocation>,
-  divisions: Array<ILocation>,
-  selectedMasterClass: IClass | null,
-  selectedClass: IClass | null,
-  selectedSubClass: IClass | null,
-  selectedDistrict: ILocation | null,
-) => {
-  const masterClasses = selectedMasterClass ? [selectedMasterClass] : allMasterClasses;
-  const classes = selectedClass ? [selectedClass] : allClasses;
-  const subClasses = selectedSubClass ? [selectedSubClass] : allSubClasses;
-  const districts = selectedDistrict ? [selectedDistrict] : allDistricts;
+interface IPlanningRowLists {
+  masterClasses: Array<IClass>;
+  classes: Array<IClass>;
+  subClasses: Array<IClass>;
+  districts: Array<ILocation>;
+  divisions: Array<ILocation>;
+}
 
-  const getLink = (item: IClass | ILocation, type: PlanningTableRowType) => {
-    const shouldNavigate =
-      (type === 'masterClass' && selectedMasterClass === null) ||
-      (type === 'class' && selectedClass === null) ||
-      (type === 'subClass' && selectedSubClass === null) ||
-      (type === 'district-preview' && selectedDistrict === null);
+interface IPlanningRowSelections {
+  selectedMasterClass: IClass | null;
+  selectedClass: IClass | null;
+  selectedSubClass: IClass | null;
+  selectedDistrict: ILocation | null;
+}
 
-    if (shouldNavigate) {
-      return [selectedMasterClass?.id, selectedClass?.id, selectedSubClass?.id, item.id]
-        .join('/')
-        .replace(/(\/{2,})/gm, '/') // replace triple /// with one in case of one of values is undefined/null
-        .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
-    } else {
-      return null;
-    }
-  };
+interface IPlanningRowsState {
+  lists: IPlanningRowLists;
+  selections: IPlanningRowSelections;
+}
+
+/**
+ * Returns false whether a given row is already selected and present in the url.
+ *
+ * @param type the type of the row
+ * @param selections current row selections for all the rows
+ */
+const shouldNavigate = (type: PlanningTableRowType, selections: IPlanningRowSelections) => {
+  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
+  switch (type) {
+    case 'masterClass':
+      return !selectedMasterClass;
+    case 'class':
+      return !selectedClass;
+    case 'subClass':
+      return !selectedSubClass;
+    case 'district-preview':
+      return !selectedDistrict;
+    default:
+      return false;
+  }
+};
+
+/**
+ * Builds a link for a row. If the current rows type is already selected,
+ * i.e. the row is a masterClass and there already is a selectedMasterClass, it will return null.
+ *
+ * @param item class or location
+ * @param type the type that the link is created for
+ */
+const getLink = (
+  item: IClass | ILocation,
+  type: PlanningTableRowType,
+  selections: IPlanningRowSelections,
+): string | null => {
+  const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
+
+  if (shouldNavigate(type, selections)) {
+    return [selectedMasterClass?.id, selectedClass?.id, selectedSubClass?.id, item.id]
+      .join('/')
+      .replace(/(\/{2,})/gm, '/') // replace triple /// with one in case of one of values is undefined/null
+      .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
+  } else {
+    return null;
+  }
+};
+
+const buildPlanningTableRows = (state: IPlanningRowsState) => {
+  const {
+    selections: { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict },
+    lists: { masterClasses, classes, subClasses, districts, divisions },
+  } = state;
 
   const getRowProps = (
     item: IClass | ILocation,
@@ -51,7 +90,7 @@ const buildPlanningTableRows = (
       path: item.path,
       id: item.id,
       key: item.id,
-      link: getLink(item, type),
+      link: getLink(item, type, state.selections),
       defaultExpanded: defaultExpanded || false,
     };
   };
@@ -96,77 +135,149 @@ const buildPlanningTableRows = (
   return selectedDistrict ? projectRows : classRows;
 };
 
+/**
+ * Returns the selected class or location from a list of classes or locations if it's found,
+ * otherwise it will return null if no selection is made or found.
+ *
+ * @param list class or location list to compare
+ * @param id id of the item to compare
+ */
+const getSelectedItemOrNull = (list: Array<IClass | ILocation>, id: string | undefined) =>
+  (id ? list.find((l) => l.id === id) : null) as IClass | ILocation | null;
+
+/**
+ * Creates a row hierarchy of masterClasses, classes, subClasses, districts and divisions for the PlanningTable
+ *
+ * It also listens to the url params for a masterClassId, classId, subClassId or districtId which it will
+ * use to return the currently selected (opened/expanded) rows.
+ *
+ * @returns rows for the PlanningTable and the currently selected rows
+ */
 const usePlanningTableRows = () => {
   const { masterClassId, classId, subClassId, districtId } = useParams();
 
-  const [selectedMasterClass, setSelectedMasterClass] = useState<IClass | null>(null);
-  const [selectedClass, setSelectedClass] = useState<IClass | null>(null);
-  const [selectedSubClass, setSelectedSubClass] = useState<IClass | null>(null);
-  const [selectedDistrict, setSelectedDistrict] = useState<ILocation | null>(null);
+  const allMasterClasses = useAppSelector(selectMasterClasses);
+  const allClasses = useAppSelector(selectClasses);
+  const allSubClasses = useAppSelector(selectSubClasses);
+  const allDistricts = useAppSelector(selectDistricts);
+  const allDivisions = useAppSelector(selectDivisions);
 
-  const masterClasses = useAppSelector(selectMasterClasses);
-  const classes = useAppSelector(selectClasses);
-  const subClasses = useAppSelector(selectSubClasses);
-  const districts = useAppSelector(selectDistricts);
-  const divisions = useAppSelector(selectDivisions);
+  const [planningRowsState, setPlanningRowsState] = useState<IPlanningRowsState>({
+    lists: {
+      masterClasses: [],
+      classes: [],
+      subClasses: [],
+      districts: [],
+      divisions: [],
+    },
+    selections: {
+      selectedMasterClass: null,
+      selectedClass: null,
+      selectedSubClass: null,
+      selectedDistrict: null,
+    },
+  });
 
   const [rows, setRows] = useState<Array<IPlanningTableRow>>([]);
 
   useEffect(() => {
-    setRows(
-      buildPlanningTableRows(
-        masterClasses,
-        classes,
-        subClasses,
-        districts,
-        divisions,
+    setRows(buildPlanningTableRows(planningRowsState));
+  }, [planningRowsState]);
+
+  /**
+   * React to changes in allMasterClasses and the masterClassId from the url,
+   * if selected is found it will be the only item in the list
+   */
+  useEffect(() => {
+    const selectedMasterClass = getSelectedItemOrNull(allMasterClasses, masterClassId);
+
+    setPlanningRowsState((current) => ({
+      ...current,
+      selections: {
+        ...current.selections,
         selectedMasterClass,
+      },
+      lists: {
+        ...current.lists,
+        masterClasses: selectedMasterClass ? [selectedMasterClass] : allMasterClasses,
+      },
+    }));
+  }, [masterClassId, allMasterClasses]);
+
+  /**
+   * React to changes in allClasses and the classId from the url,
+   * if selected is found it will be the only item in the list
+   */
+  useEffect(() => {
+    const selectedClass = getSelectedItemOrNull(allClasses, classId);
+
+    setPlanningRowsState((current) => ({
+      ...current,
+      selections: {
+        ...current.selections,
         selectedClass,
+      },
+      lists: {
+        ...current.lists,
+        classes: selectedClass ? [selectedClass] : allClasses,
+      },
+    }));
+  }, [classId, allClasses]);
+
+  /**
+   * React to changes in allSubClasses and the subClassId from the url,
+   * if selected is found it will be the only item in the list
+   */
+  useEffect(() => {
+    const selectedSubClass = getSelectedItemOrNull(allSubClasses, subClassId);
+
+    setPlanningRowsState((current) => ({
+      ...current,
+      selections: {
+        ...current.selections,
         selectedSubClass,
+      },
+      lists: {
+        ...current.lists,
+        subClasses: selectedSubClass ? [selectedSubClass] : allSubClasses,
+      },
+    }));
+  }, [subClassId, allSubClasses]);
+
+  /**
+   * React to changes in allDistricts and the districtId from the url,
+   * if selected is found it will be the only item in the list
+   */
+  useEffect(() => {
+    const selectedDistrict = getSelectedItemOrNull(allDistricts, districtId) as ILocation;
+
+    setPlanningRowsState((current) => ({
+      ...current,
+      selections: {
+        ...current.selections,
         selectedDistrict,
-      ),
-    );
-  }, [
-    subClasses,
-    divisions,
-    selectedMasterClass,
-    selectedClass,
-    selectedSubClass,
-    selectedDistrict,
-    masterClasses,
-    classes,
-    districts,
-  ]);
+      },
+      lists: {
+        ...current.lists,
+        districts: selectedDistrict ? [selectedDistrict] : allDistricts,
+      },
+    }));
+  }, [districtId, allDistricts]);
 
-  // set selectedMasterClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
+  // React to changes in allDivisions
   useEffect(() => {
-    setSelectedMasterClass(
-      masterClassId ? (masterClasses.find((mc) => mc.id === masterClassId) as IClass) : null,
-    );
-  }, [masterClassId, masterClasses]);
-
-  // set selectedClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
-  useEffect(() => {
-    setSelectedClass(classId ? (classes.find((c) => c.id === classId) as IClass) : null);
-  }, [classId, classes]);
-
-  // set selectedSubClass if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
-  useEffect(() => {
-    setSelectedSubClass(
-      subClassId ? (subClasses.find((sc) => sc.id === subClassId) as IClass) : null,
-    );
-  }, [subClassId, subClasses]);
-
-  // set selectedDistrict if it appears in the url, if the url param id is removed, then it will be set to null (i.e, the user navigates back)
-  useEffect(() => {
-    setSelectedDistrict(
-      districtId ? (districts.find((d) => d.id === districtId) as ILocation) : null,
-    );
-  }, [districtId, districts]);
+    setPlanningRowsState((current) => ({
+      ...current,
+      lists: {
+        ...current.lists,
+        divisions: allDivisions,
+      },
+    }));
+  }, [allDivisions]);
 
   return {
     rows,
-    selections: { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict },
+    selections: planningRowsState.selections,
   };
 };
 
