@@ -17,7 +17,7 @@ const PlanningYearsTable: FC = () => {
       <thead>
         <tr>
           {planningYearsTableData.map((o, i) => (
-            <td key={i} className="min-w-[var(--table-cell-width)] max-w-[var(--table-cell-width)]">
+            <td key={i} className="planning-years-cell">
               <span className="text-sm font-light">{o.title}</span>
               <span className="text-sm font-bold">{`<> ${o.year}`}</span>
             </td>

@@ -8,7 +8,7 @@
 
 :root {
   --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
-  --table-cell-width: 5.5rem;
+  --planning-cell-width: 5.5rem;
   --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
 }
 

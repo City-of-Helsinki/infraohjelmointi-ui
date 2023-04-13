@@ -10,3 +10,7 @@
 .years-table-first-cell {
   @apply bg-bus-d py-2 px-1 text-white first:bg-bus;
 }
+
+.planning-years-cell {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)];
+}

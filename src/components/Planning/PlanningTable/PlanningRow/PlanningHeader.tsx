@@ -24,19 +24,19 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({ link, name, type, handleExpa
   }, [handleExpand, link, navigate]);
 
   return (
-    <th className={`table-header ${type}`}>
-      <div className="table-header-content">
+    <th className={`planning-header ${type}`}>
+      <div className="planning-header-content">
         <button className="display-flex" onClick={onExpand}>
           {angleIcon}
         </button>
         {type !== 'division' && (
-          <div className={`table-header-content-dots`}>
+          <div className={`planning-header-content-dots`}>
             <IconMenuDots size="s" />
           </div>
         )}
-        <div className="table-title-container">
-          <button className="table-title-button" onClick={onExpand}>
-            <span className="table-header-title">{name}</span>
+        <div className="planning-title-container">
+          <button className="planning-title-button" onClick={onExpand}>
+            <span className="planning-header-title">{name}</span>
           </button>
           <NameTooltip value={name} />
         </div>

@@ -21,7 +21,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ sum, position, type }) => {
     <td className={`table-cell ${type}`}>
       {/* temporarily hide mock values if it's division */}
       {type !== 'division' && (
-        <div className={`table-cell-container`}>
+        <div className={`planning-cell-container`}>
           <span>{sum}</span>
           {position === 0 && type !== 'group' && type !== 'district' ? (
             // Add overright icon for the first cell of every row

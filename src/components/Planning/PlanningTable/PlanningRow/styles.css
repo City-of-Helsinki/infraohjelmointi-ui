@@ -9,80 +9,80 @@
 }
 
 /* TABLE HEADER */
-.table-header {
+.planning-header {
   /* max-width: 1rem makes it so that the header doesn't grow beyond its max width */
   @apply h-11 w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus py-2 px-5 text-white;
 }
 
-.table-header-content {
+.planning-header-content {
   @apply flex items-center gap-1 overflow-ellipsis;
 }
 
-.table-header.masterClass {
+.planning-header.masterClass {
   @apply bg-[var(--color-masterClass)] pl-4;
 }
 
-.table-header.class {
+.planning-header.class {
   @apply bg-[var(--color-class)] pl-10;
 }
 
-.table-header.subClass {
+.planning-header.subClass {
   @apply bg-[var(--color-subClass)] pl-16;
 }
 
-.table-header.district-preview {
+.planning-header.district-preview {
   @apply bg-[var(--color-district-preview)] pl-[5.5rem];
 }
 
-.table-header.district-preview {
+.planning-header.district-preview {
   padding-left: 5.875rem;
   background: var(--color-district-preview);
 }
 
-.table-header.district {
+.planning-header.district {
   @apply bg-[var(--color-district)] pl-4 text-xl;
 }
 
-.table-header.division {
+.planning-header.division {
   @apply border-b border-black-70 bg-[var(--color-division)] pl-10 text-l font-medium text-black-90;
 }
 
-.table-header.division .table-header-content {
+.planning-header.division .planning-header-content {
   @apply gap-4;
 }
 
-.table-header.group {
+.planning-header.group {
   @apply border-b border-black-70 bg-[var(--color-group)] font-medium text-black;
 }
 
 /* Group row under a subClass */
-.subClass ~ .group .table-header.group {
+.subClass ~ .group .planning-header.group {
   @apply pl-[5.5rem];
 }
 
 /* Group row under a district */
-.district ~ .group .table-header.group {
+.district ~ .group .planning-header.group {
   @apply pl-10;
 }
 
 /* Group row under a division */
-.division ~ .group .table-header.group {
+.division ~ .group .planning-header.group {
   @apply pl-16;
 }
 
-.table-header .table-title-button {
+.planning-header .table-title-button {
   @apply flex overflow-hidden;
 }
 
-.table-header .table-title-container {
+.planning-header .table-title-container {
   @apply relative flex max-w-[85%];
 }
 
-.table-header .table-title-button:hover {
+.planning-header .table-title-button:hover {
   @apply cursor-pointer;
 }
 
-.table-header .table-title-button .table-header-title {
+.planning-header .table-title-button .planning-header-title {
   @apply w-full overflow-hidden text-ellipsis text-left;
 }
 
@@ -99,62 +99,62 @@
 }
 
 /* TABLE CELL */
-.table-cell {
-  @apply min-w-[var(--table-cell-width)] border-b border-white bg-bus pb-[4px] pt-[7px] align-text-top text-white;
+.planning-cell {
+  @apply min-w-[var(--planning-cell-width)] border-b border-white bg-bus pb-[4px] pt-[7px] align-text-top text-white;
 }
 
-.table-cell.masterClass {
+.planning-cell.masterClass {
   @apply bg-[var(--color-masterClass)];
 }
 
-.table-cell.class {
+.planning-cell.class {
   @apply bg-[var(--color-class)];
 }
 
-.table-cell.subClass {
+.planning-cell.subClass {
   @apply bg-[var(--color-subClass)];
 }
 
-.table-cell.district-preview {
+.planning-cell.district-preview {
   @apply bg-[var(--color-district-preview)];
 }
 
-.table-cell.district-preview {
+.planning-cell.district-preview {
   background: var(--color-district-preview);
 }
 
-.table-cell.district {
+.planning-cell.district {
   @apply bg-[var(--color-district)];
 }
 
-.table-cell.division {
+.planning-cell.division {
   @apply border-b border-black-70 bg-[var(--color-division)] text-black-90;
 }
 
-.table-cell.group {
+.planning-cell.group {
   @apply border-b border-black-70 bg-[var(--color-group)] text-black;
 }
 
-.table-cell .table-cell-container {
+.planning-cell .planning-cell-container {
   @apply grid grid-flow-row;
 }
 
-.table-cell .table-cell-container span {
+.planning-cell .planning-cell-container span {
   @apply w-full text-sm leading-[22px];
 }
 
-.table-cell .table-cell-container span:first-child {
+.planning-cell .planning-cell-container span:first-child {
   @apply !text-base font-bold;
 }
 
-.table-cell .table-cell-container span:nth-child(3) {
+.planning-cell .planning-cell-container span:nth-child(3) {
   @apply font-bold text-suomenlinna-d;
 }
 
-.table-cell span {
+.planning-cell span {
   @apply translate-x-[-15%] font-light;
 }
 
-.table-header-content-dots {
+.planning-header-content-dots {
   @apply mr-2 flex;
 }
