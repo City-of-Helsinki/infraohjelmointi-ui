@@ -126,7 +126,6 @@ const usePlanningTableRows = () => {
         selectedDistrict,
       ),
     );
-    // Only listen to subClasses and divisions since they are populated last
   }, [
     subClasses,
     divisions,

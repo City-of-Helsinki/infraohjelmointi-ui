@@ -52,13 +52,11 @@ export type ListType =
   | 'constructionPhases'
   | 'programmedYears';
 
-export type NotificationType = 'notification' | 'toast';
+type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';
-export type SelectCallback = (selected: IOption) => void;
 export type TextColorType = 'black' | 'white';
 export type FontWeightType = 'bold' | 'light' | 'medium';
 export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';
-export type InputSizeType = 'l' | 'm';
 
 export interface IFreeSearchResults {
   hashtags: Array<IListItem>;

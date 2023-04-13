@@ -2,7 +2,7 @@ export interface IClass {
   id: string;
   name: string;
   path: string;
-  forCoordinatorOnly: false;
+  forCoordinatorOnly: boolean;
   relatedTo: string | null;
   parent: string | null;
 }
