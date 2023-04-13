@@ -217,7 +217,7 @@ describe('GroupDialog', () => {
 
     // Click the 'add to project' button to patch the project with the new hashtag
     await user.click(submitButton);
-
+    // TODO: Fix botttom test lines
     expect(getByText('Alaluokka on pakollinen tieto.')).toBeInTheDocument();
     expect(getByText('Suurpiiri on pakollinen tieto.')).toBeInTheDocument();
     expect(getByText('Kaupunginosa on pakollinen tieto.')).toBeInTheDocument();

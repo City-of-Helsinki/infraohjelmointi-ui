@@ -23,7 +23,7 @@ const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
   // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
   return {
     name: form.name,
-    classRelation: form.subClass?.value || form.class?.value || '',
+    classRelation: form.subClass?.value || '',
     districtRelation: form.division?.value || form.district?.value || '',
     projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
