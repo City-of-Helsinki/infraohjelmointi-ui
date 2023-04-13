@@ -12,6 +12,7 @@ import { act } from 'react-dom/test-utils';
 import PlanningView from './PlanningView';
 import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocations';
 import { mockProjectPhases } from '@/mocks/mockLists';
+import { mockGroups } from '@/mocks/mockGroups';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -45,6 +46,10 @@ describe('PlanningView', () => {
               allLocations: mockLocations.data,
               districts: mockDistricts.data,
               divisions: mockDivisions.data,
+            },
+            group: {
+              ...store.getState().group,
+              groups: mockGroups.data,
             },
             lists: {
               ...store.getState().lists,
@@ -176,25 +181,40 @@ describe('PlanningView', () => {
       expect(getClass('planning-table')).toBeInTheDocument();
     });
 
-    it('renders only masterClass rows if no masterClass is expanded', () => {
-      const { store, getByTestId } = renderResult;
+    it('renders only masterClass rows, heads and cells if no masterClass is expanded', () => {
+      const { store, getByTestId, queryByTestId } = renderResult;
 
       const masterClasses = store.getState().class.masterClasses;
-      const planningTableRows = getClass('planning-table').children[0].children;
+      const classes = store.getState().class.classes;
+      const subClasses = store.getState().class.subClasses;
+      const districts = store.getState().location.districts;
+      const divisions = store.getState().location.divisions;
+      const groups = store.getState().group.groups;
 
-      expect(planningTableRows.length).toBe(masterClasses.length);
-      masterClasses.forEach(async ({ id }) => {
-        const currentMasterClassRow = getByTestId(`row-${id}`);
-        const currentCells = currentMasterClassRow.children;
+      classes.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
 
-        expect(currentMasterClassRow).toBeInTheDocument();
+      subClasses.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
 
-        // Expand button
-        expect(getByTestId(`expand-${id}`)).toBeInTheDocument();
-        // Show more button
-        expect(getByTestId(`show-more-${id}`)).toBeInTheDocument();
-        // Title
-        expect(getByTestId(`title-${id}`)).toBeInTheDocument();
+      districts.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
+
+      divisions.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
+
+      groups.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
+
+      // There are as many rows as masterClasses
+      expect(getClass('planning-table').children[0].children.length).toBe(masterClasses.length);
+      // Check that each masterClass has all the row properties
+      masterClasses.forEach(async ({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+    });
+
+    describe('PlanningRow', () => {
+      it('renders head and cells', async () => {
+        const { store, getByTestId } = renderResult;
+        const { id } = store.getState().class.masterClasses[0];
+        const currentCells = getByTestId(`row-${id}`).children;
+
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        expect(getByTestId(`head-${id}`)).toBeInTheDocument();
 
         // Loop through the cells
         Array.from(currentCells).forEach((c, i) => {
@@ -202,19 +222,50 @@ describe('PlanningView', () => {
           if (c.tagName !== 'TH') {
             const year = new Date().getFullYear() + i - 1;
             expect(getByTestId(`cell-${id}-${year}`)).toBeInTheDocument();
-            expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-            // First cell should include 3 sums with overrun and deviation sums
-            if (i === 1) {
-              expect(c.children[0].children.length).toBe(3);
-              expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
-              expect(getByTestId(`deviation-${id}-${year}`)).toBeInTheDocument();
-            }
-            // Rest cells should include 2 sums with realized sums
-            else {
-              expect(c.children[0].children.length).toBe(2);
-              expect(getByTestId(`realized-${id}-${year}`)).toBeInTheDocument();
-            }
           }
+        });
+      });
+
+      describe('PlanningHeader', () => {
+        it('renders all elements', async () => {
+          const { store, getByTestId } = renderResult;
+          const { id } = store.getState().class.masterClasses[0];
+
+          // Expand button
+          expect(getByTestId(`expand-${id}`)).toBeInTheDocument();
+          // Show more button
+          expect(getByTestId(`show-more-${id}`)).toBeInTheDocument();
+          // Title
+          expect(getByTestId(`title-${id}`)).toBeInTheDocument();
+        });
+      });
+
+      describe('PlanningCell', () => {
+        it('renders budget, overrun and deviation only for the current year', async () => {
+          const { store, getByTestId } = renderResult;
+          const { id } = store.getState().class.masterClasses[0];
+          const firstCell = getByTestId(`row-${id}`).children[1];
+
+          const year = new Date().getFullYear();
+
+          expect(firstCell.children[0].children.length).toBe(3);
+
+          expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
+          expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
+          expect(getByTestId(`deviation-${id}-${year}`)).toBeInTheDocument();
+        });
+
+        it('renders budget and realized cost for future years', async () => {
+          const { store, getByTestId } = renderResult;
+          const { id } = store.getState().class.masterClasses[0];
+          const secondCell = getByTestId(`row-${id}`).children[2];
+
+          const year = new Date().getFullYear() + 1;
+
+          expect(secondCell.children[0].children.length).toBe(2);
+
+          expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
+          expect(getByTestId(`realized-${id}-${year}`)).toBeInTheDocument();
         });
       });
     });
@@ -241,5 +292,6 @@ describe('PlanningView', () => {
 
     // TODO: expand different rows... (currently clicking the expand-navigations don't work)
     // TODO: renders only district... ()
+    // TODO: project rows
   });
 });
