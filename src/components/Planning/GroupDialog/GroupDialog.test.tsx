@@ -218,6 +218,7 @@ describe('GroupDialog', () => {
     // Click the 'add to project' button to patch the project with the new hashtag
     await user.click(submitButton);
     // TODO: Fix botttom test lines
+    // TODO: add test to check the group exists on planning view with the projects under it
     expect(getByText('Alaluokka on pakollinen tieto.')).toBeInTheDocument();
     expect(getByText('Suurpiiri on pakollinen tieto.')).toBeInTheDocument();
     expect(getByText('Kaupunginosa on pakollinen tieto.')).toBeInTheDocument();
