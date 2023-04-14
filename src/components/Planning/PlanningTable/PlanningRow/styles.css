@@ -34,11 +34,6 @@
   @apply bg-[var(--color-district-preview)] pl-[5.5rem];
 }
 
-.planning-header.district-preview {
-  padding-left: 5.875rem;
-  background: var(--color-district-preview);
-}
-
 .planning-header.district {
   @apply bg-[var(--color-district)] pl-4 text-xl;
 }
@@ -117,10 +112,6 @@
 
 .planning-cell.district-preview {
   @apply bg-[var(--color-district-preview)];
-}
-
-.planning-cell.district-preview {
-  background: var(--color-district-preview);
 }
 
 .planning-cell.district {

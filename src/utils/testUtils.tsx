@@ -40,7 +40,6 @@ export const renderWithProviders = (
   { route = '/' } = {},
 ): CustomRenderResult => {
   window.history.pushState({}, 'Test page', route);
-  // const history = createMemoryHistory();
 
   const Wrapper = ({ children }: { children: ReactElement }) => {
     return <Provider store={store}>{children}</Provider>;
