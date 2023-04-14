@@ -190,5 +190,7 @@ describe('ProjectProgrammedDialog', () => {
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as Array<IProjectRequestObject>;
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
+
+    // TODO: Test to check the project gets added to planning list view
   });
 });
