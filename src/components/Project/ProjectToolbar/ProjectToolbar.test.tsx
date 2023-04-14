@@ -3,6 +3,7 @@ import { act } from '@testing-library/react';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import ProjectToolbar from './ProjectToolbar';
 import mockPersons from '@/mocks/mockPersons';
+import { Route } from 'react-router';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -12,7 +13,7 @@ describe('ProjectToolbar', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<ProjectToolbar />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<ProjectToolbar />} />, {
           preloadedState: {
             auth: { user: mockPersons.data[0], error: {} },
           },

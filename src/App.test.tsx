@@ -22,6 +22,7 @@ import { getClassesThunk } from './reducers/classSlice';
 import { getLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -38,7 +39,9 @@ describe('App', () => {
   });
 
   it('adds all needed data to store', async () => {
-    const { store } = await act(async () => renderWithProviders(<App />));
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
 
     const classes = store.getState().class;
 
@@ -62,33 +65,47 @@ describe('App', () => {
   });
 
   it('renders TopBar', async () => {
-    const { getByTestId } = await act(async () => renderWithProviders(<App />));
+    const { getByTestId } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     expect(getByTestId('top-bar')).toBeInTheDocument();
   });
 
   it('renders SideBar', async () => {
-    const { getByTestId } = await act(async () => renderWithProviders(<App />));
+    const { getByTestId } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     expect(getByTestId('sidebar')).toBeInTheDocument();
   });
 
   it('renders app-content', async () => {
-    const { container } = await act(async () => renderWithProviders(<App />));
+    const { container } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     expect(container.getElementsByClassName('app-content').length).toBe(1);
   });
 
   it('does not render Loader', async () => {
-    const { container } = await act(async () => renderWithProviders(<App />));
+    const { container } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     expect(container.getElementsByClassName('loader-overlay').length).toBe(0);
   });
 
   it('does not render Notification', async () => {
-    const { container } = await act(async () => renderWithProviders(<App />));
+    const { container } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
   });
 
   it('landing on a bad page', async () => {
     const { getByText, getByTestId } = await act(() =>
-      renderWithProviders(<App />, {}, { route: '/something-that-does-not-match' }),
+      renderWithProviders(
+        <Route path="*" element={<App />} />,
+        {},
+        { route: '/something-that-does-not-match' },
+      ),
     );
     await waitFor(() => {
       expect(getByText('error.404')).toBeInTheDocument();
@@ -98,7 +115,9 @@ describe('App', () => {
   });
 
   it('catches a failed phase list fetch', async () => {
-    const { store } = await act(async () => renderWithProviders(<App />));
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectPhasesThunk());
 
@@ -108,7 +127,9 @@ describe('App', () => {
   });
 
   it('catches a failed projectCategories list fetch', async () => {
-    const { store } = await act(async () => renderWithProviders(<App />));
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getProjectCategoriesThunk());
 
@@ -118,7 +139,9 @@ describe('App', () => {
   });
 
   it('catches a failed responsible persons fetch', async () => {
-    const { store } = await act(async () => renderWithProviders(<App />));
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getResponsiblePersonsThunk());
 
@@ -128,7 +151,9 @@ describe('App', () => {
   });
 
   it('catches a failed classes fetch', async () => {
-    const { store } = await act(async () => renderWithProviders(<App />));
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getClassesThunk());
 
@@ -138,7 +163,9 @@ describe('App', () => {
   });
 
   it('catches a failed locations fetch', async () => {
-    const { store } = await act(async () => renderWithProviders(<App />));
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getLocationsThunk());
 
@@ -148,7 +175,9 @@ describe('App', () => {
   });
 
   it('catches a failed hashtags fetch', async () => {
-    const { store } = await act(async () => renderWithProviders(<App />));
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getHashTagsThunk());
 

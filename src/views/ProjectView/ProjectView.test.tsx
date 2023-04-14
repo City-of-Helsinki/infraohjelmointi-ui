@@ -28,6 +28,7 @@ import {
   getResponsibleZonesThunk,
 } from '@/reducers/listsSlice';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -39,7 +40,10 @@ describe('ProjectView', () => {
 
   beforeEach(async () => {
     mockGetResponseProvider();
-    await act(async () => (renderResult = renderWithProviders(<ProjectView />)));
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<Route path="/" element={<ProjectView />} />)),
+    );
   });
 
   afterEach(async () => {

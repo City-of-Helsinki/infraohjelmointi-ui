@@ -7,6 +7,7 @@ import { matchExact } from '@/utils/common';
 import mockPersons from '@/mocks/mockPersons';
 import { act } from 'react-dom/test-utils';
 import { waitFor } from '@testing-library/react';
+import { Route } from 'react-router';
 jest.mock('react-i18next', () => mockI18next());
 
 describe('Notification', () => {
@@ -15,7 +16,7 @@ describe('Notification', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<Notification />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<Notification />} />, {
           preloadedState: {
             auth: { user: mockPersons.data[0], error: {} },
           },
@@ -43,24 +44,23 @@ describe('Notification', () => {
     });
   });
 
-  it.skip('is destroyed if notification is cleared', async () => {
-    const { queryAllByText, getByText, store } = renderResult;
+  it('is destroyed if notification is cleared', async () => {
+    const { queryByText, getByText, store } = renderResult;
 
     await waitFor(() => store.dispatch(notifyInfo(mockNotification)));
 
-    expect(getByText('sendSuccess')).toBeInTheDocument();
-    expect(getByText('formSaveSuccess')).toBeInTheDocument();
+    expect(store.getState().notifications.length).toBe(1);
+
+    expect(getByText('notification.title.sendSuccess')).toBeInTheDocument();
+    expect(getByText('notification.message.formSaveSuccess')).toBeInTheDocument();
 
     // FIXME: we should test by clicking the button, but that doesn't dispatch the action
     // => await user.click(getByRole('button', { name: matchExact('Close toast') }));
     await waitFor(() => store.dispatch(clearNotification(0)));
 
-    Object.values(mockNotification).forEach((n) => {
-      if (n !== 'notification') {
-        expect(queryAllByText(matchExact(n))).toBeNull();
-      }
-    });
+    expect(queryByText('notification.title.sendSuccess')).toBeNull();
+    expect(queryByText('notification.message.formSaveSuccess')).toBeNull();
 
-    expect(store.getState().notifications).toBeNull();
+    expect(store.getState().notifications.length).toBe(0);
   });
 });

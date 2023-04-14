@@ -8,9 +8,11 @@ import './styles.css';
 
 const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id: string }) => (
   <>
-    <IconAngleRight />
-    <li data-testid={`${id}-breadcrumbs`}>
-      <Link to={path}>{value}</Link>
+    <IconAngleRight data-testid="breadcrumb-arrow" />
+    <li>
+      <Link data-testid={`${id}-breadcrumb`} to={path}>
+        {value}
+      </Link>
     </li>
   </>
 ));
@@ -31,8 +33,10 @@ const PlanningBreadcrumbs: FC<PlanningBreadcrumbs> = ({ selections }) => {
 
   return (
     <ul className="breadcrumbs-list">
-      <li data-testid="programming-breadcrumb">
-        <Link to="">{t('enums.programming')}</Link>
+      <li>
+        <Link to="" data-testid="programming-breadcrumb">
+          {t('enums.programming')}
+        </Link>
       </li>
 
       {selectedMasterClass && (

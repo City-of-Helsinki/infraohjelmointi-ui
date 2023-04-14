@@ -16,6 +16,7 @@ import { IError } from '@/interfaces/common';
 import { act, waitFor } from '@testing-library/react';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { stringToDateTime } from '@/utils/dates';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -30,7 +31,7 @@ describe('ProjectNotes', () => {
 
     await act(
       async () =>
-        (renderResult = renderWithProviders(<ProjectNotes />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<ProjectNotes />} />, {
           preloadedState: {
             project: {
               projects: [],

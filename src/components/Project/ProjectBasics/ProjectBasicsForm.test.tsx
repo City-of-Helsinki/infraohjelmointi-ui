@@ -23,6 +23,7 @@ import { act } from 'react-dom/test-utils';
 import { screen, waitFor } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -37,7 +38,7 @@ describe('ProjectBasicsForm', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<ProjectBasicsForm />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<ProjectBasicsForm />} />, {
           preloadedState: {
             project: {
               projects: [mockProject.data],

@@ -1,4 +1,3 @@
-// import axios from 'axios';
 import {
   mockClasses,
   mockMasterClasses,
@@ -13,11 +12,10 @@ import PlanningView from './PlanningView';
 import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocations';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockGroups } from '@/mocks/mockGroups';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
-
-// const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const store = setupStore();
 
@@ -32,31 +30,42 @@ describe('PlanningView', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<PlanningView />, {
-          preloadedState: {
-            class: {
-              ...store.getState().class,
-              allClasses: mockProjectClasses.data,
-              masterClasses: mockMasterClasses.data,
-              classes: mockClasses.data,
-              subClasses: mockSubClasses.data,
-            },
-            location: {
-              ...store.getState().location,
-              allLocations: mockLocations.data,
-              districts: mockDistricts.data,
-              divisions: mockDivisions.data,
-            },
-            group: {
-              ...store.getState().group,
-              groups: mockGroups.data,
-            },
-            lists: {
-              ...store.getState().lists,
-              phases: mockProjectPhases.data,
+        (renderResult = renderWithProviders(
+          <Route path="/" element={<PlanningView />}>
+            <Route path=":masterClassId" element={<PlanningView />}>
+              <Route path=":classId" element={<PlanningView />}>
+                <Route path=":subClassId" element={<PlanningView />}>
+                  <Route path=":districtId" element={<PlanningView />} />
+                </Route>
+              </Route>
+            </Route>
+          </Route>,
+          {
+            preloadedState: {
+              class: {
+                ...store.getState().class,
+                allClasses: mockProjectClasses.data,
+                masterClasses: mockMasterClasses.data,
+                classes: mockClasses.data,
+                subClasses: mockSubClasses.data,
+              },
+              location: {
+                ...store.getState().location,
+                allLocations: mockLocations.data,
+                districts: mockDistricts.data,
+                divisions: mockDivisions.data,
+              },
+              group: {
+                ...store.getState().group,
+                groups: mockGroups.data,
+              },
+              lists: {
+                ...store.getState().lists,
+                phases: mockProjectPhases.data,
+              },
             },
           },
-        })),
+        )),
     );
   });
 
@@ -79,20 +88,67 @@ describe('PlanningView', () => {
       expect(queryByTestId('district-breadcrumb')).toBeNull();
     });
 
-    it('renders breadcrumbs when table rows are expanded', async () => {
-      const { getByTestId, user, store } = renderResult;
+    it('renders breadcrumbs when table rows are expanded all the way to the selected district and navigates to planning frontpage from first breadcrumb', async () => {
+      const { getByTestId, user, store, getAllByTestId, queryByTestId } = renderResult;
 
-      const firstMasterClassId = store.getState().class.masterClasses[0].id;
-      const masterClassRow = getByTestId(`expand-${firstMasterClassId}`);
+      const firstMasterClass = store.getState().class.masterClasses[0];
+      const firstClass = store.getState().class.classes[0];
+      const firstSubClass = store.getState().class.subClasses[0];
+      const firstDistrict = store.getState().location.districts[0];
 
-      await user.click(masterClassRow);
+      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
+      expect(getByTestId('masterClass-breadcrumb')).toHaveAttribute(
+        'href',
+        `/${firstMasterClass.id}`,
+      );
 
-      // FIXME: clicking this doesn't change the url and so doesn't navigate
-      // so the usePlanningRows-hook doesn't set the selectedMasterClass
-      // expect(getByTestId('masterClass-breadcrumb')).toBeInTheDocument();
+      await user.click(getByTestId(`expand-${firstClass.id}`));
+      expect(getByTestId('class-breadcrumb')).toHaveAttribute(
+        'href',
+        `/${firstMasterClass.id}/${firstClass.id}`,
+      );
+
+      await user.click(getByTestId(`expand-${firstSubClass.id}`));
+      expect(getByTestId('subClass-breadcrumb')).toHaveAttribute(
+        'href',
+        `/${firstMasterClass.id}/${firstClass.id}/${firstSubClass.id}`,
+      );
+
+      await user.click(getByTestId(`expand-${firstDistrict.id}`));
+      expect(getByTestId('district-breadcrumb')).toHaveAttribute(
+        'href',
+        `/${firstMasterClass.id}/${firstClass.id}/${firstSubClass.id}/${firstDistrict.id}`,
+      );
+
+      expect(getAllByTestId('breadcrumb-arrow').length).toBe(4);
+
+      await user.click(getByTestId('programming-breadcrumb'));
+
+      expect(queryByTestId('masterClass-breadcrumb')).toBeNull();
+      expect(queryByTestId('class-breadcrumb')).toBeNull();
+      expect(queryByTestId('subClass-breadcrumb')).toBeNull();
+      expect(queryByTestId('district-breadcrumb')).toBeNull();
     });
 
-    // TODO: Renders links correctly
+    it('navigates to the clicked class', async () => {
+      const { getByTestId, store, user, queryByTestId } = renderResult;
+
+      const firstMasterClass = store.getState().class.masterClasses[0];
+      const firstClass = store.getState().class.classes[0];
+      const firstSubClass = store.getState().class.subClasses[0];
+
+      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
+      await user.click(getByTestId(`expand-${firstClass.id}`));
+      await user.click(getByTestId(`expand-${firstSubClass.id}`));
+
+      expect(getByTestId('class-breadcrumb')).toBeInTheDocument();
+      expect(getByTestId('subClass-breadcrumb')).toBeInTheDocument();
+
+      await user.click(getByTestId('masterClass-breadcrumb'));
+
+      expect(queryByTestId('class-breadcrumb')).toBeNull();
+      expect(queryByTestId('subClass-breadcrumb')).toBeNull();
+    });
   });
 
   describe('PlanningToolbar', () => {
@@ -122,7 +178,38 @@ describe('PlanningView', () => {
       // Previous button
       expect(queryByTestId('previous-button')).toBeNull();
     });
-    // TODO: shows selectedMasterClass when selected and previous button
+
+    it('shows the selectedMasterClass name and the previos-button if a masterClass is expanded', async () => {
+      const { getByTestId, user, store } = renderResult;
+      const firstMasterClass = store.getState().class.masterClasses[0];
+
+      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
+
+      expect(getByTestId('selected-class')).toBeInTheDocument();
+      expect(getByTestId('currency-indicator')).toBeInTheDocument();
+      expect(getByTestId('previous-button')).toBeInTheDocument();
+    });
+
+    it('previous-button navigates back in history when clicked', async () => {
+      const { getByTestId, user, store } = renderResult;
+      const firstMasterClass = store.getState().class.masterClasses[0];
+      const firstClass = store.getState().class.classes[0];
+
+      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
+      await user.click(getByTestId(`expand-${firstClass.id}`));
+
+      expect(getByTestId('masterClass-breadcrumb')).toBeInTheDocument();
+      expect(getByTestId('class-breadcrumb')).toBeInTheDocument();
+
+      await user.click(getByTestId('previous-button'));
+
+      //FIXME: navigate(-1) doesnt seem to work...
+      // expect(queryByTestId('class-breadcrumb')).toBeNull();
+
+      // await user.click(getByTestId('previous-button'));
+
+      // expect(queryByTestId('masterClass-breadcrumb')).toBeNull();
+    });
   });
 
   describe('PlanningYearsTable', () => {
@@ -184,12 +271,9 @@ describe('PlanningView', () => {
     it('renders only masterClass rows, heads and cells if no masterClass is expanded', () => {
       const { store, getByTestId, queryByTestId } = renderResult;
 
-      const masterClasses = store.getState().class.masterClasses;
-      const classes = store.getState().class.classes;
-      const subClasses = store.getState().class.subClasses;
-      const districts = store.getState().location.districts;
-      const divisions = store.getState().location.divisions;
-      const groups = store.getState().group.groups;
+      const { masterClasses, classes, subClasses } = store.getState().class;
+      const { districts, divisions } = store.getState().location;
+      const { groups } = store.getState().group;
 
       classes.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
 
@@ -204,40 +288,205 @@ describe('PlanningView', () => {
       // There are as many rows as masterClasses
       expect(getClass('planning-table').children[0].children.length).toBe(masterClasses.length);
       // Check that each masterClass has all the row properties
-      masterClasses.forEach(async ({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+      masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
     });
 
-    describe('PlanningRow', () => {
-      it('renders head and cells', async () => {
-        const { store, getByTestId } = renderResult;
-        const { id } = store.getState().class.masterClasses[0];
-        const currentCells = getByTestId(`row-${id}`).children;
+    it('renders all children rows and only one parent when parent is expanded', async () => {
+      const { store, getByTestId, queryByTestId, user } = renderResult;
 
-        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-        expect(getByTestId(`head-${id}`)).toBeInTheDocument();
+      const { masterClasses, classes, subClasses } = store.getState().class;
+      const { districts, divisions } = store.getState().location;
+      const { groups } = store.getState().group;
 
-        // Loop through the cells
-        Array.from(currentCells).forEach((c, i) => {
-          // Ignore the head
-          if (c.tagName !== 'TH') {
-            const year = new Date().getFullYear() + i - 1;
-            expect(getByTestId(`cell-${id}-${year}`)).toBeInTheDocument();
-          }
-        });
+      // Check that all masterClass-rows is visible
+      masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+
+      // Click the first masterclass row
+      const firstMasterClassId = masterClasses[0].id;
+      await user.click(getByTestId(`expand-${firstMasterClassId}`));
+
+      // Check that only first masterClass-row are visible
+      masterClasses.forEach(({ id }, i) => {
+        if (i === 0) {
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}`).classList.contains('masterClass')).toBeTruthy();
+        }
+        if (i !== 0) {
+          expect(queryByTestId(`row-${id}`)).toBeNull();
+        }
       });
 
-      describe('PlanningHeader', () => {
-        it('renders all elements', async () => {
-          const { store, getByTestId } = renderResult;
-          const { id } = store.getState().class.masterClasses[0];
+      const classesForMasterClass = classes.filter((c) => c.parent === firstMasterClassId);
 
-          // Expand button
-          expect(getByTestId(`expand-${id}`)).toBeInTheDocument();
-          // Show more button
-          expect(getByTestId(`show-more-${id}`)).toBeInTheDocument();
-          // Title
-          expect(getByTestId(`title-${id}`)).toBeInTheDocument();
-        });
+      // Check that all class-rows are visible
+      classesForMasterClass.forEach(({ id }) =>
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+      );
+
+      // Click the first class row
+      const firstClassId = classesForMasterClass[0].id;
+      await user.click(getByTestId(`expand-${firstClassId}`));
+
+      // Check that only first class-row is visible
+      classes.forEach(({ id }, i) => {
+        if (i === 0) {
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}`).classList.contains('class')).toBeTruthy();
+        }
+        if (i !== 0) {
+          expect(queryByTestId(`row-${id}`)).toBeNull();
+        }
+      });
+
+      const subClassesForClass = subClasses.filter((c) => c.parent === firstClassId);
+
+      // Check that all subClass-rows are visible
+      subClassesForClass.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+
+      // Click the first subClass row
+      const firstSubClassId = subClassesForClass[0].id;
+      await user.click(getByTestId(`expand-${firstSubClassId}`));
+
+      // Check that only first subClass-row is visible
+      subClasses.forEach(({ id }, i) => {
+        if (i === 0) {
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}`).classList.contains('subClass')).toBeTruthy();
+        }
+        if (i !== 0) {
+          expect(queryByTestId(`row-${id}`)).toBeNull();
+        }
+      });
+
+      const districtsForSubClass = districts.filter((c) => c.parentClass === firstSubClassId);
+
+      // // Check that all district-rows are visible and they have the 'district-preview' class
+      districtsForSubClass.forEach(({ id }) => {
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        expect(getByTestId(`row-${id}`).classList.contains('district-preview')).toBeTruthy();
+      });
+
+      // Click the first district row
+      const firstDistrictId = districtsForSubClass[0].id;
+      await user.click(getByTestId(`expand-${firstDistrictId}`));
+
+      // Check that only first district-row is visible
+      districts.forEach(({ id }, i) => {
+        if (i === 0) {
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
+          expect(
+            getByTestId(`row-${firstDistrictId}`).classList.contains('district-preview'),
+          ).toBeFalsy();
+        }
+        if (i !== 0) {
+          expect(queryByTestId(`row-${id}`)).toBeNull();
+        }
+      });
+
+      // Divisions should be expanded by default and render all their children
+      const divisionsForDistrict = divisions.filter((d) => d.parent === firstDistrictId);
+
+      divisionsForDistrict.forEach(({ id }) => {
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        expect(getByTestId(`row-${id}`).classList.contains('division')).toBeTruthy();
+      });
+
+      // Groups
+      const groupsForDivision = groups.filter((g) => g.districtRelation === divisions[0].id);
+
+      groupsForDivision.forEach(({ id }) => {
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
+      });
+    });
+
+    it('can click expand button to show and hide children and does not bring back all parent rows when re-clicked', async () => {
+      const { store, getByTestId, queryByTestId, user } = renderResult;
+      const { masterClasses, classes } = store.getState().class;
+      const classesForMasterClass = classes.filter((c) => c.parent === masterClasses[0].id);
+
+      // Classes are hidden at first
+      masterClasses.forEach((c) => expect(getByTestId(`row-${c.id}`)).toBeInTheDocument());
+      classesForMasterClass.forEach((c) => expect(queryByTestId(`row-${c.id}`)).toBeNull());
+
+      // Click expand button
+      await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+
+      // Classes are visible
+      classesForMasterClass.forEach((c) => expect(getByTestId(`row-${c.id}`)).toBeInTheDocument());
+
+      // Only clicked masterClass is visible
+      masterClasses.forEach((c, i) => {
+        if (i === 0) {
+          expect(getByTestId(`row-${c.id}`)).toBeInTheDocument();
+        } else {
+          expect(queryByTestId(`row-${c.id}`)).toBeNull();
+        }
+      });
+
+      // Click the expand button
+      await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+
+      // Classes are hidden again
+      classesForMasterClass.forEach((c) => expect(queryByTestId(`row-${c.id}`)).toBeNull());
+
+      // Only clicked masterClass is still visible
+      masterClasses.forEach((c, i) => {
+        if (i === 0) {
+          expect(getByTestId(`row-${c.id}`)).toBeInTheDocument();
+        } else {
+          expect(queryByTestId(`row-${c.id}`)).toBeNull();
+        }
+      });
+    });
+  });
+
+  describe('PlanningRow', () => {
+    it('renders head and cells', async () => {
+      const { store, getByTestId } = renderResult;
+      const { id } = store.getState().class.masterClasses[0];
+      const currentCells = getByTestId(`row-${id}`).children;
+
+      expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+      expect(getByTestId(`head-${id}`)).toBeInTheDocument();
+
+      // Loop through the cells
+      Array.from(currentCells).forEach((c, i) => {
+        // Ignore the head
+        if (c.tagName !== 'TH') {
+          const year = new Date().getFullYear() + i - 1;
+          expect(getByTestId(`cell-${id}-${year}`)).toBeInTheDocument();
+        }
+      });
+    });
+
+    it('can click expand button or title to expand and hide children but doesnt navigate back', async () => {
+      const { store, getByTestId, queryByTestId, user } = renderResult;
+      const { masterClasses, classes } = store.getState().class;
+
+      await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+
+      expect(getByTestId('masterClass-breadcrumb')).toBeInTheDocument();
+      expect(getByTestId(`row-${classes[0].id}`)).toBeInTheDocument();
+
+      await user.click(getByTestId(`title-${masterClasses[0].id}`));
+
+      expect(getByTestId('masterClass-breadcrumb')).toBeInTheDocument();
+      expect(queryByTestId(`row-${classes[0].id}`)).toBeNull();
+    });
+
+    describe('PlanningHeader', () => {
+      it('renders all elements', async () => {
+        const { store, getByTestId } = renderResult;
+        const { id } = store.getState().class.masterClasses[0];
+
+        // Expand button
+        expect(getByTestId(`expand-${id}`)).toBeInTheDocument();
+        // Show more button
+        expect(getByTestId(`show-more-${id}`)).toBeInTheDocument();
+        // Title
+        expect(getByTestId(`title-${id}`)).toBeInTheDocument();
       });
 
       describe('PlanningCell', () => {

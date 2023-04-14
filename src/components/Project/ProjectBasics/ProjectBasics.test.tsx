@@ -5,6 +5,7 @@ import { act } from '@testing-library/react';
 import mockPersons from '@/mocks/mockPersons';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
+import { Route } from 'react-router';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -20,7 +21,7 @@ describe('ProjectBasics', () => {
 
     await act(
       async () =>
-        (renderResult = renderWithProviders(<ProjectBasics />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<ProjectBasics />} />, {
           preloadedState: {
             auth: { user: mockPersons.data[0], error: {} },
             project: {

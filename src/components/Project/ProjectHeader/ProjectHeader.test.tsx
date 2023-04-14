@@ -6,6 +6,7 @@ import mockProject from '@/mocks/mockProject';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { matchExact } from '@/utils/common';
 import { act } from 'react-dom/test-utils';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -18,7 +19,7 @@ describe('ProjectHeader', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<ProjectHeader />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<ProjectHeader />} />, {
           preloadedState: {
             project: {
               projects: [],

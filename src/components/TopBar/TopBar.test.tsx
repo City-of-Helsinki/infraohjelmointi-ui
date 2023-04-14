@@ -7,6 +7,7 @@ import { act } from 'react-dom/test-utils';
 import axios from 'axios';
 import { waitFor } from '@testing-library/react';
 import { getUserThunk } from '@/reducers/authSlice';
+import { Route } from 'react-router';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
@@ -19,7 +20,7 @@ describe('TopBar', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<TopBar />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<TopBar />} />, {
           preloadedState: {
             auth: { user: null, error: {} },
           },

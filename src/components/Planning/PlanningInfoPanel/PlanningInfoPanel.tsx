@@ -12,8 +12,8 @@ interface IPlanningInfoPanelProps {
 
 const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
   const navigateBack = useCallback(() => navigate(-1), []);
 
   return (

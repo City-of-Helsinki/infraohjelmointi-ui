@@ -8,6 +8,7 @@ import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { act } from 'react-dom/test-utils';
 import AuthGuard from './AuthGuard';
 import mockPersons from '@/mocks/mockPersons';
+import { Route } from 'react-router';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
@@ -20,7 +21,10 @@ describe('AuthGuard', () => {
   beforeEach(async () => {
     const store = setupStore();
     mockedAxios.get.mockResolvedValueOnce(mockPersons);
-    await act(async () => (renderResult = renderWithProviders(<AuthGuard />, { store })));
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<Route path="/" element={<AuthGuard />} />, { store })),
+    );
   });
 
   it('adds a user to store if found', async () => {

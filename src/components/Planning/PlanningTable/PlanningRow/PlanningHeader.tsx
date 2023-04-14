@@ -41,8 +41,8 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({
             <IconMenuDots size="s" />
           </div>
         )}
-        <div className="planning-title-container" data-testid={`title-${id}`}>
-          <button className="planning-title-button" onClick={onExpand}>
+        <div className="planning-title-container">
+          <button className="planning-title-button" onClick={onExpand} data-testid={`title-${id}`}>
             <span className="planning-header-title">{name}</span>
           </button>
           <NameTooltip value={name} id={id} />

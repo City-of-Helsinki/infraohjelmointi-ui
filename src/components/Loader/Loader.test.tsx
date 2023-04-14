@@ -4,6 +4,7 @@ import { clearLoading, setLoading } from '@/reducers/loadingSlice';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { act, waitFor } from '@testing-library/react';
 import Loader from './Loader';
+import { Route } from 'react-router';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -13,7 +14,7 @@ describe('Loader', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<Loader />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<Loader />} />, {
           preloadedState: {
             auth: { user: mockPersons.data[0], error: {} },
           },

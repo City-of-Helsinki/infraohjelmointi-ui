@@ -3,6 +3,7 @@ import mockPersons from '@/mocks/mockPersons';
 import { act } from '@testing-library/react';
 import { CustomRenderResult, renderWithProviders } from '../../utils/testUtils';
 import ErrorView from './ErrorView';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -13,7 +14,7 @@ describe('ErrorView', () => {
   beforeEach(async () => {
     await act(
       async () =>
-        (renderResult = renderWithProviders(<ErrorView />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<ErrorView />} />, {
           preloadedState: {
             auth: { user: mockPersons.data[0], error: {} },
           },

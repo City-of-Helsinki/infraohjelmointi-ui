@@ -31,6 +31,7 @@ import { mockError } from '@/mocks/mockError';
 import { IError, IFreeSearchResults } from '@/interfaces/common';
 import { ISearchResults } from '@/interfaces/searchInterfaces';
 import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -44,7 +45,7 @@ describe('Search', () => {
     const store = setupStore();
     await act(
       async () =>
-        (renderResult = renderWithProviders(<Search />, {
+        (renderResult = renderWithProviders(<Route path="/" element={<Search />} />, {
           preloadedState: {
             auth: { user: mockPersons.data[0], error: {} },
             class: {
