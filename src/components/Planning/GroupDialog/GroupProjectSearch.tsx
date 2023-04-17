@@ -58,7 +58,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
       return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
         // printing out search params for later
         const queryParams = buildQueryParamString(inputValue);
-        console.log(queryParams);
 
         getProjectsWithParams(queryParams)
           .then((res) => {
