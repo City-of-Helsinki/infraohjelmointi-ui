@@ -48,16 +48,17 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
     (inputValue: string) => {
       if (
         (showAdvanceFields &&
-          ((!getValues('division')?.value && !getValues('class')?.value) ||
-            (getValues('division')?.value && !getValues('class')?.value) ||
-            (!getValues('division')?.value && getValues('class')?.value))) ||
-        (!showAdvanceFields && !getValues('class')?.value)
+          ((!getValues('division')?.value && !getValues('subClass')?.value) ||
+            (getValues('division')?.value && !getValues('subClass')?.value) ||
+            (!getValues('division')?.value && getValues('subClass')?.value))) ||
+        (!showAdvanceFields && !getValues('subClass')?.value)
       ) {
         return Promise.resolve([]);
       }
       return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
         // printing out search params for later
         const queryParams = buildQueryParamString(inputValue);
+        console.log(queryParams);
 
         getProjectsWithParams(queryParams)
           .then((res) => {
