@@ -1,10 +1,11 @@
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { initialSearchForm, selectSearchForm } from '@/reducers/searchSlice';
 import useMultiClassOptions from '@/hooks/useMultiClassOptions';
 import useMultiLocationOptions from '@/hooks/useMultiLocationOptions';
+import { IOption } from '@/interfaces/common';
 
 const useSearchForm = () => {
   const storeFormValues = useAppSelector(selectSearchForm);
@@ -40,31 +41,40 @@ const useSearchForm = () => {
     watch,
     formState: { isDirty },
   } = formMethods;
+
+  const setMultiListOption = useCallback((key: string, value: IOption) => {
+    switch (key) {
+      case 'class':
+      case 'masterClass':
+      case 'subClass':
+      case 'district':
+      case 'division':
+      case 'subDivision':
+        setMultiListsState((current) => ({ ...current, [key]: value }));
+        break;
+      default:
+        break;
+    }
+  }, []);
+
   /**
    * Listens to form changes and checks if form has any added values and sets submitDisabled
    */
   useEffect(() => {
     const subscription = watch((value, { name }) => {
-      switch (name) {
-        case 'class':
-        case 'masterClass':
-        case 'subClass':
-        case 'district':
-        case 'division':
-        case 'subDivision':
-          setMultiListsState((current) => ({ ...current, [name]: value[name] }));
-          break;
-        default:
-          break;
-      }
+      setMultiListOption(name as string, value[name as keyof ISearchForm] as unknown as IOption);
       if (!isDirty) {
         setSubmitDisabled(JSON.stringify(value) === JSON.stringify(initialSearchForm));
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, storeFormValues]);
 
+  // Set the form and the multi-selections to match the values in redux storeFormValues
   useEffect(() => {
+    Object.entries(storeFormValues).forEach(([key, value]) => {
+      setMultiListOption(key, value);
+    });
     reset(storeFormValues);
   }, [storeFormValues]);
 
