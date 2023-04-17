@@ -66,7 +66,7 @@ const ProjectHeader: FC = () => {
           </div>
         </div>
         <div className="flex-[3]" data-testid="project-header-center">
-          <div className="ml-8 w-96">
+          <div className="project-header-phase-select-container">
             <ProjectNameFields control={control} />
             <SelectField name="phase" control={control} options={phases} />;
           </div>

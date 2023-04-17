@@ -71,7 +71,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
-            <div className="relative max-w-[22.5rem]" ref={selectContainerRef}>
+            <div className="select-field-wrapper" ref={selectContainerRef}>
               <HDSSelect
                 className="input-l custom-select"
                 value={value}
@@ -88,8 +88,9 @@ const SelectField: FC<ISelectFieldProps> = ({
               />
 
               {value.value && (
+                // top should be => top: 1rem; with hds in project header
                 <button
-                  className="absolute top-[2.6rem] right-11"
+                  className="empty-select-field-button"
                   data-testid={`empty-${name}-selection-button`}
                   onClick={() => handleRemoveSelection(onChange)}
                 >
