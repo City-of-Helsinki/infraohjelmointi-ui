@@ -34,7 +34,7 @@ const useGroupForm = () => {
   });
   const { selectedClass, selectedLocation } = selections;
   const classOptions = useClassOptions(selectedClass);
-  const locationOptions = useLocationOptions(selectedLocation);
+  const locationOptions = useLocationOptions(selectedLocation,selectedClass);
   const { formValues } = useGroupValues();
 
   const formMethods = useForm<IGroupForm>({

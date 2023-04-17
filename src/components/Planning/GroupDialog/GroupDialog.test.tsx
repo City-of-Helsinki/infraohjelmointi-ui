@@ -19,14 +19,22 @@ import {
   mockResponsibleZones,
 } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import { waitFor } from '@testing-library/react';
+import { getAllByText, waitFor } from '@testing-library/react';
 import mockPersons from '@/mocks/mockPersons';
 import { setupStore } from '@/store';
-import mockProjectClasses from '@/mocks/mockClasses';
-import { mockLocations } from '@/mocks/mockLocations';
+import {
+  mockClasses,
+  mockMasterClasses,
+  mockProjectClasses,
+  mockSubClasses,
+} from '@/mocks/mockClasses';
+import {
+  mockDistricts,
+  mockDivisions,
+  mockLocations,
+  mockSubDivisions,
+} from '@/mocks/mockLocations';
 import { mockSearchResults } from '@/mocks/mockSearch';
-import { setMasterClasses, setClasses, setSubClasses } from '@/reducers/classSlice';
-import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -70,10 +78,16 @@ describe('GroupDialog', () => {
             class: {
               ...store.getState().class,
               allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
             },
             location: {
               ...store.getState().location,
               allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+              subDivisions: mockSubDivisions.data,
             },
           },
         })),
@@ -122,20 +136,14 @@ describe('GroupDialog', () => {
         id: 'e39a5f66-8be5-4cd8-9a8a-16f69cc02c18',
         name: 'test-group',
         districtRelation: null,
-        classRelation: 'eac7ec6b-84e1-482f-b745-d2cea2179095',
+        classRelation: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
       },
     };
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    const { user, getAllByTestId, getByTestId, getByRole, getByText, store } = renderResult;
-    await waitFor(() => store.dispatch(setMasterClasses()));
-    await waitFor(() => store.dispatch(setClasses()));
-    await waitFor(() => store.dispatch(setSubClasses()));
-    // filter locations into categories (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setDistricts()));
-    await waitFor(() => store.dispatch(setDivisions()));
-    await waitFor(() => store.dispatch(setSubDivisions()));
+    const { user, getAllByTestId, getByTestId, getByRole, getByText, getAllByText } = renderResult;
+
     // Open modal
     await user.click(getByRole('button', { name: matchExact('createSummingGroups') }));
 
@@ -151,14 +159,14 @@ describe('GroupDialog', () => {
     await user.click(getByText(matchExact('Uudisrakentaminen')));
 
     await user.click(getByRole('button', { name: 'groupForm.subClass *' }));
-    await user.click(getByText(matchExact('Meluesteet')));
+    await user.click(getByText(matchExact('Koillinen suurpiiri')));
 
-    await user.type(getByText('groupForm.searchForProjects'), 'Y');
+    await user.type(getByText('groupForm.searchForProjects'), 'V');
 
     await waitFor(async () => {
       expect(getByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
 
-      await user.click(getByText('Yhteiskouluntie ja aukio'));
+      await user.click(getByText('Vanha yrttimaantie'));
       expect(getAllByTestId('project-selections').length).toBe(1);
     });
 
@@ -166,18 +174,18 @@ describe('GroupDialog', () => {
 
     // Check that the correct url was called
     expect(getRequest.calls[0][0]).toBe(
-      'localhost:4000/projects/?masterClass=fa3ac589-816e-47cb-a2f9-0c6956e85913&class=c4708dad-d8ea-4873-8916-3fd5d847d459&subClass=eac7ec6b-84e1-482f-b745-d2cea2179095&projectName=Y&inGroup=false&programmed=true&limit=30&order=new',
+      'localhost:4000/projects/?masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&projectName=V&inGroup=false&programmed=true&limit=30&order=new',
     );
 
     // retype and check the suggestion gets filtered
     await user.clear(getByRole('combobox', { name: 'groupForm.searchForProjects' }));
-    await user.type(getByText('groupForm.searchForProjects'), 'Y');
+    await user.type(getByText('groupForm.searchForProjects'), 'V');
 
     await waitFor(async () => {
       // The only text in the document is already selected project
       // The click triggers on the selection and not on the suggestion
       expect(getByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-      await user.click(getByText('Yhteiskouluntie ja aukio'));
+      expect(getAllByText('Vanha yrttimaantie').length).toBe(1);
       expect(getAllByTestId('project-selections').length).toBe(1);
     });
     expect(submitButton).toBeEnabled();
@@ -189,14 +197,8 @@ describe('GroupDialog', () => {
     expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
   });
   it('Cannot submit if all required fields are not populated', async () => {
-    const { user, getAllByTestId, getByTestId, getByRole, getByText, store } = renderResult;
-    await waitFor(() => store.dispatch(setMasterClasses()));
-    await waitFor(() => store.dispatch(setClasses()));
-    await waitFor(() => store.dispatch(setSubClasses()));
-    // filter locations into categories (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setDistricts()));
-    await waitFor(() => store.dispatch(setDivisions()));
-    await waitFor(() => store.dispatch(setSubDivisions()));
+    const { user, getByTestId, getByRole, getByText } = renderResult;
+
     // Open modal
     await user.click(getByRole('button', { name: matchExact('createSummingGroups') }));
 
