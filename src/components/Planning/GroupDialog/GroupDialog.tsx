@@ -24,7 +24,7 @@ const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
   return {
     name: form.name,
     classRelation: form.subClass?.value || '',
-    districtRelation: form.division?.value || form.district?.value || '',
+    locationRelation: form.division?.value || form.district?.value || '',
     projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
 };
