@@ -19,7 +19,7 @@ const OverrunSum = memo(({ value }: { value: string }) => (
 const PlanningClassesCell: FC<IPlanningClassesCellProps> = ({ sum, position, type }) => {
   return (
     <td className={`table-cell ${type}`}>
-      {/* temporarily hide mock values if it's a subdivision */}
+      {/* temporarily hide mock values if it's division */}
       {type !== 'division' && (
         <div className={`table-cell-container`}>
           <span>{sum}</span>
