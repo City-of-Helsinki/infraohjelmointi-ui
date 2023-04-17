@@ -130,7 +130,7 @@ tr.active .edit-timeline-button {
 }
 
 .project-cell-input {
-  @apply h-10 w-[85%] text-center;
+  @apply h-10 w-[85%] border-2 border-transparent !bg-transparent text-center;
 }
 
 .project-cell-input-container {
@@ -138,9 +138,7 @@ tr.active .edit-timeline-button {
 }
 
 .project-cell-input:focus {
-  outline: none;
-  border-radius: 3px;
-  border: 2px solid var(--color-coat-of-arms);
+  @apply rounded-[3px] border-2 border-coat-of-arms outline-none;
 }
 /* Hide arrows from number input in Chrome, Safari, Edge, Opera */
 .project-cell-input::-webkit-outer-spin-button,

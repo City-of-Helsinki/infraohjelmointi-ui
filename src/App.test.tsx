@@ -4,7 +4,7 @@ import { act, waitFor } from '@testing-library/react';
 import { renderWithProviders } from './utils/testUtils';
 import App from './App';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
-import mockProjectClasses from './mocks/mockClasses';
+import { mockProjectClasses } from './mocks/mockClasses';
 import { mockLocations } from './mocks/mockLocations';
 import {
   mockProjectCategories,
@@ -41,6 +41,7 @@ describe('App', () => {
     const { store } = await act(async () => renderWithProviders(<App />));
 
     const classes = store.getState().class;
+
     const locations = store.getState().location;
     const lists = store.getState().lists;
     const hashTags = store.getState().hashTags;

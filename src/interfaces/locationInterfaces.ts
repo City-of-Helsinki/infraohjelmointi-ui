@@ -1,3 +1,5 @@
 import { IClass } from './classInterfaces';
 
-export type ILocation = IClass;
+export interface ILocation extends IClass {
+  parentClass: string | null;
+}

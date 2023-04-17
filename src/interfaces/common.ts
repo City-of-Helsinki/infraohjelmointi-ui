@@ -52,19 +52,11 @@ export type ListType =
   | 'constructionPhases'
   | 'programmedYears';
 
-export type NotificationType = 'notification' | 'toast';
+type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';
-export type SelectCallback = (selected: IOption) => void;
 export type TextColorType = 'black' | 'white';
-export type FontWeightType = 'bold' | 'light';
+export type FontWeightType = 'bold' | 'light' | 'medium';
 export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';
-export type InputSizeType = 'l' | 'm';
-
-export enum ClassTableHierarchy {
-  First = 'first',
-  Second = 'second',
-  Third = 'third',
-}
 
 export interface IFreeSearchResults {
   hashtags: Array<IListItem>;
@@ -98,4 +90,25 @@ export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 export enum ContextMenuType {
   EDIT_PROJECT_CELL,
   EDIT_PROJECT_PHASE,
+}
+
+export type PlanningTableRowType =
+  | 'masterClass'
+  | 'class'
+  | 'subClass'
+  | 'district-preview'
+  | 'district'
+  | 'division'
+  | 'group'
+  | 'project';
+
+export interface IPlanningTableRow {
+  type: PlanningTableRowType;
+  name: string;
+  path: string;
+  children: Array<IPlanningTableRow>;
+  id: string;
+  key: string;
+  defaultExpanded: boolean;
+  link: string | null;
 }

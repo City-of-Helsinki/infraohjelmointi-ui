@@ -1,4 +1,4 @@
-import mockProjectClasses from '@/mocks/mockClasses';
+import { mockProjectClasses } from '@/mocks/mockClasses';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import {
   mockConstructionPhaseDetails,

@@ -1,5 +1,10 @@
 import axios from 'axios';
-import mockProjectClasses from '@/mocks/mockClasses';
+import {
+  mockClasses,
+  mockMasterClasses,
+  mockProjectClasses,
+  mockSubClasses,
+} from '@/mocks/mockClasses';
 import mockI18next from '@/mocks/mockI18next';
 import { initialSearchForm } from '@/reducers/searchSlice';
 import { setupStore } from '@/store';
@@ -32,8 +37,13 @@ const filledSearchForm = {
       type: 'hashtags',
     },
   },
-  masterClass: [{ label: '801 Esirakentaminen', value: '41d6bd7b-4a86-4ea4-95b7-4bff4f179095' }],
-  class: [{ label: 'Esirakentaminen', value: '354edbb1-f257-432c-b5bf-4a7e4f02aeba' }],
+  masterClass: [
+    {
+      label: '803 Kadut, liikenneväylät',
+      value: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
+    },
+  ],
+  class: [{ label: 'Uudisrakentaminen', value: 'c6294258-41b1-4ad6-afdf-0b10849ca000' }],
 };
 
 const searchActiveState = {
@@ -51,6 +61,9 @@ const searchActiveState = {
   class: {
     ...store.getState().class,
     allClasses: mockProjectClasses.data,
+    masterClasses: mockMasterClasses.data,
+    classes: mockClasses.data,
+    subClass: mockSubClasses.data,
   },
   hashTags: {
     ...store.getState().hashTags,
@@ -256,42 +269,42 @@ describe('SearchResultsView', () => {
       expect(getByClass('search-result-breadcrumbs')).toBe(2);
       expect(getByClass('search-result-title-container')).toBe(2);
       expect(getByClass('search-result-title')).toBe(2);
-      expect(getByClass('custom-tag-container')).toBe(3);
+      expect(getByClass('custom-tag-container')).toBe(4);
 
       const projectCard = container.getElementsByClassName('search-result-card')[0];
       const projectChildren = projectCard.childNodes;
 
       // Title and status tag
-      expect(projectChildren[0]).toHaveTextContent('Yhteiskouluntie ja aukio');
+      expect(projectChildren[0]).toHaveTextContent('Vanha yrttimaantie');
       expect(projectChildren[0]).toHaveTextContent('enums.warrantyPeriod');
       // Breadcrumbs
-      expect(projectChildren[1]).toHaveTextContent('801 Esirakentaminen');
-      expect(projectChildren[1]).toHaveTextContent('Esirakentaminen');
-      expect(projectChildren[1]).toHaveTextContent('Muu esirakentaminen');
+      expect(projectChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
+      expect(projectChildren[1]).toHaveTextContent('Uudisrakentaminen');
+      expect(projectChildren[1]).toHaveTextContent('Koillinen suurpiiri');
 
       // Both hashTags to renders under project card
       expect(getByTestId('search-result-hashtags')).toBeInTheDocument();
       expect(projectChildren[2]).toHaveTextContent('#leikkipaikka');
       // Link rendered around project card
-      expect(getAllByText('Yhteiskouluntie ja aukio')[0].closest('a')).toHaveAttribute(
+      expect(getAllByText('Vanha yrttimaantie')[0].closest('a')).toHaveAttribute(
         'href',
-        '/planning/coordinator/41d6bd7b-4a86-4ea4-95b7-4bff4f179095/354edbb1-f257-432c-b5bf-4a7e4f02aeba/f2ffb57e-d7a4-49d1-b7bf-3fa4f9c2b1df',
+        '/planning/coordinator/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
       );
 
       const classCard = container.getElementsByClassName('search-result-card')[1];
       const classChildren = classCard.childNodes;
 
       // Title and class tag
-      expect(classChildren[0]).toHaveTextContent('Muu esirakentaminen');
+      expect(classChildren[0]).toHaveTextContent('Koillinen suurpiiri');
       expect(classChildren[0]).toHaveTextContent('searchTag.classes');
       // Breadcrumbs
-      expect(classChildren[1]).toHaveTextContent('801 Esirakentaminen');
-      expect(classChildren[1]).toHaveTextContent('Esirakentaminen');
-      expect(classChildren[1]).toHaveTextContent('Muu esirakentaminen');
+      expect(classChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
+      expect(classChildren[1]).toHaveTextContent('Uudisrakentaminen');
+      expect(classChildren[1]).toHaveTextContent('Koillinen suurpiiri');
       // Link rendered around class card
-      expect(getAllByText('Muu esirakentaminen')[0].closest('a')).toHaveAttribute(
+      expect(getAllByText('Koillinen suurpiiri')[0].closest('a')).toHaveAttribute(
         'href',
-        '/planning/coordinator/41d6bd7b-4a86-4ea4-95b7-4bff4f179095/354edbb1-f257-432c-b5bf-4a7e4f02aeba/f2ffb57e-d7a4-49d1-b7bf-3fa4f9c2b1df',
+        '/planning/coordinator/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
       );
     });
   });

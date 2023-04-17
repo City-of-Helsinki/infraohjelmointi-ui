@@ -7,9 +7,12 @@ import { useAppSelector } from './common';
  * Creates lists of districts, divisions and subDivisions. If filtering is used, then all
  * divisions and subDivisions will be filtered according to their parent.
  *
- * @param withFilter boolean if filtering should be used
+ * It only returns districts that are related to the given currentClass.
  */
-const useLocationOptions = (currentLocation: string | undefined) => {
+const useLocationOptions = (
+  currentLocation: string | undefined,
+  currentClass: string | undefined,
+) => {
   const allDistricts = useAppSelector(selectDistricts);
   const allDivisions = useAppSelector(selectDivisions);
   const allSubDivisions = useAppSelector(selectSubDivisions);
@@ -29,16 +32,24 @@ const useLocationOptions = (currentLocation: string | undefined) => {
     [currentLocation, allSubDivisions],
   );
 
+  const getNextDistricts = useCallback(() => {
+    if (currentClass) {
+      return allDistricts.filter((d) => currentClass === d.parentClass || d.parentClass === null);
+    } else {
+      return [];
+    }
+  }, [allDistricts, currentClass]);
+
   const getNextDivisions = useCallback(() => {
     if (selectedDistrict) {
-      return allDivisions.filter((c) => c.parent === currentLocation);
+      return allDivisions.filter((d) => d.parent === currentLocation);
     } else if (selectedDivision) {
-      const divisionParent = allDistricts.find((mc) => mc.id === selectedDivision.parent);
-      return allDivisions.filter((c) => c.parent === divisionParent?.id);
+      const divisionParent = allDistricts.find((d) => d.id === selectedDivision.parent);
+      return allDivisions.filter((d) => d.parent === divisionParent?.id);
     } else if (selectedSubDivision) {
-      const subDivisionParent = allDivisions.find((c) => c.id === selectedSubDivision.parent);
-      const divisionParent = allDistricts.find((mc) => mc.id === subDivisionParent?.parent);
-      return allDivisions.filter((c) => c.parent === divisionParent?.id);
+      const subDivisionParent = allDivisions.find((d) => d.id === selectedSubDivision.parent);
+      const divisionParent = allDistricts.find((d) => d.id === subDivisionParent?.parent);
+      return allDivisions.filter((d) => d.parent === divisionParent?.id);
     } else {
       return [];
     }
@@ -63,7 +74,7 @@ const useLocationOptions = (currentLocation: string | undefined) => {
   }, [allDivisions, currentLocation, selectedDivision, selectedSubDivision, allSubDivisions]);
 
   return {
-    districts: classesToOptions(allDistricts),
+    districts: classesToOptions(getNextDistricts()),
     divisions: classesToOptions(getNextDivisions()),
     subDivisions: classesToOptions(getNextSubDivisions()),
   };

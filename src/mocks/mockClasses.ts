@@ -1,278 +1,101 @@
 import { IClass } from '@/interfaces/classInterfaces';
 
-const mockProjectClasses: { data: Array<IClass> } = {
+export const mockProjectClasses: { data: Array<IClass> } = {
   data: [
     {
-      id: 'eac7ec6b-84e1-482f-b745-d2cea2179095',
-      name: 'Meluesteet',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Meluesteet',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: 'd23c5f64-1aa5-4c45-9418-e98f6cd721f3',
-      name: 'Läntinen suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Läntinen suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: '7b65edaf-e448-4a46-9f81-546921cdb91d',
-      name: 'Katujen peruskorjaukset',
-      path: '803 Kadut, liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Katujen peruskorjaukset',
-      parent: '08367ffc-7d8f-4c8a-962a-cd33367d43d1',
-    },
-    {
-      id: '2090f4f9-d134-4d5b-97d1-93f451aa85d0',
-      name: 'Siltojen peruskorjaus ja uusiminen',
-      path: '803 Kadut, liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Siltojen peruskorjaus ja uusiminen',
-      parent: '08367ffc-7d8f-4c8a-962a-cd33367d43d1',
-    },
-    {
-      id: 'e0c7a8c2-ba62-4318-81b8-d2214e12f8b3',
-      name: 'Päällysteiden uusiminen',
-      path: '803 Kadut, liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Päällysteiden uusiminen',
-      parent: '08367ffc-7d8f-4c8a-962a-cd33367d43d1',
-    },
-    {
-      id: '169ef002-9274-48ab-baf2-cfc7789b58f9',
-      name: 'Liikennejärjestelyt',
-      path: '803 Kadut, liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Liikennejärjestelyt',
-      parent: '08367ffc-7d8f-4c8a-962a-cd33367d43d1',
-    },
-    {
-      id: '8124df76-56ef-4502-b329-61149ea7e42d',
-      name: 'Jalankulun ja pyöräilyn väylät',
-      path: '803 Kadut, liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Jalankulun ja pyöräilyn väylät',
-      parent: '08367ffc-7d8f-4c8a-962a-cd33367d43d1',
-    },
-    {
-      id: '3f3d6c68-d63a-4e14-8e17-7a1b9af7ffc2',
-      name: 'Täytemaan vastaanottopaikat',
-      path: '803 Kadut, liikenneväylät/Muut kadunpidon investoinnit/Täytemaan vastaanottopaikat',
-      parent: '29e3c5f7-633f-4bca-a392-80e1e4e5babc',
-    },
-    {
-      id: 'd0ff26e2-3137-48fc-a85a-23f6c51b09ec',
-      name: 'Lumenvastaanottopaikat ja hiekkasiilot',
-      path: '803 Kadut, liikenneväylät/Muut kadunpidon investoinnit/Lumenvastaanottopaikat ja hiekkasiilot',
-      parent: '29e3c5f7-633f-4bca-a392-80e1e4e5babc',
-    },
-    {
-      id: 'cb57716c-35ac-45ab-bba3-4a1298f1ad53',
-      name: 'Yleiset käymälät',
-      path: '803 Kadut, liikenneväylät/Muut kadunpidon investoinnit/Yleiset käymälät',
-      parent: '29e3c5f7-633f-4bca-a392-80e1e4e5babc',
-    },
-    {
-      id: '18a81d17-49a4-4c61-b6ff-67652a6365d0',
-      name: 'Uudet puistot',
-      path: '804 Puistot ja liikunta-alueet/Uudet puistot',
-      parent: '700a6ce9-8496-41f4-ab25-c32139b9b4d8',
-    },
-    {
-      id: '5df3cc24-db77-4c65-ad43-8a05f03a8a12',
-      name: 'Puistojen peruskorjaus',
-      path: '804 Puistot ja liikunta-alueet/Puistojen peruskorjaus',
-      parent: '700a6ce9-8496-41f4-ab25-c32139b9b4d8',
-    },
-    {
-      id: 'a23121cc-f1e0-43f2-a9a6-c898f815e4dc',
-      name: 'Projektialueiden puistot ja liikunta-alueet',
-      path: '804 Puistot ja liikunta-alueet/Projektialueiden puistot ja liikunta-alueet',
-      parent: '700a6ce9-8496-41f4-ab25-c32139b9b4d8',
-    },
-    {
-      id: 'c8ff0163-dc79-4df0-ab13-f3f1c7727994',
-      name: 'Kamppi-Töölönlahden esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen/Kamppi-Töölönlahden esirakentaminen',
-      parent: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-    },
-    {
-      id: '7e342fcd-6c7e-4b9b-8ba4-40d59117c708',
-      name: '807 Lähiörahasto',
-      path: '807 Lähiörahasto',
+      id: '6f41c344-3550-49f1-872d-a106daa8698b',
+      name: '801 Esirakentmainen (kiinteä omaisuus)',
+      path: '801 Esirakentmainen (kiinteä omaisuus)',
+      forCoordinatorOnly: false,
       parent: null,
+      relatedTo: null,
     },
     {
-      id: 'c60d0bd5-5471-4702-9e71-9adc898ea4c0',
-      name: '807 Lähiörahasto',
-      path: '807 Lähiörahasto/807 Lähiörahasto',
-      parent: '7e342fcd-6c7e-4b9b-8ba4-40d59117c708',
-    },
-    {
-      id: 'c3f7dbbf-28e2-41c5-832a-c3cb176a01b6',
-      name: 'Yhteishankkeet liikenneviraston kanssa',
-      path: '803 Kadut, liikenneväylät/Yhteishankkeet liikenneviraston kanssa',
-      parent: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
-    },
-    {
-      id: '50248381-dc83-41d6-a43e-325318c6dd13',
-      name: 'Projektialueiden kadut',
-      path: '803 Kadut, liikenneväylät/Projektialueiden kadut',
-      parent: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
-    },
-    {
-      id: 'c1442932-d4be-4562-9711-f8294e8150b9',
-      name: 'Täydennysrakennuskorvaukset ja korvausinvestoinnit',
-      path: '801 Esirakentaminen/Esirakentaminen/Täydennysrakennuskorvaukset ja korvausinvestoinnit',
-      parent: '354edbb1-f257-432c-b5bf-4a7e4f02aeba',
-    },
-    {
-      id: 'c74c3ae5-f895-4842-bb5d-443f31378490',
-      name: 'Länsisataman esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen/Länsisataman esirakentaminen',
-      parent: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-    },
-    {
-      id: '354edbb1-f257-432c-b5bf-4a7e4f02aeba',
-      name: 'Esirakentaminen',
-      path: '801 Esirakentaminen/Esirakentaminen',
-      parent: '41d6bd7b-4a86-4ea4-95b7-4bff4f179095',
-    },
-    {
-      id: 'f2ffb57e-d7a4-49d1-b7bf-3fa4f9c2b1df',
-      name: 'Muu esirakentaminen',
-      path: '801 Esirakentaminen/Esirakentaminen/Muu esirakentaminen',
-      parent: '354edbb1-f257-432c-b5bf-4a7e4f02aeba',
-    },
-    {
-      id: '1160e169-16ac-42e0-9330-9bb8fe97c7c1',
-      name: 'Kalasataman esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen/Kalasataman esirakentaminen',
-      parent: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-    },
-    {
-      id: '51f66a94-484d-45e9-8669-7210067b2682',
-      name: 'Kruunuvuorenrannan esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen/Kruunuvuorenrannan esirakentaminen',
-      parent: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-    },
-    {
-      id: 'b04335cf-07e8-4b0c-96a5-e97812c0e955',
-      name: 'Kuninkaankolmion esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen/Kuninkaankolmion esirakentaminen',
-      parent: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-    },
-    {
-      id: '94f1c5a5-2dd3-4d17-b4d2-cac17777dffa',
-      name: 'Pasilan esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen/Pasilan esirakentaminen',
-      parent: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-    },
-    {
-      id: '41d6bd7b-4a86-4ea4-95b7-4bff4f179095',
-      name: '801 Esirakentaminen',
-      path: '801 Esirakentaminen',
-      parent: null,
-    },
-    {
-      id: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-      name: 'Projektialueiden esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen',
-      parent: '41d6bd7b-4a86-4ea4-95b7-4bff4f179095',
-    },
-    {
-      id: '189d1976-a764-46f8-9dc5-c151370d612f',
-      name: 'Uusien projektialueiden esirakentaminen',
-      path: '801 Esirakentaminen/Projektialueiden esirakentaminen/Uusien projektialueiden esirakentaminen',
-      parent: 'cf05e414-d6b0-426c-b259-82081ccaede7',
-    },
-    {
-      id: '29e3c5f7-633f-4bca-a392-80e1e4e5babc',
-      name: 'Muut kadunpidon investoinnit',
-      path: '803 Kadut, liikenneväylät/Muut kadunpidon investoinnit',
-      parent: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
-    },
-    {
-      id: '4bc41fc2-0963-4201-a5ab-e1ae60355b2b',
-      name: 'Ranta-alueiden kunnostus',
-      path: '803 Kadut, liikenneväylät/Muut kadunpidon investoinnit/Ranta-alueiden kunnostus',
-      parent: '29e3c5f7-633f-4bca-a392-80e1e4e5babc',
-    },
-    {
-      id: '3eeb5516-7ed6-417e-bebf-b3623ceba605',
-      name: 'Eteläinen suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Eteläinen suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: '08367ffc-7d8f-4c8a-962a-cd33367d43d1',
-      name: 'Perusparantaminen ja liikennejärjestelyt',
-      path: '803 Kadut, liikenneväylät/Perusparantaminen ja liikennejärjestelyt',
-      parent: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
-    },
-    {
-      id: '76e22195-84c9-4627-87d6-a5bd0edaf4ca',
-      name: 'Joukkoliikenteen kehittäminen',
-      path: '803 Kadut, liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Joukkoliikenteen kehittäminen',
-      parent: '08367ffc-7d8f-4c8a-962a-cd33367d43d1',
-    },
-    {
-      id: '6730686a-5af8-49dc-a5ad-8caeda765c26',
-      name: 'Keskinen suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Keskinen suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: '4a7d44a4-197c-4bc1-89f0-04fb04082c72',
-      name: 'Pohjoinen suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Pohjoinen suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: 'e3227191-dc37-447f-8456-047681313c32',
-      name: 'Koillinen suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Koillinen suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: 'fa42b5a7-7e15-4713-9d6c-78f6b0e1b4ed',
-      name: 'Kaakkoinen suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Kaakkoinen suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: 'eef92b47-fe65-47f5-ae9a-c0c656f1f677',
-      name: 'Itäinen suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Itäinen suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
+      id: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
       name: '803 Kadut, liikenneväylät',
       path: '803 Kadut, liikenneväylät',
+      forCoordinatorOnly: false,
       parent: null,
+      relatedTo: null,
     },
     {
-      id: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-      name: 'Uudisrakentaminen',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen',
-      parent: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
-    },
-    {
-      id: '117e5354-2b5c-4d3f-8b4e-8fef78006e2a',
-      name: 'Östersundomin suurpiiri',
-      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Östersundomin suurpiiri',
-      parent: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    },
-    {
-      id: '545736b7-84e7-4f82-b87c-29a74a82e3a2',
-      name: 'Uudet liikunta- ja ulkoilualueet',
-      path: '804 Puistot ja liikunta-alueet/Uudet liikunta- ja ulkoilualueet',
-      parent: '700a6ce9-8496-41f4-ab25-c32139b9b4d8',
-    },
-    {
-      id: '700a6ce9-8496-41f4-ab25-c32139b9b4d8',
+      id: '85077f3c-e79b-45ba-ad6e-c68b06710d83',
       name: '804 Puistot ja liikunta-alueet',
       path: '804 Puistot ja liikunta-alueet',
+      forCoordinatorOnly: false,
       parent: null,
+      relatedTo: null,
     },
     {
-      id: 'b718e7eb-91bd-4b3a-bcdd-9dc4bbc8e98a',
-      name: 'Liikunta- ja ulkoilualueiden peruskorjaus',
-      path: '804 Puistot ja liikunta-alueet/Liikunta- ja ulkoilualueiden peruskorjaus',
-      parent: '700a6ce9-8496-41f4-ab25-c32139b9b4d8',
+      id: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
+      name: 'Uudisrakentaminen',
+      path: '803 Kadut, liikenneväylät/Uudisrakentaminen',
+      forCoordinatorOnly: false,
+      parent: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
+      relatedTo: null,
+    },
+    {
+      id: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
+      name: 'Koillinen suurpiiri',
+      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Koillinen suurpiiri',
+      forCoordinatorOnly: false,
+      parent: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
+      relatedTo: null,
     },
   ],
 };
 
-export default mockProjectClasses;
+export const mockMasterClasses: { data: Array<IClass> } = {
+  data: [
+    {
+      id: '6f41c344-3550-49f1-872d-a106daa8698b',
+      name: '801 Esirakentmainen (kiinteä omaisuus)',
+      path: '801 Esirakentmainen (kiinteä omaisuus)',
+      forCoordinatorOnly: false,
+      parent: null,
+      relatedTo: null,
+    },
+    {
+      id: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
+      name: '803 Kadut, liikenneväylät',
+      path: '803 Kadut, liikenneväylät',
+      forCoordinatorOnly: false,
+      parent: null,
+      relatedTo: null,
+    },
+    {
+      id: '85077f3c-e79b-45ba-ad6e-c68b06710d83',
+      name: '804 Puistot ja liikunta-alueet',
+      path: '804 Puistot ja liikunta-alueet',
+      forCoordinatorOnly: false,
+      parent: null,
+      relatedTo: null,
+    },
+  ],
+};
+
+export const mockClasses: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
+      name: 'Uudisrakentaminen',
+      path: '803 Kadut, liikenneväylät/Uudisrakentaminen',
+      forCoordinatorOnly: false,
+      parent: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
+      relatedTo: null,
+    },
+  ],
+};
+
+export const mockSubClasses: { data: Array<IClass> } = {
+  data: [
+    {
+      id: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
+      name: 'Koillinen suurpiiri',
+      path: '803 Kadut, liikenneväylät/Uudisrakentaminen/Koillinen suurpiiri',
+      forCoordinatorOnly: false,
+      parent: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
+      relatedTo: null,
+    },
+  ],
+};

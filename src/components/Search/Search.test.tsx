@@ -11,14 +11,22 @@ import {
 import { act } from 'react-dom/test-utils';
 import mockPersons from '@/mocks/mockPersons';
 import Search from './Search';
-import mockProjectClasses from '@/mocks/mockClasses';
+import {
+  mockClasses,
+  mockMasterClasses,
+  mockProjectClasses,
+  mockSubClasses,
+} from '@/mocks/mockClasses';
 import { setupStore } from '@/store';
 import { waitFor } from '@testing-library/react';
 import { getSearchResultsThunk, toggleSearch } from '@/reducers/searchSlice';
 import { setProgrammedYears } from '@/utils/common';
-import { mockLocations } from '@/mocks/mockLocations';
-import { setClasses, setMasterClasses, setSubClasses } from '@/reducers/classSlice';
-import { setDistricts, setDivisions, setSubDivisions } from '@/reducers/locationSlice';
+import {
+  mockDistricts,
+  mockDivisions,
+  mockLocations,
+  mockSubDivisions,
+} from '@/mocks/mockLocations';
 import { mockError } from '@/mocks/mockError';
 import { IError, IFreeSearchResults } from '@/interfaces/common';
 import { ISearchResults } from '@/interfaces/searchInterfaces';
@@ -42,10 +50,16 @@ describe('Search', () => {
             class: {
               ...store.getState().class,
               allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
             },
             location: {
               ...store.getState().location,
               allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+              subDivisions: mockSubDivisions.data,
             },
             lists: {
               ...store.getState().lists,
@@ -102,14 +116,6 @@ describe('Search', () => {
     const { store } = renderResult;
     // open search
     await waitFor(() => store.dispatch(toggleSearch()));
-    // filter classes into categories (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setMasterClasses()));
-    await waitFor(() => store.dispatch(setClasses()));
-    await waitFor(() => store.dispatch(setSubClasses()));
-    // filter locations into categories (this happens in App.tsx)
-    await waitFor(() => store.dispatch(setDistricts()));
-    await waitFor(() => store.dispatch(setDivisions()));
-    await waitFor(() => store.dispatch(setSubDivisions()));
 
     const classes = store.getState().class;
     const locations = store.getState().location;
