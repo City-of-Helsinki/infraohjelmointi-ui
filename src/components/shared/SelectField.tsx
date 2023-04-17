@@ -1,5 +1,5 @@
 import { IOption } from '@/interfaces/common';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback, useRef } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select as HDSSelect } from 'hds-react/components/Select';
@@ -38,7 +38,31 @@ const SelectField: FC<ISelectFieldProps> = ({
   placeholder,
 }) => {
   const required = rules?.required ? true : false;
+  const selectContainerRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
+
+  /**
+   * Empties the selected value for the SelectField and focuses the field afterwards so that
+   * autosave-functionality works with the remove button.
+   *
+   * Since the HDS SelectField's button cannot be given a ref, we need to give the ref to the parent element
+   * to access the child elements for the button when focusing it.
+   */
+  const handleRemoveSelection = useCallback((onChange: (...event: unknown[]) => void) => {
+    if (!selectContainerRef || !selectContainerRef.current) {
+      return;
+    }
+    // If the SelectField has a label
+    if (selectContainerRef.current.children[0]?.children[1]?.children[0]) {
+      onChange({ value: '', label: '' });
+      (selectContainerRef.current.children[0].children[1].children[0] as HTMLButtonElement).focus();
+    }
+    // If the SelectField doesn't have a label
+    else if (selectContainerRef.current.children[0]?.children[0]?.children[0]) {
+      onChange({ value: '', label: '' });
+      (selectContainerRef.current.children[0].children[1].children[0] as HTMLButtonElement).focus();
+    }
+  }, []);
 
   return (
     <Controller
@@ -47,7 +71,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
-            <div className="relative max-w-[22.5rem]">
+            <div className="relative max-w-[22.5rem]" ref={selectContainerRef}>
               <HDSSelect
                 className="input-l custom-select"
                 value={value}
@@ -62,13 +86,12 @@ const SelectField: FC<ISelectFieldProps> = ({
                 placeholder={(placeholder && t(placeholder || '')) || ''}
                 icon={getIcon(icon)}
               />
+
               {value.value && (
                 <button
                   className="absolute top-[2.6rem] right-11"
                   data-testid={`empty-${name}-selection-button`}
-                  onClick={() => {
-                    onChange({ value: '', label: '' });
-                  }}
+                  onClick={() => handleRemoveSelection(onChange)}
                 >
                   <IconCrossCircle />
                 </button>
