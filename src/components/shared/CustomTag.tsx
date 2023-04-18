@@ -6,16 +6,18 @@ interface ICustomTagProps {
   color?: string;
   size?: string;
   weight?: string;
+  id?: string;
 }
 
 /**
  * A rounded border tag like a HDS tag, but it fits an icon better and is easily customizeable
  * by us.
  */
-const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size, weight }) => {
+const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size, weight, id }) => {
   return (
     <div
       className="custom-tag-container"
+      data-testid={id || ''}
       style={{
         background: color || 'var(--color-silver)',
       }}

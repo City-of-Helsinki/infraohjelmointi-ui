@@ -11,6 +11,7 @@ import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useAppDispatch } from '@/hooks/common';
 import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { Link } from 'react-router-dom';
 import './styles.css';
 
 interface IProjectRowProps {
@@ -18,9 +19,7 @@ interface IProjectRowProps {
 }
 
 const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const navigateToProject = () => navigate(`/project/${project.id}/basics`);
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const projectCells = useProjectCells(project);
 
@@ -59,28 +58,52 @@ const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
   return (
     <tr id={`project-row-${project.id}`} ref={projectRowRef} data-testid={`row-${project.id}`}>
       {/* HEADER */}
-      <th className="project-header-cell">
+      <th className="project-header-cell" data-testid={`head-${project.id}`}>
         <div className="project-header-cell-container">
           {/* Left (dots & document) */}
           <div className="project-left-icons-container">
-            <IconMenuDots size="xs" className="cursor-pointer" onMouseDown={handleOpenPhaseMenu} />
+            <IconMenuDots
+              size="xs"
+              className="cursor-pointer"
+              data-testid={`edit-phase-${project.id}`}
+              onMouseDown={handleOpenPhaseMenu}
+            />
             <IconDocument />
             {/* <button className="h-2 w-2 bg-[blue]" onClick={handleOpenPhaseMenu}></button> */}
           </div>
           {/* Center (name button) */}
           <div className="project-name-container">
-            <button className="project-name-button" onClick={navigateToProject}>
+            <Link
+              to={`/project/${project.id}/basics`}
+              className="project-name-button"
+              data-testid={`navigate-${project.id}`}
+            >
               {project.name}
-            </button>
+            </Link>
           </div>
           {/* Right side (category & budget) */}
           <div className="project-right-icons-container">
             <div>
-              {project.category && <CustomTag text={project.category.value} weight={'light'} />}
+              {project.category && (
+                <>
+                  <CustomTag
+                    text={project.category.value}
+                    weight={'light'}
+                    id={`category-${project.id}`}
+                  />
+                </>
+              )}
             </div>
             <div className="flex flex-col">
-              <span>{planProjectValues.value1}</span>
-              <span className="text-sm font-normal">{planProjectValues.value2}</span>
+              <span data-testid={`project-total-budget-${project.id}`}>
+                {planProjectValues.value1}
+              </span>
+              <span
+                className="text-sm font-normal"
+                data-testid={`project-realized-budget-${project.id}`}
+              >
+                {planProjectValues.value2}
+              </span>
             </div>
           </div>
         </div>

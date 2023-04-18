@@ -16,6 +16,7 @@ import { Route } from 'react-router';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { waitFor } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
+import { IListItem } from '@/interfaces/common';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -583,34 +584,34 @@ describe('PlanningView', () => {
         // Title
         expect(getByTestId(`title-${id}`)).toBeInTheDocument();
       });
+    });
 
-      describe('PlanningCell', () => {
-        it('renders budget, overrun and deviation only for the current year', async () => {
-          const { store, getByTestId } = renderResult;
-          const { id } = store.getState().class.masterClasses[0];
-          const firstCell = getByTestId(`row-${id}`).children[1];
+    describe('PlanningCell', () => {
+      it('renders budget, overrun and deviation only for the current year', async () => {
+        const { store, getByTestId } = renderResult;
+        const { id } = store.getState().class.masterClasses[0];
+        const firstCell = getByTestId(`row-${id}`).children[1];
 
-          const year = new Date().getFullYear();
+        const year = new Date().getFullYear();
 
-          expect(firstCell.children[0].children.length).toBe(3);
+        expect(firstCell.children[0].children.length).toBe(3);
 
-          expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-          expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
-          expect(getByTestId(`deviation-${id}-${year}`)).toBeInTheDocument();
-        });
+        expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
+        expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
+        expect(getByTestId(`deviation-${id}-${year}`)).toBeInTheDocument();
+      });
 
-        it('renders budget and realized cost for future years', async () => {
-          const { store, getByTestId } = renderResult;
-          const { id } = store.getState().class.masterClasses[0];
-          const secondCell = getByTestId(`row-${id}`).children[2];
+      it('renders budget and realized cost for future years', async () => {
+        const { store, getByTestId } = renderResult;
+        const { id } = store.getState().class.masterClasses[0];
+        const secondCell = getByTestId(`row-${id}`).children[2];
 
-          const year = new Date().getFullYear() + 1;
+        const year = new Date().getFullYear() + 1;
 
-          expect(secondCell.children[0].children.length).toBe(2);
+        expect(secondCell.children[0].children.length).toBe(2);
 
-          expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-          expect(getByTestId(`realized-${id}-${year}`)).toBeInTheDocument();
-        });
+        expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
+        expect(getByTestId(`realized-${id}-${year}`)).toBeInTheDocument();
       });
     });
 
@@ -634,8 +635,45 @@ describe('PlanningView', () => {
       });
     });
 
-    // TODO: expand different rows... (currently clicking the expand-navigations don't work)
-    // TODO: renders only district... ()
+    describe('Project Row', () => {
+      it('renders all the elements and no financial data to cells if there is no planning or construction', async () => {
+        const { user, store, getByTestId } = renderResult;
+        const { masterClasses, classes } = store.getState().class;
+        const { id, category, name, finances } = mockPlanningViewProjects.data.results[0];
+
+        await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+        await user.click(getByTestId(`expand-${classes[0].id}`));
+
+        await waitFor(() => {
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`head-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`edit-phase-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`navigate-${id}`)).toHaveTextContent(name);
+          expect(getByTestId(`category-${id}`)).toHaveTextContent((category as IListItem).value);
+          expect(getByTestId(`project-total-budget-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`project-realized-budget-${id}`)).toBeInTheDocument();
+        });
+
+        for (let i = 0; i < 10; i++) {
+          const year = finances.year + i;
+          expect(getByTestId(`project-cell-${year}-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`cell-input-${year}-${id}`)).toBeDisabled();
+        }
+      });
+    });
+
+    it('doesnt render the project category if there is no category', async () => {
+      const { user, store, getByTestId, queryByTestId } = renderResult;
+      const { masterClasses, classes } = store.getState().class;
+      const { id } = mockPlanningViewProjects.data.results[1];
+
+      await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+      await user.click(getByTestId(`expand-${classes[0].id}`));
+
+      await waitFor(() => {
+        expect(queryByTestId(`category-${id}`)).toBeNull();
+      });
+    });
     // TODO: project rows
   });
 });

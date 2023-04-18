@@ -380,6 +380,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
       ref={cellRef}
       className={`project-cell ${getCssType()}`}
       onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
+      data-testid={`project-cell-${year}-${id}`}
     >
       <div className="project-cell-input-container">
         <input
@@ -391,6 +392,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
           disabled={type === 'none'}
           readOnly={isReadOnly}
           className="project-cell-input"
+          data-testid={`cell-input-${year}-${id}`}
         />
       </div>
       {growDirections.map((d) => (
