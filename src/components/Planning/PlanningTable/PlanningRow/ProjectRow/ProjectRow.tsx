@@ -2,7 +2,6 @@ import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, MouseEvent as ReactMouseEvent, useRef } from 'react';
-import { useNavigate } from 'react-router';
 import ProjectCell from './ProjectCell';
 import { ContextMenuType } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';

@@ -140,6 +140,7 @@ const CustomContextMenu = () => {
       id="custom-context-menu"
       className="context-menu-container"
       style={menuPosition}
+      data-testid="custom-context-menu"
     >
       {renderMenu()}
     </div>

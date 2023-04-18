@@ -5,7 +5,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
   data: {
     count: 10,
     results: [
-      // Without group and in class
+      // Without group and in class (for testing project rows)
       {
         ...mockProject.data,
         id: 'planning-project-1',
@@ -29,20 +29,20 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
           preliminaryCurrentYearPlus10: '0.00',
         },
       },
-      // Wihout group and in subClass
+      // Wihout group and in class (for testing project rows)
       {
         ...mockProject.data,
         id: 'planning-project-2',
-        projectClass: 'test-sub-class-1',
-        estPlanningStart: '01.12.2024',
-        estPlanningEnd: '01.12.2026',
-        estConstructionStart: '01.12.2027',
-        estConstructionEnd: '01.12.2030',
+        projectClass: 'test-class-1',
+        estPlanningStart: '01.01.2024',
+        estPlanningEnd: '01.01.2026',
+        estConstructionStart: '01.01.2026',
+        estConstructionEnd: '01.01.2028',
         category: undefined,
         finances: {
           year: 2023,
           budgetProposalCurrentYearPlus0: '0.00',
-          budgetProposalCurrentYearPlus1: '20.00',
+          budgetProposalCurrentYearPlus1: '0.00',
           budgetProposalCurrentYearPlus2: '30.00',
           preliminaryCurrentYearPlus3: '40.00',
           preliminaryCurrentYearPlus4: '50.00',
@@ -54,17 +54,22 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
           preliminaryCurrentYearPlus10: '0.00',
         },
       },
-      // With group and in subClass
       {
         ...mockProject.data,
         id: 'planning-project-3',
+        projectClass: 'test-sub-class-1',
+      },
+      // With group and in subClass
+      {
+        ...mockProject.data,
+        id: 'planning-project-4',
         projectClass: 'test-sub-class-1',
         projectGroup: 'test-group-3',
       },
       // Without group and in district
       {
         ...mockProject.data,
-        id: 'planning-project-4',
+        id: 'planning-project-5',
         projectClass: 'test-sub-class-1',
         projectGroup: null,
         projectLocation: 'test-district-1',
@@ -72,7 +77,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
       // With group and in district
       {
         ...mockProject.data,
-        id: 'planning-project-5',
+        id: 'planning-project-6',
         projectClass: 'test-sub-class-1',
         projectGroup: 'test-group-4',
         projectLocation: 'test-district-1',
@@ -80,7 +85,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
       // Without group and in division
       {
         ...mockProject.data,
-        id: 'planning-project-6',
+        id: 'planning-project-7',
         projectClass: 'test-sub-class-1',
         projectGroup: null,
         projectLocation: 'test-division-1',
@@ -88,7 +93,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
       // With group and in division
       {
         ...mockProject.data,
-        id: 'planning-project-7',
+        id: 'planning-project-8',
         projectClass: 'test-sub-class-1',
         projectGroup: 'test-group-1',
         projectLocation: 'test-division-1',
