@@ -77,6 +77,7 @@ export interface IProject {
   masterPlanAreaNumber?: string;
   trafficPlanNumber?: string;
   bridgeNumber?: string;
+  projectGroup: string | null;
 }
 
 export interface IProjectRequest {

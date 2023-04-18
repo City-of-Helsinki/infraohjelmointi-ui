@@ -5,51 +5,23 @@ import { classSums } from '@/mocks/common';
 import PlanningCell from './PlanningCell';
 import PlanningHeader from './PlanningHeader';
 import { IPlanningRow } from '@/interfaces/common';
-import { IProject } from '@/interfaces/projectInterfaces';
-import { getProject } from '@/services/projectServices';
 import ProjectRow from './ProjectRow/ProjectRow';
 import './styles.css';
 
 const PlanningRow: FC<IPlanningRow> = (props) => {
-  const { defaultExpanded, type } = props;
-  const [projects, setProjects] = useState<Array<IProject>>([]);
-  const [fetchingProjects, setFetchingProjects] = useState(false);
-
+  const { defaultExpanded, projects } = props;
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   const handleExpand = useCallback(() => {
+    // console.log('Expanded: ', props.name, ' with id: ', props.id);
+    // console.log('And children: ', props.children);
+
     setExpanded((current) => !current);
   }, []);
 
   useEffect(() => {
     setExpanded(defaultExpanded || false);
   }, [defaultExpanded]);
-
-  // If the row is expanded and type is correct, fetch the projects for that row
-  useEffect(() => {
-    if (
-      !fetchingProjects &&
-      expanded &&
-      (type === 'class' ||
-        type === 'subClass' ||
-        type === 'division' ||
-        type === 'group' ||
-        type === 'district')
-    ) {
-      const fetchProjectsByRelation = async () => {
-        setFetchingProjects(true);
-        try {
-          const project = await getProject('ffced10b-7918-4332-8bb7-adda827a92c4/');
-          setProjects([project]);
-          setFetchingProjects(false);
-        } catch (e) {
-          setFetchingProjects(false);
-        }
-      };
-      // call the function
-      fetchProjectsByRelation();
-    }
-  }, [expanded]);
 
   return (
     <>
@@ -63,12 +35,12 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
 
       {expanded && (
         <>
+          {projects.map((p, i) => (
+            <ProjectRow key={i} project={p} />
+          ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
             <PlanningRow {...c} />
-          ))}
-          {projects.map((p, i) => (
-            <ProjectRow key={i} project={p} />
           ))}
         </>
       )}

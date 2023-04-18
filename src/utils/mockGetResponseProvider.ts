@@ -16,6 +16,7 @@ import {
 import { mockLocations } from '@/mocks/mockLocations';
 import mockNotes from '@/mocks/mockNotes';
 import mockPersons from '@/mocks/mockPersons';
+import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import mockProject from '@/mocks/mockProject';
 import axios from 'axios';
 
@@ -37,43 +38,45 @@ const { REACT_APP_API_URL } = process.env;
 export const mockGetResponseProvider = () =>
   mockedAxios.get.mockImplementation((url) => {
     url = url.replace(`${REACT_APP_API_URL}`, '');
-    switch (url) {
-      case '/projects/':
+    switch (true) {
+      case url === '/projects/':
         return Promise.resolve(mockProject);
-      case `/projects/${mockProject.data.id}`:
+      case url === `/projects/${mockProject.data.id}`:
         return Promise.resolve(mockProject);
-      case '/project-hashtags/':
+      case url === '/project-hashtags/':
         return Promise.resolve(mockHashTags);
-      case '/project-types/':
+      case url === '/project-types/':
         return Promise.resolve(mockProjectTypes);
-      case '/project-phases/':
+      case url === '/project-phases/':
         return Promise.resolve(mockProjectPhases);
-      case '/project-areas/':
+      case url === '/project-areas/':
         return Promise.resolve(mockProjectAreas);
-      case '/construction-phase-details/':
+      case url === '/construction-phase-details/':
         return Promise.resolve(mockConstructionPhaseDetails);
-      case '/project-categories/':
+      case url === '/project-categories/':
         return Promise.resolve(mockProjectCategories);
-      case '/project-risks/':
+      case url === '/project-risks/':
         return Promise.resolve(mockProjectRisks);
-      case '/project-quality-levels/':
+      case url === '/project-quality-levels/':
         return Promise.resolve(mockProjectQualityLevels);
-      case '/planning-phases/':
+      case url === '/planning-phases/':
         return Promise.resolve(mockPlanningPhases);
-      case '/construction-phases/':
+      case url === '/construction-phases/':
         return Promise.resolve(mockConstructionPhases);
-      case '/responsible-zones/':
+      case url === '/responsible-zones/':
         return Promise.resolve(mockResponsibleZones);
-      case '/persons/':
+      case url === '/persons/':
         return Promise.resolve(mockPersons);
-      case '/project-classes/':
+      case url === '/project-classes/':
         return Promise.resolve(mockProjectClasses);
-      case '/project-locations/':
+      case url === '/project-locations/':
         return Promise.resolve(mockLocations);
-      case `/projects/${mockProject.data.id}/notes/`:
+      case url === `/projects/${mockProject.data.id}/notes/`:
         return Promise.resolve(mockNotes);
-      case `/project-groups/`:
+      case url === `/project-groups/`:
         return Promise.resolve(mockGroups);
+      case url.toLocaleLowerCase().includes(`/projects/planning-view/`):
+        return Promise.resolve(mockPlanningViewProjects);
       default:
         return Promise.reject(new Error('not found'));
     }

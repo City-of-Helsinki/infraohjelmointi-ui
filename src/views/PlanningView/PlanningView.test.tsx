@@ -13,6 +13,9 @@ import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocatio
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockGroups } from '@/mocks/mockGroups';
 import { Route } from 'react-router';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { waitFor } from '@testing-library/react';
+import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -67,6 +70,7 @@ describe('PlanningView', () => {
           },
         )),
     );
+    mockGetResponseProvider();
   });
 
   afterEach(async () => {
@@ -298,6 +302,8 @@ describe('PlanningView', () => {
       const { districts, divisions } = store.getState().location;
       const { groups } = store.getState().group;
 
+      const projects = mockPlanningViewProjects.data.results;
+
       // Check that all masterClass-rows is visible
       masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
 
@@ -306,14 +312,16 @@ describe('PlanningView', () => {
       await user.click(getByTestId(`expand-${firstMasterClassId}`));
 
       // Check that only first masterClass-row are visible
-      masterClasses.forEach(({ id }, i) => {
-        if (i === 0) {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`row-${id}`).classList.contains('masterClass')).toBeTruthy();
-        }
-        if (i !== 0) {
-          expect(queryByTestId(`row-${id}`)).toBeNull();
-        }
+      await waitFor(() => {
+        masterClasses.forEach(({ id }, i) => {
+          if (i === 0) {
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`row-${id}`).classList.contains('masterClass')).toBeTruthy();
+          }
+          if (i !== 0) {
+            expect(queryByTestId(`row-${id}`)).toBeNull();
+          }
+        });
       });
 
       const classesForMasterClass = classes.filter((c) => c.parent === firstMasterClassId);
@@ -328,14 +336,27 @@ describe('PlanningView', () => {
       await user.click(getByTestId(`expand-${firstClassId}`));
 
       // Check that only first class-row is visible
-      classes.forEach(({ id }, i) => {
-        if (i === 0) {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`row-${id}`).classList.contains('class')).toBeTruthy();
-        }
-        if (i !== 0) {
-          expect(queryByTestId(`row-${id}`)).toBeNull();
-        }
+      await waitFor(() => {
+        classes.forEach(({ id }, i) => {
+          if (i === 0) {
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`row-${id}`).classList.contains('class')).toBeTruthy();
+          }
+          if (i !== 0) {
+            expect(queryByTestId(`row-${id}`)).toBeNull();
+          }
+        });
+      });
+
+      // Check that projects that belong directly to the selected class are visible
+      const projectsForClassWithoutGroup = projects.filter(
+        (p) => p.projectClass === firstClassId && !p.projectLocation && !p.projectGroup,
+      );
+
+      await waitFor(() => {
+        projectsForClassWithoutGroup.forEach((p) =>
+          expect(getByTestId(`row-${p.id}`)).toBeInTheDocument(),
+        );
       });
 
       const subClassesForClass = subClasses.filter((c) => c.parent === firstClassId);
@@ -348,14 +369,39 @@ describe('PlanningView', () => {
       await user.click(getByTestId(`expand-${firstSubClassId}`));
 
       // Check that only first subClass-row is visible
-      subClasses.forEach(({ id }, i) => {
-        if (i === 0) {
+      await waitFor(() => {
+        subClasses.forEach(({ id }, i) => {
+          if (i === 0) {
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`row-${id}`).classList.contains('subClass')).toBeTruthy();
+          }
+          if (i !== 0) {
+            expect(queryByTestId(`row-${id}`)).toBeNull();
+          }
+        });
+      });
+
+      // Check that groups that belong directly to the selected subClass are visible
+      const groupsForSubClass = mockGroups.data.filter(
+        (g) => g.classRelation === firstSubClassId && !g.districtRelation,
+      );
+
+      await waitFor(() => {
+        groupsForSubClass.forEach(({ id }) => {
           expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`row-${id}`).classList.contains('subClass')).toBeTruthy();
-        }
-        if (i !== 0) {
-          expect(queryByTestId(`row-${id}`)).toBeNull();
-        }
+          expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
+        });
+      });
+
+      // Check that projects that belong directly to the selected subClass are visible
+      const projectsForSubClassWithoutGroup = projects.filter(
+        (p) => p.projectClass === firstClassId && !p.projectLocation && !p.projectGroup,
+      );
+
+      await waitFor(() => {
+        projectsForSubClassWithoutGroup.forEach(({ id }) =>
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+        );
       });
 
       const districtsForSubClass = districts.filter((c) => c.parentClass === firstSubClassId);
@@ -371,33 +417,82 @@ describe('PlanningView', () => {
       await user.click(getByTestId(`expand-${firstDistrictId}`));
 
       // Check that only first district-row is visible
-      districts.forEach(({ id }, i) => {
-        if (i === 0) {
+      await waitFor(() => {
+        districts.forEach(({ id }, i) => {
+          if (i === 0) {
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
+            expect(
+              getByTestId(`row-${firstDistrictId}`).classList.contains('district-preview'),
+            ).toBeFalsy();
+          }
+          if (i !== 0) {
+            expect(queryByTestId(`row-${id}`)).toBeNull();
+          }
+        });
+      });
+
+      // Check that groups that belong directly to the selected district are visible
+      const groupsForDistrict = mockGroups.data.filter(
+        (g) => g.districtRelation === firstDistrictId,
+      );
+
+      await waitFor(() => {
+        groupsForDistrict.forEach(({ id }) => {
           expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
-          expect(
-            getByTestId(`row-${firstDistrictId}`).classList.contains('district-preview'),
-          ).toBeFalsy();
-        }
-        if (i !== 0) {
-          expect(queryByTestId(`row-${id}`)).toBeNull();
-        }
+          expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
+        });
+      });
+
+      //Check that projects that belong directly to the selected district are visible
+      const projectsForDistrictWithoutGroup = projects.filter(
+        (p) => p.projectLocation === firstDistrictId && !p.projectGroup,
+      );
+
+      await waitFor(() => {
+        projectsForDistrictWithoutGroup.forEach(({ id }) =>
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+        );
       });
 
       // Divisions should be expanded by default and render all their children
       const divisionsForDistrict = divisions.filter((d) => d.parent === firstDistrictId);
 
-      divisionsForDistrict.forEach(({ id }) => {
-        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-        expect(getByTestId(`row-${id}`).classList.contains('division')).toBeTruthy();
+      await waitFor(() => {
+        divisionsForDistrict.forEach(({ id }) => {
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}`).classList.contains('division')).toBeTruthy();
+
+          //Check that projects that belong directly to each division are visible
+          const projectsForDivision = projects.filter(
+            (p) => p.projectLocation === id && !p.projectGroup,
+          );
+
+          projectsForDivision.forEach(({ id }) =>
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          );
+        });
       });
 
-      // Groups
+      // Check that groups that belong directly to the selected district are visible
       const groupsForDivision = groups.filter((g) => g.districtRelation === divisions[0].id);
 
-      groupsForDivision.forEach(({ id }) => {
-        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-        expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
+      await waitFor(() => {
+        groupsForDivision.forEach(({ id }) => {
+          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
+        });
+      });
+
+      // Click the first group row
+      const firstGroupId = groupsForDivision[0].id;
+      await user.click(getByTestId(`expand-${firstGroupId}`));
+
+      // Check that projects that belong directly to opened group are visible
+      const projectsForGroup = projects.filter((p) => p.projectGroup === firstGroupId);
+
+      await waitFor(() => {
+        projectsForGroup.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
       });
     });
 

@@ -34,6 +34,7 @@ export interface ISearchRequest {
   fullPath?: string;
   limit?: string;
   order?: string;
+  direct?: boolean;
 }
 
 export type SearchLimit = '10' | '20' | '30';

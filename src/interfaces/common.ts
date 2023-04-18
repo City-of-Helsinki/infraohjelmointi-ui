@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { CellType, IProjectRequest } from './projectInterfaces';
+import { CellType, IProject, IProjectRequest } from './projectInterfaces';
 
 export interface IError {
   status: number | undefined;
@@ -107,6 +107,7 @@ export interface IPlanningRow {
   name: string;
   path: string;
   children: Array<IPlanningRow>;
+  projects: Array<IProject>;
   id: string;
   key: string;
   defaultExpanded: boolean;

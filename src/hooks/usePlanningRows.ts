@@ -8,6 +8,8 @@ import { useParams } from 'react-router';
 import { IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
+import { getPlanningProjectsWithParams } from '@/services/projectServices';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 interface IPlanningRowLists {
   masterClasses: Array<IClass>;
@@ -77,6 +79,29 @@ const getLink = (
 };
 
 /**
+ * Filters and sorts projects for a class, location or group alphabetically for a given row type.
+ */
+const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IProject>) => {
+  let projectList: Array<IProject> = [];
+  switch (type) {
+    case 'class':
+    case 'subClass':
+      projectList = projects
+        .filter((p) => !p.projectGroup && !p.projectLocation)
+        .filter((p) => p.projectClass === id);
+      break;
+    case 'group':
+      projectList = projects.filter((p) => p.projectGroup).filter((p) => p.projectGroup === id);
+      break;
+    case 'district':
+    case 'division':
+      projectList = projects.filter((p) => !p.projectGroup).filter((p) => p.projectLocation === id);
+      break;
+  }
+  return projectList.sort((a, b) => a.name.localeCompare(b.name));
+};
+
+/**
  * Builds a hierarchy-list of IPlanningTableRows, that will either include
  * - masterClasses, classes, subClasses, groups and districts; if a district isn't selected
  * - districts, divisions and groups; if a district is selected
@@ -87,7 +112,7 @@ const getLink = (
  * @param state the current state of the planningRows-hook
  * @returns a list of planning rows for the planning table
  */
-const buildPlanningTableRows = (state: IPlanningRowsState) => {
+const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProject>) => {
   const {
     selections: { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict },
     lists: { masterClasses, classes, subClasses, districts, divisions, groups },
@@ -107,6 +132,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
       link: getLink(item, type, state.selections),
       defaultExpanded: defaultExpanded || false,
       children: [],
+      projects: getSortedProjects(item.id, type, projects),
     };
   };
 
@@ -125,41 +151,39 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
     }
     return filteredGroups.map((group) => ({
       ...getRowProps(group, 'group'),
-      children: [
-        // Projects
-      ],
     }));
   };
 
   // Map the class rows going from masterClasses to districts
-  const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => ({
-    ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
-    // Map classes
-    children: classes
-      .filter((c) => c.parent === masterClass.id)
-      .map((filteredClass) => ({
-        ...getRowProps(filteredClass, 'class', !!selectedClass),
-        // Map sub classes
-        children: subClasses
-          .filter((subClass) => subClass.parent === filteredClass.id)
-          .map((filteredSubClass) => ({
-            ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
-            // Map districts & groups (groups only if they do not belong to a district)
-            children: [
-              ...districts
-                .filter((district) => district.parentClass === filteredSubClass.id)
-                .map((filteredDistrict) => ({
-                  ...getRowProps(filteredDistrict, 'district-preview'),
-                  // Clicking a district will render the projectRows-list, so no children are needed
-                })),
-              ...mapGroups(filteredSubClass.id, 'subClass'),
-            ],
-          })),
-      })),
-  }));
+  const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
+    return {
+      ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
+      // Map classes
+      children: classes
+        .filter((c) => c.parent === masterClass.id)
+        .map((filteredClass) => ({
+          ...getRowProps(filteredClass, 'class', !!selectedClass),
+          // Map sub classes
+          children: subClasses
+            .filter((subClass) => subClass.parent === filteredClass.id)
+            .map((filteredSubClass) => ({
+              ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
+              // Map districts & groups (groups only if they do not belong to a district)
+              children: [
+                ...districts
+                  .filter((district) => district.parentClass === filteredSubClass.id)
+                  .map((filteredDistrict) => ({
+                    ...getRowProps(filteredDistrict, 'district-preview'),
+                  })),
+                ...mapGroups(filteredSubClass.id, 'subClass'),
+              ],
+            })),
+        })),
+    };
+  });
 
   // Map the selected districts divisions and the groups & projects that belong to those divisions
-  const projectRows = districts.map((district) => ({
+  const locationRows = districts.map((district) => ({
     ...getRowProps(district, 'district', true),
     // Map divisions & groups (groups only if there are no divisions)
     children: [
@@ -168,16 +192,13 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
         .map((filteredDivision) => ({
           ...getRowProps(filteredDivision, 'division', true),
           // Map projects & groups
-          children: [
-            ...mapGroups(filteredDivision.id, 'division'),
-            /* Projects */
-          ],
+          children: mapGroups(filteredDivision.id, 'division'),
         })),
       ...mapGroups(district.id, 'district'),
     ],
   }));
 
-  return selectedDistrict ? projectRows : classRows;
+  return selectedDistrict ? locationRows : classRows;
 };
 
 /**
@@ -189,6 +210,33 @@ const buildPlanningTableRows = (state: IPlanningRowsState) => {
  */
 const getSelectedItemOrNull = (list: Array<IClass | ILocation>, id: string | undefined) =>
   (id ? list.find((l) => l.id === id) : null) as IClass | ILocation | null;
+
+/**
+ * Fetches projects for a given location or class.
+ *
+ * It will add the direct=true parameter to the search query if we're fetching projects for classes or subClasses, which
+ * will only return projects that are directly underneath that class or subClass (children ignored).
+ *
+ * @returns a promise list of projects.
+ */
+const fetchProjectsByRelation = async (
+  type: PlanningRowType,
+  id: string | undefined,
+): Promise<Array<IProject>> => {
+  const direct = type === 'class' || type === 'subClass';
+  try {
+    const tempType = type === 'district' ? 'mainDistrict' : type === 'division' ? 'district' : type;
+    const allResults = await getPlanningProjectsWithParams({
+      params: `${tempType}=${id}`,
+      limit: '5000',
+      direct: direct,
+    });
+    return allResults.results;
+  } catch (e) {
+    console.log('Error fetching projects by relation: ', e);
+  }
+  return [];
+};
 
 /**
  * Creates a row hierarchy of masterClasses, classes, subClasses, districts and divisions for the PlanningTable
@@ -228,7 +276,31 @@ const usePlanningRows = () => {
   const [rows, setRows] = useState<Array<IPlanningRow>>([]);
 
   useEffect(() => {
-    setRows(buildPlanningTableRows(planningRowsState));
+    let type = 'district';
+    let id: string | undefined = '';
+
+    const { selectedClass, selectedSubClass, selectedDistrict } = planningRowsState.selections;
+
+    if (selectedDistrict) {
+      type = 'district';
+      id = selectedDistrict.id;
+    } else if (selectedSubClass) {
+      type = 'subClass';
+      id = selectedSubClass.id;
+    } else if (selectedClass) {
+      type = 'class';
+      id = selectedClass.id;
+    }
+
+    if (type && id) {
+      fetchProjectsByRelation(type as PlanningRowType, id)
+        .then((projects) => {
+          setRows(buildPlanningTableRows(planningRowsState, projects));
+        })
+        .catch(() => setRows(buildPlanningTableRows(planningRowsState, [])));
+    } else {
+      setRows(buildPlanningTableRows(planningRowsState, []));
+    }
   }, [planningRowsState]);
 
   /**

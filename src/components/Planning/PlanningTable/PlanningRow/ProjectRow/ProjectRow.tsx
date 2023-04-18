@@ -57,7 +57,7 @@ const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
   );
 
   return (
-    <tr id={`row-${project.id}`} ref={projectRowRef}>
+    <tr id={`project-row-${project.id}`} ref={projectRowRef} data-testid={`row-${project.id}`}>
       {/* HEADER */}
       <th className="project-header-cell">
         <div className="project-header-cell-container">

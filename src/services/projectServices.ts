@@ -56,6 +56,21 @@ export const getProjectsWithParams = async (req: ISearchRequest): Promise<ISearc
     .catch((err: IError) => Promise.reject(err));
 };
 
+// FIXME: this should be remove when search-results gets their own endpoint
+export const getPlanningProjectsWithParams = async (
+  req: ISearchRequest,
+): Promise<IProjectsResponse> => {
+  return axios
+    .get(
+      req.fullPath ||
+        `${REACT_APP_API_URL}/projects/planning-view/?${req.params}&limit=${req.limit}&direct=${
+          req.direct || false
+        }`,
+    )
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
 export const getProjectsWithFreeSearch = async (
   searchWord: string,
 ): Promise<IFreeSearchResults> => {

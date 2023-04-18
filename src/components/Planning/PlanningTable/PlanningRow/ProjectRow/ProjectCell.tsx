@@ -23,7 +23,7 @@ import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 
 const addActiveClassToProjectRow = (projectId: string) => {
-  document.getElementById(`row-${projectId}`)?.classList.add('active');
+  document.getElementById(`project-row-${projectId}`)?.classList.add('active');
 };
 
 const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
