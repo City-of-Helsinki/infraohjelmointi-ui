@@ -7,21 +7,34 @@ import PlanningHeader from './PlanningHeader';
 import { IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
 import './styles.css';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 const PlanningRow: FC<IPlanningRow> = (props) => {
-  const { defaultExpanded, projects } = props;
+  const { defaultExpanded, projectRows } = props;
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [projects, setProjects] = useState<Array<IProject>>([]);
 
   const handleExpand = useCallback(() => {
-    // console.log('Expanded: ', props.name, ' with id: ', props.id);
-    // console.log('And children: ', props.children);
-
     setExpanded((current) => !current);
   }, []);
 
   useEffect(() => {
     setExpanded(defaultExpanded || false);
   }, [defaultExpanded]);
+
+  useEffect(() => {
+    setProjects(projectRows);
+  }, [projectRows]);
+
+  const onUpdateProject = useCallback(
+    (projectToUpdate: IProject) => {
+      const updatedProjects = projects.map((p) =>
+        p.id === projectToUpdate.id ? projectToUpdate : p,
+      );
+      setProjects(updatedProjects);
+    },
+    [projects],
+  );
 
   return (
     <>
@@ -36,7 +49,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
       {expanded && (
         <>
           {projects.map((p, i) => (
-            <ProjectRow key={i} project={p} />
+            <ProjectRow key={i} project={p} onUpdateProject={onUpdateProject} />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (

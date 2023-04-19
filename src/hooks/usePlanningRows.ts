@@ -132,22 +132,22 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       link: getLink(item, type, state.selections),
       defaultExpanded: defaultExpanded || false,
       children: [],
-      projects: getSortedProjects(item.id, type, projects),
+      projectRows: getSortedProjects(item.id, type, projects),
     };
   };
 
   // Groups can get mapped under subClasses, districts and divisions
   const mapGroups = (id: string, type: PlanningRowType) => {
     const filteredGroups = [];
-    // Filter groups under subClass only if there are is no districtRelation
+    // Filter groups under subClass only if there are is no locationRelation
     if (type === 'subClass') {
       filteredGroups.push(
-        ...groups.filter((group) => !group.districtRelation && group.classRelation === id),
+        ...groups.filter((group) => !group.locationRelation && group.classRelation === id),
       );
     }
     // Filter groups under division or district
     else if (type === 'division' || type == 'district') {
-      filteredGroups.push(...groups.filter((group) => group.districtRelation === id));
+      filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
     return filteredGroups.map((group) => ({
       ...getRowProps(group, 'group'),
@@ -225,9 +225,8 @@ const fetchProjectsByRelation = async (
 ): Promise<Array<IProject>> => {
   const direct = type === 'class' || type === 'subClass';
   try {
-    const tempType = type === 'district' ? 'mainDistrict' : type === 'division' ? 'district' : type;
     const allResults = await getPlanningProjectsWithParams({
-      params: `${tempType}=${id}`,
+      params: `${type}=${id}`,
       limit: '5000',
       direct: direct,
     });

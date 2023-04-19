@@ -15,9 +15,10 @@ import './styles.css';
 
 interface IProjectRowProps {
   project: IProject;
+  onUpdateProject: (projectToUpdate: IProject) => void;
 }
 
-const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
+const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
   const dispatch = useAppDispatch();
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const projectCells = useProjectCells(project);
@@ -108,7 +109,7 @@ const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
         </div>
       </th>
       {projectCells.map((c) => (
-        <ProjectCell key={c.financeKey} cell={c} />
+        <ProjectCell key={c.financeKey} cell={c} onUpdateProject={onUpdateProject} />
       ))}
     </tr>
   );

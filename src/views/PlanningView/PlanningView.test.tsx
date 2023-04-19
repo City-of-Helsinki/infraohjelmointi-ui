@@ -18,7 +18,6 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { waitFor } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
-import { IProjectRequest } from '@/interfaces/projectInterfaces';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -389,7 +388,7 @@ describe('PlanningView', () => {
 
       // Check that groups that belong directly to the selected subClass are visible
       const groupsForSubClass = mockGroups.data.filter(
-        (g) => g.classRelation === firstSubClassId && !g.districtRelation,
+        (g) => g.classRelation === firstSubClassId && !g.locationRelation,
       );
 
       await waitFor(() => {
@@ -440,7 +439,7 @@ describe('PlanningView', () => {
 
       // Check that groups that belong directly to the selected district are visible
       const groupsForDistrict = mockGroups.data.filter(
-        (g) => g.districtRelation === firstDistrictId,
+        (g) => g.locationRelation === firstDistrictId,
       );
 
       await waitFor(() => {
@@ -481,7 +480,7 @@ describe('PlanningView', () => {
       });
 
       // Check that groups that belong directly to the selected district are visible
-      const groupsForDivision = groups.filter((g) => g.districtRelation === divisions[0].id);
+      const groupsForDivision = groups.filter((g) => g.locationRelation === divisions[0].id);
 
       await waitFor(() => {
         groupsForDivision.forEach(({ id }) => {

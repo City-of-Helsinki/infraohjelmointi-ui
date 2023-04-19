@@ -2,12 +2,12 @@ export interface IGroup {
   id: string;
   name: string;
   classRelation: string | null;
-  districtRelation: string | null;
+  locationRelation: string | null;
 }
 
 export interface IGroupRequest {
   name: string;
-  classRelation: string;
-  districtRelation: string | null;
   projects?: string[];
+  classRelation: string;
+  locationRelation: string | null;
 }

@@ -107,7 +107,7 @@ export interface IPlanningRow {
   name: string;
   path: string;
   children: Array<IPlanningRow>;
-  projects: Array<IProject>;
+  projectRows: Array<IProject>;
   id: string;
   key: string;
   defaultExpanded: boolean;

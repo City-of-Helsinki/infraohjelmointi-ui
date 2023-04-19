@@ -1,12 +1,12 @@
-import { useAppDispatch } from '@/hooks/common';
 import { ContextMenuType } from '@/interfaces/common';
 import {
+  IProject,
   IProjectCell,
   IProjectFinancesRequestObject,
   IProjectRequest,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import {
   ChangeEvent,
@@ -269,11 +269,11 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
 
 interface IProjectCellProps {
   cell: IProjectCell;
+  onUpdateProject: (projectToUpdate: IProject) => void;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
-  const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<number | null>(parseInt(budget || '0'));
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -286,14 +286,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
-      dispatch(
-        silentPatchProjectThunk({
-          id,
-          data: { ...req },
-        }),
-      );
+      patchProject({
+        id,
+        data: { ...req },
+      }).then((res) => onUpdateProject(res));
     },
-    [dispatch, id],
+    [id, onUpdateProject],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property
