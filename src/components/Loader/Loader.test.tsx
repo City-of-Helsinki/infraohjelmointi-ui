@@ -1,6 +1,6 @@
 import mockI18next from '@/mocks/mockI18next';
 import mockPersons from '@/mocks/mockPersons';
-import { clearLoading, setLoading } from '@/reducers/loadingSlice';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 import { act, waitFor } from '@testing-library/react';
 import Loader from './Loader';
@@ -28,23 +28,20 @@ describe('Loader', () => {
   });
 
   it('renders Loader when isLoading is true', async () => {
-    const { getByText, store, getByTestId } = renderResult;
+    const { store, getByTestId } = renderResult;
 
-    await waitFor(() => store.dispatch(setLoading('Testing loader')));
+    await waitFor(() => store.dispatch(setLoading({ text: 'Testing loader', id: 'test-url' })));
 
-    expect(getByText(/Testing loader/i)).toBeInTheDocument();
     expect(getByTestId('loader-wrapper')).toBeInTheDocument();
     expect(getByTestId('loader')).toBeInTheDocument();
   });
 
   it('hides Loader when isLoading is becomes false', async () => {
-    const { store, getByText, queryByText } = renderResult;
+    const { store, queryByText } = renderResult;
 
-    await waitFor(() => store.dispatch(setLoading('Testing loader')));
+    await waitFor(() => store.dispatch(setLoading({ text: 'Testing loader', id: 'test-url' })));
 
-    expect(getByText(/Testing loader/i)).toBeInTheDocument();
-
-    await waitFor(() => store.dispatch(clearLoading()));
+    await waitFor(() => store.dispatch(clearLoading('test-url')));
 
     expect(queryByText(/Testing loader/i)).toBeNull();
   });

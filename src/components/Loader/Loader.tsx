@@ -1,7 +1,7 @@
-import { useAppSelector } from '@/hooks/common';
-import { selectIsLoading, selectLoadingText } from '@/reducers/loadingSlice';
 import { LoadingSpinner } from 'hds-react/components/LoadingSpinner';
 import { FC } from 'react';
+import { useAppSelector } from '@/hooks/common';
+import { selectIsLoading } from '@/reducers/loaderSlice';
 import './styles.css';
 
 /**
@@ -10,14 +10,13 @@ import './styles.css';
  */
 const Loader: FC = () => {
   const isLoading = useAppSelector(selectIsLoading);
-  const text = useAppSelector(selectLoadingText);
 
   return (
     <>
       {isLoading && (
         <div className="loader-container" data-testid="loader-wrapper">
           <div className="loader-wrapper" data-testid="loader">
-            <LoadingSpinner loadingText={text || ''} />
+            <LoadingSpinner loadingText={'loading'} />
           </div>
         </div>
       )}

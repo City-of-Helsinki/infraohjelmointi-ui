@@ -1,6 +1,7 @@
 import { useAppSelector } from '@/hooks/common';
 import useSearchTerms from '@/hooks/useSearchTerms';
-import { selectIsLoading } from '@/reducers/loadingSlice';
+import { selectIsLoading } from '@/reducers/loaderSlice';
+// import { selectIsLoading } from '@/reducers/loadingSlice';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +9,7 @@ const SearchResultsNotFound = () => {
   const { t } = useTranslation();
   const { searchTerms } = useSearchTerms();
   const isLoading = useAppSelector(selectIsLoading);
+
   return (
     <div className="flex flex-col items-center" data-testid="result-not-found">
       {!isLoading && (

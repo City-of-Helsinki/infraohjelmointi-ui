@@ -18,6 +18,7 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { waitFor } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
+import { CustomContextMenu } from '@/components/CustomContextMenu';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -36,10 +37,21 @@ describe('PlanningView', () => {
   const asNumber = (value: string | null) => parseInt(value || '');
 
   beforeEach(async () => {
+    // Mock custom event
+    mockGetResponseProvider();
+
     await act(
       async () =>
         (renderResult = renderWithProviders(
-          <Route path="/" element={<PlanningView />}>
+          <Route
+            path="/"
+            element={
+              <>
+                <PlanningView />
+                <CustomContextMenu />
+              </>
+            }
+          >
             <Route path=":masterClassId" element={<PlanningView />}>
               <Route path=":classId" element={<PlanningView />}>
                 <Route path=":subClassId" element={<PlanningView />}>
@@ -75,7 +87,6 @@ describe('PlanningView', () => {
           },
         )),
     );
-    mockGetResponseProvider();
   });
 
   afterEach(async () => {
@@ -645,8 +656,8 @@ describe('PlanningView', () => {
         const { masterClasses, classes } = store.getState().class;
         const { id, category, name, finances } = mockPlanningViewProjects.data.results[0];
 
-        await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-        await user.click(getByTestId(`expand-${classes[0].id}`));
+        await waitFor(() => user.click(getByTestId(`expand-${masterClasses[0].id}`)));
+        await waitFor(() => user.click(getByTestId(`expand-${classes[0].id}`)));
 
         await waitFor(() => {
           expect(getByTestId(`row-${id}`)).toBeInTheDocument();
@@ -678,7 +689,7 @@ describe('PlanningView', () => {
         });
       });
 
-      it.skip('FIXME can patch the project phase with the custom context menu', async () => {
+      it('can patch the project phase with the custom context menu', async () => {
         const { user, store, getByTestId } = renderResult;
         const { masterClasses, classes } = store.getState().class;
         const { id } = mockPlanningViewProjects.data.results[0];
@@ -688,8 +699,7 @@ describe('PlanningView', () => {
 
         await waitFor(async () => await user.click(getByTestId(`edit-phase-${id}`)));
 
-        // FIXME: the custom event isnt fired and the menu isnt opened
-        // expect(getByTestId('custom-context-menu')).toBeInTheDocument();
+        await waitFor(() => expect(getByTestId('custom-context-menu')).toBeInTheDocument());
       });
 
       it('creates cells for planning, construction and overlap when the project has planning', async () => {

@@ -1,6 +1,6 @@
-import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
+import { selectBatchedClasses } from '@/reducers/classSlice';
 import { useAppSelector } from './common';
-import { selectDistricts, selectDivisions } from '@/reducers/locationSlice';
+import { selectedBatchedLocations } from '@/reducers/locationSlice';
 import { useEffect, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -238,6 +238,23 @@ const fetchProjectsByRelation = async (
 };
 
 /**
+ * Checks if there is a selectedClass, selectedSubClass or selectedDistrict and returns
+ * the type and id for that, prioritizing the lowest row.
+ */
+const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelections) => {
+  const { selectedClass, selectedSubClass, selectedDistrict } = selections;
+  if (selectedDistrict) {
+    return { type: 'district', id: selectedDistrict.id };
+  } else if (selectedSubClass) {
+    return { type: 'subClass', id: selectedSubClass.id };
+  } else if (selectedClass) {
+    return { type: 'class', id: selectedClass.id };
+  } else {
+    return { type: null, id: null };
+  }
+};
+
+/**
  * Creates a row hierarchy of masterClasses, classes, subClasses, districts and divisions for the PlanningTable
  *
  * It also listens to the url params for a masterClassId, classId, subClassId or districtId which it will
@@ -247,13 +264,9 @@ const fetchProjectsByRelation = async (
  */
 const usePlanningRows = () => {
   const { masterClassId, classId, subClassId, districtId } = useParams();
-
-  const allMasterClasses = useAppSelector(selectMasterClasses);
-  const allClasses = useAppSelector(selectClasses);
-  const allSubClasses = useAppSelector(selectSubClasses);
-  const allDistricts = useAppSelector(selectDistricts);
-  const allDivisions = useAppSelector(selectDivisions);
-  const allGroups = useAppSelector(selectGroups);
+  const batchedClasses = useAppSelector(selectBatchedClasses);
+  const batchedLocations = useAppSelector(selectedBatchedLocations);
+  const groups = useAppSelector(selectGroups);
 
   const [planningRowsState, setPlanningRowsState] = useState<IPlanningRowsState>({
     lists: {
@@ -271,103 +284,48 @@ const usePlanningRows = () => {
       selectedDistrict: null,
     },
   });
-
   const [rows, setRows] = useState<Array<IPlanningRow>>([]);
 
   useEffect(() => {
-    let type = 'district';
-    let id: string | undefined = '';
-
-    const { selectedClass, selectedSubClass, selectedDistrict } = planningRowsState.selections;
-
-    if (selectedDistrict) {
-      type = 'district';
-      id = selectedDistrict.id;
-    } else if (selectedSubClass) {
-      type = 'subClass';
-      id = selectedSubClass.id;
-    } else if (selectedClass) {
-      type = 'class';
-      id = selectedClass.id;
-    }
+    const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id)
-        .then((projects) => {
-          setRows(buildPlanningTableRows(planningRowsState, projects));
-        })
-        .catch(() => setRows(buildPlanningTableRows(planningRowsState, [])));
+      fetchProjectsByRelation(type as PlanningRowType, id).then((projects) => {
+        setRows(buildPlanningTableRows(planningRowsState, projects));
+      });
     } else {
       setRows(buildPlanningTableRows(planningRowsState, []));
     }
   }, [planningRowsState]);
 
-  /**
-   * React to changes in allMasterClasses and the masterClassId from the url,
-   * if selected is found it will be the only item in the list
-   */
+  // React to changes in classes and set the selectedMasterClass/selectedClass/selectedSubClass if it is present in the route
   useEffect(() => {
-    const selectedMasterClass = getSelectedItemOrNull(allMasterClasses, masterClassId);
+    const { masterClasses, classes, subClasses } = batchedClasses;
+    const selectedMasterClass = getSelectedItemOrNull(masterClasses, masterClassId);
+    const selectedClass = getSelectedItemOrNull(classes, classId);
+    const selectedSubClass = getSelectedItemOrNull(subClasses, subClassId);
 
     setPlanningRowsState((current) => ({
       ...current,
       selections: {
         ...current.selections,
         selectedMasterClass,
-      },
-      lists: {
-        ...current.lists,
-        masterClasses: selectedMasterClass ? [selectedMasterClass] : allMasterClasses,
-      },
-    }));
-  }, [masterClassId, allMasterClasses]);
-
-  /**
-   * React to changes in allClasses and the classId from the url,
-   * if selected is found it will be the only item in the list
-   */
-  useEffect(() => {
-    const selectedClass = getSelectedItemOrNull(allClasses, classId);
-
-    setPlanningRowsState((current) => ({
-      ...current,
-      selections: {
-        ...current.selections,
         selectedClass,
-      },
-      lists: {
-        ...current.lists,
-        classes: selectedClass ? [selectedClass] : allClasses,
-      },
-    }));
-  }, [classId, allClasses]);
-
-  /**
-   * React to changes in allSubClasses and the subClassId from the url,
-   * if selected is found it will be the only item in the list
-   */
-  useEffect(() => {
-    const selectedSubClass = getSelectedItemOrNull(allSubClasses, subClassId);
-
-    setPlanningRowsState((current) => ({
-      ...current,
-      selections: {
-        ...current.selections,
         selectedSubClass,
       },
       lists: {
         ...current.lists,
-        subClasses: selectedSubClass ? [selectedSubClass] : allSubClasses,
+        masterClasses: selectedMasterClass ? [selectedMasterClass] : masterClasses,
+        classes: selectedClass ? [selectedClass] : classes,
+        subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
       },
     }));
-  }, [subClassId, allSubClasses]);
+  }, [masterClassId, classId, subClassId, batchedClasses]);
 
-  /**
-   * React to changes in allDistricts and the districtId from the url,
-   * if selected is found it will be the only item in the list
-   */
+  // React to changes in locations and set the selectedDistrict if it is present in the route
   useEffect(() => {
-    const selectedDistrict = getSelectedItemOrNull(allDistricts, districtId) as ILocation;
+    const { districts, divisions } = batchedLocations;
+    const selectedDistrict = getSelectedItemOrNull(districts, districtId) as ILocation;
 
     setPlanningRowsState((current) => ({
       ...current,
@@ -377,21 +335,11 @@ const usePlanningRows = () => {
       },
       lists: {
         ...current.lists,
-        districts: selectedDistrict ? [selectedDistrict] : allDistricts,
+        districts: selectedDistrict ? [selectedDistrict] : districts,
+        divisions,
       },
     }));
-  }, [districtId, allDistricts]);
-
-  // React to changes in allDivisions
-  useEffect(() => {
-    setPlanningRowsState((current) => ({
-      ...current,
-      lists: {
-        ...current.lists,
-        divisions: allDivisions,
-      },
-    }));
-  }, [allDivisions]);
+  }, [districtId, batchedLocations]);
 
   // React to changes in allGroups
   useEffect(() => {
@@ -399,10 +347,10 @@ const usePlanningRows = () => {
       ...current,
       lists: {
         ...current.lists,
-        groups: allGroups,
+        groups,
       },
     }));
-  }, [allGroups]);
+  }, [groups]);
 
   return {
     rows,

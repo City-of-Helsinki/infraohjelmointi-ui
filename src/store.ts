@@ -2,7 +2,7 @@ import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolki
 import projectReducer from '@/reducers/projectSlice';
 import authReducer from '@/reducers/authSlice';
 import notificationReducer from '@/reducers/notificationSlice';
-import loadingReducer from './reducers/loadingSlice';
+import loaderReducer from './reducers/loaderSlice';
 import listsReducer from './reducers/listsSlice';
 import noteReducer from './reducers/noteSlice';
 import classReducer from './reducers/classSlice';
@@ -16,7 +16,7 @@ export const storeItems = {
   project: projectReducer,
   auth: authReducer,
   notifications: notificationReducer,
-  loading: loadingReducer,
+  loader: loaderReducer,
   lists: listsReducer,
   note: noteReducer,
   class: classReducer,

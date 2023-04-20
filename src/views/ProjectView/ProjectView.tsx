@@ -7,16 +7,6 @@ import { INavigationItem } from '@/interfaces/common';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { useTranslation } from 'react-i18next';
 
-import {
-  getConstructionPhasesThunk,
-  getPlanningPhasesThunk,
-  getProjectAreasThunk,
-  getProjectQualityLevelsThunk,
-  getProjectTypesThunk,
-  getConstructionPhaseDetailsThunk,
-  getProjectRisksThunk,
-  getResponsibleZonesThunk,
-} from '@/reducers/listsSlice';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
@@ -28,14 +18,6 @@ const ProjectView = () => {
 
   useEffect(() => {
     dispatch(getProjectThunk(projectId || ''));
-    dispatch(getProjectTypesThunk());
-    dispatch(getProjectAreasThunk());
-    dispatch(getConstructionPhaseDetailsThunk());
-    dispatch(getProjectRisksThunk());
-    dispatch(getProjectQualityLevelsThunk());
-    dispatch(getPlanningPhasesThunk());
-    dispatch(getConstructionPhasesThunk());
-    dispatch(getResponsibleZonesThunk());
   }, [dispatch, projectId]);
 
   const navItems: Array<INavigationItem> = [

@@ -7,22 +7,26 @@ import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
 import { mockProjectClasses } from './mocks/mockClasses';
 import { mockLocations } from './mocks/mockLocations';
 import {
+  mockConstructionPhaseDetails,
+  mockConstructionPhases,
+  mockPlanningPhases,
+  mockProjectAreas,
   mockProjectCategories,
   mockProjectPhases,
+  mockProjectQualityLevels,
+  mockProjectRisks,
+  mockProjectTypes,
   mockResponsiblePersons,
+  mockResponsibleZones,
 } from './mocks/mockLists';
 import { mockError } from './mocks/mockError';
-import {
-  getProjectCategoriesThunk,
-  getProjectPhasesThunk,
-  getResponsiblePersonsThunk,
-} from './reducers/listsSlice';
 import { IError } from './interfaces/common';
 import { getClassesThunk } from './reducers/classSlice';
 import { getLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
+import { getListsThunk } from './reducers/listsSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -52,6 +56,14 @@ describe('App', () => {
     expect(lists.categories).toStrictEqual(mockProjectCategories.data);
     expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
     expect(lists.phases).toStrictEqual(mockProjectPhases.data);
+    expect(lists.areas).toStrictEqual(mockProjectAreas.data);
+    expect(lists.types).toStrictEqual(mockProjectTypes.data);
+    expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
+    expect(lists.riskAssessments).toStrictEqual(mockProjectRisks.data);
+    expect(lists.projectQualityLevels).toStrictEqual(mockProjectQualityLevels.data);
+    expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);
+    expect(lists.planningPhases).toStrictEqual(mockPlanningPhases.data);
+    expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
     expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
     expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
     expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
@@ -114,42 +126,6 @@ describe('App', () => {
     });
   });
 
-  it('catches a failed phase list fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getProjectPhasesThunk());
-
-    const storeError = store.getState().lists.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
-  it('catches a failed projectCategories list fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getProjectCategoriesThunk());
-
-    const storeError = store.getState().lists.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
-  it('catches a failed responsible persons fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
-    mockedAxios.get.mockRejectedValueOnce(mockError);
-    await store.dispatch(getResponsiblePersonsThunk());
-
-    const storeError = store.getState().lists.error as IError;
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
-
   it('catches a failed classes fetch', async () => {
     const { store } = await act(async () =>
       renderWithProviders(<Route path="*" element={<App />} />),
@@ -178,10 +154,27 @@ describe('App', () => {
     const { store } = await act(async () =>
       renderWithProviders(<Route path="*" element={<App />} />),
     );
+
     mockedAxios.get.mockRejectedValueOnce(mockError);
+
     await store.dispatch(getHashTagsThunk());
 
     const storeError = store.getState().hashTags.error as IError;
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed lists fetch', async () => {
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
+
+    mockedAxios.get.mockRejectedValueOnce(mockError);
+
+    await waitFor(() => store.dispatch(getListsThunk()));
+
+    const storeError = store.getState().lists.error as IError;
+
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
   });

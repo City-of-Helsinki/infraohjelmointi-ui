@@ -58,5 +58,6 @@ export const selectAllLocations = (state: RootState) => state.location.allLocati
 export const selectDistricts = (state: RootState) => state.location.districts;
 export const selectDivisions = (state: RootState) => state.location.divisions;
 export const selectSubDivisions = (state: RootState) => state.location.subDivisions;
+export const selectedBatchedLocations = (state: RootState) => state.location;
 
 export default locationSlice.reducer;

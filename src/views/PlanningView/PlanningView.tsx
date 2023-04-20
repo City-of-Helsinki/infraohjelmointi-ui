@@ -19,7 +19,7 @@ const PlanningView: FC = () => {
           <PlanningInfoPanel selectedMasterClass={selections.selectedMasterClass} />
           <PlanningYearsTable />
         </div>
-        <PlanningTable rows={rows} />
+        {rows.length > 0 && <PlanningTable rows={rows} />}
       </div>
     </>
   );
