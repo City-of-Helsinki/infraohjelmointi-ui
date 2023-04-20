@@ -1276,6 +1276,120 @@ describe('PlanningView', () => {
             expect(patchMock[1]).toStrictEqual(patchAddOverlapConRequest);
           });
         });
+
+        it('can increase the whole timeline by one year with double clicking ', async () => {
+          const { user, getByTestId } = renderResult;
+          const project = mockPlanningViewProjects.data.results[1];
+          const { id } = project;
+          const year = new Date().getFullYear();
+          const conEndYear = year + 6;
+
+          const patchMoveYearRequest = {
+            finances: {
+              year: 2023,
+              budgetProposalCurrentYearPlus0: '0.00',
+              budgetProposalCurrentYearPlus1: '0.00',
+              budgetProposalCurrentYearPlus2: '0.00',
+              preliminaryCurrentYearPlus3: '30.00',
+              preliminaryCurrentYearPlus4: '40.00',
+              preliminaryCurrentYearPlus5: '50.00',
+              preliminaryCurrentYearPlus6: '60.00',
+              preliminaryCurrentYearPlus7: '70.00',
+              preliminaryCurrentYearPlus8: null,
+              preliminaryCurrentYearPlus9: '90.00',
+              preliminaryCurrentYearPlus10: '0.00',
+            },
+            estPlanningStart: '12.02.2025',
+            estPlanningEnd: '12.02.2027',
+            estConstructionStart: '12.02.2027',
+            estConstructionEnd: '12.02.2030',
+          };
+
+          const mockMoveYearPatchResponse = {
+            data: {
+              ...project,
+              finances: {
+                ...project.finances,
+                ...patchMoveYearRequest.finances,
+              },
+              estConstructionEnd: patchMoveYearRequest.estConstructionEnd,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockMoveYearPatchResponse);
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
+          await user.click(getByTestId('edit-year-button'));
+
+          const addYearButton = getByTestId(`add-cell-${conEndYear}-${id}-right`);
+          expect(addYearButton).toBeVisible();
+
+          await user.dblClick(addYearButton);
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchMoveYearRequest);
+          });
+        });
+
+        it('can decrease the whole timeline by one year with double clicking ', async () => {
+          const { user, getByTestId } = renderResult;
+          const project = mockPlanningViewProjects.data.results[1];
+          const { id } = project;
+          const year = new Date().getFullYear();
+          const planStartYear = year + 1;
+
+          const patchMoveYearRequest = {
+            finances: {
+              year: 2023,
+              budgetProposalCurrentYearPlus0: '0.00',
+              budgetProposalCurrentYearPlus1: '30.00',
+              budgetProposalCurrentYearPlus2: '40.00',
+              preliminaryCurrentYearPlus3: '50.00',
+              preliminaryCurrentYearPlus4: '60.00',
+              preliminaryCurrentYearPlus5: '70.00',
+              preliminaryCurrentYearPlus6: null,
+              preliminaryCurrentYearPlus7: '90.00',
+              preliminaryCurrentYearPlus8: '0.00',
+              preliminaryCurrentYearPlus9: '0.00',
+              preliminaryCurrentYearPlus10: '0.00',
+            },
+            estPlanningStart: '12.02.2023',
+            estPlanningEnd: '12.02.2025',
+            estConstructionStart: '12.02.2025',
+            estConstructionEnd: '12.02.2028',
+          };
+
+          const mockMoveYearPatchResponse = {
+            data: {
+              ...project,
+              finances: {
+                ...project.finances,
+                ...patchMoveYearRequest.finances,
+              },
+              estConstructionEnd: patchMoveYearRequest.estConstructionEnd,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockMoveYearPatchResponse);
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
+          await user.click(getByTestId('edit-year-button'));
+
+          const addYearButton = getByTestId(`add-cell-${planStartYear}-${id}-left`);
+          expect(addYearButton).toBeVisible();
+
+          await user.dblClick(addYearButton);
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchMoveYearRequest);
+          });
+        });
       });
 
       // TODO: move timeline by one year forward
