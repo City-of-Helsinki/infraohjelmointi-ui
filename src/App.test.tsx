@@ -37,6 +37,7 @@ import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
+import { getGroupsThunk } from './reducers/groupSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -186,6 +187,21 @@ describe('App', () => {
     await waitFor(() => store.dispatch(getListsThunk()));
 
     const storeError = store.getState().lists.error as IError;
+
+    expect(storeError.message).toBe(mockError.message);
+    expect(storeError.status).toBe(mockError.status);
+  });
+
+  it('catches a failed groups fetch', async () => {
+    const { store } = await act(async () =>
+      renderWithProviders(<Route path="*" element={<App />} />),
+    );
+
+    mockedAxios.get.mockRejectedValueOnce(mockError);
+
+    await waitFor(() => store.dispatch(getGroupsThunk()));
+
+    const storeError = store.getState().group.error as IError;
 
     expect(storeError.message).toBe(mockError.message);
     expect(storeError.status).toBe(mockError.status);
