@@ -1,6 +1,8 @@
 import { IProjectsResponse } from '@/interfaces/projectInterfaces';
 import mockProject from './mockProject';
 
+const year = new Date().getFullYear();
+
 const mockPlanningViewProjects: { data: IProjectsResponse } = {
   data: {
     count: 10,
@@ -34,10 +36,10 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         ...mockProject.data,
         id: 'planning-project-2',
         projectClass: 'test-class-1',
-        estPlanningStart: '12.02.2024',
-        estPlanningEnd: '12.02.2026',
-        estConstructionStart: '12.02.2026',
-        estConstructionEnd: '12.02.2029',
+        estPlanningStart: `12.02.${year + 1}`,
+        estPlanningEnd: `12.02.${year + 3}`,
+        estConstructionStart: `12.02.${year + 3}`,
+        estConstructionEnd: `12.02.${year + 6}`,
         category: undefined,
         finances: {
           year: 2023,
@@ -97,6 +99,36 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         projectClass: 'test-sub-class-1',
         projectGroup: 'test-group-1',
         projectLocation: 'test-division-1',
+      },
+      // For deleting last construction cell
+      {
+        ...mockProject.data,
+        id: 'planning-project-9',
+        projectClass: 'test-class-1',
+        estPlanningStart: null,
+        estPlanningEnd: null,
+        estConstructionStart: `12.02.${year + 3}`,
+        estConstructionEnd: `12.02.${year + 3}`,
+      },
+      // For deleting last planning cell
+      {
+        ...mockProject.data,
+        id: 'planning-project-10',
+        projectClass: 'test-class-1',
+        estPlanningStart: `12.02.${year + 3}`,
+        estPlanningEnd: `12.02.${year + 3}`,
+        estConstructionStart: null,
+        estConstructionEnd: null,
+      },
+      // For deleting last overlap cell
+      {
+        ...mockProject.data,
+        id: 'planning-project-11',
+        projectClass: 'test-class-1',
+        estPlanningStart: `12.02.${year + 3}`,
+        estPlanningEnd: `12.02.${year + 3}`,
+        estConstructionStart: `12.02.${year + 3}`,
+        estConstructionEnd: `12.02.${year + 3}`,
       },
     ],
   },
