@@ -9,9 +9,9 @@ import useProjectCells from '@/hooks/useProjectCell';
 import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useAppDispatch } from '@/hooks/common';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
 import { Link } from 'react-router-dom';
 import './styles.css';
+import { patchProject } from '@/services/projectServices';
 
 interface IProjectRowProps {
   project: IProject;
@@ -25,7 +25,7 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
-      dispatch(silentPatchProjectThunk({ data: req, id: project.id }));
+      patchProject({ data: req, id: project.id }).then((res) => onUpdateProject(res));
     },
     [dispatch, project.id],
   );

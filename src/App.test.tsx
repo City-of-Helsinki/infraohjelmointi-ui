@@ -4,8 +4,18 @@ import { act, waitFor } from '@testing-library/react';
 import { renderWithProviders } from './utils/testUtils';
 import App from './App';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
-import { mockProjectClasses } from './mocks/mockClasses';
-import { mockLocations } from './mocks/mockLocations';
+import {
+  mockClasses,
+  mockMasterClasses,
+  mockProjectClasses,
+  mockSubClasses,
+} from './mocks/mockClasses';
+import {
+  mockDistricts,
+  mockDivisions,
+  mockLocations,
+  mockSubDivisions,
+} from './mocks/mockLocations';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
@@ -53,27 +63,29 @@ describe('App', () => {
     const lists = store.getState().lists;
     const hashTags = store.getState().hashTags;
 
-    expect(lists.categories).toStrictEqual(mockProjectCategories.data);
-    expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
-    expect(lists.phases).toStrictEqual(mockProjectPhases.data);
-    expect(lists.areas).toStrictEqual(mockProjectAreas.data);
-    expect(lists.types).toStrictEqual(mockProjectTypes.data);
-    expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
-    expect(lists.riskAssessments).toStrictEqual(mockProjectRisks.data);
-    expect(lists.projectQualityLevels).toStrictEqual(mockProjectQualityLevels.data);
-    expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);
-    expect(lists.planningPhases).toStrictEqual(mockPlanningPhases.data);
-    expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
-    expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
-    expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
-    expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
-    expect(classes.masterClasses.length).toBeGreaterThan(0);
-    expect(classes.classes.length).toBeGreaterThan(0);
-    expect(classes.subClasses.length).toBeGreaterThan(0);
-    expect(locations.allLocations).toStrictEqual(mockLocations.data);
-    expect(locations.districts.length).toBeGreaterThan(0);
-    expect(locations.divisions.length).toBeGreaterThan(0);
-    expect(locations.subDivisions.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(lists.categories).toStrictEqual(mockProjectCategories.data);
+      expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
+      expect(lists.phases).toStrictEqual(mockProjectPhases.data);
+      expect(lists.areas).toStrictEqual(mockProjectAreas.data);
+      expect(lists.types).toStrictEqual(mockProjectTypes.data);
+      expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
+      expect(lists.riskAssessments).toStrictEqual(mockProjectRisks.data);
+      expect(lists.projectQualityLevels).toStrictEqual(mockProjectQualityLevels.data);
+      expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);
+      expect(lists.planningPhases).toStrictEqual(mockPlanningPhases.data);
+      expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
+      expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
+      expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
+      expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
+      expect(classes.masterClasses).toStrictEqual(mockMasterClasses.data);
+      expect(classes.classes).toStrictEqual(mockClasses.data);
+      expect(classes.subClasses).toStrictEqual(mockSubClasses.data);
+      expect(locations.allLocations).toStrictEqual(mockLocations.data);
+      expect(locations.districts).toStrictEqual(mockDistricts.data);
+      expect(locations.divisions).toStrictEqual(mockDivisions.data);
+      expect(locations.subDivisions).toStrictEqual(mockSubDivisions.data);
+    });
   });
 
   it('renders TopBar', async () => {

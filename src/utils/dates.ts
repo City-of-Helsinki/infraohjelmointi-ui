@@ -73,7 +73,9 @@ export const getYear = (date?: string | null): number =>
 export const updateYear = (year: number | undefined, date?: string | null) => {
   if (date && year) {
     const moment = momentFromHDSDate(date);
+
     moment.set({ year: year, month: moment.month(), day: moment.day() });
+
     return moment.format('DD.MM.YYYY');
   }
   return null;
