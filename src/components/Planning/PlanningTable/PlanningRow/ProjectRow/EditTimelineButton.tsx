@@ -5,10 +5,12 @@ import { memo, useRef } from 'react';
 
 const EditTimelineButton = ({
   direction,
+  id,
   onSingleClick,
   onDoubleClick,
 }: {
   direction: ProjectCellGrowDirection;
+  id: string;
   onSingleClick: (d: ProjectCellGrowDirection) => void;
   onDoubleClick: (d: ProjectCellGrowDirection) => void;
 }) => {
@@ -19,7 +21,11 @@ const EditTimelineButton = ({
   useDoubleClick(buttonRef, handleSingleClick, handleDoubleClick);
 
   return (
-    <button ref={buttonRef} className={`edit-timeline-button ${direction}`}>
+    <button
+      ref={buttonRef}
+      className={`edit-timeline-button ${direction}`}
+      data-testid={`add-cell-${id}-${direction}`}
+    >
       <IconAngleLeft />
     </button>
   );

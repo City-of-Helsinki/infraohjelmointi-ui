@@ -393,14 +393,16 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
           data-testid={`cell-input-${year}-${id}`}
         />
       </div>
-      {growDirections.map((d) => (
-        <EditTimelineButton
-          key={d}
-          direction={d}
-          onSingleClick={onAddYear}
-          onDoubleClick={onMoveTimeline}
-        />
-      ))}
+      {type !== 'none' &&
+        growDirections.map((d) => (
+          <EditTimelineButton
+            key={d}
+            direction={d}
+            id={`${year}-${id}`}
+            onSingleClick={onAddYear}
+            onDoubleClick={onMoveTimeline}
+          />
+        ))}
     </td>
   );
 };

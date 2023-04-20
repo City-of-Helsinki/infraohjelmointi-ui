@@ -76,7 +76,12 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
         >
           {t('removeYearFromTimeline')}
         </Button>
-        <Button variant="supplementary" iconLeft={undefined} onClick={handleEditTimeline}>
+        <Button
+          variant="supplementary"
+          iconLeft={undefined}
+          onClick={handleEditTimeline}
+          data-testid="edit-year-button"
+        >
           {t('editTimeline')}
         </Button>
       </div>

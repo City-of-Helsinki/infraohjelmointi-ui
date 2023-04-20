@@ -50,7 +50,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
           preliminaryCurrentYearPlus4: '50.00',
           preliminaryCurrentYearPlus5: '60.00',
           preliminaryCurrentYearPlus6: '70.00',
-          preliminaryCurrentYearPlus7: '80.00',
+          preliminaryCurrentYearPlus7: null,
           preliminaryCurrentYearPlus8: '90.00',
           preliminaryCurrentYearPlus9: '0.00',
           preliminaryCurrentYearPlus10: '0.00',

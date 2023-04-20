@@ -37,6 +37,18 @@ describe('PlanningView', () => {
 
   const asNumber = (value: string | null) => parseInt(value || '');
 
+  const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
+    const { user, store, getByTestId } = renderResult;
+    const { masterClasses, classes } = store.getState().class;
+    await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+    await user.click(getByTestId(`expand-${classes[0].id}`));
+  };
+
+  const openContextMenuForCell = (year: number, id: string, renderResult: CustomRenderResult) => {
+    const { getByTestId } = renderResult;
+    fireEvent.contextMenu(getByTestId(`project-cell-${year}-${id}`));
+  };
+
   beforeEach(async () => {
     // Mock custom event
     mockGetResponseProvider();
@@ -653,12 +665,10 @@ describe('PlanningView', () => {
 
     describe('Project Row', () => {
       it('renders all the elements and no financial data to cells if there is no planning or construction', async () => {
-        const { user, store, getByTestId } = renderResult;
-        const { masterClasses, classes } = store.getState().class;
+        const { getByTestId } = renderResult;
         const { id, category, name, finances } = mockPlanningViewProjects.data.results[0];
 
-        await waitFor(() => user.click(getByTestId(`expand-${masterClasses[0].id}`)));
-        await waitFor(() => user.click(getByTestId(`expand-${classes[0].id}`)));
+        await waitFor(() => navigateToProjectRows(renderResult));
 
         await waitFor(() => {
           expect(getByTestId(`row-${id}`)).toBeInTheDocument();
@@ -678,12 +688,10 @@ describe('PlanningView', () => {
       });
 
       it('doesnt render the project category if there is no category', async () => {
-        const { user, store, getByTestId, queryByTestId } = renderResult;
-        const { masterClasses, classes } = store.getState().class;
+        const { queryByTestId } = renderResult;
         const { id } = mockPlanningViewProjects.data.results[1];
 
-        await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-        await user.click(getByTestId(`expand-${classes[0].id}`));
+        await waitFor(() => navigateToProjectRows(renderResult));
 
         await waitFor(() => {
           expect(queryByTestId(`category-${id}`)).toBeNull();
@@ -691,8 +699,7 @@ describe('PlanningView', () => {
       });
 
       it('can patch the project phase with the custom context menu', async () => {
-        const { user, store, getByTestId, getByText, queryByTestId } = renderResult;
-        const { masterClasses, classes } = store.getState().class;
+        const { user, getByTestId, getByText, queryByTestId } = renderResult;
         const project = mockPlanningViewProjects.data.results[0];
         const { id } = project;
         const phasesAsOptions = mockProjectPhases.data.map((p) => listItemToOption(p));
@@ -707,8 +714,7 @@ describe('PlanningView', () => {
 
         mockedAxios.patch.mockResolvedValueOnce(mockPatchPhaseResponse);
 
-        await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-        await user.click(getByTestId(`expand-${classes[0].id}`));
+        await waitFor(() => navigateToProjectRows(renderResult));
 
         // Open context menu for phase
         await waitFor(async () => await user.click(getByTestId(`edit-phase-${id}`)));
@@ -733,8 +739,8 @@ describe('PlanningView', () => {
         await user.click(getByTestId('patch-project-phase'));
 
         await waitFor(() => {
-          const patchMock = mockedAxios.patch.mock;
-          expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-1/');
+          const patchMock = mockedAxios.patch.mock.lastCall;
+          expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-1/');
         });
 
         // Context menu is hidden after patch
@@ -755,12 +761,10 @@ describe('PlanningView', () => {
       });
 
       it('creates cells for planning, construction and overlap when the project has planning', async () => {
-        const { user, store, getByTestId } = renderResult;
-        const { masterClasses, classes } = store.getState().class;
+        const { getByTestId } = renderResult;
         const { id, finances } = mockPlanningViewProjects.data.results[1];
 
-        await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-        await user.click(getByTestId(`expand-${classes[0].id}`));
+        await waitFor(() => navigateToProjectRows(renderResult));
 
         await waitFor(() => {
           for (let i = 0; i < 10; i++) {
@@ -808,8 +812,7 @@ describe('PlanningView', () => {
 
       describe('ProjectCell', () => {
         it('active project cells can be edited and patched and the initial 0 value will be replaced by user input', async () => {
-          const { user, store, getByTestId } = renderResult;
-          const { masterClasses, classes } = store.getState().class;
+          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
           const { id } = project;
           const year = new Date().getFullYear();
@@ -828,8 +831,7 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockEditCellPatchResponse);
 
-          await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-          await user.click(getByTestId(`expand-${classes[0].id}`));
+          await waitFor(() => navigateToProjectRows(renderResult));
 
           const input = await waitFor(() => getByTestId(`cell-input-${year + 1}-${id}`));
 
@@ -838,9 +840,9 @@ describe('PlanningView', () => {
           await user.click(getByTestId(`cell-input-${year}-${id}`));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock;
-            expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock.lastCall[1]).toStrictEqual({
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual({
               finances: { year: 2023, budgetProposalCurrentYearPlus1: 40 },
             });
             expect(input).toHaveValue(
@@ -850,10 +852,9 @@ describe('PlanningView', () => {
         });
 
         it('can open the project cell menu and delete a cell in the middle to hide it from the timeline and moves the current sum to the next avaliable cell', async () => {
-          const { user, store, getByTestId } = renderResult;
+          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
           const { id, name } = project;
-          const { masterClasses, classes } = store.getState().class;
           const year = new Date().getFullYear();
           const yearToHide = year + 4;
 
@@ -877,13 +878,8 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockDeleteCellPatchResponse);
 
-          await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-          await user.click(getByTestId(`expand-${classes[0].id}`));
-
-          const cell = await waitFor(() => getByTestId(`project-cell-${yearToHide}-${id}`));
-
-          // Open context menu
-          fireEvent.contextMenu(cell);
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(yearToHide, id, renderResult));
 
           expect(getByTestId('project-cell-menu')).toBeInTheDocument();
           expect(getByTestId('close-project-cell-menu')).toBeInTheDocument();
@@ -896,9 +892,9 @@ describe('PlanningView', () => {
           await user.click(getByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock;
-            expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock.lastCall[1]).toStrictEqual(patchRequest);
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchRequest);
             // Cell is hidden
             expect(getByTestId(`cell-input-${yearToHide}-${id}`)).toBeDisabled();
             expect(getByTestId(`cell-input-${yearToHide}-${id}`)).toHaveValue(null);
@@ -913,10 +909,9 @@ describe('PlanningView', () => {
         });
 
         it('can delete the start and end of the timeline to decrease the planning or construction dates', async () => {
-          const { user, store, getByTestId } = renderResult;
+          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
           const { id } = project;
-          const { masterClasses, classes } = store.getState().class;
           const year = new Date().getFullYear();
           const endOfTimeline = year + 6;
 
@@ -944,24 +939,15 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveConEndPatchResponse);
 
-          await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-          await user.click(getByTestId(`expand-${classes[0].id}`));
-
-          const conEndCell = await waitFor(() =>
-            getByTestId(`project-cell-${endOfTimeline}-${id}`),
-          );
-
-          // Open context menu for last construction cell
-          fireEvent.contextMenu(conEndCell);
-
-          // Delete cell
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(endOfTimeline, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
 
           // Check that correct data was patched and construction end date has moved
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock;
-            expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock.lastCall[1]).toStrictEqual(patchConEndRequest);
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchConEndRequest);
             // Cell is hidden
             expect(getByTestId(`cell-input-${endOfTimeline}-${id}`)).toBeDisabled();
             expect(getByTestId(`cell-input-${endOfTimeline}-${id}`)).toHaveValue(null);
@@ -996,19 +982,14 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemovePlanStartPatchResponse);
 
-          const cell = await waitFor(() => getByTestId(`project-cell-${startOfTimeline}-${id}`));
-
-          // Open context menu for first planning cell
-          fireEvent.contextMenu(cell);
-
-          // Delete cell
+          await waitFor(() => openContextMenuForCell(startOfTimeline, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
 
           // Check that correct data was patched and planning start has moved
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock;
-            expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock.lastCall[1]).toStrictEqual(patchPlanStartRequest);
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchPlanStartRequest);
             expect(getByTestId(`cell-input-${startOfTimeline}-${id}`)).toBeDisabled();
             expect(getByTestId(`cell-input-${startOfTimeline}-${id}`)).toHaveValue(null);
             expect(
@@ -1018,8 +999,7 @@ describe('PlanningView', () => {
         });
 
         it('it removes construction end and start dates if last construction cell is removed', async () => {
-          const { user, store, getByTestId } = renderResult;
-          const { masterClasses, classes } = store.getState().class;
+          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[8];
           const { id } = project;
           const year = new Date().getFullYear();
@@ -1048,24 +1028,19 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveLastConPatchResponse);
 
-          await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-          await user.click(getByTestId(`expand-${classes[0].id}`));
-          const cell = await waitFor(() => getByTestId(`project-cell-${lastConYear}-${id}`));
-
-          fireEvent.contextMenu(cell);
-
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(lastConYear, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock;
-            expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-9/');
-            expect(patchMock.lastCall[1]).toStrictEqual(patchLastConRequest);
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-9/');
+            expect(patchMock[1]).toStrictEqual(patchLastConRequest);
           });
         });
 
         it('it removes planning end and start dates if last planning cell is removed', async () => {
-          const { user, store, getByTestId } = renderResult;
-          const { masterClasses, classes } = store.getState().class;
+          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[9];
           const { id } = project;
           const year = new Date().getFullYear();
@@ -1094,24 +1069,19 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveLastPlanPatchResponse);
 
-          await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-          await user.click(getByTestId(`expand-${classes[0].id}`));
-          const cell = await waitFor(() => getByTestId(`project-cell-${lastPlanYear}-${id}`));
-
-          fireEvent.contextMenu(cell);
-
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(lastPlanYear, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock;
-            expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-10/');
-            expect(patchMock.lastCall[1]).toStrictEqual(patchLastPlanRequest);
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-10/');
+            expect(patchMock[1]).toStrictEqual(patchLastPlanRequest);
           });
         });
 
         it('it removes planning and construction end and start dates if last overlap cell is removed', async () => {
-          const { user, store, getByTestId } = renderResult;
-          const { masterClasses, classes } = store.getState().class;
+          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[10];
           const { id } = project;
           const year = new Date().getFullYear();
@@ -1144,23 +1114,170 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveLastOverlapPatchResponse);
 
-          await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-          await user.click(getByTestId(`expand-${classes[0].id}`));
-          const cell = await waitFor(() => getByTestId(`project-cell-${lastOverlapYear}-${id}`));
-
-          fireEvent.contextMenu(cell);
-
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(lastOverlapYear, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
 
           await waitFor(() => {
-            const patchMock = mockedAxios.patch.mock;
-            expect(patchMock.lastCall[0]).toBe('localhost:4000/projects/planning-project-11/');
-            expect(patchMock.lastCall[1]).toStrictEqual(patchLastOverlapRequest);
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-11/');
+            expect(patchMock[1]).toStrictEqual(patchLastOverlapRequest);
+          });
+        });
+
+        it('can add a year to construction and replaces the budgets null value with 0', async () => {
+          const { user, getByTestId } = renderResult;
+          const project = mockPlanningViewProjects.data.results[1];
+          const { id } = project;
+          const year = new Date().getFullYear();
+          const conEndYear = year + 6;
+
+          const patchAddConYearRequest = {
+            finances: { year: 2023, preliminaryCurrentYearPlus7: '0' },
+            estConstructionEnd: '12.02.2030',
+          };
+
+          const mockAddConYearPatchResponse = {
+            data: {
+              ...project,
+              finances: {
+                ...project.finances,
+                ...patchAddConYearRequest.finances,
+              },
+              estConstructionEnd: patchAddConYearRequest.estConstructionEnd,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockAddConYearPatchResponse);
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
+          await user.click(getByTestId('edit-year-button'));
+
+          const addYearButton = getByTestId(`add-cell-${conEndYear}-${id}-right`);
+          expect(addYearButton).toBeVisible();
+
+          await user.click(addYearButton);
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchAddConYearRequest);
+          });
+        });
+
+        it('can add a year to planning', async () => {
+          const { user, getByTestId } = renderResult;
+          const project = mockPlanningViewProjects.data.results[1];
+          const { id } = project;
+          const year = new Date().getFullYear();
+          const planStartYear = year + 1;
+
+          const patchAddPlanYearRequest = {
+            finances: { year: 2023 },
+            estPlanningStart: '12.02.2023',
+          };
+
+          const mockAddConYearPatchResponse = {
+            data: {
+              ...project,
+              finances: {
+                ...project.finances,
+                ...patchAddPlanYearRequest.finances,
+              },
+              estPlanningStart: patchAddPlanYearRequest.estPlanningStart,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockAddConYearPatchResponse);
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
+          await user.click(getByTestId('edit-year-button'));
+
+          const addYearButton = getByTestId(`add-cell-${planStartYear}-${id}-left`);
+
+          await user.click(addYearButton);
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchAddPlanYearRequest);
+          });
+        });
+
+        it('can add a year to planning and construction if an overlap cell is selected', async () => {
+          const { user, getByTestId } = renderResult;
+          const project = mockPlanningViewProjects.data.results[10];
+          const { id } = project;
+          const year = new Date().getFullYear();
+          const overlapYear = year + 3;
+
+          // Adding plan year from overlap
+          const patchAddOverlapPlanRequest = {
+            finances: { year: 2023 },
+            estPlanningStart: '12.02.2025',
+          };
+
+          const mockAddOverlapPlanPatchResponse = {
+            data: {
+              ...project,
+              finances: {
+                ...project.finances,
+                ...patchAddOverlapPlanRequest.finances,
+              },
+              estPlanningStart: patchAddOverlapPlanRequest.estPlanningStart,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockAddOverlapPlanPatchResponse);
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
+          await user.click(getByTestId('edit-year-button'));
+
+          const addYearButton = getByTestId(`add-cell-${overlapYear}-${id}-left`);
+
+          await user.click(addYearButton);
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-11/');
+            expect(patchMock[1]).toStrictEqual(patchAddOverlapPlanRequest);
+          });
+
+          // Adding con year from overlap
+          const patchAddOverlapConRequest = {
+            finances: { year: 2023 },
+            estPlanningStart: '12.02.2025',
+          };
+
+          const mockAddOverlapConPatchResponse = {
+            data: {
+              ...project,
+              finances: {
+                ...project.finances,
+                ...patchAddOverlapConRequest.finances,
+              },
+              estPlanningStart: patchAddOverlapConRequest.estPlanningStart,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockAddOverlapConPatchResponse);
+
+          await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
+          await user.click(getByTestId('edit-year-button'));
+
+          await user.click(addYearButton);
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-11/');
+            expect(patchMock[1]).toStrictEqual(patchAddOverlapConRequest);
           });
         });
       });
 
-      // TODO: add a year
       // TODO: move timeline by one year forward
       // TODO: move timeline by one year backwards
     });
