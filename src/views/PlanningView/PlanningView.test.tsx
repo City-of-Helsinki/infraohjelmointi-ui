@@ -668,13 +668,13 @@ describe('PlanningView', () => {
           expect(getByTestId(`category-${id}`)).toHaveTextContent((category as IListItem).value);
           expect(getByTestId(`project-total-budget-${id}`)).toBeInTheDocument();
           expect(getByTestId(`project-realized-budget-${id}`)).toBeInTheDocument();
-        });
 
-        for (let i = 0; i < 10; i++) {
-          const year = finances.year + i;
-          expect(getByTestId(`project-cell-${year}-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`cell-input-${year}-${id}`)).toBeDisabled();
-        }
+          for (let i = 0; i < 10; i++) {
+            const year = finances.year + i;
+            expect(getByTestId(`project-cell-${year}-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`cell-input-${year}-${id}`)).toBeDisabled();
+          }
+        });
       });
 
       it('doesnt render the project category if there is no category', async () => {
