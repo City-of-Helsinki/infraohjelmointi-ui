@@ -817,7 +817,7 @@ describe('PlanningView', () => {
           const { id } = project;
           const year = new Date().getFullYear();
           const patchRequest = {
-            finances: { year: 2023, budgetProposalCurrentYearPlus1: '40' },
+            finances: { year: year, budgetProposalCurrentYearPlus1: '40' },
           };
           const mockEditCellPatchResponse = {
             data: {
@@ -843,7 +843,7 @@ describe('PlanningView', () => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual({
-              finances: { year: 2023, budgetProposalCurrentYearPlus1: 40 },
+              finances: { year: year, budgetProposalCurrentYearPlus1: 40 },
             });
             expect(input).toHaveValue(
               asNumber(patchRequest.finances.budgetProposalCurrentYearPlus1),
@@ -923,7 +923,7 @@ describe('PlanningView', () => {
             },
             // FIXME: the updateYear() function in dates.ts generates a date that is 5 days in the past,
             // we should actually expect 12.02.2028
-            estConstructionEnd: '07.02.2028',
+            estConstructionEnd: `07.02.${year + 5}`,
           };
 
           const mockRemoveConEndPatchResponse = {
@@ -966,7 +966,7 @@ describe('PlanningView', () => {
             },
             // FIXME: the updateYear() function in dates.ts generates a date that is 5 days in the past,
             // we should actually expect 12.02.2025
-            estPlanningStart: '10.02.2025',
+            estPlanningStart: `10.02.${year + 2}`,
           };
 
           const mockRemovePlanStartPatchResponse = {
@@ -976,7 +976,7 @@ describe('PlanningView', () => {
                 ...project.finances,
                 ...patchPlanStartRequest.finances,
               },
-              estPlanningStart: '12.02.2025',
+              estPlanningStart: `12.02.${year + 2}`,
             },
           };
 
@@ -1133,8 +1133,8 @@ describe('PlanningView', () => {
           const conEndYear = year + 6;
 
           const patchAddConYearRequest = {
-            finances: { year: 2023, preliminaryCurrentYearPlus7: '0' },
-            estConstructionEnd: '12.02.2030',
+            finances: { year: year, preliminaryCurrentYearPlus7: '0' },
+            estConstructionEnd: `12.02.${year + 7}`,
           };
 
           const mockAddConYearPatchResponse = {
@@ -1174,8 +1174,8 @@ describe('PlanningView', () => {
           const planStartYear = year + 1;
 
           const patchAddPlanYearRequest = {
-            finances: { year: 2023 },
-            estPlanningStart: '12.02.2023',
+            finances: { year: year },
+            estPlanningStart: `12.02.${year}`,
           };
 
           const mockAddConYearPatchResponse = {
@@ -1215,8 +1215,8 @@ describe('PlanningView', () => {
 
           // Adding plan year from overlap
           const patchAddOverlapPlanRequest = {
-            finances: { year: 2023 },
-            estPlanningStart: '12.02.2025',
+            finances: { year: year },
+            estPlanningStart: `12.02.${year + 2}`,
           };
 
           const mockAddOverlapPlanPatchResponse = {
@@ -1248,8 +1248,8 @@ describe('PlanningView', () => {
 
           // Adding con year from overlap
           const patchAddOverlapConRequest = {
-            finances: { year: 2023 },
-            estPlanningStart: '12.02.2025',
+            finances: { year: year },
+            estPlanningStart: `12.02.${year + 2}`,
           };
 
           const mockAddOverlapConPatchResponse = {
@@ -1286,7 +1286,7 @@ describe('PlanningView', () => {
 
           const patchMoveYearRequest = {
             finances: {
-              year: 2023,
+              year: year,
               budgetProposalCurrentYearPlus0: '0.00',
               budgetProposalCurrentYearPlus1: '0.00',
               budgetProposalCurrentYearPlus2: '0.00',
@@ -1299,10 +1299,10 @@ describe('PlanningView', () => {
               preliminaryCurrentYearPlus9: '90.00',
               preliminaryCurrentYearPlus10: '0.00',
             },
-            estPlanningStart: '12.02.2025',
-            estPlanningEnd: '12.02.2027',
-            estConstructionStart: '12.02.2027',
-            estConstructionEnd: '12.02.2030',
+            estPlanningStart: `12.02.${year + 2}`,
+            estPlanningEnd: `12.02.${year + 4}`,
+            estConstructionStart: `12.02.${year + 4}`,
+            estConstructionEnd: `12.02.${year + 7}`,
           };
 
           const mockMoveYearPatchResponse = {
@@ -1343,7 +1343,7 @@ describe('PlanningView', () => {
 
           const patchMoveYearRequest = {
             finances: {
-              year: 2023,
+              year: year,
               budgetProposalCurrentYearPlus0: '0.00',
               budgetProposalCurrentYearPlus1: '30.00',
               budgetProposalCurrentYearPlus2: '40.00',
@@ -1356,10 +1356,10 @@ describe('PlanningView', () => {
               preliminaryCurrentYearPlus9: '0.00',
               preliminaryCurrentYearPlus10: '0.00',
             },
-            estPlanningStart: '12.02.2023',
-            estPlanningEnd: '12.02.2025',
-            estConstructionStart: '12.02.2025',
-            estConstructionEnd: '12.02.2028',
+            estPlanningStart: `12.02.${year}`,
+            estPlanningEnd: `12.02.${year + 2}`,
+            estConstructionStart: `12.02.${year + 2}`,
+            estConstructionEnd: `12.02.${year + 5}`,
           };
 
           const mockMoveYearPatchResponse = {
