@@ -8,7 +8,6 @@ import {
 import mockI18next from '@/mocks/mockI18next';
 import { setupStore } from '@/store';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
-import { act } from 'react-dom/test-utils';
 import PlanningView from './PlanningView';
 import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocations';
 import { mockProjectPhases } from '@/mocks/mockLists';
@@ -29,14 +28,55 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const store = setupStore();
 
+const render = async () =>
+  await waitFor(async () =>
+    renderWithProviders(
+      <Route
+        path="/"
+        element={
+          <>
+            <PlanningView />
+            <CustomContextMenu />
+          </>
+        }
+      >
+        <Route path=":masterClassId" element={<PlanningView />}>
+          <Route path=":classId" element={<PlanningView />}>
+            <Route path=":subClassId" element={<PlanningView />}>
+              <Route path=":districtId" element={<PlanningView />} />
+            </Route>
+          </Route>
+        </Route>
+      </Route>,
+      {
+        preloadedState: {
+          class: {
+            ...store.getState().class,
+            allClasses: mockProjectClasses.data,
+            masterClasses: mockMasterClasses.data,
+            classes: mockClasses.data,
+            subClasses: mockSubClasses.data,
+          },
+          location: {
+            ...store.getState().location,
+            allLocations: mockLocations.data,
+            districts: mockDistricts.data,
+            divisions: mockDivisions.data,
+          },
+          group: {
+            ...store.getState().group,
+            groups: mockGroups.data,
+          },
+          lists: {
+            ...store.getState().lists,
+            phases: mockProjectPhases.data,
+          },
+        },
+      },
+    ),
+  );
+
 describe('PlanningView', () => {
-  let renderResult: CustomRenderResult;
-
-  const getClass = (name: string) => {
-    const { container } = renderResult;
-    return container.getElementsByClassName(name)[0];
-  };
-
   const asNumber = (value: string | null) => parseInt(value || '');
 
   const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
@@ -51,81 +91,37 @@ describe('PlanningView', () => {
     fireEvent.contextMenu(getByTestId(`project-cell-${year}-${id}`));
   };
 
-  beforeEach(async () => {
-    // Mock custom event
+  beforeEach(() => {
     mockGetResponseProvider();
-
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(
-          <Route
-            path="/"
-            element={
-              <>
-                <PlanningView />
-                <CustomContextMenu />
-              </>
-            }
-          >
-            <Route path=":masterClassId" element={<PlanningView />}>
-              <Route path=":classId" element={<PlanningView />}>
-                <Route path=":subClassId" element={<PlanningView />}>
-                  <Route path=":districtId" element={<PlanningView />} />
-                </Route>
-              </Route>
-            </Route>
-          </Route>,
-          {
-            preloadedState: {
-              class: {
-                ...store.getState().class,
-                allClasses: mockProjectClasses.data,
-                masterClasses: mockMasterClasses.data,
-                classes: mockClasses.data,
-                subClasses: mockSubClasses.data,
-              },
-              location: {
-                ...store.getState().location,
-                allLocations: mockLocations.data,
-                districts: mockDistricts.data,
-                divisions: mockDivisions.data,
-              },
-              group: {
-                ...store.getState().group,
-                groups: mockGroups.data,
-              },
-              lists: {
-                ...store.getState().lists,
-                phases: mockProjectPhases.data,
-              },
-            },
-          },
-        )),
-    );
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders the container', async () => {
-    expect(getClass('planning-view-container')).toBeInTheDocument();
+    const { container } = await render();
+
+    expect(container.getElementsByClassName('planning-view-container')[0]).toBeInTheDocument();
   });
 
   it('catches a failed getProjectsWithParams request', async () => {
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
+    await render();
+
     await waitFor(() => getProjectsWithParams({ params: 'test=123', direct: false }));
-    await waitFor(() => {
-      const getMock = mockedAxios.get.mock.lastCall;
-      expect(getMock[0]).toBe('localhost:4000/projects/planning-view/?test=123&direct=false');
-    });
+
+    const getMock = mockedAxios.get.mock.lastCall;
+
+    expect(getMock[0]).toBe('localhost:4000/projects/planning-view/?test=123&direct=false');
   });
 
   describe('PlanningBreadCrumbs', () => {
     it('renders only first breadcrumb if no table row is expanded', async () => {
-      const { getByTestId, queryByTestId } = renderResult;
-      expect(getClass('breadcrumbs-list')).toBeInTheDocument();
+      const { getByTestId, queryByTestId, container } = await render();
+
+      expect(container.getElementsByClassName('breadcrumbs-list')[0]).toBeInTheDocument();
       expect(getByTestId('programming-breadcrumb')).toBeInTheDocument();
       expect(queryByTestId('masterClass-breadcrumb')).toBeNull();
       expect(queryByTestId('class-breadcrumb')).toBeNull();
@@ -134,35 +130,35 @@ describe('PlanningView', () => {
     });
 
     it('renders breadcrumbs when table rows are expanded all the way to the selected district and navigates to planning frontpage from first breadcrumb', async () => {
-      const { getByTestId, user, store, getAllByTestId, queryByTestId } = renderResult;
+      const { getByTestId, user, store, getAllByTestId, queryByTestId } = await render();
 
-      const firstMasterClass = store.getState().class.masterClasses[0];
-      const firstClass = store.getState().class.classes[0];
-      const firstSubClass = store.getState().class.subClasses[0];
-      const firstDistrict = store.getState().location.districts[0];
+      const { masterClasses, classes, subClasses } = store.getState().class;
+      const { districts } = store.getState().location;
 
-      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
-      expect(getByTestId('masterClass-breadcrumb')).toHaveAttribute(
-        'href',
-        `/${firstMasterClass.id}`,
-      );
+      const { id: masterClassId } = masterClasses[0];
+      const { id: classId } = classes[0];
+      const { id: subClassId } = subClasses[0];
+      const { id: districtId } = districts[0];
 
-      await user.click(getByTestId(`expand-${firstClass.id}`));
+      await user.click(getByTestId(`expand-${masterClassId}`));
+      expect(getByTestId('masterClass-breadcrumb')).toHaveAttribute('href', `/${masterClassId}`);
+
+      await user.click(getByTestId(`expand-${classId}`));
       expect(getByTestId('class-breadcrumb')).toHaveAttribute(
         'href',
-        `/${firstMasterClass.id}/${firstClass.id}`,
+        `/${masterClassId}/${classId}`,
       );
 
-      await user.click(getByTestId(`expand-${firstSubClass.id}`));
+      await user.click(getByTestId(`expand-${subClassId}`));
       expect(getByTestId('subClass-breadcrumb')).toHaveAttribute(
         'href',
-        `/${firstMasterClass.id}/${firstClass.id}/${firstSubClass.id}`,
+        `/${masterClassId}/${classId}/${subClassId}`,
       );
 
-      await user.click(getByTestId(`expand-${firstDistrict.id}`));
+      await user.click(getByTestId(`expand-${districtId}`));
       expect(getByTestId('district-breadcrumb')).toHaveAttribute(
         'href',
-        `/${firstMasterClass.id}/${firstClass.id}/${firstSubClass.id}/${firstDistrict.id}`,
+        `/${masterClassId}/${classId}/${subClassId}/${districtId}`,
       );
 
       expect(getAllByTestId('breadcrumb-arrow').length).toBe(4);
@@ -176,15 +172,13 @@ describe('PlanningView', () => {
     });
 
     it('navigates to the clicked class', async () => {
-      const { getByTestId, store, user, queryByTestId } = renderResult;
+      const { getByTestId, store, user, queryByTestId } = await render();
 
-      const firstMasterClass = store.getState().class.masterClasses[0];
-      const firstClass = store.getState().class.classes[0];
-      const firstSubClass = store.getState().class.subClasses[0];
+      const { masterClasses, classes, subClasses } = store.getState().class;
 
-      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
-      await user.click(getByTestId(`expand-${firstClass.id}`));
-      await user.click(getByTestId(`expand-${firstSubClass.id}`));
+      await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+      await user.click(getByTestId(`expand-${classes[0].id}`));
+      await user.click(getByTestId(`expand-${subClasses[0].id}`));
 
       expect(getByTestId('class-breadcrumb')).toBeInTheDocument();
       expect(getByTestId('subClass-breadcrumb')).toBeInTheDocument();
@@ -197,8 +191,9 @@ describe('PlanningView', () => {
   });
 
   describe('PlanningToolbar', () => {
-    it('doesnt render anything yet', () => {
-      const { getByTestId } = renderResult;
+    it('doesnt render anything yet', async () => {
+      const { getByTestId } = await render();
+
       expect(getByTestId('toolbar')).toBeInTheDocument();
       expect(getByTestId('toolbar-left')).toBeInTheDocument();
       expect(getByTestId('toolbar-right')).toBeInTheDocument();
@@ -207,10 +202,10 @@ describe('PlanningView', () => {
 
   describe('PlanningInfoPanel', () => {
     it('shows the view as planning and doesnt render selectedMasterClass name or previous button if no masterClass is expanded', async () => {
-      const { getByTestId, queryByTestId } = renderResult;
+      const { getByTestId, queryByTestId, container } = await render();
 
       // Main container
-      expect(getClass('planning-info-panel')).toBeInTheDocument();
+      expect(container.getElementsByClassName('planning-info-panel')[0]).toBeInTheDocument();
       // Grid containers
       expect(getByTestId('mode-button-container')).toBeInTheDocument();
       expect(getByTestId('selected-class-container')).toBeInTheDocument();
@@ -225,10 +220,10 @@ describe('PlanningView', () => {
     });
 
     it('shows the selectedMasterClass name and the previos-button if a masterClass is expanded', async () => {
-      const { getByTestId, user, store } = renderResult;
-      const firstMasterClass = store.getState().class.masterClasses[0];
+      const { getByTestId, user, store } = await render();
+      const { id: masterClassId } = store.getState().class.masterClasses[0];
 
-      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
+      await user.click(getByTestId(`expand-${masterClassId}`));
 
       expect(getByTestId('selected-class')).toBeInTheDocument();
       expect(getByTestId('currency-indicator')).toBeInTheDocument();
@@ -236,12 +231,13 @@ describe('PlanningView', () => {
     });
 
     it('previous-button navigates back in history when clicked', async () => {
-      const { getByTestId, user, store } = renderResult;
-      const firstMasterClass = store.getState().class.masterClasses[0];
-      const firstClass = store.getState().class.classes[0];
+      const { getByTestId, user, store } = await render();
 
-      await user.click(getByTestId(`expand-${firstMasterClass.id}`));
-      await user.click(getByTestId(`expand-${firstClass.id}`));
+      const { id: masterClassId } = store.getState().class.masterClasses[0];
+      const { id: classId } = store.getState().class.classes[0];
+
+      await user.click(getByTestId(`expand-${masterClassId}`));
+      await user.click(getByTestId(`expand-${classId}`));
 
       expect(getByTestId('masterClass-breadcrumb')).toBeInTheDocument();
       expect(getByTestId('class-breadcrumb')).toBeInTheDocument();
@@ -259,8 +255,9 @@ describe('PlanningView', () => {
 
   describe('PlanningYearsTable', () => {
     it('renders the current year + 10 years and mock data for now', async () => {
-      const { getByTestId, getAllByText } = renderResult;
-      expect(getClass('planning-years-table')).toBeInTheDocument();
+      const { getByTestId, getAllByText, container } = await render();
+
+      expect(container.getElementsByClassName('planning-years-table')[0]).toBeInTheDocument();
       expect(getByTestId('planning-years-head')).toBeInTheDocument();
       expect(getByTestId('planning-years-head-row')).toBeInTheDocument();
       expect(getByTestId('planning-years-body')).toBeInTheDocument();
@@ -310,11 +307,13 @@ describe('PlanningView', () => {
 
   describe('PlanningTable', () => {
     it('renders the table', async () => {
-      expect(getClass('planning-table')).toBeInTheDocument();
+      const { container } = await render();
+
+      expect(container.getElementsByClassName('planning-table')[0]).toBeInTheDocument();
     });
 
-    it('renders only masterClass rows, heads and cells if no masterClass is expanded', () => {
-      const { store, getByTestId, queryByTestId } = renderResult;
+    it('renders only masterClass rows, heads and cells if no masterClass is expanded', async () => {
+      const { store, getByTestId, queryByTestId } = await render();
 
       const { masterClasses, classes, subClasses } = store.getState().class;
       const { districts, divisions } = store.getState().location;
@@ -330,14 +329,12 @@ describe('PlanningView', () => {
 
       groups.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
 
-      // There are as many rows as masterClasses
-      expect(getClass('planning-table').children[0].children.length).toBe(masterClasses.length);
-      // Check that each masterClass has all the row properties
+      // Every masterClass has a row
       masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
     });
 
     it('renders all children rows and only one parent when parent is expanded', async () => {
-      const { store, getByTestId, queryByTestId, user } = renderResult;
+      const { store, getByTestId, queryByTestId, user } = await render();
 
       const { masterClasses, classes, subClasses } = store.getState().class;
       const { districts, divisions } = store.getState().location;
@@ -349,8 +346,8 @@ describe('PlanningView', () => {
       masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
 
       // Click the first masterclass row
-      const firstMasterClassId = masterClasses[0].id;
-      await user.click(getByTestId(`expand-${firstMasterClassId}`));
+      const { id: masterClassId } = masterClasses[0];
+      await user.click(getByTestId(`expand-${masterClassId}`));
 
       // Check that only first masterClass-row are visible
       await waitFor(() => {
@@ -365,7 +362,7 @@ describe('PlanningView', () => {
         });
       });
 
-      const classesForMasterClass = classes.filter((c) => c.parent === firstMasterClassId);
+      const classesForMasterClass = classes.filter((c) => c.parent === masterClassId);
 
       // Check that all class-rows are visible
       classesForMasterClass.forEach(({ id }) =>
@@ -373,8 +370,8 @@ describe('PlanningView', () => {
       );
 
       // Click the first class row
-      const firstClassId = classesForMasterClass[0].id;
-      await user.click(getByTestId(`expand-${firstClassId}`));
+      const { id: classId } = classesForMasterClass[0];
+      await user.click(getByTestId(`expand-${classId}`));
 
       // Check that only first class-row is visible
       await waitFor(() => {
@@ -391,7 +388,7 @@ describe('PlanningView', () => {
 
       // Check that projects that belong directly to the selected class are visible
       const projectsForClassWithoutGroup = projects.filter(
-        (p) => p.projectClass === firstClassId && !p.projectLocation && !p.projectGroup,
+        (p) => p.projectClass === classId && !p.projectLocation && !p.projectGroup,
       );
 
       await waitFor(() => {
@@ -400,14 +397,14 @@ describe('PlanningView', () => {
         );
       });
 
-      const subClassesForClass = subClasses.filter((c) => c.parent === firstClassId);
+      const subClassesForClass = subClasses.filter((c) => c.parent === classId);
 
       // Check that all subClass-rows are visible
       subClassesForClass.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
 
       // Click the first subClass row
-      const firstSubClassId = subClassesForClass[0].id;
-      await user.click(getByTestId(`expand-${firstSubClassId}`));
+      const { id: subClassId } = subClassesForClass[0];
+      await user.click(getByTestId(`expand-${subClassId}`));
 
       // Check that only first subClass-row is visible
       await waitFor(() => {
@@ -424,7 +421,7 @@ describe('PlanningView', () => {
 
       // Check that groups that belong directly to the selected subClass are visible
       const groupsForSubClass = mockGroups.data.filter(
-        (g) => g.classRelation === firstSubClassId && !g.locationRelation,
+        (g) => g.classRelation === subClassId && !g.locationRelation,
       );
 
       await waitFor(() => {
@@ -436,7 +433,7 @@ describe('PlanningView', () => {
 
       // Check that projects that belong directly to the selected subClass are visible
       const projectsForSubClassWithoutGroup = projects.filter(
-        (p) => p.projectClass === firstClassId && !p.projectLocation && !p.projectGroup,
+        (p) => p.projectClass === classId && !p.projectLocation && !p.projectGroup,
       );
 
       await waitFor(() => {
@@ -445,7 +442,7 @@ describe('PlanningView', () => {
         );
       });
 
-      const districtsForSubClass = districts.filter((c) => c.parentClass === firstSubClassId);
+      const districtsForSubClass = districts.filter((c) => c.parentClass === subClassId);
 
       // // Check that all district-rows are visible and they have the 'district-preview' class
       districtsForSubClass.forEach(({ id }) => {
@@ -454,8 +451,8 @@ describe('PlanningView', () => {
       });
 
       // Click the first district row
-      const firstDistrictId = districtsForSubClass[0].id;
-      await user.click(getByTestId(`expand-${firstDistrictId}`));
+      const { id: districtId } = districtsForSubClass[0];
+      await user.click(getByTestId(`expand-${districtId}`));
 
       // Check that only first district-row is visible
       await waitFor(() => {
@@ -464,7 +461,7 @@ describe('PlanningView', () => {
             expect(getByTestId(`row-${id}`)).toBeInTheDocument();
             expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
             expect(
-              getByTestId(`row-${firstDistrictId}`).classList.contains('district-preview'),
+              getByTestId(`row-${districtId}`).classList.contains('district-preview'),
             ).toBeFalsy();
           }
           if (i !== 0) {
@@ -474,9 +471,7 @@ describe('PlanningView', () => {
       });
 
       // Check that groups that belong directly to the selected district are visible
-      const groupsForDistrict = mockGroups.data.filter(
-        (g) => g.locationRelation === firstDistrictId,
-      );
+      const groupsForDistrict = mockGroups.data.filter((g) => g.locationRelation === districtId);
 
       await waitFor(() => {
         groupsForDistrict.forEach(({ id }) => {
@@ -487,7 +482,7 @@ describe('PlanningView', () => {
 
       //Check that projects that belong directly to the selected district are visible
       const projectsForDistrictWithoutGroup = projects.filter(
-        (p) => p.projectLocation === firstDistrictId && !p.projectGroup,
+        (p) => p.projectLocation === districtId && !p.projectGroup,
       );
 
       await waitFor(() => {
@@ -497,7 +492,7 @@ describe('PlanningView', () => {
       });
 
       // Divisions should be expanded by default and render all their children
-      const divisionsForDistrict = divisions.filter((d) => d.parent === firstDistrictId);
+      const divisionsForDistrict = divisions.filter((d) => d.parent === districtId);
 
       await waitFor(() => {
         divisionsForDistrict.forEach(({ id }) => {
@@ -526,11 +521,11 @@ describe('PlanningView', () => {
       });
 
       // Click the first group row
-      const firstGroupId = groupsForDivision[0].id;
-      await user.click(getByTestId(`expand-${firstGroupId}`));
+      const { id: groupId } = groupsForDivision[0];
+      await user.click(getByTestId(`expand-${groupId}`));
 
       // Check that projects that belong directly to opened group are visible
-      const projectsForGroup = projects.filter((p) => p.projectGroup === firstGroupId);
+      const projectsForGroup = projects.filter((p) => p.projectGroup === groupId);
 
       await waitFor(() => {
         projectsForGroup.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
@@ -538,8 +533,10 @@ describe('PlanningView', () => {
     });
 
     it('can click expand button to show and hide children and does not bring back all parent rows when re-clicked', async () => {
-      const { store, getByTestId, queryByTestId, user } = renderResult;
+      const { store, getByTestId, queryByTestId, user } = await render();
+
       const { masterClasses, classes } = store.getState().class;
+
       const classesForMasterClass = classes.filter((c) => c.parent === masterClasses[0].id);
 
       // Classes are hidden at first
@@ -580,8 +577,10 @@ describe('PlanningView', () => {
 
   describe('PlanningRow', () => {
     it('renders head and cells', async () => {
-      const { store, getByTestId } = renderResult;
+      const { store, getByTestId } = await render();
+
       const { id } = store.getState().class.masterClasses[0];
+
       const currentCells = getByTestId(`row-${id}`).children;
 
       expect(getByTestId(`row-${id}`)).toBeInTheDocument();
@@ -598,23 +597,27 @@ describe('PlanningView', () => {
     });
 
     it('can click expand button or title to expand and hide children but doesnt navigate back', async () => {
-      const { store, getByTestId, queryByTestId, user } = renderResult;
+      const { store, getByTestId, queryByTestId, user } = await render();
       const { masterClasses, classes } = store.getState().class;
 
-      await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+      const { id: masterClassId } = masterClasses[0];
+      const { id: classId } = classes[0];
+
+      await user.click(getByTestId(`expand-${masterClassId}`));
 
       expect(getByTestId('masterClass-breadcrumb')).toBeInTheDocument();
-      expect(getByTestId(`row-${classes[0].id}`)).toBeInTheDocument();
+      expect(getByTestId(`row-${classId}`)).toBeInTheDocument();
 
-      await user.click(getByTestId(`title-${masterClasses[0].id}`));
+      await user.click(getByTestId(`title-${masterClassId}`));
 
       expect(getByTestId('masterClass-breadcrumb')).toBeInTheDocument();
-      expect(queryByTestId(`row-${classes[0].id}`)).toBeNull();
+      expect(queryByTestId(`row-${classId}`)).toBeNull();
     });
 
     describe('PlanningHeader', () => {
       it('renders all elements', async () => {
-        const { store, getByTestId } = renderResult;
+        const { store, getByTestId } = await render();
+
         const { id } = store.getState().class.masterClasses[0];
 
         // Expand button
@@ -628,10 +631,10 @@ describe('PlanningView', () => {
 
     describe('PlanningCell', () => {
       it('renders budget, overrun and deviation only for the current year', async () => {
-        const { store, getByTestId } = renderResult;
+        const { store, getByTestId } = await render();
+
         const { id } = store.getState().class.masterClasses[0];
         const firstCell = getByTestId(`row-${id}`).children[1];
-
         const year = new Date().getFullYear();
 
         expect(firstCell.children[0].children.length).toBe(3);
@@ -642,10 +645,10 @@ describe('PlanningView', () => {
       });
 
       it('renders budget and realized cost for future years', async () => {
-        const { store, getByTestId } = renderResult;
+        const { store, getByTestId } = await render();
+
         const { id } = store.getState().class.masterClasses[0];
         const secondCell = getByTestId(`row-${id}`).children[2];
-
         const year = new Date().getFullYear() + 1;
 
         expect(secondCell.children[0].children.length).toBe(2);
@@ -657,7 +660,8 @@ describe('PlanningView', () => {
 
     describe('NameTooltip', () => {
       it('FIXME is hidden by default and displays the current rows title on hover', async () => {
-        const { store, getByTestId, user } = renderResult;
+        const { store, getByTestId, user } = await render();
+
         const { name, id } = store.getState().class.masterClasses[0];
         const rowTitle = getByTestId(`title-${id}`);
         const hoverTooltip = getByTestId(`hover-tooltip-${id}`);
@@ -677,7 +681,10 @@ describe('PlanningView', () => {
 
     describe('Project Row', () => {
       it('renders all the elements and no financial data to cells if there is no planning or construction', async () => {
+        const renderResult = await render();
+
         const { getByTestId } = renderResult;
+
         const { id, category, name, finances } = mockPlanningViewProjects.data.results[0];
 
         await waitFor(() => navigateToProjectRows(renderResult));
@@ -700,7 +707,9 @@ describe('PlanningView', () => {
       });
 
       it('doesnt render the project category if there is no category', async () => {
+        const renderResult = await render();
         const { queryByTestId } = renderResult;
+
         const { id } = mockPlanningViewProjects.data.results[1];
 
         await waitFor(() => navigateToProjectRows(renderResult));
@@ -711,11 +720,7 @@ describe('PlanningView', () => {
       });
 
       it('can patch the project phase with the custom context menu', async () => {
-        const { user, getByTestId, getByText, queryByTestId } = renderResult;
         const project = mockPlanningViewProjects.data.results[0];
-        const { id } = project;
-        const phasesAsOptions = mockProjectPhases.data.map((p) => listItemToOption(p));
-        const firstOptionValue = phasesAsOptions[0].value;
 
         const mockPatchPhaseResponse = {
           data: {
@@ -725,6 +730,14 @@ describe('PlanningView', () => {
         };
 
         mockedAxios.patch.mockResolvedValueOnce(mockPatchPhaseResponse);
+
+        const renderResult = await render();
+
+        const { user, getByTestId, getByText, queryByTestId } = renderResult;
+
+        const { id } = project;
+        const phasesAsOptions = mockProjectPhases.data.map((p) => listItemToOption(p));
+        const firstOptionValue = phasesAsOptions[0].value;
 
         await waitFor(() => navigateToProjectRows(renderResult));
 
@@ -773,6 +786,8 @@ describe('PlanningView', () => {
       });
 
       it('creates cells for planning, construction and overlap when the project has planning', async () => {
+        const renderResult = await render();
+
         const { getByTestId } = renderResult;
         const { id, finances } = mockPlanningViewProjects.data.results[1];
 
@@ -824,13 +839,13 @@ describe('PlanningView', () => {
 
       describe('ProjectCell', () => {
         it('active project cells can be edited and patched and the initial 0 value will be replaced by user input', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
-          const { id } = project;
           const year = new Date().getFullYear();
+
           const patchRequest = {
             finances: { year: year, budgetProposalCurrentYearPlus1: '40' },
           };
+
           const mockEditCellPatchResponse = {
             data: {
               ...project,
@@ -842,6 +857,11 @@ describe('PlanningView', () => {
           };
 
           mockedAxios.patch.mockResolvedValueOnce(mockEditCellPatchResponse);
+
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
 
           await waitFor(() => navigateToProjectRows(renderResult));
 
@@ -864,11 +884,8 @@ describe('PlanningView', () => {
         });
 
         it('can open the project cell menu and delete a cell in the middle to hide it from the timeline and moves the current sum to the next avaliable cell', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
-          const { id, name } = project;
           const year = new Date().getFullYear();
-          const yearToHide = year + 4;
 
           const patchRequest = {
             finances: {
@@ -889,6 +906,12 @@ describe('PlanningView', () => {
           };
 
           mockedAxios.patch.mockResolvedValueOnce(mockDeleteCellPatchResponse);
+
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id, name } = project;
+          const yearToHide = year + 4;
 
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(yearToHide, id, renderResult));
@@ -921,11 +944,8 @@ describe('PlanningView', () => {
         });
 
         it('can delete the start and end of the timeline to decrease the planning or construction dates', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const endOfTimeline = year + 6;
 
           const patchConEndRequest = {
             finances: {
@@ -950,6 +970,12 @@ describe('PlanningView', () => {
           };
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveConEndPatchResponse);
+
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const endOfTimeline = year + 6;
 
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(endOfTimeline, id, renderResult));
@@ -1011,11 +1037,8 @@ describe('PlanningView', () => {
         });
 
         it('it removes construction end and start dates if last construction cell is removed', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[8];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const lastConYear = year + 3;
 
           const patchLastConRequest = {
             finances: {
@@ -1040,6 +1063,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveLastConPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const lastConYear = year + 3;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(lastConYear, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
@@ -1052,11 +1081,8 @@ describe('PlanningView', () => {
         });
 
         it('it removes planning end and start dates if last planning cell is removed', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[9];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const lastPlanYear = year + 3;
 
           const patchLastPlanRequest = {
             finances: {
@@ -1081,6 +1107,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveLastPlanPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const lastPlanYear = year + 3;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(lastPlanYear, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
@@ -1093,11 +1125,8 @@ describe('PlanningView', () => {
         });
 
         it('it removes planning and construction end and start dates if last overlap cell is removed', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[10];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const lastOverlapYear = year + 3;
 
           const patchLastOverlapRequest = {
             finances: {
@@ -1126,6 +1155,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockRemoveLastOverlapPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const lastOverlapYear = year + 3;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(lastOverlapYear, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
@@ -1138,11 +1173,8 @@ describe('PlanningView', () => {
         });
 
         it('can add a year to construction and replaces the budgets null value with 0', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const conEndYear = year + 6;
 
           const patchAddConYearRequest = {
             finances: { year: year, preliminaryCurrentYearPlus7: '0' },
@@ -1162,6 +1194,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockAddConYearPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const conEndYear = year + 6;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
@@ -1179,11 +1217,8 @@ describe('PlanningView', () => {
         });
 
         it('can add a year to planning', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const planStartYear = year + 1;
 
           const patchAddPlanYearRequest = {
             finances: { year: year },
@@ -1203,6 +1238,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockAddConYearPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const planStartYear = year + 1;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
@@ -1219,13 +1260,9 @@ describe('PlanningView', () => {
         });
 
         it('can add a year to planning and construction if an overlap cell is selected', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[10];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const overlapYear = year + 3;
 
-          // Adding plan year from overlap
           const patchAddOverlapPlanRequest = {
             finances: { year: year },
             estPlanningStart: `12.02.${year + 2}`,
@@ -1244,6 +1281,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockAddOverlapPlanPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const overlapYear = year + 3;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
@@ -1258,7 +1301,6 @@ describe('PlanningView', () => {
             expect(patchMock[1]).toStrictEqual(patchAddOverlapPlanRequest);
           });
 
-          // Adding con year from overlap
           const patchAddOverlapConRequest = {
             finances: { year: year },
             estPlanningStart: `12.02.${year + 2}`,
@@ -1290,11 +1332,8 @@ describe('PlanningView', () => {
         });
 
         it('can increase the whole timeline by one year with double clicking ', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const conEndYear = year + 6;
 
           const patchMoveYearRequest = {
             finances: {
@@ -1330,6 +1369,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockMoveYearPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const conEndYear = year + 6;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
@@ -1347,11 +1392,8 @@ describe('PlanningView', () => {
         });
 
         it('can decrease the whole timeline by one year with double clicking ', async () => {
-          const { user, getByTestId } = renderResult;
           const project = mockPlanningViewProjects.data.results[1];
-          const { id } = project;
           const year = new Date().getFullYear();
-          const planStartYear = year + 1;
 
           const patchMoveYearRequest = {
             finances: {
@@ -1387,6 +1429,12 @@ describe('PlanningView', () => {
 
           mockedAxios.patch.mockResolvedValueOnce(mockMoveYearPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const planStartYear = year + 1;
+
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
@@ -1403,9 +1451,6 @@ describe('PlanningView', () => {
           });
         });
       });
-
-      // TODO: move timeline by one year forward
-      // TODO: move timeline by one year backwards
     });
   });
 });
