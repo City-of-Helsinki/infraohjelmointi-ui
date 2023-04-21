@@ -1,7 +1,6 @@
 import { IError, IFreeSearchResults } from '@/interfaces/common';
 import {
   IProject,
-  IProjectGetRequestObject,
   IProjectPatchRequestObject,
   IProjectsResponse,
 } from '@/interfaces/projectInterfaces';
@@ -14,31 +13,9 @@ import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const getProjects = async (req: IProjectGetRequestObject): Promise<IProjectsResponse> => {
-  const year = req.year ? `${req.year}/` : '';
-  return axios
-    .get(`${REACT_APP_API_URL}/projects/${year}?page=${req.page}`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
-};
-
 export const getProject = async (id: string): Promise<IProject> => {
   return axios
     .get(`${REACT_APP_API_URL}/projects/${id}`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
-};
-
-export const postProject = async (request: IProjectPatchRequestObject): Promise<void> => {
-  return axios
-    .post(`${REACT_APP_API_URL}/projects/`, request.data)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
-};
-
-export const deleteProject = async (id: string): Promise<void> => {
-  return axios
-    .delete(`${REACT_APP_API_URL}/projects/${id}/`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

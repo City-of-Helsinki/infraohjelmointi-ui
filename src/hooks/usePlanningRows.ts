@@ -8,8 +8,8 @@ import { useParams } from 'react-router';
 import { IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
-import { getProjectsWithParams } from '@/services/projectServices';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { getProjectsWithParams } from '@/services/projectServices';
 
 interface IPlanningRowLists {
   masterClasses: Array<IClass>;

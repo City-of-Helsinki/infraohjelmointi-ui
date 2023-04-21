@@ -1,11 +1,6 @@
 import { IError } from '@/interfaces/common';
-import {
-  IProject,
-  IProjectGetRequestObject,
-  IProjectPatchRequestObject,
-  IProjectsResponse,
-} from '@/interfaces/projectInterfaces';
-import { getProject, getProjects, patchProject, postProject } from '@/services/projectServices';
+import { IProject, IProjectPatchRequestObject } from '@/interfaces/projectInterfaces';
+import { getProject, patchProject } from '@/services/projectServices';
 import { RootState } from '@/store';
 import { getCurrentTime } from '@/utils/dates';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -28,36 +23,12 @@ const initialState: IProjectState = {
   updated: null,
 };
 
-export const getProjectsThunk = createAsyncThunk(
-  'project/getAll',
-  async (req: IProjectGetRequestObject, thunkAPI) => {
-    return await getProjects(req)
-      .then((res) => {
-        thunkAPI.dispatch(setPage(req.page));
-        if ((thunkAPI.getState() as RootState).project.projects.length > 0 && req.page === 1) {
-          thunkAPI.dispatch(resetProjects());
-        }
-        return res;
-      })
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
 export const getProjectThunk = createAsyncThunk('project/getOne', async (id: string, thunkAPI) => {
   thunkAPI.dispatch(resetProject());
   return await getProject(id)
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
-
-export const postProjectThunk = createAsyncThunk(
-  'project/post',
-  async (request: IProjectPatchRequestObject, thunkAPI) => {
-    return await postProject(request)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
 
 export const patchProjectThunk = createAsyncThunk(
   'project/silent-patch',
@@ -89,29 +60,11 @@ export const projectSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // GET ALL
-    builder.addCase(
-      getProjectsThunk.fulfilled,
-      (state, action: PayloadAction<IProjectsResponse>) => {
-        return {
-          ...state,
-          projects: [...state.projects, ...action.payload.results],
-          count: action.payload.count,
-        };
-      },
-    );
-    builder.addCase(getProjectsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
-      return { ...state, error: action.payload };
-    });
     // GET ONE
     builder.addCase(getProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
       return { ...state, selectedProject: action.payload };
     });
     builder.addCase(getProjectThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
-      return { ...state, error: action.payload };
-    });
-    // POST
-    builder.addCase(postProjectThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
     // SILENT PATCH

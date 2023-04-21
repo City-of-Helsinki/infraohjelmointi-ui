@@ -20,6 +20,8 @@ import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
 import { listItemToOption } from '@/utils/common';
+import { mockError } from '@/mocks/mockError';
+import { getProjectsWithParams } from '@/services/projectServices';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -108,6 +110,16 @@ describe('PlanningView', () => {
 
   it('renders the container', async () => {
     expect(getClass('planning-view-container')).toBeInTheDocument();
+  });
+
+  it('catches a failed getProjectsWithParams request', async () => {
+    mockedAxios.get.mockRejectedValueOnce(mockError);
+
+    await waitFor(() => getProjectsWithParams({ params: 'test=123', direct: false }));
+    await waitFor(() => {
+      const getMock = mockedAxios.get.mock.lastCall;
+      expect(getMock[0]).toBe('localhost:4000/projects/planning-view/?test=123&direct=false');
+    });
   });
 
   describe('PlanningBreadCrumbs', () => {

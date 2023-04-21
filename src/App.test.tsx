@@ -58,11 +58,7 @@ describe('App', () => {
       renderWithProviders(<Route path="*" element={<App />} />),
     );
 
-    const classes = store.getState().class;
-
-    const locations = store.getState().location;
-    const lists = store.getState().lists;
-    const hashTags = store.getState().hashTags;
+    const { class: classes, location: locations, lists, hashTags } = store.getState();
 
     await waitFor(() => {
       expect(lists.categories).toStrictEqual(mockProjectCategories.data);
