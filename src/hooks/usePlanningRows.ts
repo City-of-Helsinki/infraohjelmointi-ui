@@ -8,7 +8,7 @@ import { useParams } from 'react-router';
 import { IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
-import { getPlanningProjectsWithParams } from '@/services/projectServices';
+import { getProjectsWithParams } from '@/services/projectServices';
 import { IProject } from '@/interfaces/projectInterfaces';
 
 interface IPlanningRowLists {
@@ -225,9 +225,8 @@ const fetchProjectsByRelation = async (
 ): Promise<Array<IProject>> => {
   const direct = type === 'class' || type === 'subClass';
   try {
-    const allResults = await getPlanningProjectsWithParams({
+    const allResults = await getProjectsWithParams({
       params: `${type}=${id}`,
-      limit: '5000',
       direct: direct,
     });
     return allResults.results;

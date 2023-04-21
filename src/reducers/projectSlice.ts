@@ -9,7 +9,6 @@ import { getProject, getProjects, patchProject, postProject } from '@/services/p
 import { RootState } from '@/store';
 import { getCurrentTime } from '@/utils/dates';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { notifySuccess } from './notificationSlice';
 
 interface IProjectState {
   selectedProject: IProject | null;
@@ -60,29 +59,11 @@ export const postProjectThunk = createAsyncThunk(
   },
 );
 
-export const silentPatchProjectThunk = createAsyncThunk(
+export const patchProjectThunk = createAsyncThunk(
   'project/silent-patch',
   async (request: IProjectPatchRequestObject, thunkAPI) => {
     return await patchProject(request)
       .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
-export const patchProjectThunk = createAsyncThunk(
-  'project/patch',
-  async (request: IProjectPatchRequestObject, thunkAPI) => {
-    return await patchProject(request)
-      .then((res) => {
-        thunkAPI.dispatch(
-          notifySuccess({
-            title: 'sendSuccess',
-            message: 'formSaveSuccess',
-            type: 'toast',
-          }),
-        );
-        return res;
-      })
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
@@ -133,26 +114,8 @@ export const projectSlice = createSlice({
     builder.addCase(postProjectThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
-    // PATCH
-    builder.addCase(patchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
-      // All projects also need to be updated to get changes into the planning list
-      const updatedProjectList: Array<IProject> = state.projects.map((p) =>
-        p.id === action.payload.id ? action.payload : p,
-      );
-      return {
-        ...state,
-        selectedProject: action.payload,
-        projects: [...updatedProjectList],
-      };
-    });
-    builder.addCase(
-      patchProjectThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
     // SILENT PATCH
-    builder.addCase(silentPatchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
+    builder.addCase(patchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
       // All projects also need to be updated to get changes into the planning list
       const updatedProjectList: Array<IProject> = state.projects.map((p) =>
         p.id === action.payload?.id ? action.payload : p,
@@ -165,7 +128,7 @@ export const projectSlice = createSlice({
       };
     });
     builder.addCase(
-      silentPatchProjectThunk.rejected,
+      patchProjectThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

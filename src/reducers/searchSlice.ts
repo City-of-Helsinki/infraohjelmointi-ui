@@ -6,7 +6,7 @@ import {
   SearchLimit,
   SearchOrder,
 } from '@/interfaces/searchInterfaces';
-import { getProjectsWithParams } from '@/services/projectServices';
+import { getSearchResults } from '@/services/projectServices';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
 
@@ -63,7 +63,7 @@ export const getSearchResultsThunk = createAsyncThunk(
     req.limit = (thunkAPI.getState() as RootState).search.searchLimit;
     req.params = req.params || (thunkAPI.getState() as RootState).search.lastSearchParams;
     req.order = (thunkAPI.getState() as RootState).search.searchOrder;
-    return await getProjectsWithParams(req)
+    return await getSearchResults(req)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },

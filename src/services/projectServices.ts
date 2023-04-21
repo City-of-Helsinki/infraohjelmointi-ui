@@ -5,7 +5,11 @@ import {
   IProjectPatchRequestObject,
   IProjectsResponse,
 } from '@/interfaces/projectInterfaces';
-import { ISearchRequest, ISearchResults } from '@/interfaces/searchInterfaces';
+import {
+  IProjectSearchRequest,
+  ISearchRequest,
+  ISearchResults,
+} from '@/interfaces/searchInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
@@ -46,7 +50,7 @@ export const patchProject = async (request: IProjectPatchRequestObject): Promise
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const getProjectsWithParams = async (req: ISearchRequest): Promise<ISearchResults> => {
+export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResults> => {
   return axios
     .get(
       req.fullPath ||
@@ -56,17 +60,11 @@ export const getProjectsWithParams = async (req: ISearchRequest): Promise<ISearc
     .catch((err: IError) => Promise.reject(err));
 };
 
-// FIXME: this should be remove when search-results gets their own endpoint
-export const getPlanningProjectsWithParams = async (
-  req: ISearchRequest,
+export const getProjectsWithParams = async (
+  req: IProjectSearchRequest,
 ): Promise<IProjectsResponse> => {
   return axios
-    .get(
-      req.fullPath ||
-        `${REACT_APP_API_URL}/projects/planning-view/?${req.params}&limit=${req.limit}&direct=${
-          req.direct || false
-        }`,
-    )
+    .get(`${REACT_APP_API_URL}/projects/planning-view/?${req.params}&direct=${req.direct}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
