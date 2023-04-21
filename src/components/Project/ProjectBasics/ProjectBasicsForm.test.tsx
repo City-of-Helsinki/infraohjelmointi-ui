@@ -1,7 +1,7 @@
 import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import ProjectBasicsForm from './ProjectBasicsForm';
 import { arrayHasValue, matchExact } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
@@ -30,61 +30,59 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+const getFormField = (name: string) => `projectBasicsForm.${name}`;
+
+const render = async () =>
+  await act(async () =>
+    renderWithProviders(<Route path="/" element={<ProjectBasicsForm />} />, {
+      preloadedState: {
+        project: {
+          projects: [mockProject.data],
+          selectedProject: mockProject.data,
+          count: 1,
+          error: {},
+          page: 1,
+          updated: null,
+        },
+        auth: { user: mockPersons.data[0], error: {} },
+        lists: {
+          areas: mockProjectAreas.data,
+          phases: mockProjectPhases.data,
+          types: mockProjectTypes.data,
+          constructionPhaseDetails: mockConstructionPhaseDetails.data,
+          categories: mockProjectCategories.data,
+          riskAssessments: mockProjectRisks.data,
+          projectQualityLevels: mockProjectQualityLevels.data,
+          planningPhases: mockPlanningPhases.data,
+          constructionPhases: mockConstructionPhases.data,
+          responsibleZones: mockResponsibleZones.data,
+          responsiblePersons: mockResponsiblePersons.data,
+          programmedYears: [],
+          error: {},
+        },
+        hashTags: {
+          hashTags: mockHashTags.data.hashTags,
+          popularHashTags: mockHashTags.data.popularHashTags,
+          error: {},
+        },
+      },
+    }),
+  );
+
 describe('ProjectBasicsForm', () => {
-  let renderResult: CustomRenderResult;
-
-  const getFormField = (name: string) => `projectBasicsForm.${name}`;
-
-  beforeEach(async () => {
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<Route path="/" element={<ProjectBasicsForm />} />, {
-          preloadedState: {
-            project: {
-              projects: [mockProject.data],
-              selectedProject: mockProject.data,
-              count: 1,
-              error: {},
-              page: 1,
-              updated: null,
-            },
-            auth: { user: mockPersons.data[0], error: {} },
-            lists: {
-              areas: mockProjectAreas.data,
-              phases: mockProjectPhases.data,
-              types: mockProjectTypes.data,
-              constructionPhaseDetails: mockConstructionPhaseDetails.data,
-              categories: mockProjectCategories.data,
-              riskAssessments: mockProjectRisks.data,
-              projectQualityLevels: mockProjectQualityLevels.data,
-              planningPhases: mockPlanningPhases.data,
-              constructionPhases: mockConstructionPhases.data,
-              responsibleZones: mockResponsibleZones.data,
-              responsiblePersons: mockResponsiblePersons.data,
-              programmedYears: [],
-              error: {},
-            },
-            hashTags: {
-              hashTags: mockHashTags.data.hashTags,
-              popularHashTags: mockHashTags.data.popularHashTags,
-              error: {},
-            },
-          },
-        })),
-    );
-  });
-
   afterEach(async () => {
     jest.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {
-    const { getByTestId } = renderResult;
+    const { getByTestId } = await render();
+
     expect(getByTestId('project-basics-form')).toBeInTheDocument();
   });
 
   it('fills the fields with existing project data', async () => {
-    const { getByDisplayValue, getByText, getByTestId } = renderResult;
+    const { getByDisplayValue, getByText, getByTestId } = await render();
+
     const project = mockProject.data;
     const euroFormat = (value: string) => `${value} €`;
     const expectDisplayValue = (value: string | undefined) =>
@@ -146,14 +144,16 @@ describe('ProjectBasicsForm', () => {
     });
   });
 
-  it('has all required fields as required', () => {
-    const { getByText } = renderResult;
+  it('has all required fields as required', async () => {
+    const { getByText } = await render();
+
     expect(getByText('projectBasicsForm.type')).toBeInTheDocument();
     expect(getByText('projectBasicsForm.description')).toBeInTheDocument();
   });
 
   it('renders hashTags modal and can search and patch hashTags', async () => {
-    const { getByText, getByRole, user, getAllByTestId, store } = renderResult;
+    const { getByText, getByRole, user, getAllByTestId, store } = await render();
+
     const expectedValues = [
       ...(mockProject.data.hashTags as Array<string>),
       '816cc173-6340-45ed-9b49-4b4976b2a48b',
@@ -212,7 +212,7 @@ describe('ProjectBasicsForm', () => {
     mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
     mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
 
-    const { user, queryAllByText, getByTestId } = renderResult;
+    const { user, queryAllByText, getByTestId } = await render();
 
     // Open modal
     await user.click(getByTestId('open-hash-tag-dialog-button'));
@@ -237,7 +237,6 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can use popular hashtags from the hashtags form', async () => {
-    const { getByText, getByRole, user, queryByTestId, getAllByText } = renderResult;
     const expectedValues = [
       ...(mockProject.data.hashTags as Array<string>),
       mockHashTags.data.popularHashTags[0].id,
@@ -249,6 +248,9 @@ describe('ProjectBasicsForm', () => {
     // Mock all needed requests, to be able to
     // PATCH the project with the popular hashtag
     mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
+
+    const { getByText, getByRole, user, queryByTestId, getAllByText } = await render();
+
     // Open modal
     await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
 
@@ -280,14 +282,15 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a NumberField', async () => {
-    const { user, getByDisplayValue, getByTestId } = renderResult;
-    const expectedValue = '1234';
     const project = mockProject.data;
+    const expectedValue = '1234';
     const responseProject: { data: IProject } = {
       data: { ...project, hkrId: expectedValue },
     };
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+    const { user, getByDisplayValue, getByTestId } = await render();
 
     const parentContainer = getByTestId('project-basics-form');
 
@@ -303,7 +306,6 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a SelectField', async () => {
-    const { user, getByRole, getByText, getByTestId } = renderResult;
     const expectedValue = { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' };
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -311,6 +313,8 @@ describe('ProjectBasicsForm', () => {
     };
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+    const { user, getByRole, getByText, getByTestId } = await render();
 
     const parentContainer = getByTestId('project-basics-form');
 
@@ -324,7 +328,7 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a DateField', async () => {
-    const { user, getByRole, getByDisplayValue, getByTestId } = renderResult;
+    const { user, getByRole, getByDisplayValue, getByTestId } = await render();
     const expectedValue = '13.12.2022';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -346,7 +350,6 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a TextField', async () => {
-    const { user, getByDisplayValue, getByTestId } = renderResult;
     const expectedValue = 'New description';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -354,6 +357,8 @@ describe('ProjectBasicsForm', () => {
     };
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+    const { user, getByDisplayValue, getByTestId } = await render();
 
     const descriptionField = screen.getByRole('textbox', { name: getFormField('description *') });
     const parentContainer = getByTestId('project-basics-form');
@@ -368,7 +373,6 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('can autosave patch a RadioCheckboxField', async () => {
-    const { user, getByTestId } = renderResult;
     const expectedValue = true;
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -376,6 +380,8 @@ describe('ProjectBasicsForm', () => {
     };
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+    const { user, getByTestId } = await render();
 
     const louhiField = getByTestId('louhi-0') as HTMLInputElement;
     const parentContainer = getByTestId('project-basics-form');

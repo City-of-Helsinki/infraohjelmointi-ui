@@ -3,7 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from './ProjectView';
 import { getProjectThunk } from '@/reducers/projectSlice';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
 import { act } from 'react-dom/test-utils';
@@ -15,50 +15,53 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('ProjectView', () => {
-  let renderResult: CustomRenderResult;
+const render = async () =>
+  await act(async () => renderWithProviders(<Route path="/" element={<ProjectView />} />));
 
-  beforeEach(async () => {
+describe('ProjectView', () => {
+  beforeEach(() => {
     mockGetResponseProvider();
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<Route path="/" element={<ProjectView />} />)),
-    );
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('has all needed data in store', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
 
     expect(store.getState().project.selectedProject).toStrictEqual(mockProject.data);
   });
 
-  it('renders the parent container', () => {
-    const { getByTestId } = renderResult;
+  it('renders the parent container', async () => {
+    const { getByTestId } = await render();
+
     expect(getByTestId('project-view')).toBeInTheDocument();
   });
 
-  it('renders the ProjectToolbar', () => {
-    const { getByTestId } = renderResult;
+  it('renders the ProjectToolbar', async () => {
+    const { getByTestId } = await render();
+
     expect(getByTestId('toolbar')).toBeInTheDocument();
   });
 
-  it('renders the ProjectHeader', () => {
-    const { getByTestId } = renderResult;
+  it('renders the ProjectHeader', async () => {
+    const { getByTestId } = await render();
+
     expect(getByTestId('project-header')).toBeInTheDocument();
   });
 
   it('renders the ProjectTabs', async () => {
-    const { findByTestId } = renderResult;
+    const { findByTestId } = await render();
+
     expect(await findByTestId('tabs-list')).toBeInTheDocument();
   });
 
   it('catches a failed project  fetch', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
+
     mockedAxios.get.mockRejectedValueOnce(mockError);
+
     await act(() => store.dispatch(getProjectThunk(mockProject.data.id)));
 
     const storeError = store.getState().project.error as IError;

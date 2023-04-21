@@ -14,7 +14,7 @@ import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockGroups } from '@/mocks/mockGroups';
 import { Route } from 'react-router';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import { fireEvent, waitFor } from '@testing-library/react';
+import { act, fireEvent, waitFor } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
@@ -29,7 +29,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 const store = setupStore();
 
 const render = async () =>
-  await waitFor(async () =>
+  await act(async () =>
     renderWithProviders(
       <Route
         path="/"

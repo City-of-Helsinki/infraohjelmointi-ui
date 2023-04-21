@@ -44,19 +44,20 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+const render = async () =>
+  await act(async () => renderWithProviders(<Route path="*" element={<App />} />));
+
 describe('App', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     mockGetResponseProvider();
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('adds all needed data to store', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { store } = await render();
 
     const { class: classes, location: locations, lists, hashTags } = store.getState();
 
@@ -86,37 +87,27 @@ describe('App', () => {
   });
 
   it('renders TopBar', async () => {
-    const { getByTestId } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { getByTestId } = await render();
     expect(getByTestId('top-bar')).toBeInTheDocument();
   });
 
   it('renders SideBar', async () => {
-    const { getByTestId } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { getByTestId } = await render();
     expect(getByTestId('sidebar')).toBeInTheDocument();
   });
 
   it('renders app-content', async () => {
-    const { container } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { container } = await render();
     expect(container.getElementsByClassName('app-content').length).toBe(1);
   });
 
   it('does not render Loader', async () => {
-    const { container } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { container } = await render();
     expect(container.getElementsByClassName('loader-overlay').length).toBe(0);
   });
 
   it('does not render Notification', async () => {
-    const { container } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { container } = await render();
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
   });
 
@@ -136,10 +127,10 @@ describe('App', () => {
   });
 
   it('catches a failed classes fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { store } = await render();
+
     mockedAxios.get.mockRejectedValueOnce(mockError);
+
     await store.dispatch(getClassesThunk());
 
     const storeError = store.getState().class.error as IError;
@@ -148,10 +139,10 @@ describe('App', () => {
   });
 
   it('catches a failed locations fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { store } = await render();
+
     mockedAxios.get.mockRejectedValueOnce(mockError);
+
     await store.dispatch(getLocationsThunk());
 
     const storeError = store.getState().location.error as IError;
@@ -160,9 +151,7 @@ describe('App', () => {
   });
 
   it('catches a failed hashtags fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { store } = await render();
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
@@ -174,9 +163,7 @@ describe('App', () => {
   });
 
   it('catches a failed lists fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { store } = await render();
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
@@ -189,9 +176,7 @@ describe('App', () => {
   });
 
   it('catches a failed groups fetch', async () => {
-    const { store } = await act(async () =>
-      renderWithProviders(<Route path="*" element={<App />} />),
-    );
+    const { store } = await render();
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 

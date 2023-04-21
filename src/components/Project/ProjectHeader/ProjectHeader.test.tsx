@@ -1,5 +1,5 @@
 import mockI18next from '@/mocks/mockI18next';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import ProjectHeader from './ProjectHeader';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
@@ -13,32 +13,29 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('ProjectHeader', () => {
-  let renderResult: CustomRenderResult;
+const render = async () =>
+  await act(async () =>
+    renderWithProviders(<Route path="/" element={<ProjectHeader />} />, {
+      preloadedState: {
+        project: {
+          projects: [],
+          selectedProject: mockProject.data,
+          count: 1,
+          error: {},
+          page: 1,
+          updated: null,
+        },
+      },
+    }),
+  );
 
-  beforeEach(async () => {
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<Route path="/" element={<ProjectHeader />} />, {
-          preloadedState: {
-            project: {
-              projects: [],
-              selectedProject: mockProject.data,
-              count: 1,
-              error: {},
-              page: 1,
-              updated: null,
-            },
-          },
-        })),
-    );
-  });
-  afterEach(async () => {
+describe('ProjectHeader', () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders all component wrappers', () => {
-    const { getByTestId } = renderResult;
+  it('renders all component wrappers', async () => {
+    const { getByTestId } = await render();
 
     expect(getByTestId('project-header')).toBeInTheDocument();
     expect(getByTestId('project-header-left')).toBeInTheDocument();
@@ -47,7 +44,7 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all left side elements', async () => {
-    const { getByRole, getByText, store } = renderResult;
+    const { getByRole, getByText, store } = await render();
 
     const project = store.getState().project.selectedProject as IProject;
     const { projectReadiness, name, phase, address } = project;
@@ -60,7 +57,7 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all right side elements', async () => {
-    const { getByRole, getByText, getByTestId } = renderResult;
+    const { getByRole, getByText, getByTestId } = await render();
 
     expect(getByTestId('project-favourite')).toBeInTheDocument();
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
@@ -69,7 +66,7 @@ describe('ProjectHeader', () => {
   });
 
   it('can autosave patch a form value', async () => {
-    const { queryByRole, getByRole, user, getByText } = renderResult;
+    const { queryByRole, getByRole, user, getByText } = await render();
     const expectedValue = 'New name';
     const project = mockProject.data;
 

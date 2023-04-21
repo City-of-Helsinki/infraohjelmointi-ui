@@ -1,7 +1,7 @@
 import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import ProjectNotes from './ProjectNotes';
 import mockNotes from '@/mocks/mockNotes';
 import {
@@ -23,41 +23,39 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+const render = async () =>
+  await act(async () =>
+    renderWithProviders(<Route path="/" element={<ProjectNotes />} />, {
+      preloadedState: {
+        project: {
+          projects: [],
+          selectedProject: mockProject.data,
+          count: 1,
+          error: {},
+          page: 1,
+          updated: null,
+        },
+      },
+    }),
+  );
+
 describe('ProjectNotes', () => {
-  let renderResult: CustomRenderResult;
-
-  beforeEach(async () => {
+  beforeEach(() => {
     mockGetResponseProvider();
-
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<Route path="/" element={<ProjectNotes />} />, {
-          preloadedState: {
-            project: {
-              projects: [],
-              selectedProject: mockProject.data,
-              count: 1,
-              error: {},
-              page: 1,
-              updated: null,
-            },
-          },
-        })),
-    );
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders the component wrappers', async () => {
-    const { getByTestId } = renderResult;
+    const { getByTestId } = await render();
 
     expect(getByTestId('notes-page')).toBeInTheDocument();
   });
 
   it('renders the new note form', async () => {
-    const { getByTestId, getByLabelText, getByRole } = renderResult;
+    const { getByTestId, getByLabelText, getByRole } = await render();
 
     expect(getByTestId('new-note-textarea')).toBeInTheDocument();
     expect(getByLabelText('writeNote')).toBeInTheDocument();
@@ -66,7 +64,7 @@ describe('ProjectNotes', () => {
   });
 
   it('renders the existing notes', async () => {
-    const { getByText } = renderResult;
+    const { getByText } = await render();
 
     mockNotes.data.forEach((n) => {
       const author = `${n.updatedBy.firstName} ${n.updatedBy.lastName}`;
@@ -78,21 +76,21 @@ describe('ProjectNotes', () => {
   });
 
   it('renders history label and history button only if a note has history', async () => {
-    const { getAllByText, getAllByRole } = renderResult;
+    const { getAllByText, getAllByRole } = await render();
 
     expect(getAllByText('modified').length).toBe(1);
     expect(getAllByRole('button', { name: 'editHistory' }).length).toBe(1);
   });
 
   it('renders delete and edit button for every note', async () => {
-    const { getAllByRole } = renderResult;
+    const { getAllByRole } = await render();
 
     expect(getAllByRole('button', { name: 'delete' }).length).toBe(2);
     expect(getAllByRole('button', { name: 'edit' }).length).toBe(2);
   });
 
   it('can open history rows if a note has history', async () => {
-    const { getByRole, user, container, getByText } = renderResult;
+    const { getByRole, user, container, getByText } = await render();
 
     await user.click(getByRole('button', { name: 'editHistory' }));
 
@@ -107,7 +105,7 @@ describe('ProjectNotes', () => {
   });
 
   it('can POST a note', async () => {
-    const { user, getByRole, getByText } = renderResult;
+    const { user, getByRole, getByText } = await render();
 
     const responseNote = {
       data: {
@@ -130,7 +128,7 @@ describe('ProjectNotes', () => {
   });
 
   it('can DELETE a note', async () => {
-    const { user, getByRole, getByTestId, getAllByRole } = renderResult;
+    const { user, getByRole, getByTestId, getAllByRole } = await render();
 
     mockedAxios.delete.mockResolvedValue(
       Promise.resolve({
@@ -148,7 +146,7 @@ describe('ProjectNotes', () => {
 
   it('can PATCH a note', async () => {
     const { user, queryByText, getAllByRole, getByTestId, getByText, getAllByTestId } =
-      renderResult;
+      await render();
 
     const responseNote = {
       data: {
@@ -178,7 +176,7 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes GET request', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
     await store.dispatch(getNotesByProjectThunk(''));
@@ -189,7 +187,7 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes PATCH request', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
 
     mockedAxios.patch.mockRejectedValueOnce(mockError);
     await store.dispatch(patchNoteThunk({}));
@@ -200,7 +198,7 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes DELETE request', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
 
     mockedAxios.delete.mockRejectedValueOnce(mockError);
     await store.dispatch(deleteNoteThunk(''));
@@ -211,7 +209,7 @@ describe('ProjectNotes', () => {
   });
 
   it('catches a bad notes POST request', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
     mockedAxios.post.mockRejectedValueOnce(mockError);
     await store.dispatch(postNoteThunk({}));
 
