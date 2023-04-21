@@ -1,5 +1,3 @@
-// import { useAppSelector } from '@/hooks/common';
-// import { selectIsLoading } from '@/reducers/loadingSlice';
 import useSearchResultsList from '@/hooks/useSearchResultsList';
 import SearchResultsCard from './SearchResultsCard';
 import SearchResultsNotFound from './SearchResultsNotFound';

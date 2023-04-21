@@ -1,7 +1,6 @@
 import { useAppSelector } from '@/hooks/common';
 import useSearchTerms from '@/hooks/useSearchTerms';
 import { selectIsLoading } from '@/reducers/loaderSlice';
-// import { selectIsLoading } from '@/reducers/loadingSlice';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
