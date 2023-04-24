@@ -114,7 +114,7 @@ describe('PlanningView', () => {
 
     const getMock = mockedAxios.get.mock.lastCall;
 
-    expect(getMock[0]).toBe('localhost:4000/projects/planning-view/?test=123&direct=false');
+    expect(getMock[0]).toBe('localhost:4000/projects/?test=123&direct=false');
   });
 
   describe('PlanningBreadCrumbs', () => {

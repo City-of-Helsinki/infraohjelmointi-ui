@@ -75,7 +75,7 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockNotes);
       case url === `/project-groups/`:
         return Promise.resolve(mockGroups);
-      case url.toLocaleLowerCase().includes(`/projects/planning-view/`):
+      case url.toLocaleLowerCase().includes(`/projects/`):
         return Promise.resolve(mockPlanningViewProjects);
       default:
         return Promise.reject(new Error('not found'));
