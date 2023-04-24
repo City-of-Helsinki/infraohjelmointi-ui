@@ -85,13 +85,11 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
           <div className="project-right-icons-container">
             <div>
               {project.category && (
-                <>
-                  <CustomTag
-                    text={project.category.value}
-                    weight={'light'}
-                    id={`category-${project.id}`}
-                  />
-                </>
+                <CustomTag
+                  text={project.category.value}
+                  weight={'light'}
+                  id={`category-${project.id}`}
+                />
               )}
             </div>
             <div className="flex flex-col">

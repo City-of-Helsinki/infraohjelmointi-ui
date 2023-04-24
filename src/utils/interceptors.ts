@@ -85,8 +85,6 @@ const handleError = (error: AxiosError): Promise<IError> => {
     }),
   );
 
-  console.log('Error intercepted: ', error);
-
   if (shouldTriggerLoading(error.config?.url)) {
     store.dispatch(clearLoading(error.config?.url || ''));
   }
