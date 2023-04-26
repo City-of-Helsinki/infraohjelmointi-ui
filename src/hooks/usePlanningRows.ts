@@ -79,6 +79,24 @@ const getLink = (
 };
 
 /**
+ * Parses a location name and returns the number value at the beginning of the name.
+ */
+const parseNumberFromName = (name: string) =>
+  parseInt(name.match(/^\d+\./)?.[0]?.slice(0, -1) ?? '');
+
+/**
+ * Takes a list of groups or projects and returns them sorted by their name
+ */
+const sortByName = (list: Array<IProject> | Array<IGroup>) =>
+  list.sort((a, b) => a.name.localeCompare(b.name));
+
+/**
+ * Takes a list of locations and returns them sorted by their name
+ */
+const sortByNumber = (list: Array<ILocation>) =>
+  list.sort((n1, n2) => parseNumberFromName(n1.name) - parseNumberFromName(n2.name));
+
+/**
  * Filters and sorts projects for a class, location or group alphabetically for a given row type.
  */
 const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IProject>) => {
@@ -98,7 +116,7 @@ const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IP
       projectList = projects.filter((p) => !p.projectGroup).filter((p) => p.projectLocation === id);
       break;
   }
-  return projectList.sort((a, b) => a.name.localeCompare(b.name));
+  return sortByName(projectList) as Array<IProject>;
 };
 
 /**
@@ -136,8 +154,8 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
     };
   };
 
-  // Groups can get mapped under subClasses, districts and divisions
-  const mapGroups = (id: string, type: PlanningRowType) => {
+  // Groups can get mapped under subClasses, districts and divisions and sorts them by name
+  const getSortedGroupRows = (id: string, type: PlanningRowType) => {
     const filteredGroups = [];
     // Filter groups under subClass only if there are is no locationRelation
     if (type === 'subClass') {
@@ -149,8 +167,8 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
     else if (type === 'division' || type == 'district') {
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
-    return filteredGroups.map((group) => ({
-      ...getRowProps(group, 'group'),
+    return sortByName(filteredGroups).map((group) => ({
+      ...getRowProps(group as IGroup, 'group'),
     }));
   };
 
@@ -170,12 +188,12 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
               ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
               // Map districts & groups (groups only if they do not belong to a district)
               children: [
+                ...getSortedGroupRows(filteredSubClass.id, 'subClass'),
                 ...districts
                   .filter((district) => district.parentClass === filteredSubClass.id)
                   .map((filteredDistrict) => ({
                     ...getRowProps(filteredDistrict, 'district-preview'),
                   })),
-                ...mapGroups(filteredSubClass.id, 'subClass'),
               ],
             })),
         })),
@@ -183,20 +201,21 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
   });
 
   // Map the selected districts divisions and the groups & projects that belong to those divisions
-  const locationRows = districts.map((district) => ({
-    ...getRowProps(district, 'district', true),
-    // Map divisions & groups (groups only if there are no divisions)
-    children: [
-      ...divisions
-        .filter((division) => division.parent === district.id)
-        .map((filteredDivision) => ({
+  const locationRows = districts.map((district) => {
+    const divisionsForDistrict = divisions.filter((division) => division.parent === district.id);
+    return {
+      ...getRowProps(district, 'district', true),
+      // Map divisions & groups (groups only if there are no divisions)
+      children: [
+        ...getSortedGroupRows(district.id, 'district'),
+        ...sortByNumber(divisionsForDistrict).map((filteredDivision) => ({
           ...getRowProps(filteredDivision, 'division', true),
           // Map projects & groups
-          children: mapGroups(filteredDivision.id, 'division'),
+          children: getSortedGroupRows(filteredDivision.id, 'division'),
         })),
-      ...mapGroups(district.id, 'district'),
-    ],
-  }));
+      ],
+    };
+  });
 
   return selectedDistrict ? locationRows : classRows;
 };
