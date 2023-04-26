@@ -66,7 +66,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
               (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
             );
 
-            // Convert the resultList to options for the suggestion dropdown
             const searchProjectsItemList: Array<IOption> | [] = resultList
               ? resultList.map((project) => ({
                   ...listItemToOption({ id: project.id, value: project.name }),
