@@ -2,7 +2,6 @@ import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, MouseEvent as ReactMouseEvent, useRef } from 'react';
-import { useNavigate } from 'react-router';
 import ProjectCell from './ProjectCell';
 import { ContextMenuType } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
@@ -10,22 +9,23 @@ import useProjectCells from '@/hooks/useProjectCell';
 import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useAppDispatch } from '@/hooks/common';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { Link } from 'react-router-dom';
+import './styles.css';
+import { patchProject } from '@/services/projectServices';
 
-interface IPlanningGroupsTableRowProps {
+interface IProjectRowProps {
   project: IProject;
+  onUpdateProject: (projectToUpdate: IProject) => void;
 }
 
-const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({ project }) => {
-  const navigate = useNavigate();
+const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
   const dispatch = useAppDispatch();
-  const navigateToProject = () => navigate(`/project/${project.id}/basics`);
-  const tableRowRef = useRef<HTMLTableRowElement>(null);
+  const projectRowRef = useRef<HTMLTableRowElement>(null);
   const projectCells = useProjectCells(project);
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
-      dispatch(silentPatchProjectThunk({ data: req, id: project.id }));
+      patchProject({ data: req, id: project.id }).then((res) => onUpdateProject(res));
     },
     [dispatch, project.id],
   );
@@ -47,48 +47,70 @@ const PlanningGroupsTableRow: FC<IPlanningGroupsTableRowProps> = ({ project }) =
 
   // Remove the active css-class from the current row if the user clicks outside of it
   useClickOutsideRef(
-    tableRowRef,
+    projectRowRef,
     useCallback(() => {
-      if (tableRowRef?.current?.classList.contains('active')) {
-        tableRowRef.current.classList.remove('active');
+      if (projectRowRef?.current?.classList.contains('active')) {
+        projectRowRef.current.classList.remove('active');
       }
     }, []),
   );
 
   return (
-    <tr id={`row-${project.id}`} ref={tableRowRef}>
+    <tr id={`project-row-${project.id}`} ref={projectRowRef} data-testid={`row-${project.id}`}>
       {/* HEADER */}
-      <th className="project-header-cell">
+      <th className="project-header-cell" data-testid={`head-${project.id}`}>
         <div className="project-header-cell-container">
           {/* Left (dots & document) */}
           <div className="project-left-icons-container">
-            <IconMenuDots size="xs" className="cursor-pointer" onMouseDown={handleOpenPhaseMenu} />
+            <IconMenuDots
+              size="xs"
+              className="cursor-pointer"
+              data-testid={`edit-phase-${project.id}`}
+              onMouseDown={handleOpenPhaseMenu}
+            />
             <IconDocument />
             {/* <button className="h-2 w-2 bg-[blue]" onClick={handleOpenPhaseMenu}></button> */}
           </div>
           {/* Center (name button) */}
           <div className="project-name-container">
-            <button className="project-name-button" onClick={navigateToProject}>
+            <Link
+              to={`/project/${project.id}/basics`}
+              className="project-name-button"
+              data-testid={`navigate-${project.id}`}
+            >
               {project.name}
-            </button>
+            </Link>
           </div>
           {/* Right side (category & budget) */}
           <div className="project-right-icons-container">
             <div>
-              {project.category && <CustomTag text={project.category.value} weight={'light'} />}
+              {project.category && (
+                <CustomTag
+                  text={project.category.value}
+                  weight={'light'}
+                  id={`category-${project.id}`}
+                />
+              )}
             </div>
             <div className="flex flex-col">
-              <span>{planProjectValues.value1}</span>
-              <span className="text-sm font-normal">{planProjectValues.value2}</span>
+              <span data-testid={`project-total-budget-${project.id}`}>
+                {planProjectValues.value1}
+              </span>
+              <span
+                className="text-sm font-normal"
+                data-testid={`project-realized-budget-${project.id}`}
+              >
+                {planProjectValues.value2}
+              </span>
             </div>
           </div>
         </div>
       </th>
       {projectCells.map((c) => (
-        <ProjectCell key={c.financeKey} cell={c} />
+        <ProjectCell key={c.financeKey} cell={c} onUpdateProject={onUpdateProject} />
       ))}
     </tr>
   );
 };
 
-export default memo(PlanningGroupsTableRow);
+export default memo(ProjectRow);

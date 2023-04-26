@@ -1,21 +1,22 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { NameTooltip } from '../NameTooltip';
-import { IPlanningTableRow } from '@/interfaces/common';
+import { NameTooltip } from './NameTooltip';
+import { IPlanningRow } from '@/interfaces/common';
 import './styles.css';
 
-interface IPlanningClassesHeaderProps extends IPlanningTableRow {
+interface IPlanningHeaderProps extends IPlanningRow {
   handleExpand: () => void;
   expanded?: boolean;
 }
 
-const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
+const PlanningHeader: FC<IPlanningHeaderProps> = ({
   link,
   name,
   type,
   handleExpand,
   expanded,
+  id,
 }) => {
   const navigate = useNavigate();
 
@@ -30,25 +31,25 @@ const PlanningClassesHeader: FC<IPlanningClassesHeaderProps> = ({
   }, [handleExpand, link, navigate]);
 
   return (
-    <th className={`table-header ${type}`}>
-      <div className="table-header-content">
-        <button className="display-flex" onClick={onExpand}>
+    <th className={`planning-header ${type}`} data-testid={`head-${id}`}>
+      <div className="planning-header-content">
+        <button className="flex" data-testid={`expand-${id}`} onClick={onExpand}>
           {angleIcon}
         </button>
         {type !== 'division' && (
-          <div className={`table-header-content-dots`}>
+          <div className={`planning-header-content-dots`} data-testid={`show-more-${id}`}>
             <IconMenuDots size="s" />
           </div>
         )}
-        <div className="table-title-container">
-          <button className="table-title-button" onClick={onExpand}>
-            <span className="table-header-title">{name}</span>
+        <div className="planning-title-container">
+          <button className="planning-title-button" onClick={onExpand} data-testid={`title-${id}`}>
+            <span className="planning-header-title">{name}</span>
           </button>
-          <NameTooltip value={name} />
+          <NameTooltip value={name} id={id} />
         </div>
       </div>
     </th>
   );
 };
 
-export default memo(PlanningClassesHeader);
+export default memo(PlanningHeader);

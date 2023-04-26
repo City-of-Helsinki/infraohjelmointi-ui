@@ -36,7 +36,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
   }, [phase]);
 
   return (
-    <div className="phase-menu-container">
+    <div className="phase-menu-container" data-testid={'project-phase-menu'}>
       <div className="phase-menu-header">
         <div className="overflow-hidden">
           <p className="title">{title}</p>
@@ -47,16 +47,25 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
       <ul className="phase-menu-list">
         {phases.map(({ value, label }) => (
           <li key={value} className={`list-item ${selectedPhase === value ? 'selected' : ''}`}>
-            <button className="selection-button" onClick={() => handleSetSelectedPhase(value)}>
+            <button
+              className="selection-button"
+              data-testid={`select-${value}`}
+              onClick={() => handleSetSelectedPhase(value)}
+            >
               <IconPlaybackRecord className="icon-width" />
-              <p className={`item-text ${selectedPhase === value ? 'selected' : ''}`}>{label}</p>
+              <p
+                className={`item-text ${selectedPhase === value ? 'selected' : ''}`}
+                data-testid={`project-phase-menu-option-${value}`}
+              >
+                {label}
+              </p>
             </button>
             {selectedPhase === value && <IconCheck className="icon-width check-icon" />}
           </li>
         ))}
       </ul>
       <div className="phase-menu-footer">
-        <Button size="small" onClick={onSubmit}>
+        <Button size="small" onClick={onSubmit} data-testid="patch-project-phase">
           {t('save')}
         </Button>
       </div>

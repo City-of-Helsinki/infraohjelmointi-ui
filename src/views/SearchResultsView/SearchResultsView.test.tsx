@@ -15,6 +15,7 @@ import { mockLongSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 import { waitFor } from '@testing-library/react';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { SearchLimit, SearchOrder } from '@/interfaces/searchInterfaces';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -81,7 +82,10 @@ describe('SearchResultsView', () => {
   };
 
   beforeEach(async () => {
-    await act(async () => (renderResult = renderWithProviders(<SearchResultsView />)));
+    await act(
+      async () =>
+        (renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />)),
+    );
   });
 
   afterEach(async () => {
@@ -112,7 +116,7 @@ describe('SearchResultsView', () => {
     });
 
     it('renders empty button if there are search terms and resets the store if clicked', async () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: searchActiveState,
       });
 
@@ -131,7 +135,7 @@ describe('SearchResultsView', () => {
 
     it('renders all terms and sends a new GET request if a term is removed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: searchActiveState,
       });
       const { getAllByTestId, getByText, getAllByText, user, getAllByRole, store } = renderResult;
@@ -173,7 +177,7 @@ describe('SearchResultsView', () => {
     });
 
     it('renders the list and all search results if there are results', () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: searchActiveState,
       });
       const { getByTestId } = renderResult;
@@ -193,7 +197,7 @@ describe('SearchResultsView', () => {
 
     it('renders limit dropdown and can select a new search limit and sends a GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: searchActiveState,
       });
       const { container, user, getByText, getByRole, getAllByText, queryByText } = renderResult;
@@ -231,7 +235,7 @@ describe('SearchResultsView', () => {
     it('renders if there are search results and can choose order options and send a new GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: searchActiveState,
       });
 
@@ -260,7 +264,7 @@ describe('SearchResultsView', () => {
 
   describe('SearchResultsCard', () => {
     it('renders all elements if there are results', () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: searchActiveState,
       });
       const { container, getAllByText, getByTestId } = renderResult;
@@ -318,7 +322,7 @@ describe('SearchResultsView', () => {
     });
 
     it('advices the user to edit search filters if there are no search results and there are searchTerms', async () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: {
           ...searchActiveState,
           search: {
@@ -336,7 +340,7 @@ describe('SearchResultsView', () => {
     });
 
     it('doesnt render if there are results', async () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: searchActiveState,
       });
       expect(getByClass('flex flex-col items-center')).toBe(0);
@@ -353,7 +357,7 @@ describe('SearchResultsView', () => {
 
     // click the pagination buttons does nothing for some reason
     it('renders the pagination correctly with a search limit of 10', async () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: {
           ...searchActiveState,
           search: {
@@ -378,7 +382,7 @@ describe('SearchResultsView', () => {
     });
 
     it('renders the pagination correctly with a search limit of 20', async () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: {
           ...searchActiveState,
           search: {
@@ -397,7 +401,7 @@ describe('SearchResultsView', () => {
     });
 
     it('renders the pagination correctly with a search limit of 30', async () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: {
           ...searchActiveState,
           search: {
@@ -416,7 +420,7 @@ describe('SearchResultsView', () => {
     });
 
     it('can navigate to the next, previous and any number page and sends a GET request for searchResults', async () => {
-      renderResult = renderWithProviders(<SearchResultsView />, {
+      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
         preloadedState: {
           ...searchActiveState,
           search: {

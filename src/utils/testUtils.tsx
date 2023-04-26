@@ -1,13 +1,12 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactElement } from 'react';
 import { render, RenderResult } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { Store } from 'redux';
 import { setupStore } from '../store';
 import type { PreloadedState } from '@reduxjs/toolkit';
 import type { RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Routes } from 'react-router-dom';
 import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 
 // This type interface extends the default options for render from RTL, as well
@@ -16,15 +15,6 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: PreloadedState<RootState>;
   store?: AppStore;
 }
-
-interface IWrapperProps {
-  children: ReactNode;
-}
-
-export const ReduxProvider =
-  (store: Store) =>
-  ({ children }: IWrapperProps): ReactElement =>
-    (<Provider store={store}>{children}</Provider>) as unknown as ReactElement;
 
 export interface CustomRenderResult extends RenderResult {
   user: UserEvent;
@@ -51,12 +41,21 @@ export const renderWithProviders = (
 ): CustomRenderResult => {
   window.history.pushState({}, 'Test page', route);
 
-  const WrappedWithReduxProvider = ReduxProvider(store)({ children: ui });
+  const Wrapper = ({ children }: { children: ReactElement }) => {
+    return <Provider store={store}>{children}</Provider>;
+  };
 
-  const renderResult = render(WrappedWithReduxProvider, {
-    wrapper: BrowserRouter,
-    ...renderOptions,
-  });
+  const renderResult = render(
+    <BrowserRouter>
+      <Routes>
+        <>{ui}</>
+      </Routes>
+    </BrowserRouter>,
+    {
+      wrapper: Wrapper,
+      ...renderOptions,
+    },
+  );
 
   return {
     store,

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import {
   mockProjectAreas,
   mockProjectCategories,
@@ -31,62 +31,61 @@ import { mockError } from '@/mocks/mockError';
 import { IError, IFreeSearchResults } from '@/interfaces/common';
 import { ISearchResults } from '@/interfaces/searchInterfaces';
 import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
+import { Route } from 'react-router';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+const store = setupStore();
 
+const render = async () =>
+  await act(async () =>
+    renderWithProviders(<Route path="/" element={<Search />} />, {
+      preloadedState: {
+        auth: { user: mockPersons.data[0], error: {} },
+        class: {
+          ...store.getState().class,
+          allClasses: mockProjectClasses.data,
+          masterClasses: mockMasterClasses.data,
+          classes: mockClasses.data,
+          subClasses: mockSubClasses.data,
+        },
+        location: {
+          ...store.getState().location,
+          allLocations: mockLocations.data,
+          districts: mockDistricts.data,
+          divisions: mockDivisions.data,
+          subDivisions: mockSubDivisions.data,
+        },
+        lists: {
+          ...store.getState().lists,
+          areas: mockProjectAreas.data,
+          phases: mockProjectPhases.data,
+          types: mockProjectTypes.data,
+          categories: mockProjectCategories.data,
+          responsiblePersons: mockResponsiblePersons.data,
+          programmedYears: setProgrammedYears(),
+        },
+      },
+    }),
+  );
 describe('Search', () => {
-  let renderResult: CustomRenderResult;
-
-  beforeEach(async () => {
-    const store = setupStore();
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<Search />, {
-          preloadedState: {
-            auth: { user: mockPersons.data[0], error: {} },
-            class: {
-              ...store.getState().class,
-              allClasses: mockProjectClasses.data,
-              masterClasses: mockMasterClasses.data,
-              classes: mockClasses.data,
-              subClasses: mockSubClasses.data,
-            },
-            location: {
-              ...store.getState().location,
-              allLocations: mockLocations.data,
-              districts: mockDistricts.data,
-              divisions: mockDivisions.data,
-              subDivisions: mockSubDivisions.data,
-            },
-            lists: {
-              ...store.getState().lists,
-              areas: mockProjectAreas.data,
-              phases: mockProjectPhases.data,
-              types: mockProjectTypes.data,
-              categories: mockProjectCategories.data,
-              responsiblePersons: mockResponsiblePersons.data,
-              programmedYears: setProgrammedYears(),
-            },
-          },
-        })),
-    );
-  });
-
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should be hidden by default', async () => {
-    const { queryByTestId } = renderResult;
+    const { queryByTestId } = await render();
+
     expect(queryByTestId('project-search-form')).toBeNull();
   });
 
   it('should render if the search open state is true and all elements should be rendered', async () => {
-    const { store, getByTestId, getByText, getByLabelText } = renderResult;
+    const { store, getByTestId, getByText, getByLabelText } = await render();
+
     await waitFor(() => store.dispatch(toggleSearch()));
+
     expect(getByTestId('project-search-form')).toBeInTheDocument();
     expect(getByTestId('search-projects-button')).toBeInTheDocument();
     expect(getByTestId('cancel-search')).toBeInTheDocument();
@@ -113,7 +112,7 @@ describe('Search', () => {
   });
 
   it('should have all needed data to search for projects', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
     // open search
     await waitFor(() => store.dispatch(toggleSearch()));
 
@@ -141,7 +140,8 @@ describe('Search', () => {
   });
 
   it('cancel button should close the search form and keep changes in redux', async () => {
-    const { user, store, getByText, getByTestId, queryByTestId } = renderResult;
+    const { user, store, getByText, getByTestId, queryByTestId } = await render();
+
     await waitFor(() => store.dispatch(toggleSearch()));
 
     // check that programmed is false in redux
@@ -158,7 +158,7 @@ describe('Search', () => {
   it('submit button should be disabled if no value has been given', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-    const { user, getByTestId, store, getByText } = renderResult;
+    const { user, getByTestId, store, getByText } = await render();
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
@@ -174,7 +174,7 @@ describe('Search', () => {
   it('can use the free search field to get suggestions and add selections to search params', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockFreeSearchResults);
 
-    const { user, store, getByText, queryByText, getByTestId } = renderResult;
+    const { user, store, getByText, queryByText, getByTestId } = await render();
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
@@ -218,7 +218,7 @@ describe('Search', () => {
   it('adds search results to redux with a successful GET request', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-    const { user, getByTestId, store, getByText } = renderResult;
+    const { user, getByTestId, store, getByText } = await render();
 
     await waitFor(() => store.dispatch(toggleSearch()));
 
@@ -238,8 +238,10 @@ describe('Search', () => {
   });
 
   it('catches a bad search request', async () => {
-    const { store } = renderResult;
+    const { store } = await render();
+
     mockedAxios.get.mockRejectedValueOnce(mockError);
+
     await store.dispatch(getSearchResultsThunk({ params: '123' }));
 
     const storeError = store.getState().search.error as IError;

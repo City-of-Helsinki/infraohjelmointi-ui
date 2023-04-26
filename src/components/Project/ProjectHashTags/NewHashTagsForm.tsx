@@ -4,7 +4,7 @@ import useHashTagsForm from '@/forms/useHashTagsForm';
 import { IListItem } from '@/interfaces/common';
 import { IHashTagsForm } from '@/interfaces/formInterfaces';
 import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
-import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject, patchProjectThunk } from '@/reducers/projectSlice';
 import { postHashTag } from '@/services/hashTagsService';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconPlus } from 'hds-react/icons';
@@ -44,7 +44,7 @@ const NewHashTagsForm = () => {
   const addToProject = () => {
     if (responseHashTag && project?.id) {
       dispatch(
-        silentPatchProjectThunk({
+        patchProjectThunk({
           id: project?.id,
           data: { hashTags: [...projectHashTags, responseHashTag.id] },
         }),

@@ -1,15 +1,9 @@
 import { IError } from '@/interfaces/common';
-import {
-  IProject,
-  IProjectGetRequestObject,
-  IProjectPatchRequestObject,
-  IProjectsResponse,
-} from '@/interfaces/projectInterfaces';
-import { getProject, getProjects, patchProject, postProject } from '@/services/projectServices';
+import { IProject, IProjectPatchRequestObject } from '@/interfaces/projectInterfaces';
+import { getProject, patchProject } from '@/services/projectServices';
 import { RootState } from '@/store';
 import { getCurrentTime } from '@/utils/dates';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { notifySuccess } from './notificationSlice';
 
 interface IProjectState {
   selectedProject: IProject | null;
@@ -29,21 +23,6 @@ const initialState: IProjectState = {
   updated: null,
 };
 
-export const getProjectsThunk = createAsyncThunk(
-  'project/getAll',
-  async (req: IProjectGetRequestObject, thunkAPI) => {
-    return await getProjects(req)
-      .then((res) => {
-        thunkAPI.dispatch(setPage(req.page));
-        if ((thunkAPI.getState() as RootState).project.projects.length > 0 && req.page === 1) {
-          thunkAPI.dispatch(resetProjects());
-        }
-        return res;
-      })
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
 export const getProjectThunk = createAsyncThunk('project/getOne', async (id: string, thunkAPI) => {
   thunkAPI.dispatch(resetProject());
   return await getProject(id)
@@ -51,38 +30,11 @@ export const getProjectThunk = createAsyncThunk('project/getOne', async (id: str
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
 
-export const postProjectThunk = createAsyncThunk(
-  'project/post',
-  async (request: IProjectPatchRequestObject, thunkAPI) => {
-    return await postProject(request)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
-export const silentPatchProjectThunk = createAsyncThunk(
+export const patchProjectThunk = createAsyncThunk(
   'project/silent-patch',
   async (request: IProjectPatchRequestObject, thunkAPI) => {
     return await patchProject(request)
       .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
-export const patchProjectThunk = createAsyncThunk(
-  'project/patch',
-  async (request: IProjectPatchRequestObject, thunkAPI) => {
-    return await patchProject(request)
-      .then((res) => {
-        thunkAPI.dispatch(
-          notifySuccess({
-            title: 'sendSuccess',
-            message: 'formSaveSuccess',
-            type: 'toast',
-          }),
-        );
-        return res;
-      })
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
@@ -108,20 +60,6 @@ export const projectSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // GET ALL
-    builder.addCase(
-      getProjectsThunk.fulfilled,
-      (state, action: PayloadAction<IProjectsResponse>) => {
-        return {
-          ...state,
-          projects: [...state.projects, ...action.payload.results],
-          count: action.payload.count,
-        };
-      },
-    );
-    builder.addCase(getProjectsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
-      return { ...state, error: action.payload };
-    });
     // GET ONE
     builder.addCase(getProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
       return { ...state, selectedProject: action.payload };
@@ -129,30 +67,8 @@ export const projectSlice = createSlice({
     builder.addCase(getProjectThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
-    // POST
-    builder.addCase(postProjectThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
-      return { ...state, error: action.payload };
-    });
-    // PATCH
-    builder.addCase(patchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
-      // All projects also need to be updated to get changes into the planning list
-      const updatedProjectList: Array<IProject> = state.projects.map((p) =>
-        p.id === action.payload.id ? action.payload : p,
-      );
-      return {
-        ...state,
-        selectedProject: action.payload,
-        projects: [...updatedProjectList],
-      };
-    });
-    builder.addCase(
-      patchProjectThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
     // SILENT PATCH
-    builder.addCase(silentPatchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
+    builder.addCase(patchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
       // All projects also need to be updated to get changes into the planning list
       const updatedProjectList: Array<IProject> = state.projects.map((p) =>
         p.id === action.payload?.id ? action.payload : p,
@@ -165,7 +81,7 @@ export const projectSlice = createSlice({
       };
     });
     builder.addCase(
-      silentPatchProjectThunk.rejected,
+      patchProjectThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, error: action.payload };
       },

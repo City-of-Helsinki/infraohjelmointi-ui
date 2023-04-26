@@ -10,7 +10,7 @@ import {
   SelectField,
   TextField,
 } from '../../shared';
-import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject, patchProjectThunk } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
@@ -58,7 +58,7 @@ const ProjectBasicsForm: FC = () => {
     (form: IProjectBasicsForm) => {
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
       project?.id &&
-        dispatch(silentPatchProjectThunk({ id: project.id, data })).then((res) => {
+        dispatch(patchProjectThunk({ id: project.id, data })).then((res) => {
           // Set form saved to true if action is successfull, queue it to false async
           handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
           setTimeout(() => {

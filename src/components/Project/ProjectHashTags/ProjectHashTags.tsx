@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { selectProject, silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject, patchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useState, MouseEvent, FC, forwardRef, Ref, useEffect, memo, useCallback } from 'react';
@@ -139,7 +139,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     // Submit hashTagsForSubmit and close the dialog
     const onSubmit = useCallback(() => {
       dispatch(
-        silentPatchProjectThunk({
+        patchProjectThunk({
           data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
           id: projectId,
         }),

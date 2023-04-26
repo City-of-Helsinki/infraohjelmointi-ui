@@ -5,6 +5,7 @@ import { useAppSelector } from '../hooks/common';
 import { initialSearchForm, selectSearchForm } from '@/reducers/searchSlice';
 import useMultiClassOptions from '@/hooks/useMultiClassOptions';
 import useMultiLocationOptions from '@/hooks/useMultiLocationOptions';
+import _ from 'lodash';
 import { IOption } from '@/interfaces/common';
 
 const useSearchForm = () => {
@@ -61,10 +62,10 @@ const useSearchForm = () => {
    * Listens to form changes and checks if form has any added values and sets submitDisabled
    */
   useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      setMultiListOption(name as string, value[name as keyof ISearchForm] as unknown as IOption);
+    const subscription = watch((form, { name }) => {
+      setMultiListOption(name as string, form[name as keyof ISearchForm] as unknown as IOption);
       if (!isDirty) {
-        setSubmitDisabled(JSON.stringify(value) === JSON.stringify(initialSearchForm));
+        setSubmitDisabled(_.isEqual(form, initialSearchForm));
       }
     });
     return () => subscription.unsubscribe();

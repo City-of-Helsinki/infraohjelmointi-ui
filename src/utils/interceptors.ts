@@ -1,10 +1,36 @@
 import { IError } from '@/interfaces/common';
-import { clearLoading, setLoading } from '@/reducers/loadingSlice';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 let store: AppStore;
+
+// Add urls here that you don't want the interceptor to add a loader to
+const urlsToExclueFromLoading = [
+  '/project-types/',
+  '/project-phases/',
+  '/project-areas/',
+  '/construction-phase-details/',
+  '/project-categories/',
+  '/project-risks/',
+  '/project-quality-levels/',
+  '/planning-phases/',
+  '/construction-phases/',
+  '/responsible-zones/',
+  '/persons/',
+  'projects/?freeSearch',
+  '/project-classes',
+  '/project-locations',
+  '/project-groups',
+  '/project-hashtags',
+];
+
+/**
+ * Check if the current url is supposed to add a loader to redux.
+ */
+const shouldTriggerLoading = (url?: string) =>
+  url && !urlsToExclueFromLoading.some((excludedUrl) => url.includes(excludedUrl));
 
 export const injectStore = (_store: AppStore) => {
   store = _store;
@@ -30,18 +56,17 @@ axios.interceptors.response.use(
   (error) => handleError(error),
 );
 
-// Add urls here that shouldn't have loading indicator
 const handleRequest = (req: InternalAxiosRequestConfig) => {
-  // disable loading if using freeSearch, refactor this if more urls are needed
-  if (!store.getState().loading.isLoading && !req.url?.includes('projects/?freeSearch')) {
-    store.dispatch(setLoading('Loading request'));
+  // Check if the url should add a loader to redux
+  if (shouldTriggerLoading(req?.url)) {
+    store.dispatch(setLoading({ text: 'Loading request', id: req?.url || '' }));
   }
   return req;
 };
 
 const handleResponse = (res: AxiosResponse) => {
-  if (store.getState().loading.isLoading) {
-    store.dispatch(clearLoading());
+  if (shouldTriggerLoading(res.config.url)) {
+    store.dispatch(clearLoading(res.config?.url || ''));
   }
   return res;
 };
@@ -60,7 +85,9 @@ const handleError = (error: AxiosError): Promise<IError> => {
     }),
   );
 
-  store.dispatch(clearLoading());
+  if (shouldTriggerLoading(error.config?.url)) {
+    store.dispatch(clearLoading(error.config?.url || ''));
+  }
 
   return Promise.reject(parsedError);
 };

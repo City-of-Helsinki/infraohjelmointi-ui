@@ -1,40 +1,37 @@
 import mockI18next from '@/mocks/mockI18next';
 import TopBar from './TopBar';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
 import mockPersons from '@/mocks/mockPersons';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios';
 import { waitFor } from '@testing-library/react';
 import { getUserThunk } from '@/reducers/authSlice';
+import { Route } from 'react-router';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+const render = async () =>
+  await act(async () =>
+    renderWithProviders(<Route path="/" element={<TopBar />} />, {
+      preloadedState: {
+        auth: { user: null, error: {} },
+      },
+    }),
+  );
+
 describe('TopBar', () => {
-  let renderResult: CustomRenderResult;
-
-  beforeEach(async () => {
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<TopBar />, {
-          preloadedState: {
-            auth: { user: null, error: {} },
-          },
-        })),
-    );
-  });
-
-  it('renders component wrapper', () => {
-    const { getByTestId } = renderResult;
+  it('renders component wrapper', async () => {
+    const { getByTestId } = await render();
 
     expect(getByTestId('top-bar')).toBeInTheDocument();
   });
 
-  it('renders all content', () => {
-    const { getByTestId, getByRole, getAllByRole } = renderResult;
+  it('renders all content', async () => {
+    const { getByTestId, getByRole, getAllByRole } = await render();
 
     expect(getByTestId('top-bar')).toBeInTheDocument();
     expect(getByRole('link', { name: matchExact('nav.skipToContent') })).toBeInTheDocument();
@@ -46,9 +43,10 @@ describe('TopBar', () => {
   });
 
   it('render username if user is found', async () => {
-    const { getByRole, store, queryByRole } = renderResult;
-
     mockedAxios.get.mockResolvedValueOnce({ data: mockPersons.data });
+
+    const { getByRole, store, queryByRole } = await render();
+
     await waitFor(() => store.dispatch(getUserThunk()));
 
     expect(

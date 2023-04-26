@@ -65,7 +65,7 @@ export interface IProject {
   finances: IProjectFinances;
   louhi: boolean;
   gravel: boolean;
-  category: IListItem;
+  category?: IListItem;
   effectHousing: boolean;
   constructionEndYear: string;
   planningStartYear: string;
@@ -77,6 +77,7 @@ export interface IProject {
   masterPlanAreaNumber?: string;
   trafficPlanNumber?: string;
   bridgeNumber?: string;
+  projectGroup: string | null;
 }
 
 export interface IProjectRequest {

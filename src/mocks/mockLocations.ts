@@ -3,6 +3,15 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 export const mockLocations: { data: Array<ILocation> } = {
   data: [
     {
+      id: 'test-district-1',
+      name: 'TestDistrict',
+      path: 'TestDistrict',
+      forCoordinatorOnly: false,
+      parent: null,
+      parentClass: 'test-sub-class-1',
+      relatedTo: null,
+    },
+    {
       id: '55b5a61e-f270-4c84-9547-d013f2c8ae87',
       name: 'Eteläinen',
       path: 'Eteläinen',
@@ -30,6 +39,15 @@ export const mockLocations: { data: Array<ILocation> } = {
       relatedTo: null,
     },
     {
+      id: 'test-division-1',
+      name: 'TestDivision',
+      path: 'TestDistrict/TestDivision',
+      forCoordinatorOnly: false,
+      parent: 'test-district-1',
+      parentClass: 'test-sub-class-1',
+      relatedTo: null,
+    },
+    {
       id: 'fb35bbd1-193d-48ed-8fa1-46fcf8912f03',
       name: 'Kluuvi',
       path: 'Eteläinen/Kluuvi',
@@ -39,9 +57,9 @@ export const mockLocations: { data: Array<ILocation> } = {
       relatedTo: null,
     },
     {
-      id: '123-123-123-123',
-      name: 'TestDivision1',
-      path: 'Koillinen/Suutarila/TestDivision1',
+      id: 'test-sub-division-1',
+      name: 'TestSubDivision',
+      path: 'Koillinen/Kluuvi/TestSubDivision',
       forCoordinatorOnly: false,
       parent: 'fb35bbd1-193d-48ed-8fa1-46fcf8912f03',
       parentClass: null,
@@ -52,6 +70,15 @@ export const mockLocations: { data: Array<ILocation> } = {
 
 export const mockDistricts: { data: Array<ILocation> } = {
   data: [
+    {
+      id: 'test-district-1',
+      name: 'TestDistrict',
+      path: 'TestDistrict',
+      forCoordinatorOnly: false,
+      parent: null,
+      parentClass: 'test-sub-class-1',
+      relatedTo: null,
+    },
     {
       id: '55b5a61e-f270-4c84-9547-d013f2c8ae87',
       name: 'Eteläinen',
@@ -85,6 +112,15 @@ export const mockDistricts: { data: Array<ILocation> } = {
 export const mockDivisions: { data: Array<ILocation> } = {
   data: [
     {
+      id: 'test-division-1',
+      name: 'TestDivision',
+      path: 'TestDistrict/TestDivision',
+      forCoordinatorOnly: false,
+      parent: 'test-district-1',
+      parentClass: 'test-sub-class-1',
+      relatedTo: null,
+    },
+    {
       id: 'fb35bbd1-193d-48ed-8fa1-46fcf8912f03',
       name: 'Kluuvi',
       path: 'Eteläinen/Kluuvi',
@@ -99,9 +135,9 @@ export const mockDivisions: { data: Array<ILocation> } = {
 export const mockSubDivisions: { data: Array<ILocation> } = {
   data: [
     {
-      id: '123-123-123-123',
-      name: 'TestDivision1',
-      path: 'Koillinen/Kluuvi/TestDivision1',
+      id: 'test-sub-division-1',
+      name: 'TestSubDivision',
+      path: 'Koillinen/Kluuvi/TestSubDivision',
       forCoordinatorOnly: false,
       parent: 'fb35bbd1-193d-48ed-8fa1-46fcf8912f03',
       parentClass: null,

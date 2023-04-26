@@ -3,11 +3,12 @@ import './styles.css';
 
 interface INameTooltipProps {
   value: string;
+  id: string;
 }
 
-const NameTooltip: FC<INameTooltipProps> = ({ value }) => {
+const NameTooltip: FC<INameTooltipProps> = ({ value, id }) => {
   return (
-    <section className="tooltip-container">
+    <section className="tooltip-container" data-testid={`hover-tooltip-${id}`}>
       {value}
       <div className="tooltip-arrow" />
     </section>

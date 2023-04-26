@@ -12,30 +12,39 @@ interface IPlanningInfoPanelProps {
 
 const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
-  const navigateBack = useCallback(() => navigate(-1), [navigate]);
+  const navigate = useNavigate();
+  const navigateBack = useCallback(() => navigate(-1), []);
 
   return (
     <div className="planning-info-panel">
-      <div id="planningButton">
-        <Button className="h-11" variant="success">
+      <div id="planningButton" data-testid="mode-button-container">
+        <Button className="h-11" variant="success" data-testid="mode-button">
           {t('planning')}
         </Button>
       </div>
 
-      <div id="selectedClass">
+      <div id="selectedClass" data-testid="selected-class-container">
         {selectedMasterClass && (
           <>
-            <span className="block text-sm font-bold">{selectedMasterClass.name}</span>
-            <span className="block text-sm">{t('keur')}</span>
+            <span className="block text-sm font-bold" data-testid="selected-class">
+              {selectedMasterClass.name}
+            </span>
+            <span className="block text-sm" data-testid="currency-indicator">
+              {t('keur')}
+            </span>
           </>
         )}
       </div>
 
-      <div id="previousButton">
+      <div id="previousButton" data-testid="previous-button-container">
         {selectedMasterClass && (
-          <Button onClick={navigateBack} variant="supplementary" iconLeft={<IconAngleLeft />}>
+          <Button
+            data-testid="previous-button"
+            onClick={navigateBack}
+            variant="supplementary"
+            iconLeft={<IconAngleLeft />}
+          >
             {t('previous')}
           </Button>
         )}

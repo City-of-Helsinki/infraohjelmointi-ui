@@ -1,31 +1,25 @@
-import { FC, useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
-import { PlanningClassesTable } from '../PlanningClassesTable';
-import { PlanningGroupsTable } from '../PlanningGroupsTable';
-import { IPlanningTableRow } from '@/interfaces/common';
+// Disabled jsx-key because eslint doesn't understand that the key is spread through props
+/* eslint-disable react/jsx-key */
+import { FC, memo } from 'react';
+import PlanningRow from './PlanningRow/PlanningRow';
+import { IPlanningRow } from '@/interfaces/common';
 import './styles.css';
 
 interface IPlanningTableProps {
-  rows: Array<IPlanningTableRow>;
+  rows: Array<IPlanningRow>;
 }
 
-// FIXME: this any will be removed ones we get the actual group model
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PlanningTable: FC<IPlanningTableProps> = ({ rows }) => {
-  const pathname = useLocation().pathname;
-
-  const [isClassView, setIsClassView] = useState(false);
-
-  // Check if there is a need to change between planner / coordinator view
-  useEffect(() => {
-    if (pathname.includes('planner')) {
-      setIsClassView(false);
-    } else if (pathname.includes('coordinator')) {
-      setIsClassView(true);
-    }
-  }, [pathname]);
-
-  return <>{isClassView ? <PlanningClassesTable rows={rows} /> : <PlanningGroupsTable />}</>;
+  return (
+    <table className="planning-table" cellSpacing={0}>
+      <tbody>
+        {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
+        {rows.map((row: IPlanningRow) => (
+          <PlanningRow {...row} />
+        ))}
+      </tbody>
+    </table>
+  );
 };
 
-export default PlanningTable;
+export default memo(PlanningTable);

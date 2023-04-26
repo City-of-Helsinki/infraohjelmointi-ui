@@ -52,5 +52,6 @@ export const selectAllClasses = (state: RootState) => state.class.allClasses;
 export const selectMasterClasses = (state: RootState) => state.class.masterClasses;
 export const selectClasses = (state: RootState) => state.class.classes;
 export const selectSubClasses = (state: RootState) => state.class.subClasses;
+export const selectBatchedClasses = (state: RootState) => state.class;
 
 export default classSlice.reducer;

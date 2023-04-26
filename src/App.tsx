@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import TopBar from '@/components/TopBar';
 import SideBar from '@/components/Sidebar';
 import Notification from '@/components/Notification';
@@ -6,11 +6,7 @@ import Loader from '@/components/Loader';
 import { Search } from '@/components/Search';
 import { useAppDispatch } from './hooks/common';
 import { Route, Routes } from 'react-router-dom';
-import {
-  getProjectCategoriesThunk,
-  getResponsiblePersonsThunk,
-  getProjectPhasesThunk,
-} from './reducers/listsSlice';
+import { getListsThunk } from './reducers/listsSlice';
 import { getClassesThunk } from './reducers/classSlice';
 import { getLocationsThunk } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
@@ -19,21 +15,33 @@ import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
 import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
-import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
+import { getGroupsThunk } from './reducers/groupSlice';
+import { getHashTagsThunk } from './reducers/hashTagsSlice';
+import { clearLoading, setLoading } from './reducers/loaderSlice';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
+  const [appDataReady, setAppDataReady] = useState(false);
+
+  const initalizeStates = async () => {
+    dispatch(setLoading({ text: 'Loading app data', id: 'loading-app-data' }));
+    await Promise.all([
+      dispatch(getListsThunk()),
+      dispatch(getHashTagsThunk()),
+      dispatch(getClassesThunk()),
+      dispatch(getLocationsThunk()),
+      dispatch(getGroupsThunk()),
+    ]).then(() => {
+      dispatch(clearLoading('loading-app-data'));
+      setAppDataReady(true);
+    });
+  };
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
-    dispatch(getProjectCategoriesThunk());
-    dispatch(getResponsiblePersonsThunk());
-    dispatch(getProjectPhasesThunk());
-    dispatch(getHashTagsThunk());
-    dispatch(getClassesThunk());
-    dispatch(getLocationsThunk());
+    initalizeStates();
   }, []);
 
   return (
@@ -46,21 +54,13 @@ const App: FC = () => {
         <SideBar />
         <div className="w-full">
           <Loader />
-          <Routes>
-            <Route path="/project/:projectId?" element={<ProjectView />}>
-              <Route path="basics" element={<ProjectBasics />} />
-              <Route path="notes" element={<ProjectNotes />} />
-            </Route>
-            <Route path="/planning">
-              <Route path="planner" element={<PlanningView />} />
-              {/* these optional routes should work according to newest doc...
-              https://github.com/remix-run/react-router/releases/tag/react-router%406.5.0
-              <Route
-                path="coordinator/:masterClassId?/:classId?/:subClassId?"
-                element={<PlanningView />}
-              /> 
-              */}
-              <Route path="coordinator" element={<PlanningView />}>
+          {appDataReady && (
+            <Routes>
+              <Route path="/project/:projectId?" element={<ProjectView />}>
+                <Route path="basics" element={<ProjectBasics />} />
+                <Route path="notes" element={<ProjectNotes />} />
+              </Route>
+              <Route path="/planning" element={<PlanningView />}>
                 <Route path=":masterClassId" element={<PlanningView />}>
                   <Route path=":classId" element={<PlanningView />}>
                     <Route path=":subClassId" element={<PlanningView />}>
@@ -69,10 +69,10 @@ const App: FC = () => {
                   </Route>
                 </Route>
               </Route>
-            </Route>
-            <Route path="/search-results" element={<SearchResultsView />} />
-            <Route path="*" element={<ErrorView />} />
-          </Routes>
+              <Route path="/search-results" element={<SearchResultsView />} />
+              <Route path="*" element={<ErrorView />} />
+            </Routes>
+          )}
         </div>
       </div>
       {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}

@@ -34,18 +34,30 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   }, [onCloseMenu, onRemoveCell]);
 
   return (
-    <div className="project-cell-menu">
+    <div className="project-cell-menu" data-testid="project-cell-menu">
       <div className="project-cell-menu-header">
         <div className="overflow-hidden">
-          <p className="title">{title}</p>
+          <p className="title" data-testid={'cell-title'}>
+            {title}
+          </p>
         </div>
-        <IconCross className="close-icon" onClick={onCloseMenu} />
+        <IconCross
+          className="close-icon"
+          onClick={onCloseMenu}
+          data-testid="close-project-cell-menu"
+        />
       </div>
       <div className="project-cell-menu-content">
-        <p className="ml-1 font-bold">{year}</p>
+        <p className="ml-1 font-bold" data-testid={'cell-year'}>
+          {year}
+        </p>
         <ul className="py-2">
           {options.map(({ value, label }) => (
-            <li key={value} className={`list-item ${value === cellType ? 'selected' : ''}`}>
+            <li
+              key={value}
+              className={`list-item ${value === cellType ? 'selected' : ''}`}
+              data-testid={`cell-type-${value}`}
+            >
               <div className="flex items-center">
                 <div className={`list-icon ${value}`} />
                 <span className={value === cellType ? 'font-bold' : 'font-light'}>{label}</span>
@@ -56,10 +68,20 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
         </ul>
       </div>
       <div className="project-cell-menu-footer">
-        <Button variant="supplementary" iconLeft={undefined} onClick={handleRemoveYear}>
+        <Button
+          variant="supplementary"
+          iconLeft={undefined}
+          onClick={handleRemoveYear}
+          data-testid="remove-year-button"
+        >
           {t('removeYearFromTimeline')}
         </Button>
-        <Button variant="supplementary" iconLeft={undefined} onClick={handleEditTimeline}>
+        <Button
+          variant="supplementary"
+          iconLeft={undefined}
+          onClick={handleEditTimeline}
+          data-testid="edit-year-button"
+        >
           {t('editTimeline')}
         </Button>
       </div>

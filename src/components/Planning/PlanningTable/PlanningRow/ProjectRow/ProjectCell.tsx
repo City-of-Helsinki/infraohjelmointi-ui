@@ -1,12 +1,12 @@
-import { useAppDispatch } from '@/hooks/common';
 import { ContextMenuType } from '@/interfaces/common';
 import {
+  IProject,
   IProjectCell,
   IProjectFinancesRequestObject,
   IProjectRequest,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
-import { silentPatchProjectThunk } from '@/reducers/projectSlice';
+import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import {
   ChangeEvent,
@@ -23,7 +23,7 @@ import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 
 const addActiveClassToProjectRow = (projectId: string) => {
-  document.getElementById(`row-${projectId}`)?.classList.add('active');
+  document.getElementById(`project-row-${projectId}`)?.classList.add('active');
 };
 
 const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
@@ -269,11 +269,11 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
 
 interface IProjectCellProps {
   cell: IProjectCell;
+  onUpdateProject: (projectToUpdate: IProject) => void;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
-  const dispatch = useAppDispatch();
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<number | null>(parseInt(budget || '0'));
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -286,14 +286,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
-      dispatch(
-        silentPatchProjectThunk({
-          id,
-          data: { ...req },
-        }),
-      );
+      patchProject({
+        id,
+        data: { ...req },
+      }).then((res) => onUpdateProject(res));
     },
-    [dispatch, id],
+    [id, onUpdateProject],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property
@@ -380,6 +378,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
       ref={cellRef}
       className={`project-cell ${getCssType()}`}
       onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
+      data-testid={`project-cell-${year}-${id}`}
     >
       <div className="project-cell-input-container">
         <input
@@ -391,16 +390,19 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
           disabled={type === 'none'}
           readOnly={isReadOnly}
           className="project-cell-input"
+          data-testid={`cell-input-${year}-${id}`}
         />
       </div>
-      {growDirections.map((d) => (
-        <EditTimelineButton
-          key={d}
-          direction={d}
-          onSingleClick={onAddYear}
-          onDoubleClick={onMoveTimeline}
-        />
-      ))}
+      {type !== 'none' &&
+        growDirections.map((d) => (
+          <EditTimelineButton
+            key={d}
+            direction={d}
+            id={`${year}-${id}`}
+            onSingleClick={onAddYear}
+            onDoubleClick={onMoveTimeline}
+          />
+        ))}
     </td>
   );
 };

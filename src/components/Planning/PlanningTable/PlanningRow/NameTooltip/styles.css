@@ -12,6 +12,7 @@
   z-index: 1000;
   font-weight: 400;
   display: none;
+  visibility: hidden;
 }
 
 .tooltip-arrow {
@@ -24,12 +25,13 @@
   right: 0;
   margin: 0 auto;
   width: 0px;
+  visibility: hidden;
 }
 
-.table-title-container:hover .tooltip-container {
-  @apply block;
+.planning-title-container:hover .tooltip-container {
+  @apply visible block;
 }
 
-.table-title-container:hover .tooltip-arrow {
-  @apply block;
+.planning-title-container:hover .tooltip-arrow {
+  @apply visible block;
 }

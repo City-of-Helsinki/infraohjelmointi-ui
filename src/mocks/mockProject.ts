@@ -133,6 +133,7 @@ const mockProject: { data: IProject } = {
       preliminaryCurrentYearPlus9: '0.00',
       preliminaryCurrentYearPlus10: '0.00',
     },
+    projectGroup: null,
   },
 };
 
