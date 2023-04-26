@@ -219,6 +219,30 @@ const getProjectCells = (project: IProject) => {
   return projectCells;
 };
 
+/* FIXME: rename budget1 and budget2 to actually reflect what the values are */
+interface IProjectSums {
+  budget1: number;
+  budget2: number;
+}
+
+const calculateProjectSum = (project: IProject): IProjectSums => {
+  const { year, ...finances } = project.finances;
+  const { budget } = project;
+
+  const budget2 = Object.values(finances).reduce((accumulator, currentValue) => {
+    if (currentValue !== null) {
+      return accumulator + parseInt(currentValue);
+    }
+    return accumulator;
+  }, 0);
+
+  return { budget1: parseInt(budget ?? '0'), budget2 };
+};
+
+interface IProjectRowsState {
+  cells: Array<IProjectCell>;
+  sums: IProjectSums;
+}
 /**
  * Get 11 project cells from a project, each cell will include all the needed properties to patch and delete the budgets and
  * dates associated with the cell year. This whole structure can be a bit confusing, please refer to the comments on IProjectCell
@@ -227,16 +251,23 @@ const getProjectCells = (project: IProject) => {
  * @param project
  * @returns a list of IProjectCell
  */
-const useProjectCells = (project: IProject) => {
-  const [projectCells, setProjectCells] = useState<Array<IProjectCell>>([]);
+const useProjectRow = (project: IProject) => {
+  const [projectRowsState, setProjectRowsState] = useState<IProjectRowsState>({
+    cells: [],
+    sums: { budget1: 0, budget2: 0 },
+  });
 
   useEffect(() => {
     if (project) {
-      setProjectCells(getProjectCells(project));
+      setProjectRowsState((current) => ({
+        ...current,
+        cells: getProjectCells(project),
+        sums: calculateProjectSum(project),
+      }));
     }
   }, [project]);
 
-  return projectCells;
+  return projectRowsState;
 };
 
-export default useProjectCells;
+export default useProjectRow;

@@ -53,13 +53,6 @@ export const planClasses = [
   },
 ];
 
-export const planProjectValues = {
-  readiness: '1',
-  value1: '3 400',
-  value2: '2 700',
-  sums: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-};
-
 export const planningYearsTableData = [
   {
     title: 'kuluva TA',

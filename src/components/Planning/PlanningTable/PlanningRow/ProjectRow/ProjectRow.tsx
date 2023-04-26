@@ -1,11 +1,10 @@
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
-import { planProjectValues } from '@/mocks/common';
 import { IconDocument, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, MouseEvent as ReactMouseEvent, useRef } from 'react';
 import ProjectCell from './ProjectCell';
 import { ContextMenuType } from '@/interfaces/common';
 import { CustomTag } from '@/components/shared';
-import useProjectCells from '@/hooks/useProjectCell';
+import useProjectRow from '@/hooks/useProjectRow';
 import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useAppDispatch } from '@/hooks/common';
@@ -21,7 +20,10 @@ interface IProjectRowProps {
 const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
   const dispatch = useAppDispatch();
   const projectRowRef = useRef<HTMLTableRowElement>(null);
-  const projectCells = useProjectCells(project);
+  const {
+    cells,
+    sums: { budget1, budget2 },
+  } = useProjectRow(project);
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
@@ -92,21 +94,20 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
                 />
               )}
             </div>
+            {/* FIXME: rename classes project-total-budget and project-realized-budget to reflect the name of the variables */}
             <div className="flex flex-col">
-              <span data-testid={`project-total-budget-${project.id}`}>
-                {planProjectValues.value1}
-              </span>
+              <span data-testid={`project-total-budget-${project.id}`}>{budget1}</span>
               <span
                 className="text-sm font-normal"
                 data-testid={`project-realized-budget-${project.id}`}
               >
-                {planProjectValues.value2}
+                {budget2}
               </span>
             </div>
           </div>
         </div>
       </th>
-      {projectCells.map((c) => (
+      {cells.map((c) => (
         <ProjectCell key={c.financeKey} cell={c} onUpdateProject={onUpdateProject} />
       ))}
     </tr>
