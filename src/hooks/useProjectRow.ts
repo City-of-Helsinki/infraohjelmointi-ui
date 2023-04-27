@@ -6,6 +6,7 @@ import {
   IProjectFinancesRequestObject,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
+import { formatNumber } from '@/utils/common';
 import { isInYearRange, isSameYear } from '@/utils/dates';
 import { useEffect, useState } from 'react';
 
@@ -219,24 +220,26 @@ const getProjectCells = (project: IProject) => {
   return projectCells;
 };
 
-/* FIXME: rename budget1 and budget2 to actually reflect what the values are */
 interface IProjectSums {
-  budget1: number;
-  budget2: number;
+  availableFrameBudget: string;
+  costEstimateBudget: string;
 }
 
-const calculateProjectSum = (project: IProject): IProjectSums => {
+const calculateProjectSums = (project: IProject): IProjectSums => {
   const { year, ...finances } = project.finances;
-  const { budget } = project;
+  const { costForecast } = project;
 
-  const budget2 = Object.values(finances).reduce((accumulator, currentValue) => {
+  const availableFrameBudget = Object.values(finances).reduce((accumulator, currentValue) => {
     if (currentValue !== null) {
       return accumulator + parseInt(currentValue);
     }
     return accumulator;
   }, 0);
 
-  return { budget1: parseInt(budget ?? '0'), budget2 };
+  return {
+    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0')),
+    availableFrameBudget: formatNumber(availableFrameBudget),
+  };
 };
 
 interface IProjectRowsState {
@@ -254,7 +257,7 @@ interface IProjectRowsState {
 const useProjectRow = (project: IProject) => {
   const [projectRowsState, setProjectRowsState] = useState<IProjectRowsState>({
     cells: [],
-    sums: { budget1: 0, budget2: 0 },
+    sums: { availableFrameBudget: '0', costEstimateBudget: '0' },
   });
 
   useEffect(() => {
@@ -262,7 +265,7 @@ const useProjectRow = (project: IProject) => {
       setProjectRowsState((current) => ({
         ...current,
         cells: getProjectCells(project),
-        sums: calculateProjectSum(project),
+        sums: calculateProjectSums(project),
       }));
     }
   }, [project]);

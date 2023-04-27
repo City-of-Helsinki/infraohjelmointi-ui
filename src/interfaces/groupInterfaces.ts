@@ -1,8 +1,11 @@
+import { IClassFinances } from './classInterfaces';
+
 export interface IGroup {
   id: string;
   name: string;
   classRelation: string | null;
   locationRelation: string | null;
+  finances: IClassFinances;
 }
 
 export interface IGroupRequest {

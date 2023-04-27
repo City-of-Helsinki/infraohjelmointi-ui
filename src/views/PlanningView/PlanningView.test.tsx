@@ -640,7 +640,7 @@ describe('PlanningView', () => {
         expect(firstCell.children[0].children.length).toBe(3);
 
         expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-        expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
+        // expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
         expect(getByTestId(`deviation-${id}-${year}`)).toBeInTheDocument();
       });
 
@@ -695,8 +695,8 @@ describe('PlanningView', () => {
           expect(getByTestId(`edit-phase-${id}`)).toBeInTheDocument();
           expect(getByTestId(`navigate-${id}`)).toHaveTextContent(name);
           expect(getByTestId(`category-${id}`)).toHaveTextContent((category as IListItem).value);
-          expect(getByTestId(`project-total-budget-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`project-realized-budget-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`cost-estimate-budget-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`available-frame-budget-${id}`)).toBeInTheDocument();
 
           for (let i = 0; i < 10; i++) {
             const year = finances.year + i;

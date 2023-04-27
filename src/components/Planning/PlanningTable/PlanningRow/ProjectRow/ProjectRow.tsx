@@ -22,7 +22,7 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const {
     cells,
-    sums: { budget1, budget2 },
+    sums: { costEstimateBudget, availableFrameBudget },
   } = useProjectRow(project);
 
   const onSubmitPhase = useCallback(
@@ -94,14 +94,13 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
                 />
               )}
             </div>
-            {/* FIXME: rename classes project-total-budget and project-realized-budget to reflect the name of the variables */}
             <div className="flex flex-col">
-              <span data-testid={`project-total-budget-${project.id}`}>{budget1}</span>
+              <span data-testid={`cost-estimate-budget-${project.id}`}>{costEstimateBudget}</span>
               <span
                 className="text-sm font-normal"
-                data-testid={`project-realized-budget-${project.id}`}
+                data-testid={`available-frame-budget-${project.id}`}
               >
-                {budget2}
+                {availableFrameBudget}
               </span>
             </div>
           </div>

@@ -2,14 +2,15 @@ import { selectBatchedClasses } from '@/reducers/classSlice';
 import { useAppSelector } from './common';
 import { selectedBatchedLocations } from '@/reducers/locationSlice';
 import { useEffect, useState } from 'react';
-import { IClass } from '@/interfaces/classInterfaces';
+import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
-import { IPlanningRow, PlanningRowType } from '@/interfaces/common';
+import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
+import { formatNumber } from '@/utils/common';
 
 interface IPlanningRowLists {
   masterClasses: Array<IClass>;
@@ -119,6 +120,41 @@ const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IP
   return sortByName(projectList) as Array<IProject>;
 };
 
+const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
+  const { year, ...rest } = finances;
+  return Object.entries(rest).map(([key, value]) => ({
+    key,
+    frameBudget: formatNumber(value.frameBudget),
+    ...(key === 'year0' && { plannedBudget: formatNumber(value.plannedBudget) }),
+    ...(value.plannedBudget !== undefined && {
+      deviation: formatNumber(value.plannedBudget - value.frameBudget),
+    }),
+  }));
+};
+
+interface IPlanningSums {
+  availableFrameBudget: string;
+  costEstimateBudget: string;
+  deviation: string;
+}
+
+const calculatePlanningSums = (finances: IClassFinances): IPlanningSums => {
+  const { year, ...rest } = finances;
+
+  const availableFrameBudget = Object.values(rest).reduce((accumulator, currentValue) => {
+    if (currentValue !== null && currentValue.plannedBudget) {
+      return accumulator + currentValue.plannedBudget;
+    }
+    return accumulator;
+  }, 0);
+
+  return {
+    availableFrameBudget: formatNumber(availableFrameBudget),
+    costEstimateBudget: formatNumber(availableFrameBudget), // overrun sum - availableFrameBudget
+    deviation: formatNumber(availableFrameBudget - availableFrameBudget), // deviation of costEstimate and availableFrameBudget
+  };
+};
+
 /**
  * Builds a hierarchy-list of IPlanningTableRows, that will either include
  * - masterClasses, classes, subClasses, groups and districts; if a district isn't selected
@@ -151,6 +187,8 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       defaultExpanded: defaultExpanded || false,
       children: [],
       projectRows: getSortedProjects(item.id, type, projects),
+      cells: calculatePlanningCells(item.finances),
+      ...calculatePlanningSums(item.finances),
     };
   };
 

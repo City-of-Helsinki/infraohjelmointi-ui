@@ -1,4 +1,5 @@
 import { IClass } from '@/interfaces/classInterfaces';
+import { mockClassFinances } from './mockClassFinances';
 
 export const mockProjectClasses: { data: Array<IClass> } = {
   data: [
@@ -9,6 +10,7 @@ export const mockProjectClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: null,
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
@@ -17,6 +19,7 @@ export const mockProjectClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: null,
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: '85077f3c-e79b-45ba-ad6e-c68b06710d83',
@@ -25,6 +28,7 @@ export const mockProjectClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: null,
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: 'test-class-1',
@@ -33,6 +37,7 @@ export const mockProjectClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: 'test-master-class-1',
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
@@ -41,6 +46,7 @@ export const mockProjectClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: 'test-sub-class-1',
@@ -49,6 +55,7 @@ export const mockProjectClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: 'test-class-1',
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
@@ -57,6 +64,7 @@ export const mockProjectClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
       relatedTo: null,
+      finances: mockClassFinances,
     },
   ],
 };
@@ -70,6 +78,7 @@ export const mockMasterClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: null,
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
@@ -78,6 +87,7 @@ export const mockMasterClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: null,
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: '85077f3c-e79b-45ba-ad6e-c68b06710d83',
@@ -86,6 +96,7 @@ export const mockMasterClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: null,
       relatedTo: null,
+      finances: mockClassFinances,
     },
   ],
 };
@@ -99,6 +110,7 @@ export const mockClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: 'test-master-class-1',
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
@@ -107,6 +119,7 @@ export const mockClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: '7b69a4ae-5950-4175-a142-66dc9c6306a4',
       relatedTo: null,
+      finances: mockClassFinances,
     },
   ],
 };
@@ -120,6 +133,7 @@ export const mockSubClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: 'test-class-1',
       relatedTo: null,
+      finances: mockClassFinances,
     },
     {
       id: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
@@ -128,6 +142,7 @@ export const mockSubClasses: { data: Array<IClass> } = {
       forCoordinatorOnly: false,
       parent: 'c6294258-41b1-4ad6-afdf-0b10849ca000',
       relatedTo: null,
+      finances: mockClassFinances,
     },
   ],
 };

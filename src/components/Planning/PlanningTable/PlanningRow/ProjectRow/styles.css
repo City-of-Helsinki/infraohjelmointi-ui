@@ -13,7 +13,8 @@
 }
 
 .project-header-cell .project-name-container {
-  @apply flex w-[65%] items-center gap-2 overflow-hidden pr-4 text-left font-normal;
+  --header-width: calc(100% - var(--planning-cell-width));
+  @apply flex w-[var(--header-width)] items-center gap-2 overflow-hidden pr-4 text-left font-normal;
 }
 
 .project-header-cell .project-name-button {
@@ -21,7 +22,7 @@
 }
 
 .project-header-cell .project-right-icons-container {
-  @apply flex w-[35%] items-center justify-between;
+  @apply flex w-[var(--planning-cell-width)] items-center justify-between;
 }
 
 .table-input input {

@@ -102,6 +102,13 @@ export type PlanningRowType =
   | 'group'
   | 'project';
 
+export interface IPlanningCell {
+  key: string;
+  deviation?: string;
+  plannedBudget?: string;
+  frameBudget: string;
+}
+
 export interface IPlanningRow {
   type: PlanningRowType;
   name: string;
@@ -112,4 +119,8 @@ export interface IPlanningRow {
   key: string;
   defaultExpanded: boolean;
   link: string | null;
+  cells: Array<IPlanningCell>;
+  availableFrameBudget: string;
+  costEstimateBudget: string;
+  deviation: string;
 }
