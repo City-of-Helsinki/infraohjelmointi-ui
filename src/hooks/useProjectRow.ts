@@ -232,7 +232,7 @@ interface IProjectSums {
  * - costEstimateBudget: the deviation between the projects total budget and the already spent budget from past years
  * - availableFrameBudget: the sum of all the cells visible in the current year
  */
-const calculateProjectSums = (project: IProject): IProjectSums => {
+export const calculateProjectRowSums = (project: IProject): IProjectSums => {
   const { year, ...finances } = project.finances;
   const { costForecast, spentBudget } = project;
 
@@ -272,7 +272,7 @@ const useProjectRow = (project: IProject) => {
       setProjectRowsState((current) => ({
         ...current,
         cells: getProjectCells(project),
-        sums: calculateProjectSums(project),
+        sums: calculateProjectRowSums(project),
       }));
     }
   }, [project]);

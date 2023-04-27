@@ -129,7 +129,7 @@ const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IP
  * - plannedBudget: the plannedBudget for that year calculated in the backend (only first cell)
  * - deviation: the deviation between the plannedBudget and the framedBudget
  */
-const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
+export const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
   const { year, budgetOverrunAmount, ...rest } = finances;
   return Object.entries(rest).map(([key, value]) => ({
     key,
