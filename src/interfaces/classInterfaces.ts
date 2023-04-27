@@ -5,6 +5,7 @@ export interface IClassBudgets {
 
 export interface IClassFinances {
   year: number;
+  budgetOverrunAmount: number;
   year0: IClassBudgets;
   year1: IClassBudgets;
   year2: IClassBudgets;

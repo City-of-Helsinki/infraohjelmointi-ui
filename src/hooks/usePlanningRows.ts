@@ -120,8 +120,17 @@ const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IP
   return sortByName(projectList) as Array<IProject>;
 };
 
+/**
+ * Calculates the budgets for each cell for the current row. The first cell will get additional properties.
+ *
+ * @returns
+ * - key: the key for the cell (key of the finance object)
+ * - frameBudget: the frameBudget for that year calculated in the backend (only first cell)
+ * - plannedBudget: the plannedBudget for that year calculated in the backend (only first cell)
+ * - deviation: the deviation between the plannedBudget and the framedBudget
+ */
 const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
-  const { year, ...rest } = finances;
+  const { year, budgetOverrunAmount, ...rest } = finances;
   return Object.entries(rest).map(([key, value]) => ({
     key,
     frameBudget: formatNumber(value.frameBudget),
@@ -138,20 +147,34 @@ interface IPlanningSums {
   deviation: string;
 }
 
-const calculatePlanningSums = (finances: IClassFinances): IPlanningSums => {
-  const { year, ...rest } = finances;
+/**
+ * Calculates the budgets for the current row.
+ *
+ * @returns
+ * - availableFrameBudget: the sum of all frameBudgets (cells) for the current row
+ * - costEstimateBudget: the sum of all the frameBudgets and budgetOverrunAmount
+ * - deviation: the deviation between costEstimateBudget and availableFrameBudget
+ */
+const calculateRowSums = (finances: IClassFinances): IPlanningSums => {
+  const { year, budgetOverrunAmount, ...rest } = finances;
 
-  const availableFrameBudget = Object.values(rest).reduce((accumulator, currentValue) => {
-    if (currentValue !== null && currentValue.plannedBudget) {
-      return accumulator + currentValue.plannedBudget;
+  const sumOfFrameBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
+    if (currentValue !== null && currentValue.frameBudget) {
+      return accumulator + currentValue.frameBudget;
     }
     return accumulator;
   }, 0);
 
+  const sumOfFrameBudgetsAndOverrunAmount = sumOfFrameBudgets + budgetOverrunAmount;
+
+  const availableFrameBudget = formatNumber(sumOfFrameBudgets);
+  const costEstimateBudget = formatNumber(sumOfFrameBudgetsAndOverrunAmount);
+  const deviation = formatNumber(sumOfFrameBudgetsAndOverrunAmount - sumOfFrameBudgets);
+
   return {
-    availableFrameBudget: formatNumber(availableFrameBudget),
-    costEstimateBudget: formatNumber(availableFrameBudget), // overrun sum - availableFrameBudget
-    deviation: formatNumber(availableFrameBudget - availableFrameBudget), // deviation of costEstimate and availableFrameBudget
+    availableFrameBudget: availableFrameBudget,
+    costEstimateBudget: costEstimateBudget,
+    deviation: deviation,
   };
 };
 
@@ -188,7 +211,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       children: [],
       projectRows: getSortedProjects(item.id, type, projects),
       cells: calculatePlanningCells(item.finances),
-      ...calculatePlanningSums(item.finances),
+      ...calculateRowSums(item.finances),
     };
   };
 

@@ -17,15 +17,18 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
 
   return (
     <td className={`planning-cell ${type}`} data-testid={`cell-${id}-${year}`}>
-      {/* temporarily hide mock values if it's a subdivision */}
+      {/* Don't render sums for division */}
       {type !== 'division' && (
         <div className={`planning-cell-container`}>
+          {/* Planned budget */}
           {plannedBudget !== undefined && (
-            <span data-testid={`budget-${id}-${year}`} className="planning-budget">
+            <span data-testid={`planned-budget-${id}-${year}`} className="planning-budget">
               {plannedBudget}
             </span>
           )}
-          <span data-testid={`realized-${id}-${year}`}>{frameBudget}</span>
+          {/* Frame budget */}
+          <span data-testid={`frame-budget-${id}-${year}`}>{frameBudget}</span>
+          {/* Deviation between planned and frame budget */}
           {deviation !== undefined && (
             <span data-testid={`deviation-${id}-${year}`} className="planning-deviation">
               {deviation}

@@ -60,9 +60,9 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({
         </div>
         {displayBudgets && (
           <div className="grid w-[5.5rem] grid-flow-row text-right">
-            <span className="text-base leading-[22px]">{availableFrameBudget}</span>
-            <span className="text-sm font-normal leading-[22px]">{costEstimateBudget}</span>
-            <span className="text-sm font-bold leading-[22px] text-suomenlinna">{deviation}</span>
+            <span className="text-base">{availableFrameBudget}</span>
+            <span className="text-sm font-normal">{costEstimateBudget}</span>
+            <span className="text-sm font-bold text-suomenlinna">{deviation}</span>
           </div>
         )}
       </div>

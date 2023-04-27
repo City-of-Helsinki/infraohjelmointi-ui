@@ -78,6 +78,7 @@ export interface IProject {
   trafficPlanNumber?: string;
   bridgeNumber?: string;
   projectGroup: string | null;
+  spentBudget: number;
 }
 
 export interface IProjectRequest {

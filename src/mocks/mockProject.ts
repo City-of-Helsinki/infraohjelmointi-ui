@@ -134,6 +134,7 @@ const mockProject: { data: IProject } = {
       preliminaryCurrentYearPlus10: '0.00',
     },
     projectGroup: null,
+    spentBudget: 0,
   },
 };
 

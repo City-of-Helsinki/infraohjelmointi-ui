@@ -11,7 +11,7 @@
 /* TABLE HEADER */
 .planning-header {
   /* max-width: 1rem makes it so that the header doesn't grow beyond its max width */
-  @apply h-11 w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus px-5 pt-[7px] pb-[4px] text-white;
+  @apply h-11 w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus py-1 pr-4 text-white;
 }
 
 .planning-header-content {
@@ -96,7 +96,7 @@
 
 /* TABLE CELL */
 .planning-cell {
-  @apply min-w-[var(--planning-cell-width)] border-b border-white bg-bus px-5 pb-[4px] pt-[7px] align-text-top text-white;
+  @apply min-w-[var(--planning-cell-width)] border-b border-white bg-bus py-1 pr-4 align-text-top text-white;
 }
 
 .planning-cell.masterClass {
@@ -132,7 +132,7 @@
 }
 
 .planning-cell .planning-cell-container span {
-  @apply w-full text-sm leading-[22px];
+  @apply text-sm;
 }
 
 .planning-budget {

@@ -2,13 +2,17 @@
   /* width 65% since the info-panel is 30% */
   @apply w-[65%] text-right;
 }
-
+/* 
 .planning-year-cell {
-  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)];
+  @apply ;
+} */
+
+.planning-years-table td {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] !pr-4;
 }
 
 .planning-years-table span {
-  @apply block w-full translate-x-[-15%];
+  @apply block w-full;
 }
 
 .planning-budget-cell {

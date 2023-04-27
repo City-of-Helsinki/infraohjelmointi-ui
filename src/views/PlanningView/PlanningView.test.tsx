@@ -18,9 +18,11 @@ import { act, fireEvent, waitFor } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
-import { listItemToOption } from '@/utils/common';
+import { formatNumber, listItemToOption } from '@/utils/common';
 import { mockError } from '@/mocks/mockError';
 import { getProjectsWithParams } from '@/services/projectServices';
+import { IClassFinances } from '@/interfaces/classInterfaces';
+import { IClassBudgets } from '@/interfaces/classInterfaces';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -630,31 +632,47 @@ describe('PlanningView', () => {
     });
 
     describe('PlanningCell', () => {
-      it('renders budget, overrun and deviation only for the current year', async () => {
+      it('renders budget, overrun and deviation only for the current year and formats the numbers', async () => {
         const { store, getByTestId } = await render();
 
-        const { id } = store.getState().class.masterClasses[0];
+        const {
+          id,
+          finances: {
+            year0: { plannedBudget, frameBudget },
+          },
+        } = store.getState().class.masterClasses[0];
         const firstCell = getByTestId(`row-${id}`).children[1];
         const year = new Date().getFullYear();
 
         expect(firstCell.children[0].children.length).toBe(3);
 
-        expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-        // expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
-        expect(getByTestId(`deviation-${id}-${year}`)).toBeInTheDocument();
+        expect(getByTestId(`planned-budget-${id}-${year}`)).toHaveTextContent(
+          formatNumber(plannedBudget),
+        );
+        expect(getByTestId(`frame-budget-${id}-${year}`)).toHaveTextContent(
+          formatNumber(frameBudget),
+        );
+        expect(getByTestId(`deviation-${id}-${year}`)).toHaveTextContent(
+          formatNumber((plannedBudget ?? 0) - frameBudget),
+        );
       });
 
-      it('renders budget and realized cost for future years', async () => {
+      it('renders frame budget for future years', async () => {
         const { store, getByTestId } = await render();
 
-        const { id } = store.getState().class.masterClasses[0];
+        const { id, finances } = store.getState().class.masterClasses[0];
         const secondCell = getByTestId(`row-${id}`).children[2];
         const year = new Date().getFullYear() + 1;
 
-        expect(secondCell.children[0].children.length).toBe(2);
+        expect(secondCell.children[0].children.length).toBe(1);
 
-        expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-        expect(getByTestId(`realized-${id}-${year}`)).toBeInTheDocument();
+        for (let i = 0; i < 10; i++) {
+          expect(getByTestId(`frame-budget-${id}-${year + i}`)).toHaveTextContent(
+            formatNumber(
+              (finances[`year${i + 1}` as keyof IClassFinances] as IClassBudgets).frameBudget,
+            ),
+          );
+        }
       });
     });
 

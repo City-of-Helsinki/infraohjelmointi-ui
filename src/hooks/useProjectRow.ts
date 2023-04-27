@@ -225,9 +225,16 @@ interface IProjectSums {
   costEstimateBudget: string;
 }
 
+/**
+ * Calculates the budget sums for a project row and returns the sums.
+ *
+ * @returns
+ * - costEstimateBudget: the deviation between the projects total budget and the already spent budget from past years
+ * - availableFrameBudget: the sum of all the cells visible in the current year
+ */
 const calculateProjectSums = (project: IProject): IProjectSums => {
   const { year, ...finances } = project.finances;
-  const { costForecast } = project;
+  const { costForecast, spentBudget } = project;
 
   const availableFrameBudget = Object.values(finances).reduce((accumulator, currentValue) => {
     if (currentValue !== null) {
@@ -237,7 +244,7 @@ const calculateProjectSums = (project: IProject): IProjectSums => {
   }, 0);
 
   return {
-    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0')),
+    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
     availableFrameBudget: formatNumber(availableFrameBudget),
   };
 };
