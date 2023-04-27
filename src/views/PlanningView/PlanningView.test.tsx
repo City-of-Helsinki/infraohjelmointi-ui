@@ -23,6 +23,7 @@ import { mockError } from '@/mocks/mockError';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { IClassFinances } from '@/interfaces/classInterfaces';
 import { IClassBudgets } from '@/interfaces/classInterfaces';
+import { calculatePlanningRowSums } from '@/hooks/usePlanningRows';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -335,7 +336,7 @@ describe('PlanningView', () => {
       masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
     });
 
-    it('renders all children rows and only one parent when parent is expanded', async () => {
+    it('renders all children rows and budgets for all but divisions and only one parent when parent is expanded', async () => {
       const { store, getByTestId, queryByTestId, user } = await render();
 
       const { masterClasses, classes, subClasses } = store.getState().class;
@@ -343,6 +344,16 @@ describe('PlanningView', () => {
       const { groups } = store.getState().group;
 
       const projects = mockPlanningViewProjects.data.results;
+
+      const expectRowProperties = (finances: IClassFinances, id: string) => {
+        const { availableFrameBudget, costEstimateBudget, deviation } =
+          calculatePlanningRowSums(finances);
+
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        expect(getByTestId(`available-frame-budget-${id}`)).toHaveTextContent(availableFrameBudget);
+        expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
+        expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation);
+      };
 
       // Check that all masterClass-rows is visible
       masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
@@ -353,9 +364,9 @@ describe('PlanningView', () => {
 
       // Check that only first masterClass-row are visible
       await waitFor(() => {
-        masterClasses.forEach(({ id }, i) => {
+        masterClasses.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('masterClass')).toBeTruthy();
           }
           if (i !== 0) {
@@ -377,9 +388,9 @@ describe('PlanningView', () => {
 
       // Check that only first class-row is visible
       await waitFor(() => {
-        classes.forEach(({ id }, i) => {
+        classes.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('class')).toBeTruthy();
           }
           if (i !== 0) {
@@ -410,9 +421,9 @@ describe('PlanningView', () => {
 
       // Check that only first subClass-row is visible
       await waitFor(() => {
-        subClasses.forEach(({ id }, i) => {
+        subClasses.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('subClass')).toBeTruthy();
           }
           if (i !== 0) {
@@ -427,8 +438,8 @@ describe('PlanningView', () => {
       );
 
       await waitFor(() => {
-        groupsForSubClass.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        groupsForSubClass.forEach(({ id, finances }) => {
+          expectRowProperties(finances, id);
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -458,9 +469,9 @@ describe('PlanningView', () => {
 
       // Check that only first district-row is visible
       await waitFor(() => {
-        districts.forEach(({ id }, i) => {
+        districts.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
             expect(
               getByTestId(`row-${districtId}`).classList.contains('district-preview'),
@@ -476,8 +487,8 @@ describe('PlanningView', () => {
       const groupsForDistrict = mockGroups.data.filter((g) => g.locationRelation === districtId);
 
       await waitFor(() => {
-        groupsForDistrict.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        groupsForDistrict.forEach(({ id, finances }) => {
+          expectRowProperties(finances, id);
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -516,8 +527,8 @@ describe('PlanningView', () => {
       const groupsForDivision = groups.filter((g) => g.locationRelation === divisions[0].id);
 
       await waitFor(() => {
-        groupsForDivision.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        groupsForDivision.forEach(({ id, finances }) => {
+          expectRowProperties(finances, id);
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });

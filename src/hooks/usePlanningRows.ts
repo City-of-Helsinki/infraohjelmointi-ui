@@ -155,7 +155,7 @@ interface IPlanningSums {
  * - costEstimateBudget: the sum of all the frameBudgets and budgetOverrunAmount
  * - deviation: the deviation between costEstimateBudget and availableFrameBudget
  */
-const calculateRowSums = (finances: IClassFinances): IPlanningSums => {
+export const calculatePlanningRowSums = (finances: IClassFinances): IPlanningSums => {
   const { year, budgetOverrunAmount, ...rest } = finances;
 
   const sumOfFrameBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
@@ -211,7 +211,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       children: [],
       projectRows: getSortedProjects(item.id, type, projects),
       cells: calculatePlanningCells(item.finances),
-      ...calculateRowSums(item.finances),
+      ...calculatePlanningRowSums(item.finances),
     };
   };
 
