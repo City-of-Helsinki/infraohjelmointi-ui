@@ -139,8 +139,28 @@
   @apply !text-base !font-bold;
 }
 
-.planning-deviation {
-  @apply !font-bold text-suomenlinna;
+.planning-cell-deviation {
+  @apply !font-bold text-copper-m;
+}
+
+.planning-cell-deviation.group {
+  @apply text-coat-of-arms-d;
+}
+
+.planning-cell-deviation.negative {
+  @apply text-suomenlinna;
+}
+
+.planning-header-deviation {
+  @apply text-sm font-bold text-copper-m;
+}
+
+.planning-header-deviation.group {
+  @apply text-coat-of-arms-d;
+}
+
+.planning-header-deviation.negative {
+  @apply text-suomenlinna;
 }
 
 .planning-header-content-dots {

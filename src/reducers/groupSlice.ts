@@ -6,11 +6,13 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IGroupsState {
   groups: Array<IGroup>;
+  year: number;
   error: IError | null | unknown;
 }
 
 const initialState: IGroupsState = {
   groups: [],
+  year: new Date().getFullYear(),
   error: null,
 };
 
@@ -43,7 +45,7 @@ export const groupSlice = createSlice({
     });
     // GROUP GET ALL
     builder.addCase(getGroupsThunk.fulfilled, (state, action: PayloadAction<Array<IGroup>>) => {
-      return { ...state, groups: action.payload };
+      return { ...state, groups: action.payload, year: action.payload[0].finances.year };
     });
     builder.addCase(getGroupsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };

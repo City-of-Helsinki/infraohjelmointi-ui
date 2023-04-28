@@ -9,6 +9,7 @@ interface IClassState {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
+  year: number;
   error: IError | null | unknown;
 }
 
@@ -17,6 +18,7 @@ const initialState: IClassState = {
   masterClasses: [],
   classes: [],
   subClasses: [],
+  year: new Date().getFullYear(),
   error: null,
 };
 
@@ -34,13 +36,23 @@ export const classSlice = createSlice({
     // GET ALL
     builder.addCase(getClassesThunk.fulfilled, (state, action: PayloadAction<Array<IClass>>) => {
       const masterClasses = action.payload?.filter((c) => !c.parent);
+
       const classes = masterClasses
         ? action.payload?.filter((c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1)
         : [];
+
       const subClasses = classes
         ? action.payload?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
         : [];
-      return { ...state, allClasses: [...action.payload], masterClasses, classes, subClasses };
+
+      return {
+        ...state,
+        allClasses: action.payload,
+        masterClasses,
+        classes,
+        subClasses,
+        year: action.payload[0].finances.year,
+      };
     });
     builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };

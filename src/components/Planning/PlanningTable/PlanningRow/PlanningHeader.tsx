@@ -66,8 +66,13 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({
             <span className="text-sm font-normal" data-testid={`cost-estimate-budget-${id}`}>
               {costEstimateBudget}
             </span>
-            <span className="text-sm font-bold text-suomenlinna" data-testid={`deviation-${id}`}>
-              {deviation}
+            <span
+              className={`planning-header-deviation ${
+                deviation.isNegative ? 'negative' : ''
+              } ${type}`}
+              data-testid={`deviation-${id}`}
+            >
+              {deviation.value}
             </span>
           </div>
         )}

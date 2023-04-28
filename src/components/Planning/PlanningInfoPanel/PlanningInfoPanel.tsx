@@ -18,35 +18,37 @@ const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass })
 
   return (
     <div className="planning-info-panel">
-      <div id="planningButton" data-testid="mode-button-container">
-        <Button className="h-11" variant="success" data-testid="mode-button">
-          {t('planning')}
-        </Button>
+      {/* Mode and previous button */}
+      <div className="buttons-container">
+        <div data-testid="mode-button-container">
+          <Button className="h-11" variant="success" data-testid="mode-button">
+            {t('planning')}
+          </Button>
+        </div>
+        <div id="previousButton" data-testid="previous-button-container">
+          {selectedMasterClass && (
+            <Button
+              data-testid="previous-button"
+              onClick={navigateBack}
+              variant="supplementary"
+              iconLeft={<IconAngleLeft />}
+            >
+              {t('previous')}
+            </Button>
+          )}
+        </div>
       </div>
-
-      <div id="selectedClass" data-testid="selected-class-container">
+      {/* Selected class name */}
+      <div className="selected-class-container" data-testid="selected-class-container">
         {selectedMasterClass && (
-          <>
-            <span className="block text-sm font-bold" data-testid="selected-class">
+          <div className="overflow-hidden">
+            <span id="selectedClass" className="selected-class" data-testid="selected-class">
               {selectedMasterClass.name}
             </span>
             <span className="block text-sm" data-testid="currency-indicator">
               {t('keur')}
             </span>
-          </>
-        )}
-      </div>
-
-      <div id="previousButton" data-testid="previous-button-container">
-        {selectedMasterClass && (
-          <Button
-            data-testid="previous-button"
-            onClick={navigateBack}
-            variant="supplementary"
-            iconLeft={<IconAngleLeft />}
-          >
-            {t('previous')}
-          </Button>
+          </div>
         )}
       </div>
     </div>

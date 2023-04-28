@@ -25,6 +25,8 @@ import { IClassFinances } from '@/interfaces/classInterfaces';
 import { IClassBudgets } from '@/interfaces/classInterfaces';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/hooks/usePlanningRows';
 import { calculateProjectRowSums } from '@/hooks/useProjectRow';
+import { mockClassFinances } from '@/mocks/mockClassFinances';
+import { getPlanningRowTitle } from '@/hooks/useSummaryRows';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -257,55 +259,54 @@ describe('PlanningView', () => {
     });
   });
 
-  describe('PlanningYearsTable', () => {
-    it('renders the current year + 10 years and mock data for now', async () => {
-      const { getByTestId, getAllByText, container } = await render();
+  describe('PlanningSummaryTable', () => {
+    it('renders all rows but an empty table with the startYear if a masterClass isnt selected', async () => {
+      const { getByTestId, container } = await render();
 
-      expect(container.getElementsByClassName('planning-years-table')[0]).toBeInTheDocument();
-      expect(getByTestId('planning-years-head')).toBeInTheDocument();
-      expect(getByTestId('planning-years-head-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-body')).toBeInTheDocument();
-      expect(getByTestId('planning-years-total-budget-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-realized-budget-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-overrun-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-deviation-row')).toBeInTheDocument();
-      expect(getAllByText('alustava').length).toBe(6);
+      const finances = mockClassFinances;
+      const { year, budgetOverrunAmount, ...rest } = finances;
 
-      for (let i = 0; i < 10; i++) {
-        const year = new Date().getFullYear() + i;
-        const currentHeaderCell = getByTestId(`head-${year}`);
-        const currentTotalBudgetCell = getByTestId(`budget-${year}`);
-        const currentRealizedBudgetCell = getByTestId(`realized-${year}`);
-        const currentOverrunCell = getByTestId(`overrun-${year}`);
-        const currentDeviationCell = getByTestId(`deviation-${year}`);
+      expect(container.getElementsByClassName('planning-summary-table')[0]).toBeInTheDocument();
+      expect(getByTestId('planning-summary-head')).toBeInTheDocument();
+      expect(getByTestId('planning-summary-head-row')).toBeInTheDocument();
 
-        expect(currentHeaderCell).toHaveTextContent(`<> ${year}`);
-        expect(currentTotalBudgetCell).toHaveTextContent('341 400');
-        expect(currentRealizedBudgetCell).toBeInTheDocument();
-        expect(currentOverrunCell).toHaveTextContent('400');
-        expect(currentDeviationCell).toHaveTextContent('1400');
-
-        // First col
-        if (i === 0) {
-          expect(currentHeaderCell).toHaveTextContent('kuluva TA');
-          expect(currentRealizedBudgetCell).toHaveTextContent('340 200');
-          expect(currentOverrunCell.children[0].classList.contains('overrun-icon')).toBeTruthy();
-          expect(currentOverrunCell).toHaveTextContent('+400');
-        }
-        // Second col
-        if (i === 1) {
-          expect(currentHeaderCell).toHaveTextContent('TAE');
-        }
-        // Third and fourth col
-        if (i === 2 || i === 3) {
-          expect(currentHeaderCell).toHaveTextContent('TSE');
-          expect(currentHeaderCell).toHaveTextContent('TSE');
-        }
-        // Fifth col
-        if (i === 4) {
-          expect(currentHeaderCell).toHaveTextContent('kuluva TA');
-        }
+      for (let i = 0; i < 11; i++) {
+        const title = getPlanningRowTitle(i);
+        const headCell = getByTestId(`head-${year + i}`);
+        expect(headCell).toHaveTextContent((year + i).toString());
+        expect(headCell).toHaveTextContent(title);
       }
+
+      expect(getByTestId('planning-summary-body')).toBeInTheDocument();
+      expect(getByTestId('planning-summary-planned-budget-row')).toBeInTheDocument();
+      expect(getByTestId('planning-summary-realized-budget-row')).toBeInTheDocument();
+
+      Object.keys(rest).forEach((k) => {
+        expect(getByTestId(`summary-budget-${k}`)).toHaveTextContent('');
+        expect(getByTestId(`summary-frame-${k}`)).toHaveTextContent('');
+        expect(getByTestId(`summary-budget-${k}`)).toHaveTextContent('');
+      });
+    });
+
+    it('renders the selectedMasterClasses financial data if a masterClass is expanded', async () => {
+      const { getByTestId, user } = await render();
+
+      const finances = mockClassFinances;
+      const { year, budgetOverrunAmount, ...rest } = finances;
+      const { id: masterClassId } = mockMasterClasses.data[0];
+
+      await user.click(getByTestId(`expand-${masterClassId}`));
+
+      const cells = calculatePlanningCells(finances);
+
+      await waitFor(() => {
+        Object.keys(rest).forEach((k, i) => {
+          const { plannedBudget, frameBudget, deviation } = cells[i];
+          expect(getByTestId(`summary-budget-${k}`)).toHaveTextContent(plannedBudget || '');
+          expect(getByTestId(`summary-frame-${k}`)).toHaveTextContent(frameBudget);
+          expect(getByTestId(`summary-deviation-${k}`)).toHaveTextContent(deviation?.value || '');
+        });
+      });
     });
   });
 
@@ -353,7 +354,7 @@ describe('PlanningView', () => {
         expect(getByTestId(`row-${id}`)).toBeInTheDocument();
         expect(getByTestId(`available-frame-budget-${id}`)).toHaveTextContent(availableFrameBudget);
         expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
-        expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation);
+        expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation.value);
       };
 
       // Check that all masterClass-rows is visible
@@ -660,7 +661,7 @@ describe('PlanningView', () => {
 
         expect(getByTestId(`planned-budget-${id}-${year}`)).toHaveTextContent(plannedBudget || '0');
         expect(getByTestId(`frame-budget-${id}-${year}`)).toHaveTextContent(frameBudget);
-        expect(getByTestId(`deviation-${id}-${year}`)).toHaveTextContent(deviation || '0');
+        expect(getByTestId(`deviation-${id}-${year}`)).toHaveTextContent(deviation?.value || '0');
       });
 
       it('renders frame budget for future years', async () => {

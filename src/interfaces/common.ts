@@ -102,9 +102,14 @@ export type PlanningRowType =
   | 'group'
   | 'project';
 
+export interface IDeviation {
+  isNegative: boolean;
+  value: string;
+}
+
 export interface IPlanningCell {
   key: string;
-  deviation?: string;
+  deviation?: IDeviation;
   plannedBudget?: string;
   frameBudget: string;
 }
@@ -122,5 +127,5 @@ export interface IPlanningRow {
   cells: Array<IPlanningCell>;
   availableFrameBudget: string;
   costEstimateBudget: string;
-  deviation: string;
+  deviation: IDeviation;
 }

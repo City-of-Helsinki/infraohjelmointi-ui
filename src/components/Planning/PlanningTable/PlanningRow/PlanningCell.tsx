@@ -30,8 +30,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
           <span data-testid={`frame-budget-${id}-${year}`}>{frameBudget}</span>
           {/* Deviation between planned and frame budget */}
           {deviation !== undefined && (
-            <span data-testid={`deviation-${id}-${year}`} className="planning-deviation">
-              {deviation}
+            <span
+              data-testid={`deviation-${id}-${year}`}
+              className={`planning-cell-deviation ${
+                deviation.isNegative ? 'negative' : ''
+              } ${type}`}
+            >
+              {deviation.value}
             </span>
           )}
         </div>

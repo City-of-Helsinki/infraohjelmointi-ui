@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
-import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
+import { IDeviation, IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
@@ -31,6 +31,7 @@ interface IPlanningRowSelections {
 interface IPlanningRowsState {
   lists: IPlanningRowLists;
   selections: IPlanningRowSelections;
+  year: number;
 }
 
 /**
@@ -127,24 +128,33 @@ const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IP
  * - key: the key for the cell (key of the finance object)
  * - frameBudget: the frameBudget for that year calculated in the backend (only first cell)
  * - plannedBudget: the plannedBudget for that year calculated in the backend (only first cell)
- * - deviation: the deviation between the plannedBudget and the framedBudget
+ * - deviation: the deviation between the plannedBudget and the framedBudget and if the value is negative
  */
 export const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
   const { year, budgetOverrunAmount, ...rest } = finances;
-  return Object.entries(rest).map(([key, value]) => ({
-    key,
-    frameBudget: formatNumber(value.frameBudget),
-    ...(key === 'year0' && { plannedBudget: formatNumber(value.plannedBudget) }),
-    ...(value.plannedBudget !== undefined && {
-      deviation: formatNumber(value.plannedBudget - value.frameBudget),
-    }),
-  }));
+  return Object.entries(rest).map(([key, value]) => {
+    const { frameBudget, plannedBudget } = value;
+
+    const deviation = plannedBudget && plannedBudget - frameBudget;
+
+    return {
+      key,
+      frameBudget: formatNumber(frameBudget),
+      ...(key === 'year0' && { plannedBudget: formatNumber(plannedBudget) }),
+      ...(deviation !== undefined && {
+        deviation: {
+          value: formatNumber(deviation),
+          isNegative: deviation < 0,
+        },
+      }),
+    };
+  });
 };
 
 interface IPlanningSums {
   availableFrameBudget: string;
   costEstimateBudget: string;
-  deviation: string;
+  deviation: IDeviation;
 }
 
 /**
@@ -153,7 +163,7 @@ interface IPlanningSums {
  * @returns
  * - availableFrameBudget: the sum of all frameBudgets (cells) for the current row
  * - costEstimateBudget: the sum of all the frameBudgets and budgetOverrunAmount
- * - deviation: the deviation between costEstimateBudget and availableFrameBudget
+ * - deviation: the deviation between costEstimateBudget and availableFrameBudget and if the value is negative
  */
 export const calculatePlanningRowSums = (finances: IClassFinances): IPlanningSums => {
   const { year, budgetOverrunAmount, ...rest } = finances;
@@ -166,15 +176,16 @@ export const calculatePlanningRowSums = (finances: IClassFinances): IPlanningSum
   }, 0);
 
   const sumOfFrameBudgetsAndOverrunAmount = sumOfFrameBudgets + budgetOverrunAmount;
+  const devationBetweenFrameAndOverrun = sumOfFrameBudgetsAndOverrunAmount - sumOfFrameBudgets;
 
   const availableFrameBudget = formatNumber(sumOfFrameBudgets);
   const costEstimateBudget = formatNumber(sumOfFrameBudgetsAndOverrunAmount);
-  const deviation = formatNumber(sumOfFrameBudgetsAndOverrunAmount - sumOfFrameBudgets);
+  const deviation = formatNumber(devationBetweenFrameAndOverrun);
 
   return {
     availableFrameBudget: availableFrameBudget,
     costEstimateBudget: costEstimateBudget,
-    deviation: deviation,
+    deviation: { value: deviation, isNegative: devationBetweenFrameAndOverrun < 0 },
   };
 };
 
@@ -362,6 +373,7 @@ const usePlanningRows = () => {
       selectedSubClass: null,
       selectedDistrict: null,
     },
+    year: new Date().getFullYear(),
   });
   const [rows, setRows] = useState<Array<IPlanningRow>>([]);
 
@@ -379,7 +391,7 @@ const usePlanningRows = () => {
 
   // React to changes in classes and set the selectedMasterClass/selectedClass/selectedSubClass if it is present in the route
   useEffect(() => {
-    const { masterClasses, classes, subClasses } = batchedClasses;
+    const { masterClasses, classes, subClasses, year } = batchedClasses;
     const selectedMasterClass = getSelectedItemOrNull(masterClasses, masterClassId);
     const selectedClass = getSelectedItemOrNull(classes, classId);
     const selectedSubClass = getSelectedItemOrNull(subClasses, subClassId);
@@ -398,6 +410,7 @@ const usePlanningRows = () => {
         classes: selectedClass ? [selectedClass] : classes,
         subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
       },
+      year,
     }));
   }, [masterClassId, classId, subClassId, batchedClasses]);
 
@@ -434,6 +447,7 @@ const usePlanningRows = () => {
   return {
     rows,
     selections: planningRowsState.selections,
+    startYear: planningRowsState.year,
   };
 };
 

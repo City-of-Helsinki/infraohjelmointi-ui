@@ -1,7 +1,9 @@
 import { IClassFinances } from '@/interfaces/classInterfaces';
 
+const startYear = new Date().getFullYear();
+
 export const mockClassFinances: IClassFinances = {
-  year: 2023,
+  year: startYear,
   budgetOverrunAmount: 0,
   year0: {
     plannedBudget: 20000,

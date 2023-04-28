@@ -250,7 +250,6 @@
   "allocationPreparation": "Määrärahojen valmistelu",
   "keur": "keur",
   "basicInfoKA": ">< Perustiedot <> KA ja ohj.",
-  "inProgressUntil": "Käynnissä {{planningInfo.date}} asti",
   "send:": "Lähetä",
   "savedTime": "Tallennettu: {{time}}",
   "address": "Osoite",
