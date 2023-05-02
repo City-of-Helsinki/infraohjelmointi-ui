@@ -8,7 +8,9 @@
   margin: 0;
 }
 
-
+#open-group-form-container {
+  cursor: pointer;
+}
 #group-create-dialog .search-form .advance-fields-button {
   color: var(--color-bus);
   display: flex;

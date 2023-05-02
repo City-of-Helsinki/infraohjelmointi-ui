@@ -13,12 +13,15 @@ import { useAppDispatch } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { postGroupThunk } from '@/reducers/groupSlice';
 import { IGroupRequest } from '@/interfaces/groupInterfaces';
+import { useNavigate } from 'react-router';
 
 interface IDialogProps {
   handleClose: () => void;
   isOpen: boolean;
 }
-
+const buildRedirectRoute = (form: IGroupForm): string => {
+  return `${form.masterClass.value}/${form.class.value}/${form.subClass.value}/${form.district?.value}`;
+};
 const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
   // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
   return {
@@ -30,6 +33,8 @@ const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
 };
 
 const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
+  const navigate = useNavigate();
+
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);
 
   const { formMethods, formValues, classOptions, locationOptions } = useGroupForm();
@@ -50,6 +55,8 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
       dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
         reset(formValues);
         setShowAdvanceFields(false);
+        handleDialogClose();
+        navigate(buildRedirectRoute(form));
       });
     },
 
@@ -246,7 +253,7 @@ const GroupDialog: FC = () => {
 
   const toggleSetOpen = useCallback(() => setIsOpen((current) => !current), [setIsOpen]);
   const onOpenGroupForm = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+    (e: MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
       toggleSetOpen();
     },
@@ -259,10 +266,9 @@ const GroupDialog: FC = () => {
     <div>
       {isOpen && <DialogContainer isOpen={isOpen} handleClose={handleClose} />}
       <div>
-        <div data-testid="open-group-form-dialog-button"></div>
-        <Button onClick={onOpenGroupForm} size="small">
-          {t(`createSummingGroups`)}
-        </Button>
+        <div data-testid="open-group-form-container" id="open-group-form-container">
+          <div onClick={onOpenGroupForm}>{t(`createSummingGroups`)}</div>
+        </div>
       </div>
     </div>
   );

@@ -3,11 +3,11 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { arrayHasValue, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
-import { ISearchRequest } from '@/interfaces/searchInterfaces';
+import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
@@ -19,7 +19,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const buildQueryParamString = useCallback(
-    (projectName: string): ISearchRequest => {
+    (projectName: string): IProjectSearchRequest => {
       const searchParams = Object.entries(getValues())
         .filter(([_, value]) => value?.value)
         .map(([key, value]) => `${key}=${value.value}`);
@@ -28,7 +28,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
       searchParams.push('inGroup=false');
       searchParams.push('programmed=true');
 
-      return { limit: '30', params: searchParams.join('&'), order: 'new' };
+      return { params: searchParams.join('&'), direct: false };
     },
     [getValues],
   );
@@ -63,7 +63,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
           .then((res) => {
             const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
             const resultList = res.results?.filter(
-              (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
+              (project) => !arrayHasValue(projectsIdList, project.id),
             );
 
             const searchProjectsItemList: Array<IOption> | [] = resultList
