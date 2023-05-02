@@ -31,7 +31,7 @@ export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResu
   return axios
     .get(
       req.fullPath ||
-        `${REACT_APP_API_URL}/projects/search-results/?${req.params}&limit=${req.limit}&order=${req.order}`,
+        `${REACT_APP_API_URL}/projects/?${req.params}&limit=${req.limit}&order=${req.order}`,
     )
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
@@ -41,7 +41,7 @@ export const getProjectsWithParams = async (
   req: IProjectSearchRequest,
 ): Promise<IProjectsResponse> => {
   return axios
-    .get(`${REACT_APP_API_URL}/projects/?${req.params}&direct=${req.direct}`)
+    .get(`${REACT_APP_API_URL}/projects/planning-view/?${req.params}&direct=${req.direct}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

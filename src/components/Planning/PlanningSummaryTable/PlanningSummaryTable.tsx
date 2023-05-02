@@ -1,18 +1,16 @@
 import { FC } from 'react';
-import { IClass } from '@/interfaces/classInterfaces';
 import useSummaryRows from '@/hooks/useSummaryRows';
 import './styles.css';
+import { IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
 
 interface IPlanningSummaryTableProps {
   startYear: number;
-  selectedMasterClass: IClass | null;
+  selections: IPlanningRowSelections;
+  lists: IPlanningRowLists;
 }
 
-const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({
-  startYear,
-  selectedMasterClass,
-}) => {
-  const { header, cells } = useSummaryRows({ startYear, selectedMasterClass });
+const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selections, lists }) => {
+  const { header, cells } = useSummaryRows({ startYear, selections, lists });
 
   return (
     <table cellSpacing={0} className="planning-summary-table">

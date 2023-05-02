@@ -5,12 +5,12 @@ import { NameTooltip } from './NameTooltip';
 import { IPlanningRow } from '@/interfaces/common';
 import './styles.css';
 
-interface IPlanningHeaderProps extends IPlanningRow {
+interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
   expanded?: boolean;
 }
 
-const PlanningHeader: FC<IPlanningHeaderProps> = ({
+const PlanningHead: FC<IPlanningHeadProps> = ({
   link,
   name,
   type,
@@ -18,7 +18,7 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({
   expanded,
   id,
   costEstimateBudget,
-  availableFrameBudget,
+  plannedBudgets,
   deviation,
 }) => {
   const navigate = useNavigate();
@@ -60,20 +60,22 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({
         </div>
         {displayBudgets && (
           <div className="grid w-[5.5rem] grid-flow-row text-right">
-            <span className="text-base" data-testid={`available-frame-budget-${id}`}>
-              {availableFrameBudget}
+            <span className="text-base" data-testid={`planned-budgets-${id}`}>
+              {plannedBudgets}
             </span>
             <span className="text-sm font-normal" data-testid={`cost-estimate-budget-${id}`}>
               {costEstimateBudget}
             </span>
-            <span
-              className={`planning-header-deviation ${
-                deviation.isNegative ? 'negative' : ''
-              } ${type}`}
-              data-testid={`deviation-${id}`}
-            >
-              {deviation.value}
-            </span>
+            {deviation !== undefined && (
+              <span
+                className={`planning-header-deviation ${
+                  deviation.isNegative ? 'negative' : ''
+                } ${type}`}
+                data-testid={`deviation-${id}`}
+              >
+                {deviation.value}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -81,4 +83,4 @@ const PlanningHeader: FC<IPlanningHeaderProps> = ({
   );
 };
 
-export default memo(PlanningHeader);
+export default memo(PlanningHead);

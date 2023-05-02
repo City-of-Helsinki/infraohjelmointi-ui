@@ -1,3 +1,4 @@
+import { IProjectSums } from '@/interfaces/common';
 import {
   CellType,
   IProject,
@@ -220,17 +221,12 @@ const getProjectCells = (project: IProject) => {
   return projectCells;
 };
 
-interface IProjectSums {
-  availableFrameBudget: string;
-  costEstimateBudget: string;
-}
-
 /**
  * Calculates the budget sums for a project row and returns the sums.
  *
  * @returns
- * - costEstimateBudget: the deviation between the projects total budget and the already spent budget from past years
- * - availableFrameBudget: the sum of all the cells visible in the current year
+ * - costEstimateBudget: the sum of all the project finances (cells visible in the current year)
+ * - availableFrameBudget: the deviation between the projects total budget and the already spent budget from past years
  */
 export const calculateProjectRowSums = (project: IProject): IProjectSums => {
   const { year, ...finances } = project.finances;
@@ -244,8 +240,8 @@ export const calculateProjectRowSums = (project: IProject): IProjectSums => {
   }, 0);
 
   return {
-    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
     availableFrameBudget: formatNumber(availableFrameBudget),
+    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
   };
 };
 

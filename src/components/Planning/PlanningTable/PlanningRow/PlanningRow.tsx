@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import PlanningCell from './PlanningCell';
-import PlanningHeader from './PlanningHeader';
+import PlanningHead from './PlanningHead';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
 import './styles.css';
@@ -38,7 +38,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
   return (
     <>
       <tr className={props.type} data-testid={`row-${props.id}`}>
-        <PlanningHeader handleExpand={handleExpand} expanded={expanded} {...props} />
+        <PlanningHead handleExpand={handleExpand} expanded={expanded} {...props} />
         {cells.map((c: IPlanningCell) => (
           <PlanningCell {...props} cell={c} key={c.key} />
         ))}

@@ -5,33 +5,25 @@ import { useEffect, useState } from 'react';
 import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
-import { IDeviation, IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
+import {
+  IDeviation,
+  IPlanningCell,
+  IPlanningRow,
+  IPlanningRowLists,
+  IPlanningRowSelections,
+  PlanningRowType,
+} from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { formatNumber } from '@/utils/common';
 
-interface IPlanningRowLists {
-  masterClasses: Array<IClass>;
-  classes: Array<IClass>;
-  subClasses: Array<IClass>;
-  districts: Array<ILocation>;
-  divisions: Array<ILocation>;
-  groups: Array<IGroup>;
-}
-
-interface IPlanningRowSelections {
-  selectedMasterClass: IClass | null;
-  selectedClass: IClass | null;
-  selectedSubClass: IClass | null;
-  selectedDistrict: ILocation | null;
-}
-
 interface IPlanningRowsState {
   lists: IPlanningRowLists;
   selections: IPlanningRowSelections;
   year: number;
+  rows: Array<IPlanningRow>;
 }
 
 /**
@@ -126,47 +118,55 @@ const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IP
  *
  * @returns
  * - key: the key for the cell (key of the finance object)
- * - frameBudget: the frameBudget for that year calculated in the backend (only first cell)
- * - plannedBudget: the plannedBudget for that year calculated in the backend (only first cell)
+ * - plannedBudget: sum of all underlying project finances for that year (calculated in the backend)
+ * - frameBudget: the amount of frameBudget given to the underlying projects during that year
  * - deviation: the deviation between the plannedBudget and the framedBudget and if the value is negative
  */
 export const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
-  const { year, budgetOverrunAmount, ...rest } = finances;
+  const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
   return Object.entries(rest).map(([key, value]) => {
     const { frameBudget, plannedBudget } = value;
 
-    const deviation = plannedBudget && plannedBudget - frameBudget;
+    const deviation = frameBudget - plannedBudget;
 
     return {
       key,
+      plannedBudget: formatNumber(plannedBudget),
       frameBudget: formatNumber(frameBudget),
-      ...(key === 'year0' && { plannedBudget: formatNumber(plannedBudget) }),
-      ...(deviation !== undefined && {
-        deviation: {
-          value: formatNumber(deviation),
-          isNegative: deviation < 0,
-        },
-      }),
+      deviation: {
+        value: formatNumber(deviation),
+        isNegative: deviation < 0,
+      },
     };
   });
 };
 
 interface IPlanningSums {
-  availableFrameBudget: string;
+  plannedBudgets: string;
   costEstimateBudget: string;
-  deviation: IDeviation;
+  deviation?: IDeviation;
 }
 
 /**
  * Calculates the budgets for the current row.
  *
  * @returns
- * - availableFrameBudget: the sum of all frameBudgets (cells) for the current row
- * - costEstimateBudget: the sum of all the frameBudgets and budgetOverrunAmount
- * - deviation: the deviation between costEstimateBudget and availableFrameBudget and if the value is negative
+ * - plannedBudgets: sum of all plannedBudgets (cells) for the current row
+ * - costEstimateBudget: sum of all the frameBudgets and budgetOverrunAmount
+ * - deviation: deviation between costEstimateBudget and plannedBudgets and if the value is negative
  */
-export const calculatePlanningRowSums = (finances: IClassFinances): IPlanningSums => {
-  const { year, budgetOverrunAmount, ...rest } = finances;
+export const calculatePlanningRowSums = (
+  finances: IClassFinances,
+  type: PlanningRowType,
+): IPlanningSums => {
+  const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
+
+  const sumOfPlannedBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
+    if (currentValue !== null && currentValue.plannedBudget) {
+      return accumulator + currentValue.plannedBudget;
+    }
+    return accumulator;
+  }, 0);
 
   const sumOfFrameBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
     if (currentValue !== null && currentValue.frameBudget) {
@@ -175,17 +175,26 @@ export const calculatePlanningRowSums = (finances: IClassFinances): IPlanningSum
     return accumulator;
   }, 0);
 
-  const sumOfFrameBudgetsAndOverrunAmount = sumOfFrameBudgets + budgetOverrunAmount;
-  const devationBetweenFrameAndOverrun = sumOfFrameBudgetsAndOverrunAmount - sumOfFrameBudgets;
+  const sumOfFramesAndOverrun = sumOfFrameBudgets + budgetOverrunAmount;
+  const deviationBetweenCostEstimateAndBudget = sumOfFramesAndOverrun - sumOfPlannedBudgets;
 
-  const availableFrameBudget = formatNumber(sumOfFrameBudgets);
-  const costEstimateBudget = formatNumber(sumOfFrameBudgetsAndOverrunAmount);
-  const deviation = formatNumber(devationBetweenFrameAndOverrun);
+  const plannedBudgets = formatNumber(sumOfPlannedBudgets);
+  const costEstimateBudget = formatNumber(
+    type === 'group' ? projectBudgets : sumOfFramesAndOverrun,
+  );
 
   return {
-    availableFrameBudget: availableFrameBudget,
-    costEstimateBudget: costEstimateBudget,
-    deviation: { value: deviation, isNegative: devationBetweenFrameAndOverrun < 0 },
+    plannedBudgets,
+    costEstimateBudget,
+    ...(type !== 'group' && {
+      deviation: {
+        value: formatNumber(deviationBetweenCostEstimateAndBudget),
+        isNegative: deviationBetweenCostEstimateAndBudget < 0,
+      },
+    }),
+    ...(type === 'group' && {
+      projectBudgets,
+    }),
   };
 };
 
@@ -222,7 +231,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       children: [],
       projectRows: getSortedProjects(item.id, type, projects),
       cells: calculatePlanningCells(item.finances),
-      ...calculatePlanningRowSums(item.finances),
+      ...calculatePlanningRowSums(item.finances, type),
     };
   };
 
@@ -317,7 +326,7 @@ const fetchProjectsByRelation = async (
   const direct = type === 'class' || type === 'subClass';
   try {
     const allResults = await getProjectsWithParams({
-      params: `${type}=${id}`,
+      params: `${type}=${id}&programmed=true`,
       direct: direct,
     });
     return allResults.results;
@@ -373,21 +382,29 @@ const usePlanningRows = () => {
       selectedSubClass: null,
       selectedDistrict: null,
     },
+    rows: [],
     year: new Date().getFullYear(),
   });
-  const [rows, setRows] = useState<Array<IPlanningRow>>([]);
+
+  const { lists, selections } = planningRowsState;
 
   useEffect(() => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
 
     if (type && id) {
       fetchProjectsByRelation(type as PlanningRowType, id).then((projects) => {
-        setRows(buildPlanningTableRows(planningRowsState, projects));
+        setPlanningRowsState((current) => ({
+          ...current,
+          rows: buildPlanningTableRows(planningRowsState, projects),
+        }));
       });
     } else {
-      setRows(buildPlanningTableRows(planningRowsState, []));
+      setPlanningRowsState((current) => ({
+        ...current,
+        rows: buildPlanningTableRows(planningRowsState, []),
+      }));
     }
-  }, [planningRowsState]);
+  }, [lists, selections]);
 
   // React to changes in classes and set the selectedMasterClass/selectedClass/selectedSubClass if it is present in the route
   useEffect(() => {
@@ -444,11 +461,7 @@ const usePlanningRows = () => {
     }));
   }, [groups]);
 
-  return {
-    rows,
-    selections: planningRowsState.selections,
-    startYear: planningRowsState.year,
-  };
+  return planningRowsState;
 };
 
 export default usePlanningRows;

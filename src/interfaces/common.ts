@@ -1,5 +1,8 @@
 import { ReactNode } from 'react';
 import { CellType, IProject, IProjectRequest } from './projectInterfaces';
+import { IClass } from './classInterfaces';
+import { ILocation } from './locationInterfaces';
+import { IGroup } from './groupInterfaces';
 
 export interface IError {
   status: number | undefined;
@@ -107,11 +110,32 @@ export interface IDeviation {
   value: string;
 }
 
+export interface IProjectSums {
+  availableFrameBudget: string;
+  costEstimateBudget: string;
+}
+
 export interface IPlanningCell {
   key: string;
   deviation?: IDeviation;
-  plannedBudget?: string;
+  plannedBudget: string;
   frameBudget: string;
+}
+
+export interface IPlanningRowLists {
+  masterClasses: Array<IClass>;
+  classes: Array<IClass>;
+  subClasses: Array<IClass>;
+  districts: Array<ILocation>;
+  divisions: Array<ILocation>;
+  groups: Array<IGroup>;
+}
+
+export interface IPlanningRowSelections {
+  selectedMasterClass: IClass | null;
+  selectedClass: IClass | null;
+  selectedSubClass: IClass | null;
+  selectedDistrict: ILocation | null;
 }
 
 export interface IPlanningRow {
@@ -125,7 +149,7 @@ export interface IPlanningRow {
   defaultExpanded: boolean;
   link: string | null;
   cells: Array<IPlanningCell>;
-  availableFrameBudget: string;
+  plannedBudgets: string;
   costEstimateBudget: string;
-  deviation: IDeviation;
+  deviation?: IDeviation;
 }

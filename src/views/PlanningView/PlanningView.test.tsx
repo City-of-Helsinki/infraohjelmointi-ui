@@ -348,13 +348,15 @@ describe('PlanningView', () => {
       const projects = mockPlanningViewProjects.data.results;
 
       const expectRowProperties = (finances: IClassFinances, id: string) => {
-        const { availableFrameBudget, costEstimateBudget, deviation } =
-          calculatePlanningRowSums(finances);
+        const { plannedBudgets, costEstimateBudget, deviation } = calculatePlanningRowSums(
+          finances,
+          'class',
+        );
 
         expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-        expect(getByTestId(`available-frame-budget-${id}`)).toHaveTextContent(availableFrameBudget);
+        expect(getByTestId(`planned-budgets-${id}`)).toHaveTextContent(plannedBudgets);
         expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
-        expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation.value);
+        expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation?.value || '');
       };
 
       // Check that all masterClass-rows is visible
@@ -629,7 +631,7 @@ describe('PlanningView', () => {
       expect(queryByTestId(`row-${classId}`)).toBeNull();
     });
 
-    describe('PlanningHeader', () => {
+    describe('PlanningHead', () => {
       it('renders all elements', async () => {
         const { store, getByTestId } = await render();
 
@@ -724,9 +726,7 @@ describe('PlanningView', () => {
           const { availableFrameBudget, costEstimateBudget } = calculateProjectRowSums(project);
 
           expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
-          expect(getByTestId(`available-frame-budget-${id}`)).toHaveTextContent(
-            availableFrameBudget,
-          );
+          expect(getByTestId(`planned-budgets-${id}`)).toHaveTextContent(availableFrameBudget);
 
           for (let i = 0; i < 10; i++) {
             const year = finances.year + i;

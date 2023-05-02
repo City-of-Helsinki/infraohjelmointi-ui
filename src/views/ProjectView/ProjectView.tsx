@@ -6,7 +6,6 @@ import { useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { useTranslation } from 'react-i18next';
-
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';

@@ -1,28 +1,8 @@
-import { IClass } from '@/interfaces/classInterfaces';
-import { IPlanningCell } from '@/interfaces/common';
+import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfaces';
+import { IPlanningCell, IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
 import { useEffect, useState } from 'react';
 import { calculatePlanningCells } from './usePlanningRows';
-
-const initialCell: IPlanningCell = {
-  key: 'year0',
-  deviation: { value: '', isNegative: false },
-  plannedBudget: '',
-  frameBudget: '',
-};
-
-export const initialCells: Array<IPlanningCell> = [
-  { ...initialCell },
-  { ...initialCell, key: 'year1' },
-  { ...initialCell, key: 'year2' },
-  { ...initialCell, key: 'year3' },
-  { ...initialCell, key: 'year4' },
-  { ...initialCell, key: 'year5' },
-  { ...initialCell, key: 'year6' },
-  { ...initialCell, key: 'year7' },
-  { ...initialCell, key: 'year8' },
-  { ...initialCell, key: 'year9' },
-  { ...initialCell, key: 'year10' },
-];
+import _ from 'lodash';
 
 interface IPlanningSummaryHeaderCell {
   year: number;
@@ -56,23 +36,54 @@ const buildPlanningSummaryHeaderRow = (startYear: number) => {
   return { header };
 };
 
-const buildPlanningSummaryCells = (selectedMasterClass: IClass | null) => ({
-  cells: selectedMasterClass ? calculatePlanningCells(selectedMasterClass.finances) : initialCells,
-});
+const buildPlanningSummaryCells = (classes: Array<IClass>) => {
+  const totalFinances = classes.reduce((acc: IClassFinances, curr: IClass) => {
+    const { budgetOverrunAmount, projectBudgets, year, ...rest } = curr.finances;
 
-interface IUseSummarRowsParams {
+    Object.entries(rest).forEach(([key, value]) => {
+      if (!Object.prototype.hasOwnProperty.call(acc, key)) {
+        Object.assign(acc, {
+          [key]: { frameBudget: value.frameBudget, plannedBudget: value.plannedBudget },
+        });
+      } else {
+        Object.assign(acc, {
+          [key]: {
+            frameBudget: ((acc[key as keyof IClassFinances] as IClassBudgets).frameBudget +=
+              value.frameBudget),
+            plannedBudget: ((acc[key as keyof IClassFinances] as IClassBudgets).plannedBudget +=
+              value.plannedBudget),
+          },
+        });
+      }
+    });
+
+    return acc;
+  }, {} as IClassFinances);
+
+  return {
+    cells: calculatePlanningCells(totalFinances),
+  };
+};
+
+interface IUseSummaryRowsParams {
   startYear: number;
-  selectedMasterClass: IClass | null;
+  selections: IPlanningRowSelections;
+  lists: IPlanningRowLists;
 }
 
 /**
  * Listens to a startYear and a selectedMasterClass and returns rows for the PlanningSummaryTable.
  */
-const useSummaryRows = ({ startYear, selectedMasterClass }: IUseSummarRowsParams) => {
+const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams) => {
+  const { selectedMasterClass, selectedSubClass } = selections;
+  const { masterClasses, classes } = lists;
+
   const [planningSummaryRows, setPlanningSummaryRows] = useState<IPlanningSummaryTableState>({
     header: [],
-    cells: initialCells,
+    cells: [],
   });
+
+  // console.log(masterClasses);
 
   // Listens to a startYear and creates 11 cells starting with the startYear
   useEffect(() => {
@@ -86,11 +97,18 @@ const useSummaryRows = ({ startYear, selectedMasterClass }: IUseSummarRowsParams
 
   // Listens to the selectedMasterClass and either populates the cells with the masterClasses data or empty
   useEffect(() => {
-    setPlanningSummaryRows((current) => ({
-      ...current,
-      ...buildPlanningSummaryCells(selectedMasterClass),
-    }));
-  }, [selectedMasterClass]);
+    if (selectedSubClass) {
+      setPlanningSummaryRows((current) => ({
+        ...current,
+        ...buildPlanningSummaryCells(classes),
+      }));
+    } else {
+      setPlanningSummaryRows((current) => ({
+        ...current,
+        ...buildPlanningSummaryCells(masterClasses),
+      }));
+    }
+  }, [selectedMasterClass, selectedSubClass, classes, masterClasses]);
 
   return planningSummaryRows;
 };

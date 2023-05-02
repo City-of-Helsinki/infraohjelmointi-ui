@@ -1,11 +1,12 @@
 export interface IClassBudgets {
-  plannedBudget?: number;
+  plannedBudget: number;
   frameBudget: number;
 }
 
 export interface IClassFinances {
   year: number;
   budgetOverrunAmount: number;
+  projectBudgets?: number;
   year0: IClassBudgets;
   year1: IClassBudgets;
   year2: IClassBudgets;
@@ -18,6 +19,7 @@ export interface IClassFinances {
   year9: IClassBudgets;
   year10: IClassBudgets;
 }
+
 export interface IClass {
   id: string;
   name: string;
