@@ -2,6 +2,9 @@
 #add-project-programmed-dialog {
   width: 45vw;
 }
+#open-project-add-dialog-container {
+  cursor: pointer;
+}
 #add-project-programmed-dialog .project-search-input .search-selections {
   @apply mt-5;
 }

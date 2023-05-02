@@ -7,8 +7,13 @@ import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import './styles.css';
 import { IconCross } from 'hds-react/icons/';
 import { useCallback, useRef } from 'react';
+import { IPlanningRowSelections } from '@/hooks/usePlanningRows';
 
-const ProjectToolbar = () => {
+interface ProjectToolBarProps {
+  onAddProject: () => void;
+  selections: IPlanningRowSelections;
+}
+const ProjectToolbar = ({ onAddProject, selections }: ProjectToolBarProps) => {
   const { Dropdown, Item } = Navigation;
   const dropDownRef = useRef<HTMLDivElement>(null);
   const closeDropdown = useCallback(() => {
@@ -34,6 +39,9 @@ const ProjectToolbar = () => {
               </div>
               <Item>
                 <GroupDialog />
+              </Item>
+              <Item>
+                <ProjectProgrammedDialog onAddProject={onAddProject} selections={selections} />
               </Item>
             </Dropdown>
           </div>

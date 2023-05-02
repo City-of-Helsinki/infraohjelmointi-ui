@@ -3,21 +3,21 @@ import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
-import { IProjectsRequestObject } from '@/interfaces/projectInterfaces';
+import { IProjectsPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { silentPatchProjectsThunk } from '@/reducers/projectSlice';
-import { selectSelectedClass, selectSelectedSubClass } from '@/reducers/classSlice';
 import { useOptions } from '@/hooks/useOptions';
-import { current } from '@reduxjs/toolkit';
+import usePlanningRows, { IPlanningRowSelections } from '@/hooks/usePlanningRows';
 
 interface IDialogProps {
   handleClose: () => void;
   isOpen: boolean;
+  onAddProject: () => void;
 }
 
-const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
+const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, onAddProject }) => {
   const [projectsForSubmit, setProjectsForSubmit] = useState<Array<IProgrammedProjectSuggestions>>(
     [],
   );
@@ -25,7 +25,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
 
   const buildRequestPayload = useCallback(
-    (projects: Array<IProgrammedProjectSuggestions>): IProjectsRequestObject => {
+    (projects: Array<IProgrammedProjectSuggestions>): IProjectsPatchRequestObject => {
       return {
         data: projects.map((p) => ({ id: p.value, data: { programmed: true, phase: phase } })),
       };
@@ -56,6 +56,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       dispatch(silentPatchProjectsThunk(buildRequestPayload(projectsForSubmit))).then(() => {
+        onAddProject();
         setProjectsForSubmit([]);
       });
     },
@@ -113,15 +114,21 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
 DialogContainer.displayName = 'Project Programmed Dialog';
 
-const ProjectProgrammedDialog: FC = () => {
-  const selectedClass = useAppSelector(selectSelectedClass);
-  const selectedSubClass = useAppSelector(selectSelectedSubClass);
+interface ProjectProgrammedDialogProps {
+  onAddProject: () => void;
+  selections: IPlanningRowSelections;
+}
+
+const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({
+  onAddProject,
+  selections,
+}) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSetOpen = useCallback(() => setIsOpen((current) => !current), []);
   const onOpenGroupForm = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+    (e: MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
       toggleSetOpen();
     },
@@ -132,16 +139,21 @@ const ProjectProgrammedDialog: FC = () => {
   }, []);
   return (
     <div>
-      <DialogContainer isOpen={isOpen} handleClose={handleClose} />
+      <DialogContainer isOpen={isOpen} handleClose={handleClose} onAddProject={onAddProject} />
       <div>
-        <div data-testid="open-project-add-dialog-button"></div>
-        <Button
-          disabled={!(selectedClass?.id || selectedSubClass?.id)}
-          onClick={onOpenGroupForm}
-          size="small"
-        >
-          {t(`projectProgrammedForm.addProjectsToProgramming`)}
-        </Button>
+        <div data-testid="open-project-add-dialog-container" id="open-project-add-dialog-container">
+          <div
+            onClick={
+              selections.selectedClass?.id || selections.selectedSubClass?.id
+                ? onOpenGroupForm
+                : () => {
+                    return;
+                  }
+            }
+          >
+            {t(`projectProgrammedForm.addProjectsToProgramming`)}
+          </div>
+        </div>
       </div>
     </div>
   );

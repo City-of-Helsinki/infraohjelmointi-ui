@@ -1,4 +1,4 @@
-import { getProjectsWithParams } from '@/services/projectServices';
+import { getProjectsWithParams, getSearchResults } from '@/services/projectServices';
 import { arrayHasValue } from '@/utils/common';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -7,12 +7,9 @@ import { useOptions } from '@/hooks/useOptions';
 import { IProgrammedProjectSuggestions, ISearchRequest } from '@/interfaces/searchInterfaces';
 import { IClass } from '@/interfaces/classInterfaces';
 import { useAppSelector } from '@/hooks/common';
-import {
-  selectAllClasses,
-  selectSelectedClass,
-  selectSelectedSubClass,
-} from '@/reducers/classSlice';
+import { selectAllClasses } from '@/reducers/classSlice';
 import SelectedProjectCard from './SelectedProjectCard';
+import usePlanningRows from '@/hooks/usePlanningRows';
 
 interface ISearchState {
   searchWord: string;
@@ -46,10 +43,9 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
     useOptions('phases', true).find((phase) => phase.label === 'design')?.value || '';
 
   // selectedClass and selectedSubClass refer to the class and/or subclass currently selected by the user
-  // in cordinator view
+  // in planning view
   // any one of these classes have to be selected by the user to be able to toggle the form
-  const selectedClass = useAppSelector(selectSelectedClass);
-  const selectedSubClass = useAppSelector(selectSelectedSubClass);
+  const { selections } = usePlanningRows();
 
   useEffect(() => {
     setTimeout(() => {
@@ -65,16 +61,16 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       searchParams.push(`phase=${phaseProposal}`);
       searchParams.push(`phase=${phaseDesign}`);
       searchParams.push(`programmed=false`);
-      if (selectedSubClass?.id) {
-        searchParams.push(`subClass=${selectedSubClass.id}`);
-      } else if (selectedClass?.id) {
-        searchParams.push(`class=${selectedClass.id}`);
+      if (selections.selectedSubClass?.id) {
+        searchParams.push(`subClass=${selections.selectedSubClass.id}`);
+      } else if (selections.selectedClass?.id) {
+        searchParams.push(`class=${selections.selectedClass.id}`);
       }
 
       reqParamObject.params = searchParams.join('&');
       return reqParamObject;
     },
-    [phaseProposal, phaseDesign, selectedSubClass, selectedClass],
+    [phaseProposal, phaseDesign, selections.selectedSubClass, selections.selectedClass],
   );
 
   const { t } = useTranslation();
@@ -87,15 +83,14 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   const getSuggestions = useCallback(
     (inputValue: string) => {
       return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
-        // printing out search params for later
         const queryString = buildQueryParamString(inputValue);
 
-        getProjectsWithParams(queryString)
+        getSearchResults(queryString)
           .then((res) => {
             // Filter out only the projects which haven't yet been added to be the submitted list from the result
             const projectsIdList = projectsForSubmit.map((p) => p.value);
             const resultList = res.results.filter(
-              (object) => object.type === 'projects' && !arrayHasValue(projectsIdList, object.id),
+              (result) => result.type == 'projects' && !arrayHasValue(projectsIdList, result.id),
             );
 
             // Convert the resultList to options for the suggestion dropdown

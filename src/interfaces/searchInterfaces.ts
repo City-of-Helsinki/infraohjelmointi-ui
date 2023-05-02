@@ -52,6 +52,7 @@ export interface ISearchRequest {
 export interface IProjectSearchRequest
   extends Omit<ISearchRequest, 'fullPath' | 'limit' | 'order'> {
   direct: boolean;
+  programmed?: boolean;
 }
 
 export type SearchLimit = '10' | '20' | '30';
