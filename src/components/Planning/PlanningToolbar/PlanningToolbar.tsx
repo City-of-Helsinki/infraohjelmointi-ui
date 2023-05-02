@@ -1,5 +1,4 @@
-import { IconArrowDown, IconMap } from 'hds-react/icons';
-import { IconButton, Toolbar } from '../../shared';
+import { Icon, Toolbar } from '../../shared';
 import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
 import { Navigation } from 'hds-react/components/Navigation';
 import { useTranslation } from 'react-i18next';
@@ -9,12 +8,11 @@ const ProjectToolbar = () => {
   const { Dropdown, Item } = Navigation;
   const { t } = useTranslation();
 
-  const click = () => console.log('click');
   return (
     <Toolbar
       left={
         <>
-          <Dropdown label={t('nav.notifications')}>
+          <Dropdown label={t(`new`)} icon={<Icon icon={IconNewItem} />}>
             <Item>
               <GroupDialog />
             </Item>
