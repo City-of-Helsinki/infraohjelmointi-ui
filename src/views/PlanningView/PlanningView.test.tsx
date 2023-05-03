@@ -18,11 +18,10 @@ import { act, fireEvent, waitFor } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
-import { formatNumber, listItemToOption } from '@/utils/common';
+import { listItemToOption } from '@/utils/common';
 import { mockError } from '@/mocks/mockError';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { IClassFinances } from '@/interfaces/classInterfaces';
-import { IClassBudgets } from '@/interfaces/classInterfaces';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/hooks/usePlanningRows';
 import { calculateProjectRowSums } from '@/hooks/useProjectRow';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
@@ -479,8 +478,8 @@ describe('PlanningView', () => {
       // Check that only first district-row is visible
       await waitFor(() => {
         districts.forEach(({ id, finances }, i) => {
-          // expectRowProperties(finances, id);
           if (i === 0) {
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
             expect(
               getByTestId(`row-${districtId}`).classList.contains('district-preview'),
@@ -496,8 +495,7 @@ describe('PlanningView', () => {
       const groupsForDistrict = mockGroups.data.filter((g) => g.locationRelation === districtId);
 
       await waitFor(() => {
-        groupsForDistrict.forEach(({ id, finances }) => {
-          // expectRowProperties(finances, id);
+        groupsForDistrict.forEach(({ id }) => {
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -536,8 +534,7 @@ describe('PlanningView', () => {
       const groupsForDivision = groups.filter((g) => g.locationRelation === divisions[0].id);
 
       await waitFor(() => {
-        groupsForDivision.forEach(({ id, finances }) => {
-          // expectRowProperties(finances, id);
+        groupsForDivision.forEach(({ id }) => {
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
