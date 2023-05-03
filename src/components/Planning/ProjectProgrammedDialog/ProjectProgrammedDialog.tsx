@@ -73,7 +73,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, onAddProj
           aria-labelledby={'add-project-programmed-dialog-label'}
           isOpen={isOpen}
           close={handleDialogClose}
-          closeButtonLabelText={t('closeGroupFormWindow')}
+          closeButtonLabelText={t('closeProjectProgrammedDialog')}
           className="big-dialog"
           scrollable
         >

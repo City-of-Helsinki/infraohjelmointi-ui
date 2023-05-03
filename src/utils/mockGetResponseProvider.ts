@@ -18,6 +18,7 @@ import mockNotes from '@/mocks/mockNotes';
 import mockPersons from '@/mocks/mockPersons';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import mockProject from '@/mocks/mockProject';
+import { mockSearchResults } from '@/mocks/mockSearch';
 import axios from 'axios';
 
 jest.mock('axios');
@@ -75,8 +76,11 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockNotes);
       case url === `/project-groups/`:
         return Promise.resolve(mockGroups);
+      case url.toLocaleLowerCase().includes(`/projects/search-results/`):
+        return Promise.resolve(mockSearchResults);
       case url.toLocaleLowerCase().includes(`/projects/`):
         return Promise.resolve(mockPlanningViewProjects);
+      
       default:
         return Promise.reject(new Error('not found'));
     }

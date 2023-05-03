@@ -3,77 +3,89 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
 
-import { matchExact } from '@/utils/common';
-import {
-  mockConstructionPhaseDetails,
-  mockConstructionPhases,
-  mockPlanningPhases,
-  mockProjectAreas,
-  mockProjectCategories,
-  mockProjectPhases,
-  mockProjectQualityLevels,
-  mockProjectRisks,
-  mockProjectTypes,
-  mockResponsiblePersons,
-  mockResponsibleZones,
-} from '@/mocks/mockLists';
+import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
 import { waitFor } from '@testing-library/react';
-import mockPersons from '@/mocks/mockPersons';
 import { setupStore } from '@/store';
-import { mockProjectClasses } from '@/mocks/mockClasses';
+import {
+  mockClasses,
+  mockMasterClasses,
+  mockProjectClasses,
+  mockSubClasses,
+} from '@/mocks/mockClasses';
 import { mockSearchResults } from '@/mocks/mockSearch';
 // import { setSelectedClass } from '@/reducers/classSlice';
-import ProjectProgrammedDialog from './ProjectProgrammedDialog';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProjectPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { Route } from 'react-router';
 import PlanningView from '@/views/PlanningView/PlanningView';
+import { CustomContextMenu } from '@/components/CustomContextMenu';
+import { mockGroups } from '@/mocks/mockGroups';
+import { mockLocations, mockDistricts, mockDivisions } from '@/mocks/mockLocations';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+const store = setupStore();
 
-describe('ProjectProgrammedDialog', () => {
-  let renderResult: CustomRenderResult;
-
-  beforeEach(async () => {
-    const store = setupStore();
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<Route path="/" element={<PlanningView />} />, {
-          preloadedState: {
-            project: {
-              projects: [mockProject.data],
-              selectedProject: null,
-              count: 1,
-              error: {},
-              page: 1,
-              updated: null,
-            },
-            auth: { user: mockPersons.data[0], error: {} },
-            lists: {
-              areas: mockProjectAreas.data,
-              phases: mockProjectPhases.data,
-              types: mockProjectTypes.data,
-              constructionPhaseDetails: mockConstructionPhaseDetails.data,
-              categories: mockProjectCategories.data,
-              riskAssessments: mockProjectRisks.data,
-              projectQualityLevels: mockProjectQualityLevels.data,
-              planningPhases: mockPlanningPhases.data,
-              constructionPhases: mockConstructionPhases.data,
-              responsibleZones: mockResponsibleZones.data,
-              responsiblePersons: mockResponsiblePersons.data,
-              programmedYears: [],
-              error: {},
-            },
-            class: {
-              ...store.getState().class,
-              allClasses: mockProjectClasses.data,
-            },
+const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
+  const { user, store, getByTestId } = renderResult;
+  const { masterClasses, classes } = store.getState().class;
+  await user.click(getByTestId(`expand-${masterClasses[0].id}`));
+  await user.click(getByTestId(`expand-${classes[0].id}`));
+};
+const render = async () =>
+  await act(async () =>
+    renderWithProviders(
+      <Route
+        path="/"
+        element={
+          <>
+            <PlanningView />
+            <CustomContextMenu />
+          </>
+        }
+      >
+        <Route path=":masterClassId" element={<PlanningView />}>
+          <Route path=":classId" element={<PlanningView />}>
+            <Route path=":subClassId" element={<PlanningView />}>
+              <Route path=":districtId" element={<PlanningView />} />
+            </Route>
+          </Route>
+        </Route>
+      </Route>,
+      {
+        preloadedState: {
+          class: {
+            ...store.getState().class,
+            allClasses: mockProjectClasses.data,
+            masterClasses: mockMasterClasses.data,
+            classes: mockClasses.data,
+            subClasses: mockSubClasses.data,
           },
-        })),
-    );
+          location: {
+            ...store.getState().location,
+            allLocations: mockLocations.data,
+            districts: mockDistricts.data,
+            divisions: mockDivisions.data,
+          },
+          group: {
+            ...store.getState().group,
+            groups: mockGroups.data,
+          },
+          lists: {
+            ...store.getState().lists,
+            phases: mockProjectPhases.data,
+          },
+        },
+      },
+    ),
+  );
+describe('ProjectProgrammedDialog', () => {
+  beforeEach(() => {
+    mockGetResponseProvider();
   });
 
   afterEach(async () => {
@@ -81,52 +93,37 @@ describe('ProjectProgrammedDialog', () => {
   });
 
   it('renders the component wrappers', async () => {
+    const renderResult = await render();
     const { getByTestId } = renderResult;
-    expect(getByTestId('open-project-add-dialog-button')).toBeInTheDocument();
+    expect(getByTestId('open-project-add-dialog-container')).toBeInTheDocument();
   });
 
-  it.only('renders project to programming modal', async () => {
-    const { getByText, getByRole, user, store } = renderResult;
+  it('renders project to programming modal', async () => {
+    const renderResult = await render();
+    const { getByText, getByRole, user, queryByText } = renderResult;
 
-    // Button disabled since no class or subclass selected
-    expect(
-      getByRole('button', { name: matchExact('projectProgrammedForm.addProjectsToProgramming') }),
-    ).toBeDisabled();
-    // TODO:
-    // await waitFor(() =>
-    //   store.dispatch(
-    //     setSelectedClass({
-    //       id: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    //       name: 'Uudisrakentaminen',
-    //       path: '803 Kadut, liikenneväylät/Uudisrakentaminen',
-    //       parent: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
-    //     }),
-    //   ),
-    // );
+    expect(getByText('projectProgrammedForm.addProjectsToProgramming')).toBeInTheDocument();
 
-    // Button enabled since class is selected
-    expect(
-      getByRole('button', { name: matchExact('projectProgrammedForm.addProjectsToProgramming') }),
-    ).toBeEnabled();
+    // User is not under class/subClass balk hence the modal won't open
+    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
+    expect(queryByText(`projectProgrammedForm.searchForProjects`)).toBeNull();
+    // Navigate to a class row
+    await waitFor(() => navigateToProjectRows(renderResult));
 
-    await user.click(
-      getByRole('button', { name: matchExact('projectProgrammedForm.addProjectsToProgramming') }),
-    );
-
+    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
     expect(getByText(`projectProgrammedForm.searchForProjects`)).toBeInTheDocument();
-    // TODO: Fix below commented check
-    // expect(getByText('projectProgrammedForm.addProjectsToProgramming')).toBeInTheDocument();
 
     expect(getByRole('button', { name: 'search' }));
     expect(getByRole('button', { name: 'cancel' }));
   });
 
   it('can add non programmed projects to programming view', async () => {
+    const renderResult = await render();
     const mockPatchResponse = {
       data: [
         {
           ...mockProject.data,
-          id: 'ffe0d7fe-f40e-471c-8c38-3c6dcba5712f',
+          id: 'ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
           name: 'Yhteiskouluntie ja aukio',
           programmed: true,
           phase: {
@@ -136,63 +133,67 @@ describe('ProjectProgrammedDialog', () => {
         },
       ],
     };
-    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+
     mockedAxios.patch.mockResolvedValueOnce(mockPatchResponse);
 
-    const { user, getAllByTestId, getByTestId, getByRole, getByText, store } = renderResult;
+    const { user, getAllByTestId, getByTestId, queryByText, getByText, getByRole } = renderResult;
 
-    // Button disabled since no class or subclass selected
-    expect(
-      getByRole('button', { name: matchExact('projectProgrammedForm.addProjectsToProgramming') }),
-    ).toBeDisabled();
+    expect(getByText('projectProgrammedForm.addProjectsToProgramming')).toBeInTheDocument();
 
-    // await waitFor(() =>
-    //   store.dispatch(
-    //     setSelectedClass({
-    //       id: 'c4708dad-d8ea-4873-8916-3fd5d847d459',
-    //       name: 'Uudisrakentaminen',
-    //       path: '803 Kadut, liikenneväylät/Uudisrakentaminen',
-    //       parent: 'fa3ac589-816e-47cb-a2f9-0c6956e85913',
-    //     }),
-    //   ),
-    // );
+    // User is not under class/subClass balk hence the modal won't open
+    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
+    expect(queryByText(`projectProgrammedForm.searchForProjects`)).toBeNull();
+    // Navigate to a class row
+    await waitFor(() => navigateToProjectRows(renderResult));
 
-    // Button enabled since class is selected
-    expect(
-      getByRole('button', { name: matchExact('projectProgrammedForm.addProjectsToProgramming') }),
-    ).toBeEnabled();
-
-    await user.click(
-      getByRole('button', { name: matchExact('projectProgrammedForm.addProjectsToProgramming') }),
-    );
+    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
 
     const submitButton = getByTestId('add-projects-button');
     expect(submitButton).toBeDisabled();
 
-    await user.type(getByText('projectProgrammedForm.searchForProjects'), 'Y');
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+    await user.type(getByText('projectProgrammedForm.searchForProjects'), 'V');
 
     await waitFor(async () => {
       expect(getByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
 
-      await user.click(getByText('Yhteiskouluntie ja aukio'));
+      await user.click(getByText(mockSearchResults.data.results[0].name));
       expect(getAllByTestId('project-selection').length).toBe(1);
     });
 
     const getRequest = mockedAxios.get.mock;
-
     // Check that the correct url was called
-    expect(getRequest.calls[0][0]).toBe(
-      'localhost:4000/projects/?projectName=Y&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&programmed=false&class=c4708dad-d8ea-4873-8916-3fd5d847d459&limit=30&order=new',
+    expect(getRequest.lastCall[0]).toBe(
+      'localhost:4000/projects/search-results/?projectName=V&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&programmed=false&class=test-class-1&limit=30&order=new',
     );
 
     // project selected, button is enabled
     expect(submitButton).toBeEnabled();
-
+    // mocking response to rebuilding the class level to have updated project
+    mockedAxios.get.mockResolvedValueOnce({
+      data: {
+        count: 11,
+        results: [
+          ...mockPlanningViewProjects.data.results,
+          {
+            ...mockProject.data,
+            id: 'ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
+            projectClass: 'test-class-1',
+            name: 'Vanha yrttimaantie',
+            programmed: true,
+          },
+        ],
+      },
+    });
     await user.click(submitButton);
-    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as Array<IProject>;
-    expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
-    expect(formPatchRequest[0].programmed).toEqual(mockPatchResponse.data[0].programmed);
 
-    // TODO: Test to check the project gets added to planning list view
+    const formPatchRequest = mockedAxios.patch.mock
+      .lastCall[1] as Array<IProjectPatchRequestObject>;
+    expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
+    expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
+
+    await user.click(getByRole('button', { name: 'closeProjectProgrammedDialog' }));
+
+    expect(getByText('Vanha yrttimaantie')).toBeInTheDocument();
   });
 });
