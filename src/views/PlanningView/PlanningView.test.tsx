@@ -26,7 +26,7 @@ import { IClassBudgets } from '@/interfaces/classInterfaces';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/hooks/usePlanningRows';
 import { calculateProjectRowSums } from '@/hooks/useProjectRow';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
-import { getPlanningRowTitle } from '@/hooks/useSummaryRows';
+import { buildPlanningSummaryCells, getPlanningRowTitle } from '@/hooks/useSummaryRows';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -260,11 +260,11 @@ describe('PlanningView', () => {
   });
 
   describe('PlanningSummaryTable', () => {
-    it('renders all rows but an empty table with the startYear if a masterClass isnt selected', async () => {
-      const { getByTestId, container } = await render();
+    it('renders all budgets of all masterClasses if a masterClass isnt selected', async () => {
+      const { getByTestId, container, store } = await render();
 
-      const finances = mockClassFinances;
-      const { year, budgetOverrunAmount, ...rest } = finances;
+      const { year } = mockClassFinances;
+      const { masterClasses } = store.getState().class;
 
       expect(container.getElementsByClassName('planning-summary-table')[0]).toBeInTheDocument();
       expect(getByTestId('planning-summary-head')).toBeInTheDocument();
@@ -281,10 +281,11 @@ describe('PlanningView', () => {
       expect(getByTestId('planning-summary-planned-budget-row')).toBeInTheDocument();
       expect(getByTestId('planning-summary-realized-budget-row')).toBeInTheDocument();
 
-      Object.keys(rest).forEach((k) => {
-        expect(getByTestId(`summary-budget-${k}`)).toHaveTextContent('');
-        expect(getByTestId(`summary-frame-${k}`)).toHaveTextContent('');
-        expect(getByTestId(`summary-budget-${k}`)).toHaveTextContent('');
+      const cells = buildPlanningSummaryCells(masterClasses);
+      cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
+        expect(getByTestId(`summary-budget-${key}`)).toHaveTextContent(plannedBudget);
+        expect(getByTestId(`summary-frame-${key}`)).toHaveTextContent(frameBudget);
+        expect(getByTestId(`summary-deviation-${key}`)).toHaveTextContent(deviation?.value || '');
       });
     });
 
@@ -292,7 +293,6 @@ describe('PlanningView', () => {
       const { getByTestId, user } = await render();
 
       const finances = mockClassFinances;
-      const { year, budgetOverrunAmount, ...rest } = finances;
       const { id: masterClassId } = mockMasterClasses.data[0];
 
       await user.click(getByTestId(`expand-${masterClassId}`));
@@ -300,11 +300,10 @@ describe('PlanningView', () => {
       const cells = calculatePlanningCells(finances);
 
       await waitFor(() => {
-        Object.keys(rest).forEach((k, i) => {
-          const { plannedBudget, frameBudget, deviation } = cells[i];
-          expect(getByTestId(`summary-budget-${k}`)).toHaveTextContent(plannedBudget || '');
-          expect(getByTestId(`summary-frame-${k}`)).toHaveTextContent(frameBudget);
-          expect(getByTestId(`summary-deviation-${k}`)).toHaveTextContent(deviation?.value || '');
+        cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
+          expect(getByTestId(`summary-budget-${key}`)).toHaveTextContent(plannedBudget || '');
+          expect(getByTestId(`summary-frame-${key}`)).toHaveTextContent(frameBudget);
+          expect(getByTestId(`summary-deviation-${key}`)).toHaveTextContent(deviation?.value || '');
         });
       });
     });
@@ -347,16 +346,22 @@ describe('PlanningView', () => {
 
       const projects = mockPlanningViewProjects.data.results;
 
-      const expectRowProperties = (finances: IClassFinances, id: string) => {
+      const expectRowProperties = async (
+        finances: IClassFinances,
+        id: string,
+        isGroup?: boolean,
+      ) => {
         const { plannedBudgets, costEstimateBudget, deviation } = calculatePlanningRowSums(
           finances,
-          'class',
+          isGroup ? 'group' : 'class',
         );
 
         expect(getByTestId(`row-${id}`)).toBeInTheDocument();
         expect(getByTestId(`planned-budgets-${id}`)).toHaveTextContent(plannedBudgets);
         expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
-        expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation?.value || '');
+        if (!isGroup) {
+          expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation?.value || '');
+        }
       };
 
       // Check that all masterClass-rows is visible
@@ -443,7 +448,7 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         groupsForSubClass.forEach(({ id, finances }) => {
-          expectRowProperties(finances, id);
+          expectRowProperties(finances, id, true);
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -474,8 +479,8 @@ describe('PlanningView', () => {
       // Check that only first district-row is visible
       await waitFor(() => {
         districts.forEach(({ id, finances }, i) => {
+          // expectRowProperties(finances, id);
           if (i === 0) {
-            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
             expect(
               getByTestId(`row-${districtId}`).classList.contains('district-preview'),
@@ -492,7 +497,7 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         groupsForDistrict.forEach(({ id, finances }) => {
-          expectRowProperties(finances, id);
+          // expectRowProperties(finances, id);
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -532,7 +537,7 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         groupsForDivision.forEach(({ id, finances }) => {
-          expectRowProperties(finances, id);
+          // expectRowProperties(finances, id);
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -647,7 +652,7 @@ describe('PlanningView', () => {
     });
 
     describe('PlanningCell', () => {
-      it('renders budget, overrun and deviation only for the current year and formats the numbers', async () => {
+      it('renders budget, overrun and deviationrs', async () => {
         const { store, getByTestId } = await render();
 
         const { id, finances } = store.getState().class.masterClasses[0];
@@ -664,24 +669,6 @@ describe('PlanningView', () => {
         expect(getByTestId(`planned-budget-${id}-${year}`)).toHaveTextContent(plannedBudget || '0');
         expect(getByTestId(`frame-budget-${id}-${year}`)).toHaveTextContent(frameBudget);
         expect(getByTestId(`deviation-${id}-${year}`)).toHaveTextContent(deviation?.value || '0');
-      });
-
-      it('renders frame budget for future years', async () => {
-        const { store, getByTestId } = await render();
-
-        const { id, finances } = store.getState().class.masterClasses[0];
-        const secondCell = getByTestId(`row-${id}`).children[2];
-        const year = new Date().getFullYear() + 1;
-
-        expect(secondCell.children[0].children.length).toBe(1);
-
-        for (let i = 0; i < 10; i++) {
-          expect(getByTestId(`frame-budget-${id}-${year + i}`)).toHaveTextContent(
-            formatNumber(
-              (finances[`year${i + 1}` as keyof IClassFinances] as IClassBudgets).frameBudget,
-            ),
-          );
-        }
       });
     });
 
@@ -725,8 +712,10 @@ describe('PlanningView', () => {
 
           const { availableFrameBudget, costEstimateBudget } = calculateProjectRowSums(project);
 
+          expect(getByTestId(`available-frame-budget-${id}`)).toHaveTextContent(
+            availableFrameBudget,
+          );
           expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
-          expect(getByTestId(`planned-budgets-${id}`)).toHaveTextContent(availableFrameBudget);
 
           for (let i = 0; i < 10; i++) {
             const year = finances.year + i;

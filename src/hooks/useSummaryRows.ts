@@ -36,7 +36,7 @@ const buildPlanningSummaryHeaderRow = (startYear: number) => {
   return { header };
 };
 
-const buildPlanningSummaryCells = (classes: Array<IClass>) => {
+export const buildPlanningSummaryCells = (classes: Array<IClass>) => {
   const totalFinances = classes.reduce((acc: IClassFinances, curr: IClass) => {
     const { budgetOverrunAmount, projectBudgets, year, ...rest } = curr.finances;
 
@@ -60,9 +60,7 @@ const buildPlanningSummaryCells = (classes: Array<IClass>) => {
     return acc;
   }, {} as IClassFinances);
 
-  return {
-    cells: calculatePlanningCells(totalFinances),
-  };
+  return calculatePlanningCells(totalFinances);
 };
 
 interface IUseSummaryRowsParams {
@@ -100,12 +98,12 @@ const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams)
     if (selectedSubClass) {
       setPlanningSummaryRows((current) => ({
         ...current,
-        ...buildPlanningSummaryCells(classes),
+        cells: buildPlanningSummaryCells(classes),
       }));
     } else {
       setPlanningSummaryRows((current) => ({
         ...current,
-        ...buildPlanningSummaryCells(masterClasses),
+        cells: buildPlanningSummaryCells(masterClasses),
       }));
     }
   }, [selectedMasterClass, selectedSubClass, classes, masterClasses]);

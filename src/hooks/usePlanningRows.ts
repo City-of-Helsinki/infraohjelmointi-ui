@@ -152,7 +152,7 @@ interface IPlanningSums {
  *
  * @returns
  * - plannedBudgets: sum of all plannedBudgets (cells) for the current row
- * - costEstimateBudget: sum of all the frameBudgets and budgetOverrunAmount
+ * - costEstimateBudget: sum of all the frameBudgets and budgetOverrunAmount or the sum of project budgets if its a group
  * - deviation: deviation between costEstimateBudget and plannedBudgets and if the value is negative
  */
 export const calculatePlanningRowSums = (
@@ -191,9 +191,6 @@ export const calculatePlanningRowSums = (
         value: formatNumber(deviationBetweenCostEstimateAndBudget),
         isNegative: deviationBetweenCostEstimateAndBudget < 0,
       },
-    }),
-    ...(type === 'group' && {
-      projectBudgets,
     }),
   };
 };
