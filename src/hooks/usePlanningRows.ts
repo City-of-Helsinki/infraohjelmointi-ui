@@ -218,8 +218,10 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
   const getRowProps = (
     item: IClass | ILocation | IGroup,
     type: PlanningRowType,
-    defaultExpanded?: boolean,
+    expanded?: boolean,
   ): IPlanningRow => {
+    const projectRows = getSortedProjects(item.id, type, projects);
+    const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
     return {
       type: type,
       name: item.name,
@@ -227,9 +229,9 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       id: item.id,
       key: item.id,
       link: getLink(item, type, state.selections),
-      defaultExpanded: defaultExpanded || false,
+      defaultExpanded,
       children: [],
-      projectRows: getSortedProjects(item.id, type, projects),
+      projectRows,
       cells: calculatePlanningCells(item.finances),
       ...calculatePlanningRowSums(item.finances, type),
     };
@@ -289,11 +291,14 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       // Map divisions & groups (groups only if there are no divisions)
       children: [
         ...getSortedGroupRows(district.id, 'district'),
-        ...sortByNumber(divisionsForDistrict).map((filteredDivision) => ({
-          ...getRowProps(filteredDivision, 'division', true),
-          // Map projects & groups
-          children: getSortedGroupRows(filteredDivision.id, 'division'),
-        })),
+        ...sortByNumber(divisionsForDistrict).map((filteredDivision) => {
+          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
+          return {
+            ...getRowProps(filteredDivision, 'division', groupsForDivision.length > 0),
+            // Map projects & groups
+            children: groupsForDivision,
+          };
+        }),
       ],
     };
   });
@@ -326,7 +331,7 @@ const fetchProjectsByRelation = async (
   const direct = type === 'class' || type === 'subClass';
   try {
     const allResults = await getProjectsWithParams({
-      params: `${type}=${id}&programmed=true`,
+      params: `${type}=${id}`,
       direct: direct,
     });
     return allResults.results;
