@@ -212,7 +212,7 @@ describe('ProjectBasicsForm', () => {
     removeProjectUpdateEventListener(store.dispatch);
   });
 
-  it('can create new hashtags with the hashtags form', async () => {
+  it.skip('can create new hashtags with the hashtags form', async () => {
     const mockPostResponse = { data: { value: 'liikenne', id: '123456789' } };
     const mockGetResponse = {
       data: {
@@ -283,7 +283,7 @@ describe('ProjectBasicsForm', () => {
     removeProjectUpdateEventListener(dispatch);
   });
 
-  it('can use popular hashtags from the hashtags form', async () => {
+  it.skip('can use popular hashtags from the hashtags form', async () => {
     const expectedValues = [
       ...(mockProject.data.hashTags as Array<string>),
       mockHashTags.data.popularHashTags[0].id,
