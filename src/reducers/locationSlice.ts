@@ -10,7 +10,7 @@ interface ILocationState {
   divisions: Array<ILocation>;
   subDivisions: Array<ILocation>;
   year: number;
-  error: IError | null | unknown;
+  error: unknown;
 }
 
 const initialState: ILocationState = {
@@ -32,11 +32,15 @@ export const locationSlice = createSlice({
   name: 'locations',
   initialState,
   reducers: {
-    updateDistrict(state, action: PayloadAction<ILocation>) {
-      const updateDistricts = [...state.districts].map((d) =>
-        d.id === action.payload.id ? action.payload : d,
-      );
-      return { ...state, districts: updateDistricts };
+    updateDistrict(state, action: PayloadAction<ILocation | null>) {
+      const districtToUpdate = action.payload;
+
+      if (districtToUpdate) {
+        const districts = [...state.districts].map((d) =>
+          d.id === districtToUpdate.id ? districtToUpdate : d,
+        );
+        return { ...state, districts };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -64,12 +68,9 @@ export const locationSlice = createSlice({
         };
       },
     );
-    builder.addCase(
-      getLocationsThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
+    builder.addCase(getLocationsThunk.rejected, (state, action: PayloadAction<unknown>) => {
+      return { ...state, error: action.payload };
+    });
   },
 });
 

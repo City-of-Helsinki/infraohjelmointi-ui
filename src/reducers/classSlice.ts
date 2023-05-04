@@ -10,7 +10,7 @@ interface IClassState {
   classes: Array<IClass>;
   subClasses: Array<IClass>;
   year: number;
-  error: IError | null | unknown;
+  error: unknown;
 }
 
 const initialState: IClassState = {
@@ -32,23 +32,35 @@ export const classSlice = createSlice({
   name: 'class',
   initialState,
   reducers: {
-    updateMasterClass(state, action: PayloadAction<IClass>) {
-      const updatedMasterClasses = [...state.masterClasses].map((mc) =>
-        mc.id === action.payload.id ? action.payload : mc,
-      );
-      return { ...state, masterClasses: updatedMasterClasses };
+    updateMasterClass(state, action: PayloadAction<IClass | null>) {
+      const masterClassToUpdate = action.payload;
+
+      if (masterClassToUpdate) {
+        const masterClasses = [...state.masterClasses].map((mc) =>
+          mc.id === masterClassToUpdate.id ? masterClassToUpdate : mc,
+        );
+        return { ...state, masterClasses };
+      }
     },
-    updateClass(state, action: PayloadAction<IClass>) {
-      const updatedClasses = [...state.classes].map((c) =>
-        c.id === action.payload.id ? action.payload : c,
-      );
-      return { ...state, classes: updatedClasses };
+    updateClass(state, action: PayloadAction<IClass | null>) {
+      const classToUpdate = action.payload;
+
+      if (classToUpdate) {
+        const classes = [...state.classes].map((c) =>
+          c.id === classToUpdate.id ? classToUpdate : c,
+        );
+        return { ...state, classes };
+      }
     },
-    updateSubClass(state, action: PayloadAction<IClass>) {
-      const updatedSubClass = [...state.subClasses].map((sc) =>
-        sc.id === action.payload.id ? action.payload : sc,
-      );
-      return { ...state, subClasses: updatedSubClass };
+    updateSubClass(state, action: PayloadAction<IClass | null>) {
+      const subClassToUpdate = action.payload;
+
+      if (subClassToUpdate) {
+        const subClasses = [...state.subClasses].map((sc) =>
+          sc.id === subClassToUpdate.id ? subClassToUpdate : sc,
+        );
+        return { ...state, subClasses };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -73,7 +85,7 @@ export const classSlice = createSlice({
         year: action.payload[0].finances.year,
       };
     });
-    builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
   },

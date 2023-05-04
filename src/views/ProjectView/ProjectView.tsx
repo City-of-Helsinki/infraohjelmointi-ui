@@ -16,7 +16,7 @@ const ProjectView = () => {
   const { projectId } = useParams();
 
   useEffect(() => {
-    dispatch(getProjectThunk(projectId || ''));
+    dispatch(getProjectThunk(projectId ?? ''));
   }, [dispatch, projectId]);
 
   const navItems: Array<INavigationItem> = [

@@ -1,4 +1,3 @@
-import { ContextMenuType } from '@/interfaces/common';
 import {
   IProjectCell,
   IProjectFinancesRequestObject,
@@ -20,6 +19,7 @@ import {
 } from 'react';
 import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
+import { ContextMenuType } from '@/interfaces/eventInterfaces';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');

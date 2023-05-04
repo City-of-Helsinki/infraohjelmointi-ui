@@ -1,5 +1,6 @@
 import { CustomTag } from '@/components/shared';
-import { ContextMenuType, IProjectSums } from '@/interfaces/common';
+import { IProjectSums } from '@/interfaces/common';
+import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';

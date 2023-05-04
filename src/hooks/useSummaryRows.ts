@@ -1,6 +1,5 @@
 import { IPlanningCell, IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
 import { useEffect, useState } from 'react';
-import _ from 'lodash';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
 
 interface IPlanningSummaryHeaderCell {
@@ -52,8 +51,6 @@ const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams)
     header: [],
     cells: [],
   });
-
-  // console.log(masterClasses);
 
   // Listens to a startYear and creates 11 cells starting with the startYear
   useEffect(() => {

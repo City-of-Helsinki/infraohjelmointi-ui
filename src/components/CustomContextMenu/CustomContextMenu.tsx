@@ -1,8 +1,8 @@
-import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
 import { useState, useEffect, useRef, useLayoutEffect, useMemo, memo, useCallback } from 'react';
 import { ProjectCellMenu } from './ContextMenus/ProjectCellContextMenu';
 import { ProjectPhaseMenu } from './ContextMenus/ProjectPhaseContextMenu';
 import './styles.css';
+import { ContextMenuType, IContextMenuData } from '@/interfaces/eventInterfaces';
 
 interface IContextMenuState extends IContextMenuData {
   isVisible: boolean;

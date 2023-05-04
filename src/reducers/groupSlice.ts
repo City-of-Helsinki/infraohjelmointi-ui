@@ -7,7 +7,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface IGroupsState {
   groups: Array<IGroup>;
   year: number;
-  error: IError | null | unknown;
+  error: unknown;
 }
 
 const initialState: IGroupsState = {
@@ -35,11 +35,15 @@ export const groupSlice = createSlice({
   name: 'group',
   initialState,
   reducers: {
-    updateGroup(state, action: PayloadAction<IGroup>) {
-      const updatedGroups = [...state.groups].map((g) =>
-        g.id === action.payload.id ? action.payload : g,
-      );
-      return { ...state, groups: updatedGroups };
+    updateGroup(state, action: PayloadAction<IGroup | null>) {
+      const groupToUpdate = action.payload;
+
+      if (groupToUpdate) {
+        const groups = [...state.groups].map((g) =>
+          g.id === groupToUpdate.id ? groupToUpdate : g,
+        );
+        return { ...state, groups };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -47,14 +51,14 @@ export const groupSlice = createSlice({
     builder.addCase(postGroupThunk.fulfilled, (state, action: PayloadAction<IGroup>) => {
       return { ...state, groups: [...state.groups, action.payload] };
     });
-    builder.addCase(postGroupThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(postGroupThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
     // GROUP GET ALL
     builder.addCase(getGroupsThunk.fulfilled, (state, action: PayloadAction<Array<IGroup>>) => {
       return { ...state, groups: action.payload, year: action.payload[0].finances.year };
     });
-    builder.addCase(getGroupsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getGroupsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
   },

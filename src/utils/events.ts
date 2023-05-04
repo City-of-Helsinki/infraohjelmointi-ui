@@ -1,4 +1,4 @@
-import { IContextMenuData } from '@/interfaces/common';
+import { IContextMenuData } from '@/interfaces/eventInterfaces';
 import { MouseEvent } from 'react';
 
 const { REACT_APP_API_URL } = process.env;

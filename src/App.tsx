@@ -21,12 +21,14 @@ import { getGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
 
+const LOADING_APP_ID = 'loading-app-data';
+
 const App: FC = () => {
   const dispatch = useAppDispatch();
   const [appDataReady, setAppDataReady] = useState(false);
 
   const initalizeStates = async () => {
-    dispatch(setLoading({ text: 'Loading app data', id: 'loading-app-data' }));
+    dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
     await Promise.all([
       dispatch(getListsThunk()),
       dispatch(getHashTagsThunk()),
@@ -34,7 +36,7 @@ const App: FC = () => {
       dispatch(getLocationsThunk()),
       dispatch(getGroupsThunk()),
     ]).then(() => {
-      dispatch(clearLoading('loading-app-data'));
+      dispatch(clearLoading(LOADING_APP_ID));
       setAppDataReady(true);
     });
   };

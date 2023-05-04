@@ -14,8 +14,8 @@ export const listItemToOption = (
   label:
     listItem?.value && translate
       ? translate(`enums.${removeDotsFromString(listItem?.value)}`)
-      : listItem?.value || '',
-  value: listItem?.id || '',
+      : listItem?.value ?? '',
+  value: listItem?.id ?? '',
 });
 
 export const booleanToString = (
@@ -33,7 +33,7 @@ export const emptyStringsToNull = (formData: IAppForms) => {
     .filter((field) => typeof formData[field as keyof IAppForms] === 'string')
     .reduce((accumulator, current) => {
       const key = current as keyof IAppForms;
-      return { ...accumulator, [current]: formData[key] || null };
+      return { ...accumulator, [current]: formData[key] ?? null };
     }, {});
 
   return { ...formData, ...transformedFields };

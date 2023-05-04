@@ -22,6 +22,8 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
 import { eventSource } from '@/utils/events';
+import { IFinanceEventData, IProjectEventData } from '@/interfaces/eventInterfaces';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 /**
  * Returns false whether a given row is already selected and present in the url.
@@ -73,7 +75,7 @@ const getLink = (
  * Parses a location name and returns the number value at the beginning of the name.
  */
 const parseNumberFromName = (name: string) =>
-  parseInt(name.match(/^\d+\./)?.[0]?.slice(0, -1) ?? '');
+  parseInt(/^\d+\./.exec(name)?.[0]?.slice(0, -1) ?? '');
 
 /**
  * Takes a list of groups or projects and returns them sorted by their name
@@ -278,26 +280,14 @@ interface IPlanningRowsState {
   year: number;
 }
 
-interface IFinanceEventData {
-  masterClass: IClass;
-  class: IClass;
-  subClass: IClass;
-  district: ILocation;
-  group: IGroup;
-  project: IProject;
-}
-
-interface IProjectEventData {
-  project: IProject;
-}
-
+const LOADING_PLANNING_ID = 'loading-planning-data';
 /**
  * Creates a row hierarchy of masterClasses, classes, subClasses, districts and divisions for the PlanningTable
  *
  * It also listens to the url params for a masterClassId, classId, subClassId or districtId which it will
  * use to return the currently selected (opened/expanded) rows.
  *
- * @returns rows for the PlanningTable and the currently selected rows
+ * @returns IPlanningRowsState
  */
 const usePlanningRows = () => {
   const { masterClassId, classId, subClassId, districtId } = useParams();
@@ -414,7 +404,7 @@ const usePlanningRows = () => {
     }));
   }, [groups]);
 
-  // Listen to finance updates when a projects budgets are changed
+  // Listen to finance-update and project-update events to update the list
   useEffect(() => {
     eventSource.onerror = () => {
       console.log('Error opening a connection to events');
@@ -426,13 +416,15 @@ const usePlanningRows = () => {
     const updateState = async (dataString: string) => {
       const data = JSON.parse(dataString) as IFinanceEventData;
 
+      dispatch(setLoading({ text: 'Loading planning view', id: LOADING_PLANNING_ID }));
+
       await Promise.all([
         dispatch(updateMasterClass(data.masterClass)),
         dispatch(updateClass(data.class)),
         dispatch(updateSubClass(data.subClass)),
         dispatch(updateDistrict(data.district)),
         dispatch(updateGroup(data.group)),
-      ]);
+      ]).finally(() => dispatch(clearLoading(LOADING_PLANNING_ID)));
     };
 
     const updateProject = (dataString: string) => {
@@ -452,6 +444,10 @@ const usePlanningRows = () => {
       eventSource.close();
     };
   }, []);
+
+  useEffect(() => {
+    console.log('rows: ', planningRowsState.rows);
+  }, [planningRowsState.rows]);
 
   return planningRowsState;
 };

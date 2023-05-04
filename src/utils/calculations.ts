@@ -2,7 +2,7 @@ import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfa
 import { IPlanningCell, IPlanningSums, PlanningRowType } from '@/interfaces/common';
 
 export const formatNumber = (number: number | undefined) =>
-  number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') || '0';
+  number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') ?? '0';
 
 /**
  * Calculates the budgets for the current row.
@@ -19,14 +19,14 @@ export const calculatePlanningRowSums = (
   const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
 
   const sumOfPlannedBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
-    if (currentValue !== null && currentValue.plannedBudget) {
+    if (currentValue?.plannedBudget) {
       return accumulator + currentValue.plannedBudget;
     }
     return accumulator;
   }, 0);
 
   const sumOfFrameBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
-    if (currentValue !== null && currentValue.frameBudget) {
+    if (currentValue?.frameBudget) {
       return accumulator + currentValue.frameBudget;
     }
     return accumulator;
@@ -99,12 +99,11 @@ export const calculatePlanningSummaryCells = (classes: Array<IClass>): Array<IPl
           [key]: { frameBudget: value.frameBudget, plannedBudget: value.plannedBudget },
         });
       } else {
+        const accBudgets = acc[key as keyof IClassFinances] as IClassBudgets;
         Object.assign(acc, {
           [key]: {
-            frameBudget: ((acc[key as keyof IClassFinances] as IClassBudgets).frameBudget +=
-              value.frameBudget),
-            plannedBudget: ((acc[key as keyof IClassFinances] as IClassBudgets).plannedBudget +=
-              value.plannedBudget),
+            frameBudget: (accBudgets.frameBudget += value.frameBudget),
+            plannedBudget: (accBudgets.plannedBudget += value.plannedBudget),
           },
         });
       }

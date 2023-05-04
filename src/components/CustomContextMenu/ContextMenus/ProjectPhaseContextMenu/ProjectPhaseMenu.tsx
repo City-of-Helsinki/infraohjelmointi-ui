@@ -3,7 +3,7 @@ import { IconCheck, IconCross, IconPlaybackRecord } from 'hds-react/icons';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
-import { IPhaseMenuDetails } from '@/interfaces/common';
+import { IPhaseMenuDetails } from '@/interfaces/eventInterfaces';
 import './styles.css';
 
 interface IProjectPhaseMenuProps extends IPhaseMenuDetails {
