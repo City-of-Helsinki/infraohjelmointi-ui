@@ -9,16 +9,15 @@ import { Link } from 'react-router-dom';
 
 interface IProjectHeadProps {
   project: IProject;
-  onUpdateProject: (projectToUpdate: IProject) => void;
   sums: IProjectSums;
 }
 
-const ProjectHead: FC<IProjectHeadProps> = ({ project, onUpdateProject, sums }) => {
+const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
-      patchProject({ data: req, id: project.id }).then((res) => onUpdateProject(res));
+      patchProject({ data: req, id: project.id });
     },
     [project.id],
   );

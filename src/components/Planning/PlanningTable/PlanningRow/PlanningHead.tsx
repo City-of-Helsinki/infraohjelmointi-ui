@@ -67,12 +67,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               {costEstimateBudget}
             </span>
             {deviation !== undefined && (
-              <span
-                className={`planning-header-deviation ${
-                  deviation.isNegative ? 'negative' : ''
-                } ${type}`}
-                data-testid={`deviation-${id}`}
-              >
+              <span className="planning-header-deviation" data-testid={`deviation-${id}`}>
                 {deviation.value}
               </span>
             )}

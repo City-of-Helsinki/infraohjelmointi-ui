@@ -1,8 +1,7 @@
-import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfaces';
 import { IPlanningCell, IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
 import { useEffect, useState } from 'react';
-import { calculatePlanningCells } from './usePlanningRows';
 import _ from 'lodash';
+import { calculatePlanningSummaryCells } from '@/utils/calculations';
 
 interface IPlanningSummaryHeaderCell {
   year: number;
@@ -34,33 +33,6 @@ const buildPlanningSummaryHeaderRow = (startYear: number) => {
     header.push({ year: startYear + i, title: getPlanningRowTitle(i) });
   }
   return { header };
-};
-
-export const buildPlanningSummaryCells = (classes: Array<IClass>) => {
-  const totalFinances = classes.reduce((acc: IClassFinances, curr: IClass) => {
-    const { budgetOverrunAmount, projectBudgets, year, ...rest } = curr.finances;
-
-    Object.entries(rest).forEach(([key, value]) => {
-      if (!Object.prototype.hasOwnProperty.call(acc, key)) {
-        Object.assign(acc, {
-          [key]: { frameBudget: value.frameBudget, plannedBudget: value.plannedBudget },
-        });
-      } else {
-        Object.assign(acc, {
-          [key]: {
-            frameBudget: ((acc[key as keyof IClassFinances] as IClassBudgets).frameBudget +=
-              value.frameBudget),
-            plannedBudget: ((acc[key as keyof IClassFinances] as IClassBudgets).plannedBudget +=
-              value.plannedBudget),
-          },
-        });
-      }
-    });
-
-    return acc;
-  }, {} as IClassFinances);
-
-  return calculatePlanningCells(totalFinances);
 };
 
 interface IUseSummaryRowsParams {
@@ -98,12 +70,12 @@ const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams)
     if (selectedSubClass) {
       setPlanningSummaryRows((current) => ({
         ...current,
-        cells: buildPlanningSummaryCells(classes),
+        cells: calculatePlanningSummaryCells(classes),
       }));
     } else {
       setPlanningSummaryRows((current) => ({
         ...current,
-        cells: buildPlanningSummaryCells(masterClasses),
+        cells: calculatePlanningSummaryCells(masterClasses),
       }));
     }
   }, [selectedMasterClass, selectedSubClass, classes, masterClasses]);

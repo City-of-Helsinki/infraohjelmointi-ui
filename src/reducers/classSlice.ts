@@ -31,7 +31,26 @@ export const getClassesThunk = createAsyncThunk('class/getAll', async (_, thunkA
 export const classSlice = createSlice({
   name: 'class',
   initialState,
-  reducers: {},
+  reducers: {
+    updateMasterClass(state, action: PayloadAction<IClass>) {
+      const updatedMasterClasses = [...state.masterClasses].map((mc) =>
+        mc.id === action.payload.id ? action.payload : mc,
+      );
+      return { ...state, masterClasses: updatedMasterClasses };
+    },
+    updateClass(state, action: PayloadAction<IClass>) {
+      const updatedClasses = [...state.classes].map((c) =>
+        c.id === action.payload.id ? action.payload : c,
+      );
+      return { ...state, classes: updatedClasses };
+    },
+    updateSubClass(state, action: PayloadAction<IClass>) {
+      const updatedSubClass = [...state.subClasses].map((sc) =>
+        sc.id === action.payload.id ? action.payload : sc,
+      );
+      return { ...state, subClasses: updatedSubClass };
+    },
+  },
   extraReducers: (builder) => {
     // GET ALL
     builder.addCase(getClassesThunk.fulfilled, (state, action: PayloadAction<Array<IClass>>) => {
@@ -59,6 +78,8 @@ export const classSlice = createSlice({
     });
   },
 });
+
+export const { updateMasterClass, updateClass, updateSubClass } = classSlice.actions;
 
 export const selectAllClasses = (state: RootState) => state.class.allClasses;
 export const selectMasterClasses = (state: RootState) => state.class.masterClasses;

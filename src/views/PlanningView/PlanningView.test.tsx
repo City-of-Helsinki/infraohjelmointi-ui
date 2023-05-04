@@ -22,10 +22,14 @@ import { listItemToOption } from '@/utils/common';
 import { mockError } from '@/mocks/mockError';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { IClassFinances } from '@/interfaces/classInterfaces';
-import { calculatePlanningCells, calculatePlanningRowSums } from '@/hooks/usePlanningRows';
 import { calculateProjectRowSums } from '@/hooks/useProjectRow';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
-import { buildPlanningSummaryCells, getPlanningRowTitle } from '@/hooks/useSummaryRows';
+import { getPlanningRowTitle } from '@/hooks/useSummaryRows';
+import {
+  calculatePlanningCells,
+  calculatePlanningRowSums,
+  calculatePlanningSummaryCells,
+} from '@/utils/calculations';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -280,7 +284,7 @@ describe('PlanningView', () => {
       expect(getByTestId('planning-summary-planned-budget-row')).toBeInTheDocument();
       expect(getByTestId('planning-summary-realized-budget-row')).toBeInTheDocument();
 
-      const cells = buildPlanningSummaryCells(masterClasses);
+      const cells = calculatePlanningSummaryCells(masterClasses);
       cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
         expect(getByTestId(`summary-budget-${key}`)).toHaveTextContent(plannedBudget);
         expect(getByTestId(`summary-frame-${key}`)).toHaveTextContent(frameBudget);
@@ -649,7 +653,7 @@ describe('PlanningView', () => {
     });
 
     describe('PlanningCell', () => {
-      it('renders budget, overrun and deviationrs', async () => {
+      it('renders budget, overrun and deviation', async () => {
         const { store, getByTestId } = await render();
 
         const { id, finances } = store.getState().class.masterClasses[0];

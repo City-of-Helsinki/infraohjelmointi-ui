@@ -1,30 +1,27 @@
-import { selectBatchedClasses } from '@/reducers/classSlice';
-import { useAppSelector } from './common';
-import { selectedBatchedLocations } from '@/reducers/locationSlice';
+import {
+  selectBatchedClasses,
+  updateClass,
+  updateMasterClass,
+  updateSubClass,
+} from '@/reducers/classSlice';
+import { useAppDispatch, useAppSelector } from './common';
+import { selectedBatchedLocations, updateDistrict } from '@/reducers/locationSlice';
 import { useEffect, useState } from 'react';
-import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
+import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
 import {
-  IDeviation,
-  IPlanningCell,
   IPlanningRow,
   IPlanningRowLists,
   IPlanningRowSelections,
   PlanningRowType,
 } from '@/interfaces/common';
-import { selectGroups } from '@/reducers/groupSlice';
+import { selectGroups, updateGroup } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { formatNumber } from '@/utils/common';
-
-interface IPlanningRowsState {
-  lists: IPlanningRowLists;
-  selections: IPlanningRowSelections;
-  year: number;
-  rows: Array<IPlanningRow>;
-}
+import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
+import { eventSource } from '@/utils/events';
 
 /**
  * Returns false whether a given row is already selected and present in the url.
@@ -111,88 +108,6 @@ const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IP
       break;
   }
   return sortByName(projectList) as Array<IProject>;
-};
-
-/**
- * Calculates the budgets for each cell for the current row. The first cell will get additional properties.
- *
- * @returns
- * - key: the key for the cell (key of the finance object)
- * - plannedBudget: sum of all underlying project finances for that year (calculated in the backend)
- * - frameBudget: the amount of frameBudget given to the underlying projects during that year
- * - deviation: the deviation between the plannedBudget and the framedBudget and if the value is negative
- */
-export const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
-  const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
-  return Object.entries(rest).map(([key, value]) => {
-    const { frameBudget, plannedBudget } = value;
-
-    const deviation = frameBudget - plannedBudget;
-
-    return {
-      key,
-      plannedBudget: formatNumber(plannedBudget),
-      frameBudget: formatNumber(frameBudget),
-      deviation: {
-        value: formatNumber(deviation),
-        isNegative: deviation < 0,
-      },
-    };
-  });
-};
-
-interface IPlanningSums {
-  plannedBudgets: string;
-  costEstimateBudget: string;
-  deviation?: IDeviation;
-}
-
-/**
- * Calculates the budgets for the current row.
- *
- * @returns
- * - plannedBudgets: sum of all plannedBudgets (cells) for the current row
- * - costEstimateBudget: sum of all the frameBudgets and budgetOverrunAmount or the sum of project budgets if its a group
- * - deviation: deviation between costEstimateBudget and plannedBudgets and if the value is negative
- */
-export const calculatePlanningRowSums = (
-  finances: IClassFinances,
-  type: PlanningRowType,
-): IPlanningSums => {
-  const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
-
-  const sumOfPlannedBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
-    if (currentValue !== null && currentValue.plannedBudget) {
-      return accumulator + currentValue.plannedBudget;
-    }
-    return accumulator;
-  }, 0);
-
-  const sumOfFrameBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
-    if (currentValue !== null && currentValue.frameBudget) {
-      return accumulator + currentValue.frameBudget;
-    }
-    return accumulator;
-  }, 0);
-
-  const sumOfFramesAndOverrun = sumOfFrameBudgets + budgetOverrunAmount;
-  const deviationBetweenCostEstimateAndBudget = sumOfFramesAndOverrun - sumOfPlannedBudgets;
-
-  const plannedBudgets = formatNumber(sumOfPlannedBudgets);
-  const costEstimateBudget = formatNumber(
-    type === 'group' ? projectBudgets : sumOfFramesAndOverrun,
-  );
-
-  return {
-    plannedBudgets,
-    costEstimateBudget,
-    ...(type !== 'group' && {
-      deviation: {
-        value: formatNumber(deviationBetweenCostEstimateAndBudget),
-        isNegative: deviationBetweenCostEstimateAndBudget < 0,
-      },
-    }),
-  };
 };
 
 /**
@@ -355,6 +270,27 @@ const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelections) =>
   }
 };
 
+interface IPlanningRowsState {
+  lists: IPlanningRowLists;
+  selections: IPlanningRowSelections;
+  rows: Array<IPlanningRow>;
+  projectToUpdate: IProject | null;
+  year: number;
+}
+
+interface IFinanceEventData {
+  masterClass: IClass;
+  class: IClass;
+  subClass: IClass;
+  district: ILocation;
+  group: IGroup;
+  project: IProject;
+}
+
+interface IProjectEventData {
+  project: IProject;
+}
+
 /**
  * Creates a row hierarchy of masterClasses, classes, subClasses, districts and divisions for the PlanningTable
  *
@@ -365,6 +301,7 @@ const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelections) =>
  */
 const usePlanningRows = () => {
   const { masterClassId, classId, subClassId, districtId } = useParams();
+  const dispatch = useAppDispatch();
   const batchedClasses = useAppSelector(selectBatchedClasses);
   const batchedLocations = useAppSelector(selectedBatchedLocations);
   const groups = useAppSelector(selectGroups);
@@ -385,6 +322,7 @@ const usePlanningRows = () => {
       selectedDistrict: null,
     },
     rows: [],
+    projectToUpdate: null,
     year: new Date().getFullYear(),
   });
 
@@ -407,6 +345,19 @@ const usePlanningRows = () => {
       }));
     }
   }, [lists, selections]);
+
+  useEffect(() => {
+    const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
+
+    if (type && id) {
+      fetchProjectsByRelation(type as PlanningRowType, id).then((projects) => {
+        setPlanningRowsState((current) => ({
+          ...current,
+          projects,
+        }));
+      });
+    }
+  }, [selections]);
 
   // React to changes in classes and set the selectedMasterClass/selectedClass/selectedSubClass if it is present in the route
   useEffect(() => {
@@ -462,6 +413,45 @@ const usePlanningRows = () => {
       },
     }));
   }, [groups]);
+
+  // Listen to finance updates when a projects budgets are changed
+  useEffect(() => {
+    eventSource.onerror = () => {
+      console.log('Error opening a connection to events');
+    };
+    eventSource.onopen = () => {
+      console.log('Connection to events opened');
+    };
+
+    const updateState = async (dataString: string) => {
+      const data = JSON.parse(dataString) as IFinanceEventData;
+
+      await Promise.all([
+        dispatch(updateMasterClass(data.masterClass)),
+        dispatch(updateClass(data.class)),
+        dispatch(updateSubClass(data.subClass)),
+        dispatch(updateDistrict(data.district)),
+        dispatch(updateGroup(data.group)),
+      ]);
+    };
+
+    const updateProject = (dataString: string) => {
+      const projectToUpdate = (JSON.parse(dataString) as IProjectEventData).project;
+      setPlanningRowsState((current) => ({
+        ...current,
+        projectToUpdate,
+      }));
+    };
+
+    eventSource.addEventListener('finance-update', async (e) => await updateState(e.data));
+    eventSource.addEventListener('project-update', (e) => updateProject(e.data));
+
+    return () => {
+      eventSource.removeEventListener('finance-update', async (e) => await updateState(e.data));
+      eventSource.addEventListener('project-update', (e) => updateProject(e.data));
+      eventSource.close();
+    };
+  }, []);
 
   return planningRowsState;
 };

@@ -115,6 +115,12 @@ export interface IProjectSums {
   costEstimateBudget: string;
 }
 
+export interface IPlanningSums {
+  plannedBudgets: string;
+  costEstimateBudget: string;
+  deviation?: IDeviation;
+}
+
 export interface IPlanningCell {
   key: string;
   deviation?: IDeviation;

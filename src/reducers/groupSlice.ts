@@ -34,7 +34,14 @@ export const getGroupsThunk = createAsyncThunk('group/getAll', async (_, thunkAP
 export const groupSlice = createSlice({
   name: 'group',
   initialState,
-  reducers: {},
+  reducers: {
+    updateGroup(state, action: PayloadAction<IGroup>) {
+      const updatedGroups = [...state.groups].map((g) =>
+        g.id === action.payload.id ? action.payload : g,
+      );
+      return { ...state, groups: updatedGroups };
+    },
+  },
   extraReducers: (builder) => {
     // GROUP POST
     builder.addCase(postGroupThunk.fulfilled, (state, action: PayloadAction<IGroup>) => {
@@ -53,6 +60,7 @@ export const groupSlice = createSlice({
   },
 });
 
+export const { updateGroup } = groupSlice.actions;
 export const selectGroups = (state: RootState) => state.group.groups;
 
 export default groupSlice.reducer;

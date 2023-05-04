@@ -5,11 +5,16 @@ import PlanningCell from './PlanningCell';
 import PlanningHead from './PlanningHead';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
-import './styles.css';
 import { IProject } from '@/interfaces/projectInterfaces';
+import './styles.css';
+import _ from 'lodash';
 
-const PlanningRow: FC<IPlanningRow> = (props) => {
-  const { defaultExpanded, projectRows, cells } = props;
+interface IPlanningRowProps extends IPlanningRow {
+  projectToUpdate: IProject | null;
+}
+
+const PlanningRow: FC<IPlanningRowProps> = (props) => {
+  const { defaultExpanded, projectRows, cells, projectToUpdate } = props;
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [projects, setProjects] = useState<Array<IProject>>([]);
 
@@ -25,15 +30,16 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
     setProjects(projectRows);
   }, [projectRows]);
 
-  const onUpdateProject = useCallback(
-    (projectToUpdate: IProject) => {
+  useEffect(() => {
+    if (projectToUpdate) {
       const updatedProjects = projects.map((p) =>
         p.id === projectToUpdate.id ? projectToUpdate : p,
       );
-      setProjects(updatedProjects);
-    },
-    [projects],
-  );
+      if (!_.isEqual(projects, updatedProjects)) {
+        setProjects(updatedProjects);
+      }
+    }
+  }, [projectToUpdate]);
 
   return (
     <>
@@ -47,11 +53,11 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
       {expanded && (
         <>
           {projects.map((p) => (
-            <ProjectRow key={p.id} project={p} onUpdateProject={onUpdateProject} />
+            <ProjectRow key={p.id} project={p} />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} />
+            <PlanningRow {...c} projectToUpdate={projectToUpdate} />
           ))}
         </>
       )}

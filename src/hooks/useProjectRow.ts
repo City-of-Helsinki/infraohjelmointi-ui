@@ -7,7 +7,7 @@ import {
   IProjectFinancesRequestObject,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
-import { formatNumber } from '@/utils/common';
+import { formatNumber } from '@/utils/calculations';
 import { isInYearRange, isSameYear } from '@/utils/dates';
 import { useEffect, useState } from 'react';
 

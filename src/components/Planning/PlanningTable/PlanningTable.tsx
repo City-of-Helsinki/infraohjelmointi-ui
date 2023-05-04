@@ -3,19 +3,21 @@
 import { FC, memo } from 'react';
 import PlanningRow from './PlanningRow/PlanningRow';
 import { IPlanningRow } from '@/interfaces/common';
+import { IProject } from '@/interfaces/projectInterfaces';
 import './styles.css';
 
 interface IPlanningTableProps {
   rows: Array<IPlanningRow>;
+  projectToUpdate: IProject | null;
 }
 
-const PlanningTable: FC<IPlanningTableProps> = ({ rows }) => {
+const PlanningTable: FC<IPlanningTableProps> = ({ rows, projectToUpdate }) => {
   return (
     <table className="planning-table" cellSpacing={0}>
       <tbody>
         {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
         {rows.map((row: IPlanningRow) => (
-          <PlanningRow {...row} />
+          <PlanningRow {...row} projectToUpdate={projectToUpdate} />
         ))}
       </tbody>
     </table>

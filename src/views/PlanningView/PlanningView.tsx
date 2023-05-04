@@ -8,7 +8,7 @@ import usePlanningRows from '@/hooks/usePlanningRows';
 import './styles.css';
 
 const PlanningView: FC = () => {
-  const { rows, selections, year, lists } = usePlanningRows();
+  const { rows, selections, year, lists, projectToUpdate } = usePlanningRows();
 
   return (
     <>
@@ -19,7 +19,7 @@ const PlanningView: FC = () => {
           <PlanningInfoPanel selectedMasterClass={selections.selectedMasterClass} />
           <PlanningSummaryTable startYear={year} selections={selections} lists={lists} />
         </div>
-        {rows.length > 0 && <PlanningTable rows={rows} />}
+        {rows.length > 0 && <PlanningTable rows={rows} projectToUpdate={projectToUpdate} />}
       </div>
     </>
   );

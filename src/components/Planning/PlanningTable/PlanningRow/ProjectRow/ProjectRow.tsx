@@ -8,10 +8,9 @@ import './styles.css';
 
 interface IProjectRowProps {
   project: IProject;
-  onUpdateProject: (projectToUpdate: IProject) => void;
 }
 
-const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
+const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const { cells, sums } = useProjectRow(project);
 
@@ -28,9 +27,9 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, onUpdateProject }) => {
   return (
     <tr id={`project-row-${project.id}`} ref={projectRowRef} data-testid={`row-${project.id}`}>
       {/* HEADER */}
-      <ProjectHead project={project} sums={sums} onUpdateProject={onUpdateProject} />
+      <ProjectHead project={project} sums={sums} />
       {cells.map((c) => (
-        <ProjectCell key={c.financeKey} cell={c} onUpdateProject={onUpdateProject} />
+        <ProjectCell key={c.financeKey} cell={c} />
       ))}
     </tr>
   );

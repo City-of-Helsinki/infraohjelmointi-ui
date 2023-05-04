@@ -113,6 +113,3 @@ export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
     value: mc.id,
     label: mc.name,
   }));
-
-export const formatNumber = (number: number | undefined) =>
-  number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') || '0';

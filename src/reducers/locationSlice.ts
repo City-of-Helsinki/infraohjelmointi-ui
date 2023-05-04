@@ -31,7 +31,14 @@ export const getLocationsThunk = createAsyncThunk('location/getAll', async (_, t
 export const locationSlice = createSlice({
   name: 'locations',
   initialState,
-  reducers: {},
+  reducers: {
+    updateDistrict(state, action: PayloadAction<ILocation>) {
+      const updateDistricts = [...state.districts].map((d) =>
+        d.id === action.payload.id ? action.payload : d,
+      );
+      return { ...state, districts: updateDistricts };
+    },
+  },
   extraReducers: (builder) => {
     // GET ALL
     builder.addCase(
@@ -65,6 +72,8 @@ export const locationSlice = createSlice({
     );
   },
 });
+
+export const { updateDistrict } = locationSlice.actions;
 
 export const selectAllLocations = (state: RootState) => state.location.allLocations;
 export const selectDistricts = (state: RootState) => state.location.districts;

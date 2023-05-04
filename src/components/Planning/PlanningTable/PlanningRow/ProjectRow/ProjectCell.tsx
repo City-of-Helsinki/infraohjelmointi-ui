@@ -1,6 +1,5 @@
 import { ContextMenuType } from '@/interfaces/common';
 import {
-  IProject,
   IProjectCell,
   IProjectFinancesRequestObject,
   IProjectRequest,
@@ -269,10 +268,9 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
 
 interface IProjectCellProps {
   cell: IProjectCell;
-  onUpdateProject: (projectToUpdate: IProject) => void;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [formValue, setFormValue] = useState<number | null>(parseInt(budget || '0'));
@@ -286,12 +284,15 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
+      if (req.finances && Object.keys(req.finances).length === 1) {
+        delete req.finances;
+      }
       patchProject({
         id,
         data: { ...req },
-      }).then((res) => onUpdateProject(res));
+      });
     },
-    [id, onUpdateProject],
+    [id],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property
