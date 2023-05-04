@@ -13,6 +13,7 @@ export interface INavigationItem {
   route: string;
   label: string;
   component?: ReactNode;
+  disabled?: boolean;
 }
 
 export interface IOption {

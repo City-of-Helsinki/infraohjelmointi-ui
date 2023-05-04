@@ -273,7 +273,7 @@ interface IProjectCellProps {
 const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [formValue, setFormValue] = useState<number | null>(parseInt(budget || '0'));
+  const [formValue, setFormValue] = useState<number | null | string>(parseInt(budget || '0'));
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   // Values of cells that have the none type will be empty strings to hide them
@@ -301,10 +301,13 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   }, []);
 
   // Make sure the budget is always at least 0 and remove the first 0 if the user types a number in the field
-  const handleChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => setFormValue(e.target.value ? +e.target.value : 0),
-    [],
-  );
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === '00') {
+      setFormValue(e.target.value);
+    } else {
+      setFormValue(e.target.value ? +e.target.value : 0);
+    }
+  }, []);
 
   // Blurring the input field will patch the current budget
   const handleBlur = useCallback(() => {

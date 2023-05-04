@@ -18,7 +18,9 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
-      patchProject({ data: req, id: project.id });
+      patchProject({ data: req, id: project.id }).catch((e) =>
+        console.log('Error saving project phase: ', e),
+      );
     },
     [project.id],
   );

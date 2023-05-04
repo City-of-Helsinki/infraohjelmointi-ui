@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useAppDispatch } from '@/hooks/common';
-import { getProjectThunk } from '@/reducers/projectSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { getProjectThunk, selectProject } from '@/reducers/projectSlice';
 import { TabList } from '@/components/shared';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +14,17 @@ const ProjectView = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { projectId } = useParams();
+  const navigate = useNavigate();
+  const selectedProject = useAppSelector(selectProject);
 
   useEffect(() => {
-    dispatch(getProjectThunk(projectId ?? ''));
+    if (projectId) {
+      dispatch(getProjectThunk(projectId)).then(
+        (res) => res.type.includes('rejected') && navigate('/not-found'),
+      );
+    } else {
+      navigate('/planning');
+    }
   }, [dispatch, projectId]);
 
   const navItems: Array<INavigationItem> = [
@@ -26,9 +34,13 @@ const ProjectView = () => {
 
   return (
     <div className="w-full" data-testid="project-view">
-      <ProjectToolbar />
-      <ProjectHeader />
-      <TabList navItems={navItems} />
+      {selectedProject && (
+        <>
+          <ProjectToolbar />
+          <ProjectHeader />
+          <TabList navItems={navItems} />
+        </>
+      )}
     </div>
   );
 };

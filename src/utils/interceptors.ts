@@ -1,4 +1,4 @@
-import { IError } from '@/interfaces/common';
+import { IError, INotification } from '@/interfaces/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
@@ -71,19 +71,34 @@ const handleResponse = (res: AxiosResponse) => {
   return res;
 };
 
+const getErrorNotification = (error: AxiosError): INotification => {
+  const url = error.config?.url;
+
+  const parsedError: INotification = {
+    status: error.response?.status?.toLocaleString(),
+    title: error.status?.toLocaleString() ?? '',
+    message: error.message ?? 'Unknown error',
+  };
+
+  if (!url) {
+    return parsedError;
+  }
+
+  if (url.includes('projects') && error.request?.status === 404) {
+    parsedError.title = 'projectNotFound';
+    parsedError.message = 'projectNotFound';
+  }
+
+  return parsedError;
+};
+
 const handleError = (error: AxiosError): Promise<IError> => {
   const parsedError: IError = {
     status: error.response?.status,
     message: error.message || 'Unknown error',
   };
 
-  store.dispatch(
-    notifyError({
-      message: parsedError.message,
-      title: `${parsedError.status || ''}`,
-      status: parsedError.status?.toLocaleString(),
-    }),
-  );
+  store.dispatch(notifyError(getErrorNotification(error)));
 
   if (shouldTriggerLoading(error.config?.url)) {
     store.dispatch(clearLoading(error.config?.url || ''));

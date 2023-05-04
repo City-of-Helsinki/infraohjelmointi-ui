@@ -122,7 +122,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(getByText('error.404')).toBeInTheDocument();
       expect(getByText('error.pageNotFound')).toBeInTheDocument();
-      expect(getByTestId('return-to-previous-btn')).toBeInTheDocument();
+      expect(getByTestId('return-to-frontpage-btn')).toBeInTheDocument();
     });
   });
 

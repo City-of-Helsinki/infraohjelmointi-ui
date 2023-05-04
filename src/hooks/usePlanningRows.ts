@@ -445,10 +445,6 @@ const usePlanningRows = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log('rows: ', planningRowsState.rows);
-  }, [planningRowsState.rows]);
-
   return planningRowsState;
 };
 

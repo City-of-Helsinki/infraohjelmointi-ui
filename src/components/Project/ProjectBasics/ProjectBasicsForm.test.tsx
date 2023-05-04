@@ -37,7 +37,6 @@ const render = async () =>
     renderWithProviders(<Route path="/" element={<ProjectBasicsForm />} />, {
       preloadedState: {
         project: {
-          projects: [mockProject.data],
           selectedProject: mockProject.data,
           count: 1,
           error: {},

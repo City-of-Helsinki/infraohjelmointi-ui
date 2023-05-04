@@ -113,8 +113,6 @@ describe('PlanningView', () => {
   it('renders the container', async () => {
     const { container } = await render();
 
-    console.log('Window: ', window);
-
     expect(container.getElementsByClassName('planning-view-container')[0]).toBeInTheDocument();
   });
 

@@ -7,7 +7,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IProjectState {
   selectedProject: IProject | null;
-  projects: Array<IProject>;
   count: number | null;
   page: number;
   error: IError | null | unknown;
@@ -16,7 +15,6 @@ interface IProjectState {
 
 const initialState: IProjectState = {
   selectedProject: null,
-  projects: [],
   count: null,
   error: null,
   page: 0,
@@ -49,12 +47,6 @@ export const projectSlice = createSlice({
         page: action.payload,
       };
     },
-    resetProjects(state) {
-      return {
-        ...state,
-        projects: initialState.projects,
-      };
-    },
     resetProject(state) {
       return { ...state, selectedProject: null };
     },
@@ -69,14 +61,9 @@ export const projectSlice = createSlice({
     });
     // SILENT PATCH
     builder.addCase(patchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
-      // All projects also need to be updated to get changes into the planning list
-      const updatedProjectList: Array<IProject> = state.projects.map((p) =>
-        p.id === action.payload?.id ? action.payload : p,
-      );
       return {
         ...state,
         selectedProject: action.payload,
-        projects: [...updatedProjectList],
         updated: getCurrentTime(),
       };
     });
@@ -90,11 +77,10 @@ export const projectSlice = createSlice({
 });
 
 export const selectProject = (state: RootState) => state.project.selectedProject;
-export const selectProjects = (state: RootState) => state.project.projects;
 export const selectCount = (state: RootState) => state.project.count;
 export const selectPage = (state: RootState) => state.project.page;
 export const selectUpdated = (state: RootState) => state.project.updated;
 
-export const { setPage, resetProjects, resetProject } = projectSlice.actions;
+export const { setPage, resetProject } = projectSlice.actions;
 
 export default projectSlice.reducer;

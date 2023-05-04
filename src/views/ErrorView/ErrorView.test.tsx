@@ -26,6 +26,6 @@ describe('ErrorView', () => {
 
   it('renders a return to previous page button', async () => {
     const { getByTestId } = await render();
-    expect(getByTestId('return-to-previous-btn')).toBeInTheDocument();
+    expect(getByTestId('return-to-frontpage-btn')).toBeInTheDocument();
   });
 });
