@@ -30,6 +30,7 @@ import {
   calculatePlanningRowSums,
   calculatePlanningSummaryCells,
 } from '@/utils/calculations';
+import { mockEventSource } from '@/mocks/mockEventSource';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -85,9 +86,10 @@ const render = async () =>
     ),
   );
 
+mockEventSource();
+
 describe('PlanningView', () => {
   const asNumber = (value: string | null) => parseInt(value || '');
-
   const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
     const { user, store, getByTestId } = renderResult;
     const { masterClasses, classes } = store.getState().class;
@@ -110,6 +112,8 @@ describe('PlanningView', () => {
 
   it('renders the container', async () => {
     const { container } = await render();
+
+    console.log('Window: ', window);
 
     expect(container.getElementsByClassName('planning-view-container')[0]).toBeInTheDocument();
   });

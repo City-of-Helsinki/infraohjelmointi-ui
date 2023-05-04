@@ -48,7 +48,7 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selec
                   className={`deviation ${deviation?.isNegative ? 'negative' : ''} `}
                   data-testid={`summary-deviation-${key}`}
                 >
-                  {deviation?.value || ''}
+                  {deviation?.value ?? ''}
                 </span>
               </div>
             </td>

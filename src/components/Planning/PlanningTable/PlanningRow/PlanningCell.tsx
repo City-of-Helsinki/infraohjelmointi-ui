@@ -1,7 +1,6 @@
-// import { BubbleIcon } from '../../../shared';
 import { FC, memo } from 'react';
-import './styles.css';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
+import './styles.css';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
