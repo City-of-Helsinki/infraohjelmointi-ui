@@ -1,11 +1,12 @@
 import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfaces';
-import { IPlanningCell, IPlanningSums, PlanningRowType } from '@/interfaces/common';
+import { IPlanningCell, IPlanningSums, IProjectSums, PlanningRowType } from '@/interfaces/common';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 export const formatNumber = (number: number | undefined) =>
   number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') ?? '0';
 
 /**
- * Calculates the budgets for the current row.
+ * Calculates the budgets for the current row. Returns nothing for a division and no deviation for groups.
  *
  * @returns
  * - plannedBudgets: sum of all plannedBudgets (cells) for the current row
@@ -41,19 +42,22 @@ export const calculatePlanningRowSums = (
   );
 
   return {
-    plannedBudgets,
-    costEstimateBudget,
-    ...(type !== 'group' && {
-      deviation: {
-        value: formatNumber(deviationBetweenCostEstimateAndBudget),
-        isNegative: deviationBetweenCostEstimateAndBudget < 0,
-      },
+    ...(type !== 'division' && {
+      plannedBudgets,
+      costEstimateBudget,
+      ...(type !== 'group' && {
+        deviation: {
+          value: formatNumber(deviationBetweenCostEstimateAndBudget),
+          isNegative: deviationBetweenCostEstimateAndBudget < 0,
+        },
+      }),
     }),
   };
 };
 
 /**
- * Calculates the budgets for each cell for the current row. The first cell will get additional properties.
+ * Calculates the budgets for each cell for the current row. Return only the key for division and
+ * no deviation for groups.
  *
  * @returns
  * - key: the key for the cell (key of the finance object)
@@ -61,27 +65,35 @@ export const calculatePlanningRowSums = (
  * - frameBudget: the amount of frameBudget given to the underlying projects during that year
  * - deviation: the deviation between the plannedBudget and the framedBudget and if the value is negative
  */
-export const calculatePlanningCells = (finances: IClassFinances): Array<IPlanningCell> => {
+export const calculatePlanningCells = (
+  finances: IClassFinances,
+  type: PlanningRowType,
+): Array<IPlanningCell> => {
   const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
   return Object.entries(rest).map(([key, value]) => {
     const { frameBudget, plannedBudget } = value;
-
     const deviation = frameBudget - plannedBudget;
 
     return {
       key,
-      plannedBudget: formatNumber(plannedBudget),
-      frameBudget: formatNumber(frameBudget),
-      deviation: {
-        value: formatNumber(deviation),
-        isNegative: deviation < 0,
-      },
+      // we don't return any budgets for divisions
+      ...(type !== 'division' && {
+        plannedBudget: formatNumber(plannedBudget),
+        // we don't return frameBudget or deviation for a group
+        ...(type !== 'group' && {
+          frameBudget: formatNumber(frameBudget),
+          deviation: {
+            value: formatNumber(deviation),
+            isNegative: deviation < 0,
+          },
+        }),
+      }),
     };
   });
 };
 
 /**
- * Takes an array of classes and sums together all their finances into a list of IPlanningCells
+ * Takes an array of classes and sums together all their finances and create a list of planning cells with it.
  *
  * @returns
  * - key: the key for the cell (key of the finance object)
@@ -89,7 +101,10 @@ export const calculatePlanningCells = (finances: IClassFinances): Array<IPlannin
  * - frameBudget: the amount of frameBudget given to the underlying projects during that year
  * - deviation: the deviation between the plannedBudget and the framedBudget and if the value is negative
  */
-export const calculatePlanningSummaryCells = (classes: Array<IClass>): Array<IPlanningCell> => {
+export const calculatePlanningSummaryCells = (
+  classes: Array<IClass>,
+  type: PlanningRowType,
+): Array<IPlanningCell> => {
   const totalFinances = classes.reduce((acc: IClassFinances, curr: IClass) => {
     const { budgetOverrunAmount, projectBudgets, year, ...rest } = curr.finances;
 
@@ -112,5 +127,32 @@ export const calculatePlanningSummaryCells = (classes: Array<IClass>): Array<IPl
     return acc;
   }, {} as IClassFinances);
 
-  return calculatePlanningCells(totalFinances);
+  return calculatePlanningCells(totalFinances, type);
+};
+
+/**
+ * Calculates the budget sums for a project row and returns the sums.
+ *
+ * @returns
+ * - costEstimateBudget: the sum of all the project finances (cells visible in the current year)
+ * - availableFrameBudget: the deviation between the projects total budget and the already spent budget from past years
+ */
+export const calculateProjectRowSums = (project: IProject): IProjectSums => {
+  const {
+    costForecast,
+    spentBudget,
+    finances: { year, ...finances },
+  } = project;
+
+  const availableFrameBudget = Object.values(finances).reduce((accumulator, currentValue) => {
+    if (currentValue !== null) {
+      return accumulator + parseInt(currentValue);
+    }
+    return accumulator;
+  }, 0);
+
+  return {
+    availableFrameBudget: formatNumber(availableFrameBudget),
+    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
+  };
 };

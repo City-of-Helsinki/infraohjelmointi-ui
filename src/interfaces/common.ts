@@ -92,16 +92,16 @@ export interface IProjectSums {
 }
 
 export interface IPlanningSums {
-  plannedBudgets: string;
-  costEstimateBudget: string;
+  plannedBudgets?: string;
+  costEstimateBudget?: string;
   deviation?: IDeviation;
 }
 
 export interface IPlanningCell {
   key: string;
   deviation?: IDeviation;
-  plannedBudget: string;
-  frameBudget: string;
+  plannedBudget?: string;
+  frameBudget?: string;
 }
 
 export interface IPlanningRowLists {
@@ -120,7 +120,7 @@ export interface IPlanningRowSelections {
   selectedDistrict: ILocation | null;
 }
 
-export interface IPlanningRow {
+export interface IPlanningRow extends IPlanningSums {
   type: PlanningRowType;
   name: string;
   path: string;
@@ -131,7 +131,4 @@ export interface IPlanningRow {
   defaultExpanded: boolean;
   link: string | null;
   cells: Array<IPlanningCell>;
-  plannedBudgets: string;
-  costEstimateBudget: string;
-  deviation?: IDeviation;
 }

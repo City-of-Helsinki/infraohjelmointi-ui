@@ -8,77 +8,77 @@
   --color-group: var(--color-fog-light);
 }
 
-/* TABLE HEADER */
-.planning-header {
-  /* max-width: 1rem makes it so that the header doesn't grow beyond its max width */
+/* TABLE HEAD */
+.planning-head {
+  /* max-width: 1rem makes it so that the head doesn't grow beyond its max width */
   @apply h-11 w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus py-1 pr-4 text-white;
 }
 
-.planning-header-content {
-  --header-width: calc(100% - var(--planning-cell-width));
-  @apply flex w-[var(--header-width)] items-center gap-1 overflow-ellipsis;
+.planning-head-content {
+  --head-width: calc(100% - var(--planning-cell-width));
+  @apply flex w-[var(--head-width)] items-center gap-1 overflow-ellipsis;
 }
 
-.planning-header.masterClass {
+.planning-head.masterClass {
   @apply bg-[var(--color-masterClass)] pl-4;
 }
 
-.planning-header.class {
+.planning-head.class {
   @apply bg-[var(--color-class)] pl-10;
 }
 
-.planning-header.subClass {
+.planning-head.subClass {
   @apply bg-[var(--color-subClass)] pl-16;
 }
 
-.planning-header.district-preview {
+.planning-head.district-preview {
   @apply bg-[var(--color-district-preview)] pl-[5.5rem];
 }
 
-.planning-header.district {
+.planning-head.district {
   @apply bg-[var(--color-district)] pl-4 text-xl;
 }
 
-.planning-header.division {
+.planning-head.division {
   @apply border-b border-black-70 bg-[var(--color-division)] pl-10 text-l font-medium text-black-90;
 }
 
-.planning-header.division .planning-header-content {
+.planning-head.division .planning-head-content {
   @apply gap-4;
 }
 
-.planning-header.group {
+.planning-head.group {
   @apply border-b border-black-70 bg-[var(--color-group)] font-medium text-black;
 }
 
 /* Group row under a subClass */
-.subClass ~ .group .planning-header.group {
+.subClass ~ .group .planning-head.group {
   @apply pl-[5.5rem];
 }
 
 /* Group row under a district */
-.district ~ .group .planning-header.group {
+.district ~ .group .planning-head.group {
   @apply pl-10;
 }
 
 /* Group row under a division */
-.division ~ .group .planning-header.group {
+.division ~ .group .planning-head.group {
   @apply pl-16;
 }
 
-.planning-header .planning-title-button {
+.planning-head .planning-title-button {
   @apply flex overflow-hidden;
 }
 
-.planning-header .planning-title-container {
+.planning-head .planning-title-container {
   @apply relative flex max-w-[85%];
 }
 
-.planning-header .planning-title-button:hover {
+.planning-head .planning-title-button:hover {
   @apply cursor-pointer;
 }
 
-.planning-header .planning-title-button .planning-header-title {
+.planning-head .planning-title-button .planning-head-title {
   @apply w-full overflow-hidden text-ellipsis text-left;
 }
 
@@ -143,10 +143,14 @@
   @apply !font-bold text-suomenlinna;
 }
 
-.planning-header-deviation {
+.planning-head-deviation {
   @apply text-sm font-bold text-suomenlinna;
 }
 
-.planning-header-content-dots {
+.planning-head-content-dots {
   @apply mr-2 flex;
+}
+
+.planning-head .total-budgets {
+  @apply grid w-[5.5rem] grid-flow-row text-right;
 }

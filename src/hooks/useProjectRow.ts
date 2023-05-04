@@ -7,7 +7,7 @@ import {
   IProjectFinancesRequestObject,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
-import { formatNumber } from '@/utils/calculations';
+import { calculateProjectRowSums } from '@/utils/calculations';
 import { isInYearRange, isSameYear } from '@/utils/dates';
 import { useEffect, useState } from 'react';
 
@@ -219,30 +219,6 @@ const getProjectCells = (project: IProject) => {
   });
 
   return projectCells;
-};
-
-/**
- * Calculates the budget sums for a project row and returns the sums.
- *
- * @returns
- * - costEstimateBudget: the sum of all the project finances (cells visible in the current year)
- * - availableFrameBudget: the deviation between the projects total budget and the already spent budget from past years
- */
-export const calculateProjectRowSums = (project: IProject): IProjectSums => {
-  const { year, ...finances } = project.finances;
-  const { costForecast, spentBudget } = project;
-
-  const availableFrameBudget = Object.values(finances).reduce((accumulator, currentValue) => {
-    if (currentValue !== null) {
-      return accumulator + parseInt(currentValue);
-    }
-    return accumulator;
-  }, 0);
-
-  return {
-    availableFrameBudget: formatNumber(availableFrameBudget),
-    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
-  };
 };
 
 interface IProjectRowsState {

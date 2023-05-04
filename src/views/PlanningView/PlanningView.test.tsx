@@ -22,13 +22,13 @@ import { listItemToOption } from '@/utils/common';
 import { mockError } from '@/mocks/mockError';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { IClassFinances } from '@/interfaces/classInterfaces';
-import { calculateProjectRowSums } from '@/hooks/useProjectRow';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { getPlanningRowTitle } from '@/hooks/useSummaryRows';
 import {
   calculatePlanningCells,
   calculatePlanningRowSums,
   calculatePlanningSummaryCells,
+  calculateProjectRowSums,
 } from '@/utils/calculations';
 import { mockEventSource } from '@/mocks/mockEventSource';
 
@@ -286,10 +286,10 @@ describe('PlanningView', () => {
       expect(getByTestId('planning-summary-planned-budget-row')).toBeInTheDocument();
       expect(getByTestId('planning-summary-realized-budget-row')).toBeInTheDocument();
 
-      const cells = calculatePlanningSummaryCells(masterClasses);
+      const cells = calculatePlanningSummaryCells(masterClasses, 'masterClass');
       cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
-        expect(getByTestId(`summary-budget-${key}`)).toHaveTextContent(plannedBudget);
-        expect(getByTestId(`summary-frame-${key}`)).toHaveTextContent(frameBudget);
+        expect(getByTestId(`summary-budget-${key}`)).toHaveTextContent(plannedBudget || '');
+        expect(getByTestId(`summary-frame-${key}`)).toHaveTextContent(frameBudget || '');
         expect(getByTestId(`summary-deviation-${key}`)).toHaveTextContent(deviation?.value || '');
       });
     });
@@ -302,12 +302,12 @@ describe('PlanningView', () => {
 
       await user.click(getByTestId(`expand-${masterClassId}`));
 
-      const cells = calculatePlanningCells(finances);
+      const cells = calculatePlanningCells(finances, 'class');
 
       await waitFor(() => {
         cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
           expect(getByTestId(`summary-budget-${key}`)).toHaveTextContent(plannedBudget || '');
-          expect(getByTestId(`summary-frame-${key}`)).toHaveTextContent(frameBudget);
+          expect(getByTestId(`summary-frame-${key}`)).toHaveTextContent(frameBudget || '');
           expect(getByTestId(`summary-deviation-${key}`)).toHaveTextContent(deviation?.value || '');
         });
       });
@@ -362,8 +362,10 @@ describe('PlanningView', () => {
         );
 
         expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-        expect(getByTestId(`planned-budgets-${id}`)).toHaveTextContent(plannedBudgets);
-        expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
+        expect(getByTestId(`planned-budgets-${id}`)).toHaveTextContent(plannedBudgets || '');
+        expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(
+          costEstimateBudget || '',
+        );
         if (!isGroup) {
           expect(getByTestId(`deviation-${id}`)).toHaveTextContent(deviation?.value || '');
         }
@@ -663,14 +665,14 @@ describe('PlanningView', () => {
         const firstCell = getByTestId(`row-${id}`).children[1];
         const year = new Date().getFullYear();
 
-        const cells = calculatePlanningCells(finances);
+        const cells = calculatePlanningCells(finances, 'class');
 
         const { plannedBudget, frameBudget, deviation } = cells[0];
 
         expect(firstCell.children[0].children.length).toBe(3);
 
         expect(getByTestId(`planned-budget-${id}-${year}`)).toHaveTextContent(plannedBudget || '0');
-        expect(getByTestId(`frame-budget-${id}-${year}`)).toHaveTextContent(frameBudget);
+        expect(getByTestId(`frame-budget-${id}-${year}`)).toHaveTextContent(frameBudget || '0');
         expect(getByTestId(`deviation-${id}-${year}`)).toHaveTextContent(deviation?.value || '0');
       });
     });

@@ -146,7 +146,7 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       defaultExpanded,
       children: [],
       projectRows,
-      cells: calculatePlanningCells(item.finances),
+      cells: calculatePlanningCells(item.finances, type),
       ...calculatePlanningRowSums(item.finances, type),
     };
   };
@@ -406,11 +406,11 @@ const usePlanningRows = () => {
 
   // Listen to finance-update and project-update events to update the list
   useEffect(() => {
-    eventSource.onerror = () => {
-      console.log('Error opening a connection to events');
+    eventSource.onerror = (e) => {
+      console.log('Error opening a connection to events: ', e);
     };
-    eventSource.onopen = () => {
-      console.log('Connection to events opened');
+    eventSource.onopen = (e) => {
+      console.log('Listening to finance-update and project-update events: ', e);
     };
 
     const updateState = async (dataString: string) => {

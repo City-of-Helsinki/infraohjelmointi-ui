@@ -2,13 +2,13 @@ import { IPlanningCell, IPlanningRowLists, IPlanningRowSelections } from '@/inte
 import { useEffect, useState } from 'react';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
 
-interface IPlanningSummaryHeaderCell {
+interface IPlanningSummaryHeadCell {
   year: number;
   title: string;
 }
 
 interface IPlanningSummaryTableState {
-  header: Array<IPlanningSummaryHeaderCell>;
+  header: Array<IPlanningSummaryHeadCell>;
   cells: Array<IPlanningCell>;
 }
 
@@ -26,12 +26,15 @@ export const getPlanningRowTitle = (index: number) => {
   }
 };
 
-const buildPlanningSummaryHeaderRow = (startYear: number) => {
-  const header: Array<IPlanningSummaryHeaderCell> = [];
+/**
+ * Creates 11 head-cells starting from the given startYear param.
+ */
+const buildPlanningSummaryHeadCells = (startYear: number) => {
+  const cells = [];
   for (let i = 0; i < 11; i++) {
-    header.push({ year: startYear + i, title: getPlanningRowTitle(i) });
+    cells.push({ year: startYear + i, title: getPlanningRowTitle(i) });
   }
-  return { header };
+  return cells;
 };
 
 interface IUseSummaryRowsParams {
@@ -57,22 +60,28 @@ const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams)
     if (startYear) {
       setPlanningSummaryRows((current) => ({
         ...current,
-        ...buildPlanningSummaryHeaderRow(startYear),
+        header: buildPlanningSummaryHeadCells(startYear),
       }));
     }
   }, [startYear]);
 
-  // Listens to the selectedMasterClass and either populates the cells with the masterClasses data or empty
+  /**
+   * Listens to the selectedMasterClass and selectedSubClass and populates the cells with budgets.
+   *
+   * - if no there is no selectedMasterClass all masterClass budgets will be summed and populated
+   * - if there is a selectedMasterClass then that masterClasses budgets will be populated
+   * - if there is a selectedSubClass then its parentClass will be populated
+   */
   useEffect(() => {
     if (selectedSubClass) {
       setPlanningSummaryRows((current) => ({
         ...current,
-        cells: calculatePlanningSummaryCells(classes),
+        cells: calculatePlanningSummaryCells(classes, 'class'),
       }));
     } else {
       setPlanningSummaryRows((current) => ({
         ...current,
-        cells: calculatePlanningSummaryCells(masterClasses),
+        cells: calculatePlanningSummaryCells(masterClasses, 'masterClass'),
       }));
     }
   }, [selectedMasterClass, selectedSubClass, classes, masterClasses]);

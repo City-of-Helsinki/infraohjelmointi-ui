@@ -33,17 +33,16 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     handleExpand();
   }, [handleExpand, link, navigate]);
 
-  const displayBudgets = type !== 'division';
-
   return (
-    <th className={`planning-header ${type}`} data-testid={`head-${id}`}>
+    <th className={`planning-head ${type}`} data-testid={`head-${id}`}>
       <div className="flex w-full justify-between">
-        <div className="planning-header-content">
+        {/* Title and icons */}
+        <div className="planning-head-content">
           <button className="flex" data-testid={`expand-${id}`} onClick={onExpand}>
             {angleIcon}
           </button>
-          {displayBudgets && (
-            <div className={`planning-header-content-dots`} data-testid={`show-more-${id}`}>
+          {type !== 'division' && (
+            <div className={`planning-head-content-dots`} data-testid={`show-more-${id}`}>
               <IconMenuDots size="s" />
             </div>
           )}
@@ -53,26 +52,23 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               onClick={onExpand}
               data-testid={`title-${id}`}
             >
-              <span className="planning-header-title">{name}</span>
+              <span className="planning-head-title">{name}</span>
             </button>
             <NameTooltip value={name} id={id} />
           </div>
         </div>
-        {displayBudgets && (
-          <div className="grid w-[5.5rem] grid-flow-row text-right">
-            <span className="text-base" data-testid={`planned-budgets-${id}`}>
-              {plannedBudgets}
-            </span>
-            <span className="text-sm font-normal" data-testid={`cost-estimate-budget-${id}`}>
-              {costEstimateBudget}
-            </span>
-            {deviation !== undefined && (
-              <span className="planning-header-deviation" data-testid={`deviation-${id}`}>
-                {deviation.value}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Budgets */}
+        <div className="total-budgets">
+          <span className="text-base" data-testid={`planned-budgets-${id}`}>
+            {plannedBudgets}
+          </span>
+          <span className="text-sm font-normal" data-testid={`cost-estimate-budget-${id}`}>
+            {costEstimateBudget}
+          </span>
+          <span className="planning-head-deviation" data-testid={`deviation-${id}`}>
+            {deviation?.value}
+          </span>
+        </div>
       </div>
     </th>
   );
