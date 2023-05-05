@@ -2,8 +2,7 @@ import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfa
 import { IPlanningCell, IPlanningSums, IProjectSums, PlanningRowType } from '@/interfaces/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 
-export const formatNumber = (number: number | undefined) =>
-  number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') ?? '0';
+export const formatNumber = (number: number | undefined) => number?.toLocaleString('fi-FI') ?? '0';
 
 /**
  * Calculates the budgets for the current row. Returns nothing for a division and no deviation for groups.
