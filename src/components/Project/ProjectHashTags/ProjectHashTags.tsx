@@ -158,10 +158,12 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
             id: projectId,
           }),
-        ).then(() => {
-          toggleOpenDialog(e);
-          onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
-        });
+        )
+          .then(() => {
+            onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
+            toggleOpenDialog(e);
+          })
+          .catch(Promise.reject);
       },
       [dispatch, hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
     );
