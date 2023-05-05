@@ -300,11 +300,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     setIsReadOnly((current) => !current);
   }, []);
 
-  // Make sure the budget is always at least 0 and remove the first 0 if the user types a number in the field
+  // Removes the zero value on change if there is only one zero in the value
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value === '00') {
+    // If value is greater than 1 and starts with a zero, let the value be
+    if (/^0.{2,}$/.exec(e.target.value)) {
       setFormValue(e.target.value);
-    } else {
+    }
+    // If value is just a zero replace it
+    else {
       setFormValue(e.target.value ? +e.target.value : 0);
     }
   }, []);
