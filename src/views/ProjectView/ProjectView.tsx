@@ -25,7 +25,7 @@ const ProjectView = () => {
     } else {
       navigate('/planning');
     }
-  }, [dispatch, projectId]);
+  }, [projectId]);
 
   const navItems: Array<INavigationItem> = [
     { route: 'basics', label: t('basicInfo'), component: <ProjectBasics /> },

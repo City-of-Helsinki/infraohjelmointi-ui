@@ -6,6 +6,7 @@ type EventMessage = {
 
 let singleton: EventSourceMock;
 let listeners: { [key: string]: any };
+
 export default class EventSourceMock {
   constructor() {
     if (!singleton) {
@@ -36,10 +37,7 @@ export default class EventSourceMock {
 }
 
 export const mockEventSource = () => {
-  console.log('mocking event source');
   Object.defineProperty(window, 'EventSource', {
     value: EventSourceMock,
   });
-
-  console.log('after event source mocked', window);
 };

@@ -429,6 +429,7 @@ const usePlanningRows = () => {
 
     const updateProject = (dataString: string) => {
       const projectToUpdate = (JSON.parse(dataString) as IProjectEventData).project;
+
       setPlanningRowsState((current) => ({
         ...current,
         projectToUpdate,
