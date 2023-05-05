@@ -35,8 +35,9 @@
   "scripts": {
     "start": "PORT=4000 craco start",
     "build": "craco build",
-    "test": "react-scripts test",
-    "test:coverage": "yarn test --coverage .",
+    "test": "react-scripts test --env=jsdom",
+    "test:coverage": "yarn test --coverage",
+    "test:ci": "CI=true yarn test:coverage --ci",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}'",
     "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc.json",
@@ -54,6 +55,9 @@
     ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "transform": {
+      "^.+\\.tsx?$": "esbuild-jest"
     }
   },
   "browserslist": {
@@ -75,6 +79,8 @@
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "css-loader": "^6.7.1",
+    "esbuild": "^0.17.18",
+    "esbuild-jest": "^0.5.0",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.5.2",
