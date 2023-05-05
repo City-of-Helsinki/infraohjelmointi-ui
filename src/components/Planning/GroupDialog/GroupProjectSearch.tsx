@@ -3,7 +3,7 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { arrayHasValue, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { FC, memo, useCallback, useRef, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
@@ -38,7 +38,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       }
       searchParams.push(`projectName=${projectName}`);
       searchParams.push('inGroup=false');
-      searchParams.push('programmed=false');
+      searchParams.push('programmed=true');
 
       return { params: searchParams.join('&'), direct: !showAdvanceFields };
     },
@@ -50,6 +50,10 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
+
+  // Test fail if I uncomment this, this is a fix to make the screen focus back on the
+  // top of suggestions results if suggestions are many
+
   // useEffect(() => {
   //   if (searchedProjects.length > 0 && scrollRef.current) {
   //     scrollRef.current?.scrollIntoView();

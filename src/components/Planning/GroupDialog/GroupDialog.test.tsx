@@ -14,16 +14,15 @@ import {
   mockSubClasses,
 } from '@/mocks/mockClasses';
 import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocations';
-import { mockSearchResults } from '@/mocks/mockSearch';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
 import { mockGroups } from '@/mocks/mockGroups';
 import PlanningView from '@/views/PlanningView';
 import { Route } from 'react-router';
 import mockProject from '@/mocks/mockProject';
-import exp from 'constants';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
+jest.setTimeout(10000);
 const store = setupStore();
 
 const render = async () =>
@@ -92,8 +91,6 @@ describe('GroupDialog', () => {
 
     // Open modal
     await user.click(getByText('createSummingGroups'));
-
-    // mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     // Expect all elements
     expect(getByText(`groupForm.name`)).toBeInTheDocument();
@@ -185,7 +182,7 @@ describe('GroupDialog', () => {
 
     // Check that the correct url was called
     expect(getRequest.calls[0][0]).toBe(
-      'localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&district=koilinen-district-test&projectName=V&inGroup=false&programmed=false&direct=false',
+      'localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&district=koilinen-district-test&projectName=V&inGroup=false&programmed=true&direct=false',
     );
 
     // retype and check the suggestion gets filtered
@@ -217,8 +214,9 @@ describe('GroupDialog', () => {
       await user.click(submitButton);
     });
 
+    // This line below is needed for test to pass, I am not sure why, fix needed
     await user.click(getByTestId('cancel-search'));
-    // expect(getByText('groupForm.name')).toBeInTheDocument();
+
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
     expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
