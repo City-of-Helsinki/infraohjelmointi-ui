@@ -113,7 +113,7 @@ describe('GroupDialog', () => {
     expect(getByRole('button', { name: 'cancel' }));
   });
 
-  it.only('can create new group with the groups form', async () => {
+  it('can create new group with the groups form', async () => {
     const renderResult = await render();
     const mockPostResponse = {
       data: {
@@ -220,6 +220,7 @@ describe('GroupDialog', () => {
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
     expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
+    expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
     // Check if the planning view has navigated to correct subclass/district
     // Checking if district header exists, meaning we are in the correct district balk
     expect(getByTestId(`head-${mockPostResponse.data.locationRelation}`)).toBeInTheDocument();
