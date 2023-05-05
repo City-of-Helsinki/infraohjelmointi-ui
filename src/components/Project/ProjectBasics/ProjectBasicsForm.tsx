@@ -108,7 +108,12 @@ const ProjectBasicsForm: FC = () => {
             rules={{ required: t('required', { value: 'Kuvaus' }) || '' }}
             formSaved={formSaved}
           />
-          <ProjectHashTags {...formProps('hashTags')} control={control} />
+          <ProjectHashTags
+            name="hashTags"
+            label={'projectBasicsForm.hashTags'}
+            control={control}
+            project={project}
+          />
           {/* SECTION 2 - STATUS */}
           <FormSectionTitle {...formProps('status')} />
           <SelectField
