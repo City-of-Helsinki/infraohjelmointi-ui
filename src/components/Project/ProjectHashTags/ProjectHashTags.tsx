@@ -152,15 +152,16 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
 
     // Submit hashTagsForSubmit and close the dialog
     const onSubmit = useCallback(
-      async (e: MouseEvent<HTMLButtonElement>) => {
-        await dispatch(
+      (e: MouseEvent<HTMLButtonElement>) => {
+        dispatch(
           patchProjectThunk({
             data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
             id: projectId,
           }),
-        );
-        toggleOpenDialog(e);
-        onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
+        ).then(() => {
+          toggleOpenDialog(e);
+          onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
+        });
       },
       [dispatch, hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
     );
