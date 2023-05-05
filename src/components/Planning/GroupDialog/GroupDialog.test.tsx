@@ -20,6 +20,7 @@ import { mockGroups } from '@/mocks/mockGroups';
 import PlanningView from '@/views/PlanningView';
 import { Route } from 'react-router';
 import mockProject from '@/mocks/mockProject';
+import exp from 'constants';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -199,7 +200,7 @@ describe('GroupDialog', () => {
     });
     expect(submitButton).toBeEnabled();
 
-    // mock get request called by usePLanningRows hook to rebuild rows after the submit button takes user to the planning view under the subclass/district
+    // mock get request made by usePLanningRows to rebuild the row under selected district/location
     mockedAxios.get.mockResolvedValueOnce({
       data: {
         results: [
@@ -211,12 +212,13 @@ describe('GroupDialog', () => {
         count: 1,
       },
     });
-
+    // waiting for user to be navigated to correct class/district in planning view
     await waitFor(async () => {
       await user.click(submitButton);
     });
 
-    await user.type(getByText('groupForm.name'), 'test-group');
+    await user.click(getByTestId('cancel-search'));
+    // expect(getByText('groupForm.name')).toBeInTheDocument();
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
     expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
