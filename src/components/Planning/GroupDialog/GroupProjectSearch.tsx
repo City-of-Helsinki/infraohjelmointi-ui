@@ -13,24 +13,36 @@ interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
   control: Control<IGroupForm, any>;
   showAdvanceFields: boolean;
+  divisions: IOption[];
 }
 
-const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showAdvanceFields }) => {
+const GroupProjectSearch: FC<IProjectSearchProps> = ({
+  getValues,
+  control,
+  showAdvanceFields,
+  divisions,
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const buildQueryParamString = useCallback(
     (projectName: string): IProjectSearchRequest => {
-      const searchParams = Object.entries(getValues())
-        .filter(([_, value]) => value?.value)
-        .map(([key, value]) => `${key}=${value.value}`);
+      const searchParams = [];
 
+      searchParams.push(`subClass=${getValues('subClass').value}`);
+      if (getValues('subDivision').value) {
+        searchParams.push(`subDivision=${getValues('subDivision').value}`);
+      } else if (getValues('division').value) {
+        searchParams.push(`division=${getValues('division').value}`);
+      } else if (getValues('district').value) {
+        searchParams.push(`district=${getValues('district').value}`);
+      }
       searchParams.push(`projectName=${projectName}`);
       searchParams.push('inGroup=false');
-      searchParams.push('programmed=true');
+      searchParams.push('programmed=false');
 
-      return { params: searchParams.join('&'), direct: false };
+      return { params: searchParams.join('&'), direct: !showAdvanceFields };
     },
-    [getValues],
+    [getValues, showAdvanceFields],
   );
 
   const { t } = useTranslation();
@@ -48,9 +60,9 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
     (inputValue: string) => {
       if (
         (showAdvanceFields &&
-          ((!getValues('division')?.value && !getValues('subClass')?.value) ||
-            (getValues('division')?.value && !getValues('subClass')?.value) ||
-            (!getValues('division')?.value && getValues('subClass')?.value))) ||
+          (!getValues('district')?.value ||
+            (divisions.length > 0 && !getValues('division')?.value) ||
+            !getValues('subClass')?.value)) ||
         (!showAdvanceFields && !getValues('subClass')?.value)
       ) {
         return Promise.resolve([]);
@@ -58,7 +70,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
       return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
         // printing out search params for later
         const queryParams = buildQueryParamString(inputValue);
-
         getProjectsWithParams(queryParams)
           .then((res) => {
             const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
@@ -79,7 +90,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control, showA
           .catch(() => reject([]));
       });
     },
-    [getValues, showAdvanceFields, buildQueryParamString],
+    [getValues, showAdvanceFields, buildQueryParamString, divisions],
   );
 
   const handleSubmit = useCallback(

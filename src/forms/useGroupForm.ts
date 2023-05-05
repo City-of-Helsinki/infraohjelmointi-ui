@@ -52,6 +52,10 @@ const useGroupForm = () => {
           if(value[name]?.value) setSelections((current) => ({ ...current, selectedClass: value[name]?.value }));
           if(name==='masterClass') setValue('class', { label: '', value: '' })
           if(name==='masterClass' || name==='class') setValue('subClass', { label: '', value: '' })
+          setValue('district',{ label: '', value: '' })
+          setValue('division', { label: '', value: '' })
+          setValue('subDivision', { label: '', value: '' })
+          setValue('projectsForSubmit',[])
           break;
         case 'district':
         case 'division':
@@ -59,6 +63,7 @@ const useGroupForm = () => {
           if(value[name]?.value) setSelections((current) => ({ ...current, selectedLocation: value[name]?.value }));
           if(name==='district') setValue('division', { label: '', value: '' })
           if(name==='district' || name==='division') setValue('subDivision', { label: '', value: '' })
+          setValue('projectsForSubmit',[])
           break;
         default:
       }

@@ -49,7 +49,10 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-
+  const handleDialogClose = useCallback(() => {
+    setShowAdvanceFields(false);
+    handleClose();
+  }, [handleClose]);
   const onSubmit = useCallback(
     async (form: IGroupForm) => {
       dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
@@ -60,7 +63,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
       });
     },
 
-    [dispatch, reset, formValues],
+    [dispatch, reset, formValues, handleDialogClose, navigate],
   );
 
   const toggleAdvanceFields = useCallback(
@@ -77,10 +80,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
   const { Header, Content, ActionButtons } = Dialog;
 
-  const handleDialogClose = useCallback(() => {
-    setShowAdvanceFields(false);
-    handleClose();
-  }, [handleClose]);
   const formProps = useCallback(
     (name: string) => ({
       name: name,
@@ -222,6 +221,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                   getValues={getValues}
                   control={control}
                   showAdvanceFields={showAdvanceFields}
+                  divisions={locationOptions.divisions}
                 />
               </div>
             </div>
