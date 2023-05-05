@@ -55,16 +55,18 @@ const ProjectBasicsForm: FC = () => {
   }, []);
 
   const onSubmit = useCallback(
-    (form: IProjectBasicsForm) => {
+    async (form: IProjectBasicsForm) => {
+      if (!project?.id) {
+        return;
+      }
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      project?.id &&
-        dispatch(patchProjectThunk({ id: project.id, data })).then((res) => {
-          // Set form saved to true if action is successfull, queue it to false async
-          handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
-          setTimeout(() => {
-            handleSetFormSaved(false);
-          }, 0);
-        });
+      await dispatch(patchProjectThunk({ id: project.id, data })).then((res) => {
+        // Set form saved to true if action is successfull, queue it to false async
+        handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
+        setTimeout(() => {
+          handleSetFormSaved(false);
+        }, 0);
+      });
     },
     [dirtyFields, project?.id, dispatch, handleSetFormSaved],
   );
