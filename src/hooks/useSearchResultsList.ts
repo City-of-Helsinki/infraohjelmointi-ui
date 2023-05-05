@@ -4,18 +4,29 @@ import { selectAllClasses } from '@/reducers/classSlice';
 import { selectSearchResults } from '@/reducers/searchSlice';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from './common';
+import { ILocation } from '@/interfaces/locationInterfaces';
+import { selectDistricts } from '@/reducers/locationSlice';
 
-const buildBreadCrumbs = (path: string, classes: Array<IClass>): Array<string> =>
-  path.split('/').map((p) => classes.find((c) => c.id === p)?.name ?? '');
+const buildBreadCrumbs = (
+  path: string,
+  classes: Array<IClass>,
+  districts: Array<ILocation>,
+): Array<string> =>
+  path
+    .split('/')
+    .map(
+      (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
+    );
 
 const buildSearchResultsList = (
   searchResults: Array<ISearchResultPayloadItem>,
   classes: Array<IClass>,
+  districts: Array<ILocation>,
 ): Array<ISearchResultListItem> => {
   const parsedResults = searchResults.map((r) => ({
     ...r,
     phase: r.phase?.value ?? null,
-    breadCrumbs: buildBreadCrumbs(r.path, classes),
+    breadCrumbs: buildBreadCrumbs(r.path, classes, districts),
   }));
 
   return parsedResults;
@@ -29,12 +40,13 @@ const buildSearchResultsList = (
  */
 const useSearchResultsList = () => {
   const classes = useAppSelector(selectAllClasses);
+  const districts = useAppSelector(selectDistricts);
   const { results, next, previous, count } = useAppSelector(selectSearchResults);
   const [searchResultsList, setSearchResultsList] = useState<Array<ISearchResultListItem>>([]);
 
   useEffect(() => {
     if (results) {
-      setSearchResultsList(buildSearchResultsList(results, classes));
+      setSearchResultsList(buildSearchResultsList(results, classes, districts));
     }
   }, [classes, results]);
 
