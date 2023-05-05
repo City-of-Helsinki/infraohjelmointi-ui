@@ -190,7 +190,7 @@ const useProjectBasicsForm = () => {
     if (project) {
       reset(formValues);
     }
-  }, [project, formValues]);
+  }, [project]);
 
   // formFields,
   return { formMethods, classOptions, locationOptions };
