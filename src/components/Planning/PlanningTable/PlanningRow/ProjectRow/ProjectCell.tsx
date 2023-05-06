@@ -283,17 +283,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   );
 
   const updateCell = useCallback(
-    async (req: IProjectRequest) => {
+    (req: IProjectRequest) => {
       if (req.finances && Object.keys(req.finances).length === 1) {
         delete req.finances;
       }
-      await patchProject({
+      patchProject({
         id,
         data: { ...req },
-      }).catch((e) => {
-        console.log('error patching project: ', e);
-        return Promise.reject;
-      });
+      }).catch(Promise.reject);
     },
     [id],
   );
@@ -319,22 +316,22 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   const handleBlur = useCallback(async () => {
     setIsReadOnly((current) => !current);
     if (formValue !== parseInt(budget || '0')) {
-      await updateCell({
+      updateCell({
         finances: {
           year: 2023,
           [financeKey]: formValue,
         },
-      }).catch(Promise.reject);
+      });
     }
   }, [formValue, budget, updateCell, financeKey]);
 
   const onRemoveCell = useCallback(async () => {
-    await updateCell(getRemoveRequestData(cell)).catch(Promise.reject);
+    updateCell(getRemoveRequestData(cell));
   }, [updateCell, cell]);
 
   const onAddYear = useCallback(
     async (direction: ProjectCellGrowDirection) => {
-      await updateCell(getAddRequestData(direction, cell)).catch(Promise.reject);
+      updateCell(getAddRequestData(direction, cell));
     },
     [updateCell, cell],
   );
@@ -343,7 +340,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     async (direction: ProjectCellGrowDirection) => {
       const { isStartOfTimeline, isEndOfTimeline } = cell;
       if (isStartOfTimeline || isEndOfTimeline) {
-        await updateCell(getMoveTimelineRequestData(cell, direction)).catch(Promise.reject);
+        await updateCell(getMoveTimelineRequestData(cell, direction));
       }
     },
     [cell, updateCell],
