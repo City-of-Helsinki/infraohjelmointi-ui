@@ -283,13 +283,16 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   );
 
   const updateCell = useCallback(
-    (req: IProjectRequest) => {
+    async (req: IProjectRequest) => {
       if (req.finances && Object.keys(req.finances).length === 1) {
         delete req.finances;
       }
-      patchProject({
+      await patchProject({
         id,
         data: { ...req },
+      }).catch((e) => {
+        console.log('error patching project: ', e);
+        return Promise.reject;
       });
     },
     [id],
@@ -313,34 +316,34 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   }, []);
 
   // Blurring the input field will patch the current budget
-  const handleBlur = useCallback(() => {
+  const handleBlur = useCallback(async () => {
     setIsReadOnly((current) => !current);
     if (formValue !== parseInt(budget || '0')) {
-      updateCell({
+      await updateCell({
         finances: {
           year: 2023,
           [financeKey]: formValue,
         },
-      });
+      }).catch(Promise.reject);
     }
   }, [formValue, budget, updateCell, financeKey]);
 
-  const onRemoveCell = useCallback(() => {
-    updateCell(getRemoveRequestData(cell));
+  const onRemoveCell = useCallback(async () => {
+    await updateCell(getRemoveRequestData(cell)).catch(Promise.reject);
   }, [updateCell, cell]);
 
   const onAddYear = useCallback(
-    (direction: ProjectCellGrowDirection) => {
-      updateCell(getAddRequestData(direction, cell));
+    async (direction: ProjectCellGrowDirection) => {
+      await updateCell(getAddRequestData(direction, cell)).catch(Promise.reject);
     },
     [updateCell, cell],
   );
 
   const onMoveTimeline = useCallback(
-    (direction: ProjectCellGrowDirection) => {
+    async (direction: ProjectCellGrowDirection) => {
       const { isStartOfTimeline, isEndOfTimeline } = cell;
       if (isStartOfTimeline || isEndOfTimeline) {
-        updateCell(getMoveTimelineRequestData(cell, direction));
+        await updateCell(getMoveTimelineRequestData(cell, direction)).catch(Promise.reject);
       }
     },
     [cell, updateCell],

@@ -19,9 +19,9 @@ const ProjectView = () => {
 
   useEffect(() => {
     if (projectId) {
-      dispatch(getProjectThunk(projectId)).then(
-        (res) => res.type.includes('rejected') && navigate('/not-found'),
-      );
+      dispatch(getProjectThunk(projectId))
+        .then((res) => res.type.includes('rejected') && navigate('/not-found'))
+        .catch(Promise.reject);
     } else {
       navigate('/planning');
     }

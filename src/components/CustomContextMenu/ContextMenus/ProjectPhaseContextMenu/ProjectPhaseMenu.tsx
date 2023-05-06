@@ -24,7 +24,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
     setSelectedPhase(nextPhase);
   }, []);
 
-  const onSubmit = useCallback(async () => {
+  const onSubmit = useCallback(() => {
     onSubmitPhase({ phase: selectedPhase });
     onCloseMenu();
   }, [onCloseMenu, onSubmitPhase, selectedPhase]);

@@ -43,7 +43,7 @@ const App: FC = () => {
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
-    initalizeStates();
+    initalizeStates().catch(Promise.reject);
   }, []);
 
   return (

@@ -322,12 +322,14 @@ const usePlanningRows = () => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id).then((projects) => {
-        setPlanningRowsState((current) => ({
-          ...current,
-          rows: buildPlanningTableRows(planningRowsState, projects),
-        }));
-      });
+      fetchProjectsByRelation(type as PlanningRowType, id)
+        .then((projects) => {
+          setPlanningRowsState((current) => ({
+            ...current,
+            rows: buildPlanningTableRows(planningRowsState, projects),
+          }));
+        })
+        .catch(Promise.reject);
     } else {
       setPlanningRowsState((current) => ({
         ...current,
@@ -340,12 +342,14 @@ const usePlanningRows = () => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id).then((projects) => {
-        setPlanningRowsState((current) => ({
-          ...current,
-          projects,
-        }));
-      });
+      fetchProjectsByRelation(type as PlanningRowType, id)
+        .then((projects) => {
+          setPlanningRowsState((current) => ({
+            ...current,
+            projects,
+          }));
+        })
+        .catch(Promise.reject);
     }
   }, [selections]);
 
