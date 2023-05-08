@@ -55,9 +55,6 @@
     ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
-    },
-    "transform": {
-      "^.+\\.tsx?$": "esbuild-jest"
     }
   },
   "browserslist": {
@@ -79,8 +76,6 @@
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "css-loader": "^6.7.1",
-    "esbuild": "^0.17.18",
-    "esbuild-jest": "^0.5.0",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.5.2",
