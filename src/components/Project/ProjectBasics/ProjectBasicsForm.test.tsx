@@ -19,8 +19,8 @@ import {
   mockResponsibleZones,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
-import { act } from 'react-dom/test-utils';
-import { screen, waitFor } from '@testing-library/react';
+
+import { waitFor, act, within } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
@@ -75,24 +75,24 @@ describe('ProjectBasicsForm', () => {
   });
 
   it('renders the component wrappers', async () => {
-    const { getByTestId } = await render();
+    const { findByTestId } = await render();
 
-    expect(getByTestId('project-basics-form')).toBeInTheDocument();
+    expect(await findByTestId('project-basics-form')).toBeInTheDocument();
   });
 
   it('fills the fields with existing project data', async () => {
-    const { getByDisplayValue, getByText, getByTestId } = await render();
+    const { findByDisplayValue, findByText, findByTestId } = await render();
 
     const project = mockProject.data;
     const euroFormat = (value: string) => `${value} €`;
-    const expectDisplayValue = (value: string | undefined) =>
-      expect(getByDisplayValue(matchExact(value || ''))).toBeInTheDocument();
-    const expectOption = (option: string | undefined) =>
-      expect(getByText(`enums.${option || ''}`)).toBeInTheDocument();
-    const expectRadioBoolean = (testId: string, value: boolean) =>
-      expect((getByTestId(testId) as HTMLInputElement).checked).toBe(value);
-    const expectPersonOption = (person: IPerson) =>
-      expect(getByText(`${person.firstName} ${person.lastName}`)).toBeInTheDocument();
+    const expectDisplayValue = async (value: string | undefined) =>
+      expect(await findByDisplayValue(matchExact(value || ''))).toBeInTheDocument();
+    const expectOption = async (option: string | undefined) =>
+      expect(await findByText(`enums.${option || ''}`)).toBeInTheDocument();
+    const expectRadioBoolean = async (testId: string, value: boolean) =>
+      expect(((await findByTestId(testId)) as HTMLInputElement).checked).toBe(value);
+    const expectPersonOption = async (person: IPerson) =>
+      expect(await findByText(`${person.firstName} ${person.lastName}`)).toBeInTheDocument();
 
     expectOption(project?.area?.value);
     expectOption(project?.type?.value);
@@ -109,12 +109,12 @@ describe('ProjectBasicsForm', () => {
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);
     expectRadioBoolean('effectHousing-0', false);
-    expect(getByText(euroFormat(project?.budget || ''))).toBeInTheDocument();
-    expect(getByText(euroFormat(project?.realizedCost || ''))).toBeInTheDocument();
-    expect(getByText(euroFormat(project?.comittedCost || ''))).toBeInTheDocument();
-    expect(getByText(euroFormat(project?.spentCost || ''))).toBeInTheDocument();
-    expect(getByText('overrunRightValue' || '')).toBeInTheDocument();
-    expect(getByText(`${project?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();
+    expect(await findByText(euroFormat(project?.budget || ''))).toBeInTheDocument();
+    expect(await findByText(euroFormat(project?.realizedCost || ''))).toBeInTheDocument();
+    expect(await findByText(euroFormat(project?.comittedCost || ''))).toBeInTheDocument();
+    expect(await findByText(euroFormat(project?.spentCost || ''))).toBeInTheDocument();
+    expect(await findByText('overrunRightValue' || '')).toBeInTheDocument();
+    expect(await findByText(`${project?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();
     expectDisplayValue(project?.description);
     expectDisplayValue(project?.entityName);
     expectDisplayValue(project?.hkrId);
@@ -139,20 +139,20 @@ describe('ProjectBasicsForm', () => {
     const projectHashTags = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(project?.hashTags, h.id),
     );
-    projectHashTags?.forEach((h) => {
-      expect(getByText(matchExact(h.value))).toBeInTheDocument();
+    projectHashTags?.forEach(async (h) => {
+      expect(await findByText(matchExact(h.value))).toBeInTheDocument();
     });
   });
 
   it('has all required fields as required', async () => {
-    const { getByText } = await render();
+    const { findByText } = await render();
 
-    expect(getByText('projectBasicsForm.type')).toBeInTheDocument();
-    expect(getByText('projectBasicsForm.description')).toBeInTheDocument();
+    expect(await findByText('projectBasicsForm.type')).toBeInTheDocument();
+    expect(await findByText('projectBasicsForm.description')).toBeInTheDocument();
   });
 
   it('renders hashTags modal and can search and patch hashTags', async () => {
-    const { getByText, getByRole, user, getAllByTestId, store } = await render();
+    const { findByText, findByRole, user, store } = await render();
 
     const expectedValues = [
       ...(mockProject.data.hashTags as Array<string>),
@@ -164,30 +164,37 @@ describe('ProjectBasicsForm', () => {
     };
 
     // Open modal
-    await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
+    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    const dialog = within(await findByRole('dialog'));
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     // Expect all elements
-    expect(getByText(`${project.name} - manageHashTags`)).toBeInTheDocument();
-    expect(getByText('projectHashTags')).toBeInTheDocument();
-    expect(getByText('popularHashTags')).toBeInTheDocument();
-    expect(getByText('addHashTagsToProject')).toBeInTheDocument();
-    expect(getByText('cantFindHashTag')).toBeInTheDocument();
-    expect(getByRole('button', { name: 'createNewHashTag' }));
-    expect(getAllByTestId('project-hashtags').length).toBe(2);
+    expect(await dialog.findByText(`${project.name} - manageHashTags`)).toBeInTheDocument();
+    expect(await dialog.findByText('projectHashTags')).toBeInTheDocument();
+    expect(await dialog.findByText('popularHashTags')).toBeInTheDocument();
+    expect(await dialog.findByText('addHashTagsToProject')).toBeInTheDocument();
+    expect(await dialog.findByText('cantFindHashTag')).toBeInTheDocument();
+
+    expect(await dialog.findByRole('button', { name: 'createNewHashTag' }));
+    expect((await dialog.findAllByTestId('project-hashtags')).length).toBe(2);
 
     // Search for a hashTag and click on the search result
-    await user.type(getByRole('combobox', { name: 'addHashTag' }), 'hul');
-    await waitFor(async () => await user.click(getByText('hulevesi')));
-    await user.click(getByRole('button', { name: matchExact('save') }));
+    await user.type(await dialog.findByRole('combobox', { name: 'addHashTag' }), 'hul');
+
+    await waitFor(async () => await user.click(await dialog.findByText('hulevesi')));
+
+    await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
+    await waitFor(() => expect(dialog).not.toBeInTheDocument);
 
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(expectedValues, h.id),
     );
 
     expect(hashTagsAfterSubmit.length).toBe(3);
-    hashTagsAfterSubmit.forEach((h) => expect(getByText(h.value)).toBeInTheDocument());
+    expect(await findByText('leikkipaikka')).toBeInTheDocument();
+    expect(await findByText('leikkipuisto')).toBeInTheDocument();
+    expect(await findByText('hulevesi')).toBeInTheDocument();
   });
 
   it('can create new hashtags with the hashtags form', async () => {
@@ -211,19 +218,32 @@ describe('ProjectBasicsForm', () => {
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
     mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
     mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
+    // after closing dialog
+    mockedAxios.get.mockResolvedValueOnce(mockPatchProjectResponse);
 
-    const { user, queryAllByText, getByTestId } = await render();
+    const { user, findByText, findByRole } = await render();
 
     // Open modal
-    await user.click(getByTestId('open-hash-tag-dialog-button'));
+    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    const dialog = within(await findByRole('dialog'));
 
     // Open the textbox and submit a new hashtag
-    await user.click(getByTestId('create-new-hash-tag-button').children[0]);
-    await user.type(getByTestId('hashTag').getElementsByTagName('input')[0], 'liikenne');
-    await user.click(getByTestId('create-hash-tag-button').children[0]);
+    await user.click((await dialog.findByTestId('create-new-hash-tag-button')).children[0]);
+    await user.type(
+      (await dialog.findByTestId('hashTag')).getElementsByTagName('input')[0],
+      'liikenne',
+    );
+    await user.click((await dialog.findByTestId('create-hash-tag-button')).children[0]);
 
     // Click the 'add to project' button to patch the project with the new hashtag
-    await user.click(getByTestId('add-new-hash-tag-to-project'));
+    await user.click(await dialog.findByTestId('add-new-hash-tag-to-project'));
+
+    await waitFor(() => {
+      const event = new KeyboardEvent('keydown', { key: 'Escape' });
+      document.dispatchEvent(event);
+      expect(dialog).not.toBeInTheDocument;
+    });
+
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IListItem;
 
     expect(formPostRequest.value).toEqual(mockPostResponse.data.value);
@@ -231,9 +251,10 @@ describe('ProjectBasicsForm', () => {
     const expectedHashTags = mockGetResponse.data.hashTags.filter((h) =>
       arrayHasValue(mockProject.data.hashTags, h.id),
     );
-    expectedHashTags.forEach((h) => {
-      return expect(queryAllByText(h.value)[0]).toBeInTheDocument();
-    });
+    expect(expectedHashTags.length).toBe(2);
+    expect(await findByText('leikkipaikka')).toBeInTheDocument();
+    expect(await findByText('leikkipuisto')).toBeInTheDocument();
+    expect(await findByText('liikenne')).toBeInTheDocument();
   });
 
   it('can use popular hashtags from the hashtags form', async () => {
@@ -248,37 +269,33 @@ describe('ProjectBasicsForm', () => {
     // Mock all needed requests, to be able to
     // PATCH the project with the popular hashtag
     mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
-
-    const { getByText, getByRole, user, queryByTestId, getAllByText } = await render();
+    const { findByText, findByRole, user } = await render();
 
     // Open modal
-    await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
+    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    const dialog = within(await findByRole('dialog'));
 
     // popular hashtag exists in the container
-    expect(getByText('raidejokeri')).toBeInTheDocument();
+    const raidejokeriHashTag = await dialog.findByText('raidejokeri');
+    expect(raidejokeriHashTag).toBeInTheDocument();
 
     // Click the popular hashtag
-    await user.click(getByText('raidejokeri'));
+    await user.click(raidejokeriHashTag);
+    expect(dialog.queryByTestId('popular-hashtags')).not.toHaveTextContent('raidejokeri');
 
-    // popular hashtag removed from the popular hashtags list
-
-    expect(queryByTestId('popular-hashtags')).not.toHaveTextContent('raidejokeri');
-
-    await user.click(getByRole('button', { name: matchExact('save') }));
+    await waitFor(
+      async () => await user.click(await dialog.findByRole('button', { name: 'save' })),
+    );
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(expectedValues, h.id),
     );
-
     expect(formPatchRequest.hashTags?.length).toBe(3);
-    hashTagsAfterSubmit.forEach((h) => expect(getByText(h.value)).toBeInTheDocument());
-
-    // Open modal
-    await user.click(getByRole('button', { name: matchExact('projectBasicsForm.hashTags') }));
-    // Reading the whole page
-    // 1 Instance in the project form & 1 Instance inside the modal under project hashtags
-    expect(getAllByText('raidejokeri').length).toBe(2);
+    expect(hashTagsAfterSubmit.length).toBe(3);
+    expect(await findByText('leikkipaikka')).toBeInTheDocument();
+    expect(await findByText('leikkipuisto')).toBeInTheDocument();
+    expect(await findByText('raidejokeri')).toBeInTheDocument();
   });
 
   it('can autosave patch a NumberField', async () => {
@@ -290,11 +307,11 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const { user, getByDisplayValue, getByTestId } = await render();
+    const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
-    const parentContainer = getByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-basics-form');
 
-    const hkrIdField = screen.getByRole('spinbutton', { name: getFormField('hkrId') });
+    const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
 
     await user.clear(hkrIdField);
     await user.type(hkrIdField, expectedValue);
@@ -302,7 +319,7 @@ describe('ProjectBasicsForm', () => {
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.hkrId).toEqual(expectedValue);
-    expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
+    expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
   it('can autosave patch a SelectField', async () => {
@@ -314,21 +331,21 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const { user, getByRole, getByText, getByTestId } = await render();
+    const { user, findByRole, findByText, findByTestId } = await render();
 
-    const parentContainer = getByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-basics-form');
 
-    await user.click(getByRole('button', { name: 'projectBasicsForm.area' }));
-    await user.click(getByText(matchExact('enums.lansisatama')));
+    await user.click(await findByRole('button', { name: 'projectBasicsForm.area' }));
+    await user.click(await findByText(matchExact('enums.lansisatama')));
     await user.click(parentContainer);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.area).toEqual(expectedValue.id);
-    expect(getByText(matchExact(expectedValue.value))).toBeInTheDocument();
+    expect(await findByText(matchExact(expectedValue.value))).toBeInTheDocument();
   });
 
   it('can autosave patch a DateField', async () => {
-    const { user, getByRole, getByDisplayValue, getByTestId } = await render();
+    const { user, findByRole, findByDisplayValue, findByTestId } = await render();
     const expectedValue = '13.12.2022';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -337,8 +354,10 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const parentContainer = getByTestId('project-basics-form');
-    const estPlanningStart = getByRole('textbox', { name: getFormField('estPlanningStart') });
+    const parentContainer = await findByTestId('project-basics-form');
+    const estPlanningStart = await findByRole('textbox', {
+      name: getFormField('estPlanningStart'),
+    });
 
     await user.clear(estPlanningStart);
     await user.type(estPlanningStart, expectedValue);
@@ -346,7 +365,7 @@ describe('ProjectBasicsForm', () => {
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.estPlanningStart).toEqual(expectedValue);
-    expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
+    expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
   it('can autosave patch a TextField', async () => {
@@ -358,10 +377,10 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const { user, getByDisplayValue, getByTestId } = await render();
+    const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
-    const descriptionField = screen.getByRole('textbox', { name: getFormField('description *') });
-    const parentContainer = getByTestId('project-basics-form');
+    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
+    const parentContainer = await findByTestId('project-basics-form');
 
     await user.clear(descriptionField);
     await user.type(descriptionField, expectedValue);
@@ -369,7 +388,7 @@ describe('ProjectBasicsForm', () => {
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.description).toEqual(expectedValue);
-    expect(getByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
+    expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
   it('can autosave patch a RadioCheckboxField', async () => {
@@ -381,10 +400,10 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const { user, getByTestId } = await render();
+    const { user, findByTestId } = await render();
 
-    const louhiField = getByTestId('louhi-0') as HTMLInputElement;
-    const parentContainer = getByTestId('project-basics-form');
+    const louhiField = (await findByTestId('louhi-0')) as HTMLInputElement;
+    const parentContainer = await findByTestId('project-basics-form');
 
     await user.click(louhiField);
     await user.click(parentContainer);

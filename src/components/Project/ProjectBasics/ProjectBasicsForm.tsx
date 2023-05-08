@@ -55,16 +55,18 @@ const ProjectBasicsForm: FC = () => {
   }, []);
 
   const onSubmit = useCallback(
-    (form: IProjectBasicsForm) => {
+    async (form: IProjectBasicsForm) => {
+      if (!project?.id) {
+        return;
+      }
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      project?.id &&
-        dispatch(patchProjectThunk({ id: project.id, data })).then((res) => {
-          // Set form saved to true if action is successfull, queue it to false async
-          handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
-          setTimeout(() => {
-            handleSetFormSaved(false);
-          }, 0);
-        });
+      await dispatch(patchProjectThunk({ id: project.id, data })).then((res) => {
+        // Set form saved to true if action is successfull, queue it to false async
+        handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
+        setTimeout(() => {
+          handleSetFormSaved(false);
+        }, 0);
+      });
     },
     [dirtyFields, project?.id, dispatch, handleSetFormSaved],
   );
@@ -89,7 +91,7 @@ const ProjectBasicsForm: FC = () => {
           <SelectField
             {...formProps('type')}
             options={types}
-            rules={{ required: t('required', { value: 'Hankkeen tyyppi' }) || '' }}
+            rules={{ required: t('required', { value: 'Hankkeen tyyppi' }) ?? '' }}
           />
           <NumberField
             {...formProps('hkrId')}
@@ -105,15 +107,20 @@ const ProjectBasicsForm: FC = () => {
           <TextAreaField
             {...formProps('description')}
             size="l"
-            rules={{ required: t('required', { value: 'Kuvaus' }) || '' }}
+            rules={{ required: t('required', { value: 'Kuvaus' }) ?? '' }}
             formSaved={formSaved}
           />
-          <ProjectHashTags {...formProps('hashTags')} control={control} />
+          <ProjectHashTags
+            name="hashTags"
+            label={'projectBasicsForm.hashTags'}
+            control={control}
+            project={project}
+          />
           {/* SECTION 2 - STATUS */}
           <FormSectionTitle {...formProps('status')} />
           <SelectField
             {...formProps('phase')}
-            rules={{ required: t('required', { value: 'Vaihe' }) || '' }}
+            rules={{ required: t('required', { value: 'Vaihe' }) ?? '' }}
             options={phases}
           />
           <SelectField
@@ -240,7 +247,7 @@ const ProjectBasicsForm: FC = () => {
           <SelectField
             {...formProps('responsibleZone')}
             options={responsibleZones}
-            rules={{ required: t('required', { value: 'Alueen vastuujaon mukaan' }) || '' }}
+            rules={{ required: t('required', { value: 'Alueen vastuujaon mukaan' }) ?? '' }}
           />
           <SelectField {...formProps('district')} icon="location" options={districts} />
           <SelectField {...formProps('division')} icon="location" options={divisions} />

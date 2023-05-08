@@ -3,7 +3,7 @@
 set -e
 
 if [[ "$DEV_SERVER" = "true" ]]; then
-    yarn start
+    yarn && yarn start
 else
     nginx -g "daemon off;"
 fi

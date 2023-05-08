@@ -88,3 +88,11 @@
   margin: 0 0.2rem;
   white-space: nowrap;
 }
+
+.select-field-wrapper {
+  @apply relative max-w-[22.5rem];
+}
+
+.empty-select-field-button {
+  @apply absolute top-[2.65rem] right-11;
+}
