@@ -247,7 +247,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
               data-testid="create-group-button"
               disabled={!isDirty}
             >
-              {t('search')}
+              {t('groupForm.createGroup')}
             </Button>
             <Button onClick={handleDialogClose} variant="secondary" data-testid="cancel-search">
               {t('cancel')}
