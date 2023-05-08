@@ -13,9 +13,9 @@ const useDoubleClick = (
       const handleClick = () => {
         clickCount += 1;
 
-        setTimeout(async () => {
-          if (clickCount === 1) await onSingleClick();
-          else if (clickCount === 2) await onDoubleClick();
+        setTimeout(() => {
+          if (clickCount === 1) onSingleClick();
+          else if (clickCount === 2) onDoubleClick();
           clickCount = 0;
         }, latency);
       };

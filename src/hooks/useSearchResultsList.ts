@@ -14,7 +14,7 @@ const buildSearchResultsList = (
 ): Array<ISearchResultListItem> => {
   const parsedResults = searchResults.map((r) => ({
     ...r,
-    phase: r.phase?.value || null,
+    phase: r.phase?.value ?? null,
     breadCrumbs: buildBreadCrumbs(r.path, classes),
   }));
 

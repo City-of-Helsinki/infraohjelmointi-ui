@@ -60,13 +60,15 @@ const ProjectBasicsForm: FC = () => {
         return;
       }
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      await dispatch(patchProjectThunk({ id: project.id, data })).then((res) => {
-        // Set form saved to true if action is successfull, queue it to false async
-        handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
-        setTimeout(() => {
-          handleSetFormSaved(false);
-        }, 0);
-      });
+      dispatch(patchProjectThunk({ id: project.id, data }))
+        .then((res) => {
+          // Set form saved to true if action is successfull, queue it to false async
+          handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
+          setTimeout(() => {
+            handleSetFormSaved(false);
+          }, 0);
+        })
+        .catch(Promise.reject);
     },
     [dirtyFields, project?.id, dispatch, handleSetFormSaved],
   );

@@ -9,7 +9,7 @@ interface IProjectState {
   selectedProject: IProject | null;
   count: number | null;
   page: number;
-  error: IError | null | unknown;
+  error: unknown;
   updated: string | null;
 }
 
@@ -56,7 +56,7 @@ export const projectSlice = createSlice({
     builder.addCase(getProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
       return { ...state, selectedProject: action.payload };
     });
-    builder.addCase(getProjectThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getProjectThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
     // SILENT PATCH
@@ -67,12 +67,9 @@ export const projectSlice = createSlice({
         updated: getCurrentTime(),
       };
     });
-    builder.addCase(
-      patchProjectThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
+    builder.addCase(patchProjectThunk.rejected, (state, action: PayloadAction<unknown>) => {
+      return { ...state, error: action.payload };
+    });
   },
 });
 

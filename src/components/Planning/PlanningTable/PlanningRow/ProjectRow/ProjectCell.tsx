@@ -110,7 +110,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       const updateKey = cellToUpdate.financeKey;
       const updateBudget = cellToUpdate.budget;
       (req.finances[updateKey as keyof IProjectFinancesRequestObject] as string) = (
-        parseInt(budget || '0') + parseInt(updateBudget || '0')
+        parseInt(budget ?? '0') + parseInt(updateBudget ?? '0')
       ).toString();
     }
 
@@ -273,7 +273,7 @@ interface IProjectCellProps {
 const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [formValue, setFormValue] = useState<number | null | string>(parseInt(budget || '0'));
+  const [formValue, setFormValue] = useState<number | null | string>(parseInt(budget ?? '0'));
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   // Values of cells that have the none type will be empty strings to hide them
@@ -315,7 +315,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   // Blurring the input field will patch the current budget
   const handleBlur = useCallback((): void => {
     setIsReadOnly((current) => !current);
-    if (formValue !== parseInt(budget || '0')) {
+    if (formValue !== parseInt(budget ?? '0')) {
       updateCell({
         finances: {
           year: 2023,
@@ -377,7 +377,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   // Set the budgets value to a number if it exists
   useEffect(() => {
-    setFormValue(parseInt(budget || '0'));
+    setFormValue(parseInt(budget ?? '0'));
   }, [budget]);
 
   return (

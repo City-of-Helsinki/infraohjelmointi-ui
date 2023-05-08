@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import useSummaryRows from '@/hooks/useSummaryRows';
 import { IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
-import _ from 'lodash';
 import './styles.css';
 
 interface IPlanningSummaryTableProps {

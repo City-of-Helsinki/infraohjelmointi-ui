@@ -108,10 +108,12 @@ export const calculatePlanningSummaryCells = (
         });
       } else {
         const accBudgets = acc[key as keyof IClassFinances] as IClassBudgets;
+        const totalFrameBudget = (accBudgets.frameBudget += value.frameBudget);
+        const totalPlannedBudget = (accBudgets.plannedBudget += value.plannedBudget);
         Object.assign(acc, {
           [key]: {
-            frameBudget: (accBudgets.frameBudget += value.frameBudget),
-            plannedBudget: (accBudgets.plannedBudget += value.plannedBudget),
+            frameBudget: totalFrameBudget,
+            plannedBudget: totalPlannedBudget,
           },
         });
       }
