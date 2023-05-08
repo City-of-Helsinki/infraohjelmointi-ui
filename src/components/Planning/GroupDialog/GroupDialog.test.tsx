@@ -110,7 +110,9 @@ describe('GroupDialog', () => {
     expect(await dialog.findByText('groupForm.district')).toBeInTheDocument();
     expect(await dialog.findByText('groupForm.division')).toBeInTheDocument();
     expect(await dialog.findByText('groupForm.subDivision')).toBeInTheDocument();
-    expect(await dialog.findByRole('button', { name: 'search' })).toBeInTheDocument();
+    expect(
+      await dialog.findByRole('button', { name: 'groupForm.createGroup' }),
+    ).toBeInTheDocument();
     expect(await dialog.findByRole('button', { name: 'cancel' })).toBeInTheDocument();
   });
 
