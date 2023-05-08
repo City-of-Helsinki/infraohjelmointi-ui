@@ -254,6 +254,7 @@ describe('ProjectBasicsForm', () => {
     expect(expectedHashTags.length).toBe(2);
     expect(await findByText('leikkipaikka')).toBeInTheDocument();
     expect(await findByText('leikkipuisto')).toBeInTheDocument();
+    expect(await findByText('liikenne')).toBeInTheDocument();
   });
 
   it('can use popular hashtags from the hashtags form', async () => {
