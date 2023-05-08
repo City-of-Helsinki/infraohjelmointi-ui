@@ -313,7 +313,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   }, []);
 
   // Blurring the input field will patch the current budget
-  const handleBlur = useCallback(async (): Promise<void> => {
+  const handleBlur = useCallback((): void => {
     setIsReadOnly((current) => !current);
     if (formValue !== parseInt(budget || '0')) {
       updateCell({
@@ -325,22 +325,22 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
     }
   }, [formValue, budget, updateCell, financeKey]);
 
-  const onRemoveCell = useCallback(async () => {
+  const onRemoveCell = useCallback(() => {
     updateCell(getRemoveRequestData(cell));
   }, [updateCell, cell]);
 
   const onAddYear = useCallback(
-    async (direction: ProjectCellGrowDirection) => {
+    (direction: ProjectCellGrowDirection) => {
       updateCell(getAddRequestData(direction, cell));
     },
     [updateCell, cell],
   );
 
   const onMoveTimeline = useCallback(
-    async (direction: ProjectCellGrowDirection) => {
+    (direction: ProjectCellGrowDirection) => {
       const { isStartOfTimeline, isEndOfTimeline } = cell;
       if (isStartOfTimeline || isEndOfTimeline) {
-        await updateCell(getMoveTimelineRequestData(cell, direction));
+        updateCell(getMoveTimelineRequestData(cell, direction));
       }
     },
     [cell, updateCell],

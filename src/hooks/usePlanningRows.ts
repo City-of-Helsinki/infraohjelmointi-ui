@@ -417,12 +417,12 @@ const usePlanningRows = () => {
       console.log('Listening to finance-update and project-update events: ', e);
     };
 
-    const updateState = async (dataString: string) => {
+    const updateState = (dataString: string) => {
       const data = JSON.parse(dataString) as IFinanceEventData;
 
       dispatch(setLoading({ text: 'Loading planning view', id: LOADING_PLANNING_ID }));
 
-      await Promise.all([
+      Promise.all([
         dispatch(updateMasterClass(data.masterClass)),
         dispatch(updateClass(data.class)),
         dispatch(updateSubClass(data.subClass)),
@@ -440,17 +440,11 @@ const usePlanningRows = () => {
       }));
     };
 
-    eventSource.addEventListener(
-      'finance-update',
-      async (e) => await updateState(e.data).catch(Promise.reject),
-    );
+    eventSource.addEventListener('finance-update', (e) => updateState(e.data));
     eventSource.addEventListener('project-update', (e) => updateProject(e.data));
 
     return () => {
-      eventSource.removeEventListener(
-        'finance-update',
-        async (e) => await updateState(e.data).catch(Promise.reject),
-      );
+      eventSource.removeEventListener('finance-update', (e) => updateState(e.data));
       eventSource.addEventListener('project-update', (e) => updateProject(e.data));
       eventSource.close();
     };
