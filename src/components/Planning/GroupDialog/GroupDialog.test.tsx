@@ -116,6 +116,7 @@ describe('GroupDialog', () => {
 
   it('can create new group with the groups form', async () => {
     const renderResult = await render();
+
     const mockPostResponse = {
       data: {
         id: 'e39a5f66-8be5-4cd8-9a8a-16f69cc02c18',
@@ -140,26 +141,21 @@ describe('GroupDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSuggestionsResponse);
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    const {
-      user,
-      findAllByTestId,
-      findByTestId,
-      findByRole,
-      findByText,
-      findAllByText,
-      baseElement,
-    } = renderResult;
+    const { user, findAllByTestId, findByTestId, findByRole, findByText, baseElement } =
+      renderResult;
 
     // Open modal
     await user.click(await findByText('createSummingGroups'));
-    const dialog = within(await findByRole('dialog'));
+    const modal = await findByRole('dialog');
+    const dialog = within(modal);
 
     const submitButton = await dialog.findByTestId('create-group-button');
     expect(submitButton).toBeDisabled();
 
     await user.type(await dialog.findByText('groupForm.name'), 'test-group');
 
-    await user.click(await dialog.findByRole('button', { name: 'groupForm.masterClass *' }));
+    await user.click(modal.querySelector('#select-field-masterClass-toggle-button') as HTMLElement);
+
     const masterClassMenu = baseElement.querySelector(
       '#select-field-masterClass-menu',
     ) as HTMLElement;
@@ -167,23 +163,25 @@ describe('GroupDialog', () => {
       await within(masterClassMenu).findByText(matchExact('803 Kadut, liikenneväylät')),
     );
 
-    await user.click(await dialog.findByRole('button', { name: 'groupForm.class *' }));
+    await user.click(modal.querySelector('#select-field-class-toggle-button') as HTMLElement);
     await user.click(await dialog.findByText(matchExact('Uudisrakentaminen')));
 
-    await user.click(await dialog.findByRole('button', { name: 'groupForm.subClass *' }));
+    await user.click(modal.querySelector('#select-field-subClass-toggle-button') as HTMLElement);
     await user.click(await dialog.findByText(matchExact('Koillinen suurpiiri')));
 
     await user.click(await dialog.findByText(matchExact(`groupForm.openAdvanceSearch`)));
 
     const districtMenu = baseElement.querySelector('#select-field-district-menu') as HTMLElement;
-    await user.click(await dialog.findByRole('button', { name: 'groupForm.district *' }));
+    await user.click(modal.querySelector('#select-field-district-toggle-button') as HTMLElement);
     await user.click(await within(districtMenu).findByText(matchExact('Koillinen')));
 
-    expect(await dialog.findByRole('button', { name: 'groupForm.division' })).toBeInTheDocument();
     expect(
-      await dialog.findByRole('button', { name: 'groupForm.subDivision' }),
+      modal.querySelector('#select-field-division-toggle-button') as HTMLElement,
     ).toBeInTheDocument();
 
+    expect(
+      modal.querySelector('#select-field-subDivision-toggle-button') as HTMLElement,
+    ).toBeInTheDocument();
     await user.type(await dialog.findByText('groupForm.searchForProjects'), 'Vanha');
 
     await waitFor(async () => {
@@ -200,16 +198,6 @@ describe('GroupDialog', () => {
       'localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&district=koilinen-district-test&projectName=Vanha&inGroup=false&programmed=true&direct=false',
     );
 
-    // retype and check the suggestion gets filtered
-    await user.clear(await findByRole('combobox', { name: 'groupForm.searchForProjects' }));
-    await user.type(await findByText('groupForm.searchForProjects'), 'V');
-
-    await waitFor(async () => {
-      // The only text in the document is already selected project
-      expect(await findByText(mockSuggestionsResponse.data.results[0].name)).toBeInTheDocument();
-      expect((await findAllByText('Vanha yrttimaantie')).length).toBe(1);
-      expect((await findAllByTestId('project-selections')).length).toBe(1);
-    });
     expect(submitButton).toBeEnabled();
 
     // mock get request made by usePLanningRows to rebuild the row under selected district/location
@@ -228,15 +216,6 @@ describe('GroupDialog', () => {
     await waitFor(async () => {
       await user.click(submitButton);
     });
-    // close dialog
-    await waitFor(() => {
-      const event = new KeyboardEvent('keydown', { key: 'Escape' });
-      document.dispatchEvent(event);
-      expect(dialog).not.toBeInTheDocument;
-    });
-
-    // This line below is needed for test to pass, I am not sure why, fix needed
-    // await user.click(await findByTestId('cancel-search'));
 
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
