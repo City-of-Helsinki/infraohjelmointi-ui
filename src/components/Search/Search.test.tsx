@@ -32,6 +32,7 @@ import { IError, IFreeSearchResults } from '@/interfaces/common';
 import { ISearchResults } from '@/interfaces/searchInterfaces';
 import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 import { Route } from 'react-router';
+import SearchResultsView from '@/views/SearchResultsView/SearchResultsView';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -41,34 +42,40 @@ const store = setupStore();
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<Search />} />, {
-      preloadedState: {
-        auth: { user: mockPersons.data[0], error: {} },
-        class: {
-          ...store.getState().class,
-          allClasses: mockProjectClasses.data,
-          masterClasses: mockMasterClasses.data,
-          classes: mockClasses.data,
-          subClasses: mockSubClasses.data,
-        },
-        location: {
-          ...store.getState().location,
-          allLocations: mockLocations.data,
-          districts: mockDistricts.data,
-          divisions: mockDivisions.data,
-          subDivisions: mockSubDivisions.data,
-        },
-        lists: {
-          ...store.getState().lists,
-          areas: mockProjectAreas.data,
-          phases: mockProjectPhases.data,
-          types: mockProjectTypes.data,
-          categories: mockProjectCategories.data,
-          responsiblePersons: mockResponsiblePersons.data,
-          programmedYears: setProgrammedYears(),
+    renderWithProviders(
+      <>
+        <Route path="/" element={<Search />} />
+        <Route path="/search-results" element={<SearchResultsView />} />
+      </>,
+      {
+        preloadedState: {
+          auth: { user: mockPersons.data[0], error: {} },
+          class: {
+            ...store.getState().class,
+            allClasses: mockProjectClasses.data,
+            masterClasses: mockMasterClasses.data,
+            classes: mockClasses.data,
+            subClasses: mockSubClasses.data,
+          },
+          location: {
+            ...store.getState().location,
+            allLocations: mockLocations.data,
+            districts: mockDistricts.data,
+            divisions: mockDivisions.data,
+            subDivisions: mockSubDivisions.data,
+          },
+          lists: {
+            ...store.getState().lists,
+            areas: mockProjectAreas.data,
+            phases: mockProjectPhases.data,
+            types: mockProjectTypes.data,
+            categories: mockProjectCategories.data,
+            responsiblePersons: mockResponsiblePersons.data,
+            programmedYears: setProgrammedYears(),
+          },
         },
       },
-    }),
+    ),
   );
 describe('Search', () => {
   afterEach(() => {
@@ -215,7 +222,7 @@ describe('Search', () => {
     expect(getRequest.calls[1][0].includes('hashtag=123')).toBe(true);
   });
 
-  it('adds search results to redux with a successful GET request', async () => {
+  it('adds search results to redux with a successful GET request and redirects the user to SearchResults', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
     const { user, getByTestId, store, getByText } = await render();
@@ -235,6 +242,8 @@ describe('Search', () => {
       expect(res.data).toStrictEqual(mockSearchResults.data);
       expect(store.getState().search.searchResults).toStrictEqual(mockSearchResults.data);
     });
+
+    await waitFor(() => expect(getByTestId('search-results-view')).toBeInTheDocument());
   });
 
   it('catches a bad search request', async () => {
