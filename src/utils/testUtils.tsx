@@ -77,3 +77,15 @@ export const sendProjectUpdateEvent = async (data: IProject) => {
     }),
   );
 };
+
+export const sendFinanceUpdateEvent = async (data: object) => {
+  await waitFor(() =>
+    new EventSourceMock().emitMessage({
+      id: '',
+      type: 'finance-update',
+      data: JSON.stringify({
+        ...data,
+      }),
+    }),
+  );
+};

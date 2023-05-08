@@ -29,8 +29,10 @@ import {
   calculatePlanningRowSums,
   calculatePlanningSummaryCells,
   calculateProjectRowSums,
+  formatNumber,
 } from '@/utils/calculations';
-import { sendProjectUpdateEvent } from '@/utils/testUtils';
+import { sendProjectUpdateEvent, sendFinanceUpdateEvent } from '@/utils/testUtils';
+import mockProject from '@/mocks/mockProject';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -124,6 +126,55 @@ describe('PlanningView', () => {
     const getMock = mockedAxios.get.mock.lastCall;
 
     expect(getMock[0]).toBe('localhost:4000/projects/?test=123&direct=false');
+  });
+
+  it.only('updates table sums if the finance-update event triggers', async () => {
+    const renderResult = await render();
+    const { store, getByTestId } = renderResult;
+
+    const { id: masterClassId } = store.getState().class.masterClasses[0];
+    const { id: classId } = store.getState().class.classes[0];
+    const year = new Date().getFullYear();
+
+    const updatedFinances = {
+      ...mockClassFinances,
+      year0: {
+        plannedBudget: 80000,
+        frameBudget: 2000,
+      },
+    };
+
+    await navigateToProjectRows(renderResult);
+
+    await sendFinanceUpdateEvent({
+      masterClass: {
+        ...mockMasterClasses.data[0],
+        finances: {
+          ...updatedFinances,
+        },
+      },
+      class: {
+        ...mockClasses.data[0],
+        finances: {
+          ...updatedFinances,
+        },
+      },
+      project: mockProject.data,
+    });
+
+    const { plannedBudget, frameBudget } = updatedFinances.year0;
+
+    await waitFor(() => {
+      expect(getByTestId(`planned-budget-${masterClassId}-${year}`).textContent).toBe(
+        formatNumber(plannedBudget),
+      );
+      expect(getByTestId(`frame-budget-${masterClassId}-${year}`).textContent).toBe(
+        formatNumber(frameBudget),
+      );
+      expect(getByTestId(`deviation-${masterClassId}-${year}`).textContent).toBe(
+        formatNumber(frameBudget - plannedBudget),
+      );
+    });
   });
 
   describe('PlanningBreadCrumbs', () => {
