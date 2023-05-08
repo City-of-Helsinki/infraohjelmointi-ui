@@ -81,34 +81,37 @@ describe('GroupDialog', () => {
 
   it('renders the component wrappers', async () => {
     const renderResult = await render();
-    const { getByTestId } = renderResult;
-    expect(getByTestId('open-group-form-container')).toBeInTheDocument();
+    const { findByTestId } = renderResult;
+    expect(await findByTestId('open-group-form-container')).toBeInTheDocument();
   });
 
   it('renders group creation modal', async () => {
     const renderResult = await render();
-    const { getByText, getByRole, user } = renderResult;
+    const { findByText, findByRole, user } = renderResult;
 
     // Open modal
-    await user.click(getByText('createSummingGroups'));
+    await user.click(await findByText('createSummingGroups'));
+    const dialog = within(await findByRole('dialog'));
 
     // Expect all elements
-    expect(getByText(`groupForm.name`)).toBeInTheDocument();
-    expect(getByText(`groupForm.groupCreationDescription1`)).toBeInTheDocument();
-    expect(getByText(`groupForm.groupCreationDescription2`)).toBeInTheDocument();
-    expect(getByText('groupForm.name')).toBeInTheDocument();
-    expect(getByText('groupForm.masterClass')).toBeInTheDocument();
-    expect(getByText('groupForm.class')).toBeInTheDocument();
-    expect(getByText('groupForm.subClass')).toBeInTheDocument();
-    expect(getByText('groupForm.searchForProjects')).toBeInTheDocument();
+    expect(await dialog.findByText(`groupForm.name`)).toBeInTheDocument();
+    expect(await dialog.findByText(`groupForm.groupCreationDescription1`)).toBeInTheDocument();
+    expect(await dialog.findByText(`groupForm.groupCreationDescription2`)).toBeInTheDocument();
+    expect(await dialog.findByText('groupForm.name')).toBeInTheDocument();
+    expect(await dialog.findByText('groupForm.masterClass')).toBeInTheDocument();
+    expect(await dialog.findByText('groupForm.class')).toBeInTheDocument();
+    expect(await dialog.findByText('groupForm.subClass')).toBeInTheDocument();
+    expect(await dialog.findByText('groupForm.searchForProjects')).toBeInTheDocument();
 
     // Show advance fields in modal
-    await user.click(getByRole('button', { name: matchExact('groupForm.openAdvanceSearch') }));
-    expect(getByText('groupForm.district')).toBeInTheDocument();
-    expect(getByText('groupForm.division')).toBeInTheDocument();
-    expect(getByText('groupForm.subDivision')).toBeInTheDocument();
-    expect(getByRole('button', { name: 'search' }));
-    expect(getByRole('button', { name: 'cancel' }));
+    await user.click(
+      await dialog.findByRole('button', { name: matchExact('groupForm.openAdvanceSearch') }),
+    );
+    expect(await dialog.findByText('groupForm.district')).toBeInTheDocument();
+    expect(await dialog.findByText('groupForm.division')).toBeInTheDocument();
+    expect(await dialog.findByText('groupForm.subDivision')).toBeInTheDocument();
+    expect(await dialog.findByRole('button', { name: 'search' })).toBeInTheDocument();
+    expect(await dialog.findByRole('button', { name: 'cancel' })).toBeInTheDocument();
   });
 
   it('can create new group with the groups form', async () => {
@@ -137,63 +140,75 @@ describe('GroupDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSuggestionsResponse);
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    const { user, getAllByTestId, getByTestId, getByRole, getByText, getAllByText, baseElement } =
-      renderResult;
+    const {
+      user,
+      findAllByTestId,
+      findByTestId,
+      findByRole,
+      findByText,
+      findAllByText,
+      baseElement,
+    } = renderResult;
 
     // Open modal
-    await user.click(getByText('createSummingGroups'));
+    await user.click(await findByText('createSummingGroups'));
+    const dialog = within(await findByRole('dialog'));
+
+    const submitButton = await dialog.findByTestId('create-group-button');
+    expect(submitButton).toBeDisabled();
+
+    await user.type(await dialog.findByText('groupForm.name'), 'test-group');
+
+    await user.click(await dialog.findByRole('button', { name: 'groupForm.masterClass *' }));
     const masterClassMenu = baseElement.querySelector(
       '#select-field-masterClass-menu',
     ) as HTMLElement;
+    await user.click(
+      await within(masterClassMenu).findByText(matchExact('803 Kadut, liikenneväylät')),
+    );
 
-    const submitButton = getByTestId('create-group-button');
-    expect(submitButton).toBeDisabled();
+    await user.click(await dialog.findByRole('button', { name: 'groupForm.class *' }));
+    await user.click(await dialog.findByText(matchExact('Uudisrakentaminen')));
 
-    await user.type(getByText('groupForm.name'), 'test-group');
+    await user.click(await dialog.findByRole('button', { name: 'groupForm.subClass *' }));
+    await user.click(await dialog.findByText(matchExact('Koillinen suurpiiri')));
 
-    await user.click(getByRole('button', { name: 'groupForm.masterClass *' }));
-    await user.click(within(masterClassMenu).getByText(matchExact('803 Kadut, liikenneväylät')));
-
-    await user.click(getByRole('button', { name: 'groupForm.class *' }));
-    await user.click(getByText(matchExact('Uudisrakentaminen')));
-
-    await user.click(getByRole('button', { name: 'groupForm.subClass *' }));
-    await user.click(getByText(matchExact('Koillinen suurpiiri')));
-
-    await user.click(getByText(matchExact(`groupForm.openAdvanceSearch`)));
+    await user.click(await dialog.findByText(matchExact(`groupForm.openAdvanceSearch`)));
 
     const districtMenu = baseElement.querySelector('#select-field-district-menu') as HTMLElement;
-    await user.click(getByRole('button', { name: 'groupForm.district *' }));
-    await user.click(within(districtMenu).getByText(matchExact('Koillinen')));
+    await user.click(await dialog.findByRole('button', { name: 'groupForm.district *' }));
+    await user.click(await within(districtMenu).findByText(matchExact('Koillinen')));
 
-    expect(getByRole('button', { name: 'groupForm.division' })).toBeInTheDocument();
-    expect(getByRole('button', { name: 'groupForm.subDivision' })).toBeInTheDocument();
+    expect(await dialog.findByRole('button', { name: 'groupForm.division' })).toBeInTheDocument();
+    expect(
+      await dialog.findByRole('button', { name: 'groupForm.subDivision' }),
+    ).toBeInTheDocument();
 
-    await user.type(getByText('groupForm.searchForProjects'), 'V');
+    await user.type(await dialog.findByText('groupForm.searchForProjects'), 'Vanha');
 
     await waitFor(async () => {
-      expect(getByText(mockSuggestionsResponse.data.results[0].name)).toBeInTheDocument();
+      expect(await dialog.findByText('Vanha yrttimaantie')).toBeInTheDocument();
 
-      await user.click(getByText('Vanha yrttimaantie'));
-      expect(getAllByTestId('project-selections').length).toBe(1);
+      await user.click(await findByText('Vanha yrttimaantie'));
+      expect((await findAllByTestId('project-selections')).length).toBe(1);
     });
 
     const getRequest = mockedAxios.get.mock;
 
     // Check that the correct url was called
     expect(getRequest.calls[0][0]).toBe(
-      'localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&district=koilinen-district-test&projectName=V&inGroup=false&programmed=true&direct=false',
+      'localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&district=koilinen-district-test&projectName=Vanha&inGroup=false&programmed=true&direct=false',
     );
 
     // retype and check the suggestion gets filtered
-    await user.clear(getByRole('combobox', { name: 'groupForm.searchForProjects' }));
-    await user.type(getByText('groupForm.searchForProjects'), 'V');
+    await user.clear(await findByRole('combobox', { name: 'groupForm.searchForProjects' }));
+    await user.type(await findByText('groupForm.searchForProjects'), 'V');
 
     await waitFor(async () => {
       // The only text in the document is already selected project
-      expect(getByText(mockSuggestionsResponse.data.results[0].name)).toBeInTheDocument();
-      expect(getAllByText('Vanha yrttimaantie').length).toBe(1);
-      expect(getAllByTestId('project-selections').length).toBe(1);
+      expect(await findByText(mockSuggestionsResponse.data.results[0].name)).toBeInTheDocument();
+      expect((await findAllByText('Vanha yrttimaantie')).length).toBe(1);
+      expect((await findAllByTestId('project-selections')).length).toBe(1);
     });
     expect(submitButton).toBeEnabled();
 
@@ -215,7 +230,7 @@ describe('GroupDialog', () => {
     });
 
     // This line below is needed for test to pass, I am not sure why, fix needed
-    await user.click(getByTestId('cancel-search'));
+    await user.click(await findByTestId('cancel-search'));
 
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
@@ -223,12 +238,14 @@ describe('GroupDialog', () => {
     expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
     // Check if the planning view has navigated to correct subclass/district
     // Checking if district header exists, meaning we are in the correct district balk
-    expect(getByTestId(`head-${mockPostResponse.data.locationRelation}`)).toBeInTheDocument();
+    expect(
+      await findByTestId(`head-${mockPostResponse.data.locationRelation}`),
+    ).toBeInTheDocument();
     // Check if new created group header exists
-    expect(getByTestId(`head-${mockPostResponse.data.id}`)).toBeInTheDocument();
+    expect(await findByTestId(`head-${mockPostResponse.data.id}`)).toBeInTheDocument();
 
-    await user.click(getByTestId(`expand-${mockPostResponse.data.id}`));
+    await user.click(await findByTestId(`expand-${mockPostResponse.data.id}`));
 
-    expect(getByText('Vanha yrttimaantie')).toBeInTheDocument();
+    expect(await findByText('Vanha yrttimaantie')).toBeInTheDocument();
   });
 });
