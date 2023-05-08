@@ -67,7 +67,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     [dispatch, handleDialogClose, navigate],
   );
 
-  const handleCreateNewGroup = useCallback(
+  const handleOnSubmitForm = useCallback(
     (e: unknown) => {
       handleSubmit(onSubmit).call(e).catch(Promise.reject);
     },
@@ -137,7 +137,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                 <form
                   id="group-create-form"
                   className="search-form"
-                  onSubmit={handleSubmit(onSubmit)}
+                  onSubmit={handleOnSubmitForm}
                   data-testid="group-create-form"
                 >
                   <div>
@@ -243,7 +243,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
           <ActionButtons>
             <Button
-              onClick={handleCreateNewGroup}
+              onClick={handleOnSubmitForm}
               data-testid="create-group-button"
               disabled={!isDirty}
             >
