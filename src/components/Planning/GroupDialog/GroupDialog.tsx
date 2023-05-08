@@ -58,13 +58,20 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
   const onSubmit = useCallback(
     async (form: IGroupForm) => {
-      dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
+      await dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
         handleDialogClose();
         navigate(buildRedirectRoute(form));
       });
     },
 
     [dispatch, handleDialogClose, navigate],
+  );
+
+  const handleCreateNewGroup = useCallback(
+    (e: unknown) => {
+      handleSubmit(onSubmit).call(e).catch(Promise.reject);
+    },
+    [handleSubmit, onSubmit],
   );
 
   const toggleAdvanceFields = useCallback(
@@ -236,7 +243,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
           <ActionButtons>
             <Button
-              onClick={handleSubmit(onSubmit)}
+              onClick={handleCreateNewGroup}
               data-testid="create-group-button"
               disabled={!isDirty}
             >

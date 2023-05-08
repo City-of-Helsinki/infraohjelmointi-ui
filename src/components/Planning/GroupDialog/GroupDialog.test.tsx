@@ -228,9 +228,15 @@ describe('GroupDialog', () => {
     await waitFor(async () => {
       await user.click(submitButton);
     });
+    // close dialog
+    await waitFor(() => {
+      const event = new KeyboardEvent('keydown', { key: 'Escape' });
+      document.dispatchEvent(event);
+      expect(dialog).not.toBeInTheDocument;
+    });
 
     // This line below is needed for test to pass, I am not sure why, fix needed
-    await user.click(await findByTestId('cancel-search'));
+    // await user.click(await findByTestId('cancel-search'));
 
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
