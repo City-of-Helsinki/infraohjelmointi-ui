@@ -6,8 +6,13 @@ import { useAppSelector } from '@/hooks/common';
 import { useTranslation } from 'react-i18next';
 import { selectUpdated } from '@/reducers/projectSlice';
 import './styles.css';
+import { Link } from 'hds-react/components/Link';
 
-const ProjectSidePanel: FC = () => {
+interface IProjectSidePanelProps {
+  pwFolderLink?: string | null;
+}
+
+const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
   const updated = useAppSelector(selectUpdated);
   const { t } = useTranslation();
   const navItems = [
@@ -35,6 +40,42 @@ const ProjectSidePanel: FC = () => {
           </div>
         </div>
       )}
+      <div
+        id="pw-folder-container"
+        data-testid="pw-folder-container"
+        className="mt-8 flex justify-center"
+      >
+        <div className="side-nav">
+          <div className="text-heading-s" id="pw-folder-title">
+            {t(`nav.documents`)}
+          </div>
+          <div
+            id="pw-folder-link-container"
+            data-testid="pw-folder-link-container"
+            className="mt-5 bg-gray p-4"
+          >
+            <div>
+              <div className="m-1 font-bold">ProjectWise</div>
+              <div className="m-1">{t(`pwFolderLinkDescription`)}</div>
+              <div>
+                {pwFolderLink && (
+                  <Link
+                    href={pwFolderLink}
+                    size="M"
+                    external
+                    openInNewTab
+                    openInExternalDomainAriaLabel="Opens a different website."
+                    openInNewTabAriaLabel="Opens in a new tab."
+                    style={{ display: 'block', width: 'fit-content' }}
+                  >
+                    {t(`pwFolderLink`)}
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

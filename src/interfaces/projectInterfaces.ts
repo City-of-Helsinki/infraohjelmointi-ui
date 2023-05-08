@@ -79,6 +79,7 @@ export interface IProject {
   bridgeNumber?: string;
   projectGroup: string | null;
   spentBudget: number;
+  pwFolderLink?: string | null;
 }
 
 export interface IProjectRequest {
