@@ -32,37 +32,37 @@ const useProjectBasicsValues = () => {
   const subDivisions = useAppSelector(selectSubDivisions);
 
   const { t } = useTranslation();
-  const value = (value: string | undefined | null) => value || '';
+  const value = (value: string | undefined | null) => value ?? '';
 
   /**
    * There are three project classes, but only one id is saved. We create a list item of each class based on the id.
    */
   const getProjectClassFields = (project: IProject | null) => {
     const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
-      id: projectClass?.id || '',
-      value: projectClass?.name || '',
+      id: projectClass?.id ?? '',
+      value: projectClass?.name ?? '',
     });
 
     const selectedSubClass = project
       ? subClasses.find(({ id }) => id === project.projectClass)
       : undefined;
 
-    const projectClassId = selectedSubClass?.parent || project?.projectClass;
+    const projectClassId = selectedSubClass?.parent ?? project?.projectClass;
 
     const selectedClass = projectClassId
       ? classes.find(({ id }) => id === projectClassId)
       : undefined;
 
-    const masterClassId = selectedClass?.parent || project?.projectClass;
+    const masterClassId = selectedClass?.parent ?? project?.projectClass;
 
     const selectedMasterClass = masterClassId
       ? masterClasses.find(({ id }) => id === masterClassId)
       : undefined;
 
     return {
-      masterClass: listItemToOption(classAsListItem(selectedMasterClass) || []),
-      class: listItemToOption(classAsListItem(selectedClass) || []),
-      subClass: listItemToOption(classAsListItem(selectedSubClass) || []),
+      masterClass: listItemToOption(classAsListItem(selectedMasterClass) ?? []),
+      class: listItemToOption(classAsListItem(selectedClass) ?? []),
+      subClass: listItemToOption(classAsListItem(selectedSubClass) ?? []),
     };
   };
 
@@ -71,28 +71,28 @@ const useProjectBasicsValues = () => {
    */
   const getProjectLocationFields = (project: IProject | null) => {
     const locationAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
-      id: projectLocation?.id || '',
-      value: projectLocation?.name || '',
+      id: projectLocation?.id ?? '',
+      value: projectLocation?.name ?? '',
     });
 
     const selectedSubDivision = project
       ? subDivisions.find(({ id }) => id === project.projectLocation)
       : undefined;
 
-    const projectLocationId = selectedSubDivision?.parent || project?.projectLocation;
+    const projectLocationId = selectedSubDivision?.parent ?? project?.projectLocation;
 
     const selectedDivision = projectLocationId
       ? divisions.find(({ id }) => id === projectLocationId)
       : undefined;
 
-    const districtId = selectedDivision?.parent || project?.projectLocation;
+    const districtId = selectedDivision?.parent ?? project?.projectLocation;
 
     const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
 
     return {
-      district: listItemToOption(locationAsListItem(selectedDistrict) || []),
-      division: listItemToOption(locationAsListItem(selectedDivision) || []),
-      subDivision: listItemToOption(locationAsListItem(selectedSubDivision) || []),
+      district: listItemToOption(locationAsListItem(selectedDistrict) ?? []),
+      division: listItemToOption(locationAsListItem(selectedDivision) ?? []),
+      subDivision: listItemToOption(locationAsListItem(selectedSubDivision) ?? []),
     };
   };
 
@@ -108,9 +108,9 @@ const useProjectBasicsValues = () => {
       area: listItemToOption(project?.area, t),
       hkrId: value(project?.hkrId),
       sapProject: value(project?.sapProject),
-      sapNetwork: project?.sapNetwork || [],
+      sapNetwork: project?.sapNetwork ?? [],
       entityName: value(project?.entityName),
-      hashTags: project?.hashTags || [],
+      hashTags: project?.hashTags ?? [],
       estPlanningStart: value(project?.estPlanningStart),
       estPlanningEnd: value(project?.estPlanningEnd),
       estConstructionStart: value(project?.estConstructionStart),
@@ -120,12 +120,12 @@ const useProjectBasicsValues = () => {
       visibilityStart: value(project?.visibilityStart),
       visibilityEnd: value(project?.visibilityEnd),
       phase: listItemToOption(project?.phase, t),
-      programmed: project?.programmed || false,
+      programmed: project?.programmed ?? false,
       constructionPhaseDetail: listItemToOption(project?.constructionPhaseDetail, t),
-      louhi: project?.louhi || false,
-      gravel: project?.gravel || false,
+      louhi: project?.louhi ?? false,
+      gravel: project?.gravel ?? false,
       category: listItemToOption(project?.category, t),
-      effectHousing: project?.effectHousing || false,
+      effectHousing: project?.effectHousing ?? false,
       riskAssessment: listItemToOption(project?.riskAssessment, t),
       constructionEndYear: value(project?.constructionEndYear),
       planningStartYear: value(project?.planningStartYear),

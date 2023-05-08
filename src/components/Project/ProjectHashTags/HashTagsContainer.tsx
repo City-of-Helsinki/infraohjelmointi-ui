@@ -19,7 +19,7 @@ const getAriaLabel = (
 ) => {
   const deleteTag = onDelete && `removeHashTag ${tag}`;
   const addTag = onClick && `addHashTag ${tag}`;
-  return translate(deleteTag || addTag || '');
+  return translate(deleteTag ?? addTag ?? '');
 };
 
 const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) => {
@@ -27,15 +27,18 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) 
 
   const handleOnClick = useCallback(
     (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
-      onClick && onClick((e.currentTarget as HTMLDivElement).parentElement?.id || '');
+      if (onClick) {
+        onClick((e.currentTarget as HTMLDivElement).parentElement?.id ?? '');
+      }
     },
     [onClick],
   );
 
   const handleOnDelete = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
-      onDelete &&
-        onDelete((e.currentTarget as HTMLButtonElement).parentElement?.parentElement?.id || '');
+      if (onDelete) {
+        onDelete((e.currentTarget as HTMLButtonElement).parentElement?.parentElement?.id ?? '');
+      }
     },
     [onDelete],
   );

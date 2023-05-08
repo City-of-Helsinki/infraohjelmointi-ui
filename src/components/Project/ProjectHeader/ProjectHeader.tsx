@@ -43,7 +43,7 @@ const ProjectHeader: FC = () => {
         if (objectHasProperty(data, 'favourite')) {
           // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
           data.favPersons = Array.from(
-            new Set<string>([...(project?.favPersons || []), user?.id || '']),
+            new Set<string>([...(project?.favPersons ?? []), user?.id ?? '']),
           ).filter((fp) => (!form.favourite ? fp !== user?.id : fp));
 
           delete data.favourite;

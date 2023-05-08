@@ -271,7 +271,9 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
   }, [project]);
 
   const toggleOpenDialog = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e && e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     setState((current) => ({ ...current, openDialog: !current.openDialog }));
   }, []);
 

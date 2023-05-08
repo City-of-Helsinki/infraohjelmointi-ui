@@ -49,7 +49,7 @@ const SelectField: FC<ISelectFieldProps> = ({
    * to access the child elements for the button when focusing it.
    */
   const handleRemoveSelection = useCallback((onChange: (...event: unknown[]) => void) => {
-    if (!selectContainerRef || !selectContainerRef.current) {
+    if (!selectContainerRef?.current) {
       return;
     }
     // If the SelectField has a label
@@ -60,7 +60,7 @@ const SelectField: FC<ISelectFieldProps> = ({
     // If the SelectField doesn't have a label
     else if (selectContainerRef.current.children[0]?.children[0]?.children[0]) {
       onChange({ value: '', label: '' });
-      (selectContainerRef.current.children[0].children[1].children[0] as HTMLButtonElement).focus();
+      (selectContainerRef.current.children[0].children[0].children[0] as HTMLButtonElement).focus();
     }
   }, []);
 
