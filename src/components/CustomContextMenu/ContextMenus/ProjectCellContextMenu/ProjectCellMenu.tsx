@@ -25,12 +25,12 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   ];
 
   const handleEditTimeline = useCallback(() => {
-    onEditCell && onEditCell();
+    onEditCell();
     onCloseMenu();
   }, [onCloseMenu, onEditCell]);
 
   const handleRemoveYear = useCallback(() => {
-    onRemoveCell && onRemoveCell();
+    onRemoveCell();
     onCloseMenu();
   }, [onCloseMenu, onRemoveCell]);
 

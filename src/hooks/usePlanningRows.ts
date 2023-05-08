@@ -440,11 +440,17 @@ const usePlanningRows = () => {
       }));
     };
 
-    eventSource.addEventListener('finance-update', async (e) => await updateState(e.data));
+    eventSource.addEventListener(
+      'finance-update',
+      async (e) => await updateState(e.data).catch(Promise.reject),
+    );
     eventSource.addEventListener('project-update', (e) => updateProject(e.data));
 
     return () => {
-      eventSource.removeEventListener('finance-update', async (e) => await updateState(e.data));
+      eventSource.removeEventListener(
+        'finance-update',
+        async (e) => await updateState(e.data).catch(Promise.reject),
+      );
       eventSource.addEventListener('project-update', (e) => updateProject(e.data));
       eventSource.close();
     };

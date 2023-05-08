@@ -23,8 +23,8 @@ const useProjectHeaderValues = () => {
     () => ({
       favourite: (user && project?.favPersons?.includes(user.id)) || false,
       phase: listItemToOption(project?.phase, t) || [],
-      name: project?.name || '',
-      address: project?.address || '',
+      name: project?.name ?? '',
+      address: project?.address ?? '',
     }),
     [project, user],
   );

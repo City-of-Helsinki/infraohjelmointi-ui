@@ -18,7 +18,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
 }) => {
   const { t } = useTranslation();
   const phases = useOptions('phases');
-  const [selectedPhase, setSelectedPhase] = useState<string>(phase || '');
+  const [selectedPhase, setSelectedPhase] = useState<string>(phase ?? '');
 
   const handleSetSelectedPhase = useCallback((nextPhase: string) => {
     setSelectedPhase(nextPhase);

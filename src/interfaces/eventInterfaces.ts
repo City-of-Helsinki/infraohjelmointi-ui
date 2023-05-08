@@ -12,7 +12,7 @@ export interface ICellMenuDetails {
   title: string;
   year: number;
   cellType: CellType;
-  onRemoveCell: () => void;
+  onRemoveCell: () => Promise<void>;
   onEditCell: () => void;
 }
 

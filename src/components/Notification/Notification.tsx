@@ -23,8 +23,8 @@ const Notification: FC = () => {
                 position={n.type === 'toast' ? 'top-right' : 'inline'}
                 autoClose={n.type === 'toast'}
                 autoCloseDuration={n.duration}
-                closeButtonLabelText={t('closeNotification') || ''}
-                onClose={() => dispatch(clearNotification(n.id || 0))}
+                closeButtonLabelText={t('closeNotification') ?? ''}
+                onClose={() => dispatch(clearNotification(n.id ?? 0))}
               >
                 {t(`notification.message.${n.message}`)}
               </HDSNotification>

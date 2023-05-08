@@ -45,10 +45,7 @@ export const calculatePlanningRowSums = (
       plannedBudgets,
       costEstimateBudget,
       ...(type !== 'group' && {
-        deviation: {
-          value: formatNumber(deviationBetweenCostEstimateAndBudget),
-          isNegative: deviationBetweenCostEstimateAndBudget < 0,
-        },
+        deviation: formatNumber(deviationBetweenCostEstimateAndBudget),
       }),
     }),
   };
@@ -81,10 +78,7 @@ export const calculatePlanningCells = (
         // we don't return frameBudget or deviation for a group
         ...(type !== 'group' && {
           frameBudget: formatNumber(frameBudget),
-          deviation: {
-            value: formatNumber(deviation),
-            isNegative: deviation < 0,
-          },
+          deviation: formatNumber(deviation),
         }),
       }),
     };

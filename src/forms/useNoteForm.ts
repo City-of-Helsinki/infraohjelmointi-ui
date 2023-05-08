@@ -12,10 +12,10 @@ const useNoteValues = (note?: INote) => {
 
   const formValues = useMemo(
     () => ({
-      id: note?.id || '',
-      updatedBy: user || '',
-      content: note?.content || '',
-      project: projectId || '',
+      id: note?.id ?? '',
+      updatedBy: user ?? '',
+      content: note?.content ?? '',
+      project: projectId ?? '',
     }),
     [projectId, user, note],
   );

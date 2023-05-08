@@ -59,14 +59,14 @@ axios.interceptors.response.use(
 const handleRequest = (req: InternalAxiosRequestConfig) => {
   // Check if the url should add a loader to redux
   if (shouldTriggerLoading(req?.url)) {
-    store.dispatch(setLoading({ text: 'Loading request', id: req?.url || '' }));
+    store.dispatch(setLoading({ text: 'Loading request', id: req?.url ?? '' }));
   }
   return req;
 };
 
 const handleResponse = (res: AxiosResponse) => {
   if (shouldTriggerLoading(res.config.url)) {
-    store.dispatch(clearLoading(res.config?.url || ''));
+    store.dispatch(clearLoading(res.config?.url ?? ''));
   }
   return res;
 };
@@ -101,7 +101,7 @@ const handleError = (error: AxiosError): Promise<IError> => {
   store.dispatch(notifyError(getErrorNotification(error)));
 
   if (shouldTriggerLoading(error.config?.url)) {
-    store.dispatch(clearLoading(error.config?.url || ''));
+    store.dispatch(clearLoading(error.config?.url ?? ''));
   }
 
   return Promise.reject(parsedError);

@@ -10,7 +10,7 @@ const FormSectionTitle: FC<IFormSectionTitleProps> = ({ label, name }) => {
   return (
     <div className="input-wrapper" id={'formTitle'}>
       <h3 className="text-heading-m" id={name}>
-        {t(label || '')}
+        {t(label ?? '')}
       </h3>
     </div>
   );

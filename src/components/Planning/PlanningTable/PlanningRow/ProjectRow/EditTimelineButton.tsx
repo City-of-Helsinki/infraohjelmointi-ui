@@ -11,8 +11,8 @@ const EditTimelineButton = ({
 }: {
   direction: ProjectCellGrowDirection;
   id: string;
-  onSingleClick: (d: ProjectCellGrowDirection) => void;
-  onDoubleClick: (d: ProjectCellGrowDirection) => void;
+  onSingleClick: (d: ProjectCellGrowDirection) => Promise<void>;
+  onDoubleClick: (d: ProjectCellGrowDirection) => Promise<void>;
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const handleSingleClick = () => onSingleClick(direction);

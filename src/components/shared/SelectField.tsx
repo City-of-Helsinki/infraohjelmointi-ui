@@ -80,10 +80,10 @@ const SelectField: FC<ISelectFieldProps> = ({
                 label={!hideLabel && label && t(label)}
                 invalid={error ? true : false}
                 error={error?.message}
-                options={options || []}
+                options={options ?? []}
                 required={required}
                 style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-                placeholder={(placeholder && t(placeholder || '')) || ''}
+                placeholder={(placeholder && t(placeholder ?? '')) ?? ''}
                 icon={getIcon(icon)}
               />
 

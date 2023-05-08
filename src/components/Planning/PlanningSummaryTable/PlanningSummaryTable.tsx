@@ -1,7 +1,8 @@
 import { FC } from 'react';
 import useSummaryRows from '@/hooks/useSummaryRows';
-import './styles.css';
 import { IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
+import _ from 'lodash';
+import './styles.css';
 
 interface IPlanningSummaryTableProps {
   startYear: number;
@@ -11,7 +12,6 @@ interface IPlanningSummaryTableProps {
 
 const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selections, lists }) => {
   const { header, cells } = useSummaryRows({ startYear, selections, lists });
-
   return (
     <table cellSpacing={0} className="planning-summary-table">
       {/* Head */}
@@ -32,7 +32,7 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selec
         <tr data-testid="planning-summary-planned-budget-row">
           {cells.map(({ plannedBudget, key }) => (
             <td key={key} className="planned-budget-cell">
-              <span data-testid={`summary-budget-${key}`}>{plannedBudget || ''}</span>
+              <span data-testid={`summary-budget-${key}`}>{plannedBudget}</span>
             </td>
           ))}
         </tr>
@@ -45,10 +45,10 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selec
                   {frameBudget}
                 </span>
                 <span
-                  className={`deviation ${deviation?.isNegative ? 'negative' : ''} `}
+                  className={`deviation ${deviation && parseInt(deviation) < 0 ? 'negative' : ''} `}
                   data-testid={`summary-deviation-${key}`}
                 >
-                  {deviation?.value ?? ''}
+                  {deviation}
                 </span>
               </div>
             </td>

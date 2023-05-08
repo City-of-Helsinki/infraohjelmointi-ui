@@ -313,7 +313,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
   }, []);
 
   // Blurring the input field will patch the current budget
-  const handleBlur = useCallback(async () => {
+  const handleBlur = useCallback(async (): Promise<void> => {
     setIsReadOnly((current) => !current);
     if (formValue !== parseInt(budget || '0')) {
       updateCell({

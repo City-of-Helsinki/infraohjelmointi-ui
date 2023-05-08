@@ -144,7 +144,7 @@ const FreeSearchForm = ({
           <>
             <SearchInput
               label={t('searchForm.searchWord')}
-              helperText={t('searchForm.freeSearchDescription') || ''}
+              helperText={t('searchForm.freeSearchDescription') ?? ''}
               searchButtonAriaLabel="Search"
               suggestionLabelField="label"
               getSuggestions={getSuggestions}

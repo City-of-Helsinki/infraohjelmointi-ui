@@ -34,7 +34,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control
       control={control as Control<FieldValues>}
       render={({ field: { onChange, onBlur, value } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
-          <SelectionGroup label={t(label) || ''} direction="horizontal" id="radio-checkbox">
+          <SelectionGroup label={t(label) ?? ''} direction="horizontal" id="radio-checkbox">
             {options?.map((o, i) => (
               <HDSRadioButton
                 data-testid={`${name}-${i}`}

@@ -288,7 +288,7 @@ describe('PlanningView', () => {
       cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
         expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
         expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
-        expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation?.value);
+        expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
       });
     });
 
@@ -306,7 +306,7 @@ describe('PlanningView', () => {
         cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
           expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
           expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
-          expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation?.value);
+          expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
         });
       });
     });
@@ -363,7 +363,7 @@ describe('PlanningView', () => {
         expect(getByTestId(`planned-budgets-${id}`).textContent).toBe(plannedBudgets);
         expect(getByTestId(`cost-estimate-budget-${id}`).textContent).toBe(costEstimateBudget);
         if (!isGroup) {
-          expect(getByTestId(`deviation-${id}`).textContent).toBe(deviation?.value);
+          expect(getByTestId(`deviation-${id}`).textContent).toBe(deviation);
         }
       };
 
@@ -669,7 +669,7 @@ describe('PlanningView', () => {
 
         expect(getByTestId(`planned-budget-${id}-${year}`).textContent).toBe(plannedBudget || '0');
         expect(getByTestId(`frame-budget-${id}-${year}`).textContent).toBe(frameBudget || '0');
-        expect(getByTestId(`deviation-${id}-${year}`).textContent).toBe(deviation?.value || '0');
+        expect(getByTestId(`deviation-${id}-${year}`).textContent).toBe(deviation || '0');
       });
     });
 

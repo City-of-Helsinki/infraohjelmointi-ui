@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useAppSelector } from './common';
 
 const buildBreadCrumbs = (path: string, classes: Array<IClass>): Array<string> =>
-  path.split('/').map((p) => classes.find((c) => c.id === p)?.name || '');
+  path.split('/').map((p) => classes.find((c) => c.id === p)?.name ?? '');
 
 const buildSearchResultsList = (
   searchResults: Array<ISearchResultPayloadItem>,

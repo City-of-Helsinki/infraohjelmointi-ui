@@ -22,7 +22,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         </span>
         <span data-testid={`frame-budget-${id}-${year}`}>{frameBudget}</span>
         <span data-testid={`deviation-${id}-${year}`} className="planning-cell-deviation">
-          {deviation?.value}
+          {deviation}
         </span>
       </div>
     </td>
