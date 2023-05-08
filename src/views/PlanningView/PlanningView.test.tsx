@@ -128,12 +128,11 @@ describe('PlanningView', () => {
     expect(getMock[0]).toBe('localhost:4000/projects/?test=123&direct=false');
   });
 
-  it.only('updates table sums if the finance-update event triggers', async () => {
+  it('updates table sums if the finance-update event triggers', async () => {
     const renderResult = await render();
     const { store, getByTestId } = renderResult;
 
     const { id: masterClassId } = store.getState().class.masterClasses[0];
-    const { id: classId } = store.getState().class.classes[0];
     const year = new Date().getFullYear();
 
     const updatedFinances = {
