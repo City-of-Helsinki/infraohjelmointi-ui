@@ -71,7 +71,7 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
                     openInNewTabAriaLabel="Opens in a new tab."
                     style={{ display: 'block', width: 'fit-content' }}
                   >
-                    {t(`pwFolderLink`)}
+                    {t(`nav.pwFolderLink`)}
                   </Link>
                 </div>
               ) : (

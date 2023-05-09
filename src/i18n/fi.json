@@ -24,7 +24,8 @@
     "responsiblePersons": "Hankkeen vastuuhenkilöt",
     "location": "Hankkeen sijainti",
     "projectProgram": "Hankeohjelma",
-    "documents": "Dokumentit"
+    "documents": "Dokumentit",
+    "pwFolderLink": "Avaa dokumentit ProjectWisessa"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -304,7 +305,6 @@
   "previous": "Edellinen",
   "removeYearFromTimeline": "Poista vuosi aikajanalta",
   "editTimeline": "Muokkaa aikajanaa",
-  "pwFolderLink": "Avaa dokumentit ProjectWisessa",
   "pwFolderLinkDescription": "Vaatii erillisen PW explorer solvelluksen",
   "pwFolderLinkNotExist":"Dokumenttikansiota ei ole avattu"
 }
