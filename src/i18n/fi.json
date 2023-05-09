@@ -305,5 +305,6 @@
   "removeYearFromTimeline": "Poista vuosi aikajanalta",
   "editTimeline": "Muokkaa aikajanaa",
   "pwFolderLink": "Avaa dokumentit ProjectWisessa",
-  "pwFolderLinkDescription": "Vaatii erillisen PW explorer solvelluksen"
+  "pwFolderLinkDescription": "Vaatii erillisen PW explorer solvelluksen",
+  "pwFolderLinkNotExist":"Dokumenttikansiota ei ole avattu"
 }
