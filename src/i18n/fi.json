@@ -305,7 +305,7 @@
   "previous": "Edellinen",
   "removeYearFromTimeline": "Poista vuosi aikajanalta",
   "editTimeline": "Muokkaa aikajanaa",
-  "pwFolderLinkDescription": "Vaatii erillisen PW Explorer -sovelluksen",
+  "pwFolderLinkDescription": "Vaatii erillisen PW Explorer .sovelluksen",
   "pwFolderLinkNotExist":"Dokumenttikansiota ei ole avattu",
   "opensExternalWebsite":"Avaa toisen verkkosivuston",
   "opensInNewTab":"Avautuu uuteen välilehteen"
