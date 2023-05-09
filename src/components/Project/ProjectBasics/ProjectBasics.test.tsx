@@ -6,7 +6,6 @@ import mockPersons from '@/mocks/mockPersons';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
 import { Route } from 'react-router';
-import axios from 'axios';
 
 jest.mock('react-i18next', () => mockI18next());
 const store = setupStore();
