@@ -67,8 +67,8 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
                     data-testid="pw-folder-link"
                     external
                     openInNewTab
-                    openInExternalDomainAriaLabel="Opens a different website."
-                    openInNewTabAriaLabel="Opens in a new tab."
+                    openInExternalDomainAriaLabel={t(`opensExternalWebsite`) || ''}
+                    openInNewTabAriaLabel={t(`opensInNewTab`) || ''}
                     style={{ display: 'block', width: 'fit-content' }}
                   >
                     {t(`nav.pwFolderLink`)}
