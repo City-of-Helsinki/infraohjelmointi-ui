@@ -23,11 +23,16 @@ const buildSearchResultsList = (
   classes: Array<IClass>,
   districts: Array<ILocation>,
 ): Array<ISearchResultListItem> => {
-  const parsedResults = searchResults.map((r) => ({
-    ...r,
-    phase: r.phase?.value ?? null,
-    breadCrumbs: buildBreadCrumbs(r.path, classes, districts),
-  }));
+  const parsedResults = searchResults.map((r) => {
+    const link =
+      r.type === 'projects' ? `/planning/${r.path}/?project=${r.id}` : `/planning/${r.path}`;
+    return {
+      ...r,
+      phase: r.phase?.value ?? null,
+      breadCrumbs: buildBreadCrumbs(r.path, classes, districts),
+      link,
+    };
+  });
 
   return parsedResults;
 };

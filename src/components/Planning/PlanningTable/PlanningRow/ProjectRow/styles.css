@@ -1,3 +1,7 @@
+.project-row.searched {
+  @apply border-[1px] border-l-[3px] border-black-80;
+}
+
 .project-header-cell {
   /* setting max-width: 1rem will cause the table head to not grow bigger than the group table header */
   @apply max-w-[1rem] border-b-[0.05rem] border-l-[0.05rem] border-r-[0.05rem] border-bus-m py-1 px-4;

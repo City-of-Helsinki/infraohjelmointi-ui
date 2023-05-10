@@ -292,7 +292,7 @@ describe('SearchResultsView', () => {
       // Link rendered around project card
       expect(getAllByText('Vanha yrttimaantie')[0].closest('a')).toHaveAttribute(
         'href',
-        '/planning/coordinator/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
+        '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8/?project=ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
       );
 
       const classCard = container.getElementsByClassName('search-result-card')[1];
@@ -308,7 +308,7 @@ describe('SearchResultsView', () => {
       // Link rendered around class card
       expect(getAllByText('Koillinen suurpiiri')[0].closest('a')).toHaveAttribute(
         'href',
-        '/planning/coordinator/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
+        '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8/?project=ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
       );
     });
   });
