@@ -18,19 +18,16 @@ export const calculatePlanningRowSums = (
 ): IPlanningSums => {
   const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
 
-  const sumOfPlannedBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
-    if (currentValue?.plannedBudget) {
-      return accumulator + currentValue.plannedBudget;
-    }
-    return accumulator;
-  }, 0);
+  const budgets = Object.values(rest).reduce(
+    (budgets: { sumOfPlannedBudgets: number; sumOfFrameBudgets: number }, finance) => {
+      budgets.sumOfPlannedBudgets += finance.plannedBudget;
+      budgets.sumOfFrameBudgets += finance.plannedBudget;
+      return budgets;
+    },
+    { sumOfPlannedBudgets: 0, sumOfFrameBudgets: 0 },
+  );
 
-  const sumOfFrameBudgets = Object.values(rest).reduce((accumulator, currentValue) => {
-    if (currentValue?.frameBudget) {
-      return accumulator + currentValue.frameBudget;
-    }
-    return accumulator;
-  }, 0);
+  const { sumOfPlannedBudgets, sumOfFrameBudgets } = budgets;
 
   const sumOfFramesAndOverrun = sumOfFrameBudgets + budgetOverrunAmount;
   const deviationBetweenCostEstimateAndBudget = sumOfFramesAndOverrun - sumOfPlannedBudgets;
@@ -98,19 +95,19 @@ export const calculatePlanningSummaryCells = (
   classes: Array<IClass>,
   type: PlanningRowType,
 ): Array<IPlanningCell> => {
-  const totalFinances = classes.reduce((acc: IClassFinances, curr: IClass) => {
-    const { budgetOverrunAmount, projectBudgets, year, ...rest } = curr.finances;
+  const totalFinances = classes.reduce((totalFinances: IClassFinances, currentClass: IClass) => {
+    const { budgetOverrunAmount, projectBudgets, year, ...rest } = currentClass.finances;
 
     Object.entries(rest).forEach(([key, value]) => {
-      if (!Object.prototype.hasOwnProperty.call(acc, key)) {
-        Object.assign(acc, {
+      if (!Object.prototype.hasOwnProperty.call(totalFinances, key)) {
+        Object.assign(totalFinances, {
           [key]: { frameBudget: value.frameBudget, plannedBudget: value.plannedBudget },
         });
       } else {
-        const accBudgets = acc[key as keyof IClassFinances] as IClassBudgets;
+        const accBudgets = totalFinances[key as keyof IClassFinances] as IClassBudgets;
         const totalFrameBudget = (accBudgets.frameBudget += value.frameBudget);
         const totalPlannedBudget = (accBudgets.plannedBudget += value.plannedBudget);
-        Object.assign(acc, {
+        Object.assign(totalFinances, {
           [key]: {
             frameBudget: totalFrameBudget,
             plannedBudget: totalPlannedBudget,
@@ -119,7 +116,7 @@ export const calculatePlanningSummaryCells = (
       }
     });
 
-    return acc;
+    return totalFinances;
   }, {} as IClassFinances);
 
   return calculatePlanningCells(totalFinances, type);

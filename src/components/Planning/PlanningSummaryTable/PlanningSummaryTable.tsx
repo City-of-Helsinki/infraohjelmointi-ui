@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import useSummaryRows from '@/hooks/useSummaryRows';
 import { IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
 import './styles.css';
@@ -58,4 +58,4 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selec
   );
 };
 
-export default PlanningSummaryTable;
+export default memo(PlanningSummaryTable);

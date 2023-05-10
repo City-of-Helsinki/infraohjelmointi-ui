@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { IconAngleLeft } from 'hds-react/icons';
 import { useNavigate } from 'react-router';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 
 interface IPlanningInfoPanelProps {
@@ -16,6 +16,7 @@ const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass })
   const navigate = useNavigate();
   const navigateBack = useCallback(() => navigate(-1), []);
 
+  const iconLeft = useMemo(() => <IconAngleLeft />, []);
   return (
     <div className="planning-info-panel">
       {/* Mode and previous button */}
@@ -31,7 +32,7 @@ const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass })
               data-testid="previous-button"
               onClick={navigateBack}
               variant="supplementary"
-              iconLeft={<IconAngleLeft />}
+              iconLeft={iconLeft}
             >
               {t('previous')}
             </Button>
