@@ -21,9 +21,13 @@ import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
-import { eventSource } from '@/utils/events';
-import { IFinanceEventData, IProjectEventData } from '@/interfaces/eventInterfaces';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import {
+  clearFinanceUpdate,
+  clearProjectUpdate,
+  selectFinanceUpdate,
+  selectProjectUpdate,
+} from '@/reducers/eventsSlice';
 
 /**
  * Returns false whether a given row is already selected and present in the url.
@@ -295,6 +299,8 @@ const usePlanningRows = () => {
   const batchedClasses = useAppSelector(selectBatchedClasses);
   const batchedLocations = useAppSelector(selectedBatchedLocations);
   const groups = useAppSelector(selectGroups);
+  const financeUpdate = useAppSelector(selectFinanceUpdate);
+  const projectUpdate = useAppSelector(selectProjectUpdate);
 
   const [planningRowsState, setPlanningRowsState] = useState<IPlanningRowsState>({
     lists: {
@@ -408,47 +414,34 @@ const usePlanningRows = () => {
     }));
   }, [groups]);
 
-  // Listen to finance-update and project-update events to update the list
+  // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
-    eventSource.onerror = (e) => {
-      console.log('Error opening a connection to events: ', e);
-    };
-    eventSource.onopen = (e) => {
-      console.log('Listening to finance-update and project-update events: ', e);
-    };
-
-    const updateState = (dataString: string) => {
-      const data = JSON.parse(dataString) as IFinanceEventData;
-
+    if (financeUpdate) {
       dispatch(setLoading({ text: 'Loading planning view', id: LOADING_PLANNING_ID }));
 
       Promise.all([
-        dispatch(updateMasterClass(data.masterClass)),
-        dispatch(updateClass(data.class)),
-        dispatch(updateSubClass(data.subClass)),
-        dispatch(updateDistrict(data.district)),
-        dispatch(updateGroup(data.group)),
-      ]).finally(() => dispatch(clearLoading(LOADING_PLANNING_ID)));
-    };
+        dispatch(updateMasterClass(financeUpdate.masterClass)),
+        dispatch(updateClass(financeUpdate.class)),
+        dispatch(updateSubClass(financeUpdate.subClass)),
+        dispatch(updateDistrict(financeUpdate.district)),
+        dispatch(updateGroup(financeUpdate.group)),
+      ]).finally(() => {
+        dispatch(clearLoading(LOADING_PLANNING_ID));
+        dispatch(clearFinanceUpdate());
+      });
+    }
+  }, [financeUpdate]);
 
-    const updateProject = (dataString: string) => {
-      const projectToUpdate = (JSON.parse(dataString) as IProjectEventData).project;
-
+  // Listen to project-update from redux to see if an update event was triggered
+  useEffect(() => {
+    if (projectUpdate) {
       setPlanningRowsState((current) => ({
         ...current,
-        projectToUpdate,
+        projectToUpdate: projectUpdate.project,
       }));
-    };
-
-    eventSource.addEventListener('finance-update', (e) => updateState(e.data));
-    eventSource.addEventListener('project-update', (e) => updateProject(e.data));
-
-    return () => {
-      eventSource.removeEventListener('finance-update', (e) => updateState(e.data));
-      eventSource.addEventListener('project-update', (e) => updateProject(e.data));
-      eventSource.close();
-    };
-  }, []);
+      dispatch(clearProjectUpdate());
+    }
+  }, [projectUpdate]);
 
   return planningRowsState;
 };

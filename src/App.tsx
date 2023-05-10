@@ -20,6 +20,13 @@ import { CustomContextMenu } from './components/CustomContextMenu';
 import { getGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
+import { eventSource } from './utils/events';
+import {
+  addFinanceUpdateEventListener,
+  removeFinanceUpdateEventListener,
+  addProjectUpdateEventListener,
+  removeProjectUpdateEventListener,
+} from '@/utils/events';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -44,6 +51,25 @@ const App: FC = () => {
   // Initialize states that are used everywhere in the app
   useEffect(() => {
     initalizeStates().catch(Promise.reject);
+  }, []);
+
+  // Listen to finance-update and project-update events
+  useEffect(() => {
+    eventSource.onerror = (e) => {
+      console.log('Error opening a connection to events: ', e);
+    };
+    eventSource.onopen = (e) => {
+      console.log('Listening to finance-update and project-update events: ', e);
+    };
+
+    addFinanceUpdateEventListener(dispatch);
+    addProjectUpdateEventListener(dispatch);
+
+    return () => {
+      removeFinanceUpdateEventListener(dispatch);
+      removeProjectUpdateEventListener(dispatch);
+      eventSource.close();
+    };
   }, []);
 
   return (

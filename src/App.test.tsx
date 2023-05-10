@@ -1,7 +1,11 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import { act, waitFor } from '@testing-library/react';
-import { renderWithProviders } from './utils/testUtils';
+import {
+  renderWithProviders,
+  sendFinanceUpdateEvent,
+  sendProjectUpdateEvent,
+} from './utils/testUtils';
 import App from './App';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
 import {
@@ -38,6 +42,7 @@ import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
 import { getGroupsThunk } from './reducers/groupSlice';
+import mockProject from './mocks/mockProject';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -109,6 +114,28 @@ describe('App', () => {
   it('does not render Notification', async () => {
     const { container } = await render();
     expect(container.getElementsByClassName('notifications-container').length).toBe(0);
+  });
+
+  it('listens to the project-update event stream and updates redux eventSlice', async () => {
+    const { store } = await render();
+
+    await sendProjectUpdateEvent(mockProject.data);
+
+    await waitFor(() => {
+      expect(store.getState().events.projectUpdate?.project).toStrictEqual(mockProject.data);
+    });
+  });
+
+  it('listens to the finance-update event stream and updates redux eventSlice', async () => {
+    const { store } = await render();
+
+    await sendFinanceUpdateEvent({ masterClass: mockMasterClasses.data[0] });
+
+    await waitFor(() => {
+      expect(store.getState().events.financeUpdate?.masterClass).toStrictEqual(
+        mockMasterClasses.data[0],
+      );
+    });
   });
 
   it('landing on a bad page', async () => {

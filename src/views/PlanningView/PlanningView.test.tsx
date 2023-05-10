@@ -33,6 +33,12 @@ import {
 } from '@/utils/calculations';
 import { sendProjectUpdateEvent, sendFinanceUpdateEvent } from '@/utils/testUtils';
 import mockProject from '@/mocks/mockProject';
+import {
+  addFinanceUpdateEventListener,
+  removeFinanceUpdateEventListener,
+  addProjectUpdateEventListener,
+  removeProjectUpdateEventListener,
+} from '@/utils/events';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -43,23 +49,25 @@ const store = setupStore();
 const render = async () =>
   await act(async () =>
     renderWithProviders(
-      <Route
-        path="/"
-        element={
-          <>
-            <PlanningView />
-            <CustomContextMenu />
-          </>
-        }
-      >
-        <Route path=":masterClassId" element={<PlanningView />}>
-          <Route path=":classId" element={<PlanningView />}>
-            <Route path=":subClassId" element={<PlanningView />}>
-              <Route path=":districtId" element={<PlanningView />} />
+      <>
+        <Route
+          path="/"
+          element={
+            <>
+              <PlanningView />
+              <CustomContextMenu />
+            </>
+          }
+        >
+          <Route path=":masterClassId" element={<PlanningView />}>
+            <Route path=":classId" element={<PlanningView />}>
+              <Route path=":subClassId" element={<PlanningView />}>
+                <Route path=":districtId" element={<PlanningView />} />
+              </Route>
             </Route>
           </Route>
         </Route>
-      </Route>,
+      </>,
       {
         preloadedState: {
           class: {
@@ -132,6 +140,8 @@ describe('PlanningView', () => {
     const renderResult = await render();
     const { store, getByTestId } = renderResult;
 
+    addFinanceUpdateEventListener(store.dispatch);
+
     const { id: masterClassId } = store.getState().class.masterClasses[0];
     const year = new Date().getFullYear();
 
@@ -143,9 +153,7 @@ describe('PlanningView', () => {
       },
     };
 
-    await navigateToProjectRows(renderResult);
-
-    await sendFinanceUpdateEvent({
+    const financeUpdateData = {
       masterClass: {
         ...mockMasterClasses.data[0],
         finances: {
@@ -159,7 +167,15 @@ describe('PlanningView', () => {
         },
       },
       project: mockProject.data,
+    };
+    await navigateToProjectRows(renderResult);
+
+    await waitFor(async () => {
+      await sendFinanceUpdateEvent(financeUpdateData);
     });
+
+    // It clears the events stores financeUpdate state back to null
+    expect(store.getState().events.financeUpdate).toBeNull();
 
     const { plannedBudget, frameBudget } = updatedFinances.year0;
 
@@ -174,6 +190,8 @@ describe('PlanningView', () => {
         formatNumber(frameBudget - plannedBudget),
       );
     });
+
+    removeFinanceUpdateEventListener(store.dispatch);
   });
 
   describe('PlanningBreadCrumbs', () => {
@@ -803,7 +821,9 @@ describe('PlanningView', () => {
 
         const renderResult = await render();
 
-        const { user, getByTestId, getByText, queryByTestId } = renderResult;
+        const { user, getByTestId, getByText, queryByTestId, store } = renderResult;
+
+        addProjectUpdateEventListener(store.dispatch);
 
         const { id } = project;
         const phasesAsOptions = mockProjectPhases.data.map((p) => listItemToOption(p));
@@ -842,6 +862,9 @@ describe('PlanningView', () => {
         // Send the project-update event with the updated project
         await sendProjectUpdateEvent(mockPatchPhaseResponse.data);
 
+        // It clears the events stores projectUpdate state back to null
+        expect(store.getState().events.projectUpdate).toBeNull();
+
         // Context menu is hidden after patch
         await waitFor(() => expect(queryByTestId('project-phase-menu')).toBeNull());
 
@@ -856,6 +879,8 @@ describe('PlanningView', () => {
             ),
           ).toBeTruthy();
         });
+
+        removeProjectUpdateEventListener(store.dispatch);
       });
 
       it('creates cells for planning, construction and overlap when the project has planning', async () => {
@@ -982,7 +1007,14 @@ describe('PlanningView', () => {
 
           const renderResult = await render();
 
-          const { user, getByTestId } = renderResult;
+          const {
+            user,
+            getByTestId,
+            store: { dispatch },
+          } = renderResult;
+
+          addProjectUpdateEventListener(dispatch);
+
           const { id, name } = project;
           const yearToHide = year + 4;
 
@@ -1005,27 +1037,6 @@ describe('PlanningView', () => {
             expect(patchMock[1]).toStrictEqual(patchRequest);
           });
 
-          // TODO: finance update test
-          // const { masterClasses, classes, subClasses } = store.getState().class;
-          // const { districts } = store.getState().location;
-          // const { groups } = store.getState().group;
-
-          // // Sends a finance-update event for the rows
-          // await waitFor(() =>
-          //   new EventSourceMock().emitMessage({
-          //     id: '',
-          //     type: 'finance-update',
-          //     data: JSON.stringify({
-          //       masterClass: masterClasses[0],
-          //       class: classes[0],
-          //       subClass: subClasses[0],
-          //       district: districts[0],
-          //       group: groups[0],
-          //       project: mockDeleteCellPatchResponse.data.id,
-          //     }),
-          //   }),
-          // );
-
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockDeleteCellPatchResponse.data);
 
@@ -1041,6 +1052,8 @@ describe('PlanningView', () => {
               getByTestId(`project-cell-${yearToHide + 1}-${id}`).classList.contains('con'),
             ).toBeTruthy();
           });
+
+          removeProjectUpdateEventListener(dispatch);
         });
 
         it('can delete the start and end of the timeline to decrease the planning or construction dates', async () => {
@@ -1073,7 +1086,14 @@ describe('PlanningView', () => {
 
           const renderResult = await render();
 
-          const { user, getByTestId } = renderResult;
+          const {
+            user,
+            getByTestId,
+            store: { dispatch },
+          } = renderResult;
+
+          addProjectUpdateEventListener(dispatch);
+
           const { id } = project;
           const endOfTimeline = year + 6;
 
@@ -1147,6 +1167,8 @@ describe('PlanningView', () => {
               getByTestId(`project-cell-${startOfTimeline}-${id}`).classList.contains('none'),
             ).toBeTruthy();
           });
+
+          removeProjectUpdateEventListener(dispatch);
         });
 
         it('it removes construction end and start dates if last construction cell is removed', async () => {
