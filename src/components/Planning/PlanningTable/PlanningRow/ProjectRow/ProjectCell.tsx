@@ -302,8 +302,8 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell }) => {
 
   // Removes the zero value on change if there is only one zero in the value
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    // If value is longer than 1 and starts with a zero, let the value be
-    if (/^0.{2,}$/.exec(e.target.value)) {
+    // If the value is more than one zero set the form value normally
+    if (/^0{2,}/.exec(e.target.value)) {
       setFormValue(e.target.value);
     }
     // If value is just a zero replace it

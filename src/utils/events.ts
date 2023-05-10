@@ -47,7 +47,6 @@ export const addProjectUpdateEventListener = (dispatch: Dispatch) => {
     const projectData = JSON.parse(event.data) as IProjectEventData;
     dispatch(setProjectUpdate(projectData));
   };
-
   eventSource.addEventListener('project-update', projectUpdate);
 };
 
