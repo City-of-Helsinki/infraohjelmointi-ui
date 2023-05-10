@@ -19,10 +19,20 @@ interface IPlanningRowState {
 interface IPlanningRowProps extends IPlanningRow {
   projectToUpdate: IProject | null;
   selectedYear: number | null;
+  groupsExpanded: boolean;
 }
 
 const PlanningRow: FC<IPlanningRowProps> = (props) => {
-  const { defaultExpanded, projectRows, cells, projectToUpdate, selectedYear, id, type } = props;
+  const {
+    defaultExpanded,
+    projectRows,
+    cells,
+    projectToUpdate,
+    selectedYear,
+    groupsExpanded,
+    id,
+    type,
+  } = props;
 
   const { search } = useLocation();
 
@@ -48,6 +58,11 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
     setPlanningRowState((current) => ({ ...current, projects: projectRows }));
   }, [projectRows]);
 
+  useEffect(() => {
+    if (type === 'group') {
+      setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
+    }
+  }, [type, groupsExpanded]);
   // usePlanningRows-hook sets a projectToUpdate when the project-update event is triggered,
   // this useEffect updates the project in the view with the projecToUpdate
   useEffect(() => {
@@ -160,7 +175,12 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} projectToUpdate={projectToUpdate} selectedYear={selectedYear} />
+            <PlanningRow
+              {...c}
+              projectToUpdate={projectToUpdate}
+              selectedYear={selectedYear}
+              groupsExpanded={groupsExpanded}
+            />
           ))}
         </>
       )}

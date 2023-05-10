@@ -336,5 +336,7 @@
   "searchForProjects": "Etsi hanke",
   "closeProjectProgrammedDialog": "Sulje projektiohjelmoitu dialogi",
   "implemented": "Toteutettu",
-  "bound": "Sidottu"
+  "bound": "Sidottu",
+  "openAllGroups":"Avaa ryhmät",
+  "closeAllGroups":"Pinoa ryhmät"
 }

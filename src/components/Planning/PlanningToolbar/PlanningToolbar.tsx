@@ -1,18 +1,24 @@
 import { Toolbar } from '../../shared';
 import { IconPlusCircle } from 'hds-react/icons/';
-import { useCallback, MouseEvent as ReactMouseEvent, useState } from 'react';
+import { useCallback, MouseEvent as ReactMouseEvent, useState, FC } from 'react';
 import { IPlanningRowSelections } from '@/interfaces/common';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { Button } from 'hds-react/components/Button';
-import './styles.css';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
+import './styles.css';
 
-interface ProjectToolBarProps {
+interface IPlanningToolbarProps {
+  toggleGroupsExpanded: () => void;
+  groupsExpanded: boolean;
   selections: IPlanningRowSelections;
 }
-const ProjectToolbar = ({ selections }: ProjectToolBarProps) => {
+const ProjectToolbar: FC<IPlanningToolbarProps> = ({
+  toggleGroupsExpanded,
+  groupsExpanded,
+  selections,
+}) => {
   const [toolbarState, setToolbarState] = useState({
     groupDialogVisible: false,
     projectProgrammedDialogVisible: false,
