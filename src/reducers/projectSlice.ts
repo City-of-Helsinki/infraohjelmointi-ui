@@ -1,8 +1,7 @@
 import { IError } from '@/interfaces/common';
-import { IProject, IProjectPatchRequestObject } from '@/interfaces/projectInterfaces';
-import { getProject, patchProject } from '@/services/projectServices';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { getProject } from '@/services/projectServices';
 import { RootState } from '@/store';
-import { getCurrentTime } from '@/utils/dates';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IProjectState {
@@ -28,15 +27,6 @@ export const getProjectThunk = createAsyncThunk('project/getOne', async (id: str
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
 
-export const patchProjectThunk = createAsyncThunk(
-  'project/silent-patch',
-  async (request: IProjectPatchRequestObject, thunkAPI) => {
-    return await patchProject(request)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
-
 export const projectSlice = createSlice({
   name: 'project',
   initialState,
@@ -50,6 +40,9 @@ export const projectSlice = createSlice({
     resetProject(state) {
       return { ...state, selectedProject: null };
     },
+    setSelectedProject(state, action: PayloadAction<IProject>) {
+      return { ...state, selectedProject: action.payload };
+    },
   },
   extraReducers: (builder) => {
     // GET ONE
@@ -57,17 +50,6 @@ export const projectSlice = createSlice({
       return { ...state, selectedProject: action.payload };
     });
     builder.addCase(getProjectThunk.rejected, (state, action: PayloadAction<unknown>) => {
-      return { ...state, error: action.payload };
-    });
-    // SILENT PATCH
-    builder.addCase(patchProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
-      return {
-        ...state,
-        selectedProject: action.payload,
-        updated: getCurrentTime(),
-      };
-    });
-    builder.addCase(patchProjectThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
   },
@@ -78,6 +60,6 @@ export const selectCount = (state: RootState) => state.project.count;
 export const selectPage = (state: RootState) => state.project.page;
 export const selectUpdated = (state: RootState) => state.project.updated;
 
-export const { setPage, resetProject } = projectSlice.actions;
+export const { setPage, resetProject, setSelectedProject } = projectSlice.actions;
 
 export default projectSlice.reducer;

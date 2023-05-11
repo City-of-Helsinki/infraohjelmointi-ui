@@ -2,17 +2,18 @@ import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '../hooks/common';
+import { useAppDispatch, useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { selectProject } from '@/reducers/projectSlice';
+import { selectProject, setSelectedProject } from '@/reducers/projectSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
+import { selectProjectUpdate } from '@/reducers/eventsSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -171,7 +172,9 @@ const useProjectBasicsValues = () => {
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectBasicsForm = () => {
-  const project = useAppSelector(selectProject);
+  const selectedProject = useAppSelector(selectProject);
+  const projectUpdate = useAppSelector(selectProjectUpdate);
+  const dispatch = useAppDispatch();
   const { formValues } = useProjectBasicsValues();
 
   const formMethods = useForm<IProjectBasicsForm>({
@@ -182,15 +185,25 @@ const useProjectBasicsForm = () => {
   // control,
   const { reset } = formMethods;
 
-  const classOptions = useClassOptions(project?.projectClass);
-  const locationOptions = useLocationOptions(project?.projectLocation, project?.projectClass);
+  const classOptions = useClassOptions(selectedProject?.projectClass);
+  const locationOptions = useLocationOptions(
+    selectedProject?.projectLocation,
+    selectedProject?.projectClass,
+  );
 
-  // Updates
+  // Update selectedProject to redux with a projectUpdate event
   useEffect(() => {
-    if (project) {
+    if (projectUpdate?.project) {
+      dispatch(setSelectedProject(projectUpdate.project));
+    }
+  }, [projectUpdate]);
+
+  // Updates form with the selectedProject from redux
+  useEffect(() => {
+    if (selectedProject) {
       reset(formValues);
     }
-  }, [project]);
+  }, [selectedProject]);
 
   // formFields,
   return { formMethods, classOptions, locationOptions };

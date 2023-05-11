@@ -1,7 +1,7 @@
 import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
-import { renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import ProjectBasicsForm from './ProjectBasicsForm';
 import { arrayHasValue, matchExact } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
@@ -19,7 +19,7 @@ import {
   mockResponsibleZones,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
-
+import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor, act, within } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
@@ -153,6 +153,8 @@ describe('ProjectBasicsForm', () => {
   it('renders hashTags modal and can search and patch hashTags', async () => {
     const { findByText, findByRole, user, store } = await render();
 
+    addProjectUpdateEventListener(store.dispatch);
+
     const expectedValues = [
       ...(mockProject.data.hashTags as Array<string>),
       '816cc173-6340-45ed-9b49-4b4976b2a48b',
@@ -184,6 +186,10 @@ describe('ProjectBasicsForm', () => {
     await waitFor(async () => await user.click(await dialog.findByText('hulevesi')));
 
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
+
+    // Send the project-update event with the updated project
+    await sendProjectUpdateEvent(responseProject.data);
+
     await waitFor(() => expect(dialog).not.toBeInTheDocument);
 
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
@@ -194,6 +200,8 @@ describe('ProjectBasicsForm', () => {
     expect(await findByText('leikkipaikka')).toBeInTheDocument();
     expect(await findByText('leikkipuisto')).toBeInTheDocument();
     expect(await findByText('hulevesi')).toBeInTheDocument();
+
+    removeProjectUpdateEventListener(store.dispatch);
   });
 
   it('can create new hashtags with the hashtags form', async () => {
@@ -220,7 +228,14 @@ describe('ProjectBasicsForm', () => {
     // after closing dialog
     mockedAxios.get.mockResolvedValueOnce(mockPatchProjectResponse);
 
-    const { user, findByText, findByRole } = await render();
+    const {
+      user,
+      findByText,
+      findByRole,
+      store: { dispatch },
+    } = await render();
+
+    addProjectUpdateEventListener(dispatch);
 
     // Open modal
     await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
@@ -233,6 +248,8 @@ describe('ProjectBasicsForm', () => {
       'liikenne',
     );
     await user.click((await dialog.findByTestId('create-hash-tag-button')).children[0]);
+
+    await sendProjectUpdateEvent(mockPatchProjectResponse.data);
 
     // Click the 'add to project' button to patch the project with the new hashtag
     await user.click(await dialog.findByTestId('add-new-hash-tag-to-project'));
@@ -254,6 +271,8 @@ describe('ProjectBasicsForm', () => {
     expect(await findByText('leikkipaikka')).toBeInTheDocument();
     expect(await findByText('leikkipuisto')).toBeInTheDocument();
     expect(await findByText('liikenne')).toBeInTheDocument();
+
+    removeProjectUpdateEventListener(dispatch);
   });
 
   it('can use popular hashtags from the hashtags form', async () => {
@@ -268,7 +287,14 @@ describe('ProjectBasicsForm', () => {
     // Mock all needed requests, to be able to
     // PATCH the project with the popular hashtag
     mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
-    const { findByText, findByRole, user } = await render();
+    const {
+      findByText,
+      findByRole,
+      user,
+      store: { dispatch },
+    } = await render();
+
+    addProjectUpdateEventListener(dispatch);
 
     // Open modal
     await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
@@ -286,6 +312,8 @@ describe('ProjectBasicsForm', () => {
       async () => await user.click(await dialog.findByRole('button', { name: 'save' })),
     );
 
+    await sendProjectUpdateEvent(mockPatchProjectResponse.data);
+
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(expectedValues, h.id),
@@ -295,6 +323,8 @@ describe('ProjectBasicsForm', () => {
     expect(await findByText('leikkipaikka')).toBeInTheDocument();
     expect(await findByText('leikkipuisto')).toBeInTheDocument();
     expect(await findByText('raidejokeri')).toBeInTheDocument();
+
+    removeProjectUpdateEventListener(dispatch);
   });
 
   it('can autosave patch a NumberField', async () => {

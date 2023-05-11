@@ -10,7 +10,7 @@ import {
   SelectField,
   TextField,
 } from '../../shared';
-import { selectProject, patchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { useOptions } from '@/hooks/useOptions';
 import './styles.css';
+import { patchProject } from '@/services/projectServices';
 
 const ProjectBasicsForm: FC = () => {
   const dispatch = useAppDispatch();
@@ -60,10 +61,9 @@ const ProjectBasicsForm: FC = () => {
         return;
       }
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      dispatch(patchProjectThunk({ id: project.id, data }))
-        .then((res) => {
-          // Set form saved to true if action is successfull, queue it to false async
-          handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
+      await patchProject({ id: project.id, data })
+        .then(() => {
+          handleSetFormSaved(true);
           setTimeout(() => {
             handleSetFormSaved(false);
           }, 0);
