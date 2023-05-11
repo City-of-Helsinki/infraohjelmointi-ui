@@ -8,7 +8,7 @@ import {
 import mockI18next from '@/mocks/mockI18next';
 import { initialSearchForm } from '@/reducers/searchSlice';
 import { setupStore } from '@/store';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders } from '@/utils/testUtils';
 import { act } from 'react-dom/test-utils';
 import SearchResultsView from './SearchResultsView';
 import { mockLongSearchResults, mockSearchResults } from '@/mocks/mockSearch';
@@ -16,6 +16,11 @@ import { waitFor } from '@testing-library/react';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { SearchLimit, SearchOrder } from '@/interfaces/searchInterfaces';
 import { Route } from 'react-router';
+import PlanningView from '../PlanningView';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import mockProject from '@/mocks/mockProject';
+import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
+import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -73,85 +78,113 @@ const searchActiveState = {
   },
 };
 
+const render = async (customState?: object) =>
+  await act(async () =>
+    renderWithProviders(
+      <>
+        <Route path="/" element={<SearchResultsView />} />
+        <Route path="/planning" element={<PlanningView />}>
+          <Route path=":masterClassId" element={<PlanningView />}>
+            <Route path=":classId" element={<PlanningView />}>
+              <Route path=":subClassId" element={<PlanningView />}>
+                <Route path=":districtId" element={<PlanningView />} />
+              </Route>
+            </Route>
+          </Route>
+        </Route>
+      </>,
+      {
+        preloadedState: customState ?? store.getState(),
+      },
+    ),
+  );
+
 describe('SearchResultsView', () => {
-  let renderResult: CustomRenderResult;
-
-  const getByClass = (name: string) => {
-    const { container } = renderResult;
-    return container.getElementsByClassName(name).length;
-  };
-
-  beforeEach(async () => {
-    await act(
-      async () =>
-        (renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />)),
-    );
+  beforeEach(() => {
+    mockGetResponseProvider();
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   describe('SearchResultsHeader', () => {
     it('renders elements', async () => {
-      const { getByText, getByTestId } = renderResult;
-      expect(getByClass('search-result-header-container')).toBe(1);
-      expect(getByClass('search-result-page-title')).toBe(1);
+      const { getByText, getByTestId, container } = await render();
+      expect(container.getElementsByClassName('search-result-header-container').length).toBe(1);
+      expect(container.getElementsByClassName('search-result-page-title').length).toBe(1);
       expect(getByText('searchResults')).toBeInTheDocument();
-      expect(getByClass('search-result-terms-and-filters-container')).toBe(1);
-      expect(getByClass('search-filter-container')).toBe(1);
+      expect(
+        container.getElementsByClassName('search-result-terms-and-filters-container').length,
+      ).toBe(1);
+      expect(container.getElementsByClassName('search-filter-container').length).toBe(1);
       expect(getByTestId('filterSearchBtn')).toBeInTheDocument();
-      expect(getByClass('search-terms-container')).toBe(1);
+      expect(container.getElementsByClassName('search-terms-container').length).toBe(1);
     });
   });
 
   describe('SearchTerms', () => {
-    it('renders elements', () => {
-      expect(getByClass('search-terms-container')).toBe(1);
-      expect(getByClass('search-terms')).toBe(1);
+    it('renders elements', async () => {
+      const { container } = await render();
+      expect(container.getElementsByClassName('search-terms-container').length).toBe(1);
+      expect(container.getElementsByClassName('search-terms').length).toBe(1);
     });
 
-    it('doesnt render empty all button without search terms', () => {
-      expect(getByClass('empty-all-btn')).toBe(0);
+    it('doesnt render empty all button without search terms', async () => {
+      const { container } = await render();
+      expect(container.getElementsByClassName('empty-all-btn').length).toBe(0);
     });
 
     it('renders empty button if there are search terms and resets the store if clicked', async () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: searchActiveState,
-      });
+      const { user, store, getAllByTestId, queryAllByTestId, container } = await render(
+        searchActiveState,
+      );
 
-      const { user, store, getAllByRole, getAllByTestId, queryAllByTestId } = renderResult;
       expect(getAllByTestId('search-term').length).toBe(4);
-      // Since I couldn't find out how to click the HDS-tag delete button, we're getting by index
-      const emptyAllBtn = getAllByRole('button')[5];
+
+      const emptyAllBtn = container.querySelector('#empty-all-btn-delete-button') as Element;
+
       expect(emptyAllBtn).toBeInTheDocument();
 
       await user.click(emptyAllBtn);
 
       expect(store.getState().search.submittedForm).toStrictEqual(initialSearchForm);
       expect(queryAllByTestId('search-term').length).toBe(0);
-      expect(getByClass('empty-all-btn')).toBe(0);
+      expect(container.querySelector('#empty-all-btn-delete-button')).toBeNull();
     });
 
     it('renders all terms and sends a new GET request if a term is removed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: searchActiveState,
-      });
-      const { getAllByTestId, getByText, getAllByText, user, getAllByRole, store } = renderResult;
+
+      const { getAllByTestId, getByText, getAllByText, user, store, container } = await render(
+        searchActiveState,
+      );
+
       expect(getAllByTestId('search-term').length).toBe(4);
 
       Object.keys(filledSearchForm.freeSearchParams).forEach((k) =>
         expect(getAllByText(k)[0]).toBeInTheDocument(),
       );
+
       expect(
         getByText(`searchTag.masterClass: ${filledSearchForm.masterClass[0].label}`),
       ).toBeInTheDocument();
+
       expect(getByText(`searchTag.class: ${filledSearchForm.class[0].label}`)).toBeInTheDocument();
 
-      const firstTerm = getAllByRole('button')[1];
+      const removeFirstTermButton = container.querySelector(
+        `#search-term-${mockHashTags.data.hashTags[1].id}-delete-button`,
+      ) as Element;
 
-      await user.click(firstTerm);
+      expect(removeFirstTermButton).toBeInTheDocument();
+
+      expect(mockedAxios.get.mock.lastCall).toBe(undefined);
+
+      await user.click(removeFirstTermButton);
+
+      expect(mockedAxios.get.mock.lastCall[0]).toBe(
+        'localhost:4000/projects/search-results/?hashtag=ccf89105-ee58-49f1-be0a-2cffca8711ab&masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&limit=10&order=new',
+      );
 
       await waitFor(() => {
         const freeSearchParams = store.getState().search.submittedForm.freeSearchParams;
@@ -163,44 +196,41 @@ describe('SearchResultsView', () => {
 
   describe('SearchResultsList', () => {
     it('renders elements', async () => {
-      const { getByTestId } = renderResult;
-      expect(getByClass('search-result-list-container')).toBe(1);
-      expect(getByClass('result-list-options-container')).toBe(1);
+      const { getByTestId, container } = await render();
+      expect(container.getElementsByClassName('search-result-list-container').length).toBe(1);
+      expect(container.getElementsByClassName('result-list-options-container').length).toBe(1);
       expect(getByTestId('result-not-found')).toBeInTheDocument();
     });
 
-    it('doesnt render elements if there are no results', () => {
-      const { queryByTestId } = renderResult;
+    it('doesnt render elements if there are no results', async () => {
+      const { queryByTestId, container } = await render();
       expect(queryByTestId('search-result-list')).toBeNull();
       expect(queryByTestId('search-order-dropdown')).toBeNull();
-      expect(getByClass('search-result-card')).toBe(0);
+      expect(container.getElementsByClassName('search-result-card').length).toBe(0);
     });
 
-    it('renders the list and all search results if there are results', () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: searchActiveState,
-      });
-      const { getByTestId } = renderResult;
+    it('renders the list and all search results if there are results', async () => {
+      const { getByTestId, container } = await render(searchActiveState);
       expect(getByTestId('search-result-list')).toBeInTheDocument();
-      expect(getByClass('search-result-card')).toBe(2);
+      expect(container.getElementsByClassName('search-result-card').length).toBe(2);
       expect(getByTestId('search-order-dropdown')).toBeInTheDocument();
     });
   });
 
   describe('SearchLimitDropdown', () => {
-    it('renders elements and 0 results if there are no results', () => {
-      const { getByText } = renderResult;
-      expect(getByClass('limit-dropdown-container')).toBe(1);
+    it('renders elements and 0 results if there are no results', async () => {
+      const { getByText, container } = await render();
+      expect(container.getElementsByClassName('limit-dropdown-container').length).toBe(1);
       expect(getByText('0')).toBeInTheDocument();
       expect(getByText('resultsForSearch')).toBeInTheDocument();
     });
 
     it('renders limit dropdown and can select a new search limit and sends a GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: searchActiveState,
-      });
-      const { container, user, getByText, getByRole, getAllByText, queryByText } = renderResult;
+
+      const { container, user, getByText, getByRole, getAllByText, queryByText } = await render(
+        searchActiveState,
+      );
 
       const limitDropdown = container.getElementsByClassName('limit-dropdown-container')[0];
 
@@ -235,9 +265,9 @@ describe('SearchResultsView', () => {
     it('renders if there are search results and can choose order options and send a new GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: searchActiveState,
-      });
+      const { user, getByRole, getByText, queryByText, getByTestId, getAllByText } = await render(
+        searchActiveState,
+      );
 
       const orderOptions = [
         'searchOrder.new',
@@ -246,7 +276,6 @@ describe('SearchResultsView', () => {
         'searchOrder.group',
         'searchOrder.phase',
       ];
-      const { user, getByRole, getByText, queryByText, getByTestId, getAllByText } = renderResult;
 
       expect(getByTestId('search-order-dropdown')).toBeInTheDocument();
 
@@ -263,36 +292,33 @@ describe('SearchResultsView', () => {
   });
 
   describe('SearchResultsCard', () => {
-    it('renders all elements if there are results', () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: searchActiveState,
-      });
-      const { container, getAllByText, getByTestId } = renderResult;
+    it('renders all elements if there are results', async () => {
+      const { container, getAllByText, getByTestId } = await render(searchActiveState);
 
-      expect(getByClass('search-result-card')).toBe(2);
-      expect(getByClass('search-result-breadcrumbs')).toBe(2);
-      expect(getByClass('search-result-title-container')).toBe(2);
-      expect(getByClass('search-result-title')).toBe(2);
-      expect(getByClass('custom-tag-container')).toBe(4);
+      expect(container.getElementsByClassName('search-result-card').length).toBe(2);
+      expect(container.getElementsByClassName('search-result-breadcrumbs').length).toBe(2);
+      expect(container.getElementsByClassName('search-result-title-container').length).toBe(2);
+      expect(container.getElementsByClassName('search-result-title').length).toBe(2);
+      expect(container.getElementsByClassName('custom-tag-container').length).toBe(4);
 
       const projectCard = container.getElementsByClassName('search-result-card')[0];
       const projectChildren = projectCard.childNodes;
 
       // Title and status tag
-      expect(projectChildren[0]).toHaveTextContent('Vanha yrttimaantie');
+      expect(projectChildren[0]).toHaveTextContent('Planning Project 1');
       expect(projectChildren[0]).toHaveTextContent('enums.warrantyPeriod');
       // Breadcrumbs
-      expect(projectChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
-      expect(projectChildren[1]).toHaveTextContent('Uudisrakentaminen');
-      expect(projectChildren[1]).toHaveTextContent('Koillinen suurpiiri');
+      expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');
+      expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');
+      expect(projectChildren[1]).toHaveTextContent('TestClass');
 
       // Both hashTags to renders under project card
       expect(getByTestId('search-result-hashtags')).toBeInTheDocument();
       expect(projectChildren[2]).toHaveTextContent('#leikkipaikka');
       // Link rendered around project card
-      expect(getAllByText('Vanha yrttimaantie')[0].closest('a')).toHaveAttribute(
+      expect(getAllByText('Planning Project 1')[0].closest('a')).toHaveAttribute(
         'href',
-        '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8/?project=ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
+        '/planning/test-master-class-1/test-class-1//?project=planning-project-1',
       );
 
       const classCard = container.getElementsByClassName('search-result-card')[1];
@@ -308,48 +334,63 @@ describe('SearchResultsView', () => {
       // Link rendered around class card
       expect(getAllByText('Koillinen suurpiiri')[0].closest('a')).toHaveAttribute(
         'href',
-        '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8/?project=ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
+        '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
       );
+    });
+
+    it('navigates to the planning view when clicking a result project and focuses the project: ', async () => {
+      const { container, user, getByTestId } = await render(searchActiveState);
+
+      const scrollIntoViewMock = jest.fn();
+
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+      const projectCard = container.getElementsByClassName('search-result-card')[0];
+
+      await user.click(projectCard);
+
+      expect(container.getElementsByClassName('planning-view-container')[0]).toBeInTheDocument();
+
+      const project = mockPlanningViewProjects.data.results[0];
+
+      await waitFor(() => {
+        expect(scrollIntoViewMock).toBeCalled();
+        expect(getByTestId(`row-${project.id}`).classList.contains('searched')).toBeTruthy();
+      });
     });
   });
 
   describe('SearchResultsNotFound', () => {
-    it('advices the user to search if there are no results and there are searchTerms', () => {
-      const { getByTestId, getByText } = renderResult;
+    it('advices the user to search if there are no results and there are searchTerms', async () => {
+      const { getByTestId, getByText } = await render();
       expect(getByTestId('result-not-found')).toBeInTheDocument();
       expect(getByText('adviceSearchTitle')).toBeInTheDocument();
       expect(getByText('adviceSearchText')).toBeInTheDocument();
     });
 
     it('advices the user to edit search filters if there are no search results and there are searchTerms', async () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: {
-          ...searchActiveState,
-          search: {
-            ...searchActiveState.search,
-            searchResults: { ...searchActiveState.search.searchResults, results: [], count: 0 },
-          },
+      const { getByText, container } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          searchResults: { ...searchActiveState.search.searchResults, results: [], count: 0 },
         },
       });
 
-      const { getByText } = renderResult;
-
-      expect(getByClass('flex flex-col items-center')).toBe(1);
+      expect(container.getElementsByClassName('flex flex-col items-center').length).toBe(1);
       expect(getByText('resultsNotFoundTitle')).toBeInTheDocument();
       expect(getByText('resultsNotFoundText')).toBeInTheDocument();
     });
 
     it('doesnt render if there are results', async () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: searchActiveState,
-      });
-      expect(getByClass('flex flex-col items-center')).toBe(0);
+      const { container } = await render(searchActiveState);
+      expect(container.getElementsByClassName('flex flex-col items-center').length).toBe(0);
     });
   });
 
   describe('SearchResultsPagination', () => {
-    it('renders only the container if theres less than one page of content', () => {
-      const { queryByTestId, getByTestId } = renderResult;
+    it('renders only the container if theres less than one page of content', async () => {
+      const { queryByTestId, getByTestId } = await render();
 
       expect(getByTestId('search-results-pagination-container')).toBeInTheDocument();
       expect(queryByTestId('search-results-pagination')).toBeNull();
@@ -357,19 +398,15 @@ describe('SearchResultsView', () => {
 
     // click the pagination buttons does nothing for some reason
     it('renders the pagination correctly with a search limit of 10', async () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: {
-          ...searchActiveState,
-          search: {
-            ...searchActiveState.search,
-            searchResults: mockLongSearchResults.data,
-          },
+      const { getByTestId } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          searchResults: mockLongSearchResults.data,
         },
       });
 
       const pageCount = Math.floor(mockLongSearchResults.data.count / 10) + 1;
-
-      const { getByTestId } = renderResult;
 
       expect(getByTestId('search-results-pagination')).toBeInTheDocument();
       expect(getByTestId('search-results-pagination-next-button')).toBeInTheDocument();
@@ -382,55 +419,43 @@ describe('SearchResultsView', () => {
     });
 
     it('renders the pagination correctly with a search limit of 20', async () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: {
-          ...searchActiveState,
-          search: {
-            ...searchActiveState.search,
-            searchResults: mockLongSearchResults.data,
-            searchLimit: '20',
-          },
+      const { getByTestId } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          searchResults: mockLongSearchResults.data,
+          searchLimit: '20',
         },
       });
 
       const pageCount = Math.floor(mockLongSearchResults.data.count / 20) + 1;
 
-      const { getByTestId } = renderResult;
-
       expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
     });
 
     it('renders the pagination correctly with a search limit of 30', async () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: {
-          ...searchActiveState,
-          search: {
-            ...searchActiveState.search,
-            searchResults: mockLongSearchResults.data,
-            searchLimit: '30',
-          },
+      const { getByTestId } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          searchResults: mockLongSearchResults.data,
+          searchLimit: '30',
         },
       });
 
       const pageCount = Math.floor(mockLongSearchResults.data.count / 30) + 1;
 
-      const { getByTestId } = renderResult;
-
       expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
     });
 
     it('can navigate to the next, previous and any number page and sends a GET request for searchResults', async () => {
-      renderResult = renderWithProviders(<Route path="/" element={<SearchResultsView />} />, {
-        preloadedState: {
-          ...searchActiveState,
-          search: {
-            ...searchActiveState.search,
-            searchResults: mockLongSearchResults.data,
-          },
+      const { getByTestId, user } = await render({
+        ...searchActiveState,
+        search: {
+          ...searchActiveState.search,
+          searchResults: mockLongSearchResults.data,
         },
       });
-
-      const { getByTestId, user } = renderResult;
 
       // Next page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);

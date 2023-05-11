@@ -43,8 +43,8 @@ export const mockSearchResults: { data: ISearchResults } = {
     count: 2,
     results: [
       {
-        name: 'Vanha yrttimaantie',
-        id: 'ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
+        name: 'Planning Project 1',
+        id: 'planning-project-1',
         type: 'projects',
         hashTags: [
           {
@@ -60,8 +60,7 @@ export const mockSearchResults: { data: ISearchResults } = {
           id: '3c46274d-bcd7-4fb9-aa5b-d70169db34e0',
           value: 'warrantyPeriod',
         },
-
-        path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
+        path: 'test-master-class-1/test-class-1/',
       },
       {
         name: 'Koillinen suurpiiri',
