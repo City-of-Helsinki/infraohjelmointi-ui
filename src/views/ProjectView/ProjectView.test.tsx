@@ -3,7 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from './ProjectView';
 import { getProjectThunk } from '@/reducers/projectSlice';
-import { renderWithProviders } from '@/utils/testUtils';
+import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
 import { act } from 'react-dom/test-utils';
@@ -13,6 +13,9 @@ import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import PlanningView from '../PlanningView/PlanningView';
 import { setupStore } from '@/store';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
+import { waitFor } from '@testing-library/react';
 
 const store = setupStore();
 
@@ -55,6 +58,21 @@ describe('ProjectView', () => {
     expect(store.getState().project.selectedProject).toStrictEqual(mockProject.data);
   });
 
+  it('listens to projectUpdate in redux and sets the selectedProject when it changes: ', async () => {
+    const { store } = await render();
+
+    addProjectUpdateEventListener(store.dispatch);
+
+    const updatedProject: IProject = { ...mockProject.data, name: 'New name' };
+
+    await sendProjectUpdateEvent(updatedProject);
+
+    await waitFor(() => {
+      expect(store.getState().project.selectedProject).toStrictEqual(updatedProject);
+    });
+
+    removeProjectUpdateEventListener(store.dispatch);
+  });
   it('renders the parent container', async () => {
     const { getByTestId } = await render();
 
