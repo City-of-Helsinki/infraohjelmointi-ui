@@ -174,9 +174,6 @@ describe('PlanningView', () => {
       await sendFinanceUpdateEvent(financeUpdateData);
     });
 
-    // It clears the events stores financeUpdate state back to null
-    expect(store.getState().events.financeUpdate).toBeNull();
-
     const { plannedBudget, frameBudget } = updatedFinances.year0;
 
     await waitFor(() => {
@@ -861,9 +858,6 @@ describe('PlanningView', () => {
 
         // Send the project-update event with the updated project
         await sendProjectUpdateEvent(mockPatchPhaseResponse.data);
-
-        // It clears the events stores projectUpdate state back to null
-        expect(store.getState().events.projectUpdate).toBeNull();
 
         // Context menu is hidden after patch
         await waitFor(() => expect(queryByTestId('project-phase-menu')).toBeNull());

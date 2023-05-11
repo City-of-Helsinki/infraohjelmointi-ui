@@ -22,12 +22,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
-import {
-  clearFinanceUpdate,
-  clearProjectUpdate,
-  selectFinanceUpdate,
-  selectProjectUpdate,
-} from '@/reducers/eventsSlice';
+import { selectFinanceUpdate, selectProjectUpdate } from '@/reducers/eventsSlice';
 
 /**
  * Returns false whether a given row is already selected and present in the url.
@@ -427,7 +422,6 @@ const usePlanningRows = () => {
         dispatch(updateGroup(financeUpdate.group)),
       ]).finally(() => {
         dispatch(clearLoading(LOADING_PLANNING_ID));
-        dispatch(clearFinanceUpdate());
       });
     }
   }, [financeUpdate]);
@@ -439,7 +433,6 @@ const usePlanningRows = () => {
         ...current,
         projectToUpdate: projectUpdate.project,
       }));
-      dispatch(clearProjectUpdate());
     }
   }, [projectUpdate]);
 

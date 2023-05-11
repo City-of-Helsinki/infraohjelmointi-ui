@@ -21,17 +21,10 @@ export const eventsSlice = createSlice({
     setProjectUpdate(state, action: PayloadAction<IProjectEventData>) {
       return { ...state, projectUpdate: action.payload };
     },
-    clearFinanceUpdate(state) {
-      return { ...state, financeUpdate: initialState.financeUpdate };
-    },
-    clearProjectUpdate(state) {
-      return { ...state, projectUpdate: initialState.projectUpdate };
-    },
   },
 });
 
-export const { setFinanceUpdate, setProjectUpdate, clearFinanceUpdate, clearProjectUpdate } =
-  eventsSlice.actions;
+export const { setFinanceUpdate, setProjectUpdate } = eventsSlice.actions;
 
 export const selectFinanceUpdate = (state: RootState) => state.events.financeUpdate;
 export const selectProjectUpdate = (state: RootState) => state.events.projectUpdate;
