@@ -374,6 +374,17 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     [formValue, type],
   );
 
+  const onUpdateCellPhase = useCallback((phase: string) => {
+    console.log(phase);
+    // if phase is construction
+    // check dates before and after and set appropriat dates
+
+    // if phase is planning
+    // check dates before and after and set appropriat dates
+
+    // call update cell with correct date params
+  }, []);
+
   const updateCell = useCallback(
     (req: IProjectRequest) => {
       // if there's only the year property in the finances object, delete it
@@ -481,6 +492,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
           cellType: cellTypeClass,
           onRemoveCell,
           onEditCell,
+          onUpdateCellPhase,
         },
       });
     },

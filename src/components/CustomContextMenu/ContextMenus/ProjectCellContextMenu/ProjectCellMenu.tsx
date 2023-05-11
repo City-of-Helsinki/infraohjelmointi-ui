@@ -16,6 +16,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   cellType,
   onRemoveCell,
   onEditCell,
+  onUpdateCellPhase,
 }) => {
   const { t } = useTranslation();
   const options: Array<IOption> = [
@@ -55,8 +56,9 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
           {options.map(({ value, label }) => (
             <li
               key={value}
-              className={`list-item ${value === cellType ? 'selected' : ''}`}
+              className={`list-item ${value === cellType ? 'selected' : 'not-selected'}`}
               data-testid={`cell-type-${value}`}
+              onClick={() => (value !== cellType ? onUpdateCellPhase(value) : '')}
             >
               <div className="flex items-center">
                 <div className={`list-icon ${value}`} />
