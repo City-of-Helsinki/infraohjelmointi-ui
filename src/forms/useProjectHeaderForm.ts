@@ -1,12 +1,11 @@
 import { IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAppDispatch, useAppSelector } from '../hooks/common';
+import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { useTranslation } from 'react-i18next';
-import { selectProject, setSelectedProject } from '@/reducers/projectSlice';
+import { selectProject } from '@/reducers/projectSlice';
 import { selectUser } from '@/reducers/authSlice';
-import { selectProjectUpdate } from '@/reducers/eventsSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -42,8 +41,6 @@ const useProjectHeaderValues = () => {
  */
 const useProjectHeaderForm = () => {
   const { formValues, selectedProject } = useProjectHeaderValues();
-  const projectUpdate = useAppSelector(selectProjectUpdate);
-  const dispatch = useAppDispatch();
 
   const formMethods = useForm<IProjectHeaderForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -51,13 +48,6 @@ const useProjectHeaderForm = () => {
   });
 
   const { control, reset } = formMethods;
-
-  // Update selectedProject to redux with a projectUpdate event
-  useEffect(() => {
-    if (projectUpdate?.project) {
-      dispatch(setSelectedProject(projectUpdate.project));
-    }
-  }, [projectUpdate]);
 
   // Updates form when the selectedProject changes in redux
   useEffect(() => {

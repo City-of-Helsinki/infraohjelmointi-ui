@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { getProjectThunk, selectProject } from '@/reducers/projectSlice';
+import { getProjectThunk, selectProject, setSelectedProject } from '@/reducers/projectSlice';
 import { TabList } from '@/components/shared';
 import { useNavigate, useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
+import { selectProjectUpdate } from '@/reducers/eventsSlice';
+import _ from 'lodash';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +18,14 @@ const ProjectView = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const selectedProject = useAppSelector(selectProject);
+  const projectUpdate = useAppSelector(selectProjectUpdate);
+
+  // Update selectedProject to redux with a project-update event
+  useEffect(() => {
+    if (projectUpdate?.project && !_.isEqual(projectUpdate?.project, selectedProject)) {
+      dispatch(setSelectedProject(projectUpdate.project));
+    }
+  }, [projectUpdate]);
 
   useEffect(() => {
     if (projectId) {

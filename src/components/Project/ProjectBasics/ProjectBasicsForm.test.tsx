@@ -24,6 +24,8 @@ import { waitFor, act, within } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
+import { setSelectedProject } from '@/reducers/projectSlice';
+import { Dispatch } from '@reduxjs/toolkit';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -67,6 +69,13 @@ const render = async () =>
       },
     }),
   );
+
+/**
+ * simulate event and setting selected project since it happens in projectview
+ */
+const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project: IProject) => {
+  await sendProjectUpdateEvent(project).then(() => dispatch(setSelectedProject(project)));
+};
 
 describe('ProjectBasicsForm', () => {
   afterEach(async () => {
@@ -187,8 +196,7 @@ describe('ProjectBasicsForm', () => {
 
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
 
-    // Send the project-update event with the updated project
-    await sendProjectUpdateEvent(responseProject.data);
+    await sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data);
 
     await waitFor(() => expect(dialog).not.toBeInTheDocument);
 
@@ -249,7 +257,7 @@ describe('ProjectBasicsForm', () => {
     );
     await user.click((await dialog.findByTestId('create-hash-tag-button')).children[0]);
 
-    await sendProjectUpdateEvent(mockPatchProjectResponse.data);
+    await sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data);
 
     // Click the 'add to project' button to patch the project with the new hashtag
     await user.click(await dialog.findByTestId('add-new-hash-tag-to-project'));
@@ -312,7 +320,8 @@ describe('ProjectBasicsForm', () => {
       async () => await user.click(await dialog.findByRole('button', { name: 'save' })),
     );
 
-    await sendProjectUpdateEvent(mockPatchProjectResponse.data);
+    // simulate event and setting selected project since it happens in projectview
+    await sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>

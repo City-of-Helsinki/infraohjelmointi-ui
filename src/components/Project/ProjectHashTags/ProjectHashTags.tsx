@@ -17,7 +17,6 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from '../../shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
-import './styles.css';
 import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
 import { IListItem } from '@/interfaces/common';
@@ -25,6 +24,7 @@ import { arrayHasValue, objectHasProperty } from '@/utils/common';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
+import './styles.css';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };

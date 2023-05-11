@@ -1,5 +1,5 @@
 import useProjectBasicsForm from '@/forms/useProjectBasicsForm';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback, useState } from 'react';
 import {
@@ -25,7 +25,6 @@ import './styles.css';
 import { patchProject } from '@/services/projectServices';
 
 const ProjectBasicsForm: FC = () => {
-  const dispatch = useAppDispatch();
   const { formMethods, classOptions, locationOptions } = useProjectBasicsForm();
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
@@ -70,7 +69,7 @@ const ProjectBasicsForm: FC = () => {
         })
         .catch(Promise.reject);
     },
-    [dirtyFields, project?.id, dispatch, handleSetFormSaved],
+    [dirtyFields, project?.id, handleSetFormSaved],
   );
 
   const formProps = useCallback(
