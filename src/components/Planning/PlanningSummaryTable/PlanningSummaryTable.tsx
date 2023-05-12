@@ -1,6 +1,7 @@
 import { FC, memo } from 'react';
 import useSummaryRows from '@/hooks/useSummaryRows';
 import { IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
+import { formattedNumberToNumber } from '@/utils/calculations';
 import './styles.css';
 
 interface IPlanningSummaryTableProps {
@@ -11,6 +12,7 @@ interface IPlanningSummaryTableProps {
 
 const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selections, lists }) => {
   const { header, cells } = useSummaryRows({ startYear, selections, lists });
+
   return (
     <table cellSpacing={0} className="planning-summary-table">
       {/* Head */}
@@ -44,7 +46,9 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selec
                   {frameBudget}
                 </span>
                 <span
-                  className={`deviation ${deviation && parseInt(deviation) < 0 ? 'negative' : ''} `}
+                  className={`deviation ${
+                    deviation && formattedNumberToNumber(deviation) < 0 ? 'negative' : ''
+                  } `}
                   data-testid={`summary-deviation-${key}`}
                 >
                   {deviation}

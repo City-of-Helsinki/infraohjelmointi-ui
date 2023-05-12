@@ -2,7 +2,21 @@ import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfa
 import { IPlanningCell, IPlanningSums, IProjectSums, PlanningRowType } from '@/interfaces/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 
+// Formats a number to include thousand sepparators
 export const formatNumber = (number: number | undefined) => number?.toLocaleString('fi-FI') ?? '0';
+
+// Turns a formatted number string to a number
+export const formattedNumberToNumber = (formattedNumber?: string) => {
+  if (!formattedNumber) {
+    return 0;
+  }
+  // The character U+2212 is compared intentional here, since the number is formatted with toLocaleString('fi-FI')
+  if (formattedNumber.charAt(0) === '−') {
+    return -parseInt(formattedNumber.replace(/\D/g, ''));
+  } else {
+    return parseInt(formattedNumber.replace(/\D/g, ''));
+  }
+};
 
 /**
  * Calculates the budgets for the current row. Returns nothing for a division and no deviation for groups.
