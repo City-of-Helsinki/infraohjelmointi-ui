@@ -291,6 +291,8 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
+const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
+
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -448,9 +450,21 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
           ))}
       </td>
       {year === selectedYear && (
-        <td key={`${year}-monthly-view`} className="h-28 !min-w-[500px]">
-          <span className="text-sm font-light">{'Monthly view cell'}</span>
-        </td>
+        <>
+          <td key={`${year}-monthly-view`} className="!min-w-[200px]">
+            {/* TODO: some stuff here */}
+          </td>
+          {months.map((m, i) => (
+            <td
+              key={m}
+              className={`!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0 ${
+                i % 2 == 0 ? 'bg-bus-l' : 'bg-white'
+              }`}
+            >
+              {/* TODO: some stuff here */}
+            </td>
+          ))}
+        </>
       )}
     </>
   );

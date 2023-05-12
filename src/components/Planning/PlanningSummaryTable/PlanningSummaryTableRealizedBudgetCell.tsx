@@ -9,6 +9,8 @@ interface IPlanningSummaryTableRealizedBudgetCellProps {
   selectedYear: number | null;
 }
 
+const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
+
 const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBudgetCellProps> = ({
   frameBudget,
   deviation,
@@ -33,9 +35,14 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
         </div>
       </td>
       {year === selectedYear && (
-        <td key={`${year}-monthly-view`} className="!min-w-[500px]">
-          <span className="!text-left text-sm font-light">{'Monthly view cell'}</span>
-        </td>
+        <>
+          <td key={`${year}-monthly-view`} className="!min-w-[100px]"></td>
+          {months.map((m) => (
+            <td key={m} className="!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0">
+              {/* TODO: there's going to be graph here and we can use each months cell to paint the graph */}
+            </td>
+          ))}
+        </>
       )}
     </>
   );

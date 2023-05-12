@@ -5,7 +5,7 @@
 }
 
 .planning-summary-table td {
-  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 !pr-4;
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
 }
 
 .planning-summary-table span {

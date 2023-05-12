@@ -8,6 +8,8 @@ interface IPlanningSummaryTableHeadCellProps {
   title: string;
 }
 
+const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
+
 const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   year,
   selectedYear,
@@ -23,9 +25,17 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
         </button>
       </td>
       {year === selectedYear && (
-        <td key={`${year}-monthly-view`} className="!min-w-[500px]">
-          <span className="!text-left text-sm font-light">{'Monthly view cell'}</span>
-        </td>
+        // className="!min-w-[500px]"
+        <>
+          <td key={`${year}-monthly-view`} className="!min-w-[200px]">
+            <span className="!text-center text-sm font-light">{'4.6.2020'}</span>
+          </td>
+          {months.map((m) => (
+            <td key={m} className="!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0">
+              <span className="!text-center text-sm font-light">{m}</span>
+            </td>
+          ))}
+        </>
       )}
     </>
   );

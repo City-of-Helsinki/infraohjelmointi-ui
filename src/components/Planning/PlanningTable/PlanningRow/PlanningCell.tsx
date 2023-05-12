@@ -9,6 +9,8 @@ interface IPlanningCellProps extends IPlanningRow {
   selectedYear: number | null;
 }
 
+const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
+
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) => {
   const { plannedBudget, frameBudget, deviation, year } = cell;
 
@@ -26,9 +28,16 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) 
         </div>
       </td>
       {year === selectedYear && (
-        <td key={`${year}-monthly-view`} className="!min-w-[500px]">
-          <span className="text-sm font-light">{'Monthly view cell'}</span>
-        </td>
+        <>
+          <td key={`${year}-monthly-view`} className="!min-w-[200px]">
+            {/* TODO: some stuff here */}
+          </td>
+          {months.map((m) => (
+            <td key={m} className="!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0">
+              {/* TODO: some stuff here */}
+            </td>
+          ))}
+        </>
       )}
     </>
   );
