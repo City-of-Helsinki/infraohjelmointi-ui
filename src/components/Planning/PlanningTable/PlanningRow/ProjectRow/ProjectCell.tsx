@@ -191,7 +191,7 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
 };
 
 const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planEnd, conEnd, planStart, conStart, startYear } = cell;
+  const { planEnd, conEnd, planStart, conStart } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the next property
@@ -206,7 +206,7 @@ const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinanc
       }
       return movedFinances;
     },
-    { year: startYear } as IProjectFinances,
+    { year } as IProjectFinances,
   );
 
   const req: IProjectRequest = { finances: financesMovedForward };
@@ -225,7 +225,7 @@ const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinanc
 };
 
 const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planEnd, conEnd, planStart, conStart, startYear } = cell;
+  const { planEnd, conEnd, planStart, conStart } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the previous property
@@ -240,7 +240,7 @@ const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinan
       }
       return movedFinances;
     },
-    { year: startYear } as IProjectFinances,
+    { year } as IProjectFinances,
   );
 
   const req: IProjectRequest = { finances: financesMovedBackward };
