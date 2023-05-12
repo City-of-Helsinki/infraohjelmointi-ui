@@ -12,7 +12,7 @@ interface IProjectRowProps {
 
 const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
-  const { cells, sums } = useProjectRow(project);
+  const { cells, sums, projectFinances } = useProjectRow(project);
 
   // Remove the active css-class from the current row if the user clicks outside of it
   useClickOutsideRef(
@@ -29,7 +29,7 @@ const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
       {/* HEADER */}
       <ProjectHead project={project} sums={sums} />
       {cells.map((c) => (
-        <ProjectCell key={c.financeKey} cell={c} />
+        <ProjectCell key={c.financeKey} cell={c} projectFinances={projectFinances} />
       ))}
     </tr>
   );

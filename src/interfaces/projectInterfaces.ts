@@ -356,8 +356,4 @@ export interface IProjectCell {
    * Wether the cell is an edge cell, an edge cell is a cell that affects the start/ends dates associated with the timeline
    */
   isEdgeCell: boolean;
-  /**
-   * All the finances with their respective values, this array is needed when moving the timeline by a year
-   */
-  financesList: Array<Array<string | null>>;
 }

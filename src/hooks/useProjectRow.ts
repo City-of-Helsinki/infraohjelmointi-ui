@@ -17,8 +17,6 @@ const getProjectCells = (project: IProject) => {
 
   const { year, ...finances } = project.finances;
 
-  const financesList = Object.entries(finances).map(([key, value]) => [key, value]);
-
   /**
    * Gets the type of the cell for the current year
    */
@@ -191,7 +189,6 @@ const getProjectCells = (project: IProject) => {
       id: id,
       growDirections: [],
       financesToReset: null,
-      financesList,
       isEdgeCell,
     };
   });
@@ -224,6 +221,7 @@ const getProjectCells = (project: IProject) => {
 interface IProjectRowsState {
   cells: Array<IProjectCell>;
   sums: IProjectSums;
+  projectFinances: IProjectFinances | null;
 }
 /**
  * Get 11 project cells from a project, each cell will include all the needed properties to patch and delete the budgets and
@@ -237,6 +235,7 @@ const useProjectRow = (project: IProject) => {
   const [projectRowsState, setProjectRowsState] = useState<IProjectRowsState>({
     cells: [],
     sums: { availableFrameBudget: '0', costEstimateBudget: '0' },
+    projectFinances: null,
   });
 
   useEffect(() => {
@@ -245,6 +244,7 @@ const useProjectRow = (project: IProject) => {
         ...current,
         cells: getProjectCells(project),
         sums: calculateProjectRowSums(project),
+        projectFinances: project.finances,
       }));
     }
   }, [project]);

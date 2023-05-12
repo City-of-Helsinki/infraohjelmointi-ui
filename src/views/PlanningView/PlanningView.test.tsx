@@ -1467,7 +1467,7 @@ describe('PlanningView', () => {
           const patchMoveYearRequest = {
             finances: {
               year: year,
-              budgetProposalCurrentYearPlus0: '0.00',
+              budgetProposalCurrentYearPlus0: '0',
               budgetProposalCurrentYearPlus1: '0.00',
               budgetProposalCurrentYearPlus2: '0.00',
               preliminaryCurrentYearPlus3: '30.00',
@@ -1537,7 +1537,7 @@ describe('PlanningView', () => {
               preliminaryCurrentYearPlus7: '90.00',
               preliminaryCurrentYearPlus8: '0.00',
               preliminaryCurrentYearPlus9: '0.00',
-              preliminaryCurrentYearPlus10: '0.00',
+              preliminaryCurrentYearPlus10: '0',
             },
             estPlanningStart: `12.02.${year}`,
             estPlanningEnd: `12.02.${year + 2}`,
