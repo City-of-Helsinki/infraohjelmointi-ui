@@ -18,10 +18,11 @@ interface IPlanningRowState {
 
 interface IPlanningRowProps extends IPlanningRow {
   projectToUpdate: IProject | null;
+  selectedYear: number | null;
 }
 
 const PlanningRow: FC<IPlanningRowProps> = (props) => {
-  const { defaultExpanded, projectRows, cells, projectToUpdate } = props;
+  const { defaultExpanded, projectRows, cells, projectToUpdate, selectedYear } = props;
 
   const { search } = useLocation();
 
@@ -123,11 +124,16 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       {expanded && (
         <>
           {projects.map((p) => (
-            <ProjectRow key={p.id} project={p} isSearched={p.id === searchedProjectId} />
+            <ProjectRow
+              key={p.id}
+              project={p}
+              isSearched={p.id === searchedProjectId}
+              selectedYear={selectedYear}
+            />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} projectToUpdate={projectToUpdate} />
+            <PlanningRow {...c} projectToUpdate={projectToUpdate} selectedYear={selectedYear} />
           ))}
         </>
       )}

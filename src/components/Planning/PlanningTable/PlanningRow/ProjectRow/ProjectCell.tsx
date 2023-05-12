@@ -282,13 +282,26 @@ const getMoveTimelineRequestData = (
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
+  selectedYear: number | null;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
+interface IProjectCellState {
+  isReadOnly: boolean;
+  isSelectedYear: boolean;
+  formValue: number | null | string;
+}
+
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
-  const [isReadOnly, setIsReadOnly] = useState(true);
-  const [formValue, setFormValue] = useState<number | null | string>(parseInt(budget ?? '0'));
   const cellRef = useRef<HTMLTableCellElement>(null);
+
+  const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
+    isReadOnly: true,
+    isSelectedYear: false,
+    formValue: parseInt(budget ?? '0'),
+  });
+
+  const { formValue, isSelectedYear, isReadOnly } = projectCellState;
 
   // Values of cells that have the none type will be empty strings to hide them
   const formDisplayValue = useMemo(
@@ -311,24 +324,27 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
 
   // Focusing the input field will activate the input field by switching its readOnly property
   const handleFocus = useCallback(() => {
-    setIsReadOnly((current) => !current);
+    setProjectCellState((current) => ({ ...current, isReadOnly: !current.isReadOnly }));
   }, []);
 
   // Removes the zero value on change if there is only one zero in the value
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     // If the value is more than one zero set the form value normally
     if (/^0{2,}/.exec(e.target.value)) {
-      setFormValue(e.target.value);
+      setProjectCellState((current) => ({ ...current, formValue: e.target.value }));
     }
     // If value is just a zero replace it
     else {
-      setFormValue(e.target.value ? +e.target.value : 0);
+      setProjectCellState((current) => ({
+        ...current,
+        formValue: e.target.value ? +e.target.value : 0,
+      }));
     }
   }, []);
 
   // Blurring the input field will patch the current budget
   const handleBlur = useCallback((): void => {
-    setIsReadOnly((current) => !current);
+    setProjectCellState((current) => ({ ...current, isReadOnly: !current.isReadOnly }));
     if (formValue !== parseInt(budget ?? '0')) {
       updateCell({
         finances: {
@@ -391,40 +407,52 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
 
   // Set the budgets value to a number if it exists
   useEffect(() => {
-    setFormValue(parseInt(budget ?? '0'));
+    setProjectCellState((current) => ({ ...current, formValue: parseInt(budget ?? '0') }));
   }, [budget]);
 
+  // Sets isSelectedYear to true if the current cell is the selectedYear
+  useEffect(() => {
+    setProjectCellState((current) => ({ ...current, isSelectedYear: selectedYear === year }));
+  }, [selectedYear, year]);
+
   return (
-    <td
-      ref={cellRef}
-      className={`project-cell ${getCssType()}`}
-      onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
-      data-testid={`project-cell-${year}-${id}`}
-    >
-      <div className="project-cell-input-container">
-        <input
-          value={formDisplayValue}
-          type="number"
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          disabled={type === 'none'}
-          readOnly={isReadOnly}
-          className="project-cell-input"
-          data-testid={`cell-input-${year}-${id}`}
-        />
-      </div>
-      {type !== 'none' &&
-        growDirections.map((d) => (
-          <EditTimelineButton
-            key={d}
-            direction={d}
-            id={`${year}-${id}`}
-            onSingleClick={onAddYear}
-            onDoubleClick={onMoveTimeline}
+    <>
+      <td
+        ref={cellRef}
+        className={`project-cell ${getCssType()}`}
+        onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
+        data-testid={`project-cell-${year}-${id}`}
+      >
+        <div className="project-cell-input-container">
+          <input
+            value={formDisplayValue}
+            type="number"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
+            disabled={type === 'none'}
+            readOnly={isReadOnly}
+            className="project-cell-input"
+            data-testid={`cell-input-${year}-${id}`}
           />
-        ))}
-    </td>
+        </div>
+        {type !== 'none' &&
+          growDirections.map((d) => (
+            <EditTimelineButton
+              key={d}
+              direction={d}
+              id={`${year}-${id}`}
+              onSingleClick={onAddYear}
+              onDoubleClick={onMoveTimeline}
+            />
+          ))}
+      </td>
+      {year === selectedYear && (
+        <td key={`${year}-monthly-view`} className="h-28 !min-w-[500px]">
+          <span className="text-sm font-light">{'Monthly view cell'}</span>
+        </td>
+      )}
+    </>
   );
 };
 

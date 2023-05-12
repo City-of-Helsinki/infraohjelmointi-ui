@@ -9,9 +9,10 @@ import './styles.css';
 interface IProjectRowProps {
   project: IProject;
   isSearched?: boolean;
+  selectedYear: number | null;
 }
 
-const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched }) => {
+const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, selectedYear }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const { cells, sums, projectFinances } = useProjectRow(project);
 
@@ -35,7 +36,12 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched }) => {
       {/* HEADER */}
       <ProjectHead project={project} sums={sums} />
       {cells.map((c) => (
-        <ProjectCell key={c.financeKey} cell={c} projectFinances={projectFinances} />
+        <ProjectCell
+          key={c.financeKey}
+          cell={c}
+          projectFinances={projectFinances}
+          selectedYear={selectedYear}
+        />
       ))}
     </tr>
   );

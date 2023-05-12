@@ -11,7 +11,7 @@
 /* TABLE HEAD */
 .planning-head {
   /* max-width: 1rem makes it so that the head doesn't grow beyond its max width */
-  @apply h-11 w-[35%] min-w-[26.74rem] max-w-[1rem] border-b border-white bg-bus py-1 pr-4 text-white;
+  @apply h-11 w-[32rem] min-w-[32rem] max-w-[32rem] border-b border-white bg-bus py-1 pr-4 text-white;
 }
 
 .planning-head-content {

@@ -1,6 +1,7 @@
 .planning-summary-table {
   /* width 65% since the info-panel is 30% */
-  @apply w-[65%] text-right;
+  --summary-table-width: calc(100% - 32rem);
+  @apply w-[var(--summary-table-width)] text-right;
 }
 
 .planning-summary-table td {
@@ -33,4 +34,12 @@
 
 .planning-summary-frame-and-deviation-container .deviation.negative {
   @apply text-[#b01038];
+}
+
+.selected-year {
+  @apply !min-w-[500px] !text-left;
+}
+
+.selected-year span {
+  @apply !min-w-[500px] !text-left;
 }
