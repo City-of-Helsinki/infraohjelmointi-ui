@@ -6,6 +6,7 @@ interface IPlanningSummaryTableHeadCellProps {
   selectedYear: number | null;
   handleSetSelectedYear: (year: number | null) => void;
   title: string;
+  isFirstYear: boolean;
 }
 
 const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
@@ -15,10 +16,11 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   selectedYear,
   handleSetSelectedYear,
   title,
+  isFirstYear,
 }) => {
   return (
     <>
-      <td data-testid={`head-${year}`}>
+      <td data-testid={`head-${year}`} className="planning-summary-head-cell">
         <button onClick={() => handleSetSelectedYear(year)}>
           <span className="text-sm font-light">{title}</span>
           <span className="text-sm font-bold">{`<> ${year}`}</span>
@@ -26,12 +28,15 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
       </td>
       {year === selectedYear && (
         // className="!min-w-[500px]"
+
         <>
-          <td key={`${year}-monthly-view`} className="!min-w-[200px]">
-            <span className="!text-center text-sm font-light">{'4.6.2020'}</span>
-          </td>
+          {isFirstYear && (
+            <td key={`${year}-monthly-view`} className="monthly-summary-cell">
+              <span className="!text-center text-sm font-light">{'4.6.2020'}</span>
+            </td>
+          )}
           {months.map((m) => (
-            <td key={m} className="!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0">
+            <td key={m} className="monthly-cell">
               <span className="!text-center text-sm font-light">{m}</span>
             </td>
           ))}

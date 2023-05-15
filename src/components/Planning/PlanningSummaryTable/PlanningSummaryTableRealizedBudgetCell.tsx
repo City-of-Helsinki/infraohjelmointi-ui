@@ -7,6 +7,7 @@ interface IPlanningSummaryTableRealizedBudgetCellProps {
   deviation?: string;
   year: number;
   selectedYear: number | null;
+  isFirstYear: boolean;
 }
 
 const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
@@ -16,10 +17,11 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
   deviation,
   year,
   selectedYear,
+  isFirstYear,
 }) => {
   return (
     <>
-      <td>
+      <td className="planning-summary-frame-and-deviation-cell">
         <div className="planning-summary-frame-and-deviation-container">
           <span className="frame-budget" data-testid={`summary-frame-${year}`}>
             {frameBudget}
@@ -36,9 +38,9 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
       </td>
       {year === selectedYear && (
         <>
-          <td key={`${year}-monthly-view`} className="!min-w-[100px]"></td>
+          {isFirstYear && <td key={`${year}-monthly-view`} className="monthly-summary-cell"></td>}
           {months.map((m) => (
-            <td key={m} className="!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0">
+            <td key={m} className="monthly-cell">
               {/* TODO: there's going to be graph here and we can use each months cell to paint the graph */}
             </td>
           ))}

@@ -22,7 +22,7 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({
   handleSetSelectedYear,
   selectedYear,
 }) => {
-  const { header, cells } = useSummaryRows({ startYear, selections, lists });
+  const { heads, cells } = useSummaryRows({ startYear, selections, lists });
 
   return (
     <table cellSpacing={0} className="planning-summary-table">
@@ -30,11 +30,12 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({
       <thead data-testid="planning-summary-head">
         {/* Year and title row */}
         <tr data-testid="planning-summary-head-row">
-          {header.map(({ year, title }) => (
+          {heads.map(({ year, title, isFirstYear }) => (
             <PlanningSummaryTableHeadCell
               key={year}
               year={year}
               title={title}
+              isFirstYear={isFirstYear}
               handleSetSelectedYear={handleSetSelectedYear}
               selectedYear={selectedYear}
             />

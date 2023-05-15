@@ -1,13 +1,3 @@
-:root {
-  --color-masterClass: var(--color-bus);
-  --color-class: #0000a3; /* color had to be improvised */
-  --color-subClass: #00007a; /* color had to be improvised */
-  --color-district-preview: var(--color-bus-dark);
-  --color-district: var(--color-bus);
-  --color-division: var(--color-fog-medium-light);
-  --color-group: var(--color-fog-light);
-}
-
 /* TABLE HEAD */
 .planning-head {
   /* max-width: 1rem makes it so that the head doesn't grow beyond its max width */

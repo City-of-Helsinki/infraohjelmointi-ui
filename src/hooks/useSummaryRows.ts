@@ -5,10 +5,11 @@ import { calculatePlanningSummaryCells } from '@/utils/calculations';
 interface IPlanningSummaryHeadCell {
   year: number;
   title: string;
+  isFirstYear: boolean;
 }
 
 interface IPlanningSummaryTableState {
-  header: Array<IPlanningSummaryHeadCell>;
+  heads: Array<IPlanningSummaryHeadCell>;
   cells: Array<IPlanningCell>;
 }
 
@@ -32,7 +33,11 @@ export const getPlanningRowTitle = (index: number) => {
 const buildPlanningSummaryHeadCells = (startYear: number) => {
   const cells = [];
   for (let i = 0; i < 11; i++) {
-    cells.push({ year: startYear + i, title: getPlanningRowTitle(i) });
+    cells.push({
+      year: startYear + i,
+      title: getPlanningRowTitle(i),
+      isFirstYear: startYear + i === startYear,
+    });
   }
   return cells;
 };
@@ -51,7 +56,7 @@ const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams)
   const { masterClasses, classes } = lists;
 
   const [planningSummaryRows, setPlanningSummaryRows] = useState<IPlanningSummaryTableState>({
-    header: [],
+    heads: [],
     cells: [],
   });
 
@@ -60,7 +65,7 @@ const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams)
     if (startYear) {
       setPlanningSummaryRows((current) => ({
         ...current,
-        header: buildPlanningSummaryHeadCells(startYear),
+        heads: buildPlanningSummaryHeadCells(startYear),
       }));
     }
   }, [startYear]);

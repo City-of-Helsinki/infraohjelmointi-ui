@@ -5,6 +5,7 @@ interface IPlanningSummaryTablePlannedBudgetCellProps {
   year: number;
   plannedBudget?: string;
   selectedYear: number | null;
+  isFirstYear: boolean;
 }
 
 const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
@@ -13,6 +14,7 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
   year,
   plannedBudget,
   selectedYear,
+  isFirstYear,
 }) => {
   return (
     <>
@@ -20,11 +22,18 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
         <span data-testid={`summary-budget-${year}`}>{plannedBudget}</span>
       </td>
       {year === selectedYear && (
-        // className="!min-w-[500px]"
         <>
-          <td key={`${year}-monthly-view`} className="!min-w-[100px] bg-bus"></td>
+          {isFirstYear && (
+            <td
+              key={`${year}-monthly-view`}
+              className={`monthly-summary-cell summary-budget ${isFirstYear ? 'first-year' : ''}`}
+            ></td>
+          )}
           {months.map((m) => (
-            <td key={m} className="!w-[39px] !min-w-[39px] !max-w-[39px] bg-bus !p-0 !pr-0"></td>
+            <td
+              key={m}
+              className={`monthly-cell summary-budget ${isFirstYear ? 'first-year' : ''}`}
+            ></td>
           ))}
         </>
       )}

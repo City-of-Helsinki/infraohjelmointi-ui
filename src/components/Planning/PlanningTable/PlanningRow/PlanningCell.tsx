@@ -12,7 +12,7 @@ interface IPlanningCellProps extends IPlanningRow {
 const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
 
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) => {
-  const { plannedBudget, frameBudget, deviation, year } = cell;
+  const { plannedBudget, frameBudget, deviation, year, isFirstYear } = cell;
 
   return (
     <>
@@ -29,11 +29,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) 
       </td>
       {year === selectedYear && (
         <>
-          <td key={`${year}-monthly-view`} className="!min-w-[200px]">
-            {/* TODO: some stuff here */}
-          </td>
+          {isFirstYear && (
+            <td key={`${year}-monthly-cell`} className={`monthly-summary-cell ${type}`}>
+              {/* TODO: some stuff here */}
+            </td>
+          )}
           {months.map((m) => (
-            <td key={m} className="!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0">
+            <td key={m} className={`monthly-cell ${type}`}>
               {/* TODO: some stuff here */}
             </td>
           ))}

@@ -294,7 +294,7 @@ interface IProjectCellState {
 const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
-  const { budget, type, financeKey, year, growDirections, id, title } = cell;
+  const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
@@ -451,16 +451,28 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
       </td>
       {year === selectedYear && (
         <>
-          <td key={`${year}-monthly-view`} className="!min-w-[200px]">
-            {/* TODO: some stuff here */}
-          </td>
+          {startYear === year && (
+            <td key={`${year}-monthly-view`} className="monthly-summary-cell project">
+              <div className="h-full w-full border-b-[1px] border-black-80">
+                <div className="h-full w-full border-b-2 border-gray">
+                  {/* TODO: some stuff here */}
+                </div>
+              </div>
+            </td>
+          )}
+
           {months.map((m, i) => (
             <td
               key={m}
-              className={`!w-[39px] !min-w-[39px] !max-w-[39px] !p-0 !pr-0 ${
+              className={`monthly-cell project ${startYear === year ? 'first-year' : ''} ${
                 i % 2 == 0 ? 'bg-bus-l' : 'bg-white'
               }`}
             >
+              <div className="h-full w-full border-b-[1px] border-black-80">
+                <div className="h-full w-full border-b-2 border-gray">
+                  {/* TODO: some stuff here */}
+                </div>
+              </div>
               {/* TODO: some stuff here */}
             </td>
           ))}

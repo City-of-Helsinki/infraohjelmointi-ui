@@ -4,7 +4,11 @@
   @apply w-[var(--summary-table-width)] text-right;
 }
 
-.planning-summary-table td {
+.planning-summary-head-cell {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
+}
+
+.planning-summary-frame-and-deviation-cell {
   @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
 }
 
@@ -13,7 +17,7 @@
 }
 
 .planned-budget-cell {
-  @apply h-[36px] bg-bus-d text-white first:bg-bus;
+  @apply h-[36px] min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] bg-bus-d py-1 pr-4 text-white first:bg-bus;
 }
 
 .planned-budget-cell span {
@@ -34,12 +38,4 @@
 
 .planning-summary-frame-and-deviation-container .deviation.negative {
   @apply text-[#b01038];
-}
-
-.selected-year {
-  @apply !min-w-[500px] !text-left;
-}
-
-.selected-year span {
-  @apply !min-w-[500px] !text-left;
 }
