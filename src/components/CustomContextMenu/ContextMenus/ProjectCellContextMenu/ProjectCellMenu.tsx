@@ -24,6 +24,13 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
     { value: 'construction', label: 'Rakentaminen' },
   ];
 
+  const handleCellPhaseUpdate = useCallback(
+    (phase: string) => {
+      onUpdateCellPhase(phase);
+    },
+    [onUpdateCellPhase],
+  );
+
   const handleEditTimeline = useCallback(() => {
     onEditCell();
     onCloseMenu();
@@ -58,7 +65,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
               key={value}
               className={`list-item ${value === cellType ? 'selected' : 'not-selected'}`}
               data-testid={`cell-type-${value}`}
-              onClick={() => (value !== cellType ? onUpdateCellPhase(value) : '')}
+              onClick={() => (value !== cellType ? handleCellPhaseUpdate(value) : '')}
             >
               <div className="flex items-center">
                 <div className={`list-icon ${value}`} />

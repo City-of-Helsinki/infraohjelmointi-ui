@@ -16,6 +16,7 @@ export interface ICellMenuDetails {
   cellType: CellType;
   onRemoveCell: () => void;
   onEditCell: () => void;
+  onUpdateCellPhase: (phase:string) => void;
 }
 
 export interface IPhaseMenuDetails {

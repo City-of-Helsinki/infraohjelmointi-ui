@@ -18,7 +18,7 @@ import {
   useRef,
   useMemo,
 } from 'react';
-import { addYear, getYear, removeYear, updateYear } from '@/utils/dates';
+import { addYear, getYear, removeYear, updateYear, getLastDate, getFirstDate } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
@@ -28,6 +28,106 @@ import { selectSelectedYear } from '@/reducers/planningSlice';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
+};
+
+const getPhaseUpdateRequestData = (cell: IProjectCell, phase: string): IProjectRequest => {
+  const req: IProjectRequest = {};
+  const { type } = cell;
+  switch (type) {
+    case 'planEnd':
+      if (cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
+        req.estPlanningEnd = removeYear(cell.planEnd);
+        req.estConstructionStart = removeYear(cell.conStart);
+      } else if (!cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
+        req.estConstructionStart = removeYear(cell.conStart);
+        req.estPlanningEnd = null;
+        req.estPlanningStart = null;
+        req.planningStartYear = null;
+      } else if (!cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
+        req.estPlanningStart = null;
+        req.estPlanningEnd = null;
+        req.planningStartYear = null;
+        req.estConstructionStart = getFirstDate(cell.planStart);
+        req.estConstructionEnd = getLastDate(cell.planStart);
+        req.constructionEndYear = getYear(cell.planEnd).toString();
+      } else if (cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
+        req.estPlanningEnd = removeYear(cell.planEnd);
+        req.estConstructionStart = getFirstDate(cell.planEnd);
+        req.estConstructionEnd = getLastDate(cell.planEnd);
+        req.constructionEndYear = getYear(cell.planEnd).toString();
+      }
+      break;
+    case 'conStart':
+      if (cell.prev?.type.includes('plan')) {
+        req.estPlanningEnd = addYear(cell.planEnd);
+        req.estConstructionStart = addYear(cell.conStart);
+      }
+      if (!cell.prev?.type.includes('plan')) {
+        req.estConstructionStart = addYear(cell.conStart);
+        req.estPlanningStart = getFirstDate(cell.conStart);
+        req.estPlanningEnd = getLastDate(cell.conStart);
+        req.planningStartYear = getYear(cell.conEnd).toString();
+      }
+      break;
+    case 'conEnd':
+      if (cell.prev?.type.includes('plan')) {
+        req.estPlanningEnd = addYear(cell.planEnd);
+        req.estConstructionStart = null;
+        req.estConstructionEnd = null;
+        req.constructionEndYear = null;
+      }
+      if (!cell.prev?.type.includes('plan') && !cell.prev?.type.includes('con')) {
+        req.estConstructionStart = null;
+        req.estConstructionEnd = null;
+        req.constructionEndYear = null;
+        req.estPlanningStart = getFirstDate(cell.conStart);
+        req.estPlanningEnd = getLastDate(cell.conStart);
+        req.planningStartYear = getYear(cell.conEnd).toString();
+      }
+      break;
+    case 'overlap':
+      console.log(phase);
+      if (cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
+        if (phase.includes('con')) {
+          req.estPlanningEnd = removeYear(cell.planEnd);
+        }
+        if (phase.includes('plan')) {
+          req.estConstructionStart = addYear(cell.conStart);
+        }
+      } else if (!cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
+        if (phase.includes('con')) {
+          req.estPlanningEnd = null;
+          req.estPlanningStart = null;
+          req.planningStartYear = null;
+        }
+        if (phase.includes('plan')) {
+          req.estConstructionStart = addYear(cell.conStart);
+        }
+      } else if (!cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
+        if (phase.includes('con')) {
+          req.estPlanningEnd = null;
+          req.estPlanningStart = null;
+          req.planningStartYear = null;
+        }
+        if (phase.includes('plan')) {
+          req.estConstructionEnd = null;
+          req.estConstructionStart = null;
+          req.constructionEndYear = null;
+        }
+      } else if (cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
+        if (phase.includes('con')) {
+          req.estPlanningEnd = removeYear(cell.planEnd);
+        }
+        if (phase.includes('plan')) {
+          req.estConstructionEnd = null;
+          req.estConstructionStart = null;
+          req.constructionEndYear = null;
+        }
+      }
+      break;
+    default:
+  }
+  return req;
 };
 
 const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
@@ -373,18 +473,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     () => (type !== 'none' ? formValue?.toString() : ''),
     [formValue, type],
   );
-
-  const onUpdateCellPhase = useCallback((phase: string) => {
-    console.log(phase);
-    // if phase is construction
-    // check dates before and after and set appropriat dates
-
-    // if phase is planning
-    // check dates before and after and set appropriat dates
-
-    // call update cell with correct date params
-  }, []);
-
   const updateCell = useCallback(
     (req: IProjectRequest) => {
       // if there's only the year property in the finances object, delete it
@@ -398,6 +486,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
       }).catch(Promise.reject);
     },
     [id],
+  );
+  const onUpdateCellPhase = useCallback(
+    (phase: string) => {
+      updateCell(getPhaseUpdateRequestData(cell, phase));
+    },
+    [type, cell, updateCell],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property
@@ -496,7 +590,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
         },
       });
     },
-    [onRemoveCell, onEditCell, cellTypeClass, year, title],
+    [onRemoveCell, onEditCell, cellTypeClass, year, title, onUpdateCellPhase],
   );
 
   // Set the budgets value to a number if it exists
