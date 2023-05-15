@@ -27,17 +27,19 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
         </button>
       </td>
       {year === selectedYear && (
-        // className="!min-w-[500px]"
-
         <>
           {isFirstYear && (
-            <td key={`${year}-monthly-view`} className="monthly-summary-cell">
-              <span className="!text-center text-sm font-light">{'4.6.2020'}</span>
+            <td key={`${year}-monthly-view`} className="monthly-summary-cell label">
+              <div className="monthly-cell-container">
+                <span>{'4.6.2020'}</span>
+              </div>
             </td>
           )}
           {months.map((m) => (
-            <td key={m} className="monthly-cell">
-              <span className="!text-center text-sm font-light">{m}</span>
+            <td key={m} className="monthly-cell label">
+              <div className="monthly-cell-container">
+                <span>{m}</span>
+              </div>
             </td>
           ))}
         </>
