@@ -232,7 +232,7 @@ const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinan
   const financesMovedBackward = Object.keys(finances).reduce(
     (movedFinances: IProjectFinances, key, i, keys) => {
       const financeKey = key as keyof Omit<IProjectFinances, 'year'>;
-      // Cannot copy from -1 indexed cell, so default is 0
+      // Cannot copy from +1 indexed cell, so default is 0
       if (i === keys.length - 1) {
         movedFinances[financeKey] = '0';
       } else {
