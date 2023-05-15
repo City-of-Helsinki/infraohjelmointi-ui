@@ -21,6 +21,7 @@ import {
 import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
+import { IconTicket } from 'hds-react/icons';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
@@ -454,8 +455,85 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
           {startYear === year && (
             <td key={`${year}-monthly-view`} className="monthly-summary-cell project">
               <div className="h-full w-full border-b-[1px] border-black-80">
-                <div className="h-full w-full border-b-2 border-gray">
-                  {/* TODO: some stuff here */}
+                <div className="flex h-full w-full justify-center border-b-2 border-gray p-2 pt-1">
+                  <table className="gap-2 text-right">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th className="w-14">
+                          <span className="text-sm font-medium text-black-60">Toteut.</span>
+                        </th>
+                        <th className="w-14">
+                          <span className="text-sm font-medium text-black-60">Sidot.</span>
+                        </th>
+                        <th className="w-14">
+                          <span className="text-sm font-medium text-black-60">Lisät.</span>
+                        </th>
+                        <th className="w-14">
+                          <span className="text-sm font-medium text-black-60">Viiväst.</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th>
+                          <span className="text-sm font-light">
+                            <IconTicket size="xs" />
+                          </span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">400</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">200</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">0</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">0/3</span>
+                        </th>
+                      </tr>
+                      <tr>
+                        <th>
+                          <span className="text-sm font-light">
+                            <IconTicket size="xs" />
+                          </span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">400</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">200</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">0</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">0/3</span>
+                        </th>
+                      </tr>
+                      <tr>
+                        <th>
+                          <span className="text-sm font-light">
+                            <IconTicket size="xs" />
+                          </span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">400</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">200</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">0</span>
+                        </th>
+                        <th>
+                          <span className="text-sm font-light">0/3</span>
+                        </th>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </td>
@@ -473,7 +551,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
                   {/* TODO: some stuff here */}
                 </div>
               </div>
-              {/* TODO: some stuff here */}
             </td>
           ))}
         </>

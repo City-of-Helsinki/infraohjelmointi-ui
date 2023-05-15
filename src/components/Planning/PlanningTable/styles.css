@@ -13,7 +13,7 @@
 }
 
 .monthly-summary-cell {
-  @apply w-[200px] min-w-[200px] max-w-[200px];
+  @apply w-64 min-w-[16rem] max-w-[16rem];
 }
 
 .monthly-cell.summary-budget.first-year,
