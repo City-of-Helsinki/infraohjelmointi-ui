@@ -50,7 +50,7 @@ export const getProjectsWithFreeSearch = async (
   searchWord: string,
 ): Promise<IFreeSearchResults> => {
   return axios
-    .get(`${REACT_APP_API_URL}/projects/?freeSearch=${searchWord}`)
+    .get(`${REACT_APP_API_URL}/projects/search-results/?freeSearch=${searchWord}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
