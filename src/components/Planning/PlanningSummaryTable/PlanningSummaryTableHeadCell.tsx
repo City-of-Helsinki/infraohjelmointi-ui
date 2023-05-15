@@ -1,5 +1,7 @@
 import { FC, memo } from 'react';
 import './styles.css';
+import moment from 'moment';
+import 'moment/locale/fi';
 
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
@@ -8,8 +10,6 @@ interface IPlanningSummaryTableHeadCellProps {
   title: string;
   isFirstYear: boolean;
 }
-
-const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
 
 const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   year,
@@ -31,14 +31,14 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
           {isFirstYear && (
             <td key={`${year}-monthly-view`} className="monthly-summary-cell label">
               <div className="monthly-cell-container">
-                <span>{'4.6.2020'}</span>
+                <span>{moment().format('D.M.YYYY')}</span>
               </div>
             </td>
           )}
-          {months.map((m) => (
+          {moment.monthsShort().map((m) => (
             <td key={m} className="monthly-cell label">
               <div className="monthly-cell-container">
-                <span>{m}</span>
+                <span>{m.substring(0, 3)}</span>
               </div>
             </td>
           ))}

@@ -1,6 +1,7 @@
 import { FC, memo } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import './styles.css';
+import moment from 'moment';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -9,10 +10,9 @@ interface IPlanningCellProps extends IPlanningRow {
   selectedYear: number | null;
 }
 
-const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
-
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) => {
   const { plannedBudget, frameBudget, deviation, year, isFirstYear } = cell;
+  console.log(moment());
 
   return (
     <>
@@ -34,7 +34,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) 
               {/* TODO: some stuff here */}
             </td>
           )}
-          {months.map((m) => (
+          {moment.monthsShort().map((m) => (
             <td key={m} className={`monthly-cell ${type}`}>
               {/* TODO: some stuff here */}
             </td>

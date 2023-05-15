@@ -1,3 +1,7 @@
+:root {
+  --amount-of-month: 0%;
+}
+
 .project-row.searched {
   @apply border-[1px] border-l-[3px] border-black-80;
 }
@@ -143,4 +147,20 @@ tr.active .edit-timeline-button {
 /* Hide arrows from number input in Firefox */
 .project-cell-input[type='number'] {
   -moz-appearance: textfield;
+}
+
+.planning-amount-bar-container {
+  @apply row-start-2 flex h-3 w-full text-sm font-light;
+}
+
+.construction-amount-bar-container {
+  @apply row-start-3 flex h-3 w-full justify-end text-sm font-light;
+}
+
+.planning-amount-bar {
+  @apply h-full w-[50%] bg-black-70;
+}
+
+.construction-amount-bar {
+  @apply h-full bg-copper-m;
 }

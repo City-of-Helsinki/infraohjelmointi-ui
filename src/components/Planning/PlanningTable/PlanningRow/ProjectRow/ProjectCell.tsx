@@ -22,6 +22,7 @@ import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IconTicket } from 'hds-react/icons';
+import moment from 'moment';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
@@ -292,8 +293,6 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
-const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
-
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -418,6 +417,19 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
     setProjectCellState((current) => ({ ...current, isSelectedYear: selectedYear === year }));
   }, [selectedYear, year]);
 
+  const getDaysInMonth = (year: number, month: number): number => {
+    // Create a Moment.js object representing the given month
+    const date = moment({ year, month: month - 1 });
+
+    console.log('date is: ', date);
+    console.log('days in month: ', date.daysInMonth());
+
+    // Use the `daysInMonth()` method to get the number of days in the month
+
+    //TODO: check if the con/plan end this month and get the percentage rep or that from the whole month
+    return date.daysInMonth();
+  };
+
   return (
     <>
       <td
@@ -456,6 +468,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
             <td key={`${year}-monthly-view`} className="monthly-summary-cell project">
               <div className="h-full w-full border-b-[1px] border-black-80">
                 <div className="flex h-full w-full justify-center border-b-2 border-gray p-2 pt-1">
+                  {/* TODO: All the values in the table are retrieved from SAP and mocked as 0 for now */}
                   <table className="gap-2 text-right">
                     <thead>
                       <tr>
@@ -475,62 +488,43 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
                       </tr>
                     </thead>
                     <tbody>
+                      {/* TODO: planning values from SAP */}
                       <tr>
-                        <th>
-                          <span className="text-sm font-light">
-                            <IconTicket size="xs" />
-                          </span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">400</span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">200</span>
-                        </th>
-                        <th>
+                        <td>
+                          {/* TODO: planning icon */}
+                          <IconTicket size="xs" />
+                        </td>
+                        <td>
                           <span className="text-sm font-light">0</span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">0/3</span>
-                        </th>
+                        </td>
+                        <td>
+                          <span className="text-sm font-light">0</span>
+                        </td>
+                        <td>
+                          <span className="text-sm font-light">0</span>
+                        </td>
+                        <td>
+                          <span className="text-sm font-light">0/0</span>
+                        </td>
                       </tr>
                       <tr>
-                        <th>
-                          <span className="text-sm font-light">
-                            <IconTicket size="xs" />
-                          </span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">400</span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">200</span>
-                        </th>
-                        <th>
+                        {/* TODO: construction values from SAP */}
+                        <td>
+                          {/* TODO: construction icon */}
+                          <IconTicket size="xs" />
+                        </td>
+                        <td>
                           <span className="text-sm font-light">0</span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">0/3</span>
-                        </th>
-                      </tr>
-                      <tr>
-                        <th>
-                          <span className="text-sm font-light">
-                            <IconTicket size="xs" />
-                          </span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">400</span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">200</span>
-                        </th>
-                        <th>
+                        </td>
+                        <td>
                           <span className="text-sm font-light">0</span>
-                        </th>
-                        <th>
-                          <span className="text-sm font-light">0/3</span>
-                        </th>
+                        </td>
+                        <td>
+                          <span className="text-sm font-light">0</span>
+                        </td>
+                        <td>
+                          <span className="text-sm font-light">0/0</span>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -539,7 +533,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
             </td>
           )}
 
-          {months.map((m, i) => (
+          {moment.monthsShort().map((m, i) => (
             <td
               key={m}
               className={`monthly-cell project ${startYear === year ? 'first-year' : ''} ${
@@ -547,8 +541,19 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
               }`}
             >
               <div className="h-full w-full border-b-[1px] border-black-80">
-                <div className="h-full w-full border-b-2 border-gray">
-                  {/* TODO: some stuff here */}
+                <div className="h-full w-full border-b-2 border-gray pt-1">
+                  <div className="grid h-full grid-rows-3 gap-1">
+                    {i < 6 && (
+                      <div className="planning-amount-bar-container">
+                        <span className="planning-amount-bar" />
+                      </div>
+                    )}
+                    {i > 4 && (
+                      <div className="construction-amount-bar-container">
+                        <span className={`construction-amount-bar w-[80%]`} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </td>

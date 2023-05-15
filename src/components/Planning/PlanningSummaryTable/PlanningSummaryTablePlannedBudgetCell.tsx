@@ -1,5 +1,6 @@
 import { FC, memo } from 'react';
 import './styles.css';
+import moment from 'moment';
 
 interface IPlanningSummaryTablePlannedBudgetCellProps {
   year: number;
@@ -7,8 +8,6 @@ interface IPlanningSummaryTablePlannedBudgetCellProps {
   selectedYear: number | null;
   isFirstYear: boolean;
 }
-
-const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
 
 const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudgetCellProps> = ({
   year,
@@ -29,7 +28,7 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
               className={`monthly-summary-cell summary-budget ${isFirstYear ? 'first-year' : ''}`}
             ></td>
           )}
-          {months.map((m) => (
+          {moment.monthsShort().map((m) => (
             <td
               key={m}
               className={`monthly-cell summary-budget ${isFirstYear ? 'first-year' : ''}`}

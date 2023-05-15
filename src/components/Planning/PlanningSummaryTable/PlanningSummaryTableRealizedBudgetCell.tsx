@@ -1,6 +1,7 @@
 import { FC, memo } from 'react';
 import { formattedNumberToNumber } from '@/utils/calculations';
 import './styles.css';
+import moment from 'moment';
 
 interface IPlanningSummaryTableRealizedBudgetCellProps {
   frameBudget?: string;
@@ -9,8 +10,6 @@ interface IPlanningSummaryTableRealizedBudgetCellProps {
   selectedYear: number | null;
   isFirstYear: boolean;
 }
-
-const months = ['tam', 'hel', 'maa', 'huh', 'tou', 'kes', 'hei', 'elo', 'syy', 'lok', 'mar', 'jou'];
 
 const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBudgetCellProps> = ({
   frameBudget,
@@ -39,7 +38,7 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
       {year === selectedYear && (
         <>
           {isFirstYear && <td key={`${year}-monthly-view`} className="monthly-summary-cell"></td>}
-          {months.map((m) => (
+          {moment.monthsShort().map((m) => (
             <td key={m} className="monthly-cell">
               {/* TODO: there's going to be graph here and we can use each months cell to paint the graph */}
             </td>
