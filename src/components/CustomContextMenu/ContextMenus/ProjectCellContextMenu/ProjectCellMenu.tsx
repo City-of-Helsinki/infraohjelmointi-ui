@@ -27,8 +27,9 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   const handleCellPhaseUpdate = useCallback(
     (phase: string) => {
       onUpdateCellPhase(phase);
+      onCloseMenu();
     },
-    [onUpdateCellPhase],
+    [onUpdateCellPhase, onCloseMenu],
   );
 
   const handleEditTimeline = useCallback(() => {

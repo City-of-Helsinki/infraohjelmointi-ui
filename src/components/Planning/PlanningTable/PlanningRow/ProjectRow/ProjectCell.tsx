@@ -491,7 +491,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     (phase: string) => {
       updateCell(getPhaseUpdateRequestData(cell, phase));
     },
-    [type, cell, updateCell],
+    [cell, updateCell],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property
