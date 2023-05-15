@@ -11,7 +11,7 @@ export const formattedNumberToNumber = (formattedNumber?: string) => {
     return 0;
   }
   // The character U+2212 is compared intentional here, since the number is formatted with toLocaleString('fi-FI')
-  if (formattedNumber.charAt(0) === '−') {
+  if (formattedNumber.trim().startsWith('−')) {
     return -parseInt(formattedNumber.replace(/\D/g, ''));
   } else {
     return parseInt(formattedNumber.replace(/\D/g, ''));
