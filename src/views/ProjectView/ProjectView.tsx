@@ -1,24 +1,41 @@
 import { useEffect } from 'react';
-import { useAppDispatch } from '@/hooks/common';
-import { getProjectThunk } from '@/reducers/projectSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { getProjectThunk, selectProject, setSelectedProject } from '@/reducers/projectSlice';
 import { TabList } from '@/components/shared';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { useTranslation } from 'react-i18next';
-
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
+import { selectProjectUpdate } from '@/reducers/eventsSlice';
+import _ from 'lodash';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { projectId } = useParams();
+  const navigate = useNavigate();
+  const selectedProject = useAppSelector(selectProject);
+  const projectUpdate = useAppSelector(selectProjectUpdate);
+
+  // Update selectedProject to redux with a project-update event
+  useEffect(() => {
+    if (projectUpdate?.project && !_.isEqual(projectUpdate?.project, selectedProject)) {
+      dispatch(setSelectedProject(projectUpdate.project));
+    }
+  }, [projectUpdate]);
 
   useEffect(() => {
-    dispatch(getProjectThunk(projectId || ''));
-  }, [dispatch, projectId]);
+    if (projectId) {
+      dispatch(getProjectThunk(projectId))
+        .then((res) => res.type.includes('rejected') && navigate('/not-found'))
+        .catch(Promise.reject);
+    } else {
+      navigate('/planning');
+    }
+  }, [projectId]);
 
   const navItems: Array<INavigationItem> = [
     { route: 'basics', label: t('basicInfo'), component: <ProjectBasics /> },
@@ -27,9 +44,13 @@ const ProjectView = () => {
 
   return (
     <div className="w-full" data-testid="project-view">
-      <ProjectToolbar />
-      <ProjectHeader />
-      <TabList navItems={navItems} />
+      {selectedProject && (
+        <>
+          <ProjectToolbar />
+          <ProjectHeader />
+          <TabList navItems={navItems} />
+        </>
+      )}
     </div>
   );
 };

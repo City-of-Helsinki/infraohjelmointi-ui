@@ -1,6 +1,5 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { patchProjectThunk } from '@/reducers/projectSlice';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import {
@@ -18,13 +17,14 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from '../../shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
-import './styles.css';
 import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
 import { IListItem } from '@/interfaces/common';
 import { arrayHasValue, objectHasProperty } from '@/utils/common';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { patchProject } from '@/services/projectServices';
+import './styles.css';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -53,9 +53,8 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     ref: Ref<HTMLDivElement>,
   ) => {
     const { Header, Content, ActionButtons } = Dialog;
-    const { t } = useTranslation();
-    const dispatch = useAppDispatch();
     const allHashTags = useAppSelector(selectHashTags);
+    const { t } = useTranslation();
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
@@ -153,19 +152,17 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     // Submit hashTagsForSubmit and close the dialog
     const onSubmit = useCallback(
       (e: MouseEvent<HTMLButtonElement>) => {
-        dispatch(
-          patchProjectThunk({
-            data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
-            id: projectId,
-          }),
-        )
+        patchProject({
+          id: projectId,
+          data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
+        })
           .then(() => {
             onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
             toggleOpenDialog(e);
           })
           .catch(Promise.reject);
       },
-      [dispatch, hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
+      [hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
     );
 
     const handleClose = useCallback(() => {

@@ -171,8 +171,7 @@ const useProjectBasicsValues = () => {
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectBasicsForm = () => {
-  const project = useAppSelector(selectProject);
-  const { formValues } = useProjectBasicsValues();
+  const { formValues, project } = useProjectBasicsValues();
 
   const formMethods = useForm<IProjectBasicsForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -185,14 +184,13 @@ const useProjectBasicsForm = () => {
   const classOptions = useClassOptions(project?.projectClass);
   const locationOptions = useLocationOptions(project?.projectLocation, project?.projectClass);
 
-  // Updates
+  // Updates form with the selectedProject from redux
   useEffect(() => {
     if (project) {
       reset(formValues);
     }
   }, [project]);
 
-  // formFields,
   return { formMethods, classOptions, locationOptions };
 };
 

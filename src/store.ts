@@ -10,6 +10,7 @@ import locationReducer from './reducers/locationSlice';
 import hashTagReducer from './reducers/hashTagsSlice';
 import searchReducer from './reducers/searchSlice';
 import groupReducer from './reducers/groupSlice';
+import eventsReducer from './reducers/eventsSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
@@ -24,6 +25,7 @@ export const storeItems = {
   hashTags: hashTagReducer,
   search: searchReducer,
   group: groupReducer,
+  events: eventsReducer,
 };
 
 const rootReducer = combineReducers(storeItems);

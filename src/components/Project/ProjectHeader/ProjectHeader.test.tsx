@@ -18,7 +18,6 @@ const render = async () =>
     renderWithProviders(<Route path="/" element={<ProjectHeader />} />, {
       preloadedState: {
         project: {
-          projects: [],
           selectedProject: mockProject.data,
           count: 1,
           error: {},

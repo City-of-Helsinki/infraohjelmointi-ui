@@ -1,5 +1,5 @@
 import useProjectBasicsForm from '@/forms/useProjectBasicsForm';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectBasicsForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback, useState } from 'react';
 import {
@@ -10,7 +10,7 @@ import {
   SelectField,
   TextField,
 } from '../../shared';
-import { selectProject, patchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
@@ -22,9 +22,9 @@ import { useTranslation } from 'react-i18next';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { useOptions } from '@/hooks/useOptions';
 import './styles.css';
+import { patchProject } from '@/services/projectServices';
 
 const ProjectBasicsForm: FC = () => {
-  const dispatch = useAppDispatch();
   const { formMethods, classOptions, locationOptions } = useProjectBasicsForm();
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
@@ -46,7 +46,7 @@ const ProjectBasicsForm: FC = () => {
   const planningPhases = useOptions('planningPhases');
   const constructionPhases = useOptions('constructionPhases');
   const responsibleZones = useOptions('responsibleZones');
-  const responsiblePersons = useOptions('responsiblePersons');
+  const responsiblePersons = useOptions('responsiblePersons', true);
   const { masterClasses, classes, subClasses } = classOptions;
   const { districts, divisions, subDivisions } = locationOptions;
 
@@ -60,15 +60,16 @@ const ProjectBasicsForm: FC = () => {
         return;
       }
       const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-      await dispatch(patchProjectThunk({ id: project.id, data })).then((res) => {
-        // Set form saved to true if action is successfull, queue it to false async
-        handleSetFormSaved(res.type === 'project/silent-patch/fulfilled');
-        setTimeout(() => {
-          handleSetFormSaved(false);
-        }, 0);
-      });
+      await patchProject({ id: project.id, data })
+        .then(() => {
+          handleSetFormSaved(true);
+          setTimeout(() => {
+            handleSetFormSaved(false);
+          }, 0);
+        })
+        .catch(Promise.reject);
     },
-    [dirtyFields, project?.id, dispatch, handleSetFormSaved],
+    [dirtyFields, project?.id, handleSetFormSaved],
   );
 
   const formProps = useCallback(

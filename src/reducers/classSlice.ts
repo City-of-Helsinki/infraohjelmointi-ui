@@ -9,7 +9,8 @@ interface IClassState {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
-  error: IError | null | unknown;
+  year: number;
+  error: unknown;
 }
 
 const initialState: IClassState = {
@@ -17,6 +18,7 @@ const initialState: IClassState = {
   masterClasses: [],
   classes: [],
   subClasses: [],
+  year: new Date().getFullYear(),
   error: null,
 };
 
@@ -29,24 +31,67 @@ export const getClassesThunk = createAsyncThunk('class/getAll', async (_, thunkA
 export const classSlice = createSlice({
   name: 'class',
   initialState,
-  reducers: {},
+  reducers: {
+    updateMasterClass(state, action: PayloadAction<IClass | null>) {
+      const masterClassToUpdate = action.payload;
+
+      if (masterClassToUpdate) {
+        const masterClasses = [...state.masterClasses].map((mc) =>
+          mc.id === masterClassToUpdate.id ? masterClassToUpdate : mc,
+        );
+        return { ...state, masterClasses };
+      }
+    },
+    updateClass(state, action: PayloadAction<IClass | null>) {
+      const classToUpdate = action.payload;
+
+      if (classToUpdate) {
+        const classes = [...state.classes].map((c) =>
+          c.id === classToUpdate.id ? classToUpdate : c,
+        );
+        return { ...state, classes };
+      }
+    },
+    updateSubClass(state, action: PayloadAction<IClass | null>) {
+      const subClassToUpdate = action.payload;
+
+      if (subClassToUpdate) {
+        const subClasses = [...state.subClasses].map((sc) =>
+          sc.id === subClassToUpdate.id ? subClassToUpdate : sc,
+        );
+        return { ...state, subClasses };
+      }
+    },
+  },
   extraReducers: (builder) => {
     // GET ALL
     builder.addCase(getClassesThunk.fulfilled, (state, action: PayloadAction<Array<IClass>>) => {
       const masterClasses = action.payload?.filter((c) => !c.parent);
+
       const classes = masterClasses
         ? action.payload?.filter((c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1)
         : [];
+
       const subClasses = classes
         ? action.payload?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
         : [];
-      return { ...state, allClasses: [...action.payload], masterClasses, classes, subClasses };
+
+      return {
+        ...state,
+        allClasses: action.payload,
+        masterClasses,
+        classes,
+        subClasses,
+        year: action.payload[0].finances.year,
+      };
     });
-    builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
   },
 });
+
+export const { updateMasterClass, updateClass, updateSubClass } = classSlice.actions;
 
 export const selectAllClasses = (state: RootState) => state.class.allClasses;
 export const selectMasterClasses = (state: RootState) => state.class.masterClasses;

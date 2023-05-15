@@ -20,13 +20,22 @@ import { CustomContextMenu } from './components/CustomContextMenu';
 import { getGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
+import { eventSource } from './utils/events';
+import {
+  addFinanceUpdateEventListener,
+  removeFinanceUpdateEventListener,
+  addProjectUpdateEventListener,
+  removeProjectUpdateEventListener,
+} from '@/utils/events';
+
+const LOADING_APP_ID = 'loading-app-data';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
   const [appDataReady, setAppDataReady] = useState(false);
 
   const initalizeStates = async () => {
-    dispatch(setLoading({ text: 'Loading app data', id: 'loading-app-data' }));
+    dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
     await Promise.all([
       dispatch(getListsThunk()),
       dispatch(getHashTagsThunk()),
@@ -34,14 +43,33 @@ const App: FC = () => {
       dispatch(getLocationsThunk()),
       dispatch(getGroupsThunk()),
     ]).then(() => {
-      dispatch(clearLoading('loading-app-data'));
+      dispatch(clearLoading(LOADING_APP_ID));
       setAppDataReady(true);
     });
   };
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
-    initalizeStates();
+    initalizeStates().catch(Promise.reject);
+  }, []);
+
+  // Listen to finance-update and project-update events
+  useEffect(() => {
+    eventSource.onerror = (e) => {
+      console.log('Error opening a connection to events: ', e);
+    };
+    eventSource.onopen = (e) => {
+      console.log('Listening to finance-update and project-update events: ', e);
+    };
+
+    addFinanceUpdateEventListener(dispatch);
+    addProjectUpdateEventListener(dispatch);
+
+    return () => {
+      removeFinanceUpdateEventListener(dispatch);
+      removeProjectUpdateEventListener(dispatch);
+      eventSource.close();
+    };
   }, []);
 
   return (

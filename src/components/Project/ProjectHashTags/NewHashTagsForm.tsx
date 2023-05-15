@@ -4,12 +4,13 @@ import useHashTagsForm from '@/forms/useHashTagsForm';
 import { IListItem } from '@/interfaces/common';
 import { IHashTagsForm } from '@/interfaces/formInterfaces';
 import { getHashTagsThunk } from '@/reducers/hashTagsSlice';
-import { selectProject, patchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject } from '@/reducers/projectSlice';
 import { postHashTag } from '@/services/hashTagsService';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconPlus } from 'hds-react/icons';
 import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { patchProject } from '@/services/projectServices';
 
 const NewHashTagsForm = () => {
   // Only show this section for admins (hardcoded to true for now)
@@ -43,12 +44,12 @@ const NewHashTagsForm = () => {
 
   const addToProject = () => {
     if (responseHashTag && project?.id) {
-      dispatch(
-        patchProjectThunk({
-          id: project?.id,
-          data: { hashTags: [...projectHashTags, responseHashTag.id] },
-        }),
-      ).then(() => setResponseHashTag(null));
+      patchProject({
+        id: project?.id,
+        data: { hashTags: [...projectHashTags, responseHashTag.id] },
+      })
+        .then(() => setResponseHashTag(null))
+        .catch(Promise.reject);
     }
   };
 

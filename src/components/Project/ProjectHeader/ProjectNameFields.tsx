@@ -33,7 +33,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
                   id={field.name}
                   {...field}
                   className="w-80"
-                  placeholder={t('name') || ''}
+                  placeholder={t('name') ?? ''}
                   aria-label="project-name"
                 />
                 <br />
@@ -53,7 +53,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
                 id={field.name}
                 {...field}
                 className="edit-address-input"
-                placeholder={t('address') || ''}
+                placeholder={t('address') ?? ''}
                 aria-label="project-address"
               />
             ) : (

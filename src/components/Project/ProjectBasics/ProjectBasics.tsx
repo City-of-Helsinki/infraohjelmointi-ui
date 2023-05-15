@@ -6,6 +6,7 @@ import { selectProject } from '@/reducers/projectSlice';
 
 const ProjectBasics = () => {
   const project = useAppSelector(selectProject);
+
   return (
     <div className="project-basics-container" data-testid="project-basics">
       <ScrollToTop />

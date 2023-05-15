@@ -1,0 +1,36 @@
+.planning-summary-table {
+  /* width 65% since the info-panel is 30% */
+  @apply w-[65%] text-right;
+}
+
+.planning-summary-table td {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 !pr-4;
+}
+
+.planning-summary-table span {
+  @apply block w-full;
+}
+
+.planned-budget-cell {
+  @apply h-[36px] bg-bus-d text-white first:bg-bus;
+}
+
+.planned-budget-cell span {
+  @apply text-sm font-light text-white;
+}
+
+.planning-summary-frame-and-deviation-container {
+  @apply grid grid-flow-row;
+}
+
+.planning-summary-frame-and-deviation-container .frame-budget {
+  @apply min-h-[21px] text-sm font-light;
+}
+
+.planning-summary-frame-and-deviation-container .deviation {
+  @apply min-h-[21px] text-sm font-bold text-[#007a64];
+}
+
+.planning-summary-frame-and-deviation-container .deviation.negative {
+  @apply text-[#b01038];
+}

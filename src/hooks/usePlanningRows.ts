@@ -1,36 +1,28 @@
-import { selectBatchedClasses } from '@/reducers/classSlice';
-import { useAppSelector } from './common';
-import { selectedBatchedLocations } from '@/reducers/locationSlice';
+import {
+  selectBatchedClasses,
+  updateClass,
+  updateMasterClass,
+  updateSubClass,
+} from '@/reducers/classSlice';
+import { useAppDispatch, useAppSelector } from './common';
+import { selectedBatchedLocations, updateDistrict } from '@/reducers/locationSlice';
 import { useEffect, useState } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { useParams } from 'react-router';
-import { IPlanningRow, PlanningRowType } from '@/interfaces/common';
-import { selectGroups } from '@/reducers/groupSlice';
+import {
+  IPlanningRow,
+  IPlanningRowLists,
+  IPlanningRowSelections,
+  PlanningRowType,
+} from '@/interfaces/common';
+import { selectGroups, updateGroup } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
-
-interface IPlanningRowLists {
-  masterClasses: Array<IClass>;
-  classes: Array<IClass>;
-  subClasses: Array<IClass>;
-  districts: Array<ILocation>;
-  divisions: Array<ILocation>;
-  groups: Array<IGroup>;
-}
-
-interface IPlanningRowSelections {
-  selectedMasterClass: IClass | null;
-  selectedClass: IClass | null;
-  selectedSubClass: IClass | null;
-  selectedDistrict: ILocation | null;
-}
-
-interface IPlanningRowsState {
-  lists: IPlanningRowLists;
-  selections: IPlanningRowSelections;
-}
+import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import { selectFinanceUpdate, selectProjectUpdate } from '@/reducers/eventsSlice';
 
 /**
  * Returns false whether a given row is already selected and present in the url.
@@ -82,7 +74,7 @@ const getLink = (
  * Parses a location name and returns the number value at the beginning of the name.
  */
 const parseNumberFromName = (name: string) =>
-  parseInt(name.match(/^\d+\./)?.[0]?.slice(0, -1) ?? '');
+  parseInt(/^\d+\./.exec(name)?.[0]?.slice(0, -1) ?? '');
 
 /**
  * Takes a list of groups or projects and returns them sorted by their name
@@ -139,8 +131,10 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
   const getRowProps = (
     item: IClass | ILocation | IGroup,
     type: PlanningRowType,
-    defaultExpanded?: boolean,
+    expanded?: boolean,
   ): IPlanningRow => {
+    const projectRows = getSortedProjects(item.id, type, projects);
+    const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
     return {
       type: type,
       name: item.name,
@@ -148,9 +142,11 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       id: item.id,
       key: item.id,
       link: getLink(item, type, state.selections),
-      defaultExpanded: defaultExpanded || false,
+      defaultExpanded,
       children: [],
-      projectRows: getSortedProjects(item.id, type, projects),
+      projectRows,
+      cells: calculatePlanningCells(item.finances, type),
+      ...calculatePlanningRowSums(item.finances, type),
     };
   };
 
@@ -208,11 +204,14 @@ const buildPlanningTableRows = (state: IPlanningRowsState, projects: Array<IProj
       // Map divisions & groups (groups only if there are no divisions)
       children: [
         ...getSortedGroupRows(district.id, 'district'),
-        ...sortByNumber(divisionsForDistrict).map((filteredDivision) => ({
-          ...getRowProps(filteredDivision, 'division', true),
-          // Map projects & groups
-          children: getSortedGroupRows(filteredDivision.id, 'division'),
-        })),
+        ...sortByNumber(divisionsForDistrict).map((filteredDivision) => {
+          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
+          return {
+            ...getRowProps(filteredDivision, 'division', groupsForDivision.length > 0),
+            // Map projects & groups
+            children: groupsForDivision,
+          };
+        }),
       ],
     };
   });
@@ -272,19 +271,31 @@ const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelections) =>
   }
 };
 
+interface IPlanningRowsState {
+  lists: IPlanningRowLists;
+  selections: IPlanningRowSelections;
+  rows: Array<IPlanningRow>;
+  projectToUpdate: IProject | null;
+  year: number;
+}
+
+const LOADING_PLANNING_ID = 'loading-planning-data';
 /**
  * Creates a row hierarchy of masterClasses, classes, subClasses, districts and divisions for the PlanningTable
  *
  * It also listens to the url params for a masterClassId, classId, subClassId or districtId which it will
  * use to return the currently selected (opened/expanded) rows.
  *
- * @returns rows for the PlanningTable and the currently selected rows
+ * @returns IPlanningRowsState
  */
 const usePlanningRows = () => {
   const { masterClassId, classId, subClassId, districtId } = useParams();
+  const dispatch = useAppDispatch();
   const batchedClasses = useAppSelector(selectBatchedClasses);
   const batchedLocations = useAppSelector(selectedBatchedLocations);
   const groups = useAppSelector(selectGroups);
+  const financeUpdate = useAppSelector(selectFinanceUpdate);
+  const projectUpdate = useAppSelector(selectProjectUpdate);
 
   const [planningRowsState, setPlanningRowsState] = useState<IPlanningRowsState>({
     lists: {
@@ -301,24 +312,51 @@ const usePlanningRows = () => {
       selectedSubClass: null,
       selectedDistrict: null,
     },
+    rows: [],
+    projectToUpdate: null,
+    year: new Date().getFullYear(),
   });
-  const [rows, setRows] = useState<Array<IPlanningRow>>([]);
+
+  const { lists, selections } = planningRowsState;
 
   useEffect(() => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id).then((projects) => {
-        setRows(buildPlanningTableRows(planningRowsState, projects));
-      });
+      fetchProjectsByRelation(type as PlanningRowType, id)
+        .then((projects) => {
+          setPlanningRowsState((current) => ({
+            ...current,
+            rows: buildPlanningTableRows(planningRowsState, projects),
+          }));
+        })
+        .catch(Promise.reject);
     } else {
-      setRows(buildPlanningTableRows(planningRowsState, []));
+      setPlanningRowsState((current) => ({
+        ...current,
+        rows: buildPlanningTableRows(planningRowsState, []),
+      }));
     }
-  }, [planningRowsState]);
+  }, [lists, selections]);
+
+  useEffect(() => {
+    const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
+
+    if (type && id) {
+      fetchProjectsByRelation(type as PlanningRowType, id)
+        .then((projects) => {
+          setPlanningRowsState((current) => ({
+            ...current,
+            projects,
+          }));
+        })
+        .catch(Promise.reject);
+    }
+  }, [selections]);
 
   // React to changes in classes and set the selectedMasterClass/selectedClass/selectedSubClass if it is present in the route
   useEffect(() => {
-    const { masterClasses, classes, subClasses } = batchedClasses;
+    const { masterClasses, classes, subClasses, year } = batchedClasses;
     const selectedMasterClass = getSelectedItemOrNull(masterClasses, masterClassId);
     const selectedClass = getSelectedItemOrNull(classes, classId);
     const selectedSubClass = getSelectedItemOrNull(subClasses, subClassId);
@@ -337,6 +375,7 @@ const usePlanningRows = () => {
         classes: selectedClass ? [selectedClass] : classes,
         subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
       },
+      year,
     }));
   }, [masterClassId, classId, subClassId, batchedClasses]);
 
@@ -370,10 +409,34 @@ const usePlanningRows = () => {
     }));
   }, [groups]);
 
-  return {
-    rows,
-    selections: planningRowsState.selections,
-  };
+  // Listen to finance-update from redux to see if an update event was triggered
+  useEffect(() => {
+    if (financeUpdate) {
+      dispatch(setLoading({ text: 'Loading planning view', id: LOADING_PLANNING_ID }));
+
+      Promise.all([
+        dispatch(updateMasterClass(financeUpdate.masterClass)),
+        dispatch(updateClass(financeUpdate.class)),
+        dispatch(updateSubClass(financeUpdate.subClass)),
+        dispatch(updateDistrict(financeUpdate.district)),
+        dispatch(updateGroup(financeUpdate.group)),
+      ]).finally(() => {
+        dispatch(clearLoading(LOADING_PLANNING_ID));
+      });
+    }
+  }, [financeUpdate]);
+
+  // Listen to project-update from redux to see if an update event was triggered
+  useEffect(() => {
+    if (projectUpdate) {
+      setPlanningRowsState((current) => ({
+        ...current,
+        projectToUpdate: projectUpdate.project,
+      }));
+    }
+  }, [projectUpdate]);
+
+  return planningRowsState;
 };
 
 export default usePlanningRows;

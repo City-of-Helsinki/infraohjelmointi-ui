@@ -14,22 +14,22 @@ import { selectUser } from '@/reducers/authSlice';
  * @returns formValues, project
  */
 const useProjectHeaderValues = () => {
-  const project = useAppSelector(selectProject);
+  const selectedProject = useAppSelector(selectProject);
   const user = useAppSelector(selectUser);
 
   const { t } = useTranslation();
 
   const formValues = useMemo(
     () => ({
-      favourite: (user && project?.favPersons?.includes(user.id)) || false,
-      phase: listItemToOption(project?.phase, t) || [],
-      name: project?.name || '',
-      address: project?.address || '',
+      favourite: (user && selectedProject?.favPersons?.includes(user.id)) ?? false,
+      phase: listItemToOption(selectedProject?.phase, t) ?? [],
+      name: selectedProject?.name ?? '',
+      address: selectedProject?.address ?? '',
     }),
-    [project, user],
+    [selectedProject, user],
   );
 
-  return { formValues, project };
+  return { formValues, selectedProject };
 };
 
 /**
@@ -40,7 +40,7 @@ const useProjectHeaderValues = () => {
  * @returns handleSubmit, control, dirtyFields
  */
 const useProjectHeaderForm = () => {
-  const { formValues, project } = useProjectHeaderValues();
+  const { formValues, selectedProject } = useProjectHeaderValues();
 
   const formMethods = useForm<IProjectHeaderForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -49,12 +49,12 @@ const useProjectHeaderForm = () => {
 
   const { control, reset } = formMethods;
 
-  // Updates
+  // Updates form when the selectedProject changes in redux
   useEffect(() => {
-    if (project) {
+    if (selectedProject) {
       reset(formValues);
     }
-  }, [project, formValues]);
+  }, [selectedProject, formValues]);
 
   return { formMethods, control };
 };

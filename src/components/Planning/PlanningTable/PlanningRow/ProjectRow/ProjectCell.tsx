@@ -1,7 +1,6 @@
-import { ContextMenuType } from '@/interfaces/common';
 import {
-  IProject,
   IProjectCell,
+  IProjectFinances,
   IProjectFinancesRequestObject,
   IProjectRequest,
   ProjectCellGrowDirection,
@@ -21,6 +20,7 @@ import {
 } from 'react';
 import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
+import { ContextMenuType } from '@/interfaces/eventInterfaces';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
@@ -111,7 +111,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       const updateKey = cellToUpdate.financeKey;
       const updateBudget = cellToUpdate.budget;
       (req.finances[updateKey as keyof IProjectFinancesRequestObject] as string) = (
-        parseInt(budget || '0') + parseInt(updateBudget || '0')
+        parseInt(budget ?? '0') + parseInt(updateBudget ?? '0')
       ).toString();
     }
 
@@ -190,10 +190,26 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
   return req;
 };
 
-const moveTimelineForward = (finances: Array<Array<string | null>>, cell: IProjectCell) => {
-  const { planEnd, conEnd, planStart, conStart, startYear } = cell;
+const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
+  const { planEnd, conEnd, planStart, conStart } = cell;
+  const { year, ...finances } = projectFinances;
 
-  const req: IProjectRequest = { finances: { year: startYear } };
+  // Move all finance property values to the next property
+  const financesMovedForward = Object.keys(finances).reduce(
+    (movedFinances: IProjectFinances, key, i, keys) => {
+      const financeKey = key as keyof Omit<IProjectFinances, 'year'>;
+      // Cannot copy from -1 indexed cell, so default is 0
+      if (i === 0) {
+        movedFinances[financeKey] = '0';
+      } else {
+        movedFinances[financeKey] = finances[keys[i - 1] as keyof Omit<IProjectFinances, 'year'>];
+      }
+      return movedFinances;
+    },
+    { year } as IProjectFinances,
+  );
+
+  const req: IProjectRequest = { finances: financesMovedForward };
 
   if (planEnd) {
     req.estPlanningStart = addYear(planStart);
@@ -205,25 +221,29 @@ const moveTimelineForward = (finances: Array<Array<string | null>>, cell: IProje
     req.estConstructionEnd = addYear(conEnd);
   }
 
-  for (let i = finances.length - 1; i >= 0; i--) {
-    if (i < finances.length - 1) {
-      finances[i + 1][1] = finances[i][1];
-    }
-  }
-
-  finances.slice(0).forEach((f) => {
-    // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
-    if (req.finances) {
-      (req.finances[f[0] as keyof IProjectFinancesRequestObject] as string | null) = f[1];
-    }
-  });
-
   return req;
 };
 
-const moveTimelineBackward = (finances: Array<Array<string | null>>, cell: IProjectCell) => {
-  const { planEnd, conEnd, planStart, conStart, startYear } = cell;
-  const req: IProjectRequest = { finances: { year: startYear } };
+const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
+  const { planEnd, conEnd, planStart, conStart } = cell;
+  const { year, ...finances } = projectFinances;
+
+  // Move all finance property values to the previous property
+  const financesMovedBackward = Object.keys(finances).reduce(
+    (movedFinances: IProjectFinances, key, i, keys) => {
+      const financeKey = key as keyof Omit<IProjectFinances, 'year'>;
+      // Cannot copy from +1 indexed cell, so default is 0
+      if (i === keys.length - 1) {
+        movedFinances[financeKey] = '0';
+      } else {
+        movedFinances[financeKey] = finances[keys[i + 1] as keyof Omit<IProjectFinances, 'year'>];
+      }
+      return movedFinances;
+    },
+    { year } as IProjectFinances,
+  );
+
+  const req: IProjectRequest = { finances: financesMovedBackward };
 
   if (planEnd) {
     req.estPlanningStart = removeYear(planStart);
@@ -235,32 +255,24 @@ const moveTimelineBackward = (finances: Array<Array<string | null>>, cell: IProj
     req.estConstructionEnd = removeYear(conEnd);
   }
 
-  for (let i = 1; i < finances.length; i++) {
-    finances[i - 1][1] = finances[i][1];
-  }
-
-  finances.forEach((b) => {
-    // TS thinks that req.finances can be undefined if this if-condition is called outside the loop...
-    if (req.finances) {
-      (req.finances[b[0] as keyof IProjectFinancesRequestObject] as string | null) = b[1];
-    }
-  });
-
   return req;
 };
 
-const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
-  const { isEndOfTimeline, isStartOfTimeline, financesList } = cell;
+const getMoveTimelineRequestData = (
+  cell: IProjectCell,
+  direction: string,
+  finances: IProjectFinances,
+) => {
+  const { isEndOfTimeline, isStartOfTimeline } = cell;
 
   let req: IProjectRequest = {};
-  const nextFinances = [...financesList];
 
   switch (true) {
     case direction === 'right' && isEndOfTimeline:
-      req = moveTimelineForward(nextFinances, cell);
+      req = moveTimelineForward(cell, finances);
       break;
     case direction === 'left' && isStartOfTimeline:
-      req = moveTimelineBackward(nextFinances, cell);
+      req = moveTimelineBackward(cell, finances);
       break;
   }
 
@@ -269,13 +281,13 @@ const getMoveTimelineRequestData = (cell: IProjectCell, direction: string) => {
 
 interface IProjectCellProps {
   cell: IProjectCell;
-  onUpdateProject: (projectToUpdate: IProject) => void;
+  projectFinances: IProjectFinances | null;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
   const { budget, type, financeKey, year, growDirections, id, title } = cell;
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [formValue, setFormValue] = useState<number | null>(parseInt(budget || '0'));
+  const [formValue, setFormValue] = useState<number | null | string>(parseInt(budget ?? '0'));
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   // Values of cells that have the none type will be empty strings to hide them
@@ -286,12 +298,15 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
+      if (req.finances && Object.keys(req.finances).length === 1) {
+        delete req.finances;
+      }
       patchProject({
         id,
         data: { ...req },
-      }).then((res) => onUpdateProject(res));
+      }).catch(Promise.reject);
     },
-    [id, onUpdateProject],
+    [id],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property
@@ -299,16 +314,22 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
     setIsReadOnly((current) => !current);
   }, []);
 
-  // Make sure the budget is always at least 0 and remove the first 0 if the user types a number in the field
-  const handleChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => setFormValue(e.target.value ? +e.target.value : 0),
-    [],
-  );
+  // Removes the zero value on change if there is only one zero in the value
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    // If the value is more than one zero set the form value normally
+    if (/^0{2,}/.exec(e.target.value)) {
+      setFormValue(e.target.value);
+    }
+    // If value is just a zero replace it
+    else {
+      setFormValue(e.target.value ? +e.target.value : 0);
+    }
+  }, []);
 
   // Blurring the input field will patch the current budget
-  const handleBlur = useCallback(() => {
+  const handleBlur = useCallback((): void => {
     setIsReadOnly((current) => !current);
-    if (formValue !== parseInt(budget || '0')) {
+    if (formValue !== parseInt(budget ?? '0')) {
       updateCell({
         finances: {
           year: 2023,
@@ -332,11 +353,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
   const onMoveTimeline = useCallback(
     (direction: ProjectCellGrowDirection) => {
       const { isStartOfTimeline, isEndOfTimeline } = cell;
-      if (isStartOfTimeline || isEndOfTimeline) {
-        updateCell(getMoveTimelineRequestData(cell, direction));
+      if ((isStartOfTimeline || isEndOfTimeline) && projectFinances) {
+        updateCell(getMoveTimelineRequestData(cell, direction, projectFinances));
       }
     },
-    [cell, updateCell],
+    [cell, updateCell, projectFinances],
   );
 
   // Set the active css-class to the current row using the project id, this will render the edit-buttons and borders
@@ -370,7 +391,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, onUpdateProject }) => {
 
   // Set the budgets value to a number if it exists
   useEffect(() => {
-    setFormValue(parseInt(budget || '0'));
+    setFormValue(parseInt(budget ?? '0'));
   }, [budget]);
 
   return (

@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { render, RenderResult } from '@testing-library/react';
+import { render, RenderResult, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { setupStore } from '../store';
 import type { PreloadedState } from '@reduxjs/toolkit';
@@ -8,6 +8,8 @@ import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter, Routes } from 'react-router-dom';
 import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
+import EventSourceMock from '@/mocks/mockEventSource';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store.
@@ -62,4 +64,28 @@ export const renderWithProviders = (
     user: userEvent.setup(),
     ...renderResult,
   };
+};
+
+export const sendProjectUpdateEvent = async (data: IProject) => {
+  await waitFor(() =>
+    new EventSourceMock().emitMessage({
+      id: '',
+      type: 'project-update',
+      data: JSON.stringify({
+        project: data,
+      }),
+    }),
+  );
+};
+
+export const sendFinanceUpdateEvent = async (data: object) => {
+  await waitFor(() =>
+    new EventSourceMock().emitMessage({
+      id: '',
+      type: 'finance-update',
+      data: JSON.stringify({
+        ...data,
+      }),
+    }),
+  );
 };

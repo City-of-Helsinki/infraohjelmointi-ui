@@ -1,8 +1,8 @@
-import { ContextMenuType, IContextMenuData } from '@/interfaces/common';
 import { useState, useEffect, useRef, useLayoutEffect, useMemo, memo, useCallback } from 'react';
 import { ProjectCellMenu } from './ContextMenus/ProjectCellContextMenu';
 import { ProjectPhaseMenu } from './ContextMenus/ProjectPhaseContextMenu';
 import './styles.css';
+import { ContextMenuType, IContextMenuData } from '@/interfaces/eventInterfaces';
 
 interface IContextMenuState extends IContextMenuData {
   isVisible: boolean;
@@ -54,7 +54,7 @@ const CustomContextMenu = () => {
    * - Hide context menu on 'mouseup'-event when clicking outside the context menu container
    */
   useEffect(() => {
-    if (!contextMenuRef || !contextMenuRef.current) {
+    if (!contextMenuRef?.current) {
       return;
     }
 
@@ -99,19 +99,19 @@ const CustomContextMenu = () => {
 
   // Check if the context menu position overflows the viewport and move it into the viewport
   useLayoutEffect(() => {
-    if (contextMenuRef && contextMenuRef.current) {
+    if (contextMenuRef?.current) {
       // If the context menu overflows the windows x-axis, move it into the viewport
       if (posX + contextMenuRef.current.offsetWidth > window.innerWidth) {
         setContextMenuState((current) => ({
           ...current,
-          posX: posX - (contextMenuRef.current?.offsetWidth || 0),
+          posX: posX - (contextMenuRef.current?.offsetWidth ?? 0),
         }));
       }
       // If the context menu overflows the windows y-axis, move it into the viewport
       if (posY + contextMenuRef.current.offsetHeight > window.innerHeight) {
         setContextMenuState((current) => ({
           ...current,
-          posY: posY - (contextMenuRef.current?.offsetHeight || 0),
+          posY: posY - (contextMenuRef.current?.offsetHeight ?? 0),
         }));
       }
     }

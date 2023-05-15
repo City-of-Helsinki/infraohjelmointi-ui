@@ -1,33 +1,31 @@
 .planning-info-panel {
-  grid-template-rows: repeat(5, 1.7rem);
-  padding: 0.75rem;
-  @apply grid w-[35%] min-w-[26.75rem] grid-cols-2;
+  @apply flex w-[35%] min-w-[26.75rem] justify-between pl-2 pr-3;
 }
 
-.planning-info-panel #planningButton {
-  @apply col-span-1 row-start-1 row-end-2;
+.planning-info-panel .buttons-container {
+  @apply flex flex-col justify-between;
 }
 
-.planning-info-panel #selectedClass {
-  @apply col-start-2 row-start-2 row-end-2 ml-4;
+.planning-info-panel .selected-class-container {
+  @apply flex w-[50%] items-center justify-end;
 }
 
-#selectedClass span {
-  @apply overflow-hidden overflow-ellipsis whitespace-nowrap;
-}
-
-.planning-info-panel #previousButton {
-  @apply row-start-5 flex items-start;
+.selected-class {
+  @apply block overflow-hidden text-ellipsis pl-4 text-sm font-bold;
 }
 
 #previousButton button {
-  @apply h-8 min-h-[unset] w-28 min-w-[unset];
+  @apply h-8 min-h-[unset] w-[7.5rem] min-w-[unset] pl-3;
+}
+
+#previousButton button div {
+  @apply m-0;
+}
+
+#previousButton button span {
+  @apply pl-2;
 }
 
 #previousButton button svg {
   @apply max-w-[unset];
-}
-
-#previousButton button:hover {
-  background-color: none !important;
 }

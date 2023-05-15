@@ -21,6 +21,24 @@ import { CustomContextMenu } from '@/components/CustomContextMenu';
 import { listItemToOption } from '@/utils/common';
 import { mockError } from '@/mocks/mockError';
 import { getProjectsWithParams } from '@/services/projectServices';
+import { IClassFinances } from '@/interfaces/classInterfaces';
+import { mockClassFinances } from '@/mocks/mockClassFinances';
+import { getPlanningRowTitle } from '@/hooks/useSummaryRows';
+import {
+  calculatePlanningCells,
+  calculatePlanningRowSums,
+  calculatePlanningSummaryCells,
+  calculateProjectRowSums,
+  formatNumber,
+} from '@/utils/calculations';
+import { sendProjectUpdateEvent, sendFinanceUpdateEvent } from '@/utils/testUtils';
+import mockProject from '@/mocks/mockProject';
+import {
+  addFinanceUpdateEventListener,
+  removeFinanceUpdateEventListener,
+  addProjectUpdateEventListener,
+  removeProjectUpdateEventListener,
+} from '@/utils/events';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -31,23 +49,25 @@ const store = setupStore();
 const render = async () =>
   await act(async () =>
     renderWithProviders(
-      <Route
-        path="/"
-        element={
-          <>
-            <PlanningView />
-            <CustomContextMenu />
-          </>
-        }
-      >
-        <Route path=":masterClassId" element={<PlanningView />}>
-          <Route path=":classId" element={<PlanningView />}>
-            <Route path=":subClassId" element={<PlanningView />}>
-              <Route path=":districtId" element={<PlanningView />} />
+      <>
+        <Route
+          path="/"
+          element={
+            <>
+              <PlanningView />
+              <CustomContextMenu />
+            </>
+          }
+        >
+          <Route path=":masterClassId" element={<PlanningView />}>
+            <Route path=":classId" element={<PlanningView />}>
+              <Route path=":subClassId" element={<PlanningView />}>
+                <Route path=":districtId" element={<PlanningView />} />
+              </Route>
             </Route>
           </Route>
         </Route>
-      </Route>,
+      </>,
       {
         preloadedState: {
           class: {
@@ -78,7 +98,6 @@ const render = async () =>
 
 describe('PlanningView', () => {
   const asNumber = (value: string | null) => parseInt(value || '');
-
   const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
     const { user, store, getByTestId } = renderResult;
     const { masterClasses, classes } = store.getState().class;
@@ -115,6 +134,61 @@ describe('PlanningView', () => {
     const getMock = mockedAxios.get.mock.lastCall;
 
     expect(getMock[0]).toBe('localhost:4000/projects/?test=123&direct=false');
+  });
+
+  it('updates table sums if the finance-update event triggers', async () => {
+    const renderResult = await render();
+    const { store, getByTestId } = renderResult;
+
+    addFinanceUpdateEventListener(store.dispatch);
+
+    const { id: masterClassId } = store.getState().class.masterClasses[0];
+    const year = new Date().getFullYear();
+
+    const updatedFinances = {
+      ...mockClassFinances,
+      year0: {
+        plannedBudget: 80000,
+        frameBudget: 2000,
+      },
+    };
+
+    const financeUpdateData = {
+      masterClass: {
+        ...mockMasterClasses.data[0],
+        finances: {
+          ...updatedFinances,
+        },
+      },
+      class: {
+        ...mockClasses.data[0],
+        finances: {
+          ...updatedFinances,
+        },
+      },
+      project: mockProject.data,
+    };
+    await navigateToProjectRows(renderResult);
+
+    await waitFor(async () => {
+      await sendFinanceUpdateEvent(financeUpdateData);
+    });
+
+    const { plannedBudget, frameBudget } = updatedFinances.year0;
+
+    await waitFor(() => {
+      expect(getByTestId(`planned-budget-${masterClassId}-${year}`).textContent).toBe(
+        formatNumber(plannedBudget),
+      );
+      expect(getByTestId(`frame-budget-${masterClassId}-${year}`).textContent).toBe(
+        formatNumber(frameBudget),
+      );
+      expect(getByTestId(`deviation-${masterClassId}-${year}`).textContent).toBe(
+        formatNumber(frameBudget - plannedBudget),
+      );
+    });
+
+    removeFinanceUpdateEventListener(store.dispatch);
   });
 
   describe('PlanningBreadCrumbs', () => {
@@ -253,55 +327,53 @@ describe('PlanningView', () => {
     });
   });
 
-  describe('PlanningYearsTable', () => {
-    it('renders the current year + 10 years and mock data for now', async () => {
-      const { getByTestId, getAllByText, container } = await render();
+  describe('PlanningSummaryTable', () => {
+    it('renders all budgets of all masterClasses if a masterClass isnt selected', async () => {
+      const { getByTestId, container, store } = await render();
 
-      expect(container.getElementsByClassName('planning-years-table')[0]).toBeInTheDocument();
-      expect(getByTestId('planning-years-head')).toBeInTheDocument();
-      expect(getByTestId('planning-years-head-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-body')).toBeInTheDocument();
-      expect(getByTestId('planning-years-total-budget-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-realized-budget-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-overrun-row')).toBeInTheDocument();
-      expect(getByTestId('planning-years-deviation-row')).toBeInTheDocument();
-      expect(getAllByText('alustava').length).toBe(6);
+      const { year } = mockClassFinances;
+      const { masterClasses } = store.getState().class;
 
-      for (let i = 0; i < 10; i++) {
-        const year = new Date().getFullYear() + i;
-        const currentHeaderCell = getByTestId(`head-${year}`);
-        const currentTotalBudgetCell = getByTestId(`budget-${year}`);
-        const currentRealizedBudgetCell = getByTestId(`realized-${year}`);
-        const currentOverrunCell = getByTestId(`overrun-${year}`);
-        const currentDeviationCell = getByTestId(`deviation-${year}`);
+      expect(container.getElementsByClassName('planning-summary-table')[0]).toBeInTheDocument();
+      expect(getByTestId('planning-summary-head')).toBeInTheDocument();
+      expect(getByTestId('planning-summary-head-row')).toBeInTheDocument();
 
-        expect(currentHeaderCell).toHaveTextContent(`<> ${year}`);
-        expect(currentTotalBudgetCell).toHaveTextContent('341 400');
-        expect(currentRealizedBudgetCell).toBeInTheDocument();
-        expect(currentOverrunCell).toHaveTextContent('400');
-        expect(currentDeviationCell).toHaveTextContent('1400');
-
-        // First col
-        if (i === 0) {
-          expect(currentHeaderCell).toHaveTextContent('kuluva TA');
-          expect(currentRealizedBudgetCell).toHaveTextContent('340 200');
-          expect(currentOverrunCell.children[0].classList.contains('overrun-icon')).toBeTruthy();
-          expect(currentOverrunCell).toHaveTextContent('+400');
-        }
-        // Second col
-        if (i === 1) {
-          expect(currentHeaderCell).toHaveTextContent('TAE');
-        }
-        // Third and fourth col
-        if (i === 2 || i === 3) {
-          expect(currentHeaderCell).toHaveTextContent('TSE');
-          expect(currentHeaderCell).toHaveTextContent('TSE');
-        }
-        // Fifth col
-        if (i === 4) {
-          expect(currentHeaderCell).toHaveTextContent('kuluva TA');
-        }
+      for (let i = 0; i < 11; i++) {
+        const title = getPlanningRowTitle(i);
+        const headCell = getByTestId(`head-${year + i}`);
+        expect(headCell).toHaveTextContent((year + i).toString());
+        expect(headCell).toHaveTextContent(title);
       }
+
+      expect(getByTestId('planning-summary-body')).toBeInTheDocument();
+      expect(getByTestId('planning-summary-planned-budget-row')).toBeInTheDocument();
+      expect(getByTestId('planning-summary-realized-budget-row')).toBeInTheDocument();
+
+      const cells = calculatePlanningSummaryCells(masterClasses, 'masterClass');
+      cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
+        expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
+        expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
+        expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
+      });
+    });
+
+    it('renders the selectedMasterClasses financial data if a masterClass is expanded', async () => {
+      const { getByTestId, user } = await render();
+
+      const finances = mockClassFinances;
+      const { id: masterClassId } = mockMasterClasses.data[0];
+
+      await user.click(getByTestId(`expand-${masterClassId}`));
+
+      const cells = calculatePlanningCells(finances, 'class');
+
+      await waitFor(() => {
+        cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
+          expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
+          expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
+          expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
+        });
+      });
     });
   });
 
@@ -333,7 +405,7 @@ describe('PlanningView', () => {
       masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
     });
 
-    it('renders all children rows and only one parent when parent is expanded', async () => {
+    it('renders all children rows and budgets for all but divisions and only one parent when parent is expanded', async () => {
       const { store, getByTestId, queryByTestId, user } = await render();
 
       const { masterClasses, classes, subClasses } = store.getState().class;
@@ -341,6 +413,24 @@ describe('PlanningView', () => {
       const { groups } = store.getState().group;
 
       const projects = mockPlanningViewProjects.data.results;
+
+      const expectRowProperties = async (
+        finances: IClassFinances,
+        id: string,
+        isGroup?: boolean,
+      ) => {
+        const { plannedBudgets, costEstimateBudget, deviation } = calculatePlanningRowSums(
+          finances,
+          isGroup ? 'group' : 'class',
+        );
+
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        expect(getByTestId(`planned-budgets-${id}`).textContent).toBe(plannedBudgets);
+        expect(getByTestId(`cost-estimate-budget-${id}`).textContent).toBe(costEstimateBudget);
+        if (!isGroup) {
+          expect(getByTestId(`deviation-${id}`).textContent).toBe(deviation);
+        }
+      };
 
       // Check that all masterClass-rows is visible
       masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
@@ -351,9 +441,9 @@ describe('PlanningView', () => {
 
       // Check that only first masterClass-row are visible
       await waitFor(() => {
-        masterClasses.forEach(({ id }, i) => {
+        masterClasses.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('masterClass')).toBeTruthy();
           }
           if (i !== 0) {
@@ -375,9 +465,9 @@ describe('PlanningView', () => {
 
       // Check that only first class-row is visible
       await waitFor(() => {
-        classes.forEach(({ id }, i) => {
+        classes.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('class')).toBeTruthy();
           }
           if (i !== 0) {
@@ -408,9 +498,9 @@ describe('PlanningView', () => {
 
       // Check that only first subClass-row is visible
       await waitFor(() => {
-        subClasses.forEach(({ id }, i) => {
+        subClasses.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('subClass')).toBeTruthy();
           }
           if (i !== 0) {
@@ -425,8 +515,8 @@ describe('PlanningView', () => {
       );
 
       await waitFor(() => {
-        groupsForSubClass.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        groupsForSubClass.forEach(({ id, finances }) => {
+          expectRowProperties(finances, id, true);
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -456,9 +546,9 @@ describe('PlanningView', () => {
 
       // Check that only first district-row is visible
       await waitFor(() => {
-        districts.forEach(({ id }, i) => {
+        districts.forEach(({ id, finances }, i) => {
           if (i === 0) {
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
             expect(
               getByTestId(`row-${districtId}`).classList.contains('district-preview'),
@@ -475,7 +565,6 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         groupsForDistrict.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -515,7 +604,6 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         groupsForDivision.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
           expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
         });
       });
@@ -614,7 +702,7 @@ describe('PlanningView', () => {
       expect(queryByTestId(`row-${classId}`)).toBeNull();
     });
 
-    describe('PlanningHeader', () => {
+    describe('PlanningHead', () => {
       it('renders all elements', async () => {
         const { store, getByTestId } = await render();
 
@@ -630,31 +718,23 @@ describe('PlanningView', () => {
     });
 
     describe('PlanningCell', () => {
-      it('renders budget, overrun and deviation only for the current year', async () => {
+      it('renders budget, overrun and deviation', async () => {
         const { store, getByTestId } = await render();
 
-        const { id } = store.getState().class.masterClasses[0];
+        const { id, finances } = store.getState().class.masterClasses[0];
+
         const firstCell = getByTestId(`row-${id}`).children[1];
         const year = new Date().getFullYear();
 
+        const cells = calculatePlanningCells(finances, 'class');
+
+        const { plannedBudget, frameBudget, deviation } = cells[0];
+
         expect(firstCell.children[0].children.length).toBe(3);
 
-        expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-        expect(getByTestId(`overrun-${id}-${year}`)).toBeInTheDocument();
-        expect(getByTestId(`deviation-${id}-${year}`)).toBeInTheDocument();
-      });
-
-      it('renders budget and realized cost for future years', async () => {
-        const { store, getByTestId } = await render();
-
-        const { id } = store.getState().class.masterClasses[0];
-        const secondCell = getByTestId(`row-${id}`).children[2];
-        const year = new Date().getFullYear() + 1;
-
-        expect(secondCell.children[0].children.length).toBe(2);
-
-        expect(getByTestId(`budget-${id}-${year}`)).toBeInTheDocument();
-        expect(getByTestId(`realized-${id}-${year}`)).toBeInTheDocument();
+        expect(getByTestId(`planned-budget-${id}-${year}`).textContent).toBe(plannedBudget || '0');
+        expect(getByTestId(`frame-budget-${id}-${year}`).textContent).toBe(frameBudget || '0');
+        expect(getByTestId(`deviation-${id}-${year}`).textContent).toBe(deviation || '0');
       });
     });
 
@@ -680,12 +760,12 @@ describe('PlanningView', () => {
     });
 
     describe('Project Row', () => {
-      it('renders all the elements and no financial data to cells if there is no planning or construction', async () => {
+      it('renders all the elements and the row budgets and no financial data to cells if there is no planning or construction', async () => {
         const renderResult = await render();
 
         const { getByTestId } = renderResult;
-
-        const { id, category, name, finances } = mockPlanningViewProjects.data.results[0];
+        const project = mockPlanningViewProjects.data.results[0];
+        const { id, category, name, finances } = project;
 
         await waitFor(() => navigateToProjectRows(renderResult));
 
@@ -695,8 +775,13 @@ describe('PlanningView', () => {
           expect(getByTestId(`edit-phase-${id}`)).toBeInTheDocument();
           expect(getByTestId(`navigate-${id}`)).toHaveTextContent(name);
           expect(getByTestId(`category-${id}`)).toHaveTextContent((category as IListItem).value);
-          expect(getByTestId(`project-total-budget-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`project-realized-budget-${id}`)).toBeInTheDocument();
+
+          const { availableFrameBudget, costEstimateBudget } = calculateProjectRowSums(project);
+
+          expect(getByTestId(`available-frame-budget-${id}`)).toHaveTextContent(
+            availableFrameBudget,
+          );
+          expect(getByTestId(`cost-estimate-budget-${id}`)).toHaveTextContent(costEstimateBudget);
 
           for (let i = 0; i < 10; i++) {
             const year = finances.year + i;
@@ -733,7 +818,9 @@ describe('PlanningView', () => {
 
         const renderResult = await render();
 
-        const { user, getByTestId, getByText, queryByTestId } = renderResult;
+        const { user, getByTestId, getByText, queryByTestId, store } = renderResult;
+
+        addProjectUpdateEventListener(store.dispatch);
 
         const { id } = project;
         const phasesAsOptions = mockProjectPhases.data.map((p) => listItemToOption(p));
@@ -763,10 +850,14 @@ describe('PlanningView', () => {
         // Save the option
         await user.click(getByTestId('patch-project-phase'));
 
+        // Wait for the patch
         await waitFor(() => {
           const patchMock = mockedAxios.patch.mock.lastCall;
           expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-1/');
         });
+
+        // Send the project-update event with the updated project
+        await sendProjectUpdateEvent(mockPatchPhaseResponse.data);
 
         // Context menu is hidden after patch
         await waitFor(() => expect(queryByTestId('project-phase-menu')).toBeNull());
@@ -775,7 +866,6 @@ describe('PlanningView', () => {
         await waitFor(async () => await user.click(getByTestId(`edit-phase-${id}`)));
 
         // Patched option is the selected option
-
         await waitFor(() => {
           expect(
             getByTestId(`project-phase-menu-option-${firstOptionValue}`).classList.contains(
@@ -783,6 +873,8 @@ describe('PlanningView', () => {
             ),
           ).toBeTruthy();
         });
+
+        removeProjectUpdateEventListener(store.dispatch);
       });
 
       it('creates cells for planning, construction and overlap when the project has planning', async () => {
@@ -909,7 +1001,14 @@ describe('PlanningView', () => {
 
           const renderResult = await render();
 
-          const { user, getByTestId } = renderResult;
+          const {
+            user,
+            getByTestId,
+            store: { dispatch },
+          } = renderResult;
+
+          addProjectUpdateEventListener(dispatch);
+
           const { id, name } = project;
           const yearToHide = year + 4;
 
@@ -930,6 +1029,12 @@ describe('PlanningView', () => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchRequest);
+          });
+
+          // Send the project-update event with the updated project
+          await sendProjectUpdateEvent(mockDeleteCellPatchResponse.data);
+
+          await waitFor(() => {
             // Cell is hidden
             expect(getByTestId(`cell-input-${yearToHide}-${id}`)).toBeDisabled();
             expect(getByTestId(`cell-input-${yearToHide}-${id}`)).toHaveValue(null);
@@ -941,6 +1046,8 @@ describe('PlanningView', () => {
               getByTestId(`project-cell-${yearToHide + 1}-${id}`).classList.contains('con'),
             ).toBeTruthy();
           });
+
+          removeProjectUpdateEventListener(dispatch);
         });
 
         it('can delete the start and end of the timeline to decrease the planning or construction dates', async () => {
@@ -973,7 +1080,14 @@ describe('PlanningView', () => {
 
           const renderResult = await render();
 
-          const { user, getByTestId } = renderResult;
+          const {
+            user,
+            getByTestId,
+            store: { dispatch },
+          } = renderResult;
+
+          addProjectUpdateEventListener(dispatch);
+
           const { id } = project;
           const endOfTimeline = year + 6;
 
@@ -986,6 +1100,12 @@ describe('PlanningView', () => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchConEndRequest);
+          });
+
+          // Send the project-update event with the updated project
+          await sendProjectUpdateEvent(mockRemoveConEndPatchResponse.data);
+
+          await waitFor(() => {
             // Cell is hidden
             expect(getByTestId(`cell-input-${endOfTimeline}-${id}`)).toBeDisabled();
             expect(getByTestId(`cell-input-${endOfTimeline}-${id}`)).toHaveValue(null);
@@ -1028,12 +1148,21 @@ describe('PlanningView', () => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchPlanStartRequest);
+          });
+
+          // Send the project-update event with the updated project
+          await sendProjectUpdateEvent(mockRemovePlanStartPatchResponse.data);
+
+          // Check that correct data was patched and planning start has moved
+          await waitFor(() => {
             expect(getByTestId(`cell-input-${startOfTimeline}-${id}`)).toBeDisabled();
             expect(getByTestId(`cell-input-${startOfTimeline}-${id}`)).toHaveValue(null);
             expect(
               getByTestId(`project-cell-${startOfTimeline}-${id}`).classList.contains('none'),
             ).toBeTruthy();
           });
+
+          removeProjectUpdateEventListener(dispatch);
         });
 
         it('it removes construction end and start dates if last construction cell is removed', async () => {
@@ -1221,17 +1350,12 @@ describe('PlanningView', () => {
           const year = new Date().getFullYear();
 
           const patchAddPlanYearRequest = {
-            finances: { year: year },
             estPlanningStart: `12.02.${year}`,
           };
 
           const mockAddConYearPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchAddPlanYearRequest.finances,
-              },
               estPlanningStart: patchAddPlanYearRequest.estPlanningStart,
             },
           };
@@ -1259,22 +1383,17 @@ describe('PlanningView', () => {
           });
         });
 
-        it('can add a year to planning and construction if an overlap cell is selected', async () => {
+        it('can add a year to planning if an overlap cell is selected', async () => {
           const project = mockPlanningViewProjects.data.results[10];
           const year = new Date().getFullYear();
 
           const patchAddOverlapPlanRequest = {
-            finances: { year: year },
             estPlanningStart: `12.02.${year + 2}`,
           };
 
           const mockAddOverlapPlanPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchAddOverlapPlanRequest.finances,
-              },
               estPlanningStart: patchAddOverlapPlanRequest.estPlanningStart,
             },
           };
@@ -1300,27 +1419,37 @@ describe('PlanningView', () => {
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-11/');
             expect(patchMock[1]).toStrictEqual(patchAddOverlapPlanRequest);
           });
+        });
+
+        it('can add a year to planning and construction if an overlap cell is selected', async () => {
+          const project = mockPlanningViewProjects.data.results[10];
+          const year = new Date().getFullYear();
 
           const patchAddOverlapConRequest = {
-            finances: { year: year },
             estPlanningStart: `12.02.${year + 2}`,
           };
 
           const mockAddOverlapConPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchAddOverlapConRequest.finances,
-              },
               estPlanningStart: patchAddOverlapConRequest.estPlanningStart,
             },
           };
 
           mockedAxios.patch.mockResolvedValueOnce(mockAddOverlapConPatchResponse);
 
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const overlapYear = year + 3;
+
+          await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
+
           await user.click(getByTestId('edit-year-button'));
+
+          const addYearButton = getByTestId(`add-cell-${overlapYear}-${id}-left`);
 
           await user.click(addYearButton);
 
@@ -1338,7 +1467,7 @@ describe('PlanningView', () => {
           const patchMoveYearRequest = {
             finances: {
               year: year,
-              budgetProposalCurrentYearPlus0: '0.00',
+              budgetProposalCurrentYearPlus0: '0',
               budgetProposalCurrentYearPlus1: '0.00',
               budgetProposalCurrentYearPlus2: '0.00',
               preliminaryCurrentYearPlus3: '30.00',
@@ -1408,7 +1537,7 @@ describe('PlanningView', () => {
               preliminaryCurrentYearPlus7: '90.00',
               preliminaryCurrentYearPlus8: '0.00',
               preliminaryCurrentYearPlus9: '0.00',
-              preliminaryCurrentYearPlus10: '0.00',
+              preliminaryCurrentYearPlus10: '0',
             },
             estPlanningStart: `12.02.${year}`,
             estPlanningEnd: `12.02.${year + 2}`,

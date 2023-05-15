@@ -1,4 +1,4 @@
-import { IError } from '@/interfaces/common';
+import { IError, INotification } from '@/interfaces/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
@@ -59,16 +59,37 @@ axios.interceptors.response.use(
 const handleRequest = (req: InternalAxiosRequestConfig) => {
   // Check if the url should add a loader to redux
   if (shouldTriggerLoading(req?.url)) {
-    store.dispatch(setLoading({ text: 'Loading request', id: req?.url || '' }));
+    store.dispatch(setLoading({ text: 'Loading request', id: req?.url ?? '' }));
   }
   return req;
 };
 
 const handleResponse = (res: AxiosResponse) => {
   if (shouldTriggerLoading(res.config.url)) {
-    store.dispatch(clearLoading(res.config?.url || ''));
+    store.dispatch(clearLoading(res.config?.url ?? ''));
   }
   return res;
+};
+
+const getErrorNotification = (error: AxiosError): INotification => {
+  const url = error.config?.url;
+
+  const parsedError: INotification = {
+    status: error.response?.status?.toLocaleString(),
+    title: error.status?.toLocaleString() ?? '',
+    message: error.message ?? 'Unknown error',
+  };
+
+  if (!url) {
+    return parsedError;
+  }
+
+  if (url.includes('projects') && error.request?.status === 404) {
+    parsedError.title = 'projectNotFound';
+    parsedError.message = 'projectNotFound';
+  }
+
+  return parsedError;
 };
 
 const handleError = (error: AxiosError): Promise<IError> => {
@@ -77,16 +98,10 @@ const handleError = (error: AxiosError): Promise<IError> => {
     message: error.message || 'Unknown error',
   };
 
-  store.dispatch(
-    notifyError({
-      message: parsedError.message,
-      title: `${parsedError.status || ''}`,
-      status: parsedError.status?.toLocaleString(),
-    }),
-  );
+  store.dispatch(notifyError(getErrorNotification(error)));
 
   if (shouldTriggerLoading(error.config?.url)) {
-    store.dispatch(clearLoading(error.config?.url || ''));
+    store.dispatch(clearLoading(error.config?.url ?? ''));
   }
 
   return Promise.reject(parsedError);

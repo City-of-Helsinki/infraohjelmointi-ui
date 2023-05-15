@@ -1,3 +1,4 @@
+import { IProjectSums } from '@/interfaces/common';
 import {
   CellType,
   IProject,
@@ -6,6 +7,7 @@ import {
   IProjectFinancesRequestObject,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
+import { calculateProjectRowSums } from '@/utils/calculations';
 import { isInYearRange, isSameYear } from '@/utils/dates';
 import { useEffect, useState } from 'react';
 
@@ -14,8 +16,6 @@ const getProjectCells = (project: IProject) => {
     project;
 
   const { year, ...finances } = project.finances;
-
-  const financesList = Object.entries(finances).map(([key, value]) => [key, value]);
 
   /**
    * Gets the type of the cell for the current year
@@ -189,7 +189,6 @@ const getProjectCells = (project: IProject) => {
       id: id,
       growDirections: [],
       financesToReset: null,
-      financesList,
       isEdgeCell,
     };
   });
@@ -219,6 +218,11 @@ const getProjectCells = (project: IProject) => {
   return projectCells;
 };
 
+interface IProjectRowsState {
+  cells: Array<IProjectCell>;
+  sums: IProjectSums;
+  projectFinances: IProjectFinances | null;
+}
 /**
  * Get 11 project cells from a project, each cell will include all the needed properties to patch and delete the budgets and
  * dates associated with the cell year. This whole structure can be a bit confusing, please refer to the comments on IProjectCell
@@ -227,16 +231,25 @@ const getProjectCells = (project: IProject) => {
  * @param project
  * @returns a list of IProjectCell
  */
-const useProjectCells = (project: IProject) => {
-  const [projectCells, setProjectCells] = useState<Array<IProjectCell>>([]);
+const useProjectRow = (project: IProject) => {
+  const [projectRowsState, setProjectRowsState] = useState<IProjectRowsState>({
+    cells: [],
+    sums: { availableFrameBudget: '0', costEstimateBudget: '0' },
+    projectFinances: null,
+  });
 
   useEffect(() => {
     if (project) {
-      setProjectCells(getProjectCells(project));
+      setProjectRowsState((current) => ({
+        ...current,
+        cells: getProjectCells(project),
+        sums: calculateProjectRowSums(project),
+        projectFinances: project.finances,
+      }));
     }
   }, [project]);
 
-  return projectCells;
+  return projectRowsState;
 };
 
-export default useProjectCells;
+export default useProjectRow;

@@ -9,7 +9,8 @@ interface ILocationState {
   districts: Array<ILocation>;
   divisions: Array<ILocation>;
   subDivisions: Array<ILocation>;
-  error: IError | null | unknown;
+  year: number;
+  error: unknown;
 }
 
 const initialState: ILocationState = {
@@ -17,6 +18,7 @@ const initialState: ILocationState = {
   districts: [],
   divisions: [],
   subDivisions: [],
+  year: new Date().getFullYear(),
   error: null,
 };
 
@@ -29,30 +31,50 @@ export const getLocationsThunk = createAsyncThunk('location/getAll', async (_, t
 export const locationSlice = createSlice({
   name: 'locations',
   initialState,
-  reducers: {},
+  reducers: {
+    updateDistrict(state, action: PayloadAction<ILocation | null>) {
+      const districtToUpdate = action.payload;
+
+      if (districtToUpdate) {
+        const districts = [...state.districts].map((d) =>
+          d.id === districtToUpdate.id ? districtToUpdate : d,
+        );
+        return { ...state, districts };
+      }
+    },
+  },
   extraReducers: (builder) => {
     // GET ALL
     builder.addCase(
       getLocationsThunk.fulfilled,
       (state, action: PayloadAction<Array<ILocation>>) => {
         const districts = action.payload?.filter((l) => !l.parent);
+
         const divisions = districts
           ? action.payload?.filter((l) => districts.findIndex((d) => d.id === l.parent) !== -1)
           : [];
+
         const subDivisions = divisions
           ? action.payload?.filter((l) => divisions.findIndex((d) => d.id === l.parent) !== -1)
           : [];
-        return { ...state, allLocations: [...action.payload], districts, divisions, subDivisions };
+
+        return {
+          ...state,
+          allLocations: action.payload,
+          districts,
+          divisions,
+          subDivisions,
+          year: action.payload[0].finances.year,
+        };
       },
     );
-    builder.addCase(
-      getLocationsThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
+    builder.addCase(getLocationsThunk.rejected, (state, action: PayloadAction<unknown>) => {
+      return { ...state, error: action.payload };
+    });
   },
 });
+
+export const { updateDistrict } = locationSlice.actions;
 
 export const selectAllLocations = (state: RootState) => state.location.allLocations;
 export const selectDistricts = (state: RootState) => state.location.districts;

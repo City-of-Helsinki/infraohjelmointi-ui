@@ -34,7 +34,6 @@ const render = async () =>
           project: {
             ...store.getState().project,
             selectedProject: mockProject.data,
-            projects: [mockProject.data],
           },
         },
       },

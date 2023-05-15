@@ -1,6 +1,6 @@
 .project-header-cell {
   /* setting max-width: 1rem will cause the table head to not grow bigger than the group table header */
-  @apply max-w-[1rem] border-b-[0.05rem] border-l-[0.05rem] border-r-[0.05rem] border-bus-m py-1 px-5;
+  @apply max-w-[1rem] border-b-[0.05rem] border-l-[0.05rem] border-r-[0.05rem] border-bus-m py-1 px-4;
 }
 
 .project-header-cell-container {
@@ -119,7 +119,7 @@ tr.active .edit-timeline-button {
 }
 
 .project-cell-input {
-  @apply h-10 w-[85%] border-2 border-transparent !bg-transparent text-center;
+  @apply h-10 w-[85%] border-2 border-transparent !bg-transparent pr-2 text-right;
 }
 
 .project-cell-input-container {

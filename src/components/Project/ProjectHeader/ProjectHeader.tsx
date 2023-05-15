@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { selectProject, patchProjectThunk } from '@/reducers/projectSlice';
+import { selectProject } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
@@ -12,6 +12,7 @@ import ProjectFavouriteField from './ProjectFavouriteField';
 import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
 import { useTranslation } from 'react-i18next';
+import { patchProject } from '@/services/projectServices';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -49,7 +50,7 @@ const ProjectHeader: FC = () => {
           delete data.favourite;
         }
 
-        projectId && (await dispatch(patchProjectThunk({ id: projectId, data: data })));
+        projectId && (await patchProject({ id: projectId, data: data }));
       }
     },
     [project?.favPersons, projectId, user?.id, dispatch, dirtyFields, isDirty],

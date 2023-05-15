@@ -17,9 +17,9 @@ const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size, weight, id })
   return (
     <div
       className="custom-tag-container"
-      data-testid={id || ''}
+      data-testid={id ?? ''}
       style={{
-        background: color || 'var(--color-silver)',
+        background: color ?? 'var(--color-silver)',
       }}
     >
       {icon}

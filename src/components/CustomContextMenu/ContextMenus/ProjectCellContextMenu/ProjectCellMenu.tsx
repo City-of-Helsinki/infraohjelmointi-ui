@@ -1,9 +1,10 @@
-import { ICellMenuDetails, IOption } from '@/interfaces/common';
+import { IOption } from '@/interfaces/common';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
+import { ICellMenuDetails } from '@/interfaces/eventInterfaces';
 
 interface IProjectCellMenuProps extends ICellMenuDetails {
   onCloseMenu: () => void;
@@ -24,12 +25,12 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   ];
 
   const handleEditTimeline = useCallback(() => {
-    onEditCell && onEditCell();
+    onEditCell();
     onCloseMenu();
   }, [onCloseMenu, onEditCell]);
 
   const handleRemoveYear = useCallback(() => {
-    onRemoveCell && onRemoveCell();
+    onRemoveCell();
     onCloseMenu();
   }, [onCloseMenu, onRemoveCell]);
 

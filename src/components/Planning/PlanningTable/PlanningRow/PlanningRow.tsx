@@ -1,16 +1,20 @@
 // Disabled jsx-key because eslint doesn't understand that the key is spread through props
 /* eslint-disable react/jsx-key */
 import { FC, memo, useCallback, useEffect, useState } from 'react';
-import { classSums } from '@/mocks/common';
 import PlanningCell from './PlanningCell';
-import PlanningHeader from './PlanningHeader';
-import { IPlanningRow } from '@/interfaces/common';
+import PlanningHead from './PlanningHead';
+import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
-import './styles.css';
 import { IProject } from '@/interfaces/projectInterfaces';
+import './styles.css';
+import _ from 'lodash';
 
-const PlanningRow: FC<IPlanningRow> = (props) => {
-  const { defaultExpanded, projectRows } = props;
+interface IPlanningRowProps extends IPlanningRow {
+  projectToUpdate: IProject | null;
+}
+
+const PlanningRow: FC<IPlanningRowProps> = (props) => {
+  const { defaultExpanded, projectRows, cells, projectToUpdate } = props;
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [projects, setProjects] = useState<Array<IProject>>([]);
 
@@ -26,34 +30,34 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
     setProjects(projectRows);
   }, [projectRows]);
 
-  const onUpdateProject = useCallback(
-    (projectToUpdate: IProject) => {
+  useEffect(() => {
+    if (projectToUpdate) {
       const updatedProjects = projects.map((p) =>
         p.id === projectToUpdate.id ? projectToUpdate : p,
       );
-      setProjects(updatedProjects);
-    },
-    [projects],
-  );
+      if (!_.isEqual(projects, updatedProjects)) {
+        setProjects(updatedProjects);
+      }
+    }
+  }, [projectToUpdate]);
 
   return (
     <>
       <tr className={props.type} data-testid={`row-${props.id}`}>
-        <PlanningHeader handleExpand={handleExpand} expanded={expanded} {...props} />
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
-        {classSums.map((cs: any, i: number) => (
-          <PlanningCell sum={cs} position={i} {...props} key={i.toString()} />
+        <PlanningHead handleExpand={handleExpand} expanded={expanded} {...props} />
+        {cells.map((c: IPlanningCell) => (
+          <PlanningCell {...props} cell={c} key={c.key} />
         ))}
       </tr>
 
       {expanded && (
         <>
           {projects.map((p) => (
-            <ProjectRow key={p.id} project={p} onUpdateProject={onUpdateProject} />
+            <ProjectRow key={p.id} project={p} />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} />
+            <PlanningRow {...c} projectToUpdate={projectToUpdate} />
           ))}
         </>
       )}

@@ -1,5 +1,8 @@
 import { ReactNode } from 'react';
-import { CellType, IProject, IProjectRequest } from './projectInterfaces';
+import { IProject } from './projectInterfaces';
+import { IClass } from './classInterfaces';
+import { ILocation } from './locationInterfaces';
+import { IGroup } from './groupInterfaces';
 
 export interface IError {
   status: number | undefined;
@@ -10,6 +13,7 @@ export interface INavigationItem {
   route: string;
   label: string;
   component?: ReactNode;
+  disabled?: boolean;
 }
 
 export interface IOption {
@@ -64,33 +68,8 @@ export interface IFreeSearchResults {
   groups: Array<IListItem>;
 }
 
-export interface ICellMenuDetails {
-  title: string;
-  year: number;
-  cellType: CellType;
-  onRemoveCell: () => void;
-  onEditCell: () => void;
-}
-
-export interface IPhaseMenuDetails {
-  title: string;
-  phase?: string;
-  onSubmitPhase: (req: IProjectRequest) => void;
-}
-
-export interface IContextMenuData {
-  menuType: ContextMenuType;
-  cellMenuProps?: ICellMenuDetails;
-  phaseMenuProps?: IPhaseMenuDetails;
-}
-
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
-
-export enum ContextMenuType {
-  EDIT_PROJECT_CELL,
-  EDIT_PROJECT_PHASE,
-}
 
 export type PlanningRowType =
   | 'masterClass'
@@ -102,7 +81,41 @@ export type PlanningRowType =
   | 'group'
   | 'project';
 
-export interface IPlanningRow {
+export interface IProjectSums {
+  availableFrameBudget: string;
+  costEstimateBudget: string;
+}
+
+export interface IPlanningSums {
+  plannedBudgets?: string;
+  costEstimateBudget?: string;
+  deviation?: string;
+}
+
+export interface IPlanningCell {
+  key: string;
+  deviation?: string;
+  plannedBudget?: string;
+  frameBudget?: string;
+}
+
+export interface IPlanningRowLists {
+  masterClasses: Array<IClass>;
+  classes: Array<IClass>;
+  subClasses: Array<IClass>;
+  districts: Array<ILocation>;
+  divisions: Array<ILocation>;
+  groups: Array<IGroup>;
+}
+
+export interface IPlanningRowSelections {
+  selectedMasterClass: IClass | null;
+  selectedClass: IClass | null;
+  selectedSubClass: IClass | null;
+  selectedDistrict: ILocation | null;
+}
+
+export interface IPlanningRow extends IPlanningSums {
   type: PlanningRowType;
   name: string;
   path: string;
@@ -112,4 +125,5 @@ export interface IPlanningRow {
   key: string;
   defaultExpanded: boolean;
   link: string | null;
+  cells: Array<IPlanningCell>;
 }
