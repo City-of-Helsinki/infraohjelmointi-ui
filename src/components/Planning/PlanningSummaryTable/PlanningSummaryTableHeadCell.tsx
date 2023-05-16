@@ -1,7 +1,7 @@
-import { FC, memo } from 'react';
-import './styles.css';
+import { FC, memo, useMemo } from 'react';
+import { IconAngleLeft, IconAngleRight } from 'hds-react/icons';
 import moment from 'moment';
-import 'moment/locale/fi';
+import './styles.css';
 
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
@@ -18,12 +18,25 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   title,
   isStartMonth,
 }) => {
+  const leftArrow = useMemo(
+    () => (selectedYear === year ? <IconAngleRight /> : <IconAngleLeft />),
+    [selectedYear, year],
+  );
+  const rightArrow = useMemo(
+    () => (selectedYear === year ? <IconAngleLeft /> : <IconAngleRight />),
+    [selectedYear, year],
+  );
+
   return (
     <>
       <td data-testid={`head-${year}`} className="planning-summary-head-cell">
         <button onClick={() => handleSetSelectedYear(year)}>
           <span className="text-sm font-light">{title}</span>
-          <span className="text-sm font-bold">{`<> ${year}`}</span>
+          <div className="arrows-container">
+            {leftArrow}
+            {rightArrow}
+            <span className="text-sm font-bold">{year}</span>
+          </div>
         </button>
       </td>
       {year === selectedYear && (

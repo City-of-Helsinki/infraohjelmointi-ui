@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { PlanningToolbar } from '@/components/Planning/PlanningToolbar';
 import { PlanningInfoPanel } from '@/components/Planning/PlanningInfoPanel';
 import { PlanningBreadcrumbs } from '@/components/Planning/PlanningBreadcrumbs';

@@ -398,7 +398,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
   //
   const selectedYearClass = useMemo(
     () => (year === selectedYear ? 'selected-year' : ''),
-    [selectedYear],
+    [selectedYear, year],
   );
 
   const currentYearClass = useMemo(

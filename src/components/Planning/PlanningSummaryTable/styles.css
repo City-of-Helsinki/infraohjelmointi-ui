@@ -47,3 +47,15 @@
 .monthly-cell-container span {
   @apply !text-center text-sm font-light;
 }
+
+.arrows-container {
+  @apply relative flex w-14 items-center justify-start;
+}
+
+.arrows-container svg {
+  @apply absolute h-5 w-5;
+}
+
+.arrows-container svg:first-child {
+  left: -10px;
+}
