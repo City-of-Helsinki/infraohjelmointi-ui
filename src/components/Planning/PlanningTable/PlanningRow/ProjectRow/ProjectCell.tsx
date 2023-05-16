@@ -30,7 +30,7 @@ const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
 };
 
-const getPhaseUpdateRequestData = (cell: IProjectCell, phase: string): IProjectRequest => {
+const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProjectRequest => {
   const req: IProjectRequest = {};
   const { type } = cell;
   switch (type) {
@@ -86,9 +86,9 @@ const getPhaseUpdateRequestData = (cell: IProjectCell, phase: string): IProjectR
       }
       break;
     case 'overlap':
-      console.log(phase);
       if (cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
         if (phase.includes('con')) {
+          ('tri10');
           req.estPlanningEnd = removeYear(cell.planEnd);
         }
         if (phase.includes('plan')) {
@@ -487,14 +487,15 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     },
     [id],
   );
-  const canPhaseUpdate = useCallback(() => {
+  const canTypeUpdate = useCallback(() => {
     if (cell.type === 'planEnd' || cell.type === 'overlap' || cell.type === 'conStart') return true;
     if (cell.type === 'conEnd' && !cell.prev?.type.includes('con')) return true;
     return false;
   }, [cell]);
-  const onUpdateCellPhase = useCallback(
-    (phase: string) => {
-      updateCell(getPhaseUpdateRequestData(cell, phase));
+
+  const onUpdateCellType = useCallback(
+    (type: string) => {
+      updateCell(getCellTypeUpdateRequestData(cell, type));
     },
     [cell, updateCell],
   );
@@ -591,12 +592,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
           cellType: cellTypeClass,
           onRemoveCell,
           onEditCell,
-          onUpdateCellPhase,
-          canPhaseUpdate: canPhaseUpdate(),
+          onUpdateCellType,
+          canTypeUpdate: canTypeUpdate(),
         },
       });
     },
-    [onRemoveCell, onEditCell, cellTypeClass, year, title, onUpdateCellPhase, canPhaseUpdate],
+    [onRemoveCell, onEditCell, cellTypeClass, year, title, onUpdateCellType, canTypeUpdate],
   );
 
   // Set the budgets value to a number if it exists
