@@ -350,10 +350,10 @@ describe('PlanningView', () => {
       expect(getByTestId('planning-summary-realized-budget-row')).toBeInTheDocument();
 
       const cells = calculatePlanningSummaryCells(masterClasses, 'masterClass');
-      cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
-        expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
-        expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
-        expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
+      cells.forEach(({ year, plannedBudget, frameBudget, deviation }) => {
+        expect(getByTestId(`summary-budget-${year}`).textContent).toBe(plannedBudget);
+        expect(getByTestId(`summary-frame-${year}`).textContent).toBe(frameBudget);
+        expect(getByTestId(`summary-deviation-${year}`).textContent).toBe(deviation);
       });
     });
 
@@ -368,10 +368,10 @@ describe('PlanningView', () => {
       const cells = calculatePlanningCells(finances, 'class');
 
       await waitFor(() => {
-        cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
-          expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
-          expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
-          expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
+        cells.forEach(({ year, plannedBudget, frameBudget, deviation }) => {
+          expect(getByTestId(`summary-budget-${year}`).textContent).toBe(plannedBudget);
+          expect(getByTestId(`summary-frame-${year}`).textContent).toBe(frameBudget);
+          expect(getByTestId(`summary-deviation-${year}`).textContent).toBe(deviation);
         });
       });
     });
