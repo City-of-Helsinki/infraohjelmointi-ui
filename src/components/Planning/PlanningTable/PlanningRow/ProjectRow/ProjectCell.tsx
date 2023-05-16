@@ -487,6 +487,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     },
     [id],
   );
+  const canPhaseUpdate = useCallback(() => {
+    if (cell.type === 'planEnd' || cell.type === 'overlap' || cell.type === 'conStart') return true;
+    if (cell.type === 'conEnd' && !cell.prev?.type.includes('con')) return true;
+    return false;
+  }, [cell]);
   const onUpdateCellPhase = useCallback(
     (phase: string) => {
       updateCell(getPhaseUpdateRequestData(cell, phase));
@@ -587,10 +592,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
           onRemoveCell,
           onEditCell,
           onUpdateCellPhase,
+          canPhaseUpdate: canPhaseUpdate(),
         },
       });
     },
-    [onRemoveCell, onEditCell, cellTypeClass, year, title, onUpdateCellPhase],
+    [onRemoveCell, onEditCell, cellTypeClass, year, title, onUpdateCellPhase, canPhaseUpdate],
   );
 
   // Set the budgets value to a number if it exists

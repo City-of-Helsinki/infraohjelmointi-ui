@@ -17,6 +17,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   onRemoveCell,
   onEditCell,
   onUpdateCellPhase,
+  canPhaseUpdate,
 }) => {
   const { t } = useTranslation();
   const options: Array<IOption> = [
@@ -26,6 +27,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
 
   const handleCellPhaseUpdate = useCallback(
     (phase: string) => {
+      console.log('dsd');
       onUpdateCellPhase(phase);
       onCloseMenu();
     },
@@ -64,9 +66,11 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
           {options.map(({ value, label }) => (
             <li
               key={value}
-              className={`list-item ${value === cellType ? 'selected' : 'not-selected'}`}
+              className={`list-item ${
+                value === cellType ? 'selected' : canPhaseUpdate ? 'not-selected' : ''
+              }`}
               data-testid={`cell-type-${value}`}
-              onClick={() => (value !== cellType ? handleCellPhaseUpdate(value) : '')}
+              onClick={() => (canPhaseUpdate ? handleCellPhaseUpdate(value) : '')}
             >
               <div className="flex items-center">
                 <div className={`list-icon ${value}`} />
