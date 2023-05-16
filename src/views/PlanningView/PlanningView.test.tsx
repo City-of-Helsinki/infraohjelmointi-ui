@@ -897,12 +897,12 @@ describe('PlanningView', () => {
             }
             // Planning
             if (i === 1) {
-              expect(cell.classList.contains('plan')).toBeTruthy();
+              expect(cell.classList.contains('planning')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.budgetProposalCurrentYearPlus1));
             }
             // Planning
             if (i === 2) {
-              expect(cell.classList.contains('plan')).toBeTruthy();
+              expect(cell.classList.contains('planning')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.budgetProposalCurrentYearPlus2));
             }
             // Overlap
@@ -912,17 +912,17 @@ describe('PlanningView', () => {
             }
             // Construction
             if (i === 4) {
-              expect(cell.classList.contains('con')).toBeTruthy();
+              expect(cell.classList.contains('construction')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.preliminaryCurrentYearPlus4));
             }
             // Construction
             if (i === 5) {
-              expect(cell.classList.contains('con')).toBeTruthy();
+              expect(cell.classList.contains('construction')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.preliminaryCurrentYearPlus5));
             }
             // Construction
             if (i === 6) {
-              expect(cell.classList.contains('con')).toBeTruthy();
+              expect(cell.classList.contains('construction')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.preliminaryCurrentYearPlus6));
             }
           }
@@ -1019,8 +1019,8 @@ describe('PlanningView', () => {
           expect(getByTestId('close-project-cell-menu')).toBeInTheDocument();
           expect(getByTestId('cell-year')).toHaveTextContent(yearToHide.toString());
           expect(getByTestId('cell-title')).toHaveTextContent(name);
-          expect(getByTestId('cell-type-con').classList.contains('selected')).toBeTruthy();
-          expect(getByTestId('cell-type-plan')).toBeInTheDocument();
+          expect(getByTestId('cell-type-construction').classList.contains('selected')).toBeTruthy();
+          expect(getByTestId('cell-type-planning')).toBeInTheDocument();
 
           // Delete cell
           await user.click(getByTestId('remove-year-button'));
@@ -1043,7 +1043,9 @@ describe('PlanningView', () => {
             ).toBeTruthy();
             // Next cell is still construction in the document
             expect(
-              getByTestId(`project-cell-${yearToHide + 1}-${id}`).classList.contains('con'),
+              getByTestId(`project-cell-${yearToHide + 1}-${id}`).classList.contains(
+                'construction',
+              ),
             ).toBeTruthy();
           });
 
@@ -1054,7 +1056,7 @@ describe('PlanningView', () => {
           const project = mockPlanningViewProjects.data.results[1];
           const year = new Date().getFullYear();
 
-          const patchConEndRequest = {
+          const patchConstructionEndRequest = {
             finances: {
               year: year,
               preliminaryCurrentYearPlus5: '130',
@@ -1065,18 +1067,18 @@ describe('PlanningView', () => {
             estConstructionEnd: `07.02.${year + 5}`,
           };
 
-          const mockRemoveConEndPatchResponse = {
+          const mockRemoveConstructionEndPatchResponse = {
             data: {
               ...project,
               finances: {
                 ...project.finances,
-                ...patchConEndRequest.finances,
+                ...patchConstructionEndRequest.finances,
               },
-              estConstructionEnd: patchConEndRequest.estConstructionEnd,
+              estConstructionEnd: patchConstructionEndRequest.estConstructionEnd,
             },
           };
 
-          mockedAxios.patch.mockResolvedValueOnce(mockRemoveConEndPatchResponse);
+          mockedAxios.patch.mockResolvedValueOnce(mockRemoveConstructionEndPatchResponse);
 
           const renderResult = await render();
 
@@ -1099,11 +1101,11 @@ describe('PlanningView', () => {
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock[1]).toStrictEqual(patchConEndRequest);
+            expect(patchMock[1]).toStrictEqual(patchConstructionEndRequest);
           });
 
           // Send the project-update event with the updated project
-          await sendProjectUpdateEvent(mockRemoveConEndPatchResponse.data);
+          await sendProjectUpdateEvent(mockRemoveConstructionEndPatchResponse.data);
 
           await waitFor(() => {
             // Cell is hidden
@@ -1116,7 +1118,7 @@ describe('PlanningView', () => {
 
           const startOfTimeline = year + 1;
 
-          const patchPlanStartRequest = {
+          const patchPlanningStartRequest = {
             finances: {
               year: year,
               budgetProposalCurrentYearPlus1: '0',
@@ -1127,18 +1129,18 @@ describe('PlanningView', () => {
             estPlanningStart: `10.02.${year + 2}`,
           };
 
-          const mockRemovePlanStartPatchResponse = {
+          const mockRemovePlanningStartPatchResponse = {
             data: {
               ...project,
               finances: {
                 ...project.finances,
-                ...patchPlanStartRequest.finances,
+                ...patchPlanningStartRequest.finances,
               },
               estPlanningStart: `12.02.${year + 2}`,
             },
           };
 
-          mockedAxios.patch.mockResolvedValueOnce(mockRemovePlanStartPatchResponse);
+          mockedAxios.patch.mockResolvedValueOnce(mockRemovePlanningStartPatchResponse);
 
           await waitFor(() => openContextMenuForCell(startOfTimeline, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
@@ -1147,11 +1149,11 @@ describe('PlanningView', () => {
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock[1]).toStrictEqual(patchPlanStartRequest);
+            expect(patchMock[1]).toStrictEqual(patchPlanningStartRequest);
           });
 
           // Send the project-update event with the updated project
-          await sendProjectUpdateEvent(mockRemovePlanStartPatchResponse.data);
+          await sendProjectUpdateEvent(mockRemovePlanningStartPatchResponse.data);
 
           // Check that correct data was patched and planning start has moved
           await waitFor(() => {
@@ -1327,13 +1329,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const conEndYear = year + 6;
+          const constructionEndYear = year + 6;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(constructionEndYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${conEndYear}-${id}-right`);
+          const addYearButton = getByTestId(`add-cell-${constructionEndYear}-${id}-right`);
           expect(addYearButton).toBeVisible();
 
           await user.click(addYearButton);
@@ -1366,13 +1368,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const planStartYear = year + 1;
+          const planningStartYear = year + 1;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(planningStartYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${planStartYear}-${id}-left`);
+          const addYearButton = getByTestId(`add-cell-${planningStartYear}-${id}-left`);
 
           await user.click(addYearButton);
 
@@ -1502,13 +1504,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const conEndYear = year + 6;
+          const constructionEndYear = year + 6;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(constructionEndYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${conEndYear}-${id}-right`);
+          const addYearButton = getByTestId(`add-cell-${constructionEndYear}-${id}-right`);
           expect(addYearButton).toBeVisible();
 
           await user.dblClick(addYearButton);
@@ -1562,13 +1564,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const planStartYear = year + 1;
+          const planningStartYear = year + 1;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(planningStartYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${planStartYear}-${id}-left`);
+          const addYearButton = getByTestId(`add-cell-${planningStartYear}-${id}-left`);
           expect(addYearButton).toBeVisible();
 
           await user.dblClick(addYearButton);

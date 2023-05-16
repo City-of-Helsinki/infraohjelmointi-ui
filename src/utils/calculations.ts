@@ -84,7 +84,7 @@ export const calculatePlanningCells = (
     return {
       key,
       year: year + i,
-      isFirstYear: year + i === year,
+      isStartMonth: year + i === year,
       // we don't return any budgets for divisions
       ...(type !== 'division' && {
         plannedBudget: formatNumber(plannedBudget),
@@ -165,3 +165,5 @@ export const calculateProjectRowSums = (project: IProject): IProjectSums => {
     costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
   };
 };
+
+export const calcPercentage = (value: number, total: number) => Math.round((value / total) * 100);

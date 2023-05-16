@@ -265,16 +265,22 @@ export interface IProjectFinances {
 }
 
 export type CellType =
-  | 'planStart'
-  | 'planEnd'
-  | 'plan'
-  | 'conStart'
-  | 'conEnd'
-  | 'con'
+  | 'planningStart'
+  | 'planningEnd'
+  | 'planning'
+  | 'constructionStart'
+  | 'constructionEnd'
+  | 'construction'
   | 'overlap'
   | 'none';
 
 export type ProjectCellGrowDirection = 'left' | 'right';
+
+export interface IMonthlyData {
+  month: string;
+  planning: { isStart: boolean; percent: string };
+  construction: { isStart: boolean; percent: string };
+}
 
 export interface IProjectCell {
   /**
@@ -286,25 +292,25 @@ export interface IProjectCell {
    */
   startYear: number;
   /**
-   * Type of the cell (planStart / planEnd / plan / conStart / conEnd / con / overlap / none)
+   * Type of the cell (planningStart / planningEnd / planning / constructionStart / constructionEnd / construction / overlap / none)
    */
   type: CellType;
   /**
    * When planning starts (can be used to get the timeline schedule for any cell)
    */
-  planStart?: string | null;
+  planningStart?: string | null;
   /**
    * When planning ends (can be used to get the timeline schedule for any cell)
    */
-  planEnd?: string | null;
+  planningEnd?: string | null;
   /**
    * When construction starts (can be used to get the timeline schedule for any cell)
    */
-  conStart?: string | null;
+  constructionStart?: string | null;
   /**
    * When construction ends (can be used to get the timeline schedule for any cell)
    */
-  conEnd?: string | null;
+  constructionEnd?: string | null;
   /**
    * Previous cell to the left (used when adding new cells)
    */
@@ -357,4 +363,10 @@ export interface IProjectCell {
    * Wether the cell is an edge cell, an edge cell is a cell that affects the start/ends dates associated with the timeline
    */
   isEdgeCell: boolean;
+  /**
+   * A list of all the months for the current year with a percentage indicator of how much each month has planning
+   * and construction. This percentage is used to draw the "bar-chart" for the monthly view when selecting a year to
+   * view in the planning summary table.
+   */
+  monthlyDataList: Array<IMonthlyData>;
 }

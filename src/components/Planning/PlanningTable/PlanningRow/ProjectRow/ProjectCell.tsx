@@ -21,8 +21,7 @@ import {
 import { addYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
-import { IconTicket } from 'hds-react/icons';
-import moment from 'moment';
+import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
@@ -34,10 +33,10 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     isEndOfTimeline,
     isStartOfTimeline,
     isLastOfType,
-    planStart,
-    planEnd,
-    conStart,
-    conEnd,
+    planningStart,
+    planningEnd,
+    constructionStart,
+    constructionEnd,
     cellToUpdate,
     financesToReset,
     financeKey,
@@ -48,18 +47,18 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
   const req: IProjectRequest = { finances: { year: startYear, ...financesToReset } };
 
-  const updatePlanEnd = () => {
+  const updatePlanningEnd = () => {
     if (!isLastOfType) {
-      req.estPlanningEnd = updateYear(cellToUpdate?.year, planEnd);
+      req.estPlanningEnd = updateYear(cellToUpdate?.year, planningEnd);
     } else {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
     }
   };
 
-  const updateConEnd = () => {
+  const updateConstructionEnd = () => {
     if (!isLastOfType) {
-      req.estConstructionEnd = updateYear(cellToUpdate?.year, conEnd);
+      req.estConstructionEnd = updateYear(cellToUpdate?.year, constructionEnd);
     } else {
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
@@ -71,29 +70,29 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
     } else {
-      req.estPlanningEnd = removeYear(planEnd);
+      req.estPlanningEnd = removeYear(planningEnd);
     }
     if (isEndOfTimeline) {
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
     } else {
-      req.estConstructionStart = addYear(conStart);
+      req.estConstructionStart = addYear(constructionStart);
     }
   };
 
   const updateDatesIfStartEndOrOverlap = () => {
     switch (type) {
-      case 'planStart':
-        req.estPlanningStart = updateYear(cellToUpdate?.year, planStart);
+      case 'planningStart':
+        req.estPlanningStart = updateYear(cellToUpdate?.year, planningStart);
         break;
-      case 'planEnd':
-        updatePlanEnd();
+      case 'planningEnd':
+        updatePlanningEnd();
         break;
-      case 'conStart':
-        req.estConstructionStart = updateYear(cellToUpdate?.year, conStart);
+      case 'constructionStart':
+        req.estConstructionStart = updateYear(cellToUpdate?.year, constructionStart);
         break;
-      case 'conEnd':
-        updateConEnd();
+      case 'constructionEnd':
+        updateConstructionEnd();
         break;
       case 'overlap':
         updateOverlap();
@@ -132,10 +131,10 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCell) => {
   const {
     type,
-    planStart,
-    planEnd,
-    conStart,
-    conEnd,
+    planningStart,
+    planningEnd,
+    constructionStart,
+    constructionEnd,
     next,
     prev,
     isLastOfType,
@@ -147,18 +146,21 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
   const req: IProjectRequest = { finances: { year: startYear } };
 
   const updateLeft = () => {
-    if (isStartOfTimeline && (type === 'planStart' || type === 'planEnd' || type === 'overlap')) {
-      req.estPlanningStart = removeYear(planStart);
-    } else if ((isLastOfType && type === 'conEnd') || type === 'conStart') {
-      req.estConstructionStart = removeYear(conStart);
+    if (
+      isStartOfTimeline &&
+      (type === 'planningStart' || type === 'planningEnd' || type === 'overlap')
+    ) {
+      req.estPlanningStart = removeYear(planningStart);
+    } else if ((isLastOfType && type === 'constructionEnd') || type === 'constructionStart') {
+      req.estConstructionStart = removeYear(constructionStart);
     }
   };
 
   const updateRight = () => {
-    if (type === 'planEnd') {
-      req.estPlanningEnd = addYear(planEnd);
-    } else if (type === 'conEnd' || type === 'overlap') {
-      req.estConstructionEnd = addYear(conEnd);
+    if (type === 'planningEnd') {
+      req.estPlanningEnd = addYear(planningEnd);
+    } else if (type === 'constructionEnd' || type === 'overlap') {
+      req.estConstructionEnd = addYear(constructionEnd);
     }
   };
 
@@ -193,7 +195,7 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
 };
 
 const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planEnd, conEnd, planStart, conStart } = cell;
+  const { planningEnd, constructionEnd, planningStart, constructionStart } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the next property
@@ -213,21 +215,21 @@ const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinanc
 
   const req: IProjectRequest = { finances: financesMovedForward };
 
-  if (planEnd) {
-    req.estPlanningStart = addYear(planStart);
-    req.estPlanningEnd = addYear(planEnd);
+  if (planningEnd) {
+    req.estPlanningStart = addYear(planningStart);
+    req.estPlanningEnd = addYear(planningEnd);
   }
 
-  if (conEnd) {
-    req.estConstructionStart = addYear(conStart);
-    req.estConstructionEnd = addYear(conEnd);
+  if (constructionEnd) {
+    req.estConstructionStart = addYear(constructionStart);
+    req.estConstructionEnd = addYear(constructionEnd);
   }
 
   return req;
 };
 
 const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planEnd, conEnd, planStart, conStart } = cell;
+  const { planningEnd, constructionEnd, planningStart, constructionStart } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the previous property
@@ -247,14 +249,14 @@ const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinan
 
   const req: IProjectRequest = { finances: financesMovedBackward };
 
-  if (planEnd) {
-    req.estPlanningStart = removeYear(planStart);
-    req.estPlanningEnd = removeYear(planEnd);
+  if (planningEnd) {
+    req.estPlanningStart = removeYear(planningStart);
+    req.estPlanningEnd = removeYear(planningEnd);
   }
 
-  if (conEnd) {
-    req.estConstructionStart = removeYear(conStart);
-    req.estConstructionEnd = removeYear(conEnd);
+  if (constructionEnd) {
+    req.estConstructionStart = removeYear(constructionStart);
+    req.estConstructionEnd = removeYear(constructionEnd);
   }
 
   return req;
@@ -289,21 +291,20 @@ interface IProjectCellProps {
 
 interface IProjectCellState {
   isReadOnly: boolean;
-  isSelectedYear: boolean;
   formValue: number | null | string;
 }
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
-  const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
+  const { budget, type, financeKey, year, growDirections, id, title, startYear, monthlyDataList } =
+    cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
     isReadOnly: true,
-    isSelectedYear: false,
     formValue: parseInt(budget ?? '0'),
   });
 
-  const { formValue, isSelectedYear, isReadOnly } = projectCellState;
+  const { formValue, isReadOnly } = projectCellState;
 
   // Values of cells that have the none type will be empty strings to hide them
   const formDisplayValue = useMemo(
@@ -384,11 +385,26 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
   }, [id]);
 
   // Convert any cell type to 'planning' / 'construction' / 'overlap' / 'none'
-  const getCssType = useCallback(() => {
-    if (type.includes('plan')) return 'plan';
-    else if (type.includes('con')) return 'con';
-    else return type;
+  const cellTypeClass = useMemo(() => {
+    if (type.includes('planning')) {
+      return 'planning';
+    } else if (type.includes('construction')) {
+      return 'construction';
+    } else {
+      return type;
+    }
   }, [type]);
+
+  //
+  const selectedYearClass = useMemo(
+    () => (year === selectedYear ? 'selected-year' : ''),
+    [selectedYear],
+  );
+
+  const currentYearClass = useMemo(
+    () => (year === startYear ? 'current-year' : ''),
+    [year, startYear],
+  );
 
   // Open the custom context menu when right-clicking a cell
   const handleOpenContextMenu = useCallback(
@@ -398,13 +414,13 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
         cellMenuProps: {
           year,
           title,
-          cellType: getCssType(),
+          cellType: cellTypeClass,
           onRemoveCell,
           onEditCell,
         },
       });
     },
-    [onRemoveCell, onEditCell, getCssType, year, title],
+    [onRemoveCell, onEditCell, cellTypeClass, year, title],
   );
 
   // Set the budgets value to a number if it exists
@@ -417,39 +433,28 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
     setProjectCellState((current) => ({ ...current, isSelectedYear: selectedYear === year }));
   }, [selectedYear, year]);
 
-  const getDaysInMonth = (year: number, month: number): number => {
-    // Create a Moment.js object representing the given month
-    const date = moment({ year, month: month - 1 });
-
-    console.log('date is: ', date);
-    console.log('days in month: ', date.daysInMonth());
-
-    // Use the `daysInMonth()` method to get the number of days in the month
-
-    //TODO: check if the con/plan end this month and get the percentage rep or that from the whole month
-    return date.daysInMonth();
-  };
-
   return (
     <>
       <td
         ref={cellRef}
-        className={`project-cell ${getCssType()}`}
+        className={`project-cell ${cellTypeClass} ${selectedYearClass} ${currentYearClass}`}
         onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
         data-testid={`project-cell-${year}-${id}`}
       >
-        <div className="project-cell-input-container">
-          <input
-            value={formDisplayValue}
-            type="number"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            onFocus={handleFocus}
-            disabled={type === 'none'}
-            readOnly={isReadOnly}
-            className="project-cell-input"
-            data-testid={`cell-input-${year}-${id}`}
-          />
+        <div className="project-cell-input-wrapper">
+          <div className="project-cell-input-container">
+            <input
+              value={formDisplayValue}
+              type="number"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              onFocus={handleFocus}
+              disabled={type === 'none'}
+              readOnly={isReadOnly}
+              className="project-cell-input"
+              data-testid={`cell-input-${year}-${id}`}
+            />
+          </div>
         </div>
         {type !== 'none' &&
           growDirections.map((d) => (
@@ -462,103 +467,13 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
             />
           ))}
       </td>
-      {year === selectedYear && (
-        <>
-          {startYear === year && (
-            <td key={`${year}-monthly-view`} className="monthly-summary-cell project">
-              <div className="h-full w-full border-b-[1px] border-black-80">
-                <div className="flex h-full w-full justify-center border-b-2 border-gray p-2 pt-1">
-                  {/* TODO: All the values in the table are retrieved from SAP and mocked as 0 for now */}
-                  <table className="gap-2 text-right">
-                    <thead>
-                      <tr>
-                        <th></th>
-                        <th className="w-14">
-                          <span className="text-sm font-medium text-black-60">Toteut.</span>
-                        </th>
-                        <th className="w-14">
-                          <span className="text-sm font-medium text-black-60">Sidot.</span>
-                        </th>
-                        <th className="w-14">
-                          <span className="text-sm font-medium text-black-60">Lisät.</span>
-                        </th>
-                        <th className="w-14">
-                          <span className="text-sm font-medium text-black-60">Viiväst.</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* TODO: planning values from SAP */}
-                      <tr>
-                        <td>
-                          {/* TODO: planning icon */}
-                          <IconTicket size="xs" />
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0</span>
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0</span>
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0</span>
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0/0</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        {/* TODO: construction values from SAP */}
-                        <td>
-                          {/* TODO: construction icon */}
-                          <IconTicket size="xs" />
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0</span>
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0</span>
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0</span>
-                        </td>
-                        <td>
-                          <span className="text-sm font-light">0/0</span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </td>
-          )}
-
-          {moment.monthsShort().map((m, i) => (
-            <td
-              key={m}
-              className={`monthly-cell project ${startYear === year ? 'first-year' : ''} ${
-                i % 2 == 0 ? 'bg-bus-l' : 'bg-white'
-              }`}
-            >
-              <div className="h-full w-full border-b-[1px] border-black-80">
-                <div className="h-full w-full border-b-2 border-gray pt-1">
-                  <div className="grid h-full grid-rows-3 gap-1">
-                    {i < 6 && (
-                      <div className="planning-amount-bar-container">
-                        <span className="planning-amount-bar" />
-                      </div>
-                    )}
-                    {i > 4 && (
-                      <div className="construction-amount-bar-container">
-                        <span className={`construction-amount-bar w-[80%]`} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </td>
-          ))}
-        </>
+      {selectedYearClass && (
+        <ProjectYearSummary
+          year={year}
+          startYear={startYear}
+          monthlyDataList={monthlyDataList}
+          cellType={cellTypeClass}
+        />
       )}
     </>
   );

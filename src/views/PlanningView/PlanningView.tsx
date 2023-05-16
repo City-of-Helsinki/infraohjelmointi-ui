@@ -17,10 +17,6 @@ const PlanningView: FC = () => {
   const handleSetSelectedYear = (year: number | null) =>
     setSelectedYear(year === selectedYear ? null : year);
 
-  useEffect(() => {
-    console.log('selected monthly view: ', selectedYear);
-  }, [selectedYear]);
-
   return (
     <>
       <PlanningBreadcrumbs selections={selections} />

@@ -16,8 +16,8 @@
   @apply w-64 min-w-[16rem] max-w-[16rem];
 }
 
-.monthly-cell.summary-budget.first-year,
-.monthly-summary-cell.summary-budget.first-year {
+.monthly-cell.summary-budget.start-month,
+.monthly-summary-cell.summary-budget.start-month {
   @apply bg-bus;
 }
 
@@ -63,7 +63,12 @@
 
 .monthly-summary-cell.project,
 .monthly-cell.project {
-  @apply h-24 p-0;
-  /* box-shadow: inset 0 1px 0 var(--color-black-80); */
-  /* @apply border-b-2 border-b-gray; */
+  /* setting height to 0 will allow height: 100% to work for child elements */
+  @apply h-24 border-b-[0.05rem] border-bus-m p-0;
+}
+
+.monthly-summary-cell.project.none,
+.monthly-cell.project.none {
+  /* setting height to 0 will allow height: 100% to work for child elements */
+  @apply h-0 p-0;
 }

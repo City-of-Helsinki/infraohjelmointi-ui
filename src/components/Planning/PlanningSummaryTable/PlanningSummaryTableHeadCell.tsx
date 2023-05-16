@@ -8,7 +8,7 @@ interface IPlanningSummaryTableHeadCellProps {
   selectedYear: number | null;
   handleSetSelectedYear: (year: number | null) => void;
   title: string;
-  isFirstYear: boolean;
+  isStartMonth: boolean;
 }
 
 const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
@@ -16,7 +16,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   selectedYear,
   handleSetSelectedYear,
   title,
-  isFirstYear,
+  isStartMonth,
 }) => {
   return (
     <>
@@ -28,7 +28,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
       </td>
       {year === selectedYear && (
         <>
-          {isFirstYear && (
+          {isStartMonth && (
             <td key={`${year}-monthly-view`} className="monthly-summary-cell label">
               <div className="monthly-cell-container">
                 <span>{moment().format('D.M.YYYY')}</span>

@@ -46,10 +46,10 @@
   @apply h-[0.875rem] w-[0.875rem] rounded-full bg-black;
 }
 
-.project-cell-menu-content .list-icon.plan {
+.project-cell-menu-content .list-icon.planning {
   @apply mr-3 bg-black;
 }
 
-.project-cell-menu-content .list-icon.con {
+.project-cell-menu-content .list-icon.construction {
   @apply mr-2 h-[1.125rem] w-[1.125rem] -translate-x-[0.16rem] border-2 border-white bg-[var(--color-copper)];
 }

@@ -1,0 +1,37 @@
+.monthly-summary-table-container {
+  @apply flex h-full w-full justify-center border-b-2 border-gray p-2 pt-1;
+}
+
+.monthly-summary-table-container.none {
+  @apply bg-bus-l;
+}
+
+/* no gray border-bottom when cellType is none (the ProjectYearSummaryTable is hidden when viewing a none cell) */
+.monthly-summary-table-container.none {
+  @apply border-none;
+}
+
+.monthly-graph-cell-container {
+  @apply grid h-full w-full grid-rows-3 gap-1 border-b-2 border-gray pt-1;
+}
+
+/* no gray border-bottom when cellType is none */
+.monthly-graph-cell-container.none {
+  @apply border-none;
+}
+
+.monthly-planning-bar-container {
+  @apply row-start-2 flex h-3 w-full text-sm font-light;
+}
+
+.monthly-construction-bar-container {
+  @apply row-start-3 flex h-3 w-full text-sm font-light;
+}
+
+.monthly-planning-bar {
+  @apply h-full bg-black-70;
+}
+
+.monthly-construction-bar {
+  @apply h-full bg-copper-m;
+}

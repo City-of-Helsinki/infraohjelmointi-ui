@@ -40,30 +40,30 @@
   @apply relative border-b-[0.05rem] border-bus-m bg-bus-l;
 }
 
-.project-cell.plan {
+.project-cell.planning {
   box-shadow: inset 0 -4px 0 var(--color-black-80);
   @apply bg-white;
 }
 
-.project-cell.con {
+.project-cell.construction {
   box-shadow: inset 0 -4px 0 var(--color-copper);
   @apply bg-white;
 }
 
-.con,
-.plan,
+.construction,
+.planning,
 .overlap,
 .none {
   position: relative;
 }
 
 /* add a left border to cell with the none-class after the last colored cell */
-.con + .none::after,
-.plan + .none::after,
+.construction + .none::after,
+.planning + .none::after,
 .overlap + .none::after,
 /* add a left border to a colored cell if it's the first colored cell  */
-.none + .plan::after,
-.none + .con::after,
+.none + .planning::after,
+.none + .construction::after,
 .none + .overlap::after {
   content: '';
   position: absolute;
@@ -75,12 +75,12 @@
 }
 
 /* add a left border to an ACTIVE cell with the none-class after the last colored cell */
-tr.active .con + .none::after,
-tr.active .plan + .none::after,
+tr.active .construction + .none::after,
+tr.active .planning + .none::after,
 tr.active .overlap + .none::after,
 /* add a left border to a colored ACTIVE cell if it's the first colored cell */
-tr.active .none + .plan::after,
-tr.active .none + .con::after,
+tr.active .none + .planning::after,
+tr.active .none + .construction::after,
 tr.active .none + .overlap::after {
   content: '';
   position: absolute;
@@ -149,18 +149,27 @@ tr.active .edit-timeline-button {
   -moz-appearance: textfield;
 }
 
-.planning-amount-bar-container {
-  @apply row-start-2 flex h-3 w-full text-sm font-light;
+/* When a year is selected overwrite the box shadow for indicating the cell type */
+.project-cell.selected-year.current-year {
+  /* adding height 0 will make the .project-cell-input-container height: 100% work */
+  @apply h-[0] p-0 shadow-none;
 }
 
-.construction-amount-bar-container {
-  @apply row-start-3 flex h-3 w-full justify-end text-sm font-light;
+.project-cell.selected-year.current-year:before {
+  @apply shadow-none;
 }
 
-.planning-amount-bar {
-  @apply h-full w-[50%] bg-black-70;
+/* Black border bottom when viewing a selected year */
+.project-cell.selected-year.current-year .project-cell-input-wrapper {
+  @apply box-content h-full shadow-none;
 }
 
-.construction-amount-bar {
-  @apply h-full bg-copper-m;
+/* Gray border bottom on top of black border bottom when viewing a selected year */
+.project-cell.selected-year.current-year .project-cell-input-container {
+  @apply flex h-full items-center border-b-2 border-gray p-0 font-bold;
+}
+
+/* If viewing a selected year with a none type the gray border bottom is removed */
+.project-cell.none.selected-year.current-year .project-cell-input-container {
+  @apply border-none;
 }

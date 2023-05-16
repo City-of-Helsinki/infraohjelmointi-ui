@@ -30,12 +30,12 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({
       <thead data-testid="planning-summary-head">
         {/* Year and title row */}
         <tr data-testid="planning-summary-head-row">
-          {heads.map(({ year, title, isFirstYear }) => (
+          {heads.map(({ year, title, isStartMonth }) => (
             <PlanningSummaryTableHeadCell
               key={year}
               year={year}
               title={title}
-              isFirstYear={isFirstYear}
+              isStartMonth={isStartMonth}
               handleSetSelectedYear={handleSetSelectedYear}
               selectedYear={selectedYear}
             />

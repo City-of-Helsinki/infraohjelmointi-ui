@@ -11,8 +11,7 @@ interface IPlanningCellProps extends IPlanningRow {
 }
 
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) => {
-  const { plannedBudget, frameBudget, deviation, year, isFirstYear } = cell;
-  console.log(moment());
+  const { plannedBudget, frameBudget, deviation, year, isStartMonth } = cell;
 
   return (
     <>
@@ -29,7 +28,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) 
       </td>
       {year === selectedYear && (
         <>
-          {isFirstYear && (
+          {isStartMonth && (
             <td key={`${year}-monthly-cell`} className={`monthly-summary-cell ${type}`}>
               {/* TODO: some stuff here */}
             </td>

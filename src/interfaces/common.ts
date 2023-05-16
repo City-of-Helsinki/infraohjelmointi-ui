@@ -98,7 +98,7 @@ export interface IPlanningCell {
   plannedBudget?: string;
   frameBudget?: string;
   year: number;
-  isFirstYear: boolean;
+  isStartMonth: boolean;
 }
 
 export interface IPlanningRowLists {

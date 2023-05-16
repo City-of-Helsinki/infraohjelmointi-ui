@@ -1,14 +1,23 @@
 import { IProjectSums } from '@/interfaces/common';
 import {
   CellType,
+  IMonthlyData,
   IProject,
   IProjectCell,
   IProjectFinances,
   IProjectFinancesRequestObject,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
-import { calculateProjectRowSums } from '@/utils/calculations';
-import { isInYearRange, isSameYear } from '@/utils/dates';
+import { calcPercentage, calculateProjectRowSums } from '@/utils/calculations';
+import {
+  getDayFromDate,
+  getDaysInMonthForGivenYear,
+  getMonthFromDate,
+  getYear,
+  isInYearRange,
+  isSameYear,
+} from '@/utils/dates';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 
 const getProjectCells = (project: IProject) => {
@@ -27,22 +36,22 @@ const getProjectCells = (project: IProject) => {
 
     const setPlanningType = () => {
       if (isCellYear(estPlanningEnd)) {
-        return 'planEnd';
+        return 'planningEnd';
       }
       if (isCellYear(estPlanningStart)) {
-        return 'planStart';
+        return 'planningStart';
       }
-      return value !== null ? 'plan' : 'none';
+      return value !== null ? 'planning' : 'none';
     };
 
     const setConstructionType = () => {
       if (isCellYear(estConstructionEnd)) {
-        return 'conEnd';
+        return 'constructionEnd';
       }
       if (isCellYear(estConstructionStart)) {
-        return 'conStart';
+        return 'constructionStart';
       }
-      return value !== null ? 'con' : 'none';
+      return value !== null ? 'construction' : 'none';
     };
 
     switch (true) {
@@ -68,7 +77,7 @@ const getProjectCells = (project: IProject) => {
     currentCellIndex: number,
     updateCellIndex: number,
   ): IProjectFinancesRequestObject | null => {
-    const moveRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+    const moveRight = (cell.type === 'planningEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
 
     const financesToReset = cells.reduce(
       (acc: IProjectFinancesRequestObject, curr: IProjectCell, i) => {
@@ -94,7 +103,7 @@ const getProjectCells = (project: IProject) => {
    * Gets the cell to update, this cell will be the next cell that isn't a 'none' type
    */
   const getCellToUpdate = (cell: IProjectCell, currentCellIndex: number) => {
-    const moveRight = (cell.type === 'planEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
+    const moveRight = (cell.type === 'planningEnd' && !cell.isLastOfType) || cell.isEndOfTimeline;
 
     // Find the next available cell backwards
     if (moveRight) {
@@ -144,6 +153,133 @@ const getProjectCells = (project: IProject) => {
     return growDirections;
   };
 
+  const getMonthDataList = (project: IProject, year: number): Array<IMonthlyData> => {
+    const getMonthPercentage = (year: number, month: number, type: CellType) => {
+      const daysInMonth = getDaysInMonthForGivenYear(year, month);
+
+      // Planning
+      if (type === 'planning') {
+        const startDatesMonth = getMonthFromDate(project.estPlanningStart);
+        const startDatesDay = getDayFromDate(project.estPlanningStart);
+
+        const endDatesMonth = getMonthFromDate(project.estPlanningEnd);
+        const endDatesDay = getDayFromDate(project.estPlanningEnd);
+
+        // If it starts a later year
+        if (getYear(project.estPlanningStart) > year) {
+          return { percent: '0%', isStart: false };
+        }
+
+        // If it ends a later year and already started a previous year
+        if (getYear(project.estPlanningEnd) > year && getYear(project.estPlanningStart) < year) {
+          return { percent: '100%', isStart: false };
+        }
+
+        // If it starts and ends the same year
+        if (
+          getYear(project.estPlanningStart) === year &&
+          getYear(project.estPlanningEnd) === year
+        ) {
+          if (startDatesMonth === month) {
+            return {
+              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
+              isStart: true,
+            };
+          } else if (endDatesMonth === month) {
+            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
+          } else if (endDatesMonth > month && startDatesMonth < month) {
+            return { percent: '100%', isStart: false };
+          }
+        }
+        // If it starts this year
+        else if (getYear(project.estPlanningStart) === year) {
+          if (startDatesMonth < month) {
+            return { percent: '100%', isStart: false };
+          } else if (startDatesMonth === month) {
+            return {
+              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
+              isStart: true,
+            };
+          }
+        }
+        // If it ends this year
+        else if (getYear(project.estPlanningEnd) === year) {
+          if (endDatesMonth > month) {
+            return { percent: '100%', isStart: false };
+          } else if (endDatesMonth === month) {
+            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
+          }
+        }
+      }
+
+      // Construction
+      if (type === 'construction') {
+        const startDatesMonth = getMonthFromDate(project.estConstructionStart);
+        const startDatesDay = getDayFromDate(project.estConstructionStart);
+
+        const endDatesMonth = getMonthFromDate(project.estConstructionEnd);
+        const endDatesDay = getDayFromDate(project.estConstructionEnd);
+
+        // If it starts a later year
+        if (getYear(project.estConstructionStart) > year) {
+          return { percent: '0%', isStart: false };
+        }
+
+        // If it ends a later year and already started a previous year
+        if (
+          getYear(project.estConstructionEnd) > year &&
+          getYear(project.estConstructionStart) < year
+        ) {
+          return { percent: '100%', isStart: false };
+        }
+
+        // If it starts and ends the same year
+        if (
+          getYear(project.estConstructionStart) === year &&
+          getYear(project.estConstructionEnd) === year
+        ) {
+          if (startDatesMonth === month) {
+            return {
+              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
+              isStart: true,
+            };
+          } else if (endDatesMonth === month) {
+            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
+          } else if (endDatesMonth > month && startDatesMonth < month) {
+            return { percent: '100%', isStart: false };
+          }
+        }
+        // If it starts this year
+        else if (getYear(project.estConstructionStart) === year) {
+          if (startDatesMonth < month) {
+            return { percent: '100%', isStart: false };
+          } else if (startDatesMonth === month) {
+            return {
+              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
+              isStart: true,
+            };
+          }
+        }
+        // If it ends this year
+        else if (getYear(project.estConstructionEnd) === year) {
+          if (endDatesMonth > month) {
+            return { percent: '100%', isStart: false };
+          } else if (endDatesMonth === month) {
+            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
+          }
+        }
+      }
+
+      return { percent: '0%', isStart: false };
+    };
+
+    return moment.monthsShort().map((m, i) => ({
+      month: m.substring(0, 3),
+      planning: getMonthPercentage(year, i + 1, 'planning'),
+      construction: getMonthPercentage(year, i + 1, 'construction'),
+    }));
+  };
+
   // Create cells
   const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {
     const cellYear = year + i;
@@ -173,10 +309,10 @@ const getProjectCells = (project: IProject) => {
       year: cellYear,
       startYear: year,
       type,
-      planStart: type !== 'none' ? estPlanningStart : null,
-      planEnd: type !== 'none' ? estPlanningEnd : null,
-      conStart: type !== 'none' ? estConstructionStart : null,
-      conEnd: type !== 'none' ? estConstructionEnd : null,
+      planningStart: type !== 'none' ? estPlanningStart : null,
+      planningEnd: type !== 'none' ? estPlanningEnd : null,
+      constructionStart: type !== 'none' ? estConstructionStart : null,
+      constructionEnd: type !== 'none' ? estConstructionEnd : null,
       isLastOfType,
       financeKey: key as keyof IProjectFinances,
       budget: value,
@@ -190,6 +326,7 @@ const getProjectCells = (project: IProject) => {
       growDirections: [],
       financesToReset: null,
       isEdgeCell,
+      monthlyDataList: getMonthDataList(project, cellYear),
     };
   });
 
