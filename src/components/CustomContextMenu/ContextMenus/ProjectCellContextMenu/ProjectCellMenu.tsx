@@ -27,7 +27,6 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
 
   const handleCellPhaseUpdate = useCallback(
     (phase: string) => {
-      console.log('dsd');
       onUpdateCellPhase(phase);
       onCloseMenu();
     },
