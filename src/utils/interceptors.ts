@@ -19,7 +19,7 @@ const urlsToExclueFromLoading = [
   '/construction-phases/',
   '/responsible-zones/',
   '/persons/',
-  'projects/?freeSearch',
+  'projects/search-results/?freeSearch',
   '/project-classes',
   '/project-locations',
   '/project-groups',
