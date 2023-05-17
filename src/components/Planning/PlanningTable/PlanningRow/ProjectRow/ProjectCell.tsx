@@ -18,7 +18,7 @@ import {
   useRef,
   useMemo,
 } from 'react';
-import { addYear, removeYear, updateYear } from '@/utils/dates';
+import { addYear, getYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
@@ -295,8 +295,18 @@ interface IProjectCellState {
 }
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
-  const { budget, type, financeKey, year, growDirections, id, title, startYear, monthlyDataList } =
-    cell;
+  const {
+    budget,
+    type,
+    financeKey,
+    year,
+    growDirections,
+    id,
+    title,
+    startYear,
+    monthlyDataList,
+    hasEstimatedDates,
+  } = cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
@@ -314,12 +324,22 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
-      if (req.finances && Object.keys(req.finances).length === 1) {
-        delete req.finances;
+      const request: IProjectRequest = {};
+      console.log('request: ', req);
+
+      if (!hasEstimatedDates) {
+        if (Object.prototype.hasOwnProperty.call(req, 'estPlanningStart')) {
+          request.planningStartYear = getYear(req.estPlanningStart).toString();
+        }
+        if (Object.prototype.hasOwnProperty.call(req, 'estConstructionEnd')) {
+          request.constructionEndYear = getYear(req.estConstructionEnd).toString();
+        }
+      } else {
+        Object.assign(request, { ...req });
       }
       patchProject({
         id,
-        data: { ...req },
+        data: { ...request },
       }).catch(Promise.reject);
     },
     [id],

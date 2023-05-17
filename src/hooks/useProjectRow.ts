@@ -26,6 +26,7 @@ interface ITimelineDates {
   planningEnd: null | string;
   constructionStart: null | string;
   constructionEnd: null | string;
+  hasEstimatedDates: boolean;
 }
 
 const getProjectCells = (project: IProject) => {
@@ -48,6 +49,7 @@ const getProjectCells = (project: IProject) => {
       planningEnd: null,
       constructionStart: null,
       constructionEnd: null,
+      hasEstimatedDates: false,
     };
 
     if (!estPlanningStart || !estPlanningEnd) {
@@ -58,6 +60,7 @@ const getProjectCells = (project: IProject) => {
     } else {
       dates.planningStart = estPlanningStart;
       dates.planningEnd = estPlanningEnd;
+      dates.hasEstimatedDates = true;
     }
 
     if (!estConstructionStart || !estConstructionEnd) {

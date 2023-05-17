@@ -369,4 +369,10 @@ export interface IProjectCell {
    * view in the planning summary table.
    */
   monthlyDataList: Array<IMonthlyData>;
+  /**
+   * Wether the project has estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd properties. If
+   * false, then the planningStartYear and constructionEndYear properties will be patched instead when modifying
+   * the timeline.
+   */
+  hasEstimatedDates: boolean;
 }
