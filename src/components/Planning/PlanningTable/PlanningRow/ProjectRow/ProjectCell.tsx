@@ -33,33 +33,57 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     isEndOfTimeline,
     isStartOfTimeline,
     isLastOfType,
-    planningStart,
-    planningEnd,
-    constructionStart,
-    constructionEnd,
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
     cellToUpdate,
     financesToReset,
     financeKey,
     budget,
     isEdgeCell,
     startYear,
+    estPlanningStart,
+    estPlanningEnd,
+    estConstructionStart,
+    estConstructionEnd,
   } = cell;
 
   const req: IProjectRequest = { finances: { year: startYear, ...financesToReset } };
 
+  const updatePlanningStart = () => {
+    const updatedDate = updateYear(cellToUpdate?.year, planningStart);
+    if (estPlanningStart) {
+      req.estPlanningStart = updatedDate;
+    }
+    req.planningStartYear = getYear(updatedDate).toString();
+  };
+
   const updatePlanningEnd = () => {
-    if (!isLastOfType) {
-      req.estPlanningEnd = updateYear(cellToUpdate?.year, planningEnd);
-    } else {
+    const updatedDate = updateYear(cellToUpdate?.year, planningEnd);
+    if (isLastOfType) {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
+      req.planningStartYear = getYear(updatedDate).toString();
+    } else if (estPlanningEnd) {
+      req.estPlanningEnd = updatedDate;
     }
   };
 
+  const updateConstructionStart = () => {
+    const updatedDate = updateYear(cellToUpdate?.year, constructionStart);
+    if (estConstructionStart) {
+      req.estConstructionStart = updatedDate;
+    }
+    req.constructionEndYear = getYear(updatedDate).toString();
+  };
+
   const updateConstructionEnd = () => {
+    const updatedDate = updateYear(cellToUpdate?.year, constructionEnd);
     if (!isLastOfType) {
-      req.estConstructionEnd = updateYear(cellToUpdate?.year, constructionEnd);
+      if (estConstructionEnd) {
+        req.estConstructionEnd = updatedDate;
+      }
+      req.constructionEndYear = getYear(updatedDate).toString();
     } else {
+      req.constructionEndYear = getYear(planningStart).toString();
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
     }
@@ -78,18 +102,22 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     } else {
       req.estConstructionStart = addYear(constructionStart);
     }
+    if (getYear(planningStart) === getYear(constructionEnd)) {
+      req.planningStartYear = '0';
+      req.constructionEndYear = '0';
+    }
   };
 
   const updateDatesIfStartEndOrOverlap = () => {
     switch (type) {
       case 'planningStart':
-        req.estPlanningStart = updateYear(cellToUpdate?.year, planningStart);
+        updatePlanningStart();
         break;
       case 'planningEnd':
         updatePlanningEnd();
         break;
       case 'constructionStart':
-        req.estConstructionStart = updateYear(cellToUpdate?.year, constructionStart);
+        updateConstructionStart();
         break;
       case 'constructionEnd':
         updateConstructionEnd();
@@ -130,17 +158,18 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
 const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCell) => {
   const {
-    type,
-    planningStart,
-    planningEnd,
-    constructionStart,
-    constructionEnd,
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
     next,
     prev,
-    isLastOfType,
     startYear,
     isEdgeCell,
+    estPlanningStart,
+    estPlanningEnd,
+    estConstructionStart,
+    estConstructionEnd,
     isStartOfTimeline,
+    type,
+    isLastOfType,
   } = cell;
 
   const req: IProjectRequest = { finances: { year: startYear } };
@@ -150,17 +179,26 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
       isStartOfTimeline &&
       (type === 'planningStart' || type === 'planningEnd' || type === 'overlap')
     ) {
-      req.estPlanningStart = removeYear(planningStart);
-    } else if ((isLastOfType && type === 'constructionEnd') || type === 'constructionStart') {
+      if (estPlanningStart) {
+        req.estPlanningStart = removeYear(planningStart);
+      }
+      req.planningStartYear = getYear(removeYear(planningStart)).toString();
+    } else if (
+      (isLastOfType && type === 'constructionEnd') ||
+      (type === 'constructionStart' && estConstructionStart)
+    ) {
       req.estConstructionStart = removeYear(constructionStart);
     }
   };
 
   const updateRight = () => {
-    if (type === 'planningEnd') {
+    if (type === 'planningEnd' && estPlanningEnd) {
       req.estPlanningEnd = addYear(planningEnd);
     } else if (type === 'constructionEnd' || type === 'overlap') {
-      req.estConstructionEnd = addYear(constructionEnd);
+      if (estConstructionEnd) {
+        req.estConstructionEnd = addYear(constructionEnd);
+      }
+      req.constructionEndYear = getYear(addYear(constructionEnd)).toString();
     }
   };
 
@@ -195,7 +233,11 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
 };
 
 const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planningEnd, constructionEnd, planningStart, constructionStart } = cell;
+  const {
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
+    estPlanningEnd,
+    estConstructionEnd,
+  } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the next property
@@ -215,21 +257,29 @@ const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinanc
 
   const req: IProjectRequest = { finances: financesMovedForward };
 
-  if (planningEnd) {
+  if (estPlanningEnd) {
     req.estPlanningStart = addYear(planningStart);
     req.estPlanningEnd = addYear(planningEnd);
   }
 
-  if (constructionEnd) {
+  req.planningStartYear = getYear(addYear(planningStart)).toString();
+
+  if (estConstructionEnd) {
     req.estConstructionStart = addYear(constructionStart);
     req.estConstructionEnd = addYear(constructionEnd);
   }
+
+  req.constructionEndYear = getYear(addYear(constructionEnd)).toString();
 
   return req;
 };
 
 const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planningEnd, constructionEnd, planningStart, constructionStart } = cell;
+  const {
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
+    estPlanningEnd,
+    estConstructionEnd,
+  } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the previous property
@@ -249,15 +299,19 @@ const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinan
 
   const req: IProjectRequest = { finances: financesMovedBackward };
 
-  if (planningEnd) {
+  if (estPlanningEnd) {
     req.estPlanningStart = removeYear(planningStart);
     req.estPlanningEnd = removeYear(planningEnd);
   }
 
-  if (constructionEnd) {
+  req.planningStartYear = getYear(removeYear(planningStart)).toString();
+
+  if (estConstructionEnd) {
     req.estConstructionStart = removeYear(constructionStart);
     req.estConstructionEnd = removeYear(constructionEnd);
   }
+
+  req.constructionEndYear = getYear(removeYear(constructionEnd)).toString();
 
   return req;
 };
@@ -283,43 +337,6 @@ const getMoveTimelineRequestData = (
   return req;
 };
 
-const convertRequestDatesToYears = (cell: IProjectCell, req: IProjectRequest) => {
-  const { isLastOfType, type, constructionEnd, planningStart, startYear } = cell;
-  const newRequest: IProjectRequest = { finances: { year: startYear, ...req.finances } };
-  // If it's the last overlap cell start and end years
-  if (isLastOfType && type === 'overlap') {
-    newRequest.planningStartYear = '0';
-    newRequest.constructionEndYear = '0';
-  }
-  // If there's planning start
-  else if (Object.prototype.hasOwnProperty.call(req, 'estPlanningStart')) {
-    newRequest.planningStartYear = getYear(req.estPlanningStart).toString();
-  }
-  // Else if there's planning end
-  else if (Object.prototype.hasOwnProperty.call(req, 'estPlanningEnd')) {
-    // If there's still construction move the planning by one year
-    if (req.estPlanningEnd === null && constructionEnd) {
-      newRequest.planningStartYear = getYear(addYear(planningStart)).toString();
-    } else {
-      newRequest.planningStartYear = getYear(req.estPlanningEnd).toString();
-    }
-  }
-  // If there's construction end
-  else if (Object.prototype.hasOwnProperty.call(req, 'estConstructionEnd')) {
-    console.log('there was construction end');
-
-    if (req.estConstructionEnd === null && planningStart) {
-      newRequest.constructionEndYear = getYear(planningStart).toString();
-    } else {
-      newRequest.constructionEndYear = getYear(req.estConstructionEnd).toString();
-    }
-  }
-
-  console.log('new request: ', newRequest);
-
-  return newRequest;
-};
-
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
@@ -332,18 +349,8 @@ interface IProjectCellState {
 }
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
-  const {
-    budget,
-    type,
-    financeKey,
-    year,
-    growDirections,
-    id,
-    title,
-    startYear,
-    monthlyDataList,
-    hasEstimatedDates,
-  } = cell;
+  const { budget, type, financeKey, year, growDirections, id, title, startYear, monthlyDataList } =
+    cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
@@ -361,19 +368,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
-      const request: IProjectRequest = {};
+      console.log('request: ', req);
 
-      if (!hasEstimatedDates) {
-        Object.assign(request, convertRequestDatesToYears(cell, req));
-      } else {
-        Object.assign(request, { ...req });
-      }
       patchProject({
         id,
-        data: { ...request },
+        data: req,
       }).catch(Promise.reject);
     },
-    [cell, hasEstimatedDates, id],
+    [id],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property

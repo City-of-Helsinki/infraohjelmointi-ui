@@ -6,6 +6,7 @@ import {
   IProjectCell,
   IProjectFinances,
   IProjectFinancesRequestObject,
+  ITimelineDates,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
 import { calcPercentage, calculateProjectRowSums } from '@/utils/calculations';
@@ -21,67 +22,64 @@ import {
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 
-interface ITimelineDates {
-  planningStart: null | string;
-  planningEnd: null | string;
-  constructionStart: null | string;
-  constructionEnd: null | string;
-  hasEstimatedDates: boolean;
-}
-
 const getProjectCells = (project: IProject) => {
   const {
     estPlanningStart,
     estPlanningEnd,
     estConstructionStart,
     estConstructionEnd,
-    name,
-    id,
     planningStartYear,
     constructionEndYear,
+    name,
+    id,
   } = project;
 
   const { year, ...finances } = project.finances;
 
   const getTimelineDates = () => {
-    const dates: ITimelineDates = {
+    const timelineDates: ITimelineDates = {
       planningStart: null,
       planningEnd: null,
       constructionStart: null,
       constructionEnd: null,
-      hasEstimatedDates: false,
     };
 
-    const planningStartDate = yearToDateString(planningStartYear);
-    const planningEndDate = moment()
-      .year(getYear(planningStartDate))
+    const planningStartDateFromYear = yearToDateString(planningStartYear);
+    const planningEndDateFromYear = moment()
+      .year(getYear(planningStartDateFromYear))
       .endOf('year')
       .format('DD.MM.YYYY');
 
-    // Set the cell to use estimated dates
-    if (!!estPlanningStart || !!estPlanningEnd || !!estConstructionStart || !!estConstructionEnd) {
-      dates.hasEstimatedDates = true;
-      dates.planningStart = estPlanningStart ?? null;
-      dates.planningEnd = estPlanningEnd ?? null;
-      dates.constructionStart = estConstructionStart ?? null;
-      dates.constructionEnd = estConstructionEnd ?? null;
+    // Planning
+    // Set est planning dates if they exist
+    if (estPlanningStart && estPlanningEnd) {
+      timelineDates.planningStart = estPlanningStart;
+      timelineDates.planningEnd = estPlanningEnd;
     }
-    // Set the cell to not use estimated dates
-    else {
-      if (planningStartYear) {
-        dates.planningStart = planningStartDate;
-        dates.planningEnd = planningEndDate;
-      }
-      if (constructionEndYear === planningStartYear) {
-        dates.constructionStart = planningStartDate;
-        dates.constructionEnd = planningEndDate;
-      } else if (constructionEndYear) {
-        dates.constructionStart = yearToDateString(parseInt(planningStartYear) + 1);
-        dates.constructionEnd = yearToDateString(constructionEndYear);
-      }
+    // Set construction dates from the years if there are no est dates
+    else if (planningStartYear) {
+      timelineDates.planningStart = planningStartDateFromYear;
+      timelineDates.planningEnd = planningEndDateFromYear;
     }
 
-    return dates;
+    // Construction
+    // Set est construction dates if they exist
+    if (estConstructionStart && estConstructionEnd) {
+      timelineDates.constructionStart = estConstructionStart;
+      timelineDates.constructionEnd = estConstructionEnd;
+    }
+    // If construction and planning years are the same, set planning dates to construction end
+    else if (constructionEndYear === planningStartYear) {
+      timelineDates.constructionStart = planningStartDateFromYear;
+      timelineDates.constructionEnd = planningEndDateFromYear;
+    }
+    // Set construction dates from the years if there are no est dates
+    else if (constructionEndYear) {
+      timelineDates.constructionStart = yearToDateString(parseInt(planningStartYear) + 1);
+      timelineDates.constructionEnd = yearToDateString(constructionEndYear);
+    }
+
+    return timelineDates;
   };
 
   /**
@@ -359,7 +357,7 @@ const getProjectCells = (project: IProject) => {
       : isSameYear(planningEnd, cellYear);
 
     const isLastOfType =
-      (isSameYear(estPlanningStart, cellYear) && isSameYear(planningEnd, cellYear)) ||
+      (isSameYear(planningStart, cellYear) && isSameYear(planningEnd, cellYear)) ||
       (isSameYear(constructionStart, cellYear) && isSameYear(constructionEnd, cellYear));
 
     const isEdgeCell =
@@ -373,7 +371,7 @@ const getProjectCells = (project: IProject) => {
       year: cellYear,
       startYear: year,
       type,
-      ...timelineDates,
+      timelineDates: timelineDates,
       isLastOfType,
       financeKey: key as keyof IProjectFinances,
       budget: value,
@@ -388,6 +386,10 @@ const getProjectCells = (project: IProject) => {
       financesToReset: null,
       isEdgeCell,
       monthlyDataList: getMonthDataList(cellYear, timelineDates),
+      estPlanningStart: estPlanningStart ?? null,
+      estPlanningEnd: estPlanningEnd ?? null,
+      estConstructionStart: estConstructionStart ?? null,
+      estConstructionEnd: estConstructionEnd ?? null,
     };
   });
 

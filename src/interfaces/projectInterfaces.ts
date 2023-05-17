@@ -282,6 +282,13 @@ export interface IMonthlyData {
   construction: { isStart: boolean; percent: string };
 }
 
+export interface ITimelineDates {
+  planningStart: null | string;
+  planningEnd: null | string;
+  constructionStart: null | string;
+  constructionEnd: null | string;
+}
+
 export interface IProjectCell {
   /**
    * Year for the current cell
@@ -298,19 +305,19 @@ export interface IProjectCell {
   /**
    * When planning starts (can be used to get the timeline schedule for any cell)
    */
-  planningStart?: string | null;
-  /**
-   * When planning ends (can be used to get the timeline schedule for any cell)
-   */
-  planningEnd?: string | null;
-  /**
-   * When construction starts (can be used to get the timeline schedule for any cell)
-   */
-  constructionStart?: string | null;
-  /**
-   * When construction ends (can be used to get the timeline schedule for any cell)
-   */
-  constructionEnd?: string | null;
+  // planningStart?: string | null;
+  // /**
+  //  * When planning ends (can be used to get the timeline schedule for any cell)
+  //  */
+  // planningEnd?: string | null;
+  // /**
+  //  * When construction starts (can be used to get the timeline schedule for any cell)
+  //  */
+  // constructionStart?: string | null;
+  // /**
+  //  * When construction ends (can be used to get the timeline schedule for any cell)
+  //  */
+  // constructionEnd?: string | null;
   /**
    * Previous cell to the left (used when adding new cells)
    */
@@ -374,5 +381,15 @@ export interface IProjectCell {
    * false, then the planningStartYear and constructionEndYear properties will be patched instead when modifying
    * the timeline.
    */
-  hasEstimatedDates: boolean;
+
+  /**
+   * The dates used to draw the timeline, these can be a combination of
+   * estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd and planningStartYear and planningEndYear
+   */
+  timelineDates: ITimelineDates;
+
+  estPlanningStart: string | null;
+  estPlanningEnd: string | null;
+  estConstructionStart: string | null;
+  estConstructionEnd: string | null;
 }
