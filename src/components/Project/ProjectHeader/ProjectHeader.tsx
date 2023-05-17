@@ -1,7 +1,7 @@
 import { FC, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
-import { dirtyFieldsToRequestObject, objectHasProperty } from '@/utils/common';
+import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { selectProject } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
@@ -13,6 +13,7 @@ import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
 import { useTranslation } from 'react-i18next';
 import { patchProject } from '@/services/projectServices';
+import _ from 'lodash';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -41,7 +42,7 @@ const ProjectHeader: FC = () => {
       if (isDirty) {
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
-        if (objectHasProperty(data, 'favourite')) {
+        if (_.has(data, 'favourite')) {
           // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
           data.favPersons = Array.from(
             new Set<string>([...(project?.favPersons ?? []), user?.id ?? '']),

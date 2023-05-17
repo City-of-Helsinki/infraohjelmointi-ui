@@ -105,6 +105,10 @@ export const getMonthToday = () => {
   return parseInt(today.format('M'));
 };
 
-export const yearToDateString = (year: string | number) => {
-  return moment(year, 'YYYY').format('DD.MM.YYYY');
+export const createDateToStartOfYear = (year: string | number) => {
+  return moment(year, 'YYYY').startOf('year').format('DD.MM.YYYY');
+};
+
+export const createDateToEndOfYear = (year: string | number) => {
+  return moment(year, 'YYYY').endOf('year').format('DD.MM.YYYY');
 };

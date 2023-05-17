@@ -11,17 +11,22 @@ import {
 } from '@/interfaces/projectInterfaces';
 import { calcPercentage, calculateProjectRowSums } from '@/utils/calculations';
 import {
+  createDateToEndOfYear,
+  createDateToStartOfYear,
   getDayFromDate,
   getDaysInMonthForYear,
   getMonthFromDate,
   getYear,
   isInYearRange,
   isSameYear,
-  yearToDateString,
 } from '@/utils/dates';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 
+/**
+ * Creates a list of monthly data to be used for drawing the monthly graphs when expanding a
+ * year in the PlanningView.
+ */
 const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
   const getMonthData = (year: number, month: number, type: CellType) => {
     const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
@@ -90,80 +95,65 @@ const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IM
   }));
 };
 
-const getProjectCells = (project: IProject) => {
+/**
+ * Gets and sets the timeline dates to be used with drawing the timeline. This can be a blend of estPlanningStart,
+ * estPlanningEnd, estConstructionStart, estConstructionEnd, planningStartYear and constructionEndYear
+ */
+const getTimelineDates = (project: IProject) => {
   const {
+    planningStartYear,
+    constructionEndYear,
     estPlanningStart,
     estPlanningEnd,
     estConstructionStart,
     estConstructionEnd,
-    planningStartYear,
-    constructionEndYear,
-    name,
-    id,
   } = project;
 
-  const { year, ...finances } = project.finances;
+  const timelineDates: ITimelineDates = {
+    planningStart: null,
+    planningEnd: null,
+    constructionStart: null,
+    constructionEnd: null,
+  };
 
-  const getTimelineDates = () => {
-    const timelineDates: ITimelineDates = {
-      planningStart: null,
-      planningEnd: null,
-      constructionStart: null,
-      constructionEnd: null,
-    };
+  const planningStartYearAsDate = createDateToStartOfYear(planningStartYear);
+  const planningEndYearAsDate = createDateToEndOfYear(planningStartYear);
 
-    const planningStartDateFromYear = yearToDateString(planningStartYear);
-    const planningEndDateFromYear = moment()
-      .year(getYear(planningStartDateFromYear))
-      .endOf('year')
-      .format('DD.MM.YYYY');
-
-    // Planning
-    // Set est planning dates if they exist
+  const setPlanningDates = () => {
     if (estPlanningStart && estPlanningEnd) {
       timelineDates.planningStart = estPlanningStart;
       timelineDates.planningEnd = estPlanningEnd;
+    } else if (planningStartYear) {
+      timelineDates.planningStart = planningStartYearAsDate;
+      timelineDates.planningEnd = planningEndYearAsDate;
     }
-    // Set construction dates from the years if there are no est dates
-    else if (planningStartYear) {
-      timelineDates.planningStart = planningStartDateFromYear;
-      timelineDates.planningEnd = planningEndDateFromYear;
-    }
+  };
 
-    // Construction
-    // Set est construction dates if they exist
+  const setConstructionDates = () => {
     if (estConstructionStart && estConstructionEnd) {
       timelineDates.constructionStart = estConstructionStart;
       timelineDates.constructionEnd = estConstructionEnd;
+    } else if (constructionEndYear === planningStartYear) {
+      timelineDates.constructionStart = planningStartYearAsDate;
+      timelineDates.constructionEnd = planningEndYearAsDate;
+    } else if (constructionEndYear) {
+      const planningEnd = estPlanningStart ?? planningEndYearAsDate;
+      timelineDates.constructionStart = createDateToStartOfYear(getYear(planningEnd) + 1);
+      timelineDates.constructionEnd = createDateToEndOfYear(constructionEndYear);
     }
-    // If construction and planning years are the same, set planning dates to construction end
-    else if (constructionEndYear === planningStartYear) {
-      timelineDates.constructionStart = planningStartDateFromYear;
-      timelineDates.constructionEnd = planningEndDateFromYear;
-    }
-    // Set construction dates from the years if there are no est construction dates
-    else if (constructionEndYear) {
-      const constructionStart = moment()
-        .year(getYear(timelineDates.planningEnd))
-        .startOf('year')
-        .format('DD.MM.YYYY');
-
-      const constructionEnd = moment()
-        .year(parseInt(constructionEndYear))
-        .endOf('year')
-        .format('DD.MM.YYYY');
-
-      const constructionStartTest =
-        getYear(timelineDates.planningEnd) === parseInt(constructionEndYear)
-          ? constructionStart
-          : yearToDateString(getYear(constructionStart) + 1);
-
-      timelineDates.constructionStart = constructionStartTest;
-      timelineDates.constructionEnd = constructionEnd;
-    }
-
-    return timelineDates;
   };
+
+  setPlanningDates();
+  setConstructionDates();
+
+  return timelineDates;
+};
+
+const getProjectCells = (project: IProject) => {
+  const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd, name, id } =
+    project;
+
+  const { year, ...finances } = project.finances;
 
   /**
    * Gets the type of the cell for the current year. If the value of the cell is null the type
@@ -306,11 +296,11 @@ const getProjectCells = (project: IProject) => {
     return growDirections;
   };
 
+  const timelineDates = getTimelineDates(project);
+
   // Create cells
   const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {
     const cellYear = year + i;
-
-    const timelineDates = getTimelineDates();
 
     const type = getType(cellYear, value, timelineDates);
 

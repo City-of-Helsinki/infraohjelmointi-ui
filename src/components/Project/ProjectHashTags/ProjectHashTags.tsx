@@ -20,11 +20,12 @@ import HashTagsContainer from './HashTagsContainer';
 import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
 import { IListItem } from '@/interfaces/common';
-import { arrayHasValue, objectHasProperty } from '@/utils/common';
+import { arrayHasValue } from '@/utils/common';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
 import './styles.css';
+import _ from 'lodash';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -127,7 +128,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const onHashTagClick = useCallback(
       (value: string) => {
         if (
-          objectHasProperty(hashTagsObject, value) &&
+          _.has(hashTagsObject, value) &&
           hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
         ) {
           setFormState((current) => {

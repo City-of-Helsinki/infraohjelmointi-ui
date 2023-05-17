@@ -2,6 +2,8 @@ import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IAppForms, IFormValueType } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
+import { getYear, updateYear } from './dates';
+import _ from 'lodash';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
 
@@ -41,11 +43,7 @@ export const emptyStringsToNull = (formData: IAppForms) => {
 
 export const getOptionId = (option: IOption) => option.value || null;
 
-export const objectHasProperty = (obj: object, prop: string) =>
-  Object.prototype.hasOwnProperty.call(obj, prop);
-
-export const isOption = (obj: object) =>
-  objectHasProperty(obj, 'label') && objectHasProperty(obj, 'value');
+export const isOption = (obj: object) => _.has(obj, 'label') && _.has(obj, 'value');
 
 /**
  *
@@ -54,7 +52,7 @@ export const isOption = (obj: object) =>
  * @returns data object that can be used for a patch request
  */
 export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms) => {
-  const data = {};
+  const request = {};
 
   const parseValue = (value: IFormValueType) => {
     switch (true) {
@@ -78,15 +76,43 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
       }
     };
 
-    Object.assign(data, { [getKey()]: parseValue(form[key as keyof IAppForms]) });
+    _.assign(request, { [getKey()]: parseValue(form[key as keyof IAppForms]) });
   }
 
   // Remove the project location when the class is patched since the relation changes
-  if (Object.keys(data).includes('projectClass')) {
-    Object.assign(data, { projectLocation: null });
+  if (_.has(request, 'projectClass')) {
+    _.assign(request, { projectLocation: null });
   }
 
-  return data;
+  // Make sure the projects planning dates are in sync the planningStartYear
+  if (form.estPlanningStart && parseInt(form.planningStartYear)) {
+    // We make a copy of the data so that both properties can be updated
+    const requestCopy = { ...request };
+    if (_.has(requestCopy, 'estPlanningStart')) {
+      _.assign(request, { planningStartYear: getYear(form.estPlanningStart) });
+    }
+    if (_.has(requestCopy, 'planningStartYear')) {
+      _.assign(request, {
+        estPlanningStart: updateYear(parseInt(form.planningStartYear), form.estPlanningStart),
+      });
+    }
+  }
+
+  // Make sure the projects construction dates are in sync the planningEndYear
+  if (form.estConstructionEnd && parseInt(form.constructionEndYear)) {
+    // We make a copy of the data so that both properties can be updated
+    const requestCopy = { ...request };
+    if (_.has(requestCopy, 'estConstructionEnd')) {
+      _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
+    }
+    if (_.has(requestCopy, 'constructionEndYear')) {
+      _.assign(request, {
+        estConstructionEnd: updateYear(parseInt(form.constructionEndYear), form.estConstructionEnd),
+      });
+    }
+  }
+
+  return request;
 };
 
 export const setProgrammedYears = () => {
