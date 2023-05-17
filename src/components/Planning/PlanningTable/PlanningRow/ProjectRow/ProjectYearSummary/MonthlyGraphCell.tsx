@@ -18,20 +18,24 @@ const MonthlyGraphCell: FC<IMonthlyGraphCellProps> = ({
   return (
     <td className={`monthly-cell project ${cellType} ${cellColor}`}>
       <div className={`monthly-graph-cell-container ${cellType}`}>
-        {/* Planning bar */}
-        <div className={`monthly-planning-bar-container ${planning.isStart ? 'justify-end' : ''}`}>
-          {/* Width of the bar indicates how much of the month is used for planning */}
-          <span style={{ width: planning.percent }} className="monthly-planning-bar" />
-        </div>
-        {/* Construction bar */}
-        <div
-          className={`monthly-construction-bar-container ${
-            construction.isStart ? 'justify-end' : ''
-          }`}
-        >
-          {/* Width of the bar indicates how much of the month is used for construction */}
-          <span style={{ width: construction.percent }} className="monthly-construction-bar" />
-        </div>
+        <>
+          {/* Planning bar */}
+          <div
+            className={`monthly-planning-bar-container ${planning.isStart ? 'justify-end' : ''}`}
+          >
+            {/* Width of the bar indicates how much of the month is used for planning */}
+            <span style={{ width: planning.percent }} className="monthly-planning-bar" />
+          </div>
+          {/* Construction bar */}
+          <div
+            className={`monthly-construction-bar-container ${
+              construction.isStart ? 'justify-end' : ''
+            }`}
+          >
+            {/* Width of the bar indicates how much of the month is used for construction */}
+            <span style={{ width: construction.percent }} className="monthly-construction-bar" />
+          </div>
+        </>
       </div>
     </td>
   );

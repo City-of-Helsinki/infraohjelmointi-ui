@@ -5,7 +5,7 @@ import { calculatePlanningSummaryCells } from '@/utils/calculations';
 interface IPlanningSummaryHeadCell {
   year: number;
   title: string;
-  isStartMonth: boolean;
+  isCurrentYear: boolean;
 }
 
 interface IPlanningSummaryTableState {
@@ -36,7 +36,7 @@ const buildPlanningSummaryHeadCells = (startYear: number) => {
     cells.push({
       year: startYear + i,
       title: getPlanningRowTitle(i),
-      isStartMonth: startYear + i === startYear,
+      isCurrentYear: startYear + i === startYear,
     });
   }
   return cells;

@@ -68,6 +68,7 @@ module.exports = {
       silver: 'var(--color-silver)',
       'silver-l': 'var(--color-silver-light)',
       'copper-m': 'var(--color-copper-medium-light)',
+      metro: 'var(--color-metro)',
     },
     extend: {},
   },

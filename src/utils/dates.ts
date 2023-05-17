@@ -86,7 +86,7 @@ export const updateYear = (year: number | undefined, date?: string | null) => {
  * @param month which month (number)
  * @returns amount of days in that month
  */
-export const getDaysInMonthForGivenYear = (year: number, month: number): number => {
+export const getDaysInMonthForYear = (year: number, month: number): number => {
   // Create a Moment.js object representing the given month
   const date = moment({ year, month: month - 1 });
   return date.daysInMonth();
@@ -102,4 +102,13 @@ export const getMonthFromDate = (date?: string | null) => {
   if (date) {
     return parseInt(momentFromHDSDate(date).format('M'));
   } else return 0;
+};
+
+export const getMonthToday = () => {
+  const today = moment(new Date(), 'D.M.YYYY');
+  return parseInt(today.format('M'));
+};
+
+export const yearToDateString = (year: string | number) => {
+  return moment(year, 'YYYY').format('DD.MM.YYYY');
 };

@@ -8,6 +8,10 @@
   --color-group: var(--color-fog-light);
 }
 
+.planning-table {
+  @apply w-full;
+}
+
 .monthly-cell {
   @apply w-[39px] min-w-[39px] max-w-[39px] !p-0 !pr-0;
 }

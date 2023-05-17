@@ -21,7 +21,7 @@ const PlanningView: FC = () => {
     <>
       <PlanningBreadcrumbs selections={selections} />
       <PlanningToolbar />
-      <div className={`planning-view-container ${selectedYear ? '!mr-20' : ''}`}>
+      <div className={`planning-view-container ${selectedYear ? '!mr-20' : ''}`} id="planning-view">
         <div className="mb-2 flex">
           <PlanningInfoPanel selectedMasterClass={selections.selectedMasterClass} />
           <PlanningSummaryTable

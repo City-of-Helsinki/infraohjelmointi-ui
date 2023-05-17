@@ -28,6 +28,7 @@ import {
   removeProjectUpdateEventListener,
 } from '@/utils/events';
 import moment from 'moment';
+import 'moment/locale/fi';
 
 const LOADING_APP_ID = 'loading-app-data';
 

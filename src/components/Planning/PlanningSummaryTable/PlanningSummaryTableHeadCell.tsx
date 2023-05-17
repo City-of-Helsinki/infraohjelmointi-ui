@@ -1,14 +1,16 @@
-import { FC, memo, useMemo } from 'react';
+import { FC, memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { IconAngleLeft, IconAngleRight } from 'hds-react/icons';
+import { getDaysInMonthForYear, getMonthToday } from '@/utils/dates';
 import moment from 'moment';
 import './styles.css';
+import { calcPercentage } from '@/utils/calculations';
 
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
   selectedYear: number | null;
   handleSetSelectedYear: (year: number | null) => void;
   title: string;
-  isStartMonth: boolean;
+  isCurrentYear: boolean;
 }
 
 const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
@@ -16,8 +18,52 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   selectedYear,
   handleSetSelectedYear,
   title,
-  isStartMonth,
+  isCurrentYear,
 }) => {
+  const dateIndicatorRef = useRef<HTMLSpanElement>(null);
+
+  useLayoutEffect(() => {
+    if (!isCurrentYear) {
+      return;
+    }
+
+    const setElementHeight = () => {
+      if (dateIndicatorRef.current) {
+        const { scrollHeight } = document.documentElement;
+        dateIndicatorRef.current.style.height = `${scrollHeight}px`;
+      }
+    };
+
+    // Call the setElementHeight function initially and on window resize
+    setElementHeight();
+
+    // Attach an event listener to update the element's height on window resize
+    window.addEventListener('resize', setElementHeight);
+
+    // Cleanup the event listener when the component is unmounted
+    return () => {
+      window.removeEventListener('resize', setElementHeight);
+    };
+  }, [selectedYear, isCurrentYear]);
+
+  /**
+   * Get the left pixel position of the date indicator by calculating the percent of the month
+   * that has past and convert that percent to pixels.
+   *
+   * - the total width of one month is 39px
+   * - each px is around 2.55% of the of the total width
+   */
+  const getDateIndicatorLeftPixels = useCallback(
+    (month: number) => {
+      const daysInMonth = getDaysInMonthForYear(year, month);
+      const dayToday = parseInt(moment().format('D'));
+      const percentOfMonthThatHasPast = calcPercentage(dayToday, daysInMonth);
+
+      return `${Math.floor(percentOfMonthThatHasPast / 2.55)}px`;
+    },
+    [year],
+  );
+
   const leftArrow = useMemo(
     () => (selectedYear === year ? <IconAngleRight /> : <IconAngleLeft />),
     [selectedYear, year],
@@ -25,6 +71,11 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   const rightArrow = useMemo(
     () => (selectedYear === year ? <IconAngleLeft /> : <IconAngleRight />),
     [selectedYear, year],
+  );
+
+  const showDateIndicator = useCallback(
+    (month: number) => month === getMonthToday() && isCurrentYear,
+    [],
   );
 
   return (
@@ -41,17 +92,25 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
       </td>
       {year === selectedYear && (
         <>
-          {isStartMonth && (
+          {isCurrentYear && (
             <td key={`${year}-monthly-view`} className="monthly-summary-cell label">
               <div className="monthly-cell-container">
                 <span>{moment().format('D.M.YYYY')}</span>
               </div>
             </td>
           )}
-          {moment.monthsShort().map((m) => (
+          {moment.monthsShort().map((m, i) => (
             <td key={m} className="monthly-cell label">
-              <div className="monthly-cell-container">
+              <div className="monthly-cell-container relative">
                 <span>{m.substring(0, 3)}</span>
+                {/* Creates a line that's as long as the table that indicates the current date */}
+                {showDateIndicator(i + 1) && (
+                  <span
+                    ref={dateIndicatorRef}
+                    style={{ left: getDateIndicatorLeftPixels(i + 1) }}
+                    className="date-indicator"
+                  />
+                )}
               </div>
             </td>
           ))}

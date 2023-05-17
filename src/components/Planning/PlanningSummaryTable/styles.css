@@ -59,3 +59,7 @@
 .arrows-container svg:first-child {
   left: -10px;
 }
+
+.date-indicator {
+  @apply absolute top-6 z-10 !w-[2px] bg-metro;
+}
