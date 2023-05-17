@@ -283,6 +283,43 @@ const getMoveTimelineRequestData = (
   return req;
 };
 
+const convertRequestDatesToYears = (cell: IProjectCell, req: IProjectRequest) => {
+  const { isLastOfType, type, constructionEnd, planningStart, startYear } = cell;
+  const newRequest: IProjectRequest = { finances: { year: startYear, ...req.finances } };
+  // If it's the last overlap cell start and end years
+  if (isLastOfType && type === 'overlap') {
+    newRequest.planningStartYear = '0';
+    newRequest.constructionEndYear = '0';
+  }
+  // If there's planning start
+  else if (Object.prototype.hasOwnProperty.call(req, 'estPlanningStart')) {
+    newRequest.planningStartYear = getYear(req.estPlanningStart).toString();
+  }
+  // Else if there's planning end
+  else if (Object.prototype.hasOwnProperty.call(req, 'estPlanningEnd')) {
+    // If there's still construction move the planning by one year
+    if (req.estPlanningEnd === null && constructionEnd) {
+      newRequest.planningStartYear = getYear(addYear(planningStart)).toString();
+    } else {
+      newRequest.planningStartYear = getYear(req.estPlanningEnd).toString();
+    }
+  }
+  // If there's construction end
+  else if (Object.prototype.hasOwnProperty.call(req, 'estConstructionEnd')) {
+    console.log('there was construction end');
+
+    if (req.estConstructionEnd === null && planningStart) {
+      newRequest.constructionEndYear = getYear(planningStart).toString();
+    } else {
+      newRequest.constructionEndYear = getYear(req.estConstructionEnd).toString();
+    }
+  }
+
+  console.log('new request: ', newRequest);
+
+  return newRequest;
+};
+
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
@@ -325,15 +362,9 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
   const updateCell = useCallback(
     (req: IProjectRequest) => {
       const request: IProjectRequest = {};
-      console.log('request: ', req);
 
       if (!hasEstimatedDates) {
-        if (Object.prototype.hasOwnProperty.call(req, 'estPlanningStart')) {
-          request.planningStartYear = getYear(req.estPlanningStart).toString();
-        }
-        if (Object.prototype.hasOwnProperty.call(req, 'estConstructionEnd')) {
-          request.constructionEndYear = getYear(req.estConstructionEnd).toString();
-        }
+        Object.assign(request, convertRequestDatesToYears(cell, req));
       } else {
         Object.assign(request, { ...req });
       }
@@ -342,7 +373,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
         data: { ...request },
       }).catch(Promise.reject);
     },
-    [id],
+    [cell, hasEstimatedDates, id],
   );
 
   // Focusing the input field will activate the input field by switching its readOnly property

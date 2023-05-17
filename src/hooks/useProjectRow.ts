@@ -52,25 +52,33 @@ const getProjectCells = (project: IProject) => {
       hasEstimatedDates: false,
     };
 
-    if (!estPlanningStart || !estPlanningEnd) {
-      if (planningStartYear) {
-        dates.planningStart = yearToDateString(planningStartYear);
-        dates.planningEnd = yearToDateString(parseInt(planningStartYear) + 1);
-      }
-    } else {
-      dates.planningStart = estPlanningStart;
-      dates.planningEnd = estPlanningEnd;
-      dates.hasEstimatedDates = true;
-    }
+    const planningStartDate = yearToDateString(planningStartYear);
+    const planningEndDate = moment()
+      .year(getYear(planningStartDate))
+      .endOf('year')
+      .format('DD.MM.YYYY');
 
-    if (!estConstructionStart || !estConstructionEnd) {
-      if (constructionEndYear) {
+    // Set the cell to use estimated dates
+    if (!!estPlanningStart || !!estPlanningEnd || !!estConstructionStart || !!estConstructionEnd) {
+      dates.hasEstimatedDates = true;
+      dates.planningStart = estPlanningStart ?? null;
+      dates.planningEnd = estPlanningEnd ?? null;
+      dates.constructionStart = estConstructionStart ?? null;
+      dates.constructionEnd = estConstructionEnd ?? null;
+    }
+    // Set the cell to not use estimated dates
+    else {
+      if (planningStartYear) {
+        dates.planningStart = planningStartDate;
+        dates.planningEnd = planningEndDate;
+      }
+      if (constructionEndYear === planningStartYear) {
+        dates.constructionStart = planningStartDate;
+        dates.constructionEnd = planningEndDate;
+      } else if (constructionEndYear) {
         dates.constructionStart = yearToDateString(parseInt(planningStartYear) + 1);
         dates.constructionEnd = yearToDateString(constructionEndYear);
       }
-    } else {
-      dates.constructionStart = estConstructionStart;
-      dates.constructionEnd = estConstructionEnd;
     }
 
     return dates;

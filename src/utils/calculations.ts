@@ -84,7 +84,7 @@ export const calculatePlanningCells = (
     return {
       key,
       year: year + i,
-      isStartMonth: year + i === year,
+      isCurrentYear: year + i === year,
       // we don't return any budgets for divisions
       ...(type !== 'division' && {
         plannedBudget: formatNumber(plannedBudget),

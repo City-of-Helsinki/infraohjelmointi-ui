@@ -8,7 +8,7 @@ interface IPlanningSummaryTableRealizedBudgetCellProps {
   deviation?: string;
   year: number;
   selectedYear: number | null;
-  isStartMonth: boolean;
+  isCurrentYear: boolean;
 }
 
 const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBudgetCellProps> = ({
@@ -16,7 +16,7 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
   deviation,
   year,
   selectedYear,
-  isStartMonth,
+  isCurrentYear,
 }) => {
   return (
     <>
@@ -37,7 +37,7 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
       </td>
       {year === selectedYear && (
         <>
-          {isStartMonth && <td key={`${year}-monthly-view`} className="monthly-summary-cell"></td>}
+          {isCurrentYear && <td key={`${year}-monthly-view`} className="monthly-summary-cell"></td>}
           {moment.monthsShort().map((m) => (
             <td key={m} className="monthly-cell">
               {/* TODO: there's going to be graph here and we can use each months cell to paint the graph */}

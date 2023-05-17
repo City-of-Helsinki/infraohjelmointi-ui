@@ -6,14 +6,14 @@ interface IPlanningSummaryTablePlannedBudgetCellProps {
   year: number;
   plannedBudget?: string;
   selectedYear: number | null;
-  isStartMonth: boolean;
+  isCurrentYear: boolean;
 }
 
 const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudgetCellProps> = ({
   year,
   plannedBudget,
   selectedYear,
-  isStartMonth,
+  isCurrentYear,
 }) => {
   return (
     <>
@@ -22,17 +22,11 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
       </td>
       {year === selectedYear && (
         <>
-          {isStartMonth && (
-            <td
-              key={`${year}-monthly-view`}
-              className={`monthly-summary-cell summary-budget ${isStartMonth ? 'start-month' : ''}`}
-            ></td>
+          {isCurrentYear && (
+            <td key={`${year}-monthly-view`} className="monthly-summary-cell summary-budget"></td>
           )}
           {moment.monthsShort().map((m) => (
-            <td
-              key={m}
-              className={`monthly-cell summary-budget ${isStartMonth ? 'start-month' : ''}`}
-            ></td>
+            <td key={m} className={`monthly-cell summary-budget`}></td>
           ))}
         </>
       )}
