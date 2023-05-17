@@ -22,6 +22,74 @@ import {
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 
+const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
+  const getMonthData = (year: number, month: number, type: CellType) => {
+    const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+
+    const daysInMonth = getDaysInMonthForYear(year, month);
+
+    const start = type === 'planning' ? planningStart : constructionStart;
+    const end = type === 'planning' ? planningEnd : constructionEnd;
+
+    const startDatesMonth = getMonthFromDate(start);
+    const startDatesDay = getDayFromDate(start);
+    const endDatesMonth = getMonthFromDate(end);
+    const endDatesDay = getDayFromDate(end);
+
+    const isStartYear = getYear(start) === year;
+    const isEndYear = getYear(end) === year;
+    const isLaterYear = getYear(end) > year && getYear(start) < year;
+
+    let percent = isLaterYear ? '100%' : '0%';
+
+    const setPercentForStartAndEndYear = () => {
+      if (startDatesMonth === month) {
+        percent = `${100 - calcPercentage(startDatesDay, daysInMonth)}%`;
+      } else if (endDatesMonth === month) {
+        percent = `${calcPercentage(endDatesDay, daysInMonth)}%`;
+      } else if (endDatesMonth > month && startDatesMonth < month) {
+        percent = '100%';
+      }
+    };
+
+    const setPercentForStartYear = () => {
+      if (startDatesMonth < month) {
+        percent = '100%';
+      } else if (startDatesMonth === month) {
+        percent = `${100 - calcPercentage(startDatesDay, daysInMonth)}%`;
+      }
+    };
+
+    const setPercentForEndYear = () => {
+      if (endDatesMonth > month) {
+        percent = '100%';
+      } else if (endDatesMonth === month) {
+        percent = `${calcPercentage(endDatesDay, daysInMonth)}%`;
+      }
+    };
+
+    switch (true) {
+      case isStartYear && isEndYear:
+        setPercentForStartAndEndYear();
+        break;
+      case isStartYear:
+        setPercentForStartYear();
+        break;
+      case isEndYear:
+        setPercentForEndYear();
+        break;
+    }
+
+    return { percent, isStart: startDatesMonth === month };
+  };
+
+  return moment.monthsShort().map((m, i) => ({
+    month: m.substring(0, 3),
+    planning: getMonthData(year, i + 1, 'planning'),
+    construction: getMonthData(year, i + 1, 'construction'),
+  }));
+};
+
 const getProjectCells = (project: IProject) => {
   const {
     estPlanningStart,
@@ -73,10 +141,25 @@ const getProjectCells = (project: IProject) => {
       timelineDates.constructionStart = planningStartDateFromYear;
       timelineDates.constructionEnd = planningEndDateFromYear;
     }
-    // Set construction dates from the years if there are no est dates
+    // Set construction dates from the years if there are no est construction dates
     else if (constructionEndYear) {
-      timelineDates.constructionStart = yearToDateString(parseInt(planningStartYear) + 1);
-      timelineDates.constructionEnd = yearToDateString(constructionEndYear);
+      const constructionStart = moment()
+        .year(getYear(timelineDates.planningEnd))
+        .startOf('year')
+        .format('DD.MM.YYYY');
+
+      const constructionEnd = moment()
+        .year(parseInt(constructionEndYear))
+        .endOf('year')
+        .format('DD.MM.YYYY');
+
+      const constructionStartTest =
+        getYear(timelineDates.planningEnd) === parseInt(constructionEndYear)
+          ? constructionStart
+          : yearToDateString(getYear(constructionStart) + 1);
+
+      timelineDates.constructionStart = constructionStartTest;
+      timelineDates.constructionEnd = constructionEnd;
     }
 
     return timelineDates;
@@ -98,23 +181,30 @@ const getProjectCells = (project: IProject) => {
     const isCellYear = (date?: string | null) => isSameYear(date, cellYear);
 
     const setPlanningType = () => {
+      if (value === null) {
+        return 'none';
+      }
       if (isCellYear(planningEnd)) {
         return 'planningEnd';
       }
       if (isCellYear(planningStart)) {
         return 'planningStart';
       }
-      return value !== null ? 'planning' : 'none';
+      return 'planning';
     };
 
     const setConstructionType = () => {
+      if (value === null) {
+        return 'none';
+      }
       if (isCellYear(constructionEnd)) {
         return 'constructionEnd';
       }
       if (isCellYear(constructionStart)) {
         return 'constructionStart';
       }
-      return value !== null ? 'construction' : 'none';
+
+      return 'construction';
     };
 
     switch (true) {
@@ -216,128 +306,6 @@ const getProjectCells = (project: IProject) => {
     return growDirections;
   };
 
-  const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
-    const getMonthPercentage = (year: number, month: number, type: CellType) => {
-      const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
-      const daysInMonth = getDaysInMonthForYear(year, month);
-
-      // Planning
-      if (type === 'planning') {
-        const startDatesMonth = getMonthFromDate(planningStart);
-        const startDatesDay = getDayFromDate(planningStart);
-
-        const endDatesMonth = getMonthFromDate(planningEnd);
-        const endDatesDay = getDayFromDate(planningEnd);
-
-        // If it starts a later year
-        if (getYear(planningStart) > year) {
-          return { percent: '0%', isStart: false };
-        }
-
-        // If it ends a later year and already started a previous year
-        if (getYear(planningEnd) > year && getYear(planningStart) < year) {
-          return { percent: '100%', isStart: false };
-        }
-
-        // If it starts and ends the same year
-        if (getYear(planningStart) === year && getYear(planningEnd) === year) {
-          if (startDatesMonth === month) {
-            return {
-              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
-              isStart: true,
-            };
-          } else if (endDatesMonth === month) {
-            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
-          } else if (endDatesMonth > month && startDatesMonth < month) {
-            return { percent: '100%', isStart: false };
-          }
-        }
-        // If it starts this year
-        else if (getYear(planningStart) === year) {
-          if (startDatesMonth < month) {
-            return { percent: '100%', isStart: false };
-          } else if (startDatesMonth === month) {
-            return {
-              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
-              isStart: true,
-            };
-          }
-        }
-        // If it ends this year
-        else if (getYear(planningEnd) === year) {
-          if (endDatesMonth > month) {
-            return { percent: '100%', isStart: false };
-          } else if (endDatesMonth === month) {
-            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
-          }
-        }
-      }
-
-      // Construction
-      if (type === 'construction') {
-        const startDatesMonth = getMonthFromDate(constructionStart);
-        const startDatesDay = getDayFromDate(constructionStart);
-
-        const endDatesMonth = getMonthFromDate(constructionEnd);
-        const endDatesDay = getDayFromDate(constructionEnd);
-
-        // If it starts a later year
-        if (getYear(constructionStart) > year) {
-          return { percent: '0%', isStart: false };
-        }
-
-        // If it ends a later year and already started a previous year
-        if (getYear(constructionEnd) > year && getYear(constructionStart) < year) {
-          return { percent: '100%', isStart: false };
-        }
-
-        // If it starts and ends the same year
-        if (getYear(constructionStart) === year && getYear(constructionEnd) === year) {
-          if (startDatesMonth === month) {
-            return {
-              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
-              isStart: true,
-            };
-          } else if (endDatesMonth === month) {
-            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
-          } else if (endDatesMonth > month && startDatesMonth < month) {
-            return { percent: '100%', isStart: false };
-          }
-        }
-        // If it starts this year
-        else if (getYear(constructionStart) === year) {
-          if (startDatesMonth < month) {
-            return { percent: '100%', isStart: false };
-          } else if (startDatesMonth === month) {
-            return {
-              percent: `${100 - calcPercentage(startDatesDay, daysInMonth)}%`,
-              isStart: true,
-            };
-          }
-        }
-        // If it ends this year
-        else if (getYear(constructionEnd) === year) {
-          if (endDatesMonth > month) {
-            return { percent: '100%', isStart: false };
-          } else if (endDatesMonth === month) {
-            return { percent: `${calcPercentage(endDatesDay, daysInMonth)}%`, isStart: false };
-          }
-        }
-      }
-
-      return { percent: '0%', isStart: false };
-    };
-
-    return moment.monthsShort().map((m, i) => ({
-      month: m.substring(0, 3),
-      planning: getMonthPercentage(year, i + 1, 'planning'),
-      construction: getMonthPercentage(year, i + 1, 'construction'),
-    }));
-  };
-
-  // TODO: get plan/con start/end from project.planningStartYear and project.constructionEndYear if
-  // there is no est dates. If planningStartYear and constructionEndYear is used, then the first year
-  // should be planning and others should be construction
   // Create cells
   const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {
     const cellYear = year + i;
@@ -360,12 +328,24 @@ const getProjectCells = (project: IProject) => {
       (isSameYear(planningStart, cellYear) && isSameYear(planningEnd, cellYear)) ||
       (isSameYear(constructionStart, cellYear) && isSameYear(constructionEnd, cellYear));
 
-    const isEdgeCell =
-      type.includes('Start') ||
-      type.includes('End') ||
-      isLastOfType ||
-      isStartOfTimeline ||
-      isEndOfTimeline;
+    const getAffectsDates = () => {
+      if (
+        (type === 'constructionStart' && estConstructionStart) ||
+        (type === 'constructionEnd' && estConstructionEnd)
+      ) {
+        return true;
+      }
+      if (
+        (type === 'planningStart' && estPlanningStart) ||
+        (type === 'planningEnd' && estPlanningEnd)
+      ) {
+        return true;
+      }
+      if (type.includes('End') && (estPlanningEnd || estConstructionEnd)) {
+        return true;
+      }
+      return isLastOfType || isStartOfTimeline || isEndOfTimeline;
+    };
 
     return {
       year: cellYear,
@@ -384,12 +364,12 @@ const getProjectCells = (project: IProject) => {
       id: id,
       growDirections: [],
       financesToReset: null,
-      isEdgeCell,
+      affectsDates: getAffectsDates(),
       monthlyDataList: getMonthDataList(cellYear, timelineDates),
-      estPlanningStart: estPlanningStart ?? null,
-      estPlanningEnd: estPlanningEnd ?? null,
-      estConstructionStart: estConstructionStart ?? null,
-      estConstructionEnd: estConstructionEnd ?? null,
+      projectEstPlanningStart: estPlanningStart ?? null,
+      projectEstPlanningEnd: estPlanningEnd ?? null,
+      projectEstConstructionStart: estConstructionStart ?? null,
+      projectEstConstructionEnd: estConstructionEnd ?? null,
     };
   });
 
@@ -403,7 +383,7 @@ const getProjectCells = (project: IProject) => {
       cellToUpdate && cells.findIndex((c) => c.financeKey === cellToUpdate?.financeKey);
 
     const financesToReset =
-      cell.isEdgeCell && updateIndex ? getFinancesToReset(cell, index, updateIndex) : null;
+      cell.affectsDates && updateIndex ? getFinancesToReset(cell, index, updateIndex) : null;
 
     return {
       ...cell,

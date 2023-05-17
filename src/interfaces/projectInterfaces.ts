@@ -303,22 +303,6 @@ export interface IProjectCell {
    */
   type: CellType;
   /**
-   * When planning starts (can be used to get the timeline schedule for any cell)
-   */
-  // planningStart?: string | null;
-  // /**
-  //  * When planning ends (can be used to get the timeline schedule for any cell)
-  //  */
-  // planningEnd?: string | null;
-  // /**
-  //  * When construction starts (can be used to get the timeline schedule for any cell)
-  //  */
-  // constructionStart?: string | null;
-  // /**
-  //  * When construction ends (can be used to get the timeline schedule for any cell)
-  //  */
-  // constructionEnd?: string | null;
-  /**
    * Previous cell to the left (used when adding new cells)
    */
   prev: IProjectCell | null;
@@ -367,9 +351,9 @@ export interface IProjectCell {
    */
   id: string;
   /**
-   * Wether the cell is an edge cell, an edge cell is a cell that affects the start/ends dates associated with the timeline
+   * Wether the cell affects the start/ends dates associated with the timeline
    */
-  isEdgeCell: boolean;
+  affectsDates: boolean;
   /**
    * A list of all the months for the current year with a percentage indicator of how much each month has planning
    * and construction. This percentage is used to draw the "bar-chart" for the monthly view when selecting a year to
@@ -377,19 +361,24 @@ export interface IProjectCell {
    */
   monthlyDataList: Array<IMonthlyData>;
   /**
-   * Wether the project has estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd properties. If
-   * false, then the planningStartYear and constructionEndYear properties will be patched instead when modifying
-   * the timeline.
-   */
-
-  /**
    * The dates used to draw the timeline, these can be a combination of
    * estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd and planningStartYear and planningEndYear
    */
   timelineDates: ITimelineDates;
-
-  estPlanningStart: string | null;
-  estPlanningEnd: string | null;
-  estConstructionStart: string | null;
-  estConstructionEnd: string | null;
+  /**
+   * estPlanningStart property from the project
+   */
+  projectEstPlanningStart: string | null;
+  /**
+   * estPlanningEnd property from the project
+   */
+  projectEstPlanningEnd: string | null;
+  /**
+   * estConstructionStart property from the project
+   */
+  projectEstConstructionStart: string | null;
+  /**
+   * estConstructionEnd property from the project
+   */
+  projectEstConstructionEnd: string | null;
 }
