@@ -366,19 +366,12 @@ export interface IProjectCell {
    */
   timelineDates: ITimelineDates;
   /**
-   * estPlanningStart property from the project
+   * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd properties from the project
    */
-  projectEstPlanningStart: string | null;
-  /**
-   * estPlanningEnd property from the project
-   */
-  projectEstPlanningEnd: string | null;
-  /**
-   * estConstructionStart property from the project
-   */
-  projectEstConstructionStart: string | null;
-  /**
-   * estConstructionEnd property from the project
-   */
-  projectEstConstructionEnd: string | null;
+  projectEstDates: {
+    estPlanningStart: string | null;
+    estPlanningEnd: string | null;
+    estConstructionStart: string | null;
+    estConstructionEnd: string | null;
+  };
 }

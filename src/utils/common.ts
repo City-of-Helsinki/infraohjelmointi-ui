@@ -84,13 +84,17 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
     _.assign(request, { projectLocation: null });
   }
 
+  // Can be used to compare to the original object
+  const requestCopy = { ...request };
+
   // Make sure the projects planning dates are in sync the planningStartYear
   if (form.estPlanningStart && parseInt(form.planningStartYear)) {
-    // We make a copy of the data so that both properties can be updated
-    const requestCopy = { ...request };
     if (_.has(requestCopy, 'estPlanningStart')) {
-      _.assign(request, { planningStartYear: getYear(form.estPlanningStart) });
+      _.assign(request, {
+        planningStartYear: getYear(form.estPlanningStart),
+      });
     }
+
     if (_.has(requestCopy, 'planningStartYear')) {
       _.assign(request, {
         estPlanningStart: updateYear(parseInt(form.planningStartYear), form.estPlanningStart),
@@ -100,8 +104,6 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
 
   // Make sure the projects construction dates are in sync the planningEndYear
   if (form.estConstructionEnd && parseInt(form.constructionEndYear)) {
-    // We make a copy of the data so that both properties can be updated
-    const requestCopy = { ...request };
     if (_.has(requestCopy, 'estConstructionEnd')) {
       _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
     }
