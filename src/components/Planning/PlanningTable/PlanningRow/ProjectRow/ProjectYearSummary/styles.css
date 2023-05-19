@@ -2,10 +2,6 @@
   @apply flex h-full w-full justify-center border-b-2 border-gray p-2 pt-1;
 }
 
-.monthly-summary-table-container.none {
-  @apply bg-bus-l;
-}
-
 /* no gray border-bottom when cellType is none (the ProjectYearSummaryTable is hidden when viewing a none cell) */
 .monthly-summary-table-container.none {
   @apply border-none;

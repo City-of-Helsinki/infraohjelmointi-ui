@@ -45,6 +45,40 @@ export const getOptionId = (option: IOption) => option.value || null;
 
 export const isOption = (obj: object) => _.has(obj, 'label') && _.has(obj, 'value');
 
+// Make sure the projects planning dates are in sync with the planningStartYear
+const syncPlanningDates = (request: object, form: IAppForms) => {
+  const requestCopy = { ...request };
+
+  if (form.estPlanningStart) {
+    if (_.has(requestCopy, 'estPlanningStart')) {
+      _.assign(request, {
+        planningStartYear: getYear(form.estPlanningStart),
+      });
+    }
+
+    if (_.has(requestCopy, 'planningStartYear') && parseInt(form.planningStartYear)) {
+      _.assign(request, {
+        estPlanningStart: updateYear(parseInt(form.planningStartYear), form.estPlanningStart),
+      });
+    }
+  }
+};
+
+// Make sure the projects construction dates are in sync with the constructionEndYear
+const syncConstructionDates = (request: object, form: IAppForms) => {
+  const requestCopy = { ...request };
+
+  if (form.estConstructionEnd) {
+    if (_.has(requestCopy, 'estConstructionEnd')) {
+      _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
+    }
+    if (_.has(requestCopy, 'constructionEndYear') && parseInt(form.constructionEndYear)) {
+      _.assign(request, {
+        estConstructionEnd: updateYear(parseInt(form.constructionEndYear), form.estConstructionEnd),
+      });
+    }
+  }
+};
 /**
  *
  * @param dirtyFields dirtyFields from react-hook-forms
@@ -84,35 +118,8 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
     _.assign(request, { projectLocation: null });
   }
 
-  // Can be used to compare to the original object
-  const requestCopy = { ...request };
-
-  // Make sure the projects planning dates are in sync with the planningStartYear
-  if (form.estPlanningStart) {
-    if (_.has(requestCopy, 'estPlanningStart')) {
-      _.assign(request, {
-        planningStartYear: getYear(form.estPlanningStart),
-      });
-    }
-
-    if (_.has(requestCopy, 'planningStartYear') && parseInt(form.planningStartYear)) {
-      _.assign(request, {
-        estPlanningStart: updateYear(parseInt(form.planningStartYear), form.estPlanningStart),
-      });
-    }
-  }
-
-  // Make sure the projects construction dates are in sync with the constructionEndYear
-  if (form.estConstructionEnd) {
-    if (_.has(requestCopy, 'estConstructionEnd')) {
-      _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
-    }
-    if (_.has(requestCopy, 'constructionEndYear') && parseInt(form.constructionEndYear)) {
-      _.assign(request, {
-        estConstructionEnd: updateYear(parseInt(form.constructionEndYear), form.estConstructionEnd),
-      });
-    }
-  }
+  syncPlanningDates(request, form);
+  syncConstructionDates(request, form);
 
   return request;
 };

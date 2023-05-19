@@ -143,7 +143,7 @@ const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IM
         break;
     }
 
-    return { percent, isStart: startDatesMonth === month };
+    return { percent, isStart: isStartYear && startDatesMonth === month };
   };
 
   return moment.monthsShort().map((m, i) => ({
@@ -300,10 +300,51 @@ const getCellGrowDirections = (
   return growDirections;
 };
 
+const getIsStartOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
+  const { planningStart, constructionStart } = timelineDates;
+  return planningStart
+    ? isSameYear(planningStart, cellYear)
+    : isSameYear(constructionStart, cellYear);
+};
+
+const getIsEndOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
+  const { planningEnd, constructionEnd } = timelineDates;
+  return constructionEnd
+    ? isSameYear(constructionEnd, cellYear)
+    : isSameYear(planningEnd, cellYear);
+};
+
+const getIsLastOfType = (cellYear: number, timelineDates: ITimelineDates) => {
+  const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+  return (
+    (isSameYear(planningStart, cellYear) && isSameYear(planningEnd, cellYear)) ||
+    (isSameYear(constructionStart, cellYear) && isSameYear(constructionEnd, cellYear))
+  );
+};
+
+const getAffectsDates = (
+  type: CellType,
+  timelineDates: ITimelineDates,
+  isStartOfTimeline: boolean,
+  isEndOfTimeline: boolean,
+  isLastOfType: boolean,
+) => {
+  const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+  if ((type === 'planningStart' && planningStart) || (type === 'planningEnd' && planningEnd)) {
+    return true;
+  }
+  if (
+    (type === 'constructionStart' && constructionStart) ||
+    (type === 'constructionEnd' && constructionEnd)
+  ) {
+    return true;
+  }
+  return isLastOfType || isStartOfTimeline || isEndOfTimeline;
+};
+
 const getProjectCells = (project: IProject) => {
   const { year, ...finances } = project.finances;
-  const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd, name, id } =
-    project;
+  const { name, id } = project;
 
   const timelineDates = getTimelineDates(project);
 
@@ -313,39 +354,19 @@ const getProjectCells = (project: IProject) => {
 
     const type = getType(cellYear, value, timelineDates);
 
-    const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+    const isStartOfTimeline = getIsStartOfTimeline(cellYear, timelineDates);
+    const isEndOfTimeline = getIsEndOfTimeline(cellYear, timelineDates);
+    const isLastOfType = getIsLastOfType(cellYear, timelineDates);
 
-    const isStartOfTimeline = planningStart
-      ? isSameYear(planningStart, cellYear)
-      : isSameYear(constructionStart, cellYear);
+    const affectsDates = getAffectsDates(
+      type,
+      timelineDates,
+      isStartOfTimeline,
+      isEndOfTimeline,
+      isLastOfType,
+    );
 
-    const isEndOfTimeline = constructionEnd
-      ? isSameYear(constructionEnd, cellYear)
-      : isSameYear(planningEnd, cellYear);
-
-    const isLastOfType =
-      (isSameYear(planningStart, cellYear) && isSameYear(planningEnd, cellYear)) ||
-      (isSameYear(constructionStart, cellYear) && isSameYear(constructionEnd, cellYear));
-
-    const getAffectsDates = () => {
-      if (
-        (type === 'constructionStart' && estConstructionStart) ||
-        (type === 'constructionEnd' && estConstructionEnd)
-      ) {
-        return true;
-      }
-      if (
-        (type === 'planningStart' && estPlanningStart) ||
-        (type === 'planningEnd' && estPlanningEnd)
-      ) {
-        return true;
-      }
-      if (type.includes('End') && (estPlanningEnd || estConstructionEnd)) {
-        return true;
-      }
-      return isLastOfType || isStartOfTimeline || isEndOfTimeline;
-    };
-
+    // FIXME: why does project est-dates get mutated as MM.DD.0000 ?
     return {
       year: cellYear,
       startYear: year,
@@ -363,14 +384,9 @@ const getProjectCells = (project: IProject) => {
       id: id,
       growDirections: [],
       financesToReset: null,
-      affectsDates: getAffectsDates(),
+      affectsDates,
       monthlyDataList: getMonthDataList(cellYear, timelineDates),
-      projectEstDates: {
-        estPlanningStart: estPlanningStart ?? null,
-        estPlanningEnd: estPlanningEnd ?? null,
-        estConstructionStart: estConstructionStart ?? null,
-        estConstructionEnd: estConstructionEnd ?? null,
-      },
+      projectEstDates: { ...project },
     };
   });
 

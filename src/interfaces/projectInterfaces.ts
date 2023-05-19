@@ -369,9 +369,9 @@ export interface IProjectCell {
    * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd properties from the project
    */
   projectEstDates: {
-    estPlanningStart: string | null;
-    estPlanningEnd: string | null;
-    estConstructionStart: string | null;
-    estConstructionEnd: string | null;
+    estPlanningStart?: string | null;
+    estPlanningEnd?: string | null;
+    estConstructionStart?: string | null;
+    estConstructionEnd?: string | null;
   };
 }
