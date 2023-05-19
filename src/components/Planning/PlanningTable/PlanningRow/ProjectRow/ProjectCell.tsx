@@ -1,4 +1,5 @@
 import {
+  CellType,
   IProjectCell,
   IProjectFinances,
   IProjectFinancesRequestObject,
@@ -43,33 +44,27 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
   const { type, startYear } = cell;
   const req: IProjectRequest = { finances: { year: startYear } };
 
-  const setPlanGapCellFinancesNull = () => {
-    let head: IProjectCell | null = cell.prev;
-    while (head && !head.type.includes('plan') && !head.planEnd && !head.planStart) {
-      // TODO: write comment
+  const setGapCellFinancesNull = (cellType: 'con' | 'plan') => {
+    let head: IProjectCell | null = cellType === 'con' ? cell.next : cell.prev;
+    while (
+      head &&
+      !head.type.includes(cellType) &&
+      !head[`${cellType}End`] &&
+      !head[`${cellType}Start`]
+    ) {
+      // Have to use a if condition to check as other operators are still raising typescript errors
       if (req.finances) {
         (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
       }
-      head = head.prev;
-    }
-    return head;
-  };
-  const setConGapCellFinancesNull = () => {
-    let head: IProjectCell | null = cell.next;
-    while (head && !head.type.includes('con') && !head.conEnd && !head.conStart) {
-      // TODO: write comment
-      if (req.finances) {
-        (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
-      }
-      head = head.next;
+      head = cellType === 'con' ? head.next : head.prev;
     }
     return head;
   };
   const getFirstPlanCellBehind = () => {
-    return setPlanGapCellFinancesNull();
+    return setGapCellFinancesNull('plan');
   };
   const getFirstConCellAhead = () => {
-    return setConGapCellFinancesNull();
+    return setGapCellFinancesNull('con');
   };
   const getDateFromFirstPlanCellBehind = () => {
     const planCellBehind = getFirstPlanCellBehind();
@@ -90,7 +85,7 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
       if (cell.next?.type.includes('con')) {
         req.estConstructionStart = removeYear(cell.conStart);
       } else {
-        setConGapCellFinancesNull();
+        setGapCellFinancesNull('con');
         req.estConstructionStart = getFirstDate(cell.planEnd);
       }
       break;
@@ -98,7 +93,7 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
       if (cell.prev?.type.includes('plan')) {
         req.estPlanningEnd = addYear(cell.planEnd);
       } else {
-        setPlanGapCellFinancesNull();
+        setGapCellFinancesNull('plan');
         req.estPlanningEnd = getLastDate(cell.conStart);
       }
       if (cell.next?.type.includes('con')) {
