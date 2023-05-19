@@ -102,7 +102,7 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
     }
   }
 
-  // Make sure the projects construction dates are in sync with the planningEndYear
+  // Make sure the projects construction dates are in sync with the constructionEndYear
   if (form.estConstructionEnd) {
     if (_.has(requestCopy, 'estConstructionEnd')) {
       _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
