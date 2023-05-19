@@ -19,6 +19,8 @@ import { mockGroups } from '@/mocks/mockGroups';
 import PlanningView from '@/views/PlanningView';
 import { Route } from 'react-router';
 import mockProject from '@/mocks/mockProject';
+import { mockClassFinances } from '@/mocks/mockClassFinances';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -75,6 +77,10 @@ const render = async () =>
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('GroupDialog', () => {
+  beforeEach(() => {
+    mockGetResponseProvider();
+  });
+
   afterEach(async () => {
     jest.clearAllMocks();
   });
@@ -125,6 +131,7 @@ describe('GroupDialog', () => {
         name: 'test-group',
         locationRelation: 'koilinen-district-test',
         classRelation: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
+        finances: mockClassFinances,
       },
     };
     const mockSuggestionsResponse = {
@@ -236,3 +243,6 @@ describe('GroupDialog', () => {
     expect(await findByText('Vanha yrttimaantie')).toBeInTheDocument();
   });
 });
+function mockGetResponseProviders() {
+  throw new Error('Function not implemented.');
+}
