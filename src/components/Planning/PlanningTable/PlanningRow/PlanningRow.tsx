@@ -84,7 +84,7 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       searchedProjectId: project.id,
       expanded: true,
     }));
-  }, [location, projects]);
+  }, [search, projects]);
 
   // Listens to searchedProjectId and scrolls the viewport to the project
   useEffect(() => {
