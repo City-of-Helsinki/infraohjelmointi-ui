@@ -40,7 +40,7 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
           {isCurrentYear && <td key={`${year}-monthly-view`} className="monthly-summary-cell"></td>}
           {moment.monthsShort().map((m) => (
             <td key={m} className="monthly-cell">
-              {/* TODO: there's going to be graph here and we can use each months cell to paint the graph */}
+              {/* There's going to be graph here and we can use each months cell to paint the graph */}
             </td>
           ))}
         </>

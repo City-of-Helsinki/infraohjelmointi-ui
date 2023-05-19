@@ -355,9 +355,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
-      console.log('request: ', req);
-      console.log(cell);
-
       patchProject({
         id,
         data: req,

@@ -103,7 +103,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
             <td key={m} className="monthly-cell label">
               <div className="monthly-cell-container relative">
                 <span>{m.substring(0, 3)}</span>
-                {/* Creates a line that's as long as the table that indicates the current date */}
+                {/* Creates a line that indicates the current date */}
                 {showDateIndicator(i + 1) && (
                   <span
                     ref={dateIndicatorRef}
