@@ -175,6 +175,7 @@ const FreeSearchForm = ({
               value={searchWord}
               onChange={handleSetSearchWord}
               onSubmit={(v) => handleSubmit(v, onChange)}
+              clearButtonAriaLabel="Clear free search field"
             />
             <div className="search-selections">
               {Object.keys(value || {}).map((s) => (

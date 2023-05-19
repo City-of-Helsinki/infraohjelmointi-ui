@@ -24,6 +24,64 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 
 /**
+ * Creates the timeline dates to be used with drawing the timeline and building the cells.
+ *
+ * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd dates are prioritized.
+ * The planningStartYear and constructionEndYear properties are used if any of the above dates are missing
+ * from the project.
+ */
+const getTimelineDates = (project: IProject) => {
+  const {
+    planningStartYear,
+    constructionEndYear,
+    estPlanningStart,
+    estPlanningEnd,
+    estConstructionStart,
+    estConstructionEnd,
+  } = project;
+
+  const timelineDates: ITimelineDates = {
+    planningStart: null,
+    planningEnd: null,
+    constructionStart: null,
+    constructionEnd: null,
+  };
+
+  const planningStartYearAsDate = createDateToStartOfYear(planningStartYear);
+  const planningEndYearAsDate = createDateToEndOfYear(planningStartYear);
+
+  const setPlanningDates = () => {
+    timelineDates.planningStart = estPlanningStart ? estPlanningStart : planningStartYearAsDate;
+    timelineDates.planningEnd = estPlanningEnd ? estPlanningEnd : planningEndYearAsDate;
+  };
+
+  const setConstructionDates = () => {
+    const isConstructionEndSameAsPlanningStart = constructionEndYear === planningStartYear;
+    const planningEnd = estPlanningEnd ?? planningEndYearAsDate;
+
+    if (estConstructionStart) {
+      timelineDates.constructionStart = estConstructionStart;
+    } else {
+      timelineDates.constructionStart = isConstructionEndSameAsPlanningStart
+        ? planningStartYearAsDate
+        : createDateToStartOfYear(getYear(planningEnd) + 1);
+    }
+    if (estConstructionEnd) {
+      timelineDates.constructionEnd = estConstructionEnd;
+    } else {
+      timelineDates.constructionEnd = isConstructionEndSameAsPlanningStart
+        ? planningEndYearAsDate
+        : createDateToEndOfYear(constructionEndYear);
+    }
+  };
+
+  setPlanningDates();
+  setConstructionDates();
+
+  return timelineDates;
+};
+
+/**
  * Creates a list of monthly data to be used for drawing the monthly graphs when expanding a
  * year in the PlanningView.
  */
@@ -93,64 +151,6 @@ const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IM
     planning: getMonthData(year, i + 1, 'planning'),
     construction: getMonthData(year, i + 1, 'construction'),
   }));
-};
-
-/**
- * Creates the timeline dates to be used with drawing the timeline.
- *
- * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd dates are prioritized.
- * The planningStartYear and constructionEndYear properties are used if any of the above dates are missing
- * from the project.
- */
-const getTimelineDates = (project: IProject) => {
-  const {
-    planningStartYear,
-    constructionEndYear,
-    estPlanningStart,
-    estPlanningEnd,
-    estConstructionStart,
-    estConstructionEnd,
-  } = project;
-
-  const timelineDates: ITimelineDates = {
-    planningStart: null,
-    planningEnd: null,
-    constructionStart: null,
-    constructionEnd: null,
-  };
-
-  const planningStartYearAsDate = createDateToStartOfYear(planningStartYear);
-  const planningEndYearAsDate = createDateToEndOfYear(planningStartYear);
-
-  const setPlanningDates = () => {
-    timelineDates.planningStart = estPlanningStart ? estPlanningStart : planningStartYearAsDate;
-    timelineDates.planningEnd = estPlanningEnd ? estPlanningEnd : planningEndYearAsDate;
-  };
-
-  const setConstructionDates = () => {
-    const isConstructionEndSameAsPlanningStart = constructionEndYear === planningStartYear;
-    const planningEnd = estPlanningEnd ?? planningEndYearAsDate;
-
-    if (estConstructionStart) {
-      timelineDates.constructionStart = estConstructionStart;
-    } else {
-      timelineDates.constructionStart = isConstructionEndSameAsPlanningStart
-        ? planningStartYearAsDate
-        : createDateToStartOfYear(getYear(planningEnd) + 1);
-    }
-    if (estConstructionEnd) {
-      timelineDates.constructionEnd = estConstructionEnd;
-    } else {
-      timelineDates.constructionEnd = isConstructionEndSameAsPlanningStart
-        ? planningEndYearAsDate
-        : createDateToEndOfYear(constructionEndYear);
-    }
-  };
-
-  setPlanningDates();
-  setConstructionDates();
-
-  return timelineDates;
 };
 
 /**

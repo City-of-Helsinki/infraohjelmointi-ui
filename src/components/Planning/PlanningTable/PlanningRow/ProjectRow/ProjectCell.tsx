@@ -34,7 +34,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     isStartOfTimeline,
     isLastOfType,
     timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
-    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
+    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart },
     cellToUpdate,
     financesToReset,
     financeKey,
@@ -45,48 +45,27 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
   const req: IProjectRequest = { finances: { year: startYear, ...financesToReset } };
 
-  const updatePlanningStart = () => {
-    const updatedDate = updateYear(cellToUpdate?.year, planningStart);
-    if (estPlanningStart) {
-      req.estPlanningStart = updatedDate;
+  const updateYearIfNotNull = (date: string | null, yearKey: string, estDateKey?: string) => {
+    const updatedDate = updateYear(cellToUpdate?.year, date);
+    if (estDateKey) {
+      (req[estDateKey as keyof IProjectRequest] as string | null) = updatedDate;
     }
-    req.planningStartYear = getYear(updatedDate).toString();
+    (req[yearKey as keyof IProjectRequest] as string) = getYear(updatedDate).toString();
   };
 
-  const updatePlanningEnd = () => {
-    const updatedDate = updateYear(cellToUpdate?.year, planningEnd);
-    if (isLastOfType) {
-      req.estPlanningStart = null;
-      req.estPlanningEnd = null;
-      req.planningStartYear = getYear(updatedDate).toString();
-    } else if (estPlanningEnd) {
-      req.estPlanningEnd = updatedDate;
+  const updateYearIfNotNullAndNotLast = (
+    date: string | null,
+    yearKey: string,
+    estDateKey?: string,
+  ) => {
+    const updatedDate = updateYear(cellToUpdate?.year, date);
+    if (!isLastOfType && estDateKey) {
+      (req[estDateKey as keyof IProjectRequest] as string | null) = updatedDate;
     }
-  };
-
-  const updateConstructionStart = () => {
-    const updatedDate = updateYear(cellToUpdate?.year, constructionStart);
-    if (estConstructionStart) {
-      req.estConstructionStart = updatedDate;
-    }
-  };
-
-  const updateConstructionEnd = () => {
-    const updatedDate = updateYear(cellToUpdate?.year, constructionEnd);
-    if (!isLastOfType) {
-      if (estConstructionEnd) {
-        req.estConstructionEnd = updatedDate;
-      }
-      req.constructionEndYear = getYear(updatedDate).toString();
-    } else {
-      req.constructionEndYear = getYear(planningEnd).toString();
-      req.estConstructionStart = null;
-      req.estConstructionEnd = null;
-    }
+    (req[yearKey as keyof IProjectRequest] as string) = getYear(updatedDate).toString();
   };
 
   const updateOverlap = () => {
-    // Null everything if it's the last overlap cell
     if (isEndOfTimeline && isStartOfTimeline) {
       req.planningStartYear = '0';
       req.constructionEndYear = '0';
@@ -95,7 +74,6 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
     } else {
-      // Set new planning dates if it's the start of the timeline
       if (isStartOfTimeline) {
         if (estPlanningStart) {
           req.estPlanningStart = null;
@@ -105,7 +83,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       } else if (estPlanningEnd) {
         req.estPlanningEnd = removeYear(planningEnd);
       }
-      // Set new construction dates if it's the end of the timeline
+
       if (isEndOfTimeline) {
         if (estConstructionStart) {
           req.estConstructionStart = null;
@@ -125,16 +103,16 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   const updateDatesIfStartEndOrOverlap = () => {
     switch (type) {
       case 'planningStart':
-        updatePlanningStart();
+        updateYearIfNotNull(planningStart, 'planningStartYear', 'estPlanningStart');
         break;
       case 'planningEnd':
-        updatePlanningEnd();
+        updateYearIfNotNull(planningEnd, 'planningStartYear', 'estPlanningEnd');
         break;
       case 'constructionStart':
-        updateConstructionStart();
+        updateYearIfNotNull(constructionStart, 'constructionStartYear', 'estConstructionStart');
         break;
       case 'constructionEnd':
-        updateConstructionEnd();
+        updateYearIfNotNullAndNotLast(constructionEnd, 'constructionEndYear', 'estConstructionEnd');
         break;
       case 'overlap':
         updateOverlap();
@@ -149,16 +127,14 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       return;
     }
 
-    // If there is a cellToUpdate move the deleted cells budget to that cell
     if (cellToUpdate) {
       const updateKey = cellToUpdate.financeKey;
       const updateBudget = cellToUpdate.budget;
-      (req.finances[updateKey as keyof IProjectFinancesRequestObject] as string) = (
+      (req.finances[updateKey as keyof IProjectFinancesRequestObject] as string | null) = (
         parseInt(budget ?? '0') + parseInt(updateBudget ?? '0')
       ).toString();
     }
 
-    // Set the current cells value to '0' if it's an edge cell, otherwise set it to null to temporarily hide it
     (req.finances[financeKey as keyof IProjectFinancesRequestObject] as string | null) =
       affectsDates ? '0' : null;
   };
@@ -185,10 +161,7 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
   const req: IProjectRequest = { finances: { year: startYear } };
 
   const updateLeft = () => {
-    if (
-      isStartOfTimeline &&
-      (type === 'planningStart' || type === 'planningEnd' || type === 'overlap')
-    ) {
+    if (isStartOfTimeline && (type.includes('planning') || type === 'overlap')) {
       if (estPlanningStart) {
         req.estPlanningStart = removeYear(planningStart);
       }
