@@ -317,11 +317,10 @@ const usePlanningRows = () => {
     year: new Date().getFullYear(),
   });
 
-  const { lists, selections } = planningRowsState;
+  const { lists } = planningRowsState;
 
   useEffect(() => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
-
     if (type && id) {
       fetchProjectsByRelation(type as PlanningRowType, id)
         .then((projects) => {
@@ -337,22 +336,7 @@ const usePlanningRows = () => {
         rows: buildPlanningTableRows(planningRowsState, []),
       }));
     }
-  }, [lists, selections]);
-
-  useEffect(() => {
-    const { type, id } = getTypeAndIdForLowestExpandedRow(planningRowsState.selections);
-
-    if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id)
-        .then((projects) => {
-          setPlanningRowsState((current) => ({
-            ...current,
-            projects,
-          }));
-        })
-        .catch(Promise.reject);
-    }
-  }, [selections]);
+  }, [lists]);
 
   // React to changes in classes and set the selectedMasterClass/selectedClass/selectedSubClass if it is present in the route
   useEffect(() => {
