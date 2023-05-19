@@ -74,13 +74,15 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
               data-testid={`cell-type-${value}`}
             >
               <button
-                className={`flex items-center ${!canTypeUpdate ? 'cursor-not-allowed' : ''}`}
+                className={`flex items-center ${
+                  !canTypeUpdate || value === selectedType ? 'cursor-not-allowed' : ''
+                }`}
                 onClick={() => handleCellTypeUpdate(value as CellType)}
-                disabled={!canTypeUpdate}
+                disabled={!canTypeUpdate || value === selectedType}
               >
                 <div className={`list-icon ${value}`} />
                 <span
-                  className={` ${!canTypeUpdate ? 'text-gray' : ''} ${
+                  className={` ${!canTypeUpdate && !(value === selectedType) ? 'text-gray' : ''} ${
                     value === selectedType ? 'font-bold text-black' : 'font-light'
                   }`}
                 >

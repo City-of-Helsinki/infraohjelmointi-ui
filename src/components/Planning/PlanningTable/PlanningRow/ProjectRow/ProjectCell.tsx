@@ -18,7 +18,16 @@ import {
   useRef,
   useMemo,
 } from 'react';
-import { addYear, getYear, removeYear, updateYear, getLastDate, getFirstDate } from '@/utils/dates';
+import {
+  addYear,
+  getYear,
+  removeYear,
+  updateYear,
+  getLastDate,
+  getFirstDate,
+  createDateToEndOfYear,
+  createDateToStartOfYear,
+} from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
@@ -31,102 +40,92 @@ const addActiveClassToProjectRow = (projectId: string) => {
 };
 
 const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProjectRequest => {
-  const req: IProjectRequest = {};
-  const { type } = cell;
+  const { type, startYear } = cell;
+  const req: IProjectRequest = { finances: { year: startYear } };
+
+  const setPlanGapCellFinancesNull = () => {
+    let head: IProjectCell | null = cell.prev;
+    while (head && !head.type.includes('plan') && !head.planEnd && !head.planStart) {
+      // TODO: write comment
+      if (req.finances) {
+        (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
+      }
+      head = head.prev;
+    }
+    return head;
+  };
+  const setConGapCellFinancesNull = () => {
+    let head: IProjectCell | null = cell.next;
+    while (head && !head.type.includes('con') && !head.conEnd && !head.conStart) {
+      // TODO: write comment
+      if (req.finances) {
+        (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
+      }
+      head = head.next;
+    }
+    return head;
+  };
+  const getFirstPlanCellBehind = () => {
+    return setPlanGapCellFinancesNull();
+  };
+  const getFirstConCellAhead = () => {
+    return setConGapCellFinancesNull();
+  };
+  const getDateFromFirstPlanCellBehind = () => {
+    const planCellBehind = getFirstPlanCellBehind();
+    return planCellBehind ? createDateToEndOfYear(planCellBehind.year) : null;
+  };
+
+  const getDateFromFirstConCellAhead = () => {
+    const conCellAhead = getFirstConCellAhead();
+    return conCellAhead ? createDateToStartOfYear(conCellAhead.year) : null;
+  };
   switch (type) {
     case 'planEnd':
-      if (cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
+      if (cell.prev?.type.includes('plan')) {
         req.estPlanningEnd = removeYear(cell.planEnd);
+      } else {
+        req.estPlanningEnd = getDateFromFirstPlanCellBehind();
+      }
+      if (cell.next?.type.includes('con')) {
         req.estConstructionStart = removeYear(cell.conStart);
-      } else if (!cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
-        req.estConstructionStart = removeYear(cell.conStart);
-        req.estPlanningEnd = null;
-        req.estPlanningStart = null;
-        req.planningStartYear = null;
-      } else if (!cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
-        req.estPlanningStart = null;
-        req.estPlanningEnd = null;
-        req.planningStartYear = null;
-        req.estConstructionStart = getFirstDate(cell.planStart);
-        req.estConstructionEnd = getLastDate(cell.planStart);
-        req.constructionEndYear = getYear(cell.planEnd).toString();
-      } else if (cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
-        req.estPlanningEnd = removeYear(cell.planEnd);
+      } else {
+        setConGapCellFinancesNull();
         req.estConstructionStart = getFirstDate(cell.planEnd);
-        req.estConstructionEnd = getLastDate(cell.planEnd);
-        req.constructionEndYear = getYear(cell.planEnd).toString();
       }
       break;
     case 'conStart':
       if (cell.prev?.type.includes('plan')) {
         req.estPlanningEnd = addYear(cell.planEnd);
-        req.estConstructionStart = addYear(cell.conStart);
-      }
-      if (!cell.prev?.type.includes('plan')) {
-        req.estConstructionStart = addYear(cell.conStart);
-        req.estPlanningStart = getFirstDate(cell.conStart);
+      } else {
+        setPlanGapCellFinancesNull();
         req.estPlanningEnd = getLastDate(cell.conStart);
-        req.planningStartYear = getYear(cell.conEnd).toString();
       }
-      break;
-    case 'conEnd':
-      if (cell.prev?.type.includes('plan')) {
-        req.estPlanningEnd = addYear(cell.planEnd);
-        req.estConstructionStart = null;
-        req.estConstructionEnd = null;
-        req.constructionEndYear = null;
-      }
-      if (!cell.prev?.type.includes('plan') && !cell.prev?.type.includes('con')) {
-        req.estConstructionStart = null;
-        req.estConstructionEnd = null;
-        req.constructionEndYear = null;
-        req.estPlanningStart = getFirstDate(cell.conStart);
-        req.estPlanningEnd = getLastDate(cell.conStart);
-        req.planningStartYear = getYear(cell.conEnd).toString();
+      if (cell.next?.type.includes('con')) {
+        req.estConstructionStart = addYear(cell.conStart);
+      } else {
+        req.estConstructionStart = getDateFromFirstConCellAhead();
       }
       break;
     case 'overlap':
-      if (cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
-        if (phase.includes('con')) {
-          ('tri10');
+      if (phase.includes('con')) {
+        if (cell.prev?.type.includes('plan')) {
           req.estPlanningEnd = removeYear(cell.planEnd);
+        } else {
+          req.estPlanningEnd = getDateFromFirstPlanCellBehind();
         }
-        if (phase.includes('plan')) {
+      }
+      if (phase.includes('plan')) {
+        if (cell.next?.type.includes('con')) {
           req.estConstructionStart = addYear(cell.conStart);
-        }
-      } else if (!cell.prev?.type.includes('plan') && cell.next?.type.includes('con')) {
-        if (phase.includes('con')) {
-          req.estPlanningEnd = null;
-          req.estPlanningStart = null;
-          req.planningStartYear = null;
-        }
-        if (phase.includes('plan')) {
-          req.estConstructionStart = addYear(cell.conStart);
-        }
-      } else if (!cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
-        if (phase.includes('con')) {
-          req.estPlanningEnd = null;
-          req.estPlanningStart = null;
-          req.planningStartYear = null;
-        }
-        if (phase.includes('plan')) {
-          req.estConstructionEnd = null;
-          req.estConstructionStart = null;
-          req.constructionEndYear = null;
-        }
-      } else if (cell.prev?.type.includes('plan') && !cell.next?.type.includes('con')) {
-        if (phase.includes('con')) {
-          req.estPlanningEnd = removeYear(cell.planEnd);
-        }
-        if (phase.includes('plan')) {
-          req.estConstructionEnd = null;
-          req.estConstructionStart = null;
-          req.constructionEndYear = null;
+        } else {
+          req.estConstructionStart = getDateFromFirstConCellAhead();
         }
       }
       break;
     default:
   }
+  console.log(req);
   return req;
 };
 
@@ -488,8 +487,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     [id],
   );
   const canTypeUpdate = useCallback(() => {
-    if (cell.type === 'planEnd' || cell.type === 'overlap' || cell.type === 'conStart') return true;
-    if (cell.type === 'conEnd' && !cell.prev?.type.includes('con')) return true;
+    if (
+      (cell.type === 'planEnd' || cell.type === 'conStart' || cell.type === 'overlap') &&
+      !cell.isLastOfType
+    )
+      return true;
     return false;
   }, [cell]);
 

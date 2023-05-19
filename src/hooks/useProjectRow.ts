@@ -477,8 +477,29 @@ const getProjectCells = (project: IProject) => {
       growDirections: getCellGrowDirections(cell, prev, next),
     };
   });
+  function createLinkedList(list: IProjectCell[]) {
+    if (list.length === 0) {
+      return list;
+    }
 
-  return projectCells;
+    // Set the previous and next pointers for the first item
+    list[0].prev = null;
+    list[0].next = list.length > 1 ? list[1] : null;
+
+    // Set the previous and next pointers for the middle items
+    for (let i = 1; i < list.length - 1; i++) {
+      list[i].prev = list[i - 1];
+      list[i].next = list[i + 1];
+    }
+
+    // Set the previous and next pointers for the last item
+    const lastIndex = list.length - 1;
+    list[lastIndex].prev = list[lastIndex - 1];
+    list[lastIndex].next = null;
+
+    return list;
+  }
+  return createLinkedList(projectCells);
 };
 
 interface IProjectRowsState {
