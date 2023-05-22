@@ -56,7 +56,11 @@ const syncPlanningDates = (request: object, form: IAppForms) => {
       });
     }
 
-    if (_.has(requestCopy, 'planningStartYear') && parseInt(form.planningStartYear)) {
+    if (
+      _.has(requestCopy, 'planningStartYear') &&
+      form.planningStartYear &&
+      parseInt(form.planningStartYear)
+    ) {
       _.assign(request, {
         estPlanningStart: updateYear(parseInt(form.planningStartYear), form.estPlanningStart),
       });
@@ -72,7 +76,11 @@ const syncConstructionDates = (request: object, form: IAppForms) => {
     if (_.has(requestCopy, 'estConstructionEnd')) {
       _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
     }
-    if (_.has(requestCopy, 'constructionEndYear') && parseInt(form.constructionEndYear)) {
+    if (
+      _.has(requestCopy, 'constructionEndYear') &&
+      form.constructionEndYear &&
+      parseInt(form.constructionEndYear)
+    ) {
       _.assign(request, {
         estConstructionEnd: updateYear(parseInt(form.constructionEndYear), form.estConstructionEnd),
       });

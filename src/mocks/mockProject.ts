@@ -93,8 +93,8 @@ const mockProject: { data: IProject } = {
     louhi: false,
     gravel: false,
     effectHousing: false,
-    constructionEndYear: '2031',
-    planningStartYear: '2024',
+    constructionEndYear: 2031,
+    planningStartYear: 2024,
     personPlanning: {
       id: 'afc609b0-9e7b-49c8-8e01-a940d720667b',
       firstName: 'E',

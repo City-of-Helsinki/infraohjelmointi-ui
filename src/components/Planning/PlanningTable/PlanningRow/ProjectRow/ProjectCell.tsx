@@ -51,7 +51,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     if (estPlanningStart) {
       req.estPlanningStart = updatedDate;
     }
-    req.planningStartYear = getYear(updatedDate).toString();
+    req.planningStartYear = getYear(updatedDate);
   };
 
   const updatePlanningEnd = () => {
@@ -59,7 +59,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     if (isLastOfType) {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
-      req.planningStartYear = getYear(updatedDate).toString();
+      req.planningStartYear = getYear(updatedDate);
     } else if (estPlanningEnd) {
       req.estPlanningEnd = updatedDate;
     }
@@ -70,7 +70,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     if (estConstructionStart) {
       req.estConstructionStart = updatedDate;
     }
-    req.constructionEndYear = getYear(updatedDate).toString();
+    req.constructionEndYear = getYear(updatedDate);
   };
 
   const updateConstructionEnd = () => {
@@ -79,9 +79,9 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       if (estConstructionEnd) {
         req.estConstructionEnd = updatedDate;
       }
-      req.constructionEndYear = getYear(updatedDate).toString();
+      req.constructionEndYear = getYear(updatedDate);
     } else {
-      req.constructionEndYear = getYear(planningStart).toString();
+      req.constructionEndYear = getYear(planningStart);
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
     }
@@ -101,8 +101,8 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       req.estConstructionStart = addYear(constructionStart);
     }
     if (getYear(planningStart) === getYear(constructionEnd)) {
-      req.planningStartYear = '0';
-      req.constructionEndYear = '0';
+      req.planningStartYear = null;
+      req.constructionEndYear = null;
     }
   };
 
@@ -171,7 +171,7 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
       if (estPlanningStart) {
         req.estPlanningStart = removeYear(planningStart);
       }
-      req.planningStartYear = getYear(removeYear(planningStart)).toString();
+      req.planningStartYear = getYear(removeYear(planningStart));
     } else if (
       (isLastOfType && type === 'constructionEnd') ||
       (type === 'constructionStart' && estConstructionStart)
@@ -187,7 +187,7 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
       if (estConstructionEnd) {
         req.estConstructionEnd = addYear(constructionEnd);
       }
-      req.constructionEndYear = getYear(addYear(constructionEnd)).toString();
+      req.constructionEndYear = getYear(addYear(constructionEnd));
     }
   };
 
@@ -259,8 +259,8 @@ const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinanc
     req.estConstructionEnd = addYear(constructionEnd);
   }
 
-  req.planningStartYear = getYear(addYear(planningStart)).toString();
-  req.constructionEndYear = getYear(addYear(constructionEnd)).toString();
+  req.planningStartYear = getYear(addYear(planningStart));
+  req.constructionEndYear = getYear(addYear(constructionEnd));
 
   return req;
 };
@@ -303,8 +303,8 @@ const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinan
     req.estConstructionEnd = removeYear(constructionEnd);
   }
 
-  req.planningStartYear = getYear(removeYear(planningStart)).toString();
-  req.constructionEndYear = getYear(removeYear(constructionEnd)).toString();
+  req.planningStartYear = getYear(removeYear(planningStart));
+  req.constructionEndYear = getYear(removeYear(constructionEnd));
 
   return req;
 };

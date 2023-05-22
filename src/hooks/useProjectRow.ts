@@ -51,8 +51,8 @@ const getTimelineDates = (project: IProject) => {
   const planningEndYearAsDate = createDateToEndOfYear(planningStartYear);
 
   const setPlanningDates = () => {
-    timelineDates.planningStart = estPlanningStart ? estPlanningStart : planningStartYearAsDate;
-    timelineDates.planningEnd = estPlanningEnd ? estPlanningEnd : planningEndYearAsDate;
+    timelineDates.planningStart = estPlanningStart ?? planningStartYearAsDate;
+    timelineDates.planningEnd = estPlanningEnd ?? planningEndYearAsDate;
   };
 
   const setConstructionDates = () => {
@@ -61,17 +61,22 @@ const getTimelineDates = (project: IProject) => {
 
     if (estConstructionStart) {
       timelineDates.constructionStart = estConstructionStart;
-    } else {
+    } else if (constructionEndYear) {
       timelineDates.constructionStart = isConstructionEndSameAsPlanningStart
         ? planningStartYearAsDate
         : createDateToStartOfYear(getYear(planningEnd) + 1);
+    } else if (planningStartYearAsDate) {
+      timelineDates.constructionStart = planningStartYearAsDate;
     }
+
     if (estConstructionEnd) {
       timelineDates.constructionEnd = estConstructionEnd;
-    } else {
+    } else if (constructionEndYear) {
       timelineDates.constructionEnd = isConstructionEndSameAsPlanningStart
         ? planningEndYearAsDate
         : createDateToEndOfYear(constructionEndYear);
+    } else if (planningEndYearAsDate) {
+      timelineDates.constructionEnd = planningEndYearAsDate;
     }
   };
 
@@ -344,7 +349,8 @@ const getAffectsDates = (
 
 const getProjectCells = (project: IProject) => {
   const { year, ...finances } = project.finances;
-  const { name, id } = project;
+  const { name, id, estConstructionEnd, estConstructionStart, estPlanningEnd, estPlanningStart } =
+    project;
 
   const timelineDates = getTimelineDates(project);
 
@@ -358,6 +364,8 @@ const getProjectCells = (project: IProject) => {
     const isEndOfTimeline = getIsEndOfTimeline(cellYear, timelineDates);
     const isLastOfType = getIsLastOfType(cellYear, timelineDates);
 
+    const monthlyDataList = getMonthDataList(cellYear, timelineDates);
+
     const affectsDates = getAffectsDates(
       type,
       timelineDates,
@@ -366,7 +374,6 @@ const getProjectCells = (project: IProject) => {
       isLastOfType,
     );
 
-    // FIXME: why does project est-dates get mutated as MM.DD.0000 ?
     return {
       year: cellYear,
       startYear: year,
@@ -385,8 +392,13 @@ const getProjectCells = (project: IProject) => {
       growDirections: [],
       financesToReset: null,
       affectsDates,
-      monthlyDataList: getMonthDataList(cellYear, timelineDates),
-      projectEstDates: { ...project },
+      monthlyDataList,
+      projectEstDates: {
+        estConstructionEnd,
+        estConstructionStart,
+        estPlanningEnd,
+        estPlanningStart,
+      },
     };
   });
 

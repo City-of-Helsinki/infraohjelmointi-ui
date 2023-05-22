@@ -1067,7 +1067,7 @@ describe('PlanningView', () => {
               preliminaryCurrentYearPlus6: '0',
             },
             estConstructionEnd: updateYear(updatedConstructionYear, project.estConstructionEnd),
-            constructionEndYear: updatedConstructionYear.toString(),
+            constructionEndYear: updatedConstructionYear,
           };
 
           const mockRemoveConstructionEndPatchResponse = {
@@ -1130,7 +1130,7 @@ describe('PlanningView', () => {
               budgetProposalCurrentYearPlus2: '30',
             },
             estPlanningStart: updateYear(updatedPlanningYear, project.estPlanningStart),
-            planningStartYear: updatedPlanningYear.toString(),
+            planningStartYear: updatedPlanningYear,
           };
 
           const mockRemovePlanningStartPatchResponse = {
@@ -1225,7 +1225,7 @@ describe('PlanningView', () => {
             },
             estPlanningStart: null,
             estPlanningEnd: null,
-            planningStartYear: '2027',
+            planningStartYear: 2027,
           };
 
           const mockRemoveLastPlanPatchResponse = {
@@ -1267,8 +1267,8 @@ describe('PlanningView', () => {
             estConstructionEnd: null,
             estPlanningStart: null,
             estPlanningEnd: null,
-            planningStartYear: '0',
-            constructionEndYear: '0',
+            planningStartYear: null,
+            constructionEndYear: null,
           };
 
           const mockRemoveLastOverlapPatchResponse = {
@@ -1304,7 +1304,7 @@ describe('PlanningView', () => {
           const patchAddConYearRequest = {
             finances: { year: year, preliminaryCurrentYearPlus7: '0' },
             estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
-            constructionEndYear: updatedConstructionEndYear.toString(),
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockAddConYearPatchResponse = {
@@ -1345,7 +1345,7 @@ describe('PlanningView', () => {
 
           const patchAddPlanYearRequest = {
             estPlanningStart: updateYear(updatedPlanningStartYear, project.estPlanningStart),
-            planningStartYear: updatedPlanningStartYear.toString(),
+            planningStartYear: updatedPlanningStartYear,
           };
 
           const mockAddConYearPatchResponse = {
@@ -1385,7 +1385,7 @@ describe('PlanningView', () => {
 
           const patchAddOverlapPlanRequest = {
             estPlanningStart: updateYear(updatedPlanningStartYear, project.estPlanningStart),
-            planningStartYear: updatedPlanningStartYear.toString(),
+            planningStartYear: updatedPlanningStartYear,
           };
 
           const mockAddOverlapPlanPatchResponse = {
@@ -1426,7 +1426,7 @@ describe('PlanningView', () => {
 
           const patchAddOverlapConRequest = {
             estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
-            constructionEndYear: updatedConstructionEndYear.toString(),
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockAddOverlapConPatchResponse = {
@@ -1486,8 +1486,8 @@ describe('PlanningView', () => {
             estPlanningEnd: updateYear(year + 4, project.estPlanningEnd),
             estConstructionStart: updateYear(year + 4, project.estConstructionStart),
             estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
-            planningStartYear: updatedPlanningStartYear.toString(),
-            constructionEndYear: updatedConstructionEndYear.toString(),
+            planningStartYear: updatedPlanningStartYear,
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockMoveYearPatchResponse = {
@@ -1547,8 +1547,8 @@ describe('PlanningView', () => {
             estPlanningEnd: updateYear(year + 2, project.estPlanningEnd),
             estConstructionStart: updateYear(year + 2, project.estConstructionStart),
             estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
-            planningStartYear: updatedPlanningStartYear.toString(),
-            constructionEndYear: updatedConstructionEndYear.toString(),
+            planningStartYear: updatedPlanningStartYear,
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockMoveYearPatchResponse = {

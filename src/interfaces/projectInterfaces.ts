@@ -14,10 +14,10 @@ export interface IProject {
   phase: IListItem;
   programmed: boolean;
   constructionPhaseDetail: IListItem;
-  estPlanningStart?: string | null;
-  estPlanningEnd?: string | null;
-  estConstructionStart?: string | null;
-  estConstructionEnd?: string | null;
+  estPlanningStart: string | null;
+  estPlanningEnd: string | null;
+  estConstructionStart: string | null;
+  estConstructionEnd: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;
@@ -67,8 +67,8 @@ export interface IProject {
   gravel: boolean;
   category?: IListItem;
   effectHousing: boolean;
-  constructionEndYear: string;
-  planningStartYear: string;
+  constructionEndYear: number | null;
+  planningStartYear: number | null;
   projectClass?: string;
   projectLocation?: string;
   projectProgram?: string;
@@ -126,8 +126,8 @@ export interface IProjectRequest {
   category?: string | null;
   effectHousing?: boolean;
   riskAssessment?: string | null;
-  constructionEndYear?: string;
-  planningStartYear?: string;
+  constructionEndYear?: number | null;
+  planningStartYear?: number | null;
   projectClass?: string | null;
   projectLocation?: string | null;
   projectProgram?: string | null;
@@ -369,9 +369,9 @@ export interface IProjectCell {
    * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd properties from the project
    */
   projectEstDates: {
-    estPlanningStart?: string | null;
-    estPlanningEnd?: string | null;
-    estConstructionStart?: string | null;
-    estConstructionEnd?: string | null;
+    estPlanningStart: string | null;
+    estPlanningEnd: string | null;
+    estConstructionStart: string | null;
+    estConstructionEnd: string | null;
   };
 }

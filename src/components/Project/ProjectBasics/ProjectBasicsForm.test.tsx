@@ -126,8 +126,8 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.description);
     expectDisplayValue(project?.entityName);
     expectDisplayValue(project?.hkrId);
-    expectDisplayValue(project?.planningStartYear);
-    expectDisplayValue(project?.constructionEndYear);
+    expectDisplayValue(project?.planningStartYear?.toString());
+    expectDisplayValue(project?.constructionEndYear?.toString());
     expectDisplayValue(project?.estPlanningStart || '');
     expectDisplayValue(project?.estPlanningEnd || '');
     expectDisplayValue(project?.presenceStart);
