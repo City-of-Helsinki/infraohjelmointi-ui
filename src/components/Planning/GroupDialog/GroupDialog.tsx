@@ -158,7 +158,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                         rules={{ required: t('required', { value: 'Ryhman nimi' }) || '' }}
                       />
                       <SelectField
-                        clearable={true}
                         {...formProps('masterClass')}
                         rules={{
                           required: t('required', { value: 'Pääluokka' }) || '',
@@ -169,7 +168,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                         options={classOptions.masterClasses}
                       />
                       <SelectField
-                        clearable={true}
                         {...formProps('class')}
                         rules={{
                           required: t('required', { value: 'Luokka' }) || '',
@@ -180,7 +178,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                         options={classOptions.classes}
                       />
                       <SelectField
-                        clearable={true}
                         {...formProps('subClass')}
                         options={classOptions.subClasses}
                         rules={{
@@ -195,7 +192,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                     {showAdvanceFields && (
                       <div className="search-form-content">
                         <SelectField
-                          clearable={true}
                           {...formProps('district')}
                           rules={{
                             required: t('required', { value: 'Suurpiiri' }) || '',
@@ -206,13 +202,11 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                           options={locationOptions.districts}
                         />
                         <SelectField
-                          clearable={true}
                           {...formProps('division')}
                           rules={getDivisionValidation()}
                           options={locationOptions.divisions}
                         />
                         <SelectField
-                          clearable={true}
                           {...formProps('subDivision')}
                           options={locationOptions.subDivisions}
                         />
