@@ -2184,6 +2184,158 @@ describe('PlanningView', () => {
 
           removeProjectUpdateEventListener(store.dispatch);
         });
+        it('can open the project cell menu and change cell phase', async () => {
+          const project = mockPlanningViewProjects.data.results[1];
+          const year = new Date().getFullYear();
+          // initial years for project planningEnd and construction Start
+          const planEndCellYear = year + 3;
+          const conStartYearCell = year + 3;
+          const mockUpdateCellTypePatchResponse = {
+            data: {
+              ...project,
+              estConstructionStart: `12.02.${conStartYearCell + 1}`,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockUpdateCellTypePatchResponse);
+
+          const patchRequest = {
+            estConstructionStart: `12.02.${conStartYearCell + 1}`,
+          };
+
+          const renderResult = await render();
+
+          const {
+            user,
+            getByTestId,
+            store: { dispatch },
+          } = renderResult;
+
+          addProjectUpdateEventListener(dispatch);
+
+          const { id, name } = project;
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(planEndCellYear, id, renderResult));
+
+          await waitFor(() => {
+            expect(getByTestId('project-cell-menu')).toBeInTheDocument();
+            expect(getByTestId('close-project-cell-menu')).toBeInTheDocument();
+            expect(getByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
+            expect(getByTestId('cell-title')).toHaveTextContent(name);
+            // overlap cells
+            expect(
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('overlap'),
+            ).toBeTruthy();
+            expect(getByTestId('cell-type-con').classList.contains('selected')).toBeFalsy();
+            expect(getByTestId('cell-type-plan').classList.contains('selected')).toBeFalsy();
+          });
+
+          // Overlap cells can be changed to either plan or con
+          expect(getByTestId('update-cell-type-to-plan')).toBeEnabled();
+          expect(getByTestId('update-cell-type-to-con')).toBeEnabled();
+
+          // Updating overlap celltype to plan
+          await user.click(getByTestId('update-cell-type-to-plan'));
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchRequest);
+          });
+
+          // Send the project-update event with the updated project
+          await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse.data);
+
+          await user.click(getByTestId('close-project-cell-menu'));
+
+          await waitFor(() => {
+            // overlap changed to plan
+            expect(getByTestId(`project-cell-${planEndCellYear}-${id}`)).toBeInTheDocument();
+            expect(
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('plan'),
+            ).toBeTruthy();
+            // moved construction + 1 year forward
+            expect(getByTestId(`project-cell-${planEndCellYear + 1}-${id}`)).toBeInTheDocument();
+            expect(
+              getByTestId(`project-cell-${planEndCellYear + 1}-${id}`).classList.contains('con'),
+            ).toBeTruthy();
+          });
+
+          // opening menu for a cell before the planEnd cell
+          await waitFor(() => openContextMenuForCell(planEndCellYear - 1, id, renderResult));
+
+          await waitFor(() => {
+            expect(getByTestId('cell-year')).toHaveTextContent((planEndCellYear - 1).toString());
+            expect(
+              getByTestId(`project-cell-${planEndCellYear - 1}-${id}`).classList.contains('plan'),
+            ).toBeTruthy();
+            expect(getByTestId('cell-type-plan').classList.contains('selected')).toBeTruthy();
+          });
+
+          // Cannot update cells in the middle of timeline
+          expect(getByTestId('update-cell-type-to-plan')).toBeDisabled();
+          expect(getByTestId('update-cell-type-to-con')).toBeDisabled();
+
+          await user.click(getByTestId('close-project-cell-menu'));
+
+          const mockUpdateCellTypePatchResponse_2 = {
+            data: {
+              ...project,
+              estConstructionStart: `12.02.${conStartYearCell}`,
+              estPlanningEnd: `12.02.${planEndCellYear - 1}`,
+            },
+          };
+          const patchRequest_2 = {
+            estConstructionStart: `12.02.${conStartYearCell}`,
+            estPlanningEnd: `12.02.${planEndCellYear - 1}`,
+          };
+          mockedAxios.patch.mockResolvedValueOnce(mockUpdateCellTypePatchResponse_2);
+
+          await waitFor(() => openContextMenuForCell(planEndCellYear, id, renderResult));
+
+          await waitFor(() => {
+            expect(getByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
+            // plan end cell
+            expect(
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('plan'),
+            ).toBeTruthy();
+            expect(getByTestId('cell-type-plan').classList.contains('selected')).toBeTruthy();
+          });
+          // plan cell cannot be changed to plan
+          // only con button enabled
+          expect(getByTestId('update-cell-type-to-plan')).toBeDisabled();
+          expect(getByTestId('update-cell-type-to-con')).toBeEnabled();
+
+          // Updating celltype to con
+          await user.click(getByTestId('update-cell-type-to-con'));
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
+            expect(patchMock[1]).toStrictEqual(patchRequest_2);
+          });
+
+          // Send the project-update event with the updated project
+          await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse_2.data);
+
+          await user.click(getByTestId('close-project-cell-menu'));
+
+          await waitFor(() => {
+            // planEnd moved 1 year back
+            // plan cell changed to conStart cell
+            expect(getByTestId(`project-cell-${conStartYearCell}-${id}`)).toBeInTheDocument();
+            expect(
+              getByTestId(`project-cell-${conStartYearCell}-${id}`).classList.contains('con'),
+            ).toBeTruthy();
+
+            expect(getByTestId(`project-cell-${conStartYearCell - 1}-${id}`)).toBeInTheDocument();
+            expect(
+              getByTestId(`project-cell-${conStartYearCell - 1}-${id}`).classList.contains('plan'),
+            ).toBeTruthy();
+            removeProjectUpdateEventListener(dispatch);
+          });
+        });
       });
     });
   });

@@ -79,6 +79,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
                 }`}
                 onClick={() => handleCellTypeUpdate(value as CellType)}
                 disabled={!canTypeUpdate || value === selectedType}
+                data-testid={`update-cell-type-to-${value}`}
               >
                 <div className={`list-icon ${value}`} />
                 <span
