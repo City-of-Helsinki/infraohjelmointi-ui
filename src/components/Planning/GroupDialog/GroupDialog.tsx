@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FC, useCallback, useMemo, memo } from 'react';
+import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
@@ -104,6 +104,16 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
         : t('required', { value: fieldName }) || '',
     [t],
   );
+  const getDivisionValidation = useCallback(() => {
+    if (locationOptions.divisions.length > 0)
+      return {
+        required: t('required', { value: 'Kaupunginosa' }) || '',
+        validate: {
+          isPopulated: (d: IOption) => customValidation(d, 'Kaupunginosa'),
+        },
+      };
+    return {};
+  }, [locationOptions, customValidation]);
   const advanceFieldIcons = useMemo(
     () => (showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />),
     [showAdvanceFields],
@@ -198,17 +208,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                         <SelectField
                           clearable={true}
                           {...formProps('division')}
-                          rules={
-                            locationOptions.divisions.length > 0
-                              ? {
-                                  required: t('required', { value: 'Kaupunginosa' }) || '',
-                                  validate: {
-                                    isPopulated: (d: IOption) =>
-                                      customValidation(d, 'Kaupunginosa'),
-                                  },
-                                }
-                              : {}
-                          }
+                          rules={getDivisionValidation()}
                           options={locationOptions.divisions}
                         />
                         <SelectField
@@ -222,7 +222,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                     {/* Divider to click */}
                     <div className="advance-fields-button">
                       <button onClick={toggleAdvanceFields}>
-                        {t(`groupForm.openAdvanceSearch`)}
+                        {t(`groupForm.openAdvanceFilters`)}
                       </button>
                       {advanceFieldIcons}
                     </div>

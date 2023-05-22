@@ -197,7 +197,7 @@
     "district": "Suurpiiri",
     "division": "Kaupunginosa",
     "subDivision": "Osa-alue",
-    "openAdvanceSearch":"Avaa tarkennettu haku",
+    "openAdvanceFilters":"Avaa lisävalinnat",
     "groupCreationDescription1": "Ryhmään voi valita vain Ohjelmoituja hankkeita.",
     "groupCreationDescription2": "Tähdellä (*) merkityt kentat ovat pakolissia.",
     "suggestionHelperText": "Täytä pakolliset kentät saadaksesi ehdotuksia",

@@ -111,7 +111,7 @@ describe('GroupDialog', () => {
 
     // Show advance fields in modal
     await user.click(
-      await dialog.findByRole('button', { name: matchExact('groupForm.openAdvanceSearch') }),
+      await dialog.findByRole('button', { name: matchExact('groupForm.openAdvanceFilters') }),
     );
     expect(await dialog.findByText('groupForm.district')).toBeInTheDocument();
     expect(await dialog.findByText('groupForm.division')).toBeInTheDocument();
@@ -178,7 +178,7 @@ describe('GroupDialog', () => {
     await user.click(modal.querySelector('#select-field-subClass-toggle-button') as HTMLElement);
     await user.click(await dialog.findByText(matchExact('Koillinen suurpiiri')));
 
-    await user.click(await dialog.findByText(matchExact(`groupForm.openAdvanceSearch`)));
+    await user.click(await dialog.findByText(matchExact(`groupForm.openAdvanceFilters`)));
 
     const districtMenu = baseElement.querySelector('#select-field-district-menu') as HTMLElement;
     await user.click(modal.querySelector('#select-field-district-toggle-button') as HTMLElement);
