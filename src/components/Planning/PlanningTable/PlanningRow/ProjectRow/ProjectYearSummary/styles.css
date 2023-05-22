@@ -4,7 +4,7 @@
 
 /* no gray border-bottom when cellType is none (the ProjectYearSummaryTable is hidden when viewing a none cell) */
 .monthly-summary-table-container.none {
-  @apply border-none;
+  @apply border-none bg-bus-l;
 }
 
 .monthly-graph-cell-container {

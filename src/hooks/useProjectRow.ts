@@ -49,39 +49,35 @@ const getTimelineDates = (project: IProject) => {
 
   const planningStartYearAsDate = createDateToStartOfYear(planningStartYear);
   const planningEndYearAsDate = createDateToEndOfYear(planningStartYear);
+  const isConstructionEndSameAsPlanningStart = constructionEndYear === planningStartYear;
+  const planningEnd = estPlanningEnd ?? planningEndYearAsDate;
 
-  const setPlanningDates = () => {
-    timelineDates.planningStart = estPlanningStart ?? planningStartYearAsDate;
-    timelineDates.planningEnd = estPlanningEnd ?? planningEndYearAsDate;
+  const getConstructionStartDate = () => {
+    if (constructionEndYear && isConstructionEndSameAsPlanningStart) {
+      return planningStartYearAsDate;
+    } else if (constructionEndYear && !planningEnd) {
+      return createDateToStartOfYear(getYear(planningEnd) + 1);
+    } else if (planningEnd) {
+      return createDateToStartOfYear(getYear(planningEnd));
+    }
+    return null;
   };
 
-  const setConstructionDates = () => {
-    const isConstructionEndSameAsPlanningStart = constructionEndYear === planningStartYear;
-    const planningEnd = estPlanningEnd ?? planningEndYearAsDate;
-
-    if (estConstructionStart) {
-      timelineDates.constructionStart = estConstructionStart;
+  const getConstructionEndDate = () => {
+    if (constructionEndYear && isConstructionEndSameAsPlanningStart) {
+      return planningEndYearAsDate;
     } else if (constructionEndYear) {
-      timelineDates.constructionStart = isConstructionEndSameAsPlanningStart
-        ? planningStartYearAsDate
-        : createDateToStartOfYear(getYear(planningEnd) + 1);
-    } else if (planningStartYearAsDate) {
-      timelineDates.constructionStart = planningStartYearAsDate;
+      return createDateToEndOfYear(constructionEndYear);
+    } else if (planningEnd) {
+      return createDateToEndOfYear(getYear(planningEnd));
     }
-
-    if (estConstructionEnd) {
-      timelineDates.constructionEnd = estConstructionEnd;
-    } else if (constructionEndYear) {
-      timelineDates.constructionEnd = isConstructionEndSameAsPlanningStart
-        ? planningEndYearAsDate
-        : createDateToEndOfYear(constructionEndYear);
-    } else if (planningEndYearAsDate) {
-      timelineDates.constructionEnd = planningEndYearAsDate;
-    }
+    return null;
   };
 
-  setPlanningDates();
-  setConstructionDates();
+  timelineDates.planningStart = estPlanningStart ?? planningStartYearAsDate;
+  timelineDates.planningEnd = estPlanningEnd ?? planningEndYearAsDate;
+  timelineDates.constructionStart = estConstructionStart ?? getConstructionStartDate();
+  timelineDates.constructionEnd = estConstructionEnd ?? getConstructionEndDate();
 
   return timelineDates;
 };
@@ -162,7 +158,7 @@ const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IM
  * Gets the type of the cell for the current year. If the value of the cell is null the type
  * will always be 'none'.
  */
-const getType = (
+const getCellType = (
   cellYear: number,
   value: string | null,
   timelineDates: ITimelineDates,
@@ -172,6 +168,11 @@ const getType = (
   const isPlanning = isInYearRange(cellYear, planningStart, planningEnd);
   const isConstruction = isInYearRange(cellYear, constructionStart, constructionEnd);
   const isCellYear = (date?: string | null) => isSameYear(date, cellYear);
+
+  console.log('for year: ', cellYear);
+  console.log('isConstruction: ', isConstruction);
+  console.log('start: ', constructionStart);
+  console.log('end: ', constructionEnd);
 
   const setPlanningType = () => {
     if (value === null) {
@@ -358,7 +359,7 @@ const getProjectCells = (project: IProject) => {
   const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {
     const cellYear = year + i;
 
-    const type = getType(cellYear, value, timelineDates);
+    const type = getCellType(cellYear, value, timelineDates);
 
     const isStartOfTimeline = getIsStartOfTimeline(cellYear, timelineDates);
     const isEndOfTimeline = getIsEndOfTimeline(cellYear, timelineDates);

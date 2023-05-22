@@ -1,6 +1,6 @@
 import { FC, memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { IconAngleLeft, IconAngleRight } from 'hds-react/icons';
-import { getDaysInMonthForYear, getMonthToday } from '@/utils/dates';
+import { getDaysInMonthForYear, getMonthToday, getToday } from '@/utils/dates';
 import moment from 'moment';
 import './styles.css';
 import { calcPercentage } from '@/utils/calculations';
@@ -81,7 +81,10 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   return (
     <>
       <td data-testid={`head-${year}`} className="planning-summary-head-cell">
-        <button onClick={() => handleSetSelectedYear(year)}>
+        <button
+          onClick={() => handleSetSelectedYear(year)}
+          data-testid={`expand-monthly-view-button-${year}`}
+        >
           <span className="text-sm font-light">{title}</span>
           <div className="arrows-container">
             {leftArrow}
@@ -95,19 +98,20 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
           {isCurrentYear && (
             <td key={`${year}-monthly-view`} className="monthly-summary-cell label">
               <div className="monthly-cell-container">
-                <span>{moment().format('D.M.YYYY')}</span>
+                <span data-testid="date-today-label">{getToday()}</span>
               </div>
             </td>
           )}
-          {moment.monthsShort().map((m, i) => (
+          {moment.months().map((m, i) => (
             <td key={m} className="monthly-cell label">
-              <div className="monthly-cell-container relative">
+              <div className="monthly-cell-container relative" data-testid={`month-label-${m}`}>
                 <span>{m.substring(0, 3)}</span>
                 {/* Creates a line that indicates the current date */}
                 {showDateIndicator(i + 1) && (
                   <span
                     ref={dateIndicatorRef}
                     style={{ left: getDateIndicatorLeftPixels(i + 1) }}
+                    data-testid="date-indicator"
                     className="date-indicator"
                   />
                 )}

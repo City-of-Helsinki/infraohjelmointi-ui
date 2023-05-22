@@ -37,9 +37,15 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
       </td>
       {year === selectedYear && (
         <>
-          {isCurrentYear && <td key={`${year}-monthly-view`} className="monthly-summary-cell"></td>}
-          {moment.monthsShort().map((m) => (
-            <td key={m} className="monthly-cell">
+          {isCurrentYear && (
+            <td
+              key={`${year}-monthly-view`}
+              className="monthly-summary-cell"
+              data-testid="year-summary"
+            ></td>
+          )}
+          {moment.months().map((m) => (
+            <td key={m} className="monthly-cell" data-testid={`graph-cell-${m}`}>
               {/* There's going to be graph here and we can use each months cell to paint the graph */}
             </td>
           ))}

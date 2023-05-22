@@ -39,7 +39,8 @@ import {
   addProjectUpdateEventListener,
   removeProjectUpdateEventListener,
 } from '@/utils/events';
-import { updateYear } from '@/utils/dates';
+import { getMonthToday, getToday, updateYear } from '@/utils/dates';
+import moment from 'moment';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -328,7 +329,7 @@ describe('PlanningView', () => {
     });
   });
 
-  describe('PlanningSummaryTable', () => {
+  describe.only('PlanningSummaryTable', () => {
     it('renders all budgets of all masterClasses if a masterClass isnt selected', async () => {
       const { getByTestId, container, store } = await render();
 
@@ -375,6 +376,63 @@ describe('PlanningView', () => {
           expect(getByTestId(`summary-deviation-${year}`).textContent).toBe(deviation);
         });
       });
+    });
+
+    it('expands the monthly view and shows detailed info when clicking the current year and can be closed by clicking another year or clicking it again', async () => {
+      const { user, getByTestId, queryByTestId } = await render();
+      const year = new Date().getFullYear();
+      const months = moment.months();
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year}`));
+
+      months.forEach((m, i) => {
+        expect(getByTestId(`month-label-${m}`)).toHaveTextContent(m.substring(0, 3));
+        expect(getByTestId(`graph-cell-${m}`)).toBeInTheDocument();
+
+        if (i + 1 === getMonthToday()) {
+          expect(getByTestId(`month-label-${m}`).children.length).toBe(2);
+          expect(
+            getByTestId(`month-label-${m}`).children[1].classList.contains('date-indicator'),
+          ).toBeTruthy();
+        } else {
+          expect(getByTestId(`month-label-${m}`).children.length).toBe(1);
+        }
+      });
+
+      expect(getByTestId('date-today-label')).toHaveTextContent(getToday());
+      expect(getByTestId('date-indicator')).toBeInTheDocument();
+      expect(getByTestId('year-summary')).toBeInTheDocument();
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+      expect(queryByTestId('date-today-label')).toBeNull();
+
+      months.forEach((m) => {
+        expect(getByTestId(`month-label-${m}`)).toHaveTextContent(m.substring(0, 3));
+      });
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+      months.forEach((m) => {
+        expect(queryByTestId(`month-label-${m}`)).toBeNull();
+      });
+    });
+
+    it('expands only the monthly view calendar when clicking the other years', async () => {
+      const { user, getByTestId, queryByTestId } = await render();
+      const year = new Date().getFullYear();
+      const months = moment.months();
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+      months.forEach((m) => {
+        expect(getByTestId(`month-label-${m}`)).toHaveTextContent(m.substring(0, 3));
+        expect(getByTestId(`graph-cell-${m}`)).toBeInTheDocument();
+      });
+
+      expect(queryByTestId('date-today-label')).toBeNull();
+      expect(queryByTestId('date-indicator')).toBeNull();
+      expect(queryByTestId('year-summary')).toBeNull();
     });
   });
 
