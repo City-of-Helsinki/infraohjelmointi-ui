@@ -12,9 +12,10 @@ export interface ISearchResultPayloadItem {
   phase: IListItem | null;
 }
 
-export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'phase'> {
+export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'phase' | 'path'> {
   breadCrumbs: Array<string>;
   phase: string | null;
+  link: string;
 }
 
 export interface ISearchResultsProject {

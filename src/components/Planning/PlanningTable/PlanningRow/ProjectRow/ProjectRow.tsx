@@ -8,9 +8,10 @@ import './styles.css';
 
 interface IProjectRowProps {
   project: IProject;
+  isSearched?: boolean;
 }
 
-const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
+const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const { cells, sums, projectFinances } = useProjectRow(project);
 
@@ -25,7 +26,12 @@ const ProjectRow: FC<IProjectRowProps> = ({ project }) => {
   );
 
   return (
-    <tr id={`project-row-${project.id}`} ref={projectRowRef} data-testid={`row-${project.id}`}>
+    <tr
+      id={`project-row-${project.id}`}
+      ref={projectRowRef}
+      data-testid={`row-${project.id}`}
+      className={`project-row ${isSearched ? 'searched' : ''}`}
+    >
       {/* HEADER */}
       <ProjectHead project={project} sums={sums} />
       {cells.map((c) => (

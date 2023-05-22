@@ -37,6 +37,8 @@ interface ISearchState {
   resultObject: FreeSearchFormObject;
 }
 
+let searchWordDuplicates: Record<string, FreeSearchFormListItem[]> = {};
+
 const FreeSearchForm = ({
   control,
   getValues,
@@ -60,8 +62,25 @@ const FreeSearchForm = ({
           .then((res) => {
             const formValue = getValues('freeSearchParams');
             // Create a combined list of all results and filter already added values
-            const resultList = freeSearchResultsToList(res || {}).filter(
+            const resultListWithDuplicates = freeSearchResultsToList(res || {}).filter(
               (f) => !arrayHasValue(Object.keys(formValue), f.value),
+            );
+            // reset duplicates
+            searchWordDuplicates = {};
+            const resultList = Object.values(
+              resultListWithDuplicates.reduce((accumulator, current) => {
+                // catch duplicates
+                if (accumulator[current.value]) {
+                  searchWordDuplicates[current.value] = [
+                    ...(searchWordDuplicates[current.value] ?? []),
+                    current,
+                  ];
+                } else {
+                  // kep only one copy of each element
+                  accumulator[current.value] = current;
+                }
+                return accumulator;
+              }, {} as Record<string, FreeSearchFormListItem>),
             );
 
             // Convert the resultList to options for the suggestion dropdown
@@ -131,7 +150,12 @@ const FreeSearchForm = ({
   );
 
   const handleSetSearchWord = useCallback(
-    (value: string) => setSearchState((current) => ({ ...current, searchWord: value })),
+    (value: string) =>
+      setSearchState((current) => {
+        // TODO: here user must be notified if selected value is duplicate
+        // TODO: searchWordDuplicates contains duplicates
+        return { ...current, searchWord: value };
+      }),
     [],
   );
 

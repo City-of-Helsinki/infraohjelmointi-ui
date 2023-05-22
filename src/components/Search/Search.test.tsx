@@ -205,7 +205,7 @@ describe('Search', () => {
     const getRequest = mockedAxios.get.mock;
 
     // Check that the freeSearch url was called
-    expect(getRequest.calls[0][0]).toBe('localhost:4000/projects/?freeSearch=l');
+    expect(getRequest.calls[0][0]).toBe('localhost:4000/projects/search-results/?freeSearch=l');
 
     // Check that the get response is correct and that only the clicked selection is in the document
     await Promise.resolve(getRequest.results[0].value).then((res: { data: IFreeSearchResults }) => {

@@ -14,7 +14,12 @@ const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass })
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const navigateBack = useCallback(() => navigate(-1), []);
+
+  const navigateBack = useCallback(() => {
+    const routes = window.location.pathname.split('/');
+    routes.pop();
+    navigate(routes.join('/'));
+  }, []);
 
   const iconLeft = useMemo(() => <IconAngleLeft />, []);
   return (

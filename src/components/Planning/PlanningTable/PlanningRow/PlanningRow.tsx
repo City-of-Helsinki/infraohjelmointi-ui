@@ -6,8 +6,15 @@ import PlanningHead from './PlanningHead';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
 import { IProject } from '@/interfaces/projectInterfaces';
-import './styles.css';
+import { useLocation } from 'react-router-dom';
 import _ from 'lodash';
+import './styles.css';
+
+interface IPlanningRowState {
+  expanded: boolean;
+  projects: Array<IProject>;
+  searchedProjectId: string;
+}
 
 interface IPlanningRowProps extends IPlanningRow {
   projectToUpdate: IProject | null;
@@ -15,31 +22,94 @@ interface IPlanningRowProps extends IPlanningRow {
 
 const PlanningRow: FC<IPlanningRowProps> = (props) => {
   const { defaultExpanded, projectRows, cells, projectToUpdate } = props;
-  const [expanded, setExpanded] = useState(defaultExpanded);
-  const [projects, setProjects] = useState<Array<IProject>>([]);
+
+  const { search } = useLocation();
+
+  const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
+    expanded: defaultExpanded,
+    projects: [],
+    searchedProjectId: '',
+  });
+
+  const { expanded, projects, searchedProjectId } = planningRowState;
 
   const handleExpand = useCallback(() => {
-    setExpanded((current) => !current);
+    setPlanningRowState((current) => ({ ...current, expanded: !current.expanded }));
   }, []);
 
+  // Set the rows initial expanded state
   useEffect(() => {
-    setExpanded(defaultExpanded || false);
+    setPlanningRowState((current) => ({ ...current, expanded: defaultExpanded || false }));
   }, [defaultExpanded]);
 
+  // Set the projects to a local hook to be able to update it when the project-update event is triggered
   useEffect(() => {
-    setProjects(projectRows);
+    setPlanningRowState((current) => ({ ...current, projects: projectRows }));
   }, [projectRows]);
 
+  // usePlanningRows-hook sets a projectToUpdate when the project-update event is triggered,
+  // this useEffect updates the project in the view with the projecToUpdate
   useEffect(() => {
     if (projectToUpdate) {
       const updatedProjects = projects.map((p) =>
         p.id === projectToUpdate.id ? projectToUpdate : p,
       );
       if (!_.isEqual(projects, updatedProjects)) {
-        setProjects(updatedProjects);
+        setPlanningRowState((current) => ({ ...current, projects: updatedProjects }));
       }
     }
   }, [projectToUpdate]);
+
+  const resetSearchedProjectId = useCallback(() => {
+    setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
+  }, []);
+
+  // Listens to the 'project' searchParam and sets the searchedProjectId and expanded to true if
+  // the current row contains the project
+  useEffect(() => {
+    if (!search) {
+      resetSearchedProjectId();
+      return;
+    }
+
+    const projectId = new URLSearchParams(search).get('project');
+
+    if (!projectId) {
+      if (projectId !== searchedProjectId) {
+        resetSearchedProjectId();
+      }
+      return;
+    }
+
+    const project = projectRows.filter((p) => p.id === projectId)[0];
+
+    if (!project) {
+      resetSearchedProjectId();
+      return;
+    }
+
+    setPlanningRowState((current) => ({
+      ...current,
+      searchedProjectId: project.id,
+      expanded: true,
+    }));
+  }, [search, projects]);
+
+  // Listens to searchedProjectId and scrolls the viewport to the project
+  useEffect(() => {
+    if (!searchedProjectId) {
+      return;
+    }
+
+    const element = document.getElementById(`project-row-${searchedProjectId}`);
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+      });
+    }
+  }, [searchedProjectId]);
 
   return (
     <>
@@ -53,7 +123,7 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       {expanded && (
         <>
           {projects.map((p) => (
-            <ProjectRow key={p.id} project={p} />
+            <ProjectRow key={p.id} project={p} isSearched={p.id === searchedProjectId} />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (

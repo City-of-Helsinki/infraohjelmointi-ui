@@ -8,18 +8,18 @@ import './styles.css';
 
 const SearchResultsCard: FC<ISearchResultListItem> = ({
   name,
-  path,
   type,
   hashTags,
   phase,
   breadCrumbs,
+  link,
 }) => {
   const { t } = useTranslation();
   const iconLayers = useMemo(() => <IconLayers size="xs" />, []);
   const iconPaperclip = useMemo(() => <IconPaperclip size="xs" />, []);
 
   return (
-    <Link to={`/planning/coordinator/${path}`} className="color-black no-underline">
+    <Link to={link} className="color-black no-underline">
       <div className="search-result-card">
         {/* Title */}
         <div className="search-result-title-container">
