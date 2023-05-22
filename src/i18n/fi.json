@@ -23,7 +23,9 @@
     "status": "Hankkeen tila",
     "responsiblePersons": "Hankkeen vastuuhenkilöt",
     "location": "Hankkeen sijainti",
-    "projectProgram": "Hankeohjelma"
+    "projectProgram": "Hankeohjelma",
+    "documents": "Dokumentit",
+    "pwFolderLink": "Avaa dokumentit ProjectWisessa"
   },
   "enums": {
     "underConstruction": "Rakenteilla",
@@ -302,5 +304,9 @@
   "filterSearch": "Rajaa hakua",
   "previous": "Edellinen",
   "removeYearFromTimeline": "Poista vuosi aikajanalta",
-  "editTimeline": "Muokkaa aikajanaa"
+  "editTimeline": "Muokkaa aikajanaa",
+  "pwFolderLinkDescription": "Vaatii erillisen PW Explorer -sovelluksen",
+  "pwFolderLinkNotExist":"Dokumenttikansiota ei ole avattu",
+  "opensExternalWebsite":"Avaa toisen verkkosivuston",
+  "opensInNewTab":"Avautuu uuteen välilehteen"
 }

@@ -270,6 +270,10 @@
   @apply flex w-full flex-col;
 }
 
+.project-side-panel #pw-folder-link-container{
+  background-color: var(--color-bus-light)
+}
+
 .basic-form-container {
   @apply flex w-full flex-col flex-wrap;
 }
@@ -289,3 +293,4 @@
     width: 60%;
   }
 }
+

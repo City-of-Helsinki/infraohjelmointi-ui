@@ -8,7 +8,6 @@ import mockProject from '@/mocks/mockProject';
 import { Route } from 'react-router';
 
 jest.mock('react-i18next', () => mockI18next());
-
 const store = setupStore();
 
 const render = async () =>
@@ -40,7 +39,7 @@ describe('ProjectBasics', () => {
   });
 
   it('renders SideNavigation and links', async () => {
-    const { container, getByRole } = await render();
+    const { container, getByRole, getByTestId } = await render();
 
     const navItems = [
       'nav.basics',
@@ -52,8 +51,10 @@ describe('ProjectBasics', () => {
       'nav.projectProgram',
     ];
 
-    expect(container.getElementsByClassName('side-nav').length).toBe(1);
+    expect(container.getElementsByClassName('side-nav').length).toBe(2);
+    expect(getByTestId('pw-folder-container')).toBeInTheDocument();
 
+    expect(getByTestId('pw-folder-link')).toBeInTheDocument();
     navItems.forEach((n) => {
       expect(
         getByRole('link', {

@@ -14,7 +14,7 @@ const ProjectBasics = () => {
         <>
           <div className="flex-1">
             <div className="side-panel-container" data-testid="side-panel">
-              <ProjectSidePanel />
+              <ProjectSidePanel pwFolderLink={project.pwFolderLink} />
             </div>
           </div>
 

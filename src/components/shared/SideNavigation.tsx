@@ -40,15 +40,17 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   );
 
   return (
-    <HDSSideNavigation
-      id="side-navigation"
-      toggleButtonLabel={t('nav.navigateToForm')}
-      className="side-nav"
-    >
-      {hdsNavItems.map((s) => (
-        <HDSSideNavigation.MainLevel {...s} key={s.href} />
-      ))}
-    </HDSSideNavigation>
+    <div>
+      <HDSSideNavigation
+        id="side-navigation"
+        toggleButtonLabel={t('nav.navigateToForm')}
+        className="side-nav"
+      >
+        {hdsNavItems.map((s) => (
+          <HDSSideNavigation.MainLevel {...s} key={s.href} />
+        ))}
+      </HDSSideNavigation>
+    </div>
   );
 };
 
