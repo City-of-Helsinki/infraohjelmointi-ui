@@ -6,7 +6,7 @@ import PlanningHead from './PlanningHead';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import _ from 'lodash';
 import './styles.css';
 
@@ -60,22 +60,31 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
     }
   }, [projectToUpdate]);
 
+  const resetSearchedProjectId = useCallback(() => {
+    setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
+  }, []);
+
   // Listens to the 'project' searchParam and sets the searchedProjectId and expanded to true if
   // the current row contains the project
   useEffect(() => {
     if (!search) {
+      resetSearchedProjectId();
       return;
     }
 
     const projectId = new URLSearchParams(search).get('project');
 
     if (!projectId) {
+      if (projectId !== searchedProjectId) {
+        resetSearchedProjectId();
+      }
       return;
     }
 
     const project = projectRows.filter((p) => p.id === projectId)[0];
 
     if (!project) {
+      resetSearchedProjectId();
       return;
     }
 
