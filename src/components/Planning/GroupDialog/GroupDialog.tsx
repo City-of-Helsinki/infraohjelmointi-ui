@@ -36,7 +36,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const navigate = useNavigate();
 
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);
-  const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
+  // const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
 
   const { formMethods, formValues, classOptions, locationOptions } = useGroupForm();
   const {
@@ -48,16 +48,16 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     control,
   } = formMethods;
 
-  useEffect(() => {
-    setSubmitButtonDisabled(
-      !getValues('name') ||
-        (showAdvanceFields &&
-          (!getValues('district')?.value ||
-            (locationOptions.divisions.length > 0 && !getValues('division')?.value) ||
-            !getValues('subClass')?.value)) ||
-        (!showAdvanceFields && !getValues('subClass')?.value),
-    );
-  }, [getValues, locationOptions.divisions.length, showAdvanceFields]);
+  // useEffect(() => {
+  //   setSubmitButtonDisabled(
+  //     !getValues('name') ||
+  //       (showAdvanceFields &&
+  //         (!getValues('district')?.value ||
+  //           (locationOptions.divisions.length > 0 && !getValues('division')?.value) ||
+  //           !getValues('subClass')?.value)) ||
+  //       (!showAdvanceFields && !getValues('subClass')?.value),
+  //   );
+  // }, [getValues, locationOptions.divisions.length, showAdvanceFields]);
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -251,7 +251,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
             <Button
               onClick={handleOnSubmitForm}
               data-testid="create-group-button"
-              disabled={submitButtonDisabled}
+              disabled={!isDirty}
             >
               {t('groupForm.createGroup')}
             </Button>
