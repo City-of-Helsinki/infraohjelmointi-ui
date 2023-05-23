@@ -88,27 +88,35 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   };
 
   const updateOverlap = () => {
-    console.log('update overlap');
-
-    if (isStartOfTimeline) {
+    if (isStartOfTimeline && isEndOfTimeline) {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
-    } else {
-      req.estPlanningEnd = removeYear(planningEnd);
-    }
-    if (isEndOfTimeline) {
+      req.planningStartYear = null;
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
-    } else {
-      console.log('hello 1');
-
-      req.estConstructionStart = addYear(constructionStart);
-    }
-    if (getYear(planningStart) === getYear(constructionEnd)) {
-      console.log('hello 2');
-
-      req.planningStartYear = null;
       req.constructionEndYear = null;
+    } else if (isStartOfTimeline) {
+      if (estPlanningStart) {
+        req.estPlanningStart = addYear(planningStart);
+      }
+      if (estPlanningEnd) {
+        req.estPlanningEnd = addYear(planningEnd);
+      }
+      if (estConstructionStart) {
+        req.estConstructionStart = addYear(constructionStart);
+      }
+      req.planningStartYear = getYear(planningEnd) + 1;
+    } else if (isEndOfTimeline) {
+      if (estConstructionStart) {
+        req.estConstructionStart = removeYear(constructionStart);
+      }
+      if (estConstructionEnd) {
+        req.estConstructionEnd = removeYear(constructionEnd);
+      }
+      if (estPlanningEnd) {
+        req.estPlanningEnd = removeYear(planningEnd);
+      }
+      req.constructionEndYear = getYear(constructionEnd) - 1;
     }
   };
 
@@ -371,12 +379,11 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
       if (_.size(req.finances) === 1) {
         delete req.finances;
       }
-      console.log('patch: ', req);
 
-      // patchProject({
-      //   id,
-      //   data: req,
-      // }).catch(Promise.reject);
+      patchProject({
+        id,
+        data: req,
+      }).catch(Promise.reject);
     },
     [id],
   );

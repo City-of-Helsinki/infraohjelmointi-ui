@@ -47,11 +47,6 @@ const getTimelineDates = (project: IProject) => {
     constructionEnd: null,
   };
 
-  const planningStartYearAsDate = createDateToStartOfYear(planningStartYear);
-  const planningEndYearAsDate = createDateToEndOfYear(planningStartYear);
-  const isConstructionEndSameAsPlanningStart = constructionEndYear === planningStartYear;
-  const planningEnd = estPlanningEnd ?? planningEndYearAsDate;
-
   /**
    * Always return estPlanningStart if present
    * ---------
@@ -148,8 +143,8 @@ const getTimelineDates = (project: IProject) => {
       } else if (planningStart) {
         return createDateToStartOfYear(planningStart);
       }
-    } else if (estPlanningEnd) {
-      return createDateToStartOfYear(getYear(estPlanningEnd));
+    } else if (estPlanningEnd && planningStart && constructionEnd - planningStart > 1) {
+      return createDateToStartOfYear(getYear(estPlanningEnd) + 1);
     }
 
     return createDateToStartOfYear(constructionEnd);
@@ -170,18 +165,17 @@ const getTimelineDates = (project: IProject) => {
       return estConstructionEnd;
     }
 
+    const planningStart = getYear(estPlanningStart) || planningStartYear;
+
     if (!constructionEndYear) {
       if (estConstructionStart) {
-        createDateToEndOfYear(getYear(estConstructionStart));
+        return createDateToEndOfYear(getYear(estConstructionStart));
       }
       if (estPlanningEnd) {
-        createDateToEndOfYear(getYear(estPlanningEnd));
+        return createDateToEndOfYear(getYear(estPlanningEnd));
       }
-      if (estPlanningStart) {
-        createDateToEndOfYear(getYear(estPlanningStart));
-      }
-      if (planningStartYear) {
-        createDateToEndOfYear(planningStartYear);
+      if (planningStart) {
+        return createDateToEndOfYear(planningStart);
       }
     }
 
