@@ -29,6 +29,8 @@ import { useEffect, useState } from 'react';
  * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd dates are prioritized.
  * The planningStartYear and constructionEndYear properties are used if any of the above dates are missing
  * from the project.
+ *
+ * https://helsinkisolutionoffice.atlassian.net/browse/IO-223 <- please refer to the rules on this ticket.
  */
 const getTimelineDates = (project: IProject) => {
   const {
@@ -47,16 +49,9 @@ const getTimelineDates = (project: IProject) => {
     constructionEnd: null,
   };
 
-  /**
-   * Always return estPlanningStart if present
-   * ---------
-   * Always return planningStartYear if present
-   * ---------
-   * - !planningStartYear & constructionEndYear (return start of constructionEndYear)
-   * - !planningStartYear & estConstructionEndYear (return start of estConstructionEndYear)
-   * - !planningStartYear & estConstructionStartYear (return start of estConstructionStartYear)
-   * - !planningStartYear & estPlanningEnd (return start of estPlanningEnd)
-   */
+  const effectiveConstructionEndYear = getYear(estConstructionEnd) || constructionEndYear;
+  const effectivePlanningStartYear = getYear(estPlanningStart) || planningStartYear;
+
   const getPlanningStartDate = () => {
     if (estPlanningStart) {
       return estPlanningStart;
@@ -65,10 +60,8 @@ const getTimelineDates = (project: IProject) => {
     if (!planningStartYear) {
       if (estConstructionStart) {
         return createDateToStartOfYear(getYear(estConstructionStart));
-      } else if (estConstructionEnd) {
-        return createDateToStartOfYear(getYear(estConstructionEnd));
-      } else if (constructionEndYear) {
-        return createDateToStartOfYear(constructionEndYear);
+      } else if (effectiveConstructionEndYear) {
+        return createDateToStartOfYear(effectiveConstructionEndYear);
       } else if (estPlanningEnd) {
         return createDateToStartOfYear(getYear(estPlanningEnd));
       }
@@ -76,17 +69,6 @@ const getTimelineDates = (project: IProject) => {
     return createDateToStartOfYear(planningStartYear);
   };
 
-  /**
-   * Always return estPlanningEnd if present
-   * ---------
-   * If there's planningStartYear prioritize that year as end of planning if no estPlanningEnd is given
-   * - !estPlanningEnd & planningStartYear (return end of planningStartYear)
-   * ---------
-   * - !planningStartYear & estConstrucionStart (return end of estConstrucionStart)
-   * - !planningStartYear & estConstructionEnd (return end of estConstructionEnd)
-   * - !planningStartYear & constructionEndYear (return end of constructionEndYear)
-   * - !planningStartYear & estPlanningStart  (return end of estPlanningStart)
-   */
   const getPlanningEndDate = () => {
     if (estPlanningEnd) {
       return estPlanningEnd;
@@ -95,10 +77,8 @@ const getTimelineDates = (project: IProject) => {
     if (!planningStartYear) {
       if (estConstructionStart) {
         return createDateToEndOfYear(getYear(estConstructionStart));
-      } else if (estConstructionEnd) {
-        return createDateToEndOfYear(getYear(estConstructionEnd));
-      } else if (constructionEndYear) {
-        return createDateToEndOfYear(constructionEndYear);
+      } else if (effectiveConstructionEndYear) {
+        return createDateToEndOfYear(effectiveConstructionEndYear);
       } else if (estPlanningStart) {
         return createDateToEndOfYear(getYear(estPlanningStart));
       }
@@ -107,65 +87,38 @@ const getTimelineDates = (project: IProject) => {
     return createDateToEndOfYear(planningStartYear);
   };
 
-  /**
-   * Always return estConstructionStart if present
-   * ---------
-   * Construction will be the next year after plan starts (ONLY if there's no estPlanningEnd)
-   * - planningStartYear & constructionEndYear (return start of planningStartYear + 1)
-   * - estPlanningStart & constructionEndYear (return start of estPlanningStart + 1)
-   * ---------
-   * If construction ends the same year as planning starts
-   * - planningStartYear & constructionEndYear (return start of planningStartYear)
-   * - estPlanningStart & constructionEndYear (return start of estPlanningStart)
-   * ---------
-   * If there's no estConstructionEnd or constructionEndYear
-   * - estPlanningEnd (return start of estPlanningEnd)
-   * - estPlanningStart (return start of estPlanningStart)
-   * --------
-   */
   const getConstructionStartDate = () => {
     if (estConstructionStart) {
       return estConstructionStart;
     }
 
-    const constructionEnd = getYear(estConstructionEnd) || constructionEndYear;
-    const planningStart = getYear(estPlanningStart) || planningStartYear;
-
-    if (!estPlanningEnd && constructionEnd) {
-      if (planningStart === constructionEnd) {
-        return createDateToStartOfYear(planningStart);
-      } else if (planningStart) {
-        return createDateToStartOfYear(planningStart + 1);
+    if (!estPlanningEnd && effectiveConstructionEndYear) {
+      if (effectivePlanningStartYear === effectiveConstructionEndYear) {
+        return createDateToStartOfYear(effectivePlanningStartYear);
+      } else if (effectivePlanningStartYear) {
+        return createDateToStartOfYear(effectivePlanningStartYear + 1);
       }
-    } else if (!constructionEnd) {
+    } else if (!effectiveConstructionEndYear) {
       if (estPlanningEnd) {
         return createDateToStartOfYear(getYear(estPlanningEnd));
-      } else if (planningStart) {
-        return createDateToStartOfYear(planningStart);
+      } else if (effectivePlanningStartYear) {
+        return createDateToStartOfYear(effectivePlanningStartYear);
       }
-    } else if (estPlanningEnd && planningStart && constructionEnd - planningStart > 1) {
+    } else if (
+      estPlanningEnd &&
+      effectivePlanningStartYear &&
+      effectiveConstructionEndYear - effectivePlanningStartYear > 1
+    ) {
       return createDateToStartOfYear(getYear(estPlanningEnd) + 1);
     }
 
-    return createDateToStartOfYear(constructionEnd);
+    return createDateToStartOfYear(effectiveConstructionEndYear);
   };
 
-  /**
-   * Always return estConstructionEnd if present
-   * ---------
-   * Always return constructionEndYear if present
-   * ---------
-   * - !constructionEndYear & estConstrucionStart (return end of constructionEndYear)
-   * - !constructionEndYear & estPlanningEnd (return end of estConstructionEndYear)
-   * - !constructionEndYear & estPlanningStart (return end of estConstructionStartYear)
-   * - !constructionEndYear & planningStartYear (return end of estConstructionStartYear)
-   */
   const getConstructionEndDate = () => {
     if (estConstructionEnd) {
       return estConstructionEnd;
     }
-
-    const planningStart = getYear(estPlanningStart) || planningStartYear;
 
     if (!constructionEndYear) {
       if (estConstructionStart) {
@@ -174,8 +127,8 @@ const getTimelineDates = (project: IProject) => {
       if (estPlanningEnd) {
         return createDateToEndOfYear(getYear(estPlanningEnd));
       }
-      if (planningStart) {
-        return createDateToEndOfYear(planningStart);
+      if (effectivePlanningStartYear) {
+        return createDateToEndOfYear(effectivePlanningStartYear);
       }
     }
 
