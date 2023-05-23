@@ -51,15 +51,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
 
-  // Test fail if I uncomment this, this is a fix to make the screen focus back on the
-  // top of suggestions results if suggestions are many
-
-  // useEffect(() => {
-  //   if (searchedProjects.length > 0 && scrollRef.current) {
-  //     scrollRef.current?.scrollIntoView();
-  //   }
-  // }, [searchedProjects]);
-
   const getSuggestions = useCallback(
     (inputValue: string) => {
       if (

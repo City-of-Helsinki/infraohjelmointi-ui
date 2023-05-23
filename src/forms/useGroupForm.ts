@@ -10,7 +10,8 @@ interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
 }
-const useGroupValues = () => {
+
+const useGroupForm = () => {
   const formValues = useMemo(
     () => ({
       name: '',
@@ -24,21 +25,17 @@ const useGroupValues = () => {
     }),
     [],
   );
-  return { formValues };
-};
 
-const useGroupForm = () => {
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: '',
     selectedLocation: '',
   });
   const { selectedClass, selectedLocation } = selections;
   const classOptions = useClassOptions(selectedClass);
-  const locationOptions = useLocationOptions(selectedLocation,selectedClass);
-  const { formValues } = useGroupValues();
+  const locationOptions = useLocationOptions(selectedLocation, selectedClass);
 
   const formMethods = useForm<IGroupForm>({
-    defaultValues: useMemo(() => formValues, [formValues]),
+    defaultValues: formValues,
     mode: 'onSubmit',
   });
 
@@ -49,21 +46,33 @@ const useGroupForm = () => {
         case 'masterClass':
         case 'class':
         case 'subClass':
-          if(value[name]?.value) setSelections((current) => ({ ...current, selectedClass: value[name]?.value }));
-          if(name==='masterClass') setValue('class', { label: '', value: '' })
-          if(name==='masterClass' || name==='class') setValue('subClass', { label: '', value: '' })
-          setValue('district',{ label: '', value: '' })
-          setValue('division', { label: '', value: '' })
-          setValue('subDivision', { label: '', value: '' })
-          setValue('projectsForSubmit',[])
+          if (value[name]?.value) {
+            setSelections((current) => ({ ...current, selectedClass: value[name]?.value }));
+          }
+          if (name === 'masterClass') {
+            setValue('class', { label: '', value: '' });
+          }
+          if (name === 'masterClass' || name === 'class') {
+            setValue('subClass', { label: '', value: '' });
+          }
+          setValue('district', { label: '', value: '' });
+          setValue('division', { label: '', value: '' });
+          setValue('subDivision', { label: '', value: '' });
+          setValue('projectsForSubmit', []);
           break;
         case 'district':
         case 'division':
         case 'subDivision':
-          if(value[name]?.value) setSelections((current) => ({ ...current, selectedLocation: value[name]?.value }));
-          if(name==='district') setValue('division', { label: '', value: '' })
-          if(name==='district' || name==='division') setValue('subDivision', { label: '', value: '' })
-          setValue('projectsForSubmit',[])
+          if (value[name]?.value) {
+            setSelections((current) => ({ ...current, selectedLocation: value[name]?.value }));
+          }
+          if (name === 'district') {
+            setValue('division', { label: '', value: '' });
+          }
+          if (name === 'district' || name === 'division') {
+            setValue('subDivision', { label: '', value: '' });
+          }
+          setValue('projectsForSubmit', []);
           break;
         default:
       }
