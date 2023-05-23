@@ -36,6 +36,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const navigate = useNavigate();
 
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);
+  const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
 
   const { formMethods, formValues, classOptions, locationOptions } = useGroupForm();
   const {
@@ -46,6 +47,17 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     setValue,
     control,
   } = formMethods;
+
+  useEffect(() => {
+    setSubmitButtonDisabled(
+      !getValues('name') ||
+        (showAdvanceFields &&
+          (!getValues('district')?.value ||
+            (locationOptions.divisions.length > 0 && !getValues('division')?.value) ||
+            !getValues('subClass')?.value)) ||
+        (!showAdvanceFields && !getValues('subClass')?.value),
+    );
+  }, [getValues, locationOptions.divisions.length, showAdvanceFields]);
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -113,7 +125,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
         },
       };
     return {};
-  }, [locationOptions, customValidation]);
+  }, [locationOptions, customValidation, t]);
   const advanceFieldIcons = useMemo(
     () => (showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />),
     [showAdvanceFields],
@@ -239,7 +251,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
             <Button
               onClick={handleOnSubmitForm}
               data-testid="create-group-button"
-              disabled={!isDirty}
+              disabled={submitButtonDisabled}
             >
               {t('groupForm.createGroup')}
             </Button>
