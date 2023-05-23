@@ -130,6 +130,26 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         estConstructionStart: `12.02.${year + 3}`,
         estConstructionEnd: `12.02.${year + 3}`,
       },
+      // For deleting an overlap planning
+      {
+        ...mockProject.data,
+        id: 'planning-project-12',
+        projectClass: 'test-class-1',
+        estPlanningStart: `12.02.${year + 3}`,
+        estPlanningEnd: `12.02.${year + 3}`,
+        estConstructionStart: `12.02.${year + 3}`,
+        estConstructionEnd: `12.02.${year + 5}`,
+      },
+      // For deleting an overlap construction
+      {
+        ...mockProject.data,
+        id: 'planning-project-13',
+        projectClass: 'test-class-1',
+        estPlanningStart: `12.02.${year + 1}`,
+        estPlanningEnd: `12.02.${year + 3}`,
+        estConstructionStart: `12.02.${year + 3}`,
+        estConstructionEnd: `12.02.${year + 3}`,
+      },
     ],
   },
 };

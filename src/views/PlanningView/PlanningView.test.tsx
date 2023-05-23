@@ -1610,6 +1610,92 @@ describe('PlanningView', () => {
           });
         });
 
+        it('moves planning start and end and construction start if an overlapping planning cell is deleted', async () => {
+          const project = mockPlanningViewProjects.data.results[11];
+          const year = new Date().getFullYear();
+          const updatedYear = year + 4;
+
+          const deleteOverlapPlanRequest = {
+            estPlanningStart: updateYear(updatedYear, project.estPlanningStart),
+            estPlanningEnd: updateYear(updatedYear, project.estPlanningEnd),
+            estConstructionStart: updateYear(updatedYear, project.estConstructionStart),
+            planningStartYear: updatedYear,
+            finances: {
+              preliminaryCurrentYearPlus3: '0',
+              preliminaryCurrentYearPlus4: '0',
+              year,
+            },
+          };
+
+          const mockDeleteOverlapPlanPatchResponse = {
+            data: {
+              ...project,
+              ...deleteOverlapPlanRequest,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockDeleteOverlapPlanPatchResponse);
+
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const overlapYear = year + 3;
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
+          await user.click(getByTestId('remove-year-button'));
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-12/');
+            expect(patchMock[1]).toStrictEqual(deleteOverlapPlanRequest);
+          });
+        });
+
+        it('moves construction start and end and planning end if an overlapping planning cell is deleted', async () => {
+          const project = mockPlanningViewProjects.data.results[12];
+          const year = new Date().getFullYear();
+          const updatedYear = year + 2;
+
+          const deleteOverlapConRequest = {
+            estConstructionStart: updateYear(updatedYear, project.estConstructionStart),
+            estConstructionEnd: updateYear(updatedYear, project.estConstructionEnd),
+            estPlanningEnd: updateYear(updatedYear, project.estPlanningEnd),
+            constructionEndYear: updatedYear,
+            finances: {
+              budgetProposalCurrentYearPlus2: '0',
+              preliminaryCurrentYearPlus3: '0',
+              year,
+            },
+          };
+
+          const mockDeleteOverlapConPatchResponse = {
+            data: {
+              ...project,
+              ...deleteOverlapConRequest,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockDeleteOverlapConPatchResponse);
+
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const overlapYear = year + 3;
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
+          await user.click(getByTestId('remove-year-button'));
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-13/');
+            expect(patchMock[1]).toStrictEqual(deleteOverlapConRequest);
+          });
+        });
+
         it('can increase the whole timeline by one year with double clicking ', async () => {
           const project = mockPlanningViewProjects.data.results[1];
           const year = new Date().getFullYear();
