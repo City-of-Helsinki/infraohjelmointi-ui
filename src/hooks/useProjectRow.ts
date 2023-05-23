@@ -42,13 +42,6 @@ const getTimelineDates = (project: IProject) => {
     estConstructionEnd,
   } = project;
 
-  const timelineDates: ITimelineDates = {
-    planningStart: null,
-    planningEnd: null,
-    constructionStart: null,
-    constructionEnd: null,
-  };
-
   const effectiveConstructionEndYear = getYear(estConstructionEnd) || constructionEndYear;
   const effectivePlanningStartYear = getYear(estPlanningStart) || planningStartYear;
 
@@ -107,7 +100,7 @@ const getTimelineDates = (project: IProject) => {
     } else if (
       estPlanningEnd &&
       effectivePlanningStartYear &&
-      effectiveConstructionEndYear - effectivePlanningStartYear > 1
+      effectiveConstructionEndYear !== getYear(estPlanningEnd)
     ) {
       return createDateToStartOfYear(getYear(estPlanningEnd) + 1);
     }
@@ -135,10 +128,12 @@ const getTimelineDates = (project: IProject) => {
     return createDateToEndOfYear(constructionEndYear);
   };
 
-  timelineDates.planningStart = getPlanningStartDate();
-  timelineDates.planningEnd = getPlanningEndDate();
-  timelineDates.constructionStart = getConstructionStartDate();
-  timelineDates.constructionEnd = getConstructionEndDate();
+  const timelineDates = {
+    planningStart: getPlanningStartDate(),
+    planningEnd: getPlanningEndDate(),
+    constructionStart: getConstructionStartDate(),
+    constructionEnd: getConstructionEndDate(),
+  };
 
   return timelineDates;
 };
@@ -147,7 +142,7 @@ const getTimelineDates = (project: IProject) => {
  * Creates a list of monthly data to be used for drawing the monthly graphs when expanding a
  * year in the PlanningView.
  */
-const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
+const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
   const getMonthData = (year: number, month: number, type: CellType) => {
     const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
 
@@ -208,8 +203,8 @@ const getMonthDataList = (year: number, timelineDates: ITimelineDates): Array<IM
     return { percent, isStart: isStartYear && startDatesMonth === month };
   };
 
-  return moment.monthsShort().map((m, i) => ({
-    month: m.substring(0, 3),
+  return moment.months().map((m, i) => ({
+    month: m,
     planning: getMonthData(year, i + 1, 'planning'),
     construction: getMonthData(year, i + 1, 'construction'),
   }));
@@ -421,7 +416,7 @@ const getProjectCells = (project: IProject) => {
     const isEndOfTimeline = getIsEndOfTimeline(cellYear, timelineDates);
     const isLastOfType = getIsLastOfType(cellYear, timelineDates);
 
-    const monthlyDataList = getMonthDataList(cellYear, timelineDates);
+    const monthlyDataList = getMonthlyDataList(cellYear, timelineDates);
 
     const affectsDates = getAffectsDates(
       type,

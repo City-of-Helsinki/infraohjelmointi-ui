@@ -1,10 +1,11 @@
 import { CellType, IMonthlyData } from '@/interfaces/projectInterfaces';
 import { FC, memo, useMemo } from 'react';
 import ProjectYearSummaryTable from './ProjectYearSummaryTable';
-import './styles.css';
 import MonthlyGraphCell from './MonthlyGraphCell';
+import './styles.css';
 
 interface IProjectYearSummaryProps {
+  id: string;
   startYear: number;
   year: number;
   monthlyDataList: Array<IMonthlyData>;
@@ -12,6 +13,7 @@ interface IProjectYearSummaryProps {
 }
 
 const ProjectYearSummary: FC<IProjectYearSummaryProps> = ({
+  id,
   startYear,
   year,
   monthlyDataList,
@@ -22,10 +24,17 @@ const ProjectYearSummary: FC<IProjectYearSummaryProps> = ({
   return (
     <>
       {/* Year summary (only visible for the first year in the table) */}
-      {showYearSummaryTable && <ProjectYearSummaryTable cellType={cellType} />}
+      {showYearSummaryTable && <ProjectYearSummaryTable cellType={cellType} id={id} />}
       {/* Monthly graph */}
       {monthlyDataList.map((c, i) => (
-        <MonthlyGraphCell key={c.month} index={i} {...c} cellType={cellType} />
+        <MonthlyGraphCell
+          key={c.month}
+          index={i}
+          {...c}
+          cellType={cellType}
+          month={c.month}
+          id={id}
+        />
       ))}
     </>
   );

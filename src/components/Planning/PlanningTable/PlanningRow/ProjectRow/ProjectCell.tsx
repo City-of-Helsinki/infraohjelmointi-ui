@@ -532,6 +532,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
       </td>
       {selectedYearClass && (
         <ProjectYearSummary
+          id={id}
           year={year}
           startYear={startYear}
           monthlyDataList={monthlyDataList}

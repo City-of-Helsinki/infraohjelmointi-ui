@@ -990,6 +990,98 @@ describe('PlanningView', () => {
         });
       });
 
+      it('can expand the years to view a year summary and monthly data graph about the project', async () => {
+        const renderResult = await render();
+        const { user, getByTestId } = renderResult;
+        const year = new Date().getFullYear();
+        const months = moment.months();
+        const project = mockPlanningViewProjects.data.results[1];
+
+        await navigateToProjectRows(renderResult);
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year}`));
+
+        await waitFor(() => {
+          expect(getByTestId(`project-year-summary-${project.id}`));
+          months.forEach((m) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            expect(
+              getByTestId(`project-monthly-graph-cell-${project.id}-${m}`),
+            ).toBeInTheDocument();
+            expect(getComputedStyle(planningBar).width).toBe('0%');
+            expect(getComputedStyle(constructionBar).width).toBe('0%');
+          });
+        });
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+        await waitFor(() => {
+          months.forEach((m, i) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            expect(getComputedStyle(constructionBar).width).toBe('0%');
+
+            if (i === 0) {
+              expect(getComputedStyle(planningBar).width).toBe('0%');
+            } else if (i === 1) {
+              expect(getComputedStyle(planningBar).width).toBe('59%');
+            } else {
+              expect(getComputedStyle(planningBar).width).toBe('100%');
+            }
+          });
+        });
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year + 3}`));
+
+        await waitFor(() => {
+          months.forEach((m, i) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            if (i === 0) {
+              expect(getComputedStyle(planningBar).width).toBe('100%');
+              expect(getComputedStyle(constructionBar).width).toBe('0%');
+            } else if (i === 1) {
+              expect(getComputedStyle(planningBar).width).toBe('43%');
+              expect(getComputedStyle(constructionBar).width).toBe('57%');
+            } else {
+              expect(getComputedStyle(planningBar).width).toBe('0%');
+              expect(getComputedStyle(constructionBar).width).toBe('100%');
+            }
+          });
+        });
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year + 6}`));
+
+        await waitFor(() => {
+          months.forEach((m, i) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            expect(getComputedStyle(planningBar).width).toBe('0%');
+
+            if (i === 0) {
+              expect(getComputedStyle(constructionBar).width).toBe('100%');
+            } else if (i === 1) {
+              expect(getComputedStyle(constructionBar).width).toBe('43%');
+            } else {
+              expect(getComputedStyle(constructionBar).width).toBe('0%');
+            }
+          });
+        });
+      });
+
       describe('ProjectCell', () => {
         it('active project cells can be edited and patched and the initial 0 value will be replaced by user input', async () => {
           const project = mockPlanningViewProjects.data.results[1];
@@ -1642,10 +1734,6 @@ describe('PlanningView', () => {
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchMoveYearRequest);
           });
-        });
-
-        it('where is this test', async () => {
-          //
         });
       });
     });

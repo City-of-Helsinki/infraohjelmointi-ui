@@ -18,7 +18,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         estConstructionEnd: null,
         finances: {
           year: 2023,
-          budgetProposalCurrentYearPlus0: '0.00',
+          budgetProposalCurrentYearPlus0: '40.00',
           budgetProposalCurrentYearPlus1: '20.00',
           budgetProposalCurrentYearPlus2: '30.00',
           preliminaryCurrentYearPlus3: '40.00',
