@@ -329,7 +329,7 @@ describe('PlanningView', () => {
     });
   });
 
-  describe.only('PlanningSummaryTable', () => {
+  describe('PlanningSummaryTable', () => {
     it('renders all budgets of all masterClasses if a masterClass isnt selected', async () => {
       const { getByTestId, container, store } = await render();
 
@@ -818,7 +818,7 @@ describe('PlanningView', () => {
       });
     });
 
-    describe('Project Row', () => {
+    describe('ProjectRow', () => {
       it('renders all the elements and the row budgets to rows that have either est-dates or planningStartYear or constructionEndYear, and no financial data to cells if there is no planning or construction', async () => {
         const renderResult = await render();
 
@@ -1642,6 +1642,10 @@ describe('PlanningView', () => {
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchMoveYearRequest);
           });
+        });
+
+        it('where is this test', async () => {
+          //
         });
       });
     });

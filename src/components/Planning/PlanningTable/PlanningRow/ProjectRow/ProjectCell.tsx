@@ -88,6 +88,8 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   };
 
   const updateOverlap = () => {
+    console.log('update overlap');
+
     if (isStartOfTimeline) {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
@@ -98,9 +100,13 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
     } else {
+      console.log('hello 1');
+
       req.estConstructionStart = addYear(constructionStart);
     }
     if (getYear(planningStart) === getYear(constructionEnd)) {
+      console.log('hello 2');
+
       req.planningStartYear = null;
       req.constructionEndYear = null;
     }
@@ -365,10 +371,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYea
       if (_.size(req.finances) === 1) {
         delete req.finances;
       }
-      patchProject({
-        id,
-        data: req,
-      }).catch(Promise.reject);
+      console.log('patch: ', req);
+
+      // patchProject({
+      //   id,
+      //   data: req,
+      // }).catch(Promise.reject);
     },
     [id],
   );
