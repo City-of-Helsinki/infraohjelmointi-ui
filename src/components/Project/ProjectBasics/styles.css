@@ -132,11 +132,12 @@
 
 .basic-info-form #visibilityStart {
   grid-row: 3;
-  grid-column: var(--grid-col-small-right);
+  grid-column: var(--grid-col-small-left);
 }
+
 .basic-info-form #visibilityEnd {
   grid-row: 3;
-  grid-column: var(--grid-col-small-left);
+  grid-column: var(--grid-col-small-right);
 }
 
 .basic-info-form #estConstructionStart {
@@ -270,8 +271,8 @@
   @apply flex w-full flex-col;
 }
 
-.project-side-panel #pw-folder-link-container{
-  background-color: var(--color-bus-light)
+.project-side-panel #pw-folder-link-container {
+  background-color: var(--color-bus-light);
 }
 
 .basic-form-container {
@@ -293,4 +294,3 @@
     width: 60%;
   }
 }
-
