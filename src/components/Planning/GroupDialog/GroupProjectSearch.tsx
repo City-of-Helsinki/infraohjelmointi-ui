@@ -113,10 +113,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     [getValues],
   );
   return (
-    <div
-      className="dialog-section group-form-search-input"
-      data-testid="search-project-field-section"
-    >
+    <div className="dialog-section " data-testid="search-project-field-section">
       <Controller
         name="projectsForSubmit"
         control={control}
@@ -131,7 +128,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
               helperText={t('groupForm.suggestionHelperText') || ''}
               hideSearchButton={true}
               value={searchWord}
-              className="search-input"
+              className="group-form-search-input"
               onChange={handleValueChange}
               onSubmit={(v) => handleSubmit(v, onChange)}
             />
