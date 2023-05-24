@@ -113,4 +113,17 @@ export const createDateToEndOfYear = (year: string | number | null) => {
   return year ? moment(year, 'YYYY').endOf('year').format('DD.MM.YYYY') : null;
 };
 
-export const getToday = () => moment().format('D.M.YYYY');
+export const getToday = () => moment().format('M.D.YYYY');
+
+export const isBefore = (start?: string | null, end?: string | null) => {
+  if (start && end) {
+    const startMoment = momentFromHDSDate(start);
+    const endMoment = momentFromHDSDate(end);
+    console.log('start: ', startMoment);
+    console.log('end: ', endMoment);
+    console.log('isBeforeEnd: ', moment(startMoment).isBefore(moment(endMoment)));
+
+    return moment(startMoment).isBefore(moment(endMoment));
+  }
+  return true;
+};

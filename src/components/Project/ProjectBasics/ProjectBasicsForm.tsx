@@ -21,8 +21,10 @@ import DateField from '@/components/shared/DateField';
 import { useTranslation } from 'react-i18next';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { useOptions } from '@/hooks/useOptions';
-import './styles.css';
 import { patchProject } from '@/services/projectServices';
+import { isBefore } from '@/utils/dates';
+import './styles.css';
+import { IOption } from '@/interfaces/common';
 
 const ProjectBasicsForm: FC = () => {
   const { formMethods, classOptions, locationOptions } = useProjectBasicsForm();
@@ -34,6 +36,7 @@ const ProjectBasicsForm: FC = () => {
     formState: { dirtyFields, isDirty },
     handleSubmit,
     control,
+    getValues,
   } = formMethods;
 
   const types = useOptions('types');
@@ -59,7 +62,12 @@ const ProjectBasicsForm: FC = () => {
       if (!project?.id) {
         return;
       }
-      const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+      const data: IProjectRequest = dirtyFieldsToRequestObject(
+        dirtyFields,
+        form as IAppForms,
+        phases,
+      );
+
       await patchProject({ id: project.id, data })
         .then(() => {
           handleSetFormSaved(true);
@@ -69,7 +77,7 @@ const ProjectBasicsForm: FC = () => {
         })
         .catch(Promise.reject);
     },
-    [dirtyFields, project?.id, handleSetFormSaved],
+    [project?.id, dirtyFields, phases, handleSetFormSaved],
   );
 
   const formProps = useCallback(
@@ -82,6 +90,41 @@ const ProjectBasicsForm: FC = () => {
     },
     [control],
   );
+
+  const validateBeforeEndDate = useCallback(
+    (startLabel: string, endLabel: string, compareKey: string) => {
+      return {
+        validate: {
+          isBeforeEndDate: (startDate: string | null) =>
+            isBefore(startDate, getValues(compareKey as keyof IProjectBasicsForm) as string)
+              ? true
+              : t('isBefore', { start: startLabel, end: t(endLabel) }),
+        },
+      };
+    },
+    [getValues],
+  );
+
+  const validatePhase = useCallback(() => {
+    const programmedPhase = phases[2].value;
+
+    return {
+      required: t('required', { value: 'Vaihe' }) ?? '',
+      validate: {
+        isPhaseValid: (phase: IOption) => {
+          const phaseToSubmit = phase.value;
+          if (
+            phaseToSubmit === programmedPhase &&
+            !getValues('planningStartYear') &&
+            !getValues('constructionEndYear')
+          ) {
+            return "Suunnittelun aloitusvuosi ja rakentamisen päättymisvuosi on täytettävä kun hankkeen vaihe on 'Ohjelmointi'";
+          }
+          return true;
+        },
+      },
+    };
+  }, [getValues, phases]);
 
   return (
     <div className="basic-form-container" data-testid="project-basics-form">
@@ -119,14 +162,11 @@ const ProjectBasicsForm: FC = () => {
           />
           {/* SECTION 2 - STATUS */}
           <FormSectionTitle {...formProps('status')} />
-          <SelectField
-            {...formProps('phase')}
-            rules={{ required: t('required', { value: 'Vaihe' }) ?? '' }}
-            options={phases}
-          />
+          <SelectField {...formProps('phase')} rules={validatePhase()} options={phases} />
           <SelectField
             {...formProps('constructionPhaseDetail')}
             options={constructionPhaseDetails}
+            disabled={getValues('phase').value !== phases[7].value}
           />
           <RadioCheckboxField {...formProps('programmed')} />
           <NumberField
@@ -167,7 +207,14 @@ const ProjectBasicsForm: FC = () => {
             className="custom-fieldset"
             id="planning"
           >
-            <DateField {...formProps('estPlanningStart')} />
+            <DateField
+              {...formProps('estPlanningStart')}
+              rules={validateBeforeEndDate(
+                'Suunnittelun aloitus',
+                'suunnittelun päättymistä',
+                'estPlanningEnd',
+              )}
+            />
             <DateField {...formProps('estPlanningEnd')} />
             <DateField {...formProps('presenceStart')} />
             <DateField {...formProps('presenceEnd')} />
@@ -179,7 +226,14 @@ const ProjectBasicsForm: FC = () => {
             className="custom-fieldset"
             id="construction"
           >
-            <DateField {...formProps('estConstructionStart')} />
+            <DateField
+              {...formProps('estConstructionStart')}
+              rules={validateBeforeEndDate(
+                'Rakentaminen alkaa',
+                'rakentaminen päättyy',
+                'estConstructionEnd',
+              )}
+            />
             <DateField {...formProps('estConstructionEnd')} />
           </Fieldset>
           {/* SECTION 4 - FINANCIALS */}

@@ -125,4 +125,4 @@ export type HookFormRulesType = Omit<
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
 
-export type IFormValueType = string | boolean | IOption | string[] | undefined;
+export type FormValueType = string | boolean | IOption | string[] | undefined;

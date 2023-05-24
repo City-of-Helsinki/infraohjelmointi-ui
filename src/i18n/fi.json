@@ -305,6 +305,7 @@
   "searchProjects": "Hae projekteja",
   "choose": "Valitse",
   "required": "{{value}} on pakollinen tieto.",
+  "isBefore": "{{start}} on oltava ennen {{end}}",
   "maxLength": "Maksimipituus on {{value}} merkkiä.",
   "minValue": "Arvon on oltava suurempi tai yhtä suuri kuin {{value}}",
   "maxValue": "Arvon on oltava pienempi tai yhtä suuri kuin {{value}}",

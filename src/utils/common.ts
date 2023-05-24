@@ -1,9 +1,10 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
-import { IAppForms, IFormValueType } from '@/interfaces/formInterfaces';
+import { IAppForms, FormValueType } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import { getYear, updateYear } from './dates';
 import _ from 'lodash';
+import { IProjectRequest } from '@/interfaces/projectInterfaces';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
 
@@ -45,15 +46,15 @@ export const getOptionId = (option: IOption) => option.value || null;
 
 export const isOption = (obj: object) => _.has(obj, 'label') && _.has(obj, 'value');
 
-// Make sure the projects planning dates are in sync with the planningStartYear
-const syncPlanningDates = (request: object, form: IAppForms) => {
+/**
+ * Make sure the projects planning dates are in sync with the planningStartYear
+ */
+const syncPlanningDates = (request: IProjectRequest, form: IAppForms) => {
   const requestCopy = { ...request };
 
   if (form.estPlanningStart) {
     if (_.has(requestCopy, 'estPlanningStart')) {
-      _.assign(request, {
-        planningStartYear: getYear(form.estPlanningStart),
-      });
+      request.planningStartYear = getYear(form.estPlanningStart);
     }
 
     if (
@@ -61,42 +62,79 @@ const syncPlanningDates = (request: object, form: IAppForms) => {
       form.planningStartYear &&
       parseInt(form.planningStartYear)
     ) {
-      _.assign(request, {
-        estPlanningStart: updateYear(parseInt(form.planningStartYear), form.estPlanningStart),
-      });
+      request.estPlanningStart = updateYear(
+        parseInt(form.planningStartYear),
+        form.estPlanningStart,
+      );
     }
   }
 };
 
-// Make sure the projects construction dates are in sync with the constructionEndYear
-const syncConstructionDates = (request: object, form: IAppForms) => {
+/**
+ * Make sure the projects construction dates are in sync with the constructionEndYear
+ */
+const syncConstructionDates = (request: IProjectRequest, form: IAppForms) => {
   const requestCopy = { ...request };
 
   if (form.estConstructionEnd) {
     if (_.has(requestCopy, 'estConstructionEnd')) {
-      _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
+      request.constructionEndYear = getYear(form.estConstructionEnd);
     }
     if (
       _.has(requestCopy, 'constructionEndYear') &&
       form.constructionEndYear &&
       parseInt(form.constructionEndYear)
     ) {
-      _.assign(request, {
-        estConstructionEnd: updateYear(parseInt(form.constructionEndYear), form.estConstructionEnd),
-      });
+      request.estConstructionEnd = updateYear(
+        parseInt(form.constructionEndYear),
+        form.estConstructionEnd,
+      );
     }
   }
 };
+
+const syncProgrammedWithPhase = (
+  request: IProjectRequest,
+  form: IAppForms,
+  phases?: Array<IOption>,
+) => {
+  const requestCopy = { ...request };
+
+  const draftPhase = phases && phases[0].value;
+  const programmedPhase = phases && phases[2].value;
+
+  // We patch phase to 'Hanke-ehdotus' if user switch programmed off
+  if (requestCopy.programmed === false && form.phase.value !== draftPhase) {
+    request.phase = draftPhase;
+  }
+  // We patch phase to 'Ohjelmoitu' if user switch programmed on
+  if (requestCopy.programmed === true && form.phase.value !== programmedPhase) {
+    request.phase = programmedPhase;
+  }
+  // We patch programmed to true if user changes phase to 'Ohjelmoitu'
+  if (requestCopy.phase === programmedPhase && !form.programmed) {
+    request.programmed = true;
+  }
+  // We patch programmed to false if user changes phase to 'Hanke-ehdotus'
+  if (requestCopy.phase === draftPhase && form.programmed) {
+    request.programmed = false;
+  }
+};
+
 /**
  *
  * @param dirtyFields dirtyFields from react-hook-forms
  * @param form form object
  * @returns data object that can be used for a patch request
  */
-export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms) => {
-  const request = {};
+export const dirtyFieldsToRequestObject = (
+  dirtyFields: object,
+  form: IAppForms,
+  phases?: Array<IOption>,
+) => {
+  const request: IProjectRequest = {};
 
-  const parseValue = (value: IFormValueType) => {
+  const parseValue = (value: FormValueType) => {
     switch (true) {
       case value instanceof Object && isOption(value):
         return getOptionId(value as IOption);
@@ -128,6 +166,7 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
 
   syncPlanningDates(request, form);
   syncConstructionDates(request, form);
+  syncProgrammedWithPhase(request, form, phases);
 
   return request;
 };

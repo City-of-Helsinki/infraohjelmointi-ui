@@ -308,3 +308,23 @@
     width: 60%;
   }
 }
+
+/* Select fields error message svg icon resize */
+.select-field-wrapper div div > svg {
+  @apply min-w-[25px] max-w-[25px];
+}
+
+/* Phase error message to extend both containers */
+#phase div div div:nth-child(3) {
+  @apply w-[200%];
+}
+
+/* Planning start/end error message to extend both of the containers  */
+#estPlanningStart div div div:nth-child(3) {
+  @apply w-[200%];
+}
+
+/* Construction start/end error message to extend both of the containers  */
+#estConstructionStart div div div:nth-child(3) {
+  @apply w-[200%];
+}
