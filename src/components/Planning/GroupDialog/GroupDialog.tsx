@@ -36,7 +36,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const navigate = useNavigate();
 
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);
-  // const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
 
   const { formMethods, formValues, classOptions, locationOptions } = useGroupForm();
   const {
@@ -46,18 +45,30 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     getValues,
     setValue,
     control,
+    watch,
   } = formMethods;
+  const nameField = watch('name');
+  const subClassField = watch('subClass');
+  const districtField = watch('district');
+  const divisionField = watch('division');
 
-  // useEffect(() => {
-  //   setSubmitButtonDisabled(
-  //     !getValues('name') ||
-  //       (showAdvanceFields &&
-  //         (!getValues('district')?.value ||
-  //           (locationOptions.divisions.length > 0 && !getValues('division')?.value) ||
-  //           !getValues('subClass')?.value)) ||
-  //       (!showAdvanceFields && !getValues('subClass')?.value),
-  //   );
-  // }, [getValues, locationOptions.divisions.length, showAdvanceFields]);
+  const isButtonDisabled = useCallback(() => {
+    return (
+      !nameField ||
+      (showAdvanceFields &&
+        (!districtField.value ||
+          (locationOptions.divisions.length > 0 && !divisionField.value) ||
+          !subClassField.value)) ||
+      (!showAdvanceFields && !subClassField.value)
+    );
+  }, [
+    districtField.value,
+    divisionField.value,
+    nameField,
+    showAdvanceFields,
+    subClassField.value,
+    locationOptions,
+  ]);
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -251,7 +262,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
             <Button
               onClick={handleOnSubmitForm}
               data-testid="create-group-button"
-              disabled={!isDirty}
+              disabled={isButtonDisabled()}
             >
               {t('groupForm.createGroup')}
             </Button>

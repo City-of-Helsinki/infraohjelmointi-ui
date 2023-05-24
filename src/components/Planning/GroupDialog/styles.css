@@ -38,6 +38,6 @@
 .dialog-section .button-container {
   @apply fixed;
 }
-#group-create-dialog .group-form-search-input {
-  @apply z-10
+#group-create-dialog .group-form-search-input button{
+  @apply z-[1]
 }
