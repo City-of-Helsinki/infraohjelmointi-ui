@@ -65,7 +65,6 @@ describe('App', () => {
     const { store } = await render();
 
     const { class: classes, location: locations, lists, hashTags } = store.getState();
-
     await waitFor(() => {
       expect(lists.categories).toStrictEqual(mockProjectCategories.data);
       expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);

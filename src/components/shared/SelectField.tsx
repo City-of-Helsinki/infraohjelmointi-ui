@@ -25,6 +25,7 @@ interface ISelectFieldProps {
   hideLabel?: boolean;
   icon?: string;
   placeholder?: string;
+  clearable?: boolean;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -36,6 +37,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   hideLabel,
   icon,
   placeholder,
+  clearable,
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -73,6 +75,7 @@ const SelectField: FC<ISelectFieldProps> = ({
           <div className="input-wrapper" id={name} data-testid={name}>
             <div className="select-field-wrapper" ref={selectContainerRef}>
               <HDSSelect
+                id={`select-field-${name}`}
                 className="input-l custom-select"
                 value={value}
                 onChange={onChange}

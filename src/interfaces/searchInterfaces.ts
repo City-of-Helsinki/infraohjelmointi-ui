@@ -11,6 +11,10 @@ export interface ISearchResultPayloadItem {
   hashTags: Array<IListItem>;
   phase: IListItem | null;
 }
+export interface ISearchResultsProject {
+  project: IProject;
+  path: string;
+}
 
 export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'phase' | 'path'> {
   breadCrumbs: Array<string>;
@@ -18,10 +22,7 @@ export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'p
   link: string;
 }
 
-export interface ISearchResultsProject {
-  project: IProject;
-  path: string;
-}
+
 
 export interface ISearchResults {
   next: string | null;

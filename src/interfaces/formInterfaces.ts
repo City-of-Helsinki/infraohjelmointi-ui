@@ -85,6 +85,19 @@ export interface IProjectNoteForm {
   project: string;
 }
 
+export interface IGroupForm {
+ 
+  name: string;
+  masterClass: IOption;
+  class: IOption;
+  subClass: IOption;
+  district: IOption;
+  division: IOption;
+  subDivision: IOption;
+  projectsForSubmit: Array<IOption>;
+}
+
+
 export interface IHashTagsForm {
   hashTag: string;
 }
@@ -94,6 +107,7 @@ export interface IAppForms
     IProjectBasicsForm,
     IProjectNoteForm,
     IHashTagsForm {}
+    
 
 export type HookFormControlType =
   | Control<FieldValues>
@@ -101,6 +115,7 @@ export type HookFormControlType =
   | Control<IProjectHeaderForm>
   | Control<IHashTagsForm>
   | Control<ISearchForm>
+  | Control<IGroupForm>
   | undefined;
 
 export type HookFormRulesType = Omit<
