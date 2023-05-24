@@ -9,7 +9,7 @@ import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
 import { IProjectsPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { silentPatchProjectsThunk } from '@/reducers/projectSlice';
 import { useOptions } from '@/hooks/useOptions';
-import usePlanningRows, { IPlanningRowSelections } from '@/hooks/usePlanningRows';
+import { IPlanningRowSelections } from '@/hooks/usePlanningRows';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -128,7 +128,7 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({
 
   const toggleSetOpen = useCallback(() => setIsOpen((current) => !current), []);
   const onOpenGroupForm = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
+    (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       toggleSetOpen();
     },
@@ -142,17 +142,14 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({
       <DialogContainer isOpen={isOpen} handleClose={handleClose} onAddProject={onAddProject} />
       <div>
         <div data-testid="open-project-add-dialog-container" id="open-project-add-dialog-container">
-          <div
-            onClick={
-              selections.selectedClass?.id || selections.selectedSubClass?.id
-                ? onOpenGroupForm
-                : () => {
-                    return;
-                  }
+          <button
+            disabled={
+              selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true
             }
+            onClick={onOpenGroupForm}
           >
             {t(`projectProgrammedForm.addProjectsToProgramming`)}
-          </div>
+          </button>
         </div>
       </div>
     </div>
