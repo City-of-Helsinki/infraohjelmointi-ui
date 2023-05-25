@@ -1,11 +1,16 @@
-import { Icon, Toolbar } from '../../shared';
+import { Icon, IconButton, Toolbar } from '../../shared';
 import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
 import { Navigation } from 'hds-react/components/Navigation';
 import { useTranslation } from 'react-i18next';
 import { GroupDialog } from '../GroupDialog';
 import './styles.css';
+import { IconCross } from 'hds-react/icons/';
+import { MouseEventHandler, useCallback, useState } from 'react';
 const ProjectToolbar = () => {
   const { Dropdown, Item } = Navigation;
+  const closeDropdown = useCallback(() => {
+    //close the dropdown
+  }, []);
   const { t } = useTranslation();
 
   return (
@@ -17,6 +22,12 @@ const ProjectToolbar = () => {
             label={t(`new`)}
             icon={<Icon icon={IconNewItem} />}
           >
+            <div className="dropdown-header border-b-2 border-gray">
+              <div>Uusi</div>
+              <div>
+                <IconButton icon={IconCross} onClick={closeDropdown}></IconButton>
+              </div>
+            </div>
             <Item>
               <GroupDialog />
             </Item>

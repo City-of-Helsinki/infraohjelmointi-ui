@@ -1,3 +1,7 @@
 .planning-toolbar-dropdown{
     @apply z-10
   }
+
+.planning-toolbar-dropdown .dropdown-header{
+    @apply flex flex-row justify-between bg-white text-black font-bold
+  }
