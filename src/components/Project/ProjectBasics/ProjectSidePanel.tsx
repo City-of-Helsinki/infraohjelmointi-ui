@@ -62,7 +62,7 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
                 <div>
                   <Link
                     href={pwFolderLink}
-                    size="M"
+                    size="S"
                     id="pw-folder-link"
                     className="pw-folder-link"
                     data-testid="pw-folder-link"
