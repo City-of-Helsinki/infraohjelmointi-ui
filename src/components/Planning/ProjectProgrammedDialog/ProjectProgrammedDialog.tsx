@@ -3,13 +3,12 @@ import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 
-import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
 import { IProjectsPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { useOptions } from '@/hooks/useOptions';
 import { IPlanningRowSelections } from '@/interfaces/common';
-import { patchProject, patchProjects } from '@/services/projectServices';
+import { patchProjects } from '@/services/projectServices';
 
 interface IDialogProps {
   handleClose: () => void;

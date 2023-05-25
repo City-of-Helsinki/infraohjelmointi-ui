@@ -47,10 +47,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
     searchedProjects: [],
   });
   const { searchedProjects, searchWord } = searchState;
-  const phaseProposal =
-    useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
-  const phaseDesign =
-    useOptions('phases', true).find((phase) => phase.label === 'design')?.value || '';
 
   // selectedClass and selectedSubClass refer to the class and/or subclass currently selected by the user
   // in planning view
@@ -68,8 +64,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       const reqParamObject = { limit: '30', params: '', order: 'new' };
       const searchParams = [];
       searchParams.push(`projectName=${projectName}`);
-      searchParams.push(`phase=${phaseProposal}`);
-      searchParams.push(`phase=${phaseDesign}`);
       searchParams.push(`programmed=false`);
       if (selections.selectedSubClass?.id) {
         searchParams.push(`subClass=${selections.selectedSubClass.id}`);
@@ -80,7 +74,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       reqParamObject.params = searchParams.join('&');
       return reqParamObject;
     },
-    [phaseProposal, phaseDesign, selections.selectedSubClass, selections.selectedClass],
+    [selections.selectedSubClass, selections.selectedClass],
   );
 
   const { t } = useTranslation();

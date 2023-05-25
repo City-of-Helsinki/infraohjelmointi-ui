@@ -1,7 +1,7 @@
 import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
-import { CustomRenderResult, renderWithProviders } from '@/utils/testUtils';
+import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
@@ -22,8 +22,7 @@ import { CustomContextMenu } from '@/components/CustomContextMenu';
 import { mockGroups } from '@/mocks/mockGroups';
 import { mockLocations, mockDistricts, mockDivisions } from '@/mocks/mockLocations';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
-
+import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
@@ -118,6 +117,7 @@ describe('ProjectProgrammedDialog', () => {
   });
 
   it('can add non programmed projects to programming view', async () => {
+    addProjectUpdateEventListener(store.dispatch);
     const renderResult = await render();
     const mockPatchResponse = {
       data: [
@@ -163,22 +163,26 @@ describe('ProjectProgrammedDialog', () => {
     const getRequest = mockedAxios.get.mock;
     // Check that the correct url was called
     expect(getRequest.lastCall[0]).toBe(
-      'localhost:4000/projects/search-results/?projectName=Planning&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&programmed=false&class=test-class-1&limit=30&order=new',
+      'localhost:4000/projects/search-results/?projectName=Planning&programmed=false&class=test-class-1&limit=30&order=new',
     );
 
     // project selected, button is enabled
     expect(submitButton).toBeEnabled();
 
     mockedAxios.patch.mockResolvedValueOnce(mockPatchResponse);
-    await user.click(submitButton);
-
+    await waitFor(async () => {
+      await user.click(submitButton);
+    });
+    await sendProjectUpdateEvent(mockPatchResponse.data[0]);
     const formPatchRequest = mockedAxios.patch.mock
       .lastCall[1] as Array<IProjectPatchRequestObject>;
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
     await user.click(getByRole('button', { name: 'closeProjectProgrammedDialog' }));
-    // TODO: Listen to event here
+
     expect(getByText('Planning Project 1')).toBeInTheDocument();
+
+    removeProjectUpdateEventListener(store.dispatch);
   });
 });

@@ -22,7 +22,7 @@ interface IPlanningRowProps extends IPlanningRow {
 }
 
 const PlanningRow: FC<IPlanningRowProps> = (props) => {
-  const { defaultExpanded, projectRows, cells, projectToUpdate, selectedYear } = props;
+  const { defaultExpanded, projectRows, cells, projectToUpdate, selectedYear, id, type } = props;
 
   const { search } = useLocation();
 
@@ -55,8 +55,38 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       const updatedProjects = projects.map((p) =>
         p.id === projectToUpdate.id ? projectToUpdate : p,
       );
+      // updatedProject does not already belong to this planning row if no projectsUpdated
+      // check if project belongs to this row type
+      if (_.isEqual(projects, updatedProjects)) {
+        if (
+          projectToUpdate.projectGroup &&
+          type.includes('group') &&
+          id === projectToUpdate.projectGroup
+        ) {
+          updatedProjects.push(projectToUpdate);
+        } else if (
+          projectToUpdate.projectLocation &&
+          !projectToUpdate.projectGroup &&
+          (type.includes('district') || type.includes('division')) &&
+          id === projectToUpdate.projectLocation
+        ) {
+          updatedProjects.push(projectToUpdate);
+        } else if (
+          projectToUpdate.projectClass &&
+          !projectToUpdate.projectLocation &&
+          !projectToUpdate.projectGroup &&
+          type.includes('class') &&
+          id === projectToUpdate.projectClass
+        ) {
+          updatedProjects.push(projectToUpdate);
+        }
+      }
       if (!_.isEqual(projects, updatedProjects)) {
-        setPlanningRowState((current) => ({ ...current, projects: updatedProjects }));
+        setPlanningRowState((current) => ({
+          ...current,
+          projects: updatedProjects,
+          expanded: true,
+        }));
       }
     }
   }, [projectToUpdate]);
