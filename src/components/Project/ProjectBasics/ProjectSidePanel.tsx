@@ -52,7 +52,7 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
           <div
             id="pw-folder-link-container"
             data-testid="pw-folder-link-container"
-            className="mt-5 bg-gray p-4"
+            className="pw-folder-link-container"
           >
             <div>
               <div className="m-1 font-bold">ProjectWise</div>
@@ -64,18 +64,21 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
                     href={pwFolderLink}
                     size="M"
                     id="pw-folder-link"
+                    className="pw-folder-link"
                     data-testid="pw-folder-link"
                     external
                     openInNewTab
                     openInExternalDomainAriaLabel={t(`opensExternalWebsite`) || ''}
                     openInNewTabAriaLabel={t(`opensInNewTab`) || ''}
-                    style={{ display: 'block', width: 'fit-content' }}
                   >
                     {t(`nav.pwFolderLink`)}
                   </Link>
                 </div>
               ) : (
-                <div className="m-1 font-bold" data-testid="pw-folder-link-not-exist-message">
+                <div
+                  className="pw-folder-link-not-exist"
+                  data-testid="pw-folder-link-not-exist-message"
+                >
                   {t(`pwFolderLinkNotExist`)}
                 </div>
               )}

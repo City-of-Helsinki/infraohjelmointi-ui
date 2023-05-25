@@ -39,7 +39,7 @@
 /* TABS */
 
 .side-nav {
-  @apply w-[65%] max-w-[16.5rem];
+  @apply w-[100%] max-w-[16.5rem];
 }
 
 .side-nav li:last-child {
