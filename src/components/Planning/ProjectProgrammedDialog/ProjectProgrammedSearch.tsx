@@ -10,6 +10,8 @@ import { useAppSelector } from '@/hooks/common';
 import { selectAllClasses } from '@/reducers/classSlice';
 import SelectedProjectCard from './SelectedProjectCard';
 import usePlanningRows from '@/hooks/usePlanningRows';
+import { selectAllLocations, selectDistricts } from '@/reducers/locationSlice';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface ISearchState {
   searchWord: string;
@@ -21,9 +23,16 @@ interface IProjectSearchProps {
   onProjectSelectionDelete: (projectName: string) => void;
 }
 
-const buildBreadCrumbs = (path: string, classes: Array<IClass>): Array<string> =>
-  path.split('/').map((p) => classes.find((c) => c.id === p)?.name || '');
-
+const buildBreadCrumbs = (
+  path: string,
+  classes: Array<IClass>,
+  districts: Array<ILocation>,
+): Array<string> =>
+  path
+    .split('/')
+    .map(
+      (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
+    );
 const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   onProjectClick,
   projectsForSubmit,
@@ -31,6 +40,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const classes = useAppSelector(selectAllClasses);
+  const districts = useAppSelector(selectDistricts);
 
   const [searchState, setSearchState] = useState<ISearchState>({
     searchWord: '',
@@ -98,7 +108,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
               ? resultList.map((project) => ({
                   label: project.name,
                   value: project.id,
-                  breadCrumbs: buildBreadCrumbs(project.path, classes),
+                  breadCrumbs: buildBreadCrumbs(project.path, classes, districts),
                 }))
               : [];
             if (searchProjectsItemList.length > 0) {

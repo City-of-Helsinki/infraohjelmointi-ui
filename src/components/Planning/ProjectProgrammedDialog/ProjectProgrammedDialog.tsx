@@ -7,17 +7,16 @@ import { useAppDispatch } from '@/hooks/common';
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
 import { IProjectsPatchRequestObject } from '@/interfaces/projectInterfaces';
-import { silentPatchProjectsThunk } from '@/reducers/projectSlice';
 import { useOptions } from '@/hooks/useOptions';
-import { IPlanningRowSelections } from '@/hooks/usePlanningRows';
+import { IPlanningRowSelections } from '@/interfaces/common';
+import { patchProject, patchProjects } from '@/services/projectServices';
 
 interface IDialogProps {
   handleClose: () => void;
   isOpen: boolean;
-  onAddProject: () => void;
 }
 
-const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, onAddProject }) => {
+const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const [projectsForSubmit, setProjectsForSubmit] = useState<Array<IProgrammedProjectSuggestions>>(
     [],
   );
@@ -33,7 +32,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, onAddProj
     [phase],
   );
 
-  const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const onProjectClick = useCallback((value: IProgrammedProjectSuggestions | undefined) => {
     if (value) {
@@ -55,13 +53,12 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, onAddProj
   const onSubmit = useCallback(
     async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      dispatch(silentPatchProjectsThunk(buildRequestPayload(projectsForSubmit))).then(() => {
-        onAddProject();
+      patchProjects(buildRequestPayload(projectsForSubmit)).then(() => {
         setProjectsForSubmit([]);
       });
     },
 
-    [dispatch, buildRequestPayload, projectsForSubmit],
+    [buildRequestPayload, projectsForSubmit],
   );
 
   return (
@@ -115,14 +112,10 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, onAddProj
 DialogContainer.displayName = 'Project Programmed Dialog';
 
 interface ProjectProgrammedDialogProps {
-  onAddProject: () => void;
   selections: IPlanningRowSelections;
 }
 
-const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({
-  onAddProject,
-  selections,
-}) => {
+const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({ selections }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -139,7 +132,7 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({
   }, []);
   return (
     <div>
-      <DialogContainer isOpen={isOpen} handleClose={handleClose} onAddProject={onAddProject} />
+      <DialogContainer isOpen={isOpen} handleClose={handleClose} />
       <div>
         <div data-testid="open-project-add-dialog-container" id="open-project-add-dialog-container">
           <button

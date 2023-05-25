@@ -123,18 +123,17 @@ describe('ProjectProgrammedDialog', () => {
       data: [
         {
           ...mockProject.data,
-          id: 'ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
-          name: 'Yhteiskouluntie ja aukio',
+          id: 'planning-project-1',
+          name: 'Planning Project 1',
           programmed: true,
           phase: {
             id: 'f99bcf35-c1f4-4624-8ddc-e3dbf6d5f2dc',
             value: 'programming',
           },
+          projectClass: 'test-class-1',
         },
       ],
     };
-
-    mockedAxios.patch.mockResolvedValueOnce(mockPatchResponse);
 
     const { user, getAllByTestId, getByTestId, queryByText, getByText, getByRole } = renderResult;
 
@@ -152,7 +151,7 @@ describe('ProjectProgrammedDialog', () => {
     expect(submitButton).toBeDisabled();
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-    await user.type(getByText('projectProgrammedForm.searchForProjects'), 'V');
+    await user.type(getByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
     await waitFor(async () => {
       expect(getByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
@@ -164,27 +163,13 @@ describe('ProjectProgrammedDialog', () => {
     const getRequest = mockedAxios.get.mock;
     // Check that the correct url was called
     expect(getRequest.lastCall[0]).toBe(
-      'localhost:4000/projects/search-results/?projectName=V&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&programmed=false&class=test-class-1&limit=30&order=new',
+      'localhost:4000/projects/search-results/?projectName=Planning&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&programmed=false&class=test-class-1&limit=30&order=new',
     );
 
     // project selected, button is enabled
     expect(submitButton).toBeEnabled();
-    // mocking response to rebuilding the class level to have updated project
-    mockedAxios.get.mockResolvedValueOnce({
-      data: {
-        count: 11,
-        results: [
-          ...mockPlanningViewProjects.data.results,
-          {
-            ...mockProject.data,
-            id: 'ffbb6297-363b-4a8e-ba03-56c5fb5d7a76',
-            projectClass: 'test-class-1',
-            name: 'Vanha yrttimaantie',
-            programmed: true,
-          },
-        ],
-      },
-    });
+
+    mockedAxios.patch.mockResolvedValueOnce(mockPatchResponse);
     await user.click(submitButton);
 
     const formPatchRequest = mockedAxios.patch.mock
@@ -193,7 +178,7 @@ describe('ProjectProgrammedDialog', () => {
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
     await user.click(getByRole('button', { name: 'closeProjectProgrammedDialog' }));
-
-    expect(getByText('Vanha yrttimaantie')).toBeInTheDocument();
+    // TODO: Listen to event here
+    expect(getByText('Planning Project 1')).toBeInTheDocument();
   });
 });
