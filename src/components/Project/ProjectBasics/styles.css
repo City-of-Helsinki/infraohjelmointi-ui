@@ -277,7 +277,7 @@
 }
 .project-side-panel .pw-folder-link-container .pw-folder-link {
   background-color: var(--color-bus-light);
-  @apply text-black text-sm font-bold block max-w-max
+  @apply text-black text-sm font-bold block w-max
 }
 .project-side-panel .pw-folder-link-container .pw-folder-link-not-exist {
   @apply m-1 font-bold text-sm
