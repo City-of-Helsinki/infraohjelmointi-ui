@@ -40,7 +40,7 @@ const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
   );
 
   return (
-    <div>
+    <div className="w-full">
       <HDSSideNavigation
         id="side-navigation"
         toggleButtonLabel={t('nav.navigateToForm')}

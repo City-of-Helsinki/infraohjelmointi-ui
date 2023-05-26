@@ -18,9 +18,7 @@ import { SearchLimit, SearchOrder } from '@/interfaces/searchInterfaces';
 import { Route } from 'react-router';
 import PlanningView from '../PlanningView';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import mockProject from '@/mocks/mockProject';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
-import { debug } from 'console';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());

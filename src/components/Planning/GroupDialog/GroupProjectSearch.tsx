@@ -3,7 +3,7 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { arrayHasValue, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
@@ -11,7 +11,7 @@ import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
-  control: Control<IGroupForm, any>;
+  control: Control<IGroupForm>;
   showAdvanceFields: boolean;
   divisions: IOption[];
 }

@@ -12,13 +12,13 @@ const ProjectBasics = () => {
       <ScrollToTop />
       {project && (
         <>
-          <div className="flex-1">
-            <div className="side-panel-container" data-testid="side-panel">
+          <div className="flex flex-1 justify-center">
+            <div className="side-panel-container " data-testid="side-panel">
               <ProjectSidePanel pwFolderLink={project.pwFolderLink} />
             </div>
           </div>
 
-          <div className=" my-16 flex flex-[2]" data-testid="form-panel">
+          <div className="my-16 flex flex-[2]" data-testid="form-panel">
             <ProjectBasicsForm />
           </div>
         </>

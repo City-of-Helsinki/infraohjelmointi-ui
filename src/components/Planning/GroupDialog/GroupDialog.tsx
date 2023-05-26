@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
+import { useState, MouseEvent, FC, useCallback, useMemo, memo } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
@@ -38,15 +38,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);
 
   const { formMethods, formValues, classOptions, locationOptions } = useGroupForm();
-  const {
-    handleSubmit,
-    reset,
-    formState: { isDirty },
-    getValues,
-    setValue,
-    control,
-    watch,
-  } = formMethods;
+  const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
   const nameField = watch('name');
   const subClassField = watch('subClass');
   const districtField = watch('district');

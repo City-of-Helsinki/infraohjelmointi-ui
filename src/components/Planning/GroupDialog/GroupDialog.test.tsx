@@ -243,6 +243,3 @@ describe('GroupDialog', () => {
     expect(await findByText('Vanha yrttimaantie')).toBeInTheDocument();
   });
 });
-function mockGetResponseProviders() {
-  throw new Error('Function not implemented.');
-}
