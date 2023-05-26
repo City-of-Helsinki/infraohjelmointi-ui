@@ -1,5 +1,5 @@
 import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../hooks/common';
@@ -192,7 +192,9 @@ const useProjectBasicsForm = () => {
     }
   }, [project]);
 
-  return { formMethods, classOptions, locationOptions };
+  const resetForm = useCallback(() => reset(formValues), [formValues, reset]);
+
+  return { formMethods, classOptions, locationOptions, resetForm };
 };
 
 export default useProjectBasicsForm;

@@ -27,6 +27,7 @@ export const booleanToString = (
 ): string =>
   typeof boolVal === 'boolean' && translate ? translate(`enums.${boolVal.toString()}`) : 'Ei';
 
+export const isOptionEmpty = (option: IOption) => !option.value;
 /**
  * Converts all empty string values from a form to null values. Useful when submitting forms,
  * since controlled forms always need to have a value as an empty string instead of null or undefined.
@@ -93,33 +94,43 @@ const syncConstructionDates = (request: IProjectRequest, form: IAppForms) => {
   }
 };
 
-const syncProgrammedWithPhase = (
-  request: IProjectRequest,
-  form: IAppForms,
-  phases?: Array<IOption>,
-) => {
-  const requestCopy = { ...request };
+// const syncProgrammedWithPhase = (
+//   request: IProjectRequest,
+//   form: IAppForms,
+//   phases?: Array<IOption>,
+// ) => {
+//   const requestCopy = { ...request };
 
-  const draftPhase = phases && phases[0].value;
-  const programmedPhase = phases && phases[2].value;
+//   const draftPhase = phases && phases[0].value;
+//   const programmedPhase = phases && phases[2].value;
+//   const warrantyPeriodPhase = phases && phases[8].value;
+//   const completedPhase = phases && phases[9].value;
 
-  // We patch phase to 'Hanke-ehdotus' if user switch programmed off
-  if (requestCopy.programmed === false && form.phase.value !== draftPhase) {
-    request.phase = draftPhase;
-  }
-  // We patch phase to 'Ohjelmoitu' if user switch programmed on
-  if (requestCopy.programmed === true && form.phase.value !== programmedPhase) {
-    request.phase = programmedPhase;
-  }
-  // We patch programmed to true if user changes phase to 'Ohjelmoitu'
-  if (requestCopy.phase === programmedPhase && !form.programmed) {
-    request.programmed = true;
-  }
-  // We patch programmed to false if user changes phase to 'Hanke-ehdotus'
-  if (requestCopy.phase === draftPhase && form.programmed) {
-    request.programmed = false;
-  }
-};
+//   // We patch phase to 'Hanke-ehdotus' if user switch programmed off
+//   if (requestCopy.programmed === false && form.phase.value !== draftPhase) {
+//     request.phase = draftPhase;
+//   }
+//   // We patch phase to 'Ohjelmoitu' if user switch programmed on
+//   if (requestCopy.programmed === true && form.phase.value !== programmedPhase) {
+//     request.phase = programmedPhase;
+//   }
+//   // We patch programmed to true if user changes phase to 'Ohjelmoitu'
+//   if (requestCopy.phase === programmedPhase && !form.programmed) {
+//     request.programmed = true;
+//   }
+//   // We patch programmed to false if user changes phase to 'Hanke-ehdotus'
+//   if (requestCopy.phase === draftPhase && form.programmed) {
+//     request.programmed = false;
+//   }
+//   // We patch programmed to false if user changes phase to 'Takuuaika'
+//   if (requestCopy.phase === warrantyPeriodPhase && form.programmed) {
+//     request.programmed = false;
+//   }
+//   // We patch programmed to false if user changes phase to 'Valmis/ylläpidossa'
+//   if (requestCopy.phase === completedPhase && form.programmed) {
+//     request.programmed = false;
+//   }
+// };
 
 /**
  *
@@ -166,7 +177,7 @@ export const dirtyFieldsToRequestObject = (
 
   syncPlanningDates(request, form);
   syncConstructionDates(request, form);
-  syncProgrammedWithPhase(request, form, phases);
+  // syncProgrammedWithPhase(request, form, phases);
 
   return request;
 };

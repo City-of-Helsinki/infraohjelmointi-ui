@@ -97,6 +97,16 @@
     "bigTrafficProjects": "Suuret liikennehankkeet",
     "spesialtyStructures": "Taitorakenne"
   },
+  "validation": {
+    "estPlanningStart": "Suunnittelu alkaa",
+    "estPlanningEnd": "Suunnittelu päättyy",
+    "estConstructionStart": "Rakentaminen alkaa",
+    "estConstructionEnd": "Rakentaminen päättyy",
+    "planningStartYear": "Suunnittelun aloitusvuosi",
+    "constructionEndYear": "Rakentamisen valmistumisvuosi",
+    "personConstruction": "Rakennuttamisen vastuuhenkilö",
+    "constructionPhaseDetail": "Rakentamisvaiheen tarkenne"
+  },
   "projectBasicsForm": {
     "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
@@ -330,22 +340,22 @@
   "pwFolderLinkNotExist": "Dokumenttikansiota ei ole avattu",
   "opensExternalWebsite": "Avaa toisen verkkosivuston",
   "opensInNewTab": "Avautuu uuteen välilehteen",
+  "searchForProjects": "Etsi hankkeita",
   "createSummingGroups": "Luo uusi summaava ryhmä",
   "fieldRequiredWarning": "Tämä kenttä on täytettävä",
   "addProgrammedProject": "Tuo uusi hanke listalle",
   "addProjectsToProgramming": "Tuo uusi hanke listalle",
-  "searchForProjects": "Etsi hanke",
   "closeProjectProgrammedDialog": "Sulje projektiohjelmoitu dialogi",
   "implemented": "Toteutettu",
   "bound": "Sidottu",
-  "openAllGroups":"Avaa ryhmät",
-  "closeAllGroups":"Pinoa ryhmät",
-  "createNewProject":"Luo uusi hanke",
-  "editGroup":"Muokkaa ryhmää",
-  "deleteGroup":"Poista ryhmä",
-  "deleteGroupDialog":{
+  "openAllGroups": "Avaa ryhmät",
+  "closeAllGroups": "Pinoa ryhmät",
+  "createNewProject": "Luo uusi hanke",
+  "editGroup": "Muokkaa ryhmää",
+  "deleteGroup": "Poista ryhmä",
+  "deleteGroupDialog": {
     "title": "Oletko varma että haluat poistaa \"{{name}}\" ryhmän?",
-    "description":"Ryhmän poistaminen on pysyvää eikä sitä voida enää palauttaa. Hankkeita ei poisteta."
+    "description": "Ryhmän poistaminen on pysyvää eikä sitä voida enää palauttaa. Hankkeita ei poisteta."
   },
-  "editSummingGroup":"Muokkaa summaavaa ryhmää"
+  "editSummingGroup": "Muokkaa summaavaa ryhmää"
 }

@@ -25,8 +25,8 @@ interface ISelectFieldProps {
   hideLabel?: boolean;
   icon?: string;
   placeholder?: string;
-  clearable?: boolean;
   disabled?: boolean;
+  clearable?: boolean;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -72,6 +72,7 @@ const SelectField: FC<ISelectFieldProps> = ({
     <Controller
       name={name}
       control={control as Control<FieldValues>}
+      rules={rules}
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
@@ -105,7 +106,6 @@ const SelectField: FC<ISelectFieldProps> = ({
           </div>
         );
       }}
-      rules={rules}
     />
   );
 };

@@ -12,7 +12,7 @@ import {
 } from '../../shared';
 import { selectProject } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { dirtyFieldsToRequestObject } from '@/utils/common';
+import { dirtyFieldsToRequestObject, isOptionEmpty } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { ProjectHashTags } from '../ProjectHashTags';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
@@ -22,12 +22,13 @@ import { useTranslation } from 'react-i18next';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { useOptions } from '@/hooks/useOptions';
 import { patchProject } from '@/services/projectServices';
-import { isBefore } from '@/utils/dates';
-import './styles.css';
+import { getToday, isBefore } from '@/utils/dates';
 import { IOption } from '@/interfaces/common';
+import _ from 'lodash';
+import './styles.css';
 
 const ProjectBasicsForm: FC = () => {
-  const { formMethods, classOptions, locationOptions } = useProjectBasicsForm();
+  const { formMethods, classOptions, locationOptions, resetForm } = useProjectBasicsForm();
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
   const [formSaved, setFormSaved] = useState(false);
@@ -53,12 +54,21 @@ const ProjectBasicsForm: FC = () => {
   const { masterClasses, classes, subClasses } = classOptions;
   const { districts, divisions, subDivisions } = locationOptions;
 
+  const proposalPhase = phases[0].value;
+  const designPhase = phases[1].value;
+  const programmedPhase = phases[2].value;
+  const draftApprovalPhase = phases[3].value;
+  const constructionPhase = phases[7].value;
+  const warrantyPeriodPhase = phases[8].value;
+
   const handleSetFormSaved = useCallback((value: boolean) => {
     setFormSaved(value);
   }, []);
 
   const onSubmit = useCallback(
     async (form: IProjectBasicsForm) => {
+      console.log('submitting');
+
       if (!project?.id) {
         return;
       }
@@ -92,43 +102,117 @@ const ProjectBasicsForm: FC = () => {
   );
 
   const validateBeforeEndDate = useCallback(
-    (startLabel: string, endLabel: string, compareKey: string) => {
+    (startLabel: string, endLabel: string) => {
       return {
         validate: {
           isBeforeEndDate: (startDate: string | null) =>
-            isBefore(startDate, getValues(compareKey as keyof IProjectBasicsForm) as string)
+            isBefore(startDate, getValues(endLabel as keyof IProjectBasicsForm) as string)
               ? true
-              : t('isBefore', { start: startLabel, end: t(endLabel) }),
+              : t('isBefore', {
+                  start: t(`validation.${startLabel}`),
+                  end: t(`validation.${endLabel}`),
+                }),
         },
       };
+    },
+    [getValues, t],
+  );
+
+  const validatePlanningStartYear = useCallback(() => {
+    return {
+      validate: {
+        isBeforeEndDate: (startDate: string | null) => {
+          const endDate = getValues('constructionEndYear');
+          if (startDate && endDate && parseInt(startDate) > parseInt(endDate)) {
+            // return t('isBefore', {
+            //   start: t('validation.planningStartYear'),
+            //   end: t('validation.constructionEndYear'),
+            // }
+          }
+        },
+      },
+    };
+  }, []);
+
+  const getErrorMessageIfMissingFields = useCallback(
+    (fields: Array<string>) => {
+      const missingFields = fields
+        .filter((f) => {
+          if (_.has(getValues(f as keyof IProjectBasicsForm), 'value')) {
+            return !(getValues(f as keyof IProjectBasicsForm) as IOption).value;
+          } else {
+            return !getValues(f as keyof IProjectBasicsForm);
+          }
+        })
+        .map((f) => t(`validation.${f}`))
+        .join(', ');
+
+      return missingFields.length > 0 ? `Täytä kentät: ${missingFields}` : true;
     },
     [getValues],
   );
 
   const validatePhase = useCallback(() => {
-    const programmedPhase = phases[2].value;
-
     return {
       required: t('required', { value: 'Vaihe' }) ?? '',
       validate: {
         isPhaseValid: (phase: IOption) => {
           const phaseToSubmit = phase.value;
-          if (
-            phaseToSubmit === programmedPhase &&
-            !getValues('planningStartYear') &&
-            !getValues('constructionEndYear')
-          ) {
-            return "Suunnittelun aloitusvuosi ja rakentamisen päättymisvuosi on täytettävä kun hankkeen vaihe on 'Ohjelmointi'";
+          switch (phaseToSubmit) {
+            case programmedPhase:
+              return getErrorMessageIfMissingFields(['planningStartYear', 'constructionEndYear']);
+            case draftApprovalPhase:
+              return getErrorMessageIfMissingFields(['estPlanningStart', 'estPlanningEnd']);
+            case constructionPhase:
+              return getErrorMessageIfMissingFields([
+                'estConstructionStart',
+                'estConstructionEnd',
+                'personConstruction',
+                'constructionPhaseDetail',
+              ]);
+            case warrantyPeriodPhase:
+              if (isBefore(getToday(), getValues('estConstructionEnd'))) {
+                return "Hankkeen vaihe ei voi olla 'Takuuaika' jos nykyinen päivä on ennen rakentamisen päättymispäivää";
+              }
+              break;
+            default:
+              return true;
           }
-          return true;
         },
       },
     };
-  }, [getValues, phases]);
+  }, [
+    constructionPhase,
+    draftApprovalPhase,
+    getErrorMessageIfMissingFields,
+    getValues,
+    programmedPhase,
+    warrantyPeriodPhase,
+  ]);
+
+  const validateProgrammed = useCallback(() => {
+    return {
+      validate: {
+        isProgrammedValid: (programmed: boolean) => {
+          const phase = getValues('phase');
+
+          if (phase.value === proposalPhase || phase.value === designPhase) {
+            return programmed
+              ? `Ohjelmoitu oltava 'Kyllä' kun hankkeen vaihe on '${phase.label}'`
+              : true;
+          } else {
+            return programmed
+              ? true
+              : `Ohjelmoitu on oltava 'Ei' kun hankkeen vaihe on '${phase.label}'`;
+          }
+        },
+      },
+    };
+  }, [designPhase, getValues, proposalPhase]);
 
   return (
     <div className="basic-form-container" data-testid="project-basics-form">
-      <form onBlur={isDirty ? (handleSubmit(onSubmit) as SubmitHandler<FieldValues>) : undefined}>
+      <form onBlur={isDirty ? (handleSubmit(onSubmit) as SubmitHandler<FieldValues>) : resetForm}>
         <div className="basic-info-form">
           {/* SECTION 1 - BASIC INFO */}
           <FormSectionTitle {...formProps('basics')} />
@@ -162,13 +246,14 @@ const ProjectBasicsForm: FC = () => {
           />
           {/* SECTION 2 - STATUS */}
           <FormSectionTitle {...formProps('status')} />
+          {/*  rules={validatePhase()} */}
           <SelectField {...formProps('phase')} rules={validatePhase()} options={phases} />
           <SelectField
             {...formProps('constructionPhaseDetail')}
             options={constructionPhaseDetails}
             disabled={getValues('phase').value !== phases[7].value}
           />
-          <RadioCheckboxField {...formProps('programmed')} />
+          <RadioCheckboxField {...formProps('programmed')} rules={validateProgrammed()} />
           <NumberField
             {...formProps('planningStartYear')}
             rules={{
@@ -209,11 +294,7 @@ const ProjectBasicsForm: FC = () => {
           >
             <DateField
               {...formProps('estPlanningStart')}
-              rules={validateBeforeEndDate(
-                'Suunnittelun aloitus',
-                'suunnittelun päättymistä',
-                'estPlanningEnd',
-              )}
+              rules={validateBeforeEndDate('estPlanningStart', 'estPlanningEnd')}
             />
             <DateField {...formProps('estPlanningEnd')} />
             <DateField {...formProps('presenceStart')} />
@@ -228,11 +309,7 @@ const ProjectBasicsForm: FC = () => {
           >
             <DateField
               {...formProps('estConstructionStart')}
-              rules={validateBeforeEndDate(
-                'Rakentaminen alkaa',
-                'rakentaminen päättyy',
-                'estConstructionEnd',
-              )}
+              rules={validateBeforeEndDate('estConstructionStart', 'estConstructionEnd')}
             />
             <DateField {...formProps('estConstructionEnd')} />
           </Fieldset>
