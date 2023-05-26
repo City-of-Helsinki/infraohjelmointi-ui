@@ -5,33 +5,36 @@ import { useTranslation } from 'react-i18next';
 import { GroupDialog } from '../GroupDialog';
 import './styles.css';
 import { IconCross } from 'hds-react/icons/';
-import { MouseEventHandler, useCallback, useState } from 'react';
+import { useCallback, useRef } from 'react';
 const ProjectToolbar = () => {
   const { Dropdown, Item } = Navigation;
+  const dropDownRef = useRef<HTMLDivElement>(null);
   const closeDropdown = useCallback(() => {
-    //close the dropdown
-  }, []);
+    dropDownRef.current?.click();
+  }, [dropDownRef]);
   const { t } = useTranslation();
 
   return (
     <Toolbar
       left={
         <>
-          <Dropdown
-            className="planning-toolbar-dropdown"
-            label={t(`new`)}
-            icon={<Icon icon={IconNewItem} />}
-          >
-            <div className="dropdown-header border-b-2 border-gray">
-              <div>Uusi</div>
-              <div>
-                <IconButton icon={IconCross} onClick={closeDropdown}></IconButton>
+          <div ref={dropDownRef}>
+            <Dropdown
+              className="planning-toolbar-dropdown"
+              label={t(`new`)}
+              icon={<Icon icon={IconNewItem} />}
+            >
+              <div className="dropdown-header border-b-2 border-gray">
+                <div>Uusi</div>
+                <div>
+                  <IconButton icon={IconCross} onClick={closeDropdown}></IconButton>
+                </div>
               </div>
-            </div>
-            <Item>
-              <GroupDialog />
-            </Item>
-          </Dropdown>
+              <Item>
+                <GroupDialog />
+              </Item>
+            </Dropdown>
+          </div>
         </>
       }
     />
