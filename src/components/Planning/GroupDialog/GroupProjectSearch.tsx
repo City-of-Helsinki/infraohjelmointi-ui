@@ -11,7 +11,7 @@ import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
-  control: Control<IGroupForm, any>;
+  control: Control<IGroupForm>;
   showAdvanceFields: boolean;
   divisions: IOption[];
 }
