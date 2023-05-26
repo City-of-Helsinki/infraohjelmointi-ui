@@ -421,6 +421,7 @@ const usePlanningRows = () => {
   // Listen to project-update from redux to see if an update event was triggered
   useEffect(() => {
     if (projectUpdate) {
+      console.log(projectUpdate)
       setPlanningRowsState((current) => ({
         ...current,
         projectToUpdate: projectUpdate.project,

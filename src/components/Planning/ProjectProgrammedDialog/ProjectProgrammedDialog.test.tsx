@@ -172,16 +172,22 @@ describe('ProjectProgrammedDialog', () => {
     mockedAxios.patch.mockResolvedValueOnce(mockPatchResponse);
     await waitFor(async () => {
       await user.click(submitButton);
+      await sendProjectUpdateEvent(mockPatchResponse.data[0]);
     });
-    await sendProjectUpdateEvent(mockPatchResponse.data[0]);
+    await waitFor(() => {
+      expect(store.getState().events.projectUpdate?.project).toStrictEqual(
+        mockPatchResponse.data[0],
+      );
+    });
     const formPatchRequest = mockedAxios.patch.mock
       .lastCall[1] as Array<IProjectPatchRequestObject>;
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
     await user.click(getByRole('button', { name: 'closeProjectProgrammedDialog' }));
-
-    expect(getByText('Planning Project 1')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(getByTestId('row-planning-project-1')).toBeInTheDocument();
+    });
 
     removeProjectUpdateEventListener(store.dispatch);
   });
