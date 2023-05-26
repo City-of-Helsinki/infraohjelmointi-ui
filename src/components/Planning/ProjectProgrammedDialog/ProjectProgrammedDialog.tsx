@@ -9,6 +9,7 @@ import { IProjectsPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { useOptions } from '@/hooks/useOptions';
 import { IPlanningRowSelections } from '@/interfaces/common';
 import { patchProjects } from '@/services/projectServices';
+import { createDateToEndOfYear, createDateToStartOfYear } from '@/utils/dates';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -24,8 +25,19 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
   const buildRequestPayload = useCallback(
     (projects: Array<IProgrammedProjectSuggestions>): IProjectsPatchRequestObject => {
+      const currentYear = new Date().getFullYear();
       return {
-        data: projects.map((p) => ({ id: p.value, data: { programmed: true, phase: phase } })),
+        data: projects.map((p) => ({
+          id: p.value,
+          data: {
+            programmed: true,
+            phase: phase,
+            estPlanningStart: createDateToStartOfYear(currentYear),
+            estPlanningEnd: createDateToEndOfYear(currentYear),
+            estConstructionStart: createDateToStartOfYear(currentYear + 1),
+            estConstructionEnd: createDateToEndOfYear(currentYear + 1),
+          },
+        })),
       };
     },
     [phase],
