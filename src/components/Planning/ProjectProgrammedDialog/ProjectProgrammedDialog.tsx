@@ -62,7 +62,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   }, [handleClose]);
 
   const onSubmit = useCallback(
-    async (e: MouseEvent<HTMLButtonElement>) => {
+    (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       patchProjects(buildRequestPayload(projectsForSubmit))
         .then(() => {
