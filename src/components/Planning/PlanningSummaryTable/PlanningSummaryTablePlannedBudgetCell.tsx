@@ -23,10 +23,16 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
       {year === selectedYear && (
         <>
           {isCurrentYear && (
-            <td key={`${year}-monthly-view`} className="monthly-summary-cell summary-budget"></td>
+            <td
+              key={`${year}-monthly-view`}
+              className={`monthly-summary-cell summary-budget ${isCurrentYear ? '!bg-bus' : ''}`}
+            ></td>
           )}
           {moment.monthsShort().map((m) => (
-            <td key={m} className={`monthly-cell summary-budget`}></td>
+            <td
+              key={m}
+              className={`monthly-cell summary-budget ${isCurrentYear ? '!bg-bus' : ''}`}
+            ></td>
           ))}
         </>
       )}

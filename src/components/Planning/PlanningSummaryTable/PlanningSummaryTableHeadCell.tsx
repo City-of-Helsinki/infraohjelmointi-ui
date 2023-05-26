@@ -64,18 +64,17 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
     [year],
   );
 
-  const leftArrow = useMemo(
-    () => (selectedYear === year ? <IconAngleRight /> : <IconAngleLeft />),
-    [selectedYear, year],
-  );
-  const rightArrow = useMemo(
-    () => (selectedYear === year ? <IconAngleLeft /> : <IconAngleRight />),
+  const arrows = useMemo(
+    () => ({
+      left: selectedYear === year ? <IconAngleRight /> : <IconAngleLeft />,
+      right: selectedYear === year ? <IconAngleLeft /> : <IconAngleRight />,
+    }),
     [selectedYear, year],
   );
 
   const showDateIndicator = useCallback(
     (month: number) => month === getMonthToday() && isCurrentYear,
-    [],
+    [isCurrentYear],
   );
 
   return (
@@ -87,8 +86,8 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
         >
           <span className="text-sm font-light">{title}</span>
           <div className="arrows-container">
-            {leftArrow}
-            {rightArrow}
+            {arrows.left}
+            {arrows.right}
             <span className="text-sm font-bold">{year}</span>
           </div>
         </button>

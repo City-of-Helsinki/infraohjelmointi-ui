@@ -26,17 +26,14 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) 
           </span>
         </div>
       </td>
+      {/* There will be data generated here (at least for the first year) in future tasks */}
       {year === selectedYear && (
         <>
           {isCurrentYear && (
-            <td key={`${year}-monthly-cell`} className={`monthly-summary-cell ${type}`}>
-              {/* TODO: some stuff here */}
-            </td>
+            <td key={`${year}-monthly-cell`} className={`monthly-summary-cell ${type}`}></td>
           )}
           {moment.monthsShort().map((m) => (
-            <td key={m} className={`monthly-cell ${type}`}>
-              {/* TODO: some stuff here */}
-            </td>
+            <td key={m} className={`monthly-cell ${type}`}></td>
           ))}
         </>
       )}

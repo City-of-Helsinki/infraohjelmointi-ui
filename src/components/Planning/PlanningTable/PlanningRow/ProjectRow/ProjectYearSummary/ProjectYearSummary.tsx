@@ -26,15 +26,8 @@ const ProjectYearSummary: FC<IProjectYearSummaryProps> = ({
       {/* Year summary (only visible for the first year in the table) */}
       {showYearSummaryTable && <ProjectYearSummaryTable cellType={cellType} id={id} />}
       {/* Monthly graph */}
-      {monthlyDataList.map((c, i) => (
-        <MonthlyGraphCell
-          key={c.month}
-          index={i}
-          {...c}
-          cellType={cellType}
-          month={c.month}
-          id={id}
-        />
+      {monthlyDataList.map((c) => (
+        <MonthlyGraphCell key={c.month} {...c} cellType={cellType} month={c.month} id={id} />
       ))}
     </>
   );

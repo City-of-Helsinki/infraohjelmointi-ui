@@ -61,7 +61,7 @@
 .construction + .none::after,
 .planning + .none::after,
 .overlap + .none::after,
-/* add a left border to a colored cell if it's the first colored cell  */
+/* add a right border to a colored cell if it's the first colored cell  */
 .none + .planning::after,
 .none + .construction::after,
 .none + .overlap::after {
@@ -72,6 +72,13 @@
   width: 2px;
   height: 100%;
   background: var(--color-black-20);
+}
+
+/* remove the left border when a monthly-cell is expanded next to a none cell */
+.construction + .monthly-cell + .none::after,
+.planning + .monthly-cell + .none::after,
+.overlap + .monthly-cell + .none::after {
+  width: 0px;
 }
 
 /* add a left border to an ACTIVE cell with the none-class after the last colored cell */

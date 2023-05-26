@@ -37,7 +37,6 @@ const SelectField: FC<ISelectFieldProps> = ({
   hideLabel,
   icon,
   placeholder,
-  clearable,
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
