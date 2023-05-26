@@ -126,11 +126,11 @@ const ProjectBasicsForm: FC = () => {
     () => ({
       min: {
         value: 0,
-        message: t('minValue', { value: '0' }),
+        message: t('validation.minValue', { value: '0' }),
       },
       max: {
         value: 3000,
-        message: t('maxValue', { value: '3000' }),
+        message: t('validation.maxValue', { value: '3000' }),
       },
     }),
     [t],
@@ -147,7 +147,7 @@ const ProjectBasicsForm: FC = () => {
 
   const validatePhase = useCallback(() => {
     return {
-      required: t('required', { value: 'Vaihe' }) ?? '',
+      required: t('validation.required', { field: 'Vaihe' }) ?? '',
       validate: {
         isPhaseValid: (phase: IOption) => {
           const phaseToSubmit = phase.value;
@@ -211,7 +211,7 @@ const ProjectBasicsForm: FC = () => {
           const endYear = getValues('constructionEndYear');
           if (isFieldDirty('planningStartYear')) {
             if (startYear && endYear && parseInt(startYear) > parseInt(endYear)) {
-              return t('isBefore', {
+              return t('validation.isBefore', {
                 start: t('validation.planningStartYear'),
                 end: t('validation.constructionEndYear'),
               });
@@ -235,7 +235,7 @@ const ProjectBasicsForm: FC = () => {
             parseInt(endYear) < parseInt(startYear) &&
             isFieldDirty('constructionEndYear')
           ) {
-            return t('isAfter', {
+            return t('validation.isAfter', {
               end: t('validation.constructionEndYear'),
               start: t('validation.planningStartYear'),
             });
@@ -282,7 +282,7 @@ const ProjectBasicsForm: FC = () => {
         isRequired: (startDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedPlanning.includes(phase) && !startDate) {
-            return t('requiredFor', {
+            return t('validation.requiredFor', {
               requiredField: t('validation.estPlanningStart'),
               field: t('validation.phase'),
               value: getValues('phase').label,
@@ -293,7 +293,7 @@ const ProjectBasicsForm: FC = () => {
         isBeforeEndDate: (startDate: string | null) => {
           if (isFieldDirty('estPlanningStart')) {
             if (!isBefore(startDate, getValues('estPlanningEnd'))) {
-              return t('isBefore', {
+              return t('validation.isBefore', {
                 start: t('validation.estPlanningStart'),
                 end: t('validation.estPlanningEnd'),
               });
@@ -311,7 +311,7 @@ const ProjectBasicsForm: FC = () => {
         isRequired: (endDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedPlanning.includes(phase) && !endDate) {
-            return t('requiredFor', {
+            return t('validation.requiredFor', {
               requiredField: t('validation.estPlanningEnd'),
               field: t('validation.phase'),
               value: getValues('phase').label,
@@ -322,7 +322,7 @@ const ProjectBasicsForm: FC = () => {
         isAfterStartDate: (endDate: string | null) => {
           if (isFieldDirty('estPlanningEnd')) {
             if (!isBefore(getValues('estPlanningStart'), endDate)) {
-              return t('isAfter', {
+              return t('validation.isAfter', {
                 start: t('validation.estPlanningStart'),
                 end: t('validation.estPlanningEnd'),
               });
@@ -342,7 +342,7 @@ const ProjectBasicsForm: FC = () => {
         isRequired: (startDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedConstruction.includes(phase) && !startDate) {
-            return t('requiredFor', {
+            return t('validation.requiredFor', {
               requiredField: t('validation.estConstructionStart'),
               field: t('validation.phase'),
               value: getValues('phase').label,
@@ -353,7 +353,7 @@ const ProjectBasicsForm: FC = () => {
         isBeforeEndDate: (startDate: string | null) => {
           if (isFieldDirty('estConstructionStart')) {
             if (!isBefore(startDate, getValues('estConstructionEnd'))) {
-              return t('isBefore', {
+              return t('validation.isBefore', {
                 start: t('validation.estConstructionStart'),
                 end: t('validation.estConstructionEnd'),
               });
@@ -371,7 +371,7 @@ const ProjectBasicsForm: FC = () => {
         isRequired: (endDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedConstruction.includes(phase) && !endDate) {
-            return t('requiredFor', {
+            return t('validation.requiredFor', {
               requiredField: t('validation.estConstructionEnd'),
               field: t('validation.phase'),
               value: getValues('phase').label,
@@ -382,7 +382,7 @@ const ProjectBasicsForm: FC = () => {
         isAfterStartDate: (endDate: string | null) => {
           if (isFieldDirty('estConstructionEnd')) {
             if (!isBefore(getValues('estConstructionStart'), endDate)) {
-              return t('isAfter', {
+              return t('validation.isAfter', {
                 start: t('validation.estConstructionStart'),
                 end: t('validation.estConstructionEnd'),
               });
@@ -403,15 +403,19 @@ const ProjectBasicsForm: FC = () => {
           <SelectField
             {...formProps('type')}
             options={types}
-            rules={{ required: t('required', { value: t('validation.phase') }) ?? '' }}
+            rules={{ required: t('validation.required', { field: t('validation.phase') }) ?? '' }}
           />
           <NumberField
             {...formProps('hkrId')}
-            rules={{ maxLength: { value: 18, message: t('maxLength', { value: '18' }) } }}
+            rules={{
+              maxLength: { value: 18, message: t('validation.maxLength', { value: '18' }) },
+            }}
           />
           <TextField
             {...formProps('entityName')}
-            rules={{ maxLength: { value: 30, message: t('maxLength', { value: '30' }) } }}
+            rules={{
+              maxLength: { value: 30, message: t('validation.maxLength', { value: '30' }) },
+            }}
           />
           <TextField {...formProps('sapProject')} control={control} />
           <TextField {...formProps('sapNetwork')} readOnly={true} />
@@ -419,7 +423,7 @@ const ProjectBasicsForm: FC = () => {
           <TextAreaField
             {...formProps('description')}
             size="l"
-            rules={{ required: t('required', { value: 'Kuvaus' }) ?? '' }}
+            rules={{ required: t('validation.required', { field: 'Kuvaus' }) ?? '' }}
             formSaved={formSaved}
           />
           <ProjectHashTags
@@ -537,7 +541,9 @@ const ProjectBasicsForm: FC = () => {
           <SelectField
             {...formProps('responsibleZone')}
             options={responsibleZones}
-            rules={{ required: t('required', { value: 'Alueen vastuujaon mukaan' }) ?? '' }}
+            rules={{
+              required: t('validation.required', { field: 'Alueen vastuujaon mukaan' }) ?? '',
+            }}
           />
           <SelectField {...formProps('district')} icon="location" options={districts} />
           <SelectField {...formProps('division')} icon="location" options={divisions} />
