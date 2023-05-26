@@ -1,6 +1,7 @@
 
 #add-project-programmed-dialog {
   width: 45vw;
+  @apply h-screen
 }
 
 #add-project-programmed-dialog .project-search-input .search-selections {
@@ -11,7 +12,7 @@
 }
 
 #add-project-programmed-dialog .dialog-search-section{
-  min-height: 20vh;
+  @apply min-h-screen
 }
 
 .project-suggestions-card {

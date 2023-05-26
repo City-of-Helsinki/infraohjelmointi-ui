@@ -84,7 +84,6 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
           isOpen={isOpen}
           close={handleDialogClose}
           closeButtonLabelText={t('closeProjectProgrammedDialog')}
-          className="big-dialog"
           scrollable
         >
           {/* Header */}

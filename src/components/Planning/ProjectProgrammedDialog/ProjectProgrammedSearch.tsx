@@ -147,6 +147,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   );
   return (
     <div className="project-search-input" data-testid="search-project-field-section">
+      <div ref={scrollRef}></div>
       <SearchInput
         label={t('projectProgrammedForm.searchForProjects')}
         getSuggestions={getSuggestions}
@@ -168,7 +169,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
           />
         ))}
       </div>
-      <div ref={scrollRef}></div>
     </div>
   );
 };
