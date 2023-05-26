@@ -27,7 +27,7 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
 
   return (
     <div className="project-side-panel">
-      <div className="flex max-w-[17.5rem] justify-center">
+      <div className="side-navigation">
         <SideNavigation navItems={navItems} />
       </div>
 
@@ -43,7 +43,7 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
       <div
         id="pw-folder-container"
         data-testid="pw-folder-container"
-        className="mt-8 flex justify-center"
+        className="pw-folder-container"
       >
         <div className="side-nav">
           <div className="text-heading-s" id="pw-folder-title">
