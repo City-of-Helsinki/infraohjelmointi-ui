@@ -318,13 +318,3 @@
 #phase div div div:nth-child(3) {
   @apply w-[200%];
 }
-
-/* Planning start/end error message to extend both of the containers  */
-#estPlanningStart div div div:nth-child(3) {
-  @apply w-[200%];
-}
-
-/* Construction start/end error message to extend both of the containers  */
-#estConstructionStart div div div:nth-child(3) {
-  @apply w-[200%];
-}

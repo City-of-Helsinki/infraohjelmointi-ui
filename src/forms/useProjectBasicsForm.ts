@@ -192,9 +192,7 @@ const useProjectBasicsForm = () => {
     }
   }, [project]);
 
-  const resetForm = useCallback(() => reset(formValues), [formValues, reset]);
-
-  return { formMethods, classOptions, locationOptions, resetForm };
+  return { formMethods, classOptions, locationOptions };
 };
 
 export default useProjectBasicsForm;

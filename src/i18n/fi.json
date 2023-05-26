@@ -105,7 +105,8 @@
     "planningStartYear": "Suunnittelun aloitusvuosi",
     "constructionEndYear": "Rakentamisen valmistumisvuosi",
     "personConstruction": "Rakennuttamisen vastuuhenkilö",
-    "constructionPhaseDetail": "Rakentamisvaiheen tarkenne"
+    "constructionPhaseDetail": "Rakentamisvaiheen tarkenne",
+    "phase": "Hankkeen vaihe"
   },
   "projectBasicsForm": {
     "basics": "Hankkeen perustiedot",
@@ -314,11 +315,13 @@
   "search": "Hae",
   "searchProjects": "Hae projekteja",
   "choose": "Valitse",
-  "required": "{{value}} on pakollinen tieto.",
-  "isBefore": "{{start}} on oltava ennen {{end}}",
-  "maxLength": "Maksimipituus on {{value}} merkkiä.",
+  "required": "{{value}} on pakollinen tieto",
+  "isBefore": "{{start}} on oltava ennen kuin {{end}}",
+  "isAfter": "{{end}} on oltava myöhemmin kuin {{start}}",
+  "maxLength": "Maksimipituus on {{value}} merkkiä",
   "minValue": "Arvon on oltava suurempi tai yhtä suuri kuin {{value}}",
   "maxValue": "Arvon on oltava pienempi tai yhtä suuri kuin {{value}}",
+  "requiredFor": "'{{requiredField}}' on pakollinen kun '{{field}}' on '{{value}}'",
   "groups": "Ryhmä",
   "classes": "Luokat",
   "locations": "Sijainnit",

@@ -115,6 +115,9 @@ export const createDateToEndOfYear = (year: string | number | null) => {
 
 export const getToday = () => moment().format('D.M.YYYY');
 
+/**
+ * Returns true if the given start date is before the end date
+ */
 export const isBefore = (start?: string | null, end?: string | null) => {
   if (start && end) {
     const startMoment = momentFromHDSDate(start);
