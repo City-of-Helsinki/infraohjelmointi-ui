@@ -164,7 +164,7 @@ describe('ProjectProgrammedDialog', () => {
     const getRequest = mockedAxios.get.mock;
     // Check that the correct url was called
     expect(getRequest.lastCall[0]).toBe(
-      'localhost:4000/projects/search-results/?projectName=Planning&programmed=false&class=test-class-1&limit=30&order=new',
+      'localhost:4000/projects/search-results/?projectName=Planning&programmed=false&phase=7bc0829e-ffb4-4e4c-8653-1e1709e9f17a&phase=7d02f54f-b874-484e-8db5-89bda613f918&class=test-class-1&limit=30&order=new',
     );
 
     // project selected, button is enabled
