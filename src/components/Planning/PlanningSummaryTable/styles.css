@@ -1,10 +1,15 @@
 .planning-summary-table {
   /* width 65% since the info-panel is 30% */
-  @apply w-[65%] text-right;
+  --summary-table-width: calc(100% - 32rem);
+  @apply w-[var(--summary-table-width)] text-right;
 }
 
-.planning-summary-table td {
-  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 !pr-4;
+.planning-summary-head-cell {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
+}
+
+.planning-summary-frame-and-deviation-cell {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
 }
 
 .planning-summary-table span {
@@ -12,7 +17,7 @@
 }
 
 .planned-budget-cell {
-  @apply h-[36px] bg-bus-d text-white first:bg-bus;
+  @apply h-[36px] min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] bg-bus-d py-1 pr-4 text-white first:bg-bus;
 }
 
 .planned-budget-cell span {
@@ -33,4 +38,28 @@
 
 .planning-summary-frame-and-deviation-container .deviation.negative {
   @apply text-[#b01038];
+}
+
+.monthly-cell-container {
+  @apply flex h-10 items-end;
+}
+
+.monthly-cell-container span {
+  @apply !text-center text-sm font-light;
+}
+
+.arrows-container {
+  @apply relative flex w-14 items-center justify-start;
+}
+
+.arrows-container svg {
+  @apply absolute h-5 w-5;
+}
+
+.arrows-container svg:first-child {
+  left: -10px;
+}
+
+.date-indicator {
+  @apply absolute top-6 z-10 !w-[2px] bg-metro;
 }

@@ -58,6 +58,10 @@ export interface IProjectBasicsForm {
   riskAssessment: IOption;
   constructionEndYear: string;
   planningStartYear: string;
+  estPlanningStart: string;
+  estPlanningEnd: string;
+  estConstructionStart: string;
+  estConstructionEnd: string;
 }
 
 export interface ISearchForm {

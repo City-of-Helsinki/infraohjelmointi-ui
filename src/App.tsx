@@ -27,6 +27,8 @@ import {
   addProjectUpdateEventListener,
   removeProjectUpdateEventListener,
 } from '@/utils/events';
+import moment from 'moment';
+import 'moment/locale/fi';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -50,6 +52,8 @@ const App: FC = () => {
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
+    // Set moments locale to finnish for the app
+    moment().locale('fi');
     initalizeStates().catch(Promise.reject);
   }, []);
 

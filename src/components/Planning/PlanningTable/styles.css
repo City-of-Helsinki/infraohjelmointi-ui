@@ -1,7 +1,78 @@
+:root {
+  --color-masterClass: var(--color-bus);
+  --color-class: #0000a3; /* color had to be improvised */
+  --color-subClass: #00007a; /* color had to be improvised */
+  --color-district-preview: var(--color-bus-dark);
+  --color-district: var(--color-bus);
+  --color-division: var(--color-fog-medium-light);
+  --color-group: var(--color-fog-light);
+}
+
 .planning-table {
   @apply w-full;
 }
 
-.planning-table thead tr th:nth-child(2) span {
-  @apply pr-0;
+.monthly-cell {
+  @apply w-[39px] min-w-[39px] max-w-[39px] !p-0 !pr-0;
+}
+
+.monthly-summary-cell {
+  @apply w-64 min-w-[16rem] max-w-[16rem];
+}
+
+.monthly-cell.summary-budget.start-month,
+.monthly-summary-cell.summary-budget.start-month {
+  @apply bg-bus;
+}
+
+.monthly-cell.summary-budget,
+.monthly-summary-cell.summary-budget {
+  @apply bg-bus-d;
+}
+
+.monthly-cell.masterClass,
+.monthly-summary-cell.masterClass {
+  @apply border-b border-white bg-[var(--color-masterClass)];
+}
+
+.monthly-cell.class,
+.monthly-summary-cell.class {
+  @apply border-b border-white bg-[var(--color-class)];
+}
+
+.monthly-cell.subClass,
+.monthly-summary-cell.subClass {
+  @apply border-b border-white bg-[var(--color-subClass)];
+}
+
+.monthly-cell.district-preview,
+.monthly-summary-cell.district-preview {
+  @apply border-b border-white bg-[var(--color-district-preview)];
+}
+
+.monthly-cell.district,
+.monthly-summary-cell.district {
+  @apply border-b border-white bg-[var(--color-district)];
+}
+
+.monthly-cell.division,
+.monthly-summary-cell.division {
+  @apply border-b border-black-70 bg-[var(--color-division)];
+}
+
+.monthly-cell.group,
+.monthly-summary-cell.group {
+  @apply border-b border-black-70 bg-[var(--color-group)];
+}
+
+.monthly-summary-cell.project,
+.monthly-cell.project {
+  /* setting height to 0 will allow height: 100% to work for child elements */
+  @apply h-24 border-b-[0.05rem] border-bus-m p-0;
+}
+
+.monthly-summary-cell.project.none,
+.monthly-cell.project.none {
+  /* setting height to 0 will allow height: 100% to work for child elements */
+  @apply h-0 p-0;
 }

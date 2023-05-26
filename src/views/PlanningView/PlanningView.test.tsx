@@ -39,6 +39,8 @@ import {
   addProjectUpdateEventListener,
   removeProjectUpdateEventListener,
 } from '@/utils/events';
+import { getMonthToday, getToday, updateYear } from '@/utils/dates';
+import moment from 'moment';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -350,10 +352,10 @@ describe('PlanningView', () => {
       expect(getByTestId('planning-summary-realized-budget-row')).toBeInTheDocument();
 
       const cells = calculatePlanningSummaryCells(masterClasses, 'masterClass');
-      cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
-        expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
-        expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
-        expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
+      cells.forEach(({ year, plannedBudget, frameBudget, deviation }) => {
+        expect(getByTestId(`summary-budget-${year}`).textContent).toBe(plannedBudget);
+        expect(getByTestId(`summary-frame-${year}`).textContent).toBe(frameBudget);
+        expect(getByTestId(`summary-deviation-${year}`).textContent).toBe(deviation);
       });
     });
 
@@ -368,12 +370,69 @@ describe('PlanningView', () => {
       const cells = calculatePlanningCells(finances, 'class');
 
       await waitFor(() => {
-        cells.forEach(({ key, plannedBudget, frameBudget, deviation }) => {
-          expect(getByTestId(`summary-budget-${key}`).textContent).toBe(plannedBudget);
-          expect(getByTestId(`summary-frame-${key}`).textContent).toBe(frameBudget);
-          expect(getByTestId(`summary-deviation-${key}`).textContent).toBe(deviation);
+        cells.forEach(({ year, plannedBudget, frameBudget, deviation }) => {
+          expect(getByTestId(`summary-budget-${year}`).textContent).toBe(plannedBudget);
+          expect(getByTestId(`summary-frame-${year}`).textContent).toBe(frameBudget);
+          expect(getByTestId(`summary-deviation-${year}`).textContent).toBe(deviation);
         });
       });
+    });
+
+    it('expands the monthly view and shows detailed info when clicking the current year and can be closed by clicking another year or clicking it again', async () => {
+      const { user, getByTestId, queryByTestId } = await render();
+      const year = new Date().getFullYear();
+      const months = moment.months();
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year}`));
+
+      months.forEach((m, i) => {
+        expect(getByTestId(`month-label-${m}`)).toHaveTextContent(m.substring(0, 3));
+        expect(getByTestId(`graph-cell-${m}`)).toBeInTheDocument();
+
+        if (i + 1 === getMonthToday()) {
+          expect(getByTestId(`month-label-${m}`).children.length).toBe(2);
+          expect(
+            getByTestId(`month-label-${m}`).children[1].classList.contains('date-indicator'),
+          ).toBeTruthy();
+        } else {
+          expect(getByTestId(`month-label-${m}`).children.length).toBe(1);
+        }
+      });
+
+      expect(getByTestId('date-today-label')).toHaveTextContent(getToday());
+      expect(getByTestId('date-indicator')).toBeInTheDocument();
+      expect(getByTestId('year-summary')).toBeInTheDocument();
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+      expect(queryByTestId('date-today-label')).toBeNull();
+
+      months.forEach((m) => {
+        expect(getByTestId(`month-label-${m}`)).toHaveTextContent(m.substring(0, 3));
+      });
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+      months.forEach((m) => {
+        expect(queryByTestId(`month-label-${m}`)).toBeNull();
+      });
+    });
+
+    it('expands only the monthly view calendar when clicking the other years', async () => {
+      const { user, getByTestId, queryByTestId } = await render();
+      const year = new Date().getFullYear();
+      const months = moment.months();
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+      months.forEach((m) => {
+        expect(getByTestId(`month-label-${m}`)).toHaveTextContent(m.substring(0, 3));
+        expect(getByTestId(`graph-cell-${m}`)).toBeInTheDocument();
+      });
+
+      expect(queryByTestId('date-today-label')).toBeNull();
+      expect(queryByTestId('date-indicator')).toBeNull();
+      expect(queryByTestId('year-summary')).toBeNull();
     });
   });
 
@@ -759,8 +818,8 @@ describe('PlanningView', () => {
       });
     });
 
-    describe('Project Row', () => {
-      it('renders all the elements and the row budgets and no financial data to cells if there is no planning or construction', async () => {
+    describe('ProjectRow', () => {
+      it('renders all the elements and the row budgets to rows that have either est-dates or planningStartYear or constructionEndYear, and no financial data to cells if there is no planning or construction', async () => {
         const renderResult = await render();
 
         const { getByTestId } = renderResult;
@@ -786,7 +845,9 @@ describe('PlanningView', () => {
           for (let i = 0; i < 10; i++) {
             const year = finances.year + i;
             expect(getByTestId(`project-cell-${year}-${id}`)).toBeInTheDocument();
-            expect(getByTestId(`cell-input-${year}-${id}`)).toBeDisabled();
+            if (i === 0 || i === 9 || i === 10) {
+              expect(getByTestId(`cell-input-${year}-${id}`)).toBeDisabled();
+            }
           }
         });
       });
@@ -897,12 +958,12 @@ describe('PlanningView', () => {
             }
             // Planning
             if (i === 1) {
-              expect(cell.classList.contains('plan')).toBeTruthy();
+              expect(cell.classList.contains('planning')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.budgetProposalCurrentYearPlus1));
             }
             // Planning
             if (i === 2) {
-              expect(cell.classList.contains('plan')).toBeTruthy();
+              expect(cell.classList.contains('planning')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.budgetProposalCurrentYearPlus2));
             }
             // Overlap
@@ -912,20 +973,112 @@ describe('PlanningView', () => {
             }
             // Construction
             if (i === 4) {
-              expect(cell.classList.contains('con')).toBeTruthy();
+              expect(cell.classList.contains('construction')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.preliminaryCurrentYearPlus4));
             }
             // Construction
             if (i === 5) {
-              expect(cell.classList.contains('con')).toBeTruthy();
+              expect(cell.classList.contains('construction')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.preliminaryCurrentYearPlus5));
             }
             // Construction
             if (i === 6) {
-              expect(cell.classList.contains('con')).toBeTruthy();
+              expect(cell.classList.contains('construction')).toBeTruthy();
               expect(input).toHaveValue(asNumber(finances.preliminaryCurrentYearPlus6));
             }
           }
+        });
+      });
+
+      it('can expand the years to view a year summary and monthly data graph about the project', async () => {
+        const renderResult = await render();
+        const { user, getByTestId } = renderResult;
+        const year = new Date().getFullYear();
+        const months = moment.months();
+        const project = mockPlanningViewProjects.data.results[1];
+
+        await navigateToProjectRows(renderResult);
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year}`));
+
+        await waitFor(() => {
+          expect(getByTestId(`project-year-summary-${project.id}`));
+          months.forEach((m) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            expect(
+              getByTestId(`project-monthly-graph-cell-${project.id}-${m}`),
+            ).toBeInTheDocument();
+            expect(getComputedStyle(planningBar).width).toBe('0%');
+            expect(getComputedStyle(constructionBar).width).toBe('0%');
+          });
+        });
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+        await waitFor(() => {
+          months.forEach((m, i) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            expect(getComputedStyle(constructionBar).width).toBe('0%');
+
+            if (i === 0) {
+              expect(getComputedStyle(planningBar).width).toBe('0%');
+            } else if (i === 1) {
+              expect(getComputedStyle(planningBar).width).toBe('59%');
+            } else {
+              expect(getComputedStyle(planningBar).width).toBe('100%');
+            }
+          });
+        });
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year + 3}`));
+
+        await waitFor(() => {
+          months.forEach((m, i) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            if (i === 0) {
+              expect(getComputedStyle(planningBar).width).toBe('100%');
+              expect(getComputedStyle(constructionBar).width).toBe('0%');
+            } else if (i === 1) {
+              expect(getComputedStyle(planningBar).width).toBe('43%');
+              expect(getComputedStyle(constructionBar).width).toBe('57%');
+            } else {
+              expect(getComputedStyle(planningBar).width).toBe('0%');
+              expect(getComputedStyle(constructionBar).width).toBe('100%');
+            }
+          });
+        });
+
+        await user.click(getByTestId(`expand-monthly-view-button-${year + 6}`));
+
+        await waitFor(() => {
+          months.forEach((m, i) => {
+            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(
+              `monthly-construction-graph-bar-${project.id}-${m}`,
+            );
+
+            expect(getComputedStyle(planningBar).width).toBe('0%');
+
+            if (i === 0) {
+              expect(getComputedStyle(constructionBar).width).toBe('100%');
+            } else if (i === 1) {
+              expect(getComputedStyle(constructionBar).width).toBe('43%');
+            } else {
+              expect(getComputedStyle(constructionBar).width).toBe('0%');
+            }
+          });
         });
       });
 
@@ -1019,8 +1172,8 @@ describe('PlanningView', () => {
           expect(getByTestId('close-project-cell-menu')).toBeInTheDocument();
           expect(getByTestId('cell-year')).toHaveTextContent(yearToHide.toString());
           expect(getByTestId('cell-title')).toHaveTextContent(name);
-          expect(getByTestId('cell-type-con').classList.contains('selected')).toBeTruthy();
-          expect(getByTestId('cell-type-plan')).toBeInTheDocument();
+          expect(getByTestId('cell-type-construction').classList.contains('selected')).toBeTruthy();
+          expect(getByTestId('cell-type-planning')).toBeInTheDocument();
 
           // Delete cell
           await user.click(getByTestId('remove-year-button'));
@@ -1043,7 +1196,9 @@ describe('PlanningView', () => {
             ).toBeTruthy();
             // Next cell is still construction in the document
             expect(
-              getByTestId(`project-cell-${yearToHide + 1}-${id}`).classList.contains('con'),
+              getByTestId(`project-cell-${yearToHide + 1}-${id}`).classList.contains(
+                'construction',
+              ),
             ).toBeTruthy();
           });
 
@@ -1053,30 +1208,30 @@ describe('PlanningView', () => {
         it('can delete the start and end of the timeline to decrease the planning or construction dates', async () => {
           const project = mockPlanningViewProjects.data.results[1];
           const year = new Date().getFullYear();
+          const updatedConstructionYear = year + 5;
 
-          const patchConEndRequest = {
+          const patchConstructionEndRequest = {
             finances: {
               year: year,
               preliminaryCurrentYearPlus5: '130',
               preliminaryCurrentYearPlus6: '0',
             },
-            // FIXME: the updateYear() function in dates.ts generates a date that is 5 days in the past,
-            // we should actually expect 12.02.2028
-            estConstructionEnd: `07.02.${year + 5}`,
+            estConstructionEnd: updateYear(updatedConstructionYear, project.estConstructionEnd),
+            constructionEndYear: updatedConstructionYear,
           };
 
-          const mockRemoveConEndPatchResponse = {
+          const mockRemoveConstructionEndPatchResponse = {
             data: {
               ...project,
               finances: {
                 ...project.finances,
-                ...patchConEndRequest.finances,
+                ...patchConstructionEndRequest.finances,
               },
-              estConstructionEnd: patchConEndRequest.estConstructionEnd,
+              estConstructionEnd: patchConstructionEndRequest.estConstructionEnd,
             },
           };
 
-          mockedAxios.patch.mockResolvedValueOnce(mockRemoveConEndPatchResponse);
+          mockedAxios.patch.mockResolvedValueOnce(mockRemoveConstructionEndPatchResponse);
 
           const renderResult = await render();
 
@@ -1099,11 +1254,11 @@ describe('PlanningView', () => {
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock[1]).toStrictEqual(patchConEndRequest);
+            expect(patchMock[1]).toStrictEqual(patchConstructionEndRequest);
           });
 
           // Send the project-update event with the updated project
-          await sendProjectUpdateEvent(mockRemoveConEndPatchResponse.data);
+          await sendProjectUpdateEvent(mockRemoveConstructionEndPatchResponse.data);
 
           await waitFor(() => {
             // Cell is hidden
@@ -1116,29 +1271,30 @@ describe('PlanningView', () => {
 
           const startOfTimeline = year + 1;
 
-          const patchPlanStartRequest = {
+          const updatedPlanningYear = year + 2;
+
+          const patchPlanningStartRequest = {
             finances: {
               year: year,
               budgetProposalCurrentYearPlus1: '0',
               budgetProposalCurrentYearPlus2: '30',
             },
-            // FIXME: the updateYear() function in dates.ts generates a date that is 5 days in the past,
-            // we should actually expect 12.02.2025
-            estPlanningStart: `10.02.${year + 2}`,
+            estPlanningStart: updateYear(updatedPlanningYear, project.estPlanningStart),
+            planningStartYear: updatedPlanningYear,
           };
 
-          const mockRemovePlanStartPatchResponse = {
+          const mockRemovePlanningStartPatchResponse = {
             data: {
               ...project,
+              ...patchPlanningStartRequest,
               finances: {
                 ...project.finances,
-                ...patchPlanStartRequest.finances,
+                ...patchPlanningStartRequest.finances,
               },
-              estPlanningStart: `12.02.${year + 2}`,
             },
           };
 
-          mockedAxios.patch.mockResolvedValueOnce(mockRemovePlanStartPatchResponse);
+          mockedAxios.patch.mockResolvedValueOnce(mockRemovePlanningStartPatchResponse);
 
           await waitFor(() => openContextMenuForCell(startOfTimeline, id, renderResult));
           await user.click(getByTestId('remove-year-button'));
@@ -1147,11 +1303,11 @@ describe('PlanningView', () => {
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
-            expect(patchMock[1]).toStrictEqual(patchPlanStartRequest);
+            expect(patchMock[1]).toStrictEqual(patchPlanningStartRequest);
           });
 
           // Send the project-update event with the updated project
-          await sendProjectUpdateEvent(mockRemovePlanStartPatchResponse.data);
+          await sendProjectUpdateEvent(mockRemovePlanningStartPatchResponse.data);
 
           // Check that correct data was patched and planning start has moved
           await waitFor(() => {
@@ -1165,7 +1321,7 @@ describe('PlanningView', () => {
           removeProjectUpdateEventListener(dispatch);
         });
 
-        it('it removes construction end and start dates if last construction cell is removed', async () => {
+        it('it removes construction end and start dates if last construction cell is removed and move construction end year to planning start if its not the last cell', async () => {
           const project = mockPlanningViewProjects.data.results[8];
           const year = new Date().getFullYear();
 
@@ -1173,7 +1329,10 @@ describe('PlanningView', () => {
             finances: {
               year: year,
               preliminaryCurrentYearPlus3: '0',
+              budgetProposalCurrentYearPlus1: '0',
+              budgetProposalCurrentYearPlus2: '0',
             },
+            constructionEndYear: project.planningStartYear,
             estConstructionEnd: null,
             estConstructionStart: null,
           };
@@ -1181,12 +1340,7 @@ describe('PlanningView', () => {
           const mockRemoveLastConPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchLastConRequest.finances,
-              },
-              estConstructionEnd: null,
-              estConstructionStart: null,
+              ...patchLastConRequest,
             },
           };
 
@@ -1209,7 +1363,7 @@ describe('PlanningView', () => {
           });
         });
 
-        it('it removes planning end and start dates if last planning cell is removed', async () => {
+        it('it removes est planning end and start dates if last planning cell is removed and moves the planning start year to the first construction year', async () => {
           const project = mockPlanningViewProjects.data.results[9];
           const year = new Date().getFullYear();
 
@@ -1217,20 +1371,17 @@ describe('PlanningView', () => {
             finances: {
               year: year,
               preliminaryCurrentYearPlus3: '0',
+              preliminaryCurrentYearPlus4: '0',
             },
             estPlanningStart: null,
             estPlanningEnd: null,
+            planningStartYear: 2027,
           };
 
           const mockRemoveLastPlanPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchLastPlanRequest.finances,
-              },
-              estPlanningStart: null,
-              estPlanningEnd: null,
+              ...patchLastPlanRequest,
             },
           };
 
@@ -1253,7 +1404,7 @@ describe('PlanningView', () => {
           });
         });
 
-        it('it removes planning and construction end and start dates if last overlap cell is removed', async () => {
+        it('it removes planning and construction end and start dates and years if last overlap cell is removed', async () => {
           const project = mockPlanningViewProjects.data.results[10];
           const year = new Date().getFullYear();
 
@@ -1266,19 +1417,14 @@ describe('PlanningView', () => {
             estConstructionEnd: null,
             estPlanningStart: null,
             estPlanningEnd: null,
+            planningStartYear: null,
+            constructionEndYear: null,
           };
 
           const mockRemoveLastOverlapPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchLastOverlapRequest.finances,
-              },
-              estConstructionStart: null,
-              estConstructionEnd: null,
-              estPlanningStart: null,
-              estPlanningEnd: null,
+              ...patchLastOverlapRequest,
             },
           };
 
@@ -1304,20 +1450,17 @@ describe('PlanningView', () => {
         it('can add a year to construction and replaces the budgets null value with 0', async () => {
           const project = mockPlanningViewProjects.data.results[1];
           const year = new Date().getFullYear();
-
+          const updatedConstructionEndYear = year + 7;
           const patchAddConYearRequest = {
             finances: { year: year, preliminaryCurrentYearPlus7: '0' },
-            estConstructionEnd: `12.02.${year + 7}`,
+            estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockAddConYearPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchAddConYearRequest.finances,
-              },
-              estConstructionEnd: patchAddConYearRequest.estConstructionEnd,
+              ...patchAddConYearRequest,
             },
           };
 
@@ -1327,13 +1470,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const conEndYear = year + 6;
+          const constructionEndYear = year + 6;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(constructionEndYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${conEndYear}-${id}-right`);
+          const addYearButton = getByTestId(`add-cell-${constructionEndYear}-${id}-right`);
           expect(addYearButton).toBeVisible();
 
           await user.click(addYearButton);
@@ -1348,15 +1491,17 @@ describe('PlanningView', () => {
         it('can add a year to planning', async () => {
           const project = mockPlanningViewProjects.data.results[1];
           const year = new Date().getFullYear();
+          const updatedPlanningStartYear = year;
 
           const patchAddPlanYearRequest = {
-            estPlanningStart: `12.02.${year}`,
+            estPlanningStart: updateYear(updatedPlanningStartYear, project.estPlanningStart),
+            planningStartYear: updatedPlanningStartYear,
           };
 
           const mockAddConYearPatchResponse = {
             data: {
               ...project,
-              estPlanningStart: patchAddPlanYearRequest.estPlanningStart,
+              ...patchAddPlanYearRequest,
             },
           };
 
@@ -1366,13 +1511,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const planStartYear = year + 1;
+          const planningStartYear = year + 1;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(planningStartYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${planStartYear}-${id}-left`);
+          const addYearButton = getByTestId(`add-cell-${planningStartYear}-${id}-left`);
 
           await user.click(addYearButton);
 
@@ -1386,15 +1531,17 @@ describe('PlanningView', () => {
         it('can add a year to planning if an overlap cell is selected', async () => {
           const project = mockPlanningViewProjects.data.results[10];
           const year = new Date().getFullYear();
+          const updatedPlanningStartYear = year + 2;
 
           const patchAddOverlapPlanRequest = {
-            estPlanningStart: `12.02.${year + 2}`,
+            estPlanningStart: updateYear(updatedPlanningStartYear, project.estPlanningStart),
+            planningStartYear: updatedPlanningStartYear,
           };
 
           const mockAddOverlapPlanPatchResponse = {
             data: {
               ...project,
-              estPlanningStart: patchAddOverlapPlanRequest.estPlanningStart,
+              ...patchAddOverlapPlanRequest,
             },
           };
 
@@ -1421,18 +1568,21 @@ describe('PlanningView', () => {
           });
         });
 
-        it('can add a year to planning and construction if an overlap cell is selected', async () => {
+        it('can add a year to construction if an overlap cell is selected', async () => {
           const project = mockPlanningViewProjects.data.results[10];
           const year = new Date().getFullYear();
 
+          const updatedConstructionEndYear = year + 4;
+
           const patchAddOverlapConRequest = {
-            estPlanningStart: `12.02.${year + 2}`,
+            estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockAddOverlapConPatchResponse = {
             data: {
               ...project,
-              estPlanningStart: patchAddOverlapConRequest.estPlanningStart,
+              ...patchAddOverlapConRequest,
             },
           };
 
@@ -1449,7 +1599,7 @@ describe('PlanningView', () => {
 
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${overlapYear}-${id}-left`);
+          const addYearButton = getByTestId(`add-cell-${overlapYear}-${id}-right`);
 
           await user.click(addYearButton);
 
@@ -1460,9 +1610,98 @@ describe('PlanningView', () => {
           });
         });
 
+        it('moves planning start and end and construction start if an overlapping planning cell is deleted', async () => {
+          const project = mockPlanningViewProjects.data.results[11];
+          const year = new Date().getFullYear();
+          const updatedYear = year + 4;
+
+          const deleteOverlapPlanRequest = {
+            estPlanningStart: updateYear(updatedYear, project.estPlanningStart),
+            estPlanningEnd: updateYear(updatedYear, project.estPlanningEnd),
+            estConstructionStart: updateYear(updatedYear, project.estConstructionStart),
+            planningStartYear: updatedYear,
+            finances: {
+              preliminaryCurrentYearPlus3: '0',
+              preliminaryCurrentYearPlus4: '0',
+              year,
+            },
+          };
+
+          const mockDeleteOverlapPlanPatchResponse = {
+            data: {
+              ...project,
+              ...deleteOverlapPlanRequest,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockDeleteOverlapPlanPatchResponse);
+
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const overlapYear = year + 3;
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
+          await user.click(getByTestId('remove-year-button'));
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-12/');
+            expect(patchMock[1]).toStrictEqual(deleteOverlapPlanRequest);
+          });
+        });
+
+        it('moves construction start and end and planning end if an overlapping planning cell is deleted', async () => {
+          const project = mockPlanningViewProjects.data.results[12];
+          const year = new Date().getFullYear();
+          const updatedYear = year + 2;
+
+          const deleteOverlapConRequest = {
+            estConstructionStart: updateYear(updatedYear, project.estConstructionStart),
+            estConstructionEnd: updateYear(updatedYear, project.estConstructionEnd),
+            estPlanningEnd: updateYear(updatedYear, project.estPlanningEnd),
+            constructionEndYear: updatedYear,
+            finances: {
+              budgetProposalCurrentYearPlus2: '0',
+              preliminaryCurrentYearPlus3: '0',
+              year,
+            },
+          };
+
+          const mockDeleteOverlapConPatchResponse = {
+            data: {
+              ...project,
+              ...deleteOverlapConRequest,
+            },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(mockDeleteOverlapConPatchResponse);
+
+          const renderResult = await render();
+
+          const { user, getByTestId } = renderResult;
+          const { id } = project;
+          const overlapYear = year + 3;
+
+          await waitFor(() => navigateToProjectRows(renderResult));
+          await waitFor(() => openContextMenuForCell(overlapYear, id, renderResult));
+          await user.click(getByTestId('remove-year-button'));
+
+          await waitFor(() => {
+            const patchMock = mockedAxios.patch.mock.lastCall;
+            expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-13/');
+            expect(patchMock[1]).toStrictEqual(deleteOverlapConRequest);
+          });
+        });
+
         it('can increase the whole timeline by one year with double clicking ', async () => {
           const project = mockPlanningViewProjects.data.results[1];
           const year = new Date().getFullYear();
+
+          const updatedPlanningStartYear = year + 2;
+          const updatedConstructionEndYear = year + 7;
 
           const patchMoveYearRequest = {
             finances: {
@@ -1479,20 +1718,18 @@ describe('PlanningView', () => {
               preliminaryCurrentYearPlus9: '90.00',
               preliminaryCurrentYearPlus10: '0.00',
             },
-            estPlanningStart: `12.02.${year + 2}`,
-            estPlanningEnd: `12.02.${year + 4}`,
-            estConstructionStart: `12.02.${year + 4}`,
-            estConstructionEnd: `12.02.${year + 7}`,
+            estPlanningStart: updateYear(updatedPlanningStartYear, project.estPlanningStart),
+            estPlanningEnd: updateYear(year + 4, project.estPlanningEnd),
+            estConstructionStart: updateYear(year + 4, project.estConstructionStart),
+            estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
+            planningStartYear: updatedPlanningStartYear,
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockMoveYearPatchResponse = {
             data: {
               ...project,
-              finances: {
-                ...project.finances,
-                ...patchMoveYearRequest.finances,
-              },
-              estConstructionEnd: patchMoveYearRequest.estConstructionEnd,
+              ...patchMoveYearRequest,
             },
           };
 
@@ -1502,13 +1739,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const conEndYear = year + 6;
+          const constructionEndYear = year + 6;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(conEndYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(constructionEndYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${conEndYear}-${id}-right`);
+          const addYearButton = getByTestId(`add-cell-${constructionEndYear}-${id}-right`);
           expect(addYearButton).toBeVisible();
 
           await user.dblClick(addYearButton);
@@ -1523,6 +1760,9 @@ describe('PlanningView', () => {
         it('can decrease the whole timeline by one year with double clicking ', async () => {
           const project = mockPlanningViewProjects.data.results[1];
           const year = new Date().getFullYear();
+
+          const updatedPlanningStartYear = year;
+          const updatedConstructionEndYear = year + 5;
 
           const patchMoveYearRequest = {
             finances: {
@@ -1539,10 +1779,12 @@ describe('PlanningView', () => {
               preliminaryCurrentYearPlus9: '0.00',
               preliminaryCurrentYearPlus10: '0',
             },
-            estPlanningStart: `12.02.${year}`,
-            estPlanningEnd: `12.02.${year + 2}`,
-            estConstructionStart: `12.02.${year + 2}`,
-            estConstructionEnd: `12.02.${year + 5}`,
+            estPlanningStart: updateYear(updatedPlanningStartYear, project.estPlanningStart),
+            estPlanningEnd: updateYear(year + 2, project.estPlanningEnd),
+            estConstructionStart: updateYear(year + 2, project.estConstructionStart),
+            estConstructionEnd: updateYear(updatedConstructionEndYear, project.estConstructionEnd),
+            planningStartYear: updatedPlanningStartYear,
+            constructionEndYear: updatedConstructionEndYear,
           };
 
           const mockMoveYearPatchResponse = {
@@ -1562,13 +1804,13 @@ describe('PlanningView', () => {
 
           const { user, getByTestId } = renderResult;
           const { id } = project;
-          const planStartYear = year + 1;
+          const planningStartYear = year + 1;
 
           await waitFor(() => navigateToProjectRows(renderResult));
-          await waitFor(() => openContextMenuForCell(planStartYear, id, renderResult));
+          await waitFor(() => openContextMenuForCell(planningStartYear, id, renderResult));
           await user.click(getByTestId('edit-year-button'));
 
-          const addYearButton = getByTestId(`add-cell-${planStartYear}-${id}-left`);
+          const addYearButton = getByTestId(`add-cell-${planningStartYear}-${id}-left`);
           expect(addYearButton).toBeVisible();
 
           await user.dblClick(addYearButton);

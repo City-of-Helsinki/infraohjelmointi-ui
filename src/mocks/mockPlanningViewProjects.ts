@@ -18,7 +18,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         estConstructionEnd: null,
         finances: {
           year: 2023,
-          budgetProposalCurrentYearPlus0: '0.00',
+          budgetProposalCurrentYearPlus0: '40.00',
           budgetProposalCurrentYearPlus1: '20.00',
           budgetProposalCurrentYearPlus2: '30.00',
           preliminaryCurrentYearPlus3: '40.00',
@@ -126,6 +126,26 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         id: 'planning-project-11',
         projectClass: 'test-class-1',
         estPlanningStart: `12.02.${year + 3}`,
+        estPlanningEnd: `12.02.${year + 3}`,
+        estConstructionStart: `12.02.${year + 3}`,
+        estConstructionEnd: `12.02.${year + 3}`,
+      },
+      // For deleting an overlap planning
+      {
+        ...mockProject.data,
+        id: 'planning-project-12',
+        projectClass: 'test-class-1',
+        estPlanningStart: `12.02.${year + 3}`,
+        estPlanningEnd: `12.02.${year + 3}`,
+        estConstructionStart: `12.02.${year + 3}`,
+        estConstructionEnd: `12.02.${year + 5}`,
+      },
+      // For deleting an overlap construction
+      {
+        ...mockProject.data,
+        id: 'planning-project-13',
+        projectClass: 'test-class-1',
+        estPlanningStart: `12.02.${year + 1}`,
         estPlanningEnd: `12.02.${year + 3}`,
         estConstructionStart: `12.02.${year + 3}`,
         estConstructionEnd: `12.02.${year + 3}`,

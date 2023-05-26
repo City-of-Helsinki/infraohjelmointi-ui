@@ -77,12 +77,14 @@ export const calculatePlanningCells = (
   type: PlanningRowType,
 ): Array<IPlanningCell> => {
   const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
-  return Object.entries(rest).map(([key, value]) => {
+  return Object.entries(rest).map(([key, value], i) => {
     const { frameBudget, plannedBudget } = value;
     const deviation = frameBudget - plannedBudget;
 
     return {
       key,
+      year: year + i,
+      isCurrentYear: year + i === year,
       // we don't return any budgets for divisions
       ...(type !== 'division' && {
         plannedBudget: formatNumber(plannedBudget),
@@ -115,6 +117,7 @@ export const calculatePlanningSummaryCells = (
     Object.entries(rest).forEach(([key, value]) => {
       if (!Object.prototype.hasOwnProperty.call(totalFinances, key)) {
         Object.assign(totalFinances, {
+          year,
           [key]: { frameBudget: value.frameBudget, plannedBudget: value.plannedBudget },
         });
       } else {
@@ -162,3 +165,5 @@ export const calculateProjectRowSums = (project: IProject): IProjectSums => {
     costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
   };
 };
+
+export const calcPercentage = (value: number, total: number) => Math.round((value / total) * 100);

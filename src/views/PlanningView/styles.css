@@ -7,7 +7,7 @@
   @apply text-right;
 }
 
-@media (max-width: 1490px) {
+@media (max-width: 1600px) {
   .planning-view-container {
     @apply mr-20;
   }

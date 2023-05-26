@@ -1,5 +1,5 @@
 .planning-info-panel {
-  @apply flex w-[35%] min-w-[26.75rem] justify-between pl-2 pr-3;
+  @apply flex w-[32rem] min-w-[32rem] max-w-[32rem] justify-between pl-2 pr-3;
 }
 
 .planning-info-panel .buttons-container {

@@ -9,15 +9,16 @@ import './styles.css';
 interface IPlanningTableProps {
   rows: Array<IPlanningRow>;
   projectToUpdate: IProject | null;
+  selectedYear: number | null;
 }
 
-const PlanningTable: FC<IPlanningTableProps> = ({ rows, projectToUpdate }) => {
+const PlanningTable: FC<IPlanningTableProps> = ({ rows, projectToUpdate, selectedYear }) => {
   return (
     <table className="planning-table" cellSpacing={0}>
       <tbody>
         {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
         {rows.map((row: IPlanningRow) => (
-          <PlanningRow {...row} projectToUpdate={projectToUpdate} />
+          <PlanningRow {...row} projectToUpdate={projectToUpdate} selectedYear={selectedYear} />
         ))}
       </tbody>
     </table>

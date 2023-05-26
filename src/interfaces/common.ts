@@ -97,6 +97,8 @@ export interface IPlanningCell {
   deviation?: string;
   plannedBudget?: string;
   frameBudget?: string;
+  year: number;
+  isCurrentYear: boolean;
 }
 
 export interface IPlanningRowLists {

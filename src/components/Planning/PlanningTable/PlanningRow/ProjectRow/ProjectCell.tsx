@@ -18,9 +18,11 @@ import {
   useRef,
   useMemo,
 } from 'react';
-import { addYear, removeYear, updateYear } from '@/utils/dates';
+import { addYear, getYear, removeYear, updateYear } from '@/utils/dates';
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
+import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
+import _ from 'lodash';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
@@ -32,66 +34,105 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     isEndOfTimeline,
     isStartOfTimeline,
     isLastOfType,
-    planStart,
-    planEnd,
-    conStart,
-    conEnd,
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
+    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
     cellToUpdate,
     financesToReset,
     financeKey,
     budget,
-    isEdgeCell,
+    affectsDates,
     startYear,
   } = cell;
 
   const req: IProjectRequest = { finances: { year: startYear, ...financesToReset } };
 
-  const updatePlanEnd = () => {
-    if (!isLastOfType) {
-      req.estPlanningEnd = updateYear(cellToUpdate?.year, planEnd);
-    } else {
+  const updatePlanningStart = () => {
+    const updatedDate = updateYear(cellToUpdate?.year, planningStart);
+    if (estPlanningStart) {
+      req.estPlanningStart = updatedDate;
+    }
+    req.planningStartYear = getYear(updatedDate);
+  };
+
+  const updatePlanningEnd = () => {
+    const updatedDate = updateYear(cellToUpdate?.year, planningEnd);
+    if (isLastOfType) {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
+      req.planningStartYear = getYear(updatedDate);
+    } else if (estPlanningEnd) {
+      req.estPlanningEnd = updatedDate;
     }
   };
 
-  const updateConEnd = () => {
+  const updateConstructionStart = () => {
+    const updatedDate = updateYear(cellToUpdate?.year, constructionStart);
+    if (estConstructionStart) {
+      req.estConstructionStart = updatedDate;
+    }
+    req.constructionEndYear = getYear(updatedDate);
+  };
+
+  const updateConstructionEnd = () => {
+    const updatedDate = updateYear(cellToUpdate?.year, constructionEnd);
     if (!isLastOfType) {
-      req.estConstructionEnd = updateYear(cellToUpdate?.year, conEnd);
+      if (estConstructionEnd) {
+        req.estConstructionEnd = updatedDate;
+      }
+      req.constructionEndYear = getYear(updatedDate);
     } else {
+      req.constructionEndYear = getYear(planningStart);
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
     }
   };
 
   const updateOverlap = () => {
-    if (isStartOfTimeline) {
+    if (isStartOfTimeline && isEndOfTimeline) {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
-    } else {
-      req.estPlanningEnd = removeYear(planEnd);
-    }
-    if (isEndOfTimeline) {
+      req.planningStartYear = null;
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
-    } else {
-      req.estConstructionStart = addYear(conStart);
+      req.constructionEndYear = null;
+    } else if (isStartOfTimeline) {
+      if (estPlanningStart) {
+        req.estPlanningStart = addYear(planningStart);
+      }
+      if (estPlanningEnd) {
+        req.estPlanningEnd = addYear(planningEnd);
+      }
+      if (estConstructionStart) {
+        req.estConstructionStart = addYear(constructionStart);
+      }
+      req.planningStartYear = getYear(planningEnd) + 1;
+    } else if (isEndOfTimeline) {
+      if (estConstructionStart) {
+        req.estConstructionStart = removeYear(constructionStart);
+      }
+      if (estConstructionEnd) {
+        req.estConstructionEnd = removeYear(constructionEnd);
+      }
+      if (estPlanningEnd) {
+        req.estPlanningEnd = removeYear(planningEnd);
+      }
+      req.constructionEndYear = getYear(constructionEnd) - 1;
     }
   };
 
   const updateDatesIfStartEndOrOverlap = () => {
     switch (type) {
-      case 'planStart':
-        req.estPlanningStart = updateYear(cellToUpdate?.year, planStart);
+      case 'planningStart':
+        updatePlanningStart();
         break;
-      case 'planEnd':
-        updatePlanEnd();
+      case 'planningEnd':
+        updatePlanningEnd();
         break;
-      case 'conStart':
-        req.estConstructionStart = updateYear(cellToUpdate?.year, conStart);
+      case 'constructionStart':
+        updateConstructionStart();
         break;
-      case 'conEnd':
-        updateConEnd();
+      case 'constructionEnd':
+        updateConstructionEnd();
         break;
       case 'overlap':
         updateOverlap();
@@ -106,19 +147,16 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       return;
     }
 
-    // If there is a cellToUpdate move the deleted cells budget to that cell
     if (cellToUpdate) {
       const updateKey = cellToUpdate.financeKey;
       const updateBudget = cellToUpdate.budget;
-      (req.finances[updateKey as keyof IProjectFinancesRequestObject] as string) = (
+      (req.finances[updateKey as keyof IProjectFinancesRequestObject] as string | null) = (
         parseInt(budget ?? '0') + parseInt(updateBudget ?? '0')
       ).toString();
     }
 
-    // Set the current cells value to '0' if it's an edge cell, otherwise set it to null to temporarily hide it
-    (req.finances[financeKey as keyof IProjectFinancesRequestObject] as string | null) = isEdgeCell
-      ? '0'
-      : null;
+    (req.finances[financeKey as keyof IProjectFinancesRequestObject] as string | null) =
+      affectsDates ? '0' : null;
   };
 
   updateDatesIfStartEndOrOverlap();
@@ -129,39 +167,46 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
 const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCell) => {
   const {
-    type,
-    planStart,
-    planEnd,
-    conStart,
-    conEnd,
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
+    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
     next,
     prev,
-    isLastOfType,
     startYear,
-    isEdgeCell,
+    affectsDates,
     isStartOfTimeline,
+    type,
+    isLastOfType,
   } = cell;
 
   const req: IProjectRequest = { finances: { year: startYear } };
 
   const updateLeft = () => {
-    if (isStartOfTimeline && (type === 'planStart' || type === 'planEnd' || type === 'overlap')) {
-      req.estPlanningStart = removeYear(planStart);
-    } else if ((isLastOfType && type === 'conEnd') || type === 'conStart') {
-      req.estConstructionStart = removeYear(conStart);
+    if (isStartOfTimeline && (type.includes('planning') || type === 'overlap')) {
+      if (estPlanningStart) {
+        req.estPlanningStart = removeYear(planningStart);
+      }
+      req.planningStartYear = getYear(removeYear(planningStart));
+    } else if (
+      (isLastOfType && type === 'constructionEnd') ||
+      (type === 'constructionStart' && estConstructionStart)
+    ) {
+      req.estConstructionStart = removeYear(constructionStart);
     }
   };
 
   const updateRight = () => {
-    if (type === 'planEnd') {
-      req.estPlanningEnd = addYear(planEnd);
-    } else if (type === 'conEnd' || type === 'overlap') {
-      req.estConstructionEnd = addYear(conEnd);
+    if (type === 'planningEnd' && estPlanningEnd) {
+      req.estPlanningEnd = addYear(planningEnd);
+    } else if (type === 'constructionEnd' || type === 'overlap') {
+      if (estConstructionEnd) {
+        req.estConstructionEnd = addYear(constructionEnd);
+      }
+      req.constructionEndYear = getYear(addYear(constructionEnd));
     }
   };
 
-  const updateStartOrEndDateIfEdgeCell = () => {
-    if (!isEdgeCell) {
+  const updateStartOrEndDateIfCellAffectsDates = () => {
+    if (!affectsDates) {
       return;
     }
     switch (direction) {
@@ -184,14 +229,17 @@ const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCe
     (req.finances[nextCell.financeKey as keyof IProjectFinancesRequestObject] as string) = '0';
   };
 
-  updateStartOrEndDateIfEdgeCell();
+  updateStartOrEndDateIfCellAffectsDates();
   setNextFinanceToZeroIfNull();
 
   return req;
 };
 
 const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planEnd, conEnd, planStart, conStart } = cell;
+  const {
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
+    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
+  } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the next property
@@ -211,21 +259,31 @@ const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinanc
 
   const req: IProjectRequest = { finances: financesMovedForward };
 
-  if (planEnd) {
-    req.estPlanningStart = addYear(planStart);
-    req.estPlanningEnd = addYear(planEnd);
+  if (estPlanningStart) {
+    req.estPlanningStart = addYear(planningStart);
+  }
+  if (estPlanningEnd) {
+    req.estPlanningEnd = addYear(planningEnd);
   }
 
-  if (conEnd) {
-    req.estConstructionStart = addYear(conStart);
-    req.estConstructionEnd = addYear(conEnd);
+  if (estConstructionStart) {
+    req.estConstructionStart = addYear(constructionStart);
   }
+  if (estConstructionEnd) {
+    req.estConstructionEnd = addYear(constructionEnd);
+  }
+
+  req.planningStartYear = getYear(addYear(planningStart));
+  req.constructionEndYear = getYear(addYear(constructionEnd));
 
   return req;
 };
 
 const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
-  const { planEnd, conEnd, planStart, conStart } = cell;
+  const {
+    timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
+    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
+  } = cell;
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the previous property
@@ -245,15 +303,22 @@ const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinan
 
   const req: IProjectRequest = { finances: financesMovedBackward };
 
-  if (planEnd) {
-    req.estPlanningStart = removeYear(planStart);
-    req.estPlanningEnd = removeYear(planEnd);
+  if (estPlanningStart) {
+    req.estPlanningStart = removeYear(planningStart);
+  }
+  if (estPlanningEnd) {
+    req.estPlanningEnd = removeYear(planningEnd);
   }
 
-  if (conEnd) {
-    req.estConstructionStart = removeYear(conStart);
-    req.estConstructionEnd = removeYear(conEnd);
+  if (estConstructionStart) {
+    req.estConstructionStart = removeYear(constructionStart);
   }
+  if (estConstructionEnd) {
+    req.estConstructionEnd = removeYear(constructionEnd);
+  }
+
+  req.planningStartYear = getYear(removeYear(planningStart));
+  req.constructionEndYear = getYear(removeYear(constructionEnd));
 
   return req;
 };
@@ -282,13 +347,25 @@ const getMoveTimelineRequestData = (
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
+  selectedYear: number | null;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
-  const { budget, type, financeKey, year, growDirections, id, title } = cell;
-  const [isReadOnly, setIsReadOnly] = useState(true);
-  const [formValue, setFormValue] = useState<number | null | string>(parseInt(budget ?? '0'));
+interface IProjectCellState {
+  isReadOnly: boolean;
+  formValue: number | null | string;
+}
+
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
+  const { budget, type, financeKey, year, growDirections, id, title, startYear, monthlyDataList } =
+    cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
+
+  const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
+    isReadOnly: true,
+    formValue: parseInt(budget ?? '0'),
+  });
+
+  const { formValue, isReadOnly } = projectCellState;
 
   // Values of cells that have the none type will be empty strings to hide them
   const formDisplayValue = useMemo(
@@ -298,12 +375,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
-      if (req.finances && Object.keys(req.finances).length === 1) {
+      // if there's only the year property in the finances object, delete it
+      if (_.size(req.finances) === 1) {
         delete req.finances;
       }
+
       patchProject({
         id,
-        data: { ...req },
+        data: req,
       }).catch(Promise.reject);
     },
     [id],
@@ -311,24 +390,27 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
 
   // Focusing the input field will activate the input field by switching its readOnly property
   const handleFocus = useCallback(() => {
-    setIsReadOnly((current) => !current);
+    setProjectCellState((current) => ({ ...current, isReadOnly: !current.isReadOnly }));
   }, []);
 
   // Removes the zero value on change if there is only one zero in the value
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     // If the value is more than one zero set the form value normally
     if (/^0{2,}/.exec(e.target.value)) {
-      setFormValue(e.target.value);
+      setProjectCellState((current) => ({ ...current, formValue: e.target.value }));
     }
     // If value is just a zero replace it
     else {
-      setFormValue(e.target.value ? +e.target.value : 0);
+      setProjectCellState((current) => ({
+        ...current,
+        formValue: e.target.value ? +e.target.value : 0,
+      }));
     }
   }, []);
 
   // Blurring the input field will patch the current budget
   const handleBlur = useCallback((): void => {
-    setIsReadOnly((current) => !current);
+    setProjectCellState((current) => ({ ...current, isReadOnly: !current.isReadOnly }));
     if (formValue !== parseInt(budget ?? '0')) {
       updateCell({
         finances: {
@@ -366,11 +448,26 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
   }, [id]);
 
   // Convert any cell type to 'planning' / 'construction' / 'overlap' / 'none'
-  const getCssType = useCallback(() => {
-    if (type.includes('plan')) return 'plan';
-    else if (type.includes('con')) return 'con';
-    else return type;
+  const cellTypeClass = useMemo(() => {
+    if (type.includes('planning')) {
+      return 'planning';
+    } else if (type.includes('construction')) {
+      return 'construction';
+    } else {
+      return type;
+    }
   }, [type]);
+
+  //
+  const selectedYearClass = useMemo(
+    () => (year === selectedYear ? 'selected-year' : ''),
+    [selectedYear, year],
+  );
+
+  const currentYearClass = useMemo(
+    () => (year === startYear ? 'current-year' : ''),
+    [year, startYear],
+  );
 
   // Open the custom context menu when right-clicking a cell
   const handleOpenContextMenu = useCallback(
@@ -380,51 +477,69 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
         cellMenuProps: {
           year,
           title,
-          cellType: getCssType(),
+          cellType: cellTypeClass,
           onRemoveCell,
           onEditCell,
         },
       });
     },
-    [onRemoveCell, onEditCell, getCssType, year, title],
+    [onRemoveCell, onEditCell, cellTypeClass, year, title],
   );
 
   // Set the budgets value to a number if it exists
   useEffect(() => {
-    setFormValue(parseInt(budget ?? '0'));
+    setProjectCellState((current) => ({ ...current, formValue: parseInt(budget ?? '0') }));
   }, [budget]);
 
+  // Sets isSelectedYear to true if the current cell is the selectedYear
+  useEffect(() => {
+    setProjectCellState((current) => ({ ...current, isSelectedYear: selectedYear === year }));
+  }, [selectedYear, year]);
+
   return (
-    <td
-      ref={cellRef}
-      className={`project-cell ${getCssType()}`}
-      onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
-      data-testid={`project-cell-${year}-${id}`}
-    >
-      <div className="project-cell-input-container">
-        <input
-          value={formDisplayValue}
-          type="number"
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          disabled={type === 'none'}
-          readOnly={isReadOnly}
-          className="project-cell-input"
-          data-testid={`cell-input-${year}-${id}`}
+    <>
+      <td
+        ref={cellRef}
+        className={`project-cell ${cellTypeClass} ${selectedYearClass} ${currentYearClass}`}
+        onContextMenu={type !== 'none' ? handleOpenContextMenu : undefined}
+        data-testid={`project-cell-${year}-${id}`}
+      >
+        <div className="project-cell-input-wrapper">
+          <div className="project-cell-input-container">
+            <input
+              value={formDisplayValue}
+              type="number"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              onFocus={handleFocus}
+              disabled={type === 'none'}
+              readOnly={isReadOnly}
+              className="project-cell-input"
+              data-testid={`cell-input-${year}-${id}`}
+            />
+          </div>
+        </div>
+        {type !== 'none' &&
+          growDirections.map((d) => (
+            <EditTimelineButton
+              key={d}
+              direction={d}
+              id={`${year}-${id}`}
+              onSingleClick={onAddYear}
+              onDoubleClick={onMoveTimeline}
+            />
+          ))}
+      </td>
+      {selectedYearClass && (
+        <ProjectYearSummary
+          id={id}
+          year={year}
+          startYear={startYear}
+          monthlyDataList={monthlyDataList}
+          cellType={cellTypeClass}
         />
-      </div>
-      {type !== 'none' &&
-        growDirections.map((d) => (
-          <EditTimelineButton
-            key={d}
-            direction={d}
-            id={`${year}-${id}`}
-            onSingleClick={onAddYear}
-            onDoubleClick={onMoveTimeline}
-          />
-        ))}
-    </td>
+      )}
+    </>
   );
 };
 

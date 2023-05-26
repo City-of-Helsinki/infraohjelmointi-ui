@@ -42,5 +42,5 @@
 }
 
 .free-search div div div button {
-  z-index: 10;
+  @apply z-10;
 }

@@ -3,7 +3,7 @@ import { SearchInput } from 'hds-react/components/SearchInput';
 import { memo, useCallback, useState, MouseEvent } from 'react';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
 import { useTranslation } from 'react-i18next';
-import { arrayHasValue, listItemToOption, objectHasProperty } from '@/utils/common';
+import { arrayHasValue, listItemToOption } from '@/utils/common';
 import { HookFormControlType, ISearchForm } from '@/interfaces/formInterfaces';
 import { Control, Controller, FieldValues, UseFormGetValues } from 'react-hook-form';
 import {
@@ -110,7 +110,7 @@ const FreeSearchForm = ({
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
       const formValue = getValues('freeSearchParams');
-      if (!arrayHasValue(Object.keys(formValue), value) && objectHasProperty(resultObject, value)) {
+      if (!arrayHasValue(Object.keys(formValue), value) && _.has(resultObject, value)) {
         const nextChange = {
           ...formValue,
           [resultObject[value].label]: resultObject[value],
@@ -175,6 +175,7 @@ const FreeSearchForm = ({
               value={searchWord}
               onChange={handleSetSearchWord}
               onSubmit={(v) => handleSubmit(v, onChange)}
+              clearButtonAriaLabel="Clear free search field"
             />
             <div className="search-selections">
               {Object.keys(value || {}).map((s) => (
