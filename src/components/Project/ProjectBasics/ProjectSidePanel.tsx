@@ -27,7 +27,7 @@ const ProjectSidePanel: FC<IProjectSidePanelProps> = ({ pwFolderLink }) => {
 
   return (
     <div className="project-side-panel">
-      <div className="flex justify-center">
+      <div className="flex max-w-[17.5rem] justify-center">
         <SideNavigation navItems={navItems} />
       </div>
 

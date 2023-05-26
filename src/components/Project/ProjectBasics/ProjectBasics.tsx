@@ -12,8 +12,8 @@ const ProjectBasics = () => {
       <ScrollToTop />
       {project && (
         <>
-          <div className="flex-1">
-            <div className="side-panel-container" data-testid="side-panel">
+          <div className="flex flex-1 justify-center">
+            <div className="side-panel-container mx-6 max-w-[19.5rem]" data-testid="side-panel">
               <ProjectSidePanel pwFolderLink={project.pwFolderLink} />
             </div>
           </div>
