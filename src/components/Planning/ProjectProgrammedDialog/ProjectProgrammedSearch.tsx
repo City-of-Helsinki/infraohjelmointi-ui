@@ -1,7 +1,7 @@
-import { getProjectsWithParams, getSearchResults } from '@/services/projectServices';
+import { getSearchResults } from '@/services/projectServices';
 import { arrayHasValue } from '@/utils/common';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
 import { IProgrammedProjectSuggestions, ISearchRequest } from '@/interfaces/searchInterfaces';
@@ -10,7 +10,7 @@ import { useAppSelector } from '@/hooks/common';
 import { selectAllClasses } from '@/reducers/classSlice';
 import SelectedProjectCard from './SelectedProjectCard';
 import usePlanningRows from '@/hooks/usePlanningRows';
-import { selectAllLocations, selectDistricts } from '@/reducers/locationSlice';
+import { selectDistricts } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface ISearchState {
