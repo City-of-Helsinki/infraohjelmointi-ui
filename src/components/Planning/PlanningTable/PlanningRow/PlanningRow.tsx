@@ -55,7 +55,7 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       const updatedProjects = projects.map((p) =>
         p.id === projectToUpdate.id ? projectToUpdate : p,
       );
-      // updatedProject does not already belong to this planning row if no projectsUpdated
+      // projectToUpdate does not already exist in this planning row if updatedProjects is the same
       // check if project belongs to this row type
       if (_.isEqual(projects, updatedProjects)) {
         if (
