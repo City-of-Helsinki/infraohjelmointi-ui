@@ -155,10 +155,9 @@ describe('ProjectProgrammedDialog', () => {
 
     await waitFor(async () => {
       expect(getByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-
-      await user.click(getByText(mockSearchResults.data.results[0].name));
-      expect(getAllByTestId('project-selection').length).toBe(1);
     });
+    await user.click(getByText(mockSearchResults.data.results[0].name));
+    expect(getAllByTestId('project-selection').length).toBe(1);
 
     const getRequest = mockedAxios.get.mock;
     // Check that the correct url was called
@@ -170,24 +169,20 @@ describe('ProjectProgrammedDialog', () => {
     expect(submitButton).toBeEnabled();
 
     mockedAxios.patch.mockResolvedValueOnce(mockPatchResponse);
-    await waitFor(async () => {
-      await user.click(submitButton);
-      await sendProjectUpdateEvent(mockPatchResponse.data[0]);
-    });
-    await waitFor(() => {
-      expect(store.getState().events.projectUpdate?.project).toStrictEqual(
-        mockPatchResponse.data[0],
-      );
-    });
+
+    await user.click(submitButton);
+    await sendProjectUpdateEvent(mockPatchResponse.data[0]);
+
+    expect(store.getState().events.projectUpdate?.project).toStrictEqual(mockPatchResponse.data[0]);
+
     const formPatchRequest = mockedAxios.patch.mock
       .lastCall[1] as Array<IProjectPatchRequestObject>;
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
     await user.click(getByRole('button', { name: 'closeProjectProgrammedDialog' }));
-    await waitFor(() => {
-      expect(getByTestId('row-planning-project-1')).toBeInTheDocument();
-    });
+
+    expect(getByTestId('row-planning-project-1')).toBeInTheDocument();
 
     removeProjectUpdateEventListener(store.dispatch);
   });
