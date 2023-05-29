@@ -52,12 +52,17 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
   // this useEffect updates the project in the view with the projecToUpdate
   useEffect(() => {
     if (projectToUpdate) {
-      const updatedProjects = projects.map((p) =>
-        p.id === projectToUpdate.id ? projectToUpdate : p,
-      );
+      let inRow = false;
+      const updatedProjects = projects.map((p) => {
+        if (p.id === projectToUpdate.id) {
+          inRow = true;
+          return projectToUpdate;
+        }
+        return p;
+      });
       // projectToUpdate does not already exist in this planning row if updatedProjects is the same
       // check if project belongs to this row type
-      if (_.isEqual(projects, updatedProjects)) {
+      if (!inRow) {
         if (
           projectToUpdate.projectGroup &&
           type.includes('group') &&
