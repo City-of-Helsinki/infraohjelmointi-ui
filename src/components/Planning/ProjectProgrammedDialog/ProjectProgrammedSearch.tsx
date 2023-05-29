@@ -75,7 +75,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
       reqParamObject.params = searchParams.join('&');
       return reqParamObject;
     },
-    [selections.selectedSubClass, selections.selectedClass],
+    [selections.selectedSubClass, selections.selectedClass, phaseDesign, phaseProposal],
   );
 
   const { t } = useTranslation();
@@ -118,7 +118,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
           .catch(() => reject([]));
       });
     },
-    [projectsForSubmit, buildQueryParamString, classes],
+    [projectsForSubmit, buildQueryParamString, classes, districts],
   );
 
   const handleSubmit = useCallback(
