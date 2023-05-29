@@ -5,7 +5,7 @@ import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from 
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import { waitFor } from '@testing-library/react';
+import { waitFor, within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
   mockClasses,
@@ -135,7 +135,7 @@ describe('ProjectProgrammedDialog', () => {
       ],
     };
 
-    const { user, getAllByTestId, findByTestId, queryByText, findByText } = renderResult;
+    const { user, findByTestId, queryByText, findByRole } = renderResult;
     const openDialogButton = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButton).toBeInTheDocument();
 
@@ -146,18 +146,18 @@ describe('ProjectProgrammedDialog', () => {
     await waitFor(() => navigateToProjectRows(renderResult));
 
     await user.click(openDialogButton);
-
-    const submitButton = await findByTestId('add-projects-button');
+    const dialog = within(await findByRole('dialog'));
+    const submitButton = await dialog.findByTestId('add-projects-button');
     expect(submitButton).toBeDisabled();
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-    await user.type(await findByText('projectProgrammedForm.searchForProjects'), 'Planning');
+    await user.type(await dialog.findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
     await waitFor(async () => {
-      expect(await findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
+      expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
     });
-    await user.click(await findByText(mockSearchResults.data.results[0].name));
-    expect(getAllByTestId('project-selection').length).toBe(1);
+    await user.click(await dialog.findByText(mockSearchResults.data.results[0].name));
+    expect(dialog.getAllByTestId('project-selection').length).toBe(1);
 
     const getRequest = mockedAxios.get.mock;
     // Check that the correct url was called
@@ -180,7 +180,7 @@ describe('ProjectProgrammedDialog', () => {
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
-    await user.click(await findByTestId('cancel-search'));
+    await user.click(await dialog.findByTestId('cancel-search'));
 
     expect(await findByTestId('row-planning-project-1')).toBeInTheDocument();
 

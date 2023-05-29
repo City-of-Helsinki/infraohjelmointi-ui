@@ -109,7 +109,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
               disabled={!(projectsForSubmit && projectsForSubmit.length > 0)}
               data-testid="add-projects-button"
             >
-              {t('search')}
+              {t('projectProgrammedForm.addProjects')}
             </Button>
             <Button onClick={handleDialogClose} variant="secondary" data-testid="cancel-search">
               {t('cancel')}

@@ -249,7 +249,8 @@
   },
   "projectProgrammedForm":{
     "addProjectsToProgramming":"Tuo uusi hanke listalle",
-    "searchForProjects":"Etsi hanke"
+    "searchForProjects":"Etsi hanke",
+    "addProjects":"Tuo"
   },
   "appTitle": "Infraohjelmointi UI",
   "project": "Hankekortti",
