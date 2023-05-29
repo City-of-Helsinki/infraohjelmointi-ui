@@ -30,10 +30,10 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 const store = setupStore();
 
 const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
-  const { user, store, getByTestId } = renderResult;
+  const { user, store, findByTestId } = renderResult;
   const { masterClasses, classes } = store.getState().class;
-  await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-  await user.click(getByTestId(`expand-${classes[0].id}`));
+  await user.click(await findByTestId(`expand-${masterClasses[0].id}`));
+  await user.click(await findByTestId(`expand-${classes[0].id}`));
 };
 const render = async () =>
   await act(async () =>
@@ -93,27 +93,27 @@ describe('ProjectProgrammedDialog', () => {
 
   it('renders the component wrappers', async () => {
     const renderResult = await render();
-    const { getByTestId } = renderResult;
-    expect(getByTestId('open-project-add-dialog-container')).toBeInTheDocument();
+    const { findByTestId } = renderResult;
+    expect(await findByTestId('open-project-add-dialog-container')).toBeInTheDocument();
   });
 
   it('renders project to programming modal', async () => {
     const renderResult = await render();
-    const { user, queryByTestId, getByTestId } = renderResult;
-
-    expect(getByTestId('open-project-programmed-dialog')).toBeInTheDocument();
+    const { user, queryByTestId, findByTestId } = renderResult;
+    const openDialogButton = await findByTestId('open-project-programmed-dialog');
+    expect(openDialogButton).toBeInTheDocument();
 
     // User is not under class/subClass balk hence the modal won't open
-    await user.click(getByTestId('open-project-programmed-dialog'));
+    await user.click(openDialogButton);
     expect(queryByTestId('search-projects-input')).toBeNull();
     // Navigate to a class row
     await waitFor(() => navigateToProjectRows(renderResult));
 
-    await user.click(getByTestId('open-project-programmed-dialog'));
-    expect(getByTestId('search-project-field-section')).toBeInTheDocument();
+    await user.click(openDialogButton);
+    expect(await findByTestId('search-project-field-section')).toBeInTheDocument();
 
-    expect(getByTestId('add-projects-button')).toBeInTheDocument();
-    expect(getByTestId('cancel-search')).toBeInTheDocument();
+    expect(await findByTestId('add-projects-button')).toBeInTheDocument();
+    expect(await findByTestId('cancel-search')).toBeInTheDocument();
   });
 
   it('can add non programmed projects to programming view', async () => {
@@ -135,28 +135,28 @@ describe('ProjectProgrammedDialog', () => {
       ],
     };
 
-    const { user, getAllByTestId, getByTestId, queryByText, getByText } = renderResult;
-
-    expect(getByTestId('open-project-programmed-dialog')).toBeInTheDocument();
+    const { user, getAllByTestId, findByTestId, queryByText, findByText } = renderResult;
+    const openDialogButton = await findByTestId('open-project-programmed-dialog');
+    expect(openDialogButton).toBeInTheDocument();
 
     // User is not under class/subClass balk hence the modal won't open
-    await user.click(getByTestId('open-project-programmed-dialog'));
+    await user.click(openDialogButton);
     expect(queryByText(`projectProgrammedForm.searchForProjects`)).toBeNull();
     // Navigate to a class row
     await waitFor(() => navigateToProjectRows(renderResult));
 
-    await user.click(getByTestId('open-project-programmed-dialog'));
+    await user.click(openDialogButton);
 
-    const submitButton = getByTestId('add-projects-button');
+    const submitButton = await findByTestId('add-projects-button');
     expect(submitButton).toBeDisabled();
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
-    await user.type(getByText('projectProgrammedForm.searchForProjects'), 'Planning');
+    await user.type(await findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
     await waitFor(async () => {
-      expect(getByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
+      expect(await findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
     });
-    await user.click(getByText(mockSearchResults.data.results[0].name));
+    await user.click(await findByText(mockSearchResults.data.results[0].name));
     expect(getAllByTestId('project-selection').length).toBe(1);
 
     const getRequest = mockedAxios.get.mock;
@@ -180,9 +180,9 @@ describe('ProjectProgrammedDialog', () => {
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
-    await user.click(getByTestId('cancel-search'));
+    await user.click(await findByTestId('cancel-search'));
 
-    expect(getByTestId('row-planning-project-1')).toBeInTheDocument();
+    expect(await findByTestId('row-planning-project-1')).toBeInTheDocument();
 
     removeProjectUpdateEventListener(store.dispatch);
   });

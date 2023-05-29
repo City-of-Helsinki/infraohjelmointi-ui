@@ -59,11 +59,13 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   const buildQueryParamString = useCallback(
     (projectName: string): ISearchRequest => {
       const reqParamObject = { limit: '30', params: '', order: 'new' };
-      const searchParams = [];
-      searchParams.push(`projectName=${projectName}`);
-      searchParams.push(`programmed=false`);
-      searchParams.push(`phase=${phaseProposal}`);
-      searchParams.push(`phase=${phaseDesign}`);
+      const searchParams = [
+        `projectName=${projectName}`,
+        `programmed=false`,
+        `phase=${phaseProposal}`,
+        `phase=${phaseDesign}`,
+      ];
+
       if (selections.selectedSubClass?.id) {
         searchParams.push(`subClass=${selections.selectedSubClass.id}`);
       } else if (selections.selectedClass?.id) {
