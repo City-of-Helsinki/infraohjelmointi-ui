@@ -65,14 +65,14 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       if (!inRow) {
         if (
           projectToUpdate.projectGroup &&
-          type.includes('group') &&
+          type === 'group' &&
           id === projectToUpdate.projectGroup
         ) {
           updatedProjects.push(projectToUpdate);
         } else if (
           projectToUpdate.projectLocation &&
           !projectToUpdate.projectGroup &&
-          (type.includes('district') || type.includes('division')) &&
+          (type === 'district' || type === 'division') &&
           id === projectToUpdate.projectLocation
         ) {
           updatedProjects.push(projectToUpdate);
