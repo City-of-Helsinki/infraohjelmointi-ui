@@ -64,24 +64,16 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       // check if project belongs to this row type
       if (!inRow) {
         if (
-          projectToUpdate.projectGroup &&
-          type === 'group' &&
-          id === projectToUpdate.projectGroup
-        ) {
-          updatedProjects.push(projectToUpdate);
-        } else if (
-          projectToUpdate.projectLocation &&
-          !projectToUpdate.projectGroup &&
-          (type === 'district' || type === 'division') &&
-          id === projectToUpdate.projectLocation
-        ) {
-          updatedProjects.push(projectToUpdate);
-        } else if (
-          projectToUpdate.projectClass &&
-          !projectToUpdate.projectLocation &&
-          !projectToUpdate.projectGroup &&
-          type.includes('class') &&
-          id === projectToUpdate.projectClass
+          (type === 'group' &&
+            projectToUpdate.projectGroup &&
+            id === projectToUpdate.projectGroup) ||
+          (!projectToUpdate.projectGroup &&
+            (type === 'district' || type === 'division') &&
+            id === projectToUpdate.projectLocation) ||
+          (!projectToUpdate.projectLocation &&
+            !projectToUpdate.projectGroup &&
+            type.includes('class') &&
+            id === projectToUpdate.projectClass)
         ) {
           updatedProjects.push(projectToUpdate);
         }
