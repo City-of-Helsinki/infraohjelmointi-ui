@@ -99,7 +99,7 @@ describe('ProjectProgrammedDialog', () => {
 
   it('renders project to programming modal', async () => {
     const renderResult = await render();
-    const { user, queryByTestId, findByTestId } = renderResult;
+    const { user, queryByTestId, findByTestId, findByRole } = renderResult;
     const openDialogButton = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButton).toBeInTheDocument();
 
@@ -110,10 +110,11 @@ describe('ProjectProgrammedDialog', () => {
     await waitFor(() => navigateToProjectRows(renderResult));
 
     await user.click(openDialogButton);
-    expect(await findByTestId('search-project-field-section')).toBeInTheDocument();
+    const dialog = within(await findByRole('dialog'));
+    expect(await dialog.findByTestId('search-project-field-section')).toBeInTheDocument();
 
-    expect(await findByTestId('add-projects-button')).toBeInTheDocument();
-    expect(await findByTestId('cancel-search')).toBeInTheDocument();
+    expect(await dialog.findByTestId('add-projects-button')).toBeInTheDocument();
+    expect(await dialog.findByTestId('cancel-search')).toBeInTheDocument();
   });
 
   it('can add non programmed projects to programming view', async () => {
