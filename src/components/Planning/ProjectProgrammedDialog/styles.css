@@ -3,6 +3,9 @@
   width: 45vw;
   @apply h-screen
 }
+#add-project-programmed-dialog div:nth-child(2){
+ @apply h-full
+}
 
 #add-project-programmed-dialog .project-search-input .search-selections {
   @apply mt-5;
@@ -11,9 +14,7 @@
   @apply mt-5;
 }
 
-#add-project-programmed-dialog .dialog-search-section{
-  @apply min-h-screen
-}
+
 
 .project-suggestions-card {
   @apply mb-3 border-2 border-black bg-white py-6 px-8;
