@@ -152,6 +152,7 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({ selections 
               selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true
             }
             onClick={onOpenGroupForm}
+            data-testid="open-project-programmed-dialog"
           >
             {t(`projectProgrammedForm.addProjectsToProgramming`)}
           </button>

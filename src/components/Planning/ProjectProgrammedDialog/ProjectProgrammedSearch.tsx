@@ -142,6 +142,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
     <div className="project-search-input" data-testid="search-project-field-section">
       <SearchInput
         label={t('projectProgrammedForm.searchForProjects')}
+        data-testid="search-projects-input"
         getSuggestions={getSuggestions}
         clearButtonAriaLabel="Clear search field"
         searchButtonAriaLabel="Search"

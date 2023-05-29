@@ -5,7 +5,7 @@ import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from 
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import { waitFor } from '@testing-library/react';
+import { getByTestId, waitFor } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
   mockClasses,
@@ -99,21 +99,21 @@ describe('ProjectProgrammedDialog', () => {
 
   it('renders project to programming modal', async () => {
     const renderResult = await render();
-    const { getByText, getByRole, user, queryByText } = renderResult;
+    const { user, queryByTestId, getByTestId } = renderResult;
 
-    expect(getByText('projectProgrammedForm.addProjectsToProgramming')).toBeInTheDocument();
+    expect(getByTestId('open-project-programmed-dialog')).toBeInTheDocument();
 
     // User is not under class/subClass balk hence the modal won't open
-    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
-    expect(queryByText(`projectProgrammedForm.searchForProjects`)).toBeNull();
+    await user.click(getByTestId('open-project-programmed-dialog'));
+    expect(queryByTestId('search-projects-input')).toBeNull();
     // Navigate to a class row
     await waitFor(() => navigateToProjectRows(renderResult));
 
-    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
-    expect(getByText(`projectProgrammedForm.searchForProjects`)).toBeInTheDocument();
+    await user.click(getByTestId('open-project-programmed-dialog'));
+    expect(getByTestId('search-project-field-section')).toBeInTheDocument();
 
-    expect(getByRole('button', { name: 'search' }));
-    expect(getByRole('button', { name: 'cancel' }));
+    expect(getByTestId('add-projects-button')).toBeInTheDocument();
+    expect(getByTestId('cancel-search')).toBeInTheDocument();
   });
 
   it('can add non programmed projects to programming view', async () => {
@@ -137,15 +137,15 @@ describe('ProjectProgrammedDialog', () => {
 
     const { user, getAllByTestId, getByTestId, queryByText, getByText, getByRole } = renderResult;
 
-    expect(getByText('projectProgrammedForm.addProjectsToProgramming')).toBeInTheDocument();
+    expect(getByTestId('open-project-programmed-dialog')).toBeInTheDocument();
 
     // User is not under class/subClass balk hence the modal won't open
-    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
+    await user.click(getByTestId('open-project-programmed-dialog'));
     expect(queryByText(`projectProgrammedForm.searchForProjects`)).toBeNull();
     // Navigate to a class row
     await waitFor(() => navigateToProjectRows(renderResult));
 
-    await user.click(getByText('projectProgrammedForm.addProjectsToProgramming'));
+    await user.click(getByTestId('open-project-programmed-dialog'));
 
     const submitButton = getByTestId('add-projects-button');
     expect(submitButton).toBeDisabled();
