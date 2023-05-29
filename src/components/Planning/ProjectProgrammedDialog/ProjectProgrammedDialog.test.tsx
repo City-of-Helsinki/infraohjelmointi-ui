@@ -117,7 +117,6 @@ describe('ProjectProgrammedDialog', () => {
   });
 
   it('can add non programmed projects to programming view', async () => {
-    window.HTMLElement.prototype.scrollIntoView = jest.fn();
     addProjectUpdateEventListener(store.dispatch);
     const renderResult = await render();
     const mockPatchResponse = {

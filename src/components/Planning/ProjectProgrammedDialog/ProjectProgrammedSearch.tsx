@@ -38,7 +38,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   projectsForSubmit,
   onProjectSelectionDelete,
 }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const classes = useAppSelector(selectAllClasses);
   const districts = useAppSelector(selectDistricts);
 
@@ -56,12 +55,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   // in planning view
   // any one of these classes have to be selected by the user to be able to toggle the form
   const { selections } = usePlanningRows();
-
-  useEffect(() => {
-    setTimeout(() => {
-      scrollRef.current?.scrollIntoView();
-    }, 2000);
-  }, [searchedProjects]);
 
   const buildQueryParamString = useCallback(
     (projectName: string): ISearchRequest => {
@@ -147,7 +140,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   );
   return (
     <div className="project-search-input" data-testid="search-project-field-section">
-      <div ref={scrollRef}></div>
       <SearchInput
         label={t('projectProgrammedForm.searchForProjects')}
         getSuggestions={getSuggestions}
