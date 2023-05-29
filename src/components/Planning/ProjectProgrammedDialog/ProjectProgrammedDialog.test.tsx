@@ -135,7 +135,7 @@ describe('ProjectProgrammedDialog', () => {
       ],
     };
 
-    const { user, getAllByTestId, getByTestId, queryByText, getByText, getByRole } = renderResult;
+    const { user, getAllByTestId, getByTestId, queryByText, getByText } = renderResult;
 
     expect(getByTestId('open-project-programmed-dialog')).toBeInTheDocument();
 
@@ -180,7 +180,7 @@ describe('ProjectProgrammedDialog', () => {
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
-    await user.click(getByRole('button', { name: 'closeProjectProgrammedDialog' }));
+    await user.click(getByTestId('cancel-search'));
 
     expect(getByTestId('row-planning-project-1')).toBeInTheDocument();
 
