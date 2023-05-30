@@ -16,7 +16,7 @@ const PlanningView: FC = () => {
   // when the same year is re-clicked
   const handleSetSelectedYear = (year: number | null) =>
     setSelectedYear(year === selectedYear ? null : year);
-  const [groupsExpanded, setGroupsExpanded] = useState<boolean>(true);
+  const [groupsExpanded, setGroupsExpanded] = useState<boolean>(false);
 
   const toggleGroupsExpanded = useCallback(function () {
     setGroupsExpanded((current) => !current);
