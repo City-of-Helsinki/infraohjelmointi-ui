@@ -44,27 +44,27 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
   const { type, startYear } = cell;
   const req: IProjectRequest = { finances: { year: startYear } };
 
-  const setGapCellFinancesNull = (cellType: 'con' | 'plan') => {
-    let head: IProjectCell | null = cellType === 'con' ? cell.next : cell.prev;
+  const setGapCellFinancesNull = (cellType: 'Construction' | 'Planning') => {
+    let head: IProjectCell | null = cellType === 'Construction' ? cell.next : cell.prev;
     while (
       head &&
       !head.type.includes(cellType) &&
-      !head[`${cellType}End`] &&
-      !head[`${cellType}Start`]
+      !head.projectEstDates[`est${cellType}End`] &&
+      !head.projectEstDates[`est${cellType}Start`]
     ) {
       // Have to use a if condition to check as other operators are still raising typescript errors
       if (req.finances) {
         (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
       }
-      head = cellType === 'con' ? head.next : head.prev;
+      head = cellType === 'Construction' ? head.next : head.prev;
     }
     return head;
   };
   const getFirstPlanCellBehind = () => {
-    return setGapCellFinancesNull('plan');
+    return setGapCellFinancesNull('Planning');
   };
   const getFirstConCellAhead = () => {
-    return setGapCellFinancesNull('con');
+    return setGapCellFinancesNull('Construction');
   };
   const getDateFromFirstPlanCellBehind = () => {
     const planCellBehind = getFirstPlanCellBehind();
@@ -76,43 +76,43 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
     return conCellAhead ? createDateToStartOfYear(conCellAhead.year) : null;
   };
   switch (type) {
-    case 'planEnd':
-      if (cell.prev?.type.includes('plan')) {
-        req.estPlanningEnd = removeYear(cell.planEnd);
+    case 'planningEnd':
+      if (cell.prev?.type.includes('planning')) {
+        req.estPlanningEnd = removeYear(cell.projectEstDates.estPlanningEnd);
       } else {
         req.estPlanningEnd = getDateFromFirstPlanCellBehind();
       }
-      if (cell.next?.type.includes('con')) {
-        req.estConstructionStart = removeYear(cell.conStart);
+      if (cell.next?.type.includes('construction')) {
+        req.estConstructionStart = removeYear(cell.projectEstDates.estConstructionStart);
       } else {
-        setGapCellFinancesNull('con');
-        req.estConstructionStart = getFirstDate(cell.planEnd);
+        setGapCellFinancesNull('Construction');
+        req.estConstructionStart = getFirstDate(cell.projectEstDates.estPlanningEnd);
       }
       break;
-    case 'conStart':
-      if (cell.prev?.type.includes('plan')) {
-        req.estPlanningEnd = addYear(cell.planEnd);
+    case 'constructionStart':
+      if (cell.prev?.type.includes('planning')) {
+        req.estPlanningEnd = addYear(cell.projectEstDates.estPlanningEnd);
       } else {
-        setGapCellFinancesNull('plan');
-        req.estPlanningEnd = getLastDate(cell.conStart);
+        setGapCellFinancesNull('Planning');
+        req.estPlanningEnd = getLastDate(cell.projectEstDates.estConstructionStart);
       }
-      if (cell.next?.type.includes('con')) {
-        req.estConstructionStart = addYear(cell.conStart);
+      if (cell.next?.type.includes('construction')) {
+        req.estConstructionStart = addYear(cell.projectEstDates.estConstructionStart);
       } else {
         req.estConstructionStart = getDateFromFirstConCellAhead();
       }
       break;
     case 'overlap':
-      if (phase.includes('con')) {
-        if (cell.prev?.type.includes('plan')) {
-          req.estPlanningEnd = removeYear(cell.planEnd);
+      if (phase.includes('construction')) {
+        if (cell.prev?.type.includes('planning')) {
+          req.estPlanningEnd = removeYear(cell.projectEstDates.estPlanningEnd);
         } else {
           req.estPlanningEnd = getDateFromFirstPlanCellBehind();
         }
       }
-      if (phase.includes('plan')) {
-        if (cell.next?.type.includes('con')) {
-          req.estConstructionStart = addYear(cell.conStart);
+      if (phase.includes('planning')) {
+        if (cell.next?.type.includes('construction')) {
+          req.estConstructionStart = addYear(cell.projectEstDates.estConstructionStart);
         } else {
           req.estConstructionStart = getDateFromFirstConCellAhead();
         }
@@ -483,7 +483,9 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
   );
   const canTypeUpdate = useCallback(() => {
     if (
-      (cell.type === 'planEnd' || cell.type === 'conStart' || cell.type === 'overlap') &&
+      (cell.type === 'planningEnd' ||
+        cell.type === 'constructionStart' ||
+        cell.type === 'overlap') &&
       !cell.isLastOfType
     )
       return true;

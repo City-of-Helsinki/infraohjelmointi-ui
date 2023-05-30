@@ -20,7 +20,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   onUpdateCellType,
   canTypeUpdate,
 }) => {
-  const [selectedType, setSelectedType] = useState<CellType>('plan');
+  const [selectedType, setSelectedType] = useState<CellType>('planning');
   useEffect(() => {
     setSelectedType(cellType);
   }, [cellType]);

@@ -2227,16 +2227,18 @@ describe('PlanningView', () => {
             expect(
               getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('overlap'),
             ).toBeTruthy();
-            expect(getByTestId('cell-type-con').classList.contains('selected')).toBeFalsy();
-            expect(getByTestId('cell-type-plan').classList.contains('selected')).toBeFalsy();
+            expect(
+              getByTestId('cell-type-construction').classList.contains('selected'),
+            ).toBeFalsy();
+            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeFalsy();
           });
 
           // Overlap cells can be changed to either plan or con
-          expect(getByTestId('update-cell-type-to-plan')).toBeEnabled();
-          expect(getByTestId('update-cell-type-to-con')).toBeEnabled();
+          expect(getByTestId('update-cell-type-to-planning')).toBeEnabled();
+          expect(getByTestId('update-cell-type-to-construction')).toBeEnabled();
 
           // Updating overlap celltype to plan
-          await user.click(getByTestId('update-cell-type-to-plan'));
+          await user.click(getByTestId('update-cell-type-to-planning'));
 
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
@@ -2253,12 +2255,14 @@ describe('PlanningView', () => {
             // overlap changed to plan
             expect(getByTestId(`project-cell-${planEndCellYear}-${id}`)).toBeInTheDocument();
             expect(
-              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('plan'),
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('planning'),
             ).toBeTruthy();
             // moved construction + 1 year forward
             expect(getByTestId(`project-cell-${planEndCellYear + 1}-${id}`)).toBeInTheDocument();
             expect(
-              getByTestId(`project-cell-${planEndCellYear + 1}-${id}`).classList.contains('con'),
+              getByTestId(`project-cell-${planEndCellYear + 1}-${id}`).classList.contains(
+                'construction',
+              ),
             ).toBeTruthy();
           });
 
@@ -2268,14 +2272,16 @@ describe('PlanningView', () => {
           await waitFor(() => {
             expect(getByTestId('cell-year')).toHaveTextContent((planEndCellYear - 1).toString());
             expect(
-              getByTestId(`project-cell-${planEndCellYear - 1}-${id}`).classList.contains('plan'),
+              getByTestId(`project-cell-${planEndCellYear - 1}-${id}`).classList.contains(
+                'planning',
+              ),
             ).toBeTruthy();
-            expect(getByTestId('cell-type-plan').classList.contains('selected')).toBeTruthy();
+            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeTruthy();
           });
 
           // Cannot update cells in the middle of timeline
-          expect(getByTestId('update-cell-type-to-plan')).toBeDisabled();
-          expect(getByTestId('update-cell-type-to-con')).toBeDisabled();
+          expect(getByTestId('update-cell-type-to-planning')).toBeDisabled();
+          expect(getByTestId('update-cell-type-to-construction')).toBeDisabled();
 
           await user.click(getByTestId('close-project-cell-menu'));
 
@@ -2298,17 +2304,17 @@ describe('PlanningView', () => {
             expect(getByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
             // plan end cell
             expect(
-              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('plan'),
+              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('planning'),
             ).toBeTruthy();
-            expect(getByTestId('cell-type-plan').classList.contains('selected')).toBeTruthy();
+            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeTruthy();
           });
           // plan cell cannot be changed to plan
           // only con button enabled
-          expect(getByTestId('update-cell-type-to-plan')).toBeDisabled();
-          expect(getByTestId('update-cell-type-to-con')).toBeEnabled();
+          expect(getByTestId('update-cell-type-to-planning')).toBeDisabled();
+          expect(getByTestId('update-cell-type-to-construction')).toBeEnabled();
 
           // Updating celltype to con
-          await user.click(getByTestId('update-cell-type-to-con'));
+          await user.click(getByTestId('update-cell-type-to-construction'));
 
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
@@ -2326,12 +2332,16 @@ describe('PlanningView', () => {
             // plan cell changed to conStart cell
             expect(getByTestId(`project-cell-${conStartYearCell}-${id}`)).toBeInTheDocument();
             expect(
-              getByTestId(`project-cell-${conStartYearCell}-${id}`).classList.contains('con'),
+              getByTestId(`project-cell-${conStartYearCell}-${id}`).classList.contains(
+                'construction',
+              ),
             ).toBeTruthy();
 
             expect(getByTestId(`project-cell-${conStartYearCell - 1}-${id}`)).toBeInTheDocument();
             expect(
-              getByTestId(`project-cell-${conStartYearCell - 1}-${id}`).classList.contains('plan'),
+              getByTestId(`project-cell-${conStartYearCell - 1}-${id}`).classList.contains(
+                'planning',
+              ),
             ).toBeTruthy();
             removeProjectUpdateEventListener(dispatch);
           });
