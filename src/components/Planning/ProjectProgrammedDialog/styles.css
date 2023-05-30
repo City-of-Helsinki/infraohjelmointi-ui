@@ -13,7 +13,9 @@
 #add-project-programmed-dialog .project-search-input {
   @apply mt-5;
 }
-
+#add-project-programmed-dialog .project-search-input div div div button {
+  @apply z-10;
+}
 
 
 .project-suggestions-card {
