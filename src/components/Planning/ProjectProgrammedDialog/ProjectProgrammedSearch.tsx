@@ -123,7 +123,6 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
 
   const handleSubmit = useCallback(
     (value: string) => {
-      console.log(value);
       const selectedProject = searchedProjects.find(
         (p) => p.label.toLowerCase() === value.toLowerCase(),
       );
