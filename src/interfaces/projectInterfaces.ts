@@ -156,6 +156,10 @@ export interface IProjectGetRequestObject {
   year?: string;
 }
 
+export interface IProjectsPatchRequestObject {
+  data : Array<IProjectPatchRequestObject>
+}
+
 // These will be used to render the icons for projects in the planning view list
 export enum ProjectType {
   ProjectComplex = 'projectComplex',

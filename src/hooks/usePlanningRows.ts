@@ -24,6 +24,13 @@ import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calcul
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { selectFinanceUpdate, selectProjectUpdate } from '@/reducers/eventsSlice';
 
+
+
+interface IPlanningRowsState {
+  lists: IPlanningRowLists;
+  selections: IPlanningRowSelections;
+}
+
 /**
  * Returns false whether a given row is already selected and present in the url.
  *
@@ -246,6 +253,7 @@ const fetchProjectsByRelation = async (
     const allResults = await getProjectsWithParams({
       params: `${type}=${id}`,
       direct: direct,
+      programmed: true,
     });
     return allResults.results;
   } catch (e) {
@@ -421,6 +429,7 @@ const usePlanningRows = () => {
   }, [projectUpdate]);
 
   return planningRowsState;
+ 
 };
 
 export default usePlanningRows;

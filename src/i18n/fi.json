@@ -247,6 +247,11 @@
     "programmedYearMin": "Ohjelmoitu vuosi min {{label}}",
     "programmedYearMax": "Ohjelmoitu vuosi max {{label}}"
   },
+  "projectProgrammedForm":{
+    "addProjectsToProgramming":"Tuo uusi hanke listalle",
+    "searchForProjects":"Etsi hanke",
+    "addProjects":"Tuo"
+  },
   "appTitle": "Infraohjelmointi UI",
   "project": "Hankekortti",
   "planning": "Ohjelmointinäkymä",
@@ -325,7 +330,10 @@
   "pwFolderLinkNotExist":"Dokumenttikansiota ei ole avattu",
   "opensExternalWebsite":"Avaa toisen verkkosivuston",
   "opensInNewTab":"Avautuu uuteen välilehteen",
-  "searchForProjects":"Etsi hankkeita",
   "createSummingGroups": "Luo uusi summaava ryhmä",
-  "fieldRequiredWarning": "Tämä kenttä on täytettävä"
+  "fieldRequiredWarning": "Tämä kenttä on täytettävä",
+  "addProgrammedProject":"Tuo uusi hanke listalle",
+  "addProjectsToProgramming":"Tuo uusi hanke listalle",
+  "searchForProjects":"Etsi hanke",
+  "closeProjectProgrammedDialog":"Sulje projektiohjelmoitu dialogi"
 }

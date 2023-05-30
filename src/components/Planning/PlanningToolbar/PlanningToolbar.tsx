@@ -3,10 +3,16 @@ import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
 import { Navigation } from 'hds-react/components/Navigation';
 import { useTranslation } from 'react-i18next';
 import { GroupDialog } from '../GroupDialog';
+import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import './styles.css';
 import { IconCross } from 'hds-react/icons/';
 import { useCallback, useRef } from 'react';
-const ProjectToolbar = () => {
+import { IPlanningRowSelections } from '@/interfaces/common';
+
+interface ProjectToolBarProps {
+  selections: IPlanningRowSelections;
+}
+const ProjectToolbar = ({ selections }: ProjectToolBarProps) => {
   const { Dropdown, Item } = Navigation;
   const dropDownRef = useRef<HTMLDivElement>(null);
   const closeDropdown = useCallback(() => {
@@ -32,6 +38,9 @@ const ProjectToolbar = () => {
               </div>
               <Item>
                 <GroupDialog />
+              </Item>
+              <Item>
+                <ProjectProgrammedDialog selections={selections} />
               </Item>
             </Dropdown>
           </div>

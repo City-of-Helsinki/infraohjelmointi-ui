@@ -2,6 +2,7 @@ import { IError, IFreeSearchResults } from '@/interfaces/common';
 import {
   IProject,
   IProjectPatchRequestObject,
+  IProjectsPatchRequestObject,
   IProjectsResponse,
 } from '@/interfaces/projectInterfaces';
 import {
@@ -37,11 +38,21 @@ export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResu
     .catch((err: IError) => Promise.reject(err));
 };
 
+export const patchProjects = async (request: IProjectsPatchRequestObject): Promise<Array<IProject>> => {
+  return axios
+    .patch(`${REACT_APP_API_URL}/projects/bulk-update/`, request.data)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+
 export const getProjectsWithParams = async (
   req: IProjectSearchRequest,
 ): Promise<IProjectsResponse> => {
+  const { params, direct, programmed } = req;
+  const allParams = `${params}&direct=${direct}${programmed ? '&programmed=true' : ''}`;
   return axios
-    .get(`${REACT_APP_API_URL}/projects/?${req.params}&direct=${req.direct}`)
+    .get(`${REACT_APP_API_URL}/projects/?${allParams}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

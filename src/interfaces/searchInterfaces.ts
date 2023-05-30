@@ -11,6 +11,17 @@ export interface ISearchResultPayloadItem {
   hashTags: Array<IListItem>;
   phase: IListItem | null;
 }
+export interface IProgrammedProjectSuggestions {
+  value: string;
+  label: string;
+  breadCrumbs: Array<string>;
+}
+
+export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'phase'> {
+  breadCrumbs: Array<string>;
+  phase: string | null;
+}
+
 export interface ISearchResultsProject {
   project: IProject;
   path: string;
@@ -41,6 +52,7 @@ export interface ISearchRequest {
 export interface IProjectSearchRequest
   extends Omit<ISearchRequest, 'fullPath' | 'limit' | 'order'> {
   direct: boolean;
+  programmed?: boolean;
 }
 
 export type SearchLimit = '10' | '20' | '30';
