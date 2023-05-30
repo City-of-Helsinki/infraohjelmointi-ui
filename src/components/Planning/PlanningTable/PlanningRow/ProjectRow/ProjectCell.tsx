@@ -1,5 +1,4 @@
 import {
-  CellType,
   IProjectCell,
   IProjectFinances,
   IProjectFinancesRequestObject,
