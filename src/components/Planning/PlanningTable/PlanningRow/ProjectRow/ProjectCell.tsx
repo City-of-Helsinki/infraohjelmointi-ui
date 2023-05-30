@@ -43,8 +43,13 @@ const addActiveClassToProjectRow = (projectId: string) => {
 const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProjectRequest => {
   const { type, startYear } = cell;
   const req: IProjectRequest = { finances: { year: startYear } };
-
-  const setGapCellFinancesNull = (cellType: 'Construction' | 'Planning') => {
+  /**
+   * Returns the first/last valid construction/planning cell and sets any inbetween cell finances to null.
+   * Traverses backwards to find a planning cell and forward to find a construction cell.
+   * @param cellType the type of cell to find
+   * @returns IProjectCell
+   */
+  const traverseAndSetGapCellFinancesNull = (cellType: 'Construction' | 'Planning') => {
     let head: IProjectCell | null = cellType === 'Construction' ? cell.next : cell.prev;
     while (
       head &&
@@ -60,17 +65,32 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
     }
     return head;
   };
+  /**
+   * Traverses backwards from current cell to get the first valid planning cell
+   * @returns IProjectCell
+   */
   const getFirstPlanCellBehind = () => {
-    return setGapCellFinancesNull('Planning');
+    return traverseAndSetGapCellFinancesNull('Planning');
   };
+  /**
+   * Traverses forward from current cell to get the first valid construction cell
+   * @returns IProjectCell
+   */
   const getFirstConCellAhead = () => {
-    return setGapCellFinancesNull('Construction');
+    return traverseAndSetGapCellFinancesNull('Construction');
   };
+  /**
+   * Gets EndOfYear date from the first valid planning cell behind
+   * @returns string
+   */
   const getDateFromFirstPlanCellBehind = () => {
     const planCellBehind = getFirstPlanCellBehind();
     return planCellBehind ? createDateToEndOfYear(planCellBehind.year) : null;
   };
-
+  /**
+   * Gets StartOfYear date from the first valid construction cell ahead
+   * @returns string
+   */
   const getDateFromFirstConCellAhead = () => {
     const conCellAhead = getFirstConCellAhead();
     return conCellAhead ? createDateToStartOfYear(conCellAhead.year) : null;
@@ -85,7 +105,7 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
       if (cell.next?.type.includes('construction')) {
         req.estConstructionStart = removeYear(cell.projectEstDates.estConstructionStart);
       } else {
-        setGapCellFinancesNull('Construction');
+        traverseAndSetGapCellFinancesNull('Construction');
         req.estConstructionStart = getFirstDate(cell.projectEstDates.estPlanningEnd);
       }
       break;
@@ -93,7 +113,7 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
       if (cell.prev?.type.includes('planning')) {
         req.estPlanningEnd = addYear(cell.projectEstDates.estPlanningEnd);
       } else {
-        setGapCellFinancesNull('Planning');
+        traverseAndSetGapCellFinancesNull('Planning');
         req.estPlanningEnd = getLastDate(cell.projectEstDates.estConstructionStart);
       }
       if (cell.next?.type.includes('construction')) {
