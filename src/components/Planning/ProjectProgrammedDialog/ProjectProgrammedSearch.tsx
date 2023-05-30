@@ -123,12 +123,13 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
 
   const handleSubmit = useCallback(
     (value: string) => {
-      const selectedProject = searchedProjects.find(
-        (p) => p.label.toLowerCase() === value.toLowerCase(),
+      const searchedString = value.toLowerCase();
+      const selectedProjects = searchedProjects.filter((p) =>
+        p.label.toLowerCase().includes(searchedString),
       );
 
       if (value) {
-        onProjectClick(selectedProject);
+        selectedProjects.forEach((p) => onProjectClick(p));
       }
 
       setSearchState((current) => ({ ...current, searchWord: '' }));
