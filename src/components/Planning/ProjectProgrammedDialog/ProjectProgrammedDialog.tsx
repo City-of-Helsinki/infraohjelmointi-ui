@@ -2,6 +2,7 @@ import { useState, MouseEvent, FC, useCallback, memo } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
+import Loader from '@/components/Loader';
 
 import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
@@ -11,6 +12,7 @@ import { IPlanningRowSelections } from '@/interfaces/common';
 import { patchProjects } from '@/services/projectServices';
 import { createDateToEndOfYear, createDateToStartOfYear } from '@/utils/dates';
 import { useAppDispatch } from '@/hooks/common';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -65,12 +67,20 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   }, [handleClose]);
 
   const onSubmit = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+    async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-
+      dispatch(
+        setLoading({
+          text: 'Patching programmed projects',
+          id: 'loading-programmed-projects-patched',
+        }),
+      );
       patchProjects(buildRequestPayload(projectsForSubmit))
         .then(() => {
           setProjectsForSubmit([]);
+        })
+        .finally(() => {
+          dispatch(clearLoading('loading-programmed-projects-patched'));
         })
         .catch(() => Promise.reject);
     },
@@ -106,6 +116,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                 />
               </div>
             </div>
+            <Loader />
           </Content>
           <ActionButtons>
             <Button

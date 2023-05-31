@@ -1,10 +1,9 @@
-
 #add-project-programmed-dialog {
   width: 45vw;
-  @apply h-screen
+  @apply h-screen;
 }
-#add-project-programmed-dialog div:nth-child(2){
- @apply h-full
+#add-project-programmed-dialog div:nth-child(2) {
+  @apply h-full;
 }
 
 #add-project-programmed-dialog .project-search-input .search-selections {
@@ -16,7 +15,6 @@
 #add-project-programmed-dialog .project-search-input div div div button {
   @apply z-10;
 }
-
 
 .project-suggestions-card {
   @apply mb-3 border-2 border-black bg-white py-6 px-8;
@@ -47,4 +45,12 @@
 
 .search-result-breadcrumbs > div > svg {
   @apply w-6 translate-y-[0.3rem];
+}
+
+#add-project-programmed-dialog .loader-container {
+  position: static;
+}
+
+#add-project-programmed-dialog .loader-container .loader-wrapper {
+  left: 50%;
 }
