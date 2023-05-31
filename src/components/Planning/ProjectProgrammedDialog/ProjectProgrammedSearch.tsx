@@ -4,7 +4,11 @@ import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
-import { IProgrammedProjectSuggestions, ISearchRequest } from '@/interfaces/searchInterfaces';
+import {
+  IProgrammedProjectSuggestions,
+  ISearchRequest,
+  ISearchResultPayloadItem,
+} from '@/interfaces/searchInterfaces';
 import { IClass } from '@/interfaces/classInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectAllClasses } from '@/reducers/classSlice';
@@ -18,7 +22,7 @@ interface ISearchState {
   searchedProjects: Array<IProgrammedProjectSuggestions>;
 }
 interface IProjectSearchProps {
-  onProjectClick: (value: IProgrammedProjectSuggestions | undefined) => void;
+  onProjectsSelect: (value: IProgrammedProjectSuggestions[]) => void;
   projectsForSubmit: Array<IProgrammedProjectSuggestions>;
   onProjectSelectionDelete: (projectName: string) => void;
 }
@@ -34,7 +38,7 @@ const buildBreadCrumbs = (
       (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
     );
 const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
-  onProjectClick,
+  onProjectsSelect,
   projectsForSubmit,
   onProjectSelectionDelete,
 }) => {
@@ -94,8 +98,16 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
           .then((res) => {
             // Filter out only the projects which haven't yet been added to be the submitted list from the result
             const projectsIdList = projectsForSubmit.map((p) => p.value);
-            const resultList = res.results.filter(
+            const resultListWithDuplicates = res.results.filter(
               (result) => result.type == 'projects' && !arrayHasValue(projectsIdList, result.id),
+            );
+            // reset duplicates
+
+            const resultList = Object.values(
+              resultListWithDuplicates.reduce((accumulator, current) => {
+                // kep only one copy of each element
+                return { ...accumulator, [current.name]: current };
+              }, {} as Record<string, ISearchResultPayloadItem>),
             );
 
             // Convert the resultList to options for the suggestion dropdown
@@ -128,13 +140,11 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
         p.label.toLowerCase().includes(searchedString),
       );
 
-      if (value) {
-        selectedProjects.forEach((p) => onProjectClick(p));
-      }
+      onProjectsSelect(selectedProjects);
 
       setSearchState((current) => ({ ...current, searchWord: '' }));
     },
-    [onProjectClick, searchedProjects],
+    [onProjectsSelect, searchedProjects],
   );
 
   const handleDelete = useCallback(

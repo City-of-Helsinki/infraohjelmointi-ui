@@ -10,6 +10,7 @@ import { useOptions } from '@/hooks/useOptions';
 import { IPlanningRowSelections } from '@/interfaces/common';
 import { patchProjects } from '@/services/projectServices';
 import { createDateToEndOfYear, createDateToStartOfYear } from '@/utils/dates';
+import { useAppDispatch } from '@/hooks/common';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -20,6 +21,8 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const [projectsForSubmit, setProjectsForSubmit] = useState<Array<IProgrammedProjectSuggestions>>(
     [],
   );
+  const dispatch = useAppDispatch();
+
   const phase =
     useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
 
@@ -44,9 +47,9 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   );
 
   const { t } = useTranslation();
-  const onProjectClick = useCallback((value: IProgrammedProjectSuggestions | undefined) => {
-    if (value) {
-      setProjectsForSubmit((current) => [...current, value]);
+  const onProjectsSelect = useCallback((projects: IProgrammedProjectSuggestions[]) => {
+    if (projects.length > 0) {
+      setProjectsForSubmit((current) => [...current, ...projects]);
     }
   }, []);
 
@@ -64,6 +67,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const onSubmit = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
+
       patchProjects(buildRequestPayload(projectsForSubmit))
         .then(() => {
           setProjectsForSubmit([]);
@@ -71,7 +75,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
         .catch(() => Promise.reject);
     },
 
-    [buildRequestPayload, projectsForSubmit],
+    [buildRequestPayload, projectsForSubmit, dispatch],
   );
 
   return (
@@ -96,7 +100,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
             <div className="dialog-search-section">
               <div>
                 <ProjectProgrammedSearch
-                  onProjectClick={onProjectClick}
+                  onProjectsSelect={onProjectsSelect}
                   onProjectSelectionDelete={onProjectSelectionDelete}
                   projectsForSubmit={projectsForSubmit}
                 />
