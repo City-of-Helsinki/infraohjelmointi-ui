@@ -11,7 +11,6 @@ import { IPlanningRowSelections } from '@/interfaces/common';
 import { patchProjects } from '@/services/projectServices';
 import { createDateToEndOfYear, createDateToStartOfYear } from '@/utils/dates';
 import { useAppDispatch } from '@/hooks/common';
-import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -68,18 +67,10 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const onSubmit = useCallback(
     async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      dispatch(
-        setLoading({
-          text: 'Patching programmed projects',
-          id: 'loading-programmed-projects-patched',
-        }),
-      );
+
       patchProjects(buildRequestPayload(projectsForSubmit))
         .then(() => {
           setProjectsForSubmit([]);
-        })
-        .finally(() => {
-          dispatch(clearLoading('loading-programmed-projects-patched'));
         })
         .catch(() => Promise.reject);
     },
