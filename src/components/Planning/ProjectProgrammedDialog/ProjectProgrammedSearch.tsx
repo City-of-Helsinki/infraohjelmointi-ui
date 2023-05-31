@@ -18,7 +18,7 @@ interface ISearchState {
   searchedProjects: Array<IProgrammedProjectSuggestions>;
 }
 interface IProjectSearchProps {
-  onProjectClick: (value: IProgrammedProjectSuggestions | undefined) => void;
+  onProjectsSelect: (value: IProgrammedProjectSuggestions[] | undefined) => void;
   projectsForSubmit: Array<IProgrammedProjectSuggestions>;
   onProjectSelectionDelete: (projectName: string) => void;
 }
@@ -34,7 +34,7 @@ const buildBreadCrumbs = (
       (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
     );
 const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
-  onProjectClick,
+  onProjectsSelect,
   projectsForSubmit,
   onProjectSelectionDelete,
 }) => {
@@ -128,13 +128,11 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
         p.label.toLowerCase().includes(searchedString),
       );
 
-      if (value) {
-        selectedProjects.forEach((p) => onProjectClick(p));
-      }
+      onProjectsSelect(selectedProjects);
 
       setSearchState((current) => ({ ...current, searchWord: '' }));
     },
-    [onProjectClick, searchedProjects],
+    [onProjectsSelect, searchedProjects],
   );
 
   const handleDelete = useCallback(

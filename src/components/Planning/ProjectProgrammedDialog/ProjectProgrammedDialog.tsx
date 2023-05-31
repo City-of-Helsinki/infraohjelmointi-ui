@@ -44,9 +44,9 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   );
 
   const { t } = useTranslation();
-  const onProjectClick = useCallback((value: IProgrammedProjectSuggestions | undefined) => {
-    if (value) {
-      setProjectsForSubmit((current) => [...current, value]);
+  const onProjectsSelect = useCallback((projects: IProgrammedProjectSuggestions[] | undefined) => {
+    if (projects?.length && projects.length > 0) {
+      setProjectsForSubmit((current) => [...current, ...projects]);
     }
   }, []);
 
@@ -96,7 +96,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
             <div className="dialog-search-section">
               <div>
                 <ProjectProgrammedSearch
-                  onProjectClick={onProjectClick}
+                  onProjectsSelect={onProjectsSelect}
                   onProjectSelectionDelete={onProjectSelectionDelete}
                   projectsForSubmit={projectsForSubmit}
                 />
