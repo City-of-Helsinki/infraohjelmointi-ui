@@ -10,6 +10,8 @@ import { useOptions } from '@/hooks/useOptions';
 import { IPlanningRowSelections } from '@/interfaces/common';
 import { patchProjects } from '@/services/projectServices';
 import { createDateToEndOfYear, createDateToStartOfYear } from '@/utils/dates';
+import { useAppDispatch } from '@/hooks/common';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -20,6 +22,8 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   const [projectsForSubmit, setProjectsForSubmit] = useState<Array<IProgrammedProjectSuggestions>>(
     [],
   );
+  const dispatch = useAppDispatch();
+
   const phase =
     useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
 
@@ -62,16 +66,25 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   }, [handleClose]);
 
   const onSubmit = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+    async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
+      dispatch(
+        setLoading({
+          text: 'Patching programmed projects',
+          id: 'loading-programmed-projects-patched',
+        }),
+      );
       patchProjects(buildRequestPayload(projectsForSubmit))
         .then(() => {
           setProjectsForSubmit([]);
         })
+        .finally(() => {
+          dispatch(clearLoading('loading-programmed-projects-patched'));
+        })
         .catch(() => Promise.reject);
     },
 
-    [buildRequestPayload, projectsForSubmit],
+    [buildRequestPayload, projectsForSubmit, dispatch],
   );
 
   return (

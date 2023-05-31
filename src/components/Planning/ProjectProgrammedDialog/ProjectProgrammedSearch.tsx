@@ -37,7 +37,6 @@ const buildBreadCrumbs = (
     .map(
       (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
     );
-let searchWordDuplicates: Record<string, ISearchResultPayloadItem[]> = {};
 const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   onProjectsSelect,
   projectsForSubmit,
@@ -103,22 +102,14 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
               (result) => result.type == 'projects' && !arrayHasValue(projectsIdList, result.id),
             );
             // reset duplicates
-            searchWordDuplicates = {};
+
             const resultList = Object.values(
               resultListWithDuplicates.reduce((accumulator, current) => {
-                // catch duplicates
-                if (accumulator[current.name]) {
-                  searchWordDuplicates[current.name] = [
-                    ...(searchWordDuplicates[current.name] ?? []),
-                    current,
-                  ];
-                } else {
-                  // kep only one copy of each element
-                  accumulator[current.name] = current;
-                }
-                return accumulator;
+                // kep only one copy of each element
+                return { ...accumulator, [current.name]: current };
               }, {} as Record<string, ISearchResultPayloadItem>),
             );
+
             // Convert the resultList to options for the suggestion dropdown
             const searchProjectsItemList: Array<IProgrammedProjectSuggestions> | [] = resultList
               ? resultList.map((project) => ({
