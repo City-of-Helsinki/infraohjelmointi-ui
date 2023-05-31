@@ -44,8 +44,8 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
   );
 
   const { t } = useTranslation();
-  const onProjectsSelect = useCallback((projects: IProgrammedProjectSuggestions[] | undefined) => {
-    if (projects?.length && projects.length > 0) {
+  const onProjectsSelect = useCallback((projects: IProgrammedProjectSuggestions[]) => {
+    if (projects.length > 0) {
       setProjectsForSubmit((current) => [...current, ...projects]);
     }
   }, []);

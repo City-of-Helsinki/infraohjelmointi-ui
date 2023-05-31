@@ -18,7 +18,7 @@ interface ISearchState {
   searchedProjects: Array<IProgrammedProjectSuggestions>;
 }
 interface IProjectSearchProps {
-  onProjectsSelect: (value: IProgrammedProjectSuggestions[] | undefined) => void;
+  onProjectsSelect: (value: IProgrammedProjectSuggestions[]) => void;
   projectsForSubmit: Array<IProgrammedProjectSuggestions>;
   onProjectSelectionDelete: (projectName: string) => void;
 }
