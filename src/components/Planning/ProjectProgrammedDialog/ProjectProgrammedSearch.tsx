@@ -4,7 +4,11 @@ import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
-import { IProgrammedProjectSuggestions, ISearchRequest } from '@/interfaces/searchInterfaces';
+import {
+  IProgrammedProjectSuggestions,
+  ISearchRequest,
+  ISearchResultPayloadItem,
+} from '@/interfaces/searchInterfaces';
 import { IClass } from '@/interfaces/classInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectAllClasses } from '@/reducers/classSlice';
@@ -33,6 +37,7 @@ const buildBreadCrumbs = (
     .map(
       (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
     );
+let searchWordDuplicates: Record<string, ISearchResultPayloadItem[]> = {};
 const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   onProjectsSelect,
   projectsForSubmit,
@@ -94,10 +99,26 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
           .then((res) => {
             // Filter out only the projects which haven't yet been added to be the submitted list from the result
             const projectsIdList = projectsForSubmit.map((p) => p.value);
-            const resultList = res.results.filter(
+            const resultListWithDuplicates = res.results.filter(
               (result) => result.type == 'projects' && !arrayHasValue(projectsIdList, result.id),
             );
-
+            // reset duplicates
+            searchWordDuplicates = {};
+            const resultList = Object.values(
+              resultListWithDuplicates.reduce((accumulator, current) => {
+                // catch duplicates
+                if (accumulator[current.name]) {
+                  searchWordDuplicates[current.name] = [
+                    ...(searchWordDuplicates[current.name] ?? []),
+                    current,
+                  ];
+                } else {
+                  // kep only one copy of each element
+                  accumulator[current.name] = current;
+                }
+                return accumulator;
+              }, {} as Record<string, ISearchResultPayloadItem>),
+            );
             // Convert the resultList to options for the suggestion dropdown
             const searchProjectsItemList: Array<IProgrammedProjectSuggestions> | [] = resultList
               ? resultList.map((project) => ({
