@@ -51,6 +51,7 @@ export interface IProjectBasicsForm {
   phase: IOption;
   programmed: boolean;
   constructionPhaseDetail: IOption;
+  costForecast: string;
   louhi: boolean;
   gravel: boolean;
   category: IOption;
@@ -90,7 +91,6 @@ export interface IProjectNoteForm {
 }
 
 export interface IGroupForm {
- 
   name: string;
   masterClass: IOption;
   class: IOption;
@@ -101,7 +101,6 @@ export interface IGroupForm {
   projectsForSubmit: Array<IOption>;
 }
 
-
 export interface IHashTagsForm {
   hashTag: string;
 }
@@ -111,7 +110,6 @@ export interface IAppForms
     IProjectBasicsForm,
     IProjectNoteForm,
     IHashTagsForm {}
-    
 
 export type HookFormControlType =
   | Control<FieldValues>

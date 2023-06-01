@@ -13,8 +13,11 @@ const ProjectBasics = () => {
       {project && (
         <>
           <div className="flex flex-1 justify-center">
-            <div className="side-panel-container " data-testid="side-panel">
-              <ProjectSidePanel pwFolderLink={project.pwFolderLink} />
+            {/* This "extra" div is here so that the side-panel-container's sticky position works */}
+            <div>
+              <div className="side-panel-container " data-testid="side-panel">
+                <ProjectSidePanel pwFolderLink={project.pwFolderLink} />
+              </div>
             </div>
           </div>
 

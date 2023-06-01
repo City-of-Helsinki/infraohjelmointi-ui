@@ -140,7 +140,7 @@ const useProjectBasicsValues = () => {
       constructionCostForecast: value(project?.constructionCostForecast),
       constructionPhase: listItemToOption(project?.constructionPhase, t),
       constructionWorkQuantity: value(project?.constructionWorkQuantity),
-      budget: value(project?.budget),
+      costForecast: value(project?.costForecast),
       realizedCost: value(project?.realizedCost),
       comittedCost: value(project?.comittedCost),
       spentCost: value(project?.spentCost),
