@@ -1,11 +1,10 @@
 import { CustomTag } from '@/components/shared';
-import { useOptions } from '@/hooks/useOptions';
 import { IProjectSums } from '@/interfaces/common';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
-import { useCallback, MouseEvent as ReactMouseEvent, memo, FC, useMemo } from 'react';
+import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
 import {
   IconArrowRightDashed,
@@ -26,49 +25,23 @@ interface IProjectHeadProps {
   sums: IProjectSums;
 }
 
+const projectPhaseIcon = {
+  proposal: <IconQuestionCircle />,
+  design: <IconLightbulb />,
+  programmed: <IconCogwheel />,
+  draftInitiation: <IconArrowRightDashed />,
+  draftApproval: <IconThumbsUp />,
+  constructionPlan: <IconScrollContent />,
+  constructionWait: <IconPlaybackPause />,
+  construction: <IconHammers />,
+  warrantyPeriod: <IconClock />,
+  completed: <IconShield />,
+};
+
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
-  const phases = useOptions('phases');
 
-  const projectPhase = project.phase?.id;
-
-  const projectPhaseIcon = useMemo(() => {
-    if (projectPhase) {
-      const proposalPhase = phases[0].value;
-      const designPhase = phases[1].value;
-      const programmedPhase = phases[2].value;
-      const draftInitiationPhase = phases[3].value;
-      const draftApprovalPhase = phases[4].value;
-      const constructionPlanPhase = phases[5].value;
-      const constructionWaitPhase = phases[6].value;
-      const constructionPhase = phases[7].value;
-      const warrantyPeriodPhase = phases[8].value;
-      const completedPhase = phases[9].value;
-
-      switch (projectPhase) {
-        case proposalPhase:
-          return <IconQuestionCircle />;
-        case designPhase:
-          return <IconLightbulb />;
-        case programmedPhase:
-          return <IconCogwheel />;
-        case draftInitiationPhase:
-          return <IconArrowRightDashed />;
-        case draftApprovalPhase:
-          return <IconThumbsUp />;
-        case constructionPlanPhase:
-          return <IconScrollContent />;
-        case constructionWaitPhase:
-          return <IconPlaybackPause />;
-        case constructionPhase:
-          return <IconHammers />;
-        case warrantyPeriodPhase:
-          return <IconClock />;
-        case completedPhase:
-          return <IconShield />;
-      }
-    }
-  }, [phases, projectPhase]);
+  const projectPhase = project.phase?.value;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
@@ -105,7 +78,9 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
             data-testid={`edit-phase-${project.id}`}
             onMouseDown={handleOpenPhaseMenu}
           />
-          {projectPhaseIcon}
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-ignore */}
+          {projectPhase && projectPhaseIcon[projectPhase]}
         </div>
         {/* Project name */}
         <div className="project-name-container">
