@@ -144,3 +144,27 @@
 .planning-head .total-budgets {
   @apply grid w-[5.5rem] grid-flow-row text-right;
 }
+
+.planning-forecast-sums-container {
+  @apply flex h-[4.25rem] w-full items-start justify-between px-2;
+}
+
+.planning-forecast-sums-container.group {
+  @apply h-12;
+}
+
+.planning-forecast-sums-container.division {
+  @apply hidden;
+}
+
+.planning-forecast-sums-container > .planning-forecast-sums {
+  @apply flex flex-col text-sm font-bold text-white;
+}
+
+.planning-forecast-sums-container > .planning-forecast-sums.group {
+  @apply text-black;
+}
+
+.planning-forecast-sums-container > .planning-forecast-sums.division {
+  @apply hidden;
+}
