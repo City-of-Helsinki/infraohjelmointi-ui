@@ -207,7 +207,7 @@ const ProjectBasicsForm: FC = () => {
           <ListField
             {...formProps('realizedCostLabel')}
             fields={[
-              { ...formProps('budget') },
+              { ...formProps('costForecast') },
               {
                 ...formProps('realizedCost'),
                 readOnly: true,

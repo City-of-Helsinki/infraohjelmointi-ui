@@ -117,7 +117,7 @@ describe('ProjectBasicsForm', () => {
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);
     expectRadioBoolean('effectHousing-0', false);
-    expect(await findByText(euroFormat(project?.budget || ''))).toBeInTheDocument();
+    expect(await findByText(euroFormat(project?.costForecast || ''))).toBeInTheDocument();
     expect(await findByText(euroFormat(project?.realizedCost || ''))).toBeInTheDocument();
     expect(await findByText(euroFormat(project?.comittedCost || ''))).toBeInTheDocument();
     expect(await findByText(euroFormat(project?.spentCost || ''))).toBeInTheDocument();
@@ -212,7 +212,7 @@ describe('ProjectBasicsForm', () => {
     removeProjectUpdateEventListener(store.dispatch);
   });
 
-  it.skip('can create new hashtags with the hashtags form', async () => {
+  it('can create new hashtags with the hashtags form', async () => {
     const mockPostResponse = { data: { value: 'liikenne', id: '123456789' } };
     const mockGetResponse = {
       data: {
@@ -283,7 +283,7 @@ describe('ProjectBasicsForm', () => {
     removeProjectUpdateEventListener(dispatch);
   });
 
-  it.skip('can use popular hashtags from the hashtags form', async () => {
+  it('can use popular hashtags from the hashtags form', async () => {
     const expectedValues = [
       ...(mockProject.data.hashTags as Array<string>),
       mockHashTags.data.popularHashTags[0].id,

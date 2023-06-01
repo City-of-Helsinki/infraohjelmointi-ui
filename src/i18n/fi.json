@@ -146,7 +146,7 @@
     "constructionQuality": "Laatutaso",
     "constructionWorkQuantity": "Suoritemäärä",
     "overrunRight": "Ylitysoikeus",
-    "budget": "Budjetti",
+    "costForecast": "Budjetti",
     "realizedCostLabel": "Toteumatiedot",
     "realizedCost": "Toteuma",
     "comittedCost": "Sitoumukset",
@@ -197,14 +197,13 @@
     "district": "Suurpiiri",
     "division": "Kaupunginosa",
     "subDivision": "Osa-alue",
-    "openAdvanceFilters":"Avaa lisävalinnat",
+    "openAdvanceFilters": "Avaa lisävalinnat",
     "groupCreationDescription1": "Ryhmään voi valita vain Ohjelmoituja hankkeita.",
     "groupCreationDescription2": "Tähdellä (*) merkityt kentat ovat pakolissia.",
     "suggestionHelperText": "Täytä pakolliset kentät saadaksesi ehdotuksia",
-    "searchForProjects":"Etsi hankkeita",
-    "createGroup":"Luo ryhmä"
-  }
-  ,
+    "searchForProjects": "Etsi hankkeita",
+    "createGroup": "Luo ryhmä"
+  },
   "notification": {
     "title": {
       "sendSuccess": "Lähetys onnistui",
@@ -247,10 +246,10 @@
     "programmedYearMin": "Ohjelmoitu vuosi min {{label}}",
     "programmedYearMax": "Ohjelmoitu vuosi max {{label}}"
   },
-  "projectProgrammedForm":{
-    "addProjectsToProgramming":"Tuo uusi hanke listalle",
-    "searchForProjects":"Etsi hanke",
-    "addProjects":"Tuo"
+  "projectProgrammedForm": {
+    "addProjectsToProgramming": "Tuo uusi hanke listalle",
+    "searchForProjects": "Etsi hanke",
+    "addProjects": "Tuo"
   },
   "appTitle": "Infraohjelmointi UI",
   "project": "Hankekortti",
@@ -327,13 +326,13 @@
   "removeYearFromTimeline": "Poista vuosi aikajanalta",
   "editTimeline": "Muokkaa aikajanaa",
   "pwFolderLinkDescription": "Vaatii erillisen PW Explorer -sovelluksen",
-  "pwFolderLinkNotExist":"Dokumenttikansiota ei ole avattu",
-  "opensExternalWebsite":"Avaa toisen verkkosivuston",
-  "opensInNewTab":"Avautuu uuteen välilehteen",
+  "pwFolderLinkNotExist": "Dokumenttikansiota ei ole avattu",
+  "opensExternalWebsite": "Avaa toisen verkkosivuston",
+  "opensInNewTab": "Avautuu uuteen välilehteen",
   "createSummingGroups": "Luo uusi summaava ryhmä",
   "fieldRequiredWarning": "Tämä kenttä on täytettävä",
-  "addProgrammedProject":"Tuo uusi hanke listalle",
-  "addProjectsToProgramming":"Tuo uusi hanke listalle",
-  "searchForProjects":"Etsi hanke",
-  "closeProjectProgrammedDialog":"Sulje projektiohjelmoitu dialogi"
+  "addProgrammedProject": "Tuo uusi hanke listalle",
+  "addProjectsToProgramming": "Tuo uusi hanke listalle",
+  "searchForProjects": "Etsi hanke",
+  "closeProjectProgrammedDialog": "Sulje projektiohjelmoitu dialogi"
 }
