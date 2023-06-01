@@ -78,9 +78,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
             data-testid={`edit-phase-${project.id}`}
             onMouseDown={handleOpenPhaseMenu}
           />
-          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-          {/* @ts-ignore */}
-          {projectPhase && projectPhaseIcon[projectPhase]}
+          {projectPhase && projectPhaseIcon[projectPhase as keyof typeof projectPhaseIcon]}
         </div>
         {/* Project name */}
         <div className="project-name-container">
