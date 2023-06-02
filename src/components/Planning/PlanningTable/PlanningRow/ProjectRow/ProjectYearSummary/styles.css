@@ -1,3 +1,11 @@
+.monthly-cell.project:nth-child(even) {
+  @apply bg-bus-l;
+}
+
+.monthly-cell.project:nth-child(odd) {
+  @apply bg-white;
+}
+
 .monthly-summary-table-container {
   @apply flex h-full w-full justify-center border-b-2 border-gray p-2 pt-1;
 }
@@ -8,35 +16,42 @@
 }
 
 .monthly-graph-cell-container {
-  @apply grid h-full w-full grid-rows-3 gap-1 border-b-2 border-gray pt-1;
+  @apply flex flex-col gap-3;
 }
 
 /* no gray border-bottom when cellType is none */
 .monthly-graph-cell-container.none {
-  display: none;
-  @apply border-none;
+  @apply hidden border-none;
 }
 
 .monthly-planning-bar-container {
-  @apply row-start-2 flex h-3 w-full text-sm font-light;
+  @apply flex w-full justify-start;
+}
+
+/* :has works with all selectors except for firefox 02.06.2023, for some reason the .monthly-cell.project element starts at nth-child(4) */
+td:has(.monthly-planning-bar-container.empty)
+  + td:has(.monthly-planning-bar-container:not(.empty))
+  .monthly-planning-bar-container,
+.monthly-cell.project:nth-child(4) .monthly-planning-bar-container {
+  justify-content: flex-end;
 }
 
 .monthly-construction-bar-container {
-  @apply row-start-3 flex h-3 w-full text-sm font-light;
+  @apply flex w-full justify-start;
+}
+
+/* :has works with all selectors except for firefox 02.06.2023, for some reason the .monthly-cell.project element starts at nth-child(4) */
+td:has(.monthly-construction-bar-container.empty)
+  + td:has(.monthly-construction-bar-container)
+  .monthly-construction-bar-container,
+.monthly-cell.project:nth-child(4) .monthly-construction-bar-container {
+  justify-content: flex-end;
 }
 
 .monthly-planning-bar {
-  @apply h-full bg-black-70;
+  @apply mb-3 h-3 -translate-y-[3px] bg-black-80;
 }
 
 .monthly-construction-bar {
-  @apply h-full bg-copper-m;
-}
-
-.monthly-cell.project:nth-child(even) {
-  @apply bg-bus-l;
-}
-
-.monthly-cell.project:nth-child(odd) {
-  @apply bg-white;
+  @apply h-3 bg-copper;
 }

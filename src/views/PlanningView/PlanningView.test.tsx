@@ -1018,10 +1018,8 @@ describe('PlanningView', () => {
         await waitFor(() => {
           expect(getByTestId(`project-year-summary-${project.id}`));
           months.forEach((m) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             expect(
               getByTestId(`project-monthly-graph-cell-${project.id}-${m}`),
@@ -1035,10 +1033,8 @@ describe('PlanningView', () => {
 
         await waitFor(() => {
           months.forEach((m, i) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             expect(getComputedStyle(constructionBar).width).toBe('0%');
 
@@ -1056,10 +1052,8 @@ describe('PlanningView', () => {
 
         await waitFor(() => {
           months.forEach((m, i) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             if (i === 0) {
               expect(getComputedStyle(planningBar).width).toBe('100%');
@@ -1078,10 +1072,8 @@ describe('PlanningView', () => {
 
         await waitFor(() => {
           months.forEach((m, i) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             expect(getComputedStyle(planningBar).width).toBe('0%');
 
