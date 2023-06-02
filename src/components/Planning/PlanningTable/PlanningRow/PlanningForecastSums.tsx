@@ -1,5 +1,5 @@
 import { PlanningRowType } from '@/interfaces/common';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IPlanningForecastSums {
@@ -30,4 +30,4 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ year, type, id }) => 
   );
 };
 
-export default PlanningForecastSums;
+export default memo(PlanningForecastSums);
