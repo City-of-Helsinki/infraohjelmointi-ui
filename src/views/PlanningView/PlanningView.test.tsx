@@ -723,25 +723,39 @@ describe('PlanningView', () => {
   });
 
   describe('PlanningRow', () => {
-    it('renders head and cells', async () => {
-      const { store, getByTestId } = await render();
+    describe('PlanningForecastSums', () => {
+      it('renders all the elements and 0 sums until SAP data is received from the backend ', async () => {
+        const { findByTestId, user, store } = await render();
+        const year = new Date().getFullYear();
+        const { id } = store.getState().class.masterClasses[0];
+        await user.click(await findByTestId(`expand-monthly-view-button-${year}`));
 
-      const { id } = store.getState().class.masterClasses[0];
-
-      const currentCells = getByTestId(`row-${id}`).children;
-
-      expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-      expect(getByTestId(`head-${id}`)).toBeInTheDocument();
-
-      // Loop through the cells
-      Array.from(currentCells).forEach((c, i) => {
-        // Ignore the head
-        if (c.tagName !== 'TH') {
-          const year = new Date().getFullYear() + i - 1;
-          expect(getByTestId(`cell-${id}-${year}`)).toBeInTheDocument();
-        }
+        await waitFor(async () => {
+          expect(await findByTestId(`planning-forecast-sums-${id}`)).toBeInTheDocument();
+          expect(await findByTestId(`planning-forecast-implemented-${id}`)).toHaveTextContent('0');
+          expect(await findByTestId(`planning-forecast-bound-${id}`)).toHaveTextContent('0');
+        });
       });
-    });
+    }),
+      it('renders head and cells', async () => {
+        const { store, getByTestId } = await render();
+
+        const { id } = store.getState().class.masterClasses[0];
+
+        const currentCells = getByTestId(`row-${id}`).children;
+
+        expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+        expect(getByTestId(`head-${id}`)).toBeInTheDocument();
+
+        // Loop through the cells
+        Array.from(currentCells).forEach((c, i) => {
+          // Ignore the head
+          if (c.tagName !== 'TH') {
+            const year = new Date().getFullYear() + i - 1;
+            expect(getByTestId(`cell-${id}-${year}`)).toBeInTheDocument();
+          }
+        });
+      });
 
     it('can click expand button or title to expand and hide children but doesnt navigate back', async () => {
       const { store, getByTestId, queryByTestId, user } = await render();
@@ -1004,10 +1018,8 @@ describe('PlanningView', () => {
         await waitFor(() => {
           expect(getByTestId(`project-year-summary-${project.id}`));
           months.forEach((m) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             expect(
               getByTestId(`project-monthly-graph-cell-${project.id}-${m}`),
@@ -1021,10 +1033,8 @@ describe('PlanningView', () => {
 
         await waitFor(() => {
           months.forEach((m, i) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             expect(getComputedStyle(constructionBar).width).toBe('0%');
 
@@ -1042,10 +1052,8 @@ describe('PlanningView', () => {
 
         await waitFor(() => {
           months.forEach((m, i) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             if (i === 0) {
               expect(getComputedStyle(planningBar).width).toBe('100%');
@@ -1064,10 +1072,8 @@ describe('PlanningView', () => {
 
         await waitFor(() => {
           months.forEach((m, i) => {
-            const planningBar = getByTestId(`monthly-planning-graph-bar-${project.id}-${m}`);
-            const constructionBar = getByTestId(
-              `monthly-construction-graph-bar-${project.id}-${m}`,
-            );
+            const planningBar = getByTestId(`monthly-planning-bar-${project.id}-${m}`);
+            const constructionBar = getByTestId(`monthly-construction-bar-${project.id}-${m}`);
 
             expect(getComputedStyle(planningBar).width).toBe('0%');
 

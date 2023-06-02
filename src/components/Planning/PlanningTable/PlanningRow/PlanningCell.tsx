@@ -2,6 +2,7 @@ import { FC, memo } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
 import './styles.css';
 import moment from 'moment';
+import PlanningForecastSums from './PlanningForecastSums';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -29,9 +30,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) 
       {/* There will be data generated here (at least for the first year) in future tasks */}
       {year === selectedYear && (
         <>
-          {isCurrentYear && (
-            <td key={`${year}-monthly-cell`} className={`monthly-summary-cell ${type}`}></td>
-          )}
+          {isCurrentYear && <PlanningForecastSums year={year} type={type} id={id} />}
           {moment.monthsShort().map((m) => (
             <td key={m} className={`monthly-cell ${type}`}></td>
           ))}

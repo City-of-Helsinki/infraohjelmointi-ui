@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { setupStore } from '@/store';
+import 'hds-core';
 import './index.css';
 import './i18n';
 

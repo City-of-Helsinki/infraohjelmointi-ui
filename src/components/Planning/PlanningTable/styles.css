@@ -17,7 +17,7 @@
 }
 
 .monthly-summary-cell {
-  @apply w-64 min-w-[16rem] max-w-[16rem];
+  @apply w-56 min-w-[14rem] max-w-[14rem];
 }
 
 .monthly-cell.summary-budget.start-month,

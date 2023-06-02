@@ -4,17 +4,44 @@ import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
-import { IconDocument, IconMenuDots } from 'hds-react/icons';
 import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  IconArrowRightDashed,
+  IconClock,
+  IconCogwheel,
+  IconHammers,
+  IconLightbulb,
+  IconMenuDots,
+  IconPlaybackPause,
+  IconQuestionCircle,
+  IconScrollContent,
+  IconShield,
+  IconThumbsUp,
+} from 'hds-react/icons';
 
 interface IProjectHeadProps {
   project: IProject;
   sums: IProjectSums;
 }
 
+const projectPhaseIcon = {
+  proposal: <IconQuestionCircle />,
+  design: <IconLightbulb />,
+  programmed: <IconCogwheel />,
+  draftInitiation: <IconArrowRightDashed />,
+  draftApproval: <IconThumbsUp />,
+  constructionPlan: <IconScrollContent />,
+  constructionWait: <IconPlaybackPause />,
+  construction: <IconHammers />,
+  warrantyPeriod: <IconClock />,
+  completed: <IconShield />,
+};
+
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
+
+  const projectPhase = project.phase?.value;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
@@ -51,7 +78,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
             data-testid={`edit-phase-${project.id}`}
             onMouseDown={handleOpenPhaseMenu}
           />
-          <IconDocument />
+          {projectPhase && projectPhaseIcon[projectPhase as keyof typeof projectPhaseIcon]}
         </div>
         {/* Project name */}
         <div className="project-name-container">

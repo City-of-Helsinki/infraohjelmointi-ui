@@ -334,5 +334,7 @@
   "addProgrammedProject": "Tuo uusi hanke listalle",
   "addProjectsToProgramming": "Tuo uusi hanke listalle",
   "searchForProjects": "Etsi hanke",
-  "closeProjectProgrammedDialog": "Sulje projektiohjelmoitu dialogi"
+  "closeProjectProgrammedDialog": "Sulje projektiohjelmoitu dialogi",
+  "implemented": "Toteutettu",
+  "bound": "Sidottu"
 }
