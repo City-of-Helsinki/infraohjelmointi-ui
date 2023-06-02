@@ -87,16 +87,19 @@ describe('GroupDialog', () => {
 
   it('renders the component wrappers', async () => {
     const renderResult = await render();
-    const { findByTestId } = renderResult;
-    expect(await findByTestId('open-group-form-container')).toBeInTheDocument();
+    const { findByTestId, user } = renderResult;
+    await user.click(await findByTestId('open-new-item-context-menu'));
+    expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
   });
 
   it('renders group creation modal', async () => {
     const renderResult = await render();
-    const { findByText, findByRole, user } = renderResult;
+    const { findByRole, user, findByTestId } = renderResult;
 
+    await user.click(await findByTestId('open-new-item-context-menu'));
+    expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
     // Open modal
-    await user.click(await findByText('createSummingGroups'));
+    await user.click(await findByTestId('open-summing-group-dialog'));
     const dialog = within(await findByRole('dialog'));
 
     // Expect all elements
@@ -152,9 +155,11 @@ describe('GroupDialog', () => {
 
     const { user, findAllByTestId, findByTestId, findByRole, findByText, baseElement } =
       renderResult;
-
+    await user.click(await findByTestId('open-new-item-context-menu'));
+    expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
     // Open modal
-    await user.click(await findByText('createSummingGroups'));
+    await user.click(await findByTestId('open-summing-group-dialog'));
+
     const modal = await findByRole('dialog');
     const dialog = within(modal);
 

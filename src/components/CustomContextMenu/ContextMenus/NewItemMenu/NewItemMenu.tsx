@@ -50,7 +50,7 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
             onCloseMenu();
             onShowGroupDialog();
           }}
-          data-testid="edit-year-button"
+          data-testid="open-summing-group-dialog"
         >
           {t(`createSummingGroups`)}
         </Button>
