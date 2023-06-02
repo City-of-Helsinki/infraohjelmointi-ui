@@ -3,7 +3,6 @@ import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import './styles.css';
 import { ICellMenuDetails } from '@/interfaces/eventInterfaces';
 
 interface IProjectCellMenuProps extends ICellMenuDetails {

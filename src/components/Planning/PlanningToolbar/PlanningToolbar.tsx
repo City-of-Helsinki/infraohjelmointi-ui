@@ -1,49 +1,62 @@
-import { Icon, IconButton, Toolbar } from '../../shared';
-import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
-import { Navigation } from 'hds-react/components/Navigation';
-import { useTranslation } from 'react-i18next';
+import { Toolbar } from '../../shared';
+import { IconPlusCircle } from 'hds-react/icons/';
+import { useCallback, MouseEvent as ReactMouseEvent, useState } from 'react';
+import { IPlanningRowSelections } from '@/interfaces/common';
+import { dispatchContextMenuEvent } from '@/utils/events';
+import { ContextMenuType } from '@/interfaces/eventInterfaces';
+import { Button } from 'hds-react/components/Button';
+import './styles.css';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
-import './styles.css';
-import { IconCross } from 'hds-react/icons/';
-import { useCallback, useRef } from 'react';
-import { IPlanningRowSelections } from '@/interfaces/common';
 
 interface ProjectToolBarProps {
   selections: IPlanningRowSelections;
 }
 const ProjectToolbar = ({ selections }: ProjectToolBarProps) => {
-  const { Dropdown, Item } = Navigation;
-  const dropDownRef = useRef<HTMLDivElement>(null);
-  const closeDropdown = useCallback(() => {
-    dropDownRef.current?.click();
-  }, [dropDownRef]);
-  const { t } = useTranslation();
+  const [toolbarState, setToolbarState] = useState({
+    groupDialogVisible: false,
+    projectProgrammedDialogVisible: false,
+  });
+
+  const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
+
+  const onShowProjectProgrammedDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, projectProgrammedDialog: true })),
+    [],
+  );
+
+  const onShowGroupDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, groupDialogVisible: true })),
+    [],
+  );
+
+  // Open the custom context menu for editing the project phase on click
+  const handleNewItemMenu = useCallback((e: ReactMouseEvent<HTMLButtonElement>) => {
+    dispatchContextMenuEvent(e, {
+      menuType: ContextMenuType.NEW_ITEM,
+      newItemsMenuProps: {
+        selections,
+        onShowProjectProgrammedDialog,
+        onShowGroupDialog,
+      },
+    });
+  }, []);
 
   return (
     <Toolbar
       left={
         <>
-          <div ref={dropDownRef}>
-            <Dropdown
-              className="planning-toolbar-dropdown"
-              label={t(`new`)}
-              icon={<Icon icon={IconNewItem} />}
-            >
-              <div className="dropdown-header border-b-2 border-gray">
-                <div>Uusi</div>
-                <div>
-                  <IconButton icon={IconCross} onClick={closeDropdown}></IconButton>
-                </div>
-              </div>
-              <Item>
-                <GroupDialog />
-              </Item>
-              <Item>
-                <ProjectProgrammedDialog selections={selections} />
-              </Item>
-            </Dropdown>
-          </div>
+          {/* Add new group, project or bring project to list view */}
+          <Button
+            variant="supplementary"
+            className="!text-black"
+            iconLeft={<IconPlusCircle />}
+            onMouseDown={handleNewItemMenu}
+          >
+            Uusi
+          </Button>
+          <GroupDialog visible={groupDialogVisible} />
+          <ProjectProgrammedDialog visible={projectProgrammedDialogVisible} />
         </>
       }
     />
