@@ -6,9 +6,7 @@
     @apply flex flex-row justify-between bg-white text-black font-bold
   }
   .planning-toolbar-left {
-    @apply flex flex-row items-baseline
+    @apply flex flex-row 
   }
 
-  .planning-toolbar-left > * {
-    @apply mr-5
-  }
+  

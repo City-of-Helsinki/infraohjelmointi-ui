@@ -2,13 +2,20 @@ import { Button } from 'hds-react/components/Button';
 import { IconCross } from 'hds-react/icons';
 import { FC, memo } from 'react';
 import { INewItemMenuDetails } from '@/interfaces/eventInterfaces';
+import { useTranslation } from 'react-i18next';
 
 interface INewItemMenuProps extends INewItemMenuDetails {
   onCloseMenu: () => void;
 }
 
-const NewItemMenu: FC<INewItemMenuProps> = ({ onCloseMenu, selections }) => {
+const NewItemMenu: FC<INewItemMenuProps> = ({
+  onCloseMenu,
+  selections,
+  onShowGroupDialog,
+  onShowProjectProgrammedDialog,
+}) => {
   // TODO: only use callback functions here, no logic :)
+  const { t } = useTranslation();
   return (
     <div className="project-cell-menu" data-testid="project-cell-menu">
       <div className="project-cell-menu-header">
@@ -27,7 +34,11 @@ const NewItemMenu: FC<INewItemMenuProps> = ({ onCloseMenu, selections }) => {
         <Button
           variant="supplementary"
           iconLeft={undefined}
-          // TODO: onShow...
+          onClick={() => {
+            onCloseMenu();
+            onShowProjectProgrammedDialog();
+          }}
+          disabled={selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true}
           data-testid="remove-year-button"
         >
           Tuo uusi hanke listalle
@@ -35,10 +46,13 @@ const NewItemMenu: FC<INewItemMenuProps> = ({ onCloseMenu, selections }) => {
         <Button
           variant="supplementary"
           iconLeft={undefined}
-          // TODO: onShow...
+          onClick={() => {
+            onCloseMenu();
+            onShowGroupDialog();
+          }}
           data-testid="edit-year-button"
         >
-          Luo uusi summaava ryhmä
+          {t(`createSummingGroups`)}
         </Button>
         <Button
           variant="supplementary"

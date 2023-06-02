@@ -270,29 +270,13 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
 DialogContainer.displayName = 'Group Dialog';
 
-const GroupDialog: FC = () => {
-  const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleSetOpen = useCallback(() => setIsOpen((current) => !current), [setIsOpen]);
-  const onOpenGroupForm = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      toggleSetOpen();
-    },
-    [toggleSetOpen],
-  );
-  const handleClose = useCallback(() => {
-    setIsOpen((current) => !current);
-  }, [setIsOpen]);
+const GroupDialog: FC<{ isVisible: boolean; onCloseGroupDialog: () => void }> = ({
+  isVisible,
+  onCloseGroupDialog,
+}) => {
   return (
     <div>
-      {isOpen && <DialogContainer isOpen={isOpen} handleClose={handleClose} />}
-      <div>
-        <div data-testid="open-group-form-container" id="open-group-form-container">
-          <div onClick={onOpenGroupForm}>{t(`createSummingGroups`)}</div>
-        </div>
-      </div>
+      {isVisible && <DialogContainer isOpen={isVisible} handleClose={onCloseGroupDialog} />}
     </div>
   );
 };

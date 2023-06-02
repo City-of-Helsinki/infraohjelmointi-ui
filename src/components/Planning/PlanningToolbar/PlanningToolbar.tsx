@@ -1,5 +1,5 @@
 import { Toolbar } from '../../shared';
-import { IconPlusCircle } from 'hds-react/icons/';
+import { IconCollapse, IconPlusCircle, IconSort } from 'hds-react/icons/';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, FC } from 'react';
 import { IPlanningRowSelections } from '@/interfaces/common';
 import { dispatchContextMenuEvent } from '@/utils/events';
@@ -8,6 +8,7 @@ import { Button } from 'hds-react/components/Button';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import './styles.css';
+import { t } from 'i18next';
 
 interface IPlanningToolbarProps {
   toggleGroupsExpanded: () => void;
@@ -27,7 +28,12 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
 
   const onShowProjectProgrammedDialog = useCallback(
-    () => setToolbarState((current) => ({ ...current, projectProgrammedDialog: true })),
+    () => setToolbarState((current) => ({ ...current, projectProgrammedDialogVisible: true })),
+    [],
+  );
+
+  const onCloseProjectProgrammedDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, projectProgrammedDialogVisible: false })),
     [],
   );
 
@@ -36,33 +42,54 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
     [],
   );
 
+  const onCloseGroupDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, groupDialogVisible: false })),
+    [],
+  );
+
   // Open the custom context menu for editing the project phase on click
-  const handleNewItemMenu = useCallback((e: ReactMouseEvent<HTMLButtonElement>) => {
-    dispatchContextMenuEvent(e, {
-      menuType: ContextMenuType.NEW_ITEM,
-      newItemsMenuProps: {
-        selections,
-        onShowProjectProgrammedDialog,
-        onShowGroupDialog,
-      },
-    });
-  }, []);
+  const handleNewItemMenu = useCallback(
+    (e: ReactMouseEvent<HTMLButtonElement>) => {
+      dispatchContextMenuEvent(e, {
+        menuType: ContextMenuType.NEW_ITEM,
+        newItemsMenuProps: {
+          selections,
+          onShowProjectProgrammedDialog,
+          onShowGroupDialog,
+        },
+      });
+    },
+    [onShowGroupDialog, onShowProjectProgrammedDialog, selections],
+  );
 
   return (
     <Toolbar
       left={
         <>
-          {/* Add new group, project or bring project to list view */}
-          <Button
-            variant="supplementary"
-            className="!text-black"
-            iconLeft={<IconPlusCircle />}
-            onMouseDown={handleNewItemMenu}
-          >
-            Uusi
-          </Button>
-          <GroupDialog visible={groupDialogVisible} />
-          <ProjectProgrammedDialog visible={projectProgrammedDialogVisible} />
+          <div className="planning-toolbar-left">
+            <Button
+              onClick={toggleGroupsExpanded}
+              variant="supplementary"
+              className="!text-black"
+              iconLeft={groupsExpanded ? <IconCollapse /> : <IconSort />}
+            >
+              {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}
+            </Button>
+
+            <Button
+              variant="supplementary"
+              className="!text-black"
+              iconLeft={<IconPlusCircle />}
+              onMouseDown={handleNewItemMenu}
+            >
+              Uusi
+            </Button>
+            <GroupDialog isVisible={groupDialogVisible} onCloseGroupDialog={onCloseGroupDialog} />
+            <ProjectProgrammedDialog
+              isVisible={projectProgrammedDialogVisible}
+              onCloseProjectProgrammedDialog={onCloseProjectProgrammedDialog}
+            />
+          </div>
         </>
       }
     />
