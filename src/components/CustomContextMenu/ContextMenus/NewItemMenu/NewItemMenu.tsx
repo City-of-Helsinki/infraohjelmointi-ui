@@ -14,7 +14,6 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
   onShowGroupDialog,
   onShowProjectProgrammedDialog,
 }) => {
-  // TODO: only use callback functions here, no logic :)
   const { t } = useTranslation();
   return (
     <div className="project-cell-menu" data-testid="project-cell-menu">
@@ -58,7 +57,6 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
           variant="supplementary"
           iconLeft={undefined}
           disabled={true}
-          //  TODO: onClick={handleEditTimeline}
           data-testid="edit-year-button"
         >
           Luo uusi hanke
