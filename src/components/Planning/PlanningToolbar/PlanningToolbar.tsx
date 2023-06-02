@@ -80,6 +80,7 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
               variant="supplementary"
               className="!text-black"
               iconLeft={<IconPlusCircle />}
+              data-testid="open-new-item-context-menu"
               onMouseDown={handleNewItemMenu}
             >
               Uusi

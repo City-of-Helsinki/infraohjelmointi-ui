@@ -93,23 +93,30 @@ describe('ProjectProgrammedDialog', () => {
 
   it('renders the component wrappers', async () => {
     const renderResult = await render();
-    const { findByTestId } = renderResult;
-    expect(await findByTestId('open-project-add-dialog-container')).toBeInTheDocument();
+    const { findByTestId, user } = renderResult;
+    await user.click(await findByTestId('open-new-item-context-menu'));
+    expect(await findByTestId('open-project-programmed-dialog')).toBeInTheDocument();
   });
 
   it('renders project to programming modal', async () => {
     const renderResult = await render();
-    const { user, queryByTestId, findByTestId, findByRole } = renderResult;
+    const { user, findByTestId, findByRole } = renderResult;
+
+    await user.click(await findByTestId('open-new-item-context-menu'));
     const openDialogButton = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButton).toBeInTheDocument();
 
     // User is not under class/subClass balk hence the modal won't open
-    await user.click(openDialogButton);
-    expect(queryByTestId('search-projects-input')).toBeNull();
-    // Navigate to a class row
-    await waitFor(() => navigateToProjectRows(renderResult));
+    expect(openDialogButton).toBeDisabled();
+    await user.click(await findByTestId('close-project-cell-menu'));
 
-    await user.click(openDialogButton);
+    // Navigate to a class row
+    await waitFor(async () => await navigateToProjectRows(renderResult));
+    await user.click(await findByTestId('open-new-item-context-menu'));
+
+    const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
+    expect(openDialogButtonEnabled).toBeEnabled();
+    await user.click(openDialogButtonEnabled);
     const dialog = within(await findByRole('dialog'));
     expect(await dialog.findByTestId('search-project-field-section')).toBeInTheDocument();
 
@@ -136,17 +143,21 @@ describe('ProjectProgrammedDialog', () => {
       ],
     };
 
-    const { user, findByTestId, queryByText, findByRole } = renderResult;
-    const openDialogButton = await findByTestId('open-project-programmed-dialog');
-    expect(openDialogButton).toBeInTheDocument();
+    const { user, findByTestId, findByRole } = renderResult;
+    await user.click(await findByTestId('open-new-item-context-menu'));
+    const openDialogButtonDisabled = await findByTestId('open-project-programmed-dialog');
+    expect(openDialogButtonDisabled).toBeInTheDocument();
 
     // User is not under class/subClass balk hence the modal won't open
-    await user.click(openDialogButton);
-    expect(queryByText(`projectProgrammedForm.searchForProjects`)).toBeNull();
-    // Navigate to a class row
-    await waitFor(() => navigateToProjectRows(renderResult));
+    expect(openDialogButtonDisabled).toBeDisabled();
+    await user.click(await findByTestId('close-project-cell-menu'));
 
-    await user.click(openDialogButton);
+    // Navigate to a class row
+    await waitFor(async () => await navigateToProjectRows(renderResult));
+
+    await user.click(await findByTestId('open-new-item-context-menu'));
+    const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
+    await user.click(openDialogButtonEnabled);
     const dialog = within(await findByRole('dialog'));
     const submitButton = await dialog.findByTestId('add-projects-button');
     expect(submitButton).toBeDisabled();

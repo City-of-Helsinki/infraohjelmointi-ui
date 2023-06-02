@@ -39,9 +39,9 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
             onShowProjectProgrammedDialog();
           }}
           disabled={selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true}
-          data-testid="remove-year-button"
+          data-testid="open-project-programmed-dialog"
         >
-          Tuo uusi hanke listalle
+          {t(`projectProgrammedForm.addProjectsToProgramming`)}
         </Button>
         <Button
           variant="supplementary"
