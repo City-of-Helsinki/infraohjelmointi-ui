@@ -1,11 +1,12 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
-import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent } from 'react';
+import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { IPlanningRow } from '@/interfaces/common';
 import HoverTooltip from './HoverTooltip/HoverTooltip';
 import './styles.css';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { dispatchContextMenuEvent } from '@/utils/events';
+import DeleteGroupDialog from './DeleteGroupDialog/DeleteGroupDialog';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -24,8 +25,16 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   deviation,
 }) => {
   const navigate = useNavigate();
-
+  const [isGroupDeleteDialogOpen, setGroupDeleteDialogOpen] = useState(false);
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
+
+  const onOpenGroupDeleteDialog = useCallback(() => {
+    setGroupDeleteDialogOpen(true);
+  }, []);
+
+  const onCloseGroupDeleteDialog = useCallback(() => {
+    setGroupDeleteDialogOpen(false);
+  }, []);
 
   const onExpand = useCallback(() => {
     // Navigate to the next nested path if there's a link
@@ -41,10 +50,10 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
       console.log('handle group context');
       dispatchContextMenuEvent(e, {
         menuType: ContextMenuType.EDIT_GROUP_ROW,
-        groupRowMenuProps: { groupName: name },
+        groupRowMenuProps: { groupName: name, onShowGroupDeleteDialog: onOpenGroupDeleteDialog },
       });
     },
-    [name],
+    [name, onOpenGroupDeleteDialog],
   );
 
   return (
@@ -60,6 +69,11 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               className={`planning-head-content-dots cursor-pointer`}
               data-testid={`show-more-${id}`}
             >
+              <DeleteGroupDialog
+                isVisible={isGroupDeleteDialogOpen}
+                onCloseDeleteGroupDialog={onCloseGroupDeleteDialog}
+                groupName={name}
+              />
               <IconMenuDots size="s" onMouseDown={handleGroupRowMenu} />
             </div>
           )}

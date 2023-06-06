@@ -148,7 +148,7 @@ const CustomContextMenu = () => {
           break;
         case ContextMenuType.EDIT_GROUP_ROW:
           if (groupRowMenuProps) {
-            return <GroupRowContextMenu {...groupRowMenuProps} />;
+            return <GroupRowContextMenu {...groupRowMenuProps} onCloseMenu={resetContextMenu} />;
           }
 
           break;

@@ -341,5 +341,9 @@
   "closeAllGroups":"Pinoa ryhmät",
   "createNewProject":"Luo uusi hanke",
   "editGroup":"Muokkaa ryhmää",
-  "deleteGroup":"Poista ryhmä"
+  "deleteGroup":"Poista ryhmä",
+  "deleteGroupDialog":{
+    "title": "Oletko varma että haluat poistaa \"{{name}}\" ryhmän?",
+    "description":"Ryhmän poistaminen on pysyvää eikä sitä voida enää palauttaa. Hankkeita ei poisteta."
+  }
 }
