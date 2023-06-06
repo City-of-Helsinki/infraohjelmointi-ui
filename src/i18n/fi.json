@@ -339,5 +339,7 @@
   "bound": "Sidottu",
   "openAllGroups":"Avaa ryhmät",
   "closeAllGroups":"Pinoa ryhmät",
-  "createNewProject":"Luo uusi hanke"
+  "createNewProject":"Luo uusi hanke",
+  "editGroup":"Muokkaa ryhmää",
+  "deleteGroup":"Poista ryhmä"
 }

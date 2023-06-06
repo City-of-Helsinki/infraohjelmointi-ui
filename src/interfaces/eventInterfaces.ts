@@ -7,6 +7,7 @@ export enum ContextMenuType {
   EDIT_PROJECT_CELL,
   EDIT_PROJECT_PHASE,
   NEW_ITEM,
+  EDIT_GROUP_ROW
 }
 
 export interface ICellMenuDetails {
@@ -28,11 +29,15 @@ export interface INewItemMenuDetails {
   onShowProjectProgrammedDialog: () => void;
 }
 
+export interface GroupRowMenuDetails {
+  groupName: string;
+}
 export interface IContextMenuData {
   menuType: ContextMenuType;
   cellMenuProps?: ICellMenuDetails;
   phaseMenuProps?: IPhaseMenuDetails;
   newItemsMenuProps?: INewItemMenuDetails;
+  groupRowMenuProps?: GroupRowMenuDetails
 }
 
 export interface IFinanceEventData {

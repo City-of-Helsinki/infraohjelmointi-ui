@@ -4,6 +4,7 @@ import { ProjectPhaseMenu } from './ContextMenus/ProjectPhaseContextMenu';
 import './styles.css';
 import { ContextMenuType, IContextMenuData } from '@/interfaces/eventInterfaces';
 import { NewItemMenu } from './ContextMenus/NewItemMenu';
+import { GroupRowContextMenu } from './ContextMenus/GroupRowContextMenu';
 
 interface IContextMenuState extends IContextMenuData {
   isVisible: boolean;
@@ -40,6 +41,7 @@ const CustomContextMenu = () => {
     phaseMenuProps,
     firstClick,
     newItemsMenuProps,
+    groupRowMenuProps,
   } = contextMenuState;
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -144,9 +146,23 @@ const CustomContextMenu = () => {
             return <NewItemMenu onCloseMenu={resetContextMenu} {...newItemsMenuProps} />;
           }
           break;
+        case ContextMenuType.EDIT_GROUP_ROW:
+          if (groupRowMenuProps) {
+            return <GroupRowContextMenu {...groupRowMenuProps} />;
+          }
+
+          break;
       }
     }
-  }, [cellMenuProps, resetContextMenu, isVisible, menuType, phaseMenuProps]);
+  }, [
+    cellMenuProps,
+    resetContextMenu,
+    isVisible,
+    menuType,
+    phaseMenuProps,
+    newItemsMenuProps,
+    groupRowMenuProps,
+  ]);
 
   return (
     <div

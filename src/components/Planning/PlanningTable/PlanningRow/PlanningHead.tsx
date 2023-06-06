@@ -1,9 +1,11 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { IPlanningRow } from '@/interfaces/common';
 import HoverTooltip from './HoverTooltip/HoverTooltip';
 import './styles.css';
+import { ContextMenuType } from '@/interfaces/eventInterfaces';
+import { dispatchContextMenuEvent } from '@/utils/events';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -33,6 +35,18 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     handleExpand();
   }, [handleExpand, link, navigate]);
 
+  // Open the custom context menu for editing groups
+  const handleGroupRowMenu = useCallback(
+    (e: ReactMouseEvent<SVGAElement>) => {
+      console.log('handle group context');
+      dispatchContextMenuEvent(e, {
+        menuType: ContextMenuType.EDIT_GROUP_ROW,
+        groupRowMenuProps: { groupName: name },
+      });
+    },
+    [name],
+  );
+
   return (
     <th className={`planning-head ${type} sticky left-0 z-50`} data-testid={`head-${id}`}>
       <div className="flex w-full justify-between">
@@ -42,8 +56,11 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
             {angleIcon}
           </button>
           {type !== 'division' && (
-            <div className={`planning-head-content-dots`} data-testid={`show-more-${id}`}>
-              <IconMenuDots size="s" />
+            <div
+              className={`planning-head-content-dots cursor-pointer`}
+              data-testid={`show-more-${id}`}
+            >
+              <IconMenuDots size="s" onMouseDown={handleGroupRowMenu} />
             </div>
           )}
           <div className="planning-title-container">
