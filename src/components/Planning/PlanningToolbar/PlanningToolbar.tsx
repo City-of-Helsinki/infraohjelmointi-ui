@@ -1,6 +1,6 @@
 import { Toolbar } from '../../shared';
 import { IconCollapse, IconPlusCircle, IconSort } from 'hds-react/icons/';
-import { useCallback, MouseEvent as ReactMouseEvent, useState, FC } from 'react';
+import { useCallback, MouseEvent as ReactMouseEvent, useState, FC, memo, useMemo } from 'react';
 import { IPlanningRowSelections } from '@/interfaces/common';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
@@ -24,7 +24,9 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
     groupDialogVisible: false,
     projectProgrammedDialogVisible: false,
   });
-
+  const HDSIconCollapse = useMemo(() => IconCollapse, []);
+  const HDSIconSort = useMemo(() => IconSort, []);
+  const HDSIconPlusCircle = useMemo(() => IconPlusCircle, []);
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
 
   const onShowProjectProgrammedDialog = useCallback(
@@ -71,7 +73,7 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
               onClick={toggleGroupsExpanded}
               variant="supplementary"
               className="!text-black"
-              iconLeft={groupsExpanded ? <IconCollapse /> : <IconSort />}
+              iconLeft={groupsExpanded ? <HDSIconCollapse /> : <HDSIconSort />}
             >
               {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}
             </Button>
@@ -79,7 +81,7 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
             <Button
               variant="supplementary"
               className="!text-black"
-              iconLeft={<IconPlusCircle />}
+              iconLeft={<HDSIconPlusCircle />}
               data-testid="open-new-item-context-menu"
               onMouseDown={handleNewItemMenu}
             >
@@ -97,4 +99,4 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
   );
 };
 
-export default ProjectToolbar;
+export default memo(ProjectToolbar);

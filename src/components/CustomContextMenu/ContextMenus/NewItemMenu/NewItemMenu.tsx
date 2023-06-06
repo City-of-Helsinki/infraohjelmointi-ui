@@ -1,6 +1,6 @@
 import { Button } from 'hds-react/components/Button';
 import { IconCross } from 'hds-react/icons';
-import { FC, memo } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { INewItemMenuDetails } from '@/interfaces/eventInterfaces';
 import { useTranslation } from 'react-i18next';
 
@@ -15,6 +15,15 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
   onShowProjectProgrammedDialog,
 }) => {
   const { t } = useTranslation();
+  const onOpenProjectProgrammedDialog = useCallback(() => {
+    onCloseMenu();
+    onShowProjectProgrammedDialog();
+  }, [onCloseMenu, onShowProjectProgrammedDialog]);
+
+  const onOpenGroupDialog = useCallback(() => {
+    onCloseMenu();
+    onShowGroupDialog();
+  }, [onCloseMenu, onShowGroupDialog]);
   return (
     <div className="project-cell-menu" data-testid="project-cell-menu">
       <div className="project-cell-menu-header">
@@ -33,10 +42,7 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
         <Button
           variant="supplementary"
           iconLeft={undefined}
-          onClick={() => {
-            onCloseMenu();
-            onShowProjectProgrammedDialog();
-          }}
+          onClick={onOpenProjectProgrammedDialog}
           disabled={selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true}
           data-testid="open-project-programmed-dialog"
         >
@@ -45,10 +51,7 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
         <Button
           variant="supplementary"
           iconLeft={undefined}
-          onClick={() => {
-            onCloseMenu();
-            onShowGroupDialog();
-          }}
+          onClick={onOpenGroupDialog}
           data-testid="open-summing-group-dialog"
         >
           {t(`createSummingGroups`)}
@@ -59,7 +62,7 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
           disabled={true}
           data-testid="edit-year-button"
         >
-          Luo uusi hanke
+          {t(`createNewProject`)}
         </Button>
       </div>
     </div>

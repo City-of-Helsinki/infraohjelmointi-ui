@@ -338,5 +338,6 @@
   "implemented": "Toteutettu",
   "bound": "Sidottu",
   "openAllGroups":"Avaa ryhmät",
-  "closeAllGroups":"Pinoa ryhmät"
+  "closeAllGroups":"Pinoa ryhmät",
+  "createNewProject":"Luo uusi hanke"
 }
