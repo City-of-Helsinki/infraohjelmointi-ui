@@ -8,12 +8,22 @@
   --color-group: var(--color-fog-light);
 }
 
+/* we set table-fixed to be able to set the head-cells of every row to position: sticky; */
+.planning-table-container {
+  @apply w-full table-fixed;
+}
+
 .planning-table {
   @apply w-full;
 }
 
 .monthly-cell {
-  @apply w-[39px] min-w-[39px] max-w-[39px] !p-0 !pr-0;
+  @apply w-[39px] min-w-[39px] max-w-[39px] cursor-pointer !p-0 !pr-0;
+}
+
+/* this creates a shadow over the hovered monthly cell */
+.monthly-cell.hovered {
+  box-shadow: inset 0 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .monthly-summary-cell {

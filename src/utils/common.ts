@@ -156,3 +156,22 @@ export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
     value: mc.id,
     label: mc.name,
   }));
+
+export const setHoveredClassToMonth = (month: string) => {
+  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${month}`);
+
+  if (elementsForHoveredMonth.length > 0) {
+    Array.from(elementsForHoveredMonth).forEach((element) => {
+      element.classList.add('hovered');
+    });
+  }
+};
+
+export const removeHoveredClassFromMonth = (month: string) => {
+  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${month}`);
+  if (elementsForHoveredMonth.length > 0) {
+    Array.from(elementsForHoveredMonth).forEach((element) => {
+      element.classList.remove('hovered');
+    });
+  }
+};

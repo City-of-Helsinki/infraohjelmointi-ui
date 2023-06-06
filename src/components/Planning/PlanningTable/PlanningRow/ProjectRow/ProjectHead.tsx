@@ -68,8 +68,8 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   );
 
   return (
-    <th className="project-header-cell" data-testid={`head-${project.id}`}>
-      <div className="project-header-cell-container">
+    <th className="project-head-cell" data-testid={`head-${project.id}`}>
+      <div className="project-head-cell-container">
         {/* Dots & Document */}
         <div className="project-left-icons-container">
           <IconMenuDots

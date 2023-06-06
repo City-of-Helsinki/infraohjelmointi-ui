@@ -1,5 +1,5 @@
 .planning-view-container {
-  @apply m-8 overflow-y-hidden overflow-x-scroll whitespace-nowrap leading-5;
+  @apply m-8 overflow-x-scroll whitespace-nowrap leading-5;
 }
 
 /* All spans have are aligned right */

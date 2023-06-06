@@ -6,6 +6,7 @@ import './styles.css';
 import { calcPercentage } from '@/utils/calculations';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectSelectedYear, setSelectedYear } from '@/reducers/planningSlice';
+import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
@@ -109,7 +110,12 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
             </td>
           )}
           {moment.months().map((m, i) => (
-            <td key={m} className="monthly-cell label">
+            <td
+              key={m}
+              className={`monthly-cell label hoverable-${m}`}
+              onMouseOver={() => setHoveredClassToMonth(m)}
+              onMouseLeave={() => removeHoveredClassFromMonth(m)}
+            >
               <div className="monthly-cell-container relative" data-testid={`month-label-${m}`}>
                 <span>{m.substring(0, 3)}</span>
                 {/* Creates a line that indicates the current date */}

@@ -817,7 +817,7 @@ describe('PlanningView', () => {
       });
     });
 
-    describe('NameTooltip', () => {
+    describe('HoverTooltip', () => {
       it('FIXME is hidden by default and displays the current rows title on hover', async () => {
         const { store, getByTestId, user } = await render();
 

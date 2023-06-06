@@ -1,7 +1,8 @@
 .planning-summary-table {
   /* width 65% since the info-panel is 30% */
   --summary-table-width: calc(100% - 32rem);
-  @apply w-[var(--summary-table-width)] text-right;
+  /* position is to the left of the info panel by giving it the same margin-left as the width of the info-panel*/
+  @apply ml-[32rem] w-[var(--summary-table-width)] text-right;
 }
 
 .planning-summary-head-cell {
@@ -61,5 +62,5 @@
 }
 
 .date-indicator {
-  @apply absolute top-6 z-10 !w-[2px] bg-metro;
+  @apply absolute top-6 z-30 !w-[2px] bg-metro;
 }

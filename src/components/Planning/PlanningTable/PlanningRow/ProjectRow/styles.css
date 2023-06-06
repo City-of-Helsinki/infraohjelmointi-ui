@@ -6,34 +6,38 @@
   @apply border-[1px] border-l-[3px] border-black-80;
 }
 
-.project-header-cell {
-  /* setting max-width: 1rem will cause the table head to not grow bigger than the group table header */
-  @apply max-w-[1rem] border-b-[0.05rem] border-l-[0.05rem] border-r-[0.05rem] border-bus-m py-1 px-4;
+/* 
+  * - setting max-width: 1rem will cause the table head to not grow bigger than the group table head
+  * - the head cell is sticky to keep it in place when scrolling horizontally
+  **/
+.project-head-cell {
+  box-shadow: -0.5px 0px 0px 0px #ccccff inset, 0.5px 0px 0px 0px #ccccff inset;
+  @apply sticky left-0 z-50 max-w-[1rem] bg-white px-4 py-1;
 }
 
-.project-header-cell-container {
-  /* setting max-width: 1rem will cause the table head to not grow bigger than the group table header */
+.project-head-cell-container {
+  /* setting max-width: 1rem will cause the table head to not grow bigger than the group table head */
   @apply flex w-full justify-between;
 }
 
-.project-header-cell .project-left-icons-container {
+.project-head-cell .project-left-icons-container {
   @apply flex items-center gap-2 pr-2;
 }
 
-.project-header-cell .project-name-container {
+.project-head-cell .project-name-container {
   @apply flex w-[65%] items-center gap-2 overflow-hidden pr-4 text-left font-normal;
 }
 
-.project-header-cell .project-name-button {
+.project-head-cell .project-name-button {
   @apply max-w-[100%] overflow-hidden overflow-ellipsis text-sm;
 }
 
-.project-header-cell .project-right-icons-container {
+.project-head-cell .project-right-icons-container {
   @apply flex w-[35%] items-center justify-between;
 }
 
 .table-input input {
-  @apply absolute bottom-0 -top-6 left-[0.65rem] !h-11 !w-[80%] cursor-pointer !rounded-sm  text-center !text-sm font-light;
+  @apply absolute -top-6 bottom-0 left-[0.65rem] !h-11 !w-[80%] cursor-pointer !rounded-sm  text-center !text-sm font-light;
 }
 
 .project-cell {

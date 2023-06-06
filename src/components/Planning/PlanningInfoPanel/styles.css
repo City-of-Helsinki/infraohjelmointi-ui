@@ -1,3 +1,7 @@
+.planning-info-panel-container {
+  @apply fixed z-50 h-36 bg-white;
+}
+
 .planning-info-panel {
   @apply flex w-[32rem] min-w-[32rem] max-w-[32rem] justify-between pl-2 pr-3;
 }
