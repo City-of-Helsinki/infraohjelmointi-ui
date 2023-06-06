@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { PlanningToolbar } from '@/components/Planning/PlanningToolbar';
 import { PlanningInfoPanel } from '@/components/Planning/PlanningInfoPanel';
 import { PlanningBreadcrumbs } from '@/components/Planning/PlanningBreadcrumbs';
@@ -16,11 +16,20 @@ const PlanningView: FC = () => {
   // when the same year is re-clicked
   const handleSetSelectedYear = (year: number | null) =>
     setSelectedYear(year === selectedYear ? null : year);
+  const [groupsExpanded, setGroupsExpanded] = useState<boolean>(false);
+
+  const toggleGroupsExpanded = useCallback(function () {
+    setGroupsExpanded((current) => !current);
+  }, []);
 
   return (
     <>
       <PlanningBreadcrumbs selections={selections} />
-      <PlanningToolbar selections={selections} />
+      <PlanningToolbar
+        selections={selections}
+        toggleGroupsExpanded={toggleGroupsExpanded}
+        groupsExpanded={groupsExpanded}
+      />
       <div className={`planning-view-container ${selectedYear ? '!mr-20' : ''}`} id="planning-view">
         <div className="mb-2 flex">
           <PlanningInfoPanel selectedMasterClass={selections.selectedMasterClass} />
@@ -37,6 +46,7 @@ const PlanningView: FC = () => {
             rows={rows}
             projectToUpdate={projectToUpdate}
             selectedYear={selectedYear}
+            groupsExpanded={groupsExpanded}
           />
         )}
       </div>

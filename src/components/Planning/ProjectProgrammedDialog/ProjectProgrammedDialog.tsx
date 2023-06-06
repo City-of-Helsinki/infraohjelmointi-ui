@@ -8,173 +8,135 @@ import ProjectProgrammedSearch from './ProjectProgrammedSearch';
 import { IProgrammedProjectSuggestions } from '@/interfaces/searchInterfaces';
 import { IProjectsPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { useOptions } from '@/hooks/useOptions';
-import { IPlanningRowSelections } from '@/interfaces/common';
 import { patchProjects } from '@/services/projectServices';
 import { createDateToEndOfYear, createDateToStartOfYear } from '@/utils/dates';
 import { useAppDispatch } from '@/hooks/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
-interface IDialogProps {
-  handleClose: () => void;
-  isOpen: boolean;
-}
-
-const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
-  const [projectsForSubmit, setProjectsForSubmit] = useState<Array<IProgrammedProjectSuggestions>>(
-    [],
-  );
-  const dispatch = useAppDispatch();
-
-  const phase =
-    useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
-
-  const buildRequestPayload = useCallback(
-    (projects: Array<IProgrammedProjectSuggestions>): IProjectsPatchRequestObject => {
-      const currentYear = new Date().getFullYear();
-      return {
-        data: projects.map((p) => ({
-          id: p.value,
-          data: {
-            programmed: true,
-            phase: phase,
-            estPlanningStart: createDateToStartOfYear(currentYear),
-            estPlanningEnd: createDateToEndOfYear(currentYear),
-            estConstructionStart: createDateToStartOfYear(currentYear + 1),
-            estConstructionEnd: createDateToEndOfYear(currentYear + 1),
-          },
-        })),
-      };
-    },
-    [phase],
-  );
-
-  const { t } = useTranslation();
-  const onProjectsSelect = useCallback((projects: IProgrammedProjectSuggestions[]) => {
-    if (projects.length > 0) {
-      setProjectsForSubmit((current) => [...current, ...projects]);
-    }
-  }, []);
-
-  const onProjectSelectionDelete = useCallback((projectName: string) => {
-    setProjectsForSubmit((current) => current.filter((p) => p.label !== projectName));
-  }, []);
-
-  const { Header, Content, ActionButtons } = Dialog;
-
-  const handleDialogClose = useCallback(() => {
-    setProjectsForSubmit([]);
-    handleClose();
-  }, [handleClose]);
-
-  const onSubmit = useCallback(
-    async (e: MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      dispatch(
-        setLoading({
-          text: 'Patching programmed projects',
-          id: 'loading-programmed-projects-patched',
-        }),
-      );
-      patchProjects(buildRequestPayload(projectsForSubmit))
-        .then(() => {
-          setProjectsForSubmit([]);
-        })
-        .finally(() => {
-          dispatch(clearLoading('loading-programmed-projects-patched'));
-        })
-        .catch(() => Promise.reject);
-    },
-
-    [buildRequestPayload, projectsForSubmit, dispatch],
-  );
-
-  return (
-    <div>
-      {/* Dialog */}
-      <div className="display-flex-col">
-        <Dialog
-          id="add-project-programmed-dialog"
-          aria-labelledby={'add-project-programmed-dialog-label'}
-          isOpen={isOpen}
-          close={handleDialogClose}
-          closeButtonLabelText={t('closeProjectProgrammedDialog')}
-          scrollable
-        >
-          {/* Header */}
-          <Header
-            id={'add-project-programmed-header'}
-            title={t(`projectProgrammedForm.addProjectsToProgramming`)}
-          />
-
-          <Content>
-            <div className="dialog-search-section">
-              <div>
-                <ProjectProgrammedSearch
-                  onProjectsSelect={onProjectsSelect}
-                  onProjectSelectionDelete={onProjectSelectionDelete}
-                  projectsForSubmit={projectsForSubmit}
-                />
-              </div>
-            </div>
-            <Loader />
-          </Content>
-          <ActionButtons>
-            <Button
-              onClick={onSubmit}
-              disabled={!(projectsForSubmit && projectsForSubmit.length > 0)}
-              data-testid="add-projects-button"
-            >
-              {t('projectProgrammedForm.addProjects')}
-            </Button>
-            <Button onClick={handleDialogClose} variant="secondary" data-testid="cancel-search">
-              {t('cancel')}
-            </Button>
-          </ActionButtons>
-        </Dialog>
-      </div>
-    </div>
-  );
-});
-
-DialogContainer.displayName = 'Project Programmed Dialog';
-
 interface ProjectProgrammedDialogProps {
-  selections: IPlanningRowSelections;
+  isVisible: boolean;
+  onCloseProjectProgrammedDialog: () => void;
 }
 
-const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = ({ selections }) => {
-  const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = memo(
+  ({ isVisible, onCloseProjectProgrammedDialog }) => {
+    const [projectsForSubmit, setProjectsForSubmit] = useState<
+      Array<IProgrammedProjectSuggestions>
+    >([]);
+    const dispatch = useAppDispatch();
 
-  const toggleSetOpen = useCallback(() => setIsOpen((current) => !current), []);
-  const onOpenGroupForm = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      toggleSetOpen();
-    },
-    [toggleSetOpen],
-  );
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
-  return (
-    <div>
-      <DialogContainer isOpen={isOpen} handleClose={handleClose} />
+    const phase =
+      useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
+
+    const buildRequestPayload = useCallback(
+      (projects: Array<IProgrammedProjectSuggestions>): IProjectsPatchRequestObject => {
+        const currentYear = new Date().getFullYear();
+        return {
+          data: projects.map((p) => ({
+            id: p.value,
+            data: {
+              programmed: true,
+              phase: phase,
+              estPlanningStart: createDateToStartOfYear(currentYear),
+              estPlanningEnd: createDateToEndOfYear(currentYear),
+              estConstructionStart: createDateToStartOfYear(currentYear + 1),
+              estConstructionEnd: createDateToEndOfYear(currentYear + 1),
+            },
+          })),
+        };
+      },
+      [phase],
+    );
+
+    const { t } = useTranslation();
+    const onProjectsSelect = useCallback((projects: IProgrammedProjectSuggestions[]) => {
+      if (projects.length > 0) {
+        setProjectsForSubmit((current) => [...current, ...projects]);
+      }
+    }, []);
+
+    const onProjectSelectionDelete = useCallback((projectName: string) => {
+      setProjectsForSubmit((current) => current.filter((p) => p.label !== projectName));
+    }, []);
+
+    const { Header, Content, ActionButtons } = Dialog;
+
+    const handleDialogClose = useCallback(() => {
+      setProjectsForSubmit([]);
+      onCloseProjectProgrammedDialog();
+    }, [onCloseProjectProgrammedDialog]);
+
+    const onSubmit = useCallback(
+      async (e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        dispatch(
+          setLoading({
+            text: 'Patching programmed projects',
+            id: 'loading-programmed-projects-patched',
+          }),
+        );
+        patchProjects(buildRequestPayload(projectsForSubmit))
+          .then(() => {
+            setProjectsForSubmit([]);
+          })
+          .finally(() => {
+            dispatch(clearLoading('loading-programmed-projects-patched'));
+          })
+          .catch(() => Promise.reject);
+      },
+
+      [buildRequestPayload, projectsForSubmit, dispatch],
+    );
+
+    return (
       <div>
-        <div data-testid="open-project-add-dialog-container" id="open-project-add-dialog-container">
-          <button
-            disabled={
-              selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true
-            }
-            onClick={onOpenGroupForm}
-            data-testid="open-project-programmed-dialog"
+        {/* Dialog */}
+        <div className="display-flex-col">
+          <Dialog
+            id="add-project-programmed-dialog"
+            aria-labelledby={'add-project-programmed-dialog-label'}
+            isOpen={isVisible}
+            close={handleDialogClose}
+            closeButtonLabelText={t('closeProjectProgrammedDialog')}
+            scrollable
           >
-            {t(`projectProgrammedForm.addProjectsToProgramming`)}
-          </button>
+            {/* Header */}
+            <Header
+              id={'add-project-programmed-header'}
+              title={t(`projectProgrammedForm.addProjectsToProgramming`)}
+            />
+
+            <Content>
+              <div className="dialog-search-section">
+                <div>
+                  <ProjectProgrammedSearch
+                    onProjectsSelect={onProjectsSelect}
+                    onProjectSelectionDelete={onProjectSelectionDelete}
+                    projectsForSubmit={projectsForSubmit}
+                  />
+                </div>
+              </div>
+              <Loader />
+            </Content>
+            <ActionButtons>
+              <Button
+                onClick={onSubmit}
+                disabled={!(projectsForSubmit && projectsForSubmit.length > 0)}
+                data-testid="add-projects-button"
+              >
+                {t('projectProgrammedForm.addProjects')}
+              </Button>
+              <Button onClick={handleDialogClose} variant="secondary" data-testid="cancel-search">
+                {t('cancel')}
+              </Button>
+            </ActionButtons>
+          </Dialog>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
+
+ProjectProgrammedDialog.displayName = 'Project Programmed Dialog';
 
 export default ProjectProgrammedDialog;

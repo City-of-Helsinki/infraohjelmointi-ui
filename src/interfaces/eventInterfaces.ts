@@ -1,4 +1,5 @@
 import { IClass } from './classInterfaces';
+import { IPlanningRowSelections } from './common';
 import { IGroup } from './groupInterfaces';
 import { ILocation } from './locationInterfaces';
 import { CellType, IProject, IProjectRequest } from './projectInterfaces';
@@ -6,6 +7,7 @@ import { CellType, IProject, IProjectRequest } from './projectInterfaces';
 export enum ContextMenuType {
   EDIT_PROJECT_CELL,
   EDIT_PROJECT_PHASE,
+  NEW_ITEM,
 }
 
 export interface ICellMenuDetails {
@@ -22,10 +24,17 @@ export interface IPhaseMenuDetails {
   onSubmitPhase: (req: IProjectRequest) => void;
 }
 
+export interface INewItemMenuDetails {
+  selections: IPlanningRowSelections;
+  onShowGroupDialog: () => void;
+  onShowProjectProgrammedDialog: () => void;
+}
+
 export interface IContextMenuData {
   menuType: ContextMenuType;
   cellMenuProps?: ICellMenuDetails;
   phaseMenuProps?: IPhaseMenuDetails;
+  newItemsMenuProps?: INewItemMenuDetails;
 }
 
 export interface IFinanceEventData {

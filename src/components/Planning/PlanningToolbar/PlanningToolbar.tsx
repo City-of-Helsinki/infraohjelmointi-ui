@@ -1,48 +1,97 @@
-import { Icon, IconButton, Toolbar } from '../../shared';
-import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
-import { Navigation } from 'hds-react/components/Navigation';
-import { useTranslation } from 'react-i18next';
+import { Toolbar } from '../../shared';
+import { IconCollapse, IconPlusCircle, IconSort } from 'hds-react/icons/';
+import { useCallback, MouseEvent as ReactMouseEvent, useState, FC, memo, useMemo } from 'react';
+import { IPlanningRowSelections } from '@/interfaces/common';
+import { dispatchContextMenuEvent } from '@/utils/events';
+import { ContextMenuType } from '@/interfaces/eventInterfaces';
+import { Button } from 'hds-react/components/Button';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import './styles.css';
-import { IconCross } from 'hds-react/icons/';
-import { useCallback, useRef } from 'react';
-import { IPlanningRowSelections } from '@/interfaces/common';
+import { t } from 'i18next';
 
-interface ProjectToolBarProps {
+interface IPlanningToolbarProps {
+  toggleGroupsExpanded: () => void;
+  groupsExpanded: boolean;
   selections: IPlanningRowSelections;
 }
-const ProjectToolbar = ({ selections }: ProjectToolBarProps) => {
-  const { Dropdown, Item } = Navigation;
-  const dropDownRef = useRef<HTMLDivElement>(null);
-  const closeDropdown = useCallback(() => {
-    dropDownRef.current?.click();
-  }, [dropDownRef]);
-  const { t } = useTranslation();
+const ProjectToolbar: FC<IPlanningToolbarProps> = ({
+  toggleGroupsExpanded,
+  groupsExpanded,
+  selections,
+}) => {
+  const [toolbarState, setToolbarState] = useState({
+    groupDialogVisible: false,
+    projectProgrammedDialogVisible: false,
+  });
+  const HDSIconCollapse = useMemo(() => IconCollapse, []);
+  const HDSIconSort = useMemo(() => IconSort, []);
+  const HDSIconPlusCircle = useMemo(() => IconPlusCircle, []);
+  const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
+
+  const onShowProjectProgrammedDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, projectProgrammedDialogVisible: true })),
+    [],
+  );
+
+  const onCloseProjectProgrammedDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, projectProgrammedDialogVisible: false })),
+    [],
+  );
+
+  const onShowGroupDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, groupDialogVisible: true })),
+    [],
+  );
+
+  const onCloseGroupDialog = useCallback(
+    () => setToolbarState((current) => ({ ...current, groupDialogVisible: false })),
+    [],
+  );
+
+  // Open the custom context menu for editing the project phase on click
+  const handleNewItemMenu = useCallback(
+    (e: ReactMouseEvent<HTMLButtonElement>) => {
+      dispatchContextMenuEvent(e, {
+        menuType: ContextMenuType.NEW_ITEM,
+        newItemsMenuProps: {
+          selections,
+          onShowProjectProgrammedDialog,
+          onShowGroupDialog,
+        },
+      });
+    },
+    [onShowGroupDialog, onShowProjectProgrammedDialog, selections],
+  );
 
   return (
     <Toolbar
       left={
         <>
-          <div ref={dropDownRef}>
-            <Dropdown
-              className="planning-toolbar-dropdown"
-              label={t(`new`)}
-              icon={<Icon icon={IconNewItem} />}
+          <div className="planning-toolbar-left">
+            <Button
+              onClick={toggleGroupsExpanded}
+              variant="supplementary"
+              className="!text-black"
+              iconLeft={groupsExpanded ? <HDSIconCollapse /> : <HDSIconSort />}
             >
-              <div className="dropdown-header border-b-2 border-gray">
-                <div>Uusi</div>
-                <div>
-                  <IconButton icon={IconCross} onClick={closeDropdown}></IconButton>
-                </div>
-              </div>
-              <Item>
-                <GroupDialog />
-              </Item>
-              <Item>
-                <ProjectProgrammedDialog selections={selections} />
-              </Item>
-            </Dropdown>
+              {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}
+            </Button>
+
+            <Button
+              variant="supplementary"
+              className="!text-black"
+              iconLeft={<HDSIconPlusCircle />}
+              data-testid="open-new-item-context-menu"
+              onMouseDown={handleNewItemMenu}
+            >
+              Uusi
+            </Button>
+            <GroupDialog isVisible={groupDialogVisible} onCloseGroupDialog={onCloseGroupDialog} />
+            <ProjectProgrammedDialog
+              isVisible={projectProgrammedDialogVisible}
+              onCloseProjectProgrammedDialog={onCloseProjectProgrammedDialog}
+            />
           </div>
         </>
       }
@@ -50,4 +99,4 @@ const ProjectToolbar = ({ selections }: ProjectToolBarProps) => {
   );
 };
 
-export default ProjectToolbar;
+export default memo(ProjectToolbar);

@@ -3,6 +3,7 @@ import { ProjectCellMenu } from './ContextMenus/ProjectCellContextMenu';
 import { ProjectPhaseMenu } from './ContextMenus/ProjectPhaseContextMenu';
 import './styles.css';
 import { ContextMenuType, IContextMenuData } from '@/interfaces/eventInterfaces';
+import { NewItemMenu } from './ContextMenus/NewItemMenu';
 
 interface IContextMenuState extends IContextMenuData {
   isVisible: boolean;
@@ -30,8 +31,16 @@ const initialState = {
 const CustomContextMenu = () => {
   const [contextMenuState, setContextMenuState] = useState<IContextMenuState>(initialState);
 
-  const { isVisible, posX, posY, menuType, cellMenuProps, phaseMenuProps, firstClick } =
-    contextMenuState;
+  const {
+    isVisible,
+    posX,
+    posY,
+    menuType,
+    cellMenuProps,
+    phaseMenuProps,
+    firstClick,
+    newItemsMenuProps,
+  } = contextMenuState;
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
@@ -128,6 +137,11 @@ const CustomContextMenu = () => {
         case ContextMenuType.EDIT_PROJECT_PHASE:
           if (phaseMenuProps) {
             return <ProjectPhaseMenu onCloseMenu={resetContextMenu} {...phaseMenuProps} />;
+          }
+          break;
+        case ContextMenuType.NEW_ITEM:
+          if (newItemsMenuProps) {
+            return <NewItemMenu onCloseMenu={resetContextMenu} {...newItemsMenuProps} />;
           }
           break;
       }

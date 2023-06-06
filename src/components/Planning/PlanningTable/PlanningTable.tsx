@@ -10,15 +10,26 @@ interface IPlanningTableProps {
   rows: Array<IPlanningRow>;
   projectToUpdate: IProject | null;
   selectedYear: number | null;
+  groupsExpanded: boolean;
 }
 
-const PlanningTable: FC<IPlanningTableProps> = ({ rows, projectToUpdate, selectedYear }) => {
+const PlanningTable: FC<IPlanningTableProps> = ({
+  rows,
+  groupsExpanded,
+  projectToUpdate,
+  selectedYear,
+}) => {
   return (
     <table className="planning-table" cellSpacing={0}>
       <tbody>
         {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
         {rows.map((row: IPlanningRow) => (
-          <PlanningRow {...row} projectToUpdate={projectToUpdate} selectedYear={selectedYear} />
+          <PlanningRow
+            {...row}
+            groupsExpanded={groupsExpanded}
+            projectToUpdate={projectToUpdate}
+            selectedYear={selectedYear}
+          />
         ))}
       </tbody>
     </table>
