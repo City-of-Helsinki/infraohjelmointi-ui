@@ -1,12 +1,15 @@
-.planning-toolbar-dropdown{
-    @apply z-10
-  }
+.planning-toolbar-dropdown {
+  @apply z-10;
+}
 
-.planning-toolbar-dropdown .dropdown-header{
-    @apply flex flex-row justify-between bg-white text-black font-bold
-  }
-  .planning-toolbar-left {
-    @apply flex flex-row 
-  }
+.planning-toolbar-dropdown .dropdown-header {
+  @apply flex flex-row justify-between bg-white font-bold text-black;
+}
 
-  
+.planning-toolbar-left {
+  @apply flex flex-row;
+}
+
+.expand-groups-button {
+  @apply w-[180px] !text-black;
+}
