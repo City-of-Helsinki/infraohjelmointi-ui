@@ -281,4 +281,4 @@ const GroupDialog: FC<{ isVisible: boolean; onCloseGroupDialog: () => void }> = 
   );
 };
 
-export default GroupDialog;
+export default memo(GroupDialog);
