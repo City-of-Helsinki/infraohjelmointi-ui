@@ -1,20 +1,26 @@
-import { FC, memo } from 'react';
+import { FC, memo, useCallback } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/Loader';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
+import { deleteGroupThunk } from '@/reducers/groupSlice';
+import { useAppDispatch } from '@/hooks/common';
 
 interface DeleteGroupDialogProps {
   isVisible: boolean;
   onCloseDeleteGroupDialog: () => void;
   groupName: string;
+  id: string;
 }
 
 const DeleteGroupDialog: FC<DeleteGroupDialogProps> = memo(
-  ({ isVisible, onCloseDeleteGroupDialog, groupName }) => {
+  ({ isVisible, onCloseDeleteGroupDialog, groupName, id }) => {
     const { t } = useTranslation();
-
+    const dispatch = useAppDispatch();
+    const handleDeleteGroup = useCallback(async () => {
+      await dispatch(deleteGroupThunk(id)).then(() => onCloseDeleteGroupDialog());
+    }, [dispatch, id, onCloseDeleteGroupDialog]);
     const { Header, Content, ActionButtons } = Dialog;
 
     return (
@@ -42,10 +48,7 @@ const DeleteGroupDialog: FC<DeleteGroupDialogProps> = memo(
               <Button
                 variant="danger"
                 iconLeft={<IconTrash aria-hidden="true" />}
-                onClick={() => {
-                  // Add confirm operations here
-                  close();
-                }}
+                onClick={handleDeleteGroup}
               >
                 {t(`deleteGroup`)}
               </Button>

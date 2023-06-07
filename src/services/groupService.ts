@@ -16,3 +16,11 @@ export const getGroups = async () => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+
+export const deleteGroup = async (id: string) => {
+  return axios
+    .delete(`${REACT_APP_API_URL}/project-groups/${id}/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};

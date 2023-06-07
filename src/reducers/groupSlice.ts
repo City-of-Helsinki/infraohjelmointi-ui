@@ -1,6 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { IGroup, IGroupRequest } from '@/interfaces/groupInterfaces';
-import { getGroups, postGroup } from '@/services/groupService';
+import { deleteGroup, getGroups, postGroup } from '@/services/groupService';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -20,6 +20,15 @@ export const postGroupThunk = createAsyncThunk(
   'group/post',
   async (request: IGroupRequest, thunkAPI) => {
     return await postGroup(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const deleteGroupThunk = createAsyncThunk(
+  'group/delete',
+  async (id: string, thunkAPI) => {
+    return await deleteGroup(id)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -59,6 +68,13 @@ export const groupSlice = createSlice({
       return { ...state, groups: action.payload, year: action.payload[0].finances.year };
     });
     builder.addCase(getGroupsThunk.rejected, (state, action: PayloadAction<unknown>) => {
+      return { ...state, error: action.payload };
+    });
+    // GROUP DELETE
+    builder.addCase(deleteGroupThunk.fulfilled, (state, action: PayloadAction<{id:string}>) => {
+      return { ...state, groups: state.groups.filter((g) => g.id !== action.payload.id) };
+    });
+    builder.addCase(deleteGroupThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
   },

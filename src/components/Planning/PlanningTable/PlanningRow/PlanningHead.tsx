@@ -73,6 +73,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
                 isVisible={isGroupDeleteDialogOpen}
                 onCloseDeleteGroupDialog={onCloseGroupDeleteDialog}
                 groupName={name}
+                id={id}
               />
               <IconMenuDots size="s" onMouseDown={handleGroupRowMenu} />
             </div>
