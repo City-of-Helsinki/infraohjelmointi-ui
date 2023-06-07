@@ -11,13 +11,19 @@ const GroupRowContextMenu: FC<GroupRowMenuProps> = ({
   groupName,
   onShowGroupDeleteDialog,
   onCloseMenu,
+  onShowGroupEditDialog,
 }) => {
   const { t } = useTranslation();
 
-  const handleDialogOpen = useCallback(() => {
+  const handleDeleteDialogOpen = useCallback(() => {
     onCloseMenu();
     onShowGroupDeleteDialog();
   }, [onCloseMenu, onShowGroupDeleteDialog]);
+
+  const handleEditGroupDialogOpen = useCallback(() => {
+    onCloseMenu();
+    onShowGroupEditDialog();
+  }, [onCloseMenu, onShowGroupEditDialog]);
   return (
     <div className="project-cell-menu" data-testid="project-cell-menu">
       <div className="project-cell-menu-header">
@@ -33,12 +39,17 @@ const GroupRowContextMenu: FC<GroupRowMenuProps> = ({
         />
       </div>
       <div className="project-cell-menu-footer">
-        <Button variant="supplementary" iconLeft={undefined} data-testid="open-group-edit-dialog">
+        <Button
+          variant="supplementary"
+          onClick={handleEditGroupDialogOpen}
+          iconLeft={undefined}
+          data-testid="open-group-edit-dialog"
+        >
           {t(`editGroup`)}
         </Button>
         <Button
           variant="supplementary"
-          onClick={handleDialogOpen}
+          onClick={handleDeleteDialogOpen}
           iconLeft={undefined}
           data-testid="open-delete-group-dialog"
         >

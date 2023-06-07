@@ -1,12 +1,13 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { IPlanningRow } from '@/interfaces/common';
+import { IOption, IPlanningRow } from '@/interfaces/common';
 import HoverTooltip from './HoverTooltip/HoverTooltip';
 import './styles.css';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import DeleteGroupDialog from './DeleteGroupDialog/DeleteGroupDialog';
+import EditGroupDialog from './EditGroupDialog/EditGroupDialog';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -23,17 +24,30 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   costEstimateBudget,
   plannedBudgets,
   deviation,
+  projectRows,
 }) => {
   const navigate = useNavigate();
-  const [isGroupDeleteDialogOpen, setGroupDeleteDialogOpen] = useState(false);
+  const [groupDialogState, setGroupDialogState] = useState({
+    groupDeleteOpen: false,
+    groupEditOpen: false,
+  });
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
+  const projectsToIOption = useCallback((): IOption[] => {
+    return projectRows.map((p) => ({ value: p.id, label: p.name }));
+  }, [projectRows]);
 
-  const onOpenGroupDeleteDialog = useCallback(() => {
-    setGroupDeleteDialogOpen(true);
+  const onShowGroupDeleteDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupDeleteOpen: true }));
+  }, []);
+  const onCloseGroupDeleteDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupDeleteOpen: false }));
+  }, []);
+  const onShowGroupEditDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupEditOpen: true }));
   }, []);
 
-  const onCloseGroupDeleteDialog = useCallback(() => {
-    setGroupDeleteDialogOpen(false);
+  const onCloseGroupEditDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupEditOpen: false }));
   }, []);
 
   const onExpand = useCallback(() => {
@@ -50,10 +64,10 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
       console.log('handle group context');
       dispatchContextMenuEvent(e, {
         menuType: ContextMenuType.EDIT_GROUP_ROW,
-        groupRowMenuProps: { groupName: name, onShowGroupDeleteDialog: onOpenGroupDeleteDialog },
+        groupRowMenuProps: { groupName: name, onShowGroupDeleteDialog, onShowGroupEditDialog },
       });
     },
-    [name, onOpenGroupDeleteDialog],
+    [name, onShowGroupDeleteDialog, onShowGroupEditDialog],
   );
 
   return (
@@ -69,13 +83,26 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               className={`planning-head-content-dots cursor-pointer`}
               data-testid={`show-more-${id}`}
             >
-              <DeleteGroupDialog
-                isVisible={isGroupDeleteDialogOpen}
-                onCloseDeleteGroupDialog={onCloseGroupDeleteDialog}
-                groupName={name}
-                id={id}
+              {type === 'group' && (
+                <>
+                  <EditGroupDialog
+                    isVisible={groupDialogState.groupEditOpen}
+                    onCloseGroupEditDialog={onCloseGroupEditDialog}
+                    id={id}
+                    projects={projectsToIOption()}
+                  />
+                  <DeleteGroupDialog
+                    isVisible={groupDialogState.groupDeleteOpen}
+                    onCloseDeleteGroupDialog={onCloseGroupDeleteDialog}
+                    groupName={name}
+                    id={id}
+                  />
+                </>
+              )}
+              <IconMenuDots
+                size="s"
+                onMouseDown={type === 'group' ? handleGroupRowMenu : undefined}
               />
-              <IconMenuDots size="s" onMouseDown={handleGroupRowMenu} />
             </div>
           )}
           <div className="planning-title-container">

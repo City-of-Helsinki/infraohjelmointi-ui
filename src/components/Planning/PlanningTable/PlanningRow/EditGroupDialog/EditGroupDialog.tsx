@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FC, useCallback, useMemo, memo } from 'react';
+import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
@@ -7,60 +7,49 @@ import './styles.css';
 import { TextField, SelectField } from '@/components/shared';
 import { IOption } from '@/interfaces/common';
 import { IconAngleUp, IconAngleDown } from 'hds-react/icons';
-import GroupProjectSearch from './GroupProjectSearch';
 import useGroupForm from '@/forms/useGroupForm';
 import { useAppDispatch } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { postGroupThunk } from '@/reducers/groupSlice';
 import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import { useNavigate } from 'react-router';
+import GroupProjectSearch from '@/components/Planning/GroupDialog/GroupProjectSearch';
 
 interface IDialogProps {
   handleClose: () => void;
   isOpen: boolean;
+  id: string;
+  projects: IOption[];
 }
-const buildRedirectRoute = (form: IGroupForm): string => {
-  return `${form.masterClass.value}/${form.class.value}/${form.subClass.value}/${form.district?.value}`;
-};
-const buildRequestPayload = (form: IGroupForm): IGroupRequest => {
-  // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
-  return {
-    name: form.name,
-    classRelation: form.subClass?.value || '',
-    locationRelation: form.division?.value || form.district?.value || '',
-    projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
-  };
-};
 
-const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
+const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, id, projects }) => {
   const navigate = useNavigate();
-
+  const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(id, projects);
+  const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);
 
-  const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(null, []);
-  const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
-  const nameField = watch('name');
-  const subClassField = watch('subClass');
-  const districtField = watch('district');
-  const divisionField = watch('division');
-
-  const isButtonDisabled = useCallback(() => {
-    return (
-      !nameField ||
-      (showAdvanceFields &&
-        (!districtField.value ||
-          (locationOptions.divisions.length > 0 && !divisionField.value) ||
-          !subClassField.value)) ||
-      (!showAdvanceFields && !subClassField.value)
-    );
-  }, [
-    districtField.value,
-    divisionField.value,
-    nameField,
-    showAdvanceFields,
-    subClassField.value,
-    locationOptions,
-  ]);
+  useEffect(() => {
+    if (formValues.district.value || formValues.division.value) {
+      setShowAdvanceFields(true);
+    }
+  }, [formValues.district.value, formValues.division.value]);
+  //   const isButtonDisabled = useCallback(() => {
+  //     return (
+  //       !nameField ||
+  //       (showAdvanceFields &&
+  //         (!districtField.value ||
+  //           (locationOptions.divisions.length > 0 && !divisionField.value) ||
+  //           !subClassField.value)) ||
+  //       (!showAdvanceFields && !subClassField.value)
+  //     );
+  //   }, [
+  //     districtField.value,
+  //     divisionField.value,
+  //     nameField,
+  //     showAdvanceFields,
+  //     subClassField.value,
+  //     locationOptions,
+  //   ]);
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -71,23 +60,23 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
     handleClose();
   }, [handleClose, formValues, reset]);
 
-  const onSubmit = useCallback(
-    async (form: IGroupForm) => {
-      await dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
-        handleDialogClose();
-        navigate(buildRedirectRoute(form));
-      });
-    },
+  //   const onSubmit = useCallback(
+  //     async (form: IGroupForm) => {
+  //       await dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
+  //         handleDialogClose();
+  //         navigate(buildRedirectRoute(form));
+  //       });
+  //     },
 
-    [dispatch, handleDialogClose, navigate],
-  );
+  //     [dispatch, handleDialogClose, navigate],
+  //   );
 
-  const handleOnSubmitForm = useCallback(
-    (e: unknown) => {
-      handleSubmit(onSubmit).call(e).catch(Promise.reject);
-    },
-    [handleSubmit, onSubmit],
-  );
+  //   const handleOnSubmitForm = useCallback(
+  //     (e: unknown) => {
+  //       handleSubmit(onSubmit).call(e).catch(Promise.reject);
+  //     },
+  //     [handleSubmit, onSubmit],
+  //   );
 
   const toggleAdvanceFields = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -103,6 +92,10 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
   const { Header, Content, ActionButtons } = Dialog;
 
+  const advanceFieldIcons = useMemo(
+    () => (showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />),
+    [showAdvanceFields],
+  );
   const formProps = useCallback(
     (name: string) => ({
       name: name,
@@ -129,19 +122,14 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
       };
     return {};
   }, [locationOptions, customValidation, t]);
-  const advanceFieldIcons = useMemo(
-    () => (showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />),
-    [showAdvanceFields],
-  );
-
   return (
     <div>
       {/* Dialog */}
       <div>
         <Dialog
-          data-testid="group-create-dialog"
-          id="group-create-dialog"
-          aria-labelledby={'group-form-dialog-label'}
+          data-testid="group-edit-dialog"
+          id="group-edit-dialog"
+          aria-labelledby={'group-edit-dialog-label'}
           isOpen={isOpen}
           close={handleDialogClose}
           closeButtonLabelText={t('closeGroupFormWindow')}
@@ -149,7 +137,7 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
           scrollable
         >
           {/* Header */}
-          <Header id={'group-form-dialog-label'} title={t(`createSummingGroups`)} />
+          <Header id={'group-edit-dialog-label'} title={t(`editSummingGroup`)} />
 
           <Content>
             <div className="dialog-section">
@@ -160,10 +148,10 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
               </div>
               <div>
                 <form
-                  id="group-create-form"
+                  id="group-edit-form"
                   className="search-form"
-                  onSubmit={handleOnSubmitForm}
-                  data-testid="group-create-form"
+                  //   onSubmit={handleOnSubmitForm}
+                  data-testid="group-edit-form"
                 >
                   <div>
                     {/* Basic fields */}
@@ -174,6 +162,8 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                       />
                       <SelectField
                         {...formProps('masterClass')}
+                        disabled={true}
+                        clearable={false}
                         rules={{
                           required: t('required', { value: 'Pääluokka' }) || '',
                           validate: {
@@ -184,6 +174,8 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                       />
                       <SelectField
                         {...formProps('class')}
+                        disabled={true}
+                        clearable={false}
                         rules={{
                           required: t('required', { value: 'Luokka' }) || '',
                           validate: {
@@ -194,6 +186,8 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
                       />
                       <SelectField
                         {...formProps('subClass')}
+                        disabled={true}
+                        clearable={false}
                         options={classOptions.subClasses}
                         rules={{
                           required: t('required', { value: 'Alaluokka' }) || '',
@@ -252,9 +246,9 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
           <ActionButtons>
             <Button
-              onClick={handleOnSubmitForm}
+              //   onClick={handleOnSubmitForm}
               data-testid="create-group-button"
-              disabled={isButtonDisabled()}
+              //   disabled={isButtonDisabled()}
             >
               {t('groupForm.createGroup')}
             </Button>
@@ -270,15 +264,24 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose }) => {
 
 DialogContainer.displayName = 'Group Dialog';
 
-const GroupDialog: FC<{ isVisible: boolean; onCloseGroupDialog: () => void }> = ({
-  isVisible,
-  onCloseGroupDialog,
-}) => {
+const EditGroupDialog: FC<{
+  isVisible: boolean;
+  onCloseGroupEditDialog: () => void;
+  id: string;
+  projects: IOption[];
+}> = ({ isVisible, onCloseGroupEditDialog, id, projects }) => {
   return (
     <div>
-      {isVisible && <DialogContainer isOpen={isVisible} handleClose={onCloseGroupDialog} />}
+      {isVisible && (
+        <DialogContainer
+          isOpen={isVisible}
+          handleClose={onCloseGroupEditDialog}
+          id={id}
+          projects={projects}
+        />
+      )}
     </div>
   );
 };
 
-export default memo(GroupDialog);
+export default memo(EditGroupDialog);

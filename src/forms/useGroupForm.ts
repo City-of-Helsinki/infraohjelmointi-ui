@@ -5,41 +5,132 @@ import { useForm } from 'react-hook-form';
 import { useEffect, useMemo, useState } from 'react';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
-
+import { IGroup } from '@/interfaces/groupInterfaces';
+import { selectGroups } from '@/reducers/groupSlice';
+import { useAppSelector } from '../hooks/common';
+import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
+import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
+import { IClass } from '@/interfaces/classInterfaces';
+import { IListItem, IOption } from '@/interfaces/common';
+import { listItemToOption } from '@/utils/common';
+import { ILocation } from '@/interfaces/locationInterfaces';
 interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
 }
 
-const useGroupForm = () => {
-  const formValues = useMemo(
+const useGroupValues = (id: string | null,projects:IOption[]) => {
+  const group = useAppSelector(selectGroups).find((g) => g.id === id) || null;
+  const masterClasses = useAppSelector(selectMasterClasses);
+  const classes = useAppSelector(selectClasses);
+  const subClasses = useAppSelector(selectSubClasses);
+
+  const districts = useAppSelector(selectDistricts);
+  const divisions = useAppSelector(selectDivisions);
+  const subDivisions = useAppSelector(selectSubDivisions);
+
+  /**
+   * There are three project classes, but only one id is saved. We create a list item of each class based on the id.
+   */
+  const getGroupClassFields = (group: IGroup | null) => {
+    const classAsListItem = (projectClass: IClass | undefined): IListItem => ({
+      id: projectClass?.id ?? '',
+      value: projectClass?.name ?? '',
+    });
+
+    const selectedSubClass = group
+      ? subClasses.find(({ id }) => id === group.classRelation)
+      : undefined;
+
+    const projectClassId = selectedSubClass?.parent ?? group?.classRelation;
+
+    const selectedClass = projectClassId
+      ? classes.find(({ id }) => id === projectClassId)
+      : undefined;
+
+    const masterClassId = selectedClass?.parent ?? group?.classRelation;
+
+    const selectedMasterClass = masterClassId
+      ? masterClasses.find(({ id }) => id === masterClassId)
+      : undefined;
+
+    return {
+      masterClass: listItemToOption(classAsListItem(selectedMasterClass) ?? []),
+      class: listItemToOption(classAsListItem(selectedClass) ?? []),
+      subClass: listItemToOption(classAsListItem(selectedSubClass) ?? []),
+    };
+  };
+
+  /**
+   * There are three project locations, but only one id is saved. We create a list item of each location based on the id.
+   */
+  const getGroupLocationFields = (group: IGroup | null) => {
+    const locationAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
+      id: projectLocation?.id ?? '',
+      value: projectLocation?.name ?? '',
+    });
+
+    const selectedSubDivision = group
+      ? subDivisions.find(({ id }) => id === group.locationRelation)
+      : undefined;
+
+    const projectLocationId = selectedSubDivision?.parent ?? group?.locationRelation;
+
+    const selectedDivision = projectLocationId
+      ? divisions.find(({ id }) => id === projectLocationId)
+      : undefined;
+
+    const districtId = selectedDivision?.parent ?? group?.locationRelation;
+
+    const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
+
+    return {
+      district: listItemToOption(locationAsListItem(selectedDistrict) ?? []),
+      division: listItemToOption(locationAsListItem(selectedDivision) ?? []),
+      subDivision: listItemToOption(locationAsListItem(selectedSubDivision) ?? []),
+    };
+  };
+
+  const formValues: IGroupForm = useMemo(
     () => ({
-      name: '',
-      masterClass: {},
-      class: {},
-      subClass: {},
-      district: {},
-      division: {},
-      subDivision: {},
-      projectsForSubmit: [],
+      name: group?.name || '',
+      ...getGroupClassFields(group),
+      ...getGroupLocationFields(group),
+      projectsForSubmit: projects.length > 0 ? projects: [],
     }),
-    [],
+    [group,projects],
   );
+
+  return { formValues, group };
+};
+
+const useGroupForm = (id: string | null,projects: IOption[]) => {
+  const { formValues, group } = useGroupValues(id,projects);
 
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: '',
     selectedLocation: '',
   });
+  
   const { selectedClass, selectedLocation } = selections;
   const classOptions = useClassOptions(selectedClass);
   const locationOptions = useLocationOptions(selectedLocation, selectedClass);
 
   const formMethods = useForm<IGroupForm>({
-    defaultValues: formValues,
+    defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onSubmit',
   });
+  useEffect(()=>{
+    setSelections((current) => ({ ...current, selectedClass: formValues.subClass.value, selectedLocation: formValues.division.value || formValues.district.value }));
+  },[formValues.subClass.value,formValues.division.value,formValues.district.value])
+  const { watch, setValue, reset } = formMethods;
 
-  const { watch, setValue } = formMethods;
+  useEffect(() => {
+    if (group) {
+      reset(formValues);
+    }
+  }, [group,projects]);
+
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       switch (name) {

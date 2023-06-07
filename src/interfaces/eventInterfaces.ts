@@ -32,6 +32,7 @@ export interface INewItemMenuDetails {
 export interface GroupRowMenuDetails {
   groupName: string;
   onShowGroupDeleteDialog: ()=>void;
+  onShowGroupEditDialog: ()=>void;
 }
 export interface IContextMenuData {
   menuType: ContextMenuType;
