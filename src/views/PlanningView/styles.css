@@ -1,5 +1,18 @@
 .planning-view-container {
-  @apply m-8 overflow-x-scroll whitespace-nowrap leading-5;
+  @apply m-8 whitespace-nowrap leading-5;
+}
+
+.planning-view-container-header {
+  @apply flex;
+  position: sticky;
+  top: 0;
+  overflow-x: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.planning-view-container-header::-webkit-scrollbar {
+  display: none;
 }
 
 /* All spans have are aligned right */
