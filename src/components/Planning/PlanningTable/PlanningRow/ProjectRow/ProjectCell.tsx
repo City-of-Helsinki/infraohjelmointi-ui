@@ -23,6 +23,8 @@ import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
 import _ from 'lodash';
+import { useAppSelector } from '@/hooks/common';
+import { selectSelectedYear } from '@/reducers/planningSlice';
 
 const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
@@ -347,7 +349,6 @@ const getMoveTimelineRequestData = (
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
-  selectedYear: number | null;
 }
 
 interface IProjectCellState {
@@ -355,10 +356,11 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, selectedYear }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear, monthlyDataList } =
     cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
+  const selectedYear = useAppSelector(selectSelectedYear);
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
     isReadOnly: true,

@@ -4,23 +4,30 @@ import { getDaysInMonthForYear, getMonthToday, getToday } from '@/utils/dates';
 import moment from 'moment';
 import './styles.css';
 import { calcPercentage } from '@/utils/calculations';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { selectSelectedYear, setSelectedYear } from '@/reducers/planningSlice';
 
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
-  selectedYear: number | null;
-  handleSetSelectedYear: (year: number | null) => void;
   title: string;
   isCurrentYear: boolean;
 }
 
 const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   year,
-  selectedYear,
-  handleSetSelectedYear,
   title,
   isCurrentYear,
 }) => {
+  const dispatch = useAppDispatch();
   const dateIndicatorRef = useRef<HTMLSpanElement>(null);
+  const selectedYear = useAppSelector(selectSelectedYear);
+
+  // Sets the selectedYear or null if the year is given again, so that the monthly view can be closed
+  // when the same year is re-clicked
+  const handleSetSelectedYear = useCallback(
+    (year: number | null) => dispatch(setSelectedYear(year === selectedYear ? null : year)),
+    [dispatch, selectedYear],
+  );
 
   useLayoutEffect(() => {
     if (!isCurrentYear) {

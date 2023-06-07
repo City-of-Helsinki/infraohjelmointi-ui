@@ -11,17 +11,9 @@ interface IPlanningSummaryTableProps {
   startYear: number;
   selections: IPlanningRowSelections;
   lists: IPlanningRowLists;
-  handleSetSelectedYear: (year: number | null) => void;
-  selectedYear: number | null;
 }
 
-const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({
-  startYear,
-  selections,
-  lists,
-  handleSetSelectedYear,
-  selectedYear,
-}) => {
+const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selections, lists }) => {
   const { heads, cells } = useSummaryRows({ startYear, selections, lists });
 
   return (
@@ -36,8 +28,6 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({
               year={year}
               title={title}
               isCurrentYear={isCurrentYear}
-              handleSetSelectedYear={handleSetSelectedYear}
-              selectedYear={selectedYear}
             />
           ))}
         </tr>
@@ -47,13 +37,13 @@ const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({
         {/* Planned budget row */}
         <tr data-testid="planning-summary-planned-budget-row">
           {cells.map((c) => (
-            <PlanningSummaryTablePlannedBudgetCell {...c} selectedYear={selectedYear} />
+            <PlanningSummaryTablePlannedBudgetCell {...c} />
           ))}
         </tr>
         {/* Frame budget and deviation row */}
         <tr data-testid="planning-summary-realized-budget-row" className="align-top">
           {cells.map((c) => (
-            <PlanningSummaryTableRealizedBudgetCell {...c} selectedYear={selectedYear} />
+            <PlanningSummaryTableRealizedBudgetCell {...c} />
           ))}
         </tr>
       </tbody>

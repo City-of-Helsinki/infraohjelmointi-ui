@@ -11,6 +11,7 @@ import hashTagReducer from './reducers/hashTagsSlice';
 import searchReducer from './reducers/searchSlice';
 import groupReducer from './reducers/groupSlice';
 import eventsReducer from './reducers/eventsSlice';
+import planningReducer from './reducers/planningSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
@@ -26,6 +27,7 @@ export const storeItems = {
   search: searchReducer,
   group: groupReducer,
   events: eventsReducer,
+  planning: planningReducer,
 };
 
 const rootReducer = combineReducers(storeItems);
