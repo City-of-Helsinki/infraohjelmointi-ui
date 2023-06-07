@@ -43,7 +43,7 @@ const buildPlanningSummaryHeadCells = (startYear: number) => {
 };
 
 interface IUseSummaryRowsParams {
-  startYear: number;
+  startYear: number | null;
   selections: IPlanningRowSelections;
   lists: IPlanningRowLists;
 }

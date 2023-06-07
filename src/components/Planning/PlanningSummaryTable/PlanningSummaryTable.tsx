@@ -8,7 +8,7 @@ import PlanningSummaryTableRealizedBudgetCell from './PlanningSummaryTableRealiz
 import './styles.css';
 
 interface IPlanningSummaryTableProps {
-  startYear: number;
+  startYear: number | null;
   selections: IPlanningRowSelections;
   lists: IPlanningRowLists;
 }
