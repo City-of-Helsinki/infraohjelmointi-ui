@@ -4,11 +4,16 @@ import SideBar from '@/components/Sidebar';
 import Notification from '@/components/Notification';
 import Loader from '@/components/Loader';
 import { Search } from '@/components/Search';
-import { useAppDispatch } from './hooks/common';
+import { useAppDispatch, useAppSelector } from './hooks/common';
 import { Route, Routes } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
-import { getClassesThunk } from './reducers/classSlice';
-import { getLocationsThunk } from './reducers/locationSlice';
+import {
+  getClassesThunk,
+  updateClass,
+  updateMasterClass,
+  updateSubClass,
+} from './reducers/classSlice';
+import { getLocationsThunk, updateDistrict } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import { ProjectBasics } from './components/Project/ProjectBasics';
 import PlanningView from './views/PlanningView';
@@ -17,7 +22,7 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getGroupsThunk } from './reducers/groupSlice';
+import { getGroupsThunk, updateGroup } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
 import { eventSource } from './utils/events';
@@ -29,12 +34,16 @@ import {
 } from '@/utils/events';
 import moment from 'moment';
 import 'moment/locale/fi';
+import ScrollHandler from './components/shared/ScrollHandler';
+import { selectFinanceUpdate } from './reducers/eventsSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
+const LOADING_FINANCE_ID = 'updating-finance-data';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
   const [appDataReady, setAppDataReady] = useState(false);
+  const financeUpdate = useAppSelector(selectFinanceUpdate);
 
   const initalizeStates = async () => {
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
@@ -76,6 +85,22 @@ const App: FC = () => {
     };
   }, []);
 
+  // Listen to finance-update from redux to see if an update event was triggered
+  useEffect(() => {
+    if (financeUpdate) {
+      dispatch(setLoading({ text: 'Loading planning view', id: LOADING_FINANCE_ID }));
+      Promise.all([
+        dispatch(updateMasterClass(financeUpdate.masterClass)),
+        dispatch(updateClass(financeUpdate.class)),
+        dispatch(updateSubClass(financeUpdate.subClass)),
+        dispatch(updateDistrict(financeUpdate.district)),
+        dispatch(updateGroup(financeUpdate.group)),
+      ]).finally(() => {
+        dispatch(clearLoading(LOADING_FINANCE_ID));
+      });
+    }
+  }, [financeUpdate]);
+
   return (
     <div>
       <AuthGuard />
@@ -109,6 +134,7 @@ const App: FC = () => {
       </div>
       {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}
       <CustomContextMenu />
+      <ScrollHandler />
     </div>
   );
 };

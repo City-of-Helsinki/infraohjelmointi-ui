@@ -15,7 +15,7 @@ import {
 import './styles.css';
 
 const PlanningView: FC = () => {
-  const { lists, projectToUpdate } = usePlanningRows();
+  usePlanningRows();
   const selectedYear = useAppSelector(selectSelectedYear);
   const rows = useAppSelector(selectPlanningRows);
   const selections = useAppSelector(selectSelections);
@@ -38,15 +38,9 @@ const PlanningView: FC = () => {
       <div className={`planning-view-container ${selectedYear ? '!mr-20' : ''}`} id="planning-view">
         <div className="mb-2 flex">
           <PlanningInfoPanel selectedMasterClass={selections.selectedMasterClass} />
-          <PlanningSummaryTable startYear={startYear} selections={selections} lists={lists} />
+          <PlanningSummaryTable startYear={startYear} selections={selections} />
         </div>
-        {rows.length > 0 && (
-          <PlanningTable
-            rows={rows}
-            projectToUpdate={projectToUpdate}
-            groupsExpanded={groupsExpanded}
-          />
-        )}
+        {rows.length > 0 && <PlanningTable rows={rows} groupsExpanded={groupsExpanded} />}
       </div>
     </>
   );

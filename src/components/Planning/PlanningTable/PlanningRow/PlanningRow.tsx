@@ -9,6 +9,8 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { useLocation } from 'react-router-dom';
 import _ from 'lodash';
 import './styles.css';
+import { useAppSelector } from '@/hooks/common';
+import { selectProjectUpdate } from '@/reducers/eventsSlice';
 
 interface IPlanningRowState {
   expanded: boolean;
@@ -17,13 +19,12 @@ interface IPlanningRowState {
 }
 
 interface IPlanningRowProps extends IPlanningRow {
-  projectToUpdate: IProject | null;
   groupsExpanded: boolean;
 }
 
 const PlanningRow: FC<IPlanningRowProps> = (props) => {
-  const { defaultExpanded, projectRows, cells, projectToUpdate, groupsExpanded, id, type } = props;
-
+  const { defaultExpanded, projectRows, cells, groupsExpanded, id, type } = props;
+  const projectToUpdate = useAppSelector(selectProjectUpdate)?.project;
   const { search } = useLocation();
 
   const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
@@ -160,7 +161,7 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} projectToUpdate={projectToUpdate} groupsExpanded={groupsExpanded} />
+            <PlanningRow {...c} groupsExpanded={groupsExpanded} />
           ))}
         </>
       )}

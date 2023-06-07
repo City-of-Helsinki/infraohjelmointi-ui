@@ -518,6 +518,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
               readOnly={isReadOnly}
               className="project-cell-input"
               data-testid={`cell-input-${year}-${id}`}
+              id={`cell-input-${year}-${id}`}
             />
           </div>
         </div>

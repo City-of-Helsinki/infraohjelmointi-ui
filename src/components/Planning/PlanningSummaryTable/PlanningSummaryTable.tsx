@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { FC, memo } from 'react';
 import useSummaryRows from '@/hooks/useSummaryRows';
-import { IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
+import { IPlanningRowSelections } from '@/interfaces/common';
 import PlanningSummaryTableHeadCell from './PlanningSummaryTableHeadCell';
 import PlanningSummaryTablePlannedBudgetCell from './PlanningSummaryTablePlannedBudgetCell';
 import PlanningSummaryTableRealizedBudgetCell from './PlanningSummaryTableRealizedBudgetCell';
@@ -10,11 +10,10 @@ import './styles.css';
 interface IPlanningSummaryTableProps {
   startYear: number | null;
   selections: IPlanningRowSelections;
-  lists: IPlanningRowLists;
 }
 
-const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selections, lists }) => {
-  const { heads, cells } = useSummaryRows({ startYear, selections, lists });
+const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selections }) => {
+  const { heads, cells } = useSummaryRows({ startYear, selections });
 
   return (
     <table cellSpacing={0} className="planning-summary-table">

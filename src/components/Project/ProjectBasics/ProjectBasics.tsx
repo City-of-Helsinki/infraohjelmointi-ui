@@ -1,5 +1,4 @@
 import ProjectBasicsForm from './ProjectBasicsForm';
-// import ScrollToTop from '../../shared/ScrollToTop';
 import ProjectSidePanel from './ProjectSidePanel';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
@@ -9,7 +8,6 @@ const ProjectBasics = () => {
 
   return (
     <div className="project-basics-container" data-testid="project-basics">
-      {/* <ScrollToTop /> */}
       {project && (
         <>
           <div className="flex flex-1 justify-center">

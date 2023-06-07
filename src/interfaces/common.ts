@@ -101,7 +101,7 @@ export interface IPlanningCell {
   isCurrentYear: boolean;
 }
 
-export interface IPlanningRowLists {
+export interface IPlanningRowList {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;

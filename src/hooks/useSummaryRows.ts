@@ -1,6 +1,8 @@
-import { IPlanningCell, IPlanningRowLists, IPlanningRowSelections } from '@/interfaces/common';
-import { useEffect, useState } from 'react';
+import { IPlanningCell, IPlanningRowSelections } from '@/interfaces/common';
+import { useEffect, useMemo, useState } from 'react';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
+import { useAppSelector } from './common';
+import { selectBatchedClasses } from '@/reducers/classSlice';
 
 interface IPlanningSummaryHeadCell {
   year: number;
@@ -45,15 +47,23 @@ const buildPlanningSummaryHeadCells = (startYear: number) => {
 interface IUseSummaryRowsParams {
   startYear: number | null;
   selections: IPlanningRowSelections;
-  lists: IPlanningRowLists;
 }
 
 /**
  * Listens to a startYear and a selectedMasterClass and returns rows for the PlanningSummaryTable.
  */
-const useSummaryRows = ({ startYear, selections, lists }: IUseSummaryRowsParams) => {
-  const { selectedMasterClass, selectedSubClass } = selections;
-  const { masterClasses, classes } = lists;
+const useSummaryRows = ({ startYear, selections }: IUseSummaryRowsParams) => {
+  const { selectedMasterClass, selectedSubClass, selectedClass } = selections;
+  const allClasses = useAppSelector(selectBatchedClasses);
+
+  const masterClasses = useMemo(
+    () => (selectedMasterClass ? [selectedMasterClass] : allClasses.masterClasses),
+    [allClasses.masterClasses, selectedMasterClass],
+  );
+  const classes = useMemo(
+    () => (selectedClass ? [selectedClass] : allClasses.subClasses),
+    [allClasses.subClasses, selectedClass],
+  );
 
   const [planningSummaryRows, setPlanningSummaryRows] = useState<IPlanningSummaryTableState>({
     heads: [],
