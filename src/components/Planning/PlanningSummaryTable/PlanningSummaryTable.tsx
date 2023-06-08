@@ -68,14 +68,14 @@ const PlanningSummaryTable = () => {
       mouseOver = false;
     };
 
-    tableRef.current.parentElement?.addEventListener('scroll', onScroll);
-    tableRef.current.parentElement?.addEventListener('mouseover', onMouseOver);
-    tableRef.current.parentElement?.addEventListener('mouseleave', onMouseLeave);
+    tableRef.current?.parentElement?.addEventListener('scroll', onScroll);
+    tableRef.current?.parentElement?.addEventListener('mouseover', onMouseOver);
+    tableRef.current?.parentElement?.addEventListener('mouseleave', onMouseLeave);
 
     return () => {
-      tableRef.current.parentElement?.removeEventListener('scroll', onScroll);
-      tableRef.current.parentElement?.removeEventListener('mouseover', onMouseOver);
-      tableRef.current.parentElement?.removeEventListener('mouseleave', onMouseLeave);
+      tableRef.current?.parentElement?.removeEventListener('scroll', onScroll);
+      tableRef.current?.parentElement?.removeEventListener('mouseover', onMouseOver);
+      tableRef.current?.parentElement?.removeEventListener('mouseleave', onMouseLeave);
     };
   }, [tableRef]);
 
