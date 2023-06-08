@@ -11,7 +11,6 @@ const scrollTo = (x: number, y: number) => {
   window.scrollTo({
     top: y,
     left: x,
-    behavior: 'smooth',
   });
 };
 
