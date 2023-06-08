@@ -17,6 +17,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
 import {
+  selectPlanningRows,
   selectProjects,
   selectSelections,
   setPlanningRows,
@@ -281,6 +282,9 @@ const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelections) =>
 };
 
 /**
+ * Populates redux planning slice with data needed to render the planning view. This is done to prevent the need to
+ * re-iterate the planning rows each time the user navigates back end forth between the planning table and the project basics form.
+ *
  * Creates a row hierarchy of masterClasses, classes, subClasses, districts and divisions for the PlanningTable
  *
  * It also listens to the url params for a masterClassId, classId, subClassId or districtId which it will
@@ -291,6 +295,7 @@ const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelections) =>
 const usePlanningRows = () => {
   const dispatch = useAppDispatch();
   const groups = useAppSelector(selectGroups);
+  const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
   const batchedClasses = useAppSelector(selectBatchedClasses);
@@ -345,7 +350,12 @@ const usePlanningRows = () => {
       groups,
     };
 
-    dispatch(setPlanningRows(buildPlanningTableRows(list, projects, selections)));
+    const nextRows = buildPlanningTableRows(list, projects, selections);
+
+    // Re-build planning rows if the existing rows are not equal
+    if (!_.isEqual(nextRows, rows)) {
+      dispatch(setPlanningRows(nextRows));
+    }
   }, [batchedClasses, batchedLocations, groups, projects, selections]);
 };
 
