@@ -38,7 +38,6 @@ import ScrollHandler from './components/shared/ScrollHandler';
 import { selectFinanceUpdate } from './reducers/eventsSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
-const LOADING_FINANCE_ID = 'updating-finance-data';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
@@ -88,16 +87,13 @@ const App: FC = () => {
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
-      dispatch(setLoading({ text: 'Loading planning view', id: LOADING_FINANCE_ID }));
       Promise.all([
         dispatch(updateMasterClass(financeUpdate.masterClass)),
         dispatch(updateClass(financeUpdate.class)),
         dispatch(updateSubClass(financeUpdate.subClass)),
         dispatch(updateDistrict(financeUpdate.district)),
         dispatch(updateGroup(financeUpdate.group)),
-      ]).finally(() => {
-        dispatch(clearLoading(LOADING_FINANCE_ID));
-      });
+      ]).catch((e) => console.log('Error updating finances: ', e));
     }
   }, [financeUpdate]);
 
