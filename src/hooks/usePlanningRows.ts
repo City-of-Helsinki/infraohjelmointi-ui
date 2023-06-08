@@ -1,6 +1,11 @@
-import { selectBatchedClasses } from '@/reducers/classSlice';
+import {
+  selectBatchedClasses,
+  updateClass,
+  updateMasterClass,
+  updateSubClass,
+} from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectedBatchedLocations } from '@/reducers/locationSlice';
+import { selectedBatchedLocations, updateDistrict } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -11,7 +16,7 @@ import {
   IPlanningRowSelections,
   PlanningRowType,
 } from '@/interfaces/common';
-import { selectGroups } from '@/reducers/groupSlice';
+import { selectGroups, updateGroup } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
@@ -29,6 +34,7 @@ import {
   setStartYear,
 } from '@/reducers/planningSlice';
 import _ from 'lodash';
+import { selectFinanceUpdate } from '@/reducers/eventsSlice';
 
 /**
  * Returns false whether a given row is already selected and present in the url.
@@ -334,6 +340,20 @@ const usePlanningRows = () => {
         .catch(Promise.reject);
     }
   }, [selections]);
+
+  const financeUpdate = useAppSelector(selectFinanceUpdate);
+
+  useEffect(() => {
+    if (financeUpdate) {
+      Promise.all([
+        dispatch(updateMasterClass(financeUpdate.masterClass)),
+        dispatch(updateClass(financeUpdate.class)),
+        dispatch(updateSubClass(financeUpdate.subClass)),
+        dispatch(updateDistrict(financeUpdate.district)),
+        dispatch(updateGroup(financeUpdate.group)),
+      ]).catch((e) => console.log('Error updating finances: ', e));
+    }
+  }, [financeUpdate]);
 
   // Build planning table rows when locations/classes/groups/project or selections change
   useEffect(() => {

@@ -41,6 +41,7 @@ import {
 } from '@/utils/events';
 import { getMonthToday, getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
+import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -170,10 +171,15 @@ describe('PlanningView', () => {
       },
       project: mockProject.data,
     };
+
     await navigateToProjectRows(renderResult);
 
+    // Simulate what App.tsx does when receiving a finance-update event
     await waitFor(async () => {
-      await sendFinanceUpdateEvent(financeUpdateData);
+      await sendFinanceUpdateEvent(financeUpdateData).then(() => {
+        store.dispatch(updateMasterClass(financeUpdateData.masterClass));
+        store.dispatch(updateClass(financeUpdateData.class));
+      });
     });
 
     const { plannedBudget, frameBudget } = updatedFinances.year0;
