@@ -125,7 +125,7 @@ describe('GroupDialog', () => {
     expect(await dialog.findByRole('button', { name: 'cancel' })).toBeInTheDocument();
   });
 
-  it.only('can create new group with the groups form', async () => {
+  it('can create new group with the groups form', async () => {
     const renderResult = await render();
 
     const mockPostResponse = {
