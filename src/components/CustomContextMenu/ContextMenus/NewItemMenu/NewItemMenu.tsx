@@ -3,6 +3,8 @@ import { IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { INewItemMenuDetails } from '@/interfaces/eventInterfaces';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/hooks/common';
+import { selectSelections } from '@/reducers/planningSlice';
 
 interface INewItemMenuProps extends INewItemMenuDetails {
   onCloseMenu: () => void;
@@ -10,11 +12,11 @@ interface INewItemMenuProps extends INewItemMenuDetails {
 
 const NewItemMenu: FC<INewItemMenuProps> = ({
   onCloseMenu,
-  selections,
   onShowGroupDialog,
   onShowProjectProgrammedDialog,
 }) => {
   const { t } = useTranslation();
+  const selections = useAppSelector(selectSelections);
   const onOpenProjectProgrammedDialog = useCallback(() => {
     onCloseMenu();
     onShowProjectProgrammedDialog();

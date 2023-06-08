@@ -1,19 +1,13 @@
 /* eslint-disable react/jsx-key */
-import { FC, memo } from 'react';
+import { memo } from 'react';
 import useSummaryRows from '@/hooks/useSummaryRows';
-import { IPlanningRowSelections } from '@/interfaces/common';
 import PlanningSummaryTableHeadCell from './PlanningSummaryTableHeadCell';
 import PlanningSummaryTablePlannedBudgetCell from './PlanningSummaryTablePlannedBudgetCell';
 import PlanningSummaryTableRealizedBudgetCell from './PlanningSummaryTableRealizedBudgetCell';
 import './styles.css';
 
-interface IPlanningSummaryTableProps {
-  startYear: number | null;
-  selections: IPlanningRowSelections;
-}
-
-const PlanningSummaryTable: FC<IPlanningSummaryTableProps> = ({ startYear, selections }) => {
-  const { heads, cells } = useSummaryRows({ startYear, selections });
+const PlanningSummaryTable = () => {
+  const { heads, cells } = useSummaryRows();
 
   return (
     <table cellSpacing={0} className="planning-summary-table">

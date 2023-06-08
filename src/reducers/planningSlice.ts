@@ -8,6 +8,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface IPlanningState {
   selectedYear: number | null;
   startYear: number | null;
+  groupsExpanded: boolean;
   selections: IPlanningRowSelections;
   projects: Array<IProject>;
   rows: Array<IPlanningRow>;
@@ -16,6 +17,7 @@ interface IPlanningState {
 const initialState: IPlanningState = {
   selectedYear: null,
   startYear: null,
+  groupsExpanded: false,
   selections: {
     selectedMasterClass: null,
     selectedClass: null,
@@ -54,6 +56,9 @@ export const planningSlice = createSlice({
     setProjects(state, action: PayloadAction<Array<IProject>>) {
       return { ...state, projects: action.payload };
     },
+    setGroupsExpanded(state, action: PayloadAction<boolean>) {
+      return { ...state, groupsExpanded: action.payload };
+    },
   },
 });
 
@@ -62,6 +67,7 @@ export const selectStartYear = (state: RootState) => state.planning.startYear;
 export const selectSelections = (state: RootState) => state.planning.selections;
 export const selectPlanningRows = (state: RootState) => state.planning.rows;
 export const selectProjects = (state: RootState) => state.planning.projects;
+export const selectGroupsExpanded = (state: RootState) => state.planning.groupsExpanded;
 
 export const {
   setSelectedYear,
@@ -72,6 +78,7 @@ export const {
   setSelectedDistrict,
   setStartYear,
   setProjects,
+  setGroupsExpanded,
 } = planningSlice.actions;
 
 export default planningSlice.reducer;

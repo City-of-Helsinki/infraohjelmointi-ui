@@ -7,10 +7,11 @@ import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { useLocation } from 'react-router-dom';
-import _ from 'lodash';
-import './styles.css';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
+import { selectGroupsExpanded } from '@/reducers/planningSlice';
+import _ from 'lodash';
+import './styles.css';
 
 interface IPlanningRowState {
   expanded: boolean;
@@ -18,13 +19,10 @@ interface IPlanningRowState {
   searchedProjectId: string;
 }
 
-interface IPlanningRowProps extends IPlanningRow {
-  groupsExpanded: boolean;
-}
-
-const PlanningRow: FC<IPlanningRowProps> = (props) => {
-  const { defaultExpanded, projectRows, cells, groupsExpanded, id, type } = props;
+const PlanningRow: FC<IPlanningRow> = (props) => {
+  const { defaultExpanded, projectRows, cells, id, type } = props;
   const projectToUpdate = useAppSelector(selectProjectUpdate)?.project;
+  const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
 
   const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
@@ -161,7 +159,7 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} groupsExpanded={groupsExpanded} />
+            <PlanningRow {...c} />
           ))}
         </>
       )}

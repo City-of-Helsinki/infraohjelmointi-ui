@@ -1,8 +1,9 @@
-import { IPlanningCell, IPlanningRowSelections } from '@/interfaces/common';
+import { IPlanningCell } from '@/interfaces/common';
 import { useEffect, useMemo, useState } from 'react';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
 import { useAppSelector } from './common';
 import { selectBatchedClasses } from '@/reducers/classSlice';
+import { selectSelections, selectStartYear } from '@/reducers/planningSlice';
 
 interface IPlanningSummaryHeadCell {
   year: number;
@@ -44,17 +45,13 @@ const buildPlanningSummaryHeadCells = (startYear: number) => {
   return cells;
 };
 
-interface IUseSummaryRowsParams {
-  startYear: number | null;
-  selections: IPlanningRowSelections;
-}
-
 /**
  * Listens to a startYear and a selectedMasterClass and returns rows for the PlanningSummaryTable.
  */
-const useSummaryRows = ({ startYear, selections }: IUseSummaryRowsParams) => {
-  const { selectedMasterClass, selectedSubClass, selectedClass } = selections;
+const useSummaryRows = () => {
+  const { selectedMasterClass, selectedSubClass, selectedClass } = useAppSelector(selectSelections);
   const allClasses = useAppSelector(selectBatchedClasses);
+  const startYear = useAppSelector(selectStartYear);
 
   const masterClasses = useMemo(
     () => (selectedMasterClass ? [selectedMasterClass] : allClasses.masterClasses),

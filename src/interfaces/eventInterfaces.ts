@@ -1,5 +1,4 @@
 import { IClass } from './classInterfaces';
-import { IPlanningRowSelections } from './common';
 import { IGroup } from './groupInterfaces';
 import { ILocation } from './locationInterfaces';
 import { CellType, IProject, IProjectRequest } from './projectInterfaces';
@@ -25,7 +24,6 @@ export interface IPhaseMenuDetails {
 }
 
 export interface INewItemMenuDetails {
-  selections: IPlanningRowSelections;
   onShowGroupDialog: () => void;
   onShowProjectProgrammedDialog: () => void;
 }
