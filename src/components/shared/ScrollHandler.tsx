@@ -6,8 +6,7 @@ const PLANNING_PATH = '/planning/';
 const PROJECT_CARD_PATH = '/project/';
 
 const ScrollHandler = () => {
-  const { pathname } = useLocation();
-  const { search } = useLocation();
+  const { pathname, search } = useLocation();
 
   useEffect(() => {
     // If there's a search param we don't want to modify the scrolling
