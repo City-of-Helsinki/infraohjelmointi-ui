@@ -157,7 +157,7 @@ export interface IProjectGetRequestObject {
 }
 
 export interface IProjectsPatchRequestObject {
-  data : Array<IProjectPatchRequestObject>
+  data: Array<IProjectPatchRequestObject>;
 }
 
 // These will be used to render the icons for projects in the planning view list

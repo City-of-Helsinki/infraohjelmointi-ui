@@ -46,7 +46,7 @@ export interface IProjectBasicsForm {
   area: IOption;
   hkrId: string;
   sapProject: string;
-  sapNetwork: Array<string>;
+  sapNetwork: string;
   hashTags: Array<string>;
   phase: IOption;
   programmed: boolean;

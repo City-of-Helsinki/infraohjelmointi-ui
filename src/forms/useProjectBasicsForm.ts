@@ -108,7 +108,8 @@ const useProjectBasicsValues = () => {
       area: listItemToOption(project?.area, t),
       hkrId: value(project?.hkrId),
       sapProject: value(project?.sapProject),
-      sapNetwork: project?.sapNetwork ?? [],
+      sapNetwork:
+        project?.sapNetwork && project.sapNetwork.length > 0 ? project?.sapNetwork[0] : '',
       entityName: value(project?.entityName),
       hashTags: project?.hashTags ?? [],
       estPlanningStart: value(project?.estPlanningStart),

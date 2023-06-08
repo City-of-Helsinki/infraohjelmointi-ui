@@ -103,7 +103,7 @@ const ProjectBasicsForm: FC = () => {
             rules={{ maxLength: { value: 30, message: t('maxLength', { value: '30' }) } }}
           />
           <TextField {...formProps('sapProject')} control={control} />
-          <ListField {...formProps('sapNetwork')} readOnly={true} />
+          <TextField {...formProps('sapNetwork')} readOnly={true} />
           <SelectField {...formProps('area')} options={areas} />
           <TextAreaField
             {...formProps('description')}

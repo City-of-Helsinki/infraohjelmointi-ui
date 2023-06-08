@@ -135,7 +135,8 @@ const mockProject: { data: IProject } = {
     },
     projectGroup: null,
     spentBudget: 0,
-    pwFolderLink:"pw://HELS000601.helsinki1.hki.local:PWHKIKOUL/Documents/P{b40bbbf2-3d2a-4fbb-aa70-bfdf786742b0}/"
+    pwFolderLink:
+      'pw://HELS000601.helsinki1.hki.local:PWHKIKOUL/Documents/P{b40bbbf2-3d2a-4fbb-aa70-bfdf786742b0}/',
   },
 };
 
