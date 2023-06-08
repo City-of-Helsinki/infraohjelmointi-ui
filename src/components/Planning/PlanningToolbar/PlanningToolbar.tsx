@@ -6,10 +6,10 @@ import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { Button } from 'hds-react/components/Button';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
-import './styles.css';
-import { t } from 'i18next';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectGroupsExpanded, setGroupsExpanded } from '@/reducers/planningSlice';
+import { t } from 'i18next';
+import './styles.css';
 
 const PlanningToolbar = () => {
   const dispatch = useAppDispatch();

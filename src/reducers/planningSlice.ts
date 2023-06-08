@@ -9,6 +9,7 @@ interface IPlanningState {
   selectedYear: number | null;
   startYear: number | null;
   groupsExpanded: boolean;
+  searchedProjectId: string | null;
   selections: IPlanningRowSelections;
   projects: Array<IProject>;
   rows: Array<IPlanningRow>;
@@ -18,6 +19,7 @@ const initialState: IPlanningState = {
   selectedYear: null,
   startYear: null,
   groupsExpanded: false,
+  searchedProjectId: null,
   selections: {
     selectedMasterClass: null,
     selectedClass: null,

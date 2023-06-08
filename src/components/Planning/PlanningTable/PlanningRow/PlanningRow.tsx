@@ -52,6 +52,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
       setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
     }
   }, [type, groupsExpanded]);
+
   // usePlanningRows-hook sets a projectToUpdate when the project-update event is triggered,
   // this useEffect updates the project in the view with the projecToUpdate
   useEffect(() => {

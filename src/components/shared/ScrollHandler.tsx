@@ -2,15 +2,20 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const RETRY_AMOUNT = 20;
+const PLANNING_PATH = '/planning/';
+const PROJECT_CARD_PATH = '/project/';
 
 const ScrollHandler = () => {
   const { pathname } = useLocation();
+  const { search } = useLocation();
 
   useEffect(() => {
+    // If there's a search param we don't want to modify the scrolling
+    if (search && pathname.includes(PLANNING_PATH)) {
+      return;
+    }
     // Scroll to top of the page for project basics form
-    if (pathname.includes('/project/')) {
-      console.log('pathname is project, setting localstorage: ', window.scrollY);
-
+    if (pathname.includes(PROJECT_CARD_PATH)) {
       localStorage.setItem(
         'previousScrollPosition',
         JSON.stringify({ scrollY: window.scrollY ?? '0', scrollX: window.scrollX ?? '0' }),
@@ -27,8 +32,6 @@ const ScrollHandler = () => {
       const { scrollY, scrollX } = JSON.parse(
         localStorage.getItem('previousScrollPosition') ?? '{}',
       );
-
-      console.log('scrollY: ', scrollY);
 
       if (!scrollY) {
         return;
@@ -47,7 +50,7 @@ const ScrollHandler = () => {
             behavior: 'auto',
           });
         }
-        // If 100 x 20
+        // Clear the intreval if it runs over the max amount of times to prevent an infinite loop
         else if (i > RETRY_AMOUNT) {
           clearInterval(interval);
           window.localStorage.removeItem('previousScrollPosition');
@@ -59,7 +62,7 @@ const ScrollHandler = () => {
         }
       }, 100);
     }
-  }, [pathname]);
+  }, [pathname, search]);
 
   return null;
 };
