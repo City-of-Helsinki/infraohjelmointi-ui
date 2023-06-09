@@ -53,7 +53,6 @@ const ScrollHandler = () => {
   useEffect(() => {
     // If there's a search param we don't want to modify the scrolling
     if (search && pathname.includes(PLANNING_PATH)) {
-      console.log('contains search and in planning list, returning');
       return;
     }
     // Scroll to top of the page for project basics form
@@ -74,7 +73,7 @@ const ScrollHandler = () => {
       const interval = setInterval((i) => {
         const scrollHeight = document.body.scrollHeight;
 
-        // Wait for the doc to load its height to at least the scroll height and the clear the interval
+        // Wait for the doc to load its height to at least the scroll height and then clear the interval
         if (scrollHeight >= scrollY) {
           clearInterval(interval);
           scrollTo(scrollX, scrollY);
