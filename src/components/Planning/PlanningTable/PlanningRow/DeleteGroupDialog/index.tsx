@@ -1,1 +1,1 @@
-import { default as DeleteGroupDialog } from './DeleteGroupDialog';
+export { default as DeleteGroupDialog } from './DeleteGroupDialog';

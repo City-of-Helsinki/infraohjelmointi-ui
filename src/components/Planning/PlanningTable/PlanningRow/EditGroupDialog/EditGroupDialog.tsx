@@ -10,9 +10,8 @@ import { IconAngleUp, IconAngleDown } from 'hds-react/icons';
 import useGroupForm from '@/forms/useGroupForm';
 import { useAppDispatch } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
-import { postGroupThunk, updateGroup } from '@/reducers/groupSlice';
-import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
-import { useNavigate } from 'react-router';
+import { updateGroup } from '@/reducers/groupSlice';
+import { IGroup, IGroupPatchRequestObject } from '@/interfaces/groupInterfaces';
 import GroupProjectSearch from '@/components/Planning/GroupDialog/GroupProjectSearch';
 import { patchGroup } from '@/services/groupService';
 
@@ -36,7 +35,6 @@ const buildRequestPayload = (form: IGroupForm, id: string): IGroupPatchRequestOb
 };
 
 const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, id, projects }) => {
-  const navigate = useNavigate();
   const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(id, projects);
   const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);

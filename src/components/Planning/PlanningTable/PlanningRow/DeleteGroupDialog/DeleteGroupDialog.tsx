@@ -2,7 +2,6 @@ import { FC, memo, useCallback } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
-import Loader from '@/components/Loader';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 import { deleteGroupThunk } from '@/reducers/groupSlice';
 import { useAppDispatch } from '@/hooks/common';
