@@ -1,12 +1,9 @@
 .planning-view-container {
-  @apply m-8 whitespace-nowrap leading-5;
+  @apply mx-8 mb-8 whitespace-nowrap leading-5;
 }
 
 .planning-view-container-header {
-  @apply flex;
-  position: sticky;
-  top: 0;
-  overflow-x: scroll;
+  @apply sticky top-0 z-[100] flex overflow-x-scroll bg-white pt-8;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
