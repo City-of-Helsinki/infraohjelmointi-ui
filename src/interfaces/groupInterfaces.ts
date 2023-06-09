@@ -14,3 +14,8 @@ export interface IGroupRequest {
   classRelation: string;
   locationRelation: string | null;
 }
+
+export interface IGroupPatchRequestObject {
+  id: string;
+  data: IGroupRequest;
+}

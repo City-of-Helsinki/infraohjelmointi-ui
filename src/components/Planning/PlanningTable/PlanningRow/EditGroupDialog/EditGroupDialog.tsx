@@ -10,10 +10,11 @@ import { IconAngleUp, IconAngleDown } from 'hds-react/icons';
 import useGroupForm from '@/forms/useGroupForm';
 import { useAppDispatch } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
-import { postGroupThunk } from '@/reducers/groupSlice';
-import { IGroupRequest } from '@/interfaces/groupInterfaces';
+import { postGroupThunk, updateGroup } from '@/reducers/groupSlice';
+import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
 import { useNavigate } from 'react-router';
 import GroupProjectSearch from '@/components/Planning/GroupDialog/GroupProjectSearch';
+import { patchGroup } from '@/services/groupService';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -21,35 +22,51 @@ interface IDialogProps {
   id: string;
   projects: IOption[];
 }
+const buildRequestPayload = (form: IGroupForm, id: string): IGroupPatchRequestObject => {
+  // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
+  return {
+    id,
+    data: {
+      name: form.name,
+      classRelation: form.subClass?.value || '',
+      locationRelation: form.division?.value || form.district?.value || '',
+      projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
+    },
+  };
+};
 
 const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, id, projects }) => {
   const navigate = useNavigate();
   const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(id, projects);
   const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
   const [showAdvanceFields, setShowAdvanceFields] = useState(false);
+  const nameField = watch('name');
+  const subClassField = watch('subClass');
+  const districtField = watch('district');
+  const divisionField = watch('division');
 
   useEffect(() => {
     if (formValues.district.value || formValues.division.value) {
       setShowAdvanceFields(true);
     }
   }, [formValues.district.value, formValues.division.value]);
-  //   const isButtonDisabled = useCallback(() => {
-  //     return (
-  //       !nameField ||
-  //       (showAdvanceFields &&
-  //         (!districtField.value ||
-  //           (locationOptions.divisions.length > 0 && !divisionField.value) ||
-  //           !subClassField.value)) ||
-  //       (!showAdvanceFields && !subClassField.value)
-  //     );
-  //   }, [
-  //     districtField.value,
-  //     divisionField.value,
-  //     nameField,
-  //     showAdvanceFields,
-  //     subClassField.value,
-  //     locationOptions,
-  //   ]);
+  const isButtonDisabled = useCallback(() => {
+    return (
+      !nameField ||
+      (showAdvanceFields &&
+        (!districtField.value ||
+          (locationOptions.divisions.length > 0 && !divisionField.value) ||
+          !subClassField.value)) ||
+      (!showAdvanceFields && !subClassField.value)
+    );
+  }, [
+    districtField.value,
+    divisionField.value,
+    nameField,
+    showAdvanceFields,
+    subClassField.value,
+    locationOptions,
+  ]);
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -60,23 +77,23 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, id, proje
     handleClose();
   }, [handleClose, formValues, reset]);
 
-  //   const onSubmit = useCallback(
-  //     async (form: IGroupForm) => {
-  //       await dispatch(postGroupThunk(buildRequestPayload(form))).then(() => {
-  //         handleDialogClose();
-  //         navigate(buildRedirectRoute(form));
-  //       });
-  //     },
+  const onSubmit = useCallback(
+    (form: IGroupForm) => {
+      patchGroup(buildRequestPayload(form, id)).then((group: IGroup) => {
+        dispatch(updateGroup(group));
+        handleDialogClose();
+      });
+    },
 
-  //     [dispatch, handleDialogClose, navigate],
-  //   );
+    [dispatch, handleDialogClose, id],
+  );
 
-  //   const handleOnSubmitForm = useCallback(
-  //     (e: unknown) => {
-  //       handleSubmit(onSubmit).call(e).catch(Promise.reject);
-  //     },
-  //     [handleSubmit, onSubmit],
-  //   );
+  const handleOnSubmitForm = useCallback(
+    (e: unknown) => {
+      handleSubmit(onSubmit).call(e).catch(Promise.reject);
+    },
+    [handleSubmit, onSubmit],
+  );
 
   const toggleAdvanceFields = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -246,11 +263,11 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, id, proje
 
           <ActionButtons>
             <Button
-              //   onClick={handleOnSubmitForm}
-              data-testid="create-group-button"
-              //   disabled={isButtonDisabled()}
+              onClick={handleOnSubmitForm}
+              data-testid="save-group-button"
+              disabled={isButtonDisabled()}
             >
-              {t('groupForm.createGroup')}
+              {t('save')}
             </Button>
             <Button onClick={handleDialogClose} variant="secondary" data-testid="cancel-search">
               {t('cancel')}

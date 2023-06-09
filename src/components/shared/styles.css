@@ -96,6 +96,9 @@
 #group-create-dialog .dialog-section .search-form .select-field-wrapper {
   @apply max-w-full;
 }
+#group-edit-dialog .dialog-section .search-form .select-field-wrapper{
+  @apply max-w-full
+}
 
 .empty-select-field-button {
   @apply absolute right-11 top-[2.65rem];

@@ -58,9 +58,11 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
   useEffect(() => {
     if (projectToUpdate) {
       let inRow = false;
-      const updatedProjects = projects.map((p) => {
+      let pIndex = -1;
+      const updatedProjects = projects.map((p, index) => {
         if (p.id === projectToUpdate.id) {
           inRow = true;
+          pIndex = index;
           return projectToUpdate;
         }
         return p;
@@ -73,14 +75,31 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
             projectToUpdate.projectGroup &&
             id === projectToUpdate.projectGroup) ||
           (!projectToUpdate.projectGroup &&
-            (type === 'district' || type === 'division') &&
+            (type === 'district' || type.toLowerCase().includes('division')) &&
             id === projectToUpdate.projectLocation) ||
           (!projectToUpdate.projectLocation &&
             !projectToUpdate.projectGroup &&
-            type.includes('class') &&
+            type.toLowerCase().includes('class') &&
             id === projectToUpdate.projectClass)
         ) {
           updatedProjects.push(projectToUpdate);
+        }
+      } else {
+        // updated project is in the current planning row
+        // check if the update has caused it to be removed from the row
+        if (
+          (type === 'group' &&
+            projects[pIndex].projectGroup === id &&
+            !projectToUpdate.projectGroup) ||
+          ((type === 'district' || type.toLowerCase().includes('division')) &&
+            projectToUpdate.projectGroup &&
+            projects[pIndex].projectLocation === id) ||
+          (type.toLowerCase().includes('class') &&
+            projectToUpdate.projectGroup &&
+            projectToUpdate.projectLocation &&
+            projects[pIndex].projectClass === id)
+        ) {
+          updatedProjects.splice(pIndex, 1);
         }
       }
       if (!_.isEqual(projects, updatedProjects)) {
@@ -147,7 +166,12 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
   return (
     <>
       <tr className={props.type} data-testid={`row-${props.id}`}>
-        <PlanningHead handleExpand={handleExpand} expanded={expanded} {...props} />
+        <PlanningHead
+          handleExpand={handleExpand}
+          expanded={expanded}
+          {...props}
+          projectRows={projects}
+        />
         {cells.map((c: IPlanningCell) => (
           <PlanningCell {...props} cell={c} key={c.key} />
         ))}
