@@ -77,10 +77,12 @@ const DialogContainer: FC<IDialogProps> = memo(({ isOpen, handleClose, id, proje
 
   const onSubmit = useCallback(
     (form: IGroupForm) => {
-      patchGroup(buildRequestPayload(form, id)).then((group: IGroup) => {
-        dispatch(updateGroup(group));
-        handleDialogClose();
-      });
+      patchGroup(buildRequestPayload(form, id))
+        .then((group: IGroup) => {
+          dispatch(updateGroup(group));
+          handleDialogClose();
+        })
+        .catch(Promise.reject);
     },
 
     [dispatch, handleDialogClose, id],
