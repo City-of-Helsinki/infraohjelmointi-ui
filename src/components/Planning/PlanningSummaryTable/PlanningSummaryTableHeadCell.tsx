@@ -7,6 +7,7 @@ import { calcPercentage } from '@/utils/calculations';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectSelectedYear, setSelectedYear } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
+import { dispatchDateIndicatorEvent } from '@/utils/events';
 
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
@@ -67,7 +68,8 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
       const dayToday = parseInt(moment().format('D'));
       const percentOfMonthThatHasPast = calcPercentage(dayToday, daysInMonth);
 
-      return `${Math.floor(percentOfMonthThatHasPast / 2.55)}px`;
+      // return `${Math.floor(percentOfMonthThatHasPast / 2.55)}px`;
+      return Math.floor(percentOfMonthThatHasPast / 2.55);
     },
     [year],
   );
@@ -84,6 +86,27 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
     (month: number) => month === getMonthToday() && isCurrentYear,
     [isCurrentYear],
   );
+
+  const testFunction = (i: number, m: string) => {
+    if (showDateIndicator(i + 1)) {
+      // "Async" hack to wait for the element to render before calling document.getElementById
+      setTimeout(() => {
+        const element = document.getElementById(`month-label-${m}`);
+        if (element) {
+          const elementPosition = (element as HTMLElement).offsetLeft;
+          console.log(elementPosition);
+          dispatchDateIndicatorEvent({
+            isVisible: true,
+            position: elementPosition + getDateIndicatorLeftPixels(i + 1),
+          });
+        }
+      }, 0);
+
+      // return getDateIndicatorLeftPixels(i + 1)
+      console.log(getDateIndicatorLeftPixels(i + 1));
+    }
+    return null;
+  };
 
   return (
     <>
@@ -113,20 +136,13 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
             <td
               key={m}
               className={`monthly-cell label hoverable-${m}`}
+              id={`month-label-${m}`}
               onMouseOver={() => setHoveredClassToMonth(m)}
               onMouseLeave={() => removeHoveredClassFromMonth(m)}
             >
               <div className="monthly-cell-container relative" data-testid={`month-label-${m}`}>
                 <span>{m.substring(0, 3)}</span>
-                {/* Creates a line that indicates the current date */}
-                {showDateIndicator(i + 1) && (
-                  <span
-                    ref={dateIndicatorRef}
-                    style={{ left: getDateIndicatorLeftPixels(i + 1) }}
-                    data-testid="date-indicator"
-                    className="date-indicator"
-                  />
-                )}
+                {testFunction(i, m)}
               </div>
             </td>
           ))}
@@ -137,3 +153,17 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
 };
 
 export default memo(PlanningSummaryTableHeadCell);
+
+{
+  /* Creates a line that indicates the current date */
+}
+{
+  /* {showDateIndicator(i + 1) && (
+                  <span
+                    ref={dateIndicatorRef}
+                    style={{ left: getDateIndicatorLeftPixels(i + 1) }}
+                    data-testid="date-indicator"
+                    className="date-indicator"
+                  />
+                )} */
+}

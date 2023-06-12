@@ -1,5 +1,5 @@
 .planning-info-panel-container {
-  @apply fixed z-50 h-36 bg-white;
+  @apply z-50 h-36 bg-white;
 }
 
 .planning-info-panel {

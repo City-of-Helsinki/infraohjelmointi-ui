@@ -9,6 +9,11 @@ import { MouseEvent } from 'react';
 
 const { REACT_APP_API_URL } = process.env;
 
+interface IDateIndicatorData {
+  isVisible: boolean;
+  position: number;
+}
+
 export const dispatchContextMenuEvent = (
   e: MouseEvent<HTMLElement | SVGElement>,
   data: IContextMenuData,
@@ -18,6 +23,18 @@ export const dispatchContextMenuEvent = (
     new CustomEvent('showContextMenu', {
       detail: {
         event: e,
+        ...data,
+      },
+    }),
+  );
+};
+
+export const dispatchDateIndicatorEvent = (data: IDateIndicatorData) => {
+  console.log('dispatching date indicator event with data: ', data);
+
+  document.getElementById('date-indicator')?.dispatchEvent(
+    new CustomEvent('showDateIndicator', {
+      detail: {
         ...data,
       },
     }),

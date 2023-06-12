@@ -103,13 +103,24 @@ const sortByNumber = (list: Array<ILocation>) =>
 /**
  * Filters and sorts projects for a class, location or group alphabetically for a given row type.
  */
-const getSortedProjects = (id: string, type: PlanningRowType, projects: Array<IProject>) => {
+const getSortedProjects = (
+  id: string,
+  type: PlanningRowType,
+  projects: Array<IProject>,
+  name: string,
+) => {
   let projectList: Array<IProject> = [];
   switch (type) {
     case 'class':
     case 'subClass':
+      // TODO: fetch subClass name if it has "suurpiiri"
       projectList = projects
-        .filter((p) => !p.projectGroup && !p.projectLocation)
+        .filter(
+          (p) =>
+            !p.projectGroup &&
+            !p.projectLocation &&
+            !name.toLocaleLowerCase().includes('suurpiiri'),
+        )
         .filter((p) => p.projectClass === id);
       break;
     case 'group':
@@ -148,7 +159,7 @@ const buildPlanningTableRows = (
     type: PlanningRowType,
     expanded?: boolean,
   ): IPlanningRow => {
-    const projectRows = getSortedProjects(item.id, type, projects);
+    const projectRows = getSortedProjects(item.id, type, projects, item.name);
     const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
     return {
       type: type,
@@ -195,18 +206,33 @@ const buildPlanningTableRows = (
           // Map sub classes
           children: subClasses
             .filter((subClass) => subClass.parent === filteredClass.id)
-            .map((filteredSubClass) => ({
-              ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
-              // Map districts & groups (groups only if they do not belong to a district)
-              children: [
-                ...getSortedGroupRows(filteredSubClass.id, 'subClass'),
-                ...districts
-                  .filter((district) => district.parentClass === filteredSubClass.id)
-                  .map((filteredDistrict) => ({
-                    ...getRowProps(filteredDistrict, 'district-preview'),
-                  })),
-              ],
-            })),
+            .map((filteredSubClass) => {
+              const divisionsForSubClass = filteredSubClass.name
+                .toLocaleLowerCase()
+                .includes('suurpiiri')
+                ? divisions.filter((division) => division.parentClass === filteredSubClass.id)
+                : [];
+              return {
+                ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
+                // Map districts & groups (groups only if they do not belong to a district)
+                children: [
+                  ...getSortedGroupRows(filteredSubClass.id, 'subClass'),
+                  ...districts
+                    .filter((district) => district.parentClass === filteredSubClass.id)
+                    .map((filteredDistrict) => ({
+                      ...getRowProps(filteredDistrict, 'district-preview'),
+                    })),
+                  ...sortByNumber(divisionsForSubClass).map((filteredDivision) => {
+                    const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
+                    return {
+                      ...getRowProps(filteredDivision, 'division', groupsForDivision.length > 0),
+                      // Map projects & groups
+                      children: groupsForDivision,
+                    };
+                  }),
+                ],
+              };
+            }),
         })),
     };
   });
@@ -361,11 +387,19 @@ const usePlanningRows = () => {
     const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass } = selections;
     const { districts, divisions } = batchedLocations;
 
+    const finalDistricts = [];
+
+    if (selectedDistrict) {
+      finalDistricts.push(selectedDistrict);
+    } else if (!selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')) {
+      finalDistricts.push(...districts);
+    }
+
     const list = {
       masterClasses: selectedMasterClass ? [selectedMasterClass] : masterClasses,
       classes: selectedClass ? [selectedClass] : classes,
       subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
-      districts: selectedDistrict ? [selectedDistrict] : districts,
+      districts: finalDistricts,
       divisions,
       groups,
     };

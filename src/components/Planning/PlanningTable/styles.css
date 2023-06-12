@@ -10,7 +10,7 @@
 
 /* we set table-fixed to be able to set the head-cells of every row to position: sticky; */
 .planning-table-container {
-  @apply w-full table-fixed overflow-x-scroll;
+  @apply w-full overflow-x-scroll;
 }
 
 .planning-table {

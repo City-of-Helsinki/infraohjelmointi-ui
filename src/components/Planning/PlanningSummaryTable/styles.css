@@ -1,8 +1,20 @@
-.planning-summary-table {
-  /* width 65% since the info-panel is 30% */
+.planning-summary-table-container {
   --summary-table-width: calc(100% - 32rem);
-  /* position is to the left of the info panel by giving it the same margin-left as the width of the info-panel*/
-  @apply w-[var(--summary-table-width)] text-right;
+  @apply relative w-[var(--summary-table-width)];
+}
+.scrollable-planning-summary-table {
+  /* position is to the left of the info panel by giving it the same margin-left as the width of the info-panel */
+  @apply left-0 top-0 z-[100] flex  overflow-y-hidden overflow-x-scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollable-planning-summary-table::-webkit-scrollbar {
+  display: none;
+}
+
+.planning-summary-table {
+  @apply w-full text-right;
 }
 
 .planning-summary-head-cell {
@@ -62,5 +74,5 @@
 }
 
 .date-indicator {
-  @apply absolute top-6 z-30 !w-[2px] bg-metro;
+  @apply absolute top-6 z-[999] !w-[2px] bg-metro;
 }

@@ -2,14 +2,8 @@
   @apply mx-8 mb-8 whitespace-nowrap leading-5;
 }
 
-.planning-view-container-header {
-  @apply sticky top-0 z-[100] flex overflow-x-scroll bg-white pt-8;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-.planning-view-container-header::-webkit-scrollbar {
-  display: none;
+.planning-header-container {
+  @apply sticky top-0 z-[100] flex bg-white pt-8;
 }
 
 /* All spans have are aligned right */

@@ -19,7 +19,7 @@ const PlanningView: FC = () => {
       <PlanningBreadcrumbs />
       <PlanningToolbar />
       <div className={`planning-view-container ${selectedYear ? '!mr-20' : ''}`} id="planning-view">
-        <div className="planning-view-container-header">
+        <div className="planning-header-container">
           <PlanningInfoPanel />
           <PlanningSummaryTable />
         </div>

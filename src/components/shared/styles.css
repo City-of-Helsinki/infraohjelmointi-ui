@@ -64,7 +64,7 @@
 }
 
 .toolbar-container {
-  @apply flex h-14 items-center justify-between border-b-[0.5px] border-b-gray px-6 shadow-md;
+  @apply mb-2 flex h-14 items-center justify-between border-b-[0.5px] border-b-gray px-6 shadow-md;
 }
 
 .tab-list {
