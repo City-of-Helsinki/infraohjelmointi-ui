@@ -3,15 +3,13 @@ import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { IconAngleLeft } from 'hds-react/icons';
 import { useNavigate } from 'react-router';
-import { FC, useCallback, useMemo } from 'react';
-import { IClass } from '@/interfaces/classInterfaces';
+import { useCallback, useMemo } from 'react';
+import { useAppSelector } from '@/hooks/common';
+import { selectSelections } from '@/reducers/planningSlice';
 
-interface IPlanningInfoPanelProps {
-  selectedMasterClass: IClass | null;
-}
-
-const PlanningInfoPanel: FC<IPlanningInfoPanelProps> = ({ selectedMasterClass }) => {
+const PlanningInfoPanel = () => {
   const { t } = useTranslation();
+  const { selectedMasterClass } = useAppSelector(selectSelections);
 
   const navigate = useNavigate();
 

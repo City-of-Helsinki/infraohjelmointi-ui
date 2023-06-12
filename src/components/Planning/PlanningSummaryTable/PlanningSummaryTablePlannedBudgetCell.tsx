@@ -1,20 +1,21 @@
 import { FC, memo } from 'react';
-import './styles.css';
+import { useAppSelector } from '@/hooks/common';
+import { selectSelectedYear } from '@/reducers/planningSlice';
 import moment from 'moment';
+import './styles.css';
 
 interface IPlanningSummaryTablePlannedBudgetCellProps {
   year: number;
   plannedBudget?: string;
-  selectedYear: number | null;
   isCurrentYear: boolean;
 }
 
 const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudgetCellProps> = ({
   year,
   plannedBudget,
-  selectedYear,
   isCurrentYear,
 }) => {
+  const selectedYear = useAppSelector(selectSelectedYear);
   return (
     <>
       <td className="planned-budget-cell">

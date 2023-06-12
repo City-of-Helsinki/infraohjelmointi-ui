@@ -1,9 +1,9 @@
 import { IconAngleRight } from 'hds-react/icons';
 import { t } from 'i18next';
-import { FC, memo } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { IClass } from '@/interfaces/classInterfaces';
-import { ILocation } from '@/interfaces/locationInterfaces';
+import { useAppSelector } from '@/hooks/common';
+import { selectSelections } from '@/reducers/planningSlice';
 import './styles.css';
 
 const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id: string }) => (
@@ -19,17 +19,9 @@ const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id:
 
 Breadcrumb.displayName = 'Breadcrumb';
 
-interface PlanningBreadcrumbs {
-  selections: {
-    selectedMasterClass: IClass | null;
-    selectedClass: IClass | null;
-    selectedSubClass: IClass | null;
-    selectedDistrict: ILocation | null;
-  };
-}
-
-const PlanningBreadcrumbs: FC<PlanningBreadcrumbs> = ({ selections }) => {
-  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
+const PlanningBreadcrumbs = () => {
+  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } =
+    useAppSelector(selectSelections);
 
   return (
     <ul className="breadcrumbs-list">

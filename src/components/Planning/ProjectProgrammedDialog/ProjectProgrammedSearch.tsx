@@ -13,9 +13,9 @@ import { IClass } from '@/interfaces/classInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectAllClasses } from '@/reducers/classSlice';
 import SelectedProjectCard from './SelectedProjectCard';
-import usePlanningRows from '@/hooks/usePlanningRows';
 import { selectDistricts } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import { selectSelections } from '@/reducers/planningSlice';
 
 interface ISearchState {
   searchWord: string;
@@ -58,7 +58,7 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   // selectedClass and selectedSubClass refer to the class and/or subclass currently selected by the user
   // in planning view
   // any one of these classes have to be selected by the user to be able to toggle the form
-  const { selections } = usePlanningRows();
+  const selections = useAppSelector(selectSelections);
 
   const buildQueryParamString = useCallback(
     (projectName: string): ISearchRequest => {

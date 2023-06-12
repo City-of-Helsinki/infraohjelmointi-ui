@@ -1,13 +1,14 @@
 import { FC, memo } from 'react';
 import { formattedNumberToNumber } from '@/utils/calculations';
-import './styles.css';
+import { useAppSelector } from '@/hooks/common';
+import { selectSelectedYear } from '@/reducers/planningSlice';
 import moment from 'moment';
+import './styles.css';
 
 interface IPlanningSummaryTableRealizedBudgetCellProps {
   frameBudget?: string;
   deviation?: string;
   year: number;
-  selectedYear: number | null;
   isCurrentYear: boolean;
 }
 
@@ -15,9 +16,9 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
   frameBudget,
   deviation,
   year,
-  selectedYear,
   isCurrentYear,
 }) => {
+  const selectedYear = useAppSelector(selectSelectedYear);
   return (
     <>
       <td className="planning-summary-frame-and-deviation-cell">

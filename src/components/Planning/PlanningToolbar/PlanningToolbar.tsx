@@ -1,33 +1,33 @@
 import { Toolbar } from '../../shared';
 import { IconCollapse, IconPlusCircle, IconSort } from 'hds-react/icons/';
-import { useCallback, MouseEvent as ReactMouseEvent, useState, FC, memo, useMemo } from 'react';
-import { IPlanningRowSelections } from '@/interfaces/common';
+import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { Button } from 'hds-react/components/Button';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
-import './styles.css';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { selectGroupsExpanded, setGroupsExpanded } from '@/reducers/planningSlice';
 import { t } from 'i18next';
+import './styles.css';
 
-interface IPlanningToolbarProps {
-  toggleGroupsExpanded: () => void;
-  groupsExpanded: boolean;
-  selections: IPlanningRowSelections;
-}
-const ProjectToolbar: FC<IPlanningToolbarProps> = ({
-  toggleGroupsExpanded,
-  groupsExpanded,
-  selections,
-}) => {
+const PlanningToolbar = () => {
+  const dispatch = useAppDispatch();
+  const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const [toolbarState, setToolbarState] = useState({
     groupDialogVisible: false,
     projectProgrammedDialogVisible: false,
   });
+
   const HDSIconCollapse = useMemo(() => IconCollapse, []);
   const HDSIconSort = useMemo(() => IconSort, []);
   const HDSIconPlusCircle = useMemo(() => IconPlusCircle, []);
+
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
+
+  const toggleGroupsExpanded = useCallback(() => {
+    dispatch(setGroupsExpanded(!groupsExpanded));
+  }, [dispatch, groupsExpanded]);
 
   const onShowProjectProgrammedDialog = useCallback(
     () => setToolbarState((current) => ({ ...current, projectProgrammedDialogVisible: true })),
@@ -55,13 +55,12 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
       dispatchContextMenuEvent(e, {
         menuType: ContextMenuType.NEW_ITEM,
         newItemsMenuProps: {
-          selections,
           onShowProjectProgrammedDialog,
           onShowGroupDialog,
         },
       });
     },
-    [onShowGroupDialog, onShowProjectProgrammedDialog, selections],
+    [onShowGroupDialog, onShowProjectProgrammedDialog],
   );
 
   return (
@@ -99,4 +98,4 @@ const ProjectToolbar: FC<IPlanningToolbarProps> = ({
   );
 };
 
-export default memo(ProjectToolbar);
+export default memo(PlanningToolbar);

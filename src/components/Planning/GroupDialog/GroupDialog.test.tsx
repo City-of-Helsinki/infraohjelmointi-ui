@@ -137,6 +137,7 @@ describe('GroupDialog', () => {
         finances: mockClassFinances,
       },
     };
+
     const mockSuggestionsResponse = {
       data: {
         results: [
@@ -150,13 +151,16 @@ describe('GroupDialog', () => {
         count: 1,
       },
     };
+
     mockedAxios.get.mockResolvedValueOnce(mockSuggestionsResponse);
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
     const { user, findAllByTestId, findByTestId, findByRole, findByText, baseElement } =
       renderResult;
     await user.click(await findByTestId('open-new-item-context-menu'));
+
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
+
     // Open modal
     await user.click(await findByTestId('open-summing-group-dialog'));
 
@@ -231,10 +235,13 @@ describe('GroupDialog', () => {
       await user.click(submitButton);
     });
 
-    const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
+    await act(async () => {
+      const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
 
-    expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
-    expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
+      expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
+      expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
+    });
+
     // Check if the planning view has navigated to correct subclass/district
     // Checking if district header exists, meaning we are in the correct district balk
     expect(
@@ -242,9 +249,7 @@ describe('GroupDialog', () => {
     ).toBeInTheDocument();
     // Check if new created group header exists
     expect(await findByTestId(`head-${mockPostResponse.data.id}`)).toBeInTheDocument();
-
     await user.click(await findByTestId(`expand-${mockPostResponse.data.id}`));
-
     expect(await findByText('Vanha yrttimaantie')).toBeInTheDocument();
   });
 });

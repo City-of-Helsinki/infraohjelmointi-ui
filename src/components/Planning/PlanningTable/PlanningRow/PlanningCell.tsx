@@ -3,16 +3,18 @@ import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/commo
 import './styles.css';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
+import { useAppSelector } from '@/hooks/common';
+import { selectSelectedYear } from '@/reducers/planningSlice';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
   type: PlanningRowType;
   id: string;
-  selectedYear: number | null;
 }
 
-const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, selectedYear }) => {
+const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const { plannedBudget, frameBudget, deviation, year, isCurrentYear } = cell;
+  const selectedYear = useAppSelector(selectSelectedYear);
 
   return (
     <>

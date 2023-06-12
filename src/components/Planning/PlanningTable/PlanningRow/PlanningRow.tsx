@@ -7,6 +7,9 @@ import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
 import ProjectRow from './ProjectRow/ProjectRow';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { useLocation } from 'react-router-dom';
+import { useAppSelector } from '@/hooks/common';
+import { selectProjectUpdate } from '@/reducers/eventsSlice';
+import { selectGroupsExpanded } from '@/reducers/planningSlice';
 import _ from 'lodash';
 import './styles.css';
 
@@ -16,24 +19,10 @@ interface IPlanningRowState {
   searchedProjectId: string;
 }
 
-interface IPlanningRowProps extends IPlanningRow {
-  projectToUpdate: IProject | null;
-  selectedYear: number | null;
-  groupsExpanded: boolean;
-}
-
-const PlanningRow: FC<IPlanningRowProps> = (props) => {
-  const {
-    defaultExpanded,
-    projectRows,
-    cells,
-    projectToUpdate,
-    selectedYear,
-    groupsExpanded,
-    id,
-    type,
-  } = props;
-
+const PlanningRow: FC<IPlanningRow> = (props) => {
+  const { defaultExpanded, projectRows, cells, id, type } = props;
+  const projectToUpdate = useAppSelector(selectProjectUpdate)?.project;
+  const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
 
   const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
@@ -63,6 +52,7 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
     }
   }, [type, groupsExpanded]);
+
   // usePlanningRows-hook sets a projectToUpdate when the project-update event is triggered,
   // this useEffect updates the project in the view with the projecToUpdate
   useEffect(() => {
@@ -166,21 +156,11 @@ const PlanningRow: FC<IPlanningRowProps> = (props) => {
       {expanded && (
         <>
           {projects.map((p) => (
-            <ProjectRow
-              key={p.id}
-              project={p}
-              isSearched={p.id === searchedProjectId}
-              selectedYear={selectedYear}
-            />
+            <ProjectRow key={p.id} project={p} isSearched={p.id === searchedProjectId} />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow
-              {...c}
-              projectToUpdate={projectToUpdate}
-              selectedYear={selectedYear}
-              groupsExpanded={groupsExpanded}
-            />
+            <PlanningRow {...c} />
           ))}
         </>
       )}
