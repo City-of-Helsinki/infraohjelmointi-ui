@@ -180,7 +180,12 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
       {expanded && (
         <>
           {projects.map((p) => (
-            <ProjectRow key={p.id} project={p} isSearched={p.id === searchedProjectId} />
+            <ProjectRow
+              key={p.id}
+              project={p}
+              isSearched={p.id === searchedProjectId}
+              parentId={id}
+            />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (

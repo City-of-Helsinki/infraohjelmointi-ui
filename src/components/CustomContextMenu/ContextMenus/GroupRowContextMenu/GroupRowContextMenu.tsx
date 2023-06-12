@@ -25,7 +25,7 @@ const GroupRowContextMenu: FC<GroupRowMenuProps> = ({
     onShowGroupEditDialog();
   }, [onCloseMenu, onShowGroupEditDialog]);
   return (
-    <div className="project-cell-menu" data-testid="project-cell-menu">
+    <div className="project-cell-menu" data-testid="group-row-context-menu">
       <div className="project-cell-menu-header">
         <div className="overflow-hidden">
           <p className="title" data-testid={'cell-title'}>

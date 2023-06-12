@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 import { deleteGroupThunk } from '@/reducers/groupSlice';
 import { useAppDispatch } from '@/hooks/common';
+import './styles.css';
 
 interface DeleteGroupDialogProps {
   isVisible: boolean;
@@ -45,6 +46,7 @@ const DeleteGroupDialog: FC<DeleteGroupDialogProps> = memo(
                 {t(`cancel`)}
               </Button>
               <Button
+                data-testid={`delete-group-${id}`}
                 variant="danger"
                 iconLeft={<IconTrash aria-hidden="true" />}
                 onClick={handleDeleteGroup}
