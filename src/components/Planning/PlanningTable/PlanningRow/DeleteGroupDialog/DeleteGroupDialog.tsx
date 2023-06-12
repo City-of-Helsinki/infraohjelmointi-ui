@@ -19,7 +19,9 @@ const DeleteGroupDialog: FC<DeleteGroupDialogProps> = memo(
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const handleDeleteGroup = useCallback(() => {
-      dispatch(deleteGroupThunk(id)).then(() => onCloseDeleteGroupDialog());
+      dispatch(deleteGroupThunk(id))
+        .then(() => onCloseDeleteGroupDialog())
+        .catch(Promise.reject);
     }, [dispatch, id, onCloseDeleteGroupDialog]);
     const { Header, Content, ActionButtons } = Dialog;
 
