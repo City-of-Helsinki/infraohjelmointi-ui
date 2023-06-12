@@ -14,7 +14,7 @@ import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockGroups } from '@/mocks/mockGroups';
 import { Route } from 'react-router';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import { act, findByTestId, fireEvent, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, waitFor, within } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
@@ -1965,30 +1965,39 @@ describe('PlanningView', () => {
               expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
             });
           });
+
           const groupId = groupsForSubClass[0].id;
+
           // Check that projects that belong directly to the selected subClass are visible
           const projectsForSubClassWithoutGroup = projects.filter(
             (p) => p.projectClass === subClassId && !p.projectLocation && !p.projectGroup,
           );
+
           const projectToGroup = projectsForSubClassWithoutGroup[0];
+
           await waitFor(() => {
             projectsForSubClassWithoutGroup.forEach(({ id }) =>
               expect(getByTestId(`row-${id}-parent-${subClassId}`)).toBeInTheDocument(),
             );
           });
-          // project currently under subclass
-          expect(getByTestId(`row-${projectToGroup.id}-parent-${subClassId}`)).toBeInTheDocument();
-          // check show more icon exists on group planning head
-          const groupShowMoreIcon = await findByTestId(`show-more-icon-${groupId}`);
-          expect(groupShowMoreIcon).toBeInTheDocument();
-          // open context menu
 
+          // Project currently under subclass
+          expect(getByTestId(`row-${projectToGroup.id}-parent-${subClassId}`)).toBeInTheDocument();
+
+          // Check show more icon exists on group planning head
+          const groupShowMoreIcon = await findByTestId(`show-more-icon-${groupId}`);
+
+          expect(groupShowMoreIcon).toBeInTheDocument();
+
+          // Open context menu
           await user.click(groupShowMoreIcon);
 
           const groupContextMenu = await findByTestId('group-row-context-menu');
+
           expect(groupContextMenu).toBeInTheDocument();
-          // wait for dialog to open
-          // also context menu closes
+
+          // Wait for dialog to open
+          // Also context menu closes
           await waitFor(async () => {
             await user.click(await findByTestId('open-group-edit-dialog'));
           });
@@ -2004,9 +2013,9 @@ describe('PlanningView', () => {
           expect(await groupEditDialog.findByText('TestSubClass')).toBeInTheDocument();
 
           await user.clear(await groupEditDialog.findByDisplayValue('Test Group 3'));
-          // changing group name
+          // Changing group name
           await user.type(await groupEditDialog.findByText('groupForm.name'), 'changed name group');
-          // searching for project
+          // Searching for project
           const mockSuggestionsResponse = {
             data: {
               results: [projectsForSubClassWithoutGroup[0]],
@@ -2024,9 +2033,9 @@ describe('PlanningView', () => {
 
           await waitFor(async () => {
             expect(await groupEditDialog.findByText('not-in-group-project')).toBeInTheDocument();
-            // adding project to the group
+            // Adding project to the group
             await user.click(await groupEditDialog.findByText('not-in-group-project'));
-            // length is 2 since there is already a project under this group
+            // Length is 2 since there is already a project under this group
             expect((await findAllByTestId('project-selections')).length).toBe(2);
           });
           const getRequest = mockedAxios.get.mock;
@@ -2045,16 +2054,16 @@ describe('PlanningView', () => {
           await waitFor(async () => {
             await user.click(submitButton);
           });
-          // project updated with group information
+          // Project updated with group information
           await sendProjectUpdateEvent({
             ...projectsForSubClassWithoutGroup[0],
             projectGroup: groupId,
           });
-          // group title changed
+          // Group title updated
           expect(
             await within(await findByTestId(`title-${groupId}`)).findByText('changed name group'),
           ).toBeInTheDocument();
-          // project is now under group balk
+          // Project is now under group balk
           expect(
             await findByTestId(`row-${projectToGroup.id}-parent-${groupId}`),
           ).toBeInTheDocument();
@@ -2142,19 +2151,24 @@ describe('PlanningView', () => {
               expect(getByTestId(`row-${id}-parent-${groupId}`)).toBeInTheDocument(),
             );
           });
-          // project currently under group
+
+          // Project currently under group
           expect(getByTestId(`row-${projectInGroup.id}-parent-${groupId}`)).toBeInTheDocument();
-          // check show more icon exists on group planning head
+
+          // Check show more icon exists on group planning head
           const groupShowMoreIcon = await findByTestId(`show-more-icon-${groupId}`);
+
           expect(groupShowMoreIcon).toBeInTheDocument();
-          // open context menu
+          // Open context menu
 
           await user.click(groupShowMoreIcon);
 
           const groupContextMenu = await findByTestId('group-row-context-menu');
+
           expect(groupContextMenu).toBeInTheDocument();
-          // wait for dialog to open
-          // also context menu closes
+
+          // Wait for dialog to open
+          // Also context menu closes
           await waitFor(async () => {
             await user.click(await findByTestId('open-delete-group-dialog'));
           });
@@ -2163,25 +2177,20 @@ describe('PlanningView', () => {
           const groupDeleteDialog = within(modal);
           const deleteButton = await groupDeleteDialog.findByTestId(`delete-group-${groupId}`);
           expect(deleteButton).toBeInTheDocument();
-
-          await user.click(deleteButton);
-
           const mockDeleteResponse = {
             data: {
               id: groupId,
             },
           };
-
           mockedAxios.delete.mockResolvedValueOnce(mockDeleteResponse);
+          await user.click(deleteButton);
 
-          await waitFor(async () => {
-            await sendProjectUpdateEvent({
-              ...projectInGroup,
-              projectGroup: null,
-            });
+          await sendProjectUpdateEvent({
+            ...projectInGroup,
+            projectGroup: null,
           });
 
-          // project is now under group balk
+          // Project is now under group balk
           expect(
             await findByTestId(`row-${projectInGroup.id}-parent-${subClassId}`),
           ).toBeInTheDocument();
