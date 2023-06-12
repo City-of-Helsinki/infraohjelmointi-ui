@@ -595,7 +595,7 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         projectsForClassWithoutGroup.forEach((p) =>
-          expect(getByTestId(`row-${p.id}`)).toBeInTheDocument(),
+          expect(getByTestId(`row-${p.id}-parent-${classId}`)).toBeInTheDocument(),
         );
       });
 
@@ -635,12 +635,12 @@ describe('PlanningView', () => {
 
       // Check that projects that belong directly to the selected subClass are visible
       const projectsForSubClassWithoutGroup = projects.filter(
-        (p) => p.projectClass === classId && !p.projectLocation && !p.projectGroup,
+        (p) => p.projectClass === subClassId && !p.projectLocation && !p.projectGroup,
       );
 
       await waitFor(() => {
         projectsForSubClassWithoutGroup.forEach(({ id }) =>
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          expect(getByTestId(`row-${id}-parent-${subClassId}`)).toBeInTheDocument(),
         );
       });
 
@@ -688,7 +688,7 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         projectsForDistrictWithoutGroup.forEach(({ id }) =>
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          expect(getByTestId(`row-${id}-parent-${districtId}`)).toBeInTheDocument(),
         );
       });
 
@@ -697,16 +697,17 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         divisionsForDistrict.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`row-${id}`).classList.contains('division')).toBeTruthy();
+          const divisionId = id;
+          expect(getByTestId(`row-${divisionId}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${divisionId}`).classList.contains('division')).toBeTruthy();
 
           //Check that projects that belong directly to each division are visible
           const projectsForDivision = projects.filter(
-            (p) => p.projectLocation === id && !p.projectGroup,
+            (p) => p.projectLocation === divisionId && !p.projectGroup,
           );
 
           projectsForDivision.forEach(({ id }) =>
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+            expect(getByTestId(`row-${id}-parent-${divisionId}`)).toBeInTheDocument(),
           );
         });
       });
@@ -728,7 +729,9 @@ describe('PlanningView', () => {
       const projectsForGroup = projects.filter((p) => p.projectGroup === groupId);
 
       await waitFor(() => {
-        projectsForGroup.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+        projectsForGroup.forEach(({ id }) =>
+          expect(getByTestId(`row-${id}-parent-${groupId}`)).toBeInTheDocument(),
+        );
       });
     });
 
@@ -896,7 +899,7 @@ describe('PlanningView', () => {
         await waitFor(() => navigateToProjectRows(renderResult));
 
         await waitFor(() => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}-parent-test-class-1`)).toBeInTheDocument();
           expect(getByTestId(`head-${id}`)).toBeInTheDocument();
           expect(getByTestId(`edit-phase-${id}`)).toBeInTheDocument();
           expect(getByTestId(`navigate-${id}`)).toHaveTextContent(name);
@@ -1896,7 +1899,7 @@ describe('PlanningView', () => {
           });
         });
 
-        it.only('can edit groups using context menu', async () => {
+        it('can edit groups using context menu', async () => {
           const { store, getByTestId, user, findByTestId, findByRole, findAllByTestId } =
             await render();
           addProjectUpdateEventListener(store.dispatch);
@@ -2059,7 +2062,7 @@ describe('PlanningView', () => {
           removeProjectUpdateEventListener(store.dispatch);
         });
 
-        it.only('can remove groups using context menu', async () => {
+        it('can remove groups using context menu', async () => {
           const { store, getByTestId, user, findByTestId, findByRole } = await render();
           addProjectUpdateEventListener(store.dispatch);
           const { masterClasses, classes, subClasses } = store.getState().class;
