@@ -353,7 +353,9 @@ describe('SearchResultsView', () => {
 
       await waitFor(() => {
         expect(scrollIntoViewMock).toBeCalled();
-        expect(getByTestId(`row-${project.id}`).classList.contains('searched')).toBeTruthy();
+        expect(
+          getByTestId(`row-${project.id}-parent-test-class-1`).classList.contains('searched'),
+        ).toBeTruthy();
       });
     });
   });
