@@ -86,7 +86,13 @@ const PlanningToolbar = () => {
             >
               Uusi
             </Button>
-            <GroupDialog isVisible={groupDialogVisible} onCloseGroupDialog={onCloseGroupDialog} />
+            <GroupDialog
+              isOpen={groupDialogVisible}
+              handleClose={onCloseGroupDialog}
+              editMode={false}
+              projects={[]}
+              id={null}
+            />
             <ProjectProgrammedDialog
               isVisible={projectProgrammedDialogVisible}
               onCloseProjectProgrammedDialog={onCloseProjectProgrammedDialog}

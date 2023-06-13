@@ -7,7 +7,7 @@ import './styles.css';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import DeleteGroupDialog from './DeleteGroupDialog/DeleteGroupDialog';
-import EditGroupDialog from './EditGroupDialog/EditGroupDialog';
+import { GroupDialog } from '../../GroupDialog';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -84,10 +84,11 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
             >
               {type === 'group' && (
                 <>
-                  <EditGroupDialog
-                    isVisible={groupDialogState.groupEditOpen}
-                    onCloseGroupEditDialog={onCloseGroupEditDialog}
+                  <GroupDialog
+                    isOpen={groupDialogState.groupEditOpen}
+                    handleClose={onCloseGroupEditDialog}
                     id={id}
+                    editMode={true}
                     projects={projectsToIOption()}
                   />
                   <DeleteGroupDialog

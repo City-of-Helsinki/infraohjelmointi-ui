@@ -1,9 +1,9 @@
 
-#group-create-dialog .search-input ul {
+#summing-group-dialog .search-input ul {
   max-height: 200px !important;
 }
 
-#group-create-dialog hr {
+#summing-group-dialog hr {
   border-top: 0.0625rem solid var(--color-black-20);
   margin: 0;
 }
@@ -11,7 +11,7 @@
 #open-group-form-container {
   cursor: pointer;
 }
-#group-create-dialog .search-form .advance-fields-button {
+#summing-group-dialog .search-form .advance-fields-button {
   color: var(--color-bus);
   display: flex;
   justify-content: center;
@@ -38,6 +38,6 @@
 .dialog-section .button-container {
   @apply fixed;
 }
-#group-create-dialog .group-form-search-input button{
+#summing-group-dialog .group-form-search-input button{
   @apply z-[1]
 }

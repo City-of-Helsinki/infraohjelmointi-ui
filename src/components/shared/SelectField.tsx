@@ -92,7 +92,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                 placeholder={(placeholder && t(placeholder ?? '')) ?? ''}
                 icon={getIcon(icon)}
               />
-              {((clearable === undefined && value.value) || clearable) && (
+              {((clearable === undefined && value.value) || (clearable && value.value)) && (
                 <button
                   className="empty-select-field-button"
                   data-testid={`empty-${name}-selection-button`}
