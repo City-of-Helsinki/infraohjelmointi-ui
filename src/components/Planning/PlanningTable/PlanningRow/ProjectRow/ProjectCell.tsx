@@ -50,12 +50,7 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
    */
   const traverseAndSetGapCellFinancesNull = (cellType: 'Construction' | 'Planning') => {
     let head: IProjectCell | null = cellType === 'Construction' ? cell.next : cell.prev;
-    while (
-      head &&
-      !head.type.includes(cellType) &&
-      !head.projectEstDates[`est${cellType}End`] &&
-      !head.projectEstDates[`est${cellType}Start`]
-    ) {
+    while (head && !head.type.toLowerCase().includes(cellType.toLowerCase())) {
       // Have to use a if condition to check as other operators are still raising typescript errors
       if (req.finances) {
         (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
