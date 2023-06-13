@@ -30,8 +30,6 @@ export const dispatchContextMenuEvent = (
 };
 
 export const dispatchDateIndicatorEvent = (data: IDateIndicatorData) => {
-  console.log('dispatching date indicator event with data: ', data);
-
   document.getElementById('date-indicator')?.dispatchEvent(
     new CustomEvent('showDateIndicator', {
       detail: {
