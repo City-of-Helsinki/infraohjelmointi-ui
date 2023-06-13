@@ -433,6 +433,59 @@ describe('PlanningView', () => {
       expect(queryByTestId('date-indicator')).not.toBeVisible();
       expect(queryByTestId('year-summary')).toBeNull();
     });
+
+    it('adds the hovered class when a month is hovered', async () => {
+      const { user, getByTestId, container } = await render();
+      const year = new Date().getFullYear();
+      const months = moment.months();
+
+      await user.click(getByTestId(`expand-monthly-view-button-${year + 1}`));
+
+      // Test hovering for all levels and different months
+      await waitFor(async () => {
+        const april = `hoverable-${months[3]}`;
+        const may = `hoverable-${months[4]}`;
+        const june = `hoverable-${months[5]}`;
+        const july = `hoverable-${months[6]}`;
+
+        Array.from(container.getElementsByClassName(april)).forEach((c) => {
+          expect(c.classList.contains('hovered')).toBeFalsy();
+        });
+
+        // Row 1 (planning summary head)
+        await user.hover(container.getElementsByClassName(april)[0]);
+
+        Array.from(container.getElementsByClassName(april)).forEach((c) => {
+          expect(c.classList.contains('hovered')).toBeTruthy();
+        });
+
+        // Row 2 (planning summary budget)
+        await user.hover(container.getElementsByClassName(may)[1]);
+
+        // Hovering disappears from previous when hover changes
+        Array.from(container.getElementsByClassName(`hoverable-${months[3]}`)).forEach((c) => {
+          expect(c.classList.contains('hovered')).toBeFalsy();
+        });
+
+        Array.from(container.getElementsByClassName(may)).forEach((c) => {
+          expect(c.classList.contains('hovered')).toBeTruthy();
+        });
+
+        // Row 3 (planning summary realized budget)
+        await user.hover(container.getElementsByClassName(june)[2]);
+
+        Array.from(container.getElementsByClassName(june)).forEach((c) => {
+          expect(c.classList.contains('hovered')).toBeTruthy();
+        });
+
+        // Row 4 (master class)
+        await user.hover(container.getElementsByClassName(july)[3]);
+
+        Array.from(container.getElementsByClassName(july)).forEach((c) => {
+          expect(c.classList.contains('hovered')).toBeTruthy();
+        });
+      });
+    });
   });
 
   describe('PlanningTable', () => {
@@ -1003,9 +1056,9 @@ describe('PlanningView', () => {
         });
       });
 
-      it('can expand the years to view a year summary and monthly data graph about the project', async () => {
+      it('can expand the years to view a year summary and monthly data graph about the project and the month can be hovered to highlight', async () => {
         const renderResult = await render();
-        const { user, getByTestId } = renderResult;
+        const { user, getByTestId, container } = renderResult;
         const year = new Date().getFullYear();
         const months = moment.months();
         const project = mockPlanningViewProjects.data.results[1];
@@ -1083,6 +1136,21 @@ describe('PlanningView', () => {
             } else {
               expect(getComputedStyle(constructionBar).width).toBe('0%');
             }
+          });
+        });
+
+        const april = `hoverable-${months[3]}`;
+
+        Array.from(container.getElementsByClassName(april)).forEach((a) => {
+          expect(a.classList.contains('hovered')).toBeFalsy();
+        });
+
+        await user.hover(getByTestId(`project-monthly-graph-cell-${project.id}-${months[3]}`));
+
+        await waitFor(() => {
+          const aprilElements = container.getElementsByClassName(april);
+          Array.from(aprilElements).forEach((a) => {
+            expect(a.classList.contains('hovered')).toBeTruthy();
           });
         });
       });
