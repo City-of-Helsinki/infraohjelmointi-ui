@@ -2249,8 +2249,6 @@ describe('PlanningView', () => {
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse.data);
 
-          await user.click(getByTestId('close-project-cell-menu'));
-
           await waitFor(() => {
             // overlap changed to plan
             expect(getByTestId(`project-cell-${planEndCellYear}-${id}`)).toBeInTheDocument();
@@ -2324,8 +2322,6 @@ describe('PlanningView', () => {
 
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse_2.data);
-
-          await user.click(getByTestId('close-project-cell-menu'));
 
           await waitFor(() => {
             // planEnd moved 1 year back

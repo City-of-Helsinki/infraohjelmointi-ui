@@ -139,7 +139,6 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
       break;
     default:
   }
-  console.log(req);
   return req;
 };
 
@@ -176,6 +175,7 @@ const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       req.estPlanningEnd = null;
       req.planningStartYear = getYear(updatedDate);
     } else if (estPlanningEnd) {
+      console.log(updatedDate);
       req.estPlanningEnd = updatedDate;
     }
   };

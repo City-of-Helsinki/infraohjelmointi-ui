@@ -34,6 +34,7 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
     (type: CellType) => {
       setSelectedType(type);
       onUpdateCellType(type);
+      onCloseMenu();
     },
     [onUpdateCellType, onCloseMenu],
   );
