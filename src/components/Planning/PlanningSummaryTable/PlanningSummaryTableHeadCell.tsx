@@ -27,7 +27,23 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   // Sets the selectedYear or null if the year is given again, so that the monthly view can be closed
   // when the same year is re-clicked
   const handleSetSelectedYear = useCallback(
-    (year: number | null) => dispatch(setSelectedYear(year === selectedYear ? null : year)),
+    (year: number | null) => {
+      dispatch(setSelectedYear(year === selectedYear ? null : year));
+
+      if (selectedYear !== year) {
+        // when opening not current year
+        dispatchDateIndicatorEvent({
+          isVisible: isCurrentYear,
+          position: 0,
+        });
+      } else {
+        // when closing current or other year
+        dispatchDateIndicatorEvent({
+          isVisible: false,
+          position: 0,
+        });
+      }
+    },
     [dispatch, selectedYear],
   );
 
@@ -87,26 +103,23 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
     [isCurrentYear],
   );
 
-  const testFunction = (i: number, m: string) => {
+  const notifyDateIndicator = useCallback((i: number, m: string) => {
     if (showDateIndicator(i + 1)) {
+      console.log('displayning...');
       // "Async" hack to wait for the element to render before calling document.getElementById
       setTimeout(() => {
         const element = document.getElementById(`month-label-${m}`);
         if (element) {
           const elementPosition = (element as HTMLElement).offsetLeft;
-          console.log(elementPosition);
           dispatchDateIndicatorEvent({
             isVisible: true,
             position: elementPosition + getDateIndicatorLeftPixels(i + 1),
           });
         }
       }, 0);
-
-      // return getDateIndicatorLeftPixels(i + 1)
-      console.log(getDateIndicatorLeftPixels(i + 1));
     }
     return null;
-  };
+  }, []);
 
   return (
     <>
@@ -142,7 +155,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
             >
               <div className="monthly-cell-container relative" data-testid={`month-label-${m}`}>
                 <span>{m.substring(0, 3)}</span>
-                {testFunction(i, m)}
+                {notifyDateIndicator(i, m)}
               </div>
             </td>
           ))}
@@ -153,17 +166,3 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
 };
 
 export default memo(PlanningSummaryTableHeadCell);
-
-{
-  /* Creates a line that indicates the current date */
-}
-{
-  /* {showDateIndicator(i + 1) && (
-                  <span
-                    ref={dateIndicatorRef}
-                    style={{ left: getDateIndicatorLeftPixels(i + 1) }}
-                    data-testid="date-indicator"
-                    className="date-indicator"
-                  />
-                )} */
-}

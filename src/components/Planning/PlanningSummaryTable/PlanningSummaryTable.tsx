@@ -6,7 +6,8 @@ import PlanningSummaryTablePlannedBudgetCell from './PlanningSummaryTablePlanned
 import PlanningSummaryTableRealizedBudgetCell from './PlanningSummaryTableRealizedBudgetCell';
 import './styles.css';
 
-let mouseOver = false;
+let overPlanningSummaryTable = false;
+let dateIndicatorStartPosition = 0;
 
 const useScrollableElement = (elementId: string) => {
   const [element, setElement] = useState<HTMLElement | undefined>(undefined);
@@ -35,54 +36,85 @@ const useScrollableElement = (elementId: string) => {
 const PlanningSummaryTable = () => {
   const { heads, cells } = useSummaryRows();
 
-  const tableRef = useRef() as React.MutableRefObject<HTMLTableElement>;
+  const planningSummaryTableRef = useRef() as React.MutableRefObject<HTMLTableElement>;
   const dateIndicatorRef = useRef() as React.MutableRefObject<HTMLDivElement>;
 
   const { element: planningTable } = useScrollableElement('planning-table-container');
 
-  // Listen to PlanningTable and update scroll position for PlanningSummaryTable
+  // Listen to PlanningSummaryTable/PlanningTable and update scroll position for PlanningTable/PlanningSummaryTable
   useEffect(() => {
-    if (!planningTable) {
-      return;
-    }
+    /**
+     * Listen to planning table scroll
+     */
+    const onPlanningTableScroll = (): void => {
+      planningSummaryTableRef?.current?.parentElement?.scrollTo({
+        left: planningTable?.scrollLeft,
+      });
+      const dateIndicatorElement = dateIndicatorRef.current;
+      const positionLeft = dateIndicatorStartPosition - (planningTable?.scrollLeft ?? 0);
+      dateIndicatorElement.style.left = `${positionLeft}px`;
 
-    const onScroll = (): void => {
-      tableRef?.current?.parentElement?.scrollTo({ left: planningTable.scrollLeft });
-      dateIndicatorRef?.current?.scrollTo({ left: planningTable.scrollLeft });
+      let visibility = 'visible';
+      if (positionLeft < 0) {
+        visibility = 'hidden';
+      }
+      dateIndicatorElement.style.visibility = visibility;
     };
+    planningTable?.addEventListener('scroll', onPlanningTableScroll);
 
-    planningTable.addEventListener('scroll', onScroll);
-
-    return () => {
-      planningTable.removeEventListener('scroll', onScroll);
-    };
-  }, [planningTable]);
-
-  // Listen to PlanningSummaryTable and update scroll position for PlanningTable
-  useEffect(() => {
-    const onScroll = (): void => {
+    /**
+     * Listen to planning summary table scroll
+     */
+    const onPlanningSummaryTableScroll = (): void => {
       // to void forever loop, we need to check whther crolling is happining while mouse is over the head element
-      if (mouseOver) {
-        planningTable?.scrollTo({ left: tableRef.current.parentElement?.scrollLeft });
+      if (overPlanningSummaryTable) {
+        planningTable?.scrollTo({
+          left: planningSummaryTableRef.current.parentElement?.scrollLeft,
+        });
       }
     };
-    const onMouseOver = () => {
-      mouseOver = true;
+    const onPlanningSummaryTableOver = () => {
+      overPlanningSummaryTable = true;
     };
-    const onMouseLeave = () => {
-      mouseOver = false;
+    const onPlanningSummaryTableLeave = () => {
+      overPlanningSummaryTable = false;
     };
-
-    tableRef.current?.parentElement?.addEventListener('scroll', onScroll);
-    tableRef.current?.parentElement?.addEventListener('mouseover', onMouseOver);
-    tableRef.current?.parentElement?.addEventListener('mouseleave', onMouseLeave);
+    planningSummaryTableRef.current?.parentElement?.addEventListener(
+      'scroll',
+      onPlanningSummaryTableScroll,
+    );
+    planningSummaryTableRef.current?.parentElement?.addEventListener(
+      'mouseover',
+      onPlanningSummaryTableOver,
+    );
+    planningSummaryTableRef.current?.parentElement?.addEventListener(
+      'mouseleave',
+      onPlanningSummaryTableLeave,
+    );
 
     return () => {
-      tableRef.current?.parentElement?.removeEventListener('scroll', onScroll);
-      tableRef.current?.parentElement?.removeEventListener('mouseover', onMouseOver);
-      tableRef.current?.parentElement?.removeEventListener('mouseleave', onMouseLeave);
+      /**
+       * Remove listeners from planning summary table
+       */
+      planningSummaryTableRef.current?.parentElement?.removeEventListener(
+        'scroll',
+        onPlanningSummaryTableScroll,
+      );
+      planningSummaryTableRef.current?.parentElement?.removeEventListener(
+        'mouseover',
+        onPlanningSummaryTableOver,
+      );
+      planningSummaryTableRef.current?.parentElement?.removeEventListener(
+        'mouseleave',
+        onPlanningSummaryTableLeave,
+      );
+
+      /**
+       * Remove listeners from planning table
+       */
+      planningTable?.removeEventListener('scroll', onPlanningTableScroll);
     };
-  }, [tableRef, planningTable]);
+  }, [planningSummaryTableRef, planningTable]);
 
   useEffect(() => {
     if (!dateIndicatorRef || !dateIndicatorRef.current) {
@@ -93,8 +125,14 @@ const PlanningSummaryTable = () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const showDateIndicator = (e: any) => {
-      console.log('event data: ', e.detail);
+      dateIndicatorStartPosition = e.detail.position;
       dateIndicatorElement.style.left = `${e.detail.position}px`;
+
+      let displayValue = 'block';
+      if (!e.detail.isVisible) {
+        displayValue = 'none';
+      }
+      dateIndicatorElement.style.display = displayValue;
     };
 
     const setElementHeight = () => {
@@ -117,7 +155,7 @@ const PlanningSummaryTable = () => {
   return (
     <div className="planning-summary-table-container">
       <div className="scrollable-planning-summary-table">
-        <table cellSpacing={0} className="planning-summary-table" ref={tableRef}>
+        <table cellSpacing={0} className="planning-summary-table" ref={planningSummaryTableRef}>
           {/* Head */}
           <thead data-testid="planning-summary-head">
             {/* Year and title row */}
@@ -151,7 +189,7 @@ const PlanningSummaryTable = () => {
       </div>
       <div className="relative h-3 w-full bg-black-90">
         <div
-          className="absolute top-6 z-[999] !w-[2px] bg-metro"
+          className="absolute top-[-95px] z-[999] hidden !w-[2px] bg-metro"
           ref={dateIndicatorRef}
           id="date-indicator"
         />
