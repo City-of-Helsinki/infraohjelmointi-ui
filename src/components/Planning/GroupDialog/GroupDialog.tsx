@@ -1,4 +1,4 @@
-import { useState, MouseEvent, FC, useCallback, useMemo, memo } from 'react';
+import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
@@ -58,6 +58,11 @@ const DialogContainer: FC<IDialogProps> = memo(
     const subClassField = watch('subClass');
     const districtField = watch('district');
     const divisionField = watch('division');
+    useEffect(() => {
+      if (formValues.district.value || formValues.division.value) {
+        setShowAdvanceFields(true);
+      }
+    }, [formValues.district.value, formValues.division.value]);
 
     const isButtonDisabled = useCallback(() => {
       return (
