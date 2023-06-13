@@ -74,5 +74,5 @@
 }
 
 .date-indicator {
-  @apply absolute top-6 z-[999] !w-[2px] bg-metro;
+  @apply absolute top-8 z-50 hidden h-screen !w-[2px] bg-metro;
 }

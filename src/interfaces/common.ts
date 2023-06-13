@@ -75,6 +75,7 @@ export type PlanningRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
+  | 'subClass-district'
   | 'district-preview'
   | 'district'
   | 'division'

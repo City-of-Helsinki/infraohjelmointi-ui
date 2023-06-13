@@ -39,7 +39,7 @@ import {
   addProjectUpdateEventListener,
   removeProjectUpdateEventListener,
 } from '@/utils/events';
-import { getMonthToday, getToday, updateYear } from '@/utils/dates';
+import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
 import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 
@@ -391,18 +391,11 @@ describe('PlanningView', () => {
 
       await user.click(getByTestId(`expand-monthly-view-button-${year}`));
 
-      months.forEach((m, i) => {
+      expect(queryByTestId('date-indicator')).toBeVisible();
+
+      months.forEach((m) => {
         expect(getByTestId(`month-label-${m}`)).toHaveTextContent(m.substring(0, 3));
         expect(getByTestId(`graph-cell-${m}`)).toBeInTheDocument();
-
-        if (i + 1 === getMonthToday()) {
-          expect(getByTestId(`month-label-${m}`).children.length).toBe(2);
-          expect(
-            getByTestId(`month-label-${m}`).children[1].classList.contains('date-indicator'),
-          ).toBeTruthy();
-        } else {
-          expect(getByTestId(`month-label-${m}`).children.length).toBe(1);
-        }
       });
 
       expect(getByTestId('date-today-label')).toHaveTextContent(getToday());
@@ -437,7 +430,7 @@ describe('PlanningView', () => {
       });
 
       expect(queryByTestId('date-today-label')).toBeNull();
-      expect(queryByTestId('date-indicator')).toBeNull();
+      expect(queryByTestId('date-indicator')).not.toBeVisible();
       expect(queryByTestId('year-summary')).toBeNull();
     });
   });

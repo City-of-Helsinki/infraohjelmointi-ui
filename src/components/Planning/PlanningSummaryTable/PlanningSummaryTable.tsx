@@ -1,37 +1,14 @@
 /* eslint-disable react/jsx-key */
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import useSummaryRows from '@/hooks/useSummaryRows';
 import PlanningSummaryTableHeadCell from './PlanningSummaryTableHeadCell';
 import PlanningSummaryTablePlannedBudgetCell from './PlanningSummaryTablePlannedBudgetCell';
 import PlanningSummaryTableRealizedBudgetCell from './PlanningSummaryTableRealizedBudgetCell';
+import useScrollableElement from '@/hooks/useScrollableElement';
 import './styles.css';
 
 let overPlanningSummaryTable = false;
 let dateIndicatorStartPosition = 0;
-
-const useScrollableElement = (elementId: string) => {
-  const [element, setElement] = useState<HTMLElement | undefined>(undefined);
-
-  useEffect(() => {
-    if (element) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      const targetTable = document.getElementById(elementId);
-      if (targetTable) {
-        clearInterval(interval);
-        setElement(targetTable);
-      }
-    }, 100);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  return { element };
-};
 
 const PlanningSummaryTable = () => {
   const { heads, cells } = useSummaryRows();
@@ -41,11 +18,10 @@ const PlanningSummaryTable = () => {
 
   const { element: planningTable } = useScrollableElement('planning-table-container');
 
-  // Listen to PlanningSummaryTable/PlanningTable and update scroll position for PlanningTable/PlanningSummaryTable
+  /**
+   * Listen to PlanningSummaryTable/PlanningTable and update scroll position for PlanningTable/PlanningSummaryTable
+   */
   useEffect(() => {
-    /**
-     * Listen to planning table scroll
-     */
     const onPlanningTableScroll = (): void => {
       planningSummaryTableRef?.current?.parentElement?.scrollTo({
         left: planningTable?.scrollLeft,
@@ -62,11 +38,8 @@ const PlanningSummaryTable = () => {
     };
     planningTable?.addEventListener('scroll', onPlanningTableScroll);
 
-    /**
-     * Listen to planning summary table scroll
-     */
     const onPlanningSummaryTableScroll = (): void => {
-      // to void forever loop, we need to check whther crolling is happining while mouse is over the head element
+      // to avoid a forever loop, we need to check whether scrolling is happining while mouse is over the head element
       if (overPlanningSummaryTable) {
         planningTable?.scrollTo({
           left: planningSummaryTableRef.current.parentElement?.scrollLeft,
@@ -116,6 +89,9 @@ const PlanningSummaryTable = () => {
     };
   }, [planningSummaryTableRef, planningTable]);
 
+  /**
+   * Listen to showDateIndicator event and display the date indicator if isVisible is true
+   */
   useEffect(() => {
     if (!dateIndicatorRef || !dateIndicatorRef.current) {
       return;
@@ -135,20 +111,9 @@ const PlanningSummaryTable = () => {
       dateIndicatorElement.style.display = displayValue;
     };
 
-    const setElementHeight = () => {
-      const { scrollHeight } = document.documentElement;
-      dateIndicatorElement.style.height = `${scrollHeight}px`;
-    };
-
-    // Call the setElementHeight function initially and on window resize
-    setElementHeight();
-
-    // Attach an event listener to update the element's height on window resize
-    window.addEventListener('resize', setElementHeight);
     dateIndicatorElement.addEventListener('showDateIndicator', showDateIndicator);
     return () => {
       dateIndicatorElement.removeEventListener('showDateIndicator', showDateIndicator);
-      window.removeEventListener('resize', setElementHeight);
     };
   }, [dateIndicatorRef]);
 
@@ -187,13 +152,12 @@ const PlanningSummaryTable = () => {
           </tbody>
         </table>
       </div>
-      <div className="relative h-3 w-full bg-black-90">
-        <div
-          className="absolute top-[-95px] z-[999] hidden !w-[2px] bg-metro"
-          ref={dateIndicatorRef}
-          id="date-indicator"
-        />
-      </div>
+      <div
+        className="date-indicator"
+        ref={dateIndicatorRef}
+        id="date-indicator"
+        data-testid="date-indicator"
+      />
     </div>
   );
 };

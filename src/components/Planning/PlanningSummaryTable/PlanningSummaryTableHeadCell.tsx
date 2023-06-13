@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { IconAngleLeft, IconAngleRight } from 'hds-react/icons';
 import { getDaysInMonthForYear, getMonthToday, getToday } from '@/utils/dates';
 import moment from 'moment';
@@ -21,7 +21,6 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   isCurrentYear,
 }) => {
   const dispatch = useAppDispatch();
-  const dateIndicatorRef = useRef<HTMLSpanElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
 
   // Sets the selectedYear or null if the year is given again, so that the monthly view can be closed
@@ -47,30 +46,6 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
     [dispatch, selectedYear],
   );
 
-  useLayoutEffect(() => {
-    if (!isCurrentYear) {
-      return;
-    }
-
-    const setElementHeight = () => {
-      if (dateIndicatorRef.current) {
-        const { scrollHeight } = document.documentElement;
-        dateIndicatorRef.current.style.height = `${scrollHeight}px`;
-      }
-    };
-
-    // Call the setElementHeight function initially and on window resize
-    setElementHeight();
-
-    // Attach an event listener to update the element's height on window resize
-    window.addEventListener('resize', setElementHeight);
-
-    // Cleanup the event listener when the component is unmounted
-    return () => {
-      window.removeEventListener('resize', setElementHeight);
-    };
-  }, [selectedYear, isCurrentYear]);
-
   /**
    * Get the left pixel position of the date indicator by calculating the percent of the month
    * that has past and convert that percent to pixels.
@@ -84,7 +59,6 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
       const dayToday = parseInt(moment().format('D'));
       const percentOfMonthThatHasPast = calcPercentage(dayToday, daysInMonth);
 
-      // return `${Math.floor(percentOfMonthThatHasPast / 2.55)}px`;
       return Math.floor(percentOfMonthThatHasPast / 2.55);
     },
     [year],
@@ -103,9 +77,9 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
     [isCurrentYear],
   );
 
+  // Dispatch an event that tells the PlanningSummaryTable to display the date indicator and what its position should be
   const notifyDateIndicator = useCallback((i: number, m: string) => {
     if (showDateIndicator(i + 1)) {
-      console.log('displayning...');
       // "Async" hack to wait for the element to render before calling document.getElementById
       setTimeout(() => {
         const element = document.getElementById(`month-label-${m}`);

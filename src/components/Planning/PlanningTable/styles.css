@@ -61,7 +61,9 @@
 }
 
 .monthly-cell.district,
-.monthly-summary-cell.district {
+.monthly-summary-cell.district,
+.monthly-cell.subClass-district,
+.monthly-summary-cell.subClass-district {
   @apply border-b border-white bg-[var(--color-district)];
 }
 

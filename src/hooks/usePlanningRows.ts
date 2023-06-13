@@ -50,6 +50,7 @@ const shouldNavigate = (type: PlanningRowType, selections: IPlanningRowSelection
     case 'class':
       return !selectedClass;
     case 'subClass':
+    case 'subClass-district':
       return !selectedSubClass;
     case 'district-preview':
       return !selectedDistrict;
@@ -113,7 +114,7 @@ const getSortedProjects = (
   switch (type) {
     case 'class':
     case 'subClass':
-      // TODO: fetch subClass name if it has "suurpiiri"
+    case 'subClass-district':
       projectList = projects
         .filter(
           (p) =>
@@ -154,6 +155,11 @@ const buildPlanningTableRows = (
 
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
+  const districtType = selectedDistrict ? 'district' : 'district-preview';
+  const subClassType = selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')
+    ? 'subClass-district'
+    : 'subClass';
+
   const getRowProps = (
     item: IClass | ILocation | IGroup,
     type: PlanningRowType,
@@ -179,8 +185,12 @@ const buildPlanningTableRows = (
   // Groups can get mapped under subClasses, districts and divisions and sorts them by name
   const getSortedGroupRows = (id: string, type: PlanningRowType) => {
     const filteredGroups = [];
-    // Filter groups under subClass only if there are is no locationRelation
-    if (type === 'subClass') {
+    // Filter all groups under subClass-district
+    if (type === 'subClass-district') {
+      filteredGroups.push(...groups.filter((group) => group.classRelation === id));
+    }
+    // Filter groups under subClass-preview only if there are is no locationRelation
+    else if (type === 'subClass') {
       filteredGroups.push(
         ...groups.filter((group) => !group.locationRelation && group.classRelation === id),
       );
@@ -206,45 +216,51 @@ const buildPlanningTableRows = (
           // Map sub classes
           children: subClasses
             .filter((subClass) => subClass.parent === filteredClass.id)
-            .map((filteredSubClass) => {
-              const divisionsForSubClass = filteredSubClass.name
-                .toLocaleLowerCase()
-                .includes('suurpiiri')
-                ? divisions.filter((division) => division.parentClass === filteredSubClass.id)
-                : [];
-              return {
-                ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
-                // Map districts & groups (groups only if they do not belong to a district)
-                children: [
-                  ...getSortedGroupRows(filteredSubClass.id, 'subClass'),
-                  ...districts
-                    .filter((district) => district.parentClass === filteredSubClass.id)
-                    .map((filteredDistrict) => ({
-                      ...getRowProps(filteredDistrict, 'district-preview'),
-                    })),
-                  ...sortByNumber(divisionsForSubClass).map((filteredDivision) => {
-                    const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
-                    return {
-                      ...getRowProps(filteredDivision, 'division', groupsForDivision.length > 0),
-                      // Map projects & groups
-                      children: groupsForDivision,
-                    };
-                  }),
-                ],
-              };
-            }),
+            .map((filteredSubClass) => ({
+              ...getRowProps(filteredSubClass, subClassType, !!selectedSubClass),
+              // Map districts & groups (groups only if they do not belong to a district)
+              children: [
+                ...getSortedGroupRows(filteredSubClass.id, subClassType),
+                ...districts
+                  .filter((district) => district.parentClass === filteredSubClass.id)
+                  .map((filteredDistrict) => ({
+                    ...getRowProps(filteredDistrict, districtType),
+                  })),
+              ],
+            })),
         })),
     };
   });
 
+  const subClassDistrictRows = subClasses.map((subClass) => {
+    const divisionsForSubClass = subClass.name.toLocaleLowerCase().includes('suurpiiri')
+      ? divisions.filter((division) => division.parentClass === subClass.id)
+      : [];
+    return {
+      ...getRowProps(subClass, subClassType, !!selectedSubClass),
+      // Map districts & groups (groups only if they do not belong to a district)
+      children: [
+        ...getSortedGroupRows(subClass.id, subClassType),
+        ...sortByNumber(divisionsForSubClass).map((filteredDivision) => {
+          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
+          return {
+            ...getRowProps(filteredDivision, 'division', groupsForDivision.length > 0),
+            // Map projects & groups
+            children: groupsForDivision,
+          };
+        }),
+      ],
+    };
+  });
+
   // Map the selected districts divisions and the groups & projects that belong to those divisions
-  const locationRows = districts.map((district) => {
+  const districtRows = districts.map((district) => {
     const divisionsForDistrict = divisions.filter((division) => division.parent === district.id);
     return {
-      ...getRowProps(district, 'district', true),
+      ...getRowProps(district, districtType, true),
       // Map divisions & groups (groups only if there are no divisions)
       children: [
-        ...getSortedGroupRows(district.id, 'district'),
+        ...getSortedGroupRows(district.id, districtType),
         ...sortByNumber(divisionsForDistrict).map((filteredDivision) => {
           const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
           return {
@@ -257,7 +273,17 @@ const buildPlanningTableRows = (
     };
   });
 
-  return selectedDistrict ? locationRows : classRows;
+  const getRows = () => {
+    if (subClassType === 'subClass-district') {
+      return subClassDistrictRows;
+    } else if (selectedDistrict) {
+      return districtRows;
+    } else {
+      return classRows;
+    }
+  };
+
+  return getRows();
 };
 
 /**
@@ -282,7 +308,7 @@ const fetchProjectsByRelation = async (
   type: PlanningRowType,
   id: string | undefined,
 ): Promise<Array<IProject>> => {
-  const direct = type === 'class' || type === 'subClass';
+  const direct = type === 'class' || type === 'subClass' || type === 'subClass-district';
   try {
     const allResults = await getProjectsWithParams({
       params: `${type}=${id}`,

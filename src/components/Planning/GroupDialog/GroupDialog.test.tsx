@@ -185,7 +185,7 @@ describe('GroupDialog', () => {
     await user.click(await dialog.findByText(matchExact('Uudisrakentaminen')));
 
     await user.click(modal.querySelector('#select-field-subClass-toggle-button') as HTMLElement);
-    await user.click(await dialog.findByText(matchExact('Koillinen suurpiiri')));
+    await user.click(await dialog.findByText(matchExact('Koillinen')));
 
     await user.click(await dialog.findByText(matchExact(`groupForm.openAdvanceFilters`)));
 
