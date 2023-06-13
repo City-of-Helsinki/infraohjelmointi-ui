@@ -14,7 +14,15 @@ interface INumberFieldProps {
   hideLabel?: boolean;
 }
 
-const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readOnly, tooltip }) => {
+const NumberField: FC<INumberFieldProps> = ({
+  name,
+  label,
+  control,
+  rules,
+  readOnly,
+  tooltip,
+  hideLabel,
+}) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
   return (
@@ -28,7 +36,8 @@ const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readO
             className={`input-l`}
             {...field}
             value={field.value ?? ''}
-            label={t(label)}
+            label={!hideLabel ? t(label) : ''}
+            style={{ paddingTop: hideLabel ? '1.75rem' : '0' }}
             id={label}
             readOnly={readOnly}
             required={required}

@@ -62,7 +62,7 @@ table p {
 }
 
 .input-l {
-  max-width: 22.5rem;
+  max-width: 24rem;
 }
 
 /* 
@@ -120,10 +120,10 @@ input {
 .pen-and-label-text {
   @apply !w-auto font-medium;
 }
-
+/* 
 .input-wrapper label {
   @apply min-h-[1.4rem] w-[15.625rem];
-}
+} */
 
 .input-wrapper button {
   @apply z-[1];

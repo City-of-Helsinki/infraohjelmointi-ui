@@ -26,6 +26,7 @@ import './styles.css';
 import { IOption } from '@/interfaces/common';
 import _ from 'lodash';
 import { getToday, isBefore } from '@/utils/dates';
+import { IconAlertCircleFill } from 'hds-react';
 
 const ProjectBasicsForm: FC = () => {
   const { formMethods, classOptions, locationOptions } = useProjectBasicsForm();
@@ -395,168 +396,352 @@ const ProjectBasicsForm: FC = () => {
   }, [getValues, isFieldDirty, t]);
 
   return (
-    <div className="basic-form-container" data-testid="project-basics-form">
-      <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
-        <div className="basic-info-form">
-          {/* SECTION 1 - BASIC INFO */}
-          <FormSectionTitle {...formProps('basics')} />
-          <SelectField
-            {...formProps('type')}
-            options={types}
-            rules={{ required: t('validation.required', { field: t('validation.phase') }) ?? '' }}
-          />
-          <NumberField
-            {...formProps('hkrId')}
-            rules={{
-              maxLength: { value: 18, message: t('validation.maxLength', { value: '18' }) },
-            }}
-          />
-          <TextField
-            {...formProps('entityName')}
-            rules={{
-              maxLength: { value: 30, message: t('validation.maxLength', { value: '30' }) },
-            }}
-          />
-          <TextField {...formProps('sapProject')} control={control} />
-          <TextField {...formProps('sapNetwork')} readOnly={true} />
-          <SelectField {...formProps('area')} options={areas} />
-          <TextAreaField
-            {...formProps('description')}
-            size="l"
-            rules={{ required: t('validation.required', { field: 'Kuvaus' }) ?? '' }}
-            formSaved={formSaved}
-          />
+    <form
+      onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}
+      data-testid="project-basics-form"
+      className="basic-info-form"
+    >
+      {/* SECTION 1 - BASIC INFO */}
+      <div className="w-full" id="basics-info-section">
+        <FormSectionTitle {...formProps('basics')} />
+        <div className="form-row">
+          <div className="form-col-xl">
+            <SelectField
+              {...formProps('type')}
+              options={types}
+              rules={{ required: t('validation.required', { field: t('validation.phase') }) ?? '' }}
+            />
+          </div>
+          <div className="form-col-xl">
+            <NumberField
+              {...formProps('hkrId')}
+              rules={{
+                maxLength: { value: 18, message: t('validation.maxLength', { value: '18' }) },
+              }}
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-xl">
+            <TextField
+              {...formProps('entityName')}
+              rules={{
+                maxLength: { value: 30, message: t('validation.maxLength', { value: '30' }) },
+              }}
+            />
+          </div>
+          <div className="form-col-xl">
+            <TextField {...formProps('sapProject')} control={control} />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-xl">
+            <SelectField {...formProps('area')} options={areas} />
+          </div>
+          <div className="form-col-xl">
+            <TextField {...formProps('sapNetwork')} readOnly={true} />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-xl">
+            <TextAreaField
+              {...formProps('description')}
+              size="l"
+              rules={{ required: t('validation.required', { field: 'Kuvaus' }) ?? '' }}
+              formSaved={formSaved}
+            />
+          </div>
+        </div>
+        <div className="form-row">
           <ProjectHashTags
             name="hashTags"
             label={'projectBasicsForm.hashTags'}
             control={control}
             project={project}
           />
-          {/* SECTION 2 - STATUS */}
-          <FormSectionTitle {...formProps('status')} />
-          <SelectField {...formProps('phase')} rules={validatePhase()} options={phases} />
-          <SelectField
-            {...formProps('constructionPhaseDetail')}
-            options={constructionPhaseDetails}
-          />
-          <RadioCheckboxField {...formProps('programmed')} rules={validateProgrammed()} />
-          <NumberField {...formProps('planningStartYear')} rules={validatePlanningStartYear()} />
-          <NumberField
-            {...formProps('constructionEndYear')}
-            rules={validateConstructionEndYear()}
-          />
-          <RadioCheckboxField {...formProps('louhi')} />
-          <RadioCheckboxField {...formProps('gravel')} />
-          <SelectField {...formProps('category')} options={categories} />
-          <RadioCheckboxField {...formProps('effectHousing')} />
-          <SelectField {...formProps('riskAssessment')} options={riskAssessments} />
-          {/* SECTION 3 - SCHEDULE */}
-          <FormSectionTitle {...formProps('schedule')} />
-          <Fieldset
-            heading={t('projectBasicsForm.planning')}
-            className="custom-fieldset"
-            id="planning"
-          >
-            <DateField {...formProps('estPlanningStart')} rules={validateEstPlanningStart()} />
-            <DateField {...formProps('estPlanningEnd')} rules={validateEstPlanningEnd()} />
-            <DateField {...formProps('presenceStart')} />
-            <DateField {...formProps('presenceEnd')} />
-            <DateField {...formProps('visibilityStart')} />
-            <DateField {...formProps('visibilityEnd')} />
-          </Fieldset>
-          <Fieldset
-            heading={t('projectBasicsForm.construction')}
-            className="custom-fieldset"
-            id="construction"
-          >
-            <DateField
-              {...formProps('estConstructionStart')}
-              rules={validateEstConstructionStart()}
-            />
-            <DateField {...formProps('estConstructionEnd')} rules={validateEstConstructionEnd()} />
-          </Fieldset>
-          {/* SECTION 4 - FINANCIALS */}
-          <FormSectionTitle {...formProps('financial')} />
-          <SelectField {...formProps('masterClass')} options={masterClasses} />
-          <SelectField {...formProps('class')} options={classes} />
-          <SelectField {...formProps('subClass')} options={subClasses} />
-          <NumberField {...formProps('projectCostForecast')} tooltip="keur" />
-          <SelectField
-            {...formProps('projectQualityLevel')}
-            hideLabel={true}
-            options={projectQualityLevels}
-          />
-          <NumberField {...formProps('projectWorkQuantity')} tooltip="keur" />
-          <NumberField {...formProps('planningCostForecast')} tooltip="keur" />
-          <SelectField {...formProps('planningPhase')} hideLabel={true} options={planningPhases} />
-          <NumberField {...formProps('planningWorkQuantity')} tooltip="keur" />
-          <NumberField {...formProps('constructionCostForecast')} tooltip="keur" />
-          <SelectField
-            {...formProps('constructionPhase')}
-            hideLabel={true}
-            options={constructionPhases}
-          />
-          <NumberField {...formProps('constructionWorkQuantity')} tooltip="keur" />
-          <ListField
-            {...formProps('realizedCostLabel')}
-            fields={[
-              { ...formProps('costForecast') },
-              {
-                ...formProps('realizedCost'),
-                readOnly: true,
-              },
-              {
-                ...formProps('comittedCost'),
-                readOnly: true,
-              },
-              {
-                ...formProps('spentCost'),
-                readOnly: true,
-              },
-            ]}
-          />
-          <OverrunRightField control={control} />
-          <ListField {...formProps('preliminaryBudgetDivision')} readOnly={true} />
-          {/* SECTION 5 - RESPONSIBLE PERSONS */}
-          <FormSectionTitle {...formProps('responsiblePersons')} />
-          <SelectField
-            {...formProps('personPlanning')}
-            icon="person"
-            options={responsiblePersons}
-          />
-          <SelectField
-            {...formProps('personConstruction')}
-            icon="person"
-            options={responsiblePersons}
-          />
-          <SelectField
-            {...formProps('personProgramming')}
-            icon="person"
-            options={responsiblePersons}
-          />
-
-          <TextField {...formProps('otherPersons')} />
-          {/* SECTION 6 - LOCATION */}
-          <FormSectionTitle {...formProps('location')} />
-          <SelectField
-            {...formProps('responsibleZone')}
-            options={responsibleZones}
-            rules={{
-              required: t('validation.required', { field: 'Alueen vastuujaon mukaan' }) ?? '',
-            }}
-          />
-          <SelectField {...formProps('district')} icon="location" options={districts} />
-          <SelectField {...formProps('division')} icon="location" options={divisions} />
-          <SelectField {...formProps('subDivision')} icon="location" options={subDivisions} />
-          <TextField {...formProps('masterPlanAreaNumber')} />
-          <TextField {...formProps('trafficPlanNumber')} />
-          <TextField {...formProps('bridgeNumber')} />
-          {/* SECTION 7 - PROJECT PROGRAM */}
-          <FormSectionTitle {...formProps('projectProgramTitle')} />
-          <TextAreaField {...formProps('projectProgram')} />
         </div>
-      </form>
-    </div>
+      </div>
+
+      {/* SECTION 2 - STATUS */}
+      <div className="w-full" id="basics-status-section">
+        <FormSectionTitle {...formProps('status')} />
+        <div className="form-row">
+          <div className="form-col-xl">
+            <SelectField {...formProps('phase')} rules={validatePhase()} options={phases} />
+          </div>
+          <div className="form-col-xl">
+            <SelectField
+              {...formProps('constructionPhaseDetail')}
+              options={constructionPhaseDetails}
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-xl">
+            <div
+              className="w-full border-l-8 border-error bg-error-light px-4 py-4"
+              id="error-summary"
+            >
+              <label className="text-l font-bold">
+                <IconAlertCircleFill color="#b01038" /> Seuraavat kentät ovat pakollisia
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="form-row">
+          <RadioCheckboxField {...formProps('programmed')} rules={validateProgrammed()} />
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <NumberField {...formProps('planningStartYear')} rules={validatePlanningStartYear()} />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <NumberField
+              {...formProps('constructionEndYear')}
+              rules={validateConstructionEndYear()}
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <RadioCheckboxField {...formProps('louhi')} />
+        </div>
+        <div className="form-row">
+          <RadioCheckboxField {...formProps('gravel')} />
+        </div>
+        <div className="form-row">
+          <div className="form-col-xl">
+            <SelectField {...formProps('category')} options={categories} />
+          </div>
+        </div>
+        <div className="form-row">
+          <RadioCheckboxField {...formProps('effectHousing')} />
+        </div>
+        <div className="form-row">
+          <div className="form-col-xl">
+            <SelectField {...formProps('riskAssessment')} options={riskAssessments} />
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 3 - SCHEDULE */}
+      <div className="w-full" id="basics-schedule-section">
+        <FormSectionTitle {...formProps('schedule')} />
+        <Fieldset heading={t('projectBasicsForm.planning')} className="w-full" id="planning">
+          <div className="form-row">
+            <div className="form-col-md">
+              <DateField {...formProps('estPlanningStart')} rules={validateEstPlanningStart()} />
+            </div>
+            <div className="form-col-md">
+              <DateField {...formProps('estPlanningEnd')} rules={validateEstPlanningEnd()} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-col-md">
+              <DateField {...formProps('presenceStart')} />
+            </div>
+            <div className="form-col-md">
+              <DateField {...formProps('presenceEnd')} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-col-md">
+              <DateField {...formProps('visibilityStart')} />
+            </div>
+            <div className="form-col-md">
+              <DateField {...formProps('visibilityEnd')} />
+            </div>
+          </div>
+        </Fieldset>
+        <Fieldset
+          heading={t('projectBasicsForm.construction')}
+          className="w-full"
+          id="construction"
+        >
+          <div className="form-row">
+            <div className="form-col-md">
+              <DateField
+                {...formProps('estConstructionStart')}
+                rules={validateEstConstructionStart()}
+              />
+            </div>
+            <div className="form-col-md">
+              <DateField
+                {...formProps('estConstructionEnd')}
+                rules={validateEstConstructionEnd()}
+              />
+            </div>
+          </div>
+        </Fieldset>
+      </div>
+
+      {/* SECTION 4 - FINANCIALS */}
+      <div className="w-full" id="basics-financials-section">
+        <FormSectionTitle {...formProps('financial')} />
+        <div className="form-row">
+          <div className="form-col-xxl">
+            <SelectField {...formProps('masterClass')} options={masterClasses} size="full" />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <SelectField {...formProps('class')} options={classes} />
+          </div>
+          <div className="form-col-md">
+            <SelectField {...formProps('subClass')} options={subClasses} />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-sm">
+            <NumberField {...formProps('projectCostForecast')} tooltip="keur" hideLabel={true} />
+          </div>
+          <div className="form-col-lg">
+            <SelectField {...formProps('projectQualityLevel')} options={projectQualityLevels} />
+          </div>
+          <div className="form-col-sm">
+            <NumberField {...formProps('projectWorkQuantity')} tooltip="keur" />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-sm">
+            <NumberField {...formProps('planningCostForecast')} tooltip="keur" hideLabel={true} />
+          </div>
+          <div className="form-col-lg">
+            <SelectField {...formProps('planningPhase')} options={planningPhases} />
+          </div>
+          <div className="form-col-sm">
+            <NumberField {...formProps('planningWorkQuantity')} tooltip="keur" />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-sm">
+            <NumberField
+              {...formProps('constructionCostForecast')}
+              tooltip="keur"
+              hideLabel={true}
+            />
+          </div>
+          <div className="form-col-lg">
+            <SelectField {...formProps('constructionPhase')} options={constructionPhases} />
+          </div>
+          <div className="form-col-sm">
+            <NumberField {...formProps('constructionWorkQuantity')} tooltip="keur" />
+          </div>
+        </div>
+        <ListField
+          {...formProps('realizedCostLabel')}
+          fields={[
+            { ...formProps('costForecast') },
+            {
+              ...formProps('realizedCost'),
+              readOnly: true,
+            },
+            {
+              ...formProps('comittedCost'),
+              readOnly: true,
+            },
+            {
+              ...formProps('spentCost'),
+              readOnly: true,
+            },
+          ]}
+        />
+        <OverrunRightField control={control} />
+        <ListField {...formProps('preliminaryBudgetDivision')} readOnly={true} />
+      </div>
+
+      {/* SECTION 5 - RESPONSIBLE PERSONS */}
+      <div className="w-full" id="basics-responsible-persons-section">
+        <FormSectionTitle {...formProps('responsiblePersons')} />
+        <div className="form-row">
+          <div className="form-col-md">
+            <SelectField
+              {...formProps('personPlanning')}
+              icon="person"
+              options={responsiblePersons}
+            />
+          </div>
+          <div className="form-col-md">
+            <SelectField
+              {...formProps('personConstruction')}
+              icon="person"
+              options={responsiblePersons}
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <SelectField
+              {...formProps('personProgramming')}
+              icon="person"
+              options={responsiblePersons}
+            />
+          </div>
+          <div className="form-col-md">
+            <TextField {...formProps('otherPersons')} />
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 6 - LOCATION */}
+      <div className="w-full" id="basics-location-section">
+        <FormSectionTitle {...formProps('location')} />
+        <div className="form-row">
+          <div className="form-col-xxl">
+            <SelectField
+              {...formProps('responsibleZone')}
+              options={responsibleZones}
+              rules={{
+                required: t('validation.required', { field: 'Alueen vastuujaon mukaan' }) ?? '',
+              }}
+              size="full"
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-xxl">
+            <SelectField
+              {...formProps('district')}
+              icon="location"
+              options={districts}
+              size="full"
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <SelectField {...formProps('division')} icon="location" options={divisions} />
+          </div>
+          <div className="form-col-md">
+            <SelectField {...formProps('subDivision')} icon="location" options={subDivisions} />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <TextField {...formProps('masterPlanAreaNumber')} />
+          </div>
+          <div className="form-col-md">
+            <TextField {...formProps('trafficPlanNumber')} />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <TextField {...formProps('bridgeNumber')} />
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 7 - PROJECT PROGRAM */}
+      <div className="w-full" id="basics-location-section">
+        <FormSectionTitle {...formProps('projectProgramTitle')} />
+        <div className="form-row">
+          <div className="form-col-xxl">
+            <TextAreaField {...formProps('projectProgram')} />
+          </div>
+        </div>
+      </div>
+    </form>
   );
 };
 

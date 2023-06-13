@@ -89,8 +89,13 @@
   white-space: nowrap;
 }
 
-.select-field-wrapper {
-  @apply relative max-w-[22.5rem];
+.select-field-wrapper,
+.select-field-wrapper-lg {
+  @apply relative max-w-[24rem];
+}
+
+.select-field-wrapper-full {
+  @apply relative;
 }
 
 #summing-group-dialog .dialog-section .search-form .select-field-wrapper {

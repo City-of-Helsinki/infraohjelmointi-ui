@@ -10,7 +10,7 @@ const ProjectBasics = () => {
     <div className="project-basics-container" data-testid="project-basics">
       {project && (
         <>
-          <div className="flex flex-1 justify-center">
+          <div className="flex w-[35%] justify-center">
             {/* This "extra" div is here so that the side-panel-container's sticky position works */}
             <div>
               <div className="side-panel-container " data-testid="side-panel">
@@ -19,7 +19,7 @@ const ProjectBasics = () => {
             </div>
           </div>
 
-          <div className="my-16 flex flex-[2]" data-testid="form-panel">
+          <div className="flex w-[65%]" data-testid="form-panel">
             <ProjectBasicsForm />
           </div>
         </>

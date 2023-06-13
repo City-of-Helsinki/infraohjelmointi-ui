@@ -60,6 +60,7 @@ module.exports = {
       'bus-d': 'var(--color-bus-dark)',
       transparent: 'transparent',
       error: 'var(--color-error)',
+      'error-light': 'var(--color-error-light)',
       'coat-of-arms': 'var(--color-coat-of-arms)',
       'coat-of-arms-l': 'var(--color-coat-of-arms-light)',
       'coat-of-arms-d': 'var(--color-coat-of-arms-dark)',

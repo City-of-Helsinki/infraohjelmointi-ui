@@ -1,263 +1,39 @@
-:root {
-  --grid-col-full: 1/25;
-  --grid-col-half-left: 1/13;
-  --grid-col-half-right: 13/25;
-  --grid-col-small-left: 1/8;
-  --grid-col-small-right: 8/15;
-  --grid-col-xs-left: 1/4;
-  --grid-col-xs-middle: 4/11;
-  --grid-col-xs-right: 11/14;
-}
-.basic-info-form .custom-radio div:nth-child(2) {
-  display: flex;
+.basic-info-form {
+  @apply mt-16 w-full;
 }
 
 .basic-info-form .input-wrapper {
   margin-bottom: var(--spacing-l);
 }
 
-.basic-info-form {
-  display: grid;
-  grid-template-columns: repeat(24, 1fr); /* repeat 24 rows with 1fr (fractional unit) */
-  grid-auto-flow: row;
-  gap: 0rem var(--spacing-s);
-  width: 85%;
-  margin: 0 var(--spacing-2-xl) 0 0;
+.basic-info-form .form-row {
+  @apply flex w-full;
 }
 
-.basic-info-form #formTitle {
-  grid-column: var(--grid-col-full);
+.basic-info-form .form-col-sm {
+  @apply mr-6 flex basis-24 flex-col;
 }
 
-.basic-info-form #type {
-  grid-column: var(--grid-col-half-left);
+.basic-info-form .form-col-md {
+  @apply mr-6 flex basis-72 flex-col;
 }
 
-.basic-info-form #hkrId {
-  grid-column: var(--grid-col-half-right);
+.basic-info-form .form-col-lg {
+  @apply mr-6 flex basis-[22.35rem] flex-col;
 }
 
-.basic-info-form #entityName {
-  grid-column: var(--grid-col-half-left);
+.basic-info-form .form-col-xl {
+  @apply mr-6 flex basis-96 flex-col;
 }
 
-.basic-info-form #description {
-  grid-column: var(--grid-col-half-left);
+.basic-info-form .form-col-xxl {
+  @apply mr-6 flex basis-[37.5rem] flex-col;
 }
 
-.basic-info-form #area {
-  grid-column: var(--grid-col-half-left);
-}
-
-.basic-info-form #sapProject {
-  grid-column: var(--grid-col-half-right);
-}
-
-.basic-info-form #sapNetwork {
-  grid-column: var(--grid-col-half-right);
-  grid-row: 4 / 7;
-}
-
-.basic-info-form #hashTags {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #phase {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #constructionPhaseDetail {
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #programmed {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #planningStartYear {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #constructionEndYear {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #louhi {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #gravel {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #category {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #effectHousing {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #riskAssessment {
-  grid-column: var(--grid-col-full);
-}
-
-/* elements inside custom-fieldset will take up the whole row */
-.basic-info-form .custom-fieldset {
-  display: grid;
-  grid-column: 1/25; /* use up all columns of basic-info-form */
-  grid-template-columns: repeat(24, 1fr); /* repeat 24 columns */
-  grid-auto-flow: row;
-  gap: var(--spacing-s);
-}
-
-.basic-info-form #estPlanningStart {
-  grid-row: 1;
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #estPlanningEnd {
-  grid-row: 1;
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #presenceStart {
-  grid-row: 2;
-  grid-column: var(--grid-col-small-left);
-}
-.basic-info-form #presenceEnd {
-  grid-row: 2;
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #visibilityStart {
-  grid-row: 3;
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #visibilityEnd {
-  grid-row: 3;
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #estConstructionStart {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #estConstructionEnd {
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #masterClass {
-  grid-column: var(--grid-col-half-left);
-}
-
-.basic-info-form #class {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #subClass {
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #projectCostForecast {
-  grid-column: var(--grid-col-xs-left);
-}
-
-.basic-info-form #projectQualityLevel {
-  grid-column: var(--grid-col-xs-middle);
-}
-
-.basic-info-form #projectWorkQuantity {
-  grid-column: var(--grid-col-xs-right);
-}
-
-.basic-info-form #planningCostForecast {
-  grid-column: var(--grid-col-xs-left);
-}
-
-.basic-info-form #planningPhase {
-  grid-column: var(--grid-col-xs-middle);
-}
-
-.basic-info-form #planningWorkQuantity {
-  grid-column: var(--grid-col-xs-right);
-}
-
-.basic-info-form #constructionCostForecast {
-  grid-column: var(--grid-col-xs-left);
-}
-
-.basic-info-form #constructionPhase {
-  grid-column: var(--grid-col-xs-middle);
-}
-
-.basic-info-form #constructionWorkQuantity {
-  grid-column: var(--grid-col-xs-right);
-}
-
-.basic-info-form #realizedCostLabel {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #overrunRight {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #preliminaryBudgetDivision {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #responsibleZone {
-  grid-column: var(--grid-col-half-left);
-}
-
-.basic-info-form #district {
-  grid-column: var(--grid-col-half-left);
-}
-
-.basic-info-form #division {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #subDivision {
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #masterPlanAreaNumber {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #trafficPlanNumber {
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #bridgeNumber {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #projectProgram {
-  grid-column: var(--grid-col-full);
-}
-
-.basic-info-form #projectProgram textarea {
-  width: 70%;
-}
-
-.basic-info-form #personPlanning {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #personConstruction {
-  grid-column: var(--grid-col-small-right);
-}
-
-.basic-info-form #personProgramming {
-  grid-column: var(--grid-col-small-left);
-}
-
-.basic-info-form #otherPersons {
-  grid-column: var(--grid-col-small-right);
+.basic-info-form #projectQualityLevel label,
+.basic-info-form #planningPhase label,
+.basic-info-form #constructionPhase label {
+  @apply -translate-x-[7.5rem];
 }
 
 .save-icon > span {
@@ -295,18 +71,6 @@
 
 .project-basics-container {
   @apply flex h-full w-full flex-wrap;
-}
-
-@media (max-width: 1400px) {
-  .basic-info-form {
-    width: 95%;
-  }
-}
-
-@media (min-width: 2000px) {
-  .basic-info-form {
-    width: 60%;
-  }
 }
 
 /* Select fields error message svg icon resize */
