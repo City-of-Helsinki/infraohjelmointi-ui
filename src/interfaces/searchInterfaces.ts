@@ -11,6 +11,7 @@ export interface ISearchResultPayloadItem {
   hashTags: Array<IListItem>;
   phase: IListItem | null;
 }
+
 export interface IProgrammedProjectSuggestions {
   value: string;
   label: string;
@@ -32,8 +33,6 @@ export interface ISearchResultListItem extends Omit<ISearchResultPayloadItem, 'p
   phase: string | null;
   link: string;
 }
-
-
 
 export interface ISearchResults {
   next: string | null;

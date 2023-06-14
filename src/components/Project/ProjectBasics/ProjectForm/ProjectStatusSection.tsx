@@ -1,5 +1,5 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -9,6 +9,7 @@ import { getToday, isBefore } from '@/utils/dates';
 import { IconAlertCircleFill } from 'hds-react';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import _ from 'lodash';
+import ErrorSummary from './ErrorSummary';
 
 interface IProjectStatusSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -40,6 +41,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
 
   const { t } = useTranslation();
 
+  const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
+
   const proposalPhase = phases[0].value;
   const designPhase = phases[1].value;
   const programmedPhase = phases[2].value;
@@ -65,20 +68,19 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [t],
   );
 
-  const getErrorMessageIfMissingFields = useCallback(
+  const setRequiredIfFieldsMissing = useCallback(
     (fields: Array<string>) => {
-      const missingFields = fields
-        .filter((f) => {
-          if (_.has(getValues(f as keyof IProjectForm), 'value')) {
-            return !(getValues(f as keyof IProjectForm) as IOption).value;
-          } else {
-            return !getValues(f as keyof IProjectForm);
-          }
-        })
-        .map((f) => t(`validation.${f}`))
-        .join(', ');
+      const missingFields = fields.filter((f) => {
+        if (_.has(getValues(f as keyof IProjectForm), 'value')) {
+          return !(getValues(f as keyof IProjectForm) as IOption).value;
+        } else {
+          return !getValues(f as keyof IProjectForm);
+        }
+      });
 
-      return missingFields.length > 0 ? `Täytä kentät: ${missingFields}` : true;
+      setPhaseRequirements(missingFields);
+
+      return missingFields.length > 0;
     },
     [getValues, t],
   );
@@ -91,12 +93,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const phaseToSubmit = phase.value;
           switch (phaseToSubmit) {
             case programmedPhase:
-              return getErrorMessageIfMissingFields(['planningStartYear', 'constructionEndYear']);
+              return setRequiredIfFieldsMissing(['planningStartYear', 'constructionEndYear']);
             case draftInitiationPhase:
             case draftApprovalPhase:
             case constructionPlanPhase:
             case constructionWaitPhase:
-              return getErrorMessageIfMissingFields([
+              return setRequiredIfFieldsMissing([
                 'estPlanningStart',
                 'estPlanningEnd',
                 'planningStartYear',
@@ -111,7 +113,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               ) {
                 return "Hankkeen vaihe ei voi olla 'Takuuaika' jos nykyinen päivä on ennen rakentamisen päättymispäivää";
               }
-              return getErrorMessageIfMissingFields([
+              return setRequiredIfFieldsMissing([
                 'estPlanningStart',
                 'estPlanningEnd',
                 'planningStartYear',
@@ -134,7 +136,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     constructionWaitPhase,
     draftApprovalPhase,
     draftInitiationPhase,
-    getErrorMessageIfMissingFields,
+    setRequiredIfFieldsMissing,
     getValues,
     programmedPhase,
     t,
@@ -218,23 +220,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           />
         </div>
       </div>
-      <div className="form-row">
-        <div className="error-summary-col">
-          <div className="error-summary-container" id="error-summary">
-            <label className="error-summary-label">
-              <IconAlertCircleFill color="#b01038" /> {t('validation.fieldsRequired')}
-            </label>
-            <ul className="error-summary-list">
-              <li>
-                {t('validation.errorNum', { number: 1 })}
-                <a href={`#${'estPlanningStart'}`} className="error-summary-link">
-                  {t(`validation.${'estPlanningStart'}`)}
-                </a>
-              </li>
-            </ul>
+      {phaseRequirements.length > 0 && (
+        <div className="form-row">
+          <div className="error-summary-col">
+            <ErrorSummary fields={phaseRequirements} />
           </div>
         </div>
-      </div>
+      )}
+
       <div className="form-row">
         <RadioCheckboxField {...getFieldProps('programmed')} rules={validateProgrammed()} />
       </div>
