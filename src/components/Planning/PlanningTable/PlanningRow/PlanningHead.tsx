@@ -101,7 +101,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               )}
               <IconMenuDots
                 size="s"
-                onMouseDown={type === 'group' ? handleGroupRowMenu : undefined}
+                onClick={type === 'group' ? handleGroupRowMenu : undefined}
                 data-testid={`show-more-icon-${id}`}
               />
             </div>

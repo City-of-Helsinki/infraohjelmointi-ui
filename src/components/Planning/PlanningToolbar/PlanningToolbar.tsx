@@ -90,8 +90,6 @@ const PlanningToolbar = () => {
               isOpen={groupDialogVisible}
               handleClose={onCloseGroupDialog}
               editMode={false}
-              projects={[]}
-              id={null}
             />
             <ProjectProgrammedDialog
               isVisible={projectProgrammedDialogVisible}

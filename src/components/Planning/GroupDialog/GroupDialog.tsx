@@ -20,8 +20,8 @@ interface IDialogProps {
   handleClose: () => void;
   isOpen: boolean;
   editMode: boolean;
-  id: string | null;
-  projects: IOption[];
+  id?: string | null;
+  projects?: IOption[];
 }
 const buildRedirectRoute = (form: IGroupForm): string => {
   return `${form.masterClass.value}/${form.class.value}/${form.subClass.value}/${form.district?.value}`;
@@ -40,7 +40,7 @@ const buildRequestPayload = (
   if (id) {
     return {
       id,
-      data: data,
+      data,
     };
   }
   return data;
@@ -52,7 +52,7 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const [showAdvanceFields, setShowAdvanceFields] = useState(false);
 
-    const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(id, projects);
+    const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(projects, id);
     const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
     const nameField = watch('name');
     const subClassField = watch('subClass');
@@ -92,7 +92,7 @@ const DialogContainer: FC<IDialogProps> = memo(
     }, [handleClose, formValues, reset]);
 
     const onSubmit = useCallback(
-      async (form: IGroupForm) => {
+      (form: IGroupForm) => {
         if (editMode && id) {
           patchGroup(buildRequestPayload(form, id) as IGroupPatchRequestObject)
             .then((group: IGroup) => {
@@ -101,12 +101,10 @@ const DialogContainer: FC<IDialogProps> = memo(
             })
             .catch(Promise.reject);
         } else {
-          await dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest)).then(
-            () => {
-              handleDialogClose();
-              navigate(buildRedirectRoute(form));
-            },
-          );
+          dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest)).then(() => {
+            handleDialogClose();
+            navigate(buildRedirectRoute(form));
+          });
         }
       },
 

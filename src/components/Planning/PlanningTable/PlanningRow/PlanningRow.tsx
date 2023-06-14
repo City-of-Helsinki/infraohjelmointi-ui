@@ -75,7 +75,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
             projectToUpdate.projectGroup &&
             id === projectToUpdate.projectGroup) ||
           (!projectToUpdate.projectGroup &&
-            (type === 'district' || type.toLowerCase().includes('division')) &&
+            (type === 'district' || type === 'division') &&
             id === projectToUpdate.projectLocation) ||
           (!projectToUpdate.projectLocation &&
             !projectToUpdate.projectGroup &&
@@ -91,7 +91,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
           (type === 'group' &&
             projects[pIndex].projectGroup === id &&
             !projectToUpdate.projectGroup) ||
-          ((type === 'district' || type.toLowerCase().includes('division')) &&
+          ((type === 'district' || type === 'division') &&
             projectToUpdate.projectGroup &&
             projects[pIndex].projectLocation === id) ||
           (type.toLowerCase().includes('class') &&

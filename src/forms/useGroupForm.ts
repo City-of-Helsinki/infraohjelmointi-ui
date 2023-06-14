@@ -19,7 +19,7 @@ interface ISelectionState {
   selectedLocation: string | undefined;
 }
 
-const useGroupValues = (id: string | null,projects:IOption[]) => {
+const useGroupValues = (projects?:IOption[],id?: string | null,) => {
   const group = useAppSelector(selectGroups).find((g) => g.id === id) || null;
   const masterClasses = useAppSelector(selectMasterClasses);
   const classes = useAppSelector(selectClasses);
@@ -96,7 +96,7 @@ const useGroupValues = (id: string | null,projects:IOption[]) => {
       name: group?.name || '',
       ...getGroupClassFields(group),
       ...getGroupLocationFields(group),
-      projectsForSubmit: projects.length > 0 ? projects: [],
+      projectsForSubmit: projects && projects.length > 0 ? projects: [],
     }),
     [group,projects],
   );
@@ -104,8 +104,8 @@ const useGroupValues = (id: string | null,projects:IOption[]) => {
   return { formValues, group };
 };
 
-const useGroupForm = (id: string | null,projects: IOption[]) => {
-  const { formValues, group } = useGroupValues(id,projects);
+const useGroupForm = (projects?: IOption[],id?: string | null) => {
+  const { formValues, group } = useGroupValues(projects,id);
 
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: '',
