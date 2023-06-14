@@ -477,7 +477,12 @@ const getProjectCells = (project: IProject) => {
       growDirections: getCellGrowDirections(cell, prev, next),
     };
   });
-  function createLinkedList(list: IProjectCell[]) {
+  /**
+   * Creates a linked list from the provided list
+   * @param list list of IProjectCell
+   * @returns a list of IProjectCell
+   */
+  const createLinkedList = (list: IProjectCell[]) => {
     if (list.length === 0) {
       return list;
     }
@@ -498,7 +503,7 @@ const getProjectCells = (project: IProject) => {
     list[lastIndex].next = null;
 
     return list;
-  }
+  };
   return createLinkedList(projectCells);
 };
 
