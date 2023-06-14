@@ -101,10 +101,12 @@ const DialogContainer: FC<IDialogProps> = memo(
             })
             .catch(Promise.reject);
         } else {
-          dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest)).then(() => {
-            handleDialogClose();
-            navigate(buildRedirectRoute(form));
-          });
+          dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest))
+            .then(() => {
+              handleDialogClose();
+              navigate(buildRedirectRoute(form));
+            })
+            .catch(Promise.reject);
         }
       },
 
