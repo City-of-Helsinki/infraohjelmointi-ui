@@ -3,6 +3,7 @@
 }
 
 .project-form .input-wrapper {
+  scroll-margin-top: 100px;
   margin-bottom: var(--spacing-l);
 }
 
@@ -30,6 +31,10 @@
   @apply mr-6 flex basis-[37.5rem] flex-col;
 }
 
+.project-form .error-summary-col {
+  @apply mb-6 mr-6 flex basis-[49.5rem] flex-col;
+}
+
 .project-form #projectQualityLevel label,
 .project-form #planningPhase label,
 .project-form #constructionPhase label {
@@ -48,4 +53,20 @@
 /* Phase error message to extend both containers */
 #phase div div div:nth-child(3) {
   @apply w-[200%];
+}
+
+.error-summary-container {
+  @apply w-full border-l-8 border-error bg-error-light px-4 py-4;
+}
+
+.error-summary-label {
+  @apply flex items-center gap-2 text-l font-bold;
+}
+
+.error-summary-list {
+  @apply list-disc px-4 pt-2 text-sm font-normal;
+}
+
+.error-summary-link {
+  @apply font-medium text-bus underline;
 }

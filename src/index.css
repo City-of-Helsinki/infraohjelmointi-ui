@@ -14,6 +14,7 @@
 
 html {
   font-size: 100%;
+  scroll-behavior: smooth;
   /* overflow-x: hidden; */
 }
 
@@ -120,10 +121,6 @@ input {
 .pen-and-label-text {
   @apply !w-auto font-medium;
 }
-/* 
-.input-wrapper label {
-  @apply min-h-[1.4rem] w-[15.625rem];
-} */
 
 .input-wrapper button {
   @apply z-[1];

@@ -113,7 +113,9 @@
     "constructionEndYear": "Rakentamisen valmistumisvuosi",
     "personConstruction": "Rakennuttamisen vastuuhenkilö",
     "constructionPhaseDetail": "Rakentamisvaiheen tarkenne",
-    "phase": "Hankkeen vaihe"
+    "phase": "Hankkeen vaihe",
+    "fieldsRequired": "Seuraavat kentät ovat pakollisia:",
+    "errorNum": "Virhe {{number}}: "
   },
   "projectForm": {
     "basics": "Hankkeen perustiedot",

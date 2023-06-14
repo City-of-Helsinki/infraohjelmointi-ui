@@ -219,14 +219,19 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         </div>
       </div>
       <div className="form-row">
-        <div className="form-col-xl">
-          <div
-            className="w-full border-l-8 border-error bg-error-light px-4 py-4"
-            id="error-summary"
-          >
-            <label className="text-l font-bold">
-              <IconAlertCircleFill color="#b01038" /> Seuraavat kentät ovat pakollisia
+        <div className="error-summary-col">
+          <div className="error-summary-container" id="error-summary">
+            <label className="error-summary-label">
+              <IconAlertCircleFill color="#b01038" /> {t('validation.fieldsRequired')}
             </label>
+            <ul className="error-summary-list">
+              <li>
+                {t('validation.errorNum', { number: 1 })}
+                <a href={`#${'estPlanningStart'}`} className="error-summary-link">
+                  {t(`validation.${'estPlanningStart'}`)}
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
