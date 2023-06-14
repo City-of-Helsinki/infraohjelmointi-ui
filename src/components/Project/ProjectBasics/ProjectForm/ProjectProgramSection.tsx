@@ -2,13 +2,13 @@ import { FormSectionTitle } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { FC, memo } from 'react';
 import { Control } from 'react-hook-form';
-import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
+import { IProjectForm } from '@/interfaces/formInterfaces';
 
 interface IProjectProgramSectionProps {
   getFieldProps: (name: string) => {
     name: string;
     label: string;
-    control: Control<IProjectBasicsForm>;
+    control: Control<IProjectForm>;
   };
 }
 const ProjectProgramSection: FC<IProjectProgramSectionProps> = ({ getFieldProps }) => {

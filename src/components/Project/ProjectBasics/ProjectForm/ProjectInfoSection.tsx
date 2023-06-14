@@ -1,21 +1,21 @@
 import { FormSectionTitle, NumberField, SelectField, TextField } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
-import { ProjectHashTags } from '../ProjectHashTags';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { FC, memo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control } from 'react-hook-form';
-import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
+import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
+import { ProjectHashTags } from './ProjectHashTags';
 
 interface IProjectInfoSectionProps {
   project: IProject | null;
-  control: Control<IProjectBasicsForm>;
+  control: Control<IProjectForm>;
   formSaved: boolean;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
-    control: Control<IProjectBasicsForm>;
+    control: Control<IProjectForm>;
   };
 }
 const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
@@ -82,7 +82,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
       <div className="form-row">
         <ProjectHashTags
           name="hashTags"
-          label={'projectBasicsForm.hashTags'}
+          label={'projectForm.hashTags'}
           control={control}
           project={project}
         />

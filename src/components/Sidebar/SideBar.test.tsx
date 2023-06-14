@@ -8,9 +8,9 @@ import { Route } from 'react-router';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from '@/views/ProjectView';
-import { ProjectBasics } from '../Project/ProjectBasics';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import PlanningView from '@/views/PlanningView';
+import { ProjectBasics } from '../Project/ProjectBasics';
 
 jest.mock('react-i18next', () => mockI18next());
 

@@ -2,7 +2,7 @@ import { FormSectionTitle, NumberField, SelectField } from '@/components/shared'
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
-import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
+import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { IOption } from '@/interfaces/common';
 import { getToday, isBefore } from '@/utils/dates';
@@ -11,11 +11,11 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import _ from 'lodash';
 
 interface IProjectStatusSectionProps {
-  getValues: UseFormGetValues<IProjectBasicsForm>;
+  getValues: UseFormGetValues<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
-    control: Control<IProjectBasicsForm>;
+    control: Control<IProjectForm>;
   };
   isFieldDirty: (field: string) =>
     | boolean
@@ -69,10 +69,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     (fields: Array<string>) => {
       const missingFields = fields
         .filter((f) => {
-          if (_.has(getValues(f as keyof IProjectBasicsForm), 'value')) {
-            return !(getValues(f as keyof IProjectBasicsForm) as IOption).value;
+          if (_.has(getValues(f as keyof IProjectForm), 'value')) {
+            return !(getValues(f as keyof IProjectForm) as IOption).value;
           } else {
-            return !getValues(f as keyof IProjectBasicsForm);
+            return !getValues(f as keyof IProjectForm);
           }
         })
         .map((f) => t(`validation.${f}`))

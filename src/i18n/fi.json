@@ -115,7 +115,7 @@
     "constructionPhaseDetail": "Rakentamisvaiheen tarkenne",
     "phase": "Hankkeen vaihe"
   },
-  "projectBasicsForm": {
+  "projectForm": {
     "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
     "entityName": "Hankekokonaisuuden nimi",

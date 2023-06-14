@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
-import ProjectBasicsForm from './ProjectBasicsForm';
+import ProjectForm from './ProjectForm';
 import { arrayHasValue, matchExact } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import {
@@ -32,11 +32,11 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const getFormField = (name: string) => `projectBasicsForm.${name}`;
+const getFormField = (name: string) => `projectForm.${name}`;
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectBasicsForm />} />, {
+    renderWithProviders(<Route path="/" element={<ProjectForm />} />, {
       preloadedState: {
         project: {
           selectedProject: mockProject.data,
@@ -77,7 +77,7 @@ const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project:
   await sendProjectUpdateEvent(project).then(() => dispatch(setSelectedProject(project)));
 };
 
-describe('ProjectBasicsForm', () => {
+describe('projectForm', () => {
   afterEach(async () => {
     jest.clearAllMocks();
   });
@@ -85,7 +85,7 @@ describe('ProjectBasicsForm', () => {
   it('renders the component wrappers', async () => {
     const { findByTestId } = await render();
 
-    expect(await findByTestId('project-basics-form')).toBeInTheDocument();
+    expect(await findByTestId('project-form')).toBeInTheDocument();
   });
 
   it('fills the fields with existing project data', async () => {
@@ -155,8 +155,8 @@ describe('ProjectBasicsForm', () => {
   it('has all required fields as required', async () => {
     const { findByText } = await render();
 
-    expect(await findByText('projectBasicsForm.type')).toBeInTheDocument();
-    expect(await findByText('projectBasicsForm.description')).toBeInTheDocument();
+    expect(await findByText('projectForm.type')).toBeInTheDocument();
+    expect(await findByText('projectForm.description')).toBeInTheDocument();
   });
 
   it('renders hashTags modal and can search and patch hashTags', async () => {
@@ -174,7 +174,7 @@ describe('ProjectBasicsForm', () => {
     };
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    await user.click(await findByRole('button', { name: 'projectForm.hashTags' }));
     const dialog = within(await findByRole('dialog'));
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
@@ -246,7 +246,7 @@ describe('ProjectBasicsForm', () => {
     addProjectUpdateEventListener(dispatch);
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    await user.click(await findByRole('button', { name: 'projectForm.hashTags' }));
     const dialog = within(await findByRole('dialog'));
 
     // Open the textbox and submit a new hashtag
@@ -305,7 +305,7 @@ describe('ProjectBasicsForm', () => {
     addProjectUpdateEventListener(dispatch);
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    await user.click(await findByRole('button', { name: 'projectForm.hashTags' }));
     const dialog = within(await findByRole('dialog'));
 
     // popular hashtag exists in the container
@@ -347,7 +347,7 @@ describe('ProjectBasicsForm', () => {
 
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
     const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
 
@@ -371,9 +371,9 @@ describe('ProjectBasicsForm', () => {
 
     const { user, findByRole, findByText, findByTestId } = await render();
 
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.area' }));
+    await user.click(await findByRole('button', { name: 'projectForm.area' }));
     await user.click(await findByText(matchExact('enums.lansisatama')));
     await user.click(parentContainer);
 
@@ -392,7 +392,7 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
     const estPlanningStart = await findByRole('textbox', {
       name: getFormField('estPlanningStart'),
     });
@@ -418,7 +418,7 @@ describe('ProjectBasicsForm', () => {
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
     const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
     await user.clear(descriptionField);
     await user.type(descriptionField, expectedValue);
@@ -441,7 +441,7 @@ describe('ProjectBasicsForm', () => {
     const { user, findByTestId } = await render();
 
     const louhiField = (await findByTestId('louhi-0')) as HTMLInputElement;
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
     await user.click(louhiField);
     await user.click(parentContainer);

@@ -1,7 +1,8 @@
-import ProjectBasicsForm from './ProjectBasicsForm';
-import ProjectSidePanel from './ProjectSidePanel';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
+import ProjectSidePanel from './ProjectFormSidePanel/ProjectFormSidePanel';
+import ProjectForm from './ProjectForm/ProjectForm';
+import './styles.css';
 
 const ProjectBasics = () => {
   const project = useAppSelector(selectProject);
@@ -11,16 +12,10 @@ const ProjectBasics = () => {
       {project && (
         <>
           <div className="flex w-[35%] justify-center">
-            {/* This "extra" div is here so that the side-panel-container's sticky position works */}
-            <div>
-              <div className="side-panel-container " data-testid="side-panel">
-                <ProjectSidePanel pwFolderLink={project.pwFolderLink} />
-              </div>
-            </div>
+            <ProjectSidePanel pwFolderLink={project.pwFolderLink} />
           </div>
-
           <div className="flex w-[65%]" data-testid="form-panel">
-            <ProjectBasicsForm />
+            <ProjectForm />
           </div>
         </>
       )}

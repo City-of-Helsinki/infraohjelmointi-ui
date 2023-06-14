@@ -1,5 +1,5 @@
-import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
-import { useCallback, useEffect, useMemo } from 'react';
+import { IProjectForm } from '@/interfaces/formInterfaces';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../hooks/common';
@@ -20,7 +20,7 @@ import useLocationOptions from '@/hooks/useLocationOptions';
  *
  * @returns formValues, project
  */
-const useProjectBasicsValues = () => {
+const useProjectFormValues = () => {
   const project = useAppSelector(selectProject);
 
   const masterClasses = useAppSelector(selectMasterClasses);
@@ -101,7 +101,7 @@ const useProjectBasicsValues = () => {
     value: person ? person.id : '',
   });
 
-  const formValues: IProjectBasicsForm = useMemo(
+  const formValues: IProjectForm = useMemo(
     () => ({
       type: listItemToOption(project?.type, t),
       description: value(project?.description),
@@ -165,16 +165,16 @@ const useProjectBasicsValues = () => {
 };
 
 /**
- * This hook initializes a react-hook-form control for a project basics form. It will keep the
+ * This hook initializes a react-hook-form control for the project form. It will keep the
  * form up to date with the selectedProject from redux and return all needed functions to handle
  * the form.
  *
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
-const useProjectBasicsForm = () => {
-  const { formValues, project } = useProjectBasicsValues();
+const useProjectForm = () => {
+  const { formValues, project } = useProjectFormValues();
 
-  const formMethods = useForm<IProjectBasicsForm>({
+  const formMethods = useForm<IProjectForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onBlur',
   });
@@ -195,4 +195,4 @@ const useProjectBasicsForm = () => {
   return { formMethods, classOptions, locationOptions };
 };
 
-export default useProjectBasicsForm;
+export default useProjectForm;

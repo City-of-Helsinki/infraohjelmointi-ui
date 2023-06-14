@@ -64,8 +64,8 @@ describe('ProjectBasics', () => {
     });
   });
 
-  it('renders ProjectBasicsForm', async () => {
+  it('renders ProjectForm', async () => {
     const { getByTestId } = await render();
-    expect(getByTestId('project-basics-form')).toBeInTheDocument();
+    expect(getByTestId('project-form')).toBeInTheDocument();
   });
 });

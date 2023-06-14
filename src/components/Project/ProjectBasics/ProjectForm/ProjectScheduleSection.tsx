@@ -2,7 +2,7 @@ import { FormSectionTitle } from '@/components/shared';
 import { FC, memo, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
-import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
+import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { isBefore } from '@/utils/dates';
 import { Fieldset } from 'hds-react';
@@ -10,11 +10,11 @@ import _ from 'lodash';
 import DateField from '@/components/shared/DateField';
 
 interface IProjectScheduleSectionProps {
-  getValues: UseFormGetValues<IProjectBasicsForm>;
+  getValues: UseFormGetValues<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
-    control: Control<IProjectBasicsForm>;
+    control: Control<IProjectForm>;
   };
   isFieldDirty: (field: string) =>
     | boolean
@@ -175,7 +175,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
   return (
     <div className="w-full" id="basics-schedule-section">
       <FormSectionTitle {...getFieldProps('schedule')} />
-      <Fieldset heading={t('projectBasicsForm.planning')} className="w-full" id="planning">
+      <Fieldset heading={t('projectForm.planning')} className="w-full" id="planning">
         <div className="form-row">
           <div className="form-col-md">
             <DateField {...getFieldProps('estPlanningStart')} rules={validateEstPlanningStart()} />
@@ -201,7 +201,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           </div>
         </div>
       </Fieldset>
-      <Fieldset heading={t('projectBasicsForm.construction')} className="w-full" id="construction">
+      <Fieldset heading={t('projectForm.construction')} className="w-full" id="construction">
         <div className="form-row">
           <div className="form-col-md">
             <DateField

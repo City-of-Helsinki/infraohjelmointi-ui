@@ -39,7 +39,7 @@ export interface IProjectHeaderForm {
   address?: string;
 }
 
-export interface IProjectBasicsForm {
+export interface IProjectForm {
   type: IOption;
   entityName: string;
   description: string;
@@ -108,13 +108,13 @@ export interface IHashTagsForm {
 
 export interface IAppForms
   extends IProjectHeaderForm,
-    IProjectBasicsForm,
+    IProjectForm,
     IProjectNoteForm,
     IHashTagsForm {}
 
 export type HookFormControlType =
   | Control<FieldValues>
-  | Control<IProjectBasicsForm>
+  | Control<IProjectForm>
   | Control<IProjectHeaderForm>
   | Control<IHashTagsForm>
   | Control<ISearchForm>

@@ -2,13 +2,13 @@ import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
 import { FC, memo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control } from 'react-hook-form';
-import { IProjectBasicsForm } from '@/interfaces/formInterfaces';
+import { IProjectForm } from '@/interfaces/formInterfaces';
 
 interface IProjectResponsiblePersonsSectionProps {
   getFieldProps: (name: string) => {
     name: string;
     label: string;
-    control: Control<IProjectBasicsForm>;
+    control: Control<IProjectForm>;
   };
 }
 const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProps> = ({

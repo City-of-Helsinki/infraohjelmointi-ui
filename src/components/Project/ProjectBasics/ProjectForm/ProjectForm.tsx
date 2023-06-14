@@ -1,6 +1,6 @@
-import useProjectBasicsForm from '@/forms/useProjectBasicsForm';
+import useProjectForm from '@/forms/useProjectForm';
 import { useAppSelector } from '@/hooks/common';
-import { IAppForms, IProjectBasicsForm } from '@/interfaces/formInterfaces';
+import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
 import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { selectProject } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
@@ -8,8 +8,8 @@ import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { useOptions } from '@/hooks/useOptions';
 import { patchProject } from '@/services/projectServices';
-import ProjectInfoSection from './ProjectInfoSection';
 import ProjectStatusSection from './ProjectStatusSection';
+import ProjectInfoSection from './ProjectInfoSection';
 import ProjectScheduleSection from './ProjectScheduleSection';
 import ProjectFinancialsSection from './ProjectFinancialsSection';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
@@ -18,8 +18,8 @@ import ProjectProgramSection from './ProjectProgramSection';
 import _ from 'lodash';
 import './styles.css';
 
-const ProjectBasicsForm: FC = () => {
-  const { formMethods, classOptions, locationOptions } = useProjectBasicsForm();
+const ProjectForm: FC = () => {
+  const { formMethods, classOptions, locationOptions } = useProjectForm();
   const project = useAppSelector(selectProject);
   const [formSaved, setFormSaved] = useState(false);
 
@@ -37,7 +37,7 @@ const ProjectBasicsForm: FC = () => {
   }, []);
 
   const onSubmit = useCallback(
-    async (form: IProjectBasicsForm) => {
+    async (form: IProjectForm) => {
       console.log('attempt submit');
 
       if (isDirty) {
@@ -67,7 +67,7 @@ const ProjectBasicsForm: FC = () => {
     (name: string) => {
       return {
         name: name,
-        label: `projectBasicsForm.${name}`,
+        label: `projectForm.${name}`,
         control: control,
       };
     },
@@ -77,7 +77,7 @@ const ProjectBasicsForm: FC = () => {
   const isFieldDirty = useCallback(
     (field: string) => {
       if (_.has(dirtyFields, field)) {
-        return dirtyFields[field as keyof IProjectBasicsForm];
+        return dirtyFields[field as keyof IProjectForm];
       }
     },
     [dirtyFields],
@@ -96,8 +96,8 @@ const ProjectBasicsForm: FC = () => {
   return (
     <form
       onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}
-      data-testid="project-basics-form"
-      className="basic-info-form"
+      data-testid="project-form"
+      className="project-form"
     >
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection {...formProps} project={project} formSaved={formSaved} />
@@ -117,4 +117,4 @@ const ProjectBasicsForm: FC = () => {
   );
 };
 
-export default memo(ProjectBasicsForm);
+export default memo(ProjectForm);

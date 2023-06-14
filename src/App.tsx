@@ -15,7 +15,6 @@ import {
 } from './reducers/classSlice';
 import { getLocationsThunk, updateDistrict } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
-import { ProjectBasics } from './components/Project/ProjectBasics';
 import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
 import ErrorView from './views/ErrorView';
@@ -36,6 +35,7 @@ import moment from 'moment';
 import 'moment/locale/fi';
 import ScrollHandler from './components/shared/ScrollHandler';
 import { selectFinanceUpdate } from './reducers/eventsSlice';
+import { ProjectBasics } from './components/Project/ProjectBasics';
 
 const LOADING_APP_ID = 'loading-app-data';
 

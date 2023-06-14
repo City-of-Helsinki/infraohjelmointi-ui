@@ -4,12 +4,12 @@ import { getProjectThunk, selectProject, setSelectedProject } from '@/reducers/p
 import { TabList } from '@/components/shared';
 import { useNavigate, useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
-import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { useTranslation } from 'react-i18next';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
+import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import _ from 'lodash';
 
 const ProjectView = () => {

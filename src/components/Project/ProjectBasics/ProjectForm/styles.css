@@ -1,0 +1,51 @@
+.project-form {
+  @apply mt-16 w-full;
+}
+
+.project-form .input-wrapper {
+  margin-bottom: var(--spacing-l);
+}
+
+.project-form .form-row {
+  @apply flex w-full;
+}
+
+.project-form .form-col-sm {
+  @apply mr-6 flex basis-24 flex-col;
+}
+
+.project-form .form-col-md {
+  @apply mr-6 flex basis-72 flex-col;
+}
+
+.project-form .form-col-lg {
+  @apply mr-6 flex basis-[22.35rem] flex-col;
+}
+
+.project-form .form-col-xl {
+  @apply mr-6 flex basis-96 flex-col;
+}
+
+.project-form .form-col-xxl {
+  @apply mr-6 flex basis-[37.5rem] flex-col;
+}
+
+.project-form #projectQualityLevel label,
+.project-form #planningPhase label,
+.project-form #constructionPhase label {
+  @apply -translate-x-[7.5rem];
+}
+
+.save-icon > span {
+  height: auto;
+}
+
+/* Select fields error message svg icon resize */
+.select-field-wrapper div div > svg {
+  @apply min-w-[25px] max-w-[25px];
+}
+
+/* Phase error message to extend both containers */
+#phase div div div:nth-child(3) {
+  @apply w-[200%];
+}
