@@ -1,9 +1,13 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { IPlanningRow } from '@/interfaces/common';
+import { IOption, IPlanningRow } from '@/interfaces/common';
 import HoverTooltip from './HoverTooltip/HoverTooltip';
 import './styles.css';
+import { ContextMenuType } from '@/interfaces/eventInterfaces';
+import { dispatchContextMenuEvent } from '@/utils/events';
+import DeleteGroupDialog from './DeleteGroupDialog/DeleteGroupDialog';
+import { GroupDialog } from '../../GroupDialog';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -20,10 +24,31 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   costEstimateBudget,
   plannedBudgets,
   deviation,
+  projectRows,
 }) => {
   const navigate = useNavigate();
-
+  const [groupDialogState, setGroupDialogState] = useState({
+    groupDeleteOpen: false,
+    groupEditOpen: false,
+  });
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
+  const projectsToIOption = useCallback((): IOption[] => {
+    return projectRows.map((p) => ({ value: p.id, label: p.name }));
+  }, [projectRows]);
+
+  const onShowGroupDeleteDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupDeleteOpen: true }));
+  }, []);
+  const onCloseGroupDeleteDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupDeleteOpen: false }));
+  }, []);
+  const onShowGroupEditDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupEditOpen: true }));
+  }, []);
+
+  const onCloseGroupEditDialog = useCallback(() => {
+    setGroupDialogState((current) => ({ ...current, groupEditOpen: false }));
+  }, []);
 
   const onExpand = useCallback(() => {
     // Navigate to the next nested path if there's a link
@@ -32,6 +57,17 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     }
     handleExpand();
   }, [handleExpand, link, navigate]);
+
+  // Open the custom context menu for editing groups
+  const handleGroupRowMenu = useCallback(
+    (e: ReactMouseEvent<SVGAElement>) => {
+      dispatchContextMenuEvent(e, {
+        menuType: ContextMenuType.EDIT_GROUP_ROW,
+        groupRowMenuProps: { groupName: name, onShowGroupDeleteDialog, onShowGroupEditDialog },
+      });
+    },
+    [name, onShowGroupDeleteDialog, onShowGroupEditDialog],
+  );
 
   return (
     <th className={`planning-head ${type} sticky left-0 z-50`} data-testid={`head-${id}`}>
@@ -42,8 +78,32 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
             {angleIcon}
           </button>
           {type !== 'division' && (
-            <div className={`planning-head-content-dots`} data-testid={`show-more-${id}`}>
-              <IconMenuDots size="s" />
+            <div
+              className={`planning-head-content-dots cursor-pointer`}
+              data-testid={`show-more-${id}`}
+            >
+              {type === 'group' && (
+                <>
+                  <GroupDialog
+                    isOpen={groupDialogState.groupEditOpen}
+                    handleClose={onCloseGroupEditDialog}
+                    id={id}
+                    editMode={true}
+                    projects={projectsToIOption()}
+                  />
+                  <DeleteGroupDialog
+                    isVisible={groupDialogState.groupDeleteOpen}
+                    onCloseDeleteGroupDialog={onCloseGroupDeleteDialog}
+                    groupName={name}
+                    id={id}
+                  />
+                </>
+              )}
+              <IconMenuDots
+                size="s"
+                onClick={type === 'group' ? handleGroupRowMenu : undefined}
+                data-testid={`show-more-icon-${id}`}
+              />
             </div>
           )}
           <div className="planning-title-container">

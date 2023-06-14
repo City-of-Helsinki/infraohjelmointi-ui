@@ -60,6 +60,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         ...mockProject.data,
         id: 'planning-project-3',
         projectClass: 'test-sub-class-1',
+        name:"not-in-group-project"
       },
       // With group and in subClass
       {

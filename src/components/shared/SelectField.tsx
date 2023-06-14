@@ -26,6 +26,7 @@ interface ISelectFieldProps {
   icon?: string;
   placeholder?: string;
   clearable?: boolean;
+  disabled?: boolean;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -37,6 +38,8 @@ const SelectField: FC<ISelectFieldProps> = ({
   hideLabel,
   icon,
   placeholder,
+  disabled,
+  clearable,
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -84,13 +87,12 @@ const SelectField: FC<ISelectFieldProps> = ({
                 error={error?.message}
                 options={options ?? []}
                 required={required}
+                disabled={disabled}
                 style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
                 placeholder={(placeholder && t(placeholder ?? '')) ?? ''}
                 icon={getIcon(icon)}
               />
-
-              {value.value && (
-                // top should be => top: 1rem; with hds in project header
+              {((clearable === undefined && value.value) || (clearable && value.value)) && (
                 <button
                   className="empty-select-field-button"
                   data-testid={`empty-${name}-selection-button`}

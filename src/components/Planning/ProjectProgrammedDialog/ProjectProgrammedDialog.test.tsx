@@ -194,7 +194,7 @@ describe('ProjectProgrammedDialog', () => {
 
     await user.click(await dialog.findByTestId('cancel-search'));
 
-    expect(await findByTestId('row-planning-project-1')).toBeInTheDocument();
+    expect(await findByTestId('row-planning-project-1-parent-test-class-1')).toBeInTheDocument();
 
     removeProjectUpdateEventListener(store.dispatch);
   });

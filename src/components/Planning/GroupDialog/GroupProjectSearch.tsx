@@ -140,7 +140,12 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
                   className={'search-selections'}
                   data-testid={'project-selections'}
                 >
-                  <Tag onDelete={(e) => handleDelete(e, onChange)}>{s.label}</Tag>
+                  <Tag
+                    deleteButtonAriaLabel={`delete-project-${s.value}`}
+                    onDelete={(e) => handleDelete(e, onChange)}
+                  >
+                    {s.label}
+                  </Tag>
                 </div>
               ))}
             </div>

@@ -14,7 +14,7 @@ import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockGroups } from '@/mocks/mockGroups';
 import { Route } from 'react-router';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import { act, fireEvent, waitFor } from '@testing-library/react';
+import { act, fireEvent, waitFor, within } from '@testing-library/react';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { IListItem } from '@/interfaces/common';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
@@ -42,6 +42,7 @@ import {
 import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
 import { updateClass, updateMasterClass } from '@/reducers/classSlice';
+import { IGroup } from '@/interfaces/groupInterfaces';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -594,7 +595,7 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         projectsForClassWithoutGroup.forEach((p) =>
-          expect(getByTestId(`row-${p.id}`)).toBeInTheDocument(),
+          expect(getByTestId(`row-${p.id}-parent-${classId}`)).toBeInTheDocument(),
         );
       });
 
@@ -634,12 +635,12 @@ describe('PlanningView', () => {
 
       // Check that projects that belong directly to the selected subClass are visible
       const projectsForSubClassWithoutGroup = projects.filter(
-        (p) => p.projectClass === classId && !p.projectLocation && !p.projectGroup,
+        (p) => p.projectClass === subClassId && !p.projectLocation && !p.projectGroup,
       );
 
       await waitFor(() => {
         projectsForSubClassWithoutGroup.forEach(({ id }) =>
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          expect(getByTestId(`row-${id}-parent-${subClassId}`)).toBeInTheDocument(),
         );
       });
 
@@ -687,7 +688,7 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         projectsForDistrictWithoutGroup.forEach(({ id }) =>
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          expect(getByTestId(`row-${id}-parent-${districtId}`)).toBeInTheDocument(),
         );
       });
 
@@ -696,16 +697,17 @@ describe('PlanningView', () => {
 
       await waitFor(() => {
         divisionsForDistrict.forEach(({ id }) => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-          expect(getByTestId(`row-${id}`).classList.contains('division')).toBeTruthy();
+          const divisionId = id;
+          expect(getByTestId(`row-${divisionId}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${divisionId}`).classList.contains('division')).toBeTruthy();
 
           //Check that projects that belong directly to each division are visible
           const projectsForDivision = projects.filter(
-            (p) => p.projectLocation === id && !p.projectGroup,
+            (p) => p.projectLocation === divisionId && !p.projectGroup,
           );
 
           projectsForDivision.forEach(({ id }) =>
-            expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+            expect(getByTestId(`row-${id}-parent-${divisionId}`)).toBeInTheDocument(),
           );
         });
       });
@@ -727,7 +729,9 @@ describe('PlanningView', () => {
       const projectsForGroup = projects.filter((p) => p.projectGroup === groupId);
 
       await waitFor(() => {
-        projectsForGroup.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+        projectsForGroup.forEach(({ id }) =>
+          expect(getByTestId(`row-${id}-parent-${groupId}`)).toBeInTheDocument(),
+        );
       });
     });
 
@@ -895,7 +899,7 @@ describe('PlanningView', () => {
         await waitFor(() => navigateToProjectRows(renderResult));
 
         await waitFor(() => {
-          expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+          expect(getByTestId(`row-${id}-parent-test-class-1`)).toBeInTheDocument();
           expect(getByTestId(`head-${id}`)).toBeInTheDocument();
           expect(getByTestId(`edit-phase-${id}`)).toBeInTheDocument();
           expect(getByTestId(`navigate-${id}`)).toHaveTextContent(name);
@@ -1893,6 +1897,305 @@ describe('PlanningView', () => {
             expect(patchMock[0]).toBe('localhost:4000/projects/planning-project-2/');
             expect(patchMock[1]).toStrictEqual(patchMoveYearRequest);
           });
+        });
+
+        it('can edit groups using context menu', async () => {
+          const { store, getByTestId, user, findByTestId, findByRole, findAllByTestId } =
+            await render();
+          addProjectUpdateEventListener(store.dispatch);
+          const { masterClasses, classes, subClasses } = store.getState().class;
+
+          const projects = mockPlanningViewProjects.data.results;
+
+          const expectRowProperties = async (
+            finances: IClassFinances,
+            id: string,
+            isGroup?: boolean,
+          ) => {
+            const { plannedBudgets, costEstimateBudget, deviation } = calculatePlanningRowSums(
+              finances,
+              isGroup ? 'group' : 'class',
+            );
+
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`planned-budgets-${id}`).textContent).toBe(plannedBudgets);
+            expect(getByTestId(`cost-estimate-budget-${id}`).textContent).toBe(costEstimateBudget);
+            if (!isGroup) {
+              expect(getByTestId(`deviation-${id}`).textContent).toBe(deviation);
+            }
+          };
+
+          // Check that all masterClass-rows is visible
+          masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+
+          // Click the first masterclass row
+          const { id: masterClassId } = masterClasses[0];
+          await user.click(getByTestId(`expand-${masterClassId}`));
+
+          const classesForMasterClass = classes.filter((c) => c.parent === masterClassId);
+
+          // Check that all class-rows are visible
+          classesForMasterClass.forEach(({ id }) =>
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          );
+
+          // Click the first class row
+          const { id: classId } = classesForMasterClass[0];
+          await user.click(getByTestId(`expand-${classId}`));
+
+          const subClassesForClass = subClasses.filter((c) => c.parent === classId);
+
+          // Check that all subClass-rows are visible
+          subClassesForClass.forEach(({ id }) =>
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          );
+
+          // Click the first subClass row
+          const { id: subClassId } = subClassesForClass[0];
+          await user.click(getByTestId(`expand-${subClassId}`));
+
+          // Check that groups that belong directly to the selected subClass are visible
+          const groupsForSubClass = mockGroups.data.filter(
+            (g) => g.classRelation === subClassId && !g.locationRelation,
+          );
+
+          await waitFor(() => {
+            groupsForSubClass.forEach(({ id, finances }) => {
+              expectRowProperties(finances, id, true);
+              expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
+            });
+          });
+
+          const groupId = groupsForSubClass[0].id;
+
+          // Check that projects that belong directly to the selected subClass are visible
+          const projectsForSubClassWithoutGroup = projects.filter(
+            (p) => p.projectClass === subClassId && !p.projectLocation && !p.projectGroup,
+          );
+
+          const projectToGroup = projectsForSubClassWithoutGroup[0];
+
+          await waitFor(() => {
+            projectsForSubClassWithoutGroup.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}-parent-${subClassId}`)).toBeInTheDocument(),
+            );
+          });
+
+          // Project currently under subclass
+          expect(getByTestId(`row-${projectToGroup.id}-parent-${subClassId}`)).toBeInTheDocument();
+
+          // Check show more icon exists on group planning head
+          const groupShowMoreIcon = await findByTestId(`show-more-icon-${groupId}`);
+
+          expect(groupShowMoreIcon).toBeInTheDocument();
+
+          // Open context menu
+          await user.click(groupShowMoreIcon);
+
+          const groupContextMenu = await findByTestId('group-row-context-menu');
+
+          expect(groupContextMenu).toBeInTheDocument();
+
+          // Wait for dialog to open
+          // Also context menu closes
+          await waitFor(async () => {
+            await user.click(await findByTestId('open-group-edit-dialog'));
+          });
+
+          const modal = await findByRole('dialog');
+          const groupEditDialog = within(modal);
+
+          expect(await groupEditDialog.findByDisplayValue('Test Group 3')).toBeInTheDocument();
+          expect(
+            await groupEditDialog.findByText('801 Esirakentmainen (kiinteä omaisuus)'),
+          ).toBeInTheDocument();
+          expect(await groupEditDialog.findByText('TestClass')).toBeInTheDocument();
+          expect(await groupEditDialog.findByText('TestSubClass')).toBeInTheDocument();
+
+          await user.clear(await groupEditDialog.findByDisplayValue('Test Group 3'));
+          // Changing group name
+          await user.type(await groupEditDialog.findByText('groupForm.name'), 'changed name group');
+          // Searching for project
+          const mockSuggestionsResponse = {
+            data: {
+              results: [projectsForSubClassWithoutGroup[0]],
+              count: 1,
+            },
+          };
+
+          mockedAxios.get.mockResolvedValueOnce(mockSuggestionsResponse);
+          await waitFor(async () => {
+            await user.type(
+              await groupEditDialog.findByText('groupForm.searchForProjects'),
+              'not-in',
+            );
+          });
+
+          await waitFor(async () => {
+            expect(await groupEditDialog.findByText('not-in-group-project')).toBeInTheDocument();
+            // Adding project to the group
+            await user.click(await groupEditDialog.findByText('not-in-group-project'));
+            // Length is 2 since there is already a project under this group
+            expect((await findAllByTestId('project-selections')).length).toBe(2);
+          });
+          const getRequest = mockedAxios.get.mock;
+          // Check that the correct url was called
+          expect(getRequest.lastCall[0]).toBe(
+            'localhost:4000/projects/?subClass=test-sub-class-1&projectName=not-in&inGroup=false&programmed=true&direct=true',
+          );
+          const submitButton = await groupEditDialog.findByTestId('save-group-button');
+          expect(submitButton).toBeInTheDocument();
+          const patchGroupResponse: { data: IGroup } = {
+            data: { ...groupsForSubClass[0], name: 'changed name group' },
+          };
+
+          mockedAxios.patch.mockResolvedValueOnce(patchGroupResponse);
+
+          await waitFor(async () => {
+            await user.click(submitButton);
+          });
+          // Project updated with group information
+          await sendProjectUpdateEvent({
+            ...projectsForSubClassWithoutGroup[0],
+            projectGroup: groupId,
+          });
+          // Group title updated
+          expect(
+            await within(await findByTestId(`title-${groupId}`)).findByText('changed name group'),
+          ).toBeInTheDocument();
+          // Project is now under group balk
+          expect(
+            await findByTestId(`row-${projectToGroup.id}-parent-${groupId}`),
+          ).toBeInTheDocument();
+
+          removeProjectUpdateEventListener(store.dispatch);
+        });
+
+        it('can remove groups using context menu', async () => {
+          const { store, getByTestId, user, findByTestId, findByRole } = await render();
+          addProjectUpdateEventListener(store.dispatch);
+          const { masterClasses, classes, subClasses } = store.getState().class;
+
+          const projects = mockPlanningViewProjects.data.results;
+
+          const expectRowProperties = async (
+            finances: IClassFinances,
+            id: string,
+            isGroup?: boolean,
+          ) => {
+            const { plannedBudgets, costEstimateBudget, deviation } = calculatePlanningRowSums(
+              finances,
+              isGroup ? 'group' : 'class',
+            );
+
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument();
+            expect(getByTestId(`planned-budgets-${id}`).textContent).toBe(plannedBudgets);
+            expect(getByTestId(`cost-estimate-budget-${id}`).textContent).toBe(costEstimateBudget);
+            if (!isGroup) {
+              expect(getByTestId(`deviation-${id}`).textContent).toBe(deviation);
+            }
+          };
+
+          // Check that all masterClass-rows is visible
+          masterClasses.forEach(({ id }) => expect(getByTestId(`row-${id}`)).toBeInTheDocument());
+
+          // Click the first masterclass row
+          const { id: masterClassId } = masterClasses[0];
+          await user.click(getByTestId(`expand-${masterClassId}`));
+
+          const classesForMasterClass = classes.filter((c) => c.parent === masterClassId);
+
+          // Check that all class-rows are visible
+          classesForMasterClass.forEach(({ id }) =>
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          );
+
+          // Click the first class row
+          const { id: classId } = classesForMasterClass[0];
+          await user.click(getByTestId(`expand-${classId}`));
+
+          const subClassesForClass = subClasses.filter((c) => c.parent === classId);
+
+          // Check that all subClass-rows are visible
+          subClassesForClass.forEach(({ id }) =>
+            expect(getByTestId(`row-${id}`)).toBeInTheDocument(),
+          );
+
+          // Click the first subClass row
+          const { id: subClassId } = subClassesForClass[0];
+          await user.click(getByTestId(`expand-${subClassId}`));
+
+          // Check that groups that belong directly to the selected subClass are visible
+          const groupsForSubClass = mockGroups.data.filter(
+            (g) => g.classRelation === subClassId && !g.locationRelation,
+          );
+
+          await waitFor(() => {
+            groupsForSubClass.forEach(({ id, finances }) => {
+              expectRowProperties(finances, id, true);
+              expect(getByTestId(`row-${id}`).classList.contains('group')).toBeTruthy();
+            });
+          });
+          const groupId = groupsForSubClass[0].id;
+          // open group balk
+          await user.click(await findByTestId(`expand-${groupId}`));
+          // Check that projects that belong directly to the selected subClass are visible
+          // and are under a group
+          const projectsForSubClassWithGroup = projects.filter(
+            (p) => p.projectClass === subClassId && p.projectGroup === groupId,
+          );
+
+          const projectInGroup = projectsForSubClassWithGroup[0];
+          await waitFor(() => {
+            projectsForSubClassWithGroup.forEach(({ id }) =>
+              expect(getByTestId(`row-${id}-parent-${groupId}`)).toBeInTheDocument(),
+            );
+          });
+
+          // Project currently under group
+          expect(getByTestId(`row-${projectInGroup.id}-parent-${groupId}`)).toBeInTheDocument();
+
+          // Check show more icon exists on group planning head
+          const groupShowMoreIcon = await findByTestId(`show-more-icon-${groupId}`);
+
+          expect(groupShowMoreIcon).toBeInTheDocument();
+          // Open context menu
+
+          await user.click(groupShowMoreIcon);
+
+          const groupContextMenu = await findByTestId('group-row-context-menu');
+
+          expect(groupContextMenu).toBeInTheDocument();
+
+          // Wait for dialog to open
+          // Also context menu closes
+          await waitFor(async () => {
+            await user.click(await findByTestId('open-delete-group-dialog'));
+          });
+
+          const modal = await findByRole('dialog');
+          const groupDeleteDialog = within(modal);
+          const deleteButton = await groupDeleteDialog.findByTestId(`delete-group-${groupId}`);
+          expect(deleteButton).toBeInTheDocument();
+          const mockDeleteResponse = {
+            data: {
+              id: groupId,
+            },
+          };
+          mockedAxios.delete.mockResolvedValueOnce(mockDeleteResponse);
+          await user.click(deleteButton);
+
+          await sendProjectUpdateEvent({
+            ...projectInGroup,
+            projectGroup: null,
+          });
+
+          // Project is now under group balk
+          expect(
+            await findByTestId(`row-${projectInGroup.id}-parent-${subClassId}`),
+          ).toBeInTheDocument();
+
+          removeProjectUpdateEventListener(store.dispatch);
         });
       });
     });

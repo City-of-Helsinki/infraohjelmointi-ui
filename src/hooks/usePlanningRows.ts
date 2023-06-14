@@ -391,7 +391,7 @@ const usePlanningRows = () => {
         })
         .catch(Promise.reject);
     }
-  }, [selections]);
+  }, [selections,groups]);
 
   const financeUpdate = useAppSelector(selectFinanceUpdate);
 
