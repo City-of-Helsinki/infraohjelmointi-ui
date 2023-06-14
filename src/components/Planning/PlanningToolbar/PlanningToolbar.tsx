@@ -71,7 +71,7 @@ const PlanningToolbar = () => {
             <Button
               onClick={toggleGroupsExpanded}
               variant="supplementary"
-              className="!text-black"
+              className="expand-groups-button"
               iconLeft={groupsExpanded ? <HDSIconCollapse /> : <HDSIconSort />}
             >
               {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}

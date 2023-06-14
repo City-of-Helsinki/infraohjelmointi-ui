@@ -2,6 +2,7 @@ import { FC, memo } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { selectSelectedYear } from '@/reducers/planningSlice';
 import moment from 'moment';
+import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import './styles.css';
 
 interface IPlanningSummaryTablePlannedBudgetCellProps {
@@ -29,11 +30,15 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
               className={`monthly-summary-cell summary-budget ${isCurrentYear ? '!bg-bus' : ''}`}
             ></td>
           )}
-          {moment.monthsShort().map((m) => (
+          {moment.months().map((m) => (
             <td
               key={m}
-              className={`monthly-cell summary-budget ${isCurrentYear ? '!bg-bus' : ''}`}
-            ></td>
+              className={`monthly-cell hoverable-${m} summary-budget ${
+                isCurrentYear ? '!bg-bus' : ''
+              }`}
+              onMouseOver={() => setHoveredClassToMonth(m)}
+              onMouseLeave={() => removeHoveredClassFromMonth(m)}
+            />
           ))}
         </>
       )}

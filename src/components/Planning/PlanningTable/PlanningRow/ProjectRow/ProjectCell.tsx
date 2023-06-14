@@ -357,8 +357,7 @@ interface IProjectCellState {
 }
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
-  const { budget, type, financeKey, year, growDirections, id, title, startYear, monthlyDataList } =
-    cell;
+  const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
 
@@ -533,15 +532,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
             />
           ))}
       </td>
-      {selectedYearClass && (
-        <ProjectYearSummary
-          id={id}
-          year={year}
-          startYear={startYear}
-          monthlyDataList={monthlyDataList}
-          cellType={cellTypeClass}
-        />
-      )}
+      {selectedYearClass && <ProjectYearSummary cellType={cellTypeClass} {...cell} />}
     </>
   );
 };

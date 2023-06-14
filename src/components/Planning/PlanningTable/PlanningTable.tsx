@@ -10,14 +10,16 @@ import './styles.css';
 const PlanningTable = () => {
   const rows = useAppSelector(selectPlanningRows);
   return (
-    <table className="planning-table" cellSpacing={0}>
-      <tbody>
-        {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
-        {rows.map((row: IPlanningRow) => (
-          <PlanningRow {...row} />
-        ))}
-      </tbody>
-    </table>
+    <div className="planning-table-container" id="planning-table-container">
+      <table className="planning-table" cellSpacing={0}>
+        <tbody>
+          {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
+          {rows.map((row: IPlanningRow) => (
+            <PlanningRow {...row} />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

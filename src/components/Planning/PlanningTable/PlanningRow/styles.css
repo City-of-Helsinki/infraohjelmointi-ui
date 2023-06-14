@@ -25,7 +25,8 @@
   @apply bg-[var(--color-district-preview)] pl-[5.5rem];
 }
 
-.planning-head.district {
+.planning-head.district,
+.planning-head.subClass-district {
   @apply bg-[var(--color-district)] pl-4 text-xl;
 }
 
@@ -46,8 +47,9 @@
   @apply pl-[5.5rem];
 }
 
-/* Group row under a district */
-.district ~ .group .planning-head.group {
+/* Group row under a district or subClass-district */
+.district ~ .group .planning-head.group,
+.subClass-district ~ .group .planning-head.group {
   @apply pl-10;
 }
 
@@ -105,7 +107,8 @@
   @apply bg-[var(--color-district-preview)];
 }
 
-.planning-cell.district {
+.planning-cell.district,
+.planning-cell.subClass-district {
   @apply bg-[var(--color-district)];
 }
 

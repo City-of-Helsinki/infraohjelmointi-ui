@@ -3,6 +3,7 @@ import { formattedNumberToNumber } from '@/utils/calculations';
 import { useAppSelector } from '@/hooks/common';
 import { selectSelectedYear } from '@/reducers/planningSlice';
 import moment from 'moment';
+import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import './styles.css';
 
 interface IPlanningSummaryTableRealizedBudgetCellProps {
@@ -46,7 +47,13 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
             ></td>
           )}
           {moment.months().map((m) => (
-            <td key={m} className="monthly-cell" data-testid={`graph-cell-${m}`}>
+            <td
+              key={m}
+              className={`monthly-cell hoverable-${m}`}
+              data-testid={`graph-cell-${m}`}
+              onMouseOver={() => setHoveredClassToMonth(m)}
+              onMouseLeave={() => removeHoveredClassFromMonth(m)}
+            >
               {/* There's going to be graph here and we can use each months cell to paint the graph */}
             </td>
           ))}

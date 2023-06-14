@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { IconAngleLeft, IconAngleRight } from 'hds-react/icons';
 import { getDaysInMonthForYear, getMonthToday, getToday } from '@/utils/dates';
 import moment from 'moment';
@@ -6,6 +6,8 @@ import './styles.css';
 import { calcPercentage } from '@/utils/calculations';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectSelectedYear, setSelectedYear } from '@/reducers/planningSlice';
+import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
+import { dispatchDateIndicatorEvent } from '@/utils/events';
 
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
@@ -19,39 +21,30 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   isCurrentYear,
 }) => {
   const dispatch = useAppDispatch();
-  const dateIndicatorRef = useRef<HTMLSpanElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
 
   // Sets the selectedYear or null if the year is given again, so that the monthly view can be closed
   // when the same year is re-clicked
   const handleSetSelectedYear = useCallback(
-    (year: number | null) => dispatch(setSelectedYear(year === selectedYear ? null : year)),
+    (year: number | null) => {
+      dispatch(setSelectedYear(year === selectedYear ? null : year));
+
+      if (selectedYear !== year) {
+        // when opening not current year
+        dispatchDateIndicatorEvent({
+          isVisible: isCurrentYear,
+          position: 0,
+        });
+      } else {
+        // when closing current or other year
+        dispatchDateIndicatorEvent({
+          isVisible: false,
+          position: 0,
+        });
+      }
+    },
     [dispatch, selectedYear],
   );
-
-  useLayoutEffect(() => {
-    if (!isCurrentYear) {
-      return;
-    }
-
-    const setElementHeight = () => {
-      if (dateIndicatorRef.current) {
-        const { scrollHeight } = document.documentElement;
-        dateIndicatorRef.current.style.height = `${scrollHeight}px`;
-      }
-    };
-
-    // Call the setElementHeight function initially and on window resize
-    setElementHeight();
-
-    // Attach an event listener to update the element's height on window resize
-    window.addEventListener('resize', setElementHeight);
-
-    // Cleanup the event listener when the component is unmounted
-    return () => {
-      window.removeEventListener('resize', setElementHeight);
-    };
-  }, [selectedYear, isCurrentYear]);
 
   /**
    * Get the left pixel position of the date indicator by calculating the percent of the month
@@ -66,7 +59,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
       const dayToday = parseInt(moment().format('D'));
       const percentOfMonthThatHasPast = calcPercentage(dayToday, daysInMonth);
 
-      return `${Math.floor(percentOfMonthThatHasPast / 2.55)}px`;
+      return Math.floor(percentOfMonthThatHasPast / 2.55);
     },
     [year],
   );
@@ -83,6 +76,24 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
     (month: number) => month === getMonthToday() && isCurrentYear,
     [isCurrentYear],
   );
+
+  // Dispatch an event that tells the PlanningSummaryTable to display the date indicator and what its position should be
+  const notifyDateIndicator = useCallback((i: number, m: string) => {
+    if (showDateIndicator(i + 1)) {
+      // "Async" hack to wait for the element to render before calling document.getElementById
+      setTimeout(() => {
+        const element = document.getElementById(`month-label-${m}`);
+        if (element) {
+          const elementPosition = (element as HTMLElement).offsetLeft;
+          dispatchDateIndicatorEvent({
+            isVisible: true,
+            position: elementPosition + getDateIndicatorLeftPixels(i + 1),
+          });
+        }
+      }, 0);
+    }
+    return null;
+  }, []);
 
   return (
     <>
@@ -109,18 +120,16 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
             </td>
           )}
           {moment.months().map((m, i) => (
-            <td key={m} className="monthly-cell label">
+            <td
+              key={m}
+              className={`monthly-cell label hoverable-${m}`}
+              id={`month-label-${m}`}
+              onMouseOver={() => setHoveredClassToMonth(m)}
+              onMouseLeave={() => removeHoveredClassFromMonth(m)}
+            >
               <div className="monthly-cell-container relative" data-testid={`month-label-${m}`}>
                 <span>{m.substring(0, 3)}</span>
-                {/* Creates a line that indicates the current date */}
-                {showDateIndicator(i + 1) && (
-                  <span
-                    ref={dateIndicatorRef}
-                    style={{ left: getDateIndicatorLeftPixels(i + 1) }}
-                    data-testid="date-indicator"
-                    className="date-indicator"
-                  />
-                )}
+                {notifyDateIndicator(i, m)}
               </div>
             </td>
           ))}

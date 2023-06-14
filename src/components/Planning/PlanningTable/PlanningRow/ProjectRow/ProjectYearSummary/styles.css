@@ -25,7 +25,7 @@
 }
 
 .monthly-planning-bar-container {
-  @apply flex w-full justify-start;
+  @apply relative flex w-full justify-start;
 }
 
 /* :has works with all selectors except for firefox 02.06.2023, for some reason the .monthly-cell.project element starts at nth-child(4) */
@@ -37,7 +37,7 @@ td:has(.monthly-planning-bar-container.empty)
 }
 
 .monthly-construction-bar-container {
-  @apply flex w-full justify-start;
+  @apply relative flex w-full justify-start;
 }
 
 /* :has works with all selectors except for firefox 02.06.2023, for some reason the .monthly-cell.project element starts at nth-child(4) */

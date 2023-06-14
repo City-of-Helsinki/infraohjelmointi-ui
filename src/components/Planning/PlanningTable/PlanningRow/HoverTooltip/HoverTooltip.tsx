@@ -1,18 +1,18 @@
 import { FC, memo } from 'react';
 import './styles.css';
 
-interface INameTooltipProps {
-  value: string;
+interface IHoverTooltipProps {
+  text: string;
   id: string;
 }
 
-const NameTooltip: FC<INameTooltipProps> = ({ value, id }) => {
+const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
   return (
     <section className="tooltip-container" data-testid={`hover-tooltip-${id}`}>
-      {value}
+      {text}
       <div className="tooltip-arrow" />
     </section>
   );
 };
 
-export default memo(NameTooltip);
+export default memo(HoverTooltip);

@@ -63,7 +63,7 @@ export const mockSearchResults: { data: ISearchResults } = {
         path: 'test-master-class-1/test-class-1/',
       },
       {
-        name: 'Koillinen suurpiiri',
+        name: 'Koillinen',
         id: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
         type: 'classes',
         hashTags: [],

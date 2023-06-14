@@ -1,5 +1,9 @@
 .planning-view-container {
-  @apply m-8 overflow-y-hidden overflow-x-scroll whitespace-nowrap leading-5;
+  @apply mx-8 mb-8 whitespace-nowrap leading-5;
+}
+
+.planning-header-container {
+  @apply sticky top-0 z-[100] flex bg-white pt-8;
 }
 
 /* All spans have are aligned right */

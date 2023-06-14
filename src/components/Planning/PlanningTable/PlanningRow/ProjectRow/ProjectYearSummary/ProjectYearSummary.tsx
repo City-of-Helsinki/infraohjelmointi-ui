@@ -1,4 +1,4 @@
-import { CellType, IMonthlyData } from '@/interfaces/projectInterfaces';
+import { CellType, IMonthlyData, ITimelineDates } from '@/interfaces/projectInterfaces';
 import { FC, memo, useMemo } from 'react';
 import ProjectYearSummaryTable from './ProjectYearSummaryTable';
 import MonthlyGraphCell from './MonthlyGraphCell';
@@ -10,24 +10,20 @@ interface IProjectYearSummaryProps {
   year: number;
   monthlyDataList: Array<IMonthlyData>;
   cellType: CellType;
+  timelineDates: ITimelineDates;
 }
 
-const ProjectYearSummary: FC<IProjectYearSummaryProps> = ({
-  id,
-  startYear,
-  year,
-  monthlyDataList,
-  cellType,
-}) => {
+const ProjectYearSummary: FC<IProjectYearSummaryProps> = (props) => {
+  const { startYear, year, monthlyDataList } = props;
   const showYearSummaryTable = useMemo(() => startYear === year, [startYear, year]);
 
   return (
     <>
       {/* Year summary (only visible for the first year in the table) */}
-      {showYearSummaryTable && <ProjectYearSummaryTable cellType={cellType} id={id} />}
+      {showYearSummaryTable && <ProjectYearSummaryTable {...props} />}
       {/* Monthly graph */}
       {monthlyDataList.map((c) => (
-        <MonthlyGraphCell key={c.month} {...c} cellType={cellType} month={c.month} id={id} />
+        <MonthlyGraphCell key={c.month} {...c} month={c.month} {...props} />
       ))}
     </>
   );

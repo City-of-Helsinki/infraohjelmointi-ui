@@ -323,14 +323,14 @@ describe('SearchResultsView', () => {
       const classChildren = classCard.childNodes;
 
       // Title and class tag
-      expect(classChildren[0]).toHaveTextContent('Koillinen suurpiiri');
+      expect(classChildren[0]).toHaveTextContent('Koillinen');
       expect(classChildren[0]).toHaveTextContent('searchTag.classes');
       // Breadcrumbs
       expect(classChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
       expect(classChildren[1]).toHaveTextContent('Uudisrakentaminen');
-      expect(classChildren[1]).toHaveTextContent('Koillinen suurpiiri');
+      expect(classChildren[1]).toHaveTextContent('Koillinen');
       // Link rendered around class card
-      expect(getAllByText('Koillinen suurpiiri')[0].closest('a')).toHaveAttribute(
+      expect(getAllByText('Koillinen')[0].closest('a')).toHaveAttribute(
         'href',
         '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
       );

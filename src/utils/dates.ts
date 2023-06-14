@@ -113,4 +113,4 @@ export const createDateToEndOfYear = (year: string | number | null) => {
   return year ? moment(year, 'YYYY').endOf('year').format('DD.MM.YYYY') : null;
 };
 
-export const getToday = () => moment().format('M.D.YYYY');
+export const getToday = () => moment().format('D.M.YYYY');

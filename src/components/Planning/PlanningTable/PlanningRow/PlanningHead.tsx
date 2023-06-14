@@ -1,8 +1,8 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { NameTooltip } from './NameTooltip';
 import { IPlanningRow } from '@/interfaces/common';
+import HoverTooltip from './HoverTooltip/HoverTooltip';
 import './styles.css';
 
 interface IPlanningHeadProps extends IPlanningRow {
@@ -34,7 +34,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   }, [handleExpand, link, navigate]);
 
   return (
-    <th className={`planning-head ${type}`} data-testid={`head-${id}`}>
+    <th className={`planning-head ${type} sticky left-0 z-50`} data-testid={`head-${id}`}>
       <div className="flex w-full justify-between">
         {/* Title and icons */}
         <div className="planning-head-content">
@@ -54,7 +54,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
             >
               <span className="planning-head-title">{name}</span>
             </button>
-            <NameTooltip value={name} id={id} />
+            <HoverTooltip text={name} id={id} />
           </div>
         </div>
         {/* Budgets */}
