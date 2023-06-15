@@ -2,7 +2,6 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
-import ProjectForm from './ProjectForm';
 import { arrayHasValue, matchExact } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import {
@@ -26,6 +25,7 @@ import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
 import { setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
+import ProjectBasics from '../ProjectBasics';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -36,14 +36,13 @@ const getFormField = (name: string) => `projectForm.${name}`;
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectForm />} />, {
+    renderWithProviders(<Route path="/" element={<ProjectBasics />} />, {
       preloadedState: {
         project: {
           selectedProject: mockProject.data,
           count: 1,
           error: {},
           page: 1,
-          updated: null,
         },
         auth: { user: mockPersons.data[0], error: {} },
         lists: {

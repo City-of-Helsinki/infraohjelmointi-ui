@@ -9,7 +9,7 @@
 }
 
 .project-form-side-panel .pw-folder-container {
-  @apply mt-8 flex justify-center;
+  @apply mb-4 mt-16 flex justify-center;
 }
 
 .project-form-side-panel .pw-folder-link-container {

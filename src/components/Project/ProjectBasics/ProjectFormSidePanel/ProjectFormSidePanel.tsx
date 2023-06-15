@@ -1,18 +1,16 @@
 import { FC } from 'react';
 import { SideNavigation } from '../../../shared';
-import { useAppSelector } from '@/hooks/common';
 import { useTranslation } from 'react-i18next';
-import { selectUpdated } from '@/reducers/projectSlice';
 import PWContainer from './PWContainer';
 import SaveIndicator from './SaveIndicator';
 import './styles.css';
 
 interface IProjectFormSidePanelProps {
   pwFolderLink?: string | null;
+  isSaving: boolean;
 }
 
-const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink }) => {
-  const updated = useAppSelector(selectUpdated);
+const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink, isSaving }) => {
   const { t } = useTranslation();
   const navItems = [
     { route: '#basics', label: t('nav.basics') },
@@ -32,8 +30,8 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink }) 
           <div className="side-navigation">
             <SideNavigation navItems={navItems} />
           </div>
-          {updated && <SaveIndicator />}
           <PWContainer pwFolderLink={pwFolderLink} />
+          <SaveIndicator isSaving={isSaving} />
         </div>
       </div>
     </div>

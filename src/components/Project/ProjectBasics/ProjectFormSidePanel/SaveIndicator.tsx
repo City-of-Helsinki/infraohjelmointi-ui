@@ -1,20 +1,29 @@
-import { StatusLabel } from 'hds-react/components/StatusLabel';
-import { IconSaveDiskette } from 'hds-react/icons';
-import { useAppSelector } from '@/hooks/common';
 import { useTranslation } from 'react-i18next';
-import { selectUpdated } from '@/reducers/projectSlice';
+import { CustomTag } from '@/components/shared';
+import { useAppSelector } from '@/hooks/common';
+import { selectProject } from '@/reducers/projectSlice';
+import moment from 'moment';
+import { FC } from 'react';
 import './styles.css';
 
-const SaveIndicator = () => {
-  const updated = useAppSelector(selectUpdated);
+interface ISaveIndicatorProps {
+  isSaving: boolean;
+}
+
+const SaveIndicator: FC<ISaveIndicatorProps> = ({ isSaving }) => {
   const { t } = useTranslation();
+  const project = useAppSelector(selectProject);
+  const updatedMoment = moment(project?.updatedDate).format('D.M.YYYY HH:mm:ss');
+
   return (
-    <div className="mt-4 flex justify-center">
-      <div className="side-nav">
-        <StatusLabel className="save-icon" type="success" iconLeft={<IconSaveDiskette />}>
-          {t('savedTime', { time: updated })}
-        </StatusLabel>
-      </div>
+    <div className="mt-4 flex justify-start">
+      <CustomTag
+        color={'var(--color-success)'}
+        text={isSaving ? 'Tallennetaan' : t('savedTime', { time: updatedMoment })}
+        weight={'light'}
+        textColor={'var(--color-white)'}
+        showLoading={isSaving}
+      />
     </div>
   );
 };

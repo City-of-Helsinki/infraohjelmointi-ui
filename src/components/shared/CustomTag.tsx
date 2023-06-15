@@ -1,3 +1,4 @@
+import { LoadingSpinner } from 'hds-react';
 import { FC, memo, ReactNode } from 'react';
 
 interface ICustomTagProps {
@@ -7,19 +8,31 @@ interface ICustomTagProps {
   size?: string;
   weight?: string;
   id?: string;
+  textColor?: string;
+  showLoading?: boolean;
 }
 
 /**
  * A rounded border tag like a HDS tag, but it fits an icon better and is easily customizeable
  * by us.
  */
-const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size, weight, id }) => {
+const CustomTag: FC<ICustomTagProps> = ({
+  icon,
+  text,
+  color,
+  size,
+  weight,
+  id,
+  textColor,
+  showLoading,
+}) => {
   return (
     <div
       className="custom-tag-container"
       data-testid={id ?? ''}
       style={{
         background: color ?? 'var(--color-silver)',
+        color: textColor ?? 'var(--color-black-90)',
       }}
     >
       {icon}
@@ -29,6 +42,11 @@ const CustomTag: FC<ICustomTagProps> = ({ icon, text, color, size, weight, id })
       >
         {text}
       </span>
+      {showLoading && (
+        <div className="ml-[0.3rem]">
+          <LoadingSpinner theme={{ '--spinner-color': 'var(--color-white)' }} small />
+        </div>
+      )}
     </div>
   );
 };

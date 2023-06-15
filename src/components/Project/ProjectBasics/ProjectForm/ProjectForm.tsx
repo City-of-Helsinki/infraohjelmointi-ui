@@ -1,11 +1,10 @@
 import useProjectForm from '@/forms/useProjectForm';
 import { useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
-import { FC, memo, useCallback, useMemo, useState } from 'react';
+import { Dispatch, FC, SetStateAction, memo, useCallback, useMemo, useState } from 'react';
 import { selectProject } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
-import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { useOptions } from '@/hooks/useOptions';
 import { patchProject } from '@/services/projectServices';
 import ProjectStatusSection from './ProjectStatusSection';
@@ -15,10 +14,14 @@ import ProjectFinancialsSection from './ProjectFinancialsSection';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
 import ProjectLocationSection from './ProjectLocationSection';
 import ProjectProgramSection from './ProjectProgramSection';
+import ProjectFormBanner from './ProjectFormBanner';
 import _ from 'lodash';
 import './styles.css';
 
-const ProjectForm: FC = () => {
+interface IProjectFormProps {
+  setIsSaving: Dispatch<SetStateAction<boolean>>;
+}
+const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
   const { formMethods, classOptions, locationOptions } = useProjectForm();
   const project = useAppSelector(selectProject);
   const [formSaved, setFormSaved] = useState(false);
@@ -38,9 +41,8 @@ const ProjectForm: FC = () => {
 
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
-      console.log('attempt submit');
-
       if (isDirty) {
+        setIsSaving(true);
         if (!project?.id) {
           return;
         }
@@ -57,10 +59,11 @@ const ProjectForm: FC = () => {
               handleSetFormSaved(false);
             }, 0);
           })
-          .catch(Promise.reject);
+          .catch(Promise.reject)
+          .finally(() => setIsSaving(false));
       }
     },
-    [isDirty, project?.id, dirtyFields, phases, handleSetFormSaved],
+    [isDirty, setIsSaving, project?.id, dirtyFields, phases, handleSetFormSaved],
   );
 
   const getFieldProps = useCallback(
@@ -93,12 +96,10 @@ const ProjectForm: FC = () => {
     [control, getFieldProps, getValues, isFieldDirty],
   );
 
+  const submitCallback = useCallback(() => handleSubmit(onSubmit), [handleSubmit, onSubmit]);
+
   return (
-    <form
-      onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}
-      data-testid="project-form"
-      className="project-form"
-    >
+    <form onBlur={submitCallback()} data-testid="project-form" className="project-form">
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection {...formProps} project={project} formSaved={formSaved} />
       {/* SECTION 2 - STATUS */}
@@ -113,6 +114,8 @@ const ProjectForm: FC = () => {
       <ProjectLocationSection {...formProps} locationOptions={locationOptions} />
       {/* SECTION 7 - PROJECT PROGRAM */}
       <ProjectProgramSection {...formProps} />
+      {/* BANNER */}
+      <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
     </form>
   );
 };

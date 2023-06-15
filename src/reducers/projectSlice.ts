@@ -9,7 +9,6 @@ interface IProjectState {
   count: number | null;
   page: number;
   error: unknown;
-  updated: string | null;
 }
 
 const initialState: IProjectState = {
@@ -17,7 +16,6 @@ const initialState: IProjectState = {
   count: null,
   error: null,
   page: 0,
-  updated: null,
 };
 
 export const getProjectThunk = createAsyncThunk('project/getOne', async (id: string, thunkAPI) => {
@@ -58,7 +56,6 @@ export const projectSlice = createSlice({
 export const selectProject = (state: RootState) => state.project.selectedProject;
 export const selectCount = (state: RootState) => state.project.count;
 export const selectPage = (state: RootState) => state.project.page;
-export const selectUpdated = (state: RootState) => state.project.updated;
 
 export const { setPage, resetProject, setSelectedProject } = projectSlice.actions;
 
