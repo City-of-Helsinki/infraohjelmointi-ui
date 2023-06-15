@@ -39,6 +39,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control
             direction="horizontal"
             id="radio-checkbox"
             errorText={error?.message}
+            required={true}
           >
             {options?.map((o, i) => (
               <HDSRadioButton

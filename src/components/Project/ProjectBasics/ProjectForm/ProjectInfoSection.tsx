@@ -7,6 +7,7 @@ import { Control } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
+import { validateMaxLength, validateRequired } from '@/utils/validation';
 
 interface IProjectInfoSectionProps {
   project: IProject | null;
@@ -18,6 +19,7 @@ interface IProjectInfoSectionProps {
     control: Control<IProjectForm>;
   };
 }
+
 const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   project,
   getFieldProps,
@@ -40,25 +42,19 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           />
         </div>
         <div className="form-col-xl">
-          <NumberField
-            {...getFieldProps('hkrId')}
-            rules={{
-              maxLength: { value: 18, message: t('validation.maxLength', { value: '18' }) },
-            }}
-          />
+          <NumberField {...getFieldProps('hkrId')} rules={validateMaxLength(5, t)} />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <TextField
-            {...getFieldProps('entityName')}
-            rules={{
-              maxLength: { value: 30, message: t('validation.maxLength', { value: '30' }) },
-            }}
-          />
+          <TextField {...getFieldProps('entityName')} rules={validateMaxLength(30, t)} />
         </div>
         <div className="form-col-xl">
-          <TextField {...getFieldProps('sapProject')} control={control} />
+          <TextField
+            {...getFieldProps('sapProject')}
+            control={control}
+            rules={validateMaxLength(15, t)}
+          />
         </div>
       </div>
       <div className="form-row">
@@ -66,7 +62,11 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           <SelectField {...getFieldProps('area')} options={areas} />
         </div>
         <div className="form-col-xl">
-          <TextField {...getFieldProps('sapNetwork')} readOnly={true} />
+          <TextField
+            {...getFieldProps('sapNetwork')}
+            readOnly={true}
+            rules={validateMaxLength(15, t)}
+          />
         </div>
       </div>
       <div className="form-row">
@@ -74,7 +74,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           <TextAreaField
             {...getFieldProps('description')}
             size="l"
-            rules={{ required: t('validation.required', { field: 'Kuvaus' }) ?? '' }}
+            rules={validateRequired('description', t)}
             formSaved={formSaved}
           />
         </div>

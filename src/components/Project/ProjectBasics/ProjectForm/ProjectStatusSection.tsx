@@ -1,15 +1,15 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useCallback, useMemo, useState } from 'react';
+import { FC, memo, useCallback, useState } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { IOption } from '@/interfaces/common';
 import { getToday, isBefore } from '@/utils/dates';
-import { IconAlertCircleFill } from 'hds-react';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
-import _ from 'lodash';
 import ErrorSummary from './ErrorSummary';
+import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
+import _ from 'lodash';
 
 interface IProjectStatusSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -54,94 +54,118 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const warrantyPeriodPhase = phases[8].value;
   const completedPhase = phases[9].value;
 
-  const numberMax3000 = useMemo(
-    () => ({
-      min: {
-        value: 0,
-        message: t('validation.minValue', { value: '0' }),
-      },
-      max: {
-        value: 3000,
-        message: t('validation.maxValue', { value: '3000' }),
-      },
-    }),
-    [t],
-  );
-
-  const setRequiredIfFieldsMissing = useCallback(
-    (fields: Array<string>) => {
-      const missingFields = fields.filter((f) => {
-        if (_.has(getValues(f as keyof IProjectForm), 'value')) {
-          return !(getValues(f as keyof IProjectForm) as IOption).value;
-        } else {
-          return !getValues(f as keyof IProjectForm);
-        }
-      });
-
-      setPhaseRequirements(missingFields);
-
-      return missingFields.length > 0;
-    },
-    [getValues, t],
-  );
-
   const validatePhase = useCallback(() => {
     return {
-      required: t('validation.required', { field: 'Vaihe' }) ?? '',
+      required: t('validation.required', { field: 'validation.phase' }) ?? '',
       validate: {
         isPhaseValid: (phase: IOption) => {
           const phaseToSubmit = phase.value;
+          const programmed = getValues('programmed');
+          const fields: Array<string> = [];
+          const fieldsIfEmpty = (fields: Array<string>) => getFieldsIfEmpty(fields, getValues);
+
+          // Check fields that cannot be empty
           switch (phaseToSubmit) {
             case programmedPhase:
-              return setRequiredIfFieldsMissing(['planningStartYear', 'constructionEndYear']);
+              fields.push(
+                ...fieldsIfEmpty(['planningStartYear', 'constructionEndYear', 'category']),
+              );
+              break;
             case draftInitiationPhase:
             case draftApprovalPhase:
             case constructionPlanPhase:
             case constructionWaitPhase:
-              return setRequiredIfFieldsMissing([
-                'estPlanningStart',
-                'estPlanningEnd',
-                'planningStartYear',
-                'constructionEndYear',
-              ]);
+              fields.push(
+                ...fieldsIfEmpty([
+                  'planningStartYear',
+                  'constructionEndYear',
+                  'estPlanningStart',
+                  'estPlanningEnd',
+                  'category',
+                ]),
+              );
+              break;
             case constructionPhase:
             case warrantyPeriodPhase:
             case completedPhase:
               if (
-                (phase.value === warrantyPeriodPhase || phase.value === completedPhase) &&
+                (phaseToSubmit === warrantyPeriodPhase || phaseToSubmit === completedPhase) &&
                 isBefore(getToday(), getValues('estConstructionEnd'))
               ) {
-                return "Hankkeen vaihe ei voi olla 'Takuuaika' jos nykyinen päivä on ennen rakentamisen päättymispäivää";
+                return t('validation.phaseTooEarly', { value: phase.label });
               }
-              return setRequiredIfFieldsMissing([
-                'estPlanningStart',
-                'estPlanningEnd',
-                'planningStartYear',
-                'constructionEndYear',
-                'estConstructionStart',
-                'estConstructionEnd',
-                'personConstruction',
-                'constructionPhaseDetail',
-              ]);
-            default:
-              return true;
+              fields.push(
+                ...fieldsIfEmpty([
+                  'planningStartYear',
+                  'constructionEndYear',
+                  'estPlanningStart',
+                  'estPlanningEnd',
+                  'estConstructionStart',
+                  'estConstructionEnd',
+                  'personConstruction',
+                  'constructionPhaseDetail',
+                  'category',
+                ]),
+              );
+              break;
           }
+
+          // Check if programmed has the correct value
+          if (phase.value === proposalPhase || phase.value === designPhase) {
+            if (programmed) {
+              fields.push('programmed');
+            }
+          } else {
+            if (!programmed) {
+              fields.push('programmed');
+            }
+          }
+
+          setPhaseRequirements(fields);
+
+          return fields.length === 0;
         },
       },
     };
   }, [
-    completedPhase,
-    constructionPhase,
+    t,
+    getValues,
+    proposalPhase,
+    designPhase,
+    programmedPhase,
+    draftInitiationPhase,
+    draftApprovalPhase,
     constructionPlanPhase,
     constructionWaitPhase,
-    draftApprovalPhase,
-    draftInitiationPhase,
-    setRequiredIfFieldsMissing,
-    getValues,
-    programmedPhase,
-    t,
+    constructionPhase,
     warrantyPeriodPhase,
+    completedPhase,
   ]);
+
+  const validateConstructionPhaseDetails = useCallback(() => {
+    return {
+      validate: {
+        isConstructionPhaseDetailsValid: (constructionPhaseDetail: IOption) => {
+          const phase = getValues('phase');
+          // Required after phase is changed to construction
+          if (
+            (phase.value === constructionPhase ||
+              phase.value === warrantyPeriodPhase ||
+              phase.value === completedPhase) &&
+            constructionPhaseDetail?.value === ''
+          ) {
+            return t('validation.required', { field: t('validation.constructionPhaseDetail') });
+          }
+          return true;
+        },
+      },
+    };
+  }, [completedPhase, constructionPhase, getValues, t, warrantyPeriodPhase]);
+
+  const isConstructionPhaseDetailsDisabled = useCallback(() => {
+    const phase = getValues('phase').value;
+    return phase !== constructionPhase && phase !== warrantyPeriodPhase && phase !== completedPhase;
+  }, [getValues, constructionPhase, warrantyPeriodPhase, completedPhase]);
 
   const validateProgrammed = useCallback(() => {
     return {
@@ -150,29 +174,28 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const phase = getValues('phase');
           if (phase.value === proposalPhase || phase.value === designPhase) {
             return programmed
-              ? `Ohjelmoitu oltava 'Kyllä' kun hankkeen vaihe on '${phase.label}'`
+              ? t('validation.requiredFalse', { field: t('validation.programmed') })
               : true;
           } else {
             return programmed
               ? true
-              : `Ohjelmoitu on oltava 'Ei' kun hankkeen vaihe on '${phase.label}'`;
+              : t('validation.requiredTrue', { field: t('validation.programmed') });
           }
         },
       },
     };
-  }, [designPhase, getValues, proposalPhase]);
+  }, [designPhase, getValues, proposalPhase, t]);
 
   const validatePlanningStartYear = useCallback(() => {
     return {
-      ...numberMax3000,
+      ...validateMaxNumber(3000, t),
       validate: {
-        isBeforeEndDate: (startYear: string | null) => {
+        isPlanningStartYearValid: (startYear: string | null) => {
           const endYear = getValues('constructionEndYear');
           if (isFieldDirty('planningStartYear')) {
             if (startYear && endYear && parseInt(startYear) > parseInt(endYear)) {
               return t('validation.isBefore', {
-                start: t('validation.planningStartYear'),
-                end: t('validation.constructionEndYear'),
+                value: t('validation.constructionEndYear'),
               });
             }
           }
@@ -180,13 +203,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     };
-  }, [numberMax3000, getValues, isFieldDirty, t]);
+  }, [getValues, isFieldDirty, t]);
 
   const validateConstructionEndYear = useCallback(() => {
     return {
-      ...numberMax3000,
+      ...validateMaxNumber(3000, t),
       validate: {
-        isAfterStartDate: (endYear: string | null) => {
+        isConstructionEndYearValid: (endYear: string | null) => {
           const startYear = getValues('planningStartYear');
           if (
             endYear &&
@@ -195,8 +218,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             isFieldDirty('constructionEndYear')
           ) {
             return t('validation.isAfter', {
-              end: t('validation.constructionEndYear'),
-              start: t('validation.planningStartYear'),
+              value: t('validation.planningStartYear'),
             });
           } else {
             return true;
@@ -204,22 +226,41 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     };
-  }, [getValues, isFieldDirty, numberMax3000, t]);
+  }, [getValues, isFieldDirty, t]);
+
+  const validateCategory = useCallback(() => {
+    return {
+      validate: {
+        isCategoryValid: (category: IOption) => {
+          const phase = getValues('phase').value;
+          const proposalPhase = phases[0].value;
+          const designPhase = phases[1].value;
+          if (phase !== proposalPhase && phase !== designPhase && category.value === '') {
+            return t('validation.required', { field: t('validation.category') });
+          }
+          return true;
+        },
+      },
+    };
+  }, [getValues, phases, t]);
 
   return (
     <div className="w-full" id="basics-status-section">
       <FormSectionTitle {...getFieldProps('status')} />
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('phase')} rules={validatePhase()} options={phases} />
+          <SelectField {...getFieldProps('phase')} options={phases} rules={validatePhase()} />
         </div>
         <div className="form-col-xl">
           <SelectField
             {...getFieldProps('constructionPhaseDetail')}
             options={constructionPhaseDetails}
+            rules={validateConstructionPhaseDetails()}
+            disabled={isConstructionPhaseDetailsDisabled()}
           />
         </div>
       </div>
+      {/* Error summary since phase has many requirements  */}
       {phaseRequirements.length > 0 && (
         <div className="form-row">
           <div className="error-summary-col">
@@ -255,7 +296,11 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('category')} options={categories} />
+          <SelectField
+            {...getFieldProps('category')}
+            options={categories}
+            rules={validateCategory()}
+          />
         </div>
       </div>
       <div className="form-row">

@@ -60,11 +60,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         isRequired: (startDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedPlanning.includes(phase) && !startDate) {
-            return t('validation.requiredFor', {
-              requiredField: t('validation.estPlanningStart'),
-              field: t('validation.phase'),
-              value: getValues('phase').label,
-            });
+            return t('validation.required', { field: t('validation.estPlanningStart') });
           }
           return true;
         },
@@ -89,11 +85,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         isRequired: (endDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedPlanning.includes(phase) && !endDate) {
-            return t('validation.requiredFor', {
-              requiredField: t('validation.estPlanningEnd'),
-              field: t('validation.phase'),
-              value: getValues('phase').label,
-            });
+            return t('validation.required', { field: t('validation.estPlanningEnd') });
           }
           return true;
         },
@@ -120,11 +112,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         isRequired: (startDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedConstruction.includes(phase) && !startDate) {
-            return t('validation.requiredFor', {
-              requiredField: t('validation.estConstructionStart'),
-              field: t('validation.phase'),
-              value: getValues('phase').label,
-            });
+            return t('validation.required', { field: t('validation.estConstructionStart') });
           }
           return true;
         },
@@ -149,11 +137,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         isRequired: (endDate: string | null) => {
           const phase = getValues('phase').value;
           if (phasesThatNeedConstruction.includes(phase) && !endDate) {
-            return t('validation.requiredFor', {
-              requiredField: t('validation.estConstructionEnd'),
-              field: t('validation.phase'),
-              value: getValues('phase').label,
-            });
+            return t('validation.required', { field: t('validation.estConstructionEnd') });
           }
           return true;
         },

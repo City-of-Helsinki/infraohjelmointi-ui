@@ -50,11 +50,6 @@
   @apply min-w-[25px] max-w-[25px];
 }
 
-/* Phase error message to extend both containers */
-#phase div div div:nth-child(3) {
-  @apply w-[200%];
-}
-
 .error-summary-container {
   @apply w-full border-l-8 border-error bg-error-light px-4 py-4;
 }
@@ -81,5 +76,6 @@
 
 .project-form-banner-container::before {
   content: '';
-  @apply absolute h-full w-[150%] shadow-2xl;
+  width: 200%;
+  @apply absolute h-full w-[200%] -translate-x-[13rem] shadow-2xl;
 }
