@@ -68,8 +68,8 @@ table p {
   hide overflow from all selects used with the SelectField-component, max width is calculated to
   prevent the text from overflowing on top of the empty-selections button
 */
-.input-l > div > button > span {
-  --max-w: calc(100% - 1.75rem);
+.select-field-wrapper > div > div > button > span {
+  --max-w: calc(100% - 2rem);
   @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;
 }
 

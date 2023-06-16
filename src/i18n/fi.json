@@ -125,7 +125,8 @@
     "presenceStart": "Esilläolo alkaa",
     "presenceEnd": "Esilläolo päättyy",
     "visibilityStart": "Nähtävilläolo alkaa",
-    "visibilityEnd": "Nähtävilläolo päättyy"
+    "visibilityEnd": "Nähtävilläolo päättyy",
+    "personPlanning": "Vastuuhenkilö"
   },
   "projectForm": {
     "basics": "Hankkeen perustiedot",

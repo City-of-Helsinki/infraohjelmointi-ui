@@ -68,6 +68,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
                   'constructionEndYear',
                   'estPlanningStart',
                   'estPlanningEnd',
+                  'personPlanning',
                   'category',
                 ]),
               );
@@ -89,6 +90,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
                   'estPlanningEnd',
                   'estConstructionStart',
                   'estConstructionEnd',
+                  'personPlanning',
                   'personConstruction',
                   'constructionPhaseDetail',
                   'category',
