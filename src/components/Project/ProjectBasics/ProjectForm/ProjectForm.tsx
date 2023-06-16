@@ -10,7 +10,7 @@ import { patchProject } from '@/services/projectServices';
 import ProjectStatusSection from './ProjectStatusSection';
 import ProjectInfoSection from './ProjectInfoSection';
 import ProjectScheduleSection from './ProjectScheduleSection';
-import ProjectFinancialsSection from './ProjectFinancialsSection';
+import ProjectFinancialSection from './ProjectFinancialSection';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
 import ProjectLocationSection from './ProjectLocationSection';
 import ProjectProgramSection from './ProjectProgramSection';
@@ -59,7 +59,7 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
               handleSetFormSaved(false);
             }, 0);
           })
-          .catch(Promise.reject)
+          .catch((e) => console.log('project patch error: ', e))
           .finally(() => setIsSaving(false));
       }
     },
@@ -107,7 +107,7 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
       {/* SECTION 3 - SCHEDULE */}
       <ProjectScheduleSection {...formProps} />
       {/* SECTION 4 - FINANCIALS */}
-      <ProjectFinancialsSection {...formProps} classOptions={classOptions} />
+      <ProjectFinancialSection {...formProps} classOptions={classOptions} />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
       <ProjectResponsiblePersonsSection {...formProps} />
       {/* SECTION 6 - LOCATION */}

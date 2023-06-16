@@ -10,8 +10,10 @@ import { useOptions } from '@/hooks/useOptions';
 import { Control } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
+import { validateMaxLength } from '@/utils/validation';
+import { useTranslation } from 'react-i18next';
 
-interface IProjectFinancialsSectionProps {
+interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
@@ -24,11 +26,13 @@ interface IProjectFinancialsSectionProps {
     subClasses: IOption[];
   };
 }
-const ProjectFinancialsSection: FC<IProjectFinancialsSectionProps> = ({
+const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getFieldProps,
   control,
   classOptions,
 }) => {
+  const { t } = useTranslation();
+
   const { masterClasses, classes, subClasses } = classOptions;
 
   const constructionPhases = useOptions('constructionPhases');
@@ -53,24 +57,42 @@ const ProjectFinancialsSection: FC<IProjectFinancialsSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-sm">
-          <NumberField {...getFieldProps('projectCostForecast')} tooltip="keur" hideLabel={true} />
+          <NumberField
+            {...getFieldProps('projectCostForecast')}
+            tooltip="keur"
+            hideLabel={true}
+            rules={validateMaxLength(10, t)}
+          />
         </div>
         <div className="form-col-lg">
           <SelectField {...getFieldProps('projectQualityLevel')} options={projectQualityLevels} />
         </div>
         <div className="form-col-sm">
-          <NumberField {...getFieldProps('projectWorkQuantity')} tooltip="keur" />
+          <NumberField
+            {...getFieldProps('projectWorkQuantity')}
+            tooltip="keur"
+            rules={validateMaxLength(10, t)}
+          />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-sm">
-          <NumberField {...getFieldProps('planningCostForecast')} tooltip="keur" hideLabel={true} />
+          <NumberField
+            {...getFieldProps('planningCostForecast')}
+            tooltip="keur"
+            hideLabel={true}
+            rules={validateMaxLength(10, t)}
+          />
         </div>
         <div className="form-col-lg">
           <SelectField {...getFieldProps('planningPhase')} options={planningPhases} />
         </div>
         <div className="form-col-sm">
-          <NumberField {...getFieldProps('planningWorkQuantity')} tooltip="keur" />
+          <NumberField
+            {...getFieldProps('planningWorkQuantity')}
+            tooltip="keur"
+            rules={validateMaxLength(10, t)}
+          />
         </div>
       </div>
       <div className="form-row">
@@ -79,19 +101,24 @@ const ProjectFinancialsSection: FC<IProjectFinancialsSectionProps> = ({
             {...getFieldProps('constructionCostForecast')}
             tooltip="keur"
             hideLabel={true}
+            rules={validateMaxLength(10, t)}
           />
         </div>
         <div className="form-col-lg">
           <SelectField {...getFieldProps('constructionPhase')} options={constructionPhases} />
         </div>
         <div className="form-col-sm">
-          <NumberField {...getFieldProps('constructionWorkQuantity')} tooltip="keur" />
+          <NumberField
+            {...getFieldProps('constructionWorkQuantity')}
+            tooltip="keur"
+            rules={validateMaxLength(10, t)}
+          />
         </div>
       </div>
       <ListField
         {...getFieldProps('realizedCostLabel')}
         fields={[
-          { ...getFieldProps('costForecast') },
+          { ...getFieldProps('costForecast'), rules: validateMaxLength(15, t) },
           {
             ...getFieldProps('realizedCost'),
             readOnly: true,
@@ -112,4 +139,4 @@ const ProjectFinancialsSection: FC<IProjectFinancialsSectionProps> = ({
   );
 };
 
-export default memo(ProjectFinancialsSection);
+export default memo(ProjectFinancialSection);
