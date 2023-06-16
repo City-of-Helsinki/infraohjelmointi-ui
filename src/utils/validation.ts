@@ -3,6 +3,7 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import { UseFormGetValues } from 'react-hook-form';
 import _ from 'lodash';
+import { isBefore } from './dates';
 
 export const validateMaxLength = (
   value: number,
@@ -31,6 +32,34 @@ export const validateMaxNumber = (
     message: t('validation.maxValue', { value: max }),
   },
 });
+
+export const validateBefore = (
+  startDate: string | null,
+  endDateField: string,
+  getValues: UseFormGetValues<IProjectForm>,
+  t: TFunction<'translation', undefined, 'translation'>,
+) => {
+  if (!isBefore(startDate, getValues(endDateField as keyof IProjectForm) as string)) {
+    return t('validation.isBefore', {
+      value: t(`validation.${endDateField}`),
+    });
+  }
+  return true;
+};
+
+export const validateAfter = (
+  endDate: string | null,
+  startDateField: string,
+  getValues: UseFormGetValues<IProjectForm>,
+  t: TFunction<'translation', undefined, 'translation'>,
+) => {
+  if (!isBefore(getValues(startDateField as keyof IProjectForm) as string, endDate)) {
+    return t('validation.isAfter', {
+      value: t(`validation.${startDateField}`),
+    });
+  }
+  return true;
+};
 
 export const getFieldsIfEmpty = (
   fields: Array<string>,

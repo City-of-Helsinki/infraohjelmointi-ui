@@ -77,23 +77,23 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
     [control],
   );
 
-  const isFieldDirty = useCallback(
-    (field: string) => {
-      if (_.has(dirtyFields, field)) {
-        return dirtyFields[field as keyof IProjectForm];
-      }
-    },
-    [dirtyFields],
-  );
+  // TODO: remove if not used
+  // const isFieldDirty = useCallback(
+  //   (field: string) => {
+  //     if (_.has(dirtyFields, field)) {
+  //       return dirtyFields[field as keyof IProjectForm];
+  //     }
+  //   },
+  //   [dirtyFields],
+  // );
 
   const formProps = useMemo(
     () => ({
       getFieldProps,
       control,
       getValues,
-      isFieldDirty,
     }),
-    [control, getFieldProps, getValues, isFieldDirty],
+    [control, getFieldProps, getValues],
   );
 
   const submitCallback = useCallback(() => handleSubmit(onSubmit), [handleSubmit, onSubmit]);

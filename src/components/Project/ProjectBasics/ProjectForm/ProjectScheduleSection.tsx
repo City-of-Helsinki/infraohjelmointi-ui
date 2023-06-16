@@ -1,13 +1,13 @@
 import { FormSectionTitle } from '@/components/shared';
-import { FC, memo, useCallback } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
-import { isBefore } from '@/utils/dates';
 import { Fieldset } from 'hds-react';
-import _ from 'lodash';
 import DateField from '@/components/shared/DateField';
+import { validateAfter, validateBefore } from '@/utils/validation';
+import _ from 'lodash';
 
 interface IProjectScheduleSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -16,22 +16,9 @@ interface IProjectScheduleSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
-  isFieldDirty: (field: string) =>
-    | boolean
-    | {
-        label?: boolean | undefined;
-        value?: boolean | undefined;
-        name?: boolean | undefined;
-      }
-    | boolean[]
-    | undefined;
 }
 
-const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
-  getFieldProps,
-  getValues,
-  isFieldDirty,
-}) => {
+const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ getFieldProps, getValues }) => {
   const { t } = useTranslation();
 
   const phases = useOptions('phases');
@@ -44,117 +31,224 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
   const warrantyPeriodPhase = phases[8].value;
   const completedPhase = phases[9].value;
 
-  const phasesThatNeedPlanning = [
-    draftInitiationPhase,
-    draftApprovalPhase,
-    constructionPlanPhase,
-    constructionWaitPhase,
-    constructionPhase,
-    warrantyPeriodPhase,
-    completedPhase,
-  ];
+  const phasesThatNeedPlanning = useMemo(
+    () => [
+      draftInitiationPhase,
+      draftApprovalPhase,
+      constructionPlanPhase,
+      constructionWaitPhase,
+      constructionPhase,
+      warrantyPeriodPhase,
+      completedPhase,
+    ],
+    [
+      completedPhase,
+      constructionPhase,
+      constructionPlanPhase,
+      constructionWaitPhase,
+      draftApprovalPhase,
+      draftInitiationPhase,
+      warrantyPeriodPhase,
+    ],
+  );
+
+  const phasesThatNeedConstruction = useMemo(
+    () => [constructionPhase, warrantyPeriodPhase, completedPhase],
+    [completedPhase, constructionPhase, warrantyPeriodPhase],
+  );
 
   const validateEstPlanningStart = useCallback(() => {
     return {
       validate: {
-        isRequired: (startDate: string | null) => {
+        isEstPlanningStartValid: (date: string | null) => {
           const phase = getValues('phase').value;
-          if (phasesThatNeedPlanning.includes(phase) && !startDate) {
+
+          if (phasesThatNeedPlanning.includes(phase) && !date) {
             return t('validation.required', { field: t('validation.estPlanningStart') });
           }
-          return true;
-        },
-        isBeforeEndDate: (startDate: string | null) => {
-          if (isFieldDirty('estPlanningStart')) {
-            if (!isBefore(startDate, getValues('estPlanningEnd'))) {
-              return t('validation.isBefore', {
-                start: t('validation.estPlanningStart'),
-                end: t('validation.estPlanningEnd'),
-              });
-            }
+
+          const beforePlanningEnd = validateBefore(date, 'estPlanningEnd', getValues, t);
+
+          if (beforePlanningEnd !== true) {
+            return beforePlanningEnd;
           }
+
           return true;
         },
       },
     };
-  }, [getValues, isFieldDirty, t]);
+  }, [getValues, phasesThatNeedPlanning, t]);
 
   const validateEstPlanningEnd = useCallback(() => {
     return {
       validate: {
-        isRequired: (endDate: string | null) => {
+        isEstPlanningEndValid: (date: string | null) => {
           const phase = getValues('phase').value;
-          if (phasesThatNeedPlanning.includes(phase) && !endDate) {
+
+          if (phasesThatNeedPlanning.includes(phase) && !date) {
             return t('validation.required', { field: t('validation.estPlanningEnd') });
           }
-          return true;
-        },
-        isAfterStartDate: (endDate: string | null) => {
-          if (isFieldDirty('estPlanningEnd')) {
-            if (!isBefore(getValues('estPlanningStart'), endDate)) {
-              return t('validation.isAfter', {
-                start: t('validation.estPlanningStart'),
-                end: t('validation.estPlanningEnd'),
-              });
-            }
+
+          const afterPlanningStart = validateAfter(date, 'estPlanningStart', getValues, t);
+
+          if (afterPlanningStart !== true) {
+            return afterPlanningStart;
           }
+
           return true;
         },
       },
     };
-  }, [getValues, isFieldDirty, t]);
+  }, [getValues, phasesThatNeedPlanning, t]);
 
-  const phasesThatNeedConstruction = [constructionPhase, warrantyPeriodPhase, completedPhase];
+  const validatePresenceStart = useCallback(() => {
+    return {
+      validate: {
+        isPresenceStartValid: (date: string | null) => {
+          const beforePresenceEnd = validateBefore(date, 'presenceEnd', getValues, t);
+
+          if (beforePresenceEnd !== true) {
+            return beforePresenceEnd;
+          }
+
+          const afterPlanningStart = validateAfter(date, 'estPlanningStart', getValues, t);
+
+          if (afterPlanningStart !== true) {
+            return afterPlanningStart;
+          }
+
+          const beforePlanningEnd = validateBefore(date, 'estPlanningEnd', getValues, t);
+
+          if (beforePlanningEnd !== true) {
+            return beforePlanningEnd;
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, t]);
+
+  const validatePresenceEnd = useCallback(() => {
+    return {
+      validate: {
+        isPresenceEndValid: (date: string | null) => {
+          const afterPresenceStart = validateAfter(date, 'presenceStart', getValues, t);
+
+          if (afterPresenceStart !== true) {
+            return afterPresenceStart;
+          }
+
+          const beforePlanningEnd = validateBefore(date, 'estPlanningEnd', getValues, t);
+
+          if (beforePlanningEnd !== true) {
+            return beforePlanningEnd;
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, t]);
+
+  const validateVisibilityStart = useCallback(() => {
+    return {
+      validate: {
+        isVisibilityStartValid: (date: string | null) => {
+          const beforeVisibilityEnd = validateBefore(date, 'visibilityEnd', getValues, t);
+
+          if (beforeVisibilityEnd !== true) {
+            return beforeVisibilityEnd;
+          }
+
+          const afterPlanningStarts = validateAfter(date, 'estPlanningStart', getValues, t);
+
+          if (afterPlanningStarts !== true) {
+            return afterPlanningStarts;
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, t]);
+
+  const validateVisibilityEnd = useCallback(() => {
+    return {
+      validate: {
+        isVisibilityEndValid: (date: string | null) => {
+          const afterVisibilityStart = validateAfter(date, 'visibilityStart', getValues, t);
+
+          if (afterVisibilityStart !== true) {
+            return afterVisibilityStart;
+          }
+
+          const beforePlanningEnds = validateBefore(date, 'estPlanningEnd', getValues, t);
+
+          if (beforePlanningEnds !== true) {
+            return beforePlanningEnds;
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, t]);
 
   const validateEstConstructionStart = useCallback(() => {
     return {
       validate: {
-        isRequired: (startDate: string | null) => {
+        isEstConstructionStartValid: (date: string | null) => {
           const phase = getValues('phase').value;
-          if (phasesThatNeedConstruction.includes(phase) && !startDate) {
+
+          if (phasesThatNeedConstruction.includes(phase) && !date) {
             return t('validation.required', { field: t('validation.estConstructionStart') });
           }
-          return true;
-        },
-        isBeforeEndDate: (startDate: string | null) => {
-          if (isFieldDirty('estConstructionStart')) {
-            if (!isBefore(startDate, getValues('estConstructionEnd'))) {
-              return t('validation.isBefore', {
-                start: t('validation.estConstructionStart'),
-                end: t('validation.estConstructionEnd'),
-              });
-            }
+
+          const afterPlanningEnd = validateAfter(date, 'estPlanningEnd', getValues, t);
+
+          if (afterPlanningEnd !== true) {
+            return afterPlanningEnd;
           }
+
+          const beforeConstructionEnd = validateBefore(date, 'estConstructionEnd', getValues, t);
+
+          if (beforeConstructionEnd !== true) {
+            return validateBefore(date, 'estConstructionEnd', getValues, t);
+          }
+
           return true;
         },
       },
     };
-  }, [getValues, isFieldDirty, t]);
+  }, [getValues, phasesThatNeedConstruction, t]);
 
   const validateEstConstructionEnd = useCallback(() => {
     return {
       validate: {
-        isRequired: (endDate: string | null) => {
+        isEstConstructionEndValid: (endDate: string | null) => {
           const phase = getValues('phase').value;
+
           if (phasesThatNeedConstruction.includes(phase) && !endDate) {
             return t('validation.required', { field: t('validation.estConstructionEnd') });
           }
-          return true;
-        },
-        isAfterStartDate: (endDate: string | null) => {
-          if (isFieldDirty('estConstructionEnd')) {
-            if (!isBefore(getValues('estConstructionStart'), endDate)) {
-              return t('validation.isAfter', {
-                start: t('validation.estConstructionStart'),
-                end: t('validation.estConstructionEnd'),
-              });
-            }
+
+          const afterConstructionStart = validateAfter(
+            endDate,
+            'estConstructionStart',
+            getValues,
+            t,
+          );
+
+          if (afterConstructionStart !== true) {
+            return validateAfter(endDate, 'estConstructionStart', getValues, t);
           }
+
           return true;
         },
       },
     };
-  }, [getValues, isFieldDirty, t]);
+  }, [getValues, phasesThatNeedConstruction, t]);
 
   return (
     <div className="w-full" id="basics-schedule-section">
@@ -170,18 +264,18 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         </div>
         <div className="form-row">
           <div className="form-col-md">
-            <DateField {...getFieldProps('presenceStart')} />
+            <DateField {...getFieldProps('presenceStart')} rules={validatePresenceStart()} />
           </div>
           <div className="form-col-md">
-            <DateField {...getFieldProps('presenceEnd')} />
+            <DateField {...getFieldProps('presenceEnd')} rules={validatePresenceEnd()} />
           </div>
         </div>
         <div className="form-row">
           <div className="form-col-md">
-            <DateField {...getFieldProps('visibilityStart')} />
+            <DateField {...getFieldProps('visibilityStart')} rules={validateVisibilityStart()} />
           </div>
           <div className="form-col-md">
-            <DateField {...getFieldProps('visibilityEnd')} />
+            <DateField {...getFieldProps('visibilityEnd')} rules={validateVisibilityEnd()} />
           </div>
         </div>
       </Fieldset>

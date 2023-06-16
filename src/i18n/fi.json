@@ -121,7 +121,11 @@
     "programmed": "Ohjelmoitu",
     "description": "Hankkeen kuvaus",
     "phaseTooEarly": "Hankkeen vaihe ei voi olla {{value}} jos nykyinen päivä on ennen rakentamisen päättymispäivää",
-    "category": "Kategoria"
+    "category": "Kategoria",
+    "presenceStart": "Esilläolo alkaa",
+    "presenceEnd": "Esilläolo päättyy",
+    "visibilityStart": "Nähtävilläolo alkaa",
+    "visibilityEnd": "Nähtävilläolo päättyy"
   },
   "projectForm": {
     "basics": "Hankkeen perustiedot",

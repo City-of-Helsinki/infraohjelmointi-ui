@@ -18,22 +18,9 @@ interface IProjectStatusSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
-  isFieldDirty: (field: string) =>
-    | boolean
-    | {
-        label?: boolean | undefined;
-        value?: boolean | undefined;
-        name?: boolean | undefined;
-      }
-    | boolean[]
-    | undefined;
 }
 
-const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
-  getFieldProps,
-  getValues,
-  isFieldDirty,
-}) => {
+const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, getValues }) => {
   const phases = useOptions('phases');
   const categories = useOptions('categories');
   const riskAssessments = useOptions('riskAssessments');
@@ -192,18 +179,16 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       validate: {
         isPlanningStartYearValid: (startYear: string | null) => {
           const endYear = getValues('constructionEndYear');
-          if (isFieldDirty('planningStartYear')) {
-            if (startYear && endYear && parseInt(startYear) > parseInt(endYear)) {
-              return t('validation.isBefore', {
-                value: t('validation.constructionEndYear'),
-              });
-            }
+          if (startYear && endYear && parseInt(startYear) > parseInt(endYear)) {
+            return t('validation.isBefore', {
+              value: t('validation.constructionEndYear'),
+            });
           }
           return true;
         },
       },
     };
-  }, [getValues, isFieldDirty, t]);
+  }, [getValues, t]);
 
   const validateConstructionEndYear = useCallback(() => {
     return {
@@ -211,12 +196,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       validate: {
         isConstructionEndYearValid: (endYear: string | null) => {
           const startYear = getValues('planningStartYear');
-          if (
-            endYear &&
-            startYear &&
-            parseInt(endYear) < parseInt(startYear) &&
-            isFieldDirty('constructionEndYear')
-          ) {
+          if (endYear && startYear && parseInt(endYear) < parseInt(startYear)) {
             return t('validation.isAfter', {
               value: t('validation.planningStartYear'),
             });
@@ -226,7 +206,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     };
-  }, [getValues, isFieldDirty, t]);
+  }, [getValues, t]);
 
   const validateCategory = useCallback(() => {
     return {

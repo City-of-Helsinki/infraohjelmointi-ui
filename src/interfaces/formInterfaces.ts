@@ -61,6 +61,10 @@ export interface IProjectForm {
   planningStartYear: string;
   estPlanningStart: string;
   estPlanningEnd: string;
+  presenceStart: string;
+  presenceEnd: string;
+  visibilityStart: string;
+  visibilityEnd: string;
   estConstructionStart: string;
   estConstructionEnd: string;
   personConstruction: IOption;
