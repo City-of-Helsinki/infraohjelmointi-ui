@@ -24,7 +24,7 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
     <div className="input-wrapper" id={name} data-testid={name}>
       <div className="flex flex-col">
         <div style={{ marginBottom: '1rem' }}>
-          <FormFieldLabel text={label} onClick={readOnly ? undefined : handleSetEditing} />
+          <FormFieldLabel text={t(label)} onClick={readOnly ? undefined : handleSetEditing} />
         </div>
         {fields?.map((f) => (
           <Controller

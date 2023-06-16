@@ -298,17 +298,13 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
         />
       )}
       {/* Displayed on form (Open dialog button) */}
-      <div className="flex flex-col">
-        <div className="hashtags-label">
-          <FormFieldLabel
-            dataTestId="open-hash-tag-dialog-button"
-            text={t(`projectForm.${name}`)}
-            onClick={toggleOpenDialog}
-          />
-        </div>
-        {/* Displayed on form (Project hashtags) */}
-        <HashTagsContainer tags={projectHashTags} />
-      </div>
+      <FormFieldLabel
+        dataTestId="open-hash-tag-dialog-button"
+        text={t(`projectForm.${name}`)}
+        onClick={toggleOpenDialog}
+      />
+      {/* Displayed on form (Project hashtags) */}
+      <HashTagsContainer tags={projectHashTags} />
     </div>
   );
 };

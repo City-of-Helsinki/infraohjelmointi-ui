@@ -52,6 +52,11 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
     ],
   );
 
+  const phasesThatNeedConstruction = useMemo(
+    () => [constructionPhase, warrantyPeriodPhase, completedPhase],
+    [completedPhase, constructionPhase, warrantyPeriodPhase],
+  );
+
   const validatePersonPlanning = useCallback(() => {
     return {
       validate: {
@@ -67,6 +72,22 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
       },
     };
   }, [getValues, phasesThatNeedResponsiblePerson, t]);
+
+  const validatePersonConstruction = useCallback(() => {
+    return {
+      validate: {
+        isResponsiblePersonValid: (personConstruction: IOption) => {
+          const phase = getValues('phase').value;
+
+          if (phasesThatNeedConstruction.includes(phase) && personConstruction.value === '') {
+            return t('validation.required', { field: t('validation.personConstruction') });
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, phasesThatNeedConstruction, t]);
 
   return (
     <div className="w-full" id="basics-responsible-persons-section">
@@ -85,6 +106,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             {...getFieldProps('personConstruction')}
             icon="person"
             options={responsiblePersons}
+            rules={validatePersonConstruction()}
           />
         </div>
       </div>
