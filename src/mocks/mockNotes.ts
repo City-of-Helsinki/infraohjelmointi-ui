@@ -11,7 +11,7 @@ const mockNotes: { data: Array<INote> } = {
       },
       content: 'First note',
       createdDate: '2022-12-29T17:34:35.717708+02:00',
-      project: '79e6bc78-9fa2-49a1-aaad-b50030da170e',
+      project: 'mock-project-id',
       history: [
         {
           history_id: '2',
@@ -42,7 +42,7 @@ const mockNotes: { data: Array<INote> } = {
       },
       content: 'Second note',
       createdDate: '2022-12-29T19:16:00.314528+02:00',
-      project: '79e6bc78-9fa2-49a1-aaad-b50030da170e',
+      project: 'mock-project-id',
       history: [],
     },
   ],

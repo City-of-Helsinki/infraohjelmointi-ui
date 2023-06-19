@@ -27,7 +27,7 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
   const [formSaved, setFormSaved] = useState(false);
 
   const {
-    formState: { dirtyFields, isDirty },
+    formState: { dirtyFields, isDirty, errors },
     handleSubmit,
     control,
     getValues,
@@ -42,6 +42,8 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
       if (isDirty) {
+        console.log('is saving with data: ', form);
+
         setIsSaving(true);
         if (!project?.id) {
           return;
@@ -77,16 +79,6 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
     [control],
   );
 
-  // TODO: remove if not used
-  // const isFieldDirty = useCallback(
-  //   (field: string) => {
-  //     if (_.has(dirtyFields, field)) {
-  //       return dirtyFields[field as keyof IProjectForm];
-  //     }
-  //   },
-  //   [dirtyFields],
-  // );
-
   const formProps = useMemo(
     () => ({
       getFieldProps,
@@ -96,10 +88,23 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
     [control, getFieldProps, getValues],
   );
 
-  const submitCallback = useCallback(() => handleSubmit(onSubmit), [handleSubmit, onSubmit]);
+  const submitCallback = useCallback(
+    () => handleSubmit(onSubmit),
+    [handleSubmit, onSubmit, errors],
+  );
+
+  const autoSubmit = useCallback(() => {
+    if (_.isEmpty(errors)) {
+      console.log('autosubmitting');
+
+      return handleSubmit(onSubmit);
+    }
+    // TODO: evaluate errors onBlur, it only evaluates whichever field is typed in...
+    return undefined;
+  }, [handleSubmit, onSubmit, errors]);
 
   return (
-    <form onBlur={submitCallback()} data-testid="project-form" className="project-form">
+    <form onBlur={autoSubmit()} data-testid="project-form" className="project-form">
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection {...formProps} project={project} formSaved={formSaved} />
       {/* SECTION 2 - STATUS */}

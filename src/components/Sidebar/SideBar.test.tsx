@@ -11,6 +11,7 @@ import ProjectView from '@/views/ProjectView';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import PlanningView from '@/views/PlanningView';
 import { ProjectBasics } from '../Project/ProjectBasics';
+import { mockProjectPhases } from '@/mocks/mockLists';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -34,6 +35,10 @@ const render = async () =>
           project: {
             ...store.getState().project,
             selectedProject: mockProject.data,
+          },
+          lists: {
+            ...store.getState().lists,
+            phases: mockProjectPhases.data,
           },
         },
       },

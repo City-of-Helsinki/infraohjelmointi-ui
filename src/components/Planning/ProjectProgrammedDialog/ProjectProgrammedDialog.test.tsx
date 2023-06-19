@@ -14,7 +14,6 @@ import {
   mockSubClasses,
 } from '@/mocks/mockClasses';
 import { mockSearchResults } from '@/mocks/mockSearch';
-// import { setSelectedClass } from '@/reducers/classSlice';
 import { IProjectPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { Route } from 'react-router';
 import PlanningView from '@/views/PlanningView/PlanningView';

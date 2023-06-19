@@ -11,7 +11,7 @@
   * - the head cell is sticky to keep it in place when scrolling horizontally
   **/
 .project-head-cell {
-  box-shadow: -0.5px 0px 0px 0px #ccccff inset, 0.5px 0px 0px 0px #ccccff inset;
+  box-shadow: inset -0.5px 0 0 0 #ccf, inset 0.5px 0 0 0 #ccf, inset 0px 0.5px 0 0 #ccf;
   @apply sticky left-0 z-50 max-w-[1rem] bg-white px-4 py-1;
 }
 

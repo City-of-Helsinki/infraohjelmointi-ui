@@ -249,7 +249,8 @@
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
       "Request failed with status code 404": "Pyyntö epäonnistui virhekoodilla 404",
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500",
-      "projectNotFound": "Varmista että estimäsi hanke on olemassa"
+      "projectNotFound": "Varmista että estimäsi hanke on olemassa",
+      "appDataError": "Virhe ladattaessa sovellustietoja"
     }
   },
   "searchOrder": {

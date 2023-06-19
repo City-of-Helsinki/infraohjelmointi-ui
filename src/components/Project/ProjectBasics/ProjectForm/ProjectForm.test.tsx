@@ -373,7 +373,7 @@ describe('projectForm', () => {
     const parentContainer = await findByTestId('project-form');
 
     await user.click(await findByRole('button', { name: 'projectForm.area' }));
-    await user.click(await findByText(matchExact('enums.lansisatama')));
+    await user.click(await findByText('enums.lansisatama'));
     await user.click(parentContainer);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -383,7 +383,7 @@ describe('projectForm', () => {
 
   it('can autosave patch a DateField', async () => {
     const { user, findByRole, findByDisplayValue, findByTestId } = await render();
-    const expectedValue = '13.12.2022';
+    const expectedValue = '13.12.2020';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
       data: { ...project, estPlanningStart: expectedValue },
