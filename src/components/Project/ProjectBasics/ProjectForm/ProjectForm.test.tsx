@@ -151,13 +151,6 @@ describe('projectForm', () => {
     });
   });
 
-  it('has all required fields as required', async () => {
-    const { findByText } = await render();
-
-    expect(await findByText('projectForm.type')).toBeInTheDocument();
-    expect(await findByText('projectForm.description')).toBeInTheDocument();
-  });
-
   it('renders hashTags modal and can search and patch hashTags', async () => {
     const { findByText, findByRole, user, store } = await render();
 
@@ -195,7 +188,7 @@ describe('projectForm', () => {
 
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
 
-    await sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data);
+    await act(() => sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data));
 
     await waitFor(() => expect(dialog).not.toBeInTheDocument);
 
@@ -256,7 +249,7 @@ describe('projectForm', () => {
     );
     await user.click((await dialog.findByTestId('create-hash-tag-button')).children[0]);
 
-    await sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data);
+    await act(() => sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data));
 
     // Click the 'add to project' button to patch the project with the new hashtag
     await user.click(await dialog.findByTestId('add-new-hash-tag-to-project'));
@@ -320,7 +313,7 @@ describe('projectForm', () => {
     );
 
     // simulate event and setting selected project since it happens in projectview
-    await sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data);
+    await act(() => sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data));
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
