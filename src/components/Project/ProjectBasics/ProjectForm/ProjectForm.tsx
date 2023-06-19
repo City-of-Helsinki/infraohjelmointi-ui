@@ -82,17 +82,14 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
   );
 
   const submitCallback = useCallback(() => {
-    console.log('errors: ', errors);
-
     return handleSubmit(onSubmit);
-  }, [handleSubmit, onSubmit, errors]);
+  }, [handleSubmit, onSubmit]);
 
   const autoSubmit = useCallback(() => {
     if (_.isEmpty(errors)) {
       return submitCallback();
     } else if (isDirty) {
       // TODO: evaluate the error fields
-      console.log('errors: ', errors);
       // Object.keys(errors).forEach((k) => {
       //   setValue(k as keyof IProjectForm, getValues(k as keyof IProjectForm));
       // });
