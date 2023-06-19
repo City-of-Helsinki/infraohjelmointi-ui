@@ -5,7 +5,7 @@ import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { IOption } from '@/interfaces/common';
-import { getToday, isBefore } from '@/utils/dates';
+import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
@@ -179,13 +179,38 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
     return {
       ...validateMaxNumber(3000, t),
       validate: {
-        isPlanningStartYearValid: (startYear: string | null) => {
-          const endYear = getValues('constructionEndYear');
-          if (startYear && endYear && parseInt(startYear) > parseInt(endYear)) {
+        isPlanningStartYearValid: (date: string | null) => {
+          if (!date) {
+            return true;
+          }
+
+          const conEnd = getValues('constructionEndYear');
+          const isAfterConstructionEnd = conEnd && parseInt(date) > parseInt(conEnd);
+
+          // If the date is after construction end year
+          if (isAfterConstructionEnd) {
             return t('validation.isBefore', {
               value: t('validation.constructionEndYear'),
             });
           }
+
+          const estPlanningStartToUpdate = updateYear(
+            parseInt(date),
+            getValues('estPlanningStart'),
+          );
+
+          const isEstPlanningStartAfterEstPlanningEnd = !isBefore(
+            estPlanningStartToUpdate,
+            getValues('estPlanningEnd'),
+          );
+
+          // We also patch the estPlanningStart value, so we need to check if the date would appear after estPlanningEnd
+          if (isEstPlanningStartAfterEstPlanningEnd) {
+            return t('validation.isBefore', {
+              value: t('validation.estPlanningEnd'),
+            });
+          }
+
           return true;
         },
       },
@@ -196,15 +221,39 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
     return {
       ...validateMaxNumber(3000, t),
       validate: {
-        isConstructionEndYearValid: (endYear: string | null) => {
-          const startYear = getValues('planningStartYear');
-          if (endYear && startYear && parseInt(endYear) < parseInt(startYear)) {
+        isConstructionEndYearValid: (date: string | null) => {
+          if (!date) {
+            return true;
+          }
+
+          const planStart = getValues('planningStartYear');
+          const isBeforePlanningStart = planStart && parseInt(date) < parseInt(planStart);
+
+          // If the date is before planning start year
+          if (isBeforePlanningStart) {
             return t('validation.isAfter', {
               value: t('validation.planningStartYear'),
             });
-          } else {
-            return true;
           }
+
+          const estConstructionEndToUpdate = updateYear(
+            parseInt(date),
+            getValues('estConstructionEnd'),
+          );
+
+          const isEstConstructionEndBeforeEstConstructionStart = !isBefore(
+            getValues('estConstructionStart'),
+            estConstructionEndToUpdate,
+          );
+
+          // We also patch the estConstructionEnd value, so we need to check if the date would appear after estConstructionStart
+          if (isEstConstructionEndBeforeEstConstructionStart) {
+            return t('validation.isBefore', {
+              value: t('validation.estConstructionStart'),
+            });
+          }
+
+          return true;
         },
       },
     };

@@ -226,22 +226,17 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ getFieldProp
   const validateEstConstructionEnd = useCallback(() => {
     return {
       validate: {
-        isEstConstructionEndValid: (endDate: string | null) => {
+        isEstConstructionEndValid: (date: string | null) => {
           const phase = getValues('phase').value;
 
-          if (phasesThatNeedConstruction.includes(phase) && !endDate) {
+          if (phasesThatNeedConstruction.includes(phase) && !date) {
             return t('validation.required', { field: t('validation.estConstructionEnd') });
           }
 
-          const afterConstructionStart = validateAfter(
-            endDate,
-            'estConstructionStart',
-            getValues,
-            t,
-          );
+          const afterConstructionStart = validateAfter(date, 'estConstructionStart', getValues, t);
 
           if (afterConstructionStart !== true) {
-            return validateAfter(endDate, 'estConstructionStart', getValues, t);
+            return validateAfter(date, 'estConstructionStart', getValues, t);
           }
 
           return true;

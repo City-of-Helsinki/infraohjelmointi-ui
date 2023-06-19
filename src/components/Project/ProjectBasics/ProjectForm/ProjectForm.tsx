@@ -5,7 +5,6 @@ import { Dispatch, FC, SetStateAction, memo, useCallback, useMemo, useState } fr
 import { selectProject } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
-import { useOptions } from '@/hooks/useOptions';
 import { patchProject } from '@/services/projectServices';
 import ProjectStatusSection from './ProjectStatusSection';
 import ProjectInfoSection from './ProjectInfoSection';
@@ -33,8 +32,6 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
     getValues,
   } = formMethods;
 
-  const phases = useOptions('phases');
-
   const handleSetFormSaved = useCallback((value: boolean) => {
     setFormSaved(value);
   }, []);
@@ -42,17 +39,13 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
       if (isDirty) {
-        console.log('is saving with data: ', form);
-
         setIsSaving(true);
+
         if (!project?.id) {
           return;
         }
-        const data: IProjectRequest = dirtyFieldsToRequestObject(
-          dirtyFields,
-          form as IAppForms,
-          phases,
-        );
+
+        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
         await patchProject({ id: project.id, data })
           .then(() => {
@@ -65,7 +58,7 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
           .finally(() => setIsSaving(false));
       }
     },
-    [isDirty, setIsSaving, project?.id, dirtyFields, phases, handleSetFormSaved],
+    [isDirty, setIsSaving, project?.id, dirtyFields, handleSetFormSaved],
   );
 
   const getFieldProps = useCallback(
@@ -88,20 +81,24 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
     [control, getFieldProps, getValues],
   );
 
-  const submitCallback = useCallback(
-    () => handleSubmit(onSubmit),
-    [handleSubmit, onSubmit, errors],
-  );
+  const submitCallback = useCallback(() => {
+    console.log('errors: ', errors);
+
+    return handleSubmit(onSubmit);
+  }, [handleSubmit, onSubmit, errors]);
 
   const autoSubmit = useCallback(() => {
     if (_.isEmpty(errors)) {
-      console.log('autosubmitting');
-
-      return handleSubmit(onSubmit);
+      return submitCallback();
+    } else if (isDirty) {
+      // TODO: evaluate the error fields
+      console.log('errors: ', errors);
+      // Object.keys(errors).forEach((k) => {
+      //   setValue(k as keyof IProjectForm, getValues(k as keyof IProjectForm));
+      // });
     }
-    // TODO: evaluate errors onBlur, it only evaluates whichever field is typed in...
     return undefined;
-  }, [handleSubmit, onSubmit, errors]);
+  }, [errors, isDirty, submitCallback]);
 
   return (
     <form onBlur={autoSubmit()} data-testid="project-form" className="project-form">
