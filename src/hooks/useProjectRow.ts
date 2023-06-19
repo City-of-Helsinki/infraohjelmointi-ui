@@ -478,33 +478,23 @@ const getProjectCells = (project: IProject) => {
     };
   });
   /**
-   * Creates a linked list from the provided list
+   * Transforms the provided list to a linkedList
    * @param list list of IProjectCell
    * @returns a list of IProjectCell
    */
-  const createLinkedList = (list: IProjectCell[]) => {
+  const transformToLinkedList = (list: IProjectCell[]) => {
     if (list.length === 0) {
       return list;
     }
 
-    // Set the previous and next pointers for the first item
-    list[0].prev = null;
-    list[0].next = list.length > 1 ? list[1] : null;
-
-    // Set the previous and next pointers for the middle items
-    for (let i = 1; i < list.length - 1; i++) {
-      list[i].prev = list[i - 1];
-      list[i].next = list[i + 1];
+    for (let i = 0; i < list.length; i++) {
+      list[i].prev = i == 0? null : list[i-1]
+      list[i].next = i + 1 == list.length ? null : list[i+1]
     }
-
-    // Set the previous and next pointers for the last item
-    const lastIndex = list.length - 1;
-    list[lastIndex].prev = list[lastIndex - 1];
-    list[lastIndex].next = null;
 
     return list;
   };
-  return createLinkedList(projectCells);
+  return transformToLinkedList(projectCells);
 };
 
 interface IProjectRowsState {

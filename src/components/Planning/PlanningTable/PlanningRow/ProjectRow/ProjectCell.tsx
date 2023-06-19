@@ -102,11 +102,9 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
    * @returns void
    */
   const updateCellToConstruction = (isOverlap: boolean) => {
-    if (cell.prev?.type.includes('planning')) {
-      req.estPlanningEnd = removeYear(estPlanningEnd);
-    } else {
-      req.estPlanningEnd = getDateFromFirstPlanCellBehind();
-    }
+    req.estPlanningEnd = cell.prev?.type.includes('planning')
+      ? removeYear(estPlanningEnd)
+      : getDateFromFirstPlanCellBehind();
     if (!isOverlap) {
       if (cell.next?.type.includes('construction')) {
         req.estConstructionStart = removeYear(estConstructionStart);
@@ -131,11 +129,9 @@ const getCellTypeUpdateRequestData = (cell: IProjectCell, phase: string): IProje
         req.estPlanningEnd = getLastDate(estConstructionStart);
       }
     }
-    if (cell.next?.type.includes('construction')) {
-      req.estConstructionStart = addYear(estConstructionStart);
-    } else {
-      req.estConstructionStart = getDateFromFirstConCellAhead();
-    }
+    req.estConstructionStart = cell.next?.type.includes('construction')
+      ? addYear(estConstructionStart)
+      : getDateFromFirstConCellAhead();
   };
   switch (type) {
     case 'planningEnd':
