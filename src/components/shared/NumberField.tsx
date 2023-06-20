@@ -30,12 +30,12 @@ const NumberField: FC<INumberFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState: { error } }) => (
+      render={({ field: { value, onChange }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
-            className={`input-l`}
-            {...field}
-            value={field.value ?? ''}
+            className="input-l"
+            value={value ?? ''}
+            onChange={onChange}
             label={!hideLabel ? t(label) : ''}
             style={{ paddingTop: hideLabel ? '1.75rem' : '0' }}
             id={label}

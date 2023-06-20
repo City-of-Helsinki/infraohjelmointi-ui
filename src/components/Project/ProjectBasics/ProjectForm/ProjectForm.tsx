@@ -1,8 +1,8 @@
 import useProjectForm from '@/forms/useProjectForm';
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
-import { Dispatch, FC, SetStateAction, memo, useCallback, useMemo, useState } from 'react';
-import { selectProject } from '@/reducers/projectSlice';
+import { memo, useCallback, useMemo, useState } from 'react';
+import { selectProject, setIsSaving } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { patchProject } from '@/services/projectServices';
@@ -17,16 +17,14 @@ import ProjectFormBanner from './ProjectFormBanner';
 import _ from 'lodash';
 import './styles.css';
 
-interface IProjectFormProps {
-  setIsSaving: Dispatch<SetStateAction<boolean>>;
-}
-const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
+const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions } = useProjectForm();
   const project = useAppSelector(selectProject);
   const [formSaved, setFormSaved] = useState(false);
+  const dispatch = useAppDispatch();
 
   const {
-    formState: { dirtyFields, isDirty, errors },
+    formState: { dirtyFields, isDirty },
     handleSubmit,
     control,
     getValues,
@@ -39,7 +37,7 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
       if (isDirty) {
-        setIsSaving(true);
+        dispatch(setIsSaving(true));
 
         if (!project?.id) {
           return;
@@ -55,10 +53,10 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
             }, 0);
           })
           .catch((e) => console.log('project patch error: ', e))
-          .finally(() => setIsSaving(false));
+          .finally(() => dispatch(setIsSaving(false)));
       }
     },
-    [isDirty, setIsSaving, project?.id, dirtyFields, handleSetFormSaved],
+    [isDirty, project?.id, dirtyFields, handleSetFormSaved, dispatch],
   );
 
   const getFieldProps = useCallback(
@@ -85,20 +83,8 @@ const ProjectForm: FC<IProjectFormProps> = ({ setIsSaving }) => {
     return handleSubmit(onSubmit);
   }, [handleSubmit, onSubmit]);
 
-  const autoSubmit = useCallback(() => {
-    if (_.isEmpty(errors)) {
-      return submitCallback();
-    } else if (isDirty) {
-      // TODO: evaluate the error fields
-      // Object.keys(errors).forEach((k) => {
-      //   setValue(k as keyof IProjectForm, getValues(k as keyof IProjectForm));
-      // });
-    }
-    return undefined;
-  }, [errors, isDirty, submitCallback]);
-
   return (
-    <form onBlur={autoSubmit()} data-testid="project-form" className="project-form">
+    <form onBlur={submitCallback()} data-testid="project-form" className="project-form">
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection {...formProps} project={project} formSaved={formSaved} />
       {/* SECTION 2 - STATUS */}

@@ -25,7 +25,7 @@ import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
 import { setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
-import ProjectBasics from '../ProjectBasics';
+import ProjectForm from './ProjectForm';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -36,13 +36,14 @@ const getFormField = (name: string) => `projectForm.${name}`;
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectBasics />} />, {
+    renderWithProviders(<Route path="/" element={<ProjectForm />} />, {
       preloadedState: {
         project: {
           selectedProject: mockProject.data,
           count: 1,
           error: {},
           page: 1,
+          isSaving: false,
         },
         auth: { user: mockPersons.data[0], error: {} },
         lists: {
@@ -93,7 +94,7 @@ describe('projectForm', () => {
     const project = mockProject.data;
     const euroFormat = (value: string) => `${value} €`;
     const expectDisplayValue = async (value: string | undefined) =>
-      expect(await findByDisplayValue(matchExact(value || ''))).toBeInTheDocument();
+      expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
       expect(await findByText(`enums.${option || ''}`)).toBeInTheDocument();
     const expectRadioBoolean = async (testId: string, value: boolean) =>
@@ -143,9 +144,11 @@ describe('projectForm', () => {
     expectDisplayValue(project?.constructionWorkQuantity);
 
     expect(project?.hashTags?.length).toBe(8);
+
     const projectHashTags = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(project?.hashTags, h.id),
     );
+
     projectHashTags?.forEach(async (h) => {
       expect(await findByText(matchExact(h.value))).toBeInTheDocument();
     });
@@ -160,6 +163,7 @@ describe('projectForm', () => {
       ...(mockProject.data.hashTags as Array<string>),
       '816cc173-6340-45ed-9b49-4b4976b2a48b',
     ];
+
     const project = store.getState().project.selectedProject as IProject;
     const responseProject: { data: IProject } = {
       data: { ...project, hashTags: expectedValues },
@@ -188,7 +192,9 @@ describe('projectForm', () => {
 
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
 
-    await act(() => sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data));
+    await act(async () => {
+      sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data);
+    });
 
     await waitFor(() => expect(dialog).not.toBeInTheDocument);
 

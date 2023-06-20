@@ -30,11 +30,12 @@ const TextField: FC<ITextFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState: { error } }) => (
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextInput
             className="input-l"
-            {...field}
+            value={value}
+            onChange={onChange}
             label={t(label)}
             hideLabel={hideLabel}
             id={label}

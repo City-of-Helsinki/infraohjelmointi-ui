@@ -124,6 +124,10 @@ input {
   @apply z-[1];
 }
 
+.input-l.error {
+  @apply border-2 border-error;
+}
+
 /* 
   box-sizing: border-box causes the HDS-Select dropdown list to be too small, this sets
   the list to its intended size

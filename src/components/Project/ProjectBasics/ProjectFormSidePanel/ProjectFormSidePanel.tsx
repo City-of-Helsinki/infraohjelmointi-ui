@@ -7,10 +7,9 @@ import './styles.css';
 
 interface IProjectFormSidePanelProps {
   pwFolderLink?: string | null;
-  isSaving: boolean;
 }
 
-const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink, isSaving }) => {
+const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink }) => {
   const { t } = useTranslation();
   const navItems = [
     { route: '#basics', label: t('nav.basics') },
@@ -31,7 +30,7 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink, is
             <SideNavigation navItems={navItems} />
           </div>
           <PWContainer pwFolderLink={pwFolderLink} />
-          <SaveIndicator isSaving={isSaving} />
+          <SaveIndicator />
         </div>
       </div>
     </div>

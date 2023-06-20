@@ -1,18 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { CustomTag } from '@/components/shared';
 import { useAppSelector } from '@/hooks/common';
-import { selectProject } from '@/reducers/projectSlice';
+import { selectIsProjectSaving, selectProject } from '@/reducers/projectSlice';
 import moment from 'moment';
-import { FC } from 'react';
 import './styles.css';
 
-interface ISaveIndicatorProps {
-  isSaving: boolean;
-}
-
-const SaveIndicator: FC<ISaveIndicatorProps> = ({ isSaving }) => {
+const SaveIndicator = () => {
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
+  const isSaving = useAppSelector(selectIsProjectSaving);
   const updatedMoment = moment(project?.updatedDate).format('D.M.YYYY HH:mm:ss');
 
   return (

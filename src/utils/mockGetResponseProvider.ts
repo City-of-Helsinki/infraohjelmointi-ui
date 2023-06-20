@@ -80,7 +80,6 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockSearchResults);
       case url.toLocaleLowerCase().includes(`/projects/`):
         return Promise.resolve(mockPlanningViewProjects);
-      
       default:
         return Promise.reject(new Error('not found'));
     }
