@@ -90,11 +90,11 @@
 }
 
 .select-field-wrapper,
-.select-field-wrapper-lg {
+.select-field-wrapper.lg {
   @apply relative max-w-[24rem];
 }
 
-.select-field-wrapper-full {
+.select-field-wrapper.full {
   @apply relative;
 }
 

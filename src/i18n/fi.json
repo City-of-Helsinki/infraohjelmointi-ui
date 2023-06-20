@@ -27,7 +27,7 @@
     "documents": "Dokumentit",
     "pwFolderLink": "Avaa dokumentit ProjectWisessa"
   },
-  "enums": {
+  "option": {
     "underConstruction": "Rakenteilla",
     "proposal": "Hanke-ehdotus",
     "design": "Yleissuunnittelu",

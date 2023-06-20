@@ -304,7 +304,7 @@ describe('SearchResultsView', () => {
 
       // Title and status tag
       expect(projectChildren[0]).toHaveTextContent('Planning Project 1');
-      expect(projectChildren[0]).toHaveTextContent('enums.warrantyPeriod');
+      expect(projectChildren[0]).toHaveTextContent('option.warrantyPeriod');
       // Breadcrumbs
       expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');
       expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');

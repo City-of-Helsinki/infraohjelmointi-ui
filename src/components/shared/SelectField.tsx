@@ -1,20 +1,21 @@
 import { IOption } from '@/interfaces/common';
-import { FC, memo, useCallback, useRef } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select as HDSSelect } from 'hds-react/components/Select';
-import { IconCrossCircle, IconLocation, IconUser } from 'hds-react/icons';
+import { IconCrossCircle } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
+import optionIcon from '@/utils/optionIcon';
 
-const getIcon = (icon?: string) => {
-  if (icon === 'location') {
-    return <IconLocation />;
-  } else if (icon === 'person') {
-    return <IconUser />;
-  } else {
-    return undefined;
-  }
-};
+// const getIcon = (icon?: string) => {
+//   if (icon === 'location') {
+//     return <IconLocation />;
+//   } else if (icon === 'person') {
+//     return <IconUser />;
+//   } else {
+//     return undefined;
+//   }
+// };
 
 interface ISelectFieldProps {
   name: string;
@@ -28,6 +29,7 @@ interface ISelectFieldProps {
   disabled?: boolean;
   clearable?: boolean;
   size?: 'full' | 'lg';
+  shouldTranslate?: boolean;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -42,10 +44,12 @@ const SelectField: FC<ISelectFieldProps> = ({
   disabled,
   clearable,
   size,
+  shouldTranslate,
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
+  const [translate, setTranslate] = useState(true);
 
   /**
    * Empties the selected value for the SelectField and focuses the field afterwards so that
@@ -70,6 +74,33 @@ const SelectField: FC<ISelectFieldProps> = ({
     }
   }, []);
 
+  const translatedOptions = useMemo(
+    () =>
+      translate
+        ? options.map(({ value, label }) => ({ value, label: t(`option.${label}`) }))
+        : options,
+    [options, t, translate],
+  );
+
+  const translateValue = useCallback(
+    (option: IOption) => {
+      console.log('option label: ', option.label);
+
+      if (option.label !== '' && !option.label.includes('option') && translate) {
+        const translatedLabel = t(`option.${option.label}`);
+        if (!translatedLabel.includes('option.')) {
+          return { value: option.value, label: translatedLabel };
+        }
+      }
+      return option;
+    },
+    [t, translate],
+  );
+
+  useEffect(() => {
+    setTranslate(shouldTranslate ?? true);
+  }, [shouldTranslate]);
+
   return (
     <Controller
       name={name}
@@ -78,25 +109,22 @@ const SelectField: FC<ISelectFieldProps> = ({
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
-            <div
-              className={size ? `select-field-wrapper-${size}` : 'select-field-wrapper'}
-              ref={selectContainerRef}
-            >
+            <div className={`select-field-wrapper ${size ? size : ''}`} ref={selectContainerRef}>
               <HDSSelect
                 id={`select-field-${name}`}
-                className="custom-select"
-                value={value}
+                className={`custom-select ${icon ? 'icon' : ''}`}
+                value={translateValue(value)}
                 onChange={onChange}
                 onBlur={onBlur}
                 label={!hideLabel && label && t(label)}
                 invalid={error ? true : false}
                 error={error?.message}
-                options={options ?? []}
+                options={translatedOptions ?? []}
                 required={required}
                 disabled={disabled}
                 style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
                 placeholder={(placeholder && t(placeholder ?? '')) ?? ''}
-                icon={getIcon(icon)}
+                icon={optionIcon[icon as keyof typeof optionIcon]}
               />
               {((clearable === undefined && value.value) || (clearable && value.value)) && (
                 <button

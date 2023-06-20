@@ -33,6 +33,7 @@ const ProjectHeader: FC = () => {
     formState: { dirtyFields, isDirty },
     control,
     handleSubmit,
+    getValues,
   } = formMethods;
 
   const phases = useOptions('phases');
@@ -73,7 +74,12 @@ const ProjectHeader: FC = () => {
             data-testid="project-header-name-fields"
           >
             <ProjectNameFields control={control} />
-            <SelectField name="phase" control={control} options={phases} />;
+            <SelectField
+              name="phase"
+              control={control}
+              options={phases}
+              icon={getValues('phase').label}
+            />
           </div>
         </div>
         <div className="mr-3 flex-1" data-testid="project-header-right">

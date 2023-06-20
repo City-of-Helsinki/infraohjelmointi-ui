@@ -35,9 +35,9 @@ const Search = () => {
   const { handleSubmit, getValues, control } = formMethods;
 
   const phases = useOptions('phases');
-  const programmedYearMin = useOptions('programmedYears', true);
-  const programmedYearMax = useOptions('programmedYears', true);
-  const personPlanning = useOptions('responsiblePersons', true);
+  const programmedYearMin = useOptions('programmedYears');
+  const programmedYearMax = useOptions('programmedYears');
+  const personPlanning = useOptions('responsiblePersons');
   const categories = useOptions('categories');
   const { masterClasses, classes, subClasses } = classOptions;
   const { districts, divisions, subDivisions } = locationOptions;

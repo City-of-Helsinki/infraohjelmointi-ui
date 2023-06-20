@@ -36,7 +36,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
           {phase && (
             <CustomTag
               icon={iconPaperclip}
-              text={t(`enums.${phase}`)}
+              text={t(`option.${phase}`)}
               color={'var(--color-suomenlinna-medium-light)'}
             />
           )}

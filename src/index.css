@@ -73,6 +73,11 @@ table p {
   @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;
 }
 
+.select-field-wrapper.icon > div > div > button > span {
+  --max-w: calc(100% - 4rem);
+  @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
 .input-xl {
   max-width: 100%;
 }

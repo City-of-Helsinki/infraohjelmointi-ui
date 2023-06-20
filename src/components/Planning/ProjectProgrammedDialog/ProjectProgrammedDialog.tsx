@@ -25,8 +25,7 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = memo(
     >([]);
     const dispatch = useAppDispatch();
 
-    const phase =
-      useOptions('phases', true).find((phase) => phase.label === 'programming')?.value || '';
+    const phase = useOptions('phases').find((phase) => phase.label === 'programming')?.value || '';
 
     const buildRequestPayload = useCallback(
       (projects: Array<IProgrammedProjectSuggestions>): IProjectsPatchRequestObject => {

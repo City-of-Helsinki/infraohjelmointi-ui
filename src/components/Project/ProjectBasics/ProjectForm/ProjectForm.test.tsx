@@ -97,7 +97,7 @@ describe('projectForm', () => {
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
-      expect(await findByText(`enums.${option || ''}`)).toBeInTheDocument();
+      expect(await findByText(`option.${option || ''}`)).toBeInTheDocument();
     const expectRadioBoolean = async (testId: string, value: boolean) =>
       expect(((await findByTestId(testId)) as HTMLInputElement).checked).toBe(value);
     const expectPersonOption = async (person: IPerson) =>
@@ -378,7 +378,7 @@ describe('projectForm', () => {
     await user.click(
       document.getElementById('select-field-area-toggle-button') as unknown as Element,
     );
-    await user.click(await findByText('enums.lansisatama'));
+    await user.click(await findByText('option.lansisatama'));
     await user.click(parentContainer);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
