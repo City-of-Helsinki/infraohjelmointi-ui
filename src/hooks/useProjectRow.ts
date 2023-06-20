@@ -482,17 +482,11 @@ const getProjectCells = (project: IProject) => {
    * @param list list of IProjectCell
    * @returns a list of IProjectCell
    */
-  const transformToLinkedList = (list: IProjectCell[]) : void => {
-    if (list.length === 0) {
-      return 
-    }
-
+  const transformToLinkedList = (list: IProjectCell[]): void => {
     for (let i = 0; i < list.length; i++) {
-      list[i].prev = i == 0? null : list[i-1]
-      list[i].next = i + 1 == list.length ? null : list[i+1]
+      list[i].prev = i == 0 ? null : list[i - 1];
+      list[i].next = i + 1 == list.length ? null : list[i + 1];
     }
-
-    
   };
   transformToLinkedList(projectCells);
   return projectCells;
