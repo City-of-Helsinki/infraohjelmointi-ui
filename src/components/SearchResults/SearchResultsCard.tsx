@@ -32,6 +32,10 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
                 text={t(`searchTag.${type}`)}
               />
             )}
+            {/** TODO: if project is not programmed &&
+             * 
+             <CustomTag color={'var(--color-bus-light	)'} text={t(`searchTag.notProgrammed`)} />
+             */}
           </div>
           {phase && (
             <CustomTag

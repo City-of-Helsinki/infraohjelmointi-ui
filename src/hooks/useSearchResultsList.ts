@@ -18,19 +18,25 @@ const buildBreadCrumbs = (
       (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
     );
 
+const buildLink = (r: ISearchResultPayloadItem) => {
+  if (r.type === 'projects') {
+    // if programmed is false return `/project/${r.id}/basics`
+    return `/planning/${r.path}/?project=${r.id}`;
+  }
+
+  return `/planning/${r.path}`;
+};
 const buildSearchResultsList = (
   searchResults: Array<ISearchResultPayloadItem>,
   classes: Array<IClass>,
   districts: Array<ILocation>,
 ): Array<ISearchResultListItem> => {
   const parsedResults = searchResults.map((r) => {
-    const link =
-      r.type === 'projects' ? `/planning/${r.path}/?project=${r.id}` : `/planning/${r.path}`;
     return {
       ...r,
       phase: r.phase?.value ?? null,
       breadCrumbs: buildBreadCrumbs(r.path, classes, districts),
-      link,
+      link: buildLink(r),
     };
   });
 

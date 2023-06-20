@@ -273,7 +273,8 @@
     "programmedNo": "Ohjelmoitu: ei",
     "programmedYes": "Ohjelmoitu: kyllä",
     "programmedYearMin": "Ohjelmoitu vuosi min {{label}}",
-    "programmedYearMax": "Ohjelmoitu vuosi max {{label}}"
+    "programmedYearMax": "Ohjelmoitu vuosi max {{label}}",
+    "notProgrammed": "Ei ohjelmoitu"
   },
   "projectProgrammedForm": {
     "addProjectsToProgramming": "Tuo uusi hanke listalle",
