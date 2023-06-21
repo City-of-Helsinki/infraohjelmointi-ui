@@ -18,6 +18,8 @@ import { Route } from 'react-router';
 import PlanningView from '../PlanningView';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
+import { ProjectBasics } from '@/components/Project/ProjectBasics';
+import ProjectView from '../ProjectView';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -79,6 +81,9 @@ const render = async (customState?: object) =>
   await act(async () =>
     renderWithProviders(
       <>
+        <Route path="/project/:projectId?" element={<ProjectView />}>
+          <Route path="basics" element={<ProjectBasics />} />
+        </Route>
         <Route path="/" element={<SearchResultsView />} />
         <Route path="/planning" element={<PlanningView />}>
           <Route path=":masterClassId" element={<PlanningView />}>
@@ -211,7 +216,7 @@ describe('SearchResultsView', () => {
     it('renders the list and all search results if there are results', async () => {
       const { findByTestId, container } = await render(searchActiveState);
       expect(await findByTestId('search-result-list')).toBeInTheDocument();
-      expect(container.getElementsByClassName('search-result-card').length).toBe(2);
+      expect(container.getElementsByClassName('search-result-card').length).toBe(3);
       expect(await findByTestId('search-order-dropdown')).toBeInTheDocument();
     });
   });
@@ -319,7 +324,7 @@ describe('SearchResultsView', () => {
         '/planning/test-master-class-1/test-class-1//?project=planning-project-1',
       );
 
-      const classCard = container.getElementsByClassName('search-result-card')[1];
+      const classCard = container.getElementsByClassName('search-result-card')[2];
       const classChildren = classCard.childNodes;
 
       // Title and class tag
@@ -358,6 +363,16 @@ describe('SearchResultsView', () => {
           ),
         ).toBeTruthy();
       });
+    });
+
+    it('navigates to the project form when clicking a result project that is not programmed: ', async () => {
+      const { container, user, findByTestId } = await render(searchActiveState);
+
+      const projectCard = container.getElementsByClassName('search-result-card')[1];
+
+      await user.click(projectCard);
+
+      expect(await findByTestId('project-basics-form')).toBeInTheDocument();
     });
   });
 

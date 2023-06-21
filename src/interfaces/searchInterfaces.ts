@@ -10,6 +10,7 @@ export interface ISearchResultPayloadItem {
   type: ISearchResultsType;
   hashTags: Array<IListItem>;
   phase: IListItem | null;
+  programmed: boolean | null;
 }
 
 export interface IProgrammedProjectSuggestions {

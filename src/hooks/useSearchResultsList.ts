@@ -19,13 +19,18 @@ const buildBreadCrumbs = (
     );
 
 const buildLink = (r: ISearchResultPayloadItem) => {
-  if (r.type === 'projects') {
-    // if programmed is false return `/project/${r.id}/basics`
+  // Programmed projects will navigate to planning view and get the ?project= param
+  if (r.type === 'projects' && r.programmed) {
     return `/planning/${r.path}/?project=${r.id}`;
   }
-
+  // Non-programmed projects will navigate to project form
+  else if (r.type === 'projects') {
+    return `/project/${r.id}/basics`;
+  }
+  // Default will navigate to planning view without the ?project= param
   return `/planning/${r.path}`;
 };
+
 const buildSearchResultsList = (
   searchResults: Array<ISearchResultPayloadItem>,
   classes: Array<IClass>,
