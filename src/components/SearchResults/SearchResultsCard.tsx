@@ -1,10 +1,11 @@
 import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
-import { IconAngleRight, IconLayers, IconPaperclip } from 'hds-react/icons';
+import { IconAngleRight, IconScrollGroup } from 'hds-react/icons';
 import { FC, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CustomTag } from '../shared';
 import './styles.css';
+import optionIcon from '@/utils/optionIcon';
 
 const SearchResultsCard: FC<ISearchResultListItem> = ({
   name,
@@ -15,8 +16,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
   link,
 }) => {
   const { t } = useTranslation();
-  const iconLayers = useMemo(() => <IconLayers size="xs" />, []);
-  const iconPaperclip = useMemo(() => <IconPaperclip size="xs" />, []);
+  const iconGroup = useMemo(() => <IconScrollGroup size="xs" />, []);
 
   return (
     <Link to={link} className="color-black no-underline">
@@ -25,17 +25,17 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
         <div className="search-result-title-container">
           <div className="search-result-title">
             <span>{name}</span>
-            {type !== 'projects' && (
+            {type === 'groups' && (
               <CustomTag
                 color={'var(--color-bus-medium-light	)'}
-                icon={iconLayers}
+                icon={iconGroup}
                 text={t(`searchTag.${type}`)}
               />
             )}
           </div>
           {phase && (
             <CustomTag
-              icon={iconPaperclip}
+              icon={optionIcon[phase as keyof typeof optionIcon]}
               text={t(`option.${phase}`)}
               color={'var(--color-suomenlinna-medium-light)'}
             />
@@ -53,7 +53,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
         {hashTags && hashTags.length > 0 && (
           <div className="mt-3 flex" data-testid="search-result-hashtags">
             {hashTags?.map((h) => (
-              <CustomTag key={h.id} text={`#${h.value}`} color={'var(--color-gold-medium-light	)'} />
+              <CustomTag key={h.id} text={`#${h.value}`} color={'var(--color-gold-medium-light)'} />
             ))}
           </div>
         )}

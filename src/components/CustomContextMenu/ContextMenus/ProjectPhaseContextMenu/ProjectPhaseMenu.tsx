@@ -58,7 +58,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
                 className={`item-text ${selectedPhase === value ? 'selected' : ''}`}
                 data-testid={`project-phase-menu-option-${value}`}
               >
-                {t(label)}
+                {t(`option.${label}`)}
               </p>
             </button>
             {selectedPhase === value && <IconCheck className="icon-width check-icon" />}

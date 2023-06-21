@@ -37,7 +37,7 @@ const CustomTag: FC<ICustomTagProps> = ({
     >
       {icon}
       <span
-        className={`font-${weight ? weight : 'bold'}`}
+        className={`font-${weight ? weight : '500'}`}
         style={{ fontSize: size === 'm' ? '1rem' : '0.875rem' }}
       >
         {text}

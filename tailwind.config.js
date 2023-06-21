@@ -51,6 +51,7 @@ module.exports = {
       'black-80': 'var(--color-black-80)',
       'black-70': 'var(--color-black-70)',
       'black-60': 'var(--color-black-60)',
+      'black-40': 'var(--color-black-40)',
       gray: 'var(--color-black-20)',
       white: 'var(--color-white)',
       fog: 'var(--color-fog)',

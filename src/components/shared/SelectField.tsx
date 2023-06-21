@@ -7,16 +7,6 @@ import { IconCrossCircle } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
 
-// const getIcon = (icon?: string) => {
-//   if (icon === 'location') {
-//     return <IconLocation />;
-//   } else if (icon === 'person') {
-//     return <IconUser />;
-//   } else {
-//     return undefined;
-//   }
-// };
-
 interface ISelectFieldProps {
   name: string;
   control: HookFormControlType;
@@ -24,8 +14,7 @@ interface ISelectFieldProps {
   label?: string;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
-  icon?: string;
-  placeholder?: string;
+  iconKey?: string;
   disabled?: boolean;
   clearable?: boolean;
   size?: 'full' | 'lg';
@@ -39,8 +28,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   options,
   rules,
   hideLabel,
-  icon,
-  placeholder,
+  iconKey,
   disabled,
   clearable,
   size,
@@ -86,7 +74,7 @@ const SelectField: FC<ISelectFieldProps> = ({
     (option: IOption) => {
       console.log('option label: ', option.label);
 
-      if (option.label !== '' && !option.label.includes('option') && translate) {
+      if (option?.label !== '' && !option?.label?.includes('option') && translate) {
         const translatedLabel = t(`option.${option.label}`);
         if (!translatedLabel.includes('option.')) {
           return { value: option.value, label: translatedLabel };
@@ -101,6 +89,8 @@ const SelectField: FC<ISelectFieldProps> = ({
     setTranslate(shouldTranslate ?? true);
   }, [shouldTranslate]);
 
+  const icon = useMemo(() => optionIcon[iconKey as keyof typeof optionIcon], []);
+
   return (
     <Controller
       name={name}
@@ -109,10 +99,20 @@ const SelectField: FC<ISelectFieldProps> = ({
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
-            <div className={`select-field-wrapper ${size ? size : ''}`} ref={selectContainerRef}>
+            {/**
+             * - icon class: indicates it has an icon and needs extra padding
+             * - placeholder class: our controlled form needs an empty value and the placeholder's color only becomes
+             * gray if the value is undefined
+             */}
+            <div
+              className={`select-field-wrapper ${size ? size : ''} ${iconKey ? 'with-icon' : ''} ${
+                !value?.value ? 'placeholder' : ''
+              }`}
+              ref={selectContainerRef}
+            >
               <HDSSelect
                 id={`select-field-${name}`}
-                className={`custom-select ${icon ? 'icon' : ''}`}
+                className={`custom-select ${iconKey ? 'icon' : ''}`}
                 value={translateValue(value)}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -123,18 +123,19 @@ const SelectField: FC<ISelectFieldProps> = ({
                 required={required}
                 disabled={disabled}
                 style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-                placeholder={(placeholder && t(placeholder ?? '')) ?? ''}
-                icon={optionIcon[icon as keyof typeof optionIcon]}
+                placeholder={t('choose') ?? ''}
+                icon={icon}
               />
-              {((clearable === undefined && value.value) || (clearable && value.value)) && (
-                <button
-                  className="empty-select-field-button"
-                  data-testid={`empty-${name}-selection-button`}
-                  onClick={() => handleRemoveSelection(onChange)}
-                >
-                  <IconCrossCircle />
-                </button>
-              )}
+              {((clearable === undefined && value.value) || (clearable && value.value)) &&
+                !disabled && (
+                  <button
+                    className="empty-select-field-button"
+                    data-testid={`empty-${name}-selection-button`}
+                    onClick={() => handleRemoveSelection(onChange)}
+                  >
+                    <IconCrossCircle />
+                  </button>
+                )}
             </div>
           </div>
         );

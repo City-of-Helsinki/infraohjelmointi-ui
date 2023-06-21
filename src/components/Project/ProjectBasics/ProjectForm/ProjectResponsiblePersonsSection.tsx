@@ -20,7 +20,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
 }) => {
   const { t } = useTranslation();
 
-  const responsiblePersons = useOptions('responsiblePersons', true);
+  const responsiblePersons = useOptions('responsiblePersons');
   const phases = useOptions('phases');
 
   const draftInitiationPhase = phases[3].value;
@@ -96,17 +96,19 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
         <div className="form-col-md">
           <SelectField
             {...getFieldProps('personPlanning')}
-            icon="person"
+            iconKey="person"
             options={responsiblePersons}
             rules={validatePersonPlanning()}
+            shouldTranslate={false}
           />
         </div>
         <div className="form-col-md">
           <SelectField
             {...getFieldProps('personConstruction')}
-            icon="person"
+            iconKey="person"
             options={responsiblePersons}
             rules={validatePersonConstruction()}
+            shouldTranslate={false}
           />
         </div>
       </div>
@@ -114,8 +116,9 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
         <div className="form-col-md">
           <SelectField
             {...getFieldProps('personProgramming')}
-            icon="person"
+            iconKey="person"
             options={responsiblePersons}
+            shouldTranslate={false}
           />
         </div>
         <div className="form-col-md">

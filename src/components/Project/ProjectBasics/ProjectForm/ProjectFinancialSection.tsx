@@ -44,15 +44,24 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       <FormSectionTitle {...getFieldProps('financial')} />
       <div className="form-row">
         <div className="form-col-xxl">
-          <SelectField {...getFieldProps('masterClass')} options={masterClasses} size="full" />
+          <SelectField
+            {...getFieldProps('masterClass')}
+            options={masterClasses}
+            size="full"
+            shouldTranslate={false}
+          />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <SelectField {...getFieldProps('class')} options={classes} />
+          <SelectField {...getFieldProps('class')} options={classes} shouldTranslate={false} />
         </div>
         <div className="form-col-md">
-          <SelectField {...getFieldProps('subClass')} options={subClasses} />
+          <SelectField
+            {...getFieldProps('subClass')}
+            options={subClasses}
+            shouldTranslate={false}
+          />
         </div>
       </div>
       <div className="form-row">

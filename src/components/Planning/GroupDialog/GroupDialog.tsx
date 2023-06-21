@@ -2,8 +2,6 @@ import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 
 import { Button } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
-import './styles.css';
-
 import { TextField, SelectField } from '@/components/shared';
 import { IOption } from '@/interfaces/common';
 import { IconAngleUp, IconAngleDown } from 'hds-react/icons';
@@ -15,6 +13,7 @@ import { postGroupThunk, updateGroup } from '@/reducers/groupSlice';
 import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
 import { useNavigate } from 'react-router';
 import { patchGroup } from '@/services/groupService';
+import './styles.css';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -139,6 +138,7 @@ const DialogContainer: FC<IDialogProps> = memo(
         name: name,
         label: `groupForm.${name}`,
         control: control,
+        shouldTranslate: false,
       }),
       [control],
     );

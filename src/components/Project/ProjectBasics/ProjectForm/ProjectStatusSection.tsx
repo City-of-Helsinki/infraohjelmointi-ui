@@ -291,7 +291,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
       <FormSectionTitle {...getFieldProps('status')} />
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('phase')} options={phases} rules={validatePhase} />
+          <SelectField
+            {...getFieldProps('phase')}
+            options={phases}
+            rules={validatePhase}
+            iconKey={getValues('phase').label}
+          />
         </div>
         <div className="form-col-xl">
           <SelectField

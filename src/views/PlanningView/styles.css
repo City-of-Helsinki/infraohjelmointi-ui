@@ -3,7 +3,7 @@
 }
 
 .planning-header-container {
-  @apply sticky top-0 z-[100] flex bg-white pt-8;
+  @apply sticky top-0 z-[100] mt-2 flex bg-white pt-8;
 }
 
 /* All spans have are aligned right */

@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
@@ -23,7 +23,6 @@ const ProjectHeader: FC = () => {
   const project = useAppSelector(selectProject);
   const projectId = project?.id;
   const user = useAppSelector(selectUser);
-  const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
   const { t } = useTranslation();
 
@@ -55,7 +54,7 @@ const ProjectHeader: FC = () => {
         projectId && (await patchProject({ id: projectId, data: data }));
       }
     },
-    [project?.favPersons, projectId, user?.id, dispatch, dirtyFields, isDirty],
+    [project?.favPersons, projectId, user?.id, dirtyFields, isDirty],
   );
 
   return (
@@ -78,7 +77,7 @@ const ProjectHeader: FC = () => {
               name="phase"
               control={control}
               options={phases}
-              icon={getValues('phase').label}
+              iconKey={getValues('phase').label}
             />
           </div>
         </div>
