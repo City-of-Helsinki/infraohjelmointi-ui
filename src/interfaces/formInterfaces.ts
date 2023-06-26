@@ -69,6 +69,7 @@ export interface IProjectForm {
   estConstructionEnd: string;
   personConstruction: IOption;
   personPlanning: IOption;
+  name: string;
 }
 
 export interface ISearchForm {

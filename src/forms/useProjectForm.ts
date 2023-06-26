@@ -102,6 +102,7 @@ const useProjectFormValues = () => {
   const formValues: IProjectForm = useMemo(
     () => ({
       type: listItemToOption(project?.type),
+      name: value(project?.name),
       description: value(project?.description),
       area: listItemToOption(project?.area),
       hkrId: value(project?.hkrId),

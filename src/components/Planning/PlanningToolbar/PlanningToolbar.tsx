@@ -18,6 +18,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectGroupsExpanded, setGroupsExpanded } from '@/reducers/planningSlice';
 import { t } from 'i18next';
 import './styles.css';
+import { resetProject, setIsNewProject, setSelectedProject } from '@/reducers/projectSlice';
+import { useNavigate } from 'react-router-dom';
 
 const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
@@ -38,7 +40,7 @@ const PlanningToolbar = () => {
   const downloadIcon = useMemo(() => <IconDownload />, []);
 
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
-
+  const navigate = useNavigate();
   const toggleGroupsExpanded = useCallback(() => {
     dispatch(setGroupsExpanded(!groupsExpanded));
   }, [dispatch, groupsExpanded]);
@@ -63,6 +65,12 @@ const PlanningToolbar = () => {
     [],
   );
 
+  const onOpenNewProjectForm = useCallback(() => {
+    dispatch(resetProject());
+    dispatch(setIsNewProject(true));
+    navigate('/project/new');
+  }, [dispatch, navigate]);
+
   // Open the custom context menu for editing the project phase on click
   const handleNewItemMenu = useCallback(
     (e: ReactMouseEvent<HTMLButtonElement>) => {
@@ -71,10 +79,11 @@ const PlanningToolbar = () => {
         newItemsMenuProps: {
           onShowProjectProgrammedDialog,
           onShowGroupDialog,
+          onOpenNewProjectForm,
         },
       });
     },
-    [onShowGroupDialog, onShowProjectProgrammedDialog],
+    [onShowGroupDialog, onShowProjectProgrammedDialog, onOpenNewProjectForm],
   );
 
   return (

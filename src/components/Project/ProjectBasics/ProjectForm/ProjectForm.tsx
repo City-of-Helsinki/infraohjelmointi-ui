@@ -2,10 +2,15 @@ import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { selectProject, setIsSaving } from '@/reducers/projectSlice';
+import {
+  setIsNewProject,
+  selectIsNewProject,
+  selectProject,
+  setIsSaving,
+} from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
-import { patchProject } from '@/services/projectServices';
+import { patchProject, postProject } from '@/services/projectServices';
 import ProjectStatusSection from './ProjectStatusSection';
 import ProjectInfoSection from './ProjectInfoSection';
 import ProjectScheduleSection from './ProjectScheduleSection';
@@ -16,6 +21,7 @@ import ProjectProgramSection from './ProjectProgramSection';
 import ProjectFormBanner from './ProjectFormBanner';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import _ from 'lodash';
 import './styles.css';
 
@@ -25,6 +31,8 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const dispatch = useAppDispatch();
   const formRef = useRef<HTMLFormElement>(null);
+  const isNewProject = useAppSelector(selectIsNewProject);
+  const navigate = useNavigate();
 
   const {
     formState: { dirtyFields, isDirty },
@@ -50,16 +58,34 @@ const ProjectForm = () => {
 
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
-        try {
-          await patchProject({ id: project.id, data });
-        } catch (error) {
-          console.log('project patch error: ', error);
-        } finally {
-          dispatch(setIsSaving(false));
+        if (project.id) {
+          try {
+            await patchProject({ id: project.id, data });
+          } catch (error) {
+            console.log('project patch error: ', error);
+          } finally {
+            dispatch(setIsSaving(false));
+          }
+        }
+
+        if (!project.id && isNewProject) {
+          // post project
+          // set saving false
+          // navigate to basics
+
+          await postProject({ data })
+            .then((project) => {
+              navigate(`/project/${project.id}/basics`);
+            })
+            .catch((e) => console.log('project post error: ', e))
+            .finally(() => {
+              dispatch(setIsSaving(false));
+              dispatch(setIsNewProject(false));
+            });
         }
       }
     },
-    [isDirty, project?.id, dirtyFields, dispatch],
+    [isDirty, project?.id, dirtyFields, dispatch, isNewProject, navigate],
   );
 
   const getFieldProps = useCallback(

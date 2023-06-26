@@ -151,6 +151,10 @@ export interface IProjectPatchRequestObject {
   data: IProjectRequest;
 }
 
+export interface IProjectPostRequestObject {
+  data: IProjectRequest;
+}
+
 export interface IProjectGetRequestObject {
   page: number;
   year?: string;

@@ -1,23 +1,31 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { TextInput } from 'hds-react/components/TextInput';
 import { IconPenLine } from 'hds-react/icons';
-import { t } from 'i18next';
 import { FC, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { IconButton } from '../../shared';
 import './styles.css';
+import { useAppSelector } from '@/hooks/common';
+import { selectIsNewProject } from '@/reducers/projectSlice';
+import { useTranslation } from 'react-i18next';
 
 interface IProjectNameFormProps {
   control: HookFormControlType;
 }
 
 const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
-
-  const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setEditing((currentState) => !currentState);
-  }, []);
+  const isNewProject = useAppSelector(selectIsNewProject);
+  const handleSetEditing = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      if (!isNewProject) {
+        setEditing((currentState) => !currentState);
+      }
+    },
+    [isNewProject],
+  );
 
   return (
     <div className="project-name-form">
@@ -39,7 +47,9 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
                 <br />
               </>
             ) : (
-              <h3 className="text-heading-m text-white">{field.value}</h3>
+              <h3 className="text-heading-m text-white">
+                {isNewProject ? t(`newProject`) : field.value}
+              </h3>
             )
           }
         />

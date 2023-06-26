@@ -1,18 +1,22 @@
-import { FC, MouseEvent } from 'react';
+import { FC, MouseEvent, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
+import { useAppSelector } from '@/hooks/common';
 import { IconStar, IconStarFill } from 'hds-react/icons';
 import { IconButton } from '../../shared';
 import { IProjectHeaderFieldProps } from './ProjectHeader';
+import { selectIsNewProject } from '@/reducers/projectSlice';
 
 const ProjectFavouriteField: FC<IProjectHeaderFieldProps> = ({ control }) => {
-  const handleClick = (
-    e: MouseEvent<HTMLButtonElement>,
-    onChange: (...event: unknown[]) => void,
-    value: string,
-  ) => {
-    e.preventDefault();
-    onChange(!value);
-  };
+  const isNewProject = useAppSelector(selectIsNewProject);
+  const handleClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void, value: string) => {
+      e.preventDefault();
+      if (!isNewProject) {
+        onChange(!value);
+      }
+    },
+    [isNewProject],
+  );
 
   return (
     <Controller

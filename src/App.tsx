@@ -118,6 +118,7 @@ const App: FC = () => {
             <Routes>
               <Route path="/project/:projectId?" element={<ProjectView />}>
                 <Route path="basics" element={<ProjectBasics />} />
+                <Route path="new" element={<ProjectBasics />} />
                 <Route path="notes" element={<ProjectNotes />} />
               </Route>
               <Route path="/planning" element={<PlanningView />}>

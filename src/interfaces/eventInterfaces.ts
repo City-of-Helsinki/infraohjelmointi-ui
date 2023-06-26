@@ -29,6 +29,7 @@ export interface IPhaseMenuDetails {
 export interface INewItemMenuDetails {
   onShowGroupDialog: () => void;
   onShowProjectProgrammedDialog: () => void;
+  onOpenNewProjectForm: ()=>void;
 }
 
 export interface GroupRowMenuDetails {

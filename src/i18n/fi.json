@@ -129,6 +129,7 @@
     "personPlanning": "Vastuuhenkilö"
   },
   "projectForm": {
+    "name":"Projektin nimi",
     "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
     "entityName": "Hankekokonaisuuden nimi",
@@ -381,5 +382,6 @@
   "editSummingGroup": "Muokkaa summaavaa ryhmää",
   "confirmLeaveTitle": "Oletko varma että haluat poistua?",
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
-  "proceed": "Jatka"
+  "proceed": "Jatka",
+  "newProject":"Uusi projekti"
 }

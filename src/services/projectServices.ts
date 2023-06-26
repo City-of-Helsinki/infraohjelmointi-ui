@@ -2,6 +2,7 @@ import { IError, IFreeSearchResults } from '@/interfaces/common';
 import {
   IProject,
   IProjectPatchRequestObject,
+  IProjectPostRequestObject,
   IProjectsPatchRequestObject,
   IProjectsResponse,
 } from '@/interfaces/projectInterfaces';
@@ -27,6 +28,14 @@ export const patchProject = async (request: IProjectPatchRequestObject): Promise
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const postProject = async (request: IProjectPostRequestObject): Promise<IProject> => {
+  return axios
+    .post(`${REACT_APP_API_URL}/projects/`, request.data)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
 
 export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResults> => {
   return axios

@@ -1,6 +1,13 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { getProjectThunk, selectProject, setSelectedProject } from '@/reducers/projectSlice';
+import {
+  getProjectThunk,
+  resetProject,
+  selectIsNewProject,
+  selectProject,
+  setIsNewProject,
+  setSelectedProject,
+} from '@/reducers/projectSlice';
 import { TabList } from '@/components/shared';
 import { useNavigate, useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
@@ -22,6 +29,7 @@ const ProjectView = () => {
   const navigate = useNavigate();
   const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
+  const isNewProject = useAppSelector(selectIsNewProject);
 
   // Update selectedProject to redux with a project-update event
   useEffect(() => {
@@ -32,28 +40,40 @@ const ProjectView = () => {
 
   useEffect(() => {
     if (projectId) {
+      dispatch(setIsNewProject(false));
       dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
       dispatch(getProjectThunk(projectId))
         .then((res) => res.type.includes('rejected') && navigate('/not-found'))
         .catch(Promise.reject)
         .finally(() => dispatch(clearLoading(LOADING_PROJECT)));
-    } else {
+    } else if (!isNewProject) {
       navigate('/planning');
     }
-  }, [projectId]);
+    dispatch(resetProject());
+    // if !projectId and newProject
+  }, [projectId, isNewProject, navigate, dispatch]);
 
-  const navItems: Array<INavigationItem> = [
-    { route: 'basics', label: t('basicInfo'), component: <ProjectBasics /> },
-    { route: 'notes', label: t('notes'), component: <ProjectNotes /> },
-  ];
+  const getNavItems = useCallback(() => {
+    const navItems: Array<INavigationItem> = [
+      {
+        route: isNewProject ? 'new' : 'basics',
+        label: t('basicInfo'),
+        component: <ProjectBasics />,
+      },
+    ];
+    if (!isNewProject) {
+      navItems.push({ route: 'notes', label: t('notes'), component: <ProjectNotes /> });
+    }
+    return navItems;
+  }, [isNewProject]);
 
   return (
     <div className="w-full" data-testid="project-view">
-      {selectedProject && (
+      {(selectedProject || isNewProject) && (
         <>
           <ProjectToolbar />
           <ProjectHeader />
-          <TabList navItems={navItems} />
+          <TabList navItems={getNavItems()} />
         </>
       )}
     </div>
