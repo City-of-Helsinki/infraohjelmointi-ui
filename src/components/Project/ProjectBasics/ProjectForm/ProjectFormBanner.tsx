@@ -36,7 +36,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
               variant="supplementary"
               onClick={handleDialogOpen}
             >
-              {'Delete Project'}
+              {t(`deleteProject`)}
             </Button>
             <ProjectDeleteDialog
               isVisible={isDialogOpen}
