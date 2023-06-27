@@ -22,7 +22,7 @@ export const getProject = async (id: string): Promise<IProject> => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const deleteProject = async (id: string): Promise<IProject> => {
+export const deleteProject = async (id: string) => {
   return axios
     .delete(`${REACT_APP_API_URL}/projects/${id}/`)
     .then((res) => res.data)
