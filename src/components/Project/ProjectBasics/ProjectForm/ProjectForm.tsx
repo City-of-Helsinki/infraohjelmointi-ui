@@ -72,6 +72,7 @@ const ProjectForm = () => {
           // post project
           // set saving false
           // navigate to basics
+          console.log('POSTING PROJECT', data);
 
           await postProject({ data })
             .then((project) => {

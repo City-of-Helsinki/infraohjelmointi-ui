@@ -40,6 +40,7 @@ const ProjectView = () => {
 
   useEffect(() => {
     if (projectId) {
+      console.log(projectId);
       dispatch(setIsNewProject(false));
       dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
       dispatch(getProjectThunk(projectId))
@@ -49,7 +50,10 @@ const ProjectView = () => {
     } else if (!isNewProject) {
       navigate('/planning');
     }
-    dispatch(resetProject());
+    if (isNewProject) {
+      dispatch(resetProject());
+    }
+
     // if !projectId and newProject
   }, [projectId, isNewProject, navigate, dispatch]);
 

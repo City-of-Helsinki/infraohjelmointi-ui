@@ -33,6 +33,7 @@ const render = async () =>
           error: {},
           page: 1,
           isSaving: false,
+          isNewProject: false,
         },
       },
     }),

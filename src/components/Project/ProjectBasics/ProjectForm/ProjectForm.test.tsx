@@ -23,9 +23,10 @@ import { waitFor, act, within } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
-import { setSelectedProject } from '@/reducers/projectSlice';
+import { resetProject, setIsNewProject, setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
 import ProjectForm from './ProjectForm';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -45,6 +46,7 @@ const render = async () =>
           error: {},
           page: 1,
           isSaving: false,
+          isNewProject: false,
         },
         auth: { user: mockPersons.data[0], error: {} },
         lists: {
@@ -79,6 +81,9 @@ const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project:
 };
 
 describe('projectForm', () => {
+  beforeEach(() => {
+    mockGetResponseProvider();
+  });
   afterEach(async () => {
     jest.clearAllMocks();
   });
@@ -454,5 +459,66 @@ describe('projectForm', () => {
 
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
+  });
+
+  it.only('can post a new project', async () => {
+    const expectedName = 'Post project';
+    const expectedDescription = 'Post project description';
+    const expectedProgrammed = true;
+    const expectedCategory = {
+      id: '8b614fbe-bb41-4d66-9efc-bdba3d0d943a',
+      value: 'K1',
+    };
+    const project = mockProject.data;
+    const mockPostResponse: { data: IProject } = {
+      data: {
+        ...project,
+        id: 'post-project-id',
+        name: expectedName,
+        description: expectedDescription,
+        programmed: expectedProgrammed,
+        category: expectedCategory,
+      },
+    };
+    const mockGetResponse: { data: IProject } = {
+      data: mockPostResponse.data,
+    };
+
+    mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
+    const { user, findByDisplayValue, findByTestId, findByRole, store, findByText } =
+      await render();
+    await waitFor(() => {
+      store.dispatch(resetProject());
+      store.dispatch(setIsNewProject(true));
+    });
+    expect(store.getState().project.selectedProject).toBe(null);
+    expect(store.getState().project.isNewProject).toBe(true);
+    const nameField = await findByRole('textbox', { name: getFormField('name *') });
+    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
+    const programmedField = (await findByTestId('programmed-0')) as HTMLInputElement;
+    const parentContainer = await findByTestId('project-form');
+
+    await user.clear(nameField);
+    await user.type(nameField, expectedName);
+
+    await user.clear(descriptionField);
+    await user.type(descriptionField, expectedDescription);
+    await user.click(programmedField);
+    await user.click(
+      parentContainer.querySelector('#select-field-category-toggle-button') as HTMLElement,
+    );
+    await user.click(await within(parentContainer).findByText('enums.K1'));
+    mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
+    await waitFor(async () => {
+      await user.click(parentContainer);
+    });
+
+    const formPostRequest = mockedAxios.post.mock.lastCall[1] as IProject;
+
+    expect(formPostRequest.name).toEqual(expectedName);
+    expect(formPostRequest.description).toEqual(expectedDescription);
+    // expect(formPostRequest.programmed).toEqual(expectedProgrammed);
+    expect(store.getState().project.selectedProject).toBe(null);
+    expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
   });
 });

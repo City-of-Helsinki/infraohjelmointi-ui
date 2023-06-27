@@ -7,7 +7,6 @@ import './styles.css';
 const ProjectBasics = () => {
   const project = useAppSelector(selectProject);
   const isNewProject = useAppSelector(selectIsNewProject);
-
   return (
     <div className="project-basics-container" data-testid="project-basics">
       {(project || isNewProject) && (
