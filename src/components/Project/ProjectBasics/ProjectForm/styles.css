@@ -71,7 +71,7 @@
 }
 
 .project-form-banner-container {
-  @apply relative flex h-full w-full items-center;
+  @apply relative flex h-full w-full items-center justify-between;
 }
 
 .project-form-banner-container::before {

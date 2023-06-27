@@ -203,7 +203,11 @@
     "personPlanning": "Vastuuhenkilö",
     "personConstruction": "Rakennuttamisen vastuuhenkilö",
     "personProgramming": "Ohjelmoija",
-    "otherPersons": "Muut vastuuhenkilöt"
+    "otherPersons": "Muut vastuuhenkilöt",
+    "deleteDialog": {
+      "title": "Oletko varma että haluat poistaa tämän hankkeen?",
+      "description": "Hankkeen poistaminen on pysyvää eikä sitä voida enää palauttaa."
+    }
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -416,5 +420,6 @@
   "lastUpdated": "Päivitetty viimeksi",
   "downloadPdf": "Lataa {{name}} (.pdf)",
   "downloadXlsx": "Lataa {{name}} (.xlsx)",
-  "reportsTitle": "Raportit"
+  "reportsTitle": "Raportit",
+  "deleteProject":"Poista Hanke"
 }
