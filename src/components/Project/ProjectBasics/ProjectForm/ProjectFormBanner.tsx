@@ -2,8 +2,9 @@ import { Button } from 'hds-react';
 import { BaseSyntheticEvent, FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 interface IProjectFormbannerProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: () => (e?: BaseSyntheticEvent<object, any, any> | undefined) => Promise<void>;
+  onSubmit: () =>
+    | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
+    | undefined;
   isDirty: boolean;
 }
 const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) => {
