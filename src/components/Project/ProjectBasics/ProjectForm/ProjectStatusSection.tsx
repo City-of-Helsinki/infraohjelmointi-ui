@@ -1,5 +1,5 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useCallback, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -30,19 +30,21 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
 
-  const proposalPhase = phases[0].value;
-  const designPhase = phases[1].value;
-  const programmedPhase = phases[2].value;
-  const draftInitiationPhase = phases[3].value;
-  const draftApprovalPhase = phases[4].value;
-  const constructionPlanPhase = phases[5].value;
-  const constructionWaitPhase = phases[6].value;
-  const constructionPhase = phases[7].value;
-  const warrantyPeriodPhase = phases[8].value;
-  const completedPhase = phases[9].value;
+  const [
+    proposalPhase,
+    designPhase,
+    programmedPhase,
+    draftInitiationPhase,
+    draftApprovalPhase,
+    constructionPlanPhase,
+    constructionWaitPhase,
+    constructionPhase,
+    warrantyPeriodPhase,
+    completedPhase,
+  ] = useMemo(() => phases.map(({ value }) => value), [phases]);
 
-  const validatePhase = useCallback(() => {
-    return {
+  const validatePhase = useMemo(
+    () => ({
       required: t('validation.required', { field: 'validation.phase' }) ?? '',
       validate: {
         isPhaseValid: (phase: IOption) => {
@@ -51,27 +53,27 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           const fields: Array<string> = [];
           const fieldsIfEmpty = (fields: Array<string>) => getFieldsIfEmpty(fields, getValues);
 
+          const programmedRequirements = [
+            'planningStartYear',
+            'constructionEndYear',
+            'category',
+            'masterClass',
+            'class',
+            'subClass',
+          ];
+
+          const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
+
           // Check fields that cannot be empty
           switch (phaseToSubmit) {
             case programmedPhase:
-              fields.push(
-                ...fieldsIfEmpty(['planningStartYear', 'constructionEndYear', 'category']),
-              );
+              fields.push(...fieldsIfEmpty([...programmedRequirements]));
               break;
             case draftInitiationPhase:
             case draftApprovalPhase:
             case constructionPlanPhase:
             case constructionWaitPhase:
-              fields.push(
-                ...fieldsIfEmpty([
-                  'planningStartYear',
-                  'constructionEndYear',
-                  'estPlanningStart',
-                  'estPlanningEnd',
-                  'personPlanning',
-                  'category',
-                ]),
-              );
+              fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
               break;
             case constructionPhase:
             case warrantyPeriodPhase:
@@ -84,16 +86,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
               }
               fields.push(
                 ...fieldsIfEmpty([
-                  'planningStartYear',
-                  'constructionEndYear',
-                  'estPlanningStart',
-                  'estPlanningEnd',
+                  ...programmedRequirements,
+                  ...planningRequirements,
                   'estConstructionStart',
                   'estConstructionEnd',
-                  'personPlanning',
                   'personConstruction',
                   'constructionPhaseDetail',
-                  'category',
                 ]),
               );
               break;
@@ -109,30 +107,30 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
               fields.push('programmed');
             }
           }
-
           setPhaseRequirements(fields);
 
           return fields.length === 0;
         },
       },
-    };
-  }, [
-    t,
-    getValues,
-    proposalPhase,
-    designPhase,
-    programmedPhase,
-    draftInitiationPhase,
-    draftApprovalPhase,
-    constructionPlanPhase,
-    constructionWaitPhase,
-    constructionPhase,
-    warrantyPeriodPhase,
-    completedPhase,
-  ]);
+    }),
+    [
+      t,
+      getValues,
+      proposalPhase,
+      designPhase,
+      programmedPhase,
+      draftInitiationPhase,
+      draftApprovalPhase,
+      constructionPlanPhase,
+      constructionWaitPhase,
+      constructionPhase,
+      warrantyPeriodPhase,
+      completedPhase,
+    ],
+  );
 
-  const validateConstructionPhaseDetails = useCallback(() => {
-    return {
+  const validateConstructionPhaseDetails = useMemo(
+    () => ({
       validate: {
         isConstructionPhaseDetailsValid: (constructionPhaseDetail: IOption) => {
           const phase = getValues('phase');
@@ -148,16 +146,17 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           return true;
         },
       },
-    };
-  }, [completedPhase, constructionPhase, getValues, t, warrantyPeriodPhase]);
+    }),
+    [completedPhase, constructionPhase, getValues, t, warrantyPeriodPhase],
+  );
 
-  const isConstructionPhaseDetailsDisabled = useCallback(() => {
+  const isConstructionPhaseDetailsDisabled = useMemo(() => {
     const phase = getValues('phase').value;
     return phase !== constructionPhase && phase !== warrantyPeriodPhase && phase !== completedPhase;
   }, [getValues, constructionPhase, warrantyPeriodPhase, completedPhase]);
 
-  const validateProgrammed = useCallback(() => {
-    return {
+  const validateProgrammed = useMemo(
+    () => ({
       validate: {
         isProgrammedValid: (programmed: boolean) => {
           const phase = getValues('phase');
@@ -172,11 +171,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           }
         },
       },
-    };
-  }, [designPhase, getValues, proposalPhase, t]);
+    }),
+    [designPhase, getValues, proposalPhase, t],
+  );
 
-  const validatePlanningStartYear = useCallback(() => {
-    return {
+  const validatePlanningStartYear = useMemo(
+    () => ({
       ...validateMaxNumber(3000, t),
       validate: {
         isPlanningStartYearValid: (date: string | null) => {
@@ -214,11 +214,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           return true;
         },
       },
-    };
-  }, [getValues, t]);
+    }),
+    [getValues, t],
+  );
 
-  const validateConstructionEndYear = useCallback(() => {
-    return {
+  const validateConstructionEndYear = useMemo(
+    () => ({
       ...validateMaxNumber(3000, t),
       validate: {
         isConstructionEndYearValid: (date: string | null) => {
@@ -256,11 +257,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           return true;
         },
       },
-    };
-  }, [getValues, t]);
+    }),
+    [getValues, t],
+  );
 
-  const validateCategory = useCallback(() => {
-    return {
+  const validateCategory = useMemo(
+    () => ({
       validate: {
         isCategoryValid: (category: IOption) => {
           const phase = getValues('phase').value;
@@ -272,22 +274,23 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           return true;
         },
       },
-    };
-  }, [getValues, phases, t]);
+    }),
+    [getValues, phases, t],
+  );
 
   return (
     <div className="w-full" id="basics-status-section">
       <FormSectionTitle {...getFieldProps('status')} />
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('phase')} options={phases} rules={validatePhase()} />
+          <SelectField {...getFieldProps('phase')} options={phases} rules={validatePhase} />
         </div>
         <div className="form-col-xl">
           <SelectField
             {...getFieldProps('constructionPhaseDetail')}
             options={constructionPhaseDetails}
-            rules={validateConstructionPhaseDetails()}
-            disabled={isConstructionPhaseDetailsDisabled()}
+            rules={validateConstructionPhaseDetails}
+            disabled={isConstructionPhaseDetailsDisabled}
           />
         </div>
       </div>
@@ -301,21 +304,18 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
       )}
 
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('programmed')} rules={validateProgrammed()} />
+        <RadioCheckboxField {...getFieldProps('programmed')} rules={validateProgrammed} />
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <NumberField
-            {...getFieldProps('planningStartYear')}
-            rules={validatePlanningStartYear()}
-          />
+          <NumberField {...getFieldProps('planningStartYear')} rules={validatePlanningStartYear} />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
           <NumberField
             {...getFieldProps('constructionEndYear')}
-            rules={validateConstructionEndYear()}
+            rules={validateConstructionEndYear}
           />
         </div>
       </div>
@@ -330,7 +330,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           <SelectField
             {...getFieldProps('category')}
             options={categories}
-            rules={validateCategory()}
+            rules={validateCategory}
           />
         </div>
       </div>
