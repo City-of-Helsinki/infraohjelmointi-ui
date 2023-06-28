@@ -45,15 +45,14 @@ const ProjectForm = () => {
 
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
-        await patchProject({ id: project.id, data })
-          .then(() => {
-            handleSetFormSaved(true);
-            setTimeout(() => {
-              handleSetFormSaved(false);
-            }, 0);
-          })
-          .catch((e) => console.log('project patch error: ', e))
-          .finally(() => dispatch(setIsSaving(false)));
+        try {
+          await patchProject({ id: project.id, data });
+          handleSetFormSaved(true);
+        } catch (error) {
+          console.log('project patch error: ', error);
+        } finally {
+          dispatch(setIsSaving(false));
+        }
       }
     },
     [isDirty, project?.id, dirtyFields, handleSetFormSaved, dispatch],
