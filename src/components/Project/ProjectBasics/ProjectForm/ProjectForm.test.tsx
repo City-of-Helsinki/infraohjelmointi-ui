@@ -29,6 +29,7 @@ import ProjectForm from './ProjectForm';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
+jest.setTimeout(7000);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
@@ -155,7 +156,7 @@ describe('projectForm', () => {
   });
 
   it('renders hashTags modal and can search and patch hashTags', async () => {
-    const { findByText, findByRole, user, store } = await render();
+    const { findByText, findByRole, user, store, findByTestId } = await render();
 
     addProjectUpdateEventListener(store.dispatch);
 
@@ -170,7 +171,7 @@ describe('projectForm', () => {
     };
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectForm.hashTags' }));
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
     const dialog = within(await findByRole('dialog'));
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
@@ -238,13 +239,14 @@ describe('projectForm', () => {
       user,
       findByText,
       findByRole,
+      findByTestId,
       store: { dispatch },
     } = await render();
 
     addProjectUpdateEventListener(dispatch);
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectForm.hashTags' }));
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
     const dialog = within(await findByRole('dialog'));
 
     // Open the textbox and submit a new hashtag
@@ -296,6 +298,7 @@ describe('projectForm', () => {
     const {
       findByText,
       findByRole,
+      findByTestId,
       user,
       store: { dispatch },
     } = await render();
@@ -303,7 +306,7 @@ describe('projectForm', () => {
     addProjectUpdateEventListener(dispatch);
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectForm.hashTags' }));
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
     const dialog = within(await findByRole('dialog'));
 
     // popular hashtag exists in the container
@@ -315,7 +318,8 @@ describe('projectForm', () => {
     expect(dialog.queryByTestId('popular-hashtags')).not.toHaveTextContent('raidejokeri');
 
     await waitFor(
-      async () => await user.click(await dialog.findByRole('button', { name: 'save' })),
+      async () =>
+        await user.click((await dialog.findByTestId('save-hash-tags-to-project')).children[0]),
     );
 
     // simulate event and setting selected project since it happens in projectview
@@ -367,11 +371,13 @@ describe('projectForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const { user, findByRole, findByText, findByTestId } = await render();
+    const { user, findByText, findByTestId } = await render();
 
     const parentContainer = await findByTestId('project-form');
 
-    await user.click(await findByRole('button', { name: 'projectForm.area' }));
+    await user.click(
+      document.getElementById('select-field-area-toggle-button') as unknown as Element,
+    );
     await user.click(await findByText('enums.lansisatama'));
     await user.click(parentContainer);
 

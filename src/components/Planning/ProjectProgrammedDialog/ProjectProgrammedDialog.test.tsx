@@ -110,7 +110,7 @@ describe('ProjectProgrammedDialog', () => {
     await user.click(await findByTestId('close-project-cell-menu'));
 
     // Navigate to a class row
-    await waitFor(async () => await navigateToProjectRows(renderResult));
+    await navigateToProjectRows(renderResult);
     await user.click(await findByTestId('open-new-item-context-menu'));
 
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
@@ -152,7 +152,7 @@ describe('ProjectProgrammedDialog', () => {
     await user.click(await findByTestId('close-project-cell-menu'));
 
     // Navigate to a class row
-    await waitFor(async () => await navigateToProjectRows(renderResult));
+    await navigateToProjectRows(renderResult);
 
     await user.click(await findByTestId('open-new-item-context-menu'));
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
@@ -164,9 +164,9 @@ describe('ProjectProgrammedDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
     await user.type(await dialog.findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
-    await waitFor(async () => {
-      expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-    });
+    // await waitFor(async () => {
+    expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
+    // });
     await user.click(await dialog.findByText(mockSearchResults.data.results[0].name));
     expect(dialog.getAllByTestId('project-selection').length).toBe(1);
 
