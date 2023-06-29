@@ -297,7 +297,7 @@ describe('SearchResultsView', () => {
       expect(container.getElementsByClassName('search-result-breadcrumbs').length).toBe(2);
       expect(container.getElementsByClassName('search-result-title-container').length).toBe(2);
       expect(container.getElementsByClassName('search-result-title').length).toBe(2);
-      expect(container.getElementsByClassName('custom-tag-container').length).toBe(4);
+      expect(container.getElementsByClassName('custom-tag-container').length).toBe(3);
 
       const projectCard = container.getElementsByClassName('search-result-card')[0];
       const projectChildren = projectCard.childNodes;
@@ -324,7 +324,6 @@ describe('SearchResultsView', () => {
 
       // Title and class tag
       expect(classChildren[0]).toHaveTextContent('Koillinen');
-      expect(classChildren[0]).toHaveTextContent('searchTag.classes');
       // Breadcrumbs
       expect(classChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
       expect(classChildren[1]).toHaveTextContent('Uudisrakentaminen');

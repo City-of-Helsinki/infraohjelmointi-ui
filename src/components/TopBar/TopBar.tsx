@@ -19,7 +19,7 @@ const TopBar: FC = () => {
   return (
     <div data-testid="top-bar" className="top-bar">
       <Navigation
-        title={t('option.programming')}
+        title={t('topBarTitle')}
         menuToggleAriaLabel="menu"
         skipTo="#content"
         skipToContentLabel={t('nav.skipToContent')}

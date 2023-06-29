@@ -72,8 +72,6 @@ const SelectField: FC<ISelectFieldProps> = ({
 
   const translateValue = useCallback(
     (option: IOption) => {
-      console.log('option label: ', option.label);
-
       if (option?.label !== '' && !option?.label?.includes('option') && translate) {
         const translatedLabel = t(`option.${option.label}`);
         if (!translatedLabel.includes('option.')) {
@@ -127,7 +125,8 @@ const SelectField: FC<ISelectFieldProps> = ({
                 icon={icon}
               />
               {((clearable === undefined && value.value) || (clearable && value.value)) &&
-                !disabled && (
+                !disabled &&
+                !required && (
                   <button
                     className="empty-select-field-button"
                     data-testid={`empty-${name}-selection-button`}
