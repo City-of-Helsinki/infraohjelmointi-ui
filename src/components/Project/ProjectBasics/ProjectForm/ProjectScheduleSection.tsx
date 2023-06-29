@@ -23,38 +23,14 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ getFieldProp
 
   const phases = useOptions('phases');
 
-  const draftInitiationPhase = phases[3].value;
-  const draftApprovalPhase = phases[4].value;
-  const constructionPlanPhase = phases[5].value;
-  const constructionWaitPhase = phases[6].value;
-  const constructionPhase = phases[7].value;
-  const warrantyPeriodPhase = phases[8].value;
-  const completedPhase = phases[9].value;
-
   const phasesThatNeedPlanning = useMemo(
-    () => [
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
-      constructionWaitPhase,
-      constructionPhase,
-      warrantyPeriodPhase,
-      completedPhase,
-    ],
-    [
-      completedPhase,
-      constructionPhase,
-      constructionPlanPhase,
-      constructionWaitPhase,
-      draftApprovalPhase,
-      draftInitiationPhase,
-      warrantyPeriodPhase,
-    ],
+    () => phases?.filter((p, i) => i > 2 && p).map((p) => p.value),
+    [phases],
   );
 
   const phasesThatNeedConstruction = useMemo(
-    () => [constructionPhase, warrantyPeriodPhase, completedPhase],
-    [completedPhase, constructionPhase, warrantyPeriodPhase],
+    () => phases?.filter((p, i) => i > 6 && p).map((p) => p.value),
+    [phases],
   );
 
   const validateEstPlanningStart = useCallback(() => {

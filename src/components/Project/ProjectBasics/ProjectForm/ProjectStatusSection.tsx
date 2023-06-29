@@ -25,6 +25,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
   const categories = useOptions('categories');
   const riskAssessments = useOptions('riskAssessments');
   const constructionPhaseDetails = useOptions('constructionPhaseDetails');
+  const currentPhase = getValues('phase').value;
 
   const { t } = useTranslation();
 
@@ -151,9 +152,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
   );
 
   const isConstructionPhaseDetailsDisabled = useMemo(() => {
-    const phase = getValues('phase').value;
-    return phase !== constructionPhase && phase !== warrantyPeriodPhase && phase !== completedPhase;
-  }, [getValues, constructionPhase, warrantyPeriodPhase, completedPhase]);
+    return (
+      currentPhase !== constructionPhase &&
+      currentPhase !== warrantyPeriodPhase &&
+      currentPhase !== completedPhase
+    );
+  }, [currentPhase, constructionPhase, warrantyPeriodPhase, completedPhase]);
 
   const validateProgrammed = useMemo(
     () => ({
