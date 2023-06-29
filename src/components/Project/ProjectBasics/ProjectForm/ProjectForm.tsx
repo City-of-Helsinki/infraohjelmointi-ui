@@ -41,11 +41,11 @@ const ProjectForm = () => {
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
       if (isDirty) {
-        dispatch(setIsSaving(true));
-
         if (!project?.id) {
           return;
         }
+
+        dispatch(setIsSaving(true));
 
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
