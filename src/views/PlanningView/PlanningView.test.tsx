@@ -43,6 +43,7 @@ import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
 import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
+import ProjectCell from '@/components/Planning/PlanningTable/PlanningRow/ProjectRow/ProjectCell';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -2207,6 +2208,7 @@ describe('PlanningView', () => {
 
           const {
             user,
+            findByTestId,
             getByTestId,
             store: { dispatch },
           } = renderResult;
@@ -2218,27 +2220,26 @@ describe('PlanningView', () => {
           await waitFor(() => navigateToProjectRows(renderResult));
           await waitFor(() => openContextMenuForCell(planEndCellYear, id, renderResult));
 
-          await waitFor(() => {
-            expect(getByTestId('project-cell-menu')).toBeInTheDocument();
-            expect(getByTestId('close-project-cell-menu')).toBeInTheDocument();
-            expect(getByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
-            expect(getByTestId('cell-title')).toHaveTextContent(name);
+          await waitFor(async () => {
+            expect(await findByTestId('project-cell-menu')).toBeInTheDocument();
+            expect(await findByTestId('close-project-cell-menu')).toBeInTheDocument();
+            expect(await findByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
+            expect(await findByTestId('cell-title')).toHaveTextContent(name);
             // overlap cells
-            expect(
-              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('overlap'),
-            ).toBeTruthy();
-            expect(
-              getByTestId('cell-type-construction').classList.contains('selected'),
-            ).toBeFalsy();
-            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeFalsy();
+            const overlapCell = await findByTestId(`project-cell-${planEndCellYear}-${id}`);
+            expect(overlapCell.classList.contains('overlap')).toBeTruthy();
+            const constructionCell = await findByTestId('cell-type-construction');
+            expect(constructionCell.classList.contains('selected')).toBeFalsy();
+            const planningCell = await findByTestId('cell-type-planning');
+            expect(planningCell.classList.contains('selected')).toBeFalsy();
           });
 
           // Overlap cells can be changed to either plan or con
-          expect(getByTestId('update-cell-type-to-planning')).toBeEnabled();
-          expect(getByTestId('update-cell-type-to-construction')).toBeEnabled();
+          expect(await findByTestId('update-cell-type-to-planning')).toBeEnabled();
+          expect(await findByTestId('update-cell-type-to-construction')).toBeEnabled();
 
           // Updating overlap celltype to plan
-          await user.click(getByTestId('update-cell-type-to-planning'));
+          await user.click(await findByTestId('update-cell-type-to-planning'));
 
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
@@ -2249,39 +2250,37 @@ describe('PlanningView', () => {
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse.data);
 
-          await waitFor(() => {
+          await waitFor(async () => {
             // overlap changed to plan
-            expect(getByTestId(`project-cell-${planEndCellYear}-${id}`)).toBeInTheDocument();
-            expect(
-              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('planning'),
-            ).toBeTruthy();
+            expect(await findByTestId(`project-cell-${planEndCellYear}-${id}`)).toBeInTheDocument();
+            let projectCell = await findByTestId(`project-cell-${planEndCellYear}-${id}`);
+            expect(projectCell.classList.contains('planning')).toBeTruthy();
             // moved construction + 1 year forward
-            expect(getByTestId(`project-cell-${planEndCellYear + 1}-${id}`)).toBeInTheDocument();
             expect(
-              getByTestId(`project-cell-${planEndCellYear + 1}-${id}`).classList.contains(
-                'construction',
-              ),
-            ).toBeTruthy();
+              await findByTestId(`project-cell-${planEndCellYear + 1}-${id}`),
+            ).toBeInTheDocument();
+            projectCell = await findByTestId(`project-cell-${planEndCellYear + 1}-${id}`);
+            expect(projectCell.classList.contains('construction')).toBeTruthy();
           });
 
           // opening menu for a cell before the planEnd cell
           await waitFor(() => openContextMenuForCell(planEndCellYear - 1, id, renderResult));
 
-          await waitFor(() => {
-            expect(getByTestId('cell-year')).toHaveTextContent((planEndCellYear - 1).toString());
-            expect(
-              getByTestId(`project-cell-${planEndCellYear - 1}-${id}`).classList.contains(
-                'planning',
-              ),
-            ).toBeTruthy();
-            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeTruthy();
+          await waitFor(async () => {
+            expect(await findByTestId('cell-year')).toHaveTextContent(
+              (planEndCellYear - 1).toString(),
+            );
+            let projectCell = await findByTestId(`project-cell-${planEndCellYear - 1}-${id}`);
+            expect(projectCell.classList.contains('planning')).toBeTruthy();
+            projectCell = await findByTestId('cell-type-planning');
+            expect(projectCell.classList.contains('selected')).toBeTruthy();
           });
 
           // Cannot update cells in the middle of timeline
-          expect(getByTestId('update-cell-type-to-planning')).toBeDisabled();
-          expect(getByTestId('update-cell-type-to-construction')).toBeDisabled();
+          expect(await findByTestId('update-cell-type-to-planning')).toBeDisabled();
+          expect(await findByTestId('update-cell-type-to-construction')).toBeDisabled();
 
-          await user.click(getByTestId('close-project-cell-menu'));
+          await user.click(await findByTestId('close-project-cell-menu'));
 
           const mockUpdateCellTypePatchResponse_2 = {
             data: {
@@ -2298,21 +2297,21 @@ describe('PlanningView', () => {
 
           await waitFor(() => openContextMenuForCell(planEndCellYear, id, renderResult));
 
-          await waitFor(() => {
-            expect(getByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
+          await waitFor(async () => {
+            expect(await findByTestId('cell-year')).toHaveTextContent(planEndCellYear.toString());
             // plan end cell
-            expect(
-              getByTestId(`project-cell-${planEndCellYear}-${id}`).classList.contains('planning'),
-            ).toBeTruthy();
-            expect(getByTestId('cell-type-planning').classList.contains('selected')).toBeTruthy();
+            let projectCell = await findByTestId(`project-cell-${planEndCellYear}-${id}`);
+            expect(projectCell.classList.contains('planning')).toBeTruthy();
+            projectCell = await findByTestId('cell-type-planning');
+            expect(projectCell.classList.contains('selected')).toBeTruthy();
           });
           // plan cell cannot be changed to plan
           // only con button enabled
-          expect(getByTestId('update-cell-type-to-planning')).toBeDisabled();
-          expect(getByTestId('update-cell-type-to-construction')).toBeEnabled();
+          expect(await findByTestId('update-cell-type-to-planning')).toBeDisabled();
+          expect(await findByTestId('update-cell-type-to-construction')).toBeEnabled();
 
           // Updating celltype to con
-          await user.click(getByTestId('update-cell-type-to-construction'));
+          await user.click(await findByTestId('update-cell-type-to-construction'));
 
           await waitFor(() => {
             const patchMock = mockedAxios.patch.mock.lastCall;
@@ -2323,22 +2322,20 @@ describe('PlanningView', () => {
           // Send the project-update event with the updated project
           await sendProjectUpdateEvent(mockUpdateCellTypePatchResponse_2.data);
 
-          await waitFor(() => {
+          await waitFor(async () => {
             // planEnd moved 1 year back
             // plan cell changed to conStart cell
-            expect(getByTestId(`project-cell-${conStartYearCell}-${id}`)).toBeInTheDocument();
             expect(
-              getByTestId(`project-cell-${conStartYearCell}-${id}`).classList.contains(
-                'construction',
-              ),
-            ).toBeTruthy();
+              await findByTestId(`project-cell-${conStartYearCell}-${id}`),
+            ).toBeInTheDocument();
+            let projectCell = await findByTestId(`project-cell-${conStartYearCell}-${id}`);
+            expect(projectCell.classList.contains('construction')).toBeTruthy();
 
-            expect(getByTestId(`project-cell-${conStartYearCell - 1}-${id}`)).toBeInTheDocument();
             expect(
-              getByTestId(`project-cell-${conStartYearCell - 1}-${id}`).classList.contains(
-                'planning',
-              ),
-            ).toBeTruthy();
+              await findByTestId(`project-cell-${conStartYearCell - 1}-${id}`),
+            ).toBeInTheDocument();
+            projectCell = await findByTestId(`project-cell-${conStartYearCell - 1}-${id}`);
+            expect(projectCell.classList.contains('planning')).toBeTruthy();
             removeProjectUpdateEventListener(dispatch);
           });
         });
