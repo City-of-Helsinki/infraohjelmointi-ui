@@ -97,7 +97,7 @@ describe('projectForm', () => {
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
-      expect(await findByText(`option.${option || ''}`)).toBeInTheDocument();
+      expect(await findByText(option || '')).toBeInTheDocument();
     const expectRadioBoolean = async (testId: string, value: boolean) =>
       expect(((await findByTestId(testId)) as HTMLInputElement).checked).toBe(value);
     const expectPersonOption = async (person: IPerson) =>
