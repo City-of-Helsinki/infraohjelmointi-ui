@@ -1,0 +1,56 @@
+/**
+ * Prompts a user when they exit the page
+ */
+import { useContext, useEffect } from 'react';
+import { UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
+import useConfirmDialog from './useConfirmDialog';
+
+const usePromptConfirmOnNavigate = ({
+  title,
+  description,
+  when,
+}: {
+  title: string;
+  description: string;
+  when: boolean;
+}) => {
+  const { navigator } = useContext(NavigationContext);
+  const { isConfirmed } = useConfirmDialog();
+
+  // Toggle a warning when trying to close the window if "when" is true
+  useEffect(() => {
+    if (when) {
+      window.onbeforeunload = () => {
+        return description;
+      };
+    }
+
+    return () => {
+      window.onbeforeunload = null;
+    };
+  }, [description, when]);
+
+  // Open the confirmation dialog when trying to navigate to another route if "when" is true
+  useEffect(() => {
+    if (!when) {
+      return;
+    }
+
+    const push = navigator.push;
+
+    navigator.push = async (...args: Parameters<typeof push>) => {
+      // Await for the isConfirmed to either return true or false, depending on the users input
+      const confirm = await isConfirmed({ title, description });
+
+      if (confirm !== false) {
+        push(...args);
+      }
+    };
+
+    return () => {
+      navigator.push = push;
+    };
+  }, [navigator, when, isConfirmed]);
+};
+
+export default usePromptConfirmOnNavigate;

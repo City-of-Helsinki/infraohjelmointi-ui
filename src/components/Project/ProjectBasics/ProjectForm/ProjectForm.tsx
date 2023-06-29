@@ -1,7 +1,7 @@
 import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { selectProject, setIsSaving } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
@@ -14,13 +14,15 @@ import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection
 import ProjectLocationSection from './ProjectLocationSection';
 import ProjectProgramSection from './ProjectProgramSection';
 import ProjectFormBanner from './ProjectFormBanner';
+import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
+import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
 import './styles.css';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions } = useProjectForm();
+  const { t } = useTranslation();
   const project = useAppSelector(selectProject);
-  const [formSaved, setFormSaved] = useState(false);
   const dispatch = useAppDispatch();
 
   const {
@@ -30,9 +32,11 @@ const ProjectForm = () => {
     getValues,
   } = formMethods;
 
-  const handleSetFormSaved = useCallback((value: boolean) => {
-    setFormSaved(value);
-  }, []);
+  usePromptConfirmOnNavigate({
+    title: t('confirmLeaveTitle'),
+    description: t('confirmLeaveDescription'),
+    when: isDirty,
+  });
 
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
@@ -47,7 +51,6 @@ const ProjectForm = () => {
 
         try {
           await patchProject({ id: project.id, data });
-          handleSetFormSaved(true);
         } catch (error) {
           console.log('project patch error: ', error);
         } finally {
@@ -55,7 +58,7 @@ const ProjectForm = () => {
         }
       }
     },
-    [isDirty, project?.id, dirtyFields, handleSetFormSaved, dispatch],
+    [isDirty, project?.id, dirtyFields, dispatch],
   );
 
   const getFieldProps = useCallback(
@@ -85,7 +88,7 @@ const ProjectForm = () => {
   return (
     <form onBlur={submitCallback()} data-testid="project-form" className="project-form">
       {/* SECTION 1 - BASIC INFO */}
-      <ProjectInfoSection {...formProps} project={project} formSaved={formSaved} />
+      <ProjectInfoSection {...formProps} project={project} />
       {/* SECTION 2 - STATUS */}
       <ProjectStatusSection {...formProps} />
       {/* SECTION 3 - SCHEDULE */}

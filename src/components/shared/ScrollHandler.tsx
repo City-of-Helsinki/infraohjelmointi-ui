@@ -15,8 +15,7 @@ const scrollTo = (x: number, y: number) => {
 };
 
 const ScrollHandler = () => {
-  const location = useLocation();
-  const { pathname, search } = location;
+  const { pathname, search } = useLocation();
   const clicked = useRef(false);
 
   useEffect(() => {

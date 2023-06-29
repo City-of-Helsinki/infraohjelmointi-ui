@@ -8,6 +8,7 @@ import './i18n';
 
 import App from '@/App';
 import { injectStore } from '@/utils/interceptors';
+import ConfirmDialogContextProvider from './components/context/ConfirmDialogContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -17,7 +18,9 @@ injectStore(store);
 root.render(
   <BrowserRouter>
     <Provider store={store}>
-      <App />
+      <ConfirmDialogContextProvider>
+        <App />
+      </ConfirmDialogContextProvider>
     </Provider>
   </BrowserRouter>,
 );

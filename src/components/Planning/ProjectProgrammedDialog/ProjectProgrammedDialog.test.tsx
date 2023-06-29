@@ -5,7 +5,7 @@ import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from 
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import { waitFor, within } from '@testing-library/react';
+import { within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
   mockClasses,

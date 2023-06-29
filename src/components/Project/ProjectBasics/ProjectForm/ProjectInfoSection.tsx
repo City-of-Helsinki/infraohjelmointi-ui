@@ -8,11 +8,12 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
 import { validateMaxLength, validateRequired } from '@/utils/validation';
+import { useAppSelector } from '@/hooks/common';
+import { selectIsProjectSaving } from '@/reducers/projectSlice';
 
 interface IProjectInfoSectionProps {
   project: IProject | null;
   control: Control<IProjectForm>;
-  formSaved: boolean;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -20,15 +21,12 @@ interface IProjectInfoSectionProps {
   };
 }
 
-const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
-  project,
-  getFieldProps,
-  control,
-  formSaved,
-}) => {
+const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({ project, getFieldProps, control }) => {
   const areas = useOptions('areas');
   const types = useOptions('types');
   const { t } = useTranslation();
+
+  const isSaving = useAppSelector(selectIsProjectSaving);
 
   return (
     <div className="w-full" id="basics-info-section">
@@ -75,7 +73,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('description')}
             size="l"
             rules={validateRequired('description', t)}
-            formSaved={formSaved}
+            formSaved={isSaving}
           />
         </div>
       </div>

@@ -37,6 +37,7 @@ import ScrollHandler from './components/shared/ScrollHandler';
 import { selectFinanceUpdate } from './reducers/eventsSlice';
 import { ProjectBasics } from './components/Project/ProjectBasics';
 import { notifyError } from './reducers/notificationSlice';
+import ConfirmDialog from './components/shared/ConfirmDialog';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -137,6 +138,8 @@ const App: FC = () => {
       {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}
       <CustomContextMenu />
       <ScrollHandler />
+      {/* CONFIRM DIALOG */}
+      <ConfirmDialog />
     </div>
   );
 };

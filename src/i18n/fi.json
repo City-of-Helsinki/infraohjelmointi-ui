@@ -372,5 +372,8 @@
     "title": "Oletko varma että haluat poistaa \"{{name}}\" ryhmän?",
     "description": "Ryhmän poistaminen on pysyvää eikä sitä voida enää palauttaa. Hankkeita ei poisteta."
   },
-  "editSummingGroup": "Muokkaa summaavaa ryhmää"
+  "editSummingGroup": "Muokkaa summaavaa ryhmää",
+  "confirmLeaveTitle": "Oletko varma että haluat poistua?",
+  "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
+  "proceed": "Jatka"
 }

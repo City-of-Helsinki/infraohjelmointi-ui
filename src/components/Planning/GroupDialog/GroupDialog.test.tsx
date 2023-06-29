@@ -155,8 +155,7 @@ describe('GroupDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSuggestionsResponse);
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    const { user, findAllByTestId, findByTestId, findByRole, findByText, baseElement } =
-      renderResult;
+    const { user, findAllByTestId, findByTestId, findByRole, findByText } = renderResult;
     await user.click(await findByTestId('open-new-item-context-menu'));
 
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
