@@ -51,10 +51,13 @@ const render = async () =>
         preloadedState: {
           class: {
             ...store.getState().class,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockMasterClasses.data,
-            classes: mockClasses.data,
-            subClasses: mockSubClasses.data,
+            planning: {
+              ...store.getState().class.planning,
+              allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
+            },
           },
           location: {
             ...store.getState().location,

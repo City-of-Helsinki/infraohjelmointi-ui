@@ -7,7 +7,7 @@ import {
 } from '@/mocks/mockClasses';
 import mockI18next from '@/mocks/mockI18next';
 import { initialSearchForm } from '@/reducers/searchSlice';
-import { setupStore } from '@/store';
+import { RootState, setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import SearchResultsView from './SearchResultsView';
 import { mockLongSearchResults, mockSearchResults } from '@/mocks/mockSearch';
@@ -52,7 +52,8 @@ const filledSearchForm = {
   class: [{ label: 'Uudisrakentaminen', value: 'c6294258-41b1-4ad6-afdf-0b10849ca000' }],
 };
 
-const searchActiveState = {
+const searchActiveState: RootState = {
+  ...store.getState(),
   search: {
     open: false,
     form: filledSearchForm,
@@ -66,10 +67,13 @@ const searchActiveState = {
   },
   class: {
     ...store.getState().class,
-    allClasses: mockProjectClasses.data,
-    masterClasses: mockMasterClasses.data,
-    classes: mockClasses.data,
-    subClass: mockSubClasses.data,
+    planning: {
+      ...store.getState().class.planning,
+      allClasses: mockProjectClasses.data,
+      masterClasses: mockMasterClasses.data,
+      classes: mockClasses.data,
+      subClasses: mockSubClasses.data,
+    },
   },
   hashTags: {
     ...store.getState().hashTags,

@@ -5,20 +5,24 @@ import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IClassState {
-  allClasses: Array<IClass>;
-  masterClasses: Array<IClass>;
-  classes: Array<IClass>;
-  subClasses: Array<IClass>;
-  year: number;
+  planning: {
+    allClasses: Array<IClass>;
+    masterClasses: Array<IClass>;
+    classes: Array<IClass>;
+    subClasses: Array<IClass>;
+    year: number;
+  };
   error: unknown;
 }
 
 const initialState: IClassState = {
-  allClasses: [],
-  masterClasses: [],
-  classes: [],
-  subClasses: [],
-  year: new Date().getFullYear(),
+  planning: {
+    allClasses: [],
+    masterClasses: [],
+    classes: [],
+    subClasses: [],
+    year: new Date().getFullYear(),
+  },
   error: null,
 };
 
@@ -36,30 +40,30 @@ export const classSlice = createSlice({
       const masterClassToUpdate = action.payload;
 
       if (masterClassToUpdate) {
-        const masterClasses = [...state.masterClasses].map((mc) =>
+        const masterClasses = [...state.planning.masterClasses].map((mc) =>
           mc.id === masterClassToUpdate.id ? masterClassToUpdate : mc,
         );
-        return { ...state, masterClasses };
+        return { ...state, planning: { ...state.planning, masterClasses } };
       }
     },
     updateClass(state, action: PayloadAction<IClass | null>) {
       const classToUpdate = action.payload;
 
       if (classToUpdate) {
-        const classes = [...state.classes].map((c) =>
+        const classes = [...state.planning.classes].map((c) =>
           c.id === classToUpdate.id ? classToUpdate : c,
         );
-        return { ...state, classes };
+        return { ...state, planning: { ...state.planning, classes } };
       }
     },
     updateSubClass(state, action: PayloadAction<IClass | null>) {
       const subClassToUpdate = action.payload;
 
       if (subClassToUpdate) {
-        const subClasses = [...state.subClasses].map((sc) =>
+        const subClasses = [...state.planning.subClasses].map((sc) =>
           sc.id === subClassToUpdate.id ? subClassToUpdate : sc,
         );
-        return { ...state, subClasses };
+        return { ...state, planning: { ...state.planning, subClasses } };
       }
     },
   },
@@ -78,11 +82,13 @@ export const classSlice = createSlice({
 
       return {
         ...state,
-        allClasses: action.payload,
-        masterClasses,
-        classes,
-        subClasses,
-        year: action.payload[0].finances.year,
+        planning: {
+          allClasses: action.payload,
+          masterClasses,
+          classes,
+          subClasses,
+          year: action.payload[0].finances.year,
+        },
       };
     });
     builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
@@ -93,10 +99,10 @@ export const classSlice = createSlice({
 
 export const { updateMasterClass, updateClass, updateSubClass } = classSlice.actions;
 
-export const selectAllClasses = (state: RootState) => state.class.allClasses;
-export const selectMasterClasses = (state: RootState) => state.class.masterClasses;
-export const selectClasses = (state: RootState) => state.class.classes;
-export const selectSubClasses = (state: RootState) => state.class.subClasses;
-export const selectBatchedClasses = (state: RootState) => state.class;
+export const selectAllClasses = (state: RootState) => state.class.planning.allClasses;
+export const selectMasterClasses = (state: RootState) => state.class.planning.masterClasses;
+export const selectClasses = (state: RootState) => state.class.planning.classes;
+export const selectSubClasses = (state: RootState) => state.class.planning.subClasses;
+export const selectBatchedClasses = (state: RootState) => state.class.planning;
 
 export default classSlice.reducer;

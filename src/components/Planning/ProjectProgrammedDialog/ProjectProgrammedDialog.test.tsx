@@ -30,7 +30,7 @@ const store = setupStore();
 
 const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
   const { user, store, findByTestId } = renderResult;
-  const { masterClasses, classes } = store.getState().class;
+  const { masterClasses, classes } = store.getState().class.planning;
   await user.click(await findByTestId(`expand-${masterClasses[0].id}`));
   await user.click(await findByTestId(`expand-${classes[0].id}`));
 };
@@ -58,10 +58,13 @@ const render = async () =>
         preloadedState: {
           class: {
             ...store.getState().class,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockMasterClasses.data,
-            classes: mockClasses.data,
-            subClasses: mockSubClasses.data,
+            planning: {
+              ...store.getState().class.planning,
+              allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
+            },
           },
           location: {
             ...store.getState().location,

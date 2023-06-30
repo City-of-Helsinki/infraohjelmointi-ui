@@ -64,7 +64,12 @@ describe('App', () => {
   it('adds all needed data to store', async () => {
     const { store } = await render();
 
-    const { class: classes, location: locations, lists, hashTags } = store.getState();
+    const {
+      class: { planning: planningClasses },
+      location: locations,
+      lists,
+      hashTags,
+    } = store.getState();
     await waitFor(() => {
       expect(lists.categories).toStrictEqual(mockProjectCategories.data);
       expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
@@ -79,10 +84,10 @@ describe('App', () => {
       expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
       expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
       expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
-      expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
-      expect(classes.masterClasses).toStrictEqual(mockMasterClasses.data);
-      expect(classes.classes).toStrictEqual(mockClasses.data);
-      expect(classes.subClasses).toStrictEqual(mockSubClasses.data);
+      expect(planningClasses.allClasses).toStrictEqual(mockProjectClasses.data);
+      expect(planningClasses.masterClasses).toStrictEqual(mockMasterClasses.data);
+      expect(planningClasses.classes).toStrictEqual(mockClasses.data);
+      expect(planningClasses.subClasses).toStrictEqual(mockSubClasses.data);
       expect(locations.allLocations).toStrictEqual(mockLocations.data);
       expect(locations.districts).toStrictEqual(mockDistricts.data);
       expect(locations.divisions).toStrictEqual(mockDivisions.data);

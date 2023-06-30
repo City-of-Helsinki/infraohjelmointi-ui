@@ -52,10 +52,13 @@ const render = async () =>
           auth: { user: mockPersons.data[0], error: {} },
           class: {
             ...store.getState().class,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockMasterClasses.data,
-            classes: mockClasses.data,
-            subClasses: mockSubClasses.data,
+            planning: {
+              ...store.getState().class.planning,
+              allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
+            },
           },
           location: {
             ...store.getState().location,
@@ -123,15 +126,15 @@ describe('Search', () => {
     // open search
     await waitFor(() => store.dispatch(toggleSearch()));
 
-    const classes = store.getState().class;
+    const planningClasses = store.getState().class.planning;
     const locations = store.getState().location;
     const lists = store.getState().lists;
 
     // Class store
-    expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
-    expect(classes.masterClasses.length).toBeGreaterThan(0);
-    expect(classes.classes.length).toBeGreaterThan(0);
-    expect(classes.subClasses.length).toBeGreaterThan(0);
+    expect(planningClasses.allClasses).toStrictEqual(mockProjectClasses.data);
+    expect(planningClasses.masterClasses.length).toBeGreaterThan(0);
+    expect(planningClasses.classes.length).toBeGreaterThan(0);
+    expect(planningClasses.subClasses.length).toBeGreaterThan(0);
     // Location store
     expect(locations.allLocations).toStrictEqual(mockLocations.data);
     expect(locations.districts.length).toBeGreaterThan(0);
