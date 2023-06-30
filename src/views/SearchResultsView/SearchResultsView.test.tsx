@@ -303,11 +303,11 @@ describe('SearchResultsView', () => {
     it('renders all elements if there are results', async () => {
       const { container, findAllByText, findByTestId } = await render(searchActiveState);
 
-      expect(container.getElementsByClassName('search-result-card').length).toBe(2);
-      expect(container.getElementsByClassName('search-result-breadcrumbs').length).toBe(2);
-      expect(container.getElementsByClassName('search-result-title-container').length).toBe(2);
-      expect(container.getElementsByClassName('search-result-title').length).toBe(2);
-      expect(container.getElementsByClassName('custom-tag-container').length).toBe(3);
+      expect(container.getElementsByClassName('search-result-card').length).toBe(3);
+      expect(container.getElementsByClassName('search-result-breadcrumbs').length).toBe(3);
+      expect(container.getElementsByClassName('search-result-title-container').length).toBe(3);
+      expect(container.getElementsByClassName('search-result-title').length).toBe(3);
+      expect(container.getElementsByClassName('custom-tag-container').length).toBe(4);
 
       const projectCard = container.getElementsByClassName('search-result-card')[0];
       const projectChildren = projectCard.childNodes;
