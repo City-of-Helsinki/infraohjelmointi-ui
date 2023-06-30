@@ -19,14 +19,17 @@ const usePromptConfirmOnNavigate = ({
 
   // Toggle a warning when trying to close the window if "when" is true
   useEffect(() => {
+    const promptWarningOnWindowClose = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = description;
+    };
+
     if (when) {
-      window.onbeforeunload = () => {
-        return description;
-      };
+      window.addEventListener('beforeunload', promptWarningOnWindowClose);
     }
 
     return () => {
-      window.onbeforeunload = null;
+      window.removeEventListener('beforeunload', promptWarningOnWindowClose);
     };
   }, [description, when]);
 
