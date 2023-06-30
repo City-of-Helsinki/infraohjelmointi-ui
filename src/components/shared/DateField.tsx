@@ -21,20 +21,20 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
+      render={({ field: { onChange, value }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper date-field-wrapper" id={name} data-testid={name}>
             <HDSDateInput
-              className="input-l"
+              className="input-l date-input"
               onChange={onChange}
               value={value}
-              onBlur={onBlur}
               placeholder={''}
               label={t(label)}
               language="fi"
               id={label}
               readOnly={readOnly}
               required={required}
+              initialMonth={new Date()}
               invalid={error ? true : false}
               errorText={error?.message}
             />

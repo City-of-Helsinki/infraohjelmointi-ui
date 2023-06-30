@@ -1,7 +1,7 @@
 import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { selectProject, setIsSaving } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
@@ -24,6 +24,7 @@ const ProjectForm = () => {
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
   const dispatch = useAppDispatch();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -81,12 +82,52 @@ const ProjectForm = () => {
     [control, getFieldProps, getValues],
   );
 
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+
+  // Listens to forms onClick events and checks if a datepicker is opened
+  useEffect(() => {
+    const formElement = formRef?.current;
+
+    if (!formElement) {
+      return;
+    }
+
+    const checkIfDatePickerOpened = () => {
+      const dateFields = document.getElementsByClassName('date-input');
+
+      if (dateFields.length > 0) {
+        // The date picker doesn't have any id we can give it nor a distinguishable class name so we need to look through
+        // all the date fields and see if one has the date picker open
+        const datePickers = Array.from(dateFields).filter(
+          (df) => df?.children[1]?.children[2] !== undefined,
+        );
+
+        setDatePickerVisible(datePickers.length > 0);
+      }
+    };
+
+    formElement.addEventListener('click', checkIfDatePickerOpened);
+    return () => {
+      formElement.removeEventListener('click', checkIfDatePickerOpened);
+    };
+  }, []);
+
   const submitCallback = useCallback(() => {
+    // We disable onBlur events when the datepicker is opened because it messes up with the HDS DateInput's DatePicker
+    if (datePickerVisible) {
+      return undefined;
+    }
+
     return handleSubmit(onSubmit);
-  }, [handleSubmit, onSubmit]);
+  }, [handleSubmit, onSubmit, datePickerVisible]);
 
   return (
-    <form onBlur={submitCallback()} data-testid="project-form" className="project-form">
+    <form
+      ref={formRef}
+      onBlur={submitCallback()}
+      data-testid="project-form"
+      className="project-form"
+    >
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection {...formProps} project={project} />
       {/* SECTION 2 - STATUS */}
