@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useState } from 'react';
+import React, { ReactNode, createContext, memo, useState } from 'react';
 
 interface IConfirmDialogContext {
   title: string;
@@ -33,4 +33,4 @@ const ConfirmDialogContextProvider = ({ children }: { children: ReactNode }) => 
   );
 };
 
-export default ConfirmDialogContextProvider;
+export default memo(ConfirmDialogContextProvider);

@@ -24,12 +24,12 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ getFieldProp
   const phases = useOptions('phases');
 
   const phasesThatNeedPlanning = useMemo(
-    () => phases?.filter((p, i) => i > 2 && p).map((p) => p.value),
+    () => phases?.slice(2, phases.length - 1).map(({ value }) => value),
     [phases],
   );
 
   const phasesThatNeedConstruction = useMemo(
-    () => phases?.filter((p, i) => i > 6 && p).map((p) => p.value),
+    () => phases?.slice(6, phases.length - 1).map(({ value }) => value),
     [phases],
   );
 

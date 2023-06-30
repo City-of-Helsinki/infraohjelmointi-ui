@@ -15,7 +15,7 @@ const useConfirmDialog = () => {
   // simulate what the built-in window.confirm() does
   const isConfirmed = ({ title, description }: { title: string; description: string }) => {
     setNeedsCleanup(true);
-    const promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       setConfirm({
         title,
         description,
@@ -23,9 +23,7 @@ const useConfirmDialog = () => {
         proceed: resolve,
         cancel: reject,
       });
-    });
-
-    return promise.then(
+    }).then(
       () => {
         setConfirm({ ...confirm, isOpen: false });
         return true;

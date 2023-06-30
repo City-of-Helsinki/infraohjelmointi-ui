@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'hds-react/components/Link';
 
@@ -55,4 +55,4 @@ const PWContainer: FC<IPWContainerProps> = ({ pwFolderLink }) => {
   );
 };
 
-export default PWContainer;
+export default memo(PWContainer);

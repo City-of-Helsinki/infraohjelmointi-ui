@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { SideNavigation } from '../../../shared';
 import { useTranslation } from 'react-i18next';
 import PWContainer from './PWContainer';
@@ -37,4 +37,4 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink }) 
   );
 };
 
-export default ProjectFormSidePanel;
+export default memo(ProjectFormSidePanel);

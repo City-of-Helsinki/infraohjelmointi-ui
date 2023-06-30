@@ -270,11 +270,15 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
       validate: {
         isCategoryValid: (category: IOption) => {
           const phase = getValues('phase').value;
-          const proposalPhase = phases[0].value;
-          const designPhase = phases[1].value;
-          if (phase !== proposalPhase && phase !== designPhase && category.value === '') {
-            return t('validation.required', { field: t('validation.category') });
-          }
+
+          const phasesThatNeedCategory = phases.slice(0, 2).map(({ value }) => value);
+
+          phasesThatNeedCategory.forEach((p) => {
+            if (phase !== p && category.value === '') {
+              return t('validation.required', { field: t('validation.category') });
+            }
+          });
+
           return true;
         },
       },
