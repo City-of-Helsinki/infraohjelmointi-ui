@@ -7,6 +7,7 @@ import {
   selectIsNewProject,
   selectProject,
   setIsSaving,
+  setSelectedProject,
 } from '@/reducers/projectSlice';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
@@ -47,18 +48,21 @@ const ProjectForm = () => {
     when: isDirty,
   });
 
+  const [newProjectId, setNewProjectId] = useState<string>('');
+
+  useEffect(() => {
+    if (!isDirty && newProjectId) {
+      navigate(`/project/${newProjectId}/basics`);
+    }
+  }, [newProjectId, isDirty]);
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
       if (isDirty) {
-        if (!project?.id) {
-          return;
-        }
-
         dispatch(setIsSaving(true));
 
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
-        if (project.id) {
+        if (project?.id) {
           try {
             await patchProject({ id: project.id, data });
           } catch (error) {
@@ -68,21 +72,23 @@ const ProjectForm = () => {
           }
         }
 
-        if (!project.id && isNewProject) {
+        if (!project?.id && isNewProject) {
           // post project
           // set saving false
           // navigate to basics
           console.log('POSTING PROJECT', data);
-
-          await postProject({ data })
-            .then((project) => {
-              navigate(`/project/${project.id}/basics`);
-            })
-            .catch((e) => console.log('project post error: ', e))
-            .finally(() => {
-              dispatch(setIsSaving(false));
-              dispatch(setIsNewProject(false));
-            });
+          let postResponsePId = '';
+          try {
+            const response = await postProject({ data });
+            dispatch(setSelectedProject(response));
+            postResponsePId = response.id;
+          } catch (error) {
+            console.log('project post error: ', error);
+          } finally {
+            dispatch(setIsSaving(false));
+            setNewProjectId(postResponsePId);
+            dispatch(setIsNewProject(false));
+          }
         }
       }
     },
