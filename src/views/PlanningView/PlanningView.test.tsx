@@ -87,9 +87,12 @@ const render = async () =>
           },
           location: {
             ...store.getState().location,
-            allLocations: mockLocations.data,
-            districts: mockDistricts.data,
-            divisions: mockDivisions.data,
+            planning: {
+              ...store.getState().location.planning,
+              allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+            },
           },
           group: {
             ...store.getState().group,
@@ -222,7 +225,7 @@ describe('PlanningView', () => {
       const { findByTestId, user, store, findAllByTestId, queryByTestId } = await render();
 
       const { masterClasses, classes, subClasses } = store.getState().class.planning;
-      const { districts } = store.getState().location;
+      const { districts } = store.getState().location.planning;
 
       const { id: masterClassId } = masterClasses[0];
       const { id: classId } = classes[0];
@@ -506,7 +509,7 @@ describe('PlanningView', () => {
       const { store, getByTestId, queryByTestId } = await render();
 
       const { masterClasses, classes, subClasses } = store.getState().class.planning;
-      const { districts, divisions } = store.getState().location;
+      const { districts, divisions } = store.getState().location.planning;
       const { groups } = store.getState().group;
 
       classes.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
@@ -527,7 +530,7 @@ describe('PlanningView', () => {
       const { store, getByTestId, queryByTestId, user } = await render();
 
       const { masterClasses, classes, subClasses } = store.getState().class.planning;
-      const { districts, divisions } = store.getState().location;
+      const { districts, divisions } = store.getState().location.planning;
       const { groups } = store.getState().group;
 
       const projects = mockPlanningViewProjects.data.results;

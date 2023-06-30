@@ -1,6 +1,6 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError } from '@/interfaces/common';
-import { getClasses } from '@/services/classService';
+import { getPlanningClasses } from '@/services/classService';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -26,8 +26,8 @@ const initialState: IClassState = {
   error: null,
 };
 
-export const getClassesThunk = createAsyncThunk('class/getAll', async (_, thunkAPI) => {
-  return await getClasses()
+export const getPlanningClassesThunk = createAsyncThunk('class/getAll', async (_, thunkAPI) => {
+  return await getPlanningClasses()
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
@@ -69,29 +69,34 @@ export const classSlice = createSlice({
   },
   extraReducers: (builder) => {
     // GET ALL
-    builder.addCase(getClassesThunk.fulfilled, (state, action: PayloadAction<Array<IClass>>) => {
-      const masterClasses = action.payload?.filter((c) => !c.parent);
+    builder.addCase(
+      getPlanningClassesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IClass>>) => {
+        const masterClasses = action.payload?.filter((c) => !c.parent);
 
-      const classes = masterClasses
-        ? action.payload?.filter((c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1)
-        : [];
+        const classes = masterClasses
+          ? action.payload?.filter(
+              (c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1,
+            )
+          : [];
 
-      const subClasses = classes
-        ? action.payload?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
-        : [];
+        const subClasses = classes
+          ? action.payload?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
+          : [];
 
-      return {
-        ...state,
-        planning: {
-          allClasses: action.payload,
-          masterClasses,
-          classes,
-          subClasses,
-          year: action.payload[0].finances.year,
-        },
-      };
-    });
-    builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
+        return {
+          ...state,
+          planning: {
+            allClasses: action.payload,
+            masterClasses,
+            classes,
+            subClasses,
+            year: action.payload[0].finances.year,
+          },
+        };
+      },
+    );
+    builder.addCase(getPlanningClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
   },

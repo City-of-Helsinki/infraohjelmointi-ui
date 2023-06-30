@@ -8,12 +8,12 @@ import { useAppDispatch, useAppSelector } from './hooks/common';
 import { Route, Routes } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
 import {
-  getClassesThunk,
+  getPlanningClassesThunk,
   updateClass,
   updateMasterClass,
   updateSubClass,
 } from './reducers/classSlice';
-import { getLocationsThunk, updateDistrict } from './reducers/locationSlice';
+import { getPlanningLocationsThunk, updateDistrict } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
@@ -51,8 +51,8 @@ const App: FC = () => {
     await Promise.all([
       dispatch(getListsThunk()),
       dispatch(getHashTagsThunk()),
-      dispatch(getClassesThunk()),
-      dispatch(getLocationsThunk()),
+      dispatch(getPlanningClassesThunk()),
+      dispatch(getPlanningLocationsThunk()),
       dispatch(getGroupsThunk()),
     ])
       .then(() => {

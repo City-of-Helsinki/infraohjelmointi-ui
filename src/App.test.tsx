@@ -35,8 +35,8 @@ import {
 } from './mocks/mockLists';
 import { mockError } from './mocks/mockError';
 import { IError } from './interfaces/common';
-import { getClassesThunk } from './reducers/classSlice';
-import { getLocationsThunk } from './reducers/locationSlice';
+import { getPlanningClassesThunk } from './reducers/classSlice';
+import { getPlanningLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
@@ -66,7 +66,7 @@ describe('App', () => {
 
     const {
       class: { planning: planningClasses },
-      location: locations,
+      location: { planning: planningLocations },
       lists,
       hashTags,
     } = store.getState();
@@ -88,10 +88,10 @@ describe('App', () => {
       expect(planningClasses.masterClasses).toStrictEqual(mockMasterClasses.data);
       expect(planningClasses.classes).toStrictEqual(mockClasses.data);
       expect(planningClasses.subClasses).toStrictEqual(mockSubClasses.data);
-      expect(locations.allLocations).toStrictEqual(mockLocations.data);
-      expect(locations.districts).toStrictEqual(mockDistricts.data);
-      expect(locations.divisions).toStrictEqual(mockDivisions.data);
-      expect(locations.subDivisions).toStrictEqual(mockSubDivisions.data);
+      expect(planningLocations.allLocations).toStrictEqual(mockLocations.data);
+      expect(planningLocations.districts).toStrictEqual(mockDistricts.data);
+      expect(planningLocations.divisions).toStrictEqual(mockDivisions.data);
+      expect(planningLocations.subDivisions).toStrictEqual(mockSubDivisions.data);
     });
   });
 
@@ -157,12 +157,12 @@ describe('App', () => {
     });
   });
 
-  it('catches a failed classes fetch', async () => {
+  it('catches a failed planning classes fetch', async () => {
     const { store } = await render();
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getClassesThunk());
+    await store.dispatch(getPlanningClassesThunk());
 
     const storeError = store.getState().class.error as IError;
     expect(storeError.message).toBe(mockError.message);
@@ -174,7 +174,7 @@ describe('App', () => {
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getLocationsThunk());
+    await store.dispatch(getPlanningLocationsThunk());
 
     const storeError = store.getState().location.error as IError;
     expect(storeError.message).toBe(mockError.message);

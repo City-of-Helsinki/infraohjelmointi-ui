@@ -61,9 +61,12 @@ const render = async () =>
           },
           location: {
             ...store.getState().location,
-            allLocations: mockLocations.data,
-            districts: mockDistricts.data,
-            divisions: mockDivisions.data,
+            planning: {
+              ...store.getState().location.planning,
+              allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+            },
           },
           group: {
             ...store.getState().group,
