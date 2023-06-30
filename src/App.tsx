@@ -9,11 +9,11 @@ import { Route, Routes } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
 import {
   getPlanningClassesThunk,
-  updateClass,
-  updateMasterClass,
-  updateSubClass,
+  updatePlanningClass,
+  updatePlanningMasterClass,
+  updatePlanningSubClass,
 } from './reducers/classSlice';
-import { getPlanningLocationsThunk, updateDistrict } from './reducers/locationSlice';
+import { getPlanningLocationsThunk, updatePlanningDistrict } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
@@ -95,10 +95,10 @@ const App: FC = () => {
   useEffect(() => {
     if (financeUpdate) {
       Promise.all([
-        dispatch(updateMasterClass(financeUpdate.masterClass)),
-        dispatch(updateClass(financeUpdate.class)),
-        dispatch(updateSubClass(financeUpdate.subClass)),
-        dispatch(updateDistrict(financeUpdate.district)),
+        dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
+        dispatch(updatePlanningClass(financeUpdate.class)),
+        dispatch(updatePlanningSubClass(financeUpdate.subClass)),
+        dispatch(updatePlanningDistrict(financeUpdate.district)),
         dispatch(updateGroup(financeUpdate.group)),
       ]).catch((e) => console.log('Error updating finances: ', e));
     }

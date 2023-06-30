@@ -1,11 +1,11 @@
 import {
-  selectBatchedClasses,
-  updateClass,
-  updateMasterClass,
-  updateSubClass,
+  selectBatchedPlanningClasses,
+  updatePlanningClass,
+  updatePlanningMasterClass,
+  updatePlanningSubClass,
 } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectedBatchedLocations, updateDistrict } from '@/reducers/locationSlice';
+import { selectBatchedPlanningLocations, updatePlanningDistrict } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -356,8 +356,8 @@ const usePlanningRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
-  const batchedClasses = useAppSelector(selectBatchedClasses);
-  const batchedLocations = useAppSelector(selectedBatchedLocations);
+  const batchedClasses = useAppSelector(selectBatchedPlanningClasses);
+  const batchedLocations = useAppSelector(selectBatchedPlanningLocations);
   const { masterClassId, classId, subClassId, districtId } = useParams();
 
   // Listen to masterClasses, classes and subClasses or their ids in the url and sets
@@ -398,10 +398,10 @@ const usePlanningRows = () => {
   useEffect(() => {
     if (financeUpdate) {
       Promise.all([
-        dispatch(updateMasterClass(financeUpdate.masterClass)),
-        dispatch(updateClass(financeUpdate.class)),
-        dispatch(updateSubClass(financeUpdate.subClass)),
-        dispatch(updateDistrict(financeUpdate.district)),
+        dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
+        dispatch(updatePlanningClass(financeUpdate.class)),
+        dispatch(updatePlanningSubClass(financeUpdate.subClass)),
+        dispatch(updatePlanningDistrict(financeUpdate.district)),
         dispatch(updateGroup(financeUpdate.group)),
       ]).catch((e) => console.log('Error updating finances: ', e));
     }

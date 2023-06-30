@@ -11,9 +11,9 @@ import {
 } from '@/interfaces/searchInterfaces';
 import { IClass } from '@/interfaces/classInterfaces';
 import { useAppSelector } from '@/hooks/common';
-import { selectAllClasses } from '@/reducers/classSlice';
+import { selectAllPlanningClasses } from '@/reducers/classSlice';
 import SelectedProjectCard from './SelectedProjectCard';
-import { selectDistricts } from '@/reducers/locationSlice';
+import { selectPlanningDistricts } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectSelections } from '@/reducers/planningSlice';
 
@@ -42,8 +42,8 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   projectsForSubmit,
   onProjectSelectionDelete,
 }) => {
-  const classes = useAppSelector(selectAllClasses);
-  const districts = useAppSelector(selectDistricts);
+  const classes = useAppSelector(selectAllPlanningClasses);
+  const districts = useAppSelector(selectPlanningDistricts);
 
   const [searchState, setSearchState] = useState<ISearchState>({
     searchWord: '',

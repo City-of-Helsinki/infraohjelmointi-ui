@@ -36,7 +36,7 @@ export const classSlice = createSlice({
   name: 'class',
   initialState,
   reducers: {
-    updateMasterClass(state, action: PayloadAction<IClass | null>) {
+    updatePlanningMasterClass(state, action: PayloadAction<IClass | null>) {
       const masterClassToUpdate = action.payload;
 
       if (masterClassToUpdate) {
@@ -46,7 +46,7 @@ export const classSlice = createSlice({
         return { ...state, planning: { ...state.planning, masterClasses } };
       }
     },
-    updateClass(state, action: PayloadAction<IClass | null>) {
+    updatePlanningClass(state, action: PayloadAction<IClass | null>) {
       const classToUpdate = action.payload;
 
       if (classToUpdate) {
@@ -56,7 +56,7 @@ export const classSlice = createSlice({
         return { ...state, planning: { ...state.planning, classes } };
       }
     },
-    updateSubClass(state, action: PayloadAction<IClass | null>) {
+    updatePlanningSubClass(state, action: PayloadAction<IClass | null>) {
       const subClassToUpdate = action.payload;
 
       if (subClassToUpdate) {
@@ -102,12 +102,13 @@ export const classSlice = createSlice({
   },
 });
 
-export const { updateMasterClass, updateClass, updateSubClass } = classSlice.actions;
+export const { updatePlanningMasterClass, updatePlanningClass, updatePlanningSubClass } =
+  classSlice.actions;
 
-export const selectAllClasses = (state: RootState) => state.class.planning.allClasses;
-export const selectMasterClasses = (state: RootState) => state.class.planning.masterClasses;
-export const selectClasses = (state: RootState) => state.class.planning.classes;
-export const selectSubClasses = (state: RootState) => state.class.planning.subClasses;
-export const selectBatchedClasses = (state: RootState) => state.class.planning;
+export const selectAllPlanningClasses = (state: RootState) => state.class.planning.allClasses;
+export const selectPlanningMasterClasses = (state: RootState) => state.class.planning.masterClasses;
+export const selectPlanningClasses = (state: RootState) => state.class.planning.classes;
+export const selectPlanningSubClasses = (state: RootState) => state.class.planning.subClasses;
+export const selectBatchedPlanningClasses = (state: RootState) => state.class.planning;
 
 export default classSlice.reducer;

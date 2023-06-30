@@ -1,11 +1,11 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { ISearchResultListItem, ISearchResultPayloadItem } from '@/interfaces/searchInterfaces';
-import { selectAllClasses } from '@/reducers/classSlice';
+import { selectAllPlanningClasses } from '@/reducers/classSlice';
 import { selectSearchResults } from '@/reducers/searchSlice';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from './common';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { selectDistricts } from '@/reducers/locationSlice';
+import { selectPlanningDistricts } from '@/reducers/locationSlice';
 
 const buildBreadCrumbs = (
   path: string,
@@ -55,8 +55,8 @@ const buildSearchResultsList = (
  * @returns a list of ISearchResultListItems
  */
 const useSearchResultsList = () => {
-  const classes = useAppSelector(selectAllClasses);
-  const districts = useAppSelector(selectDistricts);
+  const classes = useAppSelector(selectAllPlanningClasses);
+  const districts = useAppSelector(selectPlanningDistricts);
   const { results, next, previous, count } = useAppSelector(selectSearchResults);
   const [searchResultsList, setSearchResultsList] = useState<Array<ISearchResultListItem>>([]);
 

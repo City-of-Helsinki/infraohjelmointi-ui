@@ -1,5 +1,9 @@
 import { IOption } from '@/interfaces/common';
-import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
+import {
+  selectPlanningClasses,
+  selectAllPlanningClasses,
+  selectPlanningSubClasses,
+} from '@/reducers/classSlice';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import _ from 'lodash';
@@ -18,9 +22,9 @@ const useMultiClassOptions = (
   classes: Array<IOption>,
   subClasses: Array<IOption>,
 ) => {
-  const allMasterClasses = useAppSelector(selectMasterClasses);
-  const allClasses = useAppSelector(selectClasses);
-  const allSubClasses = useAppSelector(selectSubClasses);
+  const allMasterClasses = useAppSelector(selectAllPlanningClasses);
+  const allClasses = useAppSelector(selectPlanningClasses);
+  const allSubClasses = useAppSelector(selectPlanningSubClasses);
 
   const selectedClassParents = useMemo(
     () =>

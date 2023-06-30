@@ -1,5 +1,9 @@
 import { IOption } from '@/interfaces/common';
-import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
+import {
+  selectPlanningDistricts,
+  selectPlanningDivisions,
+  selectPlanningSubDivisions,
+} from '@/reducers/locationSlice';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import _ from 'lodash';
@@ -18,9 +22,9 @@ const useMultiLocationOptions = (
   divisions: Array<IOption>,
   subDivisions: Array<IOption>,
 ) => {
-  const allDistricts = useAppSelector(selectDistricts);
-  const allDivisions = useAppSelector(selectDivisions);
-  const allSubDivisions = useAppSelector(selectSubDivisions);
+  const allDistricts = useAppSelector(selectPlanningDistricts);
+  const allDivisions = useAppSelector(selectPlanningDivisions);
+  const allSubDivisions = useAppSelector(selectPlanningSubDivisions);
 
   const selectedDivisionParent = useMemo(
     () =>

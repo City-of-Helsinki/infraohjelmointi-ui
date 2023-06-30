@@ -40,7 +40,7 @@ export const locationSlice = createSlice({
   name: 'locations',
   initialState,
   reducers: {
-    updateDistrict(state, action: PayloadAction<ILocation | null>) {
+    updatePlanningDistrict(state, action: PayloadAction<ILocation | null>) {
       const districtToUpdate = action.payload;
 
       if (districtToUpdate) {
@@ -84,12 +84,12 @@ export const locationSlice = createSlice({
   },
 });
 
-export const { updateDistrict } = locationSlice.actions;
+export const { updatePlanningDistrict } = locationSlice.actions;
 
-export const selectAllLocations = (state: RootState) => state.location.planning.allLocations;
-export const selectDistricts = (state: RootState) => state.location.planning.districts;
-export const selectDivisions = (state: RootState) => state.location.planning.divisions;
-export const selectSubDivisions = (state: RootState) => state.location.planning.subDivisions;
-export const selectedBatchedLocations = (state: RootState) => state.location.planning;
+export const selectPlanningDistricts = (state: RootState) => state.location.planning.districts;
+export const selectPlanningDivisions = (state: RootState) => state.location.planning.divisions;
+export const selectPlanningSubDivisions = (state: RootState) =>
+  state.location.planning.subDivisions;
+export const selectBatchedPlanningLocations = (state: RootState) => state.location.planning;
 
 export default locationSlice.reducer;

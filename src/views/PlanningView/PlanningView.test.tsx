@@ -41,7 +41,7 @@ import {
 } from '@/utils/events';
 import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
-import { updateClass, updateMasterClass } from '@/reducers/classSlice';
+import { updatePlanningClass, updatePlanningMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 
 jest.mock('axios');
@@ -189,8 +189,8 @@ describe('PlanningView', () => {
     // Simulate what App.tsx does when receiving a finance-update event
     await waitFor(async () => {
       await sendFinanceUpdateEvent(financeUpdateData).then(() => {
-        store.dispatch(updateMasterClass(financeUpdateData.masterClass));
-        store.dispatch(updateClass(financeUpdateData.class));
+        store.dispatch(updatePlanningMasterClass(financeUpdateData.masterClass));
+        store.dispatch(updatePlanningClass(financeUpdateData.class));
       });
     });
 

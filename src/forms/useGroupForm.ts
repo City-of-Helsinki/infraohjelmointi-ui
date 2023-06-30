@@ -8,8 +8,16 @@ import useLocationOptions from '@/hooks/useLocationOptions';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { selectGroups } from '@/reducers/groupSlice';
 import { useAppSelector } from '../hooks/common';
-import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
-import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
+import {
+  selectPlanningClasses,
+  selectAllPlanningClasses,
+  selectPlanningSubClasses,
+} from '@/reducers/classSlice';
+import {
+  selectPlanningDistricts,
+  selectPlanningDivisions,
+  selectPlanningSubDivisions,
+} from '@/reducers/locationSlice';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { listItemToOption } from '@/utils/common';
@@ -21,13 +29,13 @@ interface ISelectionState {
 
 const useGroupValues = (projects?: IOption[], id?: string | null) => {
   const group = useAppSelector(selectGroups).find((g) => g.id === id) || null;
-  const masterClasses = useAppSelector(selectMasterClasses);
-  const classes = useAppSelector(selectClasses);
-  const subClasses = useAppSelector(selectSubClasses);
+  const masterClasses = useAppSelector(selectAllPlanningClasses);
+  const classes = useAppSelector(selectPlanningClasses);
+  const subClasses = useAppSelector(selectPlanningSubClasses);
 
-  const districts = useAppSelector(selectDistricts);
-  const divisions = useAppSelector(selectDivisions);
-  const subDivisions = useAppSelector(selectSubDivisions);
+  const districts = useAppSelector(selectPlanningDistricts);
+  const divisions = useAppSelector(selectPlanningDivisions);
+  const subDivisions = useAppSelector(selectPlanningSubDivisions);
 
   /**
    * There are three project classes, but only one id is saved. We create a list item of each class based on the id.
