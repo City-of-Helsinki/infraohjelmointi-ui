@@ -25,13 +25,14 @@
     "location": "Hankkeen sijainti",
     "projectProgram": "Hankeohjelma",
     "documents": "Dokumentit",
-    "pwFolderLink": "Avaa dokumentit ProjectWisessa"
+    "pwFolderLink": "Avaa dokumentit ProjectWisessa",
+    "planning": "Ohjelmointi",
+    "coordination": "Koordinointi"
   },
   "option": {
     "underConstruction": "Rakenteilla",
     "proposal": "Hanke-ehdotus",
     "design": "Yleissuunnittelu",
-    "programming": "Ohjelmointi",
     "draftInitiation": "Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos",
     "draftApproval": "Katu-/puistosuunnitelmaehdotus ja hyväksyminen",
     "constructionPlan": "Rakennussuunnitelma",
@@ -287,6 +288,7 @@
   "topBarTitle": "Infrahankkeiden ohjelmointi",
   "project": "Hankekortti",
   "planning": "Ohjelmointinäkymä",
+  "coordination": "Koordinointinäkymä",
   "basicInfo": "Perustiedot",
   "notes": "Muistiinpanot",
   "tasks": "Tehtävät",

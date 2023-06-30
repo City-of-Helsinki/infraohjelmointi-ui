@@ -152,3 +152,5 @@ export interface IPlanningRow extends IPlanningSums {
   link: string | null;
   cells: Array<IPlanningCell>;
 }
+
+export type PlanningMode = 'planning' | 'coordination';

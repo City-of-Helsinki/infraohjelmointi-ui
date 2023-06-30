@@ -1,8 +1,6 @@
-import { useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { selectProject } from '@/reducers/projectSlice';
 import './styles.css';
 import {
   IconBagCogwheel,
@@ -21,51 +19,49 @@ const SideBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const project = useAppSelector(selectProject);
-
   const { t } = useTranslation();
 
   const iconStyles = { height: '1.5rem', width: '1.5rem' };
 
   const navItems: Array<INavigationItem> = [
     {
-      route: `/project/${project?.id}/basics`,
-      label: t('project'),
+      route: 'coordination',
+      label: t('coordination'),
       component: <IconBinoculars style={iconStyles} />,
-      disabled: !project?.id,
+      disabled: false,
     },
     {
-      route: `planning`,
+      route: 'planning',
       label: t('planning'),
       component: <IconScrollCogwheel style={iconStyles} />,
       disabled: false,
     },
     {
-      route: `placeholder 1`,
+      route: 'placeholder 1',
       label: 'placeholder 1',
       component: <IconLocation style={iconStyles} />,
       disabled: true,
     },
     {
-      route: `placeholder 2`,
+      route: 'placeholder 2',
       label: 'placeholder 2',
       component: <IconBagCogwheel style={iconStyles} />,
       disabled: true,
     },
     {
-      route: `placeholder 3`,
+      route: 'placeholder 3',
       label: 'placeholder 3',
       component: <IconGraphColumns style={iconStyles} />,
       disabled: true,
     },
     {
-      route: `placeholder 4`,
+      route: 'placeholder 4',
       label: 'placeholder 4',
       component: <IconHistory style={iconStyles} />,
       disabled: true,
     },
     {
-      route: `placeholder 5`,
+      route: 'placeholder 5',
       label: 'placeholder 5',
       component: <IconCogwheel style={iconStyles} />,
       disabled: true,

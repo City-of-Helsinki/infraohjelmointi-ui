@@ -9,11 +9,12 @@ import { selectBatchedPlanningLocations, updatePlanningDistrict } from '@/reduce
 import { useEffect } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import {
   IPlanningRow,
   IPlanningRowList,
   IPlanningRowSelections,
+  PlanningMode,
   PlanningRowType,
 } from '@/interfaces/common';
 import { selectGroups, updateGroup } from '@/reducers/groupSlice';
@@ -22,9 +23,11 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
 import {
+  selectMode,
   selectPlanningRows,
   selectProjects,
   selectSelections,
+  setMode,
   setPlanningRows,
   setProjects,
   setSelectedClass,
@@ -359,6 +362,21 @@ const usePlanningRows = () => {
   const batchedClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedLocations = useAppSelector(selectBatchedPlanningLocations);
   const { masterClassId, classId, subClassId, districtId } = useParams();
+
+  const { pathname } = useLocation();
+  const mode = useAppSelector(selectMode);
+
+  useEffect(() => {
+    if (!pathname) {
+      return;
+    }
+
+    const rootPath = pathname.split('/')[1].replace(/-/g, '') as PlanningMode;
+
+    if (rootPath !== mode) {
+      dispatch(setMode(rootPath));
+    }
+  }, [pathname]);
 
   // Listen to masterClasses, classes and subClasses or their ids in the url and sets
   // the selectedMasterClass, selectedClass and selectedSubClass if found

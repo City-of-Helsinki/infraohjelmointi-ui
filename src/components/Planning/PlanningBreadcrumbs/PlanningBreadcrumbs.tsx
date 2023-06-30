@@ -3,7 +3,7 @@ import { t } from 'i18next';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/common';
-import { selectSelections } from '@/reducers/planningSlice';
+import { selectMode, selectSelections } from '@/reducers/planningSlice';
 import './styles.css';
 
 const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id: string }) => (
@@ -23,11 +23,13 @@ const PlanningBreadcrumbs = () => {
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } =
     useAppSelector(selectSelections);
 
+  const mode = useAppSelector(selectMode);
+
   return (
     <ul className="breadcrumbs-list">
       <li>
         <Link to="" data-testid="programming-breadcrumb">
-          {t('option.programming')}
+          {t(`nav.${mode}`)}
         </Link>
       </li>
 

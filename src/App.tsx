@@ -130,6 +130,15 @@ const App: FC = () => {
                   </Route>
                 </Route>
               </Route>
+              <Route path="/coordination" element={<PlanningView />}>
+                <Route path=":masterClassId" element={<PlanningView />}>
+                  <Route path=":classId" element={<PlanningView />}>
+                    <Route path=":subClassId" element={<PlanningView />}>
+                      <Route path=":districtId" element={<PlanningView />} />
+                    </Route>
+                  </Route>
+                </Route>
+              </Route>
               <Route path="/search-results" element={<SearchResultsView />} />
               <Route path="*" element={<ErrorView />} />
             </Routes>

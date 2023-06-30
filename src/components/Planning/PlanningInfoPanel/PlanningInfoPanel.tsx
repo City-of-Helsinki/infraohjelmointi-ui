@@ -5,10 +5,11 @@ import { IconAngleLeft } from 'hds-react/icons';
 import { useNavigate } from 'react-router';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
-import { selectSelections } from '@/reducers/planningSlice';
+import { selectMode, selectSelections } from '@/reducers/planningSlice';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
+  const mode = useAppSelector(selectMode);
   const { selectedMasterClass } = useAppSelector(selectSelections);
 
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const PlanningInfoPanel = () => {
           <div className="buttons-container">
             <div data-testid="mode-button-container">
               <Button className="h-11" variant="success" data-testid="mode-button">
-                {t('planning')}
+                {t(mode)}
               </Button>
             </div>
             <div id="previousButton" data-testid="previous-button-container">

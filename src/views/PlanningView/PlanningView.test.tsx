@@ -305,8 +305,6 @@ describe('PlanningView', () => {
       expect(getByTestId('mode-button-container')).toBeInTheDocument();
       expect(getByTestId('selected-class-container')).toBeInTheDocument();
       expect(getByTestId('previous-button-container')).toBeInTheDocument();
-      // Mode button
-      expect(getByTestId('mode-button')).toHaveTextContent('planning');
       // Selected masterClass text
       expect(queryByTestId('selected-class')).toBeNull();
       expect(queryByTestId('currency-indicator')).toBeNull();

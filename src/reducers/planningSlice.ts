@@ -1,5 +1,5 @@
 import { IClass } from '@/interfaces/classInterfaces';
-import { IPlanningRow, IPlanningRowSelections } from '@/interfaces/common';
+import { IPlanningRow, IPlanningRowSelections, PlanningMode } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { RootState } from '@/store';
@@ -13,6 +13,7 @@ interface IPlanningState {
   selections: IPlanningRowSelections;
   projects: Array<IProject>;
   rows: Array<IPlanningRow>;
+  mode: PlanningMode;
 }
 
 const initialState: IPlanningState = {
@@ -26,6 +27,7 @@ const initialState: IPlanningState = {
     selectedSubClass: null,
     selectedDistrict: null,
   },
+  mode: 'planning',
   projects: [],
   rows: [],
 };
@@ -61,6 +63,9 @@ export const planningSlice = createSlice({
     setGroupsExpanded(state, action: PayloadAction<boolean>) {
       return { ...state, groupsExpanded: action.payload };
     },
+    setMode(state, action: PayloadAction<PlanningMode>) {
+      return { ...state, mode: action.payload };
+    },
   },
 });
 
@@ -70,6 +75,7 @@ export const selectSelections = (state: RootState) => state.planning.selections;
 export const selectPlanningRows = (state: RootState) => state.planning.rows;
 export const selectProjects = (state: RootState) => state.planning.projects;
 export const selectGroupsExpanded = (state: RootState) => state.planning.groupsExpanded;
+export const selectMode = (state: RootState) => state.planning.mode;
 
 export const {
   setSelectedYear,
@@ -81,6 +87,7 @@ export const {
   setStartYear,
   setProjects,
   setGroupsExpanded,
+  setMode,
 } = planningSlice.actions;
 
 export default planningSlice.reducer;
