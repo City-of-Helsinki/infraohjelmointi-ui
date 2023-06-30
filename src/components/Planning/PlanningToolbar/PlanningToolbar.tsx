@@ -1,5 +1,13 @@
 import { Toolbar } from '../../shared';
-import { IconCollapse, IconPlusCircle, IconSort } from 'hds-react/icons/';
+import {
+  IconCollapse,
+  IconPlusCircle,
+  IconSort,
+  IconSliders,
+  IconDrag,
+  IconShare,
+  IconDownload,
+} from 'hds-react/icons/';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
@@ -19,9 +27,15 @@ const PlanningToolbar = () => {
     projectProgrammedDialogVisible: false,
   });
 
-  const HDSIconCollapse = useMemo(() => IconCollapse, []);
-  const HDSIconSort = useMemo(() => IconSort, []);
-  const HDSIconPlusCircle = useMemo(() => IconPlusCircle, []);
+  const groupsExpandIcon = useMemo(
+    () => (groupsExpanded ? <IconCollapse /> : <IconSort />),
+    [groupsExpanded],
+  );
+  const plusIcon = useMemo(() => <IconPlusCircle />, []);
+  const slidersIcon = useMemo(() => <IconSliders />, []);
+  const dragIcon = useMemo(() => <IconDrag />, []);
+  const shareIcon = useMemo(() => <IconShare />, []);
+  const downloadIcon = useMemo(() => <IconDownload />, []);
 
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
 
@@ -68,23 +82,60 @@ const PlanningToolbar = () => {
       left={
         <>
           <div className="planning-toolbar-left">
+            {/* Manage */}
+            <Button
+              variant="supplementary"
+              className="toolbar-button"
+              iconLeft={slidersIcon}
+              disabled={true}
+            >
+              {t('manage')}
+            </Button>
+            {/* Expand groups */}
             <Button
               onClick={toggleGroupsExpanded}
               variant="supplementary"
-              className="expand-groups-button"
-              iconLeft={groupsExpanded ? <HDSIconCollapse /> : <HDSIconSort />}
+              className="expand-groups-button toolbar-button"
+              iconLeft={groupsExpandIcon}
             >
               {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}
             </Button>
-
+            {/* Organize */}
             <Button
               variant="supplementary"
-              className="!text-black"
-              iconLeft={<HDSIconPlusCircle />}
+              className="toolbar-button"
+              iconLeft={dragIcon}
+              disabled={true}
+            >
+              {t('organize')}
+            </Button>
+            {/* New item */}
+            <Button
+              variant="supplementary"
+              className="toolbar-button"
+              iconLeft={plusIcon}
               data-testid="open-new-item-context-menu"
               onMouseDown={handleNewItemMenu}
             >
-              Uusi
+              {t('new')}
+            </Button>
+            {/* Save version */}
+            <Button
+              variant="supplementary"
+              className="toolbar-button"
+              iconLeft={downloadIcon}
+              disabled={true}
+            >
+              {t('saveVersion')}
+            </Button>
+            {/* Share version */}
+            <Button
+              variant="supplementary"
+              className="toolbar-button"
+              iconLeft={shareIcon}
+              disabled={true}
+            >
+              {t('shareVersion')}
             </Button>
             <GroupDialog
               isOpen={groupDialogVisible}

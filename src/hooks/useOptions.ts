@@ -3,7 +3,6 @@ import { IListState } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
 import { listItemToOption } from '@/utils/common';
 import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAppSelector } from './common';
 
 /**
@@ -14,17 +13,12 @@ import { useAppSelector } from './common';
  * @param name a ListType, restricted to the lists that we have in redux
  * @returns options & listItemToOption
  */
-export const useOptions = (name?: ListType, shouldNotTranslate?: boolean) => {
-  const { t } = useTranslation();
-
+export const useOptions = (name?: ListType) => {
   const optionsList = useAppSelector(
     (state: RootState) => state.lists[name as keyof IListState],
   ) as Array<IListItem>;
 
-  const options = useMemo(
-    () => optionsList.map((i) => listItemToOption(i, shouldNotTranslate ? undefined : t)),
-    [optionsList],
-  );
+  const options = useMemo(() => optionsList.map((i) => listItemToOption(i)), [optionsList]);
 
   return options;
 };

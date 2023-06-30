@@ -1,15 +1,33 @@
-import { IconArrowDown, IconMap } from 'hds-react/icons';
-import { IconButton, Toolbar } from '../../shared';
-import { ReactComponent as IconNewItem } from '@/assets/icons/new-item.svg';
+import { IconMap, IconPlusCircle, IconShare } from 'hds-react/icons';
+import { Toolbar } from '../../shared';
+import { Button } from 'hds-react';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const ProjectToolbar = () => {
-  const click = () => console.log('click');
+  const { t } = useTranslation();
+  const circleIcon = useMemo(() => <IconPlusCircle />, []);
+  const shareIcon = useMemo(() => <IconShare />, []);
   return (
     <Toolbar
       left={
         <>
-          <IconButton icon={IconNewItem} text="new" onClick={() => click()} />
-          <IconButton icon={IconArrowDown} text="shareProject" onClick={() => click()} />
+          <Button
+            variant="supplementary"
+            className="toolbar-button"
+            iconLeft={circleIcon}
+            disabled={true}
+          >
+            {t('new')}
+          </Button>
+          <Button
+            variant="supplementary"
+            className="toolbar-button"
+            iconLeft={shareIcon}
+            disabled={true}
+          >
+            {t('shareProject')}
+          </Button>
         </>
       }
       right={<IconMap aria-label="map" data-testid="test" />}

@@ -21,7 +21,7 @@
 
 /* programmed fieldset flex to get the checkboxes next to eachother */
 .search-form .search-form-content fieldset#programmed {
-  @apply flex w-0 pb-0;
+  @apply flex w-0 gap-8 pb-0;
 }
 
 .free-search {

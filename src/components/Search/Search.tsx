@@ -35,9 +35,9 @@ const Search = () => {
   const { handleSubmit, getValues, control } = formMethods;
 
   const phases = useOptions('phases');
-  const programmedYearMin = useOptions('programmedYears', true);
-  const programmedYearMax = useOptions('programmedYears', true);
-  const personPlanning = useOptions('responsiblePersons', true);
+  const programmedYearMin = useOptions('programmedYears');
+  const programmedYearMax = useOptions('programmedYears');
+  const personPlanning = useOptions('responsiblePersons');
   const categories = useOptions('categories');
   const { masterClasses, classes, subClasses } = classOptions;
   const { districts, divisions, subDivisions } = locationOptions;
@@ -89,17 +89,9 @@ const Search = () => {
             <div className="mb-4 pb-3">
               <FormFieldLabel text="searchForm.filter" />
             </div>
-            <MultiSelectField
-              {...formProps('masterClass')}
-              placeholder="choose"
-              options={masterClasses}
-            />
-            <MultiSelectField {...formProps('class')} placeholder="choose" options={classes} />
-            <MultiSelectField
-              {...formProps('subClass')}
-              placeholder="choose"
-              options={subClasses}
-            />
+            <MultiSelectField {...formProps('masterClass')} options={masterClasses} />
+            <MultiSelectField {...formProps('class')} options={classes} />
+            <MultiSelectField {...formProps('subClass')} options={subClasses} />
             <Fieldset
               heading={t('searchForm.programmed')}
               className="custom-fieldset"
@@ -110,29 +102,25 @@ const Search = () => {
             </Fieldset>
             <SelectField
               {...formProps('programmedYearMin')}
-              placeholder="choose"
               options={programmedYearMin}
+              shouldTranslate={false}
             />
             <SelectField
               {...formProps('programmedYearMax')}
-              placeholder="choose"
               options={programmedYearMax}
+              shouldTranslate={false}
             />
-            <SelectField {...formProps('phase')} placeholder="choose" options={phases} />
+            <SelectField {...formProps('phase')} options={phases} />
             <SelectField
               {...formProps('personPlanning')}
-              placeholder="choose"
-              icon="person"
+              iconKey="person"
               options={personPlanning}
+              shouldTranslate={false}
             />
-            <MultiSelectField {...formProps('district')} placeholder="choose" options={districts} />
-            <MultiSelectField {...formProps('division')} placeholder="choose" options={divisions} />
-            <MultiSelectField
-              {...formProps('subDivision')}
-              placeholder="choose"
-              options={subDivisions}
-            />
-            <SelectField {...formProps('category')} placeholder="choose" options={categories} />
+            <MultiSelectField {...formProps('district')} options={districts} />
+            <MultiSelectField {...formProps('division')} options={divisions} />
+            <MultiSelectField {...formProps('subDivision')} options={subDivisions} />
+            <SelectField {...formProps('category')} options={categories} />
           </div>
         </form>
       </Dialog.Content>

@@ -6,37 +6,13 @@ import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  IconArrowRightDashed,
-  IconClock,
-  IconCogwheel,
-  IconHammers,
-  IconLightbulb,
-  IconMenuDots,
-  IconPlaybackPause,
-  IconQuestionCircle,
-  IconScrollContent,
-  IconShield,
-  IconThumbsUp,
-} from 'hds-react/icons';
+import { IconMenuDots } from 'hds-react/icons';
+import optionIcon from '@/utils/optionIcon';
 
 interface IProjectHeadProps {
   project: IProject;
   sums: IProjectSums;
 }
-
-const projectPhaseIcon = {
-  proposal: <IconQuestionCircle />,
-  design: <IconLightbulb />,
-  programmed: <IconCogwheel />,
-  draftInitiation: <IconArrowRightDashed />,
-  draftApproval: <IconThumbsUp />,
-  constructionPlan: <IconScrollContent />,
-  constructionWait: <IconPlaybackPause />,
-  construction: <IconHammers />,
-  warrantyPeriod: <IconClock />,
-  completed: <IconShield />,
-};
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
@@ -78,7 +54,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
             data-testid={`edit-phase-${project.id}`}
             onMouseDown={handleOpenPhaseMenu}
           />
-          {projectPhase && projectPhaseIcon[projectPhase as keyof typeof projectPhaseIcon]}
+          {projectPhase && optionIcon[projectPhase as keyof typeof optionIcon]}
         </div>
         {/* Project name */}
         <div className="project-name-container">

@@ -1,5 +1,5 @@
 .phase-menu-container {
-  @apply max-w-[16rem] border border-black bg-white;
+  @apply w-[18rem] max-w-[18rem] border border-black bg-white;
 }
 
 .phase-menu-container p {

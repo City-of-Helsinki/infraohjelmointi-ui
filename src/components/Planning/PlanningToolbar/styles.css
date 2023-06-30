@@ -11,5 +11,5 @@
 }
 
 .expand-groups-button {
-  @apply w-[180px] !text-black;
+  @apply w-[145px] !text-black;
 }

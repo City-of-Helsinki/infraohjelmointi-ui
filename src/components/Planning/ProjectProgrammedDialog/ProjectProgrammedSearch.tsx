@@ -50,10 +50,9 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
     searchedProjects: [],
   });
   const { searchedProjects, searchWord } = searchState;
-  const phaseProposal =
-    useOptions('phases', true).find((phase) => phase.label === 'proposal')?.value || '';
-  const phaseDesign =
-    useOptions('phases', true).find((phase) => phase.label === 'design')?.value || '';
+  const phases = useOptions('phases');
+  const phaseProposal = phases.find((phase) => phase.label === 'proposal')?.value || '';
+  const phaseDesign = phases.find((phase) => phase.label === 'design')?.value || '';
 
   // selectedClass and selectedSubClass refer to the class and/or subclass currently selected by the user
   // in planning view

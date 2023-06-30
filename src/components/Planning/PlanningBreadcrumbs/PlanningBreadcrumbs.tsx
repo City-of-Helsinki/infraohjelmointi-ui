@@ -27,7 +27,7 @@ const PlanningBreadcrumbs = () => {
     <ul className="breadcrumbs-list">
       <li>
         <Link to="" data-testid="programming-breadcrumb">
-          {t('enums.programming')}
+          {t('option.programming')}
         </Link>
       </li>
 

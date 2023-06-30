@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
@@ -23,7 +23,6 @@ const ProjectHeader: FC = () => {
   const project = useAppSelector(selectProject);
   const projectId = project?.id;
   const user = useAppSelector(selectUser);
-  const dispatch = useAppDispatch();
   const group = 'Hakaniemi';
   const { t } = useTranslation();
 
@@ -33,6 +32,7 @@ const ProjectHeader: FC = () => {
     formState: { dirtyFields, isDirty },
     control,
     handleSubmit,
+    getValues,
   } = formMethods;
 
   const phases = useOptions('phases');
@@ -54,7 +54,7 @@ const ProjectHeader: FC = () => {
         projectId && (await patchProject({ id: projectId, data: data }));
       }
     },
-    [project?.favPersons, projectId, user?.id, dispatch, dirtyFields, isDirty],
+    [project?.favPersons, projectId, user?.id, dirtyFields, isDirty],
   );
 
   return (
@@ -73,7 +73,12 @@ const ProjectHeader: FC = () => {
             data-testid="project-header-name-fields"
           >
             <ProjectNameFields control={control} />
-            <SelectField name="phase" control={control} options={phases} />;
+            <SelectField
+              name="phase"
+              control={control}
+              options={phases}
+              iconKey={getValues('phase').label}
+            />
           </div>
         </div>
         <div className="mr-3 flex-1" data-testid="project-header-right">

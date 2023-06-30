@@ -1,9 +1,10 @@
 import { Button } from 'hds-react/components/Button';
-import { IconCheck, IconCross, IconPlaybackRecord } from 'hds-react/icons';
+import { IconCheck, IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';
 import { IPhaseMenuDetails } from '@/interfaces/eventInterfaces';
+import optionIcon from '@/utils/optionIcon';
 import './styles.css';
 
 interface IProjectPhaseMenuProps extends IPhaseMenuDetails {
@@ -52,12 +53,12 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
               data-testid={`select-${value}`}
               onClick={() => handleSetSelectedPhase(value)}
             >
-              <IconPlaybackRecord className="icon-width" />
+              <div className="min-w-[2rem]">{optionIcon[label as keyof typeof optionIcon]}</div>
               <p
                 className={`item-text ${selectedPhase === value ? 'selected' : ''}`}
                 data-testid={`project-phase-menu-option-${value}`}
               >
-                {label}
+                {t(`option.${label}`)}
               </p>
             </button>
             {selectedPhase === value && <IconCheck className="icon-width check-icon" />}

@@ -1,7 +1,6 @@
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
@@ -31,7 +30,6 @@ const useProjectFormValues = () => {
   const divisions = useAppSelector(selectDivisions);
   const subDivisions = useAppSelector(selectSubDivisions);
 
-  const { t } = useTranslation();
   const value = (value: string | undefined | null) => value ?? '';
 
   /**
@@ -103,9 +101,9 @@ const useProjectFormValues = () => {
 
   const formValues: IProjectForm = useMemo(
     () => ({
-      type: listItemToOption(project?.type, t),
+      type: listItemToOption(project?.type),
       description: value(project?.description),
-      area: listItemToOption(project?.area, t),
+      area: listItemToOption(project?.area),
       hkrId: value(project?.hkrId),
       sapProject: value(project?.sapProject),
       sapNetwork:
@@ -120,26 +118,26 @@ const useProjectFormValues = () => {
       presenceEnd: value(project?.presenceEnd),
       visibilityStart: value(project?.visibilityStart),
       visibilityEnd: value(project?.visibilityEnd),
-      phase: listItemToOption(project?.phase, t),
+      phase: listItemToOption(project?.phase),
       programmed: project?.programmed ?? false,
-      constructionPhaseDetail: listItemToOption(project?.constructionPhaseDetail, t),
+      constructionPhaseDetail: listItemToOption(project?.constructionPhaseDetail),
       louhi: project?.louhi ?? false,
       gravel: project?.gravel ?? false,
-      category: listItemToOption(project?.category, t),
+      category: listItemToOption(project?.category),
       effectHousing: project?.effectHousing ?? false,
-      riskAssessment: listItemToOption(project?.riskAssessment, t),
+      riskAssessment: listItemToOption(project?.riskAssessment),
       constructionEndYear: value(project?.constructionEndYear?.toString()),
       planningStartYear: value(project?.planningStartYear?.toString()),
       ...getProjectClassFields(project),
       ...getProjectLocationFields(project),
       projectWorkQuantity: project?.projectWorkQuantity,
-      projectQualityLevel: listItemToOption(project?.projectQualityLevel, t),
+      projectQualityLevel: listItemToOption(project?.projectQualityLevel),
       projectCostForecast: project?.projectCostForecast,
       planningCostForecast: value(project?.planningCostForecast),
-      planningPhase: listItemToOption(project?.planningPhase, t),
+      planningPhase: listItemToOption(project?.planningPhase),
       planningWorkQuantity: value(project?.planningWorkQuantity),
       constructionCostForecast: value(project?.constructionCostForecast),
-      constructionPhase: listItemToOption(project?.constructionPhase, t),
+      constructionPhase: listItemToOption(project?.constructionPhase),
       constructionWorkQuantity: value(project?.constructionWorkQuantity),
       costForecast: value(project?.costForecast),
       realizedCost: value(project?.realizedCost),
@@ -147,7 +145,7 @@ const useProjectFormValues = () => {
       spentCost: value(project?.spentCost),
       budgetOverrunYear: value(project?.budgetOverrunYear),
       budgetOverrunAmount: value(project?.budgetOverrunAmount),
-      responsibleZone: listItemToOption(project?.responsibleZone, t),
+      responsibleZone: listItemToOption(project?.responsibleZone),
       masterPlanAreaNumber: value(project?.masterPlanAreaNumber),
       trafficPlanNumber: value(project?.trafficPlanNumber),
       bridgeNumber: value(project?.bridgeNumber),

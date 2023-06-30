@@ -64,7 +64,7 @@
 }
 
 .toolbar-container {
-  @apply mb-2 flex h-14 items-center justify-between border-b-[0.5px] border-b-gray px-6 shadow-md;
+  @apply flex h-14 items-center justify-between border-b-[0.5px] border-b-gray pr-6 shadow-md;
 }
 
 .tab-list {
@@ -90,12 +90,12 @@
 }
 
 .select-field-wrapper,
-.select-field-wrapper-lg {
+.select-field-wrapper.lg {
   @apply relative max-w-[24rem];
 }
 
-.select-field-wrapper-full {
-  @apply relative;
+.select-field-wrapper.full {
+  @apply relative w-full max-w-full;
 }
 
 #summing-group-dialog .dialog-section .search-form .select-field-wrapper {

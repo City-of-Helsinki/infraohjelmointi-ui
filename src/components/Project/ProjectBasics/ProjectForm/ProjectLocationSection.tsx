@@ -47,18 +47,29 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
         <div className="form-col-xxl">
           <SelectField
             {...getFieldProps('district')}
-            icon="location"
+            iconKey="location"
             options={districts}
             size="full"
+            shouldTranslate={false}
           />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <SelectField {...getFieldProps('division')} icon="location" options={divisions} />
+          <SelectField
+            {...getFieldProps('division')}
+            iconKey="location"
+            options={divisions}
+            shouldTranslate={false}
+          />
         </div>
         <div className="form-col-md">
-          <SelectField {...getFieldProps('subDivision')} icon="location" options={subDivisions} />
+          <SelectField
+            {...getFieldProps('subDivision')}
+            iconKey="location"
+            options={subDivisions}
+            shouldTranslate={false}
+          />
         </div>
       </div>
       <div className="form-row">

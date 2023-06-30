@@ -972,7 +972,7 @@ describe('PlanningView', () => {
 
         // All options are visible
         phasesAsOptions.forEach(async (p) =>
-          expect(await findByText(`enums.${p.label}`)).toBeInTheDocument(),
+          expect(await findByText(`option.${p.label}`)).toBeInTheDocument(),
         );
 
         // Click first option

@@ -31,17 +31,8 @@ const buildSearchParams = (form: ISearchForm) => {
         break;
       case 'freeSearchParams':
         for (const [_, v] of Object.entries(value as FreeSearchFormObject)) {
-          switch (v.type) {
-            case 'groups':
-              searchParams.push(`projectGroup=${v.value}`);
-              break;
-            case 'projects':
-              searchParams.push(`project=${v.value}`);
-              break;
-            case 'hashtags':
-              searchParams.push(`hashtag=${v.value}`);
-              break;
-          }
+          const paramType = v.type.substring(0, v.type.length - 1);
+          searchParams.push(`${paramType}=${v.value}`);
         }
         break;
       default:

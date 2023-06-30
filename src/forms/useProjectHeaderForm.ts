@@ -3,7 +3,6 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
-import { useTranslation } from 'react-i18next';
 import { selectProject } from '@/reducers/projectSlice';
 import { selectUser } from '@/reducers/authSlice';
 
@@ -17,12 +16,10 @@ const useProjectHeaderValues = () => {
   const selectedProject = useAppSelector(selectProject);
   const user = useAppSelector(selectUser);
 
-  const { t } = useTranslation();
-
   const formValues = useMemo(
     () => ({
       favourite: (user && selectedProject?.favPersons?.includes(user.id)) ?? false,
-      phase: listItemToOption(selectedProject?.phase, t) ?? [],
+      phase: listItemToOption(selectedProject?.phase) ?? [],
       name: selectedProject?.name ?? '',
       address: selectedProject?.address ?? '',
     }),

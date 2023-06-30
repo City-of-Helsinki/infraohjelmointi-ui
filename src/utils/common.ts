@@ -10,14 +10,8 @@ export const matchExact = (value: string) => new RegExp(value, 'i');
 
 export const removeDotsFromString = (value: string) => value.replace('.', '');
 
-export const listItemToOption = (
-  listItem: IListItem | undefined,
-  translate?: TFunction<'translation'>,
-): IOption => ({
-  label:
-    listItem?.value && translate
-      ? translate(`enums.${removeDotsFromString(listItem?.value)}`)
-      : listItem?.value ?? '',
+export const listItemToOption = (listItem: IListItem | undefined): IOption => ({
+  label: listItem?.value ?? '',
   value: listItem?.id ?? '',
 });
 
@@ -25,7 +19,7 @@ export const booleanToString = (
   boolVal: boolean | undefined,
   translate?: TFunction<'translation'>,
 ): string =>
-  typeof boolVal === 'boolean' && translate ? translate(`enums.${boolVal.toString()}`) : 'Ei';
+  typeof boolVal === 'boolean' && translate ? translate(`option.${boolVal.toString()}`) : 'Ei';
 
 export const isOptionEmpty = (option: IOption) => !option.value;
 /**

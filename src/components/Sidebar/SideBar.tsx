@@ -1,11 +1,18 @@
 import { useAppSelector } from '@/hooks/common';
 import { INavigationItem } from '@/interfaces/common';
-import { ReactComponent as IconBooks } from '@/assets/icons/books.svg';
-import { ReactComponent as IconStickyNotes } from '@/assets/icons/sticky-notes.svg';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { selectProject } from '@/reducers/projectSlice';
 import './styles.css';
+import {
+  IconBagCogwheel,
+  IconBinoculars,
+  IconCogwheel,
+  IconGraphColumns,
+  IconHistory,
+  IconLocation,
+  IconScrollCogwheel,
+} from 'hds-react';
 
 /**
  * Custom Sidebar, since the HDS sidebar wasn't suited for our needs
@@ -24,14 +31,44 @@ const SideBar = () => {
     {
       route: `/project/${project?.id}/basics`,
       label: t('project'),
-      component: <IconBooks style={iconStyles} />,
+      component: <IconBinoculars style={iconStyles} />,
       disabled: !project?.id,
     },
     {
       route: `planning`,
       label: t('planning'),
-      component: <IconStickyNotes style={iconStyles} />,
+      component: <IconScrollCogwheel style={iconStyles} />,
       disabled: false,
+    },
+    {
+      route: `placeholder 1`,
+      label: 'placeholder 1',
+      component: <IconLocation style={iconStyles} />,
+      disabled: true,
+    },
+    {
+      route: `placeholder 2`,
+      label: 'placeholder 2',
+      component: <IconBagCogwheel style={iconStyles} />,
+      disabled: true,
+    },
+    {
+      route: `placeholder 3`,
+      label: 'placeholder 3',
+      component: <IconGraphColumns style={iconStyles} />,
+      disabled: true,
+    },
+    {
+      route: `placeholder 4`,
+      label: 'placeholder 4',
+      component: <IconHistory style={iconStyles} />,
+      disabled: true,
+    },
+    {
+      route: `placeholder 5`,
+      label: 'placeholder 5',
+      component: <IconCogwheel style={iconStyles} />,
+      disabled: true,
     },
   ];
 
