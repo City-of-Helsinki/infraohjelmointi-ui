@@ -16,6 +16,8 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         estPlanningEnd: null,
         estConstructionStart: null,
         estConstructionEnd: null,
+        constructionEndYear: 2031,
+        planningStartYear: 2024,
         finances: {
           year: 2023,
           budgetProposalCurrentYearPlus0: '40.00',
@@ -60,7 +62,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         ...mockProject.data,
         id: 'planning-project-3',
         projectClass: 'test-sub-class-1',
-        name:"not-in-group-project"
+        name: 'not-in-group-project',
       },
       // With group and in subClass
       {
@@ -110,6 +112,8 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         estPlanningEnd: null,
         estConstructionStart: `12.02.${year + 3}`,
         estConstructionEnd: `12.02.${year + 3}`,
+        constructionEndYear: 2031,
+        planningStartYear: 2024,
       },
       // For deleting last planning cell
       {

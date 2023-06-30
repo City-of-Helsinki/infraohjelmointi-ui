@@ -32,7 +32,7 @@ const render = async () =>
           count: 1,
           error: {},
           page: 1,
-          updated: null,
+          isSaving: false,
         },
       },
     }),

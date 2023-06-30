@@ -15,7 +15,7 @@ import {
 } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import FormFieldLabel from '../../shared/FormFieldLabel';
+import FormFieldLabel from '@/components/shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
 import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
@@ -298,17 +298,13 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
         />
       )}
       {/* Displayed on form (Open dialog button) */}
-      <div className="flex flex-col">
-        <div className="hashtags-label">
-          <FormFieldLabel
-            dataTestId="open-hash-tag-dialog-button"
-            text={t(`projectBasicsForm.${name}`)}
-            onClick={toggleOpenDialog}
-          />
-        </div>
-        {/* Displayed on form (Project hashtags) */}
-        <HashTagsContainer tags={projectHashTags} />
-      </div>
+      <FormFieldLabel
+        dataTestId="open-hash-tag-dialog-button"
+        text={t(`projectForm.${name}`)}
+        onClick={toggleOpenDialog}
+      />
+      {/* Displayed on form (Project hashtags) */}
+      <HashTagsContainer tags={projectHashTags} />
     </div>
   );
 };

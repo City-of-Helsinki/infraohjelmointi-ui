@@ -32,9 +32,15 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, onBlur, value } }) => (
+      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
-          <SelectionGroup label={t(label) ?? ''} direction="horizontal" id="radio-checkbox">
+          <SelectionGroup
+            label={t(label) ?? ''}
+            direction="horizontal"
+            id="radio-checkbox"
+            errorText={error?.message}
+            required={true}
+          >
             {options?.map((o, i) => (
               <HDSRadioButton
                 data-testid={`${name}-${i}`}

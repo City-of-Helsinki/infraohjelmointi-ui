@@ -14,7 +14,6 @@
 
 html {
   font-size: 100%;
-  /* overflow-x: hidden; */
 }
 
 body {
@@ -62,15 +61,15 @@ table p {
 }
 
 .input-l {
-  max-width: 22.5rem;
+  max-width: 24rem;
 }
 
 /* 
   hide overflow from all selects used with the SelectField-component, max width is calculated to
   prevent the text from overflowing on top of the empty-selections button
 */
-.input-l > div > button > span {
-  --max-w: calc(100% - 1.75rem);
+.select-field-wrapper > div > div > button > span {
+  --max-w: calc(100% - 2rem);
   @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;
 }
 
@@ -121,12 +120,12 @@ input {
   @apply !w-auto font-medium;
 }
 
-.input-wrapper label {
-  @apply min-h-[1.4rem] w-[15.625rem];
-}
-
 .input-wrapper button {
   @apply z-[1];
+}
+
+.input-l.error {
+  @apply border-2 border-error;
 }
 
 /* 

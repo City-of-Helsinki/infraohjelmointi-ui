@@ -1,3 +1,4 @@
+import { Button } from 'hds-react';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, MouseEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,22 +17,24 @@ interface IFormFieldLabel {
 const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled, dataTestId }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex">
-      <label className="pen-and-label-text">{t(text)}</label>
-      {onClick && (
-        <button
-          type="button"
+    <>
+      {!onClick ? (
+        <label className="pen-and-label-text">{t(text)}</label>
+      ) : (
+        <Button
+          iconRight={<IconPenLine />}
+          variant="supplementary"
+          className="pen-and-label-button"
           onClick={onClick}
           disabled={disabled}
-          style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
           name={text}
           aria-label={text}
           data-testid={dataTestId}
         >
-          <IconPenLine style={{ transform: 'translate(1.25rem, -0.18rem)' }} />
-        </button>
+          {text}
+        </Button>
       )}
-    </div>
+    </>
   );
 };
 

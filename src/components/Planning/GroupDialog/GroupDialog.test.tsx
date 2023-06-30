@@ -155,8 +155,7 @@ describe('GroupDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSuggestionsResponse);
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    const { user, findAllByTestId, findByTestId, findByRole, findByText, baseElement } =
-      renderResult;
+    const { user, findAllByTestId, findByTestId, findByRole, findByText } = renderResult;
     await user.click(await findByTestId('open-new-item-context-menu'));
 
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
@@ -172,40 +171,41 @@ describe('GroupDialog', () => {
 
     await user.type(await dialog.findByText('groupForm.name'), 'test-group');
 
-    await user.click(modal.querySelector('#select-field-masterClass-toggle-button') as HTMLElement);
+    await user.click(
+      document.getElementById('select-field-masterClass-toggle-button') as HTMLElement,
+    );
 
-    const masterClassMenu = baseElement.querySelector(
-      '#select-field-masterClass-menu',
-    ) as HTMLElement;
+    const masterClassMenu = document.getElementById('select-field-masterClass-menu') as HTMLElement;
     await user.click(
       await within(masterClassMenu).findByText(matchExact('803 Kadut, liikenneväylät')),
     );
 
-    await user.click(modal.querySelector('#select-field-class-toggle-button') as HTMLElement);
+    await user.click(document.getElementById('select-field-class-toggle-button') as HTMLElement);
     await user.click(await dialog.findByText(matchExact('Uudisrakentaminen')));
 
-    await user.click(modal.querySelector('#select-field-subClass-toggle-button') as HTMLElement);
+    await user.click(document.getElementById('select-field-subClass-toggle-button') as HTMLElement);
     await user.click(await dialog.findByText(matchExact('Koillinen')));
 
     await user.click(await dialog.findByText(matchExact(`groupForm.openAdvanceFilters`)));
 
-    const districtMenu = baseElement.querySelector('#select-field-district-menu') as HTMLElement;
-    await user.click(modal.querySelector('#select-field-district-toggle-button') as HTMLElement);
+    const districtMenu = document.getElementById('select-field-district-menu') as HTMLElement;
+    await user.click(document.getElementById('select-field-district-toggle-button') as HTMLElement);
     await user.click(await within(districtMenu).findByText(matchExact('Koillinen')));
 
     expect(
-      modal.querySelector('#select-field-division-toggle-button') as HTMLElement,
+      document.getElementById('select-field-division-toggle-button') as HTMLElement,
     ).toBeInTheDocument();
 
     expect(
-      modal.querySelector('#select-field-subDivision-toggle-button') as HTMLElement,
+      document.getElementById('select-field-subDivision-toggle-button') as HTMLElement,
     ).toBeInTheDocument();
     await user.type(await dialog.findByText('groupForm.searchForProjects'), 'Vanha');
 
     await waitFor(async () => {
-      expect(await dialog.findByText('Vanha yrttimaantie')).toBeInTheDocument();
+      const project = await dialog.findByText('Vanha yrttimaantie');
+      expect(project).toBeInTheDocument();
 
-      await user.click(await findByText('Vanha yrttimaantie'));
+      await user.click(project);
       expect((await findAllByTestId('project-selections')).length).toBe(1);
     });
 

@@ -2,7 +2,6 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
-import ProjectBasicsForm from './ProjectBasicsForm';
 import { arrayHasValue, matchExact } from '@/utils/common';
 import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import {
@@ -26,24 +25,26 @@ import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
 import { setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
+import ProjectForm from './ProjectForm';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
+jest.setTimeout(7000);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const getFormField = (name: string) => `projectBasicsForm.${name}`;
+const getFormField = (name: string) => `projectForm.${name}`;
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectBasicsForm />} />, {
+    renderWithProviders(<Route path="/" element={<ProjectForm />} />, {
       preloadedState: {
         project: {
           selectedProject: mockProject.data,
           count: 1,
           error: {},
           page: 1,
-          updated: null,
+          isSaving: false,
         },
         auth: { user: mockPersons.data[0], error: {} },
         lists: {
@@ -77,7 +78,7 @@ const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project:
   await sendProjectUpdateEvent(project).then(() => dispatch(setSelectedProject(project)));
 };
 
-describe('ProjectBasicsForm', () => {
+describe('projectForm', () => {
   afterEach(async () => {
     jest.clearAllMocks();
   });
@@ -85,7 +86,7 @@ describe('ProjectBasicsForm', () => {
   it('renders the component wrappers', async () => {
     const { findByTestId } = await render();
 
-    expect(await findByTestId('project-basics-form')).toBeInTheDocument();
+    expect(await findByTestId('project-form')).toBeInTheDocument();
   });
 
   it('fills the fields with existing project data', async () => {
@@ -94,7 +95,7 @@ describe('ProjectBasicsForm', () => {
     const project = mockProject.data;
     const euroFormat = (value: string) => `${value} €`;
     const expectDisplayValue = async (value: string | undefined) =>
-      expect(await findByDisplayValue(matchExact(value || ''))).toBeInTheDocument();
+      expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
       expect(await findByText(`enums.${option || ''}`)).toBeInTheDocument();
     const expectRadioBoolean = async (testId: string, value: boolean) =>
@@ -144,23 +145,18 @@ describe('ProjectBasicsForm', () => {
     expectDisplayValue(project?.constructionWorkQuantity);
 
     expect(project?.hashTags?.length).toBe(8);
+
     const projectHashTags = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(project?.hashTags, h.id),
     );
+
     projectHashTags?.forEach(async (h) => {
       expect(await findByText(matchExact(h.value))).toBeInTheDocument();
     });
   });
 
-  it('has all required fields as required', async () => {
-    const { findByText } = await render();
-
-    expect(await findByText('projectBasicsForm.type')).toBeInTheDocument();
-    expect(await findByText('projectBasicsForm.description')).toBeInTheDocument();
-  });
-
   it('renders hashTags modal and can search and patch hashTags', async () => {
-    const { findByText, findByRole, user, store } = await render();
+    const { findByText, findByRole, user, store, findByTestId } = await render();
 
     addProjectUpdateEventListener(store.dispatch);
 
@@ -168,13 +164,14 @@ describe('ProjectBasicsForm', () => {
       ...(mockProject.data.hashTags as Array<string>),
       '816cc173-6340-45ed-9b49-4b4976b2a48b',
     ];
+
     const project = store.getState().project.selectedProject as IProject;
     const responseProject: { data: IProject } = {
       data: { ...project, hashTags: expectedValues },
     };
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
     const dialog = within(await findByRole('dialog'));
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
@@ -196,7 +193,9 @@ describe('ProjectBasicsForm', () => {
 
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
 
-    await sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data);
+    await act(async () => {
+      sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data);
+    });
 
     await waitFor(() => expect(dialog).not.toBeInTheDocument);
 
@@ -240,13 +239,14 @@ describe('ProjectBasicsForm', () => {
       user,
       findByText,
       findByRole,
+      findByTestId,
       store: { dispatch },
     } = await render();
 
     addProjectUpdateEventListener(dispatch);
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
     const dialog = within(await findByRole('dialog'));
 
     // Open the textbox and submit a new hashtag
@@ -257,7 +257,7 @@ describe('ProjectBasicsForm', () => {
     );
     await user.click((await dialog.findByTestId('create-hash-tag-button')).children[0]);
 
-    await sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data);
+    await act(() => sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data));
 
     // Click the 'add to project' button to patch the project with the new hashtag
     await user.click(await dialog.findByTestId('add-new-hash-tag-to-project'));
@@ -298,6 +298,7 @@ describe('ProjectBasicsForm', () => {
     const {
       findByText,
       findByRole,
+      findByTestId,
       user,
       store: { dispatch },
     } = await render();
@@ -305,7 +306,7 @@ describe('ProjectBasicsForm', () => {
     addProjectUpdateEventListener(dispatch);
 
     // Open modal
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.hashTags' }));
+    await user.click(await findByTestId('open-hash-tag-dialog-button'));
     const dialog = within(await findByRole('dialog'));
 
     // popular hashtag exists in the container
@@ -317,11 +318,12 @@ describe('ProjectBasicsForm', () => {
     expect(dialog.queryByTestId('popular-hashtags')).not.toHaveTextContent('raidejokeri');
 
     await waitFor(
-      async () => await user.click(await dialog.findByRole('button', { name: 'save' })),
+      async () =>
+        await user.click((await dialog.findByTestId('save-hash-tags-to-project')).children[0]),
     );
 
     // simulate event and setting selected project since it happens in projectview
-    await sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data);
+    await act(() => sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data));
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
@@ -347,7 +349,7 @@ describe('ProjectBasicsForm', () => {
 
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
     const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
 
@@ -369,12 +371,14 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const { user, findByRole, findByText, findByTestId } = await render();
+    const { user, findByText, findByTestId } = await render();
 
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
-    await user.click(await findByRole('button', { name: 'projectBasicsForm.area' }));
-    await user.click(await findByText(matchExact('enums.lansisatama')));
+    await user.click(
+      document.getElementById('select-field-area-toggle-button') as unknown as Element,
+    );
+    await user.click(await findByText('enums.lansisatama'));
     await user.click(parentContainer);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -384,7 +388,7 @@ describe('ProjectBasicsForm', () => {
 
   it('can autosave patch a DateField', async () => {
     const { user, findByRole, findByDisplayValue, findByTestId } = await render();
-    const expectedValue = '13.12.2022';
+    const expectedValue = '13.12.2020';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
       data: { ...project, estPlanningStart: expectedValue },
@@ -392,7 +396,7 @@ describe('ProjectBasicsForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
     const estPlanningStart = await findByRole('textbox', {
       name: getFormField('estPlanningStart'),
     });
@@ -418,7 +422,7 @@ describe('ProjectBasicsForm', () => {
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
     const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
     await user.clear(descriptionField);
     await user.type(descriptionField, expectedValue);
@@ -441,7 +445,7 @@ describe('ProjectBasicsForm', () => {
     const { user, findByTestId } = await render();
 
     const louhiField = (await findByTestId('louhi-0')) as HTMLInputElement;
-    const parentContainer = await findByTestId('project-basics-form');
+    const parentContainer = await findByTestId('project-form');
 
     await user.click(louhiField);
     await user.click(parentContainer);

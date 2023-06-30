@@ -16,7 +16,7 @@ const { REACT_APP_API_URL } = process.env;
 
 export const getProject = async (id: string): Promise<IProject> => {
   return axios
-    .get(`${REACT_APP_API_URL}/projects/${id}`)
+    .get(`${REACT_APP_API_URL}/projects/${id}/`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
@@ -38,13 +38,14 @@ export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResu
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const patchProjects = async (request: IProjectsPatchRequestObject): Promise<Array<IProject>> => {
+export const patchProjects = async (
+  request: IProjectsPatchRequestObject,
+): Promise<Array<IProject>> => {
   return axios
     .patch(`${REACT_APP_API_URL}/projects/bulk-update/`, request.data)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
-
 
 export const getProjectsWithParams = async (
   req: IProjectSearchRequest,

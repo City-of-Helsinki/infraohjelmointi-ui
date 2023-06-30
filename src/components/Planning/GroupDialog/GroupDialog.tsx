@@ -147,13 +147,13 @@ const DialogContainer: FC<IDialogProps> = memo(
       (d: IOption, fieldName: string) =>
         Object.keys(d).includes('value') && d.value !== ''
           ? true
-          : t('required', { value: fieldName }) || '',
+          : t('validation.required', { value: fieldName }) || '',
       [t],
     );
     const getDivisionValidation = useCallback(() => {
       if (locationOptions.divisions.length > 0)
         return {
-          required: t('required', { value: 'Kaupunginosa' }) || '',
+          required: t('validation.required', { value: 'Kaupunginosa' }) || '',
           validate: {
             isPopulated: (d: IOption) => customValidation(d, 'Kaupunginosa'),
           },
@@ -204,14 +204,16 @@ const DialogContainer: FC<IDialogProps> = memo(
                       <div className="search-form-content">
                         <TextField
                           {...formProps('name')}
-                          rules={{ required: t('required', { value: 'Ryhman nimi' }) || '' }}
+                          rules={{
+                            required: t('validation.required', { value: 'Ryhman nimi' }) || '',
+                          }}
                         />
                         <SelectField
                           clearable={!editMode}
                           disabled={editMode}
                           {...formProps('masterClass')}
                           rules={{
-                            required: t('required', { value: 'Pääluokka' }) || '',
+                            required: t('validation.required', { value: 'Pääluokka' }) || '',
                             validate: {
                               isPopulated: (mc: IOption) => customValidation(mc, 'Pääluokka'),
                             },
@@ -223,7 +225,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           disabled={editMode}
                           {...formProps('class')}
                           rules={{
-                            required: t('required', { value: 'Luokka' }) || '',
+                            required: t('validation.required', { value: 'Luokka' }) || '',
                             validate: {
                               isPopulated: (c: IOption) => customValidation(c, 'Luokka'),
                             },
@@ -236,7 +238,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           {...formProps('subClass')}
                           options={classOptions.subClasses}
                           rules={{
-                            required: t('required', { value: 'Alaluokka' }) || '',
+                            required: t('validation.required', { value: 'Alaluokka' }) || '',
                             validate: {
                               isPopulated: (c: IOption) => customValidation(c, 'Alaluokka'),
                             },
@@ -249,7 +251,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           <SelectField
                             {...formProps('district')}
                             rules={{
-                              required: t('required', { value: 'Suurpiiri' }) || '',
+                              required: t('validation.required', { value: 'Suurpiiri' }) || '',
                               validate: {
                                 isPopulated: (d: IOption) => customValidation(d, 'Suurpiiri'),
                               },

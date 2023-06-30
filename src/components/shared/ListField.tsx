@@ -24,15 +24,16 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
     <div className="input-wrapper" id={name} data-testid={name}>
       <div className="flex flex-col">
         <div style={{ marginBottom: '1rem' }}>
-          <FormFieldLabel text={label} onClick={readOnly ? undefined : handleSetEditing} />
+          <FormFieldLabel text={t(label)} onClick={readOnly ? undefined : handleSetEditing} />
         </div>
         {fields?.map((f) => (
           <Controller
             key={f.name}
             name={f.name}
+            rules={f.rules}
             control={f.control as Control<FieldValues>}
-            render={({ field }) => (
-              <div className="mb-3 flex" key={f.label}>
+            render={({ field, fieldState: { error } }) => (
+              <div className="list-field-container" key={f.label}>
                 <label className="list-field-label">{t(f.label)}</label>
                 {!editing ? (
                   <span>{`${field.value} €`}</span>
@@ -45,6 +46,7 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
                       hideLabel={true}
                       id={field.name}
                       readOnly={!editing || f.readOnly}
+                      errorText={error?.message}
                     />
                   </>
                 )}

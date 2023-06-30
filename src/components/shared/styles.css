@@ -89,15 +89,39 @@
   white-space: nowrap;
 }
 
-.select-field-wrapper {
-  @apply relative max-w-[22.5rem];
+.select-field-wrapper,
+.select-field-wrapper-lg {
+  @apply relative max-w-[24rem];
+}
+
+.select-field-wrapper-full {
+  @apply relative;
 }
 
 #summing-group-dialog .dialog-section .search-form .select-field-wrapper {
   @apply max-w-full;
 }
 
-
 .empty-select-field-button {
   @apply absolute right-11 top-[2.65rem];
+}
+
+.list-field-container {
+  @apply mb-3 flex;
+}
+
+.list-field-container > div {
+  @apply !flex !flex-col;
+}
+
+.pen-and-label-button {
+  @apply !border-0 !px-0 !text-black;
+}
+
+.pen-and-label-button:hover {
+  @apply !bg-transparent;
+}
+
+.pen-and-label-button > span {
+  @apply px-0;
 }

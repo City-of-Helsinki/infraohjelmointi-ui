@@ -6,6 +6,7 @@ import mockPersons from '@/mocks/mockPersons';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
 import { Route } from 'react-router';
+import { mockProjectPhases } from '@/mocks/mockLists';
 
 jest.mock('react-i18next', () => mockI18next());
 const store = setupStore();
@@ -18,6 +19,10 @@ const render = async () =>
         project: {
           ...store.getState().project,
           selectedProject: mockProject.data,
+        },
+        lists: {
+          ...store.getState().lists,
+          phases: mockProjectPhases.data,
         },
       },
     }),
@@ -64,8 +69,8 @@ describe('ProjectBasics', () => {
     });
   });
 
-  it('renders ProjectBasicsForm', async () => {
+  it('renders ProjectForm', async () => {
     const { getByTestId } = await render();
-    expect(getByTestId('project-basics-form')).toBeInTheDocument();
+    expect(getByTestId('project-form')).toBeInTheDocument();
   });
 });

@@ -22,7 +22,7 @@ const render = async () =>
           count: 1,
           error: {},
           page: 1,
-          updated: null,
+          isSaving: false,
         },
       },
     }),
@@ -43,13 +43,13 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all left side elements', async () => {
-    const { getByRole, getByText, store } = await render();
+    const { getByRole, getByText, store, getByTestId } = await render();
 
     const project = store.getState().project.selectedProject as IProject;
     const { projectReadiness, name, phase, address } = project;
 
     expect(getByRole('button', { name: /edit-project-name/i })).toBeInTheDocument();
-    expect(getByText(matchExact(name))).toBeInTheDocument();
+    expect(getByTestId('project-header-name-fields')).toHaveTextContent(matchExact(name));
     expect(getByText(matchExact(phase.value))).toBeInTheDocument();
     expect(getByText(matchExact(`${projectReadiness}%`))).toBeInTheDocument();
     expect(getByText(matchExact(address || ''))).toBeInTheDocument();

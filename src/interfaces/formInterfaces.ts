@@ -39,7 +39,7 @@ export interface IProjectHeaderForm {
   address?: string;
 }
 
-export interface IProjectBasicsForm {
+export interface IProjectForm {
   type: IOption;
   entityName: string;
   description: string;
@@ -61,8 +61,14 @@ export interface IProjectBasicsForm {
   planningStartYear: string;
   estPlanningStart: string;
   estPlanningEnd: string;
+  presenceStart: string;
+  presenceEnd: string;
+  visibilityStart: string;
+  visibilityEnd: string;
   estConstructionStart: string;
   estConstructionEnd: string;
+  personConstruction: IOption;
+  personPlanning: IOption;
 }
 
 export interface ISearchForm {
@@ -107,13 +113,13 @@ export interface IHashTagsForm {
 
 export interface IAppForms
   extends IProjectHeaderForm,
-    IProjectBasicsForm,
+    IProjectForm,
     IProjectNoteForm,
     IHashTagsForm {}
 
 export type HookFormControlType =
   | Control<FieldValues>
-  | Control<IProjectBasicsForm>
+  | Control<IProjectForm>
   | Control<IProjectHeaderForm>
   | Control<IHashTagsForm>
   | Control<ISearchForm>
@@ -125,4 +131,4 @@ export type HookFormRulesType = Omit<
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
 
-export type IFormValueType = string | boolean | IOption | string[] | undefined;
+export type FormValueType = string | boolean | IOption | string[] | undefined;

@@ -14,7 +14,15 @@ interface INumberFieldProps {
   hideLabel?: boolean;
 }
 
-const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readOnly, tooltip }) => {
+const NumberField: FC<INumberFieldProps> = ({
+  name,
+  label,
+  control,
+  rules,
+  readOnly,
+  tooltip,
+  hideLabel,
+}) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
   return (
@@ -22,13 +30,14 @@ const NumberField: FC<INumberFieldProps> = ({ name, label, control, rules, readO
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field, fieldState: { error } }) => (
+      render={({ field: { value, onChange }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
-            className={`input-l`}
-            {...field}
-            value={field.value ?? ''}
-            label={t(label)}
+            className="input-l"
+            value={value ?? ''}
+            onChange={onChange}
+            label={!hideLabel ? t(label) : ''}
+            style={{ paddingTop: hideLabel ? '1.75rem' : '0' }}
             id={label}
             readOnly={readOnly}
             required={required}

@@ -25,8 +25,9 @@ interface ISelectFieldProps {
   hideLabel?: boolean;
   icon?: string;
   placeholder?: string;
-  clearable?: boolean;
   disabled?: boolean;
+  clearable?: boolean;
+  size?: 'full' | 'lg';
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -40,6 +41,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   placeholder,
   disabled,
   clearable,
+  size,
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -72,13 +74,17 @@ const SelectField: FC<ISelectFieldProps> = ({
     <Controller
       name={name}
       control={control as Control<FieldValues>}
+      rules={rules}
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
-            <div className="select-field-wrapper" ref={selectContainerRef}>
+            <div
+              className={size ? `select-field-wrapper-${size}` : 'select-field-wrapper'}
+              ref={selectContainerRef}
+            >
               <HDSSelect
                 id={`select-field-${name}`}
-                className="input-l custom-select"
+                className="custom-select"
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -105,7 +111,6 @@ const SelectField: FC<ISelectFieldProps> = ({
           </div>
         );
       }}
-      rules={rules}
     />
   );
 };

@@ -11,7 +11,7 @@ const PlanningTable = () => {
   const rows = useAppSelector(selectPlanningRows);
   return (
     <div className="planning-table-container" id="planning-table-container">
-      <table className="planning-table" cellSpacing={0}>
+      <table className="planning-table" cellSpacing={0} data-testid="planning-table">
         <tbody>
           {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
           {rows.map((row: IPlanningRow) => (

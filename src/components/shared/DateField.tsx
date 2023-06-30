@@ -15,6 +15,7 @@ interface IDateFieldProps {
 const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
+
   return (
     <Controller
       name={name}
@@ -22,7 +23,7 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
       control={control as Control<FieldValues>}
       render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
         return (
-          <div className="input-wrapper" id={name} data-testid={name}>
+          <div className="input-wrapper date-field-wrapper" id={name} data-testid={name}>
             <HDSDateInput
               className="input-l"
               onChange={onChange}

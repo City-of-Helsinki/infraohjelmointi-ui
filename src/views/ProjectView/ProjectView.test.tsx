@@ -9,13 +9,13 @@ import { mockError } from '@/mocks/mockError';
 import { act } from 'react-dom/test-utils';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { Route } from 'react-router';
-import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import PlanningView from '../PlanningView/PlanningView';
 import { setupStore } from '@/store';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor } from '@testing-library/react';
+import { ProjectBasics } from '@/components/Project/ProjectBasics';
 
 const store = setupStore();
 

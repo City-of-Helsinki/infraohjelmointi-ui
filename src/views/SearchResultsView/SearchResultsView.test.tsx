@@ -9,10 +9,9 @@ import mockI18next from '@/mocks/mockI18next';
 import { initialSearchForm } from '@/reducers/searchSlice';
 import { setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
-import { act } from 'react-dom/test-utils';
 import SearchResultsView from './SearchResultsView';
 import { mockLongSearchResults, mockSearchResults } from '@/mocks/mockSearch';
-import { waitFor } from '@testing-library/react';
+import { waitFor, act } from '@testing-library/react';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { SearchLimit, SearchOrder } from '@/interfaces/searchInterfaces';
 import { Route } from 'react-router';
@@ -108,15 +107,15 @@ describe('SearchResultsView', () => {
 
   describe('SearchResultsHeader', () => {
     it('renders elements', async () => {
-      const { getByText, getByTestId, container } = await render();
+      const { findByText, findByTestId, container } = await render();
       expect(container.getElementsByClassName('search-result-header-container').length).toBe(1);
       expect(container.getElementsByClassName('search-result-page-title').length).toBe(1);
-      expect(getByText('searchResults')).toBeInTheDocument();
+      expect(await findByText('searchResults')).toBeInTheDocument();
       expect(
         container.getElementsByClassName('search-result-terms-and-filters-container').length,
       ).toBe(1);
       expect(container.getElementsByClassName('search-filter-container').length).toBe(1);
-      expect(getByTestId('filterSearchBtn')).toBeInTheDocument();
+      expect(await findByTestId('filterSearchBtn')).toBeInTheDocument();
       expect(container.getElementsByClassName('search-terms-container').length).toBe(1);
     });
   });
@@ -134,11 +133,11 @@ describe('SearchResultsView', () => {
     });
 
     it('renders empty button if there are search terms and resets the store if clicked', async () => {
-      const { user, store, getAllByTestId, queryAllByTestId, container } = await render(
+      const { user, store, findAllByTestId, queryAllByTestId, container } = await render(
         searchActiveState,
       );
 
-      expect(getAllByTestId('search-term').length).toBe(4);
+      expect((await findAllByTestId('search-term')).length).toBe(4);
 
       const emptyAllBtn = container.querySelector('#empty-all-btn-delete-button') as Element;
 
@@ -154,21 +153,23 @@ describe('SearchResultsView', () => {
     it('renders all terms and sends a new GET request if a term is removed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { getAllByTestId, getByText, getAllByText, user, store, container } = await render(
+      const { findAllByTestId, findByText, findAllByText, user, store, container } = await render(
         searchActiveState,
       );
 
-      expect(getAllByTestId('search-term').length).toBe(4);
+      expect((await findAllByTestId('search-term')).length).toBe(4);
 
-      Object.keys(filledSearchForm.freeSearchParams).forEach((k) =>
-        expect(getAllByText(k)[0]).toBeInTheDocument(),
+      Object.keys(filledSearchForm.freeSearchParams).forEach(async (k) =>
+        expect((await findAllByText(k))[0]).toBeInTheDocument(),
       );
 
       expect(
-        getByText(`searchTag.masterClass: ${filledSearchForm.masterClass[0].label}`),
+        await findByText(`searchTag.masterClass: ${filledSearchForm.masterClass[0].label}`),
       ).toBeInTheDocument();
 
-      expect(getByText(`searchTag.class: ${filledSearchForm.class[0].label}`)).toBeInTheDocument();
+      expect(
+        await findByText(`searchTag.class: ${filledSearchForm.class[0].label}`),
+      ).toBeInTheDocument();
 
       const removeFirstTermButton = container.querySelector(
         `#search-term-${mockHashTags.data.hashTags[1].id}-delete-button`,
@@ -184,20 +185,20 @@ describe('SearchResultsView', () => {
         'localhost:4000/projects/search-results/?hashtag=ccf89105-ee58-49f1-be0a-2cffca8711ab&masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&limit=10&order=new',
       );
 
-      await waitFor(() => {
+      await waitFor(async () => {
         const freeSearchParams = store.getState().search.submittedForm.freeSearchParams;
         expect(!('#leikkipuisto' in freeSearchParams)).toBe(true);
-        expect(getAllByTestId('search-term').length).toBe(3);
+        expect((await findAllByTestId('search-term')).length).toBe(3);
       });
     });
   });
 
   describe('SearchResultsList', () => {
     it('renders elements', async () => {
-      const { getByTestId, container } = await render();
+      const { findByTestId, container } = await render();
       expect(container.getElementsByClassName('search-result-list-container').length).toBe(1);
       expect(container.getElementsByClassName('result-list-options-container').length).toBe(1);
-      expect(getByTestId('result-not-found')).toBeInTheDocument();
+      expect(await findByTestId('result-not-found')).toBeInTheDocument();
     });
 
     it('doesnt render elements if there are no results', async () => {
@@ -208,25 +209,25 @@ describe('SearchResultsView', () => {
     });
 
     it('renders the list and all search results if there are results', async () => {
-      const { getByTestId, container } = await render(searchActiveState);
-      expect(getByTestId('search-result-list')).toBeInTheDocument();
+      const { findByTestId, container } = await render(searchActiveState);
+      expect(await findByTestId('search-result-list')).toBeInTheDocument();
       expect(container.getElementsByClassName('search-result-card').length).toBe(2);
-      expect(getByTestId('search-order-dropdown')).toBeInTheDocument();
+      expect(await findByTestId('search-order-dropdown')).toBeInTheDocument();
     });
   });
 
   describe('SearchLimitDropdown', () => {
     it('renders elements and 0 results if there are no results', async () => {
-      const { getByText, container } = await render();
+      const { findByText, container } = await render();
       expect(container.getElementsByClassName('limit-dropdown-container').length).toBe(1);
-      expect(getByText('0')).toBeInTheDocument();
-      expect(getByText('resultsForSearch')).toBeInTheDocument();
+      expect(await findByText('0')).toBeInTheDocument();
+      expect(await findByText('resultsForSearch')).toBeInTheDocument();
     });
 
     it('renders limit dropdown and can select a new search limit and sends a GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { container, user, getByText, getByRole, getAllByText, queryByText } = await render(
+      const { container, user, findByText, findByRole, findAllByText, queryByText } = await render(
         searchActiveState,
       );
 
@@ -237,23 +238,23 @@ describe('SearchResultsView', () => {
 
       const limitOptions = ['10', '20', '30'];
 
-      const limitSelect = getByRole('button', { name: limitOptions[0] });
+      const limitSelect = await findByRole('button', { name: limitOptions[0] });
 
       expect(limitSelect).toBeInTheDocument();
 
       await user.click(limitSelect);
 
-      limitOptions.forEach((lo) => {
+      limitOptions.forEach(async (lo) => {
         if (lo === limitOptions[0]) {
-          expect(getAllByText(lo).length).toBe(2);
+          expect((await findAllByText(lo)).length).toBe(2);
         } else {
-          expect(getByText(lo)).toBeInTheDocument();
+          expect(await findByText(lo)).toBeInTheDocument();
         }
       });
 
-      await user.click(getByText(limitOptions[2]));
+      await user.click(await findByText(limitOptions[2]));
 
-      expect(getByText(limitOptions[2])).toBeInTheDocument();
+      expect(await findByText(limitOptions[2])).toBeInTheDocument();
       expect(queryByText(limitOptions[0])).toBeNull();
       expect(mockedAxios.get.mock.lastCall[0].includes(`&limit=${limitOptions[2]}`)).toBe(true);
     });
@@ -263,9 +264,8 @@ describe('SearchResultsView', () => {
     it('renders if there are search results and can choose order options and send a new GET request when changed', async () => {
       mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
-      const { user, getByRole, getByText, queryByText, getByTestId, getAllByText } = await render(
-        searchActiveState,
-      );
+      const { user, findByRole, findByText, queryByText, findByTestId, findAllByText } =
+        await render(searchActiveState);
 
       const orderOptions = [
         'searchOrder.new',
@@ -275,23 +275,23 @@ describe('SearchResultsView', () => {
         'searchOrder.phase',
       ];
 
-      expect(getByTestId('search-order-dropdown')).toBeInTheDocument();
+      expect(await findByTestId('search-order-dropdown')).toBeInTheDocument();
 
-      await user.click(getByRole('button', { name: 'order' }));
+      await user.click(await findByRole('button', { name: 'order' }));
 
-      orderOptions.forEach((oo) => expect(getAllByText(oo)[0]).toBeInTheDocument());
+      orderOptions.forEach(async (oo) => expect((await findAllByText(oo))[0]).toBeInTheDocument());
 
-      await user.click(getByText('searchOrder.project'));
+      await user.click(await findByText('searchOrder.project'));
 
       expect(queryByText('searchOrder.group')).toBeNull();
-      expect(getByText('searchOrder.project')).toBeInTheDocument();
+      expect(await findByText('searchOrder.project')).toBeInTheDocument();
       expect(mockedAxios.get.mock.lastCall[0].includes('&order=project')).toBe(true);
     });
   });
 
   describe('SearchResultsCard', () => {
     it('renders all elements if there are results', async () => {
-      const { container, getAllByText, getByTestId } = await render(searchActiveState);
+      const { container, findAllByText, findByTestId } = await render(searchActiveState);
 
       expect(container.getElementsByClassName('search-result-card').length).toBe(2);
       expect(container.getElementsByClassName('search-result-breadcrumbs').length).toBe(2);
@@ -311,10 +311,10 @@ describe('SearchResultsView', () => {
       expect(projectChildren[1]).toHaveTextContent('TestClass');
 
       // Both hashTags to renders under project card
-      expect(getByTestId('search-result-hashtags')).toBeInTheDocument();
+      expect(await findByTestId('search-result-hashtags')).toBeInTheDocument();
       expect(projectChildren[2]).toHaveTextContent('#leikkipaikka');
       // Link rendered around project card
-      expect(getAllByText('Planning Project 1')[0].closest('a')).toHaveAttribute(
+      expect((await findAllByText('Planning Project 1'))[0].closest('a')).toHaveAttribute(
         'href',
         '/planning/test-master-class-1/test-class-1//?project=planning-project-1',
       );
@@ -330,14 +330,14 @@ describe('SearchResultsView', () => {
       expect(classChildren[1]).toHaveTextContent('Uudisrakentaminen');
       expect(classChildren[1]).toHaveTextContent('Koillinen');
       // Link rendered around class card
-      expect(getAllByText('Koillinen')[0].closest('a')).toHaveAttribute(
+      expect((await findAllByText('Koillinen'))[0].closest('a')).toHaveAttribute(
         'href',
         '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
       );
     });
 
     it('navigates to the planning view when clicking a result project and focuses the project: ', async () => {
-      const { container, user, getByTestId } = await render(searchActiveState);
+      const { container, user, findByTestId } = await render(searchActiveState);
 
       const scrollIntoViewMock = jest.fn();
 
@@ -351,10 +351,12 @@ describe('SearchResultsView', () => {
 
       const project = mockPlanningViewProjects.data.results[0];
 
-      await waitFor(() => {
+      await waitFor(async () => {
         expect(scrollIntoViewMock).toBeCalled();
         expect(
-          getByTestId(`row-${project.id}-parent-test-class-1`).classList.contains('searched'),
+          (await findByTestId(`row-${project.id}-parent-test-class-1`)).classList.contains(
+            'searched',
+          ),
         ).toBeTruthy();
       });
     });
@@ -362,14 +364,14 @@ describe('SearchResultsView', () => {
 
   describe('SearchResultsNotFound', () => {
     it('advices the user to search if there are no results and there are searchTerms', async () => {
-      const { getByTestId, getByText } = await render();
-      expect(getByTestId('result-not-found')).toBeInTheDocument();
-      expect(getByText('adviceSearchTitle')).toBeInTheDocument();
-      expect(getByText('adviceSearchText')).toBeInTheDocument();
+      const { findByTestId, findByText } = await render();
+      expect(await findByTestId('result-not-found')).toBeInTheDocument();
+      expect(await findByText('adviceSearchTitle')).toBeInTheDocument();
+      expect(await findByText('adviceSearchText')).toBeInTheDocument();
     });
 
     it('advices the user to edit search filters if there are no search results and there are searchTerms', async () => {
-      const { getByText, container } = await render({
+      const { findByText, container } = await render({
         ...searchActiveState,
         search: {
           ...searchActiveState.search,
@@ -378,8 +380,8 @@ describe('SearchResultsView', () => {
       });
 
       expect(container.getElementsByClassName('flex flex-col items-center').length).toBe(1);
-      expect(getByText('resultsNotFoundTitle')).toBeInTheDocument();
-      expect(getByText('resultsNotFoundText')).toBeInTheDocument();
+      expect(await findByText('resultsNotFoundTitle')).toBeInTheDocument();
+      expect(await findByText('resultsNotFoundText')).toBeInTheDocument();
     });
 
     it('doesnt render if there are results', async () => {
@@ -390,15 +392,15 @@ describe('SearchResultsView', () => {
 
   describe('SearchResultsPagination', () => {
     it('renders only the container if theres less than one page of content', async () => {
-      const { queryByTestId, getByTestId } = await render();
+      const { queryByTestId, findByTestId } = await render();
 
-      expect(getByTestId('search-results-pagination-container')).toBeInTheDocument();
+      expect(await findByTestId('search-results-pagination-container')).toBeInTheDocument();
       expect(queryByTestId('search-results-pagination')).toBeNull();
     });
 
     // click the pagination buttons does nothing for some reason
     it('renders the pagination correctly with a search limit of 10', async () => {
-      const { getByTestId } = await render({
+      const { findByTestId } = await render({
         ...searchActiveState,
         search: {
           ...searchActiveState.search,
@@ -408,18 +410,18 @@ describe('SearchResultsView', () => {
 
       const pageCount = Math.floor(mockLongSearchResults.data.count / 10) + 1;
 
-      expect(getByTestId('search-results-pagination')).toBeInTheDocument();
-      expect(getByTestId('search-results-pagination-next-button')).toBeInTheDocument();
-      expect(getByTestId('search-results-pagination-previous-button')).toBeInTheDocument();
-      expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
+      expect(await findByTestId('search-results-pagination')).toBeInTheDocument();
+      expect(await findByTestId('search-results-pagination-next-button')).toBeInTheDocument();
+      expect(await findByTestId('search-results-pagination-previous-button')).toBeInTheDocument();
+      expect(await findByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
 
       for (let i = 1; i < 8; i++) {
-        expect(getByTestId(`search-results-pagination-page-${i}`)).toBeInTheDocument();
+        expect(await findByTestId(`search-results-pagination-page-${i}`)).toBeInTheDocument();
       }
     });
 
     it('renders the pagination correctly with a search limit of 20', async () => {
-      const { getByTestId } = await render({
+      const { findByTestId } = await render({
         ...searchActiveState,
         search: {
           ...searchActiveState.search,
@@ -430,11 +432,11 @@ describe('SearchResultsView', () => {
 
       const pageCount = Math.floor(mockLongSearchResults.data.count / 20) + 1;
 
-      expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
+      expect(await findByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
     });
 
     it('renders the pagination correctly with a search limit of 30', async () => {
-      const { getByTestId } = await render({
+      const { findByTestId } = await render({
         ...searchActiveState,
         search: {
           ...searchActiveState.search,
@@ -445,11 +447,11 @@ describe('SearchResultsView', () => {
 
       const pageCount = Math.floor(mockLongSearchResults.data.count / 30) + 1;
 
-      expect(getByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
+      expect(await findByTestId(`search-results-pagination-page-${pageCount}`)).toBeInTheDocument();
     });
 
     it('can navigate to the next, previous and any number page and sends a GET request for searchResults', async () => {
-      const { getByTestId, user } = await render({
+      const { findByTestId, user } = await render({
         ...searchActiveState,
         search: {
           ...searchActiveState.search,
@@ -459,17 +461,17 @@ describe('SearchResultsView', () => {
 
       // Next page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
-      await user.click(getByTestId('search-results-pagination-next-button'));
+      await user.click(await findByTestId('search-results-pagination-next-button'));
       expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.next);
 
       // Previous page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
-      await user.click(getByTestId('search-results-pagination-previous-button'));
+      await user.click(await findByTestId('search-results-pagination-previous-button'));
       expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.previous);
 
       // Page 4
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
-      await user.click(getByTestId('search-results-pagination-page-4'));
+      await user.click(await findByTestId('search-results-pagination-page-4'));
       expect(mockedAxios.get.mock.lastCall[0].includes('page=4')).toBe(true);
     });
   });

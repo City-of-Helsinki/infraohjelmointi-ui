@@ -5,7 +5,7 @@ import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from 
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import { waitFor, within } from '@testing-library/react';
+import { within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
   mockClasses,
@@ -14,7 +14,6 @@ import {
   mockSubClasses,
 } from '@/mocks/mockClasses';
 import { mockSearchResults } from '@/mocks/mockSearch';
-// import { setSelectedClass } from '@/reducers/classSlice';
 import { IProjectPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { Route } from 'react-router';
 import PlanningView from '@/views/PlanningView/PlanningView';
@@ -111,7 +110,7 @@ describe('ProjectProgrammedDialog', () => {
     await user.click(await findByTestId('close-project-cell-menu'));
 
     // Navigate to a class row
-    await waitFor(async () => await navigateToProjectRows(renderResult));
+    await navigateToProjectRows(renderResult);
     await user.click(await findByTestId('open-new-item-context-menu'));
 
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
@@ -153,7 +152,7 @@ describe('ProjectProgrammedDialog', () => {
     await user.click(await findByTestId('close-project-cell-menu'));
 
     // Navigate to a class row
-    await waitFor(async () => await navigateToProjectRows(renderResult));
+    await navigateToProjectRows(renderResult);
 
     await user.click(await findByTestId('open-new-item-context-menu'));
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
@@ -165,9 +164,9 @@ describe('ProjectProgrammedDialog', () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
     await user.type(await dialog.findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
-    await waitFor(async () => {
-      expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-    });
+    // await waitFor(async () => {
+    expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
+    // });
     await user.click(await dialog.findByText(mockSearchResults.data.results[0].name));
     expect(dialog.getAllByTestId('project-selection').length).toBe(1);
 

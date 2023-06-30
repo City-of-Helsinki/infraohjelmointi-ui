@@ -1,9 +1,10 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
-import { IAppForms, IFormValueType } from '@/interfaces/formInterfaces';
+import { IAppForms, FormValueType } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import { getYear, updateYear } from './dates';
 import _ from 'lodash';
+import { IProjectRequest } from '@/interfaces/projectInterfaces';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
 
@@ -26,6 +27,7 @@ export const booleanToString = (
 ): string =>
   typeof boolVal === 'boolean' && translate ? translate(`enums.${boolVal.toString()}`) : 'Ei';
 
+export const isOptionEmpty = (option: IOption) => !option.value;
 /**
  * Converts all empty string values from a form to null values. Useful when submitting forms,
  * since controlled forms always need to have a value as an empty string instead of null or undefined.
@@ -45,15 +47,15 @@ export const getOptionId = (option: IOption) => option.value || null;
 
 export const isOption = (obj: object) => _.has(obj, 'label') && _.has(obj, 'value');
 
-// Make sure the projects planning dates are in sync with the planningStartYear
-const syncPlanningDates = (request: object, form: IAppForms) => {
+/**
+ * Make sure the projects planning dates are in sync with the planningStartYear
+ */
+const syncPlanningDates = (request: IProjectRequest, form: IAppForms) => {
   const requestCopy = { ...request };
 
   if (form.estPlanningStart) {
     if (_.has(requestCopy, 'estPlanningStart')) {
-      _.assign(request, {
-        planningStartYear: getYear(form.estPlanningStart),
-      });
+      request.planningStartYear = getYear(form.estPlanningStart);
     }
 
     if (
@@ -61,32 +63,37 @@ const syncPlanningDates = (request: object, form: IAppForms) => {
       form.planningStartYear &&
       parseInt(form.planningStartYear)
     ) {
-      _.assign(request, {
-        estPlanningStart: updateYear(parseInt(form.planningStartYear), form.estPlanningStart),
-      });
+      request.estPlanningStart = updateYear(
+        parseInt(form.planningStartYear),
+        form.estPlanningStart,
+      );
     }
   }
 };
 
-// Make sure the projects construction dates are in sync with the constructionEndYear
-const syncConstructionDates = (request: object, form: IAppForms) => {
+/**
+ * Make sure the projects construction dates are in sync with the constructionEndYear
+ */
+const syncConstructionDates = (request: IProjectRequest, form: IAppForms) => {
   const requestCopy = { ...request };
 
   if (form.estConstructionEnd) {
     if (_.has(requestCopy, 'estConstructionEnd')) {
-      _.assign(request, { constructionEndYear: getYear(form.estConstructionEnd) });
+      request.constructionEndYear = getYear(form.estConstructionEnd);
     }
     if (
       _.has(requestCopy, 'constructionEndYear') &&
       form.constructionEndYear &&
       parseInt(form.constructionEndYear)
     ) {
-      _.assign(request, {
-        estConstructionEnd: updateYear(parseInt(form.constructionEndYear), form.estConstructionEnd),
-      });
+      request.estConstructionEnd = updateYear(
+        parseInt(form.constructionEndYear),
+        form.estConstructionEnd,
+      );
     }
   }
 };
+
 /**
  *
  * @param dirtyFields dirtyFields from react-hook-forms
@@ -94,9 +101,9 @@ const syncConstructionDates = (request: object, form: IAppForms) => {
  * @returns data object that can be used for a patch request
  */
 export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms) => {
-  const request = {};
+  const request: IProjectRequest = {};
 
-  const parseValue = (value: IFormValueType) => {
+  const parseValue = (value: FormValueType) => {
     switch (true) {
       case value instanceof Object && isOption(value):
         return getOptionId(value as IOption);

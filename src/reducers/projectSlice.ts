@@ -9,7 +9,7 @@ interface IProjectState {
   count: number | null;
   page: number;
   error: unknown;
-  updated: string | null;
+  isSaving: boolean;
 }
 
 const initialState: IProjectState = {
@@ -17,7 +17,7 @@ const initialState: IProjectState = {
   count: null,
   error: null,
   page: 0,
-  updated: null,
+  isSaving: false,
 };
 
 export const getProjectThunk = createAsyncThunk('project/getOne', async (id: string, thunkAPI) => {
@@ -43,6 +43,9 @@ export const projectSlice = createSlice({
     setSelectedProject(state, action: PayloadAction<IProject>) {
       return { ...state, selectedProject: action.payload };
     },
+    setIsSaving(state, action: PayloadAction<boolean>) {
+      return { ...state, isSaving: action.payload };
+    },
   },
   extraReducers: (builder) => {
     // GET ONE
@@ -58,8 +61,8 @@ export const projectSlice = createSlice({
 export const selectProject = (state: RootState) => state.project.selectedProject;
 export const selectCount = (state: RootState) => state.project.count;
 export const selectPage = (state: RootState) => state.project.page;
-export const selectUpdated = (state: RootState) => state.project.updated;
+export const selectIsProjectSaving = (state: RootState) => state.project.isSaving;
 
-export const { setPage, resetProject, setSelectedProject } = projectSlice.actions;
+export const { setPage, resetProject, setSelectedProject, setIsSaving } = projectSlice.actions;
 
 export default projectSlice.reducer;
