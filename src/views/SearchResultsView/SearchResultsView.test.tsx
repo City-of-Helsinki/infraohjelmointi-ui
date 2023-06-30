@@ -20,6 +20,7 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import ProjectView from '../ProjectView';
+import { mockProjectPhases } from '@/mocks/mockLists';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -74,6 +75,10 @@ const searchActiveState = {
     ...store.getState().hashTags,
     hashTags: mockHashTags.data.hashTags,
     popularHashTags: mockHashTags.data.popularHashTags,
+  },
+  lists: {
+    ...store.getState().lists,
+    phases: mockProjectPhases.data,
   },
 };
 
@@ -372,7 +377,7 @@ describe('SearchResultsView', () => {
 
       await user.click(projectCard);
 
-      expect(await findByTestId('project-basics-form')).toBeInTheDocument();
+      expect(await findByTestId('project-form')).toBeInTheDocument();
     });
   });
 
