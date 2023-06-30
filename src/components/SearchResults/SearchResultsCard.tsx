@@ -14,6 +14,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
   phase,
   breadCrumbs,
   link,
+  programmed,
 }) => {
   const { t } = useTranslation();
   const iconGroup = useMemo(() => <IconScrollGroup size="xs" />, []);
@@ -31,6 +32,9 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
                 icon={iconGroup}
                 text={t(`searchTag.${type}`)}
               />
+            )}
+            {type === 'projects' && !programmed && (
+              <CustomTag color={'var(--color-bus-light	)'} text={t(`searchTag.notProgrammed`)} />
             )}
           </div>
           {phase && (

@@ -46,6 +46,7 @@ export const mockSearchResults: { data: ISearchResults } = {
         name: 'Planning Project 1',
         id: 'planning-project-1',
         type: 'projects',
+        programmed: true,
         hashTags: [
           {
             id: '5b970a63-1d3b-4ddb-bd1a-658c8a5d67b4',
@@ -63,12 +64,22 @@ export const mockSearchResults: { data: ISearchResults } = {
         path: 'test-master-class-1/test-class-1/',
       },
       {
+        name: 'Non programmed project',
+        id: 'planning-project-2',
+        type: 'projects',
+        hashTags: [],
+        phase: null,
+        path: '',
+        programmed: false,
+      },
+      {
         name: 'Koillinen',
         id: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
         type: 'classes',
         hashTags: [],
         phase: null,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
+        programmed: null,
       },
     ],
   },
@@ -87,6 +98,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -95,6 +107,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -103,6 +116,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -111,6 +125,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -119,6 +134,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -127,6 +143,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -135,6 +152,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -143,6 +161,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -151,6 +170,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -159,6 +179,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         type: 'projects',
         hashTags: [],
         phase: null,
+        programmed: true,
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
     ],

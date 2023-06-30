@@ -18,19 +18,30 @@ const buildBreadCrumbs = (
       (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
     );
 
+const buildLink = (r: ISearchResultPayloadItem) => {
+  // Programmed projects will navigate to planning view and get the ?project= param
+  if (r.type === 'projects' && r.programmed) {
+    return `/planning/${r.path}/?project=${r.id}`;
+  }
+  // Non-programmed projects will navigate to project form
+  else if (r.type === 'projects') {
+    return `/project/${r.id}/basics`;
+  }
+  // Default will navigate to planning view without the ?project= param
+  return `/planning/${r.path}`;
+};
+
 const buildSearchResultsList = (
   searchResults: Array<ISearchResultPayloadItem>,
   classes: Array<IClass>,
   districts: Array<ILocation>,
 ): Array<ISearchResultListItem> => {
   const parsedResults = searchResults.map((r) => {
-    const link =
-      r.type === 'projects' ? `/planning/${r.path}/?project=${r.id}` : `/planning/${r.path}`;
     return {
       ...r,
       phase: r.phase?.value ?? null,
       breadCrumbs: buildBreadCrumbs(r.path, classes, districts),
-      link,
+      link: buildLink(r),
     };
   });
 
