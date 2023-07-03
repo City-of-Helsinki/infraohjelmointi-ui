@@ -4,18 +4,18 @@ import { useAppSelector } from '@/hooks/common';
 import { IconStar, IconStarFill } from 'hds-react/icons';
 import { IconButton } from '../../shared';
 import { IProjectHeaderFieldProps } from './ProjectHeader';
-import { selectIsNewProject } from '@/reducers/projectSlice';
+import { selectMode } from '@/reducers/projectSlice';
 
 const ProjectFavouriteField: FC<IProjectHeaderFieldProps> = ({ control }) => {
-  const isNewProject = useAppSelector(selectIsNewProject);
+  const projectMode = useAppSelector(selectMode);
   const handleClick = useCallback(
     (e: MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void, value: string) => {
       e.preventDefault();
-      if (!isNewProject) {
+      if (projectMode === 'edit') {
         onChange(!value);
       }
     },
-    [isNewProject],
+    [projectMode],
   );
 
   return (

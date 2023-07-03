@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectGroupsExpanded, setGroupsExpanded } from '@/reducers/planningSlice';
 import { t } from 'i18next';
 import './styles.css';
-import { resetProject, setIsNewProject, setSelectedProject } from '@/reducers/projectSlice';
+import { resetProject, setMode, setSelectedProject } from '@/reducers/projectSlice';
 import { useNavigate } from 'react-router-dom';
 
 const PlanningToolbar = () => {
@@ -67,7 +67,7 @@ const PlanningToolbar = () => {
 
   const onOpenNewProjectForm = useCallback(() => {
     dispatch(resetProject());
-    dispatch(setIsNewProject(true));
+    dispatch(setMode('new'));
     navigate('/project/new');
   }, [dispatch, navigate]);
 

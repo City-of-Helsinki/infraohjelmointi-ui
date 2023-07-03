@@ -10,7 +10,7 @@ import { ProjectHashTags } from './ProjectHashTags';
 import { validateMaxLength, validateRequired } from '@/utils/validation';
 import { useAppSelector } from '@/hooks/common';
 import { selectIsProjectSaving } from '@/reducers/projectSlice';
-import { selectIsNewProject } from '@/reducers/projectSlice';
+import { selectMode } from '@/reducers/projectSlice';
 
 interface IProjectInfoSectionProps {
   project: IProject | null;
@@ -26,7 +26,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({ project, getFieldPro
   const areas = useOptions('areas');
   const types = useOptions('types');
   const { t } = useTranslation();
-  const isNewProject = useAppSelector(selectIsNewProject);
+  const projectMode = useAppSelector(selectMode);
 
   const isSaving = useAppSelector(selectIsProjectSaving);
 
@@ -35,7 +35,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({ project, getFieldPro
       <FormSectionTitle {...getFieldProps('basics')} />
       <div className="form-row">
         <div className="form-col-xl">
-          {isNewProject && (
+          {projectMode === 'new' && (
             <TextField
               {...getFieldProps('name')}
               rules={{ ...validateMaxLength(200, t), ...validateRequired('description', t) }}

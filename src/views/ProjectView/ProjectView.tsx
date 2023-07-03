@@ -3,9 +3,9 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   getProjectThunk,
   resetProject,
-  selectIsNewProject,
+  selectMode,
   selectProject,
-  setIsNewProject,
+  setMode,
   setSelectedProject,
 } from '@/reducers/projectSlice';
 import { TabList } from '@/components/shared';
@@ -29,7 +29,7 @@ const ProjectView = () => {
   const navigate = useNavigate();
   const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
-  const isNewProject = useAppSelector(selectIsNewProject);
+  const projectMode = useAppSelector(selectMode);
 
   // Update selectedProject to redux with a project-update event
   useEffect(() => {
@@ -40,40 +40,39 @@ const ProjectView = () => {
 
   useEffect(() => {
     if (projectId) {
-      console.log(projectId);
-      dispatch(setIsNewProject(false));
+      dispatch(setMode('edit'));
       dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
       dispatch(getProjectThunk(projectId))
         .then((res) => res.type.includes('rejected') && navigate('/not-found'))
         .catch(Promise.reject)
         .finally(() => dispatch(clearLoading(LOADING_PROJECT)));
-    } else if (!isNewProject) {
+    } else if (projectMode !== 'new') {
       navigate('/planning');
     }
-    if (isNewProject) {
+    if (projectMode === 'new') {
       dispatch(resetProject());
     }
 
     // if !projectId and newProject
-  }, [projectId, isNewProject, navigate, dispatch]);
+  }, [projectId, projectMode, navigate, dispatch]);
 
   const getNavItems = useCallback(() => {
     const navItems: Array<INavigationItem> = [
       {
-        route: isNewProject ? 'new' : 'basics',
+        route: projectMode === 'new' ? 'new' : 'basics',
         label: t('basicInfo'),
         component: <ProjectBasics />,
       },
     ];
-    if (!isNewProject) {
+    if (projectMode !== 'new') {
       navItems.push({ route: 'notes', label: t('notes'), component: <ProjectNotes /> });
     }
     return navItems;
-  }, [isNewProject]);
+  }, [projectMode]);
 
   return (
     <div className="w-full" data-testid="project-view">
-      {(selectedProject || isNewProject) && (
+      {(selectedProject || projectMode === 'new') && (
         <>
           <ProjectToolbar />
           <ProjectHeader />

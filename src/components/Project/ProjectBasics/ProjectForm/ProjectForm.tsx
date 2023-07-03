@@ -3,8 +3,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  setIsNewProject,
-  selectIsNewProject,
+  setMode,
+  selectMode,
   selectProject,
   setIsSaving,
   setSelectedProject,
@@ -32,7 +32,7 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const dispatch = useAppDispatch();
   const formRef = useRef<HTMLFormElement>(null);
-  const isNewProject = useAppSelector(selectIsNewProject);
+  const projectMode = useAppSelector(selectMode);
   const navigate = useNavigate();
 
   const {
@@ -72,14 +72,11 @@ const ProjectForm = () => {
           }
         }
 
-        if (!project?.id && isNewProject) {
-          // post project
-          // set saving false
-          // navigate to basics
-          console.log('POSTING PROJECT', data);
+        if (!project?.id && projectMode) {
           let postResponsePId = '';
           try {
             const response = await postProject({ data });
+
             dispatch(setSelectedProject(response));
             postResponsePId = response.id;
           } catch (error) {
@@ -87,12 +84,12 @@ const ProjectForm = () => {
           } finally {
             dispatch(setIsSaving(false));
             setNewProjectId(postResponsePId);
-            dispatch(setIsNewProject(false));
+            dispatch(setMode('edit'));
           }
         }
       }
     },
-    [isDirty, project?.id, dirtyFields, dispatch, isNewProject, navigate],
+    [isDirty, project?.id, dirtyFields, dispatch, projectMode, navigate],
   );
 
   const getFieldProps = useCallback(

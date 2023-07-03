@@ -6,7 +6,7 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { IconButton } from '../../shared';
 import './styles.css';
 import { useAppSelector } from '@/hooks/common';
-import { selectIsNewProject } from '@/reducers/projectSlice';
+import { selectMode } from '@/reducers/projectSlice';
 import { useTranslation } from 'react-i18next';
 
 interface IProjectNameFormProps {
@@ -16,15 +16,15 @@ interface IProjectNameFormProps {
 const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
-  const isNewProject = useAppSelector(selectIsNewProject);
+  const projectMode = useAppSelector(selectMode);
   const handleSetEditing = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      if (!isNewProject) {
+      if (projectMode === 'edit') {
         setEditing((currentState) => !currentState);
       }
     },
-    [isNewProject],
+    [projectMode],
   );
 
   return (
@@ -48,7 +48,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
               </>
             ) : (
               <h3 className="text-heading-m text-white">
-                {isNewProject ? t(`newProject`) : field.value}
+                {projectMode === 'new' ? t(`newProject`) : field.value}
               </h3>
             )
           }
