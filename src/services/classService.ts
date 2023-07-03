@@ -10,3 +10,10 @@ export const getPlanningClasses = async (): Promise<Array<IClass>> => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getCoordinationClasses = async (): Promise<Array<IClass>> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/project-classes/coordinator/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};

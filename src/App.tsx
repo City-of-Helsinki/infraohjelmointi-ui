@@ -8,12 +8,17 @@ import { useAppDispatch, useAppSelector } from './hooks/common';
 import { Route, Routes } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
 import {
+  getCoordinationClassesThunk,
   getPlanningClassesThunk,
   updatePlanningClass,
   updatePlanningMasterClass,
   updatePlanningSubClass,
 } from './reducers/classSlice';
-import { getPlanningLocationsThunk, updatePlanningDistrict } from './reducers/locationSlice';
+import {
+  getCoordinationLocationsThunk,
+  getPlanningLocationsThunk,
+  updatePlanningDistrict,
+} from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
@@ -54,6 +59,8 @@ const App: FC = () => {
       dispatch(getPlanningClassesThunk()),
       dispatch(getPlanningLocationsThunk()),
       dispatch(getGroupsThunk()),
+      dispatch(getCoordinationClassesThunk()),
+      dispatch(getCoordinationLocationsThunk()),
     ])
       .then(() => {
         dispatch(clearLoading(LOADING_APP_ID));

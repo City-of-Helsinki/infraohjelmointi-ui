@@ -1,36 +1,74 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError } from '@/interfaces/common';
-import { getPlanningClasses } from '@/services/classService';
+import { getCoordinationClasses, getPlanningClasses } from '@/services/classService';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+interface IClassHierarchy {
+  allClasses: Array<IClass>;
+  masterClasses: Array<IClass>;
+  classes: Array<IClass>;
+  subClasses: Array<IClass>;
+  year: number;
+}
+
 interface IClassState {
-  planning: {
-    allClasses: Array<IClass>;
-    masterClasses: Array<IClass>;
-    classes: Array<IClass>;
-    subClasses: Array<IClass>;
-    year: number;
-  };
+  planning: IClassHierarchy;
+  coordination: IClassHierarchy;
   error: unknown;
 }
 
+const initialClasses = {
+  allClasses: [],
+  masterClasses: [],
+  classes: [],
+  subClasses: [],
+  year: new Date().getFullYear(),
+};
+
 const initialState: IClassState = {
-  planning: {
-    allClasses: [],
-    masterClasses: [],
-    classes: [],
-    subClasses: [],
-    year: new Date().getFullYear(),
-  },
+  planning: initialClasses,
+  coordination: initialClasses,
   error: null,
 };
 
-export const getPlanningClassesThunk = createAsyncThunk('class/getAll', async (_, thunkAPI) => {
-  return await getPlanningClasses()
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
-});
+export const getPlanningClassesThunk = createAsyncThunk(
+  'class/getAllPlanning',
+  async (_, thunkAPI) => {
+    return await getPlanningClasses()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getCoordinationClassesThunk = createAsyncThunk(
+  'class/getAllCoordination',
+  async (_, thunkAPI) => {
+    return await getCoordinationClasses()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+const separateClassesIntoHierarchy = (allClasses: Array<IClass>) => {
+  const masterClasses = allClasses?.filter((c) => !c.parent);
+
+  const classes = masterClasses
+    ? allClasses?.filter((c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1)
+    : [];
+
+  const subClasses = classes
+    ? allClasses?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
+    : [];
+
+  return {
+    allClasses,
+    masterClasses,
+    classes,
+    subClasses,
+    year: classes[0]?.finances?.year,
+  };
+};
 
 export const classSlice = createSlice({
   name: 'class',
@@ -68,37 +106,35 @@ export const classSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // GET ALL
+    // GET ALL PLANNING
     builder.addCase(
       getPlanningClassesThunk.fulfilled,
       (state, action: PayloadAction<Array<IClass>>) => {
-        const masterClasses = action.payload?.filter((c) => !c.parent);
-
-        const classes = masterClasses
-          ? action.payload?.filter(
-              (c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1,
-            )
-          : [];
-
-        const subClasses = classes
-          ? action.payload?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
-          : [];
-
         return {
           ...state,
-          planning: {
-            allClasses: action.payload,
-            masterClasses,
-            classes,
-            subClasses,
-            year: action.payload[0].finances.year,
-          },
+          planning: separateClassesIntoHierarchy(action.payload),
         };
       },
     );
     builder.addCase(getPlanningClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
+    // GET ALL COORDINATION
+    builder.addCase(
+      getCoordinationClassesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IClass>>) => {
+        return {
+          ...state,
+          coordination: separateClassesIntoHierarchy(action.payload),
+        };
+      },
+    );
+    builder.addCase(
+      getCoordinationClassesThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 

@@ -1,40 +1,74 @@
 import { IError } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { getPlanningLocations } from '@/services/locationService';
+import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationService';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ILocationState {
-  planning: {
-    allLocations: Array<ILocation>;
-    districts: Array<ILocation>;
-    divisions: Array<ILocation>;
-    subDivisions: Array<ILocation>;
-    year: number;
-  };
+interface ILocationHierarchy {
+  allLocations: Array<ILocation>;
+  districts: Array<ILocation>;
+  divisions: Array<ILocation>;
+  subDivisions: Array<ILocation>;
+  year: number;
+}
 
+interface ILocationState {
+  planning: ILocationHierarchy;
+  coordinator: ILocationHierarchy;
   error: unknown;
 }
 
+const initialLocations = {
+  allLocations: [],
+  districts: [],
+  divisions: [],
+  subDivisions: [],
+  year: new Date().getFullYear(),
+};
+
 const initialState: ILocationState = {
-  planning: {
-    allLocations: [],
-    districts: [],
-    divisions: [],
-    subDivisions: [],
-    year: new Date().getFullYear(),
-  },
+  planning: initialLocations,
+  coordinator: initialLocations,
   error: null,
 };
 
 export const getPlanningLocationsThunk = createAsyncThunk(
-  'location/getAll',
+  'location/getAllPlanning',
   async (_, thunkAPI) => {
     return await getPlanningLocations()
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
 );
+
+export const getCoordinationLocationsThunk = createAsyncThunk(
+  'location/getAllCoordinator',
+  async (_, thunkAPI) => {
+    return await getCoordinatorLocations()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+const separateLocationsIntoHierarchy = (allLocations: Array<ILocation>) => {
+  const districts = allLocations?.filter((l) => !l.parent);
+
+  const divisions = districts
+    ? allLocations?.filter((l) => districts.findIndex((d) => d.id === l.parent) !== -1)
+    : [];
+
+  const subDivisions = divisions
+    ? allLocations?.filter((l) => divisions.findIndex((d) => d.id === l.parent) !== -1)
+    : [];
+
+  return {
+    allLocations,
+    districts,
+    divisions,
+    subDivisions,
+    year: allLocations[0].finances.year,
+  };
+};
 
 export const locationSlice = createSlice({
   name: 'locations',
@@ -52,35 +86,35 @@ export const locationSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // GET ALL
+    // GET ALL PLANNING
     builder.addCase(
       getPlanningLocationsThunk.fulfilled,
       (state, action: PayloadAction<Array<ILocation>>) => {
-        const districts = action.payload?.filter((l) => !l.parent);
-
-        const divisions = districts
-          ? action.payload?.filter((l) => districts.findIndex((d) => d.id === l.parent) !== -1)
-          : [];
-
-        const subDivisions = divisions
-          ? action.payload?.filter((l) => divisions.findIndex((d) => d.id === l.parent) !== -1)
-          : [];
-
         return {
           ...state,
-          planning: {
-            allLocations: action.payload,
-            districts,
-            divisions,
-            subDivisions,
-            year: action.payload[0].finances.year,
-          },
+          planning: separateLocationsIntoHierarchy(action.payload),
         };
       },
     );
     builder.addCase(getPlanningLocationsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
+    // GET ALL COORDINATION
+    builder.addCase(
+      getCoordinationLocationsThunk.fulfilled,
+      (state, action: PayloadAction<Array<ILocation>>) => {
+        return {
+          ...state,
+          coordinator: separateLocationsIntoHierarchy(action.payload),
+        };
+      },
+    );
+    builder.addCase(
+      getCoordinationLocationsThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 

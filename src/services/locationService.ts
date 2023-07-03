@@ -10,3 +10,10 @@ export const getPlanningLocations = async (): Promise<Array<ILocation>> => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getCoordinatorLocations = async (): Promise<Array<ILocation>> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/project-locations/coordinator/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};

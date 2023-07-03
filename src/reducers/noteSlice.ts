@@ -16,7 +16,7 @@ const initialState: INotesState = {
 };
 
 export const getNotesByProjectThunk = createAsyncThunk(
-  'notesByProject/get',
+  'notes/getByProject',
   async (projectId: string, thunkAPI) => {
     return await getNotesByProject(projectId)
       .then((res) => res)
