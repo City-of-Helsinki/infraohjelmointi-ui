@@ -73,9 +73,9 @@ export const isSameYear = (date: string | null | undefined, year: number) => {
  * @param date date string in HDS format
  * @returns last HDS date of the year mentioned in the HDS date string
  */
-export const getLastDate = (date:string | null | undefined) => {
-  return date ? moment(momentFromHDSDate(date)).endOf('year').format('DD.MM.YYYY') : null
-}
+export const getLastDate = (date: string | null | undefined) => {
+  return date ? moment(momentFromHDSDate(date)).endOf('year').format('DD.MM.YYYY') : null;
+};
 
 /**
  * Returns the first date of the year from a HDS date string
@@ -83,9 +83,9 @@ export const getLastDate = (date:string | null | undefined) => {
  * @param date date string in HDS format
  * @returns first HDS date of the year mentioned in the HDS date string
  */
-export const getFirstDate = (date:string | null | undefined) => {
-  return date ? moment(momentFromHDSDate(date)).startOf('year').format('DD.MM.YYYY') : null
-}
+export const getFirstDate = (date: string | null | undefined) => {
+  return date ? moment(momentFromHDSDate(date)).startOf('year').format('DD.MM.YYYY') : null;
+};
 export const getYear = (date?: string | null): number =>
   date ? parseInt(momentFromHDSDate(date).format('YYYY')) : 0;
 

@@ -43,7 +43,6 @@ import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
 import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
-import ProjectCell from '@/components/Planning/PlanningTable/PlanningRow/ProjectRow/ProjectCell';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -2209,7 +2208,7 @@ describe('PlanningView', () => {
           const {
             user,
             findByTestId,
-            getByTestId,
+
             store: { dispatch },
           } = renderResult;
 
@@ -2229,9 +2228,9 @@ describe('PlanningView', () => {
             const overlapCell = await findByTestId(`project-cell-${planEndCellYear}-${id}`);
             expect(overlapCell.classList.contains('overlap')).toBeTruthy();
             const constructionCell = await findByTestId('cell-type-construction');
-            expect(constructionCell.classList.contains('selected')).toBeFalsy();
+            expect(constructionCell.classList.contains('selected')).toBeTruthy();
             const planningCell = await findByTestId('cell-type-planning');
-            expect(planningCell.classList.contains('selected')).toBeFalsy();
+            expect(planningCell.classList.contains('selected')).toBeTruthy();
           });
 
           // Overlap cells can be changed to either plan or con

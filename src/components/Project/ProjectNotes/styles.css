@@ -8,7 +8,7 @@
 
 /* adds a border with padding to each element */
 .note-history:after {
-  @apply my-0 mx-auto block w-[93%] border-t border-gray content-[''];
+  @apply mx-auto my-0 block w-[93%] border-t border-gray content-[''];
 }
 
 /* last history row will not have a border */
@@ -31,7 +31,7 @@
 }
 
 .notes-page {
-  @apply my-16 mx-24 w-[80%] max-w-[40.5rem];
+  @apply mx-24 my-16 w-[80%] max-w-[40.5rem];
 }
 
 .note-container {

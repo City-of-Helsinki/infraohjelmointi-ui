@@ -17,7 +17,6 @@ export const getGroups = async () => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-
 export const deleteGroup = async (id: string) => {
   return axios
     .delete(`${REACT_APP_API_URL}/project-groups/${id}/`)
@@ -27,7 +26,7 @@ export const deleteGroup = async (id: string) => {
 
 export const patchGroup = async (request: IGroupPatchRequestObject) => {
   return axios
-    .patch(`${REACT_APP_API_URL}/project-groups/${request.id}/`,request.data)
+    .patch(`${REACT_APP_API_URL}/project-groups/${request.id}/`, request.data)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

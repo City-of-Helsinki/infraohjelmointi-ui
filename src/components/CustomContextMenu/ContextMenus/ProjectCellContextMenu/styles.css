@@ -7,7 +7,7 @@
 }
 
 .project-cell-menu-header {
-  @apply flex w-full items-center justify-between overflow-hidden border-b border-gray pt-2 pb-1;
+  @apply flex w-full items-center justify-between overflow-hidden border-b border-gray pb-1 pt-2;
 }
 
 .project-cell-menu-header .title {
@@ -45,7 +45,6 @@
   cursor: pointer;
 }
 
-
 .project-cell-menu-content .list-icon {
   @apply h-[0.875rem] w-[0.875rem] rounded-full bg-black;
 }
@@ -56,4 +55,12 @@
 
 .project-cell-menu-content .list-icon.construction {
   @apply mr-2 h-[1.125rem] w-[1.125rem] -translate-x-[0.16rem] border-2 border-white bg-[var(--color-copper)];
+}
+
+.project-phase-button {
+  @apply flex items-center;
+}
+
+.project-phase-button[disabled] {
+  @apply cursor-not-allowed;
 }

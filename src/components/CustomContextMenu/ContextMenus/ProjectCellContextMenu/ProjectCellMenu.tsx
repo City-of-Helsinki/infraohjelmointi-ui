@@ -5,6 +5,7 @@ import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ICellMenuDetails } from '@/interfaces/eventInterfaces';
 import { CellType } from '@/interfaces/projectInterfaces';
+import './styles.css';
 
 interface IProjectCellMenuProps extends ICellMenuDetails {
   onCloseMenu: () => void;
@@ -49,6 +50,16 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
     onCloseMenu();
   }, [onCloseMenu, onRemoveCell]);
 
+  const isSelected = useCallback(
+    (value: string) => value === selectedType || cellType === 'overlap',
+    [cellType, selectedType],
+  );
+
+  const isPhaseChangeDisabled = useCallback(
+    (value: string) => !canTypeUpdate || value === selectedType,
+    [canTypeUpdate, selectedType],
+  );
+
   return (
     <div className="project-cell-menu" data-testid="project-cell-menu">
       <div className="project-cell-menu-header">
@@ -71,27 +82,25 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
           {options.map(({ value, label }) => (
             <li
               key={value}
-              className={`list-item ${value === selectedType ? 'selected' : ''}`}
+              className={`list-item ${isSelected(value) ? 'selected' : ''}`}
               data-testid={`cell-type-${value}`}
             >
               <button
-                className={`flex items-center ${
-                  !canTypeUpdate || value === selectedType ? 'cursor-not-allowed' : ''
-                }`}
+                className={'project-phase-button'}
                 onClick={() => handleCellTypeUpdate(value as CellType)}
-                disabled={!canTypeUpdate || value === selectedType}
+                disabled={isPhaseChangeDisabled(value)}
                 data-testid={`update-cell-type-to-${value}`}
               >
                 <div className={`list-icon ${value}`} />
                 <span
-                  className={` ${!canTypeUpdate && !(value === selectedType) ? 'text-gray' : ''} ${
-                    value === selectedType ? 'font-bold text-black' : 'font-light'
+                  className={` ${!canTypeUpdate && !isSelected(value) ? 'text-gray' : ''} ${
+                    isSelected(value) ? 'font-bold text-black' : 'font-light'
                   }`}
                 >
                   {label}
                 </span>
               </button>
-              {value === selectedType && <IconCheck />}
+              {isSelected(value) && <IconCheck />}
             </li>
           ))}
         </ul>

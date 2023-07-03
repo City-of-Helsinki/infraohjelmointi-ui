@@ -19,7 +19,7 @@ interface ISelectionState {
   selectedLocation: string | undefined;
 }
 
-const useGroupValues = (projects?:IOption[],id?: string | null,) => {
+const useGroupValues = (projects?: IOption[], id?: string | null) => {
   const group = useAppSelector(selectGroups).find((g) => g.id === id) || null;
   const masterClasses = useAppSelector(selectMasterClasses);
   const classes = useAppSelector(selectClasses);
@@ -96,22 +96,22 @@ const useGroupValues = (projects?:IOption[],id?: string | null,) => {
       name: group?.name || '',
       ...getGroupClassFields(group),
       ...getGroupLocationFields(group),
-      projectsForSubmit: projects && projects.length > 0 ? projects: [],
+      projectsForSubmit: projects && projects.length > 0 ? projects : [],
     }),
-    [group,projects],
+    [group, projects],
   );
 
   return { formValues, group };
 };
 
-const useGroupForm = (projects?: IOption[],id?: string | null) => {
-  const { formValues, group } = useGroupValues(projects,id);
+const useGroupForm = (projects?: IOption[], id?: string | null) => {
+  const { formValues, group } = useGroupValues(projects, id);
 
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: '',
     selectedLocation: '',
   });
-  
+
   const { selectedClass, selectedLocation } = selections;
   const classOptions = useClassOptions(selectedClass);
   const locationOptions = useLocationOptions(selectedLocation, selectedClass);
@@ -120,16 +120,20 @@ const useGroupForm = (projects?: IOption[],id?: string | null) => {
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onSubmit',
   });
-  useEffect(()=>{
-    setSelections((current) => ({ ...current, selectedClass: formValues.subClass.value, selectedLocation: formValues.division.value || formValues.district.value }));
-  },[formValues.subClass.value,formValues.division.value,formValues.district.value])
+  useEffect(() => {
+    setSelections((current) => ({
+      ...current,
+      selectedClass: formValues.subClass.value,
+      selectedLocation: formValues.division.value || formValues.district.value,
+    }));
+  }, [formValues.subClass.value, formValues.division.value, formValues.district.value]);
   const { watch, setValue, reset } = formMethods;
 
   useEffect(() => {
     if (group) {
       reset(formValues);
     }
-  }, [group,projects]);
+  }, [group, projects]);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
