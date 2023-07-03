@@ -129,7 +129,7 @@
     "personPlanning": "Vastuuhenkilö"
   },
   "projectForm": {
-    "name":"Projektin nimi",
+    "name": "Projektin nimi",
     "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
     "entityName": "Hankekokonaisuuden nimi",
@@ -383,5 +383,5 @@
   "confirmLeaveTitle": "Oletko varma että haluat poistua?",
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
-  "newProject":"Uusi projekti"
+  "newProject": "Uusi projekti"
 }

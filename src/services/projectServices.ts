@@ -36,7 +36,6 @@ export const postProject = async (request: IProjectPostRequestObject): Promise<I
     .catch((err: IError) => Promise.reject(err));
 };
 
-
 export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResults> => {
   return axios
     .get(

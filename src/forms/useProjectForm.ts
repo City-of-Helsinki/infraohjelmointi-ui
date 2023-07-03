@@ -186,10 +186,10 @@ const useProjectForm = () => {
 
   // Updates form with the selectedProject from redux
   useEffect(() => {
-    if (project || projectMode==='new') {
+    if (project || projectMode === 'new') {
       reset(formValues);
     }
-  }, [project,projectMode]);
+  }, [project, projectMode]);
 
   return { formMethods, classOptions, locationOptions };
 };
