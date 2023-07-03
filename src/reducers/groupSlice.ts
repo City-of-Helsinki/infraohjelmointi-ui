@@ -25,14 +25,11 @@ export const postGroupThunk = createAsyncThunk(
   },
 );
 
-export const deleteGroupThunk = createAsyncThunk(
-  'group/delete',
-  async (id: string, thunkAPI) => {
-    return await deleteGroup(id)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
-  },
-);
+export const deleteGroupThunk = createAsyncThunk('group/delete', async (id: string, thunkAPI) => {
+  return await deleteGroup(id)
+    .then((res) => res)
+    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+});
 
 export const getGroupsThunk = createAsyncThunk('group/getAll', async (_, thunkAPI) => {
   return await getGroups()
@@ -71,7 +68,7 @@ export const groupSlice = createSlice({
       return { ...state, error: action.payload };
     });
     // GROUP DELETE
-    builder.addCase(deleteGroupThunk.fulfilled, (state, action: PayloadAction<{id:string}>) => {
+    builder.addCase(deleteGroupThunk.fulfilled, (state, action: PayloadAction<{ id: string }>) => {
       return { ...state, groups: state.groups.filter((g) => g.id !== action.payload.id) };
     });
     builder.addCase(deleteGroupThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {

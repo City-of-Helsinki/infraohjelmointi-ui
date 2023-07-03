@@ -1,4 +1,3 @@
-
 #summing-group-dialog .search-input ul {
   max-height: 200px !important;
 }
@@ -19,8 +18,6 @@
   font-weight: bold;
 }
 
-
-
 .search-form-content {
   padding: var(--spacing-s) 0;
   display: grid;
@@ -28,16 +25,16 @@
 }
 
 .search-selections-container {
-  @apply flex h-auto w-full flex-wrap mt-3;
+  @apply mt-3 flex h-auto w-full flex-wrap;
 }
 
-.search-selections-container .search-selections{
-  @apply mr-3 mb-3;
+.search-selections-container .search-selections {
+  @apply mb-3 mr-3;
 }
 
 .dialog-section .button-container {
   @apply fixed;
 }
-#summing-group-dialog .group-form-search-input button{
-  @apply z-[1]
+#summing-group-dialog .group-form-search-input button {
+  @apply z-[1];
 }

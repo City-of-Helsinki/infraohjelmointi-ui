@@ -1,9 +1,11 @@
 import { IOption } from '@/interfaces/common';
 import { Button } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
-import { FC, memo, useCallback } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ICellMenuDetails } from '@/interfaces/eventInterfaces';
+import { CellType } from '@/interfaces/projectInterfaces';
+import './styles.css';
 
 interface IProjectCellMenuProps extends ICellMenuDetails {
   onCloseMenu: () => void;
@@ -16,12 +18,27 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
   cellType,
   onRemoveCell,
   onEditCell,
+  onUpdateCellType,
+  canTypeUpdate,
 }) => {
+  const [selectedType, setSelectedType] = useState<CellType>('planning');
+  useEffect(() => {
+    setSelectedType(cellType);
+  }, [cellType]);
   const { t } = useTranslation();
   const options: Array<IOption> = [
     { value: 'planning', label: 'Suunnittelu' },
     { value: 'construction', label: 'Rakentaminen' },
   ];
+
+  const handleCellTypeUpdate = useCallback(
+    (type: CellType) => {
+      setSelectedType(type);
+      onUpdateCellType(type);
+      onCloseMenu();
+    },
+    [onUpdateCellType, onCloseMenu],
+  );
 
   const handleEditTimeline = useCallback(() => {
     onEditCell();
@@ -32,6 +49,16 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
     onRemoveCell();
     onCloseMenu();
   }, [onCloseMenu, onRemoveCell]);
+
+  const isSelected = useCallback(
+    (value: string) => value === selectedType || cellType === 'overlap',
+    [cellType, selectedType],
+  );
+
+  const isPhaseChangeDisabled = useCallback(
+    (value: string) => !canTypeUpdate || value === selectedType,
+    [canTypeUpdate, selectedType],
+  );
 
   return (
     <div className="project-cell-menu" data-testid="project-cell-menu">
@@ -55,14 +82,25 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
           {options.map(({ value, label }) => (
             <li
               key={value}
-              className={`list-item ${value === cellType ? 'selected' : ''}`}
+              className={`list-item ${isSelected(value) ? 'selected' : ''}`}
               data-testid={`cell-type-${value}`}
             >
-              <div className="flex items-center">
+              <button
+                className={'project-phase-button'}
+                onClick={() => handleCellTypeUpdate(value as CellType)}
+                disabled={isPhaseChangeDisabled(value)}
+                data-testid={`update-cell-type-to-${value}`}
+              >
                 <div className={`list-icon ${value}`} />
-                <span className={value === cellType ? 'font-bold' : 'font-light'}>{label}</span>
-              </div>
-              {value === cellType && <IconCheck />}
+                <span
+                  className={` ${!canTypeUpdate && !isSelected(value) ? 'text-gray' : ''} ${
+                    isSelected(value) ? 'font-bold text-black' : 'font-light'
+                  }`}
+                >
+                  {label}
+                </span>
+              </button>
+              {isSelected(value) && <IconCheck />}
             </li>
           ))}
         </ul>

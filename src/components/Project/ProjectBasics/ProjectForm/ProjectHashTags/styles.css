@@ -3,11 +3,11 @@
 }
 
 #hashtags-dialog h2 {
-  @apply mt-2 mb-6 text-heading-s font-medium;
+  @apply mb-6 mt-2 text-heading-s font-medium;
 }
 
 #hashtags-dialog .content-container {
-  @apply mt-6 mb-3 flex flex-col;
+  @apply mb-3 mt-6 flex flex-col;
 }
 
 #hashtags-dialog hr {
@@ -59,7 +59,7 @@
 }
 
 .hashtags-container .hashtags-wrapper {
-  @apply mr-3 mb-3;
+  @apply mb-3 mr-3;
 }
 
 .hashtags-label {

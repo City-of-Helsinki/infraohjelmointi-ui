@@ -43,7 +43,7 @@ export const mockLocations: { data: Array<ILocation> } = {
       relatedTo: null,
       finances: mockClassFinances,
     },
-    
+
     {
       id: 'koilinen-district-test',
       name: 'Koillinen',
@@ -138,7 +138,7 @@ export const mockDistricts: { data: Array<ILocation> } = {
       parentClass: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
       relatedTo: null,
       finances: mockClassFinances,
-    }
+    },
   ],
 };
 

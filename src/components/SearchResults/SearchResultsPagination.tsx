@@ -74,7 +74,7 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
 
   return (
     <div
-      className="pt-16 pb-4"
+      className="pb-4 pt-16"
       id="custom-pagination"
       data-testid="search-results-pagination-container"
     >

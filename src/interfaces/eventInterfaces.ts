@@ -7,7 +7,7 @@ export enum ContextMenuType {
   EDIT_PROJECT_CELL,
   EDIT_PROJECT_PHASE,
   NEW_ITEM,
-  EDIT_GROUP_ROW
+  EDIT_GROUP_ROW,
 }
 
 export interface ICellMenuDetails {
@@ -16,6 +16,8 @@ export interface ICellMenuDetails {
   cellType: CellType;
   onRemoveCell: () => void;
   onEditCell: () => void;
+  onUpdateCellType: (phase: string) => void;
+  canTypeUpdate: boolean;
 }
 
 export interface IPhaseMenuDetails {
@@ -31,15 +33,15 @@ export interface INewItemMenuDetails {
 
 export interface GroupRowMenuDetails {
   groupName: string;
-  onShowGroupDeleteDialog: ()=>void;
-  onShowGroupEditDialog: ()=>void;
+  onShowGroupDeleteDialog: () => void;
+  onShowGroupEditDialog: () => void;
 }
 export interface IContextMenuData {
   menuType: ContextMenuType;
   cellMenuProps?: ICellMenuDetails;
   phaseMenuProps?: IPhaseMenuDetails;
   newItemsMenuProps?: INewItemMenuDetails;
-  groupRowMenuProps?: GroupRowMenuDetails
+  groupRowMenuProps?: GroupRowMenuDetails;
 }
 
 export interface IFinanceEventData {
