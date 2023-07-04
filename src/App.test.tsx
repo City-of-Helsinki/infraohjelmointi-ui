@@ -10,11 +10,19 @@ import App from './App';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
 import {
   mockClasses,
+  mockCoordinatorClasses,
+  mockCoordinatorCollectiveSubLevels,
+  mockCoordinatorMasterClasses,
+  mockCoordinatorOtherClassificationSubLevels,
+  mockCoordinatorOtherClassifications,
+  mockCoordinatorSubClasses,
   mockMasterClasses,
   mockProjectClasses,
+  mockProjectCoordinatorClasses,
   mockSubClasses,
 } from './mocks/mockClasses';
 import {
+  mockCoordinatorDistricts,
   mockDistricts,
   mockDivisions,
   mockLocations,
@@ -65,8 +73,8 @@ describe('App', () => {
     const { store } = await render();
 
     const {
-      class: { planning: planningClasses },
-      location: { planning: planningLocations },
+      class: { planning: planningClasses, coordination: coordinationClasses },
+      location: { planning: planningLocations, coordination: coordinationLocations },
       lists,
       hashTags,
     } = store.getState();
@@ -84,14 +92,32 @@ describe('App', () => {
       expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
       expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
       expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
+      // Planning classes
       expect(planningClasses.allClasses).toStrictEqual(mockProjectClasses.data);
       expect(planningClasses.masterClasses).toStrictEqual(mockMasterClasses.data);
       expect(planningClasses.classes).toStrictEqual(mockClasses.data);
       expect(planningClasses.subClasses).toStrictEqual(mockSubClasses.data);
+      // Coordinator classes
+      expect(coordinationClasses.allClasses).toStrictEqual(mockProjectCoordinatorClasses.data);
+      expect(coordinationClasses.masterClasses).toStrictEqual(mockCoordinatorMasterClasses.data);
+      expect(coordinationClasses.classes).toStrictEqual(mockCoordinatorClasses.data);
+      expect(coordinationClasses.subClasses).toStrictEqual(mockCoordinatorSubClasses.data);
+      expect(coordinationClasses.collectiveSubLevels).toStrictEqual(
+        mockCoordinatorCollectiveSubLevels.data,
+      );
+      expect(coordinationClasses.otherClassifications).toStrictEqual(
+        mockCoordinatorOtherClassifications.data,
+      );
+      expect(coordinationClasses.otherClassificationSubLevels).toStrictEqual(
+        mockCoordinatorOtherClassificationSubLevels.data,
+      );
+      // Planning locations
       expect(planningLocations.allLocations).toStrictEqual(mockLocations.data);
       expect(planningLocations.districts).toStrictEqual(mockDistricts.data);
       expect(planningLocations.divisions).toStrictEqual(mockDivisions.data);
       expect(planningLocations.subDivisions).toStrictEqual(mockSubDivisions.data);
+      // Coordinator locations
+      expect(coordinationLocations.districts).toStrictEqual(mockCoordinatorDistricts.data);
     });
   });
 

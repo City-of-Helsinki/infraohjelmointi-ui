@@ -181,3 +181,53 @@ export const mockSubDivisions: { data: Array<ILocation> } = {
     },
   ],
 };
+
+export const mockCoordinatorLocations: { data: Array<ILocation> } = {
+  data: [
+    {
+      id: 'test-coordinator-district-1',
+      name: 'TestCoordinatorDistrict1',
+      path: 'TestCoordinatorDistrict1',
+      forCoordinatorOnly: true,
+      parent: null,
+      parentClass: 'test-coordinator-sub-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+    {
+      id: 'test-coordinator-district-2',
+      name: 'TestCoordinatorDistrict2',
+      path: 'TestCoordinatorDistrict2',
+      forCoordinatorOnly: true,
+      parent: null,
+      parentClass: 'test-coordinator-sub-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
+
+export const mockCoordinatorDistricts: { data: Array<ILocation> } = {
+  data: [
+    {
+      id: 'test-coordinator-district-1',
+      name: 'TestCoordinatorDistrict1',
+      path: 'TestCoordinatorDistrict1',
+      forCoordinatorOnly: true,
+      parent: null,
+      parentClass: 'test-coordinator-sub-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+    {
+      id: 'test-coordinator-district-2',
+      name: 'TestCoordinatorDistrict2',
+      path: 'TestCoordinatorDistrict2',
+      forCoordinatorOnly: true,
+      parent: null,
+      parentClass: 'test-coordinator-sub-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};

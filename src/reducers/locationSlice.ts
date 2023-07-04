@@ -14,7 +14,7 @@ interface ILocationHierarchy {
 
 interface ILocationState {
   planning: ILocationHierarchy;
-  coordinator: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
+  coordination: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
   error: unknown;
 }
 
@@ -33,7 +33,7 @@ const initialCoordinatorLocations = {
 
 const initialState: ILocationState = {
   planning: initialLocations,
-  coordinator: initialCoordinatorLocations,
+  coordination: initialCoordinatorLocations,
   error: null,
 };
 
@@ -120,7 +120,7 @@ export const locationSlice = createSlice({
       (state, action: PayloadAction<Array<ILocation>>) => {
         return {
           ...state,
-          coordinator: separateLocationsIntoHierarchy(action.payload, true),
+          coordination: separateLocationsIntoHierarchy(action.payload, true),
         };
       },
     );

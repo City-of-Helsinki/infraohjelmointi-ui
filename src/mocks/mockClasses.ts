@@ -164,3 +164,146 @@ export const mockSubClasses: { data: Array<IClass> } = {
     },
   ],
 };
+
+export const mockProjectCoordinatorClasses: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'test-coordinator-master-class-1',
+      name: 'TestCoordinatorMasterClass1',
+      path: 'TestCoordinatorMasterClass1',
+      forCoordinatorOnly: true,
+      parent: null,
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+    {
+      id: 'test-coordinator-class-1',
+      name: 'TestCoordinatorClass1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-master-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+    {
+      id: 'test-coordinator-sub-class-1',
+      name: 'TestCoordinatorSubClass1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+    {
+      id: 'test-coordinator-collective-sub-level-1',
+      name: 'TestCoordinatorCollectiveSubLevel1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1/TestCoordinatorCollectiveSubLevel1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-sub-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+    {
+      id: 'test-coordinator-other-classification-1',
+      name: 'TestCoordinatorOtherClassification1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1/TestCoordinatorCollectiveSubLevel1/TestCoordinatorOtherClassification1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-collective-sub-level-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+    {
+      id: 'test-coordinator-other-classification-sub-level-1',
+      name: 'TestCoordinatorOtherClassificationSubLevel1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1/TestCoordinatorCollectiveSubLevel1/TestCoordinatorOtherClassification1/TestCoordinatorOtherClassificationSubLevel1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-other-classification-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
+
+export const mockCoordinatorMasterClasses: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'test-coordinator-master-class-1',
+      name: 'TestCoordinatorMasterClass1',
+      path: 'TestCoordinatorMasterClass1',
+      forCoordinatorOnly: true,
+      parent: null,
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
+
+export const mockCoordinatorClasses: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'test-coordinator-class-1',
+      name: 'TestCoordinatorClass1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-master-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
+
+export const mockCoordinatorSubClasses: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'test-coordinator-sub-class-1',
+      name: 'TestCoordinatorSubClass1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
+
+export const mockCoordinatorCollectiveSubLevels: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'test-coordinator-collective-sub-level-1',
+      name: 'TestCoordinatorCollectiveSubLevel1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1/TestCoordinatorCollectiveSubLevel1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-sub-class-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
+
+export const mockCoordinatorOtherClassifications: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'test-coordinator-other-classification-1',
+      name: 'TestCoordinatorOtherClassification1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1/TestCoordinatorCollectiveSubLevel1/TestCoordinatorOtherClassification1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-collective-sub-level-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
+
+export const mockCoordinatorOtherClassificationSubLevels: { data: Array<IClass> } = {
+  data: [
+    {
+      id: 'test-coordinator-other-classification-sub-level-1',
+      name: 'TestCoordinatorOtherClassificationSubLevel1',
+      path: 'TestCoordinatorMasterClass1/TestCoordinatorClass1/TestCoordinatorSubClass1/TestCoordinatorCollectiveSubLevel1/TestCoordinatorOtherClassification1/TestCoordinatorOtherClassificationSubLevel1',
+      forCoordinatorOnly: true,
+      parent: 'test-coordinator-other-classification-1',
+      relatedTo: null,
+      finances: mockClassFinances,
+    },
+  ],
+};
