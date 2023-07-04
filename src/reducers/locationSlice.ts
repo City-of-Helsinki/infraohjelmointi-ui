@@ -14,7 +14,7 @@ interface ILocationHierarchy {
 
 interface ILocationState {
   planning: ILocationHierarchy;
-  coordinator: ILocationHierarchy;
+  coordinator: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
   error: unknown;
 }
 
@@ -26,9 +26,14 @@ const initialLocations = {
   year: new Date().getFullYear(),
 };
 
+const initialCoordinatorLocations = {
+  districts: [],
+  year: new Date().getFullYear(),
+};
+
 const initialState: ILocationState = {
   planning: initialLocations,
-  coordinator: initialLocations,
+  coordinator: initialCoordinatorLocations,
   error: null,
 };
 
@@ -50,22 +55,32 @@ export const getCoordinationLocationsThunk = createAsyncThunk(
   },
 );
 
-const separateLocationsIntoHierarchy = (allLocations: Array<ILocation>) => {
-  const districts = allLocations?.filter((l) => !l.parent);
+const separateLocationsIntoHierarchy = (
+  allLocations: Array<ILocation>,
+  forCoordinator: boolean,
+) => {
+  const districts = allLocations?.filter((al) => !al.parent);
 
-  const divisions = districts
-    ? allLocations?.filter((l) => districts.findIndex((d) => d.id === l.parent) !== -1)
-    : [];
+  let divisions: Array<ILocation> = [];
+  let subDivisions: Array<ILocation> = [];
 
-  const subDivisions = divisions
-    ? allLocations?.filter((l) => divisions.findIndex((d) => d.id === l.parent) !== -1)
-    : [];
+  if (!forCoordinator) {
+    divisions = districts
+      ? allLocations?.filter((al) => districts.findIndex((d) => d.id === al.parent) !== -1)
+      : [];
+
+    subDivisions = divisions
+      ? allLocations?.filter((al) => divisions.findIndex((d) => d.id === al.parent) !== -1)
+      : [];
+  }
 
   return {
-    allLocations,
     districts,
-    divisions,
-    subDivisions,
+    ...(!forCoordinator && {
+      allLocations,
+      divisions,
+      subDivisions,
+    }),
     year: allLocations[0].finances.year,
   };
 };
@@ -92,7 +107,7 @@ export const locationSlice = createSlice({
       (state, action: PayloadAction<Array<ILocation>>) => {
         return {
           ...state,
-          planning: separateLocationsIntoHierarchy(action.payload),
+          planning: separateLocationsIntoHierarchy(action.payload, false) as ILocationHierarchy,
         };
       },
     );
@@ -105,7 +120,7 @@ export const locationSlice = createSlice({
       (state, action: PayloadAction<Array<ILocation>>) => {
         return {
           ...state,
-          coordinator: separateLocationsIntoHierarchy(action.payload),
+          coordinator: separateLocationsIntoHierarchy(action.payload, true),
         };
       },
     );

@@ -12,9 +12,15 @@ interface IClassHierarchy {
   year: number;
 }
 
+interface ICoordinatorClassHierarchy extends IClassHierarchy {
+  collectiveSubLevels: Array<IClass>;
+  otherClassifications: Array<IClass>;
+  otherClassificationSubLevels: Array<IClass>;
+}
+
 interface IClassState {
   planning: IClassHierarchy;
-  coordination: IClassHierarchy;
+  coordination: ICoordinatorClassHierarchy;
   error: unknown;
 }
 
@@ -26,9 +32,16 @@ const initialClasses = {
   year: new Date().getFullYear(),
 };
 
+const initialCoordinationClasses = {
+  ...initialClasses,
+  collectiveSubLevels: [],
+  otherClassifications: [],
+  otherClassificationSubLevels: [],
+};
+
 const initialState: IClassState = {
   planning: initialClasses,
-  coordination: initialClasses,
+  coordination: initialCoordinationClasses,
   error: null,
 };
 
@@ -50,22 +63,49 @@ export const getCoordinationClassesThunk = createAsyncThunk(
   },
 );
 
-const separateClassesIntoHierarchy = (allClasses: Array<IClass>) => {
-  const masterClasses = allClasses?.filter((c) => !c.parent);
+const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator: boolean) => {
+  const masterClasses = allClasses?.filter((ac) => !ac.parent);
 
   const classes = masterClasses
-    ? allClasses?.filter((c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1)
+    ? allClasses?.filter((ac) => masterClasses.findIndex((mc) => mc.id === ac.parent) !== -1)
     : [];
 
   const subClasses = classes
-    ? allClasses?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
+    ? allClasses?.filter((ac) => classes.findIndex((c) => c.id === ac.parent) !== -1)
     : [];
+
+  let collectiveSubLevels: Array<IClass> = [];
+  let otherClassifications: Array<IClass> = [];
+  let otherClassificationSubLevels: Array<IClass> = [];
+
+  if (forCoordinator) {
+    collectiveSubLevels = subClasses
+      ? allClasses?.filter((ac) => subClasses.findIndex((sc) => sc.id === ac.parent) !== -1)
+      : [];
+
+    otherClassifications = collectiveSubLevels
+      ? allClasses?.filter(
+          (ac) => collectiveSubLevels.findIndex((csl) => csl.id === ac.parent) !== -1,
+        )
+      : [];
+
+    otherClassificationSubLevels = otherClassifications
+      ? allClasses?.filter(
+          (ac) => otherClassifications.findIndex((oc) => oc.id === ac.parent) !== -1,
+        )
+      : [];
+  }
 
   return {
     allClasses,
     masterClasses,
     classes,
     subClasses,
+    ...(forCoordinator && {
+      collectiveSubLevels,
+      otherClassifications,
+      otherClassificationSubLevels,
+    }),
     year: classes[0]?.finances?.year,
   };
 };
@@ -112,7 +152,7 @@ export const classSlice = createSlice({
       (state, action: PayloadAction<Array<IClass>>) => {
         return {
           ...state,
-          planning: separateClassesIntoHierarchy(action.payload),
+          planning: separateClassesIntoHierarchy(action.payload, false),
         };
       },
     );
@@ -125,7 +165,10 @@ export const classSlice = createSlice({
       (state, action: PayloadAction<Array<IClass>>) => {
         return {
           ...state,
-          coordination: separateClassesIntoHierarchy(action.payload),
+          coordination: separateClassesIntoHierarchy(
+            action.payload,
+            true,
+          ) as ICoordinatorClassHierarchy,
         };
       },
     );
