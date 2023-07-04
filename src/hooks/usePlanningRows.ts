@@ -1,11 +1,16 @@
 import {
+  selectBatchedCoordinationClasses,
   selectBatchedPlanningClasses,
   updatePlanningClass,
   updatePlanningMasterClass,
   updatePlanningSubClass,
 } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectBatchedPlanningLocations, updatePlanningDistrict } from '@/reducers/locationSlice';
+import {
+  selectBatchedCoordinationLocations,
+  selectBatchedPlanningLocations,
+  updatePlanningDistrict,
+} from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -290,6 +295,134 @@ const buildPlanningTableRows = (
 };
 
 /**
+ * Builds a hierarchy-list of IPlanningTableRows, that will either include
+ * - masterClasses, classes, subClasses, groups and districts; if a district isn't selected
+ * - districts, divisions and groups; if a district is selected
+ *
+ * ! Groups will mostly appear under the selected divisions, but they can also appear under
+ * districts and subClasses
+ *
+ * @param state the current state of the planningRows-hook
+ * @returns a list of planning rows for the planning table
+ */
+const buildCoordinatorTableRows = (
+  list: IPlanningRowList,
+  projects: Array<IProject>,
+  selections: IPlanningRowSelections,
+) => {
+  const {
+    masterClasses,
+    classes,
+    subClasses,
+    collectiveSubLevels,
+    districts,
+    otherClassifications,
+    otherClassificationSubLevels,
+  } = list;
+
+  const {
+    selectedMasterClass,
+    selectedClass,
+    selectedSubClass,
+    // selectedCollectiveSubLevel,
+    // selectedDistrict,
+    // selectedOtherClassification,
+    // selectedOtherClassificationSubLevel,
+  } = selections;
+
+  const getRowProps = (
+    item: IClass | ILocation | IGroup,
+    type: PlanningRowType,
+    expanded?: boolean,
+  ): IPlanningRow => {
+    const projectRows = getSortedProjects(item.id, type, projects, item.name);
+    const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
+    return {
+      type: type,
+      name: item.name,
+      path: type !== 'group' ? (item as IClass | ILocation).path : '',
+      id: item.id,
+      key: item.id,
+      link: getLink(item, type, selections),
+      defaultExpanded,
+      children: [],
+      projectRows,
+      cells: calculatePlanningCells(item.finances, type),
+      ...calculatePlanningRowSums(item.finances, type),
+    };
+  };
+
+  // Map the class rows going from masterClasses to districts
+  const rows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
+    return {
+      // Map master classes
+      ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
+      // Map classes
+      children: classes
+        .filter((c) => c.parent === masterClass.id)
+        .map((filteredClass) => ({
+          ...getRowProps(filteredClass, 'class', !!selectedClass),
+          // Map sub classes
+          children: subClasses
+            .filter((subClass) => subClass.parent === filteredClass.id)
+            .map((filteredSubClass) => ({
+              ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
+              // Map collective sub levels
+              children: [
+                ...collectiveSubLevels
+                  .filter((collectiveSubLevel) => collectiveSubLevel.parent === filteredSubClass.id)
+                  .map((filteredCollectiveSubLevel) => ({
+                    ...getRowProps(filteredCollectiveSubLevel, 'collective-sub-level'),
+                    // Map other classifications and districts
+                    children: [
+                      // Map other classification
+                      ...otherClassifications
+                        .filter(
+                          (otherClassification) =>
+                            otherClassification.parent === filteredCollectiveSubLevel.id,
+                        )
+                        .map((filteredOtherClassification) => ({
+                          ...getRowProps(filteredOtherClassification, 'other-classification'),
+                          // Map other classification sub level
+                          children: otherClassificationSubLevels
+                            .filter(
+                              (otherClassificationSubLevel) =>
+                                otherClassificationSubLevel.parent ===
+                                filteredOtherClassification.id,
+                            )
+                            .map((filteredOtherClassificationSubLevel) => ({
+                              ...getRowProps(
+                                filteredOtherClassificationSubLevel,
+                                'other-classification-sub-level',
+                              ),
+                            })),
+                        })),
+                      // Map districts
+                      ...districts
+                        .filter(
+                          (district) => district.parentClass === filteredCollectiveSubLevel.id,
+                        )
+                        .map((filteredDistrict) => ({
+                          ...getRowProps(filteredDistrict, 'collective-district-preview'),
+                        })),
+                    ],
+                  })),
+                // Map districts
+                ...districts
+                  .filter((district) => district.parentClass === filteredSubClass.id)
+                  .map((filteredDistrict) => ({
+                    ...getRowProps(filteredDistrict, 'district-preview'),
+                  })),
+              ],
+            })),
+        })),
+    };
+  });
+
+  return rows;
+};
+
+/**
  * Returns the selected class or location from a list of classes or locations if it's found,
  * otherwise it will return null if no selection is made or found.
  *
@@ -359,13 +492,17 @@ const usePlanningRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
-  const batchedClasses = useAppSelector(selectBatchedPlanningClasses);
+  const financeUpdate = useAppSelector(selectFinanceUpdate);
+  const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
+  const batchedCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
   const batchedLocations = useAppSelector(selectBatchedPlanningLocations);
+  const batchedCoordinationLocations = useAppSelector(selectBatchedCoordinationLocations);
   const { masterClassId, classId, subClassId, districtId } = useParams();
 
   const { pathname } = useLocation();
   const mode = useAppSelector(selectMode);
 
+  // Listens to the url path and changes mode to either 'planning' or 'coordination' depending on the url
   useEffect(() => {
     if (!pathname) {
       return;
@@ -381,7 +518,7 @@ const usePlanningRows = () => {
   // Listen to masterClasses, classes and subClasses or their ids in the url and sets
   // the selectedMasterClass, selectedClass and selectedSubClass if found
   useEffect(() => {
-    const { masterClasses, classes, subClasses, year } = batchedClasses;
+    const { masterClasses, classes, subClasses, year } = batchedPlanningClasses;
     const nextMasterClass = getSelectedItemOrNull(masterClasses, masterClassId);
     const nextClass = getSelectedItemOrNull(classes, classId);
     const nextSubClass = getSelectedItemOrNull(subClasses, subClassId);
@@ -390,14 +527,14 @@ const usePlanningRows = () => {
     dispatch(setSelectedMasterClass(nextMasterClass));
     dispatch(setSelectedClass(nextClass));
     dispatch(setSelectedSubClass(nextSubClass));
-  }, [masterClassId, classId, subClassId, batchedClasses]);
+  }, [masterClassId, classId, subClassId, batchedPlanningClasses, mode]);
 
   // Listen to districts or districtId in the url and sets the selectedDistrict if found
   useEffect(() => {
     const { districts } = batchedLocations;
     const nextDistrict = getSelectedItemOrNull(districts, districtId) as ILocation;
     dispatch(setSelectedDistrict(nextDistrict));
-  }, [districtId, batchedLocations]);
+  }, [districtId, batchedLocations, mode]);
 
   // Fetch projects when selections change
   useEffect(() => {
@@ -411,8 +548,6 @@ const usePlanningRows = () => {
     }
   }, [selections, groups]);
 
-  const financeUpdate = useAppSelector(selectFinanceUpdate);
-
   useEffect(() => {
     if (financeUpdate) {
       Promise.all([
@@ -425,9 +560,13 @@ const usePlanningRows = () => {
     }
   }, [financeUpdate]);
 
-  // Build planning table rows when locations/classes/groups/project or selections change
+  // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {
-    const { masterClasses, classes, subClasses } = batchedClasses;
+    if (mode !== 'planning') {
+      return;
+    }
+
+    const { masterClasses, classes, subClasses } = batchedPlanningClasses;
     const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass } = selections;
     const { districts, divisions } = batchedLocations;
 
@@ -443,7 +582,10 @@ const usePlanningRows = () => {
       masterClasses: selectedMasterClass ? [selectedMasterClass] : masterClasses,
       classes: selectedClass ? [selectedClass] : classes,
       subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
+      collectiveSubLevels: [],
       districts: finalDistricts,
+      otherClassifications: [],
+      otherClassificationSubLevels: [],
       divisions,
       groups,
     };
@@ -454,7 +596,66 @@ const usePlanningRows = () => {
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [batchedClasses, batchedLocations, groups, projects, selections]);
+  }, [batchedPlanningClasses, batchedLocations, groups, projects, selections, mode]);
+
+  // Build coordination table rows when locations, classes, groups, project, mode or selections change
+  useEffect(() => {
+    if (mode !== 'coordination') {
+      return;
+    }
+
+    const {
+      masterClasses,
+      classes,
+      subClasses,
+      collectiveSubLevels,
+      otherClassifications,
+      otherClassificationSubLevels,
+    } = batchedCoordinationClasses;
+    const {
+      selectedClass,
+      selectedDistrict,
+      selectedMasterClass,
+      selectedSubClass,
+      selectedCollectiveSubLevel,
+      selectedOtherClassification,
+      selectedOtherClassificationSubLevel,
+    } = selections;
+    const { districts } = batchedCoordinationLocations;
+
+    const finalDistricts = [];
+
+    if (selectedDistrict) {
+      finalDistricts.push(selectedDistrict);
+    } else if (!selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')) {
+      finalDistricts.push(...districts);
+    }
+
+    const list = {
+      masterClasses: selectedMasterClass ? [selectedMasterClass] : masterClasses,
+      classes: selectedClass ? [selectedClass] : classes,
+      subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
+      collectiveSubLevels: selectedCollectiveSubLevel
+        ? [selectedCollectiveSubLevel]
+        : collectiveSubLevels,
+      districts: finalDistricts,
+      otherClassifications: selectedOtherClassification
+        ? [selectedOtherClassification]
+        : otherClassifications,
+      otherClassificationSubLevels: selectedOtherClassificationSubLevel
+        ? [selectedOtherClassificationSubLevel]
+        : otherClassificationSubLevels,
+      divisions: [],
+      groups: [],
+    };
+
+    const nextRows = buildCoordinatorTableRows(list, projects, selections);
+
+    // Re-build planning rows if the existing rows are not equal
+    if (!_.isEqual(nextRows, rows)) {
+      dispatch(setPlanningRows(nextRows));
+    }
+  }, [batchedCoordinationClasses, batchedLocations, groups, projects, selections, mode]);
 };
 
 export default usePlanningRows;

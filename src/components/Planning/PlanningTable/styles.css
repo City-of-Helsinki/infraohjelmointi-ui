@@ -56,7 +56,15 @@
 }
 
 .monthly-cell.district-preview,
-.monthly-summary-cell.district-preview {
+.monthly-summary-cell.district-preview,
+.monthly-cell.collective-district-preview,
+.monthly-cell.collective-district-preview,
+.monthly-cell.collective-sub-level,
+.monthly-summary-cell.collective-sub-level,
+.monthly-cell.other-classification,
+.monthly-summary-cell.other-classification,
+.monthly-cell.other-classification-sub-level,
+.monthly-summary-cell.other-classification-sub-level {
   @apply border-b border-white bg-[var(--color-district-preview)];
 }
 

@@ -74,26 +74,34 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
     ? allClasses?.filter((ac) => classes.findIndex((c) => c.id === ac.parent) !== -1)
     : [];
 
-  let collectiveSubLevels: Array<IClass> = [];
-  let otherClassifications: Array<IClass> = [];
-  let otherClassificationSubLevels: Array<IClass> = [];
+  const collectiveSubLevels: Array<IClass> = [];
+  const otherClassifications: Array<IClass> = [];
+  const otherClassificationSubLevels: Array<IClass> = [];
 
   if (forCoordinator) {
-    collectiveSubLevels = subClasses
-      ? allClasses?.filter((ac) => subClasses.findIndex((sc) => sc.id === ac.parent) !== -1)
-      : [];
+    if (subClasses.length > 0) {
+      allClasses?.forEach((al) => {
+        if (subClasses.findIndex((d) => d.id === al.parent) !== -1) {
+          collectiveSubLevels.push(al);
+        }
+      });
+    }
 
-    otherClassifications = collectiveSubLevels
-      ? allClasses?.filter(
-          (ac) => collectiveSubLevels.findIndex((csl) => csl.id === ac.parent) !== -1,
-        )
-      : [];
+    if (collectiveSubLevels.length > 0) {
+      allClasses?.forEach((al) => {
+        if (collectiveSubLevels.findIndex((d) => d.id === al.parent) !== -1) {
+          otherClassifications.push(al);
+        }
+      });
+    }
 
-    otherClassificationSubLevels = otherClassifications
-      ? allClasses?.filter(
-          (ac) => otherClassifications.findIndex((oc) => oc.id === ac.parent) !== -1,
-        )
-      : [];
+    if (otherClassifications.length > 0) {
+      allClasses?.forEach((al) => {
+        if (otherClassifications.findIndex((d) => d.id === al.parent) !== -1) {
+          otherClassificationSubLevels.push(al);
+        }
+      });
+    }
   }
 
   return {
@@ -189,5 +197,6 @@ export const selectPlanningMasterClasses = (state: RootState) => state.class.pla
 export const selectPlanningClasses = (state: RootState) => state.class.planning.classes;
 export const selectPlanningSubClasses = (state: RootState) => state.class.planning.subClasses;
 export const selectBatchedPlanningClasses = (state: RootState) => state.class.planning;
+export const selectBatchedCoordinationClasses = (state: RootState) => state.class.coordination;
 
 export default classSlice.reducer;

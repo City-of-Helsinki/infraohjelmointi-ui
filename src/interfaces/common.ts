@@ -93,12 +93,17 @@ export interface IContextMenuData {
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 
+// TODO: find a way to refactor these types since there are too many identical...
 export type PlanningRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
   | 'subClass-district'
+  | 'collective-sub-level'
+  | 'other-classification'
+  | 'other-classification-sub-level'
   | 'district-preview'
+  | 'collective-district-preview'
   | 'district'
   | 'division'
   | 'group'
@@ -128,7 +133,10 @@ export interface IPlanningRowList {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
+  collectiveSubLevels: Array<IClass>;
   districts: Array<ILocation>;
+  otherClassifications: Array<IClass>;
+  otherClassificationSubLevels: Array<IClass>;
   divisions: Array<ILocation>;
   groups: Array<IGroup>;
 }
@@ -137,7 +145,10 @@ export interface IPlanningRowSelections {
   selectedMasterClass: IClass | null;
   selectedClass: IClass | null;
   selectedSubClass: IClass | null;
+  selectedCollectiveSubLevel: IClass | null;
   selectedDistrict: ILocation | null;
+  selectedOtherClassification: IClass | null;
+  selectedOtherClassificationSubLevel: IClass | null;
 }
 
 export interface IPlanningRow extends IPlanningSums {

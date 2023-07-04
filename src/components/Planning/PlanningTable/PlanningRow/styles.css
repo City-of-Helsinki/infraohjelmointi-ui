@@ -21,8 +21,15 @@
   @apply bg-[var(--color-subClass)] pl-16;
 }
 
-.planning-head.district-preview {
+.planning-head.district-preview,
+.planning-head.collective-sub-level {
   @apply bg-[var(--color-district-preview)] pl-[5.5rem];
+}
+
+.planning-head.collective-district-preview,
+.planning-head.other-classification,
+.planning-head.other-classification-sub-level {
+  @apply bg-[var(--color-district-preview)] pl-[7rem];
 }
 
 .planning-head.district,
@@ -103,7 +110,11 @@
   @apply bg-[var(--color-subClass)];
 }
 
-.planning-cell.district-preview {
+.planning-cell.district-preview,
+.planning-cell.collective-district-preview,
+.planning-cell.collective-sub-level,
+.planning-cell.other-classification,
+.planning-cell.other-classification-sub-level {
   @apply bg-[var(--color-district-preview)];
 }
 

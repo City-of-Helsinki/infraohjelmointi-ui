@@ -61,17 +61,25 @@ const separateLocationsIntoHierarchy = (
 ) => {
   const districts = allLocations?.filter((al) => !al.parent);
 
-  let divisions: Array<ILocation> = [];
-  let subDivisions: Array<ILocation> = [];
+  const divisions: Array<ILocation> = [];
+  const subDivisions: Array<ILocation> = [];
 
   if (!forCoordinator) {
-    divisions = districts
-      ? allLocations?.filter((al) => districts.findIndex((d) => d.id === al.parent) !== -1)
-      : [];
+    if (districts.length > 0) {
+      allLocations?.forEach((al) => {
+        if (districts.findIndex((d) => d.id === al.parent) !== -1) {
+          divisions.push(al);
+        }
+      });
+    }
 
-    subDivisions = divisions
-      ? allLocations?.filter((al) => divisions.findIndex((d) => d.id === al.parent) !== -1)
-      : [];
+    if (divisions.length > 0) {
+      allLocations?.forEach((al) => {
+        if (divisions.findIndex((d) => d.id === al.parent) !== -1) {
+          subDivisions.push(al);
+        }
+      });
+    }
   }
 
   return {
@@ -140,5 +148,6 @@ export const selectPlanningDivisions = (state: RootState) => state.location.plan
 export const selectPlanningSubDivisions = (state: RootState) =>
   state.location.planning.subDivisions;
 export const selectBatchedPlanningLocations = (state: RootState) => state.location.planning;
+export const selectBatchedCoordinationLocations = (state: RootState) => state.location.coordination;
 
 export default locationSlice.reducer;
