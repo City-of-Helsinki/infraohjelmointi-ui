@@ -2,8 +2,6 @@ import { selectBatchedCoordinationClasses } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
 import { selectBatchedCoordinationLocations } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
-import { IClass } from '@/interfaces/classInterfaces';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import {
   IPlanningRow,
   IPlanningRowList,
@@ -11,9 +9,7 @@ import {
   PlanningRowType,
 } from '@/interfaces/common';
 import { selectGroups } from '@/reducers/groupSlice';
-import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
 import {
   selectMode,
   selectPlanningRows,
@@ -21,18 +17,13 @@ import {
   selectSelections,
   setPlanningRows,
 } from '@/reducers/planningSlice';
+import { buildPlanningRow, getSelectedOrAll } from '@/utils/planningRowUtils';
 import _ from 'lodash';
+import { IClass } from '@/interfaces/classInterfaces';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 /**
- * Builds a hierarchy-list of IPlanningTableRows, that will either include
- * - masterClasses, classes, subClasses, groups and districts; if a district isn't selected
- * - districts, divisions and groups; if a district is selected
- *
- * ! Groups will mostly appear under the selected divisions, but they can also appear under
- * districts and subClasses
- *
- * @param state the current state of the planningRows-hook
- * @returns a list of planning rows for the planning table
+ * Builds a hierarchy-list of IPlanningTableRows
  */
 const buildCoordinatorTableRows = (
   list: IPlanningRowList,
@@ -49,69 +40,43 @@ const buildCoordinatorTableRows = (
     otherClassificationSubLevels,
   } = list;
 
-  const {
-    selectedMasterClass,
-    selectedClass,
-    selectedSubClass,
-    // TODO: confirm how the paths are supposed to be before adding the new selections
-    // selectedCollectiveSubLevel,
-    // selectedDistrict,
-    // selectedOtherClassification,
-    // selectedOtherClassificationSubLevel,
-  } = selections;
+  const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
 
-  const getRowProps = (
-    item: IClass | ILocation | IGroup,
-    type: PlanningRowType,
-    expanded?: boolean,
-  ): IPlanningRow => {
-    const defaultExpanded = expanded || type === 'division';
-    return {
-      type: type,
-      name: item.name,
-      path: type !== 'group' ? (item as IClass | ILocation).path : '',
-      id: item.id,
-      key: item.id,
-      defaultExpanded,
-      children: [],
-      projectRows: [],
-      cells: calculatePlanningCells(item.finances, type),
-      ...calculatePlanningRowSums(item.finances, type),
-    };
-  };
+  const getRow = (item: IClass | ILocation, type: PlanningRowType, defaultExpanded?: boolean) =>
+    buildPlanningRow(item, type, projects, defaultExpanded);
 
   // Map the class rows going from masterClasses to districts
   const rows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
     return {
-      // Map master classes
-      ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
-      // Map classes
+      // MASTER CLASSES
+      ...getRow(masterClass, 'masterClass', !!selectedMasterClass),
+      // CLASSES
       children: classes
         .filter((c) => c.parent === masterClass.id)
         .map((filteredClass) => ({
-          ...getRowProps(filteredClass, 'class', !!selectedClass),
-          // Map sub classes
+          ...getRow(filteredClass, 'class', !!selectedClass),
+          // SUB CLASSES
           children: subClasses
             .filter((subClass) => subClass.parent === filteredClass.id)
             .map((filteredSubClass) => ({
-              ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
-              // Map collective sub levels
+              ...getRow(filteredSubClass, 'subClass', !!selectedSubClass),
+              // COLLECTIVE SUB LEVELS
               children: [
                 ...collectiveSubLevels
                   .filter((collectiveSubLevel) => collectiveSubLevel.parent === filteredSubClass.id)
                   .map((filteredCollectiveSubLevel) => ({
-                    ...getRowProps(filteredCollectiveSubLevel, 'collective-sub-level'),
-                    // Map other classifications and districts
+                    ...getRow(filteredCollectiveSubLevel, 'collectiveSubLevel'),
+                    // OTHER CLASSIFICATIONS & COLLECTIVE DISTRICTS
                     children: [
-                      // Map other classification
+                      // other classifications
                       ...otherClassifications
                         .filter(
                           (otherClassification) =>
                             otherClassification.parent === filteredCollectiveSubLevel.id,
                         )
                         .map((filteredOtherClassification) => ({
-                          ...getRowProps(filteredOtherClassification, 'other-classification'),
-                          // Map other classification sub level
+                          ...getRow(filteredOtherClassification, 'otherClassification'),
+                          // OTHER CLASSIFICATION SUB LEVELS
                           children: otherClassificationSubLevels
                             .filter(
                               (otherClassificationSubLevel) =>
@@ -119,27 +84,27 @@ const buildCoordinatorTableRows = (
                                 filteredOtherClassification.id,
                             )
                             .map((filteredOtherClassificationSubLevel) => ({
-                              ...getRowProps(
+                              ...getRow(
                                 filteredOtherClassificationSubLevel,
-                                'other-classification-sub-level',
+                                'otherClassificationSubLevel',
                               ),
                             })),
                         })),
-                      // Map districts
+                      // districts
                       ...districts
                         .filter(
                           (district) => district.parentClass === filteredCollectiveSubLevel.id,
                         )
                         .map((filteredDistrict) => ({
-                          ...getRowProps(filteredDistrict, 'collective-district-preview'),
+                          ...getRow(filteredDistrict, 'collectiveDistrict'),
                         })),
                     ],
                   })),
-                // Map districts
+                // DISTRICTS
                 ...districts
                   .filter((district) => district.parentClass === filteredSubClass.id)
                   .map((filteredDistrict) => ({
-                    ...getRowProps(filteredDistrict, 'district-preview'),
+                    ...getRow(filteredDistrict, 'districtPreview'),
                   })),
               ],
             })),
@@ -186,6 +151,9 @@ const useCoordinationRows = () => {
       otherClassifications,
       otherClassificationSubLevels,
     } = batchedCoordinationClasses;
+
+    const { districts } = batchedCoordinationLocations;
+
     const {
       selectedClass,
       selectedDistrict,
@@ -193,9 +161,7 @@ const useCoordinationRows = () => {
       selectedSubClass,
       selectedCollectiveSubLevel,
       selectedOtherClassification,
-      selectedOtherClassificationSubLevel,
     } = selections;
-    const { districts } = batchedCoordinationLocations;
 
     const finalDistricts = [];
 
@@ -206,19 +172,13 @@ const useCoordinationRows = () => {
     }
 
     const list = {
-      masterClasses: selectedMasterClass ? [selectedMasterClass] : masterClasses,
-      classes: selectedClass ? [selectedClass] : classes,
-      subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
-      collectiveSubLevels: selectedCollectiveSubLevel
-        ? [selectedCollectiveSubLevel]
-        : collectiveSubLevels,
+      masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
+      classes: getSelectedOrAll(selectedClass, classes),
+      subClasses: getSelectedOrAll(selectedSubClass, subClasses),
+      collectiveSubLevels: getSelectedOrAll(selectedCollectiveSubLevel, collectiveSubLevels),
       districts: finalDistricts,
-      otherClassifications: selectedOtherClassification
-        ? [selectedOtherClassification]
-        : otherClassifications,
-      otherClassificationSubLevels: selectedOtherClassificationSubLevel
-        ? [selectedOtherClassificationSubLevel]
-        : otherClassificationSubLevels,
+      otherClassifications: getSelectedOrAll(selectedOtherClassification, otherClassifications),
+      otherClassificationSubLevels: otherClassificationSubLevels,
       divisions: [],
       groups: [],
     };

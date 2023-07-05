@@ -7,7 +7,6 @@ import {
 import { useAppDispatch, useAppSelector } from './common';
 import { selectBatchedPlanningLocations, updatePlanningDistrict } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
-import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
   IPlanningRow,
@@ -19,7 +18,6 @@ import { selectGroups, updateGroup } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { calculatePlanningCells, calculatePlanningRowSums } from '@/utils/calculations';
 import {
   selectMode,
   selectPlanningRows,
@@ -30,6 +28,8 @@ import {
 } from '@/reducers/planningSlice';
 import _ from 'lodash';
 import { selectFinanceUpdate } from '@/reducers/eventsSlice';
+import { buildPlanningRow, getSelectedOrAll } from '@/utils/planningRowUtils';
+import { IClass } from '@/interfaces/classInterfaces';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -48,40 +48,6 @@ const sortByName = (list: Array<IProject> | Array<IGroup>) =>
  */
 const sortByNumber = (list: Array<ILocation>) =>
   list.sort((n1, n2) => parseNumberFromName(n1.name) - parseNumberFromName(n2.name));
-
-/**
- * Filters and sorts projects for a class, location or group alphabetically for a given row type.
- */
-const getSortedProjects = (
-  id: string,
-  type: PlanningRowType,
-  projects: Array<IProject>,
-  name: string,
-) => {
-  let projectList: Array<IProject> = [];
-  switch (type) {
-    case 'class':
-    case 'subClass':
-    case 'subClass-district':
-      projectList = projects
-        .filter(
-          (p) =>
-            !p.projectGroup &&
-            !p.projectLocation &&
-            !name.toLocaleLowerCase().includes('suurpiiri'),
-        )
-        .filter((p) => p.projectClass === id);
-      break;
-    case 'group':
-      projectList = projects.filter((p) => p.projectGroup).filter((p) => p.projectGroup === id);
-      break;
-    case 'district':
-    case 'division':
-      projectList = projects.filter((p) => !p.projectGroup).filter((p) => p.projectLocation === id);
-      break;
-  }
-  return sortByName(projectList) as Array<IProject>;
-};
 
 /**
  * Builds a hierarchy-list of IPlanningTableRows, that will either include
@@ -103,38 +69,22 @@ const buildPlanningTableRows = (
 
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
-  const districtType = selectedDistrict ? 'district' : 'district-preview';
+  const districtType = selectedDistrict ? 'district' : 'districtPreview';
   const subClassType = selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')
-    ? 'subClass-district'
+    ? 'subClassDistrict'
     : 'subClass';
 
-  const getRowProps = (
+  const getRow = (
     item: IClass | ILocation | IGroup,
     type: PlanningRowType,
-    expanded?: boolean,
-  ): IPlanningRow => {
-    const projectRows = getSortedProjects(item.id, type, projects, item.name);
-    const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
-    return {
-      type: type,
-      name: item.name,
-      path: type !== 'group' ? (item as IClass | ILocation).path : '',
-      id: item.id,
-      key: item.id,
-      // link: getLink(item, type, selections),
-      defaultExpanded,
-      children: [],
-      projectRows,
-      cells: calculatePlanningCells(item.finances, type),
-      ...calculatePlanningRowSums(item.finances, type),
-    };
-  };
+    defaultExpanded?: boolean,
+  ) => buildPlanningRow(item, type, projects, defaultExpanded);
 
   // Groups can get mapped under subClasses, districts and divisions and sorts them by name
   const getSortedGroupRows = (id: string, type: PlanningRowType) => {
     const filteredGroups = [];
-    // Filter all groups under subClass-district
-    if (type === 'subClass-district') {
+    // Filter all groups under subClassDistrict
+    if (type === 'subClassDistrict') {
       filteredGroups.push(...groups.filter((group) => group.classRelation === id));
     }
     // Filter groups under subClass-preview only if there are is no locationRelation
@@ -148,31 +98,34 @@ const buildPlanningTableRows = (
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
     return sortByName(filteredGroups).map((group) => ({
-      ...getRowProps(group as IGroup, 'group'),
+      ...getRow(group as IGroup, 'group'),
     }));
   };
 
   // Map the class rows going from masterClasses to districts
   const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
     return {
-      ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
-      // Map classes
+      // MASTER CLASSES
+      ...getRow(masterClass, 'masterClass', !!selectedMasterClass),
+      // CLASSES
       children: classes
         .filter((c) => c.parent === masterClass.id)
         .map((filteredClass) => ({
-          ...getRowProps(filteredClass, 'class', !!selectedClass),
-          // Map sub classes
+          ...getRow(filteredClass, 'class', !!selectedClass),
+          // SUB CLASSES
           children: subClasses
             .filter((subClass) => subClass.parent === filteredClass.id)
             .map((filteredSubClass) => ({
-              ...getRowProps(filteredSubClass, subClassType, !!selectedSubClass),
-              // Map districts & groups (groups only if they do not belong to a district)
+              ...getRow(filteredSubClass, subClassType, !!selectedSubClass),
+              // DISTRICTS & GROUPS
               children: [
+                // groups
                 ...getSortedGroupRows(filteredSubClass.id, subClassType),
+                // districts
                 ...districts
                   .filter((district) => district.parentClass === filteredSubClass.id)
                   .map((filteredDistrict) => ({
-                    ...getRowProps(filteredDistrict, districtType),
+                    ...getRow(filteredDistrict, districtType),
                   })),
               ],
             })),
@@ -185,15 +138,17 @@ const buildPlanningTableRows = (
       ? divisions.filter((division) => division.parentClass === subClass.id)
       : [];
     return {
-      ...getRowProps(subClass, subClassType, !!selectedSubClass),
-      // Map districts & groups (groups only if they do not belong to a district)
+      ...getRow(subClass, subClassType, !!selectedSubClass),
+      // DIVISIONS & GROUPS
       children: [
+        // groups
         ...getSortedGroupRows(subClass.id, subClassType),
+        // divisions
         ...sortByNumber(divisionsForSubClass).map((filteredDivision) => {
           const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
           return {
-            ...getRowProps(filteredDivision, 'division', groupsForDivision.length > 0),
-            // Map projects & groups
+            ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
+            // GROUPS (for division)
             children: groupsForDivision,
           };
         }),
@@ -205,15 +160,17 @@ const buildPlanningTableRows = (
   const districtRows = districts.map((district) => {
     const divisionsForDistrict = divisions.filter((division) => division.parent === district.id);
     return {
-      ...getRowProps(district, districtType, true),
-      // Map divisions & groups (groups only if there are no divisions)
+      ...getRow(district, districtType, true),
+      // DIVISIONS & GROUPS
       children: [
+        // groups
         ...getSortedGroupRows(district.id, districtType),
+        // divisions
         ...sortByNumber(divisionsForDistrict).map((filteredDivision) => {
           const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
           return {
-            ...getRowProps(filteredDivision, 'division', groupsForDivision.length > 0),
-            // Map projects & groups
+            ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
+            // GROUPS (for division)
             children: groupsForDivision,
           };
         }),
@@ -222,7 +179,7 @@ const buildPlanningTableRows = (
   });
 
   const getRows = () => {
-    if (subClassType === 'subClass-district') {
+    if (subClassType === 'subClassDistrict') {
       return subClassDistrictRows;
     } else if (selectedDistrict) {
       return districtRows;
@@ -246,7 +203,7 @@ const fetchProjectsByRelation = async (
   type: PlanningRowType,
   id: string | undefined,
 ): Promise<Array<IProject>> => {
-  const direct = type === 'class' || type === 'subClass' || type === 'subClass-district';
+  const direct = type === 'class' || type === 'subClass' || type === 'subClassDistrict';
   try {
     const allResults = await getProjectsWithParams({
       params: `${type}=${id}`,
@@ -351,9 +308,9 @@ const usePlanningRows = () => {
     }
 
     const list = {
-      masterClasses: selectedMasterClass ? [selectedMasterClass] : masterClasses,
-      classes: selectedClass ? [selectedClass] : classes,
-      subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
+      masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
+      classes: getSelectedOrAll(selectedClass, classes),
+      subClasses: getSelectedOrAll(selectedSubClass, subClasses),
       collectiveSubLevels: [],
       districts: finalDistricts,
       otherClassifications: [],

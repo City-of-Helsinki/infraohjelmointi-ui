@@ -21,19 +21,19 @@
   @apply bg-[var(--color-subClass)] pl-16;
 }
 
-.planning-head.district-preview,
-.planning-head.collective-sub-level {
-  @apply bg-[var(--color-district-preview)] pl-[5.5rem];
+.planning-head.districtPreview,
+.planning-head.collectiveSubLevel {
+  @apply bg-[var(--color-districtPreview)] pl-[5.5rem];
 }
 
-.planning-head.collective-district-preview,
-.planning-head.other-classification,
-.planning-head.other-classification-sub-level {
-  @apply bg-[var(--color-district-preview)] pl-[7rem];
+.planning-head.collectiveDistrict,
+.planning-head.otherClassification,
+.planning-head.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview)] pl-[7rem];
 }
 
 .planning-head.district,
-.planning-head.subClass-district {
+.planning-head.subClassDistrict {
   @apply bg-[var(--color-district)] pl-4 text-xl;
 }
 
@@ -54,9 +54,9 @@
   @apply pl-[5.5rem];
 }
 
-/* Group row under a district or subClass-district */
+/* Group row under a district or subClassDistrict */
 .district ~ .group .planning-head.group,
-.subClass-district ~ .group .planning-head.group {
+.subClassDistrict ~ .group .planning-head.group {
   @apply pl-10;
 }
 
@@ -110,16 +110,16 @@
   @apply bg-[var(--color-subClass)];
 }
 
-.planning-cell.district-preview,
-.planning-cell.collective-district-preview,
-.planning-cell.collective-sub-level,
-.planning-cell.other-classification,
-.planning-cell.other-classification-sub-level {
-  @apply bg-[var(--color-district-preview)];
+.planning-cell.districtPreview,
+.planning-cell.collectiveDistrict,
+.planning-cell.collectiveSubLevel,
+.planning-cell.otherClassification,
+.planning-cell.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview)];
 }
 
 .planning-cell.district,
-.planning-cell.subClass-district {
+.planning-cell.subClassDistrict {
   @apply bg-[var(--color-district)];
 }
 

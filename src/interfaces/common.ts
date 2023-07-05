@@ -98,13 +98,13 @@ export type PlanningRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
-  | 'subClass-district'
-  | 'collective-sub-level'
-  | 'other-classification'
-  | 'other-classification-sub-level'
-  | 'district-preview'
-  | 'collective-district-preview'
+  | 'subClassDistrict'
   | 'district'
+  | 'districtPreview'
+  | 'collectiveSubLevel'
+  | 'collectiveDistrict'
+  | 'otherClassification'
+  | 'otherClassificationSubLevel'
   | 'division'
   | 'group'
   | 'project';
@@ -145,10 +145,10 @@ export interface IPlanningRowSelections {
   selectedMasterClass: IClass | null;
   selectedClass: IClass | null;
   selectedSubClass: IClass | null;
-  selectedCollectiveSubLevel: IClass | null;
   selectedDistrict: ILocation | null;
+  selectedCollectiveSubLevel: IClass | null;
+  selectedCollectiveDistrict: ILocation | null;
   selectedOtherClassification: IClass | null;
-  selectedOtherClassificationSubLevel: IClass | null;
 }
 
 export interface IPlanningRow extends IPlanningSums {
@@ -160,7 +160,7 @@ export interface IPlanningRow extends IPlanningSums {
   id: string;
   key: string;
   defaultExpanded: boolean;
-  // link: string | null;
+  urlSearchParam: { [key: string]: string } | null;
   cells: Array<IPlanningCell>;
 }
 

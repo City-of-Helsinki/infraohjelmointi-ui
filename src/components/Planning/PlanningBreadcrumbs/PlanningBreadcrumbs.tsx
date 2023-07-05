@@ -9,7 +9,7 @@ import './styles.css';
 const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id: string }) => (
   <>
     <IconAngleRight data-testid="breadcrumb-arrow" />
-    <li>
+    <li className="breadcrumb">
       <Link data-testid={`${id}-breadcrumb`} to={path}>
         {value}
       </Link>
@@ -20,8 +20,15 @@ const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id:
 Breadcrumb.displayName = 'Breadcrumb';
 
 const PlanningBreadcrumbs = () => {
-  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } =
-    useAppSelector(selectSelections);
+  const {
+    selectedMasterClass,
+    selectedClass,
+    selectedSubClass,
+    selectedDistrict,
+    selectedCollectiveSubLevel,
+    selectedCollectiveDistrict,
+    selectedOtherClassification,
+  } = useAppSelector(selectSelections);
 
   const mode = useAppSelector(selectMode);
 
@@ -59,6 +66,27 @@ const PlanningBreadcrumbs = () => {
           id="district"
           path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict.id}`}
           value={selectedDistrict.name}
+        />
+      )}
+      {selectedCollectiveSubLevel && (
+        <Breadcrumb
+          id="district"
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel.id}`}
+          value={selectedCollectiveSubLevel.name}
+        />
+      )}
+      {selectedCollectiveDistrict && (
+        <Breadcrumb
+          id="district"
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&collectiveDistrict=${selectedCollectiveDistrict.id}`}
+          value={selectedCollectiveDistrict.name}
+        />
+      )}
+      {selectedOtherClassification && (
+        <Breadcrumb
+          id="district"
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&collectiveDistrict=${selectedCollectiveDistrict?.id}&otherClassification=${selectedOtherClassification.id}`}
+          value={selectedOtherClassification.name}
         />
       )}
     </ul>

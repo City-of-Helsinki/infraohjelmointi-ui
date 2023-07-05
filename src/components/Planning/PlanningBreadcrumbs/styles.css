@@ -17,3 +17,7 @@
 .breadcrumbs-list svg {
   @apply mr-1;
 }
+
+.breadcrumbs-list .breadcrumb {
+  @apply max-w-[16rem] overflow-x-hidden overflow-ellipsis whitespace-nowrap;
+}

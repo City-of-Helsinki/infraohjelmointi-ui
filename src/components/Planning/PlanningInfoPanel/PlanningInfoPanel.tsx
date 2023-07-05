@@ -19,11 +19,25 @@ const PlanningInfoPanel = () => {
   const navigate = useNavigate();
 
   const navigateBack = useCallback(() => {
-    const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
+    const {
+      selectedMasterClass,
+      selectedClass,
+      selectedSubClass,
+      selectedDistrict,
+      selectedOtherClassification,
+      selectedCollectiveDistrict,
+      selectedCollectiveSubLevel,
+    } = selections;
 
     const urlSearchParams = new URLSearchParams(search);
 
-    if (selectedDistrict) {
+    if (selectedOtherClassification) {
+      urlSearchParams.delete('selectedOtherClassification');
+    } else if (selectedCollectiveDistrict) {
+      urlSearchParams.delete('selectedCollectiveDistrict');
+    } else if (selectedCollectiveSubLevel) {
+      urlSearchParams.delete('selectedCollectiveSubLevel');
+    } else if (selectedDistrict) {
       urlSearchParams.delete('district');
     } else if (selectedSubClass) {
       urlSearchParams.delete('subClass');

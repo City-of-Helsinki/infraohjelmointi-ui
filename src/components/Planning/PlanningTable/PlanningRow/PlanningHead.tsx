@@ -27,6 +27,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   plannedBudgets,
   deviation,
   projectRows,
+  urlSearchParam,
 }) => {
   const navigate = useNavigate();
   const mode = useAppSelector(selectMode);
@@ -79,21 +80,8 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     const urlSearchParams = new URLSearchParams(search);
     const searchParams = Object.fromEntries(urlSearchParams.entries());
 
-    switch (type) {
-      case 'masterClass':
-        Object.assign(searchParams, { masterClass: id });
-        break;
-      case 'class':
-        Object.assign(searchParams, { class: id });
-        break;
-      case 'subClass':
-        Object.assign(searchParams, { subClass: id });
-        break;
-      case 'district-preview':
-        Object.assign(searchParams, { district: id });
-        break;
-      default:
-        break;
+    if (urlSearchParam) {
+      Object.assign(searchParams, urlSearchParam);
     }
 
     navigate({

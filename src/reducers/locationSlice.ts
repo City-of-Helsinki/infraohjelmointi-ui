@@ -149,5 +149,7 @@ export const selectPlanningSubDivisions = (state: RootState) =>
   state.location.planning.subDivisions;
 export const selectBatchedPlanningLocations = (state: RootState) => state.location.planning;
 export const selectBatchedCoordinationLocations = (state: RootState) => state.location.coordination;
+export const selectCoordinationDistricts = (state: RootState) =>
+  state.location.coordination.districts;
 
 export default locationSlice.reducer;

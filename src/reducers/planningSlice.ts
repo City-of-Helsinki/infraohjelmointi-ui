@@ -25,10 +25,10 @@ const initialState: IPlanningState = {
     selectedMasterClass: null,
     selectedClass: null,
     selectedSubClass: null,
-    selectedCollectiveSubLevel: null,
     selectedDistrict: null,
+    selectedCollectiveSubLevel: null,
+    selectedCollectiveDistrict: null,
     selectedOtherClassification: null,
-    selectedOtherClassificationSubLevel: null,
   },
   mode: 'planning',
   projects: [],
@@ -57,6 +57,24 @@ export const planningSlice = createSlice({
     setSelectedDistrict(state, action: PayloadAction<ILocation | null>) {
       return { ...state, selections: { ...state.selections, selectedDistrict: action.payload } };
     },
+    setSelectedCollectiveSubLevel(state, action: PayloadAction<IClass | null>) {
+      return {
+        ...state,
+        selections: { ...state.selections, selectedCollectiveSubLevel: action.payload },
+      };
+    },
+    setSelectedCollectiveDistrict(state, action: PayloadAction<ILocation | null>) {
+      return {
+        ...state,
+        selections: { ...state.selections, selectedCollectiveDistrict: action.payload },
+      };
+    },
+    setSelectedOtherClassification(state, action: PayloadAction<IClass | null>) {
+      return {
+        ...state,
+        selections: { ...state.selections, selectedOtherClassification: action.payload },
+      };
+    },
     setPlanningRows(state, action: PayloadAction<Array<IPlanningRow>>) {
       return { ...state, rows: action.payload };
     },
@@ -68,6 +86,9 @@ export const planningSlice = createSlice({
     },
     setMode(state, action: PayloadAction<PlanningMode>) {
       return { ...state, mode: action.payload };
+    },
+    resetSelections(state) {
+      return { ...state, selections: initialState.selections };
     },
   },
 });
@@ -87,10 +108,14 @@ export const {
   setSelectedClass,
   setSelectedSubClass,
   setSelectedDistrict,
+  setSelectedCollectiveSubLevel,
+  setSelectedCollectiveDistrict,
+  setSelectedOtherClassification,
   setStartYear,
   setProjects,
   setGroupsExpanded,
   setMode,
+  resetSelections,
 } = planningSlice.actions;
 
 export default planningSlice.reducer;

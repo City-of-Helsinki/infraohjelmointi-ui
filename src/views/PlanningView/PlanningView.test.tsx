@@ -653,7 +653,7 @@ describe('PlanningView', () => {
       // // Check that all district-rows are visible and they have the 'district-preview' class
       districtsForSubClass.forEach(({ id }) => {
         expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-        expect(getByTestId(`row-${id}`).classList.contains('district-preview')).toBeTruthy();
+        expect(getByTestId(`row-${id}`).classList.contains('districtPreview')).toBeTruthy();
       });
 
       // Click the first district row
@@ -667,7 +667,7 @@ describe('PlanningView', () => {
             expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
             expect(
-              getByTestId(`row-${districtId}`).classList.contains('district-preview'),
+              getByTestId(`row-${districtId}`).classList.contains('districtPreview'),
             ).toBeFalsy();
           }
           if (i !== 0) {
