@@ -32,11 +32,11 @@ const PlanningInfoPanel = () => {
     const urlSearchParams = new URLSearchParams(search);
 
     if (selectedOtherClassification) {
-      urlSearchParams.delete('selectedOtherClassification');
+      urlSearchParams.delete('otherClassification');
     } else if (selectedCollectiveDistrict) {
-      urlSearchParams.delete('selectedCollectiveDistrict');
+      urlSearchParams.delete('collectiveDistrict');
     } else if (selectedCollectiveSubLevel) {
-      urlSearchParams.delete('selectedCollectiveSubLevel');
+      urlSearchParams.delete('collectiveSubLevel');
     } else if (selectedDistrict) {
       urlSearchParams.delete('district');
     } else if (selectedSubClass) {
