@@ -55,6 +55,7 @@ const render = async () =>
   await act(async () =>
     renderWithProviders(
       <>
+        {/* Could there be a nicer way to render these instead of rendering the <PlanningView/> under two routes? */}
         <Route
           path="/"
           element={
@@ -64,13 +65,7 @@ const render = async () =>
             </>
           }
         >
-          <Route path=":masterClassId" element={<PlanningView />}>
-            <Route path=":classId" element={<PlanningView />}>
-              <Route path=":subClassId" element={<PlanningView />}>
-                <Route path=":districtId" element={<PlanningView />} />
-              </Route>
-            </Route>
-          </Route>
+          <Route path="/planning" element={<PlanningView />} />
         </Route>
       </>,
       {
@@ -194,6 +189,8 @@ describe('PlanningView', () => {
       });
     });
 
+    expect(store.getState().events.financeUpdate).toStrictEqual(financeUpdateData);
+
     const { plannedBudget, frameBudget } = updatedFinances.year0;
 
     expect((await findByTestId(`planned-budget-${masterClassId}-${year}`)).textContent).toBe(
@@ -235,25 +232,25 @@ describe('PlanningView', () => {
       await user.click(await findByTestId(`expand-${masterClassId}`));
       expect(await findByTestId('masterClass-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}`,
+        `/planning?masterClass=${masterClassId}`,
       );
 
       await user.click(await findByTestId(`expand-${classId}`));
       expect(await findByTestId('class-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}/${classId}`,
+        `/planning?masterClass=${masterClassId}&class=${classId}`,
       );
 
       await user.click(await findByTestId(`expand-${subClassId}`));
       expect(await findByTestId('subClass-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}/${classId}/${subClassId}`,
+        `/planning?masterClass=${masterClassId}&class=${classId}&subClass=${subClassId}`,
       );
 
       await user.click(await findByTestId(`expand-${districtId}`));
       expect(await findByTestId('district-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}/${classId}/${subClassId}/${districtId}`,
+        `/planning?masterClass=${masterClassId}&class=${classId}&subClass=${subClassId}&district=${districtId}`,
       );
 
       expect((await findAllByTestId('breadcrumb-arrow')).length).toBe(4);

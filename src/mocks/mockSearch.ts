@@ -61,7 +61,7 @@ export const mockSearchResults: { data: ISearchResults } = {
           id: '3c46274d-bcd7-4fb9-aa5b-d70169db34e0',
           value: 'warrantyPeriod',
         },
-        path: 'test-master-class-1/test-class-1/',
+        path: '?masterClass=test-master-class-1&class=test-class-1',
       },
       {
         name: 'Non programmed project',

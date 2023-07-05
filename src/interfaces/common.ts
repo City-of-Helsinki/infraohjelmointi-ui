@@ -160,7 +160,7 @@ export interface IPlanningRow extends IPlanningSums {
   id: string;
   key: string;
   defaultExpanded: boolean;
-  link: string | null;
+  // link: string | null;
   cells: Array<IPlanningCell>;
 }
 

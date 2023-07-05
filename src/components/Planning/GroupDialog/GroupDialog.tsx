@@ -7,13 +7,15 @@ import { IOption } from '@/interfaces/common';
 import { IconAngleUp, IconAngleDown } from 'hds-react/icons';
 import GroupProjectSearch from './GroupProjectSearch';
 import useGroupForm from '@/forms/useGroupForm';
-import { useAppDispatch } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { postGroupThunk, updateGroup } from '@/reducers/groupSlice';
 import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
 import { useNavigate } from 'react-router';
 import { patchGroup } from '@/services/groupService';
 import './styles.css';
+import { selectMode } from '@/reducers/planningSlice';
+import { createSearchParams } from 'react-router-dom';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -22,9 +24,7 @@ interface IDialogProps {
   id?: string | null;
   projects?: IOption[];
 }
-const buildRedirectRoute = (form: IGroupForm): string => {
-  return `${form.masterClass.value}/${form.class.value}/${form.subClass.value}/${form.district?.value}`;
-};
+
 const buildRequestPayload = (
   form: IGroupForm,
   id: string | null,
@@ -47,16 +47,18 @@ const buildRequestPayload = (
 
 const DialogContainer: FC<IDialogProps> = memo(
   ({ isOpen, handleClose, editMode, projects, id }) => {
+    const mode = useAppSelector(selectMode);
     const navigate = useNavigate();
 
     const [showAdvanceFields, setShowAdvanceFields] = useState(false);
-
     const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(projects, id);
     const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
+
     const nameField = watch('name');
     const subClassField = watch('subClass');
     const districtField = watch('district');
     const divisionField = watch('division');
+
     useEffect(() => {
       if (formValues.district.value || formValues.division.value) {
         setShowAdvanceFields(true);
@@ -84,6 +86,25 @@ const DialogContainer: FC<IDialogProps> = memo(
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
 
+    const navigateToGroupLocation = useCallback(
+      (form: IGroupForm) => {
+        const searchParams = {
+          masterClass: form.masterClass.value,
+          class: form.class.value,
+          subClass: form.subClass.value,
+          ...(form.district.value && {
+            district: form.district.value,
+          }),
+        };
+
+        navigate({
+          pathname: `/${mode}`,
+          search: `${createSearchParams(searchParams)}`,
+        });
+      },
+      [id, mode, navigate],
+    );
+
     const handleDialogClose = useCallback(() => {
       reset(formValues);
       setShowAdvanceFields(false);
@@ -103,7 +124,7 @@ const DialogContainer: FC<IDialogProps> = memo(
           dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest))
             .then(() => {
               handleDialogClose();
-              navigate(buildRedirectRoute(form));
+              navigateToGroupLocation(form);
             })
             .catch(Promise.reject);
         }

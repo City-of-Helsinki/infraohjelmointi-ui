@@ -18,7 +18,7 @@ interface IPlanningState {
 
 const initialState: IPlanningState = {
   selectedYear: null,
-  startYear: null,
+  startYear: new Date().getFullYear(),
   groupsExpanded: false,
   searchedProjectId: null,
   selections: {

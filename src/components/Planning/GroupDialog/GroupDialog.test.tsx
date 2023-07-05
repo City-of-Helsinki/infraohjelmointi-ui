@@ -25,6 +25,7 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 jest.setTimeout(10000);
+
 const store = setupStore();
 
 const render = async () =>
@@ -39,13 +40,7 @@ const render = async () =>
           </>
         }
       >
-        <Route path=":masterClassId" element={<PlanningView />}>
-          <Route path=":classId" element={<PlanningView />}>
-            <Route path=":subClassId" element={<PlanningView />}>
-              <Route path=":districtId" element={<PlanningView />} />
-            </Route>
-          </Route>
-        </Route>
+        <Route path="/planning" element={<PlanningView />} />
       </Route>,
       {
         preloadedState: {
@@ -236,6 +231,7 @@ describe('GroupDialog', () => {
         count: 1,
       },
     });
+
     // waiting for user to be navigated to correct class/district in planning view
     await waitFor(async () => {
       await user.click(submitButton);

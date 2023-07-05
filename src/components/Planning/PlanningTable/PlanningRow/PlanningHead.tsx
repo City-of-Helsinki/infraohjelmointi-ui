@@ -1,13 +1,16 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { IOption, IPlanningRow } from '@/interfaces/common';
 import HoverTooltip from './HoverTooltip/HoverTooltip';
-import './styles.css';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import DeleteGroupDialog from './DeleteGroupDialog/DeleteGroupDialog';
 import { GroupDialog } from '../../GroupDialog';
+import './styles.css';
+import { useLocation, useNavigate } from 'react-router';
+import { useAppSelector } from '@/hooks/common';
+import { selectMode } from '@/reducers/planningSlice';
+import { createSearchParams } from 'react-router-dom';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -15,7 +18,6 @@ interface IPlanningHeadProps extends IPlanningRow {
 }
 
 const PlanningHead: FC<IPlanningHeadProps> = ({
-  link,
   name,
   type,
   handleExpand,
@@ -27,11 +29,16 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   projectRows,
 }) => {
   const navigate = useNavigate();
+  const mode = useAppSelector(selectMode);
+  const { search } = useLocation();
+
   const [groupDialogState, setGroupDialogState] = useState({
     groupDeleteOpen: false,
     groupEditOpen: false,
   });
+
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
+
   const projectsToIOption = useCallback((): IOption[] => {
     return projectRows.map((p) => ({ value: p.id, label: p.name }));
   }, [projectRows]);
@@ -39,9 +46,11 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const onShowGroupDeleteDialog = useCallback(() => {
     setGroupDialogState((current) => ({ ...current, groupDeleteOpen: true }));
   }, []);
+
   const onCloseGroupDeleteDialog = useCallback(() => {
     setGroupDialogState((current) => ({ ...current, groupDeleteOpen: false }));
   }, []);
+
   const onShowGroupEditDialog = useCallback(() => {
     setGroupDialogState((current) => ({ ...current, groupEditOpen: true }));
   }, []);
@@ -49,14 +58,6 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const onCloseGroupEditDialog = useCallback(() => {
     setGroupDialogState((current) => ({ ...current, groupEditOpen: false }));
   }, []);
-
-  const onExpand = useCallback(() => {
-    // Navigate to the next nested path if there's a link
-    if (link) {
-      navigate(link);
-    }
-    handleExpand();
-  }, [handleExpand, link, navigate]);
 
   // Open the custom context menu for editing groups
   const handleGroupRowMenu = useCallback(
@@ -68,6 +69,38 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     },
     [name, onShowGroupDeleteDialog, onShowGroupEditDialog],
   );
+
+  /**
+   * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
+   */
+  const onExpand = useCallback(() => {
+    handleExpand();
+
+    const urlSearchParams = new URLSearchParams(search);
+    const searchParams = Object.fromEntries(urlSearchParams.entries());
+
+    switch (type) {
+      case 'masterClass':
+        Object.assign(searchParams, { masterClass: id });
+        break;
+      case 'class':
+        Object.assign(searchParams, { class: id });
+        break;
+      case 'subClass':
+        Object.assign(searchParams, { subClass: id });
+        break;
+      case 'district-preview':
+        Object.assign(searchParams, { district: id });
+        break;
+      default:
+        break;
+    }
+
+    navigate({
+      pathname: `/${mode}`,
+      search: `${createSearchParams(searchParams)}`,
+    });
+  }, [handleExpand, id, mode, navigate, search, type]);
 
   return (
     <th className={`planning-head ${type} sticky left-0 z-50`} data-testid={`head-${id}`}>

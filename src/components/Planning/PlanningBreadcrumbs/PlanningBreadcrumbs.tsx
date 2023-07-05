@@ -36,28 +36,28 @@ const PlanningBreadcrumbs = () => {
       {selectedMasterClass && (
         <Breadcrumb
           id="masterClass"
-          path={`${selectedMasterClass?.id}`}
+          path={`?masterClass=${selectedMasterClass?.id}`}
           value={selectedMasterClass.name}
         />
       )}
       {selectedClass && (
         <Breadcrumb
           id="class"
-          path={`${selectedMasterClass?.id}/${selectedClass?.id}`}
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}`}
           value={selectedClass.name}
         />
       )}
       {selectedSubClass && (
         <Breadcrumb
           id="subClass"
-          path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass.id}`}
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass.id}`}
           value={selectedSubClass.name}
         />
       )}
       {selectedDistrict && (
         <Breadcrumb
           id="district"
-          path={`${selectedMasterClass?.id}/${selectedClass?.id}/${selectedSubClass?.id}/${selectedDistrict.id}`}
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict.id}`}
           value={selectedDistrict.name}
         />
       )}

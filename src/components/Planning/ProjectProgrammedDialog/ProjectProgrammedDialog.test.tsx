@@ -5,7 +5,7 @@ import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from 
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import { within } from '@testing-library/react';
+import { waitFor, within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
   mockClasses,
@@ -34,6 +34,7 @@ const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
   await user.click(await findByTestId(`expand-${masterClasses[0].id}`));
   await user.click(await findByTestId(`expand-${classes[0].id}`));
 };
+
 const render = async () =>
   await act(async () =>
     renderWithProviders(
@@ -46,13 +47,7 @@ const render = async () =>
           </>
         }
       >
-        <Route path=":masterClassId" element={<PlanningView />}>
-          <Route path=":classId" element={<PlanningView />}>
-            <Route path=":subClassId" element={<PlanningView />}>
-              <Route path=":districtId" element={<PlanningView />} />
-            </Route>
-          </Route>
-        </Route>
+        <Route path="/planning" element={<PlanningView />} />
       </Route>,
       {
         preloadedState: {
@@ -165,14 +160,14 @@ describe('ProjectProgrammedDialog', () => {
     await user.click(openDialogButtonEnabled);
     const dialog = within(await findByRole('dialog'));
     const submitButton = await dialog.findByTestId('add-projects-button');
+
     expect(submitButton).toBeDisabled();
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
     await user.type(await dialog.findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
-    // await waitFor(async () => {
     expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-    // });
+
     await user.click(await dialog.findByText(mockSearchResults.data.results[0].name));
     expect(dialog.getAllByTestId('project-selection').length).toBe(1);
 
@@ -194,11 +189,15 @@ describe('ProjectProgrammedDialog', () => {
 
     const formPatchRequest = mockedAxios.patch.mock
       .lastCall[1] as Array<IProjectPatchRequestObject>;
+
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
-    await user.click(await dialog.findByTestId('cancel-search'));
+    await waitFor(async () => user.click(await dialog.findByTestId('cancel-search')));
 
+    expect(await findByTestId('row-test-class-1')).toBeInTheDocument();
+
+    // check if the project row is now in the view
     expect(await findByTestId('row-planning-project-1-parent-test-class-1')).toBeInTheDocument();
 
     removeProjectUpdateEventListener(store.dispatch);

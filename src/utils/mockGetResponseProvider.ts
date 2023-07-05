@@ -85,8 +85,6 @@ export const mockGetResponseProvider = () =>
       case url.toLocaleLowerCase().includes(`/projects/`):
         return Promise.resolve(mockPlanningViewProjects);
       default:
-        console.log('not found: ', url);
-
         return Promise.reject(new Error('not found'));
     }
   });

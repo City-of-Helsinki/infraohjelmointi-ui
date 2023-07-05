@@ -2,23 +2,42 @@ import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { IconAngleLeft } from 'hds-react/icons';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { selectMode, selectSelections } from '@/reducers/planningSlice';
+import { createSearchParams } from 'react-router-dom';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
   const mode = useAppSelector(selectMode);
-  const { selectedMasterClass } = useAppSelector(selectSelections);
+  const selections = useAppSelector(selectSelections);
+  const { selectedMasterClass } = selections;
+
+  const { search } = useLocation();
 
   const navigate = useNavigate();
 
   const navigateBack = useCallback(() => {
-    const routes = window.location.pathname.split('/');
-    routes.pop();
-    navigate(routes.join('/'));
-  }, []);
+    const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
+
+    const urlSearchParams = new URLSearchParams(search);
+
+    if (selectedDistrict) {
+      urlSearchParams.delete('district');
+    } else if (selectedSubClass) {
+      urlSearchParams.delete('subClass');
+    } else if (selectedClass) {
+      urlSearchParams.delete('class');
+    } else if (selectedMasterClass) {
+      urlSearchParams.delete('masterClass');
+    }
+
+    navigate({
+      pathname: `/${mode}`,
+      search: `${createSearchParams(urlSearchParams)}`,
+    });
+  }, [selections, search, navigate, mode]);
 
   const iconLeft = useMemo(() => <IconAngleLeft />, []);
   return (

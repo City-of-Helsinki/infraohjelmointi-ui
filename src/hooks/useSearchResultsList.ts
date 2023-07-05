@@ -21,7 +21,7 @@ const buildBreadCrumbs = (
 const buildLink = (r: ISearchResultPayloadItem) => {
   // Programmed projects will navigate to planning view and get the ?project= param
   if (r.type === 'projects' && r.programmed) {
-    return `/planning/${r.path}/?project=${r.id}`;
+    return `/planning/${r.path}&project=${r.id}`;
   }
   // Non-programmed projects will navigate to project form
   else if (r.type === 'projects') {

@@ -1,25 +1,18 @@
 import {
-  selectBatchedCoordinationClasses,
   selectBatchedPlanningClasses,
   updatePlanningClass,
   updatePlanningMasterClass,
   updatePlanningSubClass,
 } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import {
-  selectBatchedCoordinationLocations,
-  selectBatchedPlanningLocations,
-  updatePlanningDistrict,
-} from '@/reducers/locationSlice';
+import { selectBatchedPlanningLocations, updatePlanningDistrict } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { useLocation, useParams } from 'react-router';
 import {
   IPlanningRow,
   IPlanningRowList,
   IPlanningRowSelections,
-  PlanningMode,
   PlanningRowType,
 } from '@/interfaces/common';
 import { selectGroups, updateGroup } from '@/reducers/groupSlice';
@@ -32,64 +25,11 @@ import {
   selectPlanningRows,
   selectProjects,
   selectSelections,
-  setMode,
   setPlanningRows,
   setProjects,
-  setSelectedClass,
-  setSelectedDistrict,
-  setSelectedMasterClass,
-  setSelectedSubClass,
-  setStartYear,
 } from '@/reducers/planningSlice';
 import _ from 'lodash';
 import { selectFinanceUpdate } from '@/reducers/eventsSlice';
-
-/**
- * Returns false whether a given row is already selected and present in the url.
- *
- * @param type the type of the row
- * @param selections current row selections for all the rows
- */
-const shouldNavigate = (type: PlanningRowType, selections: IPlanningRowSelections) => {
-  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
-  switch (type) {
-    case 'masterClass':
-      return !selectedMasterClass;
-    case 'class':
-      return !selectedClass;
-    case 'subClass':
-    case 'subClass-district':
-      return !selectedSubClass;
-    case 'district-preview':
-      return !selectedDistrict;
-    default:
-      return false;
-  }
-};
-
-/**
- * Builds a link for a row. If the current rows type is already selected,
- * i.e. the row is a masterClass and there already is a selectedMasterClass, it will return null.
- *
- * @param item class or location
- * @param type the type that the link is created for
- */
-const getLink = (
-  item: IClass | ILocation | IGroup,
-  type: PlanningRowType,
-  selections: IPlanningRowSelections,
-): string | null => {
-  const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
-
-  if (shouldNavigate(type, selections)) {
-    return [selectedMasterClass?.id, selectedClass?.id, selectedSubClass?.id, item.id]
-      .join('/')
-      .replace(/(\/{2,})/gm, '/') // replace triple /// with one in case of one of values is undefined/null
-      .replace(/(^\/)|(\/$)/gm, ''); // remove the last and first / in case of the last one of values is undefined/null
-  } else {
-    return null;
-  }
-};
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -181,7 +121,7 @@ const buildPlanningTableRows = (
       path: type !== 'group' ? (item as IClass | ILocation).path : '',
       id: item.id,
       key: item.id,
-      link: getLink(item, type, selections),
+      // link: getLink(item, type, selections),
       defaultExpanded,
       children: [],
       projectRows,
@@ -295,144 +235,6 @@ const buildPlanningTableRows = (
 };
 
 /**
- * Builds a hierarchy-list of IPlanningTableRows, that will either include
- * - masterClasses, classes, subClasses, groups and districts; if a district isn't selected
- * - districts, divisions and groups; if a district is selected
- *
- * ! Groups will mostly appear under the selected divisions, but they can also appear under
- * districts and subClasses
- *
- * @param state the current state of the planningRows-hook
- * @returns a list of planning rows for the planning table
- */
-const buildCoordinatorTableRows = (
-  list: IPlanningRowList,
-  projects: Array<IProject>,
-  selections: IPlanningRowSelections,
-) => {
-  const {
-    masterClasses,
-    classes,
-    subClasses,
-    collectiveSubLevels,
-    districts,
-    otherClassifications,
-    otherClassificationSubLevels,
-  } = list;
-
-  const {
-    selectedMasterClass,
-    selectedClass,
-    selectedSubClass,
-    // selectedCollectiveSubLevel,
-    // selectedDistrict,
-    // selectedOtherClassification,
-    // selectedOtherClassificationSubLevel,
-  } = selections;
-
-  const getRowProps = (
-    item: IClass | ILocation | IGroup,
-    type: PlanningRowType,
-    expanded?: boolean,
-  ): IPlanningRow => {
-    const projectRows = getSortedProjects(item.id, type, projects, item.name);
-    const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
-    return {
-      type: type,
-      name: item.name,
-      path: type !== 'group' ? (item as IClass | ILocation).path : '',
-      id: item.id,
-      key: item.id,
-      link: getLink(item, type, selections),
-      defaultExpanded,
-      children: [],
-      projectRows,
-      cells: calculatePlanningCells(item.finances, type),
-      ...calculatePlanningRowSums(item.finances, type),
-    };
-  };
-
-  // Map the class rows going from masterClasses to districts
-  const rows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
-    return {
-      // Map master classes
-      ...getRowProps(masterClass, 'masterClass', !!selectedMasterClass),
-      // Map classes
-      children: classes
-        .filter((c) => c.parent === masterClass.id)
-        .map((filteredClass) => ({
-          ...getRowProps(filteredClass, 'class', !!selectedClass),
-          // Map sub classes
-          children: subClasses
-            .filter((subClass) => subClass.parent === filteredClass.id)
-            .map((filteredSubClass) => ({
-              ...getRowProps(filteredSubClass, 'subClass', !!selectedSubClass),
-              // Map collective sub levels
-              children: [
-                ...collectiveSubLevels
-                  .filter((collectiveSubLevel) => collectiveSubLevel.parent === filteredSubClass.id)
-                  .map((filteredCollectiveSubLevel) => ({
-                    ...getRowProps(filteredCollectiveSubLevel, 'collective-sub-level'),
-                    // Map other classifications and districts
-                    children: [
-                      // Map other classification
-                      ...otherClassifications
-                        .filter(
-                          (otherClassification) =>
-                            otherClassification.parent === filteredCollectiveSubLevel.id,
-                        )
-                        .map((filteredOtherClassification) => ({
-                          ...getRowProps(filteredOtherClassification, 'other-classification'),
-                          // Map other classification sub level
-                          children: otherClassificationSubLevels
-                            .filter(
-                              (otherClassificationSubLevel) =>
-                                otherClassificationSubLevel.parent ===
-                                filteredOtherClassification.id,
-                            )
-                            .map((filteredOtherClassificationSubLevel) => ({
-                              ...getRowProps(
-                                filteredOtherClassificationSubLevel,
-                                'other-classification-sub-level',
-                              ),
-                            })),
-                        })),
-                      // Map districts
-                      ...districts
-                        .filter(
-                          (district) => district.parentClass === filteredCollectiveSubLevel.id,
-                        )
-                        .map((filteredDistrict) => ({
-                          ...getRowProps(filteredDistrict, 'collective-district-preview'),
-                        })),
-                    ],
-                  })),
-                // Map districts
-                ...districts
-                  .filter((district) => district.parentClass === filteredSubClass.id)
-                  .map((filteredDistrict) => ({
-                    ...getRowProps(filteredDistrict, 'district-preview'),
-                  })),
-              ],
-            })),
-        })),
-    };
-  });
-
-  return rows;
-};
-
-/**
- * Returns the selected class or location from a list of classes or locations if it's found,
- * otherwise it will return null if no selection is made or found.
- *
- * @param list class or location list to compare
- * @param id id of the item to compare
- */
-const getSelectedItemOrNull = (list: Array<IClass | ILocation>, id: string | undefined) =>
-  (id ? list.find((l) => l.id === id) : null) as IClass | ILocation | null;
-
-/**
  * Fetches projects for a given location or class.
  *
  * It will add the direct=true parameter to the search query if we're fetching projects for classes or subClasses, which
@@ -494,50 +296,16 @@ const usePlanningRows = () => {
   const selections = useAppSelector(selectSelections);
   const financeUpdate = useAppSelector(selectFinanceUpdate);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
-  const batchedCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
-  const batchedLocations = useAppSelector(selectBatchedPlanningLocations);
-  const batchedCoordinationLocations = useAppSelector(selectBatchedCoordinationLocations);
-  const { masterClassId, classId, subClassId, districtId } = useParams();
+  const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
-  const { pathname } = useLocation();
   const mode = useAppSelector(selectMode);
-
-  // Listens to the url path and changes mode to either 'planning' or 'coordination' depending on the url
-  useEffect(() => {
-    if (!pathname) {
-      return;
-    }
-
-    const rootPath = pathname.split('/')[1].replace(/-/g, '') as PlanningMode;
-
-    if (rootPath !== mode) {
-      dispatch(setMode(rootPath));
-    }
-  }, [pathname]);
-
-  // Listen to masterClasses, classes and subClasses or their ids in the url and sets
-  // the selectedMasterClass, selectedClass and selectedSubClass if found
-  useEffect(() => {
-    const { masterClasses, classes, subClasses, year } = batchedPlanningClasses;
-    const nextMasterClass = getSelectedItemOrNull(masterClasses, masterClassId);
-    const nextClass = getSelectedItemOrNull(classes, classId);
-    const nextSubClass = getSelectedItemOrNull(subClasses, subClassId);
-
-    dispatch(setStartYear(year));
-    dispatch(setSelectedMasterClass(nextMasterClass));
-    dispatch(setSelectedClass(nextClass));
-    dispatch(setSelectedSubClass(nextSubClass));
-  }, [masterClassId, classId, subClassId, batchedPlanningClasses, mode]);
-
-  // Listen to districts or districtId in the url and sets the selectedDistrict if found
-  useEffect(() => {
-    const { districts } = batchedLocations;
-    const nextDistrict = getSelectedItemOrNull(districts, districtId) as ILocation;
-    dispatch(setSelectedDistrict(nextDistrict));
-  }, [districtId, batchedLocations, mode]);
 
   // Fetch projects when selections change
   useEffect(() => {
+    if (mode !== 'planning') {
+      return;
+    }
+
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
     if (type && id) {
       fetchProjectsByRelation(type as PlanningRowType, id)
@@ -546,9 +314,13 @@ const usePlanningRows = () => {
         })
         .catch(Promise.reject);
     }
-  }, [selections, groups]);
+  }, [selections, groups, mode]);
 
   useEffect(() => {
+    if (mode !== 'planning') {
+      return;
+    }
+
     if (financeUpdate) {
       Promise.all([
         dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
@@ -558,7 +330,7 @@ const usePlanningRows = () => {
         dispatch(updateGroup(financeUpdate.group)),
       ]).catch((e) => console.log('Error updating finances: ', e));
     }
-  }, [financeUpdate]);
+  }, [financeUpdate, mode]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {
@@ -568,7 +340,7 @@ const usePlanningRows = () => {
 
     const { masterClasses, classes, subClasses } = batchedPlanningClasses;
     const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass } = selections;
-    const { districts, divisions } = batchedLocations;
+    const { districts, divisions } = batchedPlanningLocations;
 
     const finalDistricts = [];
 
@@ -596,66 +368,7 @@ const usePlanningRows = () => {
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [batchedPlanningClasses, batchedLocations, groups, projects, selections, mode]);
-
-  // Build coordination table rows when locations, classes, groups, project, mode or selections change
-  useEffect(() => {
-    if (mode !== 'coordination') {
-      return;
-    }
-
-    const {
-      masterClasses,
-      classes,
-      subClasses,
-      collectiveSubLevels,
-      otherClassifications,
-      otherClassificationSubLevels,
-    } = batchedCoordinationClasses;
-    const {
-      selectedClass,
-      selectedDistrict,
-      selectedMasterClass,
-      selectedSubClass,
-      selectedCollectiveSubLevel,
-      selectedOtherClassification,
-      selectedOtherClassificationSubLevel,
-    } = selections;
-    const { districts } = batchedCoordinationLocations;
-
-    const finalDistricts = [];
-
-    if (selectedDistrict) {
-      finalDistricts.push(selectedDistrict);
-    } else if (!selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')) {
-      finalDistricts.push(...districts);
-    }
-
-    const list = {
-      masterClasses: selectedMasterClass ? [selectedMasterClass] : masterClasses,
-      classes: selectedClass ? [selectedClass] : classes,
-      subClasses: selectedSubClass ? [selectedSubClass] : subClasses,
-      collectiveSubLevels: selectedCollectiveSubLevel
-        ? [selectedCollectiveSubLevel]
-        : collectiveSubLevels,
-      districts: finalDistricts,
-      otherClassifications: selectedOtherClassification
-        ? [selectedOtherClassification]
-        : otherClassifications,
-      otherClassificationSubLevels: selectedOtherClassificationSubLevel
-        ? [selectedOtherClassificationSubLevel]
-        : otherClassificationSubLevels,
-      divisions: [],
-      groups: [],
-    };
-
-    const nextRows = buildCoordinatorTableRows(list, projects, selections);
-
-    // Re-build planning rows if the existing rows are not equal
-    if (!_.isEqual(nextRows, rows)) {
-      dispatch(setPlanningRows(nextRows));
-    }
-  }, [batchedCoordinationClasses, batchedLocations, groups, projects, selections, mode]);
+  }, [batchedPlanningClasses, batchedPlanningLocations, groups, projects, selections, mode]);
 };
 
 export default usePlanningRows;
