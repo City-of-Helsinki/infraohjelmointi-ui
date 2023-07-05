@@ -22,7 +22,12 @@ const ProjectDeleteDialog: FC<ProjectDeleteDialogProps> = memo(
       deleteProject(id)
         .then(() => {
           onCloseProjectDeleteDialog();
-          navigate('/planning');
+          // navigate back to history or if no history, go to planning view
+          if (window.history.state && window.history.state.idx > 0) {
+            navigate(-1);
+          } else {
+            navigate('/planning', { replace: true });
+          }
         })
         .catch(Promise.reject);
     }, [id, onCloseProjectDeleteDialog, navigate]);

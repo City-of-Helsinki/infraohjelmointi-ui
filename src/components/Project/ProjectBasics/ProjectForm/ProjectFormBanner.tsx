@@ -31,6 +31,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
           <>
             {/** Add logic for disabling button later based on user type */}
             <Button
+              data-testid={'delete-project-dialog-button'}
               disabled={false}
               iconLeft={<IconTrash />}
               variant="supplementary"

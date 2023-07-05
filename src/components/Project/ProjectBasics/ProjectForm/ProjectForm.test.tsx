@@ -29,6 +29,7 @@ import ProjectForm from './ProjectForm';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import ProjectView from '@/views/ProjectView';
 import ProjectBasics from '../ProjectBasics';
+import PlanningView from '@/views/PlanningView/PlanningView';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -46,6 +47,7 @@ const render = async () =>
         <Route path="/project/:projectId?" element={<ProjectView />}>
           <Route path="basics" element={<ProjectBasics />} />
         </Route>
+        <Route path="/planning" element={<PlanningView />} />
       </Route>,
       {
         preloadedState: {
@@ -537,5 +539,21 @@ describe('projectForm', () => {
     );
     expect(store.getState().project.selectedProject).toBe(mockPostResponse.data);
     expect(store.getState().project.mode).toBe('edit');
+  });
+  it('can delete a project', async () => {
+    const project = mockProject.data;
+    const deleteResponse = { data: { id: project.id } };
+    mockedAxios.delete.mockResolvedValueOnce(deleteResponse);
+    const { user, findByTestId, findByRole } = await render();
+
+    const openDeleteDialogButton = await findByTestId('delete-project-dialog-button');
+    await user.click(openDeleteDialogButton);
+
+    const dialog = within(await findByRole('dialog'));
+    const deleteProjectButton = await dialog.findByTestId(`delete-project-${project.id}`);
+    expect(deleteProjectButton).toBeInTheDocument();
+    await user.click(deleteProjectButton);
+
+    expect(mockedAxios.delete).toHaveBeenCalledWith('localhost:4000/projects/mock-project-id/');
   });
 });
