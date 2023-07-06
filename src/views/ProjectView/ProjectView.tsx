@@ -1,6 +1,13 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { getProjectThunk, selectProject, setSelectedProject } from '@/reducers/projectSlice';
+import {
+  getProjectThunk,
+  resetProject,
+  selectProjectMode,
+  selectProject,
+  setProjectMode,
+  setSelectedProject,
+} from '@/reducers/projectSlice';
 import { TabList } from '@/components/shared';
 import { useNavigate, useParams } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
@@ -22,6 +29,7 @@ const ProjectView = () => {
   const navigate = useNavigate();
   const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
+  const projectMode = useAppSelector(selectProjectMode);
 
   // Update selectedProject to redux with a project-update event
   useEffect(() => {
@@ -32,28 +40,49 @@ const ProjectView = () => {
 
   useEffect(() => {
     if (projectId) {
-      dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
-      dispatch(getProjectThunk(projectId))
-        .then((res) => res.type.includes('rejected') && navigate('/not-found'))
-        .catch(Promise.reject)
-        .finally(() => dispatch(clearLoading(LOADING_PROJECT)));
+      // if a new project is added after a successfull POST request goes through we want to change the mode to edit
+      if (projectMode === 'new') {
+        dispatch(setProjectMode('edit'));
+      }
+      // if project mode is not new then we fetch the project to make sure we got the latest changes
+      else {
+        dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
+        dispatch(getProjectThunk(projectId))
+          .then((res) => res.type.includes('rejected') && navigate('/not-found'))
+          .catch(Promise.reject)
+          .finally(() => dispatch(clearLoading(LOADING_PROJECT)));
+      }
+    } else if (projectMode === 'new') {
+      // If the mode is 'new' and there was no project yet, reset the project to make sure selectedProject isn't still in redux
+      if (!projectId) {
+        dispatch(resetProject());
+      }
     } else {
       navigate('/planning');
     }
-  }, [projectId]);
+  }, [projectId, projectMode, navigate, dispatch]);
 
-  const navItems: Array<INavigationItem> = [
-    { route: 'basics', label: t('basicInfo'), component: <ProjectBasics /> },
-    { route: 'notes', label: t('notes'), component: <ProjectNotes /> },
-  ];
+  const getNavItems = useCallback(() => {
+    const navItems: Array<INavigationItem> = [
+      {
+        route: projectMode === 'new' ? 'new' : 'basics',
+        label: t('basicInfo'),
+        component: <ProjectBasics />,
+      },
+    ];
+    if (projectMode !== 'new') {
+      navItems.push({ route: 'notes', label: t('notes'), component: <ProjectNotes /> });
+    }
+    return navItems;
+  }, [projectMode]);
 
   return (
     <div className="w-full" data-testid="project-view">
-      {selectedProject && (
+      {(selectedProject || projectMode === 'new') && (
         <>
           <ProjectToolbar />
           <ProjectHeader />
-          <TabList navItems={navItems} />
+          <TabList navItems={getNavItems()} />
         </>
       )}
     </div>

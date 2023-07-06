@@ -46,9 +46,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
 
   const validatePhase = useMemo(
     () => ({
-      required: t('validation.required', { field: 'validation.phase' }) ?? '',
+      required: t('validation.required', { field: t('validation.phase') }) ?? '',
       validate: {
         isPhaseValid: (phase: IOption) => {
+          if (phase.value === '') {
+            return t('validation.required', { field: t('validation.phase') }) ?? '';
+          }
+
           const phaseToSubmit = phase.value;
           const programmed = getValues('programmed');
           const fields: Array<string> = [];
@@ -164,7 +168,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
       validate: {
         isProgrammedValid: (programmed: boolean) => {
           const phase = getValues('phase');
-          if (phase.value === proposalPhase || phase.value === designPhase) {
+          if (phase.value === proposalPhase || phase.value === designPhase || phase.value === '') {
             return programmed
               ? t('validation.requiredFalse', { field: t('validation.programmed') })
               : true;

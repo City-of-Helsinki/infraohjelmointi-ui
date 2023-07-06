@@ -14,6 +14,7 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
   onCloseMenu,
   onShowGroupDialog,
   onShowProjectProgrammedDialog,
+  onOpenNewProjectForm,
 }) => {
   const { t } = useTranslation();
   const selections = useAppSelector(selectSelections);
@@ -26,6 +27,11 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
     onCloseMenu();
     onShowGroupDialog();
   }, [onCloseMenu, onShowGroupDialog]);
+
+  const openNewProjectForm = useCallback(() => {
+    onCloseMenu();
+    onOpenNewProjectForm();
+  }, [onCloseMenu, onOpenNewProjectForm]);
   return (
     <div className="project-cell-menu" data-testid="project-cell-menu">
       <div className="project-cell-menu-header">
@@ -61,7 +67,7 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
         <Button
           variant="supplementary"
           iconLeft={undefined}
-          disabled={true}
+          onClick={openNewProjectForm}
           data-testid="edit-year-button"
         >
           {t(`createNewProject`)}

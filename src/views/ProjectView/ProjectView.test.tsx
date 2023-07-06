@@ -30,6 +30,7 @@ const render = async () =>
       <Route path="/" element={<ProjectView />}>
         <Route path="/projects/:projectId" element={<ProjectView />}>
           <Route path="basics" element={<ProjectBasics />} />
+          <Route path="new" element={<ProjectBasics />} />
           <Route path="notes" element={<ProjectNotes />} />
         </Route>
         <Route path="/planning" element={<PlanningView />} />

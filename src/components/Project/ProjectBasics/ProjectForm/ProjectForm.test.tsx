@@ -23,9 +23,12 @@ import { waitFor, act, within } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
-import { setSelectedProject } from '@/reducers/projectSlice';
+import { resetProject, setProjectMode, setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
 import ProjectForm from './ProjectForm';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import ProjectView from '@/views/ProjectView';
+import ProjectBasics from '../ProjectBasics';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -37,38 +40,47 @@ const getFormField = (name: string) => `projectForm.${name}`;
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectForm />} />, {
-      preloadedState: {
-        project: {
-          selectedProject: mockProject.data,
-          count: 1,
-          error: {},
-          page: 1,
-          isSaving: false,
-        },
-        auth: { user: mockPersons.data[0], error: {} },
-        lists: {
-          areas: mockProjectAreas.data,
-          phases: mockProjectPhases.data,
-          types: mockProjectTypes.data,
-          constructionPhaseDetails: mockConstructionPhaseDetails.data,
-          categories: mockProjectCategories.data,
-          riskAssessments: mockProjectRisks.data,
-          projectQualityLevels: mockProjectQualityLevels.data,
-          planningPhases: mockPlanningPhases.data,
-          constructionPhases: mockConstructionPhases.data,
-          responsibleZones: mockResponsibleZones.data,
-          responsiblePersons: mockResponsiblePersons.data,
-          programmedYears: [],
-          error: {},
-        },
-        hashTags: {
-          hashTags: mockHashTags.data.hashTags,
-          popularHashTags: mockHashTags.data.popularHashTags,
-          error: {},
+    renderWithProviders(
+      <Route>
+        <Route path="/" element={<ProjectForm />} />
+        <Route path="/project/:projectId?" element={<ProjectView />}>
+          <Route path="basics" element={<ProjectBasics />} />
+        </Route>
+      </Route>,
+      {
+        preloadedState: {
+          project: {
+            selectedProject: mockProject.data,
+            count: 1,
+            error: {},
+            page: 1,
+            isSaving: false,
+            mode: 'edit',
+          },
+          auth: { user: mockPersons.data[0], error: {} },
+          lists: {
+            areas: mockProjectAreas.data,
+            phases: mockProjectPhases.data,
+            types: mockProjectTypes.data,
+            constructionPhaseDetails: mockConstructionPhaseDetails.data,
+            categories: mockProjectCategories.data,
+            riskAssessments: mockProjectRisks.data,
+            projectQualityLevels: mockProjectQualityLevels.data,
+            planningPhases: mockPlanningPhases.data,
+            constructionPhases: mockConstructionPhases.data,
+            responsibleZones: mockResponsibleZones.data,
+            responsiblePersons: mockResponsiblePersons.data,
+            programmedYears: [],
+            error: {},
+          },
+          hashTags: {
+            hashTags: mockHashTags.data.hashTags,
+            popularHashTags: mockHashTags.data.popularHashTags,
+            error: {},
+          },
         },
       },
-    }),
+    ),
   );
 
 /**
@@ -79,6 +91,9 @@ const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project:
 };
 
 describe('projectForm', () => {
+  beforeEach(() => {
+    mockGetResponseProvider();
+  });
   afterEach(async () => {
     jest.clearAllMocks();
   });
@@ -454,5 +469,73 @@ describe('projectForm', () => {
 
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
+  });
+
+  it('can post a new project', async () => {
+    const expectedName = 'Post project';
+    const expectedDescription = 'Post project description';
+    const expectedProgrammed = false;
+    const expectedPhase = {
+      id: '7bc0829e-ffb4-4e4c-8653-1e1709e9f17a',
+      value: 'proposal',
+    };
+
+    const project = mockProject.data;
+    const mockPostResponse: { data: IProject } = {
+      data: {
+        ...project,
+        id: 'post-project-id',
+        name: expectedName,
+        description: expectedDescription,
+        programmed: expectedProgrammed,
+        phase: expectedPhase,
+      },
+    };
+    const mockGetResponse: { data: IProject } = {
+      data: mockPostResponse.data,
+    };
+
+    const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
+    await waitFor(() => {
+      store.dispatch(resetProject());
+      store.dispatch(setProjectMode('new'));
+    });
+    expect(store.getState().project.selectedProject).toBe(null);
+    expect(store.getState().project.mode).toBe('new');
+    mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
+    const nameField = await findByRole('textbox', { name: getFormField('name *') });
+    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
+    let parentContainer = await findByTestId('project-form');
+
+    await user.type(nameField, expectedName);
+    await user.type(descriptionField, expectedDescription);
+    //select phase
+    await user.click(
+      parentContainer.querySelector('#select-field-phase-toggle-button') as HTMLElement,
+    );
+    await user.click(await within(parentContainer).findByText('option.proposal'));
+    const submitProjectButton = await findByTestId('submit-project-button');
+    mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
+    await waitFor(async () => {
+      await user.click(submitProjectButton);
+    });
+
+    const formPostRequest = mockedAxios.post.mock.lastCall[1] as IProject;
+
+    expect(formPostRequest.name).toEqual(expectedName);
+    expect(formPostRequest.description).toEqual(expectedDescription);
+    expect(formPostRequest.phase).toEqual(expectedPhase.id);
+    parentContainer = await findByTestId('project-form');
+    expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
+
+    expect(await findByTestId('project-header-name-fields')).toHaveTextContent(
+      matchExact(expectedName),
+    );
+
+    expect(await findByTestId('project-header-name-fields')).toHaveTextContent(
+      matchExact(expectedPhase.value),
+    );
+    expect(store.getState().project.selectedProject).toBe(mockPostResponse.data);
+    expect(store.getState().project.mode).toBe('edit');
   });
 });

@@ -10,12 +10,13 @@ interface IIconButton {
   color?: TextColorType;
   fontWeight?: FontWeightType;
   label?: string;
+  disabled?: boolean;
 }
 
 const IconButton: FC<IIconButton> = (props) => {
-  const { onClick, ...iconProps } = props;
+  const { onClick, disabled, ...iconProps } = props;
   return (
-    <button onClick={onClick} aria-label={iconProps.text || iconProps.label}>
+    <button onClick={onClick} aria-label={iconProps.text || iconProps.label} disabled={disabled}>
       <Icon {...iconProps} />
     </button>
   );
