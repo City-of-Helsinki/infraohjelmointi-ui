@@ -11,7 +11,7 @@ import {
 import { selectGroups } from '@/reducers/groupSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
-  selectMode,
+  selectPlanningMode,
   selectPlanningRows,
   selectProjects,
   selectSelections,
@@ -135,7 +135,7 @@ const useCoordinationRows = () => {
   const batchedCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
   const batchedCoordinationLocations = useAppSelector(selectBatchedCoordinationLocations);
 
-  const mode = useAppSelector(selectMode);
+  const mode = useAppSelector(selectPlanningMode);
 
   // Build coordination table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {

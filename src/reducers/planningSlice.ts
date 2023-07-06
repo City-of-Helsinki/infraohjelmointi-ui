@@ -84,7 +84,7 @@ export const planningSlice = createSlice({
     setGroupsExpanded(state, action: PayloadAction<boolean>) {
       return { ...state, groupsExpanded: action.payload };
     },
-    setMode(state, action: PayloadAction<PlanningMode>) {
+    setPlanningMode(state, action: PayloadAction<PlanningMode>) {
       return { ...state, mode: action.payload };
     },
     resetSelections(state) {
@@ -99,7 +99,7 @@ export const selectSelections = (state: RootState) => state.planning.selections;
 export const selectPlanningRows = (state: RootState) => state.planning.rows;
 export const selectProjects = (state: RootState) => state.planning.projects;
 export const selectGroupsExpanded = (state: RootState) => state.planning.groupsExpanded;
-export const selectMode = (state: RootState) => state.planning.mode;
+export const selectPlanningMode = (state: RootState) => state.planning.mode;
 
 export const {
   setSelectedYear,
@@ -114,7 +114,7 @@ export const {
   setStartYear,
   setProjects,
   setGroupsExpanded,
-  setMode,
+  setPlanningMode,
   resetSelections,
 } = planningSlice.actions;
 

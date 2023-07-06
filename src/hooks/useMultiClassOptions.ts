@@ -1,7 +1,7 @@
 import { IOption } from '@/interfaces/common';
 import {
   selectPlanningClasses,
-  selectAllPlanningClasses,
+  selectPlanningMasterClasses,
   selectPlanningSubClasses,
 } from '@/reducers/classSlice';
 import { useCallback, useMemo } from 'react';
@@ -22,7 +22,7 @@ const useMultiClassOptions = (
   classes: Array<IOption>,
   subClasses: Array<IOption>,
 ) => {
-  const allMasterClasses = useAppSelector(selectAllPlanningClasses);
+  const allMasterClasses = useAppSelector(selectPlanningMasterClasses);
   const allClasses = useAppSelector(selectPlanningClasses);
   const allSubClasses = useAppSelector(selectPlanningSubClasses);
 

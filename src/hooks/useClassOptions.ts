@@ -1,7 +1,7 @@
 import {
   selectPlanningClasses,
-  selectAllPlanningClasses,
   selectPlanningSubClasses,
+  selectPlanningMasterClasses,
 } from '@/reducers/classSlice';
 import { classesToOptions } from '@/utils/common';
 import { useCallback, useMemo } from 'react';
@@ -14,7 +14,7 @@ import { useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useClassOptions = (currentClass: string | undefined) => {
-  const masterClasses = useAppSelector(selectAllPlanningClasses);
+  const masterClasses = useAppSelector(selectPlanningMasterClasses);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
 

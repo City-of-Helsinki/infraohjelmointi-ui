@@ -5,12 +5,12 @@ import { IconAngleLeft } from 'hds-react/icons';
 import { useLocation, useNavigate } from 'react-router';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
-import { selectMode, selectSelections } from '@/reducers/planningSlice';
+import { selectPlanningMode, selectSelections } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
-  const mode = useAppSelector(selectMode);
+  const mode = useAppSelector(selectPlanningMode);
   const selections = useAppSelector(selectSelections);
   const { selectedMasterClass } = selections;
 

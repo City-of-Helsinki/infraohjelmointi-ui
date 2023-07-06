@@ -14,7 +14,7 @@ import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/gr
 import { useNavigate } from 'react-router';
 import { patchGroup } from '@/services/groupService';
 import './styles.css';
-import { selectMode } from '@/reducers/planningSlice';
+import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 
 interface IDialogProps {
@@ -47,7 +47,7 @@ const buildRequestPayload = (
 
 const DialogContainer: FC<IDialogProps> = memo(
   ({ isOpen, handleClose, editMode, projects, id }) => {
-    const mode = useAppSelector(selectMode);
+    const mode = useAppSelector(selectPlanningMode);
     const navigate = useNavigate();
 
     const [showAdvanceFields, setShowAdvanceFields] = useState(false);

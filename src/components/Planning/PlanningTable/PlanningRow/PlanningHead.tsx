@@ -9,7 +9,7 @@ import { GroupDialog } from '../../GroupDialog';
 import './styles.css';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
-import { selectMode } from '@/reducers/planningSlice';
+import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 
 interface IPlanningHeadProps extends IPlanningRow {
@@ -30,7 +30,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   urlSearchParam,
 }) => {
   const navigate = useNavigate();
-  const mode = useAppSelector(selectMode);
+  const mode = useAppSelector(selectPlanningMode);
   const { search } = useLocation();
 
   const [groupDialogState, setGroupDialogState] = useState({

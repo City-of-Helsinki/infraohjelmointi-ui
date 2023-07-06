@@ -4,12 +4,12 @@ import { memo } from 'react';
 import PlanningRow from './PlanningRow/PlanningRow';
 import { IPlanningRow } from '@/interfaces/common';
 import { useAppSelector } from '@/hooks/common';
-import { selectMode, selectPlanningRows } from '@/reducers/planningSlice';
+import { selectPlanningMode, selectPlanningRows } from '@/reducers/planningSlice';
 import './styles.css';
 
 const PlanningTable = () => {
   const rows = useAppSelector(selectPlanningRows);
-  const mode = useAppSelector(selectMode);
+  const mode = useAppSelector(selectPlanningMode);
   return (
     <div className="planning-table-container" id="planning-table-container">
       <table className={`planning-table ${mode}`} cellSpacing={0} data-testid="planning-table">

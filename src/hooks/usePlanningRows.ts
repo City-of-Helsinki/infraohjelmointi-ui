@@ -19,7 +19,7 @@ import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import {
-  selectMode,
+  selectPlanningMode,
   selectPlanningRows,
   selectProjects,
   selectSelections,
@@ -255,7 +255,7 @@ const usePlanningRows = () => {
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
-  const mode = useAppSelector(selectMode);
+  const mode = useAppSelector(selectPlanningMode);
 
   // Fetch projects when selections change
   useEffect(() => {

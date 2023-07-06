@@ -4,8 +4,8 @@ import { useLocation } from 'react-router';
 import { PlanningMode } from '@/interfaces/common';
 import {
   resetSelections,
-  selectMode,
-  setMode,
+  selectPlanningMode,
+  setPlanningMode,
   setSelectedClass,
   setSelectedCollectiveDistrict,
   setSelectedCollectiveSubLevel,
@@ -41,7 +41,7 @@ const usePlanningRoutes = () => {
   const planningDistricts = useAppSelector(selectPlanningDistricts);
   const coordinationDistricts = useAppSelector(selectCoordinationDistricts);
 
-  const mode = useAppSelector(selectMode);
+  const mode = useAppSelector(selectPlanningMode);
 
   // Listens to the url path and changes mode to either 'planning' or 'coordination' depending on the url
   useEffect(() => {
@@ -53,7 +53,7 @@ const usePlanningRoutes = () => {
 
     if (rootPath && rootPath !== mode) {
       dispatch(resetSelections());
-      dispatch(setMode(rootPath));
+      dispatch(setPlanningMode(rootPath));
     }
   }, [pathname, mode]);
 
