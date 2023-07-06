@@ -48,7 +48,7 @@ export const projectSlice = createSlice({
     setIsSaving(state, action: PayloadAction<boolean>) {
       return { ...state, isSaving: action.payload };
     },
-    setMode(state, action: PayloadAction<'edit' | 'new'>) {
+    setProjectMode(state, action: PayloadAction<'edit' | 'new'>) {
       return { ...state, mode: action.payload };
     },
   },
@@ -67,9 +67,9 @@ export const selectProject = (state: RootState) => state.project.selectedProject
 export const selectCount = (state: RootState) => state.project.count;
 export const selectPage = (state: RootState) => state.project.page;
 export const selectIsProjectSaving = (state: RootState) => state.project.isSaving;
-export const selectMode = (state: RootState) => state.project.mode;
+export const selectProjectMode = (state: RootState) => state.project.mode;
 
-export const { setPage, resetProject, setSelectedProject, setIsSaving, setMode } =
+export const { setPage, resetProject, setSelectedProject, setIsSaving, setProjectMode } =
   projectSlice.actions;
 
 export default projectSlice.reducer;

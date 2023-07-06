@@ -23,7 +23,7 @@ import { waitFor, act, within } from '@testing-library/react';
 import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
-import { resetProject, setMode, setSelectedProject } from '@/reducers/projectSlice';
+import { resetProject, setProjectMode, setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
 import ProjectForm from './ProjectForm';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
@@ -498,7 +498,7 @@ describe('projectForm', () => {
     const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
     await waitFor(() => {
       store.dispatch(resetProject());
-      store.dispatch(setMode('new'));
+      store.dispatch(setProjectMode('new'));
     });
     expect(store.getState().project.selectedProject).toBe(null);
     expect(store.getState().project.mode).toBe('new');

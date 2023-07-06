@@ -3,8 +3,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  setMode,
-  selectMode,
+  setProjectMode,
+  selectProjectMode,
   selectProject,
   setIsSaving,
   setSelectedProject,
@@ -32,7 +32,7 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const dispatch = useAppDispatch();
   const formRef = useRef<HTMLFormElement>(null);
-  const projectMode = useAppSelector(selectMode);
+  const projectMode = useAppSelector(selectProjectMode);
   const navigate = useNavigate();
 
   const {
@@ -50,11 +50,13 @@ const ProjectForm = () => {
 
   const [newProjectId, setNewProjectId] = useState<string>('');
 
+  // useEffect which triggers when form fields are reset by setting selectedProject after successful POST request
   useEffect(() => {
     if (!isDirty && newProjectId) {
       navigate(`/project/${newProjectId}/basics`);
     }
   }, [newProjectId, isDirty]);
+
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
       if (isDirty) {
@@ -84,7 +86,7 @@ const ProjectForm = () => {
           } finally {
             dispatch(setIsSaving(false));
             setNewProjectId(postResponsePId);
-            dispatch(setMode('edit'));
+            dispatch(setProjectMode('edit'));
           }
         }
       }

@@ -126,10 +126,11 @@
     "presenceEnd": "Esilläolo päättyy",
     "visibilityStart": "Nähtävilläolo alkaa",
     "visibilityEnd": "Nähtävilläolo päättyy",
-    "personPlanning": "Vastuuhenkilö"
+    "personPlanning": "Vastuuhenkilö",
+    "name": "Hankkeen nimi"
   },
   "projectForm": {
-    "name": "Projektin nimi",
+    "name": "Hankkeen nimi",
     "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
     "entityName": "Hankekokonaisuuden nimi",
@@ -383,5 +384,5 @@
   "confirmLeaveTitle": "Oletko varma että haluat poistua?",
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
-  "newProject": "Uusi projekti"
+  "newProject": "Uusi hanke"
 }

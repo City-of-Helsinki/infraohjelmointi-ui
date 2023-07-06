@@ -7,7 +7,7 @@ import { IPerson, IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { selectMode, selectProject } from '@/reducers/projectSlice';
+import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
 import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
 import { selectClasses, selectMasterClasses, selectSubClasses } from '@/reducers/classSlice';
 import useClassOptions from '@/hooks/useClassOptions';
@@ -172,7 +172,7 @@ const useProjectFormValues = () => {
  */
 const useProjectForm = () => {
   const { formValues, project } = useProjectFormValues();
-  const projectMode = useAppSelector(selectMode);
+  const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onBlur',

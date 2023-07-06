@@ -3,7 +3,7 @@ import { useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { selectMode, selectProject } from '@/reducers/projectSlice';
+import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
@@ -25,7 +25,7 @@ const ProjectHeader: FC = () => {
   const user = useAppSelector(selectUser);
   const group = 'Hakaniemi';
   const { t } = useTranslation();
-  const projectMode = useAppSelector(selectMode);
+  const projectMode = useAppSelector(selectProjectMode);
   const { formMethods } = useProjectHeaderForm();
 
   const {

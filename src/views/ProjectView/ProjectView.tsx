@@ -3,9 +3,9 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   getProjectThunk,
   resetProject,
-  selectMode,
+  selectProjectMode,
   selectProject,
-  setMode,
+  setProjectMode,
   setSelectedProject,
 } from '@/reducers/projectSlice';
 import { TabList } from '@/components/shared';
@@ -29,7 +29,7 @@ const ProjectView = () => {
   const navigate = useNavigate();
   const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
-  const projectMode = useAppSelector(selectMode);
+  const projectMode = useAppSelector(selectProjectMode);
 
   // Update selectedProject to redux with a project-update event
   useEffect(() => {
@@ -40,20 +40,17 @@ const ProjectView = () => {
 
   useEffect(() => {
     if (projectId) {
-      dispatch(setMode('edit'));
+      dispatch(setProjectMode('edit'));
       dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
       dispatch(getProjectThunk(projectId))
         .then((res) => res.type.includes('rejected') && navigate('/not-found'))
         .catch(Promise.reject)
         .finally(() => dispatch(clearLoading(LOADING_PROJECT)));
-    } else if (projectMode !== 'new') {
+    } else if (projectMode === 'new') {
+      dispatch(resetProject());
+    } else {
       navigate('/planning');
     }
-    if (projectMode === 'new') {
-      dispatch(resetProject());
-    }
-
-    // if !projectId and newProject
   }, [projectId, projectMode, navigate, dispatch]);
 
   const getNavItems = useCallback(() => {
