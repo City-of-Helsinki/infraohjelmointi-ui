@@ -25,7 +25,7 @@ const PlanningInfoPanel = () => {
       selectedSubClass,
       selectedDistrict,
       selectedOtherClassification,
-      selectedCollectiveDistrict,
+      selectedSubLevelDistrict,
       selectedCollectiveSubLevel,
     } = selections;
 
@@ -33,8 +33,8 @@ const PlanningInfoPanel = () => {
 
     if (selectedOtherClassification) {
       urlSearchParams.delete('otherClassification');
-    } else if (selectedCollectiveDistrict) {
-      urlSearchParams.delete('collectiveDistrict');
+    } else if (selectedSubLevelDistrict) {
+      urlSearchParams.delete('subLevelDistrict');
     } else if (selectedCollectiveSubLevel) {
       urlSearchParams.delete('collectiveSubLevel');
     } else if (selectedDistrict) {

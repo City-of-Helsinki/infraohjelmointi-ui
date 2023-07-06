@@ -26,7 +26,7 @@ const PlanningBreadcrumbs = () => {
     selectedSubClass,
     selectedDistrict,
     selectedCollectiveSubLevel,
-    selectedCollectiveDistrict,
+    selectedSubLevelDistrict,
     selectedOtherClassification,
   } = useAppSelector(selectSelections);
 
@@ -75,17 +75,17 @@ const PlanningBreadcrumbs = () => {
           value={selectedCollectiveSubLevel.name}
         />
       )}
-      {selectedCollectiveDistrict && (
+      {selectedSubLevelDistrict && (
         <Breadcrumb
           id="district"
-          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&collectiveDistrict=${selectedCollectiveDistrict.id}`}
-          value={selectedCollectiveDistrict.name}
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&subLevelDistrict=${selectedSubLevelDistrict.id}`}
+          value={selectedSubLevelDistrict.name}
         />
       )}
       {selectedOtherClassification && (
         <Breadcrumb
           id="district"
-          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&collectiveDistrict=${selectedCollectiveDistrict?.id}&otherClassification=${selectedOtherClassification.id}`}
+          path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&subLevelDistrict=${selectedSubLevelDistrict?.id}&otherClassification=${selectedOtherClassification.id}`}
           value={selectedOtherClassification.name}
         />
       )}

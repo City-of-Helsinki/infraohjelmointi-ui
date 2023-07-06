@@ -303,7 +303,9 @@ const usePlanningRows = () => {
 
     if (selectedDistrict) {
       finalDistricts.push(selectedDistrict);
-    } else if (!selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')) {
+    }
+    // Don't return districts if there are subClass with the name 'suurpiiri'
+    else if (!selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')) {
       finalDistricts.push(...districts);
     }
 

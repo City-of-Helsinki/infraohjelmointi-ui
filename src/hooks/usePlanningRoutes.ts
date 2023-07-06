@@ -7,7 +7,7 @@ import {
   selectPlanningMode,
   setPlanningMode,
   setSelectedClass,
-  setSelectedCollectiveDistrict,
+  setSelectedSubLevelDistrict,
   setSelectedCollectiveSubLevel,
   setSelectedDistrict,
   setSelectedMasterClass,
@@ -99,7 +99,7 @@ const usePlanningRoutes = () => {
     const subClassId = params.get('subClass');
     const districtId = params.get('district');
     const collectiveSubLevelId = params.get('collectiveSubLevel');
-    const collectiveDistrictId = params.get('collectiveDistrict');
+    const subLevelDistrictId = params.get('subLevelDistrict');
     const otherClassificationId = params.get('otherClassification');
 
     const nextMasterClass = getSelectedItemOrNull(masterClasses, masterClassId);
@@ -107,9 +107,9 @@ const usePlanningRoutes = () => {
     const nextSubClass = getSelectedItemOrNull(subClasses, subClassId);
     const nextDistrict = getSelectedItemOrNull(coordinationDistricts, districtId) as ILocation;
     const nextCollectiveSubLevel = getSelectedItemOrNull(collectiveSubLevels, collectiveSubLevelId);
-    const nextCollectiveDistrict = getSelectedItemOrNull(
+    const nextSubLevelDistrict = getSelectedItemOrNull(
       coordinationDistricts,
-      collectiveDistrictId,
+      subLevelDistrictId,
     ) as ILocation;
     const nextOtherClassification = getSelectedItemOrNull(
       otherClassifications,
@@ -121,7 +121,7 @@ const usePlanningRoutes = () => {
     dispatch(setSelectedSubClass(nextSubClass));
     dispatch(setSelectedDistrict(nextDistrict));
     dispatch(setSelectedCollectiveSubLevel(nextCollectiveSubLevel));
-    dispatch(setSelectedCollectiveDistrict(nextCollectiveDistrict));
+    dispatch(setSelectedSubLevelDistrict(nextSubLevelDistrict));
     dispatch(setSelectedOtherClassification(nextOtherClassification));
   }, [mode, search, batchedPlanningClasses, coordinationDistricts]);
 };

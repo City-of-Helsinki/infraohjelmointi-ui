@@ -102,7 +102,7 @@ export type PlanningRowType =
   | 'district'
   | 'districtPreview'
   | 'collectiveSubLevel'
-  | 'collectiveDistrict'
+  | 'subLevelDistrict'
   | 'otherClassification'
   | 'otherClassificationSubLevel'
   | 'division'
@@ -147,7 +147,7 @@ export interface IPlanningRowSelections {
   selectedSubClass: IClass | null;
   selectedDistrict: ILocation | null;
   selectedCollectiveSubLevel: IClass | null;
-  selectedCollectiveDistrict: ILocation | null;
+  selectedSubLevelDistrict: ILocation | null;
   selectedOtherClassification: IClass | null;
 }
 

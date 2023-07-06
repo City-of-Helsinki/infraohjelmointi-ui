@@ -27,7 +27,7 @@ const initialState: IPlanningState = {
     selectedSubClass: null,
     selectedDistrict: null,
     selectedCollectiveSubLevel: null,
-    selectedCollectiveDistrict: null,
+    selectedSubLevelDistrict: null,
     selectedOtherClassification: null,
   },
   mode: 'planning',
@@ -63,10 +63,10 @@ export const planningSlice = createSlice({
         selections: { ...state.selections, selectedCollectiveSubLevel: action.payload },
       };
     },
-    setSelectedCollectiveDistrict(state, action: PayloadAction<ILocation | null>) {
+    setSelectedSubLevelDistrict(state, action: PayloadAction<ILocation | null>) {
       return {
         ...state,
-        selections: { ...state.selections, selectedCollectiveDistrict: action.payload },
+        selections: { ...state.selections, selectedSubLevelDistrict: action.payload },
       };
     },
     setSelectedOtherClassification(state, action: PayloadAction<IClass | null>) {
@@ -109,7 +109,7 @@ export const {
   setSelectedSubClass,
   setSelectedDistrict,
   setSelectedCollectiveSubLevel,
-  setSelectedCollectiveDistrict,
+  setSelectedSubLevelDistrict,
   setSelectedOtherClassification,
   setStartYear,
   setProjects,
