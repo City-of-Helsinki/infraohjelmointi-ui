@@ -40,14 +40,23 @@ const ProjectView = () => {
 
   useEffect(() => {
     if (projectId) {
-      dispatch(setProjectMode('edit'));
-      dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
-      dispatch(getProjectThunk(projectId))
-        .then((res) => res.type.includes('rejected') && navigate('/not-found'))
-        .catch(Promise.reject)
-        .finally(() => dispatch(clearLoading(LOADING_PROJECT)));
+      // if a new project is added after a successfull POST request goes through we want to change the mode to edit
+      if (projectMode === 'new') {
+        dispatch(setProjectMode('edit'));
+      }
+      // if project mode is not new then we fetch the project to make sure we got the latest changes
+      else {
+        dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
+        dispatch(getProjectThunk(projectId))
+          .then((res) => res.type.includes('rejected') && navigate('/not-found'))
+          .catch(Promise.reject)
+          .finally(() => dispatch(clearLoading(LOADING_PROJECT)));
+      }
     } else if (projectMode === 'new') {
-      dispatch(resetProject());
+      // If the mode is 'new' and there was no project yet, reset the project to make sure selectedProject isn't still in redux
+      if (!projectId) {
+        dispatch(resetProject());
+      }
     } else {
       navigate('/planning');
     }

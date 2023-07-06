@@ -186,6 +186,7 @@ const useProjectForm = () => {
 
   // Updates form with the selectedProject from redux
   useEffect(() => {
+    // added projectMode check for when a new project creation form is opened, form values get reset too
     if (project || projectMode === 'new') {
       reset(formValues);
     }

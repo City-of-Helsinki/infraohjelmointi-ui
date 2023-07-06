@@ -514,10 +514,10 @@ describe('projectForm', () => {
       parentContainer.querySelector('#select-field-phase-toggle-button') as HTMLElement,
     );
     await user.click(await within(parentContainer).findByText('option.proposal'));
-
+    const submitProjectButton = await findByTestId('submit-project-button');
     mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
     await waitFor(async () => {
-      await user.click(parentContainer);
+      await user.click(submitProjectButton);
     });
 
     const formPostRequest = mockedAxios.post.mock.lastCall[1] as IProject;
@@ -532,9 +532,9 @@ describe('projectForm', () => {
       matchExact(expectedName),
     );
 
-    expect(
-      await within(parentContainer).findByText(matchExact(expectedPhase.value)),
-    ).toBeInTheDocument();
+    expect(await findByTestId('project-header-name-fields')).toHaveTextContent(
+      matchExact(expectedPhase.value),
+    );
     expect(store.getState().project.selectedProject).toBe(mockPostResponse.data);
     expect(store.getState().project.mode).toBe('edit');
   });

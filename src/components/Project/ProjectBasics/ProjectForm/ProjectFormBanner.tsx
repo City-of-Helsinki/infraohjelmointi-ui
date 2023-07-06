@@ -13,7 +13,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
   return (
     <div className="project-form-banner">
       <div className="project-form-banner-container">
-        <Button onClick={onSubmit()} disabled={!isDirty}>
+        <Button onClick={onSubmit()} disabled={!isDirty} data-testid="submit-project-button">
           {t('saveChanges')}
         </Button>
       </div>

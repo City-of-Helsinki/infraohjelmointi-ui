@@ -1,9 +1,8 @@
 import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  setProjectMode,
   selectProjectMode,
   selectProject,
   setIsSaving,
@@ -29,11 +28,13 @@ import './styles.css';
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions } = useProjectForm();
   const { t } = useTranslation();
-  const project = useAppSelector(selectProject);
   const dispatch = useAppDispatch();
-  const formRef = useRef<HTMLFormElement>(null);
-  const projectMode = useAppSelector(selectProjectMode);
   const navigate = useNavigate();
+
+  const project = useAppSelector(selectProject);
+  const projectMode = useAppSelector(selectProjectMode);
+
+  const [newProjectId, setNewProjectId] = useState('');
 
   const {
     formState: { dirtyFields, isDirty },
@@ -48,14 +49,17 @@ const ProjectForm = () => {
     when: isDirty,
   });
 
-  const [newProjectId, setNewProjectId] = useState<string>('');
-
   // useEffect which triggers when form fields are reset by setting selectedProject after successful POST request
   useEffect(() => {
+    if (projectMode !== 'new') {
+      return;
+    }
+
     if (!isDirty && newProjectId) {
       navigate(`/project/${newProjectId}/basics`);
+      setNewProjectId('');
     }
-  }, [newProjectId, isDirty]);
+  }, [isDirty, newProjectId]);
 
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
@@ -64,31 +68,28 @@ const ProjectForm = () => {
 
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
-        if (project?.id) {
+        // Patch project
+        if (project?.id && projectMode === 'edit') {
           try {
-            await patchProject({ id: project.id, data });
+            await patchProject({ id: project?.id, data });
           } catch (error) {
             console.log('project patch error: ', error);
-          } finally {
-            dispatch(setIsSaving(false));
           }
         }
 
-        if (!project?.id && projectMode) {
-          let postResponsePId = '';
+        // Post project
+        if (projectMode === 'new') {
           try {
+            dispatch(setIsSaving(true));
             const response = await postProject({ data });
-
             dispatch(setSelectedProject(response));
-            postResponsePId = response.id;
+            setNewProjectId(response.id);
           } catch (error) {
             console.log('project post error: ', error);
-          } finally {
-            dispatch(setIsSaving(false));
-            setNewProjectId(postResponsePId);
-            dispatch(setProjectMode('edit'));
           }
         }
+
+        dispatch(setIsSaving(false));
       }
     },
     [isDirty, project?.id, dirtyFields, dispatch, projectMode, navigate],
@@ -118,9 +119,9 @@ const ProjectForm = () => {
 
   // Listens to forms onClick events and checks if a datepicker is opened
   useEffect(() => {
-    const formElement = formRef?.current;
+    const document = window.document;
 
-    if (!formElement) {
+    if (!document) {
       return;
     }
 
@@ -138,9 +139,9 @@ const ProjectForm = () => {
       }
     };
 
-    formElement.addEventListener('click', checkIfDatePickerOpened);
+    document.addEventListener('click', checkIfDatePickerOpened);
     return () => {
-      formElement.removeEventListener('click', checkIfDatePickerOpened);
+      document.removeEventListener('click', checkIfDatePickerOpened);
     };
   }, []);
 
@@ -155,8 +156,7 @@ const ProjectForm = () => {
 
   return (
     <form
-      ref={formRef}
-      onBlur={submitCallback()}
+      onBlur={projectMode !== 'new' ? submitCallback() : undefined}
       data-testid="project-form"
       className="project-form"
     >
