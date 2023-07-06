@@ -93,16 +93,16 @@ export interface IContextMenuData {
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 
-// TODO: find a way to refactor these types since there are too many identical...
+// This types are used to create search params and style the rows differently
 export type PlanningRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
   | 'subClassDistrict'
-  | 'district'
-  | 'districtPreview'
+  | 'district' // type used for districts when there is a selectedDistrict
+  | 'districtPreview' // type used for districts when there are multiple districts
   | 'collectiveSubLevel'
-  | 'subLevelDistrict'
+  | 'subLevelDistrict' // type used for districts when the district is after the selectedCollectiveSubLevel
   | 'otherClassification'
   | 'otherClassificationSubLevel'
   | 'division'
