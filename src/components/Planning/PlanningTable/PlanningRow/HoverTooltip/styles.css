@@ -3,7 +3,6 @@
   inset: auto auto 2rem 0px;
   border-bottom: 8px solid var(--color-coat-of-arms);
   color: black !important;
-  max-width: 21.875rem;
   background-color: var(--color-coat-of-arms-light);
   padding: var(--spacing-s);
   font-size: var(--fontsize-body-s);

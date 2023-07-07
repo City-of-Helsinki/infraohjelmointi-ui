@@ -8,12 +8,17 @@ import { useAppDispatch, useAppSelector } from './hooks/common';
 import { Route, Routes } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
 import {
-  getClassesThunk,
-  updateClass,
-  updateMasterClass,
-  updateSubClass,
+  getCoordinationClassesThunk,
+  getPlanningClassesThunk,
+  updatePlanningClass,
+  updatePlanningMasterClass,
+  updatePlanningSubClass,
 } from './reducers/classSlice';
-import { getLocationsThunk, updateDistrict } from './reducers/locationSlice';
+import {
+  getCoordinationLocationsThunk,
+  getPlanningLocationsThunk,
+  updatePlanningDistrict,
+} from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import PlanningView from './views/PlanningView';
 import { ProjectNotes } from './components/Project/ProjectNotes';
@@ -51,9 +56,11 @@ const App: FC = () => {
     await Promise.all([
       dispatch(getListsThunk()),
       dispatch(getHashTagsThunk()),
-      dispatch(getClassesThunk()),
-      dispatch(getLocationsThunk()),
+      dispatch(getPlanningClassesThunk()),
+      dispatch(getPlanningLocationsThunk()),
       dispatch(getGroupsThunk()),
+      dispatch(getCoordinationClassesThunk()),
+      dispatch(getCoordinationLocationsThunk()),
     ])
       .then(() => {
         dispatch(clearLoading(LOADING_APP_ID));
@@ -95,10 +102,10 @@ const App: FC = () => {
   useEffect(() => {
     if (financeUpdate) {
       Promise.all([
-        dispatch(updateMasterClass(financeUpdate.masterClass)),
-        dispatch(updateClass(financeUpdate.class)),
-        dispatch(updateSubClass(financeUpdate.subClass)),
-        dispatch(updateDistrict(financeUpdate.district)),
+        dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
+        dispatch(updatePlanningClass(financeUpdate.class)),
+        dispatch(updatePlanningSubClass(financeUpdate.subClass)),
+        dispatch(updatePlanningDistrict(financeUpdate.district)),
         dispatch(updateGroup(financeUpdate.group)),
       ]).catch((e) => console.log('Error updating finances: ', e));
     }
@@ -121,15 +128,8 @@ const App: FC = () => {
                 <Route path="new" element={<ProjectBasics />} />
                 <Route path="notes" element={<ProjectNotes />} />
               </Route>
-              <Route path="/planning" element={<PlanningView />}>
-                <Route path=":masterClassId" element={<PlanningView />}>
-                  <Route path=":classId" element={<PlanningView />}>
-                    <Route path=":subClassId" element={<PlanningView />}>
-                      <Route path=":districtId" element={<PlanningView />} />
-                    </Route>
-                  </Route>
-                </Route>
-              </Route>
+              <Route path="/planning" element={<PlanningView />} />
+              <Route path="/coordination" element={<PlanningView />} />
               <Route path="/search-results" element={<SearchResultsView />} />
               <Route path="*" element={<ErrorView />} />
             </Routes>

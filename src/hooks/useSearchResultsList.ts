@@ -1,34 +1,38 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { ISearchResultListItem, ISearchResultPayloadItem } from '@/interfaces/searchInterfaces';
-import { selectAllClasses } from '@/reducers/classSlice';
+import { selectAllPlanningClasses } from '@/reducers/classSlice';
 import { selectSearchResults } from '@/reducers/searchSlice';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from './common';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { selectDistricts } from '@/reducers/locationSlice';
+import { selectPlanningDistricts } from '@/reducers/locationSlice';
 
 const buildBreadCrumbs = (
   path: string,
   classes: Array<IClass>,
   districts: Array<ILocation>,
-): Array<string> =>
-  path
-    .split('/')
-    .map(
-      (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
-    );
+): Array<string> => {
+  const searchParamObject = Object.fromEntries(new URLSearchParams(path).entries());
+  const ids = Object.values(searchParamObject).map((v) => v);
+
+  const breadCrumbs = ids.map(
+    (p) => classes.find((c) => c.id === p)?.name ?? districts.find((d) => d.id === p)?.name ?? '',
+  );
+
+  return breadCrumbs;
+};
 
 const buildLink = (r: ISearchResultPayloadItem) => {
   // Programmed projects will navigate to planning view and get the ?project= param
   if (r.type === 'projects' && r.programmed) {
-    return `/planning/${r.path}/?project=${r.id}`;
+    return `/planning/?${r.path}&project=${r.id}`;
   }
   // Non-programmed projects will navigate to project form
   else if (r.type === 'projects') {
     return `/project/${r.id}/basics`;
   }
   // Default will navigate to planning view without the ?project= param
-  return `/planning/${r.path}`;
+  return `/planning/?${r.path}`;
 };
 
 const buildSearchResultsList = (
@@ -55,8 +59,8 @@ const buildSearchResultsList = (
  * @returns a list of ISearchResultListItems
  */
 const useSearchResultsList = () => {
-  const classes = useAppSelector(selectAllClasses);
-  const districts = useAppSelector(selectDistricts);
+  const classes = useAppSelector(selectAllPlanningClasses);
+  const districts = useAppSelector(selectPlanningDistricts);
   const { results, next, previous, count } = useAppSelector(selectSearchResults);
   const [searchResultsList, setSearchResultsList] = useState<Array<ISearchResultListItem>>([]);
 

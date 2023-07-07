@@ -10,11 +10,19 @@ import App from './App';
 import { mockGetResponseProvider } from './utils/mockGetResponseProvider';
 import {
   mockClasses,
+  mockCoordinatorClasses,
+  mockCoordinatorCollectiveSubLevels,
+  mockCoordinatorMasterClasses,
+  mockCoordinatorOtherClassificationSubLevels,
+  mockCoordinatorOtherClassifications,
+  mockCoordinatorSubClasses,
   mockMasterClasses,
   mockProjectClasses,
+  mockProjectCoordinatorClasses,
   mockSubClasses,
 } from './mocks/mockClasses';
 import {
+  mockCoordinatorDistricts,
   mockDistricts,
   mockDivisions,
   mockLocations,
@@ -35,8 +43,8 @@ import {
 } from './mocks/mockLists';
 import { mockError } from './mocks/mockError';
 import { IError } from './interfaces/common';
-import { getClassesThunk } from './reducers/classSlice';
-import { getLocationsThunk } from './reducers/locationSlice';
+import { getPlanningClassesThunk } from './reducers/classSlice';
+import { getPlanningLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
@@ -64,7 +72,12 @@ describe('App', () => {
   it('adds all needed data to store', async () => {
     const { store } = await render();
 
-    const { class: classes, location: locations, lists, hashTags } = store.getState();
+    const {
+      class: { planning: planningClasses, coordination: coordinationClasses },
+      location: { planning: planningLocations, coordination: coordinationLocations },
+      lists,
+      hashTags,
+    } = store.getState();
     await waitFor(() => {
       expect(lists.categories).toStrictEqual(mockProjectCategories.data);
       expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
@@ -79,14 +92,32 @@ describe('App', () => {
       expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
       expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
       expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
-      expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
-      expect(classes.masterClasses).toStrictEqual(mockMasterClasses.data);
-      expect(classes.classes).toStrictEqual(mockClasses.data);
-      expect(classes.subClasses).toStrictEqual(mockSubClasses.data);
-      expect(locations.allLocations).toStrictEqual(mockLocations.data);
-      expect(locations.districts).toStrictEqual(mockDistricts.data);
-      expect(locations.divisions).toStrictEqual(mockDivisions.data);
-      expect(locations.subDivisions).toStrictEqual(mockSubDivisions.data);
+      // Planning classes
+      expect(planningClasses.allClasses).toStrictEqual(mockProjectClasses.data);
+      expect(planningClasses.masterClasses).toStrictEqual(mockMasterClasses.data);
+      expect(planningClasses.classes).toStrictEqual(mockClasses.data);
+      expect(planningClasses.subClasses).toStrictEqual(mockSubClasses.data);
+      // Coordinator classes
+      expect(coordinationClasses.allClasses).toStrictEqual(mockProjectCoordinatorClasses.data);
+      expect(coordinationClasses.masterClasses).toStrictEqual(mockCoordinatorMasterClasses.data);
+      expect(coordinationClasses.classes).toStrictEqual(mockCoordinatorClasses.data);
+      expect(coordinationClasses.subClasses).toStrictEqual(mockCoordinatorSubClasses.data);
+      expect(coordinationClasses.collectiveSubLevels).toStrictEqual(
+        mockCoordinatorCollectiveSubLevels.data,
+      );
+      expect(coordinationClasses.otherClassifications).toStrictEqual(
+        mockCoordinatorOtherClassifications.data,
+      );
+      expect(coordinationClasses.otherClassificationSubLevels).toStrictEqual(
+        mockCoordinatorOtherClassificationSubLevels.data,
+      );
+      // Planning locations
+      expect(planningLocations.allLocations).toStrictEqual(mockLocations.data);
+      expect(planningLocations.districts).toStrictEqual(mockDistricts.data);
+      expect(planningLocations.divisions).toStrictEqual(mockDivisions.data);
+      expect(planningLocations.subDivisions).toStrictEqual(mockSubDivisions.data);
+      // Coordinator locations
+      expect(coordinationLocations.districts).toStrictEqual(mockCoordinatorDistricts.data);
     });
   });
 
@@ -152,12 +183,12 @@ describe('App', () => {
     });
   });
 
-  it('catches a failed classes fetch', async () => {
+  it('catches a failed planning classes fetch', async () => {
     const { store } = await render();
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getClassesThunk());
+    await store.dispatch(getPlanningClassesThunk());
 
     const storeError = store.getState().class.error as IError;
     expect(storeError.message).toBe(mockError.message);
@@ -169,7 +200,7 @@ describe('App', () => {
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getLocationsThunk());
+    await store.dispatch(getPlanningLocationsThunk());
 
     const storeError = store.getState().location.error as IError;
     expect(storeError.message).toBe(mockError.message);

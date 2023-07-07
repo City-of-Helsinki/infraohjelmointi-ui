@@ -4,6 +4,7 @@ import {
   IProjectFinancesRequestObject,
   ProjectCellGrowDirection,
   IProjectFinances,
+  IProjectEstDates,
 } from '@/interfaces/projectInterfaces';
 import {
   createDateToEndOfYear,
@@ -20,6 +21,46 @@ export const addActiveClassToProjectRow = (projectId: string) => {
   document.getElementById(`project-row-${projectId}`)?.classList.add('active');
 };
 
+/**
+ * Mutates/updates the given request object if the project est dates has the given value
+ */
+const updateRequestIfValueExistsInProject = (
+  key: string | null,
+  updatedValue: string | null,
+  projectEstDates: IProjectEstDates,
+  req: IProjectRequest,
+) => {
+  const projectValue = projectEstDates[key as keyof typeof projectEstDates];
+
+  if (projectValue && key) {
+    Object.assign(req, { [key]: updatedValue });
+  }
+};
+
+/**
+ * Returns the first/last valid construction/planning cell and sets any inbetween cell finances to null.
+ * Traverses backwards to find a planning cell and forward to find a construction cell.
+ * @param cellType the type of cell to find
+ *
+ * @returns IProjectCell
+ */
+const traverseAndSetGapCellFinancesNull = (
+  cellType: 'construction' | 'planning',
+  req: IProjectRequest,
+  next: IProjectCell | null,
+  prev: IProjectCell | null,
+) => {
+  let head: IProjectCell | null = cellType === 'construction' ? next : prev;
+  while (head && !head.type.toLowerCase().includes(cellType)) {
+    // Have to use a if condition to check as other operators are still raising typescript errors
+    if (req.finances) {
+      (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
+    }
+    head = cellType === 'construction' ? head.next : head.prev;
+  }
+  return head;
+};
+
 export const getCellTypeUpdateRequestData = (
   cell: IProjectCell,
   phase: string,
@@ -32,108 +73,82 @@ export const getCellTypeUpdateRequestData = (
     prev,
   } = cell;
   const req: IProjectRequest = { finances: { year: startYear } };
-  /**
-   * Returns the first/last valid construction/planning cell and sets any inbetween cell finances to null.
-   * Traverses backwards to find a planning cell and forward to find a construction cell.
-   * @param cellType the type of cell to find
-   * @returns IProjectCell
-   */
-  const traverseAndSetGapCellFinancesNull = (cellType: 'construction' | 'planning') => {
-    let head: IProjectCell | null = cellType === 'construction' ? next : prev;
-    while (head && !head.type.toLowerCase().includes(cellType)) {
-      // Have to use a if condition to check as other operators are still raising typescript errors
-      if (req.finances) {
-        (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
-      }
-      head = cellType === 'construction' ? head.next : head.prev;
-    }
-    return head;
-  };
+
+  const nextCellIsConstruction = cell.next?.type.includes('construction');
+  const prevCellIsPlanning = cell.prev?.type.includes('planning');
+
+  const traverseAndSetGaps = (cellType: 'construction' | 'planning') =>
+    traverseAndSetGapCellFinancesNull(cellType, req, next, prev);
+
   /**
    * Traverses backwards from current cell to get the first valid planning cell
    * @returns IProjectCell
    */
-  const getFirstPlanCellBehind = () => {
-    return traverseAndSetGapCellFinancesNull('planning');
-  };
+  const getFirstPlanCellBehind = () => traverseAndSetGaps('planning');
+
   /**
    * Traverses forward from current cell to get the first valid construction cell
    * @returns IProjectCell
    */
-  const getFirstConCellAhead = () => {
-    return traverseAndSetGapCellFinancesNull('construction');
-  };
+  const getFirstConCellAhead = () => traverseAndSetGaps('construction');
+
   /**
    * Gets EndOfYear date from the first valid planning cell behind
    * @returns string
    */
-  const getDateFromFirstPlanCellBehind = () => {
-    const planCellBehind = getFirstPlanCellBehind();
-    return planCellBehind ? createDateToEndOfYear(planCellBehind.year) : null;
-  };
+  const getDateFromFirstPlanCellBehind = () =>
+    createDateToEndOfYear(getFirstPlanCellBehind()?.year);
+
   /**
    * Gets StartOfYear date from the first valid construction cell ahead
    * @returns string
    */
-  const getDateFromFirstConCellAhead = () => {
-    const conCellAhead = getFirstConCellAhead();
-    return conCellAhead ? createDateToStartOfYear(conCellAhead.year) : null;
-  };
-  /**
-   * Sets estPlanningEnd and estConstructionStart dates appropriately
-   * to convert current cell to construction
-   * @param isOverlap is current cell type 'overlap'
-   * @returns void
-   */
-  const updateCellToConstruction = (isOverlap: boolean) => {
-    req.estPlanningEnd = cell.prev?.type.includes('planning')
+  const getDateFromFirstConCellAhead = () => createDateToStartOfYear(getFirstConCellAhead()?.year);
+
+  const updatePlanningEnd = () =>
+    (req.estPlanningEnd = prevCellIsPlanning
       ? removeYear(estPlanningEnd)
-      : getDateFromFirstPlanCellBehind();
-    if (!isOverlap) {
-      if (cell.next?.type.includes('construction')) {
-        req.estConstructionStart = removeYear(estConstructionStart);
-      } else {
-        traverseAndSetGapCellFinancesNull('construction');
-        req.estConstructionStart = getFirstDate(estPlanningEnd);
-      }
+      : getDateFromFirstPlanCellBehind());
+
+  const updatePlanningEndAndTraverseIfGaps = () => {
+    updatePlanningEnd();
+
+    if (nextCellIsConstruction) {
+      req.estConstructionStart = removeYear(estConstructionStart);
+      return;
     }
+
+    traverseAndSetGaps('construction');
+    req.estConstructionStart = getFirstDate(estPlanningEnd);
   };
-  /**
-   * Sets estPlanningEnd and estConstructionStart dates appropriately
-   * to convert current cell to planning
-   * @param isOverlap is current cell type 'overlap'
-   * @returns void
-   */
-  const updateCellToPlanning = (isOverlap: boolean) => {
-    if (!isOverlap) {
-      if (cell.prev?.type.includes('planning')) {
-        req.estPlanningEnd = addYear(estPlanningEnd);
-      } else {
-        traverseAndSetGapCellFinancesNull('planning');
-        req.estPlanningEnd = getLastDate(estConstructionStart);
-      }
-    }
-    req.estConstructionStart = cell.next?.type.includes('construction')
+
+  const updateConstructionStart = () =>
+    (req.estConstructionStart = nextCellIsConstruction
       ? addYear(estConstructionStart)
-      : getDateFromFirstConCellAhead();
+      : getDateFromFirstConCellAhead());
+
+  const updateConstructionStartAndTraverseIfGaps = () => {
+    updateConstructionStart();
+
+    if (prevCellIsPlanning) {
+      req.estPlanningEnd = addYear(estPlanningEnd);
+      return;
+    }
+
+    traverseAndSetGaps('planning');
+    req.estPlanningEnd = getLastDate(estConstructionStart);
   };
-  switch (type) {
-    case 'planningEnd':
-      updateCellToConstruction(false);
-      break;
-    case 'constructionStart':
-      updateCellToPlanning(false);
-      break;
-    case 'overlap':
-      if (phase.includes('construction')) {
-        updateCellToConstruction(true);
-      }
-      if (phase.includes('planning')) {
-        updateCellToPlanning(true);
-      }
-      break;
-    default:
+
+  if (type === 'planningEnd') {
+    updatePlanningEndAndTraverseIfGaps();
+  } else if (type === 'constructionStart') {
+    updateConstructionStartAndTraverseIfGaps();
+  } else if (type === 'overlap' && phase.includes('construction')) {
+    updatePlanningEnd();
+  } else if (type === 'overlap' && phase.includes('planning')) {
+    updateConstructionStart();
   }
+
   return req;
 };
 
@@ -144,7 +159,7 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     isStartOfTimeline,
     isLastOfType,
     timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
-    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
+    projectEstDates,
     cellToUpdate,
     financesToReset,
     financeKey,
@@ -155,11 +170,13 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 
   const req: IProjectRequest = { finances: { year: startYear, ...financesToReset } };
 
+  const updateIfValueExists = (key: string | null, updatedValue: string | null) => {
+    updateRequestIfValueExistsInProject(key, updatedValue, projectEstDates, req);
+  };
+
   const updatePlanningStart = () => {
     const updatedDate = updateYear(cellToUpdate?.year, planningStart);
-    if (estPlanningStart) {
-      req.estPlanningStart = updatedDate;
-    }
+    updateIfValueExists('estPlanningStart', updatedDate);
     req.planningStartYear = getYear(updatedDate);
   };
 
@@ -169,25 +186,21 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
       req.planningStartYear = getYear(updatedDate);
-    } else if (estPlanningEnd) {
-      req.estPlanningEnd = updatedDate;
+    } else {
+      updateIfValueExists('estPlanningEnd', updatedDate);
     }
   };
 
   const updateConstructionStart = () => {
     const updatedDate = updateYear(cellToUpdate?.year, constructionStart);
-    if (estConstructionStart) {
-      req.estConstructionStart = updatedDate;
-    }
+    updateIfValueExists('estConstructionStart', updatedDate);
     req.constructionEndYear = getYear(updatedDate);
   };
 
   const updateConstructionEnd = () => {
     const updatedDate = updateYear(cellToUpdate?.year, constructionEnd);
     if (!isLastOfType) {
-      if (estConstructionEnd) {
-        req.estConstructionEnd = updatedDate;
-      }
+      updateIfValueExists('estConstructionEnd', updatedDate);
       req.constructionEndYear = getYear(updatedDate);
     } else {
       req.constructionEndYear = getYear(planningStart);
@@ -197,35 +210,35 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
   };
 
   const updateOverlap = () => {
-    if (isStartOfTimeline && isEndOfTimeline) {
+    const updateLastCell = () => {
       req.estPlanningStart = null;
       req.estPlanningEnd = null;
       req.planningStartYear = null;
       req.estConstructionStart = null;
       req.estConstructionEnd = null;
       req.constructionEndYear = null;
-    } else if (isStartOfTimeline) {
-      if (estPlanningStart) {
-        req.estPlanningStart = addYear(planningStart);
-      }
-      if (estPlanningEnd) {
-        req.estPlanningEnd = addYear(planningEnd);
-      }
-      if (estConstructionStart) {
-        req.estConstructionStart = addYear(constructionStart);
-      }
+    };
+
+    const updateStartOfTimeline = () => {
+      updateIfValueExists('estPlanningStart', addYear(planningStart));
+      updateIfValueExists('estPlanningEnd', addYear(planningEnd));
+      updateIfValueExists('estConstructionStart', addYear(constructionStart));
       req.planningStartYear = getYear(planningEnd) + 1;
-    } else if (isEndOfTimeline) {
-      if (estConstructionStart) {
-        req.estConstructionStart = removeYear(constructionStart);
-      }
-      if (estConstructionEnd) {
-        req.estConstructionEnd = removeYear(constructionEnd);
-      }
-      if (estPlanningEnd) {
-        req.estPlanningEnd = removeYear(planningEnd);
-      }
+    };
+
+    const updateEndOfTimeline = () => {
+      updateIfValueExists('estConstructionStart', removeYear(constructionStart));
+      updateIfValueExists('estConstructionEnd', removeYear(constructionEnd));
+      updateIfValueExists('estPlanningEnd', removeYear(planningEnd));
       req.constructionEndYear = getYear(constructionEnd) - 1;
+    };
+
+    if (isStartOfTimeline && isEndOfTimeline) {
+      updateLastCell();
+    } else if (isStartOfTimeline) {
+      updateStartOfTimeline();
+    } else if (isEndOfTimeline) {
+      updateEndOfTimeline();
     }
   };
 
@@ -277,7 +290,7 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
 export const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IProjectCell) => {
   const {
     timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
-    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
+    projectEstDates,
     next,
     prev,
     startYear,
@@ -289,27 +302,24 @@ export const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IPr
 
   const req: IProjectRequest = { finances: { year: startYear } };
 
+  const updateIfValueExists = (key: string | null, updatedValue: string | null) => {
+    updateRequestIfValueExistsInProject(key, updatedValue, projectEstDates, req);
+  };
+
   const updateLeft = () => {
     if (isStartOfTimeline && (type.includes('planning') || type === 'overlap')) {
-      if (estPlanningStart) {
-        req.estPlanningStart = removeYear(planningStart);
-      }
+      updateIfValueExists('estPlanningStart', removeYear(planningStart));
       req.planningStartYear = getYear(removeYear(planningStart));
-    } else if (
-      (isLastOfType && type === 'constructionEnd') ||
-      (type === 'constructionStart' && estConstructionStart)
-    ) {
-      req.estConstructionStart = removeYear(constructionStart);
+    } else if ((isLastOfType && type === 'constructionEnd') || type === 'constructionStart') {
+      updateIfValueExists('estConstructionStart', removeYear(constructionStart));
     }
   };
 
   const updateRight = () => {
-    if (type === 'planningEnd' && estPlanningEnd) {
-      req.estPlanningEnd = addYear(planningEnd);
+    if (type === 'planningEnd') {
+      updateIfValueExists('estPlanningEnd', addYear(planningEnd));
     } else if (type === 'constructionEnd' || type === 'overlap') {
-      if (estConstructionEnd) {
-        req.estConstructionEnd = addYear(constructionEnd);
-      }
+      updateIfValueExists('estConstructionEnd', addYear(constructionEnd));
       req.constructionEndYear = getYear(addYear(constructionEnd));
     }
   };
@@ -347,8 +357,9 @@ export const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IPr
 export const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
   const {
     timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
-    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
+    projectEstDates,
   } = cell;
+
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the next property
@@ -368,19 +379,14 @@ export const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjec
 
   const req: IProjectRequest = { finances: financesMovedForward };
 
-  if (estPlanningStart) {
-    req.estPlanningStart = addYear(planningStart);
-  }
-  if (estPlanningEnd) {
-    req.estPlanningEnd = addYear(planningEnd);
-  }
+  const updateIfValueExists = (key: string | null, updatedValue: string | null) => {
+    updateRequestIfValueExistsInProject(key, updatedValue, projectEstDates, req);
+  };
 
-  if (estConstructionStart) {
-    req.estConstructionStart = addYear(constructionStart);
-  }
-  if (estConstructionEnd) {
-    req.estConstructionEnd = addYear(constructionEnd);
-  }
+  updateIfValueExists('estPlanningStart', addYear(planningStart));
+  updateIfValueExists('estPlanningEnd', addYear(planningEnd));
+  updateIfValueExists('estConstructionStart', addYear(constructionStart));
+  updateIfValueExists('estConstructionEnd', addYear(constructionEnd));
 
   req.planningStartYear = getYear(addYear(planningStart));
   req.constructionEndYear = getYear(addYear(constructionEnd));
@@ -391,8 +397,9 @@ export const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjec
 export const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProjectFinances) => {
   const {
     timelineDates: { planningStart, planningEnd, constructionStart, constructionEnd },
-    projectEstDates: { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd },
+    projectEstDates,
   } = cell;
+
   const { year, ...finances } = projectFinances;
 
   // Move all finance property values to the previous property
@@ -412,19 +419,14 @@ export const moveTimelineBackward = (cell: IProjectCell, projectFinances: IProje
 
   const req: IProjectRequest = { finances: financesMovedBackward };
 
-  if (estPlanningStart) {
-    req.estPlanningStart = removeYear(planningStart);
-  }
-  if (estPlanningEnd) {
-    req.estPlanningEnd = removeYear(planningEnd);
-  }
+  const updateIfValueExists = (key: string | null, updatedValue: string | null) => {
+    updateRequestIfValueExistsInProject(key, updatedValue, projectEstDates, req);
+  };
 
-  if (estConstructionStart) {
-    req.estConstructionStart = removeYear(constructionStart);
-  }
-  if (estConstructionEnd) {
-    req.estConstructionEnd = removeYear(constructionEnd);
-  }
+  updateIfValueExists('estPlanningStart', removeYear(planningStart));
+  updateIfValueExists('estPlanningEnd', removeYear(planningEnd));
+  updateIfValueExists('estConstructionStart', removeYear(constructionStart));
+  updateIfValueExists('estConstructionEnd', removeYear(constructionEnd));
 
   req.planningStartYear = getYear(removeYear(planningStart));
   req.constructionEndYear = getYear(removeYear(constructionEnd));

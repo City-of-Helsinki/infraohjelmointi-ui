@@ -2,22 +2,56 @@ import { Button } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { IconAngleLeft } from 'hds-react/icons';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
-import { selectSelections } from '@/reducers/planningSlice';
+import { selectPlanningMode, selectSelections } from '@/reducers/planningSlice';
+import { createSearchParams } from 'react-router-dom';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
-  const { selectedMasterClass } = useAppSelector(selectSelections);
+  const mode = useAppSelector(selectPlanningMode);
+  const selections = useAppSelector(selectSelections);
+  const { selectedMasterClass } = selections;
+
+  const { search } = useLocation();
 
   const navigate = useNavigate();
 
   const navigateBack = useCallback(() => {
-    const routes = window.location.pathname.split('/');
-    routes.pop();
-    navigate(routes.join('/'));
-  }, []);
+    const {
+      selectedMasterClass,
+      selectedClass,
+      selectedSubClass,
+      selectedDistrict,
+      selectedOtherClassification,
+      selectedSubLevelDistrict,
+      selectedCollectiveSubLevel,
+    } = selections;
+
+    const urlSearchParams = new URLSearchParams(search);
+
+    if (selectedOtherClassification) {
+      urlSearchParams.delete('otherClassification');
+    } else if (selectedSubLevelDistrict) {
+      urlSearchParams.delete('subLevelDistrict');
+    } else if (selectedCollectiveSubLevel) {
+      urlSearchParams.delete('collectiveSubLevel');
+    } else if (selectedDistrict) {
+      urlSearchParams.delete('district');
+    } else if (selectedSubClass) {
+      urlSearchParams.delete('subClass');
+    } else if (selectedClass) {
+      urlSearchParams.delete('class');
+    } else if (selectedMasterClass) {
+      urlSearchParams.delete('masterClass');
+    }
+
+    navigate({
+      pathname: `/${mode}`,
+      search: `${createSearchParams(urlSearchParams)}`,
+    });
+  }, [selections, search, navigate, mode]);
 
   const iconLeft = useMemo(() => <IconAngleLeft />, []);
   return (
@@ -28,7 +62,7 @@ const PlanningInfoPanel = () => {
           <div className="buttons-container">
             <div data-testid="mode-button-container">
               <Button className="h-11" variant="success" data-testid="mode-button">
-                {t('planning')}
+                {t(mode)}
               </Button>
             </div>
             <div id="previousButton" data-testid="previous-button-container">

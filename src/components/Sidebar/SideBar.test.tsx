@@ -7,10 +7,8 @@ import { act } from 'react-dom/test-utils';
 import { Route } from 'react-router';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
-import ProjectView from '@/views/ProjectView';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import PlanningView from '@/views/PlanningView';
-import { ProjectBasics } from '../Project/ProjectBasics';
 import { mockProjectPhases } from '@/mocks/mockLists';
 
 jest.mock('react-i18next', () => mockI18next());
@@ -24,9 +22,7 @@ const render = async () =>
     renderWithProviders(
       <>
         <Route path="*" element={<SideBar />} />
-        <Route path="/project/:projectId?" element={<ProjectView />}>
-          <Route path="basics" element={<ProjectBasics />} />
-        </Route>
+        <Route path="/coordination" element={<PlanningView />} />
         <Route path="/planning" element={<PlanningView />} />
       </>,
       {
@@ -47,7 +43,7 @@ const render = async () =>
 
 describe('SideBar', () => {
   const navItems = [
-    'project',
+    'coordination',
     'planning',
     'placeholder 1',
     'placeholder 2',
@@ -83,10 +79,10 @@ describe('SideBar', () => {
     });
   });
 
-  it('can navigate to project basics form', async () => {
-    const { getByRole, user, getByTestId } = await render();
+  it('can navigate to coordination view', async () => {
+    const { getByRole, user, container } = await render();
     await user.click(getByRole('button', { name: matchExact(navItems[0]) }));
-    expect(getByTestId('project-header')).toBeInTheDocument();
+    expect(container.getElementsByClassName('planning-view-container')[0]).toBeInTheDocument();
   });
 
   it('can navigate to planning view', async () => {

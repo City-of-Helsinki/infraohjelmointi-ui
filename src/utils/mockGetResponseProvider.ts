@@ -1,4 +1,4 @@
-import { mockProjectClasses } from '@/mocks/mockClasses';
+import { mockProjectClasses, mockProjectCoordinatorClasses } from '@/mocks/mockClasses';
 import { mockGroups } from '@/mocks/mockGroups';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import {
@@ -13,7 +13,7 @@ import {
   mockProjectTypes,
   mockResponsibleZones,
 } from '@/mocks/mockLists';
-import { mockLocations } from '@/mocks/mockLocations';
+import { mockCoordinatorLocations, mockLocations } from '@/mocks/mockLocations';
 import mockNotes from '@/mocks/mockNotes';
 import mockPersons from '@/mocks/mockPersons';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
@@ -70,8 +70,12 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockPersons);
       case url === '/project-classes/':
         return Promise.resolve(mockProjectClasses);
+      case url === '/project-classes/coordinator/':
+        return Promise.resolve(mockProjectCoordinatorClasses);
       case url === '/project-locations/':
         return Promise.resolve(mockLocations);
+      case url === '/project-locations/coordinator/':
+        return Promise.resolve(mockCoordinatorLocations);
       case url === `/projects/${mockProject.data.id}/notes/`:
         return Promise.resolve(mockNotes);
       case url === `/project-groups/`:

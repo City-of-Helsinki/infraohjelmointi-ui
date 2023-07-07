@@ -5,7 +5,7 @@ import { CustomRenderResult, renderWithProviders, sendProjectUpdateEvent } from 
 
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import { within } from '@testing-library/react';
+import { waitFor, within } from '@testing-library/react';
 import { setupStore } from '@/store';
 import {
   mockClasses,
@@ -30,10 +30,11 @@ const store = setupStore();
 
 const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
   const { user, store, findByTestId } = renderResult;
-  const { masterClasses, classes } = store.getState().class;
+  const { masterClasses, classes } = store.getState().class.planning;
   await user.click(await findByTestId(`expand-${masterClasses[0].id}`));
   await user.click(await findByTestId(`expand-${classes[0].id}`));
 };
+
 const render = async () =>
   await act(async () =>
     renderWithProviders(
@@ -46,28 +47,28 @@ const render = async () =>
           </>
         }
       >
-        <Route path=":masterClassId" element={<PlanningView />}>
-          <Route path=":classId" element={<PlanningView />}>
-            <Route path=":subClassId" element={<PlanningView />}>
-              <Route path=":districtId" element={<PlanningView />} />
-            </Route>
-          </Route>
-        </Route>
+        <Route path="/planning" element={<PlanningView />} />
       </Route>,
       {
         preloadedState: {
           class: {
             ...store.getState().class,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockMasterClasses.data,
-            classes: mockClasses.data,
-            subClasses: mockSubClasses.data,
+            planning: {
+              ...store.getState().class.planning,
+              allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
+            },
           },
           location: {
             ...store.getState().location,
-            allLocations: mockLocations.data,
-            districts: mockDistricts.data,
-            divisions: mockDivisions.data,
+            planning: {
+              ...store.getState().location.planning,
+              allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+            },
           },
           group: {
             ...store.getState().group,
@@ -93,7 +94,7 @@ describe('ProjectProgrammedDialog', () => {
   it('renders the component wrappers', async () => {
     const renderResult = await render();
     const { findByTestId, user } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     expect(await findByTestId('open-project-programmed-dialog')).toBeInTheDocument();
   });
 
@@ -101,7 +102,7 @@ describe('ProjectProgrammedDialog', () => {
     const renderResult = await render();
     const { user, findByTestId, findByRole } = renderResult;
 
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     const openDialogButton = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButton).toBeInTheDocument();
 
@@ -111,7 +112,7 @@ describe('ProjectProgrammedDialog', () => {
 
     // Navigate to a class row
     await navigateToProjectRows(renderResult);
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
 
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButtonEnabled).toBeEnabled();
@@ -143,7 +144,7 @@ describe('ProjectProgrammedDialog', () => {
     };
 
     const { user, findByTestId, findByRole } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     const openDialogButtonDisabled = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButtonDisabled).toBeInTheDocument();
 
@@ -154,19 +155,19 @@ describe('ProjectProgrammedDialog', () => {
     // Navigate to a class row
     await navigateToProjectRows(renderResult);
 
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
     await user.click(openDialogButtonEnabled);
     const dialog = within(await findByRole('dialog'));
     const submitButton = await dialog.findByTestId('add-projects-button');
+
     expect(submitButton).toBeDisabled();
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
     await user.type(await dialog.findByText('projectProgrammedForm.searchForProjects'), 'Planning');
 
-    // await waitFor(async () => {
     expect(await dialog.findByText(mockSearchResults.data.results[0].name)).toBeInTheDocument();
-    // });
+
     await user.click(await dialog.findByText(mockSearchResults.data.results[0].name));
     expect(dialog.getAllByTestId('project-selection').length).toBe(1);
 
@@ -188,11 +189,15 @@ describe('ProjectProgrammedDialog', () => {
 
     const formPatchRequest = mockedAxios.patch.mock
       .lastCall[1] as Array<IProjectPatchRequestObject>;
+
     expect(formPatchRequest[0].id).toEqual(mockPatchResponse.data[0].id);
     expect(formPatchRequest[0].data.programmed).toEqual(mockPatchResponse.data[0].programmed);
 
-    await user.click(await dialog.findByTestId('cancel-search'));
+    await waitFor(async () => user.click(await dialog.findByTestId('cancel-search')));
 
+    expect(await findByTestId('row-test-class-1')).toBeInTheDocument();
+
+    // check if the project row is now in the view
     expect(await findByTestId('row-planning-project-1-parent-test-class-1')).toBeInTheDocument();
 
     removeProjectUpdateEventListener(store.dispatch);

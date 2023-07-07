@@ -2,7 +2,7 @@ import { IPlanningCell } from '@/interfaces/common';
 import { useEffect, useMemo, useState } from 'react';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
 import { useAppSelector } from './common';
-import { selectBatchedClasses } from '@/reducers/classSlice';
+import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import { selectSelections, selectStartYear } from '@/reducers/planningSlice';
 
 interface IPlanningSummaryHeadCell {
@@ -50,7 +50,7 @@ const buildPlanningSummaryHeadCells = (startYear: number) => {
  */
 const useSummaryRows = () => {
   const { selectedMasterClass, selectedSubClass, selectedClass } = useAppSelector(selectSelections);
-  const allClasses = useAppSelector(selectBatchedClasses);
+  const allClasses = useAppSelector(selectBatchedPlanningClasses);
   const startYear = useAppSelector(selectStartYear);
 
   const masterClasses = useMemo(

@@ -52,17 +52,23 @@ const render = async () =>
           auth: { user: mockPersons.data[0], error: {} },
           class: {
             ...store.getState().class,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockMasterClasses.data,
-            classes: mockClasses.data,
-            subClasses: mockSubClasses.data,
+            planning: {
+              ...store.getState().class.planning,
+              allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
+            },
           },
           location: {
             ...store.getState().location,
-            allLocations: mockLocations.data,
-            districts: mockDistricts.data,
-            divisions: mockDivisions.data,
-            subDivisions: mockSubDivisions.data,
+            planning: {
+              ...store.getState().location.planning,
+              allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+              subDivisions: mockSubDivisions.data,
+            },
           },
           lists: {
             ...store.getState().lists,
@@ -123,20 +129,20 @@ describe('Search', () => {
     // open search
     await waitFor(() => store.dispatch(toggleSearch()));
 
-    const classes = store.getState().class;
-    const locations = store.getState().location;
+    const planningClasses = store.getState().class.planning;
+    const planningLocations = store.getState().location.planning;
     const lists = store.getState().lists;
 
     // Class store
-    expect(classes.allClasses).toStrictEqual(mockProjectClasses.data);
-    expect(classes.masterClasses.length).toBeGreaterThan(0);
-    expect(classes.classes.length).toBeGreaterThan(0);
-    expect(classes.subClasses.length).toBeGreaterThan(0);
+    expect(planningClasses.allClasses).toStrictEqual(mockProjectClasses.data);
+    expect(planningClasses.masterClasses.length).toBeGreaterThan(0);
+    expect(planningClasses.classes.length).toBeGreaterThan(0);
+    expect(planningClasses.subClasses.length).toBeGreaterThan(0);
     // Location store
-    expect(locations.allLocations).toStrictEqual(mockLocations.data);
-    expect(locations.districts.length).toBeGreaterThan(0);
-    expect(locations.divisions.length).toBeGreaterThan(0);
-    expect(locations.subDivisions.length).toBeGreaterThan(0);
+    expect(planningLocations.allLocations).toStrictEqual(mockLocations.data);
+    expect(planningLocations.districts.length).toBeGreaterThan(0);
+    expect(planningLocations.divisions.length).toBeGreaterThan(0);
+    expect(planningLocations.subDivisions.length).toBeGreaterThan(0);
     // List store
     expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);

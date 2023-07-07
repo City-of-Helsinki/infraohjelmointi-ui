@@ -33,6 +33,9 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
 
   const { expanded, projects, searchedProjectId } = planningRowState;
 
+  /**
+   * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
+   */
   const handleExpand = useCallback(() => {
     setPlanningRowState((current) => ({ ...current, expanded: !current.expanded }));
   }, []);
@@ -103,9 +106,10 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
         }
       }
       if (!_.isEqual(projects, updatedProjects)) {
+        const sortedProjects = [...updatedProjects].sort((a, b) => a.name.localeCompare(b.name));
         setPlanningRowState((current) => ({
           ...current,
-          projects: updatedProjects,
+          projects: sortedProjects,
           expanded: true,
         }));
       }

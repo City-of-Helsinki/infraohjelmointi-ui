@@ -1,102 +1,183 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError } from '@/interfaces/common';
-import { getClasses } from '@/services/classService';
+import { getCoordinationClasses, getPlanningClasses } from '@/services/classService';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface IClassState {
+interface IClassHierarchy {
   allClasses: Array<IClass>;
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
   year: number;
+}
+
+interface ICoordinatorClassHierarchy extends IClassHierarchy {
+  collectiveSubLevels: Array<IClass>;
+  otherClassifications: Array<IClass>;
+  otherClassificationSubLevels: Array<IClass>;
+}
+
+interface IClassState {
+  planning: IClassHierarchy;
+  coordination: ICoordinatorClassHierarchy;
   error: unknown;
 }
 
-const initialState: IClassState = {
+const initialClasses = {
   allClasses: [],
   masterClasses: [],
   classes: [],
   subClasses: [],
   year: new Date().getFullYear(),
+};
+
+const initialCoordinationClasses = {
+  ...initialClasses,
+  collectiveSubLevels: [],
+  otherClassifications: [],
+  otherClassificationSubLevels: [],
+};
+
+const initialState: IClassState = {
+  planning: initialClasses,
+  coordination: initialCoordinationClasses,
   error: null,
 };
 
-export const getClassesThunk = createAsyncThunk('class/getAll', async (_, thunkAPI) => {
-  return await getClasses()
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
-});
+export const getPlanningClassesThunk = createAsyncThunk(
+  'class/getAllPlanning',
+  async (_, thunkAPI) => {
+    return await getPlanningClasses()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getCoordinationClassesThunk = createAsyncThunk(
+  'class/getAllCoordination',
+  async (_, thunkAPI) => {
+    return await getCoordinationClasses()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
+  parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
+
+const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator: boolean) => {
+  const getClasses = (parents: Array<IClass>) => getClassesForParents(allClasses, parents);
+
+  const masterClasses = allClasses?.filter((ac) => !ac.parent);
+  const classes = getClasses(masterClasses);
+  const subClasses = getClasses(classes);
+
+  if (!forCoordinator) {
+    return {
+      allClasses,
+      masterClasses,
+      classes,
+      subClasses,
+      year: classes[0]?.finances?.year,
+    };
+  }
+
+  const collectiveSubLevels = getClasses(subClasses);
+  const otherClassifications = getClasses(collectiveSubLevels);
+  const otherClassificationSubLevels = getClasses(otherClassifications);
+
+  return {
+    allClasses,
+    masterClasses,
+    classes,
+    subClasses,
+    collectiveSubLevels,
+    otherClassifications,
+    otherClassificationSubLevels,
+    year: classes[0]?.finances?.year,
+  };
+};
 
 export const classSlice = createSlice({
   name: 'class',
   initialState,
   reducers: {
-    updateMasterClass(state, action: PayloadAction<IClass | null>) {
+    updatePlanningMasterClass(state, action: PayloadAction<IClass | null>) {
       const masterClassToUpdate = action.payload;
 
       if (masterClassToUpdate) {
-        const masterClasses = [...state.masterClasses].map((mc) =>
+        const masterClasses = [...state.planning.masterClasses].map((mc) =>
           mc.id === masterClassToUpdate.id ? masterClassToUpdate : mc,
         );
-        return { ...state, masterClasses };
+        return { ...state, planning: { ...state.planning, masterClasses } };
       }
     },
-    updateClass(state, action: PayloadAction<IClass | null>) {
+    updatePlanningClass(state, action: PayloadAction<IClass | null>) {
       const classToUpdate = action.payload;
 
       if (classToUpdate) {
-        const classes = [...state.classes].map((c) =>
+        const classes = [...state.planning.classes].map((c) =>
           c.id === classToUpdate.id ? classToUpdate : c,
         );
-        return { ...state, classes };
+        return { ...state, planning: { ...state.planning, classes } };
       }
     },
-    updateSubClass(state, action: PayloadAction<IClass | null>) {
+    updatePlanningSubClass(state, action: PayloadAction<IClass | null>) {
       const subClassToUpdate = action.payload;
 
       if (subClassToUpdate) {
-        const subClasses = [...state.subClasses].map((sc) =>
+        const subClasses = [...state.planning.subClasses].map((sc) =>
           sc.id === subClassToUpdate.id ? subClassToUpdate : sc,
         );
-        return { ...state, subClasses };
+        return { ...state, planning: { ...state.planning, subClasses } };
       }
     },
   },
   extraReducers: (builder) => {
-    // GET ALL
-    builder.addCase(getClassesThunk.fulfilled, (state, action: PayloadAction<Array<IClass>>) => {
-      const masterClasses = action.payload?.filter((c) => !c.parent);
-
-      const classes = masterClasses
-        ? action.payload?.filter((c) => masterClasses.findIndex((mc) => mc.id === c.parent) !== -1)
-        : [];
-
-      const subClasses = classes
-        ? action.payload?.filter((c) => classes.findIndex((sc) => sc.id === c.parent) !== -1)
-        : [];
-
-      return {
-        ...state,
-        allClasses: action.payload,
-        masterClasses,
-        classes,
-        subClasses,
-        year: action.payload[0].finances.year,
-      };
-    });
-    builder.addCase(getClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
+    // GET ALL PLANNING
+    builder.addCase(
+      getPlanningClassesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IClass>>) => {
+        return {
+          ...state,
+          planning: separateClassesIntoHierarchy(action.payload, false),
+        };
+      },
+    );
+    builder.addCase(getPlanningClassesThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
+    // GET ALL COORDINATION
+    builder.addCase(
+      getCoordinationClassesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IClass>>) => {
+        return {
+          ...state,
+          coordination: separateClassesIntoHierarchy(
+            action.payload,
+            true,
+          ) as ICoordinatorClassHierarchy,
+        };
+      },
+    );
+    builder.addCase(
+      getCoordinationClassesThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 
-export const { updateMasterClass, updateClass, updateSubClass } = classSlice.actions;
+export const { updatePlanningMasterClass, updatePlanningClass, updatePlanningSubClass } =
+  classSlice.actions;
 
-export const selectAllClasses = (state: RootState) => state.class.allClasses;
-export const selectMasterClasses = (state: RootState) => state.class.masterClasses;
-export const selectClasses = (state: RootState) => state.class.classes;
-export const selectSubClasses = (state: RootState) => state.class.subClasses;
-export const selectBatchedClasses = (state: RootState) => state.class;
+export const selectAllPlanningClasses = (state: RootState) => state.class.planning.allClasses;
+export const selectPlanningMasterClasses = (state: RootState) => state.class.planning.masterClasses;
+export const selectPlanningClasses = (state: RootState) => state.class.planning.classes;
+export const selectPlanningSubClasses = (state: RootState) => state.class.planning.subClasses;
+export const selectBatchedPlanningClasses = (state: RootState) => state.class.planning;
+export const selectBatchedCoordinationClasses = (state: RootState) => state.class.coordination;
 
 export default classSlice.reducer;

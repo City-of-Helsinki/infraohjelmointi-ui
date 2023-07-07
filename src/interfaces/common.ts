@@ -93,13 +93,18 @@ export interface IContextMenuData {
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
 
+// This types are used to create search params and style the rows differently
 export type PlanningRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
-  | 'subClass-district'
-  | 'district-preview'
-  | 'district'
+  | 'subClassDistrict'
+  | 'district' // type used for districts when there is a selectedDistrict
+  | 'districtPreview' // type used for districts when there are multiple districts
+  | 'collectiveSubLevel'
+  | 'subLevelDistrict' // type used for districts when the district is after the selectedCollectiveSubLevel
+  | 'otherClassification'
+  | 'otherClassificationSubLevel'
   | 'division'
   | 'group'
   | 'project';
@@ -128,7 +133,10 @@ export interface IPlanningRowList {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
+  collectiveSubLevels: Array<IClass>;
   districts: Array<ILocation>;
+  otherClassifications: Array<IClass>;
+  otherClassificationSubLevels: Array<IClass>;
   divisions: Array<ILocation>;
   groups: Array<IGroup>;
 }
@@ -138,6 +146,9 @@ export interface IPlanningRowSelections {
   selectedClass: IClass | null;
   selectedSubClass: IClass | null;
   selectedDistrict: ILocation | null;
+  selectedCollectiveSubLevel: IClass | null;
+  selectedSubLevelDistrict: ILocation | null;
+  selectedOtherClassification: IClass | null;
 }
 
 export interface IPlanningRow extends IPlanningSums {
@@ -149,6 +160,8 @@ export interface IPlanningRow extends IPlanningSums {
   id: string;
   key: string;
   defaultExpanded: boolean;
-  link: string | null;
+  urlSearchParam: { [key: string]: string } | null;
   cells: Array<IPlanningCell>;
 }
+
+export type PlanningMode = 'planning' | 'coordination';

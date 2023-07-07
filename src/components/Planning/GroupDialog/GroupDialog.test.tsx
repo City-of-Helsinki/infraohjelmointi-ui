@@ -25,6 +25,7 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 jest.setTimeout(10000);
+
 const store = setupStore();
 
 const render = async () =>
@@ -39,28 +40,28 @@ const render = async () =>
           </>
         }
       >
-        <Route path=":masterClassId" element={<PlanningView />}>
-          <Route path=":classId" element={<PlanningView />}>
-            <Route path=":subClassId" element={<PlanningView />}>
-              <Route path=":districtId" element={<PlanningView />} />
-            </Route>
-          </Route>
-        </Route>
+        <Route path="/planning" element={<PlanningView />} />
       </Route>,
       {
         preloadedState: {
           class: {
             ...store.getState().class,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockMasterClasses.data,
-            classes: mockClasses.data,
-            subClasses: mockSubClasses.data,
+            planning: {
+              ...store.getState().class.planning,
+              allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
+            },
           },
           location: {
             ...store.getState().location,
-            allLocations: mockLocations.data,
-            districts: mockDistricts.data,
-            divisions: mockDivisions.data,
+            planning: {
+              ...store.getState().location.planning,
+              allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+            },
           },
           group: {
             ...store.getState().group,
@@ -88,7 +89,7 @@ describe('GroupDialog', () => {
   it('renders the component wrappers', async () => {
     const renderResult = await render();
     const { findByTestId, user } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
   });
 
@@ -96,7 +97,7 @@ describe('GroupDialog', () => {
     const renderResult = await render();
     const { findByRole, user, findByTestId } = renderResult;
 
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
     // Open modal
     await user.click(await findByTestId('open-summing-group-dialog'));
@@ -156,7 +157,7 @@ describe('GroupDialog', () => {
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
     const { user, findAllByTestId, findByTestId, findByRole, findByText } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
 
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
 
@@ -230,6 +231,7 @@ describe('GroupDialog', () => {
         count: 1,
       },
     });
+
     // waiting for user to be navigated to correct class/district in planning view
     await waitFor(async () => {
       await user.click(submitButton);

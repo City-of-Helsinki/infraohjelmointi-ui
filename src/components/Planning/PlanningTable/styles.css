@@ -2,7 +2,7 @@
   --color-masterClass: var(--color-bus);
   --color-class: #0000a3; /* color had to be improvised */
   --color-subClass: #00007a; /* color had to be improvised */
-  --color-district-preview: var(--color-bus-dark);
+  --color-districtPreview: var(--color-bus-dark);
   --color-district: var(--color-bus);
   --color-division: var(--color-fog-medium-light);
   --color-group: var(--color-fog-light);
@@ -55,15 +55,23 @@
   @apply border-b border-white bg-[var(--color-subClass)];
 }
 
-.monthly-cell.district-preview,
-.monthly-summary-cell.district-preview {
-  @apply border-b border-white bg-[var(--color-district-preview)];
+.monthly-cell.districtPreview,
+.monthly-summary-cell.districtPreview,
+.monthly-cell.subLevelDistrict,
+.monthly-summary-cell.subLevelDistrict,
+.monthly-cell.collectiveSubLevel,
+.monthly-summary-cell.collectiveSubLevel,
+.monthly-cell.otherClassification,
+.monthly-summary-cell.otherClassification,
+.monthly-cell.otherClassificationSubLevel,
+.monthly-summary-cell.otherClassificationSubLevel {
+  @apply border-b border-white bg-[var(--color-districtPreview)];
 }
 
 .monthly-cell.district,
 .monthly-summary-cell.district,
-.monthly-cell.subClass-district,
-.monthly-summary-cell.subClass-district {
+.monthly-cell.subClassDistrict,
+.monthly-summary-cell.subClassDistrict {
   @apply border-b border-white bg-[var(--color-district)];
 }
 

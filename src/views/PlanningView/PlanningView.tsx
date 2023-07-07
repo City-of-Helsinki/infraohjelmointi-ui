@@ -7,12 +7,16 @@ import { PlanningTable } from '@/components/Planning/PlanningTable';
 import usePlanningRows from '@/hooks/usePlanningRows';
 import { useAppSelector } from '@/hooks/common';
 import { selectSelectedYear } from '@/reducers/planningSlice';
+import usePlanningRoutes from '@/hooks/usePlanningRoutes';
 import './styles.css';
+import useCoordinationRows from '@/hooks/useCoordinationRows';
 
 const PlanningView: FC = () => {
   const selectedYear = useAppSelector(selectSelectedYear);
 
   usePlanningRows();
+  useCoordinationRows();
+  usePlanningRoutes();
 
   return (
     <>

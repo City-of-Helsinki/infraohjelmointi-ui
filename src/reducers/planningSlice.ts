@@ -1,5 +1,5 @@
 import { IClass } from '@/interfaces/classInterfaces';
-import { IPlanningRow, IPlanningRowSelections } from '@/interfaces/common';
+import { IPlanningRow, IPlanningRowSelections, PlanningMode } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { RootState } from '@/store';
@@ -13,11 +13,12 @@ interface IPlanningState {
   selections: IPlanningRowSelections;
   projects: Array<IProject>;
   rows: Array<IPlanningRow>;
+  mode: PlanningMode;
 }
 
 const initialState: IPlanningState = {
   selectedYear: null,
-  startYear: null,
+  startYear: new Date().getFullYear(),
   groupsExpanded: false,
   searchedProjectId: null,
   selections: {
@@ -25,7 +26,11 @@ const initialState: IPlanningState = {
     selectedClass: null,
     selectedSubClass: null,
     selectedDistrict: null,
+    selectedCollectiveSubLevel: null,
+    selectedSubLevelDistrict: null,
+    selectedOtherClassification: null,
   },
+  mode: 'planning',
   projects: [],
   rows: [],
 };
@@ -52,6 +57,24 @@ export const planningSlice = createSlice({
     setSelectedDistrict(state, action: PayloadAction<ILocation | null>) {
       return { ...state, selections: { ...state.selections, selectedDistrict: action.payload } };
     },
+    setSelectedCollectiveSubLevel(state, action: PayloadAction<IClass | null>) {
+      return {
+        ...state,
+        selections: { ...state.selections, selectedCollectiveSubLevel: action.payload },
+      };
+    },
+    setSelectedSubLevelDistrict(state, action: PayloadAction<ILocation | null>) {
+      return {
+        ...state,
+        selections: { ...state.selections, selectedSubLevelDistrict: action.payload },
+      };
+    },
+    setSelectedOtherClassification(state, action: PayloadAction<IClass | null>) {
+      return {
+        ...state,
+        selections: { ...state.selections, selectedOtherClassification: action.payload },
+      };
+    },
     setPlanningRows(state, action: PayloadAction<Array<IPlanningRow>>) {
       return { ...state, rows: action.payload };
     },
@@ -60,6 +83,12 @@ export const planningSlice = createSlice({
     },
     setGroupsExpanded(state, action: PayloadAction<boolean>) {
       return { ...state, groupsExpanded: action.payload };
+    },
+    setPlanningMode(state, action: PayloadAction<PlanningMode>) {
+      return { ...state, mode: action.payload };
+    },
+    resetSelections(state) {
+      return { ...state, selections: initialState.selections };
     },
   },
 });
@@ -70,6 +99,7 @@ export const selectSelections = (state: RootState) => state.planning.selections;
 export const selectPlanningRows = (state: RootState) => state.planning.rows;
 export const selectProjects = (state: RootState) => state.planning.projects;
 export const selectGroupsExpanded = (state: RootState) => state.planning.groupsExpanded;
+export const selectPlanningMode = (state: RootState) => state.planning.mode;
 
 export const {
   setSelectedYear,
@@ -78,9 +108,14 @@ export const {
   setSelectedClass,
   setSelectedSubClass,
   setSelectedDistrict,
+  setSelectedCollectiveSubLevel,
+  setSelectedSubLevelDistrict,
+  setSelectedOtherClassification,
   setStartYear,
   setProjects,
   setGroupsExpanded,
+  setPlanningMode,
+  resetSelections,
 } = planningSlice.actions;
 
 export default planningSlice.reducer;

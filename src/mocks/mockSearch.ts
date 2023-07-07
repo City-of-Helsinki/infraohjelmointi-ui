@@ -61,7 +61,7 @@ export const mockSearchResults: { data: ISearchResults } = {
           id: '3c46274d-bcd7-4fb9-aa5b-d70169db34e0',
           value: 'warrantyPeriod',
         },
-        path: 'test-master-class-1/test-class-1/',
+        path: 'masterClass=test-master-class-1&class=test-class-1',
       },
       {
         name: 'Non programmed project',
@@ -78,7 +78,7 @@ export const mockSearchResults: { data: ISearchResults } = {
         type: 'classes',
         hashTags: [],
         phase: null,
-        path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
+        path: 'masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8',
         programmed: null,
       },
     ],

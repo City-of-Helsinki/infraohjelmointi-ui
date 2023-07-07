@@ -1,4 +1,8 @@
-import { selectDistricts, selectDivisions, selectSubDivisions } from '@/reducers/locationSlice';
+import {
+  selectPlanningDistricts,
+  selectPlanningDivisions,
+  selectPlanningSubDivisions,
+} from '@/reducers/locationSlice';
 import { classesToOptions } from '@/utils/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
@@ -13,9 +17,9 @@ const useLocationOptions = (
   currentLocation: string | undefined,
   currentClass: string | undefined,
 ) => {
-  const allDistricts = useAppSelector(selectDistricts);
-  const allDivisions = useAppSelector(selectDivisions);
-  const allSubDivisions = useAppSelector(selectSubDivisions);
+  const allDistricts = useAppSelector(selectPlanningDistricts);
+  const allDivisions = useAppSelector(selectPlanningDivisions);
+  const allSubDivisions = useAppSelector(selectPlanningSubDivisions);
 
   const selectedDistrict = useMemo(
     () => allDistricts && allDistricts.find((mc) => mc.id === currentLocation),

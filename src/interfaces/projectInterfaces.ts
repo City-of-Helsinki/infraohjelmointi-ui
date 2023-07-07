@@ -297,6 +297,13 @@ export interface ITimelineDates {
   constructionEnd: null | string;
 }
 
+export interface IProjectEstDates {
+  estPlanningStart: string | null;
+  estPlanningEnd: string | null;
+  estConstructionStart: string | null;
+  estConstructionEnd: string | null;
+}
+
 export interface IProjectCell {
   /**
    * Year for the current cell
@@ -376,10 +383,5 @@ export interface IProjectCell {
   /**
    * The estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd properties from the project
    */
-  projectEstDates: {
-    estPlanningStart: string | null;
-    estPlanningEnd: string | null;
-    estConstructionStart: string | null;
-    estConstructionEnd: string | null;
-  };
+  projectEstDates: IProjectEstDates;
 }

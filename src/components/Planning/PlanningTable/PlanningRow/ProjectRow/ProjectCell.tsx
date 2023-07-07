@@ -29,7 +29,7 @@ import {
   getAddRequestData,
   getMoveTimelineRequestData,
   addActiveClassToProjectRow,
-} from './ProjectCellUtils';
+} from './projectCellUtils';
 
 interface IProjectCellProps {
   cell: IProjectCell;

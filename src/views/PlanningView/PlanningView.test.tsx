@@ -41,7 +41,7 @@ import {
 } from '@/utils/events';
 import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
-import { updateClass, updateMasterClass } from '@/reducers/classSlice';
+import { updatePlanningClass, updatePlanningMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 
 jest.mock('axios');
@@ -55,6 +55,7 @@ const render = async () =>
   await act(async () =>
     renderWithProviders(
       <>
+        {/* Could there be a nicer way to render these instead of rendering the <PlanningView/> under two routes? */}
         <Route
           path="/"
           element={
@@ -64,29 +65,29 @@ const render = async () =>
             </>
           }
         >
-          <Route path=":masterClassId" element={<PlanningView />}>
-            <Route path=":classId" element={<PlanningView />}>
-              <Route path=":subClassId" element={<PlanningView />}>
-                <Route path=":districtId" element={<PlanningView />} />
-              </Route>
-            </Route>
-          </Route>
+          <Route path="/planning" element={<PlanningView />} />
         </Route>
       </>,
       {
         preloadedState: {
           class: {
             ...store.getState().class,
-            allClasses: mockProjectClasses.data,
-            masterClasses: mockMasterClasses.data,
-            classes: mockClasses.data,
-            subClasses: mockSubClasses.data,
+            planning: {
+              ...store.getState().class.planning,
+              allClasses: mockProjectClasses.data,
+              masterClasses: mockMasterClasses.data,
+              classes: mockClasses.data,
+              subClasses: mockSubClasses.data,
+            },
           },
           location: {
             ...store.getState().location,
-            allLocations: mockLocations.data,
-            districts: mockDistricts.data,
-            divisions: mockDivisions.data,
+            planning: {
+              ...store.getState().location.planning,
+              allLocations: mockLocations.data,
+              districts: mockDistricts.data,
+              divisions: mockDivisions.data,
+            },
           },
           group: {
             ...store.getState().group,
@@ -105,7 +106,7 @@ describe('PlanningView', () => {
   const asNumber = (value: string | null) => parseInt(value || '');
   const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
     const { user, store, getByTestId } = renderResult;
-    const { masterClasses, classes } = store.getState().class;
+    const { masterClasses, classes } = store.getState().class.planning;
     await user.click(getByTestId(`expand-${masterClasses[0].id}`));
     await user.click(getByTestId(`expand-${classes[0].id}`));
   };
@@ -151,7 +152,7 @@ describe('PlanningView', () => {
 
     addFinanceUpdateEventListener(store.dispatch);
 
-    const { id: masterClassId } = store.getState().class.masterClasses[0];
+    const { id: masterClassId } = store.getState().class.planning.masterClasses[0];
     const year = new Date().getFullYear();
 
     const updatedFinances = {
@@ -183,10 +184,12 @@ describe('PlanningView', () => {
     // Simulate what App.tsx does when receiving a finance-update event
     await waitFor(async () => {
       await sendFinanceUpdateEvent(financeUpdateData).then(() => {
-        store.dispatch(updateMasterClass(financeUpdateData.masterClass));
-        store.dispatch(updateClass(financeUpdateData.class));
+        store.dispatch(updatePlanningMasterClass(financeUpdateData.masterClass));
+        store.dispatch(updatePlanningClass(financeUpdateData.class));
       });
     });
+
+    expect(store.getState().events.financeUpdate).toStrictEqual(financeUpdateData);
 
     const { plannedBudget, frameBudget } = updatedFinances.year0;
 
@@ -208,7 +211,7 @@ describe('PlanningView', () => {
       const { findByTestId, queryByTestId, container } = await render();
 
       expect(container.getElementsByClassName('breadcrumbs-list')[0]).toBeInTheDocument();
-      expect(await findByTestId('programming-breadcrumb')).toBeInTheDocument();
+      expect(await findByTestId('planning-breadcrumb')).toBeInTheDocument();
       expect(queryByTestId('masterClass-breadcrumb')).toBeNull();
       expect(queryByTestId('class-breadcrumb')).toBeNull();
       expect(queryByTestId('subClass-breadcrumb')).toBeNull();
@@ -218,8 +221,8 @@ describe('PlanningView', () => {
     it('renders breadcrumbs when table rows are expanded all the way to the selected district and navigates to planning frontpage from first breadcrumb', async () => {
       const { findByTestId, user, store, findAllByTestId, queryByTestId } = await render();
 
-      const { masterClasses, classes, subClasses } = store.getState().class;
-      const { districts } = store.getState().location;
+      const { masterClasses, classes, subClasses } = store.getState().class.planning;
+      const { districts } = store.getState().location.planning;
 
       const { id: masterClassId } = masterClasses[0];
       const { id: classId } = classes[0];
@@ -229,30 +232,30 @@ describe('PlanningView', () => {
       await user.click(await findByTestId(`expand-${masterClassId}`));
       expect(await findByTestId('masterClass-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}`,
+        `/planning?masterClass=${masterClassId}`,
       );
 
       await user.click(await findByTestId(`expand-${classId}`));
       expect(await findByTestId('class-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}/${classId}`,
+        `/planning?masterClass=${masterClassId}&class=${classId}`,
       );
 
       await user.click(await findByTestId(`expand-${subClassId}`));
       expect(await findByTestId('subClass-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}/${classId}/${subClassId}`,
+        `/planning?masterClass=${masterClassId}&class=${classId}&subClass=${subClassId}`,
       );
 
       await user.click(await findByTestId(`expand-${districtId}`));
       expect(await findByTestId('district-breadcrumb')).toHaveAttribute(
         'href',
-        `/${masterClassId}/${classId}/${subClassId}/${districtId}`,
+        `/planning?masterClass=${masterClassId}&class=${classId}&subClass=${subClassId}&district=${districtId}`,
       );
 
       expect((await findAllByTestId('breadcrumb-arrow')).length).toBe(4);
 
-      await user.click(await findByTestId('programming-breadcrumb'));
+      await user.click(await findByTestId('planning-breadcrumb'));
 
       expect(queryByTestId('masterClass-breadcrumb')).toBeNull();
       expect(queryByTestId('class-breadcrumb')).toBeNull();
@@ -263,7 +266,7 @@ describe('PlanningView', () => {
     it('navigates to the clicked class', async () => {
       const { findByTestId, store, user, queryByTestId } = await render();
 
-      const { masterClasses, classes, subClasses } = store.getState().class;
+      const { masterClasses, classes, subClasses } = store.getState().class.planning;
 
       await user.click(await findByTestId(`expand-${masterClasses[0].id}`));
       await user.click(await findByTestId(`expand-${classes[0].id}`));
@@ -291,16 +294,14 @@ describe('PlanningView', () => {
 
   describe('PlanningInfoPanel', () => {
     it('shows the view as planning and doesnt render selectedMasterClass name or previous button if no masterClass is expanded', async () => {
-      const { getByTestId, queryByTestId, container } = await render();
+      const { getByTestId, queryByTestId, container, findByTestId } = await render();
 
       // Main container
       expect(container.getElementsByClassName('planning-info-panel')[0]).toBeInTheDocument();
       // Grid containers
-      expect(getByTestId('mode-button-container')).toBeInTheDocument();
+      expect(await findByTestId('mode-button-container')).toHaveTextContent('planning');
       expect(getByTestId('selected-class-container')).toBeInTheDocument();
       expect(getByTestId('previous-button-container')).toBeInTheDocument();
-      // Mode button
-      expect(getByTestId('mode-button')).toHaveTextContent('planning');
       // Selected masterClass text
       expect(queryByTestId('selected-class')).toBeNull();
       expect(queryByTestId('currency-indicator')).toBeNull();
@@ -310,7 +311,8 @@ describe('PlanningView', () => {
 
     it('shows the selectedMasterClass name and the previos-button if a masterClass is expanded', async () => {
       const { getByTestId, user, store } = await render();
-      const { id: masterClassId } = store.getState().class.masterClasses[0];
+      const planningClasses = store.getState().class.planning;
+      const { id: masterClassId } = planningClasses.masterClasses[0];
 
       await user.click(getByTestId(`expand-${masterClassId}`));
 
@@ -321,9 +323,9 @@ describe('PlanningView', () => {
 
     it('previous-button navigates back in history when clicked', async () => {
       const { getByTestId, user, store } = await render();
-
-      const { id: masterClassId } = store.getState().class.masterClasses[0];
-      const { id: classId } = store.getState().class.classes[0];
+      const planningClasses = store.getState().class.planning;
+      const { id: masterClassId } = planningClasses.masterClasses[0];
+      const { id: classId } = planningClasses.classes[0];
 
       await user.click(getByTestId(`expand-${masterClassId}`));
       await user.click(getByTestId(`expand-${classId}`));
@@ -345,9 +347,8 @@ describe('PlanningView', () => {
   describe('PlanningSummaryTable', () => {
     it('renders all budgets of all masterClasses if a masterClass isnt selected', async () => {
       const { getByTestId, container, store } = await render();
-
       const { year } = mockClassFinances;
-      const { masterClasses } = store.getState().class;
+      const { masterClasses } = store.getState().class.planning;
 
       expect(container.getElementsByClassName('planning-summary-table')[0]).toBeInTheDocument();
       expect(getByTestId('planning-summary-head')).toBeInTheDocument();
@@ -502,8 +503,8 @@ describe('PlanningView', () => {
     it('renders only masterClass rows, heads and cells if no masterClass is expanded', async () => {
       const { store, getByTestId, queryByTestId } = await render();
 
-      const { masterClasses, classes, subClasses } = store.getState().class;
-      const { districts, divisions } = store.getState().location;
+      const { masterClasses, classes, subClasses } = store.getState().class.planning;
+      const { districts, divisions } = store.getState().location.planning;
       const { groups } = store.getState().group;
 
       classes.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
@@ -523,8 +524,8 @@ describe('PlanningView', () => {
     it('renders all children rows and budgets for all but divisions and only one parent when parent is expanded', async () => {
       const { store, getByTestId, queryByTestId, user } = await render();
 
-      const { masterClasses, classes, subClasses } = store.getState().class;
-      const { districts, divisions } = store.getState().location;
+      const { masterClasses, classes, subClasses } = store.getState().class.planning;
+      const { districts, divisions } = store.getState().location.planning;
       const { groups } = store.getState().group;
 
       const projects = mockPlanningViewProjects.data.results;
@@ -652,7 +653,7 @@ describe('PlanningView', () => {
       // // Check that all district-rows are visible and they have the 'district-preview' class
       districtsForSubClass.forEach(({ id }) => {
         expect(getByTestId(`row-${id}`)).toBeInTheDocument();
-        expect(getByTestId(`row-${id}`).classList.contains('district-preview')).toBeTruthy();
+        expect(getByTestId(`row-${id}`).classList.contains('districtPreview')).toBeTruthy();
       });
 
       // Click the first district row
@@ -666,7 +667,7 @@ describe('PlanningView', () => {
             expectRowProperties(finances, id);
             expect(getByTestId(`row-${id}`).classList.contains('district')).toBeTruthy();
             expect(
-              getByTestId(`row-${districtId}`).classList.contains('district-preview'),
+              getByTestId(`row-${districtId}`).classList.contains('districtPreview'),
             ).toBeFalsy();
           }
           if (i !== 0) {
@@ -741,7 +742,7 @@ describe('PlanningView', () => {
     it('can click expand button to show and hide children and does not bring back all parent rows when re-clicked', async () => {
       const { store, getByTestId, queryByTestId, user } = await render();
 
-      const { masterClasses, classes } = store.getState().class;
+      const { masterClasses, classes } = store.getState().class.planning;
 
       const classesForMasterClass = classes.filter((c) => c.parent === masterClasses[0].id);
 
@@ -786,7 +787,7 @@ describe('PlanningView', () => {
       it('renders all the elements and 0 sums until SAP data is received from the backend ', async () => {
         const { findByTestId, user, store } = await render();
         const year = new Date().getFullYear();
-        const { id } = store.getState().class.masterClasses[0];
+        const { id } = store.getState().class.planning.masterClasses[0];
         await user.click(await findByTestId(`expand-monthly-view-button-${year}`));
 
         await waitFor(async () => {
@@ -799,7 +800,7 @@ describe('PlanningView', () => {
       it('renders head and cells', async () => {
         const { store, getByTestId } = await render();
 
-        const { id } = store.getState().class.masterClasses[0];
+        const { id } = store.getState().class.planning.masterClasses[0];
 
         const currentCells = getByTestId(`row-${id}`).children;
 
@@ -818,7 +819,7 @@ describe('PlanningView', () => {
 
     it('can click expand button or title to expand and hide children but doesnt navigate back', async () => {
       const { store, getByTestId, queryByTestId, user } = await render();
-      const { masterClasses, classes } = store.getState().class;
+      const { masterClasses, classes } = store.getState().class.planning;
 
       const { id: masterClassId } = masterClasses[0];
       const { id: classId } = classes[0];
@@ -838,7 +839,7 @@ describe('PlanningView', () => {
       it('renders all elements', async () => {
         const { store, getByTestId } = await render();
 
-        const { id } = store.getState().class.masterClasses[0];
+        const { id } = store.getState().class.planning.masterClasses[0];
 
         // Expand button
         expect(getByTestId(`expand-${id}`)).toBeInTheDocument();
@@ -853,7 +854,7 @@ describe('PlanningView', () => {
       it('renders budget, overrun and deviation', async () => {
         const { store, getByTestId } = await render();
 
-        const { id, finances } = store.getState().class.masterClasses[0];
+        const { id, finances } = store.getState().class.planning.masterClasses[0];
 
         const firstCell = getByTestId(`row-${id}`).children[1];
         const year = new Date().getFullYear();
@@ -874,7 +875,7 @@ describe('PlanningView', () => {
       it('FIXME is hidden by default and displays the current rows title on hover', async () => {
         const { store, getByTestId, user } = await render();
 
-        const { name, id } = store.getState().class.masterClasses[0];
+        const { name, id } = store.getState().class.planning.masterClasses[0];
         const rowTitle = getByTestId(`title-${id}`);
         const hoverTooltip = getByTestId(`hover-tooltip-${id}`);
 
@@ -1879,7 +1880,7 @@ describe('PlanningView', () => {
         it('can edit groups using context menu', async () => {
           const { store, user, findByTestId, findByRole, findAllByTestId } = await render();
           addProjectUpdateEventListener(store.dispatch);
-          const { masterClasses, classes, subClasses } = store.getState().class;
+          const { masterClasses, classes, subClasses } = store.getState().class.planning;
 
           const projects = mockPlanningViewProjects.data.results;
 
@@ -2055,7 +2056,7 @@ describe('PlanningView', () => {
         it('can remove groups using context menu', async () => {
           const { store, user, findByTestId, findByRole } = await render();
           addProjectUpdateEventListener(store.dispatch);
-          const { masterClasses, classes, subClasses } = store.getState().class;
+          const { masterClasses, classes, subClasses } = store.getState().class.planning;
 
           const projects = mockPlanningViewProjects.data.results;
 
