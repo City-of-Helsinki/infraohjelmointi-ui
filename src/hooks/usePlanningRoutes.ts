@@ -21,7 +21,6 @@ import {
   selectBatchedPlanningClasses,
 } from '@/reducers/classSlice';
 import { selectCoordinationDistricts, selectPlanningDistricts } from '@/reducers/locationSlice';
-import _ from 'lodash';
 
 /**
  * Returns the selected class or location from a list of classes or locations if it's found,

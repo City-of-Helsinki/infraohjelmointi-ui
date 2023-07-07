@@ -55,40 +55,32 @@ export const getCoordinationLocationsThunk = createAsyncThunk(
   },
 );
 
+const getLocationsForParent = (allLocations: Array<ILocation>, parents: Array<ILocation>) =>
+  parent ? allLocations?.filter((al) => parents.findIndex((p) => p.id === al.parent) !== -1) : [];
+
 const separateLocationsIntoHierarchy = (
   allLocations: Array<ILocation>,
   forCoordinator: boolean,
 ) => {
   const districts = allLocations?.filter((al) => !al.parent);
 
-  const divisions: Array<ILocation> = [];
-  const subDivisions: Array<ILocation> = [];
-
-  if (!forCoordinator) {
-    if (districts.length > 0) {
-      allLocations?.forEach((al) => {
-        if (districts.findIndex((d) => d.id === al.parent) !== -1) {
-          divisions.push(al);
-        }
-      });
-    }
-
-    if (divisions.length > 0) {
-      allLocations?.forEach((al) => {
-        if (divisions.findIndex((d) => d.id === al.parent) !== -1) {
-          subDivisions.push(al);
-        }
-      });
-    }
+  if (forCoordinator) {
+    return {
+      districts,
+      year: allLocations[0].finances.year,
+    };
   }
+
+  const getLocations = (parents: Array<ILocation>) => getLocationsForParent(allLocations, parents);
+
+  const divisions = getLocations(districts);
+  const subDivisions = getLocations(divisions);
 
   return {
     districts,
-    ...(!forCoordinator && {
-      allLocations,
-      divisions,
-      subDivisions,
-    }),
+    allLocations,
+    divisions,
+    subDivisions,
     year: allLocations[0].finances.year,
   };
 };

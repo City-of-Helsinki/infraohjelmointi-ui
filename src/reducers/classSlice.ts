@@ -63,57 +63,38 @@ export const getCoordinationClassesThunk = createAsyncThunk(
   },
 );
 
+const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
+  parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
+
 const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator: boolean) => {
+  const getClasses = (parents: Array<IClass>) => getClassesForParents(allClasses, parents);
+
   const masterClasses = allClasses?.filter((ac) => !ac.parent);
+  const classes = getClasses(masterClasses);
+  const subClasses = getClasses(classes);
 
-  const classes = masterClasses
-    ? allClasses?.filter((ac) => masterClasses.findIndex((mc) => mc.id === ac.parent) !== -1)
-    : [];
-
-  const subClasses = classes
-    ? allClasses?.filter((ac) => classes.findIndex((c) => c.id === ac.parent) !== -1)
-    : [];
-
-  const collectiveSubLevels: Array<IClass> = [];
-  const otherClassifications: Array<IClass> = [];
-  const otherClassificationSubLevels: Array<IClass> = [];
-
-  if (forCoordinator) {
-    if (subClasses.length > 0) {
-      allClasses?.forEach((al) => {
-        if (subClasses.findIndex((d) => d.id === al.parent) !== -1) {
-          collectiveSubLevels.push(al);
-        }
-      });
-    }
-
-    if (collectiveSubLevels.length > 0) {
-      allClasses?.forEach((al) => {
-        if (collectiveSubLevels.findIndex((d) => d.id === al.parent) !== -1) {
-          otherClassifications.push(al);
-        }
-      });
-    }
-
-    if (otherClassifications.length > 0) {
-      allClasses?.forEach((al) => {
-        if (otherClassifications.findIndex((d) => d.id === al.parent) !== -1) {
-          otherClassificationSubLevels.push(al);
-        }
-      });
-    }
+  if (!forCoordinator) {
+    return {
+      allClasses,
+      masterClasses,
+      classes,
+      subClasses,
+      year: classes[0]?.finances?.year,
+    };
   }
+
+  const collectiveSubLevels = getClasses(subClasses);
+  const otherClassifications = getClasses(collectiveSubLevels);
+  const otherClassificationSubLevels = getClasses(otherClassifications);
 
   return {
     allClasses,
     masterClasses,
     classes,
     subClasses,
-    ...(forCoordinator && {
-      collectiveSubLevels,
-      otherClassifications,
-      otherClassificationSubLevels,
-    }),
+    collectiveSubLevels,
+    otherClassifications,
+    otherClassificationSubLevels,
     year: classes[0]?.finances?.year,
   };
 };

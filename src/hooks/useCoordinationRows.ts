@@ -195,7 +195,7 @@ const useCoordinationRows = () => {
       selectedSubLevelDistrict,
     } = selections;
 
-    const isAnyDistrictSelected = selectedDistrict || selectedSubLevelDistrict;
+    const isAnyDistrictSelected = selectedDistrict ?? selectedSubLevelDistrict;
     const finalCollectiveSubLevels = [];
     const finalOtherClassification = [];
 
