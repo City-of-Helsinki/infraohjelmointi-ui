@@ -319,10 +319,9 @@ describe('SearchResultsView', () => {
       // Title and status tag
       expect(projectChildren[0]).toHaveTextContent('Planning Project 1');
       expect(projectChildren[0]).toHaveTextContent('option.warrantyPeriod');
-      // Breadcrumbs FIXME: re-implement breadcrumbs test when the path from the BE changes to feature search params
-      // expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');
-      // expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');
-      // expect(projectChildren[1]).toHaveTextContent('TestClass');
+      expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');
+      expect(projectChildren[1]).toHaveTextContent('801 Esirakentmainen (kiinteä omaisuus)');
+      expect(projectChildren[1]).toHaveTextContent('TestClass');
 
       // Both hashTags to renders under project card
       expect(await findByTestId('search-result-hashtags')).toBeInTheDocument();
@@ -338,14 +337,13 @@ describe('SearchResultsView', () => {
 
       // Title and class tag
       expect(classChildren[0]).toHaveTextContent('Koillinen');
-      // Breadcrumbs FIXME: re-implement breadcrumbs test when the path from the BE changes to feature search params
-      // expect(classChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
-      // expect(classChildren[1]).toHaveTextContent('Uudisrakentaminen');
-      // expect(classChildren[1]).toHaveTextContent('Koillinen');
+      expect(classChildren[1]).toHaveTextContent('803 Kadut, liikenneväylät');
+      expect(classChildren[1]).toHaveTextContent('Uudisrakentaminen');
+      expect(classChildren[1]).toHaveTextContent('Koillinen');
       // Link rendered around class card
       expect((await findAllByText('Koillinen'))[0].closest('a')).toHaveAttribute(
         'href',
-        '/planning/7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/507e3e63-0c09-4c19-8d09-43549dcc65c8',
+        '/planning/?masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8',
       );
     });
 
