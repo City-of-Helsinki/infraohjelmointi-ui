@@ -106,7 +106,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
         }
       }
       if (!_.isEqual(projects, updatedProjects)) {
-        const sortedProjects = updatedProjects.sort((a, b) => a.name.localeCompare(b.name));
+        const sortedProjects = [...updatedProjects].sort((a, b) => a.name.localeCompare(b.name));
         setPlanningRowState((current) => ({
           ...current,
           projects: sortedProjects,

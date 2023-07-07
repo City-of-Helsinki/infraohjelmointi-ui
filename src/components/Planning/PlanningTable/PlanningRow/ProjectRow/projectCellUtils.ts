@@ -37,6 +37,30 @@ const updateRequestIfValueExistsInProject = (
   }
 };
 
+/**
+ * Returns the first/last valid construction/planning cell and sets any inbetween cell finances to null.
+ * Traverses backwards to find a planning cell and forward to find a construction cell.
+ * @param cellType the type of cell to find
+ *
+ * @returns IProjectCell
+ */
+const traverseAndSetGapCellFinancesNull = (
+  cellType: 'construction' | 'planning',
+  req: IProjectRequest,
+  next: IProjectCell | null,
+  prev: IProjectCell | null,
+) => {
+  let head: IProjectCell | null = cellType === 'construction' ? next : prev;
+  while (head && !head.type.toLowerCase().includes(cellType)) {
+    // Have to use a if condition to check as other operators are still raising typescript errors
+    if (req.finances) {
+      (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
+    }
+    head = cellType === 'construction' ? head.next : head.prev;
+  }
+  return head;
+};
+
 export const getCellTypeUpdateRequestData = (
   cell: IProjectCell,
   phase: string,
@@ -53,49 +77,33 @@ export const getCellTypeUpdateRequestData = (
   const nextCellIsConstruction = cell.next?.type.includes('construction');
   const prevCellIsPlanning = cell.prev?.type.includes('planning');
 
-  /**
-   * Returns the first/last valid construction/planning cell and sets any inbetween cell finances to null.
-   * Traverses backwards to find a planning cell and forward to find a construction cell.
-   * @param cellType the type of cell to find
-   * @returns IProjectCell
-   */
-  const traverseAndSetGapCellFinancesNull = (cellType: 'construction' | 'planning') => {
-    let head: IProjectCell | null = cellType === 'construction' ? next : prev;
-    while (head && !head.type.toLowerCase().includes(cellType)) {
-      // Have to use a if condition to check as other operators are still raising typescript errors
-      if (req.finances) {
-        (req.finances[head.financeKey as keyof IProjectFinancesRequestObject] as null) = null;
-      }
-      head = cellType === 'construction' ? head.next : head.prev;
-    }
-    return head;
-  };
+  const traverseAndSetGaps = (cellType: 'construction' | 'planning') =>
+    traverseAndSetGapCellFinancesNull(cellType, req, next, prev);
 
   /**
    * Traverses backwards from current cell to get the first valid planning cell
    * @returns IProjectCell
    */
-  const getFirstPlanCellBehind = () => traverseAndSetGapCellFinancesNull('planning');
+  const getFirstPlanCellBehind = () => traverseAndSetGaps('planning');
 
   /**
    * Traverses forward from current cell to get the first valid construction cell
    * @returns IProjectCell
    */
-  const getFirstConCellAhead = () => traverseAndSetGapCellFinancesNull('construction');
+  const getFirstConCellAhead = () => traverseAndSetGaps('construction');
 
   /**
    * Gets EndOfYear date from the first valid planning cell behind
    * @returns string
    */
   const getDateFromFirstPlanCellBehind = () =>
-    createDateToEndOfYear(getFirstPlanCellBehind()?.year ?? null);
+    createDateToEndOfYear(getFirstPlanCellBehind()?.year);
 
   /**
    * Gets StartOfYear date from the first valid construction cell ahead
    * @returns string
    */
-  const getDateFromFirstConCellAhead = () =>
-    createDateToStartOfYear(getFirstConCellAhead()?.year ?? null);
+  const getDateFromFirstConCellAhead = () => createDateToStartOfYear(getFirstConCellAhead()?.year);
 
   /**
    * Sets estPlanningEnd and estConstructionStart dates appropriately
@@ -117,7 +125,7 @@ export const getCellTypeUpdateRequestData = (
       return;
     }
 
-    traverseAndSetGapCellFinancesNull('construction');
+    traverseAndSetGaps('construction');
     req.estConstructionStart = getFirstDate(estPlanningEnd);
   };
   /**
@@ -140,8 +148,17 @@ export const getCellTypeUpdateRequestData = (
       return;
     }
 
-    traverseAndSetGapCellFinancesNull('planning');
+    traverseAndSetGaps('planning');
     req.estPlanningEnd = getLastDate(estConstructionStart);
+  };
+
+  const updateOverlapCellToConstructionOrPlanning = () => {
+    if (phase.includes('construction')) {
+      updateCellToConstruction(true);
+    }
+    if (phase.includes('planning')) {
+      updateCellToPlanning(true);
+    }
   };
 
   switch (type) {
@@ -152,12 +169,7 @@ export const getCellTypeUpdateRequestData = (
       updateCellToPlanning(false);
       break;
     case 'overlap':
-      if (phase.includes('construction')) {
-        updateCellToConstruction(true);
-      }
-      if (phase.includes('planning')) {
-        updateCellToPlanning(true);
-      }
+      updateOverlapCellToConstructionOrPlanning();
       break;
     default:
   }
