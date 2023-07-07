@@ -211,7 +211,7 @@ describe('PlanningView', () => {
       const { findByTestId, queryByTestId, container } = await render();
 
       expect(container.getElementsByClassName('breadcrumbs-list')[0]).toBeInTheDocument();
-      expect(await findByTestId('programming-breadcrumb')).toBeInTheDocument();
+      expect(await findByTestId('planning-breadcrumb')).toBeInTheDocument();
       expect(queryByTestId('masterClass-breadcrumb')).toBeNull();
       expect(queryByTestId('class-breadcrumb')).toBeNull();
       expect(queryByTestId('subClass-breadcrumb')).toBeNull();
@@ -255,7 +255,7 @@ describe('PlanningView', () => {
 
       expect((await findAllByTestId('breadcrumb-arrow')).length).toBe(4);
 
-      await user.click(await findByTestId('programming-breadcrumb'));
+      await user.click(await findByTestId('planning-breadcrumb'));
 
       expect(queryByTestId('masterClass-breadcrumb')).toBeNull();
       expect(queryByTestId('class-breadcrumb')).toBeNull();
@@ -294,12 +294,12 @@ describe('PlanningView', () => {
 
   describe('PlanningInfoPanel', () => {
     it('shows the view as planning and doesnt render selectedMasterClass name or previous button if no masterClass is expanded', async () => {
-      const { getByTestId, queryByTestId, container } = await render();
+      const { getByTestId, queryByTestId, container, findByTestId } = await render();
 
       // Main container
       expect(container.getElementsByClassName('planning-info-panel')[0]).toBeInTheDocument();
       // Grid containers
-      expect(getByTestId('mode-button-container')).toBeInTheDocument();
+      expect(await findByTestId('mode-button-container')).toHaveTextContent('planning');
       expect(getByTestId('selected-class-container')).toBeInTheDocument();
       expect(getByTestId('previous-button-container')).toBeInTheDocument();
       // Selected masterClass text

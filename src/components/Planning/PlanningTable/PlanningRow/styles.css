@@ -27,9 +27,12 @@
 }
 
 .planning-head.subLevelDistrict,
-.planning-head.otherClassification,
-.planning-head.otherClassificationSubLevel {
+.planning-head.otherClassification {
   @apply bg-[var(--color-districtPreview)] pl-[7rem];
+}
+
+.planning-head.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview)] pl-[8.5rem];
 }
 
 .planning-head.district,

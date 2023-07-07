@@ -15,7 +15,11 @@ import { Button } from 'hds-react/components/Button';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectGroupsExpanded, setGroupsExpanded } from '@/reducers/planningSlice';
+import {
+  selectGroupsExpanded,
+  selectPlanningMode,
+  setGroupsExpanded,
+} from '@/reducers/planningSlice';
 import { t } from 'i18next';
 import './styles.css';
 import { resetProject, setProjectMode } from '@/reducers/projectSlice';
@@ -23,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 
 const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
+  const mode = useAppSelector(selectPlanningMode);
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const [toolbarState, setToolbarState] = useState({
     groupDialogVisible: false,
@@ -106,6 +111,8 @@ const PlanningToolbar = () => {
               variant="supplementary"
               className="expand-groups-button toolbar-button"
               iconLeft={groupsExpandIcon}
+              disabled={mode === 'coordination'}
+              data-testid="expand-groups-button"
             >
               {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}
             </Button>
@@ -123,8 +130,9 @@ const PlanningToolbar = () => {
               variant="supplementary"
               className="toolbar-button"
               iconLeft={plusIcon}
-              data-testid="open-new-item-context-menu"
+              data-testid="new-item-button"
               onMouseDown={handleNewItemMenu}
+              disabled={mode === 'coordination'}
             >
               {t('new')}
             </Button>

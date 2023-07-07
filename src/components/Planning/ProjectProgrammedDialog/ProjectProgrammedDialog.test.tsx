@@ -94,7 +94,7 @@ describe('ProjectProgrammedDialog', () => {
   it('renders the component wrappers', async () => {
     const renderResult = await render();
     const { findByTestId, user } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     expect(await findByTestId('open-project-programmed-dialog')).toBeInTheDocument();
   });
 
@@ -102,7 +102,7 @@ describe('ProjectProgrammedDialog', () => {
     const renderResult = await render();
     const { user, findByTestId, findByRole } = renderResult;
 
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     const openDialogButton = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButton).toBeInTheDocument();
 
@@ -112,7 +112,7 @@ describe('ProjectProgrammedDialog', () => {
 
     // Navigate to a class row
     await navigateToProjectRows(renderResult);
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
 
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButtonEnabled).toBeEnabled();
@@ -144,7 +144,7 @@ describe('ProjectProgrammedDialog', () => {
     };
 
     const { user, findByTestId, findByRole } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     const openDialogButtonDisabled = await findByTestId('open-project-programmed-dialog');
     expect(openDialogButtonDisabled).toBeInTheDocument();
 
@@ -155,7 +155,7 @@ describe('ProjectProgrammedDialog', () => {
     // Navigate to a class row
     await navigateToProjectRows(renderResult);
 
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     const openDialogButtonEnabled = await findByTestId('open-project-programmed-dialog');
     await user.click(openDialogButtonEnabled);
     const dialog = within(await findByRole('dialog'));

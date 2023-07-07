@@ -33,12 +33,10 @@ const PlanningBreadcrumbs = () => {
   const mode = useAppSelector(selectPlanningMode);
 
   return (
-    <ul className="breadcrumbs-list">
-      <li>
-        <Link to="" data-testid="programming-breadcrumb">
-          {t(`nav.${mode}`)}
-        </Link>
-      </li>
+    <ul className="breadcrumbs-list" data-testid="planning-breadcrumbs">
+      <Link to="" data-testid={`${mode}-breadcrumb`}>
+        {t(`nav.${mode}`)}
+      </Link>
 
       {selectedMasterClass && (
         <Breadcrumb
@@ -70,21 +68,21 @@ const PlanningBreadcrumbs = () => {
       )}
       {selectedCollectiveSubLevel && (
         <Breadcrumb
-          id="district"
+          id="collectiveSubLevel"
           path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel.id}`}
           value={selectedCollectiveSubLevel.name}
         />
       )}
       {selectedSubLevelDistrict && (
         <Breadcrumb
-          id="district"
+          id="subLevelDistrict"
           path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&subLevelDistrict=${selectedSubLevelDistrict.id}`}
           value={selectedSubLevelDistrict.name}
         />
       )}
       {selectedOtherClassification && (
         <Breadcrumb
-          id="district"
+          id="otherClassification"
           path={`?masterClass=${selectedMasterClass?.id}&class=${selectedClass?.id}&subClass=${selectedSubClass?.id}&district=${selectedDistrict?.id}&collectiveSubLevel=${selectedCollectiveSubLevel?.id}&subLevelDistrict=${selectedSubLevelDistrict?.id}&otherClassification=${selectedOtherClassification.id}`}
           value={selectedOtherClassification.name}
         />

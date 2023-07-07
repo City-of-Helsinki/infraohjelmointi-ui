@@ -60,11 +60,12 @@ const buildCoordinatorTableRows = (
     parent: IClass,
     districts: Array<ILocation>,
     defaultExpanded: boolean,
+    type: PlanningRowType,
   ) =>
     districts
       .filter((district) => district.parentClass === parent.id)
       .map((filteredDistrict) => ({
-        ...getRow(filteredDistrict, 'subLevelDistrict', !!defaultExpanded),
+        ...getRow(filteredDistrict, type, !!defaultExpanded),
       }));
 
   // Map the class rows going from masterClasses to districts
@@ -125,6 +126,7 @@ const buildCoordinatorTableRows = (
                         filteredCollectiveSubLevel,
                         districtsAfterCollectiveSubLevel,
                         !!selectedSubLevelDistrict,
+                        'subLevelDistrict',
                       ),
                     ],
                   })),
@@ -133,6 +135,7 @@ const buildCoordinatorTableRows = (
                   filteredSubClass,
                   districtsBeforeCollectiveSubLevel,
                   !!selectedDistrict,
+                  'districtPreview',
                 ),
               ],
             })),

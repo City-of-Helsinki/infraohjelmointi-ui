@@ -89,7 +89,7 @@ describe('GroupDialog', () => {
   it('renders the component wrappers', async () => {
     const renderResult = await render();
     const { findByTestId, user } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe('GroupDialog', () => {
     const renderResult = await render();
     const { findByRole, user, findByTestId } = renderResult;
 
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
     // Open modal
     await user.click(await findByTestId('open-summing-group-dialog'));
@@ -157,7 +157,7 @@ describe('GroupDialog', () => {
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
     const { user, findAllByTestId, findByTestId, findByRole, findByText } = renderResult;
-    await user.click(await findByTestId('open-new-item-context-menu'));
+    await user.click(await findByTestId('new-item-button'));
 
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
 
