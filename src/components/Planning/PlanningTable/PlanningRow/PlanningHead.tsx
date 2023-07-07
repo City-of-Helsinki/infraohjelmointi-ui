@@ -88,7 +88,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
       pathname: `/${mode}`,
       search: `${createSearchParams(searchParams)}`,
     });
-  }, [handleExpand, id, mode, navigate, search, type]);
+  }, [handleExpand, mode, navigate, search, urlSearchParam]);
 
   return (
     <th className={`planning-head ${type} sticky left-0 z-50`} data-testid={`head-${id}`}>
