@@ -105,20 +105,13 @@ export const getCellTypeUpdateRequestData = (
    */
   const getDateFromFirstConCellAhead = () => createDateToStartOfYear(getFirstConCellAhead()?.year);
 
-  /**
-   * Sets estPlanningEnd and estConstructionStart dates appropriately
-   * to convert current cell to construction
-   * @param isOverlap is current cell type 'overlap'
-   * @returns void
-   */
-  const updateCellToConstruction = (isOverlap: boolean) => {
-    req.estPlanningEnd = prevCellIsPlanning
+  const updatePlanningEnd = () =>
+    (req.estPlanningEnd = prevCellIsPlanning
       ? removeYear(estPlanningEnd)
-      : getDateFromFirstPlanCellBehind();
+      : getDateFromFirstPlanCellBehind());
 
-    if (isOverlap) {
-      return;
-    }
+  const updatePlanningEndAndTraverseIfGaps = () => {
+    updatePlanningEnd();
 
     if (nextCellIsConstruction) {
       req.estConstructionStart = removeYear(estConstructionStart);
@@ -128,20 +121,14 @@ export const getCellTypeUpdateRequestData = (
     traverseAndSetGaps('construction');
     req.estConstructionStart = getFirstDate(estPlanningEnd);
   };
-  /**
-   * Sets estPlanningEnd and estConstructionStart dates appropriately
-   * to convert current cell to planning
-   * @param isOverlap is current cell type 'overlap'
-   * @returns void
-   */
-  const updateCellToPlanning = (isOverlap: boolean) => {
-    req.estConstructionStart = nextCellIsConstruction
-      ? addYear(estConstructionStart)
-      : getDateFromFirstConCellAhead();
 
-    if (isOverlap) {
-      return;
-    }
+  const updateConstructionStart = () =>
+    (req.estConstructionStart = nextCellIsConstruction
+      ? addYear(estConstructionStart)
+      : getDateFromFirstConCellAhead());
+
+  const updateConstructionStartAndTraverseIfGaps = () => {
+    updateConstructionStart();
 
     if (prevCellIsPlanning) {
       req.estPlanningEnd = addYear(estPlanningEnd);
@@ -152,27 +139,16 @@ export const getCellTypeUpdateRequestData = (
     req.estPlanningEnd = getLastDate(estConstructionStart);
   };
 
-  const updateOverlapCellToConstructionOrPlanning = () => {
-    if (phase.includes('construction')) {
-      updateCellToConstruction(true);
-    }
-    if (phase.includes('planning')) {
-      updateCellToPlanning(true);
-    }
-  };
-
-  switch (type) {
-    case 'planningEnd':
-      updateCellToConstruction(false);
-      break;
-    case 'constructionStart':
-      updateCellToPlanning(false);
-      break;
-    case 'overlap':
-      updateOverlapCellToConstructionOrPlanning();
-      break;
-    default:
+  if (type === 'planningEnd') {
+    updatePlanningEndAndTraverseIfGaps();
+  } else if (type === 'constructionStart') {
+    updateConstructionStartAndTraverseIfGaps();
+  } else if (type === 'overlap' && phase.includes('construction')) {
+    updatePlanningEnd();
+  } else if (type === 'overlap' && phase.includes('planning')) {
+    updateConstructionStart();
   }
+
   return req;
 };
 
