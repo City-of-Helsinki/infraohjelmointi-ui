@@ -43,6 +43,7 @@ import { selectFinanceUpdate } from './reducers/eventsSlice';
 import { ProjectBasics } from './components/Project/ProjectBasics';
 import { notifyError } from './reducers/notificationSlice';
 import ConfirmDialog from './components/shared/ConfirmDialog';
+import ReportsView from './views/ReportsView';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -68,7 +69,8 @@ const App: FC = () => {
       .catch((e) => {
         console.log('Error getting app data: ', e);
         dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-      }).finally(() => {
+      })
+      .finally(() => {
         dispatch(clearLoading(LOADING_APP_ID));
       });
   };
@@ -132,6 +134,7 @@ const App: FC = () => {
               <Route path="/planning" element={<PlanningView />} />
               <Route path="/coordination" element={<PlanningView />} />
               <Route path="/search-results" element={<SearchResultsView />} />
+              <Route path="/reports" element={<ReportsView />} />
               <Route path="*" element={<ErrorView />} />
             </Routes>
           )}

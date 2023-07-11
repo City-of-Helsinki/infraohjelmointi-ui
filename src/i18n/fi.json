@@ -390,5 +390,31 @@
   "confirmLeaveTitle": "Oletko varma että haluat poistua?",
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
-  "newProject": "Uusi hanke"
+  "newProject": "Uusi hanke",
+  "reports": {
+    "budgetProposal": {
+      "title": "Talousarvioehdotus",
+      "documentName": "talousarvioehdotus"
+    },
+    "strategy": {
+      "title": "Toimintasuunnitelma",
+      "documentName": "toimintasuunnitelma"
+    },
+    "constructionProgram": {
+      "title": "Rakentamisohjelma (yli 1 milj hankkeet)",
+      "documentName": "rakentamisohjelma"
+    },
+    "budgetBookSummary": {
+      "title": "Talousarviokirjan kooste",
+      "documentName": "talousarviokirjan kooste"
+    },
+    "financialStatement": {
+      "title": "Tilinpäätös (yli 1 milj hankkeet)",
+      "documentName": "tilinpäätös"
+    }
+  },
+  "lastUpdated": "Päivitetty viimeksi",
+  "downloadPdf": "Lataa {{name}} (.pdf)",
+  "downloadXlsx": "Lataa {{name}} (.xlsx)",
+  "reportsTitle": "Raportit"
 }

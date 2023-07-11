@@ -1,0 +1,19 @@
+.report-row-container {
+  @apply border-b-[1px] border-gray pb-6 pt-6;
+}
+
+.report-title {
+  @apply mb-2 text-heading-s;
+}
+
+.report-last-updated {
+  @apply mb-2;
+}
+
+.report-download-pdf-button {
+  @apply mt-4;
+}
+
+.report-download-xlsx-button {
+  @apply mt-4;
+}
