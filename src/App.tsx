@@ -63,12 +63,13 @@ const App: FC = () => {
       dispatch(getCoordinationLocationsThunk()),
     ])
       .then(() => {
-        dispatch(clearLoading(LOADING_APP_ID));
         setAppDataReady(true);
       })
       .catch((e) => {
         console.log('Error getting app data: ', e);
         dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+      }).finally(() => {
+        dispatch(clearLoading(LOADING_APP_ID));
       });
   };
 

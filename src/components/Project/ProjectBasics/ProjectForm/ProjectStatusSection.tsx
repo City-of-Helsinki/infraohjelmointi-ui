@@ -64,7 +64,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
             'category',
             'masterClass',
             'class',
-            'subClass',
           ];
 
           const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];

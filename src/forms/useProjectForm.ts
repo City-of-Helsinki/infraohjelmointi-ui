@@ -1,5 +1,5 @@
 import { IProjectForm } from '@/interfaces/formInterfaces';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
@@ -186,11 +186,68 @@ const useProjectForm = () => {
     mode: 'onBlur',
   });
 
-  // control,
-  const { reset } = formMethods;
+  const [selections, setSelections] = useState({ selectedClass: '', selectedLocation: '' });
 
-  const classOptions = useClassOptions(project?.projectClass);
-  const locationOptions = useLocationOptions(project?.projectLocation, project?.projectClass);
+  // control,
+  const { reset, watch, setValue } = formMethods;
+
+  const classOptions = useClassOptions(selections?.selectedClass);
+
+  const locationOptions = useLocationOptions(
+    selections?.selectedLocation,
+    selections?.selectedClass,
+  );
+
+  // Set the selected class and empty the other selected classes if a parent class is selected
+  const setSelectedClass = (name: string, form: IProjectForm) => {
+    const optionValue = (form[name as unknown as keyof IProjectForm] as IOption)?.value;
+
+    if (name === 'masterClass') {
+      setValue('class', { label: '', value: '' });
+    }
+    if (name === 'masterClass' || name === 'class') {
+      setValue('subClass', { label: '', value: '' });
+    }
+    if (optionValue) {
+      setSelections((current) => ({
+        ...current,
+        selectedClass: optionValue,
+      }));
+    }
+  };
+
+  // Set the selected location and empty the other locations if a parent location is selected
+  const setSelectedLocation = (name: string, form: IProjectForm) => {
+    const optionValue = (form[name as unknown as keyof IProjectForm] as IOption)?.value;
+
+    if (name === 'district') {
+      setValue('division', { label: '', value: '' });
+    }
+    if (name === 'district' || name === 'division') {
+      setValue('subDivision', { label: '', value: '' });
+    }
+    if (optionValue) {
+      setSelections((current) => ({
+        ...current,
+        selectedLocation: optionValue,
+      }));
+    }
+  };
+
+  // Listent to changes in the form value and set selected class or location if those properties are changed
+  useEffect(() => {
+    const subscription = watch((form, { name }) => {
+      if (name) {
+        if (['masterClass', 'class', 'subClass'].includes(name)) {
+          setSelectedClass(name, form as IProjectForm);
+        }
+        if (['district', 'division', 'subDivision'].includes(name)) {
+          setSelectedLocation(name, form as IProjectForm);
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setValue]);
 
   // Updates form with the selectedProject from redux
   useEffect(() => {
