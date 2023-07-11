@@ -70,6 +70,12 @@ export interface IProjectForm {
   personConstruction: IOption;
   personPlanning: IOption;
   name: string;
+  masterClass: IOption;
+  class: IOption;
+  subClass: IOption;
+  district: IOption;
+  division: IOption;
+  subDivision: IOption;
 }
 
 export interface ISearchForm {

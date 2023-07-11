@@ -33,6 +33,7 @@
     "underConstruction": "Rakenteilla",
     "proposal": "Hanke-ehdotus",
     "design": "Yleissuunnittelu",
+    "programming": "Ohjelmointi",
     "draftInitiation": "Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos",
     "draftApproval": "Katu-/puistosuunnitelmaehdotus ja hyväksyminen",
     "constructionPlan": "Rakennussuunnitelma",
@@ -128,7 +129,10 @@
     "visibilityStart": "Nähtävilläolo alkaa",
     "visibilityEnd": "Nähtävilläolo päättyy",
     "personPlanning": "Vastuuhenkilö",
-    "name": "Hankkeen nimi"
+    "name": "Hankkeen nimi",
+    "subClass": "Alaluokka",
+    "class": "Luokka",
+    "masterClass": "Pääluokka"
   },
   "projectForm": {
     "name": "Hankkeen nimi",
