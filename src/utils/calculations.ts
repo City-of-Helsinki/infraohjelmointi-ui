@@ -1,5 +1,10 @@
 import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfaces';
-import { IPlanningCell, IPlanningSums, IProjectSums, PlanningRowType } from '@/interfaces/common';
+import {
+  IPlanningCell,
+  IPlanningSums,
+  IProjectSums,
+  PlanningRowType,
+} from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 
 // Formats a number to include thousand sepparators

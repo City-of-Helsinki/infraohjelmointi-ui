@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */
 import { memo } from 'react';
 import PlanningRow from './PlanningRow/PlanningRow';
-import { IPlanningRow } from '@/interfaces/common';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectPlanningMode, selectPlanningRows } from '@/reducers/planningSlice';
 import './styles.css';

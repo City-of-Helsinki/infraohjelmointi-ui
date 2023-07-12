@@ -1,5 +1,5 @@
 import { FC, memo } from 'react';
-import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/common';
+import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
 import { useAppSelector } from '@/hooks/common';

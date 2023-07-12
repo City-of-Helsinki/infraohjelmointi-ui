@@ -3,7 +3,7 @@
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import PlanningCell from './PlanningCell';
 import PlanningHead from './PlanningHead';
-import { IPlanningCell, IPlanningRow } from '@/interfaces/common';
+import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import ProjectRow from './ProjectRow/ProjectRow';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { useLocation } from 'react-router-dom';

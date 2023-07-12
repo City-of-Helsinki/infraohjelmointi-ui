@@ -1,5 +1,9 @@
 import { IClass } from '@/interfaces/classInterfaces';
-import { IPlanningRow, IPlanningRowSelections, PlanningMode } from '@/interfaces/common';
+import {
+  IPlanningRow,
+  IPlanningRowSelections,
+  PlanningMode,
+} from '@/interfaces/planningInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { RootState } from '@/store';

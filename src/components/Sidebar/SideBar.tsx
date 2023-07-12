@@ -49,10 +49,10 @@ const SideBar = () => {
       disabled: true,
     },
     {
-      route: 'placeholder 3',
-      label: 'placeholder 3',
+      route: 'reports',
+      label: t('reportsTitle'),
       component: <IconGraphColumns style={iconStyles} />,
-      disabled: true,
+      disabled: false,
     },
     {
       route: 'placeholder 4',
