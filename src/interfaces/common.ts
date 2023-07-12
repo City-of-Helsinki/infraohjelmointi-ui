@@ -1,9 +1,4 @@
 import { ReactNode } from 'react';
-import { CellType, IProject, IProjectRequest } from './projectInterfaces';
-import { IClass } from './classInterfaces';
-import { ILocation } from './locationInterfaces';
-import { IGroup } from './groupInterfaces';
-import { ContextMenuType } from './eventInterfaces';
 
 export interface IError {
   status: number | undefined;
