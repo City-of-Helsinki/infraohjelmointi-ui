@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from './common';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
-import { PlanningMode } from '@/interfaces/common';
+import { PlanningMode } from '@/interfaces/planningInterfaces';
 import {
   resetSelections,
   selectPlanningMode,

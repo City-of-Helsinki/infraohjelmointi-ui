@@ -1,6 +1,7 @@
 import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
-import { IOption, IPlanningRow } from '@/interfaces/common';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { IOption } from '@/interfaces/common';
 import HoverTooltip from './HoverTooltip/HoverTooltip';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { dispatchContextMenuEvent } from '@/utils/events';

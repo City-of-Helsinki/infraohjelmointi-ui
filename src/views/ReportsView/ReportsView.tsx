@@ -1,5 +1,5 @@
 import { ReportRow } from '@/components/Report';
-import { reports } from '@/interfaces/common';
+import { reports } from '@/interfaces/reportInterfaces';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 

@@ -13,7 +13,7 @@ import {
   IPlanningRowList,
   IPlanningRowSelections,
   PlanningRowType,
-} from '@/interfaces/common';
+} from '@/interfaces/planningInterfaces';
 import { selectGroups, updateGroup } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';

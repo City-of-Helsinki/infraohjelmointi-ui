@@ -7,7 +7,7 @@ import {
   IPlanningRowList,
   IPlanningRowSelections,
   PlanningRowType,
-} from '@/interfaces/common';
+} from '@/interfaces/planningInterfaces';
 import { selectGroups } from '@/reducers/groupSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {

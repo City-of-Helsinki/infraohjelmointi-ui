@@ -3,7 +3,7 @@ import { act } from '@testing-library/react';
 import { renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
 import ReportsView from './ReportsView';
-import { reports } from '@/interfaces/common';
+import { reports } from '@/interfaces/reportInterfaces';
 
 jest.mock('react-i18next', () => mockI18next());
 

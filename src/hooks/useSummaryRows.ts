@@ -1,4 +1,4 @@
-import { IPlanningCell } from '@/interfaces/common';
+import { IPlanningCell } from '@/interfaces/planningInterfaces';
 import { useEffect, useMemo, useState } from 'react';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
 import { useAppSelector } from './common';

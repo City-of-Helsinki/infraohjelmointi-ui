@@ -1,4 +1,4 @@
-import { IProjectSums } from '@/interfaces/common';
+import { IProjectSums } from '@/interfaces/planningInterfaces';
 import {
   CellType,
   IMonthlyData,

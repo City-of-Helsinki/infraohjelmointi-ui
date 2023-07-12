@@ -1,4 +1,4 @@
-import { PlanningRowType } from '@/interfaces/common';
+import { PlanningRowType } from '@/interfaces/planningInterfaces';
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 

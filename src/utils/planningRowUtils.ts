@@ -1,5 +1,5 @@
 import { IClass } from '@/interfaces/classInterfaces';
-import { PlanningRowType, IPlanningRow } from '@/interfaces/common';
+import { PlanningRowType, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { calculatePlanningCells, calculatePlanningRowSums } from './calculations';
