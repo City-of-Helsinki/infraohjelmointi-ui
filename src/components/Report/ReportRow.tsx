@@ -1,7 +1,11 @@
 import { Button, IconDownload } from 'hds-react';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, ReactElement, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
+import BudgetProposal from './Reports/BudgetProposal';
+import { BlobProvider } from '@react-pdf/renderer';
+import saveAs from 'file-saver';
+import './pdfStyles';
 import './styles.css';
 
 interface IReportRowProps {
@@ -9,18 +13,48 @@ interface IReportRowProps {
   lastUpdated: string;
 }
 
+interface IReportDownloadPdfButtonProps {
+  document: ReactElement;
+  type: ReportType;
+}
+
+const ReportDownloadPdfButton: FC<IReportDownloadPdfButtonProps> = ({ document, type }) => {
+  const { t } = useTranslation();
+
+  const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
+
+  const downloadIcon = useMemo(() => <IconDownload />, []);
+
+  const handleDownload = useCallback(
+    (blob: Blob | null) => {
+      if (blob) {
+        saveAs(blob, `${documentName}.pdf`);
+      }
+    },
+    [documentName],
+  );
+
+  return (
+    <BlobProvider document={document}>
+      {({ blob }) => (
+        <div className="report-download-pdf-button" data-testid={`download-pdf-${type}`}>
+          <Button
+            iconLeft={downloadIcon}
+            onClick={() => handleDownload(blob)}
+            disabled={type !== 'budgetProposal'}
+          >
+            {t('downloadPdf', { name: documentName })}
+          </Button>
+        </div>
+      )}
+    </BlobProvider>
+  );
+};
+
 const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated }) => {
   const { t } = useTranslation();
 
   const downloadIcon = useMemo(() => <IconDownload />, []);
-
-  const buildPdf = useCallback(() => {
-    // TODO: handle building pdf for different types
-    switch (type) {
-      default:
-        break;
-    }
-  }, []);
 
   const buildXlsx = useCallback(() => {
     // TODO: handle building xlsx for different types
@@ -28,28 +62,24 @@ const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated }) => {
       default:
         break;
     }
-  }, []);
+  }, [type]);
 
   return (
     <div className="report-row-container" data-testid={`report-row-${type}`}>
       {/* report title */}
       <h3 className="report-title" data-testid={`report-title-${type}`}>
-        {t(`reports.${type}.title`)}
+        {t(`report.${type}.title`)}
       </h3>
       {/* last updated date */}
       <div className="report-last-updated" data-testid={`last-updated-${type}`}>{`${t(
         'lastUpdated',
       )} ${lastUpdated}`}</div>
       {/* download pdf button */}
-      <div className="report-download-pdf-button" data-testid={`download-pdf-${type}`}>
-        <Button iconLeft={downloadIcon} onClick={buildPdf} disabled={true}>
-          {t('downloadPdf', { name: t(`reports.${type}.documentName`) })}
-        </Button>
-      </div>
+      <ReportDownloadPdfButton document={<BudgetProposal />} type={type} />
       {/* download xlsx button */}
       <div className="report-download-xlsx-button" data-testid={`download-xlsx-${type}`}>
         <Button iconLeft={downloadIcon} variant="secondary" onClick={buildXlsx} disabled={true}>
-          {t('downloadXlsx', { name: t(`reports.${type}.documentName`) })}
+          {t('downloadXlsx', { name: t(`report.${type}.documentName`) })}
         </Button>
       </div>
     </div>

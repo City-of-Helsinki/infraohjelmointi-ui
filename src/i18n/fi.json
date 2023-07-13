@@ -403,7 +403,7 @@
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
-  "reports": {
+  "report": {
     "budgetProposal": {
       "title": "Talousarvioehdotus",
       "documentName": "talousarvioehdotus"
@@ -467,5 +467,6 @@
   "archive": "Arkistoi",
   "restore": "Palauta",
   "archived": "Arkistoitu",
-  "inUse": "Käytössä"
+  "inUse": "Käytössä",
+  "reports": "Raportit"
 }

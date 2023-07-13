@@ -50,7 +50,7 @@ const SideBar = () => {
     },
     {
       route: 'reports',
-      label: t('reportsTitle'),
+      label: t('report'),
       component: <IconGraphColumns style={iconStyles} />,
       disabled: false,
     },
