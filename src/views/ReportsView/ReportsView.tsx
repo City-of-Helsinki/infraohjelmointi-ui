@@ -11,7 +11,7 @@ const ReportsView = () => {
   return (
     <div className="reports-view" data-testid="reports-view">
       <h1 className="reports-title" data-testid="reports-title">
-        {t('report')}
+        {t('reports')}
       </h1>
 
       <PDFViewer style={{ width: '100vw', height: '100vh' }}>

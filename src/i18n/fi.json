@@ -405,8 +405,12 @@
   "newProject": "Uusi hanke",
   "report": {
     "budgetProposal": {
-      "title": "Talousarvioehdotus",
-      "documentName": "talousarvioehdotus"
+      "rowTitle": "Talousarvioehdotus",
+      "documentName": "talousarvioehdotus",
+      "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}} - {{endYear}}",
+      "subtitleOne": "Maankäyttö ja kaupunkirakenne",
+      "substitleTwo": "LIKE/Toiminnanohjaus",
+      "tableTitle": "Talousarvioehdotus {{startYear}} & {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}"
     },
     "strategy": {
       "title": "Toimintasuunnitelma",

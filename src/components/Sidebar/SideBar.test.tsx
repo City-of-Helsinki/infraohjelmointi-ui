@@ -47,7 +47,7 @@ describe('SideBar', () => {
     'planning',
     'placeholder 1',
     'placeholder 2',
-    'report',
+    'reports',
     'placeholder 4',
     'admin',
   ];

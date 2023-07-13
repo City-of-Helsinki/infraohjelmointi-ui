@@ -68,7 +68,7 @@ const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated }) => {
     <div className="report-row-container" data-testid={`report-row-${type}`}>
       {/* report title */}
       <h3 className="report-title" data-testid={`report-title-${type}`}>
-        {t(`report.${type}.title`)}
+        {t(`report.${type}.rowTitle`)}
       </h3>
       {/* last updated date */}
       <div className="report-last-updated" data-testid={`last-updated-${type}`}>{`${t(
