@@ -1,7 +1,6 @@
 import { Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import { memo } from 'react';
+import { FC, memo } from 'react';
 import logo from '@/assets/logo.png';
-import { useTranslation } from 'react-i18next';
 
 // Create styles (pdf docs can't be given rem for some reason)
 const styles = StyleSheet.create({
@@ -28,23 +27,27 @@ const styles = StyleSheet.create({
   },
 });
 
-const BudgetProposalHeader = () => {
-  const { t } = useTranslation();
+interface IDocumentHeaderProps {
+  title: string;
+  subtitleOne?: string;
+  subtitleTwo?: string;
+  date?: string;
+}
+
+const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, subtitleOne, subtitleTwo, date }) => {
   return (
     <View style={styles.header}>
       <View style={styles.textAndLogo}>
         <Image style={styles.logo} src={logo} />
         <View style={styles.text}>
-          <Text style={{ fontWeight: 'bold' }}>
-            {t('report.budgetProposal.title', { startYear: '2023', endYear: '2032' })}
-          </Text>
-          <Text>{t('report.budgetProposal.subtitleOne')}</Text>
-          <Text>{t('report.budgetProposal.substitleTwo')}</Text>
+          <Text style={{ fontWeight: 'bold' }}>{title}</Text>
+          <Text>{subtitleOne}</Text>
+          <Text>{subtitleTwo}</Text>
         </View>
       </View>
-      <Text>01.01.2023</Text>
+      <Text>{date}</Text>
     </View>
   );
 };
 
-export default memo(BudgetProposalHeader);
+export default memo(DocumentHeader);

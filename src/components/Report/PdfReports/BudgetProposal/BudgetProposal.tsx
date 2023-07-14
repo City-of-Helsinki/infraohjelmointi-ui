@@ -1,8 +1,9 @@
 import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
-import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import BudgetProposalHeader from './BudgetProposalHeader';
 import BudgetProposalTable from './BudgetProposalTable';
+import DocumentHeader from '../DocumentHeader';
+import { getToday } from '@/utils/dates';
+import { memo } from 'react';
 
 const styles = StyleSheet.create({
   page: {
@@ -17,11 +18,16 @@ const styles = StyleSheet.create({
 const BudgetProposal = () => {
   const { t } = useTranslation();
   return (
-    <Document title={t('report.budgetProposal.documentName') ?? ''}>
+    <Document title={t('report.budgetProposal.title') ?? ''}>
       <Page size="A3" style={styles.page}>
         <View style={styles.document}>
           {/* Header */}
-          <BudgetProposalHeader />
+          <DocumentHeader
+            title={t('report.budgetProposal.title', { startYear: '2023', endYear: '2032' })}
+            subtitleOne={t('report.budgetProposal.subtitleOne') as string}
+            subtitleTwo={t('report.budgetProposal.subtitleTwo') as string}
+            date={getToday()}
+          />
           <BudgetProposalTable />
         </View>
       </Page>

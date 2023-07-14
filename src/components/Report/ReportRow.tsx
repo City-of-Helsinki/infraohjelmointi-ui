@@ -1,55 +1,15 @@
 import { Button, IconDownload } from 'hds-react';
-import { FC, ReactElement, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
-import BudgetProposal from './Reports/BudgetProposal';
-import { BlobProvider } from '@react-pdf/renderer';
-import saveAs from 'file-saver';
-import './pdfStyles';
+import DownloadPdfButton from './DownloadPdfButton';
 import './styles.css';
+import './pdfFonts';
 
 interface IReportRowProps {
   type: ReportType;
   lastUpdated: string;
 }
-
-interface IReportDownloadPdfButtonProps {
-  document: ReactElement;
-  type: ReportType;
-}
-
-const ReportDownloadPdfButton: FC<IReportDownloadPdfButtonProps> = ({ document, type }) => {
-  const { t } = useTranslation();
-
-  const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
-
-  const downloadIcon = useMemo(() => <IconDownload />, []);
-
-  const handleDownload = useCallback(
-    (blob: Blob | null) => {
-      if (blob) {
-        saveAs(blob, `${documentName}.pdf`);
-      }
-    },
-    [documentName],
-  );
-
-  return (
-    <BlobProvider document={document}>
-      {({ blob }) => (
-        <div className="report-download-pdf-button" data-testid={`download-pdf-${type}`}>
-          <Button
-            iconLeft={downloadIcon}
-            onClick={() => handleDownload(blob)}
-            disabled={type !== 'budgetProposal'}
-          >
-            {t('downloadPdf', { name: documentName })}
-          </Button>
-        </div>
-      )}
-    </BlobProvider>
-  );
-};
 
 const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated }) => {
   const { t } = useTranslation();
@@ -75,7 +35,7 @@ const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated }) => {
         'lastUpdated',
       )} ${lastUpdated}`}</div>
       {/* download pdf button */}
-      <ReportDownloadPdfButton document={<BudgetProposal />} type={type} />
+      <DownloadPdfButton type={type} />
       {/* download xlsx button */}
       <div className="report-download-xlsx-button" data-testid={`download-xlsx-${type}`}>
         <Button iconLeft={downloadIcon} variant="secondary" onClick={buildXlsx} disabled={true}>

@@ -409,23 +409,25 @@
       "documentName": "talousarvioehdotus",
       "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}} - {{endYear}}",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
-      "substitleTwo": "LIKE/Toiminnanohjaus",
+      "subtitleTwo": "LIKE/Toiminnanohjaus",
       "tableTitle": "Talousarvioehdotus {{startYear}} & {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}"
     },
     "strategy": {
-      "title": "Toimintasuunnitelma",
+      "rowTitle": "Toimintasuunnitelma",
       "documentName": "toimintasuunnitelma"
     },
     "constructionProgram": {
-      "title": "Rakentamisohjelma (yli 1 milj hankkeet)",
-      "documentName": "rakentamisohjelma"
+      "rowTitle": "Rakentamisohjelma (yli 1 milj hankkeet)",
+      "documentName": "rakentamisohjelma",
+      "title": "Helsingin kaupunki",
+      "subtitle": "Katujen ja liikenneväylien rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)"
     },
     "budgetBookSummary": {
-      "title": "Talousarviokirjan kooste",
+      "rowTitle": "Talousarviokirjan kooste",
       "documentName": "talousarviokirjan kooste"
     },
     "financialStatement": {
-      "title": "Tilinpäätös (yli 1 milj hankkeet)",
+      "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",
       "documentName": "tilinpäätös"
     }
   },
@@ -433,7 +435,6 @@
   "downloadPdf": "Lataa {{name}} (.pdf)",
   "downloadXlsx": "Lataa {{name}} (.xlsx)",
   "reportsTitle": "Raportit",
-  "deleteProject": "Poista Hanke",
   "forcedToFrame": "Sovitettu budjetti",
   "implementedAndBound": "Toteutettu ja sidottu",
   "deviationFromBudget": "Erotus budjettiin",
@@ -472,5 +473,14 @@
   "restore": "Palauta",
   "archived": "Arkistoitu",
   "inUse": "Käytössä",
-  "reports": "Raportit"
+  "reports": "Raportit",
+  "deleteProject": "Poista Hanke",
+  "target": "Kohde",
+  "content": "Sisältö",
+  "division": "Kaupunginosa",
+  "costForecast": "Kustannusennuste",
+  "millionEuro": "milj. €",
+  "planningAnd": "Suunnittelun ja",
+  "constructionTiming": "rakentamisen ajoitus",
+  "previouslyUsed": "Aiemmin käytetty"
 }
