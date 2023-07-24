@@ -66,8 +66,12 @@ const ProjectForm = () => {
       if (isDirty) {
         dispatch(setIsSaving(true));
 
-        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
-
+        const data: IProjectRequest = dirtyFieldsToRequestObject(
+          dirtyFields,
+          form as IAppForms,
+          project,
+        );
+        // syncFinancesIfNeeded(project, data);
         // Patch project
         if (project?.id && projectMode === 'edit') {
           try {

@@ -40,7 +40,11 @@ const ProjectHeader: FC = () => {
   const onSubmit: SubmitHandler<IProjectHeaderForm> = useCallback(
     async (form: IProjectHeaderForm) => {
       if (isDirty) {
-        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+        const data: IProjectRequest = dirtyFieldsToRequestObject(
+          dirtyFields,
+          form as IAppForms,
+          project,
+        );
 
         if (_.has(data, 'favourite')) {
           // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
