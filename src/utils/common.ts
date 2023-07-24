@@ -246,10 +246,10 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
   };
 
   const projectTimelineYears = {
-    estPlanningStart: request.estPlanningStart ? request.estPlanningStart : null,
-    estPlanningEnd: request.estPlanningEnd ? request.estPlanningEnd : null,
-    estConstructionStart: request.estConstructionStart ? request.estConstructionStart : null,
-    estConstructionEnd: request.estConstructionEnd ? request.estConstructionEnd : null,
+    estPlanningStart: request.estPlanningStart || null,
+    estPlanningEnd: request.estPlanningEnd || null,
+    estConstructionStart: request.estConstructionStart || null,
+    estConstructionEnd: request.estConstructionEnd || null,
   };
 
   request.finances = { ...adjustBudgets(project.finances, projectTimelineYears) };
