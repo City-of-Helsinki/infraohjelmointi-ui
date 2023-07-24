@@ -154,7 +154,7 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
 
   const adjustBudgets = (
     budgetObject: IProjectFinances,
-    estProjectDates: IProjectEstDates,
+    projectTimelineDates: IProjectEstDates,
   ): IProjectFinances => {
     /**
      * Moves the provided finance value to its new finance location and sets current to null
@@ -188,7 +188,7 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
       10: 'preliminaryCurrentYearPlus10',
     };
     const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } =
-      estProjectDates;
+      projectTimelineDates;
     const planningStartYear = estPlanningStart ? getYear(estPlanningStart) : null;
     const planningEndYear = estPlanningEnd ? getYear(estPlanningEnd) : null;
     const constructionStartYear = estConstructionStart ? getYear(estConstructionStart) : null;
@@ -245,14 +245,14 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
     return adjustedBudgetObject;
   };
 
-  const projectTimelineYears = {
+  const projectTimelineDates = {
     estPlanningStart: request.estPlanningStart || null,
     estPlanningEnd: request.estPlanningEnd || null,
     estConstructionStart: request.estConstructionStart || null,
     estConstructionEnd: request.estConstructionEnd || null,
   };
 
-  request.finances = { ...adjustBudgets(project.finances, projectTimelineYears) };
+  request.finances = { ...adjustBudgets(project.finances, projectTimelineDates) };
 };
 
 /**
