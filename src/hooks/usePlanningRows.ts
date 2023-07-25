@@ -87,7 +87,7 @@ const buildPlanningTableRows = (
     if (type === 'subClassDistrict') {
       const districtsForSubClass = districts.filter((d)=>d.parentClass===id && !d.parent)
       filteredGroups.push(
-        ...groups.filter((group) => group.classRelation === id && (!group.locationRelation || districtsForSubClass.some((d)=>d.parentClass===id))),
+        ...groups.filter((group) => group.classRelation === id && (!group.locationRelation || districtsForSubClass.some((d)=>d.id===group.locationRelation))),
       );
     }
     // Filter groups under subClass-preview only if there are is no locationRelation
