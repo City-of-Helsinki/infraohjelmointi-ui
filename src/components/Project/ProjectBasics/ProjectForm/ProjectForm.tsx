@@ -35,6 +35,12 @@ const ProjectForm = () => {
   const projectMode = useAppSelector(selectProjectMode);
 
   const [newProjectId, setNewProjectId] = useState('');
+  const [financialsEditing, setFinancialsEditing] = useState<boolean>(false);
+
+  const onFinancialsEdit = useCallback(() => {
+    console.log('setting financials edit');
+    setFinancialsEditing((current) => !current);
+  }, []);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -88,11 +94,11 @@ const ProjectForm = () => {
             console.log('project post error: ', error);
           }
         }
-
+        onFinancialsEdit();
         dispatch(setIsSaving(false));
       }
     },
-    [isDirty, project?.id, dirtyFields, dispatch, projectMode, navigate],
+    [isDirty, project?.id, dirtyFields, dispatch, projectMode, onFinancialsEdit],
   );
 
   const getFieldProps = useCallback(
@@ -167,7 +173,12 @@ const ProjectForm = () => {
       {/* SECTION 3 - SCHEDULE */}
       <ProjectScheduleSection {...formProps} />
       {/* SECTION 4 - FINANCIALS */}
-      <ProjectFinancialSection {...formProps} classOptions={classOptions} />
+      <ProjectFinancialSection
+        {...formProps}
+        classOptions={classOptions}
+        financialsEditing={financialsEditing}
+        onFinancialsEdit={onFinancialsEdit}
+      />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
       <ProjectResponsiblePersonsSection {...formProps} />
       {/* SECTION 6 - LOCATION */}

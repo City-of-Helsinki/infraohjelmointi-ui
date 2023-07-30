@@ -25,11 +25,15 @@ interface IProjectFinancialSectionProps {
     classes: IOption[];
     subClasses: IOption[];
   };
+  financialsEditing: boolean;
+  onFinancialsEdit: () => void;
 }
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getFieldProps,
   control,
   classOptions,
+  financialsEditing,
+  onFinancialsEdit,
 }) => {
   const { t } = useTranslation();
 
@@ -141,6 +145,8 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             readOnly: true,
           },
         ]}
+        fieldsEditing={financialsEditing}
+        onListFieldsEdit={onFinancialsEdit}
       />
       <OverrunRightField control={control} />
       <ListField {...getFieldProps('preliminaryBudgetDivision')} readOnly={true} />

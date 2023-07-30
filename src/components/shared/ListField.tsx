@@ -10,16 +10,36 @@ interface IListFieldProps {
   label: string;
   fields?: Array<IForm>;
   readOnly?: boolean;
+  fieldsEditing?: boolean;
+  onListFieldsEdit?: () => void;
 }
 
-const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
-  const [editing, setEditing] = useState(false);
+const ListField: FC<IListFieldProps> = ({
+  name,
+  label,
+  fields,
+  readOnly,
+  fieldsEditing,
+  onListFieldsEdit,
+}) => {
+  const [editing, setEditing] = useState(fieldsEditing || false);
   const { t } = useTranslation();
-  const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setEditing((currentState) => !currentState);
-  }, []);
-
+  const handleSetEditing = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      if (onListFieldsEdit) {
+        onListFieldsEdit();
+      } else {
+        setEditing((current) => !current);
+      }
+    },
+    [onListFieldsEdit],
+  );
+  const isEditable = useCallback(() => {
+    return (
+      (fieldsEditing !== undefined && onListFieldsEdit !== undefined && fieldsEditing) || editing
+    );
+  }, [editing, fieldsEditing, onListFieldsEdit]);
   return (
     <div className="input-wrapper" id={name} data-testid={name}>
       <div className="flex flex-col">
@@ -35,7 +55,7 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
             render={({ field, fieldState: { error } }) => (
               <div className="list-field-container" key={f.label}>
                 <label className="list-field-label">{t(f.label)}</label>
-                {!editing ? (
+                {!isEditable() ? (
                   <span>{`${field.value} €`}</span>
                 ) : (
                   <>
@@ -45,7 +65,7 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
                       label={''}
                       hideLabel={true}
                       id={field.name}
-                      readOnly={!editing || f.readOnly}
+                      readOnly={!isEditable() || f.readOnly}
                       errorText={error?.message}
                     />
                   </>
