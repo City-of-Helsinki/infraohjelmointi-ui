@@ -9,15 +9,35 @@ import FormFieldLabel from './FormFieldLabel';
 interface IOverrunRightField {
   control: HookFormControlType;
   readOnly?: boolean;
+  overrunEditing?: boolean;
+  onOverrunEdit?: () => void;
 }
-const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
-  const [editing, setEditing] = useState(false);
+const OverrunRightField: FC<IOverrunRightField> = ({
+  readOnly,
+  control,
+  overrunEditing,
+  onOverrunEdit,
+}) => {
+  const [editing, setEditing] = useState(overrunEditing || false);
   const { t } = useTranslation();
 
-  const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setEditing((currentState) => !currentState);
-  }, []);
+  const handleSetEditing = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      if (onOverrunEdit) {
+        onOverrunEdit();
+      } else {
+        setEditing((currentState) => !currentState);
+      }
+    },
+    [onOverrunEdit],
+  );
+
+  const isEditable = useCallback(() => {
+    return (
+      (overrunEditing !== undefined && onOverrunEdit !== undefined && overrunEditing) || editing
+    );
+  }, [editing, overrunEditing, onOverrunEdit]);
 
   return (
     <div className="input-wrapper" id="overrunRight">
@@ -32,7 +52,7 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
                 onClick={handleSetEditing}
               />
             </div>
-            {editing && (
+            {isEditable() && (
               <>
                 {/* edit */}
                 <FormFieldLabel text={t(field.name)} />
@@ -41,7 +61,7 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
                   {...field}
                   label={''}
                   id={field.name}
-                  readOnly={!editing || readOnly}
+                  readOnly={!isEditable() || readOnly}
                 />
               </>
             )}
@@ -53,7 +73,7 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
         control={control as Control<FieldValues>}
         render={({ field }) => (
           <>
-            {editing ? (
+            {isEditable() ? (
               <>
                 {/* edit */}
                 <FormFieldLabel text={t(field.name)} />
@@ -62,7 +82,7 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
                   {...field}
                   label={''}
                   id={field.name}
-                  readOnly={!editing || readOnly}
+                  readOnly={!isEditable() || readOnly}
                 />
               </>
             ) : (

@@ -36,7 +36,10 @@ const ProjectForm = () => {
 
   const [newProjectId, setNewProjectId] = useState('');
   const [financialsEditing, setFinancialsEditing] = useState<boolean>(false);
-
+  const [overrunEditing, setOverrunEditing] = useState<boolean>(false);
+  const onoverrunEdit = useCallback(() => {
+    setOverrunEditing((current) => !current);
+  }, []);
   const onFinancialsEdit = useCallback(() => {
     setFinancialsEditing((current) => !current);
   }, []);
@@ -93,7 +96,8 @@ const ProjectForm = () => {
             console.log('project post error: ', error);
           }
         }
-        onFinancialsEdit();
+        setOverrunEditing(false);
+        setFinancialsEditing(false);
         dispatch(setIsSaving(false));
       }
     },
@@ -177,6 +181,8 @@ const ProjectForm = () => {
         classOptions={classOptions}
         financialsEditing={financialsEditing}
         onFinancialsEdit={onFinancialsEdit}
+        overrunEditing={overrunEditing}
+        onOverrunEdit={onoverrunEdit}
       />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
       <ProjectResponsiblePersonsSection {...formProps} />
