@@ -38,7 +38,6 @@ const ProjectForm = () => {
   const [financialsEditing, setFinancialsEditing] = useState<boolean>(false);
 
   const onFinancialsEdit = useCallback(() => {
-    console.log('setting financials edit');
     setFinancialsEditing((current) => !current);
   }, []);
 
