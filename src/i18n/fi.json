@@ -421,5 +421,5 @@
   "downloadPdf": "Lataa {{name}} (.pdf)",
   "downloadXlsx": "Lataa {{name}} (.xlsx)",
   "reportsTitle": "Raportit",
-  "deleteProject":"Poista Hanke"
+  "deleteProject": "Poista Hanke"
 }

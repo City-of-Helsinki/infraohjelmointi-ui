@@ -1,9 +1,11 @@
 import { Button, IconTrash } from 'hds-react';
 import { useAppSelector } from '@/hooks/common';
-import { BaseSyntheticEvent, FC, memo, useCallback, useState } from 'react';
+import { BaseSyntheticEvent, FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import ProjectDeleteDialog from './ProjectDeleteDialog';
 import { selectProject } from '@/reducers/projectSlice';
+import useConfirmDialog from '@/hooks/useConfirmDialog';
+import { deleteProject } from '@/services/projectServices';
+import { useNavigate } from 'react-router';
 interface IProjectFormbannerProps {
   onSubmit: () =>
     | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
@@ -13,14 +15,29 @@ interface IProjectFormbannerProps {
 const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) => {
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const handleDialogClose = useCallback(() => {
-    setIsDialogOpen(false);
-  }, []);
-  const handleDialogOpen = useCallback(() => {
-    setIsDialogOpen(true);
-  }, []);
+  const { isConfirmed } = useConfirmDialog();
+  const handleProjectDelete = useCallback(async () => {
+    const confirm = await isConfirmed({
+      dialogType: 'deleteProject',
+      title: t(`projectForm.deleteDialog.title`),
+      description: t(`projectForm.deleteDialog.description`),
+    });
+    if (confirm !== false && project?.id) {
+      deleteProject(project.id)
+        .then(() => {
+          // navigate back to history or if no history, go to planning view
+          if (window.history.state && window.history.state.idx > 0) {
+            navigate(-1);
+          } else {
+            navigate('/planning', { replace: true });
+          }
+        })
+        .catch(Promise.reject);
+    }
+  }, [isConfirmed]);
+
   return (
     <div className="project-form-banner">
       <div className="project-form-banner-container">
@@ -35,15 +52,10 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
               disabled={false}
               iconLeft={<IconTrash />}
               variant="supplementary"
-              onClick={handleDialogOpen}
+              onClick={handleProjectDelete}
             >
               {t(`deleteProject`)}
             </Button>
-            <ProjectDeleteDialog
-              isVisible={isDialogOpen}
-              onCloseProjectDeleteDialog={handleDialogClose}
-              id={project.id}
-            />
           </>
         )}
       </div>

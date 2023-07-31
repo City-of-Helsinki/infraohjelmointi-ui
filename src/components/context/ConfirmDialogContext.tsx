@@ -1,6 +1,7 @@
 import React, { ReactNode, createContext, memo, useState } from 'react';
-
+export type IConfirmDialogTypes = 'default' | 'deleteProject';
 interface IConfirmDialogContext {
+  dialogType?: IConfirmDialogTypes;
   title: string;
   description: string;
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface IConfirmDialogContext {
 }
 
 const initialConfirmDialogContext: IConfirmDialogContext = {
+  dialogType: 'default',
   title: '',
   description: '',
   isOpen: false,

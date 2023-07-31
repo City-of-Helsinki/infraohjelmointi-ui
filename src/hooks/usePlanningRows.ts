@@ -85,9 +85,14 @@ const buildPlanningTableRows = (
     const filteredGroups = [];
     // Filter all groups under subClassDistrict
     if (type === 'subClassDistrict') {
-      const districtsForSubClass = districts.filter((d)=>d.parentClass===id && !d.parent)
+      const districtsForSubClass = districts.filter((d) => d.parentClass === id && !d.parent);
       filteredGroups.push(
-        ...groups.filter((group) => group.classRelation === id && (!group.locationRelation || districtsForSubClass.some((d)=>d.id===group.locationRelation))),
+        ...groups.filter(
+          (group) =>
+            group.classRelation === id &&
+            (!group.locationRelation ||
+              districtsForSubClass.some((d) => d.id === group.locationRelation)),
+        ),
       );
     }
     // Filter groups under subClass-preview only if there are is no locationRelation
@@ -308,7 +313,7 @@ const usePlanningRows = () => {
       finalDistricts.push(selectedDistrict);
     }
     // Returning all districts since they are needed to filter correct groups for subClassDistrict level
-    else  {
+    else {
       finalDistricts.push(...districts);
     }
 

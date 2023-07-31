@@ -1,4 +1,7 @@
-import { ConfirmDialogContext } from '@/components/context/ConfirmDialogContext';
+import {
+  ConfirmDialogContext,
+  IConfirmDialogTypes,
+} from '@/components/context/ConfirmDialogContext';
 import { useContext, useEffect, useState } from 'react';
 
 /**
@@ -13,10 +16,19 @@ const useConfirmDialog = () => {
 
   // Sets the confirm dialog context values and returns a promise that needs to be awaited to
   // simulate what the built-in window.confirm() does
-  const isConfirmed = ({ title, description }: { title: string; description: string }) => {
+  const isConfirmed = ({
+    title,
+    description,
+    dialogType,
+  }: {
+    title: string;
+    description: string;
+    dialogType?: IConfirmDialogTypes;
+  }) => {
     setNeedsCleanup(true);
     return new Promise((resolve, reject) => {
       setConfirm({
+        dialogType: dialogType ? dialogType : 'default',
         title,
         description,
         isOpen: true,
