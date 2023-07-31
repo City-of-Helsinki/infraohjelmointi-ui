@@ -560,7 +560,7 @@ describe('projectForm', () => {
     await user.click(openDeleteDialogButton);
 
     const dialog = within(await findByRole('dialog'));
-    const deleteProjectButton = await dialog.findByTestId(`delete-project-dialog-button`);
+    const deleteProjectButton = await dialog.findByTestId(`confirm-dialog-button`);
     expect(deleteProjectButton).toBeInTheDocument();
     await user.click(deleteProjectButton);
 

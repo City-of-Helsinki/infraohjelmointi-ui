@@ -18,12 +18,15 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
   const navigate = useNavigate();
 
   const { isConfirmed } = useConfirmDialog();
+
   const handleProjectDelete = useCallback(async () => {
     const confirm = await isConfirmed({
-      dialogType: 'deleteProject',
+      dialogType: 'delete',
+      confirmButtonText: 'deleteProject',
       title: t(`projectForm.deleteDialog.title`),
       description: t(`projectForm.deleteDialog.description`),
     });
+
     if (confirm !== false && project?.id) {
       deleteProject(project.id)
         .then(() => {

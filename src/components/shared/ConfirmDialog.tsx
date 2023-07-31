@@ -1,6 +1,6 @@
 import useConfirmDialog from '@/hooks/useConfirmDialog';
 import { Dialog, Button, IconQuestionCircle } from 'hds-react';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 
@@ -16,7 +16,17 @@ const ConfirmDialog = () => {
   const descriptionId = 'confirmation-dialog-info';
   const { t } = useTranslation();
 
-  const { title, description, isOpen, proceed, cancel, dialogType } = useConfirmDialog();
+  const { title, description, isOpen, proceed, cancel, dialogType, confirmButtonText } =
+    useConfirmDialog();
+
+  const confirmButtonVariant = useMemo(
+    () => (dialogType === 'delete' ? 'danger' : 'primary'),
+    [dialogType],
+  );
+  const confirmButtonIcon = useMemo(
+    () => (dialogType === 'delete' ? <IconTrash aria-hidden="true" /> : ''),
+    [dialogType],
+  );
 
   return (
     <Dialog
@@ -25,13 +35,13 @@ const ConfirmDialog = () => {
       aria-describedby={descriptionId}
       isOpen={isOpen}
       focusAfterCloseRef={openConfirmationDialogButtonRef}
-      variant={dialogType === 'deleteProject' ? 'danger' : 'primary'}
+      variant={dialogType === 'delete' ? 'danger' : 'primary'}
     >
       <Dialog.Header
         id={titleId}
         title={title}
         iconLeft={
-          dialogType === 'deleteProject' ? (
+          dialogType === 'delete' ? (
             <IconAlertCircle aria-hidden="true" />
           ) : (
             <IconQuestionCircle aria-hidden="true" />
@@ -47,17 +57,17 @@ const ConfirmDialog = () => {
         <Button
           onClick={cancel as (value: unknown) => void}
           variant="secondary"
-          theme={dialogType === 'deleteProject' ? 'black' : 'default'}
+          theme={dialogType === 'delete' ? 'black' : 'default'}
         >
           {t('cancel')}
         </Button>
         <Button
-          data-testid={dialogType === 'deleteProject' ? 'delete-project-dialog-button' : ''}
+          data-testid={'confirm-dialog-button'}
           onClick={proceed as (value: unknown) => void}
-          variant={dialogType === 'deleteProject' ? 'danger' : 'primary'}
-          iconLeft={dialogType === 'deleteProject' ? <IconTrash aria-hidden="true" /> : ''}
+          variant={confirmButtonVariant}
+          iconLeft={confirmButtonIcon}
         >
-          {dialogType === 'deleteProject' ? t(`deleteProject`) : t('proceed')}
+          {t(confirmButtonText || 'proceed')}
         </Button>
       </Dialog.ActionButtons>
     </Dialog>
