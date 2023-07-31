@@ -3,10 +3,11 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const cellStyles = {
-  width: '40px',
+  width: '56px',
   textAlign: 'left' as unknown as 'left',
-  marginRight: '4px',
-  marginLeft: '8px',
+  paddingRight: '6px',
+  paddingLeft: '6px',
+  alignItems: 'center' as unknown as 'center',
 };
 
 const styles = StyleSheet.create({
@@ -22,43 +23,44 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   firstCellsWrapper: {
-    width: '318px',
-    marginLeft: '21px',
+    width: '346px',
+    paddingLeft: '21px',
   },
   targetCell: {
     ...cellStyles,
-    marginLeft: '21px',
-    marginRight: '15px',
-    width: '115px',
+    paddingLeft: '21px',
+    paddingRight: '15px',
+    width: '160px',
   },
   contentCell: {
     ...cellStyles,
-    width: '70px',
-    marginRight: '15px',
+    width: '93px',
+    paddingRight: '15px',
   },
   divisionCell: {
     ...cellStyles,
-    width: '70px',
-    marginRight: '15px',
+    width: '93px',
+    paddingRight: '15px',
   },
   cell: {
     ...cellStyles,
   },
   costForecastCell: {
     ...cellStyles,
-    width: '71px',
+    width: '83px',
   },
   planAndConStartCell: {
     ...cellStyles,
-    width: '99px',
+    width: '111px',
   },
   previouslyUsedCell: {
     ...cellStyles,
-    width: '63px',
+    width: '86px',
   },
   lastCell: {
     ...cellStyles,
-    marginRight: '21px',
+    paddingRight: '21px',
+    width: '72px',
   },
 });
 

@@ -1,6 +1,6 @@
+import { IProject } from '@/interfaces/projectInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
-import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { FC, memo } from 'react';
 
 const cellStyles = {
   width: '56px',
@@ -15,12 +15,20 @@ const cellStyles = {
   borderBottom: '1px solid #808080',
 };
 
+const tableRowStyles = {
+  fontSize: '8px',
+  fontWeight: 'normal' as unknown as 'normal',
+  flexDirection: 'row' as unknown as 'row',
+  alignItems: 'center' as unknown as 'center',
+};
+
 const styles = StyleSheet.create({
-  tableRow: {
-    fontSize: '8px',
-    fontWeight: 'normal',
-    flexDirection: 'row',
-    alignItems: 'center',
+  oddRow: {
+    ...tableRowStyles,
+  },
+  evenRow: {
+    ...tableRowStyles,
+    backgroundColor: '#dedfe1',
   },
   firstCellsWrapper: {
     width: '320px',
@@ -72,33 +80,34 @@ const styles = StyleSheet.create({
   },
 });
 
-const ConstructionProgramTableRow = () => {
-  const { t } = useTranslation();
+interface IConstructionProgramTableRowProps {
+  projects: Array<IProject>;
+}
+
+const ConstructionProgramTableRow: FC<IConstructionProgramTableRowProps> = ({ projects }) => {
   return (
     <>
-      <View style={styles.tableRow}>
-        <Text style={styles.targetCell}>Porkkalankatu, Itämerenkatu</Text>
-        <Text style={styles.contentCell}>Uudisrakentaminen</Text>
-        <Text style={styles.divisionCell}>Länsisatama</Text>
-        {/* <Text style={styles.firstCellsWrapper}></Text> */}
-        <Text style={styles.costForecastCell}>3,2</Text>
-        <Text style={styles.planAndConStartCell}>2020-2025</Text>
-        <Text style={styles.previouslyUsedCell}>0,3</Text>
-        <Text style={styles.cell}>0,6</Text>
-        <Text style={styles.cell}>1,4</Text>
-        <Text style={styles.lastCell}>0,9</Text>
-      </View>
-      {/* <View style={styles.tableRow}>
-        <Text style={styles.targetCell}>Porkkalankatu, Itämerenkatu</Text>
-        <Text style={styles.contentCell}>Uudisrakentaminen</Text>
-        <Text style={styles.divisionCell}>Länsisatama</Text>
-        <Text style={styles.costForecastCell}>3,2</Text>
-        <Text style={styles.planAndConStartCell}>2020-2025</Text>
-        <Text style={styles.previouslyUsedCell}>0,3</Text>
-        <Text style={styles.cell}>0,6</Text>
-        <Text style={styles.cell}>1,4</Text>
-        <Text style={styles.lastCell}>0,9</Text>
-      </View> */}
+      {projects?.map((p, i) => (
+        // TODO: each row should be grouped by district (or lowest class/location until district), find the best way to do this
+        <View style={i % 2 ? styles.evenRow : styles.oddRow} key={p.id}>
+          <Text style={styles.targetCell}>{p.name}</Text>
+          {/* TODO: is this the class field? */}
+          <Text style={styles.contentCell}>Uudisrakentaminen</Text>
+          {/* TODO: is this district, division or subDivision? */}
+          <Text style={styles.divisionCell}>Länsisatama</Text>
+          {/* TODO: round the value */}
+          <Text style={styles.costForecastCell}>{p.costForecast}</Text>
+          <Text
+            style={styles.planAndConStartCell}
+          >{`${p.planningStartYear}-${p.constructionEndYear}`}</Text>
+          {/* TODO: should previously used be added to project? */}
+          <Text style={styles.previouslyUsedCell}>0,3</Text>
+          {/* TODO: are the cells keur? these values need to be rounded to a million */}
+          <Text style={styles.cell}>{p.finances.budgetProposalCurrentYearPlus0}</Text>
+          <Text style={styles.cell}>{p.finances.budgetProposalCurrentYearPlus1}</Text>
+          <Text style={styles.lastCell}>{p.finances.budgetProposalCurrentYearPlus2}</Text>
+        </View>
+      ))}
     </>
   );
 };

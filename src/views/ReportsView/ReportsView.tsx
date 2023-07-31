@@ -1,9 +1,9 @@
 import { ReportRow } from '@/components/Report';
 import { reports } from '@/interfaces/reportInterfaces';
 import { useTranslation } from 'react-i18next';
-import { PDFViewer } from '@react-pdf/renderer';
+// import { PDFViewer } from '@react-pdf/renderer';
 import './styles.css';
-import ConstructionProgram from '@/components/Report/PdfReports/ConstructionProgram';
+// import ConstructionProgram from '@/components/Report/PdfReports/ConstructionProgram';
 
 const ReportsView = () => {
   const { t } = useTranslation();
@@ -14,9 +14,13 @@ const ReportsView = () => {
         {t('reports')}
       </h1>
 
+      {/* Uncomment this to view the desired pdf in an iframe
+
       <PDFViewer style={{ width: '100vw', height: '100vh' }}>
         <ConstructionProgram />
-      </PDFViewer>
+      </PDFViewer> 
+      
+      */}
       {reports.map((r) => (
         <ReportRow key={r} type={r} lastUpdated="01.01.2023" />
       ))}

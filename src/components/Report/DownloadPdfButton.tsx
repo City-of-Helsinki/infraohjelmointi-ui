@@ -5,6 +5,8 @@ import { ReportType } from '@/interfaces/reportInterfaces';
 import { BlobProvider } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import BudgetProposal from './PdfReports/BudgetProposal';
+import ConstructionProgram from './PdfReports/ConstructionProgram/ConstructionProgram';
+import { Page, Document } from '@react-pdf/renderer';
 import './pdfFonts';
 import './styles.css';
 
@@ -12,8 +14,22 @@ interface IDownloadPdfButtonProps {
   type: ReportType;
 }
 
+/**
+ * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
+ * still haven't been implemented.
+ */
+const EmptyDocument = () => (
+  <Document title="empty">
+    <Page size="A3"></Page>
+  </Document>
+);
+
 const pdfDocument = {
-  BudgetProposal: <BudgetProposal />,
+  budgetProposal: <BudgetProposal />,
+  strategy: <EmptyDocument />,
+  constructionProgram: <ConstructionProgram />,
+  budgetBookSummary: <EmptyDocument />,
+  financialStatement: <EmptyDocument />,
 };
 
 /**

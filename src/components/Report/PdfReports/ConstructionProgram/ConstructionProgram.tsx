@@ -1,8 +1,10 @@
 import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
 import DocumentHeader from '../DocumentHeader';
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import ConstructionProgramTable from './ConstructionProgramTable';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { get20Projects } from '@/services/projectServices';
 
 const styles = StyleSheet.create({
   page: {
@@ -17,6 +19,16 @@ const styles = StyleSheet.create({
 const ConstructionProgram = () => {
   const { t } = useTranslation();
 
+  // FIXME: this is here for testing purposes, when the actual report is downloaded we should
+  // 1. await => get projects with over 1 million budget
+  // 2. use the response projects to draw the rows for the pdf
+  // 3. download the finised pdf
+  const [testProjects, setTestProjects] = useState<Array<IProject>>([]);
+
+  useEffect(() => {
+    get20Projects().then((res) => setTestProjects(res));
+  }, []);
+
   return (
     <Document title={t('report.constructionProgram.title') ?? ''}>
       <Page size="A3" style={styles.page}>
@@ -30,7 +42,7 @@ const ConstructionProgram = () => {
               }) as string
             }
           />
-          <ConstructionProgramTable />
+          <ConstructionProgramTable projects={testProjects} />
         </View>
       </Page>
     </Document>
