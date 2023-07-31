@@ -52,6 +52,7 @@ const ConfirmDialog = () => {
           {t('cancel')}
         </Button>
         <Button
+          data-testid={dialogType === 'deleteProject' ? 'delete-project-dialog-button' : ''}
           onClick={proceed as (value: unknown) => void}
           variant={dialogType === 'deleteProject' ? 'danger' : 'primary'}
           iconLeft={dialogType === 'deleteProject' ? <IconTrash aria-hidden="true" /> : ''}

@@ -30,7 +30,8 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import ProjectView from '@/views/ProjectView';
 import ProjectBasics from '../ProjectBasics';
 import PlanningView from '@/views/PlanningView/PlanningView';
-
+import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogContext';
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 jest.setTimeout(7000);
@@ -43,12 +44,21 @@ const render = async () =>
   await act(async () =>
     renderWithProviders(
       <Route>
-        <Route path="/" element={<ProjectForm />} />
+        <Route
+          path="/"
+          element={
+            <ConfirmDialogContextProvider>
+              <ProjectForm />
+              <ConfirmDialog />
+            </ConfirmDialogContextProvider>
+          }
+        />
         <Route path="/project/:projectId?" element={<ProjectView />}>
           <Route path="basics" element={<ProjectBasics />} />
         </Route>
         <Route path="/planning" element={<PlanningView />} />
       </Route>,
+
       {
         preloadedState: {
           project: {
@@ -546,11 +556,11 @@ describe('projectForm', () => {
     mockedAxios.delete.mockResolvedValueOnce(deleteResponse);
     const { user, findByTestId, findByRole } = await render();
 
-    const openDeleteDialogButton = await findByTestId('delete-project-dialog-button');
+    const openDeleteDialogButton = await findByTestId('open-delete-project-dialog-button');
     await user.click(openDeleteDialogButton);
 
     const dialog = within(await findByRole('dialog'));
-    const deleteProjectButton = await dialog.findByTestId(`delete-project-${project.id}`);
+    const deleteProjectButton = await dialog.findByTestId(`delete-project-dialog-button`);
     expect(deleteProjectButton).toBeInTheDocument();
     await user.click(deleteProjectButton);
 
