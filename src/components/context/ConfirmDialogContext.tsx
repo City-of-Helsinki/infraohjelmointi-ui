@@ -1,19 +1,23 @@
 import React, { ReactNode, createContext, memo, useState } from 'react';
-
+export type IConfirmDialogTypes = 'confirm' | 'delete';
 interface IConfirmDialogContext {
+  dialogType?: IConfirmDialogTypes;
   title: string;
   description: string;
   isOpen: boolean;
   proceed: null | ((value: unknown) => void);
   cancel: null | ((value: unknown) => void);
+  confirmButtonText?: string;
 }
 
 const initialConfirmDialogContext: IConfirmDialogContext = {
+  dialogType: 'confirm',
   title: '',
   description: '',
   isOpen: false,
   proceed: null,
   cancel: null,
+  confirmButtonText: 'proceed',
 };
 
 export const ConfirmDialogContext = createContext<
