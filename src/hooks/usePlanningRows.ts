@@ -78,7 +78,8 @@ const buildPlanningTableRows = (
     item: IClass | ILocation | IGroup,
     type: PlanningRowType,
     defaultExpanded?: boolean,
-  ) => buildPlanningRow(item, type, projects, defaultExpanded);
+    districtsForSubClass?: IClass[]
+  ) => buildPlanningRow(item, type, projects, defaultExpanded,districtsForSubClass);
 
   // Groups can get mapped under subClasses, districts and divisions and sorts them by name
   const getSortedGroupRows = (id: string, type: PlanningRowType) => {
@@ -145,8 +146,9 @@ const buildPlanningTableRows = (
     const divisionsForSubClass = subClass.name.toLocaleLowerCase().includes('suurpiiri')
       ? divisions.filter((division) => division.parentClass === subClass.id)
       : [];
+    const districtsForSubClass = districts.filter((d) => d.parentClass === subClass.id && !d.parent);
     return {
-      ...getRow(subClass, subClassType, !!selectedSubClass),
+      ...getRow(subClass, subClassType, !!selectedSubClass,districtsForSubClass),
       // DIVISIONS & GROUPS
       children: [
         // groups

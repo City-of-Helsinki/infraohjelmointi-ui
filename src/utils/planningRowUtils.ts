@@ -21,12 +21,12 @@ export const getSortedProjects = (
   type: PlanningRowType,
   projects: Array<IProject>,
   name: string,
+  districtsForSubClass?: Array<IClass>,
 ) => {
   let projectList: Array<IProject> = [];
   switch (type) {
     case 'class':
     case 'subClass':
-    case 'subClassDistrict':
       projectList = projects
         .filter(
           (p) =>
@@ -35,6 +35,17 @@ export const getSortedProjects = (
             !name.toLocaleLowerCase().includes('suurpiiri'),
         )
         .filter((p) => p.projectClass === id);
+      break;
+    case 'subClassDistrict':
+      projectList = projects
+        .filter((p) => !p.projectGroup)
+        .filter(
+          (p) =>
+            p.projectClass === id &&
+            (!p.projectLocation ||
+              (districtsForSubClass &&
+                districtsForSubClass.some((d) => d.id === p.projectLocation))),
+        );
       break;
     case 'group':
       projectList = projects.filter((p) => p.projectGroup).filter((p) => p.projectGroup === id);
@@ -55,8 +66,9 @@ export const buildPlanningRow = (
   type: PlanningRowType,
   projects: Array<IProject>,
   expanded?: boolean,
+  districtsForSubClass?: IClass[],
 ): IPlanningRow => {
-  const projectRows = getSortedProjects(item.id, type, projects, item.name);
+  const projectRows = getSortedProjects(item.id, type, projects, item.name, districtsForSubClass);
   const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
   const urlSearchParamKey = type === 'districtPreview' ? 'district' : type;
   const nonNavigableTypes = [
