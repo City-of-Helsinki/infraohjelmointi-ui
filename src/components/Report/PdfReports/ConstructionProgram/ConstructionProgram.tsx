@@ -1,10 +1,10 @@
 import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
 import DocumentHeader from '../DocumentHeader';
-import { memo, useEffect, useState } from 'react';
+import { FC, memo } from 'react';
 import ConstructionProgramTable from './ConstructionProgramTable';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { get20Projects } from '@/services/projectServices';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 const styles = StyleSheet.create({
   page: {
@@ -16,18 +16,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const ConstructionProgram = () => {
+interface IConstructionProgramProps {
+  divisions: Array<ILocation>;
+  projects: Array<IProject>;
+}
+
+const ConstructionProgram: FC<IConstructionProgramProps> = ({ divisions, projects }) => {
   const { t } = useTranslation();
-
-  // FIXME: this is here for testing purposes, when the actual report is downloaded we should
-  // 1. await => get projects with over 1 million budget
-  // 2. use the response projects to draw the rows for the pdf
-  // 3. download the finised pdf
-  const [testProjects, setTestProjects] = useState<Array<IProject>>([]);
-
-  useEffect(() => {
-    get20Projects().then((res) => setTestProjects(res));
-  }, []);
 
   return (
     <Document title={t('report.constructionProgram.title') ?? ''}>
@@ -37,12 +32,12 @@ const ConstructionProgram = () => {
             title={t('report.constructionProgram.title')}
             subtitleOne={
               t('report.constructionProgram.subtitle', {
-                startYear: 2023,
-                endYear: 2025,
+                startYear: new Date().getFullYear(),
+                endYear: new Date().getFullYear() + 2,
               }) as string
             }
           />
-          <ConstructionProgramTable projects={testProjects} />
+          <ConstructionProgramTable projects={projects} divisions={divisions} />
         </View>
       </Page>
     </Document>

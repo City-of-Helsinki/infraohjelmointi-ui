@@ -169,8 +169,19 @@ export const calculateProjectRowSums = (project: IProject): IProjectSums => {
 
   return {
     availableFrameBudget: formatNumber(availableFrameBudget),
-    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - spentBudget),
+    costEstimateBudget: formatNumber(parseInt(costForecast ?? '0') - parseInt(spentBudget)),
   };
 };
 
 export const calcPercentage = (value: number, total: number) => Math.round((value / total) * 100);
+
+export const keurToMillion = (value?: string | null) => {
+  if (value) {
+    // Parse the two decimals that the backend might return
+    const valueAsNumber = parseFloat(value);
+    const millionValue = (valueAsNumber / 1000).toFixed(1);
+
+    return millionValue.toString().replace('.', ',');
+  }
+  return '0,0';
+};

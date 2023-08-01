@@ -5,13 +5,18 @@ import { ReportType } from '@/interfaces/reportInterfaces';
 import DownloadPdfButton from './DownloadPdfButton';
 import './styles.css';
 import './pdfFonts';
+import { ILocationHierarchy } from '@/reducers/locationSlice';
+import { IClassHierarchy } from '@/reducers/classSlice';
 
 interface IReportRowProps {
   type: ReportType;
   lastUpdated: string;
+  // We have to pass classes and locations as props to the react-pdf documents, since they are not wrapped in the redux context
+  locations: ILocationHierarchy;
+  classes: IClassHierarchy;
 }
 
-const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated }) => {
+const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated, locations, classes }) => {
   const { t } = useTranslation();
 
   const downloadIcon = useMemo(() => <IconDownload />, []);
@@ -35,7 +40,7 @@ const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated }) => {
         'lastUpdated',
       )} ${lastUpdated}`}</div>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} />
+      <DownloadPdfButton type={type} locations={locations} classes={classes} />
       {/* download xlsx button */}
       <div className="report-download-xlsx-button" data-testid={`download-xlsx-${type}`}>
         <Button iconLeft={downloadIcon} variant="secondary" onClick={buildXlsx} disabled={true}>

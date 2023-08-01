@@ -76,9 +76,9 @@ const ConstructionProgramTableHeader = () => {
         <Text style={styles.costForecastCell}>{t('costForecast')}</Text>
         <Text style={styles.planAndConStartCell}>{t('planningAnd')}</Text>
         <Text style={styles.previouslyUsedCell}>{t('previouslyUsed')}</Text>
-        <Text style={styles.cell}>TAE {'2023'}</Text>
-        <Text style={styles.cell}>TSE {'2024'}</Text>
-        <Text style={styles.lastCell}>TSE {'2025'}</Text>
+        <Text style={styles.cell}>TAE {new Date().getFullYear()}</Text>
+        <Text style={styles.cell}>TSE {new Date().getFullYear() + 1}</Text>
+        <Text style={styles.lastCell}>TSE {new Date().getFullYear() + 2}</Text>
       </View>
       {/* Row 2 */}
       <View style={styles.tableHeaderRow}>

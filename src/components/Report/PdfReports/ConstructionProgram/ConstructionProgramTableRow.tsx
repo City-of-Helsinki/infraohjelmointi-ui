@@ -1,4 +1,6 @@
+import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { keurToMillion } from '@/utils/calculations';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -80,11 +82,26 @@ const styles = StyleSheet.create({
   },
 });
 
+/**
+ * Gets the division name and removes the number infront of it.
+ */
+const getDivision = (divisions?: Array<ILocation>, projectLocation?: string) => {
+  const division = divisions?.filter((d) => projectLocation && d.id === projectLocation)[0];
+  if (division) {
+    return division.name.replace(/^\d+\.\s*/, '');
+  }
+  return '';
+};
+
 interface IConstructionProgramTableRowProps {
   projects: Array<IProject>;
+  divisions?: Array<ILocation>;
 }
 
-const ConstructionProgramTableRow: FC<IConstructionProgramTableRowProps> = ({ projects }) => {
+const ConstructionProgramTableRow: FC<IConstructionProgramTableRowProps> = ({
+  projects,
+  divisions,
+}) => {
   return (
     <>
       {projects?.map((p, i) => (
@@ -93,19 +110,21 @@ const ConstructionProgramTableRow: FC<IConstructionProgramTableRowProps> = ({ pr
           <Text style={styles.targetCell}>{p.name}</Text>
           {/* TODO: is this the class field? */}
           <Text style={styles.contentCell}>Uudisrakentaminen</Text>
-          {/* TODO: is this district, division or subDivision? */}
-          <Text style={styles.divisionCell}>Länsisatama</Text>
-          {/* TODO: round the value */}
-          <Text style={styles.costForecastCell}>{p.costForecast}</Text>
+          <Text style={styles.divisionCell}>{getDivision(divisions, p.projectLocation)}</Text>
+          <Text style={styles.costForecastCell}>{keurToMillion(p.costForecast)}</Text>
           <Text
             style={styles.planAndConStartCell}
           >{`${p.planningStartYear}-${p.constructionEndYear}`}</Text>
-          {/* TODO: should previously used be added to project? */}
-          <Text style={styles.previouslyUsedCell}>0,3</Text>
-          {/* TODO: are the cells keur? these values need to be rounded to a million */}
-          <Text style={styles.cell}>{p.finances.budgetProposalCurrentYearPlus0}</Text>
-          <Text style={styles.cell}>{p.finances.budgetProposalCurrentYearPlus1}</Text>
-          <Text style={styles.lastCell}>{p.finances.budgetProposalCurrentYearPlus2}</Text>
+          <Text style={styles.previouslyUsedCell}>{keurToMillion(p.spentBudget)}</Text>
+          <Text style={styles.cell}>
+            {keurToMillion(p.finances.budgetProposalCurrentYearPlus0)}
+          </Text>
+          <Text style={styles.cell}>
+            {keurToMillion(p.finances.budgetProposalCurrentYearPlus1)}
+          </Text>
+          <Text style={styles.lastCell}>
+            {keurToMillion(p.finances.budgetProposalCurrentYearPlus2)}
+          </Text>
         </View>
       ))}
     </>

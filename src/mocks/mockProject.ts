@@ -75,7 +75,7 @@ const mockProject: { data: IProject } = {
       value: '1class',
     },
     locked: false,
-    spentBudget: 0,
+    spentBudget: '0',
     effectHousing: false,
     hkrId: '17895',
     entityName: 'Mock project entity name',
