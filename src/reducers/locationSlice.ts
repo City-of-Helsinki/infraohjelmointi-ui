@@ -67,7 +67,7 @@ const separateLocationsIntoHierarchy = (
   if (forCoordinator) {
     return {
       districts,
-      year: allLocations[0].finances.year,
+      year: allLocations[0]?.finances?.year,
     };
   }
 

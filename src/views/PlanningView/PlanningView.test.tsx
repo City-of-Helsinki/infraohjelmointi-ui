@@ -872,23 +872,25 @@ describe('PlanningView', () => {
     });
 
     describe('HoverTooltip', () => {
-      it('FIXME is hidden by default and displays the current rows title on hover', async () => {
-        const { store, getByTestId, user } = await render();
+      it('Is hidden by default and displays the current rows title on hover', async () => {
+        const { store, findByTestId, user } = await render();
 
         const { name, id } = store.getState().class.planning.masterClasses[0];
-        const rowTitle = getByTestId(`title-${id}`);
-        const hoverTooltip = getByTestId(`hover-tooltip-${id}`);
+        const rowTitle = await findByTestId(`title-${id}`);
+        const hoverTooltip = await findByTestId(`hover-tooltip-undefined`);
 
-        // FIXME: its always visible in the test for some reason expect(hoverTooltip).not.toBeVisible();
+        expect(hoverTooltip).not.toBeVisible();
 
-        await user.hover(rowTitle);
+        await act(async () => {
+          await user.hover(rowTitle.children[0]);
+        });
 
         expect(hoverTooltip).toBeVisible();
         expect(hoverTooltip).toHaveTextContent(name);
 
         await user.unhover(rowTitle);
 
-        // FIXME: its always visible in the test for some reason expect(hoverTooltip).not.toBeVisible();
+        expect(hoverTooltip).not.toBeVisible();
       });
     });
 

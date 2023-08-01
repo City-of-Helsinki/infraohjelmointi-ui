@@ -2,9 +2,8 @@ import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IOption } from '@/interfaces/common';
-import HoverTooltip from './HoverTooltip/HoverTooltip';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
-import { dispatchContextMenuEvent } from '@/utils/events';
+import { dispatchContextMenuEvent, dispatchTooltipEvent } from '@/utils/events';
 import DeleteGroupDialog from './DeleteGroupDialog/DeleteGroupDialog';
 import { GroupDialog } from '../../GroupDialog';
 import './styles.css';
@@ -75,21 +74,34 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   /**
    * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
    */
-  const onExpand = useCallback(() => {
-    handleExpand();
+  const onExpand = useCallback(
+    (event: any) => {
+      dispatchTooltipEvent(event, 'hide', { text: '' });
+      handleExpand();
 
-    const urlSearchParams = new URLSearchParams(search);
-    const searchParams = Object.fromEntries(urlSearchParams.entries());
+      const urlSearchParams = new URLSearchParams(search);
+      const searchParams = Object.fromEntries(urlSearchParams.entries());
 
-    if (urlSearchParam) {
-      Object.assign(searchParams, urlSearchParam);
-    }
+      if (urlSearchParam) {
+        Object.assign(searchParams, urlSearchParam);
+      }
 
-    navigate({
-      pathname: `/${mode}`,
-      search: `${createSearchParams(searchParams)}`,
-    });
-  }, [handleExpand, mode, navigate, search, urlSearchParam]);
+      navigate({
+        pathname: `/${mode}`,
+        search: `${createSearchParams(searchParams)}`,
+      });
+    },
+    [handleExpand, mode, navigate, search, urlSearchParam],
+  );
+
+  const showTooltip = useCallback((event: ReactMouseEvent<HTMLSpanElement>) => {
+    const text =
+      (event.target as HTMLElement).textContent || (event.target as HTMLElement).innerText;
+    dispatchTooltipEvent(event, 'show', { text });
+  }, []);
+  const hideTooltip = useCallback((event: ReactMouseEvent<HTMLSpanElement>) => {
+    dispatchTooltipEvent(event, 'hide', { text: '' });
+  }, []);
 
   return (
     <th className={`planning-head ${type} sticky left-0 z-50`} data-testid={`head-${id}`}>
@@ -134,9 +146,14 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               onClick={onExpand}
               data-testid={`title-${id}`}
             >
-              <span className="planning-head-title">{name}</span>
+              <span
+                className="planning-head-title"
+                onMouseOver={showTooltip}
+                onMouseLeave={hideTooltip}
+              >
+                {name}
+              </span>
             </button>
-            <HoverTooltip text={name} id={id} />
           </div>
         </div>
         {/* Budgets */}

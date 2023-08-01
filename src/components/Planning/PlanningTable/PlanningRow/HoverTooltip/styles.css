@@ -1,10 +1,10 @@
 .tooltip-container {
   position: absolute;
   inset: auto auto 2rem 0px;
-  border-bottom: 8px solid var(--color-coat-of-arms);
   color: black !important;
   background-color: var(--color-coat-of-arms-light);
   padding: var(--spacing-s);
+  margin-bottom: 8px;
   font-size: var(--fontsize-body-s);
   line-height: 24px;
   z-index: 999;
@@ -14,22 +14,29 @@
 
 .tooltip-arrow {
   position: absolute;
-  bottom: calc(-1 * var(--spacing-s) - 8px);
+  bottom: calc(-1 * var(--spacing-s));
   border: 8px solid transparent;
   border-top: 8px solid var(--color-coat-of-arms);
+  border-bottom: 0;
   left: 0;
   right: 0;
-  margin: 0 auto;
-  width: 0px;
-  display: none;
+  margin: 0 auto 0 auto;
+  width: 0;
 }
 
-.planning-title-container:hover .tooltip-container,
-.planning-title-container:hover .tooltip-arrow,
+.tooltip-arrow-container {
+  border-bottom: 8px solid var(--color-coat-of-arms);
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
 .monthly-planning-bar-container:hover .tooltip-container,
-.monthly-planning-bar-container:hover .tooltip-arrow,
+.monthly-planning-bar-container:hover .tooltip-arrow-container,
 .monthly-construction-bar-container:hover .tooltip-container,
-.monthly-construction-bar-container:hover .tooltip-arrow {
+.monthly-construction-bar-container:hover .tooltip-arrow-container {
   @apply block;
 }
 
@@ -40,8 +47,8 @@
 * tooltip-arrow at the center of the container.
 **/
 .monthly-construction-bar-container:hover .tooltip-container {
-  inset: auto auto 2rem -4.1rem;
+  inset: auto auto 1rem -4.1rem;
 }
 .monthly-planning-bar-container:hover .tooltip-container {
-  inset: auto auto 2.6rem -4.1rem;
+  inset: auto auto 2rem -4.1rem;
 }
