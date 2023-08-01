@@ -20,12 +20,12 @@ const useConfirmDialog = () => {
     title,
     description,
     dialogType,
-    confirmButtonText
+    confirmButtonText,
   }: {
     title: string;
     description: string;
     dialogType?: IConfirmDialogTypes;
-    confirmButtonText?:string
+    confirmButtonText?: string;
   }) => {
     setNeedsCleanup(true);
     return new Promise((resolve, reject) => {
