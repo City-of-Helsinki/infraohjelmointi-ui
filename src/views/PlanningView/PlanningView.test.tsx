@@ -881,7 +881,7 @@ describe('PlanningView', () => {
 
         expect(hoverTooltip).not.toBeVisible();
 
-        await act(async () => {
+        await waitFor(async () => {
           await user.hover(rowTitle.children[0]);
         });
 
