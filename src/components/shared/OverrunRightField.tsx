@@ -1,6 +1,6 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
-import { useState, MouseEvent, useCallback, memo, FC } from 'react';
+import { useState, MouseEvent, useCallback, memo, FC, useEffect } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import BubbleIcon from './BubbleIcon';
@@ -9,11 +9,17 @@ import FormFieldLabel from './FormFieldLabel';
 interface IOverrunRightField {
   control: HookFormControlType;
   readOnly?: boolean;
+  cancelEdit?: boolean;
 }
-const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control }) => {
+const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control, cancelEdit }) => {
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
 
+  useEffect(() => {
+    if (cancelEdit && editing) {
+      setEditing(false);
+    }
+  }, [cancelEdit]);
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setEditing((currentState) => !currentState);
