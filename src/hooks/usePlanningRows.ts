@@ -87,12 +87,13 @@ const buildPlanningTableRows = (
     // Filter all groups under subClassDistrict
     if (type === 'subClassDistrict') {
       const districtsForSubClass = districts.filter((d) => d.parentClass === id && !d.parent);
+
+      const groupHasDistrictOrNoLocation = (g: IGroup) =>
+       districtsForSubClass.some((d) => d.id === g.locationRelation) || !g.locationRelation;
+
       filteredGroups.push(
         ...groups.filter(
-          (group) =>
-            group.classRelation === id &&
-            (!group.locationRelation ||
-              districtsForSubClass.some((d) => d.id === group.locationRelation)),
+          (group) => group.classRelation === id && groupHasDistrictOrNoLocation(group),
         ),
       );
     }
