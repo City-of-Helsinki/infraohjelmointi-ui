@@ -89,7 +89,7 @@ const buildPlanningTableRows = (
       const districtsForSubClass = districts.filter((d) => d.parentClass === id && !d.parent);
 
       const groupHasDistrictOrNoLocation = (g: IGroup) =>
-       districtsForSubClass.some((d) => d.id === g.locationRelation) || !g.locationRelation;
+        districtsForSubClass.some((d) => d.id === g.locationRelation) || !g.locationRelation;
 
       filteredGroups.push(
         ...groups.filter(
