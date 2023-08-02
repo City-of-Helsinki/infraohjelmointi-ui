@@ -122,7 +122,7 @@ const App: FC = () => {
       <TopBar />
       <div className="app-content">
         <SideBar />
-        <div className="w-full">
+        <div className="app-container">
           <Loader />
           {appDataReady && (
             <Routes>
