@@ -9,10 +9,10 @@ interface IHoverTooltipProps {
 const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
   const [state, setState] = useState({ tooltip: text || '', sourceEvent: undefined });
   const { tooltip } = state;
-  // const [tooltip, setTooltip] = useState<string>(text || '');
   const elementRef = useRef<HTMLElement>(null);
 
   const showTooltip = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
       if (tooltip !== event.detail.text) {
         setState({ tooltip: event.detail.text, sourceEvent: event.detail.event });
@@ -20,7 +20,9 @@ const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
     },
     [elementRef.current],
   );
+
   const hideTooltip = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
       setState({ tooltip: event.detail?.text, sourceEvent: event });
     },
@@ -62,9 +64,10 @@ const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
       // support inline tooltip
       return;
     }
-
-    const { offsetX, offsetY } = (e as any).nativeEvent;
-    const { clientX: left, clientY: top } = e as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const event = e as any;
+    const { offsetX, offsetY } = event.nativeEvent;
+    const { clientX: left, clientY: top } = event;
     const x = left - offsetX;
     const y = top - offsetY;
     targetElement.style.left = x + 'px';

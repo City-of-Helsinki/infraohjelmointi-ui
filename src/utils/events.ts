@@ -2,7 +2,7 @@ import {
   IContextMenuData,
   IFinanceEventData,
   IProjectEventData,
-  ITooltipData,
+  ITooltipEventData,
 } from '@/interfaces/eventInterfaces';
 import { setFinanceUpdate, setProjectUpdate } from '@/reducers/eventsSlice';
 import { Dispatch } from '@reduxjs/toolkit';
@@ -33,7 +33,7 @@ export const dispatchContextMenuEvent = (
 export const dispatchTooltipEvent = (
   e: MouseEvent<HTMLElement | SVGElement>,
   type: 'show' | 'hide',
-  data: ITooltipData,
+  data: ITooltipEventData,
 ) => {
   e.preventDefault();
   document.getElementById('tooltip-view')?.dispatchEvent(

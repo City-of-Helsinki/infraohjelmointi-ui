@@ -75,7 +75,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
    * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
    */
   const onExpand = useCallback(
-    (event: any) => {
+    (event: ReactMouseEvent<SVGElement | HTMLElement>) => {
       dispatchTooltipEvent(event, 'hide', { text: '' });
       handleExpand();
 
@@ -95,10 +95,11 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   );
 
   const showTooltip = useCallback((event: ReactMouseEvent<HTMLSpanElement>) => {
-    const text =
-      (event.target as HTMLElement).textContent || (event.target as HTMLElement).innerText;
+    const targetElement = event.target as HTMLElement;
+    const text = targetElement.textContent || targetElement.innerText;
     dispatchTooltipEvent(event, 'show', { text });
   }, []);
+
   const hideTooltip = useCallback((event: ReactMouseEvent<HTMLSpanElement>) => {
     dispatchTooltipEvent(event, 'hide', { text: '' });
   }, []);

@@ -45,7 +45,7 @@ export interface IContextMenuData {
   groupRowMenuProps?: GroupRowMenuDetails;
 }
 
-export interface ITooltipData {
+export interface ITooltipEventData {
   text: string;
 }
 
