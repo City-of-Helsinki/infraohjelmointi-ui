@@ -45,6 +45,10 @@ export interface IContextMenuData {
   groupRowMenuProps?: GroupRowMenuDetails;
 }
 
+export interface ITooltipEventData {
+  text: string;
+}
+
 export interface IFinanceEventData {
   masterClass: IClass | null;
   class: IClass | null;
