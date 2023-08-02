@@ -1,6 +1,6 @@
 import { IForm } from '@/interfaces/formInterfaces';
 import { NumberInput } from 'hds-react/components/NumberInput';
-import { FC, memo, MouseEvent, useCallback, useState } from 'react';
+import { FC, memo, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
@@ -10,15 +10,23 @@ interface IListFieldProps {
   label: string;
   fields?: Array<IForm>;
   readOnly?: boolean;
+  cancelEdit?: boolean;
 }
 
-const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly }) => {
+const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly, cancelEdit }) => {
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
+
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setEditing((currentState) => !currentState);
   }, []);
+
+  useEffect(() => {
+    if (cancelEdit && editing) {
+      setEditing(false);
+    }
+  }, [cancelEdit]);
 
   return (
     <div className="input-wrapper" id={name} data-testid={name}>

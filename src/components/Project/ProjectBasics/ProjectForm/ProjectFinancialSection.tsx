@@ -12,6 +12,8 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { validateMaxLength } from '@/utils/validation';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/hooks/common';
+import { selectIsProjectSaving } from '@/reducers/projectSlice';
 
 interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
@@ -34,6 +36,8 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const { t } = useTranslation();
 
   const { masterClasses, classes, subClasses } = classOptions;
+
+  const isSaving = useAppSelector(selectIsProjectSaving);
 
   const constructionPhases = useOptions('constructionPhases');
   const projectQualityLevels = useOptions('projectQualityLevels');
@@ -141,9 +145,14 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             readOnly: true,
           },
         ]}
+        cancelEdit={isSaving}
       />
-      <OverrunRightField control={control} />
-      <ListField {...getFieldProps('preliminaryBudgetDivision')} readOnly={true} />
+      <OverrunRightField control={control} cancelEdit={isSaving} />
+      <ListField
+        {...getFieldProps('preliminaryBudgetDivision')}
+        readOnly={true}
+        cancelEdit={isSaving}
+      />
     </div>
   );
 };
