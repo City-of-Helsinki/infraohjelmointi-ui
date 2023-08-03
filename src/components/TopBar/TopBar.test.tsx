@@ -8,19 +8,43 @@ import axios from 'axios';
 import { waitFor } from '@testing-library/react';
 import { getUserThunk } from '@/reducers/authSlice';
 import { Route } from 'react-router';
+import ProjectView from '@/views/ProjectView/ProjectView';
+import PlanningView from '@/views/PlanningView/PlanningView';
+import { setupStore } from '@/store';
+import mockProject from '@/mocks/mockProject';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const render = async () =>
+const store = setupStore();
+
+const render = async (customRoute?: string) =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<TopBar />} />, {
-      preloadedState: {
-        auth: { user: null, error: {} },
+    renderWithProviders(
+      <>
+        <Route path="/" element={<TopBar />}></Route>
+        <Route
+          path="/project/:projectId"
+          element={
+            <>
+              <TopBar />
+              <ProjectView />
+            </>
+          }
+        ></Route>
+        <Route path="/planning" element={<PlanningView />}></Route>
+      </>,
+
+      {
+        preloadedState: {
+          auth: { user: null, error: {} },
+          project: { ...store.getState().project, selectedProject: mockProject.data },
+        },
       },
-    }),
+      { route: customRoute ? customRoute : '/' },
+    ),
   );
 
 describe('TopBar', () => {
@@ -56,5 +80,21 @@ describe('TopBar', () => {
     ).toBeInTheDocument();
 
     expect(queryByRole('button', { name: matchExact('nav.login') })).toBeNull();
+  });
+
+  it('doesnt render the back button when not on the project route', async () => {
+    const { queryByTestId } = await render();
+
+    expect(queryByTestId('top-bar-back-button')).toBeNull();
+  });
+
+  it('renders the back button when the project route', async () => {
+    mockedAxios.get.mockResolvedValueOnce(mockProject);
+
+    const { getByTestId, user } = await render(`/project/${mockProject.data.id}`);
+
+    expect(getByTestId('top-bar-back-button')).toBeInTheDocument();
+
+    await user.click(getByTestId('top-bar-back-button'));
   });
 });

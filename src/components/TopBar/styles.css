@@ -1,3 +1,28 @@
 .search-button {
-  @apply p-0 font-light text-black-80;
+  @apply !p-0 !font-light !text-black-80;
+}
+
+/* 
+add HDS navigation border to make the top-bar-container look like the HDS navigation and add some padding 
+to center the navigation, this is needed because the .back-button-container otherwise makes the navigation un-even
+*/
+.top-bar-container {
+  @apply ml-12 flex w-full justify-end border-b-[1px] border-gray pr-24;
+}
+
+.navigation-container {
+  @apply w-full;
+}
+
+/* remove border from HDS navigation component since it is moved to the top-bar-container */
+.navigation-container header div {
+  @apply !border-0;
+}
+
+.back-button-container {
+  @apply flex w-24 items-center justify-center;
+}
+
+.back-button:hover {
+  @apply h-[75%] w-[75%] cursor-pointer bg-bus-l;
 }

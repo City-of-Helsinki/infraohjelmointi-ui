@@ -49,10 +49,17 @@ table p {
   @apply m-0;
 }
 
-/* Margin to fit the sidebar, not final values */
 .app-content {
   /* Hacky calc, since the TopBar has a 1px border bottom */
   @apply flex min-h-[var(--app-min-height)] w-full;
+}
+
+/* 
+the sidebar has a fixed position and is 3rem wide when collapsed and that's why
+we give the container a 3rem margin left
+*/
+.app-container {
+  @apply ml-12 w-full;
 }
 
 #radio-checkbox label,

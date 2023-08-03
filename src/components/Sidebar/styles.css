@@ -1,5 +1,5 @@
 .sidebar {
-  @apply sticky top-0 mr-auto flex h-screen w-12 min-w-[3rem] flex-col shadow-2xl;
+  @apply fixed top-0 mr-auto flex h-screen w-12 flex-col pt-11 shadow-2xl;
 }
 
 .sidebar-button {
