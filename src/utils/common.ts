@@ -205,10 +205,10 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
     let fieldName: keyof IProjectFinances;
     for (fieldName in adjustedBudgetObject) {
       if (fieldName !== 'year') {
-        // extract the year from current IProjectFinances fieldName
+        // Looping over project finances and extracting year from field names
         const fieldYear = adjustedBudgetObject.year + parseInt(fieldName.match(/\d+/)?.[0] || '0');
 
-        // current IProjectFinances field budget value
+        // current IProjectFinances field value
         const fieldValue = safeParseInt(adjustedBudgetObject[fieldName as keyof IProjectFinances]);
 
         if (fieldValue) {
