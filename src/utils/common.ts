@@ -152,27 +152,19 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
     return;
   }
 
-  const adjustBudgets = (
+  /**
+   * Moves the provided finance value to its new finance location and sets current to null
+   * @param newFieldYear year for the new finance field which needs to be updated
+   * @param financeValue finance value which will be summed to newFieldYear field in the budgetObject
+   * @param currentFinanceFieldName finance field which will be set to null as its value has been moved 
+   * @param budgetObject ProjectFinance object to update
+   */
+  const updateFinanceValue = (
+    newFieldYear: number,
+    financeValue: number,
+    currentFinanceFieldName: keyof IProjectFinances,
     budgetObject: IProjectFinances,
-    projectTimelineDates: IProjectEstDates,
-  ): IProjectFinances => {
-    /**
-     * Moves the provided finance value to its new finance location and sets current to null
-     * @param newFieldYear year for the new finance field which needs to be updated
-     * @param financeValue value which will be summed in the new year
-     * @param currentFinanceFieldName finance field name which the value belongs to
-     */
-    const updateFinanceValue = (
-      newFieldYear: number,
-      financeValue: number,
-      currentFinanceFieldName: keyof IProjectFinances,
-    ) => {
-      const newFinanceFieldName = yearToBudgetKey[newFieldYear - adjustedBudgetObject.year];
-      (adjustedBudgetObject[newFinanceFieldName] as string) = String(
-        safeParseInt(adjustedBudgetObject[newFinanceFieldName]) + financeValue,
-      );
-      (adjustedBudgetObject[currentFinanceFieldName] as null) = null;
-    };
+  ) => {
     // Year number to finance field name mapping
     const yearToBudgetKey: { [key: number]: keyof IProjectFinances } = {
       0: 'budgetProposalCurrentYearPlus0',
@@ -187,6 +179,18 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
       9: 'preliminaryCurrentYearPlus9',
       10: 'preliminaryCurrentYearPlus10',
     };
+    const newFinanceFieldName: keyof IProjectFinances =
+      yearToBudgetKey[newFieldYear - budgetObject.year];
+    (budgetObject[newFinanceFieldName] as string) = String(
+      safeParseInt(budgetObject[newFinanceFieldName]) + financeValue,
+    );
+    (budgetObject[currentFinanceFieldName] as null) = null;
+  };
+
+  const adjustBudgets = (
+    budgetObject: IProjectFinances,
+    projectTimelineDates: IProjectEstDates,
+  ): IProjectFinances => {
     const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } =
       projectTimelineDates;
     const planningStartYear = estPlanningStart ? getYear(estPlanningStart) : null;
@@ -201,23 +205,23 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
     let fieldName: keyof IProjectFinances;
     for (fieldName in adjustedBudgetObject) {
       if (fieldName !== 'year') {
-        // current budget field year, extract from field name
+        // extract the year from current IProjectFinances fieldName
         const fieldYear = adjustedBudgetObject.year + parseInt(fieldName.match(/\d+/)?.[0] || '0');
 
-        // current budget field value
+        // current IProjectFinances field budget value
         const fieldValue = safeParseInt(adjustedBudgetObject[fieldName as keyof IProjectFinances]);
 
         if (fieldValue) {
           // value exists before the planning timeline starts
           if (planningStartYear && fieldYear < planningStartYear) {
-            updateFinanceValue(planningStartYear, fieldValue, fieldName);
+            updateFinanceValue(planningStartYear, fieldValue, fieldName,adjustedBudgetObject);
           }
           // value exists after planning timeline ends
           else if (planningEndYear && fieldYear > planningEndYear && project?.estPlanningEnd) {
             const oldPlanningEndYear = getYear(project.estPlanningEnd);
             // Check if current finance field used to be in the planning phase timeline
             if (oldPlanningEndYear >= fieldYear) {
-              updateFinanceValue(planningEndYear, fieldValue, fieldName);
+              updateFinanceValue(planningEndYear, fieldValue, fieldName,adjustedBudgetObject);
             }
           }
           // value exists before construction timeline begins
@@ -229,12 +233,12 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
             const oldConstructionStartYear = getYear(project.estConstructionStart);
             // Check if current finance field used to be in the construction phase timeline
             if (oldConstructionStartYear <= fieldYear) {
-              updateFinanceValue(constructionStartYear, fieldValue, fieldName);
+              updateFinanceValue(constructionStartYear, fieldValue, fieldName,adjustedBudgetObject);
             }
           }
           // value exists after the construction timeline ends
           else if (constructionEndYear !== null && fieldYear > constructionEndYear) {
-            updateFinanceValue(constructionEndYear, fieldValue, fieldName);
+            updateFinanceValue(constructionEndYear, fieldValue, fieldName,adjustedBudgetObject);
           } else {
             (adjustedBudgetObject[fieldName] as string) = String(fieldValue);
           }
