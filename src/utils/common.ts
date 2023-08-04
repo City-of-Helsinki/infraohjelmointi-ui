@@ -184,6 +184,8 @@ export const syncFinances = (request: IProjectRequest, project: IProject | null)
     (budgetObject[newFinanceFieldName] as string) = String(
       safeParseInt(budgetObject[newFinanceFieldName]) + financeValue,
     );
+    // casting as null to be able to set the field as null
+    // setting field as null to patch this field as null in the backend
     (budgetObject[currentFinanceFieldName] as null) = null;
   };
 
