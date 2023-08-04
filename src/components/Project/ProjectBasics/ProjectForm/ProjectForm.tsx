@@ -71,7 +71,7 @@ const ProjectForm = () => {
           form as IAppForms,
           project,
         );
-        // syncFinancesIfNeeded(project, data);
+
         // Patch project
         if (project?.id && projectMode === 'edit') {
           try {
