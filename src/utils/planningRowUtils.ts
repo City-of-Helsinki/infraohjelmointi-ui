@@ -25,7 +25,7 @@ export const sortByName = (list: Array<IProject> | Array<IGroup>) =>
  * @param type IPlanningRowType
  * @param projects projects to map
  */
-export const getSortedProjectsForCoordinator = (
+export const filterProjectsForCoordinatorRow = (
   id: string,
   type: PlanningRowType,
   projects: Array<IProject>,
@@ -58,7 +58,7 @@ export const getSortedProjectsForCoordinator = (
  * @param projects projects to map
  * @param districtsForSubClass when the type is a subClassDistrict then we will not render districts under that subClass but would still need the projects that belong to those districts to appear under the subClassDistrict.
  */
-export const getSortedProjectsForPlanning = (
+export const filterProjectsForPlanningRow = (
   id: string,
   type: PlanningRowType,
   projects: Array<IProject>,
@@ -116,8 +116,8 @@ export const buildPlanningRow = (
   isCoordinator?: boolean,
 ): IPlanningRow => {
   const projectRows = isCoordinator
-    ? getSortedProjectsForCoordinator(item.id, type, projects)
-    : getSortedProjectsForPlanning(item.id, type, projects, districtsForSubClass);
+    ? filterProjectsForCoordinatorRow(item.id, type, projects)
+    : filterProjectsForPlanningRow(item.id, type, projects, districtsForSubClass);
   const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
   const urlSearchParamKey = type === 'districtPreview' ? 'district' : type;
   const nonNavigableTypes = [
