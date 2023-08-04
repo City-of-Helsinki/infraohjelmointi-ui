@@ -16,8 +16,14 @@ import {
   selectProjects,
   selectSelections,
   setPlanningRows,
+  setProjects,
 } from '@/reducers/planningSlice';
-import { buildPlanningRow, getSelectedOrAll } from '@/utils/planningRowUtils';
+import {
+  buildPlanningRow,
+  fetchProjectsByRelation,
+  getSelectedOrAll,
+  getTypeAndIdForLowestExpandedRow,
+} from '@/utils/planningRowUtils';
 import _ from 'lodash';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -51,7 +57,7 @@ const buildCoordinatorTableRows = (
   } = selections;
 
   const getRow = (item: IClass | ILocation, type: PlanningRowType, defaultExpanded?: boolean) =>
-    buildPlanningRow(item, type, projects, defaultExpanded);
+    buildPlanningRow(item, type, projects, defaultExpanded, [], true);
 
   const districtsBeforeCollectiveSubLevel = !selectedCollectiveSubLevel ? districts : [];
   const districtsAfterCollectiveSubLevel = !selectedOtherClassification ? districts : [];
@@ -167,6 +173,23 @@ const useCoordinationRows = () => {
   const batchedCoordinationLocations = useAppSelector(selectBatchedCoordinationLocations);
 
   const mode = useAppSelector(selectPlanningMode);
+
+  // Fetch projects when selections change
+  useEffect(() => {
+    if (mode !== 'coordination') {
+      return;
+    }
+
+    const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
+
+    if (type && id) {
+      fetchProjectsByRelation(type as PlanningRowType, id, true)
+        .then((res) => {
+          dispatch(setProjects(res));
+        })
+        .catch(Promise.reject);
+    }
+  }, [selections, groups, mode]);
 
   // Build coordination table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {

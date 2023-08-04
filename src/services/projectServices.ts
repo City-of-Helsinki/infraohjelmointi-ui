@@ -64,11 +64,16 @@ export const patchProjects = async (
 
 export const getProjectsWithParams = async (
   req: IProjectSearchRequest,
+  isCoordinator?: boolean,
 ): Promise<IProjectsResponse> => {
   const { params, direct, programmed } = req;
   const allParams = `${params}&direct=${direct}${programmed ? '&programmed=true' : ''}`;
+
+  const url = isCoordinator
+    ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`
+    : `${REACT_APP_API_URL}/projects/?${allParams}`;
   return axios
-    .get(`${REACT_APP_API_URL}/projects/?${allParams}`)
+    .get(url)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
