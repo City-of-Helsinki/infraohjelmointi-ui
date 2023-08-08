@@ -125,3 +125,9 @@
 .pen-and-label-button > span {
   @apply px-0;
 }
+
+@media (max-width: 1600px) {
+  .toolbar-container {
+    margin-right: 2.5rem;
+  }
+}

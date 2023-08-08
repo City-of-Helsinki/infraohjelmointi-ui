@@ -32,6 +32,9 @@ import { selectCoordinationDistricts, selectPlanningDistricts } from '@/reducers
 const getSelectedItemOrNull = (list: Array<IClass | ILocation>, id: string | null) =>
   (id ? list.find((l) => l.id === id) : null) as IClass | ILocation | null;
 
+// TODO: when we get authentication we need to check here
+// - if the mode is coordinator and the user is a planner and forcedToFrame is false this url shouldn't be allowed
+// - if the mode is coordinator and the user is a coordinator then forcedToFrame should not be toggleable (?)
 const usePlanningRoutes = () => {
   const dispatch = useAppDispatch();
   const { pathname, search } = useLocation();

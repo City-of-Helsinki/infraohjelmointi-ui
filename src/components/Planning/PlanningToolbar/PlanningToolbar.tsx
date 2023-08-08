@@ -7,6 +7,8 @@ import {
   IconDrag,
   IconShare,
   IconDownload,
+  IconMoneyBag,
+  IconMoneyBagFill,
 } from 'hds-react/icons/';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent } from '@/utils/events';
@@ -16,6 +18,7 @@ import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
+  selectForcedToFrame,
   selectGroupsExpanded,
   selectPlanningMode,
   selectSelections,
@@ -26,7 +29,10 @@ import { t } from 'i18next';
 import './styles.css';
 import { resetProject, setProjectMode } from '@/reducers/projectSlice';
 import { useNavigate } from 'react-router-dom';
-import { selectBatchedCoordinationClasses } from '@/reducers/classSlice';
+import {
+  selectBatchedCoordinationClasses,
+  selectBatchedPlanningClasses,
+} from '@/reducers/classSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IClass } from '@/interfaces/classInterfaces';
 import { selectCoordinationDistricts, selectPlanningDistricts } from '@/reducers/locationSlice';
@@ -55,9 +61,9 @@ const getRelatedItem = (
 const getParent = (child: IClass | ILocation, parents: Array<IClass> | Array<ILocation>) =>
   parents.filter((p) => p.id === child.parent)[0];
 
-const buildCoordinationUrl = (params: IPlanningSearchParams) => {
+const buildUrl = (path: 'planning' | 'coordination', params: IPlanningSearchParams) => {
   const queryParams = new URLSearchParams(params as Record<string, string>);
-  return `/coordination?${queryParams.toString()}`;
+  return `/${path}?${queryParams.toString()}`;
 };
 
 const getCoordinationDistrictForSubClass = (
@@ -88,6 +94,7 @@ const getLowestSelectedClass = (
     return allClasses.find((ac) => ac.id === coordinationDistrictForSubClass?.parentClass);
   } else {
     const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
+
     return getRelatedItem(selectedSubClass || selectedClass || selectedMasterClass, allClasses);
   }
 };
@@ -104,7 +111,9 @@ const PlanningToolbar = () => {
   const coordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
   const coordinationDistricts = useAppSelector(selectCoordinationDistricts);
   const planningDistricts = useAppSelector(selectPlanningDistricts);
+  const planningClasses = useAppSelector(selectBatchedPlanningClasses);
   const selections = useAppSelector(selectSelections);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const groupsExpandIcon = useMemo(
     () => (groupsExpanded ? <IconCollapse /> : <IconSort />),
@@ -264,10 +273,82 @@ const PlanningToolbar = () => {
           coordinationDistrictForSubClass?.id;
       }
 
-      navigate(buildCoordinationUrl(params));
+      navigate(buildUrl('coordination', params));
 
       dispatch(setForcedToFrame(true));
     }
+  };
+
+  const moveToIdealView = () => {
+    const { masterClasses, classes, subClasses, allClasses } = planningClasses;
+
+    const {
+      selectedMasterClass,
+      selectedClass,
+      selectedSubClass,
+      selectedDistrict,
+      selectedCollectiveSubLevel,
+      selectedOtherClassification,
+      selectedSubLevelDistrict,
+    } = selections;
+
+    const params: IPlanningSearchParams = {};
+
+    const planningDistrict = planningDistricts.find(
+      (pd) =>
+        pd.id === selectedDistrict?.relatedTo || pd.id === selectedSubLevelDistrict?.relatedTo,
+    );
+
+    const districtsParent = allClasses.find((ac) => ac.id === planningDistrict?.parentClass);
+
+    if (districtsParent?.name.toLocaleLowerCase().includes('suurpiiri')) {
+      params.subClass = districtsParent.id;
+    } else if (planningDistrict) {
+      params.district = planningDistrict?.id;
+    }
+
+    const lowestSelectedClass =
+      selectedOtherClassification ||
+      selectedCollectiveSubLevel ||
+      selectedSubClass ||
+      selectedClass ||
+      selectedMasterClass;
+
+    // Find the lowest selected class using either the coordinationDistrictForSubClass or the search param selections
+    const findClass = (classesToFilter: Array<IClass>) => {
+      const foundClass = classesToFilter.find((ctf) => ctf.id === lowestSelectedClass?.relatedTo);
+      return foundClass;
+    };
+
+    const planningSubClass = !params.subClass && findClass(subClasses);
+    const planningClass = !planningSubClass && findClass(classes);
+    const planningMasterClass = !planningClass && findClass(masterClasses);
+
+    if (planningSubClass) {
+      const planningClass = getParent(planningSubClass, classes);
+      params.masterClass = getParent(planningClass, masterClasses).id;
+      params.class = planningClass.id;
+      params.subClass = planningSubClass.id;
+    } else if (planningClass) {
+      params.masterClass = getParent(planningClass, masterClasses).id;
+      params.class = planningClass.id;
+    } else if (planningMasterClass) {
+      params.masterClass = planningMasterClass.id;
+    }
+
+    console.log('planning sub class: ', planningSubClass);
+    console.log('planning class: ', planningClass);
+    console.log('planning master class: ', planningMasterClass);
+
+    console.log('districts parent: ', districtsParent);
+    console.log('planning district: ', planningDistrict);
+    console.log('lowest selected class: ', lowestSelectedClass);
+
+    console.log('params: ', params);
+
+    navigate(buildUrl('planning', params));
+
+    dispatch(setForcedToFrame(false));
   };
 
   return (
@@ -333,15 +414,6 @@ const PlanningToolbar = () => {
             >
               {t('shareVersion')}
             </Button>
-            {/* Share version */}
-            <Button
-              variant="supplementary"
-              className="toolbar-button"
-              iconLeft={shareIcon}
-              onClick={moveToForcedToFrameView}
-            >
-              {'Sovitettu budjetti'}
-            </Button>
             <GroupDialog
               isOpen={groupDialogVisible}
               handleClose={onCloseGroupDialog}
@@ -353,6 +425,26 @@ const PlanningToolbar = () => {
             />
           </div>
         </>
+      }
+      right={
+        <div>
+          <button
+            aria-label="ideal budget view"
+            className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
+            disabled={!forcedToFrame}
+            onClick={moveToIdealView}
+          >
+            <IconMoneyBag />
+          </button>
+          <button
+            aria-label="force framed budget view"
+            className={`money-button ${forcedToFrame ? 'selected' : ''}`}
+            disabled={forcedToFrame}
+            onClick={moveToForcedToFrameView}
+          >
+            <IconMoneyBagFill />
+          </button>
+        </div>
       }
     />
   );
