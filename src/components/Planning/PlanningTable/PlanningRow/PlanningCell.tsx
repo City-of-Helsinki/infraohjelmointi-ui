@@ -3,7 +3,7 @@ import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/plann
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
 import { useAppSelector } from '@/hooks/common';
-import { selectSelectedYear } from '@/reducers/planningSlice';
+import { selectForcedToFrame, selectSelectedYear } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import './styles.css';
 
@@ -16,16 +16,23 @@ interface IPlanningCellProps extends IPlanningRow {
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const { plannedBudget, frameBudget, deviation, year, isCurrentYear } = cell;
   const selectedYear = useAppSelector(selectSelectedYear);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   return (
     <>
-      <td className={`planning-cell ${type}`} data-testid={`cell-${id}-${year}`}>
+      <td
+        className={`planning-cell ${type} ${forcedToFrame ? 'framed' : ''}`}
+        data-testid={`cell-${id}-${year}`}
+      >
         <div className={`planning-cell-container`}>
           <span data-testid={`planned-budget-${id}-${year}`} className="planning-budget">
             {plannedBudget}
           </span>
           <span data-testid={`frame-budget-${id}-${year}`}>{frameBudget}</span>
-          <span data-testid={`deviation-${id}-${year}`} className="planning-cell-deviation">
+          <span
+            data-testid={`deviation-${id}-${year}`}
+            className={`planning-cell-deviation ${forcedToFrame ? 'framed' : ''}`}
+          >
             {deviation}
           </span>
         </div>

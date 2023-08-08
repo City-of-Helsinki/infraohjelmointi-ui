@@ -18,6 +18,14 @@
   @apply block overflow-hidden text-ellipsis pl-4 text-sm font-bold;
 }
 
+.mode-indicator {
+  @apply flex h-11 items-center justify-center border-success bg-success px-8 font-medium text-white;
+}
+
+.mode-indicator.framed {
+  @apply bg-brick;
+}
+
 #previousButton button {
   @apply h-8 min-h-[unset] w-[7.5rem] min-w-[unset] pl-3;
 }

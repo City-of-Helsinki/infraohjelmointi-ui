@@ -18,6 +18,7 @@ interface IPlanningState {
   projects: Array<IProject>;
   rows: Array<IPlanningRow>;
   mode: PlanningMode;
+  forcedToFrame: boolean;
 }
 
 const initialState: IPlanningState = {
@@ -37,6 +38,7 @@ const initialState: IPlanningState = {
   mode: 'planning',
   projects: [],
   rows: [],
+  forcedToFrame: false,
 };
 
 export const planningSlice = createSlice({
@@ -94,6 +96,9 @@ export const planningSlice = createSlice({
     resetSelections(state) {
       return { ...state, selections: initialState.selections };
     },
+    setForcedToFrame(state, action: PayloadAction<boolean>) {
+      return { ...state, forcedToFrame: action.payload };
+    },
   },
 });
 
@@ -104,6 +109,7 @@ export const selectPlanningRows = (state: RootState) => state.planning.rows;
 export const selectProjects = (state: RootState) => state.planning.projects;
 export const selectGroupsExpanded = (state: RootState) => state.planning.groupsExpanded;
 export const selectPlanningMode = (state: RootState) => state.planning.mode;
+export const selectForcedToFrame = (state: RootState) => state.planning.forcedToFrame;
 
 export const {
   setSelectedYear,
@@ -120,6 +126,7 @@ export const {
   setGroupsExpanded,
   setPlanningMode,
   resetSelections,
+  setForcedToFrame,
 } = planningSlice.actions;
 
 export default planningSlice.reducer;
