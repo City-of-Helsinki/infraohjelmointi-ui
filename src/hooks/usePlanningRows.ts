@@ -17,7 +17,6 @@ import {
 import { selectGroups, updateGroup } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getProjectsWithParams } from '@/services/projectServices';
 import {
   selectPlanningMode,
   selectPlanningRows,
@@ -28,7 +27,12 @@ import {
 } from '@/reducers/planningSlice';
 import _ from 'lodash';
 import { selectFinanceUpdate } from '@/reducers/eventsSlice';
-import { buildPlanningRow, getSelectedOrAll } from '@/utils/planningRowUtils';
+import {
+  buildPlanningRow,
+  fetchProjectsByRelation,
+  getSelectedOrAll,
+  getTypeAndIdForLowestExpandedRow,
+} from '@/utils/planningRowUtils';
 import { IClass } from '@/interfaces/classInterfaces';
 
 /**
@@ -202,49 +206,6 @@ const buildPlanningTableRows = (
   };
 
   return getRows();
-};
-
-/**
- * Fetches projects for a given location or class.
- *
- * It will add the direct=true parameter to the search query if we're fetching projects for classes or subClasses, which
- * will only return projects that are directly underneath that class or subClass (children ignored).
- *
- * @returns a promise list of projects.
- */
-const fetchProjectsByRelation = async (
-  type: PlanningRowType,
-  id: string | undefined,
-): Promise<Array<IProject>> => {
-  const direct = type === 'class' || type === 'subClass' || type === 'subClassDistrict';
-  try {
-    const allResults = await getProjectsWithParams({
-      params: `${type}=${id}`,
-      direct: direct,
-      programmed: true,
-    });
-    return allResults.results;
-  } catch (e) {
-    console.log('Error fetching projects by relation: ', e);
-  }
-  return [];
-};
-
-/**
- * Checks if there is a selectedClass, selectedSubClass or selectedDistrict and returns
- * the type and id for that, prioritizing the lowest row.
- */
-const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelections) => {
-  const { selectedClass, selectedSubClass, selectedDistrict } = selections;
-  if (selectedDistrict) {
-    return { type: 'district', id: selectedDistrict.id };
-  } else if (selectedSubClass) {
-    return { type: 'subClass', id: selectedSubClass.id };
-  } else if (selectedClass) {
-    return { type: 'class', id: selectedClass.id };
-  } else {
-    return { type: null, id: null };
-  }
 };
 
 /**
