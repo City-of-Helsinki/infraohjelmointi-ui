@@ -140,7 +140,7 @@ describe('CoordinatorView', () => {
     it('renders the planning info panel in coordination mode', async () => {
       const { findByTestId } = await render();
 
-      expect(await findByTestId('mode-button-container')).toHaveTextContent('coordination');
+      expect(await findByTestId('mode-indicator-container')).toHaveTextContent('coordination');
     });
   });
 

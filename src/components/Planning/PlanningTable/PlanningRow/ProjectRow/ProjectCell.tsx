@@ -22,7 +22,7 @@ import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
 import _ from 'lodash';
 import { useAppSelector } from '@/hooks/common';
-import { selectSelectedYear } from '@/reducers/planningSlice';
+import { selectForcedToFrame, selectSelectedYear } from '@/reducers/planningSlice';
 import {
   getCellTypeUpdateRequestData,
   getRemoveRequestData,
@@ -45,6 +45,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const cellRef = useRef<HTMLTableCellElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
     isReadOnly: true,
@@ -58,6 +59,9 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     () => (type !== 'none' ? formValue?.toString() : ''),
     [formValue, type],
   );
+
+  const inputDisabled = useMemo(() => type === 'none' || forcedToFrame, [forcedToFrame, type]);
+
   const updateCell = useCallback(
     (req: IProjectRequest) => {
       // if there's only the year property in the finances object, delete it
@@ -214,7 +218,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
               onChange={handleChange}
               onBlur={handleBlur}
               onFocus={handleFocus}
-              disabled={type === 'none'}
+              disabled={inputDisabled}
               readOnly={isReadOnly}
               className="project-cell-input"
               data-testid={`cell-input-${year}-${id}`}

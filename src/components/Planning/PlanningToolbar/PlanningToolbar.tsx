@@ -18,12 +18,79 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectGroupsExpanded,
   selectPlanningMode,
+  selectSelections,
+  setForcedToFrame,
   setGroupsExpanded,
 } from '@/reducers/planningSlice';
 import { t } from 'i18next';
 import './styles.css';
 import { resetProject, setProjectMode } from '@/reducers/projectSlice';
 import { useNavigate } from 'react-router-dom';
+import { selectBatchedCoordinationClasses } from '@/reducers/classSlice';
+import { ILocation } from '@/interfaces/locationInterfaces';
+import { IClass } from '@/interfaces/classInterfaces';
+import { selectCoordinationDistricts, selectPlanningDistricts } from '@/reducers/locationSlice';
+import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
+
+interface IPlanningSearchParams {
+  masterClass?: string;
+  class?: string;
+  subClass?: string;
+  collectiveSubLevel?: string;
+  otherClassification?: string;
+  otherClassificationSubLevel?: string;
+  district?: string;
+  subLevelDistrict?: string;
+}
+
+const getRelatedItem = (
+  relatedItem?: IClass | ILocation | null,
+  items?: Array<IClass> | Array<ILocation>,
+) => {
+  if (items && relatedItem) {
+    return items?.filter((i) => i.relatedTo === relatedItem?.id)[0];
+  }
+};
+
+const getParent = (child: IClass | ILocation, parents: Array<IClass> | Array<ILocation>) =>
+  parents.filter((p) => p.id === child.parent)[0];
+
+const buildCoordinationUrl = (params: IPlanningSearchParams) => {
+  const queryParams = new URLSearchParams(params as Record<string, string>);
+  return `/coordination?${queryParams.toString()}`;
+};
+
+const getCoordinationDistrictForSubClass = (
+  selectedSubClass: IClass | null,
+  planningDistricts: Array<ILocation>,
+  coordinationDistricts: Array<ILocation>,
+) => {
+  // Add a selected district using the subClass if the subClasses name is 'suurpiiri'
+  if (selectedSubClass && selectedSubClass.name.toLocaleLowerCase().includes('suurpiiri')) {
+    const planningDistrictForSubClass = planningDistricts.find((d) => {
+      return d.parentClass === selectedSubClass?.id;
+    });
+
+    const coordinationDistrictForSubClass = coordinationDistricts.find((d) => {
+      return d.relatedTo === planningDistrictForSubClass?.id;
+    });
+
+    return coordinationDistrictForSubClass;
+  }
+};
+
+const getLowestSelectedClass = (
+  allClasses: Array<IClass>,
+  selections: IPlanningRowSelections,
+  coordinationDistrictForSubClass?: ILocation,
+) => {
+  if (coordinationDistrictForSubClass) {
+    return allClasses.find((ac) => ac.id === coordinationDistrictForSubClass?.parentClass);
+  } else {
+    const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
+    return getRelatedItem(selectedSubClass || selectedClass || selectedMasterClass, allClasses);
+  }
+};
 
 const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
@@ -34,10 +101,16 @@ const PlanningToolbar = () => {
     projectProgrammedDialogVisible: false,
   });
 
+  const coordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
+  const coordinationDistricts = useAppSelector(selectCoordinationDistricts);
+  const planningDistricts = useAppSelector(selectPlanningDistricts);
+  const selections = useAppSelector(selectSelections);
+
   const groupsExpandIcon = useMemo(
     () => (groupsExpanded ? <IconCollapse /> : <IconSort />),
     [groupsExpanded],
   );
+
   const plusIcon = useMemo(() => <IconPlusCircle />, []);
   const slidersIcon = useMemo(() => <IconSliders />, []);
   const dragIcon = useMemo(() => <IconDrag />, []);
@@ -45,6 +118,7 @@ const PlanningToolbar = () => {
   const downloadIcon = useMemo(() => <IconDownload />, []);
 
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
+
   const navigate = useNavigate();
   const toggleGroupsExpanded = useCallback(() => {
     dispatch(setGroupsExpanded(!groupsExpanded));
@@ -90,6 +164,111 @@ const PlanningToolbar = () => {
     },
     [onShowGroupDialog, onShowProjectProgrammedDialog, onOpenNewProjectForm],
   );
+
+  const moveToForcedToFrameView = () => {
+    const {
+      masterClasses,
+      classes,
+      subClasses,
+      collectiveSubLevels,
+      otherClassifications,
+      otherClassificationSubLevels,
+      allClasses,
+    } = coordinationClasses;
+
+    const { selectedSubClass } = selections;
+
+    // Navigate to coordination view to its corresponding level if the planning view mode is 'planning'
+    if (mode === 'planning') {
+      const params: IPlanningSearchParams = {};
+
+      // Get the district using the selectedSubClass if the subClasses name includes 'suurpiiri'
+      const coordinationDistrictForSubClass = getCoordinationDistrictForSubClass(
+        selectedSubClass,
+        planningDistricts,
+        coordinationDistricts,
+      );
+
+      // Find the lowest selected class using either the coordinationDistrictForSubClass or the search param selections
+      const findClass = (classesToFilter: Array<IClass>) => {
+        const lowestSelectedClass = getLowestSelectedClass(
+          allClasses,
+          selections,
+          coordinationDistrictForSubClass,
+        );
+        const foundClass = classesToFilter.find((i) => i.id === lowestSelectedClass?.id);
+        return foundClass;
+      };
+
+      // We make sure not to iterate over unnecessary levels if the lowest level is found
+      const otherClassificationSubLevel = findClass(otherClassificationSubLevels);
+      const otherClassification = !otherClassificationSubLevel && findClass(otherClassifications);
+      const collectiveSubLevel = !otherClassification && findClass(collectiveSubLevels);
+      const coordinationSubClass = !collectiveSubLevel && findClass(subClasses);
+      const coordinationClass = !coordinationSubClass && findClass(classes);
+      const coordinationMasterClass = !coordinationClass && findClass(masterClasses);
+
+      // Apply search params to the url from the highest level downwards
+      if (otherClassificationSubLevel) {
+        const otherClassification = getParent(otherClassificationSubLevel, otherClassifications);
+        const collectiveSubLevel = getParent(otherClassification, collectiveSubLevels);
+        const coordinationSubClass = getParent(collectiveSubLevel, subClasses);
+        const coordinationClass = getParent(coordinationSubClass, classes);
+        const coordinationMasterClass = getParent(coordinationClass, masterClasses);
+
+        params.masterClass = coordinationMasterClass.id;
+        params.class = coordinationClass.id;
+        params.subClass = coordinationSubClass.id;
+        params.collectiveSubLevel = collectiveSubLevel.id;
+        params.otherClassification = otherClassification.id;
+        params.otherClassificationSubLevel = otherClassificationSubLevel.id;
+      } else if (otherClassification) {
+        const collectiveSubLevel = getParent(otherClassification, collectiveSubLevels);
+        const coordinationSubClass = getParent(collectiveSubLevel, subClasses);
+        const coordinationClass = getParent(coordinationSubClass, classes);
+        const coordinationMasterClass = getParent(coordinationClass, masterClasses);
+
+        params.masterClass = coordinationMasterClass.id;
+        params.class = coordinationClass.id;
+        params.subClass = coordinationSubClass.id;
+        params.collectiveSubLevel = collectiveSubLevel.id;
+        params.otherClassification = otherClassification.id;
+      } else if (collectiveSubLevel) {
+        const coordinationSubClass = getParent(collectiveSubLevel, subClasses);
+        const coordinationClass = getParent(coordinationSubClass, classes);
+        const coordinationMasterClass = getParent(coordinationClass, masterClasses);
+
+        params.masterClass = coordinationMasterClass.id;
+        params.class = coordinationClass.id;
+        params.subClass = coordinationSubClass.id;
+        params.collectiveSubLevel = collectiveSubLevel.id;
+      } else if (coordinationSubClass) {
+        const coordinationClass = getParent(coordinationSubClass, classes);
+        const coordinationMasterClass = getParent(coordinationClass, masterClasses);
+
+        params.masterClass = coordinationMasterClass.id;
+        params.class = coordinationClass.id;
+        params.subClass = coordinationSubClass.id;
+      } else if (coordinationClass) {
+        const coordinationMasterClass = getParent(coordinationClass, masterClasses);
+
+        params.masterClass = coordinationMasterClass.id;
+        params.class = coordinationClass.id;
+      } else if (coordinationMasterClass) {
+        params.masterClass = coordinationMasterClass.id;
+      }
+
+      // Set the district as 'subLevelDistrict' if it appears alongside a 'collectiveSubLevel'
+      if (coordinationDistrictForSubClass) {
+        params[collectiveSubLevel ? 'subLevelDistrict' : 'district'] =
+          coordinationDistrictForSubClass?.id;
+      }
+
+      navigate(buildCoordinationUrl(params));
+
+      dispatch(setForcedToFrame(true));
+    }
+  };
 
   return (
     <Toolbar
@@ -153,6 +332,15 @@ const PlanningToolbar = () => {
               disabled={true}
             >
               {t('shareVersion')}
+            </Button>
+            {/* Share version */}
+            <Button
+              variant="supplementary"
+              className="toolbar-button"
+              iconLeft={shareIcon}
+              onClick={moveToForcedToFrameView}
+            >
+              {'Sovitettu budjetti'}
             </Button>
             <GroupDialog
               isOpen={groupDialogVisible}

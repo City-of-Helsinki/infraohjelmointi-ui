@@ -299,7 +299,7 @@ describe('PlanningView', () => {
       // Main container
       expect(container.getElementsByClassName('planning-info-panel')[0]).toBeInTheDocument();
       // Grid containers
-      expect(await findByTestId('mode-button-container')).toHaveTextContent('planning');
+      expect(await findByTestId('mode-indicator-container')).toHaveTextContent('planning');
       expect(getByTestId('selected-class-container')).toBeInTheDocument();
       expect(getByTestId('previous-button-container')).toBeInTheDocument();
       // Selected masterClass text
