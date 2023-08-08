@@ -3,12 +3,14 @@ import {
   PlanningRowType,
   IPlanningRow,
   IPlanningRowSelections,
+  IPlanningSearchParams,
 } from '@/interfaces/planningInterfaces';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { calculatePlanningCells, calculatePlanningRowSums } from './calculations';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
+import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 
 // These utils are used by the usePlanningRows and useCoordinationRows
 
@@ -208,4 +210,295 @@ export const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelecti
   } else {
     return { type: null, id: null };
   }
+};
+
+/**
+ * Tries to find a related item (class or location) for a given items list (a list of classes or locations)
+ *
+ * @param relatedItem IClass | ILocation
+ * @param items Array<IClass> | Array<ILocation>
+ *
+ * @returns
+ */
+const getRelatedItem = (
+  relatedItem?: IClass | ILocation | null,
+  items?: Array<IClass> | Array<ILocation>,
+) => {
+  if (items && relatedItem) {
+    return items.find((i) => i.relatedTo === relatedItem?.id);
+  }
+};
+
+/**
+ * Tries to find the parent class or location from a given class or location list.
+ *
+ * @param child IClass | ILocation
+ * @param parents Array<IClass> | Array<ILocation>
+ *
+ * @returns
+ */
+const findParent = (child: IClass | ILocation, parents: Array<IClass> | Array<ILocation>) =>
+  parents.filter((p) => p.id === child.parent)[0];
+
+/**
+ * Builds a url with either 'planning' or 'coordination' route and adds given search params to the url.
+ *
+ * @param path 'planning' or 'coordination'
+ * @param params IPlanningSearchParams
+ */
+const buildUrl = (path: 'planning' | 'coordination', params: IPlanningSearchParams) => {
+  const queryParams = new URLSearchParams(params as Record<string, string>);
+  return `/${path}?${queryParams.toString()}`;
+};
+
+/**
+ * Tries to find a coordination district for a planning subclass if the sub classes name include 'suurpiiri'.
+ *
+ * @param selectedSubClass
+ * @param planningDistricts
+ * @param coordinationDistricts
+ *
+ * @returns
+ */
+const getCoordinationDistrictForSubClass = (
+  planningSubClass: IClass | null,
+  planningDistricts: Array<ILocation>,
+  coordinationDistricts: Array<ILocation>,
+) => {
+  // Add a selected district using the subClass if the subClasses name is 'suurpiiri'
+  if (planningSubClass && planningSubClass.name.toLocaleLowerCase().includes('suurpiiri')) {
+    // First we need get the planning district because the coordination districts don't have relations with
+    // the planning subclass
+    const planningDistrictForSubClass = planningDistricts.find((d) => {
+      return d.parentClass === planningSubClass?.id;
+    });
+
+    // We use the found planning district to find the relation to the coordination district
+    const coordinationDistrictForSubClass = coordinationDistricts.find((d) => {
+      return d.relatedTo === planningDistrictForSubClass?.id;
+    });
+
+    return coordinationDistrictForSubClass;
+  }
+};
+
+/**
+ * Tries to find the lowest selected coordinator class for planning class selections. It will return
+ * the districts parent if the district param is given, otherwise it will look it there is a
+ * selectedSubClass > selectedClass > selectMasterClass.
+ *
+ * @param allClasses Array<IClass>
+ * @param selections IPlanningRowSelections
+ * @param district ILocation
+ *
+ * @returns
+ */
+const getLowestSelectedCoordinatorClass = (
+  allCoordinatorClasses: Array<IClass>,
+  selections: IPlanningRowSelections,
+  district?: ILocation,
+) => {
+  // If the district is given we can assume that
+  if (district) {
+    return allCoordinatorClasses.find((ac) => ac.id === district?.parentClass);
+  } else {
+    const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
+
+    return getRelatedItem(
+      selectedSubClass || selectedClass || selectedMasterClass,
+      allCoordinatorClasses,
+    );
+  }
+};
+
+/**
+ * Builds a coordination url with the converted selections using the planning views selection.
+ *
+ * @param coordinationClasses
+ * @param coordinationDistricts
+ * @param planningDistricts
+ * @param selections
+ *
+ * @returns
+ */
+export const getCoordinationUrlFromPlanningSelections = (
+  coordinationClasses: ICoordinatorClassHierarchy,
+  coordinationDistricts: Array<ILocation>,
+  planningDistricts: Array<ILocation>,
+  selections: IPlanningRowSelections,
+) => {
+  const {
+    masterClasses,
+    classes,
+    subClasses,
+    collectiveSubLevels,
+    otherClassifications,
+    otherClassificationSubLevels,
+    allClasses,
+  } = coordinationClasses;
+
+  const { selectedSubClass } = selections;
+  const params: IPlanningSearchParams = {};
+
+  // Get the district using the selectedSubClass if the subClasses name includes 'suurpiiri'
+  const coordinationDistrictForSubClass = getCoordinationDistrictForSubClass(
+    selectedSubClass,
+    planningDistricts,
+    coordinationDistricts,
+  );
+
+  // Find the lowest selected class using either the coordinationDistrictForSubClass or the search param selections
+  const findClass = (classesToFilter: Array<IClass>) => {
+    const lowestSelectedClass = getLowestSelectedCoordinatorClass(
+      allClasses,
+      selections,
+      coordinationDistrictForSubClass,
+    );
+    const foundClass = classesToFilter.find((i) => i.id === lowestSelectedClass?.id);
+    return foundClass;
+  };
+
+  // We make sure not to iterate over unnecessary levels if the lowest level is found
+  const otherClassificationSubLevel = findClass(otherClassificationSubLevels);
+  const otherClassification = !otherClassificationSubLevel && findClass(otherClassifications);
+  const collectiveSubLevel = !otherClassification && findClass(collectiveSubLevels);
+  const coordinationSubClass = !collectiveSubLevel && findClass(subClasses);
+  const coordinationClass = !coordinationSubClass && findClass(classes);
+  const coordinationMasterClass = !coordinationClass && findClass(masterClasses);
+
+  // Apply search params to the url from the highest level downwards
+  if (otherClassificationSubLevel) {
+    const otherClassification = findParent(otherClassificationSubLevel, otherClassifications);
+    const collectiveSubLevel = findParent(otherClassification, collectiveSubLevels);
+    const coordinationSubClass = findParent(collectiveSubLevel, subClasses);
+    const coordinationClass = findParent(coordinationSubClass, classes);
+    const coordinationMasterClass = findParent(coordinationClass, masterClasses);
+
+    params.masterClass = coordinationMasterClass.id;
+    params.class = coordinationClass.id;
+    params.subClass = coordinationSubClass.id;
+    params.collectiveSubLevel = collectiveSubLevel.id;
+    params.otherClassification = otherClassification.id;
+    params.otherClassificationSubLevel = otherClassificationSubLevel.id;
+  } else if (otherClassification) {
+    const collectiveSubLevel = findParent(otherClassification, collectiveSubLevels);
+    const coordinationSubClass = findParent(collectiveSubLevel, subClasses);
+    const coordinationClass = findParent(coordinationSubClass, classes);
+    const coordinationMasterClass = findParent(coordinationClass, masterClasses);
+
+    params.masterClass = coordinationMasterClass.id;
+    params.class = coordinationClass.id;
+    params.subClass = coordinationSubClass.id;
+    params.collectiveSubLevel = collectiveSubLevel.id;
+    params.otherClassification = otherClassification.id;
+  } else if (collectiveSubLevel) {
+    const coordinationSubClass = findParent(collectiveSubLevel, subClasses);
+    const coordinationClass = findParent(coordinationSubClass, classes);
+    const coordinationMasterClass = findParent(coordinationClass, masterClasses);
+
+    params.masterClass = coordinationMasterClass.id;
+    params.class = coordinationClass.id;
+    params.subClass = coordinationSubClass.id;
+    params.collectiveSubLevel = collectiveSubLevel.id;
+  } else if (coordinationSubClass) {
+    const coordinationClass = findParent(coordinationSubClass, classes);
+    const coordinationMasterClass = findParent(coordinationClass, masterClasses);
+
+    params.masterClass = coordinationMasterClass.id;
+    params.class = coordinationClass.id;
+    params.subClass = coordinationSubClass.id;
+  } else if (coordinationClass) {
+    const coordinationMasterClass = findParent(coordinationClass, masterClasses);
+
+    params.masterClass = coordinationMasterClass.id;
+    params.class = coordinationClass.id;
+  } else if (coordinationMasterClass) {
+    params.masterClass = coordinationMasterClass.id;
+  }
+
+  // Set the district as 'subLevelDistrict' if it appears alongside a 'collectiveSubLevel'
+  if (coordinationDistrictForSubClass) {
+    params[collectiveSubLevel ? 'subLevelDistrict' : 'district'] =
+      coordinationDistrictForSubClass?.id;
+  }
+
+  return buildUrl('coordination', params);
+};
+
+/**
+ * Builds a planning url with the converted selections using the coordination views selection.
+ *
+ * @param planningClasses IClassHierarchy
+ * @param planningDistricts Array<ILocation>
+ * @param selections IPlanningRowSelections
+ *
+ * @returns
+ */
+export const getPlanningUrlFromCoordinationSelections = (
+  planningClasses: IClassHierarchy,
+  planningDistricts: Array<ILocation>,
+  selections: IPlanningRowSelections,
+) => {
+  const { masterClasses, classes, subClasses, allClasses } = planningClasses;
+
+  const {
+    selectedMasterClass,
+    selectedClass,
+    selectedSubClass,
+    selectedDistrict,
+    selectedCollectiveSubLevel,
+    selectedOtherClassification,
+    selectedSubLevelDistrict,
+  } = selections;
+
+  const params: IPlanningSearchParams = {};
+
+  // Try to find the planning district from the coordination district selection
+  const planningDistrict = planningDistricts.find(
+    (pd) => pd.id === selectedDistrict?.relatedTo || pd.id === selectedSubLevelDistrict?.relatedTo,
+  );
+
+  // Get the districts parent class
+  const districtsParent = allClasses.find((ac) => ac.id === planningDistrict?.parentClass);
+
+  // If the districs parents name includes 'suurpiiri' we ignore setting the district param because
+  // the planning view wants all 'suurpiiri' classes as the lowest selected level
+  if (districtsParent?.name.toLocaleLowerCase().includes('suurpiiri')) {
+    params.subClass = districtsParent.id;
+  } else if (planningDistrict) {
+    params.subClass = districtsParent?.id;
+    params.district = planningDistrict?.id;
+  }
+
+  // Find the lowest selectedClass from the coordination selections
+  const findClass = (classesToFilter: Array<IClass>) => {
+    const lowestSelectedClass =
+      selectedOtherClassification ||
+      selectedCollectiveSubLevel ||
+      selectedSubClass ||
+      selectedClass ||
+      selectedMasterClass;
+
+    const foundClass = classesToFilter.find((ctf) => ctf.id === lowestSelectedClass?.relatedTo);
+    return foundClass;
+  };
+
+  // We make sure not to iterate over unnecessary levels if the lowest level is found
+  const planningSubClass = !params.subClass && findClass(subClasses);
+  const planningClass = !planningSubClass && findClass(classes);
+  const planningMasterClass = !planningClass && findClass(masterClasses);
+
+  if (planningSubClass) {
+    const planningClass = findParent(planningSubClass, classes);
+    params.masterClass = findParent(planningClass, masterClasses).id;
+    params.class = planningClass.id;
+    params.subClass = planningSubClass.id;
+  } else if (planningClass) {
+    params.masterClass = findParent(planningClass, masterClasses).id;
+    params.class = planningClass.id;
+  } else if (planningMasterClass) {
+    params.masterClass = planningMasterClass.id;
+  }
+
+  return buildUrl('planning', params);
 };

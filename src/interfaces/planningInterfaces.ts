@@ -75,3 +75,14 @@ export interface IPlanningRow extends IPlanningSums {
 }
 
 export type PlanningMode = 'planning' | 'coordination';
+
+export interface IPlanningSearchParams {
+  masterClass?: string;
+  class?: string;
+  subClass?: string;
+  collectiveSubLevel?: string;
+  otherClassification?: string;
+  otherClassificationSubLevel?: string;
+  district?: string;
+  subLevelDistrict?: string;
+}

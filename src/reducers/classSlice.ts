@@ -4,7 +4,7 @@ import { getCoordinationClasses, getPlanningClasses } from '@/services/classServ
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface IClassHierarchy {
+export interface IClassHierarchy {
   allClasses: Array<IClass>;
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
@@ -12,7 +12,7 @@ interface IClassHierarchy {
   year: number;
 }
 
-interface ICoordinatorClassHierarchy extends IClassHierarchy {
+export interface ICoordinatorClassHierarchy extends IClassHierarchy {
   collectiveSubLevels: Array<IClass>;
   otherClassifications: Array<IClass>;
   otherClassificationSubLevels: Array<IClass>;
