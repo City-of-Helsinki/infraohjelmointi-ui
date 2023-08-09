@@ -13,6 +13,8 @@ import {
   setSelectedMasterClass,
   setSelectedOtherClassification,
   setSelectedSubClass,
+  setForcedToFrame,
+  selectForcedToFrame,
 } from '@/reducers/planningSlice';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -34,7 +36,7 @@ const getSelectedItemOrNull = (list: Array<IClass | ILocation>, id: string | nul
 
 // TODO: when we get authentication we need to check here
 // - if the mode is coordinator and the user is a planner and forcedToFrame is false this url shouldn't be allowed
-// - if the mode is coordinator and the user is a coordinator then forcedToFrame should not be toggleable (?)
+// - if the mode is coordinator and the user is a coordinator then forcedToFrame should MAYBE not be toggleable (?)
 const usePlanningRoutes = () => {
   const dispatch = useAppDispatch();
   const { pathname, search } = useLocation();
@@ -42,6 +44,7 @@ const usePlanningRoutes = () => {
   const batchedCoordinatorClasses = useAppSelector(selectBatchedCoordinationClasses);
   const planningDistricts = useAppSelector(selectPlanningDistricts);
   const coordinationDistricts = useAppSelector(selectCoordinationDistricts);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const mode = useAppSelector(selectPlanningMode);
 
@@ -56,6 +59,10 @@ const usePlanningRoutes = () => {
     if (rootPath && rootPath !== mode) {
       dispatch(resetSelections());
       dispatch(setPlanningMode(rootPath));
+      // Set forcedToFrame to 'false' if the path is changed to 'planning' while forcedToFrame is 'true'
+      if (rootPath === 'planning' && forcedToFrame) {
+        dispatch(setForcedToFrame(false));
+      }
     }
   }, [pathname, mode]);
 
