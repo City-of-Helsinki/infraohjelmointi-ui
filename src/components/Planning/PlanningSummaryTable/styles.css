@@ -80,3 +80,7 @@
 .date-indicator {
   @apply absolute top-8 z-50 hidden h-screen !w-[2px] bg-metro;
 }
+
+.date-indicator.framed {
+  @apply bg-engel-d;
+}

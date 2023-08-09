@@ -44,7 +44,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
           {moment.months().map((m) => (
             <td
               key={m}
-              className={`monthly-cell ${type} hoverable-${m}`}
+              className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
               onMouseOver={() => setHoveredClassToMonth(m)}
               onMouseLeave={() => removeHoveredClassFromMonth(m)}
             />

@@ -58,14 +58,29 @@ and the indentation (sisennys) in the text continues as long as the text can be 
   @apply border-b border-white bg-[var(--color-masterClass)];
 }
 
+.monthly-cell.masterClass.framed,
+.monthly-summary-cell.masterClass.framed {
+  @apply bg-[var(--color-masterClass-framed)];
+}
+
 .monthly-cell.class,
 .monthly-summary-cell.class {
   @apply border-b border-white bg-[var(--color-class)];
 }
 
+.monthly-cell.class.framed,
+.monthly-summary-cell.class.framed {
+  @apply bg-[var(--color-class-framed)];
+}
+
 .monthly-cell.subClass,
 .monthly-summary-cell.subClass {
   @apply border-b border-white bg-[var(--color-subClass)];
+}
+
+.monthly-cell.subClass.framed,
+.monthly-summary-cell.subClass.framed {
+  @apply bg-[var(--color-subClass-framed)];
 }
 
 .monthly-cell.districtPreview,
@@ -79,6 +94,19 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 .monthly-cell.otherClassificationSubLevel,
 .monthly-summary-cell.otherClassificationSubLevel {
   @apply border-b border-white bg-[var(--color-districtPreview)];
+}
+
+.monthly-cell.districtPreview.framed,
+.monthly-summary-cell.districtPreview.framed,
+.monthly-cell.subLevelDistrict.framed,
+.monthly-summary-cell.subLevelDistrict.framed,
+.monthly-cell.collectiveSubLevel.framed,
+.monthly-summary-cell.collectiveSubLevel.framed,
+.monthly-cell.otherClassification.framed,
+.monthly-summary-cell.otherClassification.framed,
+.monthly-cell.otherClassificationSubLevel.framed,
+.monthly-summary-cell.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview-framed)];
 }
 
 .monthly-cell.district,

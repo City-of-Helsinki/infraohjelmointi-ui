@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC, memo, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { selectForcedToFrame, selectSelectedYear } from '@/reducers/planningSlice';
 import moment from 'moment';
@@ -19,6 +19,14 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
   const selectedYear = useAppSelector(selectSelectedYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
+  const budgetCellColor = useMemo(() => {
+    if (isCurrentYear && forcedToFrame) {
+      return '!bg-brick';
+    } else if (isCurrentYear) {
+      return '!bg-bus';
+    }
+  }, [isCurrentYear, forcedToFrame]);
+
   return (
     <>
       <td className={`planned-budget-cell ${forcedToFrame ? 'framed' : ''}`}>
@@ -29,15 +37,13 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
           {isCurrentYear && (
             <td
               key={`${year}-monthly-view`}
-              className={`monthly-summary-cell summary-budget ${isCurrentYear ? '!bg-bus' : ''}`}
+              className={`monthly-summary-cell summary-budget ${budgetCellColor}`}
             ></td>
           )}
           {moment.months().map((m) => (
             <td
               key={m}
-              className={`monthly-cell hoverable-${m} summary-budget ${
-                isCurrentYear ? '!bg-bus' : ''
-              }`}
+              className={`monthly-cell hoverable-${m} summary-budget ${budgetCellColor}`}
               onMouseOver={() => setHoveredClassToMonth(m)}
               onMouseLeave={() => removeHoveredClassFromMonth(m)}
             />

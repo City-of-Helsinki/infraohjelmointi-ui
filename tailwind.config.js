@@ -76,6 +76,7 @@ module.exports = {
       brick: 'var(--color-brick)',
       'brick-d': 'var(--color-brick-dark)',
       engel: 'var(--color-engel)',
+      'engel-d': 'var(--color-engel-dark)',
     },
     extend: {},
   },
