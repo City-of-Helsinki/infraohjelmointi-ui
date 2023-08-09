@@ -1,11 +1,6 @@
-import {
-  selectBatchedPlanningClasses,
-  updatePlanningClass,
-  updatePlanningMasterClass,
-  updatePlanningSubClass,
-} from '@/reducers/classSlice';
+import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectBatchedPlanningLocations, updatePlanningDistrict } from '@/reducers/locationSlice';
+import { selectBatchedPlanningLocations } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
@@ -14,7 +9,7 @@ import {
   IPlanningRowSelections,
   PlanningRowType,
 } from '@/interfaces/planningInterfaces';
-import { selectGroups, updateGroup } from '@/reducers/groupSlice';
+import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
@@ -26,7 +21,6 @@ import {
   setProjects,
 } from '@/reducers/planningSlice';
 import _ from 'lodash';
-import { selectFinanceUpdate } from '@/reducers/eventsSlice';
 import {
   buildPlanningRow,
   fetchProjectsByRelation,
@@ -230,7 +224,6 @@ const usePlanningRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
-  const financeUpdate = useAppSelector(selectFinanceUpdate);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
@@ -251,22 +244,6 @@ const usePlanningRows = () => {
         .catch(Promise.reject);
     }
   }, [selections, groups, mode]);
-
-  useEffect(() => {
-    if (mode !== 'planning') {
-      return;
-    }
-
-    if (financeUpdate) {
-      Promise.all([
-        dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
-        dispatch(updatePlanningClass(financeUpdate.class)),
-        dispatch(updatePlanningSubClass(financeUpdate.subClass)),
-        dispatch(updatePlanningDistrict(financeUpdate.district)),
-        dispatch(updateGroup(financeUpdate.group)),
-      ]).catch((e) => console.log('Error updating finances: ', e));
-    }
-  }, [financeUpdate, mode]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {

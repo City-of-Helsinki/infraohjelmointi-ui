@@ -234,7 +234,7 @@ const PlanningToolbar = () => {
           <button
             aria-label="ideal budget view"
             className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
-            disabled={!forcedToFrame}
+            disabled={!forcedToFrame || mode === 'planning'}
             onClick={moveToIdealView}
           >
             <IconMoneyBag />
@@ -242,7 +242,7 @@ const PlanningToolbar = () => {
           <button
             aria-label="force framed budget view"
             className={`money-button ${forcedToFrame ? 'selected' : ''}`}
-            disabled={forcedToFrame}
+            disabled={forcedToFrame || mode === 'coordination'}
             onClick={moveToForcedToFrameView}
           >
             <IconMoneyBagFill />
