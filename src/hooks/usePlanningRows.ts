@@ -26,14 +26,9 @@ import {
   fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
+  sortMasterClassesByName,
 } from '@/utils/planningRowUtils';
 import { IClass } from '@/interfaces/classInterfaces';
-
-/**
- * Parses a location name and returns the number value at the beginning of the name.
- */
-const parseNumberFromName = (name: string) =>
-  parseInt(/^\d+\./.exec(name)?.[0]?.slice(0, -1) ?? '');
 
 /**
  * Takes a list of groups or projects and returns them sorted by their name
@@ -42,10 +37,16 @@ const sortByName = (list: Array<IProject> | Array<IGroup>) =>
   list.sort((a, b) => a.name.localeCompare(b.name));
 
 /**
+ * Parses a location name and returns the number value at the beginning of the name.
+ */
+const parseNumberFromLocationName = (name: string) =>
+  parseInt(/^\d+\./.exec(name)?.[0]?.slice(0, -1) ?? '');
+
+/**
  * Takes a list of locations and returns them sorted by their name
  */
-const sortByNumber = (list: Array<ILocation>) =>
-  list.sort((n1, n2) => parseNumberFromName(n1.name) - parseNumberFromName(n2.name));
+const sortLocationsByName = (list: Array<ILocation>) =>
+  list.sort((a, b) => parseNumberFromLocationName(a.name) - parseNumberFromLocationName(b.name));
 
 /**
  * Builds a hierarchy-list of IPlanningTableRows, that will either include
@@ -68,6 +69,8 @@ const buildPlanningTableRows = (
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
+
+  const sortedMasterClasses = sortMasterClassesByName([...masterClasses]);
 
   const subClassType = /suurpiiri|östersundom/.test(
     selectedSubClass?.name.toLocaleLowerCase() ?? '',
@@ -114,7 +117,7 @@ const buildPlanningTableRows = (
   };
 
   // Map the class rows going from masterClasses to districts
-  const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
+  const classRows: Array<IPlanningRow> = sortedMasterClasses.map((masterClass) => {
     return {
       // MASTER CLASSES
       ...getRow(masterClass, 'masterClass', !!selectedMasterClass),
@@ -160,7 +163,7 @@ const buildPlanningTableRows = (
         // groups
         ...getSortedGroupRows(subClass.id, subClassType),
         // divisions
-        ...sortByNumber(divisionsForSubClass).map((filteredDivision) => {
+        ...sortLocationsByName(divisionsForSubClass).map((filteredDivision) => {
           const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
@@ -182,7 +185,7 @@ const buildPlanningTableRows = (
         // groups
         ...getSortedGroupRows(district.id, districtType),
         // divisions
-        ...sortByNumber(divisionsForDistrict).map((filteredDivision) => {
+        ...sortLocationsByName(divisionsForDistrict).map((filteredDivision) => {
           const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
