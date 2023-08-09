@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
@@ -10,6 +10,8 @@ import {
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import './styles.css';
+import { patchCoordinationClass } from '@/services/classService';
+import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -24,11 +26,20 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const selectedYear = useAppSelector(selectSelectedYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
+  const [formFrameBudget, setFormFrameBudget] = useState<string | number | undefined>(
+    parseInt(frameBudget ?? '0'),
+  );
+
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
   const onEditFrameBudget = useCallback(() => {
     setEditingFrameBudget((current) => !current);
   }, []);
+
+  // Update frame budget when a new value is emitted
+  useEffect(() => {
+    setFormFrameBudget(parseInt(frameBudget ?? '0'));
+  }, [frameBudget]);
 
   // Close frame budget input when clicking outside the input element
   useEffect(() => {
@@ -50,6 +61,42 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       document.removeEventListener('mouseup', closeEditFrameBudget);
     };
   }, [editFrameBudgetInputRef, editingFrameBudget]);
+
+  // Removes the zero value on change if there is only one zero in the value
+  const handleFrameBudgetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    // If the value is more than one zero set the form value normally
+    if (/^0{2,}/.exec(e.target.value)) {
+      setFormFrameBudget(e.target.value);
+    }
+    // If value is just a zero replace it
+    else {
+      setFormFrameBudget(e.target.value ? +e.target.value : 0);
+    }
+  }, []);
+
+  const onPatchCoordinationClass = async () => {
+    if (frameBudget !== formFrameBudget) {
+      return;
+    }
+
+    const request: IClassPatchRequest = {
+      id,
+      data: {
+        finances: {
+          year: year,
+          [cell.key]: {
+            frameBudget: formFrameBudget,
+          },
+        },
+      },
+    };
+
+    try {
+      await patchCoordinationClass(request);
+    } catch (e) {
+      console.log('error patching coordinator class frame budget: ', e);
+    }
+  };
 
   return (
     <>
@@ -82,12 +129,18 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
           </button>
         )}
         {editingFrameBudget && (
-          <input
-            id="edit-frame-budget-input"
-            disabled={!editingFrameBudget}
-            ref={editFrameBudgetInputRef}
-            style={{ width: '100%', height: '80px' }}
-          />
+          // height 0 prevents the table cell from growing
+          <div className="frame-budget-container">
+            <input
+              id="edit-frame-budget-input"
+              className="frame-budget-input"
+              type="number"
+              onBlur={onPatchCoordinationClass}
+              ref={editFrameBudgetInputRef}
+              value={formFrameBudget}
+              onChange={handleFrameBudgetChange}
+            />
+          </div>
         )}
       </td>
       {/* There will be data generated here (at least for the first year) in future tasks */}
