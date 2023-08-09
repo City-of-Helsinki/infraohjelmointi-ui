@@ -473,7 +473,7 @@ export const getPlanningUrlFromCoordinationSelections = (
 
   // Try to find the planning district from the coordination district selection
   const planningDistrict = planningDistricts.find(
-    (pd) => pd.id === selectedDistrict?.relatedTo ?? pd.id === selectedSubLevelDistrict?.relatedTo,
+    (pd) => pd.id === selectedDistrict?.relatedTo || pd.id === selectedSubLevelDistrict?.relatedTo,
   );
 
   // Get the districts parent class
@@ -523,6 +523,8 @@ export const getPlanningUrlFromCoordinationSelections = (
   } else if (planningMasterClass) {
     params.masterClass = planningMasterClass.id;
   }
+
+  console.log('params: ', params);
 
   return buildUrl('planning', params);
 };
