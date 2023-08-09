@@ -21,6 +21,7 @@ import {
   selectForcedToFrame,
   selectGroupsExpanded,
   selectPlanningMode,
+  selectSelectedYear,
   selectSelections,
   setForcedToFrame,
   setGroupsExpanded,
@@ -43,6 +44,7 @@ const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
   const mode = useAppSelector(selectPlanningMode);
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
+  const selectedYear = useAppSelector(selectSelectedYear);
   const [toolbarState, setToolbarState] = useState({
     groupDialogVisible: false,
     projectProgrammedDialogVisible: false,
@@ -228,7 +230,7 @@ const PlanningToolbar = () => {
         </>
       }
       right={
-        <div>
+        <div className={`planning-toolbar-right ${selectedYear ? 'monthly-view-open' : ''}`}>
           <button
             aria-label="ideal budget view"
             className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
