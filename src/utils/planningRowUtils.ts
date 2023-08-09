@@ -18,7 +18,7 @@ import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSli
  * Takes a list of groups or projects and returns them sorted by their name
  */
 export const sortByName = (list: Array<IProject> | Array<IGroup>) =>
-  list.sort((a, b) => a.name.localeCompare(b.name));
+  [...list].sort((a, b) => a.name.localeCompare(b.name));
 
 /**
  * Filters projects under an IPlanningRow in the coordinator mode if the correct conditions are met.
@@ -71,7 +71,7 @@ export const filterProjectsForPlanningRow = (
 
   const getProjectsForSubClassDistrict = () => {
     const projectHasDistrictOrNoLocation = (p: IProject) =>
-      districtsForSubClass?.some((d) => d.id === p.projectLocation) || !p.projectLocation;
+      districtsForSubClass?.some((d) => d.id === p.projectLocation) ?? !p.projectLocation;
 
     return projects.filter(
       (p) => !p.projectGroup && projectHasDistrictOrNoLocation(p) && p.projectClass === id,
@@ -165,7 +165,7 @@ export const fetchProjectsByRelation = async (
   id: string | undefined,
   isCoordinator?: boolean,
 ): Promise<Array<IProject>> => {
-  const direct = type === 'class' || type === 'subClass' || type === 'subClassDistrict';
+  const direct = type === 'class' ?? type === 'subClass' ?? type === 'subClassDistrict';
   try {
     const allResults = await getProjectsWithParams(
       {
@@ -309,7 +309,7 @@ const getLowestSelectedCoordinatorClass = (
     const { selectedMasterClass, selectedClass, selectedSubClass } = selections;
 
     return getRelatedItem(
-      selectedSubClass || selectedClass || selectedMasterClass,
+      selectedSubClass ?? selectedClass ?? selectedMasterClass,
       allCoordinatorClasses,
     );
   }
@@ -351,24 +351,29 @@ export const getCoordinationUrlFromPlanningSelections = (
     coordinationDistricts,
   );
 
-  // Find the lowest selected class using either the coordinationDistrictForSubClass or the search param selections
-  const findClass = (classesToFilter: Array<IClass>) => {
+  // Find the lowest selected class using either the coordinationDistrictForSubClass or the search param selections,
+  // if a target is found we return undefined to prevent unnecessary iteration
+  const findClass = (classesToFilter: Array<IClass>, foundClass?: IClass) => {
+    if (foundClass) {
+      return undefined;
+    }
+
     const lowestSelectedClass = getLowestSelectedCoordinatorClass(
       allClasses,
       selections,
       coordinationDistrictForSubClass,
     );
-    const foundClass = classesToFilter.find((i) => i.id === lowestSelectedClass?.id);
-    return foundClass;
+
+    return classesToFilter.find((i) => i.id === lowestSelectedClass?.id);
   };
 
   // We make sure not to iterate over unnecessary levels if the lowest level is found
   const otherClassificationSubLevel = findClass(otherClassificationSubLevels);
-  const otherClassification = !otherClassificationSubLevel && findClass(otherClassifications);
-  const collectiveSubLevel = !otherClassification && findClass(collectiveSubLevels);
-  const coordinationSubClass = !collectiveSubLevel && findClass(subClasses);
-  const coordinationClass = !coordinationSubClass && findClass(classes);
-  const coordinationMasterClass = !coordinationClass && findClass(masterClasses);
+  const otherClassification = findClass(otherClassifications, otherClassificationSubLevel);
+  const collectiveSubLevel = findClass(collectiveSubLevels, otherClassification);
+  const coordinationSubClass = findClass(subClasses, collectiveSubLevel);
+  const coordinationClass = findClass(classes, coordinationSubClass);
+  const coordinationMasterClass = findClass(masterClasses, coordinationClass);
 
   // Apply search params to the url from the highest level downwards
   if (otherClassificationSubLevel) {
@@ -468,7 +473,7 @@ export const getPlanningUrlFromCoordinationSelections = (
 
   // Try to find the planning district from the coordination district selection
   const planningDistrict = planningDistricts.find(
-    (pd) => pd.id === selectedDistrict?.relatedTo || pd.id === selectedSubLevelDistrict?.relatedTo,
+    (pd) => pd.id === selectedDistrict?.relatedTo ?? pd.id === selectedSubLevelDistrict?.relatedTo,
   );
 
   // Get the districts parent class
@@ -486,23 +491,26 @@ export const getPlanningUrlFromCoordinationSelections = (
     params.district = planningDistrict?.id;
   }
 
-  // Find the lowest selectedClass from the coordination selections
-  const findClass = (classesToFilter: Array<IClass>) => {
+  // Find the lowest selectedClass from the coordination selections, if a target is found we return undefined
+  // to prevent unnecessary iteration
+  const findClass = (classesToFilter: Array<IClass>, foundClass?: IClass | string) => {
+    if (foundClass) {
+      return undefined;
+    }
+
     const lowestSelectedClass =
-      selectedOtherClassification ||
-      selectedCollectiveSubLevel ||
-      selectedSubClass ||
-      selectedClass ||
+      selectedOtherClassification ??
+      selectedCollectiveSubLevel ??
+      selectedSubClass ??
+      selectedClass ??
       selectedMasterClass;
 
-    const foundClass = classesToFilter.find((ctf) => ctf.id === lowestSelectedClass?.relatedTo);
-    return foundClass;
+    return classesToFilter.find((ctf) => ctf.id === lowestSelectedClass?.relatedTo);
   };
 
-  // We make sure not to iterate over unnecessary levels if the lowest level is found
-  const planningSubClass = !params.subClass && findClass(subClasses);
-  const planningClass = !planningSubClass && findClass(classes);
-  const planningMasterClass = !planningClass && findClass(masterClasses);
+  const planningSubClass = findClass(subClasses, params.subClass);
+  const planningClass = findClass(classes, planningSubClass);
+  const planningMasterClass = findClass(masterClasses, planningClass);
 
   if (planningSubClass) {
     const planningClass = findParent(planningSubClass, classes);
@@ -528,6 +536,6 @@ const parseNumberFromMasterClassName = (name: string) => parseInt(name.split(' '
  * Sorts a list of masterClasses by their numerical value
  */
 export const sortMasterClassesByName = (masterClasses: Array<IClass>) =>
-  masterClasses.sort(
+  [...masterClasses].sort(
     (a, b) => parseNumberFromMasterClassName(a.name) - parseNumberFromMasterClassName(b.name),
   );

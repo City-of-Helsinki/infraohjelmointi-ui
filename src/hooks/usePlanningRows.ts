@@ -34,7 +34,7 @@ import { IClass } from '@/interfaces/classInterfaces';
  * Takes a list of groups or projects and returns them sorted by their name
  */
 const sortByName = (list: Array<IProject> | Array<IGroup>) =>
-  list.sort((a, b) => a.name.localeCompare(b.name));
+  [...list].sort((a, b) => a.name.localeCompare(b.name));
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -46,7 +46,9 @@ const parseNumberFromLocationName = (name: string) =>
  * Takes a list of locations and returns them sorted by their name
  */
 const sortLocationsByName = (list: Array<ILocation>) =>
-  list.sort((a, b) => parseNumberFromLocationName(a.name) - parseNumberFromLocationName(b.name));
+  [...list].sort(
+    (a, b) => parseNumberFromLocationName(a.name) - parseNumberFromLocationName(b.name),
+  );
 
 /**
  * Builds a hierarchy-list of IPlanningTableRows, that will either include
