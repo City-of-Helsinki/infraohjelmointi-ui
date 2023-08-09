@@ -161,18 +161,20 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
             </button>
           </div>
         </div>
-        {/* Budgets */}
-        <div className="total-budgets">
-          <span className="text-base" data-testid={`planned-budgets-${id}`}>
-            {plannedBudgets}
-          </span>
-          <span className="text-sm font-normal" data-testid={`cost-estimate-budget-${id}`}>
-            {costEstimateBudget}
-          </span>
-          <span className="planning-head-deviation" data-testid={`deviation-${id}`}>
-            {deviation}
-          </span>
-        </div>
+        {/* Budgets (not visible for coordinator) */}
+        {mode === 'planning' && (
+          <div className="total-budgets">
+            <span className="text-base" data-testid={`planned-budgets-${id}`}>
+              {plannedBudgets}
+            </span>
+            <span className="text-sm font-normal" data-testid={`cost-estimate-budget-${id}`}>
+              {costEstimateBudget}
+            </span>
+            <span className="planning-head-deviation" data-testid={`deviation-${id}`}>
+              {deviation}
+            </span>
+          </div>
+        )}
       </div>
     </th>
   );

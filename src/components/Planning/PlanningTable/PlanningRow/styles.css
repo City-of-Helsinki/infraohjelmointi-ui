@@ -117,8 +117,9 @@
 }
 
 /* TABLE CELL */
+/* setting max width to 0px will cause the table cell to stay in place when we're editing the frame budget in coordination view */
 .planning-cell {
-  @apply min-w-[var(--planning-cell-width)] border-b border-white bg-bus py-1 pr-4 align-text-top text-white;
+  @apply min-w-[var(--planning-cell-width)] max-w-0 border-b border-white bg-bus py-1 pr-4 align-text-top text-white;
 }
 
 .planning-cell.masterClass {
