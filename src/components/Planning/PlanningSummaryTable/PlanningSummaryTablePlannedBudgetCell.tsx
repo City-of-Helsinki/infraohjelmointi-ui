@@ -22,6 +22,8 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
   const budgetCellColor = useMemo(() => {
     if (isCurrentYear && forcedToFrame) {
       return '!bg-brick';
+    } else if (forcedToFrame) {
+      return '!bg-brick-d';
     } else if (isCurrentYear) {
       return '!bg-bus';
     }
