@@ -165,7 +165,7 @@ export const fetchProjectsByRelation = async (
   id: string | undefined,
   isCoordinator?: boolean,
 ): Promise<Array<IProject>> => {
-  const direct = type === 'class' ?? type === 'subClass' ?? type === 'subClassDistrict';
+  const direct = type === 'class' || type === 'subClass' || type === 'subClassDistrict';
   try {
     const allResults = await getProjectsWithParams(
       {
