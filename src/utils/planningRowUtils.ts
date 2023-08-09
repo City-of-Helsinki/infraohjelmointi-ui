@@ -425,18 +425,19 @@ export const getCoordinationUrlFromPlanningSelections = (
     params.masterClass = coordinationMasterClass.id;
   }
 
+  const districtKey = collectiveSubLevel ? 'subLevelDistrict' : 'district';
+
   // Set the district as 'subLevelDistrict' if it appears alongside a 'collectiveSubLevel'
   if (coordinationDistrictForSubClass) {
-    params[collectiveSubLevel ? 'subLevelDistrict' : 'district'] =
-      coordinationDistrictForSubClass?.id;
+    params[districtKey] = coordinationDistrictForSubClass?.id;
   }
 
-  if (selectedDistrict && !params.district && !params.subLevelDistrict) {
+  if (selectedDistrict && !params[districtKey]) {
     const coordinationDistrict = coordinationDistricts.find(
       (cd) => cd.relatedTo === selectedDistrict?.id,
     );
     if (coordinationDistrict) {
-      params[collectiveSubLevel ? 'subLevelDistrict' : 'district'] = coordinationDistrict.id;
+      params[districtKey] = coordinationDistrict.id;
     }
   }
 
