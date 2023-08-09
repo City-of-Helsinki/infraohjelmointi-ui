@@ -337,7 +337,7 @@ export const getCoordinationUrlFromPlanningSelections = (
     allClasses,
   } = coordinationClasses;
 
-  const { selectedSubClass } = selections;
+  const { selectedSubClass, selectedDistrict } = selections;
   const params: IPlanningSearchParams = {};
 
   // Get the district using the selectedSubClass if the subClasses name includes 'suurpiiri'
@@ -420,6 +420,15 @@ export const getCoordinationUrlFromPlanningSelections = (
   if (coordinationDistrictForSubClass) {
     params[collectiveSubLevel ? 'subLevelDistrict' : 'district'] =
       coordinationDistrictForSubClass?.id;
+  }
+
+  if (selectedDistrict && !params.district && !params.subLevelDistrict) {
+    const coordinationDistrict = coordinationDistricts.find(
+      (cd) => cd.relatedTo === selectedDistrict?.id,
+    );
+    if (coordinationDistrict) {
+      params[collectiveSubLevel ? 'subLevelDistrict' : 'district'] = coordinationDistrict.id;
+    }
   }
 
   return buildUrl('coordination', params);
