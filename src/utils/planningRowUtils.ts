@@ -266,7 +266,11 @@ const getCoordinationDistrictForSubClass = (
   coordinationDistricts: Array<ILocation>,
 ) => {
   // Add a selected district using the subClass if the subClasses name is 'suurpiiri'
-  if (planningSubClass && planningSubClass.name.toLocaleLowerCase().includes('suurpiiri')) {
+
+  if (
+    planningSubClass &&
+    /suurpiiri|östersundom/.test(planningSubClass?.name.toLocaleLowerCase() ?? '')
+  ) {
     // First we need get the planning district because the coordination districts don't have relations with
     // the planning subclass
     const planningDistrictForSubClass = planningDistricts.find((d) => {
@@ -472,7 +476,10 @@ export const getPlanningUrlFromCoordinationSelections = (
 
   // If the districs parents name includes 'suurpiiri' we ignore setting the district param because
   // the planning view wants all 'suurpiiri' classes as the lowest selected level
-  if (districtsParent?.name.toLocaleLowerCase().includes('suurpiiri')) {
+  if (
+    districtsParent &&
+    /suurpiiri|östersundom/.test(districtsParent?.name.toLocaleLowerCase() ?? '')
+  ) {
     params.subClass = districtsParent.id;
   } else if (planningDistrict) {
     params.subClass = districtsParent?.id;

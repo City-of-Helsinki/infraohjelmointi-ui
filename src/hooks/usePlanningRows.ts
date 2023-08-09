@@ -74,7 +74,10 @@ const buildPlanningTableRows = (
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
-  const subClassType = selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')
+
+  const subClassType = /suurpiiri|östersundom/.test(
+    selectedSubClass?.name.toLocaleLowerCase() ?? '',
+  )
     ? 'subClassDistrict'
     : 'subClass';
 
@@ -148,12 +151,14 @@ const buildPlanningTableRows = (
   });
 
   const subClassDistrictRows = subClasses.map((subClass) => {
-    const divisionsForSubClass = subClass.name.toLocaleLowerCase().includes('suurpiiri')
+    const divisionsForSubClass = /suurpiiri|östersundom/.test(subClass.name.toLocaleLowerCase())
       ? divisions.filter((division) => division.parentClass === subClass.id)
       : [];
+
     const districtsForSubClass = districts.filter(
       (d) => d.parentClass === subClass.id && !d.parent,
     );
+
     return {
       ...getRow(subClass, subClassType, !!selectedSubClass, districtsForSubClass),
       // DIVISIONS & GROUPS

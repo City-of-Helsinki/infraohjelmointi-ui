@@ -8,7 +8,7 @@ export type PlanningRowType =
   | 'masterClass'
   | 'class'
   | 'subClass'
-  | 'subClassDistrict' // type used for subClasses when they have "suurpiiri" in their name and have to act like districts
+  | 'subClassDistrict' // type used for subClasses when they have "suurpiiri" or "östersundom" in their name and have to act like districts
   | 'district' // type used for districts when there is a selectedDistrict
   | 'districtPreview' // type used for districts when there are multiple districts
   | 'collectiveSubLevel'
