@@ -49,28 +49,23 @@ export interface ITooltipEventData {
   text: string;
 }
 
-/**
- * interface IFinanceLevels {
-  masterClass: IClass | null;
-  class: IClass | null;
-  subClass: IClass | null;
-  district?: ILocation | null;
-  group?: IGroup | null;
-}
-
-export interface IFinanceEventData {
-  planning: IFinanceLevels;
-  coordination: IFinanceLevels;
-}
- */
-
-export interface IFinanceEventData {
+interface IFinancePlanningData {
   masterClass: IClass | null;
   class: IClass | null;
   subClass: IClass | null;
   district: ILocation | null;
   group: IGroup | null;
-  project: IProject | null;
+}
+
+interface IFinanceCoordinationData extends Omit<IFinancePlanningData, 'group'> {
+  collectiveSubLevel: IClass | null;
+  otherClassification: IClass | null;
+  otherClassificationSubLevel: IClass | null;
+}
+
+export interface IFinanceEventData {
+  planning: IFinancePlanningData;
+  coordination: IFinanceCoordinationData;
 }
 
 export interface IProjectEventData {

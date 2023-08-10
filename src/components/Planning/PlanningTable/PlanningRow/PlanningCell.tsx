@@ -7,6 +7,7 @@ import {
   selectForcedToFrame,
   selectPlanningMode,
   selectSelectedYear,
+  selectStartYear,
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import './styles.css';
@@ -24,6 +25,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const mode = useAppSelector(selectPlanningMode);
   const [editingFrameBudget, setEditingFrameBudget] = useState(false);
   const selectedYear = useAppSelector(selectSelectedYear);
+  const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const [formFrameBudget, setFormFrameBudget] = useState<string | number | undefined>(
@@ -79,7 +81,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       id,
       data: {
         finances: {
-          year: year,
+          year: startYear,
           [cell.key]: {
             frameBudget: formFrameBudget,
           },

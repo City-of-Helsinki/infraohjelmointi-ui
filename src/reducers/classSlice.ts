@@ -24,6 +24,11 @@ interface IClassState {
   error: unknown;
 }
 
+interface IClassUpdatePayload {
+  data: IClass | null;
+  type: 'coordination' | 'planning';
+}
+
 const initialClasses = {
   allClasses: [],
   masterClasses: [],
@@ -115,37 +120,80 @@ export const classSlice = createSlice({
   name: 'class',
   initialState,
   reducers: {
-    updatePlanningMasterClass(state, action: PayloadAction<IClass | null>) {
-      const masterClassToUpdate = action.payload;
+    updateMasterClass(state, action: PayloadAction<IClassUpdatePayload>) {
+      const { data, type } = action.payload;
 
-      if (masterClassToUpdate) {
-        const masterClasses = [...state.planning.masterClasses].map((mc) =>
-          mc.id === masterClassToUpdate.id ? masterClassToUpdate : mc,
+      if (data) {
+        const masterClasses = [...state[type].masterClasses].map((mc) =>
+          mc.id === data.id ? data : mc,
         );
         const sortedMasterClasses = sortClassByName([...masterClasses]);
-        return { ...state, planning: { ...state.planning, masterClasses: sortedMasterClasses } };
+        return { ...state, [type]: { ...state[type], masterClasses: sortedMasterClasses } };
       }
     },
-    updatePlanningClass(state, action: PayloadAction<IClass | null>) {
-      const classToUpdate = action.payload;
+    updateClass(state, action: PayloadAction<IClassUpdatePayload>) {
+      const { data, type } = action.payload;
 
-      if (classToUpdate) {
-        const classes = [...state.planning.classes].map((c) =>
-          c.id === classToUpdate.id ? classToUpdate : c,
-        );
+      if (data) {
+        const classes = [...state[type].classes].map((c) => (c.id === data.id ? data : c));
         const sortedClasses = sortClassByName([...classes]);
-        return { ...state, planning: { ...state.planning, classes: sortedClasses } };
+        return { ...state, [type]: { ...state[type], classes: sortedClasses } };
       }
     },
-    updatePlanningSubClass(state, action: PayloadAction<IClass | null>) {
-      const subClassToUpdate = action.payload;
+    updateSubClass(state, action: PayloadAction<IClassUpdatePayload>) {
+      const { data, type } = action.payload;
 
-      if (subClassToUpdate) {
-        const subClasses = [...state.planning.subClasses].map((sc) =>
-          sc.id === subClassToUpdate.id ? subClassToUpdate : sc,
-        );
+      if (data) {
+        const subClasses = [...state[type].subClasses].map((sc) => (sc.id === data.id ? data : sc));
         const sortedSubClasses = sortClassByName([...subClasses]);
-        return { ...state, planning: { ...state.planning, subClasses: sortedSubClasses } };
+        return { ...state, [type]: { ...state[type], subClasses: sortedSubClasses } };
+      }
+    },
+    updateCollectiveSubLevel(state, action: PayloadAction<IClass | null>) {
+      const data = action.payload;
+
+      if (data) {
+        const collectiveSubLevels = [...state.coordination.collectiveSubLevels].map((sc) =>
+          sc.id === data.id ? data : sc,
+        );
+        const sortedCollectiveSubLevels = sortClassByName([...collectiveSubLevels]);
+        return {
+          ...state,
+          coordination: { ...state.coordination, collectiveSubLevels: sortedCollectiveSubLevels },
+        };
+      }
+    },
+    updateOtherClassification(state, action: PayloadAction<IClass | null>) {
+      const data = action.payload;
+
+      if (data) {
+        const otherClassifications = [...state.coordination.otherClassifications].map((sc) =>
+          sc.id === data.id ? data : sc,
+        );
+        const sortedOtherClassifications = sortClassByName([...otherClassifications]);
+        return {
+          ...state,
+          coordination: { ...state.coordination, otherClassifications: sortedOtherClassifications },
+        };
+      }
+    },
+    updateOtherClassificationSubLevel(state, action: PayloadAction<IClass | null>) {
+      const data = action.payload;
+
+      if (data) {
+        const otherClassificationSubLevels = [
+          ...state.coordination.otherClassificationSubLevels,
+        ].map((sc) => (sc.id === data.id ? data : sc));
+        const sortedOtherClassificationSubLevels = sortClassByName([
+          ...otherClassificationSubLevels,
+        ]);
+        return {
+          ...state,
+          coordination: {
+            ...state.coordination,
+            otherClassificationSubLevels: sortedOtherClassificationSubLevels,
+          },
+        };
       }
     },
   },
@@ -185,8 +233,14 @@ export const classSlice = createSlice({
   },
 });
 
-export const { updatePlanningMasterClass, updatePlanningClass, updatePlanningSubClass } =
-  classSlice.actions;
+export const {
+  updateMasterClass,
+  updateClass,
+  updateSubClass,
+  updateCollectiveSubLevel,
+  updateOtherClassification,
+  updateOtherClassificationSubLevel,
+} = classSlice.actions;
 
 export const selectAllPlanningClasses = (state: RootState) => state.class.planning.allClasses;
 export const selectPlanningMasterClasses = (state: RootState) => state.class.planning.masterClasses;

@@ -32,7 +32,6 @@ import {
   formatNumber,
 } from '@/utils/calculations';
 import { sendProjectUpdateEvent, sendFinanceUpdateEvent } from '@/utils/testUtils';
-import mockProject from '@/mocks/mockProject';
 import {
   addFinanceUpdateEventListener,
   removeFinanceUpdateEventListener,
@@ -41,7 +40,7 @@ import {
 } from '@/utils/events';
 import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
-import { updatePlanningClass, updatePlanningMasterClass } from '@/reducers/classSlice';
+import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 
 jest.mock('axios');
@@ -164,19 +163,20 @@ describe('PlanningView', () => {
     };
 
     const financeUpdateData = {
-      masterClass: {
-        ...mockMasterClasses.data[0],
-        finances: {
-          ...updatedFinances,
+      planning: {
+        masterClass: {
+          ...mockMasterClasses.data[0],
+          finances: {
+            ...updatedFinances,
+          },
+        },
+        class: {
+          ...mockClasses.data[0],
+          finances: {
+            ...updatedFinances,
+          },
         },
       },
-      class: {
-        ...mockClasses.data[0],
-        finances: {
-          ...updatedFinances,
-        },
-      },
-      project: mockProject.data,
     };
 
     await navigateToProjectRows(renderResult);
@@ -184,8 +184,13 @@ describe('PlanningView', () => {
     // Simulate what App.tsx does when receiving a finance-update event
     await waitFor(async () => {
       await sendFinanceUpdateEvent(financeUpdateData).then(() => {
-        store.dispatch(updatePlanningMasterClass(financeUpdateData.masterClass));
-        store.dispatch(updatePlanningClass(financeUpdateData.class));
+        store.dispatch(
+          updateMasterClass({
+            data: financeUpdateData.planning.masterClass,
+            type: 'planning',
+          }),
+        );
+        store.dispatch(updateClass({ data: financeUpdateData.planning.class, type: 'planning' }));
       });
     });
 

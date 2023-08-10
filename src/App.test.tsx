@@ -175,10 +175,10 @@ describe('App', () => {
   it('listens to the finance-update event stream and updates redux eventSlice', async () => {
     const { store } = await render();
 
-    await sendFinanceUpdateEvent({ masterClass: mockMasterClasses.data[0] });
+    await sendFinanceUpdateEvent({ planning: { masterClass: mockMasterClasses.data[0] } });
 
     await waitFor(() => {
-      expect(store.getState().events.financeUpdate?.masterClass).toStrictEqual(
+      expect(store.getState().events.financeUpdate?.planning.masterClass).toStrictEqual(
         mockMasterClasses.data[0],
       );
     });
