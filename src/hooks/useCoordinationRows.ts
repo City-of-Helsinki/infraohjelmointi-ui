@@ -23,7 +23,6 @@ import {
   fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
-  sortMasterClassesByName,
 } from '@/utils/planningRowUtils';
 import _ from 'lodash';
 import { IClass } from '@/interfaces/classInterfaces';
@@ -60,8 +59,6 @@ const buildCoordinatorTableRows = (
   const getRow = (item: IClass | ILocation, type: PlanningRowType, defaultExpanded?: boolean) =>
     buildPlanningRow(item, type, projects, defaultExpanded, [], true);
 
-  const sortedMasterClasses = sortMasterClassesByName([...masterClasses]);
-
   const districtsBeforeCollectiveSubLevel = !selectedCollectiveSubLevel ? districts : [];
   const districtsAfterCollectiveSubLevel = !selectedOtherClassification ? districts : [];
 
@@ -78,7 +75,7 @@ const buildCoordinatorTableRows = (
       }));
 
   // Map the class rows going from masterClasses to districts
-  const rows: Array<IPlanningRow> = sortedMasterClasses.map((masterClass) => {
+  const rows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
     return {
       // MASTER CLASSES
       ...getRow(masterClass, 'masterClass', !!selectedMasterClass),

@@ -27,7 +27,6 @@ import {
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
   sortByName,
-  sortMasterClassesByName,
 } from '@/utils/planningRowUtils';
 import { IClass } from '@/interfaces/classInterfaces';
 
@@ -66,8 +65,6 @@ const buildPlanningTableRows = (
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
-
-  const sortedMasterClasses = sortMasterClassesByName([...masterClasses]);
 
   const subClassType = /suurpiiri|östersundom/.test(
     selectedSubClass?.name.toLocaleLowerCase() ?? '',
@@ -114,7 +111,7 @@ const buildPlanningTableRows = (
   };
 
   // Map the class rows going from masterClasses to districts
-  const classRows: Array<IPlanningRow> = sortedMasterClasses.map((masterClass) => {
+  const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
     return {
       // MASTER CLASSES
       ...getRow(masterClass, 'masterClass', !!selectedMasterClass),

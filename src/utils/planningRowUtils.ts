@@ -525,20 +525,5 @@ export const getPlanningUrlFromCoordinationSelections = (
     params.masterClass = planningMasterClass.id;
   }
 
-  console.log('params: ', params);
-
   return buildUrl('planning', params);
 };
-
-/**
- * Parses a masterClass name and returns the number value at the beginning of the name.
- */
-const parseNumberFromMasterClassName = (name: string) => parseInt(name.split(' ')[0]);
-
-/**
- * Sorts a list of masterClasses by their numerical value
- */
-export const sortMasterClassesByName = (masterClasses: Array<IClass>) =>
-  [...masterClasses].sort(
-    (a, b) => parseNumberFromMasterClassName(a.name) - parseNumberFromMasterClassName(b.name),
-  );

@@ -63,6 +63,25 @@ export const getCoordinationClassesThunk = createAsyncThunk(
   },
 );
 
+/**
+ * Parses a class name and returns the number value at the beginning of the name.
+ */
+const parseNumberFromClassName = (name: string, type: 'masterClass' | 'class' | 'subClass') => {
+  const index = type === 'masterClass' ? 0 : type === 'class' ? 2 : 3;
+
+  const number = parseInt(name.split(' ')[index]);
+
+  return number;
+};
+
+/**
+ * Sorts a list of classes by their numerical value
+ */
+const sortClassByNumber = (classes: Array<IClass>, type: 'masterClass' | 'class' | 'subClass') =>
+  [...classes].sort(
+    (a, b) => parseNumberFromClassName(a.name, type) - parseNumberFromClassName(b.name, type),
+  );
+
 const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
   parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
 
@@ -70,28 +89,31 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
   const getClasses = (parents: Array<IClass>) => getClassesForParents(allClasses, parents);
 
   const masterClasses = allClasses?.filter((ac) => !ac.parent);
+  const sortedMasterClasses = sortClassByNumber([...masterClasses], 'masterClass');
   const classes = getClasses(masterClasses);
   const subClasses = getClasses(classes);
 
   if (!forCoordinator) {
     return {
       allClasses,
-      masterClasses,
+      masterClasses: sortedMasterClasses,
       classes,
       subClasses,
       year: classes[0]?.finances?.year,
     };
   }
 
+  const sortedClasses = sortClassByNumber([...classes], 'class');
+  const sortedSubClasses = sortClassByNumber([...subClasses], 'subClass');
   const collectiveSubLevels = getClasses(subClasses);
   const otherClassifications = getClasses(collectiveSubLevels);
   const otherClassificationSubLevels = getClasses(otherClassifications);
 
   return {
     allClasses,
-    masterClasses,
-    classes,
-    subClasses,
+    masterClasses: sortedMasterClasses,
+    classes: sortedClasses,
+    subClasses: sortedSubClasses,
     collectiveSubLevels,
     otherClassifications,
     otherClassificationSubLevels,
@@ -110,7 +132,8 @@ export const classSlice = createSlice({
         const masterClasses = [...state.planning.masterClasses].map((mc) =>
           mc.id === masterClassToUpdate.id ? masterClassToUpdate : mc,
         );
-        return { ...state, planning: { ...state.planning, masterClasses } };
+        const sortedMasterClasses = sortClassByNumber([...masterClasses], 'masterClass');
+        return { ...state, planning: { ...state.planning, masterClasses: sortedMasterClasses } };
       }
     },
     updatePlanningClass(state, action: PayloadAction<IClass | null>) {
