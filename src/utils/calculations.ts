@@ -83,7 +83,7 @@ export const calculatePlanningCells = (
 ): Array<IPlanningCell> => {
   const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
   return Object.entries(rest).map(([key, value], i) => {
-    const { frameBudget, plannedBudget } = value;
+    const { frameBudget, plannedBudget, budgetChange } = value;
     const deviation = frameBudget - plannedBudget;
 
     return {
@@ -97,6 +97,7 @@ export const calculatePlanningCells = (
         ...(type !== 'group' && {
           frameBudget: formatNumber(frameBudget),
           deviation: formatNumber(deviation),
+          budgetChange: formatNumber(budgetChange),
         }),
       }),
     };

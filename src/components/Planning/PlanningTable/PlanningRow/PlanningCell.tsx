@@ -13,6 +13,7 @@ import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/com
 import './styles.css';
 import { patchCoordinationClass } from '@/services/classService';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
+import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -23,7 +24,7 @@ interface IPlanningCellProps extends IPlanningRow {
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const { plannedBudget, frameBudget, deviation, year, isCurrentYear } = cell;
   const mode = useAppSelector(selectPlanningMode);
-  const [editingFrameBudget, setEditingFrameBudget] = useState(false);
+  const [editFrameBudget, setEditFrameBudget] = useState(false);
   const selectedYear = useAppSelector(selectSelectedYear);
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
@@ -35,7 +36,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
   const onEditFrameBudget = useCallback(() => {
-    setEditingFrameBudget((current) => !current);
+    setEditFrameBudget((current) => !current);
   }, []);
 
   // Update frame budget when a new value is emitted
@@ -43,26 +44,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     setFormFrameBudget(parseInt(frameBudget ?? '0'));
   }, [frameBudget]);
 
-  // Close frame budget input when clicking outside the input element
-  useEffect(() => {
-    if (!editFrameBudgetInputRef || !editFrameBudgetInputRef.current) {
-      return;
-    }
-
-    const editFrameBudgetInputElement = editFrameBudgetInputRef?.current;
-
-    const closeEditFrameBudget = (e: Event) => {
-      if (editFrameBudgetInputElement && !editFrameBudgetInputElement.contains(e.target as Node)) {
-        setEditingFrameBudget(false);
-      }
-    };
-
-    document.addEventListener('mouseup', closeEditFrameBudget);
-
-    return () => {
-      document.removeEventListener('mouseup', closeEditFrameBudget);
-    };
-  }, [editFrameBudgetInputRef, editingFrameBudget]);
+  useOnClickOutsideRef(editFrameBudgetInputRef, onEditFrameBudget, editFrameBudget);
 
   // Removes the zero value on change if there is only one zero in the value
   const handleFrameBudgetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +58,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     }
   }, []);
 
-  const onPatchCoordinationClass = () => {
+  const onPatchFrameBudget = () => {
     const request: IClassPatchRequest = {
       id,
       data: {
@@ -97,7 +79,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         className={`planning-cell ${type} ${forcedToFrame ? 'framed' : ''}`}
         data-testid={`cell-${id}-${year}`}
       >
-        {!editingFrameBudget && (
+        {!editFrameBudget && (
           <button
             className="h-full w-full"
             disabled={mode !== 'coordination' || forcedToFrame}
@@ -121,14 +103,14 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
             </div>
           </button>
         )}
-        {editingFrameBudget && (
+        {editFrameBudget && (
           // height 0 prevents the table cell from growing
           <div className="frame-budget-container">
             <input
               id="edit-frame-budget-input"
               className="frame-budget-input"
               type="number"
-              onBlur={onPatchCoordinationClass}
+              onBlur={onPatchFrameBudget}
               ref={editFrameBudgetInputRef}
               value={formFrameBudget}
               onChange={handleFrameBudgetChange}
@@ -139,7 +121,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       {/* There will be data generated here (at least for the first year) in future tasks */}
       {year === selectedYear && (
         <>
-          {isCurrentYear && <PlanningForecastSums year={year} type={type} id={id} />}
+          {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} />}
           {moment.months().map((m) => (
             <td
               key={m}

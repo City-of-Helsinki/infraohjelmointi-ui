@@ -379,8 +379,6 @@
   "addProgrammedProject": "Tuo uusi hanke listalle",
   "addProjectsToProgramming": "Tuo uusi hanke listalle",
   "closeProjectProgrammedDialog": "Sulje projektiohjelmoitu dialogi",
-  "implemented": "Toteutettu",
-  "bound": "Sidottu",
   "openAllGroups": "Avaa ryhmät",
   "closeAllGroups": "Pinoa ryhmät",
   "createNewProject": "Luo uusi hanke",
@@ -422,5 +420,8 @@
   "downloadXlsx": "Lataa {{name}} (.xlsx)",
   "reportsTitle": "Raportit",
   "deleteProject": "Poista Hanke",
-  "forcedToFrame": "Sovitettu budjetti"
+  "forcedToFrame": "Sovitettu budjetti",
+  "implementedAndBound": "Toteutettu ja sidottu",
+  "deviationFromBudget": "Erotus budjettiin",
+  "budgetChange": "TA-muutos"
 }

@@ -1,6 +1,7 @@
 export interface IClassBudgets {
   plannedBudget: number;
   frameBudget: number;
+  budgetChange?: number;
 }
 
 export interface IClassFinances {
