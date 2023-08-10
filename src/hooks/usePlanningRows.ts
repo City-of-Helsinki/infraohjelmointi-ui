@@ -26,15 +26,10 @@ import {
   fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
+  sortByName,
   sortMasterClassesByName,
 } from '@/utils/planningRowUtils';
 import { IClass } from '@/interfaces/classInterfaces';
-
-/**
- * Takes a list of groups or projects and returns them sorted by their name
- */
-const sortByName = (list: Array<IProject> | Array<IGroup>) =>
-  [...list].sort((a, b) => a.name.localeCompare(b.name));
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.

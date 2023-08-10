@@ -18,7 +18,7 @@ import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSli
  * Takes a list of groups or projects and returns them sorted by their name
  */
 export const sortByName = (list: Array<IProject> | Array<IGroup>) =>
-  [...list].sort((a, b) => a.name.localeCompare(b.name));
+  [...list].sort((a, b) => a.name.localeCompare(b.name, 'fi', { sensitivity: 'base' }));
 
 /**
  * Filters projects under an IPlanningRow in the coordinator mode if the correct conditions are met.
