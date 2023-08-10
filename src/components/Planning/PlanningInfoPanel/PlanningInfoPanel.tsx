@@ -5,13 +5,19 @@ import { IconAngleLeft } from 'hds-react/icons';
 import { useLocation, useNavigate } from 'react-router';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
-import { selectPlanningMode, selectSelections } from '@/reducers/planningSlice';
+import {
+  selectForcedToFrame,
+  selectPlanningMode,
+  selectSelections,
+} from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 
 const PlanningInfoPanel = () => {
   const { t } = useTranslation();
   const mode = useAppSelector(selectPlanningMode);
   const selections = useAppSelector(selectSelections);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
+
   const { selectedMasterClass } = selections;
 
   const { search } = useLocation();
@@ -54,16 +60,17 @@ const PlanningInfoPanel = () => {
   }, [selections, search, navigate, mode]);
 
   const iconLeft = useMemo(() => <IconAngleLeft />, []);
+
   return (
     <div className="planning-info-panel-container">
       <div className="flex h-full">
         <div className="planning-info-panel">
           {/* Mode and previous button */}
           <div className="buttons-container">
-            <div data-testid="mode-button-container">
-              <Button className="h-11" variant="success" data-testid="mode-button">
-                {t(mode)}
-              </Button>
+            <div data-testid="mode-indicator-container">
+              <div className={`mode-indicator ${forcedToFrame ? 'framed' : ''}`}>
+                {t(forcedToFrame ? 'forcedToFrame' : mode)}
+              </div>
             </div>
             <div id="previousButton" data-testid="previous-button-container">
               {selectedMasterClass && (

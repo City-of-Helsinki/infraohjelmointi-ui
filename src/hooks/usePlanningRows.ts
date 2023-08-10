@@ -1,11 +1,6 @@
-import {
-  selectBatchedPlanningClasses,
-  updatePlanningClass,
-  updatePlanningMasterClass,
-  updatePlanningSubClass,
-} from '@/reducers/classSlice';
+import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectBatchedPlanningLocations, updatePlanningDistrict } from '@/reducers/locationSlice';
+import { selectBatchedPlanningLocations } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
@@ -14,7 +9,7 @@ import {
   IPlanningRowSelections,
   PlanningRowType,
 } from '@/interfaces/planningInterfaces';
-import { selectGroups, updateGroup } from '@/reducers/groupSlice';
+import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
@@ -26,32 +21,28 @@ import {
   setProjects,
 } from '@/reducers/planningSlice';
 import _ from 'lodash';
-import { selectFinanceUpdate } from '@/reducers/eventsSlice';
 import {
   buildPlanningRow,
   fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
+  sortByName,
 } from '@/utils/planningRowUtils';
 import { IClass } from '@/interfaces/classInterfaces';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
  */
-const parseNumberFromName = (name: string) =>
+const parseNumberFromLocationName = (name: string) =>
   parseInt(/^\d+\./.exec(name)?.[0]?.slice(0, -1) ?? '');
-
-/**
- * Takes a list of groups or projects and returns them sorted by their name
- */
-const sortByName = (list: Array<IProject> | Array<IGroup>) =>
-  list.sort((a, b) => a.name.localeCompare(b.name));
 
 /**
  * Takes a list of locations and returns them sorted by their name
  */
-const sortByNumber = (list: Array<ILocation>) =>
-  list.sort((n1, n2) => parseNumberFromName(n1.name) - parseNumberFromName(n2.name));
+const sortLocationsByName = (list: Array<ILocation>) =>
+  [...list].sort(
+    (a, b) => parseNumberFromLocationName(a.name) - parseNumberFromLocationName(b.name),
+  );
 
 /**
  * Builds a hierarchy-list of IPlanningTableRows, that will either include
@@ -74,7 +65,10 @@ const buildPlanningTableRows = (
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
-  const subClassType = selectedSubClass?.name.toLocaleLowerCase().includes('suurpiiri')
+
+  const subClassType = /suurpiiri|östersundom/.test(
+    selectedSubClass?.name.toLocaleLowerCase() ?? '',
+  )
     ? 'subClassDistrict'
     : 'subClass';
 
@@ -148,12 +142,14 @@ const buildPlanningTableRows = (
   });
 
   const subClassDistrictRows = subClasses.map((subClass) => {
-    const divisionsForSubClass = subClass.name.toLocaleLowerCase().includes('suurpiiri')
+    const divisionsForSubClass = /suurpiiri|östersundom/.test(subClass.name.toLocaleLowerCase())
       ? divisions.filter((division) => division.parentClass === subClass.id)
       : [];
+
     const districtsForSubClass = districts.filter(
       (d) => d.parentClass === subClass.id && !d.parent,
     );
+
     return {
       ...getRow(subClass, subClassType, !!selectedSubClass, districtsForSubClass),
       // DIVISIONS & GROUPS
@@ -161,7 +157,7 @@ const buildPlanningTableRows = (
         // groups
         ...getSortedGroupRows(subClass.id, subClassType),
         // divisions
-        ...sortByNumber(divisionsForSubClass).map((filteredDivision) => {
+        ...sortLocationsByName(divisionsForSubClass).map((filteredDivision) => {
           const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
@@ -183,7 +179,7 @@ const buildPlanningTableRows = (
         // groups
         ...getSortedGroupRows(district.id, districtType),
         // divisions
-        ...sortByNumber(divisionsForDistrict).map((filteredDivision) => {
+        ...sortLocationsByName(divisionsForDistrict).map((filteredDivision) => {
           const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
@@ -225,7 +221,6 @@ const usePlanningRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
-  const financeUpdate = useAppSelector(selectFinanceUpdate);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
@@ -246,22 +241,6 @@ const usePlanningRows = () => {
         .catch(Promise.reject);
     }
   }, [selections, groups, mode]);
-
-  useEffect(() => {
-    if (mode !== 'planning') {
-      return;
-    }
-
-    if (financeUpdate) {
-      Promise.all([
-        dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
-        dispatch(updatePlanningClass(financeUpdate.class)),
-        dispatch(updatePlanningSubClass(financeUpdate.subClass)),
-        dispatch(updatePlanningDistrict(financeUpdate.district)),
-        dispatch(updateGroup(financeUpdate.group)),
-      ]).catch((e) => console.log('Error updating finances: ', e));
-    }
-  }, [financeUpdate, mode]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {

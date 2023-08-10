@@ -1,8 +1,21 @@
+/*
+1. $color-brick
+2. #A80E00
+3. #9C0D00
+4. $color-brick-dark
+
+if there’s more levels than four in the class structure they will use the $color-brick-dark 
+and the indentation (sisennys) in the text continues as long as the text can be intended.
+*/
 :root {
   --color-masterClass: var(--color-bus);
+  --color-masterClass-framed: var(--color-brick);
   --color-class: #0000a3; /* color had to be improvised */
+  --color-class-framed: #a80e00;
   --color-subClass: #00007a; /* color had to be improvised */
+  --color-subClass-framed: #9c0d00;
   --color-districtPreview: var(--color-bus-dark);
+  --color-districtPreview-framed: var(--color-brick-dark);
   --color-district: var(--color-bus);
   --color-division: var(--color-fog-medium-light);
   --color-group: var(--color-fog-light);
@@ -45,14 +58,29 @@
   @apply border-b border-white bg-[var(--color-masterClass)];
 }
 
+.monthly-cell.masterClass.framed,
+.monthly-summary-cell.masterClass.framed {
+  @apply bg-[var(--color-masterClass-framed)];
+}
+
 .monthly-cell.class,
 .monthly-summary-cell.class {
   @apply border-b border-white bg-[var(--color-class)];
 }
 
+.monthly-cell.class.framed,
+.monthly-summary-cell.class.framed {
+  @apply bg-[var(--color-class-framed)];
+}
+
 .monthly-cell.subClass,
 .monthly-summary-cell.subClass {
   @apply border-b border-white bg-[var(--color-subClass)];
+}
+
+.monthly-cell.subClass.framed,
+.monthly-summary-cell.subClass.framed {
+  @apply bg-[var(--color-subClass-framed)];
 }
 
 .monthly-cell.districtPreview,
@@ -66,6 +94,19 @@
 .monthly-cell.otherClassificationSubLevel,
 .monthly-summary-cell.otherClassificationSubLevel {
   @apply border-b border-white bg-[var(--color-districtPreview)];
+}
+
+.monthly-cell.districtPreview.framed,
+.monthly-summary-cell.districtPreview.framed,
+.monthly-cell.subLevelDistrict.framed,
+.monthly-summary-cell.subLevelDistrict.framed,
+.monthly-cell.collectiveSubLevel.framed,
+.monthly-summary-cell.collectiveSubLevel.framed,
+.monthly-cell.otherClassification.framed,
+.monthly-summary-cell.otherClassification.framed,
+.monthly-cell.otherClassificationSubLevel.framed,
+.monthly-summary-cell.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview-framed)];
 }
 
 .monthly-cell.district,

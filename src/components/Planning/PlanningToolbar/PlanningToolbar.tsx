@@ -7,6 +7,8 @@ import {
   IconDrag,
   IconShare,
   IconDownload,
+  IconMoneyBag,
+  IconMoneyBagFill,
 } from 'hds-react/icons/';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent } from '@/utils/events';
@@ -16,28 +18,50 @@ import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
+  selectForcedToFrame,
   selectGroupsExpanded,
   selectPlanningMode,
+  selectSelectedYear,
+  selectSelections,
+  setForcedToFrame,
   setGroupsExpanded,
 } from '@/reducers/planningSlice';
 import { t } from 'i18next';
 import './styles.css';
 import { resetProject, setProjectMode } from '@/reducers/projectSlice';
 import { useNavigate } from 'react-router-dom';
+import {
+  selectBatchedCoordinationClasses,
+  selectBatchedPlanningClasses,
+} from '@/reducers/classSlice';
+import { selectCoordinationDistricts, selectPlanningDistricts } from '@/reducers/locationSlice';
+import {
+  getCoordinationUrlFromPlanningSelections,
+  getPlanningUrlFromCoordinationSelections,
+} from '@/utils/planningRowUtils';
 
 const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
   const mode = useAppSelector(selectPlanningMode);
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
+  const selectedYear = useAppSelector(selectSelectedYear);
   const [toolbarState, setToolbarState] = useState({
     groupDialogVisible: false,
     projectProgrammedDialogVisible: false,
   });
 
+  const coordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
+  const coordinationDistricts = useAppSelector(selectCoordinationDistricts);
+  const planningDistricts = useAppSelector(selectPlanningDistricts);
+  const planningClasses = useAppSelector(selectBatchedPlanningClasses);
+  const selections = useAppSelector(selectSelections);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
+
   const groupsExpandIcon = useMemo(
     () => (groupsExpanded ? <IconCollapse /> : <IconSort />),
     [groupsExpanded],
   );
+
   const plusIcon = useMemo(() => <IconPlusCircle />, []);
   const slidersIcon = useMemo(() => <IconSliders />, []);
   const dragIcon = useMemo(() => <IconDrag />, []);
@@ -45,6 +69,7 @@ const PlanningToolbar = () => {
   const downloadIcon = useMemo(() => <IconDownload />, []);
 
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
+
   const navigate = useNavigate();
   const toggleGroupsExpanded = useCallback(() => {
     dispatch(setGroupsExpanded(!groupsExpanded));
@@ -90,6 +115,44 @@ const PlanningToolbar = () => {
     },
     [onShowGroupDialog, onShowProjectProgrammedDialog, onOpenNewProjectForm],
   );
+
+  /**
+   * Construct a url for the coordination view that has the converted search params
+   * from planning levels to coordination levels and set forced to frame to true
+   */
+  const moveToForcedToFrameView = useCallback(() => {
+    const coordinationUrl = getCoordinationUrlFromPlanningSelections(
+      coordinationClasses,
+      coordinationDistricts,
+      planningDistricts,
+      selections,
+    );
+
+    navigate(coordinationUrl);
+    dispatch(setForcedToFrame(true));
+  }, [
+    coordinationClasses,
+    coordinationDistricts,
+    dispatch,
+    navigate,
+    planningDistricts,
+    selections,
+  ]);
+
+  /**
+   * Construct a url for the planning view that has the converted search params
+   * from coordinator levels to planning levels and set forced to frame to false
+   */
+  const moveToIdealView = useCallback(() => {
+    const planningUrl = getPlanningUrlFromCoordinationSelections(
+      planningClasses,
+      planningDistricts,
+      selections,
+    );
+
+    navigate(planningUrl);
+    dispatch(setForcedToFrame(false));
+  }, [dispatch, navigate, planningClasses, planningDistricts, selections]);
 
   return (
     <Toolbar
@@ -165,6 +228,26 @@ const PlanningToolbar = () => {
             />
           </div>
         </>
+      }
+      right={
+        <div className={`planning-toolbar-right ${selectedYear ? 'monthly-view-open' : ''}`}>
+          <button
+            aria-label="ideal budget view"
+            className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
+            disabled={!forcedToFrame || mode === 'planning'}
+            onClick={moveToIdealView}
+          >
+            <IconMoneyBag />
+          </button>
+          <button
+            aria-label="force framed budget view"
+            className={`money-button ${forcedToFrame ? 'selected' : ''}`}
+            disabled={forcedToFrame || mode === 'coordination'}
+            onClick={moveToForcedToFrameView}
+          >
+            <IconMoneyBagFill />
+          </button>
+        </div>
       }
     />
   );

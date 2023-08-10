@@ -1,7 +1,7 @@
 /* TABLE HEAD */
 .planning-head {
   /* max-width: 1rem makes it so that the head doesn't grow beyond its max width */
-  @apply h-11 w-[32rem] min-w-[32rem] max-w-[32rem] border-b border-white bg-bus py-1 pr-4 text-white;
+  @apply sticky left-0 z-50 h-11 w-[32rem] min-w-[32rem] max-w-[32rem] border-b border-white bg-bus py-1 pr-4 text-white;
 }
 
 .planning-head-content {
@@ -13,12 +13,24 @@
   @apply bg-[var(--color-masterClass)] pl-4;
 }
 
+.planning-head.masterClass.framed {
+  @apply bg-[var(--color-masterClass-framed)];
+}
+
 .planning-head.class {
   @apply bg-[var(--color-class)] pl-10;
 }
 
+.planning-head.class.framed {
+  @apply bg-[var(--color-class-framed)];
+}
+
 .planning-head.subClass {
   @apply bg-[var(--color-subClass)] pl-16;
+}
+
+.planning-head.subClass.framed {
+  @apply bg-[var(--color-subClass-framed)];
 }
 
 .planning-head.districtPreview,
@@ -33,6 +45,14 @@
 
 .planning-head.otherClassificationSubLevel {
   @apply bg-[var(--color-districtPreview)] pl-[8.5rem];
+}
+
+.planning-head.districtPreview.framed,
+.planning-head.collectiveSubLevel.framed,
+.planning-head.subLevelDistrict.framed,
+.planning-head.otherClassification.framed,
+.planning-cell.otherClassificationSubLevel.framed {
+  @apply bg-[var(--color-districtPreview-framed)];
 }
 
 .planning-head.district,
@@ -105,12 +125,24 @@
   @apply bg-[var(--color-masterClass)];
 }
 
+.planning-cell.masterClass.framed {
+  @apply bg-[var(--color-masterClass-framed)];
+}
+
 .planning-cell.class {
   @apply bg-[var(--color-class)];
 }
 
+.planning-cell.class.framed {
+  @apply bg-[var(--color-class-framed)];
+}
+
 .planning-cell.subClass {
   @apply bg-[var(--color-subClass)];
+}
+
+.planning-cell.subClass.framed {
+  @apply bg-[var(--color-subClass-framed)];
 }
 
 .planning-cell.districtPreview,
@@ -119,6 +151,14 @@
 .planning-cell.otherClassification,
 .planning-cell.otherClassificationSubLevel {
   @apply bg-[var(--color-districtPreview)];
+}
+
+.planning-cell.districtPreview.framed,
+.planning-cell.collectiveSubLevel.framed,
+.planning-cell.subLevelDistrict.framed,
+.planning-cell.otherClassification.framed,
+.planning-cell.otherClassificationSubLevel.framed {
+  @apply bg-[var(--color-districtPreview-framed)];
 }
 
 .planning-cell.district,
@@ -148,6 +188,10 @@
 
 .planning-cell-deviation {
   @apply !font-bold text-suomenlinna;
+}
+
+.planning-cell-deviation.framed {
+  @apply text-engel;
 }
 
 .planning-head-deviation {

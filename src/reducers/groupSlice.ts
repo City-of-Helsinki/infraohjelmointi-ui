@@ -62,7 +62,7 @@ export const groupSlice = createSlice({
     });
     // GROUP GET ALL
     builder.addCase(getGroupsThunk.fulfilled, (state, action: PayloadAction<Array<IGroup>>) => {
-      return { ...state, groups: action.payload, year: action.payload[0].finances.year };
+      return { ...state, groups: action.payload, year: action.payload[0]?.finances?.year };
     });
     builder.addCase(getGroupsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };

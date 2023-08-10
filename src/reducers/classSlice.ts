@@ -4,7 +4,7 @@ import { getCoordinationClasses, getPlanningClasses } from '@/services/classServ
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface IClassHierarchy {
+export interface IClassHierarchy {
   allClasses: Array<IClass>;
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
@@ -12,7 +12,7 @@ interface IClassHierarchy {
   year: number;
 }
 
-interface ICoordinatorClassHierarchy extends IClassHierarchy {
+export interface ICoordinatorClassHierarchy extends IClassHierarchy {
   collectiveSubLevels: Array<IClass>;
   otherClassifications: Array<IClass>;
   otherClassificationSubLevels: Array<IClass>;
@@ -63,6 +63,12 @@ export const getCoordinationClassesThunk = createAsyncThunk(
   },
 );
 
+/**
+ * Sorts a list of classes by their numerical value or alphabetically
+ */
+const sortClassByName = (classes: Array<IClass>) =>
+  [...classes].sort((a, b) => a.name.localeCompare(b.name, 'fi', { sensitivity: 'base' }));
+
 const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
   parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
 
@@ -70,31 +76,37 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
   const getClasses = (parents: Array<IClass>) => getClassesForParents(allClasses, parents);
 
   const masterClasses = allClasses?.filter((ac) => !ac.parent);
+  const sortedMasterClasses = sortClassByName([...masterClasses]);
   const classes = getClasses(masterClasses);
+  const sortedClasses = sortClassByName([...classes]);
   const subClasses = getClasses(classes);
+  const sortedSubClasses = sortClassByName([...subClasses]);
 
   if (!forCoordinator) {
     return {
       allClasses,
-      masterClasses,
-      classes,
-      subClasses,
+      masterClasses: sortedMasterClasses,
+      classes: sortedClasses,
+      subClasses: sortedSubClasses,
       year: classes[0]?.finances?.year,
     };
   }
 
   const collectiveSubLevels = getClasses(subClasses);
+  const sortedCollectiveSubLevels = sortClassByName([...collectiveSubLevels]);
   const otherClassifications = getClasses(collectiveSubLevels);
+  const sortedOtherClassifications = sortClassByName([...otherClassifications]);
   const otherClassificationSubLevels = getClasses(otherClassifications);
+  const sortedOtherClassificationSubLevels = sortClassByName([...otherClassificationSubLevels]);
 
   return {
     allClasses,
-    masterClasses,
-    classes,
-    subClasses,
-    collectiveSubLevels,
-    otherClassifications,
-    otherClassificationSubLevels,
+    masterClasses: sortedMasterClasses,
+    classes: sortedClasses,
+    subClasses: sortedSubClasses,
+    collectiveSubLevels: sortedCollectiveSubLevels,
+    otherClassifications: sortedOtherClassifications,
+    otherClassificationSubLevels: sortedOtherClassificationSubLevels,
     year: classes[0]?.finances?.year,
   };
 };
@@ -110,7 +122,8 @@ export const classSlice = createSlice({
         const masterClasses = [...state.planning.masterClasses].map((mc) =>
           mc.id === masterClassToUpdate.id ? masterClassToUpdate : mc,
         );
-        return { ...state, planning: { ...state.planning, masterClasses } };
+        const sortedMasterClasses = sortClassByName([...masterClasses]);
+        return { ...state, planning: { ...state.planning, masterClasses: sortedMasterClasses } };
       }
     },
     updatePlanningClass(state, action: PayloadAction<IClass | null>) {
@@ -120,7 +133,8 @@ export const classSlice = createSlice({
         const classes = [...state.planning.classes].map((c) =>
           c.id === classToUpdate.id ? classToUpdate : c,
         );
-        return { ...state, planning: { ...state.planning, classes } };
+        const sortedClasses = sortClassByName([...classes]);
+        return { ...state, planning: { ...state.planning, classes: sortedClasses } };
       }
     },
     updatePlanningSubClass(state, action: PayloadAction<IClass | null>) {
@@ -130,7 +144,8 @@ export const classSlice = createSlice({
         const subClasses = [...state.planning.subClasses].map((sc) =>
           sc.id === subClassToUpdate.id ? subClassToUpdate : sc,
         );
-        return { ...state, planning: { ...state.planning, subClasses } };
+        const sortedSubClasses = sortClassByName([...subClasses]);
+        return { ...state, planning: { ...state.planning, subClasses: sortedSubClasses } };
       }
     },
   },

@@ -33,6 +33,10 @@
   @apply h-[36px] min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] bg-bus-d py-1 pr-4 text-white first:bg-bus;
 }
 
+.planned-budget-cell.framed {
+  @apply bg-brick-d first:bg-brick;
+}
+
 .planned-budget-cell span {
   @apply text-sm font-light text-white;
 }
@@ -75,4 +79,8 @@
 
 .date-indicator {
   @apply absolute top-8 z-50 hidden h-screen !w-[2px] bg-metro;
+}
+
+.date-indicator.framed {
+  @apply bg-engel-d;
 }

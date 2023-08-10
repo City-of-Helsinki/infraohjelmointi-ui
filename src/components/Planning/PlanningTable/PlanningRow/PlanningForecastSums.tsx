@@ -1,4 +1,6 @@
+import { useAppSelector } from '@/hooks/common';
 import { PlanningRowType } from '@/interfaces/planningInterfaces';
+import { selectForcedToFrame } from '@/reducers/planningSlice';
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,8 +13,12 @@ interface IPlanningForecastSums {
 /** The data displayed here will be provided from SAP */
 const PlanningForecastSums: FC<IPlanningForecastSums> = ({ year, type, id }) => {
   const { t } = useTranslation();
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   return (
-    <td key={`${year}-monthly-cell`} className={`monthly-summary-cell ${type}`}>
+    <td
+      key={`${year}-monthly-cell`}
+      className={`monthly-summary-cell ${type} ${forcedToFrame ? 'framed' : ''}`}
+    >
       <div
         className={`planning-forecast-sums-container ${type}`}
         data-testid={`planning-forecast-sums-${id}`}

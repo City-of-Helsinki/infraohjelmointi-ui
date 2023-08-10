@@ -81,7 +81,7 @@ const separateLocationsIntoHierarchy = (
     allLocations,
     divisions,
     subDivisions,
-    year: allLocations[0].finances.year,
+    year: allLocations[0]?.finances?.year ?? new Date().getFullYear,
   };
 };
 

@@ -6,6 +6,8 @@ import PlanningSummaryTablePlannedBudgetCell from './PlanningSummaryTablePlanned
 import PlanningSummaryTableRealizedBudgetCell from './PlanningSummaryTableRealizedBudgetCell';
 import useScrollableElement from '@/hooks/useScrollableElement';
 import './styles.css';
+import { useAppSelector } from '@/hooks/common';
+import { selectForcedToFrame } from '@/reducers/planningSlice';
 
 let overPlanningSummaryTable = false;
 let dateIndicatorStartPosition = 0;
@@ -15,6 +17,7 @@ const PlanningSummaryTable = () => {
 
   const planningSummaryTableRef = useRef() as React.MutableRefObject<HTMLTableElement>;
   const dateIndicatorRef = useRef() as React.MutableRefObject<HTMLDivElement>;
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const { element: planningTable } = useScrollableElement('planning-table-container');
 
@@ -153,7 +156,7 @@ const PlanningSummaryTable = () => {
         </table>
       </div>
       <div
-        className="date-indicator"
+        className={`date-indicator ${forcedToFrame ? 'framed' : ''}`}
         ref={dateIndicatorRef}
         id="date-indicator"
         data-testid="date-indicator"

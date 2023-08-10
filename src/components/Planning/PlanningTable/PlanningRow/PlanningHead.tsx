@@ -9,7 +9,7 @@ import { GroupDialog } from '../../GroupDialog';
 import './styles.css';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
-import { selectPlanningMode } from '@/reducers/planningSlice';
+import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 
 interface IPlanningHeadProps extends IPlanningRow {
@@ -31,6 +31,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
 }) => {
   const navigate = useNavigate();
   const mode = useAppSelector(selectPlanningMode);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   const { search } = useLocation();
 
   const [groupDialogState, setGroupDialogState] = useState({
@@ -105,7 +106,10 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   }, []);
 
   return (
-    <th className={`planning-head ${type} sticky left-0 z-50`} data-testid={`head-${id}`}>
+    <th
+      className={`planning-head ${type} ${forcedToFrame ? 'framed' : ''}`}
+      data-testid={`head-${id}`}
+    >
       <div className="flex w-full justify-between">
         {/* Title and icons */}
         <div className="planning-head-content">
