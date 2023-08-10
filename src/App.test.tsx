@@ -43,7 +43,7 @@ import {
 } from './mocks/mockLists';
 import { mockError } from './mocks/mockError';
 import { IError } from './interfaces/common';
-import { getPlanningClassesThunk } from './reducers/classSlice';
+import { getPlanningClassesThunk, sortClassByName } from './reducers/classSlice';
 import { getPlanningLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
@@ -92,24 +92,40 @@ describe('App', () => {
       expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
       expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
       expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
+      const sortedPlanningMasterClasses = sortClassByName(mockMasterClasses.data);
+      const sortedPlanningClasses = sortClassByName(mockClasses.data);
+      const sortedPlanningSubClasses = sortClassByName(mockSubClasses.data);
       // Planning classes
       expect(planningClasses.allClasses).toStrictEqual(mockProjectClasses.data);
-      expect(planningClasses.masterClasses).toStrictEqual(mockMasterClasses.data);
-      expect(planningClasses.classes).toStrictEqual(mockClasses.data);
-      expect(planningClasses.subClasses).toStrictEqual(mockSubClasses.data);
+      expect(planningClasses.masterClasses).toStrictEqual(sortedPlanningMasterClasses);
+      expect(planningClasses.classes).toStrictEqual(sortedPlanningClasses);
+      expect(planningClasses.subClasses).toStrictEqual(sortedPlanningSubClasses);
       // Coordinator classes
-      expect(coordinationClasses.allClasses).toStrictEqual(mockProjectCoordinatorClasses.data);
-      expect(coordinationClasses.masterClasses).toStrictEqual(mockCoordinatorMasterClasses.data);
-      expect(coordinationClasses.classes).toStrictEqual(mockCoordinatorClasses.data);
-      expect(coordinationClasses.subClasses).toStrictEqual(mockCoordinatorSubClasses.data);
-      expect(coordinationClasses.collectiveSubLevels).toStrictEqual(
+      const sortedCoordinatorMasterClasses = sortClassByName(mockCoordinatorMasterClasses.data);
+      const sortedCoordinatorClasses = sortClassByName(mockCoordinatorClasses.data);
+      const sortedCoordinatorSubClasses = sortClassByName(mockCoordinatorSubClasses.data);
+      const sortedCoordinatorCollectiveSubLevels = sortClassByName(
         mockCoordinatorCollectiveSubLevels.data,
       );
-      expect(coordinationClasses.otherClassifications).toStrictEqual(
+      const sortedCoordinatorOtherClassifications = sortClassByName(
         mockCoordinatorOtherClassifications.data,
       );
-      expect(coordinationClasses.otherClassificationSubLevels).toStrictEqual(
+      const sortedCoordinatorOtherClassificationSubLevels = sortClassByName(
         mockCoordinatorOtherClassificationSubLevels.data,
+      );
+
+      expect(coordinationClasses.allClasses).toStrictEqual(mockProjectCoordinatorClasses.data);
+      expect(coordinationClasses.masterClasses).toStrictEqual(sortedCoordinatorMasterClasses);
+      expect(coordinationClasses.classes).toStrictEqual(sortedCoordinatorClasses);
+      expect(coordinationClasses.subClasses).toStrictEqual(sortedCoordinatorSubClasses);
+      expect(coordinationClasses.collectiveSubLevels).toStrictEqual(
+        sortedCoordinatorCollectiveSubLevels,
+      );
+      expect(coordinationClasses.otherClassifications).toStrictEqual(
+        sortedCoordinatorOtherClassifications,
+      );
+      expect(coordinationClasses.otherClassificationSubLevels).toStrictEqual(
+        sortedCoordinatorOtherClassificationSubLevels,
       );
       // Planning locations
       expect(planningLocations.allLocations).toStrictEqual(mockLocations.data);

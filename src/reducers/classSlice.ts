@@ -66,7 +66,7 @@ export const getCoordinationClassesThunk = createAsyncThunk(
 /**
  * Sorts a list of classes by their numerical value or alphabetically
  */
-const sortClassByName = (classes: Array<IClass>) =>
+export const sortClassByName = (classes: Array<IClass>) =>
   [...classes].sort((a, b) => a.name.localeCompare(b.name, 'fi', { sensitivity: 'base' }));
 
 const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
