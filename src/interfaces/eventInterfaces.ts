@@ -49,6 +49,21 @@ export interface ITooltipEventData {
   text: string;
 }
 
+/**
+ * interface IFinanceLevels {
+  masterClass: IClass | null;
+  class: IClass | null;
+  subClass: IClass | null;
+  district?: ILocation | null;
+  group?: IGroup | null;
+}
+
+export interface IFinanceEventData {
+  planning: IFinanceLevels;
+  coordination: IFinanceLevels;
+}
+ */
+
 export interface IFinanceEventData {
   masterClass: IClass | null;
   class: IClass | null;

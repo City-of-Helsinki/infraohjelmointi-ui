@@ -74,11 +74,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     }
   }, []);
 
-  const onPatchCoordinationClass = async () => {
-    if (frameBudget !== formFrameBudget) {
-      return;
-    }
-
+  const onPatchCoordinationClass = () => {
     const request: IClassPatchRequest = {
       id,
       data: {
@@ -90,12 +86,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         },
       },
     };
-
-    try {
-      await patchCoordinationClass(request);
-    } catch (e) {
-      console.log('error patching coordinator class frame budget: ', e);
-    }
+    patchCoordinationClass(request);
   };
 
   return (

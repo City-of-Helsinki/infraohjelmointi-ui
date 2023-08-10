@@ -104,6 +104,8 @@ const App: FC = () => {
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
+      console.log('finance update: ', financeUpdate);
+
       Promise.all([
         dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
         dispatch(updatePlanningClass(financeUpdate.class)),
