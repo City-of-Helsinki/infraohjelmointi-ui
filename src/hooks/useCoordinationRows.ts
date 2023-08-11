@@ -83,26 +83,38 @@ const buildCoordinatorTableRows = (
   const districtsBeforeCollectiveSubLevel = !selectedCollectiveSubLevel ? districts : [];
   const districtsAfterCollectiveSubLevel = !selectedOtherClassification ? districts : [];
 
-  const getDistrictRowsForParent = (
-    parent: IClass,
-    districts: Array<ILocation>,
-    defaultExpanded: boolean,
-    type: PlanningRowType,
-  ) =>
-    districts
-      .filter((district) => district.parentClass === parent.id)
-      // TODO: add siblings and parentRow here?
-      .map((filteredDistrict) => ({
-        ...getRow({
-          item: filteredDistrict,
-          type,
-          siblings: [],
-          parentRow: null,
-          expanded: !!defaultExpanded,
-        }),
-      }));
+  // const getDistrictRowsForParent = (
+  //   parent: IClass,
+  //   districts: Array<ILocation>,
+  //   defaultExpanded: boolean,
+  //   type: PlanningRowType,
+  // ) =>
+  const getDistrictRowsForParent = ({
+    type,
+    parentRow,
+    expanded,
+    parent,
+    districts,
+  }: {
+    type: PlanningRowType;
+    parent: IClass | ILocation;
+    parentRow: IPlanningRow | null;
+    expanded?: boolean;
+    districts: Array<ILocation>;
+  }) => {
+    const filteredDistricts = districts.filter((district) => district.parentClass === parent.id);
+    return filteredDistricts.map((filteredDistrict) => ({
+      ...getRow({
+        item: filteredDistrict,
+        type,
+        siblings: filteredDistricts,
+        parentRow,
+        expanded: !!expanded,
+      }),
+    }));
+  };
 
-  // Map the class rows going from masterClasses to districts
+  // Map the class rows going from masterClasses to otherClassificationSubLevels
   const rows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
     const masterClassRow = getRow({
       item: masterClass,
@@ -113,9 +125,7 @@ const buildCoordinatorTableRows = (
     });
     const filteredClasses = classes.filter((c) => c.parent === masterClass.id);
     return {
-      // MASTER CLASSES
       ...masterClassRow,
-      // CLASSES
       children: filteredClasses.map((filteredClass) => {
         const classRow = getRow({
           item: filteredClass,
@@ -129,7 +139,6 @@ const buildCoordinatorTableRows = (
         );
         return {
           ...classRow,
-          // SUB CLASSES
           children: filteredSubClasses.map((filteredSubClass) => {
             const subClassRow = getRow({
               item: filteredSubClass,
@@ -143,7 +152,6 @@ const buildCoordinatorTableRows = (
             );
             return {
               ...subClassRow,
-              // COLLECTIVE SUB LEVELS
               children: [
                 ...filteredCollectiveSubLevels.map((filteredCollectiveSubLevel) => {
                   const collectiveSubLevelRow = getRow({
@@ -161,9 +169,7 @@ const buildCoordinatorTableRows = (
 
                   return {
                     ...collectiveSubLevelRow,
-                    // OTHER CLASSIFICATIONS & COLLECTIVE DISTRICTS
                     children: [
-                      // other classifications
                       ...filteredOtherClassifications.map((filteredOtherClassification) => {
                         const otherClassificationRow = getRow({
                           item: filteredOtherClassification,
@@ -179,7 +185,6 @@ const buildCoordinatorTableRows = (
                           );
                         return {
                           ...otherClassificationRow,
-                          // OTHER CLASSIFICATION SUB LEVELS
                           children: filteredOtherClassificationSubLevels.map(
                             (filteredOtherClassificationSubLevel) => {
                               const otherClassificationSubLevelRow = getRow({
@@ -195,23 +200,25 @@ const buildCoordinatorTableRows = (
                           ),
                         };
                       }),
-                      // districts
-                      ...getDistrictRowsForParent(
-                        filteredCollectiveSubLevel,
-                        districtsAfterCollectiveSubLevel,
-                        !!selectedSubLevelDistrict,
-                        'subLevelDistrict',
-                      ),
+                      // Districts that come after a collectiveSubLevel
+                      ...getDistrictRowsForParent({
+                        type: 'subLevelDistrict',
+                        parentRow: collectiveSubLevelRow,
+                        expanded: !!selectedSubLevelDistrict,
+                        parent: filteredCollectiveSubLevel,
+                        districts: districtsAfterCollectiveSubLevel,
+                      }),
                     ],
                   };
                 }),
-                // DISTRICTS
-                ...getDistrictRowsForParent(
-                  filteredSubClass,
-                  districtsBeforeCollectiveSubLevel,
-                  !!selectedDistrict,
-                  'districtPreview',
-                ),
+                // Districts that come after a subClass
+                ...getDistrictRowsForParent({
+                  type: 'districtPreview',
+                  parentRow: subClassRow,
+                  expanded: !!selectedDistrict,
+                  parent: filteredSubClass,
+                  districts: districtsBeforeCollectiveSubLevel,
+                }),
               ],
             };
           }),
