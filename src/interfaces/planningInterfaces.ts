@@ -38,6 +38,7 @@ export interface IPlanningCell {
   budgetChange?: string;
   year: number;
   isCurrentYear: boolean;
+  isFrameBudgetOverlap: boolean;
 }
 
 export interface IPlanningRowList {

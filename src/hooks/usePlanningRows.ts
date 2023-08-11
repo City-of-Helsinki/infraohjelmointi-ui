@@ -77,7 +77,7 @@ const buildPlanningTableRows = (
     type: PlanningRowType,
     defaultExpanded?: boolean,
     districtsForSubClass?: IClass[],
-  ) => buildPlanningRow(item, type, projects, defaultExpanded, districtsForSubClass);
+  ) => buildPlanningRow({ item, type, projects, expanded: defaultExpanded, districtsForSubClass });
 
   // Groups can get mapped under subClasses, districts and divisions and sorts them by name
   const getSortedGroupRows = (id: string, type: PlanningRowType) => {

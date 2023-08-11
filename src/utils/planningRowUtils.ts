@@ -99,24 +99,40 @@ export const filterProjectsForPlanningRow = (
   return [];
 };
 
+interface IBuildPlanningRowParams {
+  item: IClass | ILocation | IGroup;
+  type: PlanningRowType;
+  projects: Array<IProject>;
+  expanded?: boolean;
+  districtsForSubClass?: IClass[];
+  isCoordinator?: boolean;
+  siblings?: Array<IClass> | Array<ILocation>;
+  parentRow?: IPlanningRow | null;
+}
+
 /**
  * Builds a PlanningRow object from a class, location or group
  *
  * @param item IClass, ILocation or IGroup (the item that the row will be built for)
  * @param type type of the row (PlanningRowType)
  * @param projects projects to map under the row (they will only be mapped if the correct conditions are met)
- * @param expanded if the row is to be expanded by default
+ * @param expanded boolean if the row is to be expanded by default
  * @param districtsForSubClass optional districts for the subClass (if a subClass is called 'suurpiiri' then the districts will not be mapped and we use this to gather the projects that would otherwise appear under the districts)
+ * @param isCoordinator boolean if the row is built for coordination view
+ * @param siblings an Array<IClass> or an Array<ILocation> that share the same parent (used for calculating total frame budget for a given year)
+ * @param parentRow the given item's parent row
  * @returns IPlanningRow
  */
-export const buildPlanningRow = (
-  item: IClass | ILocation | IGroup,
-  type: PlanningRowType,
-  projects: Array<IProject>,
-  expanded?: boolean,
-  districtsForSubClass?: IClass[],
-  isCoordinator?: boolean,
-): IPlanningRow => {
+export const buildPlanningRow = ({
+  item,
+  type,
+  projects,
+  expanded,
+  districtsForSubClass,
+  isCoordinator,
+  siblings,
+  parentRow,
+}: IBuildPlanningRowParams): IPlanningRow => {
   const projectRows = isCoordinator
     ? filterProjectsForCoordinatorRow(item.id, type, projects)
     : filterProjectsForPlanningRow(item.id, type, projects, districtsForSubClass);
@@ -142,7 +158,7 @@ export const buildPlanningRow = (
     defaultExpanded,
     children: [],
     projectRows,
-    cells: calculatePlanningCells(item.finances, type),
+    cells: calculatePlanningCells(item.finances, type, siblings, parentRow),
     ...calculatePlanningRowSums(item.finances, type),
   };
 };

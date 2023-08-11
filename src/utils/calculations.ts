@@ -1,6 +1,8 @@
 import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfaces';
+import { ILocation } from '@/interfaces/locationInterfaces';
 import {
   IPlanningCell,
+  IPlanningRow,
   IPlanningSums,
   IProjectSums,
   PlanningRowType,
@@ -80,16 +82,41 @@ export const calculatePlanningRowSums = (
 export const calculatePlanningCells = (
   finances: IClassFinances,
   type: PlanningRowType,
+  siblings?: Array<IClass> | Array<ILocation>,
+  parentRow?: IPlanningRow | null,
 ): Array<IPlanningCell> => {
   const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
   return Object.entries(rest).map(([key, value], i) => {
     const { frameBudget, plannedBudget, budgetChange } = value;
     const deviation = frameBudget - plannedBudget;
 
+    if (parentRow) {
+      // we also need to get the parentRows frame budget... either give parent here or sum the framebudgets elsewhere to compare
+      const sumOfYearsFrameBudgets = (siblings as Array<IClass>)?.reduce(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        (total, item) => total + item.finances.year0.frameBudget,
+        0,
+      );
+
+      const year0Index = parentRow?.cells.findIndex((cell) => cell.key === 'year0');
+
+      if (parentRow && year0Index !== -1) {
+        const cellForYear = parentRow.cells[year0Index];
+        const frameBudgetForYear = parseInt(
+          cellForYear.frameBudget ? cellForYear.frameBudget.replace(/\s/g, '') : '0',
+        );
+        cellForYear.isFrameBudgetOverlap = frameBudgetForYear
+          ? frameBudgetForYear < sumOfYearsFrameBudgets
+          : false;
+      }
+    }
+
     return {
       key,
       year: year + i,
       isCurrentYear: year + i === year,
+      isFrameBudgetOverlap: false,
       // we don't return any budgets for divisions
       ...(type !== 'division' && {
         plannedBudget: formatNumber(plannedBudget),
