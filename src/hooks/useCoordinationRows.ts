@@ -301,7 +301,14 @@ const useCoordinationRows = () => {
 
     // Re-build planning rows if the existing rows are not equal
     dispatch(setPlanningRows(nextRows));
-  }, [batchedCoordinationClasses, groups, projects, selections, mode]);
+  }, [
+    batchedCoordinationClasses,
+    batchedCoordinationLocations,
+    groups,
+    projects,
+    selections,
+    mode,
+  ]);
 };
 
 export default useCoordinationRows;
