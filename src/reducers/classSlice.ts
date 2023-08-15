@@ -97,6 +97,8 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
     };
   }
 
+  console.log('sorted masterclasses: ', sortedMasterClasses);
+
   const collectiveSubLevels = getClasses(subClasses);
   const sortedCollectiveSubLevels = sortClassByName([...collectiveSubLevels]);
   const otherClassifications = getClasses(collectiveSubLevels);

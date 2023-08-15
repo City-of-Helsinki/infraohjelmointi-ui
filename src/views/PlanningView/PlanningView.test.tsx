@@ -159,6 +159,7 @@ describe('PlanningView', () => {
       year0: {
         plannedBudget: 80000,
         frameBudget: 2000,
+        isFrameBudgetOverlap: false,
       },
     };
 

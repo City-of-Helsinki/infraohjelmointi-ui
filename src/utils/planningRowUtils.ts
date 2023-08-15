@@ -119,8 +119,6 @@ interface IBuildPlanningRowParams {
  * @param expanded boolean if the row is to be expanded by default
  * @param districtsForSubClass optional districts for the subClass (if a subClass is called 'suurpiiri' then the districts will not be mapped and we use this to gather the projects that would otherwise appear under the districts)
  * @param isCoordinator boolean if the row is built for coordination view
- * @param siblings an Array<IClass> or an Array<ILocation> that share the same parent (used for calculating total frame budget for a given year)
- * @param parentRow the given item's parent row
  * @returns IPlanningRow
  */
 export const buildPlanningRow = ({
@@ -130,9 +128,9 @@ export const buildPlanningRow = ({
   expanded,
   districtsForSubClass,
   isCoordinator,
-  siblings,
-  parentRow,
-}: IBuildPlanningRowParams): IPlanningRow => {
+}: // siblings,
+// parentRow,
+IBuildPlanningRowParams): IPlanningRow => {
   const projectRows = isCoordinator
     ? filterProjectsForCoordinatorRow(item.id, type, projects)
     : filterProjectsForPlanningRow(item.id, type, projects, districtsForSubClass);
@@ -158,7 +156,8 @@ export const buildPlanningRow = ({
     defaultExpanded,
     children: [],
     projectRows,
-    cells: calculatePlanningCells(item.finances, type, siblings, parentRow),
+    // cells: calculatePlanningCells(item.finances, type, siblings, parentRow),
+    cells: calculatePlanningCells(item.finances, type),
     ...calculatePlanningRowSums(item.finances, type),
   };
 };

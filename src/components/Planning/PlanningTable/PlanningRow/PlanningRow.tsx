@@ -188,7 +188,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
           projectRows={projects}
         />
         {cells.map((c: IPlanningCell) => (
-          <PlanningCell {...props} cell={c} key={c.key} />
+          <PlanningCell {...props} cell={c} key={c.key} row={props} />
         ))}
       </tr>
 

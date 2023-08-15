@@ -255,3 +255,7 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
+.budget-overlap-circle {
+  @apply h-[16px] -translate-y-[1.5px];
+}

@@ -2,6 +2,7 @@ export interface IClassBudgets {
   plannedBudget: number;
   frameBudget: number;
   budgetChange?: number;
+  isFrameBudgetOverlap: boolean;
 }
 
 export interface IClassFinances {

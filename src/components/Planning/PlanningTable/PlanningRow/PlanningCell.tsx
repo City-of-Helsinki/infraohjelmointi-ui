@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
@@ -14,15 +14,17 @@ import './styles.css';
 import { patchCoordinationClass } from '@/services/classService';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
+import { IconAlertCircle } from 'hds-react';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
   type: PlanningRowType;
   id: string;
+  row: IPlanningRow;
 }
 
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
-  const { plannedBudget, frameBudget, deviation, year, isCurrentYear } = cell;
+  const { plannedBudget, frameBudget, deviation, year, isCurrentYear, isFrameBudgetOverlap } = cell;
   const mode = useAppSelector(selectPlanningMode);
   const [editFrameBudget, setEditFrameBudget] = useState(false);
   const selectedYear = useAppSelector(selectSelectedYear);
@@ -73,6 +75,11 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     patchCoordinationClass(request);
   };
 
+  const budgetOverlapAlertIcon = useMemo(
+    () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
+    [isFrameBudgetOverlap],
+  );
+
   return (
     <>
       <td
@@ -92,7 +99,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
                 <span data-testid={`planned-budget-${id}-${year}`} className="planning-budget">
                   {plannedBudget}
                 </span>
-                <span data-testid={`frame-budget-${id}-${year}`}>{frameBudget}</span>
+                <span
+                  data-testid={`frame-budget-${id}-${year}`}
+                  className={isFrameBudgetOverlap ? 'text-engel' : 'text-white'}
+                >
+                  {budgetOverlapAlertIcon}
+                  {frameBudget}
+                </span>
                 <span
                   data-testid={`deviation-${id}-${year}`}
                   className={`planning-cell-deviation ${forcedToFrame ? 'framed' : ''}`}

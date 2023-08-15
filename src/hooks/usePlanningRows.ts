@@ -276,6 +276,8 @@ const usePlanningRows = () => {
 
     const nextRows = buildPlanningTableRows(list, projects, selections);
 
+    console.log(selectedSubClass);
+
     // Re-build planning rows if the existing rows are not equal
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
