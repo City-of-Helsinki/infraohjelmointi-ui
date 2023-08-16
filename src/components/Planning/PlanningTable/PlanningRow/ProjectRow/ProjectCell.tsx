@@ -60,7 +60,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     [formValue, type],
   );
 
-  const inputDisabled = useMemo(() => type === 'none' || forcedToFrame, [forcedToFrame, type]);
+  const inputDisabled = useMemo(() => type === 'none', [forcedToFrame, type]);
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
