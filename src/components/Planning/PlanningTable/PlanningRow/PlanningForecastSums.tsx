@@ -1,10 +1,11 @@
 import { useAppSelector } from '@/hooks/common';
+import useNumberInput from '@/hooks/useNumberInput';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classService';
-import { ChangeEvent, FC, memo, useCallback, useRef, useState } from 'react';
+import { FC, memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IPlanningForecastSums {
@@ -20,28 +21,15 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const mode = useAppSelector(selectPlanningMode);
   const startYear = useAppSelector(selectStartYear);
+  const editBudgetChangeInputRef = useRef<HTMLInputElement>(null);
 
   const [editBudgetChange, setEditBudgetChange] = useState(false);
 
-  const [formBudgetChange, setFormBudgetChange] = useState<string | number | undefined>(
-    parseInt(budgetChange ?? '0'),
-  );
+  const { value, onChange } = useNumberInput(budgetChange);
+
   const onEditBudgetChange = useCallback(() => setEditBudgetChange((current) => !current), []);
-  const editBudgetChangeInputRef = useRef<HTMLInputElement>(null);
 
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
-
-  // Removes the zero value on change if there is only one zero in the value
-  const handleBudgetChangeChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    // If the value is more than one zero set the form value normally
-    if (/^0{2,}/.exec(e.target.value)) {
-      setFormBudgetChange(e.target.value);
-    }
-    // If value is just a zero replace it
-    else {
-      setFormBudgetChange(e.target.value ? +e.target.value : 0);
-    }
-  }, []);
 
   const onPatchBudgetChange = () => {
     const request: IClassPatchRequest = {
@@ -50,7 +38,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
         finances: {
           year: startYear,
           [cell.key]: {
-            budgetChange: formBudgetChange,
+            budgetChange: value,
           },
         },
       },
@@ -91,8 +79,8 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
             type="number"
             onBlur={onPatchBudgetChange}
             ref={editBudgetChangeInputRef}
-            value={formBudgetChange}
-            onChange={handleBudgetChangeChange}
+            value={value}
+            onChange={onChange}
           />
         )}
       </button>

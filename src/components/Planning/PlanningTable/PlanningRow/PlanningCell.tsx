@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
@@ -10,17 +10,17 @@ import {
   selectStartYear,
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
-import './styles.css';
 import { patchCoordinationClass } from '@/services/classService';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IconAlertCircle } from 'hds-react';
+import './styles.css';
+import useNumberInput from '@/hooks/useNumberInput';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
   type: PlanningRowType;
   id: string;
-  row: IPlanningRow;
 }
 
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
@@ -31,9 +31,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
-  const [formFrameBudget, setFormFrameBudget] = useState<string | number | undefined>(
-    parseInt(frameBudget ?? '0'),
-  );
+  const { value, onChange } = useNumberInput(frameBudget);
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,24 +39,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     setEditFrameBudget((current) => !current);
   }, []);
 
-  // Update frame budget when a new value is emitted
-  useEffect(() => {
-    setFormFrameBudget(parseInt(frameBudget ?? '0'));
-  }, [frameBudget]);
-
   useOnClickOutsideRef(editFrameBudgetInputRef, onEditFrameBudget, editFrameBudget);
-
-  // Removes the zero value on change if there is only one zero in the value
-  const handleFrameBudgetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    // If the value is more than one zero set the form value normally
-    if (/^0{2,}/.exec(e.target.value)) {
-      setFormFrameBudget(e.target.value);
-    }
-    // If value is just a zero replace it
-    else {
-      setFormFrameBudget(e.target.value ? +e.target.value : 0);
-    }
-  }, []);
 
   const onPatchFrameBudget = () => {
     const request: IClassPatchRequest = {
@@ -67,7 +48,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         finances: {
           year: startYear,
           [cell.key]: {
-            frameBudget: formFrameBudget,
+            frameBudget: value,
           },
         },
       },
@@ -125,8 +106,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
               type="number"
               onBlur={onPatchFrameBudget}
               ref={editFrameBudgetInputRef}
-              value={formFrameBudget}
-              onChange={handleFrameBudgetChange}
+              value={value}
+              onChange={onChange}
             />
           </div>
         )}
