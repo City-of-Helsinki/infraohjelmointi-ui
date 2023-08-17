@@ -61,10 +61,10 @@ const SideBar = () => {
       disabled: true,
     },
     {
-      route: 'placeholder 5',
-      label: 'placeholder 5',
+      route: 'admin/functions',
+      label: t('admin'),
       component: <IconCogwheel style={iconStyles} />,
-      disabled: true,
+      disabled: false,
     },
   ];
 

@@ -47,6 +47,9 @@ import { ProjectBasics } from './components/Project/ProjectBasics';
 import { notifyError } from './reducers/notificationSlice';
 import ConfirmDialog from './components/shared/ConfirmDialog';
 import ReportsView from './views/ReportsView';
+import AdminView from './views/AdminView/AdminView';
+import AdminHashtags from './components/Admin/AdminHashtags';
+import AdminFunctions from './components/Admin/AdminFunctions';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -158,6 +161,10 @@ const App: FC = () => {
               <Route path="/coordination" element={<PlanningView />} />
               <Route path="/search-results" element={<SearchResultsView />} />
               <Route path="/reports" element={<ReportsView />} />
+              <Route path="/admin" element={<AdminView />}>
+                <Route path="functions" element={<AdminFunctions />} />
+                <Route path="hashtags" element={<AdminHashtags />} />
+              </Route>
               <Route path="*" element={<ErrorView />} />
             </Routes>
           )}
@@ -166,7 +173,6 @@ const App: FC = () => {
       {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}
       <CustomContextMenu />
       <ScrollHandler />
-      {/* CONFIRM DIALOG */}
       <ConfirmDialog />
     </div>
   );
