@@ -1,7 +1,14 @@
 import { memo } from 'react';
+import AdminHashtagsToolbar from './AdminHashtagsToolbar';
+import AdminHashtagsTable from './AdminHashtagsTable';
 
 const AdminHashtags = () => {
-  return <div>ADMIN HASHTAGS VIEW TODO</div>;
+  return (
+    <>
+      <AdminHashtagsToolbar />
+      <AdminHashtagsTable />
+    </>
+  );
 };
 
 export default memo(AdminHashtags);
