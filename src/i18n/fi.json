@@ -427,7 +427,7 @@
   "admin": "Ylläpitäjä",
   "helloUser": "Hei {{firstName}}",
   "adminFunctions": {
-    "hashTags": {
+    "hashtags": {
       "name": "Tunnisteet",
       "description": "Tarkastele tunnisteita, poista tunnisteita käytöstä, aktivoi tunnisteita käyttöön sekä luo uusia tunnisteita.",
       "button": "Siirry tunnisteisiin"
@@ -437,12 +437,12 @@
       "description": "Muokkaa valikoiden sisältöä, lisää uusia kohteita valikoihin ja poista kohteita valikoista.",
       "button": "Muokkaa valikoita"
     },
-    "auditLog": {
+    "auditlog": {
       "name": "Muutoshistoria",
       "description": "Tarkastele hankkeisiin tehtyjä muutoksia.",
       "button": "Katso muutoshistoria"
     },
-    "financialStatements": {
+    "financialstatements": {
       "name": "Tilinpäätös",
       "description": "Päätä edellinen vuosi ja lukitse tilinpäätös.",
       "button": "Lukitse tilinpäätös tästä"

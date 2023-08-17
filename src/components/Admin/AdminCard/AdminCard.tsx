@@ -25,7 +25,7 @@ const AdminCard: FC<IAdminCardProps> = ({ type }) => {
 
   // Remove these disabled buttons as we implement more admin functionalities
   const buttonDisabled = useMemo(
-    () => type === 'auditLog' || type === 'financialStatements' || type === 'menus',
+    () => type === 'auditlog' || type === 'financialstatements' || type === 'menus',
     [type],
   );
 
