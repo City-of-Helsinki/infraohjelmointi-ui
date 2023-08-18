@@ -42,6 +42,10 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   useOnClickOutsideRef(editFrameBudgetInputRef, onEditFrameBudget, editFrameBudget);
 
   const onPatchFrameBudget = () => {
+    if (type === 'district' || type === 'districtPreview' || !id) {
+      return;
+    }
+
     const request: IClassPatchRequest = {
       id,
       data: {
@@ -53,6 +57,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         },
       },
     };
+
     patchCoordinationClass(request);
   };
 
@@ -72,7 +77,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
             className="h-full w-full"
             disabled={mode !== 'coordination' || forcedToFrame}
             aria-label="edit framed budget"
-            data-testid="edit-framed-budget"
+            data-testid={`edit-framed-budget-${id}-${year}`}
             onClick={onEditFrameBudget}
           >
             <div className={`planning-cell-container`}>

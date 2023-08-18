@@ -858,18 +858,19 @@ describe('PlanningView', () => {
 
     describe('PlanningCell', () => {
       it('renders budget, overrun and deviation', async () => {
-        const { store, getByTestId } = await render();
+        const { store, getByTestId, findByTestId } = await render();
 
         const { id, finances } = store.getState().class.planning.masterClasses[0];
 
-        const firstCell = getByTestId(`row-${id}`).children[1];
         const year = new Date().getFullYear();
 
         const cells = calculatePlanningCells(finances, 'class');
 
         const { plannedBudget, frameBudget, deviation } = cells[0];
 
-        expect(firstCell.children[0].children.length).toBe(3);
+        expect(
+          (await findByTestId(`edit-framed-budget-${id}-${year}`)).children[0].children.length,
+        ).toBe(3);
 
         expect(getByTestId(`planned-budget-${id}-${year}`).textContent).toBe(plannedBudget || '0');
         expect(getByTestId(`frame-budget-${id}-${year}`).textContent).toBe(frameBudget || '0');
