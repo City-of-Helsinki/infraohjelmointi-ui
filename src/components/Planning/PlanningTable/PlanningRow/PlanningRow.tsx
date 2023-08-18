@@ -75,8 +75,6 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
 
       // projectToUpdate does not already exist in this planning row if updatedProjects is the same check if project belongs to this row type
       if (!inRow) {
-        console.log('not in row');
-
         const isGroupsProject =
           type === 'group' && projectToUpdate.projectGroup && id === projectToUpdate.projectGroup;
 
@@ -92,8 +90,6 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
           id === projectToUpdate.projectClass;
 
         if (isGroupsProject || isLocationsProject || isClassesProject) {
-          console.log('project found');
-
           updatedProjects.push(projectToUpdate);
         }
       }
@@ -116,7 +112,6 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
       }
       // check if updated projects and projects are not equal and update the project currently displayed
       if (!_.isEqual(projects, updatedProjects)) {
-        console.log('not equal');
         const sortedProjects = [...updatedProjects].sort((a, b) => a.name.localeCompare(b.name));
         setPlanningRowState((current) => ({
           ...current,

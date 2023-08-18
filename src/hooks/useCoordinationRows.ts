@@ -245,8 +245,6 @@ const useCoordinationRows = () => {
       return;
     }
 
-    console.log('classes change');
-
     const {
       masterClasses,
       classes,
@@ -300,7 +298,9 @@ const useCoordinationRows = () => {
     const nextRows = buildCoordinatorTableRows(list, projects, selections);
 
     // Re-build planning rows if the existing rows are not equal
-    dispatch(setPlanningRows(nextRows));
+    if (!_.isEqual(nextRows, rows)) {
+      dispatch(setPlanningRows(nextRows));
+    }
   }, [
     batchedCoordinationClasses,
     batchedCoordinationLocations,

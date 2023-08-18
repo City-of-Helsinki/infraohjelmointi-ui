@@ -1,7 +1,9 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 const useNumberInput = (value?: string) => {
-  const [inputValue, setInputValue] = useState<string | number | undefined>(parseInt(value ?? '0'));
+  const [inputValue, setInputValue] = useState<string | number | undefined>(
+    value ? parseInt(value.replace(/\s/g, '')) : '0',
+  );
 
   const parsedValue = useMemo(() => inputValue?.toString(), [inputValue]);
 
@@ -19,7 +21,7 @@ const useNumberInput = (value?: string) => {
 
   // Update frame budget when a new value is emitted
   useEffect(() => {
-    setInputValue(parseInt(value ?? '0'));
+    setInputValue(value ? parseInt(value.replace(/\s/g, '')) : '0');
   }, [value]);
 
   return { value: parsedValue, onChange };

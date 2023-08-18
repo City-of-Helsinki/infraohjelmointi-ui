@@ -165,7 +165,13 @@ IBuildPlanningRowParams): IPlanningRow => {
 export const getSelectedOrAll = (
   selected: ILocation | IClass | null,
   all: Array<ILocation | IClass>,
-) => (selected ? [selected] : all);
+) => {
+  if (selected) {
+    return all.filter((a) => a.id === selected.id);
+  } else {
+    return all;
+  }
+};
 
 /**
  * Fetches projects for a given location or class.
