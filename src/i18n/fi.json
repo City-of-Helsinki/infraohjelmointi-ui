@@ -251,7 +251,9 @@
       "404": "Virhe, resurssia ei löytynyt",
       "400": "Vääränlainen pyyntö",
       "500": "Palvelinvirhe",
-      "projectNotFound": "Hanketta ei löytnyt"
+      "projectNotFound": "Hanketta ei löytnyt",
+      "hashtagPatchSuccess": "Tunniste päivitetty",
+      "patchError": "Päivitys epäonnistui"
     },
     "message": {
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
@@ -261,7 +263,9 @@
       "Request failed with status code 404": "Pyyntö epäonnistui virhekoodilla 404",
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500",
       "projectNotFound": "Varmista että estimäsi hanke on olemassa",
-      "appDataError": "Virhe ladattaessa sovellustietoja"
+      "appDataError": "Virhe ladattaessa sovellustietoja",
+      "hashtagPatchSuccess": "Tunniste päivitetty onnistuneesti!",
+      "hashtagPatchError": "Tunnisteen päivitys epäonnistui."
     }
   },
   "searchOrder": {

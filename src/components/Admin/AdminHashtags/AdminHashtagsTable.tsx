@@ -11,6 +11,9 @@ import { FC, memo, useCallback, useMemo } from 'react';
 import { IHashTag } from '@/interfaces/hashTagsInterfaces';
 import './styles.css';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch } from '@/hooks/common';
+import { patchHashTagThunk } from '@/reducers/hashTagsSlice';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 
 interface IAdminHashtagsTableProps {
   hashtags: Array<IHashTag>;
@@ -18,6 +21,7 @@ interface IAdminHashtagsTableProps {
 
 const AdminHashtagsTable: FC<IAdminHashtagsTableProps> = ({ hashtags }) => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
 
   const getArchivedIcon = useCallback((archived: boolean) => {
     return (
@@ -35,9 +39,32 @@ const AdminHashtagsTable: FC<IAdminHashtagsTableProps> = ({ hashtags }) => {
     );
   }, []);
 
-  const archiveHashtag = useCallback((archived: boolean, id: string) => {
-    console.log('TODO: patching hashtag with id: ', id);
-  }, []);
+  const archiveHashtag = useCallback(
+    async (archived: boolean, id: string) => {
+      const request = { data: { archived: !archived }, id };
+      try {
+        await dispatch(patchHashTagThunk(request));
+        dispatch(
+          notifySuccess({
+            message: 'hashtagPatchSuccess',
+            title: 'hashtagPatchSuccess',
+            type: 'toast',
+            duration: 1500,
+          }),
+        );
+      } catch (e) {
+        dispatch(
+          notifyError({
+            message: 'hashtagPatchError',
+            title: 'patchError',
+            type: 'toast',
+            duration: 1500,
+          }),
+        );
+      }
+    },
+    [dispatch],
+  );
 
   const getArchiveButton = useCallback(
     (archived: boolean, id: string) => {
@@ -91,7 +118,7 @@ const AdminHashtagsTable: FC<IAdminHashtagsTableProps> = ({ hashtags }) => {
         },
       },
     ],
-    [],
+    [getArchiveButton, getArchivedIcon],
   );
 
   return (

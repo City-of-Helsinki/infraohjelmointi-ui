@@ -10,3 +10,8 @@ export interface IHashTagsResponse {
   hashTags: Array<IHashTag>;
   popularHashTags: Array<IHashTag>;
 }
+
+export interface IHashTagsRequest {
+  data: { archived: boolean };
+  id: string;
+}

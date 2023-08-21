@@ -1,7 +1,7 @@
 import { IError } from '@/interfaces/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
-import { getHashTags } from '@/services/hashTagsService';
+import { IHashTag, IHashTagsRequest, IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
+import { getHashTags, patchHashTag } from '@/services/hashTagsService';
 import { RootState } from '@/store';
 
 interface IHashTagState extends IHashTagsResponse {
@@ -22,6 +22,18 @@ export const getHashTagsThunk = createAsyncThunk('hashtag/getAll', async (_, thu
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
 
+export const patchHashTagThunk = createAsyncThunk(
+  'hashtag/patch',
+  async (request: IHashTagsRequest, thunkAPI) => {
+    return await patchHashTag(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const sortByHashtagName = (hashtags: Array<IHashTag>) =>
+  [...hashtags].sort((a, b) => a.value.localeCompare(b.value, 'fi', { sensitivity: 'base' }));
+
 export const hashTagSlice = createSlice({
   name: 'hashTag',
   initialState,
@@ -33,14 +45,34 @@ export const hashTagSlice = createSlice({
       (state, action: PayloadAction<IHashTagsResponse>) => {
         return {
           ...state,
-          hashTags: [...action.payload.hashTags],
-          popularHashTags: [...action.payload.popularHashTags],
+          hashTags: sortByHashtagName([...action.payload.hashTags]),
+          popularHashTags: sortByHashtagName([...action.payload.popularHashTags]),
         };
       },
     );
     builder.addCase(getHashTagsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
+    // PATCH
+    builder.addCase(patchHashTagThunk.fulfilled, (state, action: PayloadAction<IHashTag>) => {
+      const hashTags = [...state.hashTags];
+      const indexToUpdate = hashTags.findIndex((obj) => obj.id === action.payload.id);
+
+      if (indexToUpdate !== -1) {
+        hashTags[indexToUpdate] = action.payload;
+      }
+
+      return {
+        ...state,
+        hashTags,
+      };
+    });
+    builder.addCase(
+      patchHashTagThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 
