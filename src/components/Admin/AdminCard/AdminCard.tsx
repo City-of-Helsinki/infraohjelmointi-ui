@@ -35,6 +35,7 @@ const AdminCard: FC<IAdminCardProps> = ({ type }) => {
         heading={t(`adminFunctions.${type}.name`) ?? ''}
         theme={adminCardTheme}
         text={t(`adminFunctions.${type}.description`) ?? ''}
+        data-testid={`admin-card-${type}`}
       >
         <Button
           variant="secondary"
@@ -42,6 +43,7 @@ const AdminCard: FC<IAdminCardProps> = ({ type }) => {
           role="link"
           onClick={navigateToAdminFunction}
           disabled={buttonDisabled}
+          data-testid={`admin-card-button-${type}`}
         >
           {t(`adminFunctions.${type}.button`)}
         </Button>

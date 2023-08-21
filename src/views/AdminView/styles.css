@@ -1,3 +1,7 @@
 .admin-view {
   @apply my-10 ml-14 mr-[7.5rem];
 }
+
+.admin-view-title {
+  @apply mb-16 text-heading-l;
+}

@@ -28,7 +28,9 @@ const AdminView = () => {
 
   return (
     <div className="admin-view">
-      <h1 className="mb-16 text-heading-l">{pageTitle}</h1>
+      <h1 className="admin-view-title" data-testid="admin-view-title">
+        {pageTitle}
+      </h1>
       <Outlet />
     </div>
   );

@@ -46,7 +46,7 @@ import { IError } from './interfaces/common';
 import { getPlanningClassesThunk, sortClassByName } from './reducers/classSlice';
 import { getPlanningLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
-import { getHashTagsThunk } from './reducers/hashTagsSlice';
+import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
 import { getGroupsThunk } from './reducers/groupSlice';
@@ -78,6 +78,7 @@ describe('App', () => {
       lists,
       hashTags,
     } = store.getState();
+
     await waitFor(() => {
       expect(lists.categories).toStrictEqual(mockProjectCategories.data);
       expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
@@ -90,7 +91,7 @@ describe('App', () => {
       expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);
       expect(lists.planningPhases).toStrictEqual(mockPlanningPhases.data);
       expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
-      expect(hashTags.hashTags).toStrictEqual(mockHashTags.data.hashTags);
+      expect(hashTags.hashTags).toStrictEqual(sortByHashtagName(mockHashTags.data.hashTags));
       expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
       const sortedPlanningMasterClasses = sortClassByName(mockMasterClasses.data);
       const sortedPlanningClasses = sortClassByName(mockClasses.data);
