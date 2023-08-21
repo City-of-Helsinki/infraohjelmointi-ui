@@ -5,6 +5,7 @@ import { IHashTag } from '@/interfaces/hashTagsInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectAllHashtags } from '@/reducers/hashTagsSlice';
 import AdminHashtagsPagination from './AdminHashtagsPagination';
+import AddHashtagDialog from './AddHashtagDialog';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,6 +16,7 @@ interface IAdminHashtagsState {
   pageCount: number;
   startIndex: number;
   endIndex: number;
+  isAddHashtagDialogOpen: boolean;
 }
 
 const AdminHashtags = () => {
@@ -27,9 +29,11 @@ const AdminHashtags = () => {
     page: 0,
     startIndex: 0,
     endIndex: 10,
+    isAddHashtagDialogOpen: false,
   });
 
-  const { hashtags, startIndex, endIndex, pageCount, searchWord, page } = state;
+  const { hashtags, startIndex, endIndex, pageCount, searchWord, page, isAddHashtagDialogOpen } =
+    state;
 
   const onSetSearchWord = useCallback(
     (value: string) => setState((current) => ({ ...current, searchWord: value })),
@@ -48,6 +52,15 @@ const AdminHashtags = () => {
         endIndex: startIndex + ITEMS_PER_PAGE,
       }));
     },
+    [],
+  );
+
+  const onToggleAddHashtagDialog = useCallback(
+    () =>
+      setState((current) => ({
+        ...current,
+        isAddHashtagDialogOpen: !current.isAddHashtagDialogOpen,
+      })),
     [],
   );
 
@@ -76,9 +89,16 @@ const AdminHashtags = () => {
 
   return (
     <>
-      <AdminHashtagsToolbar onSetSearchWord={onSetSearchWord} />
+      <AdminHashtagsToolbar
+        onSetSearchWord={onSetSearchWord}
+        onToggleAddHashtagDialog={onToggleAddHashtagDialog}
+      />
       <AdminHashtagsTable hashtags={hashtags} />
       <AdminHashtagsPagination pageCount={pageCount} onPageChange={onPageChange} page={page} />
+      <AddHashtagDialog
+        isOpen={isAddHashtagDialogOpen}
+        onToggleAddHashtagDialog={onToggleAddHashtagDialog}
+      />
     </>
   );
 };

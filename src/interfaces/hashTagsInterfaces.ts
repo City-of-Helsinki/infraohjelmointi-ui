@@ -11,7 +11,11 @@ export interface IHashTagsResponse {
   popularHashTags: Array<IHashTag>;
 }
 
-export interface IHashTagsRequest {
+export interface IHashTagPatchRequest {
   data: { archived: boolean };
   id: string;
+}
+
+export interface IHashTagPostRequest {
+  value: string;
 }

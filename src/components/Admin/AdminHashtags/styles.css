@@ -5,18 +5,17 @@
 
 /* hashtag name cell */
 #admin-hashtags-table td:nth-child(1) {
-  width: 30% !important;
+  @apply !w-[30%];
 }
 
 /* usage count cell */
 #admin-hashtags-table td:nth-child(2) {
-  width: 190px !important;
+  @apply !w-[190px];
 }
 
 /* archive/restore button cell */
 #admin-hashtags-table td:nth-child(5) {
-  width: 190px !important;
-  padding: 0 !important;
+  @apply !w-[190px] !p-0;
 }
 
 .admin-hashtags-toolbar {
@@ -48,4 +47,14 @@
 /* we remove the padding and margin from the span inside the button since otherwise it overflows the table */
 .archived-button span {
   @apply m-0 p-0 pr-4;
+}
+
+/* border to header */
+#add-hashtag-dialog > div:nth-child(1) {
+  @apply border-b-[1px] border-black-60;
+}
+
+/* padding and border to content */
+#add-hashtag-dialog > div:nth-child(2) {
+  @apply border-b-[1px] border-black-60 pb-24 pt-8;
 }

@@ -253,7 +253,9 @@
       "500": "Palvelinvirhe",
       "projectNotFound": "Hanketta ei löytnyt",
       "hashtagPatchSuccess": "Tunniste päivitetty",
-      "patchError": "Päivitys epäonnistui"
+      "patchError": "Päivitys epäonnistui",
+      "hashtagPostSuccess": "Tunniste tallennettu",
+      "postError": "Luonti epäonnistui"
     },
     "message": {
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
@@ -265,7 +267,9 @@
       "projectNotFound": "Varmista että estimäsi hanke on olemassa",
       "appDataError": "Virhe ladattaessa sovellustietoja",
       "hashtagPatchSuccess": "Tunniste päivitetty onnistuneesti!",
-      "hashtagPatchError": "Tunnisteen päivitys epäonnistui."
+      "hashtagPatchError": "Tunnisteen päivitys epäonnistui.",
+      "hashtagPostSuccess": "Uusi tunniste tallennettu onnistuneesti!",
+      "hashtagPostError": "Tunnisteen luonti epäonnistui."
     }
   },
   "searchOrder": {
@@ -456,5 +460,6 @@
   "status": "Tila",
   "created": "Luotu",
   "hashtag": "Tunniste",
-  "searchHashtag": "Etsi tunniste"
+  "searchHashtag": "Etsi tunniste",
+  "hashtagName": "Tunnisteen nimi"
 }

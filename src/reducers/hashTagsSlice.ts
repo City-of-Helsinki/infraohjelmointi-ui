@@ -1,7 +1,12 @@
 import { IError } from '@/interfaces/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IHashTag, IHashTagsRequest, IHashTagsResponse } from '@/interfaces/hashTagsInterfaces';
-import { getHashTags, patchHashTag } from '@/services/hashTagsService';
+import {
+  IHashTag,
+  IHashTagPatchRequest,
+  IHashTagPostRequest,
+  IHashTagsResponse,
+} from '@/interfaces/hashTagsInterfaces';
+import { getHashTags, patchHashTag, postHashTag } from '@/services/hashTagsService';
 import { RootState } from '@/store';
 
 interface IHashTagState extends IHashTagsResponse {
@@ -24,8 +29,17 @@ export const getHashTagsThunk = createAsyncThunk('hashtag/getAll', async (_, thu
 
 export const patchHashTagThunk = createAsyncThunk(
   'hashtag/patch',
-  async (request: IHashTagsRequest, thunkAPI) => {
+  async (request: IHashTagPatchRequest, thunkAPI) => {
     return await patchHashTag(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const postHashTagThunk = createAsyncThunk(
+  'hashtag/post',
+  async (request: IHashTagPostRequest, thunkAPI) => {
+    return await postHashTag(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -53,7 +67,7 @@ export const hashTagSlice = createSlice({
     builder.addCase(getHashTagsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
       return { ...state, error: action.payload };
     });
-    // PATCH
+    // PATCH ONE
     builder.addCase(patchHashTagThunk.fulfilled, (state, action: PayloadAction<IHashTag>) => {
       const hashTags = [...state.hashTags];
       const indexToUpdate = hashTags.findIndex((obj) => obj.id === action.payload.id);
@@ -73,6 +87,18 @@ export const hashTagSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
+    // POST ONE
+    builder.addCase(postHashTagThunk.fulfilled, (state, action: PayloadAction<IHashTag>) => {
+      console.log('post success: ', action.payload);
+
+      return {
+        ...state,
+        hashTags: sortByHashtagName([...state.hashTags, action.payload]),
+      };
+    });
+    builder.addCase(postHashTagThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+      return { ...state, error: action.payload };
+    });
   },
 });
 

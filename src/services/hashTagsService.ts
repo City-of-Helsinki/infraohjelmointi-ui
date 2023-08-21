@@ -1,10 +1,10 @@
 import { IError } from '@/interfaces/common';
-import { IHashTagsRequest } from '@/interfaces/hashTagsInterfaces';
+import { IHashTagPatchRequest, IHashTagPostRequest } from '@/interfaces/hashTagsInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const postHashTag = async (request: { value: string }) => {
+export const postHashTag = async (request: IHashTagPostRequest) => {
   return axios
     .post(`${REACT_APP_API_URL}/project-hashtags/`, request)
     .then((res) => res.data)
@@ -18,7 +18,7 @@ export const getHashTags = async () => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const patchHashTag = async (request: IHashTagsRequest) => {
+export const patchHashTag = async (request: IHashTagPatchRequest) => {
   return axios
     .patch(`${REACT_APP_API_URL}/project-hashtags/${request.id}/`, request.data)
     .then((res) => res.data)
