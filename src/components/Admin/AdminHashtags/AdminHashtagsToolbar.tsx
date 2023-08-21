@@ -1,17 +1,22 @@
 import { Button, SearchInput } from 'hds-react';
-import { memo } from 'react';
+import { FC, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const AdminHashtagsToolbar = () => {
+interface IAdminHashtagsToolbar {
+  onSetSearchWord: (value: string) => void;
+}
+
+const AdminHashtagsToolbar: FC<IAdminHashtagsToolbar> = ({ onSetSearchWord }) => {
+  const { t } = useTranslation();
   return (
-    <div className="flex items-end justify-between">
-      <Button className="h-[3.5rem]">Lisää tunniste</Button>
+    <div className="admin-hashtags-toolbar">
+      <Button className="add-hashtag-button">{t('addHashTag')}</Button>
       <SearchInput
-        className="w-[22.5rem]"
-        label="Etsi tunniste"
-        placeholder=""
-        searchButtonAriaLabel="Search hashtags"
-        clearButtonAriaLabel="Clear search field"
-        onSubmit={(submittedValue) => console.log('Submitted value:', submittedValue)}
+        className="admin-hashtags-search"
+        label={t('searchHashtag')}
+        searchButtonAriaLabel={t('searchHashtag') ?? ''}
+        onChange={onSetSearchWord}
+        onSubmit={onSetSearchWord}
       />
     </div>
   );

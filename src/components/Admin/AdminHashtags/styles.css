@@ -1,12 +1,51 @@
+/* set a fixed height to keep the pagination in place */
+.admin-hashtags-table-container {
+  @apply mt-8 h-[540px];
+}
+
 /* hashtag name cell */
-#hashtags-table td:nth-child(1) {
+#admin-hashtags-table td:nth-child(1) {
   width: 30% !important;
 }
+
 /* usage count cell */
-#hashtags-table td:nth-child(2) {
+#admin-hashtags-table td:nth-child(2) {
   width: 190px !important;
 }
+
 /* archive/restore button cell */
-#hashtags-table td:nth-child(5) {
+#admin-hashtags-table td:nth-child(5) {
   width: 190px !important;
+  padding: 0 !important;
+}
+
+.admin-hashtags-toolbar {
+  @apply flex items-end justify-between;
+}
+
+.admin-hashtags-search {
+  @apply w-[22.5rem];
+}
+
+/* hide the clear button for hashtags search */
+.admin-hashtags-search > div > div > button:nth-child(1) {
+  @apply hidden;
+}
+
+.add-hashtag-button {
+  @apply h-[3.5rem];
+}
+
+.archived-icon-container {
+  @apply flex !w-[6.5rem] items-center gap-2;
+}
+
+/* we set the containers height to 0 since otherwise the HDS Button forces the table row to become too high */
+.archived-button-container {
+  @apply flex h-0 items-center justify-end;
+}
+
+/* we remove the padding and margin from the span inside the button since otherwise it overflows the table */
+.archived-button span {
+  @apply m-0 p-0 pr-4;
 }

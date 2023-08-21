@@ -447,5 +447,10 @@
       "description": "Päätä edellinen vuosi ja lukitse tilinpäätös.",
       "button": "Lukitse tilinpäätös tästä"
     }
-  }
+  },
+  "projectCount": "Projektien määrä",
+  "status": "Tila",
+  "created": "Luotu",
+  "hashtag": "Tunniste",
+  "searchHashtag": "Etsi tunniste"
 }
