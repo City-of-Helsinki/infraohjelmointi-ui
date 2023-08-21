@@ -34,6 +34,8 @@ export const stringToDateTime = (date: string) =>
     new Date(date),
   );
 
+export const dateStringToMoment = (date: string) => moment(date).format('D.M.YYYY');
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sortArrayByDates = (array: Array<any>, dateProperty: string, reversed?: boolean) => {
   const sortedArray =

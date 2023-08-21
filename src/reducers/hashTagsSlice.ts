@@ -45,5 +45,6 @@ export const hashTagSlice = createSlice({
 });
 
 export const selectHashTags = (state: RootState) => state.hashTags;
+export const selectAllHashtags = (state: RootState) => state.hashTags.hashTags;
 
 export default hashTagSlice.reducer;

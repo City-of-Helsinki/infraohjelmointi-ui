@@ -1,0 +1,12 @@
+/* hashtag name cell */
+#hashtags-table td:nth-child(1) {
+  width: 30% !important;
+}
+/* usage count cell */
+#hashtags-table td:nth-child(2) {
+  width: 190px !important;
+}
+/* archive/restore button cell */
+#hashtags-table td:nth-child(5) {
+  width: 190px !important;
+}

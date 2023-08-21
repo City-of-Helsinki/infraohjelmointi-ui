@@ -1,79 +1,49 @@
+import { useAppSelector } from '@/hooks/common';
+import { selectAllHashtags } from '@/reducers/hashTagsSlice';
+import { dateStringToMoment } from '@/utils/dates';
 import { Table } from 'hds-react';
 import { memo } from 'react';
+import './styles.css';
 
 const AdminHashtagsTable = () => {
   const cols = [
     { key: 'id', headerName: 'Not rendered' },
-    { key: 'name', headerName: 'Tunniste' },
+    { key: 'value', headerName: 'Tunniste' },
     {
-      key: 'projectAmount',
+      key: 'usageCount',
       headerName: 'Projektien määrä',
-      transform: ({ projectAmount }: { projectAmount: number }) => {
-        return <div style={{ textAlign: 'right' }}>{projectAmount}</div>;
+      transform: ({ usageCount }: { usageCount: number }) => {
+        return <div className="text-right">{usageCount}</div>;
       },
     },
     {
-      key: 'status',
+      key: 'archived',
       headerName: 'Tila',
-      transform: ({ status }: { status: boolean }) => {
-        return <div style={{ fontWeight: 'bold' }}>{status ? 'Käytössä' : 'Arkistoitu'}</div>;
+      transform: ({ archived }: { archived: boolean }) => {
+        return <div>{archived ? 'Arkistoitu' : 'Käytössä'}</div>;
       },
     },
     {
-      key: 'created',
+      key: 'createdDate',
       headerName: 'Luotu',
+      transform: ({ createdDate }: { createdDate: string }) => {
+        return <div>{dateStringToMoment(createdDate)}</div>;
+      },
     },
     {
-      key: 'profession',
+      key: 'restore',
       headerName: '',
       transform: ({ archived }: { archived: boolean }) => {
-        return (
-          <div style={{ fontWeight: 'bold', textAlign: 'right' }}>
-            {archived ? 'Palauta' : 'Arkistoi'}
-          </div>
-        );
+        return <div style={{ textAlign: 'right' }}>{archived ? 'Palauta' : 'Arkistoi'}</div>;
       },
     },
   ];
 
-  const rows = [
-    {
-      id: 1000,
-      name: 'Lauri',
-      projectAmount: 12,
-      status: true,
-      created: '1.1.2023',
-      archived: false,
-    },
-    {
-      id: 1001,
-      name: 'Maria',
-      projectAmount: 20,
-      status: false,
-      created: '1.1.2023',
-      archived: true,
-    },
-    {
-      id: 1002,
-      name: 'Anneli',
-      projectAmount: 16,
-      status: true,
-      created: '1.1.2023',
-      archived: false,
-    },
-    {
-      id: 1003,
-      name: 'Osku',
-      projectAmount: 9,
-      status: true,
-      created: '1.1.2023',
-      archived: false,
-    },
-  ];
+  const hashtags = useAppSelector(selectAllHashtags);
 
   return (
     <div className="mt-8">
-      <Table cols={cols} rows={rows} indexKey="id" renderIndexCol={false} />
+      <Table cols={cols} rows={hashtags} indexKey="id" renderIndexCol={false} id="hashtags-table" />
     </div>
   );
 };
