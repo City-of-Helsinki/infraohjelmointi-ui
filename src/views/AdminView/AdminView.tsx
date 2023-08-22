@@ -13,7 +13,7 @@ const AdminView = () => {
 
   /** Parse end of pathname from url to create the page title */
   const pageTitle = useMemo(() => {
-    if (!pathname || !pathname.includes('admin')) {
+    if (!pathname?.includes('admin')) {
       return;
     }
 

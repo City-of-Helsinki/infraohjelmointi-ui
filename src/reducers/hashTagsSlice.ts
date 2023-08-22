@@ -10,7 +10,7 @@ import { getHashTags, patchHashTag, postHashTag } from '@/services/hashTagsServi
 import { RootState } from '@/store';
 
 interface IHashTagState extends IHashTagsResponse {
-  error: IError | null | unknown;
+  error: unknown;
 }
 
 const initialState: IHashTagState = {
@@ -64,7 +64,7 @@ export const hashTagSlice = createSlice({
         };
       },
     );
-    builder.addCase(getHashTagsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getHashTagsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
     // PATCH ONE
@@ -81,12 +81,9 @@ export const hashTagSlice = createSlice({
         hashTags,
       };
     });
-    builder.addCase(
-      patchHashTagThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
+    builder.addCase(patchHashTagThunk.rejected, (state, action: PayloadAction<unknown>) => {
+      return { ...state, error: action.payload };
+    });
     // POST ONE
     builder.addCase(postHashTagThunk.fulfilled, (state, action: PayloadAction<IHashTag>) => {
       return {
@@ -94,7 +91,7 @@ export const hashTagSlice = createSlice({
         hashTags: sortByHashtagName([...state.hashTags, action.payload]),
       };
     });
-    builder.addCase(postHashTagThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(postHashTagThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
   },
