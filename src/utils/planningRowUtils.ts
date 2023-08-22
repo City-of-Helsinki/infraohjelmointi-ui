@@ -128,9 +128,7 @@ export const buildPlanningRow = ({
   expanded,
   districtsForSubClass,
   isCoordinator,
-}: // siblings,
-// parentRow,
-IBuildPlanningRowParams): IPlanningRow => {
+}: IBuildPlanningRowParams): IPlanningRow => {
   const projectRows = isCoordinator
     ? filterProjectsForCoordinatorRow(item.id, type, projects)
     : filterProjectsForPlanningRow(item.id, type, projects, districtsForSubClass);
@@ -156,7 +154,6 @@ IBuildPlanningRowParams): IPlanningRow => {
     defaultExpanded,
     children: [],
     projectRows,
-    // cells: calculatePlanningCells(item.finances, type, siblings, parentRow),
     cells: calculatePlanningCells(item.finances, type),
     ...calculatePlanningRowSums(item.finances, type),
   };

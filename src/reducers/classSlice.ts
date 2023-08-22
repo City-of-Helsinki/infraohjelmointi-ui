@@ -153,8 +153,8 @@ export const classSlice = createSlice({
       const data = action.payload;
 
       if (data) {
-        const collectiveSubLevels = [...state.coordination.collectiveSubLevels].map((sc) =>
-          sc.id === data.id ? data : sc,
+        const collectiveSubLevels = [...state.coordination.collectiveSubLevels].map((csl) =>
+          csl.id === data.id ? data : csl,
         );
         const sortedCollectiveSubLevels = sortClassByName([...collectiveSubLevels]);
         return {
@@ -167,8 +167,8 @@ export const classSlice = createSlice({
       const data = action.payload;
 
       if (data) {
-        const otherClassifications = [...state.coordination.otherClassifications].map((sc) =>
-          sc.id === data.id ? data : sc,
+        const otherClassifications = [...state.coordination.otherClassifications].map((oc) =>
+          oc.id === data.id ? data : oc,
         );
         const sortedOtherClassifications = sortClassByName([...otherClassifications]);
         return {
@@ -183,7 +183,7 @@ export const classSlice = createSlice({
       if (data) {
         const otherClassificationSubLevels = [
           ...state.coordination.otherClassificationSubLevels,
-        ].map((sc) => (sc.id === data.id ? data : sc));
+        ].map((ocsl) => (ocsl.id === data.id ? data : ocsl));
         const sortedOtherClassificationSubLevels = sortClassByName([
           ...otherClassificationSubLevels,
         ]);

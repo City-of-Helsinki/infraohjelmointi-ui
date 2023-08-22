@@ -12,7 +12,7 @@ const useOnClickOutsideRef = (
   elementRendered?: boolean,
 ) => {
   useEffect(() => {
-    if (!ref || !ref.current) {
+    if (!ref?.current) {
       return;
     }
 
