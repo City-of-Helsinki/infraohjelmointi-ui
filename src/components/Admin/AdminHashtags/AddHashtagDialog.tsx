@@ -1,6 +1,8 @@
-import { useAppDispatch } from '@/hooks/common';
-import { postHashTagThunk } from '@/reducers/hashTagsSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { IError } from '@/interfaces/common';
+import { postHashTagThunk, selectHashTags } from '@/reducers/hashTagsSlice';
 import { notifySuccess } from '@/reducers/notificationSlice';
+import { getErrorText } from '@/utils/validation';
 import { Button, Dialog, TextInput } from 'hds-react';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +11,7 @@ interface IAddhashtagDialogProps {
   isOpen: boolean;
   onToggleAddHashtagDialog: () => void;
 }
+
 const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHashtagDialog }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -16,6 +19,8 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
   const [hashtagName, setHashtagName] = useState('');
   const titleId = 'add-hashtag-title';
   const descriptionId = 'add-hashtag-content';
+
+  const error = useAppSelector(selectHashTags).error as IError;
 
   const onSetHashtagName = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => setHashtagName(e.target.value),
@@ -27,17 +32,20 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
       return;
     }
     try {
-      await dispatch(postHashTagThunk({ value: hashtagName }));
-      setHashtagName('');
-      onToggleAddHashtagDialog();
-      dispatch(
-        notifySuccess({
-          message: 'hashtagPostSuccess',
-          title: 'hashtagPostSuccess',
-          type: 'toast',
-          duration: 1500,
-        }),
-      );
+      const res = await dispatch(postHashTagThunk({ value: hashtagName }));
+      console.log('res: ', res);
+      if (!res.type.includes('rejected')) {
+        setHashtagName('');
+        onToggleAddHashtagDialog();
+        dispatch(
+          notifySuccess({
+            message: 'hashtagPostSuccess',
+            title: 'hashtagPostSuccess',
+            type: 'toast',
+            duration: 1500,
+          }),
+        );
+      }
     } catch (e) {
       dispatch(
         notifySuccess({
@@ -68,6 +76,8 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
             value={hashtagName}
             onChange={onSetHashtagName}
             data-testid="hashtag-name-input"
+            errorText={getErrorText('value', error, t)}
+            invalid={getErrorText('value', error, t) !== ''}
           />
         </Content>
         <ActionButtons>

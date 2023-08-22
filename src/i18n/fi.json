@@ -2,7 +2,8 @@
   "error": {
     "404": "404",
     "pageNotFound": "Sivua ei löytynyt",
-    "returnToFrontPage": "Palaa etusivulle"
+    "returnToFrontPage": "Palaa etusivulle",
+    "hashtagUnique": "Tunniste on jo olemassa."
   },
   "lang": {
     "fi": "FI",

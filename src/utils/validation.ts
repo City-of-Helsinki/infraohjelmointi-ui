@@ -1,4 +1,4 @@
-import { IOption } from '@/interfaces/common';
+import { IError, IOption } from '@/interfaces/common';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import { UseFormGetValues } from 'react-hook-form';
@@ -72,3 +72,28 @@ export const getFieldsIfEmpty = (
       return !getValues(f as keyof IProjectForm);
     }
   });
+
+/**
+ * Looks through a given error object's errors list for a given attribute
+ * and returns a translated error text if that attribute if found within the errors list.
+ *
+ * @param attribute an attribute/key to look for in the errors
+ * @param error an IError object
+ * @param translate
+ * @returns
+ */
+export const getErrorText = (
+  attribute: string,
+  error: IError,
+  translate: TFunction<'translation', undefined>,
+) => {
+  if (error?.errors && error?.errors?.length > 0) {
+    for (const e of error.errors) {
+      if (e.attr === attribute) {
+        return translate(`error.${e.code}`);
+      }
+    }
+  } else {
+    return '';
+  }
+};
