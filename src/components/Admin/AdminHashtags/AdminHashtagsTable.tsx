@@ -28,11 +28,13 @@ const AdminHashtagsTable: FC<IAdminHashtagsTableProps> = ({ hashtags }) => {
       <div className="archived-icon-container">
         {archived ? (
           <>
-            <IconCrossCircleFill color="var(--color-error)" /> Arkistoitu
+            <IconCrossCircleFill color="var(--color-error)" />
+            {t('archived')}
           </>
         ) : (
           <>
-            <IconCheckCircleFill color="var(--color-success)" /> Käytössä
+            <IconCheckCircleFill color="var(--color-success)" />
+            {t('inUse')}
           </>
         )}
       </div>
@@ -74,10 +76,11 @@ const AdminHashtagsTable: FC<IAdminHashtagsTableProps> = ({ hashtags }) => {
             type="button"
             variant="supplementary"
             className="archived-button"
+            data-testid={`archive-hashtag-${id}`}
             iconLeft={archived ? <IconCheckCircle /> : <IconCrossCircle />}
             onClick={() => archiveHashtag(archived, id)}
           >
-            {archived ? 'Palauta' : 'Arkistoi'}
+            {archived ? t('restore') : t('archive')}
           </Button>
         </div>
       );
@@ -111,7 +114,7 @@ const AdminHashtagsTable: FC<IAdminHashtagsTableProps> = ({ hashtags }) => {
         },
       },
       {
-        key: 'restore',
+        key: 'archive',
         headerName: '',
         transform: ({ archived, id }: { archived: boolean; id: string }) => {
           return getArchiveButton(archived, id);

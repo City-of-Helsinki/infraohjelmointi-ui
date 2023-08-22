@@ -348,7 +348,6 @@
   "deleteNoteInfo": "Muistiinpano poistetaan heti. Muistiinpanon poistaminen on pysyvää eikä sitä voida enää palauttaa.",
   "newNoteInfo": "Tallenna hankkeeseen liittyvät muistiinpanot tähän.",
   "noteModified": "Muistiinpanoa muokattu",
-  "cantFindHashTag": "Etkö löydä tunnisteita",
   "createNewHashTag": "Luo uusi tunniste",
   "createHashTag": "Luo tunniste",
   "addHashTagsToProject": "Lisää hankkeelle tunnisteita",
@@ -461,5 +460,9 @@
   "created": "Luotu",
   "hashtag": "Tunniste",
   "searchHashtag": "Etsi tunniste",
-  "hashtagName": "Tunnisteen nimi"
+  "hashtagName": "Tunnisteen nimi",
+  "archive": "Arkistoi",
+  "restore": "Palauta",
+  "archived": "Arkistoitu",
+  "inUse": "Käytössä"
 }

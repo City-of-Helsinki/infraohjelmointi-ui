@@ -89,8 +89,6 @@ export const hashTagSlice = createSlice({
     );
     // POST ONE
     builder.addCase(postHashTagThunk.fulfilled, (state, action: PayloadAction<IHashTag>) => {
-      console.log('post success: ', action.payload);
-
       return {
         ...state,
         hashTags: sortByHashtagName([...state.hashTags, action.payload]),

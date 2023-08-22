@@ -105,16 +105,7 @@ const mockProject: { data: IProject } = {
     updatedDate: '2023-06-19T15:12:02.526074+03:00',
     projectGroup: null,
     favPersons: [],
-    hashTags: [
-      'ccf89105-ee58-49f1-be0a-2cffca8711ab',
-      '50fe7a50-fe4d-4fe2-97b2-44d34a4ce8b4',
-      '6b7d979e-212b-45a5-a557-b7522ea19f53',
-      '31aec05c-1aa1-42c2-8284-7481b9d77dd0',
-      '00f5ab13-011f-4742-b74a-a47bbeef3708',
-      '706cc4bc-97ca-4d27-b494-44257efd7e46',
-      '9d6d4ccb-db3d-4335-8bf6-6d542ebf3eba',
-      'b8f172d3-a92f-4c51-b3f9-58f5e1a48b75',
-    ],
+    hashTags: ['hashtag-1', 'hashtag-2'],
     pwFolderLink:
       'pw://HELS000601.helsinki1.hki.local:PWHKIKOUL/Documents/P{b40bbbf2-3d2a-4fbb-aa70-bfdf786742b0}/',
     priority: {

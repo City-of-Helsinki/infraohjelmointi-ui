@@ -49,11 +49,11 @@ export const mockSearchResults: { data: ISearchResults } = {
         programmed: true,
         hashTags: [
           {
-            id: '5b970a63-1d3b-4ddb-bd1a-658c8a5d67b4',
+            id: 'hashtag-1',
             value: 'leikkipaikka',
           },
           {
-            id: '04568b59-1471-4fa9-b65b-43207ee611dc',
+            id: 'hashtag-2',
             value: 'leikkipuisto',
           },
         ],

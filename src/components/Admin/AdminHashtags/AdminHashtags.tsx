@@ -55,14 +55,12 @@ const AdminHashtags = () => {
     [],
   );
 
-  const onToggleAddHashtagDialog = useCallback(
-    () =>
-      setState((current) => ({
-        ...current,
-        isAddHashtagDialogOpen: !current.isAddHashtagDialogOpen,
-      })),
-    [],
-  );
+  const onToggleAddHashtagDialog = useCallback(() => {
+    setState((current) => ({
+      ...current,
+      isAddHashtagDialogOpen: !current.isAddHashtagDialogOpen,
+    }));
+  }, []);
 
   // Filter, slice and set hashtags and pagination variables based on the start and end indexes and search word
   useEffect(() => {
@@ -88,7 +86,7 @@ const AdminHashtags = () => {
   }, [allHashtags, searchWord, startIndex, endIndex]);
 
   return (
-    <>
+    <div data-testid="admin-hashtags">
       <AdminHashtagsToolbar
         onSetSearchWord={onSetSearchWord}
         onToggleAddHashtagDialog={onToggleAddHashtagDialog}
@@ -99,7 +97,7 @@ const AdminHashtags = () => {
         isOpen={isAddHashtagDialogOpen}
         onToggleAddHashtagDialog={onToggleAddHashtagDialog}
       />
-    </>
+    </div>
   );
 };
 

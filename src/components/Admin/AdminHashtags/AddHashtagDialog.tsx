@@ -67,10 +67,13 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
             label={t('hashtagName')}
             value={hashtagName}
             onChange={onSetHashtagName}
+            data-testid="hashtag-name-input"
           />
         </Content>
         <ActionButtons>
-          <Button onClick={onAddHashtag}>{t('save')}</Button>
+          <Button onClick={onAddHashtag} data-testid="submit-hashtag-button">
+            {t('save')}
+          </Button>
           <Button onClick={onToggleAddHashtagDialog} variant="secondary">
             {t('cancel')}
           </Button>

@@ -2,8 +2,8 @@ import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
-import './styles.css';
 import { useMemo } from 'react';
+import './styles.css';
 
 const AdminView = () => {
   const { t } = useTranslation();

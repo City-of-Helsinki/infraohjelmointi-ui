@@ -45,6 +45,41 @@ export const mockHashTags: { data: IHashTagsResponse } = {
         archived: false,
         createdDate: '2023-08-04T15:51:02.348709+03:00',
       },
+      {
+        id: 'hashtag-7',
+        value: 'testhashtag1',
+        usageCount: 0,
+        archived: false,
+        createdDate: '2023-08-04T15:51:02.348709+03:00',
+      },
+      {
+        id: 'hashtag-8',
+        value: 'testhashtag2',
+        usageCount: 0,
+        archived: false,
+        createdDate: '2023-08-04T15:51:02.348709+03:00',
+      },
+      {
+        id: 'hashtag-9',
+        value: 'testhashtag3',
+        usageCount: 0,
+        archived: false,
+        createdDate: '2023-08-04T15:51:02.348709+03:00',
+      },
+      {
+        id: 'hashtag-10',
+        value: 'testhashtag4',
+        usageCount: 0,
+        archived: false,
+        createdDate: '2023-08-04T15:51:02.348709+03:00',
+      },
+      {
+        id: 'hashtag-11',
+        value: 'viima-ratiotie',
+        usageCount: 0,
+        archived: false,
+        createdDate: '2023-08-04T15:51:02.348709+03:00',
+      },
     ],
     popularHashTags: [
       {

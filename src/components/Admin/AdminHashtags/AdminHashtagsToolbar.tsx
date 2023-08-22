@@ -13,8 +13,12 @@ const AdminHashtagsToolbar: FC<IAdminHashtagsToolbar> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="admin-hashtags-toolbar">
-      <Button className="add-hashtag-button" onClick={onToggleAddHashtagDialog}>
+    <div className="admin-hashtags-toolbar" data-testid="admin-hashtags-toolbar">
+      <Button
+        className="add-hashtag-button"
+        data-testid="add-hashtag-button"
+        onClick={onToggleAddHashtagDialog}
+      >
         {t('addHashTag')}
       </Button>
       <SearchInput

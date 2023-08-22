@@ -17,7 +17,6 @@ import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from '@/components/shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
-import NewHashTagsForm from './NewHashTagsForm';
 import HashTagSearch from './HashTagSearch';
 import { IListItem } from '@/interfaces/common';
 import { arrayHasValue } from '@/utils/common';
@@ -215,7 +214,6 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
                 />
               </div>
               <HashTagSearch onHashTagClick={onHashTagClick} hashTags={hashTagsForSearch} />
-              <NewHashTagsForm />
             </div>
           </Content>
           <hr />
