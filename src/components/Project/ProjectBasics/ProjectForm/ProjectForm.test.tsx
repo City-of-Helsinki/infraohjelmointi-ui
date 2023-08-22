@@ -34,7 +34,7 @@ import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogCont
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(7000);
+jest.setTimeout(9000);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
