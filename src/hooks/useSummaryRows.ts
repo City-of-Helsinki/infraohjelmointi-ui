@@ -2,8 +2,11 @@ import { IPlanningCell } from '@/interfaces/planningInterfaces';
 import { useEffect, useMemo, useState } from 'react';
 import { calculatePlanningSummaryCells } from '@/utils/calculations';
 import { useAppSelector } from './common';
-import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
-import { selectSelections, selectStartYear } from '@/reducers/planningSlice';
+import {
+  selectBatchedCoordinationClasses,
+  selectBatchedPlanningClasses,
+} from '@/reducers/classSlice';
+import { selectPlanningMode, selectSelections, selectStartYear } from '@/reducers/planningSlice';
 
 interface IPlanningSummaryHeadCell {
   year: number;
@@ -50,13 +53,21 @@ const buildPlanningSummaryHeadCells = (startYear: number) => {
  */
 const useSummaryRows = () => {
   const { selectedMasterClass, selectedSubClass, selectedClass } = useAppSelector(selectSelections);
-  const allClasses = useAppSelector(selectBatchedPlanningClasses);
+  const allPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
+  const allCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
+  const mode = useAppSelector(selectPlanningMode);
   const startYear = useAppSelector(selectStartYear);
+
+  const allClasses = useMemo(
+    () => (mode === 'coordination' ? allCoordinationClasses : allPlanningClasses),
+    [mode, allCoordinationClasses, allPlanningClasses],
+  );
 
   const masterClasses = useMemo(
     () => (selectedMasterClass ? [selectedMasterClass] : allClasses.masterClasses),
     [allClasses.masterClasses, selectedMasterClass],
   );
+
   const classes = useMemo(
     () => (selectedClass ? [selectedClass] : allClasses.subClasses),
     [allClasses.subClasses, selectedClass],

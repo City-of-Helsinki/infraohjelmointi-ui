@@ -18,6 +18,11 @@ interface ILocationState {
   error: unknown;
 }
 
+interface ILocationUpdatePayload {
+  data: ILocation | null;
+  type: 'coordination' | 'planning';
+}
+
 const initialLocations = {
   allLocations: [],
   districts: [],
@@ -89,14 +94,12 @@ export const locationSlice = createSlice({
   name: 'locations',
   initialState,
   reducers: {
-    updatePlanningDistrict(state, action: PayloadAction<ILocation | null>) {
-      const districtToUpdate = action.payload;
+    updateDistrict(state, action: PayloadAction<ILocationUpdatePayload>) {
+      const { data, type } = action.payload;
 
-      if (districtToUpdate) {
-        const districts = [...state.planning.districts].map((d) =>
-          d.id === districtToUpdate.id ? districtToUpdate : d,
-        );
-        return { ...state, planning: { ...state.planning, districts } };
+      if (data) {
+        const districts = [...state[type].districts].map((d) => (d.id === data.id ? data : d));
+        return { ...state, [type]: { ...state[type], districts } };
       }
     },
   },
@@ -133,7 +136,7 @@ export const locationSlice = createSlice({
   },
 });
 
-export const { updatePlanningDistrict } = locationSlice.actions;
+export const { updateDistrict } = locationSlice.actions;
 
 export const selectPlanningDistricts = (state: RootState) => state.location.planning.districts;
 export const selectPlanningDivisions = (state: RootState) => state.location.planning.divisions;

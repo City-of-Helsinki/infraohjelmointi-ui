@@ -10,14 +10,17 @@ import { getListsThunk } from './reducers/listsSlice';
 import {
   getCoordinationClassesThunk,
   getPlanningClassesThunk,
-  updatePlanningClass,
-  updatePlanningMasterClass,
-  updatePlanningSubClass,
+  updateClass,
+  updateCollectiveSubLevel,
+  updateMasterClass,
+  updateOtherClassification,
+  updateOtherClassificationSubLevel,
+  updateSubClass,
 } from './reducers/classSlice';
 import {
   getCoordinationLocationsThunk,
   getPlanningLocationsThunk,
-  updatePlanningDistrict,
+  updateDistrict,
 } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import PlanningView from './views/PlanningView';
@@ -104,13 +107,33 @@ const App: FC = () => {
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
-      Promise.all([
-        dispatch(updatePlanningMasterClass(financeUpdate.masterClass)),
-        dispatch(updatePlanningClass(financeUpdate.class)),
-        dispatch(updatePlanningSubClass(financeUpdate.subClass)),
-        dispatch(updatePlanningDistrict(financeUpdate.district)),
-        dispatch(updateGroup(financeUpdate.group)),
-      ]).catch((e) => console.log('Error updating finances: ', e));
+      const { coordination, planning } = financeUpdate;
+
+      // Update all planning finances
+      if (planning) {
+        const type = 'planning';
+        Promise.all([
+          dispatch(updateMasterClass({ data: planning.masterClass, type })),
+          dispatch(updateClass({ data: planning.class, type })),
+          dispatch(updateSubClass({ data: planning.subClass, type })),
+          dispatch(updateDistrict({ data: planning.district, type })),
+          dispatch(updateGroup(planning.group)),
+        ]).catch((e) => console.log('Error updating planning finances: ', e));
+      }
+
+      // Update all coordination finances
+      if (coordination) {
+        const type = 'coordination';
+        Promise.all([
+          dispatch(updateMasterClass({ data: coordination.masterClass, type })),
+          dispatch(updateClass({ data: coordination.class, type })),
+          dispatch(updateSubClass({ data: coordination.subClass, type })),
+          dispatch(updateCollectiveSubLevel(coordination.collectiveSubLevel)),
+          dispatch(updateOtherClassification(coordination.otherClassification)),
+          dispatch(updateOtherClassificationSubLevel(coordination.otherClassificationSubLevel)),
+          dispatch(updateDistrict({ data: coordination.district, type })),
+        ]).catch((e) => console.log('Error updating coordination finances: ', e));
+      }
     }
   }, [financeUpdate]);
 

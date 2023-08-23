@@ -99,24 +99,36 @@ export const filterProjectsForPlanningRow = (
   return [];
 };
 
+interface IBuildPlanningRowParams {
+  item: IClass | ILocation | IGroup;
+  type: PlanningRowType;
+  projects: Array<IProject>;
+  expanded?: boolean;
+  districtsForSubClass?: IClass[];
+  isCoordinator?: boolean;
+  siblings?: Array<IClass> | Array<ILocation>;
+  parentRow?: IPlanningRow | null;
+}
+
 /**
  * Builds a PlanningRow object from a class, location or group
  *
  * @param item IClass, ILocation or IGroup (the item that the row will be built for)
  * @param type type of the row (PlanningRowType)
  * @param projects projects to map under the row (they will only be mapped if the correct conditions are met)
- * @param expanded if the row is to be expanded by default
+ * @param expanded boolean if the row is to be expanded by default
  * @param districtsForSubClass optional districts for the subClass (if a subClass is called 'suurpiiri' then the districts will not be mapped and we use this to gather the projects that would otherwise appear under the districts)
+ * @param isCoordinator boolean if the row is built for coordination view
  * @returns IPlanningRow
  */
-export const buildPlanningRow = (
-  item: IClass | ILocation | IGroup,
-  type: PlanningRowType,
-  projects: Array<IProject>,
-  expanded?: boolean,
-  districtsForSubClass?: IClass[],
-  isCoordinator?: boolean,
-): IPlanningRow => {
+export const buildPlanningRow = ({
+  item,
+  type,
+  projects,
+  expanded,
+  districtsForSubClass,
+  isCoordinator,
+}: IBuildPlanningRowParams): IPlanningRow => {
   const projectRows = isCoordinator
     ? filterProjectsForCoordinatorRow(item.id, type, projects)
     : filterProjectsForPlanningRow(item.id, type, projects, districtsForSubClass);
@@ -150,7 +162,13 @@ export const buildPlanningRow = (
 export const getSelectedOrAll = (
   selected: ILocation | IClass | null,
   all: Array<ILocation | IClass>,
-) => (selected ? [selected] : all);
+) => {
+  if (selected) {
+    return all.filter((a) => a.id === selected.id);
+  } else {
+    return all;
+  }
+};
 
 /**
  * Fetches projects for a given location or class.

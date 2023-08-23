@@ -32,7 +32,6 @@ import {
   formatNumber,
 } from '@/utils/calculations';
 import { sendProjectUpdateEvent, sendFinanceUpdateEvent } from '@/utils/testUtils';
-import mockProject from '@/mocks/mockProject';
 import {
   addFinanceUpdateEventListener,
   removeFinanceUpdateEventListener,
@@ -41,7 +40,7 @@ import {
 } from '@/utils/events';
 import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
-import { updatePlanningClass, updatePlanningMasterClass } from '@/reducers/classSlice';
+import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 
 jest.mock('axios');
@@ -160,23 +159,25 @@ describe('PlanningView', () => {
       year0: {
         plannedBudget: 80000,
         frameBudget: 2000,
+        isFrameBudgetOverlap: false,
       },
     };
 
     const financeUpdateData = {
-      masterClass: {
-        ...mockMasterClasses.data[0],
-        finances: {
-          ...updatedFinances,
+      planning: {
+        masterClass: {
+          ...mockMasterClasses.data[0],
+          finances: {
+            ...updatedFinances,
+          },
+        },
+        class: {
+          ...mockClasses.data[0],
+          finances: {
+            ...updatedFinances,
+          },
         },
       },
-      class: {
-        ...mockClasses.data[0],
-        finances: {
-          ...updatedFinances,
-        },
-      },
-      project: mockProject.data,
     };
 
     await navigateToProjectRows(renderResult);
@@ -184,8 +185,13 @@ describe('PlanningView', () => {
     // Simulate what App.tsx does when receiving a finance-update event
     await waitFor(async () => {
       await sendFinanceUpdateEvent(financeUpdateData).then(() => {
-        store.dispatch(updatePlanningMasterClass(financeUpdateData.masterClass));
-        store.dispatch(updatePlanningClass(financeUpdateData.class));
+        store.dispatch(
+          updateMasterClass({
+            data: financeUpdateData.planning.masterClass,
+            type: 'planning',
+          }),
+        );
+        store.dispatch(updateClass({ data: financeUpdateData.planning.class, type: 'planning' }));
       });
     });
 
@@ -852,18 +858,19 @@ describe('PlanningView', () => {
 
     describe('PlanningCell', () => {
       it('renders budget, overrun and deviation', async () => {
-        const { store, getByTestId } = await render();
+        const { store, getByTestId, findByTestId } = await render();
 
         const { id, finances } = store.getState().class.planning.masterClasses[0];
 
-        const firstCell = getByTestId(`row-${id}`).children[1];
         const year = new Date().getFullYear();
 
         const cells = calculatePlanningCells(finances, 'class');
 
         const { plannedBudget, frameBudget, deviation } = cells[0];
 
-        expect(firstCell.children[0].children.length).toBe(3);
+        expect(
+          (await findByTestId(`edit-framed-budget-${id}-${year}`)).children[0].children.length,
+        ).toBe(3);
 
         expect(getByTestId(`planned-budget-${id}-${year}`).textContent).toBe(plannedBudget || '0');
         expect(getByTestId(`frame-budget-${id}-${year}`).textContent).toBe(frameBudget || '0');

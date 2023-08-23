@@ -62,6 +62,8 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
     if (projectToUpdate) {
       let inRow = false;
       let pIndex = -1;
+
+      // We add the project returned by the project-update event to a new "updatedProjects" list
       const updatedProjects = projects.map((p, index) => {
         if (p.id === projectToUpdate.id) {
           inRow = true;
@@ -70,26 +72,29 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
         }
         return p;
       });
-      // projectToUpdate does not already exist in this planning row if updatedProjects is the same
-      // check if project belongs to this row type
+
+      // projectToUpdate does not already exist in this planning row if updatedProjects is the same check if project belongs to this row type
       if (!inRow) {
-        if (
-          (type === 'group' &&
-            projectToUpdate.projectGroup &&
-            id === projectToUpdate.projectGroup) ||
-          (!projectToUpdate.projectGroup &&
-            (type === 'district' || type === 'division') &&
-            id === projectToUpdate.projectLocation) ||
-          (!projectToUpdate.projectLocation &&
-            !projectToUpdate.projectGroup &&
-            type.toLowerCase().includes('class') &&
-            id === projectToUpdate.projectClass)
-        ) {
+        const isGroupsProject =
+          type === 'group' && projectToUpdate.projectGroup && id === projectToUpdate.projectGroup;
+
+        const isLocationsProject =
+          !projectToUpdate.projectGroup &&
+          (type === 'district' || type === 'division') &&
+          id === projectToUpdate.projectLocation;
+
+        const isClassesProject =
+          !projectToUpdate.projectLocation &&
+          !projectToUpdate.projectGroup &&
+          type.toLowerCase().includes('class') &&
+          id === projectToUpdate.projectClass;
+
+        if (isGroupsProject || isLocationsProject || isClassesProject) {
           updatedProjects.push(projectToUpdate);
         }
-      } else {
-        // updated project is in the current planning row
-        // check if the update has caused it to be removed from the row
+      }
+      // updated project is in the current planning row check if the update has caused it to be removed from the row
+      else {
         if (
           (type === 'group' &&
             projects[pIndex].projectGroup === id &&
@@ -105,6 +110,7 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
           updatedProjects.splice(pIndex, 1);
         }
       }
+      // check if updated projects and projects are not equal and update the project currently displayed
       if (!_.isEqual(projects, updatedProjects)) {
         const sortedProjects = [...updatedProjects].sort((a, b) => a.name.localeCompare(b.name));
         setPlanningRowState((current) => ({

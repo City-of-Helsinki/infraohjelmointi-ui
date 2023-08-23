@@ -117,8 +117,9 @@
 }
 
 /* TABLE CELL */
+/* setting max width to 0px will cause the table cell to stay in place when we're editing the frame budget in coordination view */
 .planning-cell {
-  @apply min-w-[var(--planning-cell-width)] border-b border-white bg-bus py-1 pr-4 align-text-top text-white;
+  @apply min-w-[var(--planning-cell-width)] max-w-0 border-b border-white bg-bus py-1 pr-4 align-text-top text-white;
 }
 
 .planning-cell.masterClass {
@@ -228,4 +229,33 @@
 
 .planning-forecast-sums-container > .planning-forecast-sums.division {
   @apply hidden;
+}
+
+.frame-budget-container {
+  @apply flex h-[0px] items-center justify-center;
+}
+
+.frame-budget-input {
+  @apply h-[44px] w-full translate-y-[20px] rounded-sm p-2 text-right text-black-80;
+}
+
+/* Hide arrows from number input in Chrome, Safari, Edge, Opera */
+.frame-budget-input::-webkit-outer-spin-button,
+.frame-budget-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.budget-change-input {
+  @apply mt-[1.2rem] h-[44px] w-[74px] rounded-sm p-2 text-right text-black-80;
+}
+/* Hide arrows from number input in Chrome, Safari, Edge, Opera */
+.budget-change-input::-webkit-outer-spin-button,
+.budget-change-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.budget-overlap-circle {
+  @apply h-[16px] -translate-y-[1.5px];
 }

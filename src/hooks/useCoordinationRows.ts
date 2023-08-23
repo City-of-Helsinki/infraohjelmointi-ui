@@ -56,96 +56,144 @@ const buildCoordinatorTableRows = (
     selectedOtherClassification,
   } = selections;
 
-  const getRow = (item: IClass | ILocation, type: PlanningRowType, defaultExpanded?: boolean) =>
-    buildPlanningRow(item, type, projects, defaultExpanded, [], true);
+  const getRow = ({
+    item,
+    type,
+    expanded,
+  }: {
+    item: IClass | ILocation;
+    type: PlanningRowType;
+    expanded?: boolean;
+  }) =>
+    buildPlanningRow({
+      item,
+      type,
+      projects,
+      expanded,
+      districtsForSubClass: [],
+      isCoordinator: true,
+    });
 
   const districtsBeforeCollectiveSubLevel = !selectedCollectiveSubLevel ? districts : [];
   const districtsAfterCollectiveSubLevel = !selectedOtherClassification ? districts : [];
 
-  const getDistrictRowsForParent = (
-    parent: IClass,
-    districts: Array<ILocation>,
-    defaultExpanded: boolean,
-    type: PlanningRowType,
-  ) =>
-    districts
-      .filter((district) => district.parentClass === parent.id)
-      .map((filteredDistrict) => ({
-        ...getRow(filteredDistrict, type, !!defaultExpanded),
-      }));
+  const getDistrictRowsForParent = ({
+    type,
+    expanded,
+    parent,
+    districts,
+  }: {
+    type: PlanningRowType;
+    parent: IClass | ILocation;
+    expanded?: boolean;
+    districts: Array<ILocation>;
+  }) => {
+    const filteredDistricts = districts.filter((district) => district.parentClass === parent.id);
+    return filteredDistricts.map((filteredDistrict) => ({
+      ...getRow({
+        item: filteredDistrict,
+        type,
+        expanded: !!expanded,
+      }),
+    }));
+  };
 
-  // Map the class rows going from masterClasses to districts
+  // Map the class rows going from masterClasses to otherClassificationSubLevels
   const rows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
+    const masterClassRow = getRow({
+      item: masterClass,
+      type: 'masterClass',
+      expanded: !!selectedMasterClass,
+    });
+    const filteredClasses = classes.filter((c) => c.parent === masterClass.id);
     return {
-      // MASTER CLASSES
-      ...getRow(masterClass, 'masterClass', !!selectedMasterClass),
-      // CLASSES
-      children: classes
-        .filter((c) => c.parent === masterClass.id)
-        .map((filteredClass) => ({
-          ...getRow(filteredClass, 'class', !!selectedClass),
-          // SUB CLASSES
-          children: subClasses
-            .filter((subClass) => subClass.parent === filteredClass.id)
-            .map((filteredSubClass) => ({
-              ...getRow(filteredSubClass, 'subClass', !!selectedSubClass),
-              // COLLECTIVE SUB LEVELS
+      ...masterClassRow,
+      children: filteredClasses.map((filteredClass) => {
+        const classRow = getRow({
+          item: filteredClass,
+          type: 'class',
+          expanded: !!selectedClass,
+        });
+        const filteredSubClasses = subClasses.filter(
+          (subClass) => subClass.parent === filteredClass.id,
+        );
+        return {
+          ...classRow,
+          children: filteredSubClasses.map((filteredSubClass) => {
+            const subClassRow = getRow({
+              item: filteredSubClass,
+              type: 'subClass',
+              expanded: !!selectedSubClass,
+            });
+            const filteredCollectiveSubLevels = collectiveSubLevels.filter(
+              (collectiveSubLevel) => collectiveSubLevel.parent === filteredSubClass.id,
+            );
+            return {
+              ...subClassRow,
               children: [
-                ...collectiveSubLevels
-                  .filter((collectiveSubLevel) => collectiveSubLevel.parent === filteredSubClass.id)
-                  .map((filteredCollectiveSubLevel) => ({
-                    ...getRow(
-                      filteredCollectiveSubLevel,
-                      'collectiveSubLevel',
-                      !!selectedCollectiveSubLevel,
-                    ),
-                    // OTHER CLASSIFICATIONS & COLLECTIVE DISTRICTS
+                ...filteredCollectiveSubLevels.map((filteredCollectiveSubLevel) => {
+                  const collectiveSubLevelRow = getRow({
+                    item: filteredCollectiveSubLevel,
+                    type: 'collectiveSubLevel',
+                    expanded: !!selectedCollectiveSubLevel,
+                  });
+
+                  const filteredOtherClassifications = otherClassifications.filter(
+                    (otherClassification) =>
+                      otherClassification.parent === filteredCollectiveSubLevel.id,
+                  );
+
+                  return {
+                    ...collectiveSubLevelRow,
                     children: [
-                      // other classifications
-                      ...otherClassifications
-                        .filter(
-                          (otherClassification) =>
-                            otherClassification.parent === filteredCollectiveSubLevel.id,
-                        )
-                        .map((filteredOtherClassification) => ({
-                          ...getRow(
-                            filteredOtherClassification,
-                            'otherClassification',
-                            !!selectedOtherClassification,
+                      ...filteredOtherClassifications.map((filteredOtherClassification) => {
+                        const otherClassificationRow = getRow({
+                          item: filteredOtherClassification,
+                          type: 'otherClassification',
+                          expanded: !!selectedOtherClassification,
+                        });
+                        const filteredOtherClassificationSubLevels =
+                          otherClassificationSubLevels.filter(
+                            (otherClassificationSubLevel) =>
+                              otherClassificationSubLevel.parent === filteredOtherClassification.id,
+                          );
+                        return {
+                          ...otherClassificationRow,
+                          children: filteredOtherClassificationSubLevels.map(
+                            (filteredOtherClassificationSubLevel) => {
+                              const otherClassificationSubLevelRow = getRow({
+                                item: filteredOtherClassificationSubLevel,
+                                type: 'otherClassificationSubLevel',
+                              });
+                              return {
+                                ...otherClassificationSubLevelRow,
+                              };
+                            },
                           ),
-                          // OTHER CLASSIFICATION SUB LEVELS
-                          children: otherClassificationSubLevels
-                            .filter(
-                              (otherClassificationSubLevel) =>
-                                otherClassificationSubLevel.parent ===
-                                filteredOtherClassification.id,
-                            )
-                            .map((filteredOtherClassificationSubLevel) => ({
-                              ...getRow(
-                                filteredOtherClassificationSubLevel,
-                                'otherClassificationSubLevel',
-                              ),
-                            })),
-                        })),
-                      // districts
-                      ...getDistrictRowsForParent(
-                        filteredCollectiveSubLevel,
-                        districtsAfterCollectiveSubLevel,
-                        !!selectedSubLevelDistrict,
-                        'subLevelDistrict',
-                      ),
+                        };
+                      }),
+                      // Districts that come after a collectiveSubLevel
+                      ...getDistrictRowsForParent({
+                        type: 'subLevelDistrict',
+                        expanded: !!selectedSubLevelDistrict,
+                        parent: filteredCollectiveSubLevel,
+                        districts: districtsAfterCollectiveSubLevel,
+                      }),
                     ],
-                  })),
-                // DISTRICTS
-                ...getDistrictRowsForParent(
-                  filteredSubClass,
-                  districtsBeforeCollectiveSubLevel,
-                  !!selectedDistrict,
-                  'districtPreview',
-                ),
+                  };
+                }),
+                // Districts that come after a subClass
+                ...getDistrictRowsForParent({
+                  type: 'districtPreview',
+                  expanded: !!selectedDistrict,
+                  parent: filteredSubClass,
+                  districts: districtsBeforeCollectiveSubLevel,
+                }),
               ],
-            })),
-        })),
+            };
+          }),
+        };
+      }),
     };
   });
 
@@ -253,7 +301,14 @@ const useCoordinationRows = () => {
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [batchedCoordinationClasses, groups, projects, selections, mode]);
+  }, [
+    batchedCoordinationClasses,
+    batchedCoordinationLocations,
+    groups,
+    projects,
+    selections,
+    mode,
+  ]);
 };
 
 export default useCoordinationRows;

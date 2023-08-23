@@ -11,7 +11,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IPlanningState {
   selectedYear: number | null;
-  startYear: number | null;
+  startYear: number;
   groupsExpanded: boolean;
   searchedProjectId: string | null;
   selections: IPlanningRowSelections;
@@ -48,7 +48,7 @@ export const planningSlice = createSlice({
     setSelectedYear(state, action: PayloadAction<number | null>) {
       return { ...state, selectedYear: action.payload };
     },
-    setStartYear(state, action: PayloadAction<number | null>) {
+    setStartYear(state, action: PayloadAction<number>) {
       return { ...state, startYear: action.payload };
     },
     setSelectedMasterClass(state, action: PayloadAction<IClass | null>) {

@@ -83,13 +83,14 @@ export const calculatePlanningCells = (
 ): Array<IPlanningCell> => {
   const { year, budgetOverrunAmount, projectBudgets, ...rest } = finances;
   return Object.entries(rest).map(([key, value], i) => {
-    const { frameBudget, plannedBudget } = value;
+    const { frameBudget, plannedBudget, budgetChange, isFrameBudgetOverlap } = value;
     const deviation = frameBudget - plannedBudget;
 
     return {
       key,
       year: year + i,
       isCurrentYear: year + i === year,
+      isFrameBudgetOverlap: isFrameBudgetOverlap,
       // we don't return any budgets for divisions
       ...(type !== 'division' && {
         plannedBudget: formatNumber(plannedBudget),
@@ -97,6 +98,7 @@ export const calculatePlanningCells = (
         ...(type !== 'group' && {
           frameBudget: formatNumber(frameBudget),
           deviation: formatNumber(deviation),
+          budgetChange: formatNumber(budgetChange),
         }),
       }),
     };
