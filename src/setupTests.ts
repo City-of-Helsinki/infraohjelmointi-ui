@@ -8,3 +8,6 @@ import { mockEventSource } from './mocks/mockEventSource';
 mockEventSource();
 
 process.env.REACT_APP_API_URL = 'localhost:4000';
+
+// remove specific test timeouts if this works
+jest.setTimeout(10000);

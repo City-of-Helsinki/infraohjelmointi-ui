@@ -33,7 +33,6 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
     }
     try {
       const res = await dispatch(postHashTagThunk({ value: hashtagName }));
-      console.log('res: ', res);
       if (!res.type.includes('rejected')) {
         setHashtagName('');
         onToggleAddHashtagDialog();
