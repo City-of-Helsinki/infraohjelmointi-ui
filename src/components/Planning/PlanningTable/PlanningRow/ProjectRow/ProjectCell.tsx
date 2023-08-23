@@ -21,7 +21,7 @@ import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
 import _ from 'lodash';
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectForcedToFrame, selectSelectedYear } from '@/reducers/planningSlice';
 import {
   getCellTypeUpdateRequestData,
@@ -30,6 +30,7 @@ import {
   getMoveTimelineRequestData,
   addActiveClassToProjectRow,
 } from './projectCellUtils';
+import { notifyError } from '@/reducers/notificationSlice';
 
 interface IProjectCellProps {
   cell: IProjectCell;
@@ -43,6 +44,7 @@ interface IProjectCellState {
 
 const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
+  const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
@@ -72,9 +74,13 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
       patchProject({
         id,
         data: req,
-      }).catch(Promise.reject);
+      }).catch((e) => {
+        console.log('e: ', e);
+
+        dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
+      });
     },
-    [id],
+    [id, dispatch],
   );
   const canTypeUpdate = useCallback(() => {
     return (

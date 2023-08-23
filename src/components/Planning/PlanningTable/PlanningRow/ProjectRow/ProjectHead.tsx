@@ -8,6 +8,8 @@ import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
 import { IconMenuDots } from 'hds-react/icons';
 import optionIcon from '@/utils/optionIcon';
+import { useAppDispatch } from '@/hooks/common';
+import { notifyError } from '@/reducers/notificationSlice';
 
 interface IProjectHeadProps {
   project: IProject;
@@ -16,13 +18,14 @@ interface IProjectHeadProps {
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
+  const dispatch = useAppDispatch();
 
   const projectPhase = project.phase?.value;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
-      patchProject({ data: req, id: project.id }).catch((e) =>
-        console.log('Error saving project phase: ', e),
+      patchProject({ data: req, id: project.id }).catch(() =>
+        dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })),
       );
     },
     [project.id],
