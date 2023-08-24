@@ -1,5 +1,5 @@
 import { Pagination } from 'hds-react';
-import { FC, MouseEvent, useCallback } from 'react';
+import { FC, MouseEvent } from 'react';
 
 interface IAdminHashtagsPaginationProps {
   pageCount: number;
@@ -7,13 +7,13 @@ interface IAdminHashtagsPaginationProps {
   onPageChange: (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>, page: number) => void;
 }
 
+const pageHref = () => '#';
+
 const AdminHashtagsPagination: FC<IAdminHashtagsPaginationProps> = ({
   pageCount,
   page,
   onPageChange,
 }) => {
-  const pageHref = useCallback(() => '#', []);
-
   return (
     <div className="custom-pagination mt-16">
       <Pagination
