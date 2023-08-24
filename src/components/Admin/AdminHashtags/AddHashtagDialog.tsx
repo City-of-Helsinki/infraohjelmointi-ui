@@ -4,7 +4,7 @@ import { postHashTagThunk, selectHashTags } from '@/reducers/hashTagsSlice';
 import { notifySuccess } from '@/reducers/notificationSlice';
 import { getErrorText } from '@/utils/validation';
 import { Button, Dialog, TextInput } from 'hds-react';
-import { ChangeEvent, FC, useCallback, useState } from 'react';
+import { ChangeEvent, FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IAddhashtagDialogProps {
@@ -92,4 +92,4 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
   );
 };
 
-export default AddHashtagDialog;
+export default memo(AddHashtagDialog);
