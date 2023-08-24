@@ -7,6 +7,9 @@ import { Button, Dialog, TextInput } from 'hds-react';
 import { ChangeEvent, FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+const titleId = 'add-hashtag-title';
+const descriptionId = 'add-hashtag-content';
+
 interface IAddhashtagDialogProps {
   isOpen: boolean;
   onToggleAddHashtagDialog: () => void;
@@ -17,8 +20,6 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
   const dispatch = useAppDispatch();
   const { Header, Content, ActionButtons } = Dialog;
   const [hashtagName, setHashtagName] = useState('');
-  const titleId = 'add-hashtag-title';
-  const descriptionId = 'add-hashtag-content';
 
   const error = useAppSelector(selectHashTags).error as IError;
 
