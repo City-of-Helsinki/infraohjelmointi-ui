@@ -49,7 +49,7 @@ describe('SideBar', () => {
     'placeholder 2',
     'reportsTitle',
     'placeholder 4',
-    'placeholder 5',
+    'admin',
   ];
 
   const spyScrollTo = jest.fn();

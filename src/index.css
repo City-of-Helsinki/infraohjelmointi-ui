@@ -164,3 +164,8 @@ input {
 ul > li > span > svg {
   @apply !block;
 }
+
+/* restores the inteded look for HDS pagination with box-sizing: border-box; */
+.custom-pagination a {
+  @apply min-w-[2.5rem];
+}

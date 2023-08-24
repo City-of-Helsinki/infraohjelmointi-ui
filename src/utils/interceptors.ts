@@ -1,4 +1,4 @@
-import { IError, INotification } from '@/interfaces/common';
+import { IError, IErrorResponse, INotification } from '@/interfaces/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
@@ -94,12 +94,18 @@ const getErrorNotification = (error: AxiosError): INotification => {
 };
 
 const handleError = (error: AxiosError): Promise<IError> => {
+  const errorData = error.response?.data as IErrorResponse;
+
   const parsedError: IError = {
     status: error.response?.status,
     message: error.message || 'Unknown error',
+    ...errorData,
   };
 
-  store.dispatch(notifyError(getErrorNotification(error)));
+  // The handling of backend errors is still in the works, so we're excluding endpoints that we want to handle differently
+  if (!error?.request?.responseURL.includes('project-hashtags')) {
+    store.dispatch(notifyError(getErrorNotification(error)));
+  }
 
   if (shouldTriggerLoading(error.config?.url)) {
     store.dispatch(clearLoading(error.config?.url ?? ''));

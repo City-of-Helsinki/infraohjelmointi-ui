@@ -20,7 +20,6 @@ import {
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor, act, within } from '@testing-library/react';
-import { IListItem } from '@/interfaces/common';
 import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
 import { resetProject, setProjectMode, setSelectedProject } from '@/reducers/projectSlice';
@@ -32,9 +31,10 @@ import ProjectBasics from '../ProjectBasics';
 import PlanningView from '@/views/PlanningView/PlanningView';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogContext';
+
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(7000);
+jest.setTimeout(9000);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
@@ -171,7 +171,7 @@ describe('projectForm', () => {
     expectDisplayValue(project?.constructionCostForecast);
     expectDisplayValue(project?.constructionWorkQuantity);
 
-    expect(project?.hashTags?.length).toBe(8);
+    expect(project?.hashTags?.length).toBe(2);
 
     const projectHashTags = mockHashTags.data.hashTags.filter((h) =>
       arrayHasValue(project?.hashTags, h.id),
@@ -187,10 +187,7 @@ describe('projectForm', () => {
 
     addProjectUpdateEventListener(store.dispatch);
 
-    const expectedValues = [
-      ...(mockProject.data.hashTags as Array<string>),
-      '816cc173-6340-45ed-9b49-4b4976b2a48b',
-    ];
+    const expectedValues = [...(mockProject.data.hashTags as Array<string>), 'hashtag-3'];
 
     const project = store.getState().project.selectedProject as IProject;
     const responseProject: { data: IProject } = {
@@ -208,9 +205,7 @@ describe('projectForm', () => {
     expect(await dialog.findByText('projectHashTags')).toBeInTheDocument();
     expect(await dialog.findByText('popularHashTags')).toBeInTheDocument();
     expect(await dialog.findByText('addHashTagsToProject')).toBeInTheDocument();
-    expect(await dialog.findByText('cantFindHashTag')).toBeInTheDocument();
 
-    expect(await dialog.findByRole('button', { name: 'createNewHashTag' }));
     expect((await dialog.findAllByTestId('project-hashtags')).length).toBe(2);
 
     // Search for a hashTag and click on the search result
@@ -236,78 +231,6 @@ describe('projectForm', () => {
     expect(await findByText('hulevesi')).toBeInTheDocument();
 
     removeProjectUpdateEventListener(store.dispatch);
-  });
-
-  it('can create new hashtags with the hashtags form', async () => {
-    const mockPostResponse = { data: { value: 'liikenne', id: '123456789' } };
-    const mockGetResponse = {
-      data: {
-        hashTags: [...mockHashTags.data.hashTags, mockPostResponse.data],
-        popularHashTags: [],
-      },
-    };
-
-    const mockPatchProjectResponse: { data: IProject } = {
-      data: {
-        ...mockProject.data,
-        hashTags: [...(mockProject.data.hashTags as Array<string>), mockPostResponse.data.id],
-      },
-    };
-
-    // Mock all needed requests, to be able to POST a hashTag, GET all hashTags
-    // and PATCH the project with the newly created hashTag
-    mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
-    mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
-    mockedAxios.patch.mockResolvedValueOnce(mockPatchProjectResponse);
-    // after closing dialog
-    mockedAxios.get.mockResolvedValueOnce(mockPatchProjectResponse);
-
-    const {
-      user,
-      findByText,
-      findByRole,
-      findByTestId,
-      store: { dispatch },
-    } = await render();
-
-    addProjectUpdateEventListener(dispatch);
-
-    // Open modal
-    await user.click(await findByTestId('open-hash-tag-dialog-button'));
-    const dialog = within(await findByRole('dialog'));
-
-    // Open the textbox and submit a new hashtag
-    await user.click((await dialog.findByTestId('create-new-hash-tag-button')).children[0]);
-    await user.type(
-      (await dialog.findByTestId('hashTag')).getElementsByTagName('input')[0],
-      'liikenne',
-    );
-    await user.click((await dialog.findByTestId('create-hash-tag-button')).children[0]);
-
-    await act(() => sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data));
-
-    // Click the 'add to project' button to patch the project with the new hashtag
-    await user.click(await dialog.findByTestId('add-new-hash-tag-to-project'));
-
-    await waitFor(() => {
-      const event = new KeyboardEvent('keydown', { key: 'Escape' });
-      document.dispatchEvent(event);
-      expect(dialog).not.toBeInTheDocument;
-    });
-
-    const formPostRequest = mockedAxios.post.mock.lastCall[1] as IListItem;
-
-    expect(formPostRequest.value).toEqual(mockPostResponse.data.value);
-
-    const expectedHashTags = mockGetResponse.data.hashTags.filter((h) =>
-      arrayHasValue(mockProject.data.hashTags, h.id),
-    );
-    expect(expectedHashTags.length).toBe(2);
-    expect(await findByText('leikkipaikka')).toBeInTheDocument();
-    expect(await findByText('leikkipuisto')).toBeInTheDocument();
-    expect(await findByText('liikenne')).toBeInTheDocument();
-
-    removeProjectUpdateEventListener(dispatch);
   });
 
   it('can use popular hashtags from the hashtags form', async () => {

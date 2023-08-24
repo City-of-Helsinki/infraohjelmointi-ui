@@ -1,8 +1,21 @@
 import { ReactNode } from 'react';
 
+interface IDjangoError {
+  attr: string;
+  code: string;
+  detail: string;
+}
+
+export interface IErrorResponse {
+  errors: Array<IDjangoError>;
+  type: string;
+}
+
 export interface IError {
   status: number | undefined;
   message: string;
+  errors?: Array<IDjangoError>;
+  type?: string;
 }
 
 export interface INavigationItem {

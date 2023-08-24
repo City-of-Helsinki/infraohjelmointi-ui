@@ -2,7 +2,8 @@
   "error": {
     "404": "404",
     "pageNotFound": "Sivua ei löytynyt",
-    "returnToFrontPage": "Palaa etusivulle"
+    "returnToFrontPage": "Palaa etusivulle",
+    "hashtagUnique": "Tunniste on jo olemassa."
   },
   "lang": {
     "fi": "FI",
@@ -251,7 +252,11 @@
       "404": "Virhe, resurssia ei löytynyt",
       "400": "Vääränlainen pyyntö",
       "500": "Palvelinvirhe",
-      "projectNotFound": "Hanketta ei löytnyt"
+      "projectNotFound": "Hanketta ei löytnyt",
+      "hashtagPatchSuccess": "Tunniste päivitetty",
+      "patchError": "Päivitys epäonnistui",
+      "hashtagPostSuccess": "Tunniste tallennettu",
+      "postError": "Luonti epäonnistui"
     },
     "message": {
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
@@ -261,7 +266,11 @@
       "Request failed with status code 404": "Pyyntö epäonnistui virhekoodilla 404",
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500",
       "projectNotFound": "Varmista että estimäsi hanke on olemassa",
-      "appDataError": "Virhe ladattaessa sovellustietoja"
+      "appDataError": "Virhe ladattaessa sovellustietoja",
+      "hashtagPatchSuccess": "Tunniste päivitetty onnistuneesti!",
+      "hashtagPatchError": "Tunnisteen päivitys epäonnistui.",
+      "hashtagPostSuccess": "Uusi tunniste tallennettu onnistuneesti!",
+      "hashtagPostError": "Tunnisteen luonti epäonnistui."
     }
   },
   "searchOrder": {
@@ -340,7 +349,6 @@
   "deleteNoteInfo": "Muistiinpano poistetaan heti. Muistiinpanon poistaminen on pysyvää eikä sitä voida enää palauttaa.",
   "newNoteInfo": "Tallenna hankkeeseen liittyvät muistiinpanot tähän.",
   "noteModified": "Muistiinpanoa muokattu",
-  "cantFindHashTag": "Etkö löydä tunnisteita",
   "createNewHashTag": "Luo uusi tunniste",
   "createHashTag": "Luo tunniste",
   "addHashTagsToProject": "Lisää hankkeelle tunnisteita",
@@ -423,5 +431,39 @@
   "forcedToFrame": "Sovitettu budjetti",
   "implementedAndBound": "Toteutettu ja sidottu",
   "deviationFromBudget": "Erotus budjettiin",
-  "budgetChange": "TA-muutos"
+  "budgetChange": "TA-muutos",
+  "admin": "Ylläpitäjä",
+  "helloUser": "Hei {{firstName}}",
+  "adminFunctions": {
+    "hashtags": {
+      "name": "Tunnisteet",
+      "description": "Tarkastele tunnisteita, poista tunnisteita käytöstä, aktivoi tunnisteita käyttöön sekä luo uusia tunnisteita.",
+      "button": "Siirry tunnisteisiin"
+    },
+    "menus": {
+      "name": "Valikot",
+      "description": "Muokkaa valikoiden sisältöä, lisää uusia kohteita valikoihin ja poista kohteita valikoista.",
+      "button": "Muokkaa valikoita"
+    },
+    "auditlog": {
+      "name": "Muutoshistoria",
+      "description": "Tarkastele hankkeisiin tehtyjä muutoksia.",
+      "button": "Katso muutoshistoria"
+    },
+    "financialstatements": {
+      "name": "Tilinpäätös",
+      "description": "Päätä edellinen vuosi ja lukitse tilinpäätös.",
+      "button": "Lukitse tilinpäätös tästä"
+    }
+  },
+  "projectCount": "Projektien määrä",
+  "status": "Tila",
+  "created": "Luotu",
+  "hashtag": "Tunniste",
+  "searchHashtag": "Etsi tunniste",
+  "hashtagName": "Tunnisteen nimi",
+  "archive": "Arkistoi",
+  "restore": "Palauta",
+  "archived": "Arkistoitu",
+  "inUse": "Käytössä"
 }

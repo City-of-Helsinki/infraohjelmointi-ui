@@ -32,14 +32,14 @@ const store = setupStore();
 const filledSearchForm = {
   ...initialSearchForm,
   freeSearchParams: {
-    '#leikkipuisto': {
-      label: '#leikkipuisto',
-      value: '50fe7a50-fe4d-4fe2-97b2-44d34a4ce8b4',
-      type: 'hashtags',
-    },
     '#leikkipaikka': {
       label: '#leikkipaikka',
-      value: 'ccf89105-ee58-49f1-be0a-2cffca8711ab',
+      value: 'hashtag-1',
+      type: 'hashtags',
+    },
+    '#leikkipuisto': {
+      label: '#leikkipuisto',
+      value: 'hashtag-2',
       type: 'hashtags',
     },
   },
@@ -196,7 +196,7 @@ describe('SearchResultsView', () => {
       await user.click(removeFirstTermButton);
 
       expect(mockedAxios.get.mock.lastCall[0]).toBe(
-        'localhost:4000/projects/search-results/?hashtag=ccf89105-ee58-49f1-be0a-2cffca8711ab&masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&limit=10&order=new',
+        'localhost:4000/projects/search-results/?hashtag=hashtag-1&masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&limit=10&order=new',
       );
 
       await waitFor(async () => {
