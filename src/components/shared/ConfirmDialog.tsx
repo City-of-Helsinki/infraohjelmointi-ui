@@ -4,6 +4,9 @@ import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 
+const titleId = 'confirmation-dialog-title';
+const descriptionId = 'confirmation-dialog-info';
+
 /**
  * Listens to ConfirmDialogContext and renders if isOpen is true, this will also cause a
  * promise that waits for the user to either click the confirm or cancel buttons.
@@ -12,8 +15,6 @@ import { IconAlertCircle, IconTrash } from 'hds-react/icons';
  */
 const ConfirmDialog = () => {
   const openConfirmationDialogButtonRef = useRef(null);
-  const titleId = 'confirmation-dialog-title';
-  const descriptionId = 'confirmation-dialog-info';
   const { t } = useTranslation();
 
   const { title, description, isOpen, proceed, cancel, dialogType, confirmButtonText } =
