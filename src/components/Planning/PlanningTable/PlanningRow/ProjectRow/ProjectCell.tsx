@@ -74,9 +74,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
       patchProject({
         id,
         data: req,
-      }).catch((e) => {
-        console.log('e: ', e);
-
+      }).catch(() => {
         dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
       });
     },
