@@ -270,7 +270,9 @@
       "hashtagPatchSuccess": "Tunniste päivitetty onnistuneesti!",
       "hashtagPatchError": "Tunnisteen päivitys epäonnistui.",
       "hashtagPostSuccess": "Uusi tunniste tallennettu onnistuneesti!",
-      "hashtagPostError": "Tunnisteen luonti epäonnistui."
+      "hashtagPostError": "Tunnisteen luonti epäonnistui.",
+      "phaseChangeError": "Haluamasi vaihemuutos vaatii lisää tietoja hankekorttiin. Tee vaihemuutos hankekortilla.",
+      "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla."
     }
   },
   "searchOrder": {

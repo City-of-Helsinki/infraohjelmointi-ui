@@ -102,8 +102,10 @@ const handleError = (error: AxiosError): Promise<IError> => {
     ...errorData,
   };
 
+  const responseUrl = error?.request?.responseURL || '';
+
   // The handling of backend errors is still in the works, so we're excluding endpoints that we want to handle differently
-  if (!error?.request?.responseURL.includes('project-hashtags')) {
+  if (!responseUrl.includes('project-hashtags') && !responseUrl.includes('/projects/')) {
     store.dispatch(notifyError(getErrorNotification(error)));
   }
 
