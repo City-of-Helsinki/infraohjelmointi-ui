@@ -23,23 +23,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   firstCellsWrapper: {
-    width: '346px',
+    width: '328px',
     paddingLeft: '21px',
   },
   targetCell: {
     ...cellStyles,
     paddingLeft: '21px',
     paddingRight: '15px',
-    width: '160px',
-  },
-  contentCell: {
-    ...cellStyles,
-    width: '93px',
-    paddingRight: '15px',
+    width: '214px',
   },
   divisionCell: {
     ...cellStyles,
-    width: '93px',
+    width: '113px',
     paddingRight: '15px',
   },
   cell: {
@@ -71,7 +66,6 @@ const ConstructionProgramTableHeader = () => {
       {/* Row 1 */}
       <View style={styles.tableHeaderRow}>
         <Text style={styles.targetCell}>{t('target')}</Text>
-        <Text style={styles.contentCell}>{t('content')}</Text>
         <Text style={styles.divisionCell}>{t('division')}</Text>
         <Text style={styles.costForecastCell}>{t('costForecast')}</Text>
         <Text style={styles.planAndConStartCell}>{t('planningAnd')}</Text>

@@ -32,30 +32,19 @@ const styles = StyleSheet.create({
     ...tableRowStyles,
     backgroundColor: '#dedfe1',
   },
-  firstCellsWrapper: {
-    width: '320px',
-    paddingLeft: '21px',
-  },
   targetCell: {
     ...cellStyles,
     borderLeft: '1px solid #808080',
     borderRight: 0,
     paddingLeft: '21px',
     paddingRight: '15px',
-    width: '160px',
-  },
-  contentCell: {
-    ...cellStyles,
-    borderRight: 0,
-    borderLeft: 0,
-    width: '93px',
-    paddingRight: '15px',
+    width: '214px',
   },
   divisionCell: {
     ...cellStyles,
     borderRight: 0,
     borderLeft: 0,
-    width: '93px',
+    width: '113px',
     paddingRight: '15px',
   },
   cell: {
@@ -109,7 +98,6 @@ const ConstructionProgramTableRow: FC<IConstructionProgramTableRowProps> = ({
         <View style={i % 2 ? styles.evenRow : styles.oddRow} key={p.id}>
           <Text style={styles.targetCell}>{p.name}</Text>
           {/* TODO: is this the class field? */}
-          <Text style={styles.contentCell}>Uudisrakentaminen</Text>
           <Text style={styles.divisionCell}>{getDivision(divisions, p.projectLocation)}</Text>
           <Text style={styles.costForecastCell}>{keurToMillion(p.costForecast)}</Text>
           <Text

@@ -1,12 +1,15 @@
 import { ReportRow } from '@/components/Report';
 import { reports } from '@/interfaces/reportInterfaces';
 import { useTranslation } from 'react-i18next';
-// import { PDFViewer } from '@react-pdf/renderer';
+import { PDFViewer } from '@react-pdf/renderer';
 import './styles.css';
 import { useAppSelector } from '@/hooks/common';
 import { selectBatchedPlanningLocations } from '@/reducers/locationSlice';
 import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
-// import ConstructionProgram from '@/components/Report/PdfReports/ConstructionProgram';
+import ConstructionProgram from '@/components/Report/PdfReports/ConstructionProgram';
+import { useEffect, useState } from 'react';
+import { getProjectsWithParams } from '@/services/projectServices';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 const ReportsView = () => {
   const { t } = useTranslation();
@@ -15,19 +18,28 @@ const ReportsView = () => {
   const batchedLocations = useAppSelector(selectBatchedPlanningLocations);
   const batchedClasses = useAppSelector(selectBatchedPlanningClasses);
 
+  const [projects, setProjects] = useState<Array<IProject>>([]);
+
+  useEffect(() => {
+    getProjectsWithParams({
+      direct: false,
+      programmed: false,
+      params: 'overMillion=true',
+    }).then((res) => setProjects(res.results));
+  }, []);
+
   return (
     <div className="reports-view" data-testid="reports-view">
       <h1 className="reports-title" data-testid="reports-title">
         {t('reports')}
       </h1>
 
-      {/* Uncomment this to view the desired pdf in an iframe
+      {/* Uncomment this to view the desired pdf in an iframe*/}
 
       <PDFViewer style={{ width: '100vw', height: '100vh' }}>
-        <ConstructionProgram />
-      </PDFViewer> 
-      
-      */}
+        <ConstructionProgram divisions={batchedLocations.divisions} projects={projects} />
+      </PDFViewer>
+
       {reports.map((r) => (
         <ReportRow
           key={r}
