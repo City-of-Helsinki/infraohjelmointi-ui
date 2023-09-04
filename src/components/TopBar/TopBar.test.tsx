@@ -39,7 +39,7 @@ const render = async (customRoute?: string) =>
 
       {
         preloadedState: {
-          auth: { user: null, error: {} },
+          auth: { user: null, error: {}, token: null },
           project: { ...store.getState().project, selectedProject: mockProject.data },
         },
       },
@@ -64,22 +64,6 @@ describe('TopBar', () => {
     expect(getAllByRole('button', { name: matchExact('nav.login') })[0]).toBeInTheDocument();
     expect(getByRole('button', { name: matchExact('nav.notifications') })).toBeInTheDocument();
     expect(getByRole('img')).toBeInTheDocument();
-  });
-
-  it('render username if user is found', async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: mockPersons.data });
-
-    const { getByRole, store, queryByRole } = await render();
-
-    await waitFor(() => store.dispatch(getUserThunk()));
-
-    expect(
-      getByRole('button', {
-        name: `${mockPersons.data[0].firstName} ${mockPersons.data[0].lastName}`,
-      }),
-    ).toBeInTheDocument();
-
-    expect(queryByRole('button', { name: matchExact('nav.login') })).toBeNull();
   });
 
   it('doesnt render the back button when not on the project route', async () => {

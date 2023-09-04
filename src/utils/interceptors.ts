@@ -62,6 +62,12 @@ const handleRequest = (req: InternalAxiosRequestConfig) => {
   if (shouldTriggerLoading(req?.url)) {
     store.dispatch(setLoading({ text: 'Loading request', id: req?.url ?? '' }));
   }
+  const token = store.getState().auth.token;
+
+  if (token) {
+    req.headers['Authorization'] = `Bearer ${token}`;
+  }
+
   return req;
 };
 

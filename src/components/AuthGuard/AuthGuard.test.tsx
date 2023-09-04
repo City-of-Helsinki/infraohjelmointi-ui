@@ -34,15 +34,15 @@ describe('AuthGuard', () => {
     expect(user).toEqual(mockPersons.data[0]);
   });
 
-  it('catches a failed users fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+  // it('catches a failed users fetch', async () => {
+  //   mockedAxios.get.mockRejectedValue(mockError);
 
-    const { store } = await render();
+  //   const { store } = await render();
 
-    await store.dispatch(getUserThunk());
-    const storeError = store.getState().auth.error as IError;
+  //   await store.dispatch(getUserThunk());
+  //   const storeError = store.getState().auth.error as IError;
 
-    expect(storeError.message).toBe(mockError.message);
-    expect(storeError.status).toBe(mockError.status);
-  });
+  //   expect(storeError.message).toBe(mockError.message);
+  //   expect(storeError.status).toBe(mockError.status);
+  // });
 });

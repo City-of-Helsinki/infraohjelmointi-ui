@@ -27,7 +27,7 @@ const render = async () =>
       </>,
       {
         preloadedState: {
-          auth: { user: mockPersons.data[0], error: {} },
+          auth: { user: mockPersons.data[0], error: {}, token: null },
           project: {
             ...store.getState().project,
             selectedProject: mockProject.data,

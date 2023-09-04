@@ -11,7 +11,7 @@ const render = async () =>
   await act(async () =>
     renderWithProviders(<Route path="/" element={<ProjectToolbar />} />, {
       preloadedState: {
-        auth: { user: mockPersons.data[0], error: {} },
+        auth: { user: mockPersons.data[0], error: {}, token: null },
       },
     }),
   );

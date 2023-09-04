@@ -1,21 +1,22 @@
 import { FC, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { getUserThunk, selectUser } from '@/reducers/authSlice';
+import { useAppDispatch } from '@/hooks/common';
+import { getUserThunk, setToken } from '@/reducers/authSlice';
+import { useAuth } from 'react-oidc-context';
 
 /**
  * Component to handle authentication stuff
  */
 const AuthGuard: FC = () => {
-  const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
+  const auth = useAuth();
 
-  // Check if user exists
+  // Check if user exists and set token to redux and fetch user, token is set for requests in interceptors.ts
   useEffect(() => {
-    if (!user) {
-      // Temporarily adding a mock user
-      dispatch(getUserThunk());
+    if (auth.user?.access_token) {
+      dispatch(setToken(auth.user.access_token));
+      dispatch(getUserThunk(auth.user.profile.sid as string));
     }
-  }, [user]);
+  }, [auth]);
 
   return <></>;
 };

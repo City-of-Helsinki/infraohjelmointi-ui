@@ -16,10 +16,9 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 const store = setupStore();
 
 const oidcConfig = {
-  authority: '<your authority>',
-  client_id: '<your client id>',
-  redirect_uri: '<your redirect uri>',
-  // ...
+  authority: 'https://tunnistus.test.hel.ninja/auth/realms/helsinki-tunnistus',
+  client_id: 'infraohjelmointi-ui-dev',
+  redirect_uri: 'http://localhost:4000/auth/helsinki/return',
 };
 
 injectStore(store);

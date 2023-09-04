@@ -25,6 +25,10 @@ const TopBar: FC = () => {
 
   const navigateBack = useCallback(() => navigate(-1), [navigate]);
 
+  const login = async () => {
+    await auth.signinRedirect();
+  };
+
   return (
     <div data-testid="top-bar" className="top-bar-container">
       {/* Back button (appears when the projects route is active) */}
@@ -63,7 +67,7 @@ const TopBar: FC = () => {
             <User
               label={t('nav.login')}
               userName={`${user?.firstName} ${user?.lastName}`}
-              onSignIn={() => void auth.signinRedirect()}
+              onSignIn={() => login()}
               authenticated={false}
             >
               <Item label={'Tietoa käyttäjästä'} />

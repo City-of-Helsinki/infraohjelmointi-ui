@@ -6,7 +6,7 @@ const { REACT_APP_API_URL } = process.env;
 
 export const getPersons = async (): Promise<Array<IPerson>> => {
   return axios
-    .get(`${REACT_APP_API_URL}/persons/`)
+    .get(`${REACT_APP_API_URL}/user/`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
@@ -18,6 +18,13 @@ export const getPersons = async (): Promise<Array<IPerson>> => {
 export const getPerson = async (id: string) => {
   return axios
     .get(`${REACT_APP_API_URL}/persons/${id}`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getUser = async (id: string): Promise<Array<IPerson>> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/user/${id}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
