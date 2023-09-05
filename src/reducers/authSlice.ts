@@ -6,7 +6,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IUserState {
   user: IPerson | null;
-  token: string | null;
   error: IError | null | unknown;
 }
 
@@ -24,18 +23,13 @@ export const getUserThunk = createAsyncThunk('auth/getUsers', async (id: string,
 
 const initialState: IUserState = {
   user: null,
-  token: null,
   error: null,
 };
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {
-    setToken(state, action: PayloadAction<string | null>) {
-      return { ...state, token: action.payload };
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getUserThunk.fulfilled, (state, action: PayloadAction<Array<IPerson>>) => {
       return { ...state, user: action.payload[0] };
@@ -47,8 +41,5 @@ export const authSlice = createSlice({
 });
 
 export const selectUser = (state: RootState) => state.auth.user;
-export const selectToken = (state: RootState) => state.auth.token;
-
-export const { setToken } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -21,11 +21,16 @@ const oidcConfig = {
   redirect_uri: 'http://localhost:4000/auth/helsinki/return',
 };
 
+// This callback is needed to remove the login payload from the url in order for silent login (token renewals) to work
+const onSigninCallback = (): void => {
+  window.history.replaceState({}, document.title, window.location.pathname);
+};
+
 injectStore(store);
 
 root.render(
   <BrowserRouter>
-    <AuthProvider {...oidcConfig}>
+    <AuthProvider {...oidcConfig} onSigninCallback={onSigninCallback} automaticSilentRenew={true}>
       <Provider store={store}>
         <ConfirmDialogContextProvider>
           <App />

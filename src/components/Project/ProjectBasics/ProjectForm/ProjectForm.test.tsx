@@ -69,7 +69,7 @@ const render = async () =>
             isSaving: false,
             mode: 'edit',
           },
-          auth: { user: mockPersons.data[0], error: {}, token: null },
+          auth: { user: mockPersons.data[0], error: {} },
           lists: {
             areas: mockProjectAreas.data,
             phases: mockProjectPhases.data,

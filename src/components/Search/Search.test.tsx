@@ -49,7 +49,7 @@ const render = async () =>
       </>,
       {
         preloadedState: {
-          auth: { user: mockPersons.data[0], error: {}, token: null },
+          auth: { user: mockPersons.data[0], error: {} },
           class: {
             ...store.getState().class,
             planning: {

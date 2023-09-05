@@ -28,3 +28,25 @@ export const getUser = async (id: string): Promise<Array<IPerson>> => {
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
+
+export const getApiToken = async () => {
+  const tokenEndpoint = await axios
+    .get(
+      'https://tunnistus.test.hel.ninja/auth/realms/helsinki-tunnistus/.well-known/openid-configuration',
+    )
+    .then((res) => res.data.token_endpoint)
+    .catch((err: IError) => Promise.reject(err));
+
+  return axios
+    .post(
+      tokenEndpoint,
+      {
+        grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
+        audience: 'infraohjelmointi-api-dev',
+        permission: '#access',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+    )
+    .then((res) => res.data.access_token)
+    .catch((err: IError) => Promise.reject(err));
+};

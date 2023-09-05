@@ -15,7 +15,7 @@ const render = async () =>
   await act(async () =>
     renderWithProviders(<Route path="/" element={<Notification />} />, {
       preloadedState: {
-        auth: { user: mockPersons.data[0], error: {}, token: null },
+        auth: { user: mockPersons.data[0], error: {} },
       },
     }),
   );

@@ -2,9 +2,23 @@ import { IError, IErrorResponse, INotification } from '@/interfaces/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { AppStore } from '@/store';
+import { User } from 'oidc-client-ts';
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 let store: AppStore;
+
+const authority = 'https://tunnistus.test.hel.ninja/auth/realms/helsinki-tunnistus';
+const client_id = 'infraohjelmointi-ui-dev';
+
+const getUser = () => {
+  const oidcStorage = sessionStorage.getItem(`oidc.user:${authority}:${client_id}`);
+
+  if (!oidcStorage) {
+    return null;
+  }
+
+  return User.fromStorageString(oidcStorage);
+};
 
 // Add urls here that you don't want the interceptor to add a loader to
 const urlsToExclueFromLoading = [
@@ -62,7 +76,9 @@ const handleRequest = (req: InternalAxiosRequestConfig) => {
   if (shouldTriggerLoading(req?.url)) {
     store.dispatch(setLoading({ text: 'Loading request', id: req?.url ?? '' }));
   }
-  const token = store.getState().auth.token;
+
+  const user = getUser();
+  const token = user?.access_token;
 
   if (token) {
     req.headers['Authorization'] = `Bearer ${token}`;

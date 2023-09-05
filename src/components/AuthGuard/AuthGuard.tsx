@@ -1,22 +1,30 @@
-import { FC, useEffect } from 'react';
-import { useAppDispatch } from '@/hooks/common';
-import { getUserThunk, setToken } from '@/reducers/authSlice';
-import { useAuth } from 'react-oidc-context';
+import { FC, useEffect, useState } from 'react';
+import { useAuth, hasAuthParams } from 'react-oidc-context';
+import { getApiToken } from '@/services/personServices';
 
 /**
  * Component to handle authentication stuff
  */
 const AuthGuard: FC = () => {
-  const dispatch = useAppDispatch();
   const auth = useAuth();
+  const [hasTriedSignin, setHasTriedSignin] = useState(false);
+  const { isAuthenticated, activeNavigator, isLoading, user } = auth;
 
-  // Check if user exists and set token to redux and fetch user, token is set for requests in interceptors.ts
+  // Check if user token exists and get the API token
   useEffect(() => {
-    if (auth.user?.access_token) {
-      dispatch(setToken(auth.user.access_token));
-      dispatch(getUserThunk(auth.user.profile.sid as string));
+    if (user?.access_token) {
+      console.log('auto renew');
+      getApiToken();
     }
-  }, [auth]);
+  }, [user]);
+
+  // Check if user exists and sign in
+  useEffect(() => {
+    if (!hasAuthParams() && !isAuthenticated && !activeNavigator && !isLoading && !hasTriedSignin) {
+      auth.signinRedirect();
+      setHasTriedSignin(true);
+    }
+  }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin]);
 
   return <></>;
 };
