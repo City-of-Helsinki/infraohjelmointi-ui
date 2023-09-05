@@ -41,7 +41,7 @@ export const getPerson = async (id: string) => {
 
 export const getUser = async (id: string): Promise<Array<IPerson>> => {
   return axios
-    .get(`${REACT_APP_API_URL}/persons/${id}`)
+    .get(`${REACT_APP_API_URL}/who-am-i/`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
