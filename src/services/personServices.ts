@@ -2,7 +2,24 @@ import { IError } from '@/interfaces/common';
 import { IPerson } from '@/interfaces/userInterfaces';
 import axios from 'axios';
 
+import { User } from 'oidc-client-ts';
+
 const { REACT_APP_API_URL } = process.env;
+
+const API_TOKEN_KEY = 'infraohjelmointi_api_token';
+
+const authority = 'https://tunnistus.test.hel.ninja/auth/realms/helsinki-tunnistus';
+const client_id = 'infraohjelmointi-ui-dev';
+
+const getUserFromSessionStorage = () => {
+  const oidcStorage = sessionStorage.getItem(`oidc.user:${authority}:${client_id}`);
+
+  if (!oidcStorage) {
+    return null;
+  }
+
+  return User.fromStorageString(oidcStorage);
+};
 
 export const getPersons = async (): Promise<Array<IPerson>> => {
   return axios
@@ -24,7 +41,7 @@ export const getPerson = async (id: string) => {
 
 export const getUser = async (id: string): Promise<Array<IPerson>> => {
   return axios
-    .get(`${REACT_APP_API_URL}/user/${id}`)
+    .get(`${REACT_APP_API_URL}/persons/${id}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };
@@ -37,6 +54,8 @@ export const getApiToken = async () => {
     .then((res) => res.data.token_endpoint)
     .catch((err: IError) => Promise.reject(err));
 
+  const user = getUserFromSessionStorage();
+
   return axios
     .post(
       tokenEndpoint,
@@ -45,8 +64,18 @@ export const getApiToken = async () => {
         audience: 'infraohjelmointi-api-dev',
         permission: '#access',
       },
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Bearer ${user?.access_token}`,
+        },
+      },
     )
-    .then((res) => res.data.access_token)
-    .catch((err: IError) => Promise.reject(err));
+    .then((res) => {
+      sessionStorage.setItem(API_TOKEN_KEY, res.data.access_token);
+    })
+    .catch((err: IError) => {
+      sessionStorage.removeItem(API_TOKEN_KEY);
+      Promise.reject(err);
+    });
 };
