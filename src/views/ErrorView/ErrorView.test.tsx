@@ -1,10 +1,10 @@
 import mockI18next from '@/mocks/mockI18next';
-import mockPersons from '@/mocks/mockPersons';
 import { act } from '@testing-library/react';
 import { renderWithProviders } from '../../utils/testUtils';
 import ErrorView from './ErrorView';
 import { Route } from 'react-router';
 import PlanningView from '../PlanningView/PlanningView';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -18,7 +18,7 @@ const render = async () =>
       </>,
       {
         preloadedState: {
-          auth: { user: mockPersons.data[0], error: {} },
+          auth: { user: mockUser.data, error: {} },
         },
       },
     ),

@@ -4,7 +4,7 @@ import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
-import { patchCoordinationClass } from '@/services/classService';
+import { patchCoordinationClass } from '@/services/classServices';
 import { FC, memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

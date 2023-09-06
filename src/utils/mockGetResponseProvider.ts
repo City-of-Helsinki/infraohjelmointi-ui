@@ -39,6 +39,7 @@ const { REACT_APP_API_URL } = process.env;
 export const mockGetResponseProvider = () =>
   mockedAxios.get.mockImplementation((url) => {
     url = url.replace(`${REACT_APP_API_URL}`, '');
+
     switch (true) {
       case url === '/projects/':
         return Promise.resolve(mockProject);

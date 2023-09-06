@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { useAuth, hasAuthParams } from 'react-oidc-context';
-import { getApiToken } from '@/services/personServices';
-import { useAppDispatch } from '@/hooks/common';
-import { getUserThunk } from '@/reducers/authSlice';
+import { getApiToken } from '@/services/userServices';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { getUserThunk, selectUser } from '@/reducers/authSlice';
 
 /**
  * Component to handle authentication stuff
@@ -11,19 +11,19 @@ const AuthGuard: FC = () => {
   const auth = useAuth();
   const dispatch = useAppDispatch();
   const [hasTriedSignin, setHasTriedSignin] = useState(false);
-  const { isAuthenticated, activeNavigator, isLoading, user } = auth;
+  const user = useAppSelector(selectUser);
+  const { isAuthenticated, activeNavigator, isLoading, user: oidcUser } = auth;
 
-  // Check if user token exists and get the API token
+  // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
-    if (user?.access_token) {
-      console.log('auto renew');
+    if (oidcUser?.access_token) {
       getApiToken();
-      // Get user from our API if there is an sid
-      if (user?.profile?.sid) {
-        dispatch(getUserThunk(user?.profile?.sid as string));
+      // Get user from our API if the user doesn't exist oidcUser's id doesn't match the current user
+      if (!user || user?.uuid !== oidcUser.profile.sub) {
+        dispatch(getUserThunk());
       }
     }
-  }, [user]);
+  }, [oidcUser]);
 
   // Check if user exists and sign in
   useEffect(() => {

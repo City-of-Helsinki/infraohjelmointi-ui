@@ -1,6 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { IGroup, IGroupRequest } from '@/interfaces/groupInterfaces';
-import { deleteGroup, getGroups, postGroup } from '@/services/groupService';
+import { deleteGroup, getGroups, postGroup } from '@/services/groupServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 

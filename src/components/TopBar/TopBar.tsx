@@ -6,13 +6,10 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { Button } from 'hds-react/components/Button';
 import { selectUser } from '@/reducers/authSlice';
-import { useAuth } from 'react-oidc-context';
 import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
 
 const TopBar: FC = () => {
-  const auth = useAuth();
-
   const user = useAppSelector(selectUser);
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -24,10 +21,6 @@ const TopBar: FC = () => {
   const handleOpenSearch = useCallback(() => dispatch(toggleSearch()), [dispatch]);
 
   const navigateBack = useCallback(() => navigate(-1), [navigate]);
-
-  const login = async () => {
-    await auth.signinRedirect();
-  };
 
   return (
     <div data-testid="top-bar" className="top-bar-container">
@@ -66,9 +59,9 @@ const TopBar: FC = () => {
             {/* user */}
             <User
               label={t('nav.login')}
-              userName={`${user?.firstName} ${user?.lastName}`}
-              onSignIn={() => login()}
-              authenticated={false}
+              // temporary uuid here until we get the user's name from helsinki-profiili
+              userName={`${user?.uuid}`}
+              authenticated={!!user}
             >
               <Item label={'Tietoa käyttäjästä'} />
             </User>

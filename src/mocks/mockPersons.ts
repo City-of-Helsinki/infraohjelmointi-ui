@@ -1,4 +1,4 @@
-import { IPerson } from '@/interfaces/projectInterfaces';
+import { IPerson } from '@/interfaces/personsInterfaces';
 
 const mockPersons: { data: Array<IPerson> } = {
   data: [

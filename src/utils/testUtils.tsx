@@ -10,6 +10,16 @@ import { BrowserRouter, Routes } from 'react-router-dom';
 import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 import EventSourceMock from '@/mocks/mockEventSource';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { AuthProvider } from 'react-oidc-context';
+
+const { REACT_APP_AUTHORITY, REACT_APP_CLIENT_ID, REACT_APP_REDIRECT_URI } = process.env;
+
+const oidcConfig = {
+  authority: REACT_APP_AUTHORITY ?? '',
+  client_id: REACT_APP_CLIENT_ID ?? '',
+  redirect_uri: REACT_APP_REDIRECT_URI ?? '',
+  scope: 'openid profile',
+};
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store.
@@ -48,11 +58,11 @@ export const renderWithProviders = (
   };
 
   const renderResult = render(
-    <BrowserRouter>
-      <Routes>
-        <>{ui}</>
-      </Routes>
-    </BrowserRouter>,
+    <AuthProvider {...oidcConfig}>
+      <BrowserRouter>
+        <Routes>{ui}</Routes>
+      </BrowserRouter>
+    </AuthProvider>,
     {
       wrapper: Wrapper,
       ...renderOptions,

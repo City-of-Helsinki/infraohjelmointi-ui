@@ -15,10 +15,13 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 
 const store = setupStore();
 
+const { REACT_APP_AUTHORITY, REACT_APP_CLIENT_ID, REACT_APP_REDIRECT_URI } = process.env;
+
 const oidcConfig = {
-  authority: 'https://tunnistus.test.hel.ninja/auth/realms/helsinki-tunnistus',
-  client_id: 'infraohjelmointi-ui-dev',
-  redirect_uri: 'http://localhost:4000/auth/helsinki/return',
+  authority: REACT_APP_AUTHORITY ?? '',
+  client_id: REACT_APP_CLIENT_ID ?? '',
+  redirect_uri: REACT_APP_REDIRECT_URI ?? '',
+  scope: 'openid profile',
 };
 
 // This callback is needed to remove the login payload from the url in order for silent login (token renewals) to work

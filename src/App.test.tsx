@@ -51,6 +51,7 @@ import { Route } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
 import { getGroupsThunk } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
+import { mockUser } from './mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -58,7 +59,13 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const render = async () =>
-  await act(async () => renderWithProviders(<Route path="*" element={<App />} />));
+  await act(async () =>
+    renderWithProviders(<Route path="*" element={<App />} />, {
+      preloadedState: {
+        auth: { user: mockUser.data, error: {} },
+      },
+    }),
+  );
 
 describe('App', () => {
   beforeEach(() => {

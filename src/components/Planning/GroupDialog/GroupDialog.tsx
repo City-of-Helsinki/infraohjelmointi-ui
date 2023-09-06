@@ -12,7 +12,7 @@ import { IGroupForm } from '@/interfaces/formInterfaces';
 import { postGroupThunk, updateGroup } from '@/reducers/groupSlice';
 import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
 import { useNavigate } from 'react-router';
-import { patchGroup } from '@/services/groupService';
+import { patchGroup } from '@/services/groupServices';
 import './styles.css';
 import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';

@@ -6,7 +6,7 @@ import {
   IHashTagPostRequest,
   IHashTagsResponse,
 } from '@/interfaces/hashTagsInterfaces';
-import { getHashTags, patchHashTag, postHashTag } from '@/services/hashTagsService';
+import { getHashTags, patchHashTag, postHashTag } from '@/services/hashTagsServices';
 import { RootState } from '@/store';
 
 interface IHashTagState extends IHashTagsResponse {

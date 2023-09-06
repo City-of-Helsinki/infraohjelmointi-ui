@@ -10,7 +10,7 @@ import {
   selectStartYear,
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
-import { patchCoordinationClass } from '@/services/classService';
+import { patchCoordinationClass } from '@/services/classServices';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IconAlertCircle } from 'hds-react';

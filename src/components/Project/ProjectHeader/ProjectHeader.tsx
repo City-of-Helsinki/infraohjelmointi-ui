@@ -45,8 +45,8 @@ const ProjectHeader: FC = () => {
         if (_.has(data, 'favourite')) {
           // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
           data.favPersons = Array.from(
-            new Set<string>([...(project?.favPersons ?? []), user?.id ?? '']),
-          ).filter((fp) => (!form.favourite ? fp !== user?.id : fp));
+            new Set<string>([...(project?.favPersons ?? []), user?.uuid ?? '']),
+          ).filter((fp) => (!form.favourite ? fp !== user?.uuid : fp));
 
           delete data.favourite;
         }
@@ -54,7 +54,7 @@ const ProjectHeader: FC = () => {
         projectId && (await patchProject({ id: projectId, data: data }));
       }
     },
-    [project?.favPersons, projectId, user?.id, dirtyFields, isDirty],
+    [project?.favPersons, projectId, user?.uuid, dirtyFields, isDirty],
   );
 
   return (
