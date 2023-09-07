@@ -68,12 +68,6 @@ export const getCoordinationClassesThunk = createAsyncThunk(
   },
 );
 
-/**
- * Sorts a list of classes by their numerical value or alphabetically
- */
-export const sortClassByName = (classes: Array<IClass>) =>
-  [...classes].sort((a, b) => a.name.localeCompare(b.name, 'fi', { sensitivity: 'base' }));
-
 const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
   parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
 
@@ -81,37 +75,31 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
   const getClasses = (parents: Array<IClass>) => getClassesForParents(allClasses, parents);
 
   const masterClasses = allClasses?.filter((ac) => !ac.parent);
-  const sortedMasterClasses = sortClassByName([...masterClasses]);
   const classes = getClasses(masterClasses);
-  const sortedClasses = sortClassByName([...classes]);
   const subClasses = getClasses(classes);
-  const sortedSubClasses = sortClassByName([...subClasses]);
 
   if (!forCoordinator) {
     return {
       allClasses,
-      masterClasses: sortedMasterClasses,
-      classes: sortedClasses,
-      subClasses: sortedSubClasses,
+      masterClasses,
+      classes,
+      subClasses,
       year: classes[0]?.finances?.year,
     };
   }
 
   const collectiveSubLevels = getClasses(subClasses);
-  const sortedCollectiveSubLevels = sortClassByName([...collectiveSubLevels]);
   const otherClassifications = getClasses(collectiveSubLevels);
-  const sortedOtherClassifications = sortClassByName([...otherClassifications]);
   const otherClassificationSubLevels = getClasses(otherClassifications);
-  const sortedOtherClassificationSubLevels = sortClassByName([...otherClassificationSubLevels]);
 
   return {
     allClasses,
-    masterClasses: sortedMasterClasses,
-    classes: sortedClasses,
-    subClasses: sortedSubClasses,
-    collectiveSubLevels: sortedCollectiveSubLevels,
-    otherClassifications: sortedOtherClassifications,
-    otherClassificationSubLevels: sortedOtherClassificationSubLevels,
+    masterClasses,
+    classes,
+    subClasses,
+    collectiveSubLevels,
+    otherClassifications,
+    otherClassificationSubLevels,
     year: classes[0]?.finances?.year,
   };
 };
@@ -127,8 +115,7 @@ export const classSlice = createSlice({
         const masterClasses = [...state[type].masterClasses].map((mc) =>
           mc.id === data.id ? data : mc,
         );
-        const sortedMasterClasses = sortClassByName([...masterClasses]);
-        return { ...state, [type]: { ...state[type], masterClasses: sortedMasterClasses } };
+        return { ...state, [type]: { ...state[type], masterClasses } };
       }
     },
     updateClass(state, action: PayloadAction<IClassUpdatePayload>) {
@@ -136,8 +123,7 @@ export const classSlice = createSlice({
 
       if (data) {
         const classes = [...state[type].classes].map((c) => (c.id === data.id ? data : c));
-        const sortedClasses = sortClassByName([...classes]);
-        return { ...state, [type]: { ...state[type], classes: sortedClasses } };
+        return { ...state, [type]: { ...state[type], classes } };
       }
     },
     updateSubClass(state, action: PayloadAction<IClassUpdatePayload>) {
@@ -145,8 +131,7 @@ export const classSlice = createSlice({
 
       if (data) {
         const subClasses = [...state[type].subClasses].map((sc) => (sc.id === data.id ? data : sc));
-        const sortedSubClasses = sortClassByName([...subClasses]);
-        return { ...state, [type]: { ...state[type], subClasses: sortedSubClasses } };
+        return { ...state, [type]: { ...state[type], subClasses } };
       }
     },
     updateCollectiveSubLevel(state, action: PayloadAction<IClass | null>) {
@@ -156,10 +141,9 @@ export const classSlice = createSlice({
         const collectiveSubLevels = [...state.coordination.collectiveSubLevels].map((csl) =>
           csl.id === data.id ? data : csl,
         );
-        const sortedCollectiveSubLevels = sortClassByName([...collectiveSubLevels]);
         return {
           ...state,
-          coordination: { ...state.coordination, collectiveSubLevels: sortedCollectiveSubLevels },
+          coordination: { ...state.coordination, collectiveSubLevels },
         };
       }
     },
@@ -170,10 +154,9 @@ export const classSlice = createSlice({
         const otherClassifications = [...state.coordination.otherClassifications].map((oc) =>
           oc.id === data.id ? data : oc,
         );
-        const sortedOtherClassifications = sortClassByName([...otherClassifications]);
         return {
           ...state,
-          coordination: { ...state.coordination, otherClassifications: sortedOtherClassifications },
+          coordination: { ...state.coordination, otherClassifications },
         };
       }
     },
@@ -184,14 +167,11 @@ export const classSlice = createSlice({
         const otherClassificationSubLevels = [
           ...state.coordination.otherClassificationSubLevels,
         ].map((ocsl) => (ocsl.id === data.id ? data : ocsl));
-        const sortedOtherClassificationSubLevels = sortClassByName([
-          ...otherClassificationSubLevels,
-        ]);
         return {
           ...state,
           coordination: {
             ...state.coordination,
-            otherClassificationSubLevels: sortedOtherClassificationSubLevels,
+            otherClassificationSubLevels,
           },
         };
       }
