@@ -146,7 +146,6 @@ const App: FC = () => {
 
   return (
     <div>
-      <AuthGuard />
       <Search />
       <Notification />
       <TopBar />
@@ -176,8 +175,12 @@ const App: FC = () => {
       </div>
       {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}
       <CustomContextMenu />
+      {/* Handling scrolling to last position or to the top of the page if the user enters the project form */}
       <ScrollHandler />
+      {/* Listens to ConfirmDialogContext and renders if isOpen is true */}
       <ConfirmDialog />
+      {/* Handles authentication related stuff */}
+      <AuthGuard />
     </div>
   );
 };

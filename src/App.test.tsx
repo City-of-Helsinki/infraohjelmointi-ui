@@ -178,13 +178,18 @@ describe('App', () => {
   });
 
   it('landing on a bad page', async () => {
-    const { getByText, getByTestId } = await act(() =>
+    const { getByText, getByTestId } = await act(async () =>
       renderWithProviders(
         <Route path="*" element={<App />} />,
-        {},
+        {
+          preloadedState: {
+            auth: { user: mockUser.data, error: {} },
+          },
+        },
         { route: '/something-that-does-not-match' },
       ),
     );
+
     await waitFor(() => {
       expect(getByText('error.404')).toBeInTheDocument();
       expect(getByText('error.pageNotFound')).toBeInTheDocument();

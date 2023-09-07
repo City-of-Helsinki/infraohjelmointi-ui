@@ -20,19 +20,6 @@ const render = async () =>
   await act(async () => renderWithProviders(<Route path="/" element={<AuthGuard />} />, { store }));
 
 describe('AuthGuard', () => {
-  // it('adds a user to store if found', async () => {
-  //   mockedAxios.get.mockResolvedValueOnce(mockUser);
-
-  //   const { store } = await render();
-
-  //   const authState = store.getState().auth;
-  //   const user = store.getState().auth.user;
-
-  //   expect(authState).toBeDefined();
-  //   expect(user).not.toBeNull();
-  //   expect(user).toEqual(mockUser.data);
-  // });
-
   it('catches a failed users fetch', async () => {
     mockedAxios.get.mockRejectedValue(mockError);
 

@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { setupStore } from '../store';
@@ -37,6 +37,7 @@ export interface CustomRenderResult extends RenderResult {
   user: UserEvent;
   store: AppStore;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface CustomHookRenderResult extends RenderHookResult<any, any> {
   user: UserEvent;
   store: AppStore;
@@ -61,10 +62,6 @@ export const renderWithProviders = (
   { route = '/' } = {},
 ): CustomRenderResult => {
   window.history.pushState({}, 'Test page', route);
-
-  const Wrapper = ({ children }: { children: ReactElement }) => {
-    return <Provider store={store}>{children}</Provider>;
-  };
 
   const renderResult = render(
     <BrowserRouter>
