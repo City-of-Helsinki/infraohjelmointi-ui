@@ -3,7 +3,7 @@ import { render, RenderResult, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { setupStore } from '../store';
 import type { PreloadedState } from '@reduxjs/toolkit';
-import type { RenderOptions } from '@testing-library/react';
+import type { RenderHookResult, RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter, Routes } from 'react-router-dom';
@@ -11,14 +11,19 @@ import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 import EventSourceMock from '@/mocks/mockEventSource';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { AuthProvider } from 'react-oidc-context';
-
-const { REACT_APP_AUTHORITY, REACT_APP_CLIENT_ID, REACT_APP_REDIRECT_URI } = process.env;
+import { UserManager } from 'oidc-client-ts';
 
 const oidcConfig = {
-  authority: REACT_APP_AUTHORITY ?? '',
-  client_id: REACT_APP_CLIENT_ID ?? '',
-  redirect_uri: REACT_APP_REDIRECT_URI ?? '',
+  authority: 'authority',
+  client_id: 'client',
+  redirect_uri: 'redirect',
   scope: 'openid profile',
+  userManager: new UserManager({
+    authority: 'authority',
+    client_id: 'client',
+    redirect_uri: 'redirect',
+    scope: 'openid profile',
+  }) as never,
 };
 
 // This type interface extends the default options for render from RTL, as well
@@ -29,6 +34,10 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
 }
 
 export interface CustomRenderResult extends RenderResult {
+  user: UserEvent;
+  store: AppStore;
+}
+export interface CustomHookRenderResult extends RenderHookResult<any, any> {
   user: UserEvent;
   store: AppStore;
 }
@@ -58,13 +67,15 @@ export const renderWithProviders = (
   };
 
   const renderResult = render(
-    <AuthProvider {...oidcConfig}>
-      <BrowserRouter>
-        <Routes>{ui}</Routes>
-      </BrowserRouter>
-    </AuthProvider>,
+    <BrowserRouter>
+      <AuthProvider {...oidcConfig}>
+        <Provider store={store}>
+          <Routes>{ui}</Routes>
+        </Provider>
+      </AuthProvider>
+    </BrowserRouter>,
+
     {
-      wrapper: Wrapper,
       ...renderOptions,
     },
   );

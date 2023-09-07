@@ -1,6 +1,7 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import { act, waitFor } from '@testing-library/react';
+
 import {
   renderWithProviders,
   sendFinanceUpdateEvent,
@@ -130,13 +131,13 @@ describe('App', () => {
   });
 
   it('renders TopBar', async () => {
-    const { getByTestId } = await render();
-    expect(getByTestId('top-bar')).toBeInTheDocument();
+    const { findByTestId } = await render();
+    expect(await findByTestId('top-bar')).toBeInTheDocument();
   });
 
   it('renders SideBar', async () => {
-    const { getByTestId } = await render();
-    expect(getByTestId('sidebar')).toBeInTheDocument();
+    const { findByTestId } = await render();
+    expect(await findByTestId('sidebar')).toBeInTheDocument();
   });
 
   it('renders app-content', async () => {
