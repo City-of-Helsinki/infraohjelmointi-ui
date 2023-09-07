@@ -14,16 +14,19 @@ const AuthGuard: FC = () => {
   const user = useAppSelector(selectUser);
   const { isAuthenticated, activeNavigator, isLoading, user: oidcUser } = auth;
 
+  const token = sessionStorage.getItem('infraohjelmointi_api_token');
+
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
     if (oidcUser?.access_token) {
-      getApiToken();
-      // Get user from our API if the user doesn't exist oidcUser's id doesn't match the current user
-      if (!user || user?.uuid !== oidcUser.profile.sub) {
-        dispatch(getUserThunk());
-      }
+      getApiToken().then(() => {
+        // Get user from our API if the user doesn't exist oidcUser's id doesn't match the current user
+        if (!user || (user?.uuid !== oidcUser.profile.sub && !auth.isLoading)) {
+          dispatch(getUserThunk());
+        }
+      });
     }
-  }, [oidcUser]);
+  }, [oidcUser, token]);
 
   // Check if user exists and sign in
   useEffect(() => {
