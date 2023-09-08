@@ -189,6 +189,15 @@ const useProjectForm = () => {
 
   const [selections, setSelections] = useState({ selectedClass: '', selectedLocation: '' });
 
+  // using this useEffect to populate class/location selections with initial values if a project has them
+  useEffect(() => {
+    const lowestSelectedClass =
+      formValues.subClass.value || formValues.class.value || formValues.masterClass.value;
+    const lowestSelectedLocation =
+      formValues.subDivision.value || formValues.division.value || formValues.district.value;
+    setSelections({ selectedClass: lowestSelectedClass, selectedLocation: lowestSelectedLocation });
+  }, [formValues]);
+
   // control,
   const { reset, watch, setValue } = formMethods;
 
