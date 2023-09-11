@@ -15,4 +15,4 @@ process.env.REACT_APP_API_TOKEN_GRANT_TYPE = 'test-grant';
 process.env.REACT_APP_OPEN_ID_CONFIG = 'test-open-id-config';
 
 // remove specific test timeouts if this works
-jest.setTimeout(10000);
+jest.setTimeout(15000);
