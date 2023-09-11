@@ -5,6 +5,7 @@ import { FC, memo } from 'react';
 import ConstructionProgramTable from './ConstructionProgramTable';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import { IClassHierarchy } from '@/reducers/classSlice';
 
 const styles = StyleSheet.create({
   page: {
@@ -19,9 +20,10 @@ const styles = StyleSheet.create({
 interface IConstructionProgramProps {
   divisions: Array<ILocation>;
   projects: Array<IProject>;
+  classes: IClassHierarchy;
 }
 
-const ConstructionProgram: FC<IConstructionProgramProps> = ({ divisions, projects }) => {
+const ConstructionProgram: FC<IConstructionProgramProps> = ({ divisions, projects, classes }) => {
   const { t } = useTranslation();
 
   return (
@@ -37,7 +39,7 @@ const ConstructionProgram: FC<IConstructionProgramProps> = ({ divisions, project
               }) as string
             }
           />
-          <ConstructionProgramTable projects={projects} divisions={divisions} />
+          <ConstructionProgramTable projects={projects} divisions={divisions} classes={classes} />
         </View>
       </Page>
     </Document>

@@ -4,15 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
-import BudgetProposal from './PdfReports/BudgetProposal';
 import ConstructionProgram from './PdfReports/ConstructionProgram/ConstructionProgram';
 import { Page, Document } from '@react-pdf/renderer';
-import { ILocationHierarchy } from '@/reducers/locationSlice';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { IProject } from '@/interfaces/projectInterfaces';
 import './pdfFonts';
 import './styles.css';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -26,16 +25,16 @@ const EmptyDocument = () => (
 
 const getPdfDocument = (
   type: ReportType,
-  locations: ILocationHierarchy,
+  divisions: Array<ILocation>,
   classes: IClassHierarchy,
   projects: Array<IProject>,
 ) => {
-  const { divisions } = locations;
-
   const pdfDocument = {
-    budgetProposal: <BudgetProposal />,
+    budgetProposal: <EmptyDocument />,
     strategy: <EmptyDocument />,
-    constructionProgram: <ConstructionProgram divisions={divisions} projects={projects} />,
+    constructionProgram: (
+      <ConstructionProgram divisions={divisions} classes={classes} projects={projects} />
+    ),
     budgetBookSummary: <EmptyDocument />,
     financialStatement: <EmptyDocument />,
   };
@@ -45,7 +44,7 @@ const getPdfDocument = (
 
 interface IDownloadPdfButtonProps {
   type: ReportType;
-  locations: ILocationHierarchy;
+  divisions: Array<ILocation>;
   classes: IClassHierarchy;
 }
 
@@ -54,7 +53,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, locations, classes }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, classes }) => {
   const { t } = useTranslation();
 
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -70,7 +69,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, locations, class
       });
 
       if (res.results.length > 0) {
-        const document = getPdfDocument(type, locations, classes, res.results);
+        const document = getPdfDocument(type, divisions, classes, res.results);
         const documentBlob = await pdf(document).toBlob();
 
         saveAs(documentBlob, `${documentName}.pdf`);
@@ -78,13 +77,13 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, locations, class
     } catch (e) {
       console.log(`Error getting projects for ${documentName}: `, e);
     }
-  }, [classes, documentName, locations, type]);
+  }, [classes, documentName, divisions, type]);
 
   return (
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'budgetProposal' && type !== 'constructionProgram'}
+      disabled={type !== 'constructionProgram'}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>

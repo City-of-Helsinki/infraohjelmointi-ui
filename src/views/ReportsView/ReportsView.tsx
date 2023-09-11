@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { PDFViewer } from '@react-pdf/renderer';
 import './styles.css';
 import { useAppSelector } from '@/hooks/common';
-import { selectBatchedPlanningLocations } from '@/reducers/locationSlice';
+import { selectPlanningDivisions } from '@/reducers/locationSlice';
 import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import ConstructionProgram from '@/components/Report/PdfReports/ConstructionProgram';
 import { useEffect, useState } from 'react';
@@ -15,8 +15,8 @@ const ReportsView = () => {
   const { t } = useTranslation();
 
   // We have to pass classes and locations as props to the react-pdf documents, since they are not wrapped in the redux context
-  const batchedLocations = useAppSelector(selectBatchedPlanningLocations);
-  const batchedClasses = useAppSelector(selectBatchedPlanningClasses);
+  const divisions = useAppSelector(selectPlanningDivisions);
+  const classes = useAppSelector(selectBatchedPlanningClasses);
 
   const [projects, setProjects] = useState<Array<IProject>>([]);
 
@@ -37,7 +37,7 @@ const ReportsView = () => {
       {/* Uncomment this to view the desired pdf in an iframe*/}
 
       <PDFViewer style={{ width: '100vw', height: '100vh' }}>
-        <ConstructionProgram divisions={batchedLocations.divisions} projects={projects} />
+        <ConstructionProgram divisions={divisions} projects={projects} classes={classes} />
       </PDFViewer>
 
       {reports.map((r) => (
@@ -45,8 +45,8 @@ const ReportsView = () => {
           key={r}
           type={r}
           lastUpdated="01.01.2023"
-          locations={batchedLocations}
-          classes={batchedClasses}
+          divisions={divisions}
+          classes={classes}
         />
       ))}
     </div>
