@@ -1,10 +1,10 @@
-import { Button, IconDownload } from 'hds-react';
-import { FC, useCallback, useMemo } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
-import DownloadPdfButton from './DownloadPdfButton';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import DownloadPdfButton from './DownloadPdfButton';
+import DownloadCsvButton from './DownloadCsvButton';
 import './styles.css';
 import './pdfFonts';
 
@@ -19,16 +19,6 @@ interface IReportRowProps {
 const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated, divisions, classes }) => {
   const { t } = useTranslation();
 
-  const downloadIcon = useMemo(() => <IconDownload />, []);
-
-  const buildXlsx = useCallback(() => {
-    // TODO: handle building xlsx for different types
-    switch (type) {
-      default:
-        break;
-    }
-  }, [type]);
-
   return (
     <div className="report-row-container" data-testid={`report-row-${type}`}>
       {/* report title */}
@@ -41,12 +31,8 @@ const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated, divisions, classes 
       )} ${lastUpdated}`}</div>
       {/* download pdf button */}
       <DownloadPdfButton type={type} divisions={divisions} classes={classes} />
-      {/* download xlsx button */}
-      <div className="report-download-xlsx-button" data-testid={`download-xlsx-${type}`}>
-        <Button iconLeft={downloadIcon} variant="secondary" onClick={buildXlsx} disabled={true}>
-          {t('downloadXlsx', { name: t(`report.${type}.documentName`) })}
-        </Button>
-      </div>
+      {/* download csv button */}
+      <DownloadCsvButton type={type} divisions={divisions} classes={classes} />
     </div>
   );
 };
