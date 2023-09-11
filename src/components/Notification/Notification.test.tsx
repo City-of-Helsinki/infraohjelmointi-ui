@@ -4,10 +4,10 @@ import { renderWithProviders } from '@/utils/testUtils';
 import { clearNotification, notifyInfo } from '@/reducers/notificationSlice';
 import mockNotification from '@/mocks/mockNotification';
 import { matchExact } from '@/utils/common';
-import mockPersons from '@/mocks/mockPersons';
 import { act } from 'react-dom/test-utils';
 import { waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -15,7 +15,7 @@ const render = async () =>
   await act(async () =>
     renderWithProviders(<Route path="/" element={<Notification />} />, {
       preloadedState: {
-        auth: { user: mockPersons.data[0], error: {} },
+        auth: { user: mockUser.data, error: {} },
       },
     }),
   );

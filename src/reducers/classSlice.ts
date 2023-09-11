@@ -1,6 +1,6 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IError } from '@/interfaces/common';
-import { getCoordinationClasses, getPlanningClasses } from '@/services/classService';
+import { getCoordinationClasses, getPlanningClasses } from '@/services/classServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 

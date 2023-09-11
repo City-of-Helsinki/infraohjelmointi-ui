@@ -1,6 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationService';
+import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 

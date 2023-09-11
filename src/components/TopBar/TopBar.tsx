@@ -59,7 +59,8 @@ const TopBar: FC = () => {
             {/* user */}
             <User
               label={t('nav.login')}
-              userName={`${user?.firstName} ${user?.lastName}`}
+              // temporary uuid here until we get the user's name from helsinki-profiili
+              userName={`${user?.first_name} ${user?.last_name}`}
               authenticated={!!user}
             >
               <Item label={'Tietoa käyttäjästä'} />

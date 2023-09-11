@@ -2,11 +2,11 @@ import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import ProjectBasics from './ProjectBasics';
 import { act } from '@testing-library/react';
-import mockPersons from '@/mocks/mockPersons';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
 import { Route } from 'react-router';
 import { mockProjectPhases } from '@/mocks/mockLists';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('react-i18next', () => mockI18next());
 const store = setupStore();
@@ -15,7 +15,7 @@ const render = async () =>
   await act(async () =>
     renderWithProviders(<Route path="/" element={<ProjectBasics />} />, {
       preloadedState: {
-        auth: { user: mockPersons.data[0], error: {} },
+        auth: { user: mockUser.data, error: {} },
         project: {
           ...store.getState().project,
           selectedProject: mockProject.data,

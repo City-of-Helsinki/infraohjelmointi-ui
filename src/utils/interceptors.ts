@@ -6,6 +6,8 @@ import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'ax
 
 let store: AppStore;
 
+const API_TOKEN_KEY = 'infraohjelmointi_api_token';
+
 // Add urls here that you don't want the interceptor to add a loader to
 const urlsToExclueFromLoading = [
   '/project-types/',
@@ -62,6 +64,14 @@ const handleRequest = (req: InternalAxiosRequestConfig) => {
   if (shouldTriggerLoading(req?.url)) {
     store.dispatch(setLoading({ text: 'Loading request', id: req?.url ?? '' }));
   }
+
+  const token = sessionStorage.getItem(API_TOKEN_KEY);
+
+  // Don't overwrite the token if it is given elsewhere
+  if (token && !req.headers.hasAuthorization()) {
+    req.headers['Authorization'] = `Bearer ${token}`;
+  }
+
   return req;
 };
 

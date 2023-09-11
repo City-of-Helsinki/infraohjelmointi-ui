@@ -50,6 +50,7 @@ import ReportsView from './views/ReportsView';
 import AdminView from './views/AdminView/AdminView';
 import AdminHashtags from './components/Admin/AdminHashtags';
 import AdminFunctions from './components/Admin/AdminFunctions';
+import { selectUser } from './reducers/authSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -57,6 +58,7 @@ const App: FC = () => {
   const dispatch = useAppDispatch();
   const [appDataReady, setAppDataReady] = useState(false);
   const financeUpdate = useAppSelector(selectFinanceUpdate);
+  const user = useAppSelector(selectUser);
 
   const initalizeStates = async () => {
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
@@ -84,9 +86,11 @@ const App: FC = () => {
   // Initialize states that are used everywhere in the app
   useEffect(() => {
     // Set moments locale to finnish for the app
-    moment().locale('fi');
-    initalizeStates().catch(Promise.reject);
-  }, []);
+    if (user) {
+      moment().locale('fi');
+      initalizeStates().catch(Promise.reject);
+    }
+  }, [user]);
 
   // Listen to finance-update and project-update events
   useEffect(() => {
@@ -142,7 +146,6 @@ const App: FC = () => {
 
   return (
     <div>
-      <AuthGuard />
       <Search />
       <Notification />
       <TopBar />
@@ -172,8 +175,12 @@ const App: FC = () => {
       </div>
       {/* Display the custom context menu if the custom 'showContextMenu'-event is triggered */}
       <CustomContextMenu />
+      {/* Handling scrolling to last position or to the top of the page if the user enters the project form */}
       <ScrollHandler />
+      {/* Listens to ConfirmDialogContext and renders if isOpen is true */}
       <ConfirmDialog />
+      {/* Handles authentication related stuff */}
+      <AuthGuard />
     </div>
   );
 };

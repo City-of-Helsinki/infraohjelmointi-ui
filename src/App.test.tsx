@@ -1,6 +1,7 @@
 import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import { act, waitFor } from '@testing-library/react';
+
 import {
   renderWithProviders,
   sendFinanceUpdateEvent,
@@ -51,6 +52,7 @@ import { Route } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
 import { getGroupsThunk } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
+import { mockUser } from './mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -58,7 +60,13 @@ jest.mock('react-i18next', () => mockI18next());
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const render = async () =>
-  await act(async () => renderWithProviders(<Route path="*" element={<App />} />));
+  await act(async () =>
+    renderWithProviders(<Route path="*" element={<App />} />, {
+      preloadedState: {
+        auth: { user: mockUser.data, error: {} },
+      },
+    }),
+  );
 
 describe('App', () => {
   beforeEach(() => {
@@ -123,13 +131,13 @@ describe('App', () => {
   });
 
   it('renders TopBar', async () => {
-    const { getByTestId } = await render();
-    expect(getByTestId('top-bar')).toBeInTheDocument();
+    const { findByTestId } = await render();
+    expect(await findByTestId('top-bar')).toBeInTheDocument();
   });
 
   it('renders SideBar', async () => {
-    const { getByTestId } = await render();
-    expect(getByTestId('sidebar')).toBeInTheDocument();
+    const { findByTestId } = await render();
+    expect(await findByTestId('sidebar')).toBeInTheDocument();
   });
 
   it('renders app-content', async () => {
@@ -170,13 +178,18 @@ describe('App', () => {
   });
 
   it('landing on a bad page', async () => {
-    const { getByText, getByTestId } = await act(() =>
+    const { getByText, getByTestId } = await act(async () =>
       renderWithProviders(
         <Route path="*" element={<App />} />,
-        {},
+        {
+          preloadedState: {
+            auth: { user: mockUser.data, error: {} },
+          },
+        },
         { route: '/something-that-does-not-match' },
       ),
     );
+
     await waitFor(() => {
       expect(getByText('error.404')).toBeInTheDocument();
       expect(getByText('error.pageNotFound')).toBeInTheDocument();

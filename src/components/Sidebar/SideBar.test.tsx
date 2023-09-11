@@ -2,7 +2,6 @@ import mockI18next from '@/mocks/mockI18next';
 import SideBar from './SideBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
-import mockPersons from '@/mocks/mockPersons';
 import { act } from 'react-dom/test-utils';
 import { Route } from 'react-router';
 import { setupStore } from '@/store';
@@ -10,6 +9,7 @@ import mockProject from '@/mocks/mockProject';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import PlanningView from '@/views/PlanningView';
 import { mockProjectPhases } from '@/mocks/mockLists';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -27,7 +27,7 @@ const render = async () =>
       </>,
       {
         preloadedState: {
-          auth: { user: mockPersons.data[0], error: {} },
+          auth: { user: mockUser.data, error: {} },
           project: {
             ...store.getState().project,
             selectedProject: mockProject.data,

@@ -7,10 +7,10 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { act, waitFor, within } from '@testing-library/react';
 import AdminView from './AdminView';
 import { mockHashTags } from '@/mocks/mockHashTags';
-import mockUser from '@/mocks/mockUser';
 import AdminFunctions from '@/components/Admin/AdminFunctions';
 import AdminHashtags from '@/components/Admin/AdminHashtags';
 import { adminFunctions } from '@/interfaces/adminInterfaces';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -28,7 +28,7 @@ const defaultState: RootState = {
   auth: {
     ...store.getState().auth,
     user: {
-      ...mockUser,
+      ...mockUser.data,
     },
   },
 };

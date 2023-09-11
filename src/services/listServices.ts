@@ -1,4 +1,5 @@
 import { IError } from '@/interfaces/common';
+import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
@@ -69,6 +70,13 @@ export const getConstructionPhases = async () => {
 export const getResponsibleZones = async () => {
   return axios
     .get(`${REACT_APP_API_URL}/responsible-zones/`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const getPersons = async (): Promise<Array<IPerson>> => {
+  return axios
+    .get(`${REACT_APP_API_URL}/persons/`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

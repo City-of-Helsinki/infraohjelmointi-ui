@@ -18,7 +18,7 @@ const useProjectHeaderValues = () => {
 
   const formValues = useMemo(
     () => ({
-      favourite: (user && selectedProject?.favPersons?.includes(user.id)) ?? false,
+      favourite: (user && selectedProject?.favPersons?.includes(user.uuid)) ?? false,
       phase: listItemToOption(selectedProject?.phase) ?? [],
       name: selectedProject?.name ?? '',
       address: selectedProject?.address ?? '',

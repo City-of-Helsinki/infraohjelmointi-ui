@@ -2,11 +2,8 @@ import mockI18next from '@/mocks/mockI18next';
 import TopBar from './TopBar';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
-import mockPersons from '@/mocks/mockPersons';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios';
-import { waitFor } from '@testing-library/react';
-import { getUserThunk } from '@/reducers/authSlice';
 import { Route } from 'react-router';
 import ProjectView from '@/views/ProjectView/ProjectView';
 import PlanningView from '@/views/PlanningView/PlanningView';
@@ -64,22 +61,6 @@ describe('TopBar', () => {
     expect(getAllByRole('button', { name: matchExact('nav.login') })[0]).toBeInTheDocument();
     expect(getByRole('button', { name: matchExact('nav.notifications') })).toBeInTheDocument();
     expect(getByRole('img')).toBeInTheDocument();
-  });
-
-  it('render username if user is found', async () => {
-    mockedAxios.get.mockResolvedValueOnce({ data: mockPersons.data });
-
-    const { getByRole, store, queryByRole } = await render();
-
-    await waitFor(() => store.dispatch(getUserThunk()));
-
-    expect(
-      getByRole('button', {
-        name: `${mockPersons.data[0].firstName} ${mockPersons.data[0].lastName}`,
-      }),
-    ).toBeInTheDocument();
-
-    expect(queryByRole('button', { name: matchExact('nav.login') })).toBeNull();
   });
 
   it('doesnt render the back button when not on the project route', async () => {

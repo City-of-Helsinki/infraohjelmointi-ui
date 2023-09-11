@@ -1,15 +1,30 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { setupStore } from '../store';
 import type { PreloadedState } from '@reduxjs/toolkit';
-import type { RenderOptions } from '@testing-library/react';
+import type { RenderHookResult, RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter, Routes } from 'react-router-dom';
 import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
 import EventSourceMock from '@/mocks/mockEventSource';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { AuthProvider } from 'react-oidc-context';
+import { UserManager } from 'oidc-client-ts';
+
+const oidcConfig = {
+  authority: 'authority',
+  client_id: 'client',
+  redirect_uri: 'redirect',
+  scope: 'openid profile',
+  userManager: new UserManager({
+    authority: 'authority',
+    client_id: 'client',
+    redirect_uri: 'redirect',
+    scope: 'openid profile',
+  }) as never,
+};
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store.
@@ -19,6 +34,11 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
 }
 
 export interface CustomRenderResult extends RenderResult {
+  user: UserEvent;
+  store: AppStore;
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface CustomHookRenderResult extends RenderHookResult<any, any> {
   user: UserEvent;
   store: AppStore;
 }
@@ -43,18 +63,16 @@ export const renderWithProviders = (
 ): CustomRenderResult => {
   window.history.pushState({}, 'Test page', route);
 
-  const Wrapper = ({ children }: { children: ReactElement }) => {
-    return <Provider store={store}>{children}</Provider>;
-  };
-
   const renderResult = render(
     <BrowserRouter>
-      <Routes>
-        <>{ui}</>
-      </Routes>
+      <AuthProvider {...oidcConfig}>
+        <Provider store={store}>
+          <Routes>{ui}</Routes>
+        </Provider>
+      </AuthProvider>
     </BrowserRouter>,
+
     {
-      wrapper: Wrapper,
       ...renderOptions,
     },
   );

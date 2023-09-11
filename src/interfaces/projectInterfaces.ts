@@ -1,4 +1,5 @@
 import { IListItem } from './common';
+import { IPerson } from './personsInterfaces';
 
 export interface IProject {
   id: string;
@@ -198,15 +199,6 @@ export enum ProjectPriority {
   Low = 'low',
   Medium = 'medium',
   High = 'high',
-}
-
-export interface IPerson {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  title: string;
-  phone: string;
 }
 
 interface IProjectSet {

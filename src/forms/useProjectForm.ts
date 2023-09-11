@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
-import { IPerson, IProject } from '@/interfaces/projectInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -20,6 +20,7 @@ import {
 } from '@/reducers/classSlice';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
+import { IPerson } from '@/interfaces/personsInterfaces';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the

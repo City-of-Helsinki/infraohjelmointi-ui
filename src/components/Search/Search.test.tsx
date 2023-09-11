@@ -9,7 +9,6 @@ import {
   mockResponsiblePersons,
 } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
-import mockPersons from '@/mocks/mockPersons';
 import Search from './Search';
 import {
   mockClasses,
@@ -33,6 +32,7 @@ import { ISearchResults } from '@/interfaces/searchInterfaces';
 import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 import { Route } from 'react-router';
 import SearchResultsView from '@/views/SearchResultsView/SearchResultsView';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -49,7 +49,7 @@ const render = async () =>
       </>,
       {
         preloadedState: {
-          auth: { user: mockPersons.data[0], error: {} },
+          auth: { user: mockUser.data, error: {} },
           class: {
             ...store.getState().class,
             planning: {

@@ -3,7 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { arrayHasValue, matchExact } from '@/utils/common';
-import { IPerson, IProject } from '@/interfaces/projectInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
@@ -20,7 +20,6 @@ import {
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor, act, within } from '@testing-library/react';
-import mockPersons from '@/mocks/mockPersons';
 import { Route } from 'react-router';
 import { resetProject, setProjectMode, setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
@@ -31,6 +30,8 @@ import ProjectBasics from '../ProjectBasics';
 import PlanningView from '@/views/PlanningView/PlanningView';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogContext';
+import { mockUser } from '@/mocks/mockUsers';
+import { IPerson } from '@/interfaces/personsInterfaces';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -69,7 +70,7 @@ const render = async () =>
             isSaving: false,
             mode: 'edit',
           },
-          auth: { user: mockPersons.data[0], error: {} },
+          auth: { user: mockUser.data, error: {} },
           lists: {
             areas: mockProjectAreas.data,
             phases: mockProjectPhases.data,

@@ -10,8 +10,8 @@ import {
   getProjectCategories,
   getProjectRisks,
   getResponsibleZones,
+  getPersons,
 } from '@/services/listServices';
-import { getPersons } from '@/services/personServices';
 import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 

@@ -7,23 +7,23 @@ import { selectProject } from '@/reducers/projectSlice';
 import { selectUser } from '@/reducers/authSlice';
 
 const useNoteValues = (note?: INote) => {
-  const user = useAppSelector(selectUser)?.id;
+  const userId = useAppSelector(selectUser)?.uuid;
   const projectId = useAppSelector(selectProject)?.id;
 
   const formValues = useMemo(
     () => ({
       id: note?.id ?? '',
-      updatedBy: user ?? '',
+      updatedBy: userId ?? '',
       content: note?.content ?? '',
       project: projectId ?? '',
     }),
-    [projectId, user, note],
+    [projectId, userId, note],
   );
-  return { formValues, projectId, user };
+  return { formValues, projectId, userId };
 };
 
 const useProjectNoteForm = (note?: INote) => {
-  const { formValues, projectId, user } = useNoteValues(note);
+  const { formValues, projectId, userId } = useNoteValues(note);
 
   const formMethods = useForm<IProjectNoteForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -37,7 +37,7 @@ const useProjectNoteForm = (note?: INote) => {
     if (projectId) {
       reset(formValues);
     }
-  }, [projectId, formValues, user]);
+  }, [projectId, formValues, userId]);
 
   return { formMethods, formValues };
 };
