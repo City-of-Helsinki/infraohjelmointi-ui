@@ -258,5 +258,6 @@ export const selectPlanningClasses = (state: RootState) => state.class.planning.
 export const selectPlanningSubClasses = (state: RootState) => state.class.planning.subClasses;
 export const selectBatchedPlanningClasses = (state: RootState) => state.class.planning;
 export const selectBatchedCoordinationClasses = (state: RootState) => state.class.coordination;
+export const selectBatchedForcedToFrameClasses = (state: RootState) => state.class.forcedToFrame;
 
 export default classSlice.reducer;

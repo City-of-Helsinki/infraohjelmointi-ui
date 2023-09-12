@@ -1,6 +1,12 @@
-import { selectBatchedCoordinationClasses } from '@/reducers/classSlice';
+import {
+  selectBatchedCoordinationClasses,
+  selectBatchedForcedToFrameClasses,
+} from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectBatchedCoordinationLocations } from '@/reducers/locationSlice';
+import {
+  selectBatchedCoordinationLocations,
+  selectBatchedForcedToFrameLocations,
+} from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import {
   IPlanningRow,
@@ -11,6 +17,7 @@ import {
 import { selectGroups } from '@/reducers/groupSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
+  selectForcedToFrame,
   selectPlanningMode,
   selectPlanningRows,
   selectProjects,
@@ -217,8 +224,11 @@ const useCoordinationRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   const batchedCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
   const batchedCoordinationLocations = useAppSelector(selectBatchedCoordinationLocations);
+  const batchedForcedToFrameClasses = useAppSelector(selectBatchedForcedToFrameClasses);
+  const batchedForcedToFrameLocations = useAppSelector(selectBatchedForcedToFrameLocations);
 
   const mode = useAppSelector(selectPlanningMode);
 
@@ -239,9 +249,13 @@ const useCoordinationRows = () => {
     }
   }, [selections, groups, mode]);
 
-  // Build coordination table rows when locations, classes, groups, project, mode or selections change
+  /**
+   * We use coordinator values (classes and locations) when forced to frame is false.
+   *
+   * Build coordinator table rows when locations, classes, groups, project, mode or selections change.
+   */
   useEffect(() => {
-    if (mode !== 'coordination') {
+    if (mode !== 'coordination' || forcedToFrame) {
       return;
     }
 
@@ -304,6 +318,81 @@ const useCoordinationRows = () => {
   }, [
     batchedCoordinationClasses,
     batchedCoordinationLocations,
+    groups,
+    projects,
+    selections,
+    mode,
+  ]);
+
+  /**
+   * We use forced to frame values (classes and locations) when forced to frame is true.
+   *
+   * Build forced to frame table rows when locations, classes, groups, project, mode or selections change.
+   */
+  useEffect(() => {
+    if (mode !== 'coordination' || !forcedToFrame) {
+      return;
+    }
+
+    const {
+      masterClasses,
+      classes,
+      subClasses,
+      collectiveSubLevels,
+      otherClassifications,
+      otherClassificationSubLevels,
+    } = batchedForcedToFrameClasses;
+
+    const { districts } = batchedForcedToFrameLocations;
+
+    const {
+      selectedClass,
+      selectedDistrict,
+      selectedMasterClass,
+      selectedSubClass,
+      selectedCollectiveSubLevel,
+      selectedOtherClassification,
+      selectedSubLevelDistrict,
+    } = selections;
+
+    const isAnyDistrictSelected = selectedDistrict ?? selectedSubLevelDistrict;
+    const finalCollectiveSubLevels = [];
+    const finalOtherClassification = [];
+
+    // It's unnecessary to pass the collectiveSubLevels or otherClassifications if there is a selectedDistrict
+    if (!isAnyDistrictSelected) {
+      finalOtherClassification.push(
+        ...getSelectedOrAll(selectedOtherClassification, otherClassifications),
+      );
+    }
+
+    if (!selectedDistrict) {
+      finalCollectiveSubLevels.push(
+        ...getSelectedOrAll(selectedCollectiveSubLevel, collectiveSubLevels),
+      );
+    }
+
+    const list = {
+      masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
+      classes: getSelectedOrAll(selectedClass, classes),
+      subClasses: getSelectedOrAll(selectedSubClass, subClasses),
+      districts: getSelectedOrAll(isAnyDistrictSelected, districts) as Array<ILocation>,
+      collectiveSubLevels: finalCollectiveSubLevels,
+      otherClassifications: finalOtherClassification,
+      otherClassificationSubLevels: otherClassificationSubLevels,
+      divisions: [],
+      groups: [],
+    };
+
+    const nextRows = buildCoordinatorTableRows(list, projects, selections);
+
+    // Re-build planning rows if the existing rows are not equal
+    if (!_.isEqual(nextRows, rows)) {
+      dispatch(setPlanningRows(nextRows));
+    }
+  }, [
+    batchedForcedToFrameClasses,
+    batchedForcedToFrameLocations,
     groups,
     projects,
     selections,

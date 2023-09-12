@@ -15,6 +15,7 @@ export interface ILocationHierarchy {
 interface ILocationState {
   planning: ILocationHierarchy;
   coordination: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
+  forcedToFrame: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
   error: unknown;
 }
 
@@ -39,6 +40,7 @@ const initialCoordinatorLocations = {
 const initialState: ILocationState = {
   planning: initialLocations,
   coordination: initialCoordinatorLocations,
+  forcedToFrame: initialCoordinatorLocations,
   error: null,
 };
 
@@ -169,6 +171,8 @@ export const selectPlanningSubDivisions = (state: RootState) =>
   state.location.planning.subDivisions;
 export const selectBatchedPlanningLocations = (state: RootState) => state.location.planning;
 export const selectBatchedCoordinationLocations = (state: RootState) => state.location.coordination;
+export const selectBatchedForcedToFrameLocations = (state: RootState) =>
+  state.location.forcedToFrame;
 export const selectCoordinationDistricts = (state: RootState) =>
   state.location.coordination.districts;
 
