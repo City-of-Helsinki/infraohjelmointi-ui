@@ -99,7 +99,8 @@ export const calculatePlanningCells = (
         plannedBudget: formatNumber(plannedBudget),
         // we don't return frameBudget or deviation for a group
         ...(type !== 'group' && {
-          frameBudget: formatNumber(displayFrameBudget),
+          frameBudget: formatNumber(frameBudget),
+          displayFrameBudget: formatNumber(displayFrameBudget),
           deviation: formatNumber(deviation),
           budgetChange: formatNumber(budgetChange),
         }),

@@ -35,6 +35,7 @@ export interface IPlanningCell {
   deviation?: string;
   plannedBudget?: string;
   frameBudget?: string;
+  displayFrameBudget?: string;
   budgetChange?: string;
   year: number;
   isCurrentYear: boolean;

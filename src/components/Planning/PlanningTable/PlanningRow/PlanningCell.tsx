@@ -25,14 +25,22 @@ interface IPlanningCellProps extends IPlanningRow {
 }
 
 const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
-  const { plannedBudget, frameBudget, deviation, year, isCurrentYear, isFrameBudgetOverlap } = cell;
+  const {
+    plannedBudget,
+    deviation,
+    year,
+    isCurrentYear,
+    isFrameBudgetOverlap,
+    displayFrameBudget,
+    budgetChange,
+  } = cell;
   const mode = useAppSelector(selectPlanningMode);
   const [editFrameBudget, setEditFrameBudget] = useState(false);
   const selectedYear = useAppSelector(selectSelectedYear);
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
-  const { value, onChange } = useNumberInput(frameBudget);
+  const { value, onChange } = useNumberInput(displayFrameBudget);
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,9 +51,22 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   useOnClickOutsideRef(editFrameBudgetInputRef, onEditFrameBudget, editFrameBudget);
 
   const onPatchFrameBudget = () => {
-    if (!id) {
+    // Don't patch anything the value is undefined or not changed
+    if (
+      !value ||
+      !displayFrameBudget ||
+      parseInt(displayFrameBudget.replace(/\s/g, '')) === parseInt(value)
+    ) {
       return;
     }
+
+    const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '')) : 0;
+    const valueNumber = parseInt(value);
+
+    // If the budget change is greater than the patched value we will only patch the input value
+    // otherwise we patch the value - budget change
+    const valueToPatch =
+      valueNumber < budgetChangeNumber ? valueNumber : valueNumber - budgetChangeNumber;
 
     const request: IClassPatchRequest = {
       id,
@@ -53,7 +74,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         finances: {
           year: startYear,
           [cell.key]: {
-            frameBudget: value,
+            frameBudget: valueToPatch,
           },
         },
       },
@@ -95,7 +116,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
                   className={isFrameBudgetOverlap ? 'text-engel' : 'text-white'}
                 >
                   {budgetOverlapAlertIcon}
-                  {frameBudget}
+                  {displayFrameBudget}
                 </span>
                 <span
                   data-testid={`deviation-${id}-${year}`}
