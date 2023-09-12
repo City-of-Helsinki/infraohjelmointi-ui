@@ -10,13 +10,12 @@ import './pdfFonts';
 
 interface IReportRowProps {
   type: ReportType;
-  lastUpdated: string;
   // We have to pass classes and locations as props to the react-pdf documents, since they are not wrapped in the redux context
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
 }
 
-const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated, divisions, classes }) => {
+const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes }) => {
   const { t } = useTranslation();
 
   return (
@@ -25,10 +24,6 @@ const ReportRow: FC<IReportRowProps> = ({ type, lastUpdated, divisions, classes 
       <h3 className="report-title" data-testid={`report-title-${type}`}>
         {t(`report.${type}.rowTitle`)}
       </h3>
-      {/* last updated date */}
-      <div className="report-last-updated" data-testid={`last-updated-${type}`}>{`${t(
-        'lastUpdated',
-      )} ${lastUpdated}`}</div>
       {/* download pdf button */}
       <DownloadPdfButton type={type} divisions={divisions} classes={classes} />
       {/* download csv button */}

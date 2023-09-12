@@ -431,7 +431,6 @@
       "documentName": "tilinpäätös"
     }
   },
-  "lastUpdated": "Päivitetty viimeksi",
   "downloadPdf": "Lataa {{name}} (.pdf)",
   "downloadXlsx": "Lataa {{name}} (.xlsx)",
   "reportsTitle": "Raportit",

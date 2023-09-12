@@ -19,13 +19,7 @@ const ReportsView = () => {
         {t('reports')}
       </h1>
       {reports.map((r) => (
-        <ReportRow
-          key={r}
-          type={r}
-          lastUpdated="01.01.2023"
-          divisions={divisions}
-          classes={classes}
-        />
+        <ReportRow key={r} type={r} divisions={divisions} classes={classes} />
       ))}
     </div>
   );

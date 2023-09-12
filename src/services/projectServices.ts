@@ -29,13 +29,6 @@ export const deleteProject = async (id: string): Promise<{ id: string }> => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const get20Projects = async (): Promise<Array<IProject>> => {
-  return axios
-    .get(`${REACT_APP_API_URL}/projects/?limit=20`)
-    .then((res) => res.data.results)
-    .catch((err: IError) => Promise.reject(err));
-};
-
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProject> => {
   return axios
     .patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data)
