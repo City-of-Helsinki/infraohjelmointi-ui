@@ -138,7 +138,9 @@ describe('PlanningView', () => {
 
     await render();
 
-    await waitFor(() => getProjectsWithParams({ params: 'test=123', direct: false }));
+    await waitFor(() =>
+      getProjectsWithParams({ params: 'test=123', direct: false, forcedToFrame: false }),
+    );
 
     const getMock = mockedAxios.get.mock.lastCall;
 

@@ -181,6 +181,7 @@ export const getSelectedOrAll = (
 export const fetchProjectsByRelation = async (
   type: PlanningRowType,
   id: string | undefined,
+  forcedToFrame: boolean,
   isCoordinator?: boolean,
 ): Promise<Array<IProject>> => {
   const direct = type === 'class' || type === 'subClass' || type === 'subClassDistrict';
@@ -190,6 +191,7 @@ export const fetchProjectsByRelation = async (
         params: `${type}=${id}`,
         direct: direct,
         programmed: true,
+        forcedToFrame,
       },
       isCoordinator,
     );

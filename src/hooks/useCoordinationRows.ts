@@ -241,13 +241,13 @@ const useCoordinationRows = () => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id, true)
+      fetchProjectsByRelation(type as PlanningRowType, id, forcedToFrame, true)
         .then((res) => {
           dispatch(setProjects(res));
         })
         .catch(Promise.reject);
     }
-  }, [selections, groups, mode]);
+  }, [selections, groups, mode, forcedToFrame]);
 
   /**
    * We use coordinator values (classes and locations) when forced to frame is false.
@@ -258,6 +258,8 @@ const useCoordinationRows = () => {
     if (mode !== 'coordination' || forcedToFrame) {
       return;
     }
+
+    console.log('building rows');
 
     const {
       masterClasses,

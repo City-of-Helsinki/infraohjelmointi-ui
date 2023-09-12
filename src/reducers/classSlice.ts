@@ -27,7 +27,7 @@ interface IClassState {
 
 interface IClassUpdatePayload {
   data: IClass | null;
-  type: 'coordination' | 'planning';
+  type: 'coordination' | 'planning' | 'forcedToFrame';
 }
 
 const initialClasses = {

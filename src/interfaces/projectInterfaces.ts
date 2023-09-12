@@ -81,6 +81,10 @@ export interface IProject {
   projectGroup: string | null;
   spentBudget: string;
   pwFolderLink?: string | null;
+  frameEstPlanningStart: string | null;
+  frameEstPlanningEnd: string | null;
+  frameEstConstructionStart: string | null;
+  frameEstConstructionEnd: string | null;
 }
 
 export interface IProjectRequest {
@@ -145,6 +149,10 @@ export interface IProjectRequest {
   budgetForecast3CurrentYear?: string;
   budgetForecast4CurrentYear?: string;
   finances?: IProjectFinancesRequestObject;
+  frameEstPlanningStart?: string | null;
+  frameEstPlanningEnd?: string | null;
+  frameEstConstructionStart?: string | null;
+  frameEstConstructionEnd?: string | null;
 }
 
 export interface IProjectPatchRequestObject {
@@ -236,6 +244,7 @@ export interface IProjectsResponse {
 
 export interface IProjectFinancesRequestObject {
   year: number;
+  forcedToFrame?: boolean;
   budgetProposalCurrentYearPlus0?: string | null;
   budgetProposalCurrentYearPlus1?: string | null;
   budgetProposalCurrentYearPlus2?: string | null;

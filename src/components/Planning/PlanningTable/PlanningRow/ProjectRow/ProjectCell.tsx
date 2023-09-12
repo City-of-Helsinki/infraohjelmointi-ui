@@ -29,6 +29,7 @@ import {
   getAddRequestData,
   getMoveTimelineRequestData,
   addActiveClassToProjectRow,
+  convertToForcedToFrameProjectRequest,
 } from './projectCellUtils';
 import { notifyError } from '@/reducers/notificationSlice';
 
@@ -62,13 +63,17 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     [formValue, type],
   );
 
-  const inputDisabled = useMemo(() => type === 'none', [forcedToFrame, type]);
+  const inputDisabled = useMemo(() => type === 'none', [type]);
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
       // if there's only the year property in the finances object, delete it
       if (_.size(req.finances) === 1) {
         delete req.finances;
+      }
+
+      if (forcedToFrame) {
+        convertToForcedToFrameProjectRequest(req);
       }
 
       patchProject({
@@ -78,8 +83,9 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
         dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
       });
     },
-    [id, dispatch],
+    [forcedToFrame, id, dispatch],
   );
+
   const canTypeUpdate = useCallback(() => {
     return (
       (cell.type === 'planningEnd' ||
@@ -122,7 +128,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     if (formValue !== parseInt(budget ?? '0')) {
       updateCell({
         finances: {
-          year: 2023,
+          year: new Date().getFullYear(),
           [financeKey]: formValue,
         },
       });

@@ -13,6 +13,7 @@ import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
+  selectForcedToFrame,
   selectPlanningMode,
   selectPlanningRows,
   selectProjects,
@@ -103,7 +104,11 @@ const buildPlanningTableRows = (
     }
     // Filter groups under division or district
     else if (type === 'division' || type == 'district') {
+      console.log('was district');
+
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
+
+      console.log('filteredgroups: ', filteredGroups);
     }
     return sortByName(filteredGroups).map((group) => ({
       ...getRow(group as IGroup, 'group'),
@@ -221,6 +226,7 @@ const usePlanningRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
@@ -233,14 +239,15 @@ const usePlanningRows = () => {
     }
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
+
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id)
+      fetchProjectsByRelation(type as PlanningRowType, id, false)
         .then((res) => {
           dispatch(setProjects(res));
         })
         .catch(Promise.reject);
     }
-  }, [selections, groups, mode]);
+  }, [selections, groups, mode, forcedToFrame]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {
@@ -280,7 +287,15 @@ const usePlanningRows = () => {
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [batchedPlanningClasses, batchedPlanningLocations, groups, projects, selections, mode]);
+  }, [
+    batchedPlanningClasses,
+    batchedPlanningLocations,
+    groups,
+    projects,
+    selections,
+    mode,
+    forcedToFrame,
+  ]);
 };
 
 export default usePlanningRows;

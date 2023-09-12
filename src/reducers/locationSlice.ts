@@ -21,7 +21,7 @@ interface ILocationState {
 
 interface ILocationUpdatePayload {
   data: ILocation | null;
-  type: 'coordination' | 'planning';
+  type: 'coordination' | 'planning' | 'forcedToFrame';
 }
 
 const initialLocations = {

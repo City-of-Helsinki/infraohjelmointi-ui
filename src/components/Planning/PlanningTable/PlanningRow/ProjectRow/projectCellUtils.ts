@@ -454,3 +454,37 @@ export const getMoveTimelineRequestData = (
 
   return req;
 };
+
+/**
+ * This "middleware" converts the created project request dates to instead update the
+ * properties for the forced to frame view.
+ *
+ * (frameEstPlanningEnd, frameEstPlanningStart, frameEstConstructionEnd, frameEstConstructionStart)
+ *
+ * @param req IProjectRequest
+ */
+export const convertToForcedToFrameProjectRequest = (req: IProjectRequest) => {
+  if (req.estPlanningEnd) {
+    req.frameEstPlanningEnd = req.estPlanningEnd;
+    delete req.estPlanningEnd;
+  }
+  if (req.estPlanningStart) {
+    req.frameEstPlanningStart = req.estPlanningStart;
+    delete req.estPlanningStart;
+  }
+  if (req.estConstructionEnd) {
+    req.frameEstConstructionEnd = req.estConstructionEnd;
+    delete req.estConstructionEnd;
+  }
+  if (req.estConstructionStart) {
+    req.frameEstConstructionStart = req.estConstructionStart;
+    delete req.estConstructionStart;
+  }
+  // Set request forcedToFrame to true for the finances
+  if (req.finances) {
+    req.finances.forcedToFrame = true;
+  }
+  // Remove patching of start and end year since we don't want to modify the project form data
+  delete req.planningStartYear;
+  delete req.constructionEndYear;
+};

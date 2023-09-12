@@ -22,6 +22,7 @@ import { selectFinanceUpdate } from '@/reducers/eventsSlice';
 const useFinanceUpdates = () => {
   const dispatch = useAppDispatch();
   const financeUpdate = useAppSelector(selectFinanceUpdate);
+
   // Listen to finance-update and project-update events
   useEffect(() => {
     eventSource.onerror = (e) => {
@@ -44,9 +45,7 @@ const useFinanceUpdates = () => {
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
-      console.log(financeUpdate);
-
-      const { coordination, planning } = financeUpdate;
+      const { coordination, planning, forcedToFrame } = financeUpdate;
 
       // Update all planning finances
       if (planning) {
@@ -72,6 +71,20 @@ const useFinanceUpdates = () => {
           dispatch(updateOtherClassificationSubLevel(coordination.otherClassificationSubLevel)),
           dispatch(updateDistrict({ data: coordination.district, type })),
         ]).catch((e) => console.log('Error updating coordination finances: ', e));
+      }
+
+      // Update all forced to frame finances
+      if (forcedToFrame) {
+        const type = 'forcedToFrame';
+        Promise.all([
+          dispatch(updateMasterClass({ data: forcedToFrame.masterClass, type })),
+          dispatch(updateClass({ data: forcedToFrame.class, type })),
+          dispatch(updateSubClass({ data: forcedToFrame.subClass, type })),
+          dispatch(updateCollectiveSubLevel(forcedToFrame.collectiveSubLevel)),
+          dispatch(updateOtherClassification(forcedToFrame.otherClassification)),
+          dispatch(updateOtherClassificationSubLevel(forcedToFrame.otherClassificationSubLevel)),
+          dispatch(updateDistrict({ data: forcedToFrame.district, type })),
+        ]).catch((e) => console.log('Error updating forced to frame finances: ', e));
       }
     }
   }, [financeUpdate]);

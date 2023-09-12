@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
+import { useAppSelector } from '@/hooks/common';
+import { selectForcedToFrame } from '@/reducers/planningSlice';
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
@@ -22,6 +24,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   showAdvanceFields,
   divisions,
 }) => {
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const buildQueryParamString = useCallback(
@@ -40,9 +43,9 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       searchParams.push('inGroup=false');
       searchParams.push('programmed=true');
 
-      return { params: searchParams.join('&'), direct: !showAdvanceFields };
+      return { params: searchParams.join('&'), direct: !showAdvanceFields, forcedToFrame };
     },
-    [getValues, showAdvanceFields],
+    [getValues, showAdvanceFields, forcedToFrame],
   );
 
   const { t } = useTranslation();
