@@ -21,6 +21,7 @@ export interface ICoordinatorClassHierarchy extends IClassHierarchy {
 interface IClassState {
   planning: IClassHierarchy;
   coordination: ICoordinatorClassHierarchy;
+  forcedToFrame: ICoordinatorClassHierarchy;
   error: unknown;
 }
 
@@ -47,6 +48,7 @@ const initialCoordinationClasses = {
 const initialState: IClassState = {
   planning: initialClasses,
   coordination: initialCoordinationClasses,
+  forcedToFrame: initialCoordinationClasses,
   error: null,
 };
 
@@ -62,7 +64,16 @@ export const getPlanningClassesThunk = createAsyncThunk(
 export const getCoordinationClassesThunk = createAsyncThunk(
   'class/getAllCoordination',
   async (_, thunkAPI) => {
-    return await getCoordinationClasses()
+    return await getCoordinationClasses(false)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getForcedToFrameClassesThunk = createAsyncThunk(
+  'class/getAllForcedToFrame',
+  async (_, thunkAPI) => {
+    return await getCoordinationClasses(true)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -206,6 +217,25 @@ export const classSlice = createSlice({
     );
     builder.addCase(
       getCoordinationClassesThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // GET ALL FORCED TO FRAME
+    builder.addCase(
+      getForcedToFrameClassesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IClass>>) => {
+        return {
+          ...state,
+          forcedToFrame: separateClassesIntoHierarchy(
+            action.payload,
+            true,
+          ) as ICoordinatorClassHierarchy,
+        };
+      },
+    );
+    builder.addCase(
+      getForcedToFrameClassesThunk.rejected,
       (state, action: PayloadAction<unknown>) => {
         return { ...state, error: action.payload };
       },

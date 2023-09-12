@@ -66,6 +66,7 @@ interface IFinanceCoordinationData extends Omit<IFinancePlanningData, 'group'> {
 export interface IFinanceEventData {
   planning: IFinancePlanningData;
   coordination: IFinanceCoordinationData;
+  forcedToFrame: IFinanceCoordinationData;
 }
 
 export interface IProjectEventData {

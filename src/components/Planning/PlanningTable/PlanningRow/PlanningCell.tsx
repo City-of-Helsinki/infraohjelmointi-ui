@@ -16,6 +16,7 @@ import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IconAlertCircle } from 'hds-react';
 import './styles.css';
 import useNumberInput from '@/hooks/useNumberInput';
+import { patchCoordinationLocation } from '@/services/locationServices';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -42,7 +43,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   useOnClickOutsideRef(editFrameBudgetInputRef, onEditFrameBudget, editFrameBudget);
 
   const onPatchFrameBudget = () => {
-    if (type === 'district' || type === 'districtPreview' || !id) {
+    if (!id) {
       return;
     }
 
@@ -58,7 +59,11 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       },
     };
 
-    patchCoordinationClass(request);
+    if (type === 'district' || type === 'districtPreview' || type === 'subLevelDistrict') {
+      patchCoordinationLocation(request);
+    } else {
+      patchCoordinationClass(request);
+    }
   };
 
   const budgetOverlapAlertIcon = useMemo(

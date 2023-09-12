@@ -54,7 +54,16 @@ export const getPlanningLocationsThunk = createAsyncThunk(
 export const getCoordinationLocationsThunk = createAsyncThunk(
   'location/getAllCoordinator',
   async (_, thunkAPI) => {
-    return await getCoordinatorLocations()
+    return await getCoordinatorLocations(false)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getForcedToFrameLocationsThunk = createAsyncThunk(
+  'location/getAllForcedToFrame',
+  async (_, thunkAPI) => {
+    return await getCoordinatorLocations(true)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -129,6 +138,22 @@ export const locationSlice = createSlice({
     );
     builder.addCase(
       getCoordinationLocationsThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // GET ALL FORCED TO FRAME
+    builder.addCase(
+      getForcedToFrameLocationsThunk.fulfilled,
+      (state, action: PayloadAction<Array<ILocation>>) => {
+        return {
+          ...state,
+          forcedToFrame: separateLocationsIntoHierarchy(action.payload, true),
+        };
+      },
+    );
+    builder.addCase(
+      getForcedToFrameLocationsThunk.rejected,
       (state, action: PayloadAction<unknown>) => {
         return { ...state, error: action.payload };
       },
