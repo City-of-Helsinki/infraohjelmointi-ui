@@ -7,6 +7,8 @@ import { useLocation, useNavigate } from 'react-router';
 
 const INITIAL_PATH = 'initialPath';
 
+const API_TOKEN = sessionStorage.getItem('infraohjelmointi_api_token');
+
 /**
  * Component to handle authentication stuff
  */
@@ -18,8 +20,6 @@ const AuthGuard: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, activeNavigator, isLoading, user: oidcUser } = auth;
-
-  const token = sessionStorage.getItem('infraohjelmointi_api_token');
 
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
@@ -39,7 +39,7 @@ const AuthGuard: FC = () => {
         }
       });
     }
-  }, [oidcUser, token]);
+  }, [oidcUser, API_TOKEN]);
 
   // Check if user exists and sign in
   useEffect(() => {

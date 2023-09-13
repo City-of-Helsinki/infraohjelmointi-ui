@@ -259,8 +259,6 @@ const useCoordinationRows = () => {
       return;
     }
 
-    console.log('building rows');
-
     const {
       masterClasses,
       classes,

@@ -104,11 +104,7 @@ const buildPlanningTableRows = (
     }
     // Filter groups under division or district
     else if (type === 'division' || type == 'district') {
-      console.log('was district');
-
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
-
-      console.log('filteredgroups: ', filteredGroups);
     }
     return sortByName(filteredGroups).map((group) => ({
       ...getRow(group as IGroup, 'group'),
