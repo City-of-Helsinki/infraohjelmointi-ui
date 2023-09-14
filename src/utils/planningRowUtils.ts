@@ -32,15 +32,15 @@ export const filterProjectsForCoordinatorRow = (
   type: PlanningRowType,
   projects: Array<IProject>,
 ) => {
-  
   const getProjectsForClasses = () =>
     projects.filter((p) => !p.projectLocation && !p.projectGroup && p.projectClass === id);
 
   const getProjectsForGroup = () => projects.filter((p) => p.projectGroup === id);
 
-  const getProjectsForLocation = () => projects.filter((p) => p.projectLocation === id && !p.projectGroup);
-  
-  switch (type) { 
+  const getProjectsForLocation = () =>
+    projects.filter((p) => p.projectLocation === id && !p.projectGroup);
+
+  switch (type) {
     case 'class':
     case 'subClass':
     case 'collectiveSubLevel':

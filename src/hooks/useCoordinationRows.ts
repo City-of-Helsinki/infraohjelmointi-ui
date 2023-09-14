@@ -102,7 +102,7 @@ const buildCoordinatorTableRows = (
     else if (type === 'district' || type === 'subLevelDistrict') {
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
-    
+
     return sortByName(filteredGroups).map((group) => ({
       ...getRow({
         item: group as IGroup,
