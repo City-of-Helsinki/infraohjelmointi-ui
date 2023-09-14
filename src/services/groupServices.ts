@@ -21,7 +21,16 @@ export const getGroups = async (year: number): Promise<Array<IGroup>> => {
   }
 };
 
-export const deleteGroup = async (id: string): Promise<{ id: string }> => {
+export const getCoordinatorGroups = async () => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-groups/coordinator/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const deleteGroup = async (id: string) => {
   try {
     const res = await axios.delete(`${REACT_APP_API_URL}/project-groups/${id}/`);
     return res.data;

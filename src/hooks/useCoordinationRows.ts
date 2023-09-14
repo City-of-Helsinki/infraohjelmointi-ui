@@ -15,7 +15,7 @@ import {
   IPlanningRowSelections,
   PlanningRowType,
 } from '@/interfaces/planningInterfaces';
-import { selectGroups } from '@/reducers/groupSlice';
+import { selectCoordinationGroups } from '@/reducers/groupSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   selectForcedToFrame,
@@ -32,10 +32,12 @@ import {
   fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
+  sortByName,
 } from '@/utils/planningRowUtils';
 import _ from 'lodash';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import { IGroup } from '@/interfaces/groupInterfaces';
 
 /**
  * Builds a hierarchy-list of IPlanningTableRows
@@ -53,6 +55,7 @@ const buildCoordinatorTableRows = (
     districts,
     otherClassifications,
     otherClassificationSubLevels,
+    groups,
   } = list;
 
   const {
@@ -70,7 +73,7 @@ const buildCoordinatorTableRows = (
     type,
     expanded,
   }: {
-    item: IClass | ILocation;
+    item: IClass | ILocation | IGroup;
     type: PlanningRowType;
     expanded?: boolean;
   }) =>
@@ -85,6 +88,29 @@ const buildCoordinatorTableRows = (
 
   const districtsBeforeCollectiveSubLevel = !selectedCollectiveSubLevel ? districts : [];
   const districtsAfterCollectiveSubLevel = !selectedOtherClassification ? districts : [];
+
+  // groups can be mapped under subclass, collectiveSubLevel, otherClassification or subLevelDistrict or district
+  const getSortedGroupRows = (id: string, type: PlanningRowType) => {
+    const filteredGroups = [];
+
+    if (type === 'subClass' || type === 'collectiveSubLevel' || type === 'otherClassification') {
+      filteredGroups.push(
+        ...groups.filter((group) => group.classRelation === id && !group.locationRelation),
+      );
+    }
+    // Filter groups under subClass-preview only if there are is no locationRelation
+    else if (type === 'district' || type === 'subLevelDistrict') {
+      filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
+    }
+    
+    return sortByName(filteredGroups).map((group) => ({
+      ...getRow({
+        item: group as IGroup,
+        type: 'group',
+        expanded: true,
+      }),
+    }));
+  };
 
   const getDistrictRowsForParent = ({
     type,
@@ -104,6 +130,7 @@ const buildCoordinatorTableRows = (
         type,
         expanded: !!expanded,
       }),
+      children: getSortedGroupRows(filteredDistrict.id, type),
     }));
   };
 
@@ -140,6 +167,7 @@ const buildCoordinatorTableRows = (
             return {
               ...subClassRow,
               children: [
+                ...getSortedGroupRows(filteredSubClass.id, 'subClass'),
                 ...filteredCollectiveSubLevels.map((filteredCollectiveSubLevel) => {
                   const collectiveSubLevelRow = getRow({
                     item: filteredCollectiveSubLevel,
@@ -155,6 +183,7 @@ const buildCoordinatorTableRows = (
                   return {
                     ...collectiveSubLevelRow,
                     children: [
+                      ...getSortedGroupRows(filteredCollectiveSubLevel.id, 'collectiveSubLevel'),
                       ...filteredOtherClassifications.map((filteredOtherClassification) => {
                         const otherClassificationRow = getRow({
                           item: filteredOtherClassification,
@@ -168,17 +197,23 @@ const buildCoordinatorTableRows = (
                           );
                         return {
                           ...otherClassificationRow,
-                          children: filteredOtherClassificationSubLevels.map(
-                            (filteredOtherClassificationSubLevel) => {
-                              const otherClassificationSubLevelRow = getRow({
-                                item: filteredOtherClassificationSubLevel,
-                                type: 'otherClassificationSubLevel',
-                              });
-                              return {
-                                ...otherClassificationSubLevelRow,
-                              };
-                            },
-                          ),
+                          children: [
+                            ...getSortedGroupRows(
+                              filteredOtherClassification.id,
+                              'otherClassification',
+                            ),
+                            ...filteredOtherClassificationSubLevels.map(
+                              (filteredOtherClassificationSubLevel) => {
+                                const otherClassificationSubLevelRow = getRow({
+                                  item: filteredOtherClassificationSubLevel,
+                                  type: 'otherClassificationSubLevel',
+                                });
+                                return {
+                                  ...otherClassificationSubLevelRow,
+                                };
+                              },
+                            ),
+                          ],
                         };
                       }),
                       // Districts that come after a collectiveSubLevel
@@ -281,7 +316,7 @@ const getCoordinationTableRows = (
  */
 const useCoordinationRows = () => {
   const dispatch = useAppDispatch();
-  const groups = useAppSelector(selectGroups);
+  const groups = useAppSelector(selectCoordinationGroups);
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const startYear = useAppSelector(selectStartYear);
