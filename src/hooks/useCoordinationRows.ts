@@ -1,4 +1,5 @@
 import {
+  ICoordinatorClassHierarchy,
   selectBatchedCoordinationClasses,
   selectBatchedForcedToFrameClasses,
 } from '@/reducers/classSlice';
@@ -207,6 +208,65 @@ const buildCoordinatorTableRows = (
   return rows;
 };
 
+const getCoordinationTableRows = (
+  allClasses: ICoordinatorClassHierarchy,
+  districts: Array<ILocation>,
+  selections: IPlanningRowSelections,
+  projects: Array<IProject>,
+) => {
+  const {
+    masterClasses,
+    classes,
+    subClasses,
+    collectiveSubLevels,
+    otherClassifications,
+    otherClassificationSubLevels,
+  } = allClasses;
+
+  const {
+    selectedClass,
+    selectedDistrict,
+    selectedMasterClass,
+    selectedSubClass,
+    selectedCollectiveSubLevel,
+    selectedOtherClassification,
+    selectedSubLevelDistrict,
+  } = selections;
+
+  const isAnyDistrictSelected = selectedDistrict ?? selectedSubLevelDistrict;
+  const finalCollectiveSubLevels = [];
+  const finalOtherClassification = [];
+
+  // It's unnecessary to pass the collectiveSubLevels or otherClassifications if there is a selectedDistrict
+  if (!isAnyDistrictSelected) {
+    finalOtherClassification.push(
+      ...getSelectedOrAll(selectedOtherClassification, otherClassifications),
+    );
+  }
+
+  if (!selectedDistrict) {
+    finalCollectiveSubLevels.push(
+      ...getSelectedOrAll(selectedCollectiveSubLevel, collectiveSubLevels),
+    );
+  }
+
+  const list = {
+    masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
+    classes: getSelectedOrAll(selectedClass, classes),
+    subClasses: getSelectedOrAll(selectedSubClass, subClasses),
+    districts: getSelectedOrAll(isAnyDistrictSelected, districts) as Array<ILocation>,
+    collectiveSubLevels: finalCollectiveSubLevels,
+    otherClassifications: finalOtherClassification,
+    otherClassificationSubLevels: otherClassificationSubLevels,
+    divisions: [],
+    groups: [],
+  };
+
+  const coordinationRows = buildCoordinatorTableRows(list, projects, selections);
+
+  return coordinationRows;
+};
+
 /**
  * Populates redux planning slice with data needed to render the planning view. This is done to prevent the need to
  * re-iterate the planning rows each time the user navigates back end forth between the planning table and the project basics form.
@@ -251,66 +311,21 @@ const useCoordinationRows = () => {
   }, [selections, groups, mode, forcedToFrame]);
 
   /**
-   * We use coordinator values (classes and locations) when forced to frame is false.
+   * We use coordinator or forced to frame values (classes and locations).
    *
    * Build coordinator table rows when locations, classes, groups, project, mode or selections change.
    */
   useEffect(() => {
-    if (mode !== 'coordination' || forcedToFrame) {
+    if (mode !== 'coordination') {
       return;
     }
 
-    const {
-      masterClasses,
-      classes,
-      subClasses,
-      collectiveSubLevels,
-      otherClassifications,
-      otherClassificationSubLevels,
-    } = batchedCoordinationClasses;
+    const allClasses = forcedToFrame ? batchedForcedToFrameClasses : batchedCoordinationClasses;
+    const districts = forcedToFrame
+      ? batchedForcedToFrameLocations.districts
+      : batchedCoordinationLocations.districts;
 
-    const { districts } = batchedCoordinationLocations;
-
-    const {
-      selectedClass,
-      selectedDistrict,
-      selectedMasterClass,
-      selectedSubClass,
-      selectedCollectiveSubLevel,
-      selectedOtherClassification,
-      selectedSubLevelDistrict,
-    } = selections;
-
-    const isAnyDistrictSelected = selectedDistrict ?? selectedSubLevelDistrict;
-    const finalCollectiveSubLevels = [];
-    const finalOtherClassification = [];
-
-    // It's unnecessary to pass the collectiveSubLevels or otherClassifications if there is a selectedDistrict
-    if (!isAnyDistrictSelected) {
-      finalOtherClassification.push(
-        ...getSelectedOrAll(selectedOtherClassification, otherClassifications),
-      );
-    }
-
-    if (!selectedDistrict) {
-      finalCollectiveSubLevels.push(
-        ...getSelectedOrAll(selectedCollectiveSubLevel, collectiveSubLevels),
-      );
-    }
-
-    const list = {
-      masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
-      classes: getSelectedOrAll(selectedClass, classes),
-      subClasses: getSelectedOrAll(selectedSubClass, subClasses),
-      districts: getSelectedOrAll(isAnyDistrictSelected, districts) as Array<ILocation>,
-      collectiveSubLevels: finalCollectiveSubLevels,
-      otherClassifications: finalOtherClassification,
-      otherClassificationSubLevels: otherClassificationSubLevels,
-      divisions: [],
-      groups: [],
-    };
-
-    const nextRows = buildCoordinatorTableRows(list, projects, selections);
+    const nextRows = getCoordinationTableRows(allClasses, districts, selections, projects);
 
     // Re-build planning rows if the existing rows are not equal
     if (!_.isEqual(nextRows, rows)) {
@@ -319,81 +334,6 @@ const useCoordinationRows = () => {
   }, [
     batchedCoordinationClasses,
     batchedCoordinationLocations,
-    groups,
-    projects,
-    selections,
-    mode,
-  ]);
-
-  /**
-   * We use forced to frame values (classes and locations) when forced to frame is true.
-   *
-   * Build forced to frame table rows when locations, classes, groups, project, mode or selections change.
-   */
-  useEffect(() => {
-    if (mode !== 'coordination' || !forcedToFrame) {
-      return;
-    }
-
-    const {
-      masterClasses,
-      classes,
-      subClasses,
-      collectiveSubLevels,
-      otherClassifications,
-      otherClassificationSubLevels,
-    } = batchedForcedToFrameClasses;
-
-    const { districts } = batchedForcedToFrameLocations;
-
-    const {
-      selectedClass,
-      selectedDistrict,
-      selectedMasterClass,
-      selectedSubClass,
-      selectedCollectiveSubLevel,
-      selectedOtherClassification,
-      selectedSubLevelDistrict,
-    } = selections;
-
-    const isAnyDistrictSelected = selectedDistrict ?? selectedSubLevelDistrict;
-    const finalCollectiveSubLevels = [];
-    const finalOtherClassification = [];
-
-    // It's unnecessary to pass the collectiveSubLevels or otherClassifications if there is a selectedDistrict
-    if (!isAnyDistrictSelected) {
-      finalOtherClassification.push(
-        ...getSelectedOrAll(selectedOtherClassification, otherClassifications),
-      );
-    }
-
-    if (!selectedDistrict) {
-      finalCollectiveSubLevels.push(
-        ...getSelectedOrAll(selectedCollectiveSubLevel, collectiveSubLevels),
-      );
-    }
-
-    const list = {
-      masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
-      classes: getSelectedOrAll(selectedClass, classes),
-      subClasses: getSelectedOrAll(selectedSubClass, subClasses),
-      districts: getSelectedOrAll(isAnyDistrictSelected, districts) as Array<ILocation>,
-      collectiveSubLevels: finalCollectiveSubLevels,
-      otherClassifications: finalOtherClassification,
-      otherClassificationSubLevels: otherClassificationSubLevels,
-      divisions: [],
-      groups: [],
-    };
-
-    const nextRows = buildCoordinatorTableRows(list, projects, selections);
-
-    // Re-build planning rows if the existing rows are not equal
-    if (!_.isEqual(nextRows, rows)) {
-      dispatch(setPlanningRows(nextRows));
-    }
-  }, [
-    batchedForcedToFrameClasses,
-    batchedForcedToFrameLocations,
     groups,
     projects,
     selections,
