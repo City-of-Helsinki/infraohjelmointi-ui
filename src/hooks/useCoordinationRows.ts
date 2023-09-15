@@ -7,7 +7,7 @@ import {
   selectBatchedCoordinationLocations,
   selectBatchedForcedToFrameLocations,
 } from '@/reducers/locationSlice';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   IPlanningRow,
   IPlanningRowList,
@@ -232,16 +232,12 @@ const useCoordinationRows = () => {
 
   const mode = useAppSelector(selectPlanningMode);
 
-  const [currentSelections, setCurrentSelections] = useState<IPlanningRowSelections>();
-
   // Fetch projects when selections change
   useEffect(() => {
     // Don't fetch projects if mode isn't coordinator or the selections are the same as previously
-    if (mode !== 'coordination' || !_.isEqual(currentSelections, selections)) {
+    if (mode !== 'coordination') {
       return;
     }
-
-    setCurrentSelections(selections);
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 

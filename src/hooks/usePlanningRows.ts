@@ -1,7 +1,7 @@
 import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
 import { selectBatchedPlanningLocations } from '@/reducers/locationSlice';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
   IPlanningRow,
@@ -228,16 +228,12 @@ const usePlanningRows = () => {
 
   const mode = useAppSelector(selectPlanningMode);
 
-  const [currentSelections, setCurrentSelections] = useState<IPlanningRowSelections>();
-
   // Fetch projects when selections change
   useEffect(() => {
     // Don't fetch projects if mode isn't planning or the selections are the same as previously
-    if (mode !== 'planning' || !_.isEqual(currentSelections, selections)) {
+    if (mode !== 'planning') {
       return;
     }
-
-    setCurrentSelections(selections);
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
