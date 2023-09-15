@@ -22,11 +22,7 @@ const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTab
 const flattenConstructionProgramTableRows = (
   tableRows: Array<IConstructionProgramTableRow>,
 ): Array<IConstructionProgramTableRow> =>
-  tableRows
-    .map((v: IConstructionProgramTableRow) => {
-      return flatten(v);
-    })
-    .flat(Infinity) as Array<IConstructionProgramTableRow>;
+  tableRows.map(flatten).flat(Infinity) as Array<IConstructionProgramTableRow>;
 interface IConstructionProgramCsvRow {
   [key: string]: string;
 }
