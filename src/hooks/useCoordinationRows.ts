@@ -1,6 +1,13 @@
-import { selectBatchedCoordinationClasses } from '@/reducers/classSlice';
+import {
+  ICoordinatorClassHierarchy,
+  selectBatchedCoordinationClasses,
+  selectBatchedForcedToFrameClasses,
+} from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectBatchedCoordinationLocations } from '@/reducers/locationSlice';
+import {
+  selectBatchedCoordinationLocations,
+  selectBatchedForcedToFrameLocations,
+} from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import {
   IPlanningRow,
@@ -11,6 +18,7 @@ import {
 import { selectGroups } from '@/reducers/groupSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
+  selectForcedToFrame,
   selectPlanningMode,
   selectPlanningRows,
   selectProjects,
@@ -200,6 +208,65 @@ const buildCoordinatorTableRows = (
   return rows;
 };
 
+const getCoordinationTableRows = (
+  allClasses: ICoordinatorClassHierarchy,
+  districts: Array<ILocation>,
+  selections: IPlanningRowSelections,
+  projects: Array<IProject>,
+) => {
+  const {
+    masterClasses,
+    classes,
+    subClasses,
+    collectiveSubLevels,
+    otherClassifications,
+    otherClassificationSubLevels,
+  } = allClasses;
+
+  const {
+    selectedClass,
+    selectedDistrict,
+    selectedMasterClass,
+    selectedSubClass,
+    selectedCollectiveSubLevel,
+    selectedOtherClassification,
+    selectedSubLevelDistrict,
+  } = selections;
+
+  const isAnyDistrictSelected = selectedDistrict ?? selectedSubLevelDistrict;
+  const finalCollectiveSubLevels = [];
+  const finalOtherClassification = [];
+
+  // It's unnecessary to pass the collectiveSubLevels or otherClassifications if there is a selectedDistrict
+  if (!isAnyDistrictSelected) {
+    finalOtherClassification.push(
+      ...getSelectedOrAll(selectedOtherClassification, otherClassifications),
+    );
+  }
+
+  if (!selectedDistrict) {
+    finalCollectiveSubLevels.push(
+      ...getSelectedOrAll(selectedCollectiveSubLevel, collectiveSubLevels),
+    );
+  }
+
+  const list = {
+    masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
+    classes: getSelectedOrAll(selectedClass, classes),
+    subClasses: getSelectedOrAll(selectedSubClass, subClasses),
+    districts: getSelectedOrAll(isAnyDistrictSelected, districts) as Array<ILocation>,
+    collectiveSubLevels: finalCollectiveSubLevels,
+    otherClassifications: finalOtherClassification,
+    otherClassificationSubLevels: otherClassificationSubLevels,
+    divisions: [],
+    groups: [],
+  };
+
+  const coordinationRows = buildCoordinatorTableRows(list, projects, selections);
+
+  return coordinationRows;
+};
+
 /**
  * Populates redux planning slice with data needed to render the planning view. This is done to prevent the need to
  * re-iterate the planning rows each time the user navigates back end forth between the planning table and the project basics form.
@@ -217,13 +284,17 @@ const useCoordinationRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   const batchedCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
   const batchedCoordinationLocations = useAppSelector(selectBatchedCoordinationLocations);
+  const batchedForcedToFrameClasses = useAppSelector(selectBatchedForcedToFrameClasses);
+  const batchedForcedToFrameLocations = useAppSelector(selectBatchedForcedToFrameLocations);
 
   const mode = useAppSelector(selectPlanningMode);
 
   // Fetch projects when selections change
   useEffect(() => {
+    // Don't fetch projects if mode isn't coordinator or the selections are the same as previously
     if (mode !== 'coordination') {
       return;
     }
@@ -231,71 +302,30 @@ const useCoordinationRows = () => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id, true)
+      fetchProjectsByRelation(type as PlanningRowType, id, forcedToFrame, true)
         .then((res) => {
           dispatch(setProjects(res));
         })
         .catch(Promise.reject);
     }
-  }, [selections, groups, mode]);
+  }, [selections, groups, mode, forcedToFrame]);
 
-  // Build coordination table rows when locations, classes, groups, project, mode or selections change
+  /**
+   * We use coordinator or forced to frame values (classes and locations).
+   *
+   * Build coordinator table rows when locations, classes, groups, project, mode or selections change.
+   */
   useEffect(() => {
     if (mode !== 'coordination') {
       return;
     }
 
-    const {
-      masterClasses,
-      classes,
-      subClasses,
-      collectiveSubLevels,
-      otherClassifications,
-      otherClassificationSubLevels,
-    } = batchedCoordinationClasses;
+    const allClasses = forcedToFrame ? batchedForcedToFrameClasses : batchedCoordinationClasses;
+    const districts = forcedToFrame
+      ? batchedForcedToFrameLocations.districts
+      : batchedCoordinationLocations.districts;
 
-    const { districts } = batchedCoordinationLocations;
-
-    const {
-      selectedClass,
-      selectedDistrict,
-      selectedMasterClass,
-      selectedSubClass,
-      selectedCollectiveSubLevel,
-      selectedOtherClassification,
-      selectedSubLevelDistrict,
-    } = selections;
-
-    const isAnyDistrictSelected = selectedDistrict ?? selectedSubLevelDistrict;
-    const finalCollectiveSubLevels = [];
-    const finalOtherClassification = [];
-
-    // It's unnecessary to pass the collectiveSubLevels or otherClassifications if there is a selectedDistrict
-    if (!isAnyDistrictSelected) {
-      finalOtherClassification.push(
-        ...getSelectedOrAll(selectedOtherClassification, otherClassifications),
-      );
-    }
-
-    if (!selectedDistrict) {
-      finalCollectiveSubLevels.push(
-        ...getSelectedOrAll(selectedCollectiveSubLevel, collectiveSubLevels),
-      );
-    }
-
-    const list = {
-      masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
-      classes: getSelectedOrAll(selectedClass, classes),
-      subClasses: getSelectedOrAll(selectedSubClass, subClasses),
-      districts: getSelectedOrAll(isAnyDistrictSelected, districts) as Array<ILocation>,
-      collectiveSubLevels: finalCollectiveSubLevels,
-      otherClassifications: finalOtherClassification,
-      otherClassificationSubLevels: otherClassificationSubLevels,
-      divisions: [],
-      groups: [],
-    };
-
-    const nextRows = buildCoordinatorTableRows(list, projects, selections);
+    const nextRows = getCoordinationTableRows(allClasses, districts, selections, projects);
 
     // Re-build planning rows if the existing rows are not equal
     if (!_.isEqual(nextRows, rows)) {

@@ -22,6 +22,8 @@ import {
 } from '@/utils/dates';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
+import { useAppSelector } from './common';
+import { selectForcedToFrame } from '@/reducers/planningSlice';
 
 /**
  * Creates the timeline dates to be used with drawing the timeline and building the cells.
@@ -32,15 +34,17 @@ import { useEffect, useState } from 'react';
  *
  * https://helsinkisolutionoffice.atlassian.net/browse/IO-223 <- please refer to the rules on this ticket.
  */
-const getTimelineDates = (project: IProject) => {
-  const {
-    planningStartYear,
-    constructionEndYear,
-    estPlanningStart,
-    estPlanningEnd,
-    estConstructionStart,
-    estConstructionEnd,
-  } = project;
+const getTimelineDates = (
+  project: IProject,
+  dates: {
+    estPlanningStart?: string | null;
+    estPlanningEnd?: string | null;
+    estConstructionStart?: string | null;
+    estConstructionEnd?: string | null;
+  },
+) => {
+  const { planningStartYear, constructionEndYear } = project;
+  const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } = dates;
 
   const effectiveConstructionEndYear = getYear(estConstructionEnd) || constructionEndYear;
   const effectivePlanningStartYear = getYear(estPlanningStart) || planningStartYear;
@@ -399,12 +403,30 @@ const getAffectsDates = (
   return isLastOfType || isStartOfTimeline || isEndOfTimeline;
 };
 
-const getProjectCells = (project: IProject) => {
+const getProjectCells = (project: IProject, forcedToFrame: boolean) => {
   const { year, ...finances } = project.finances;
-  const { name, id, estConstructionEnd, estConstructionStart, estPlanningEnd, estPlanningStart } =
-    project;
 
-  const timelineDates = getTimelineDates(project);
+  const {
+    name,
+    id,
+    estConstructionEnd,
+    estConstructionStart,
+    estPlanningEnd,
+    estPlanningStart,
+    frameEstConstructionEnd,
+    frameEstConstructionStart,
+    frameEstPlanningEnd,
+    frameEstPlanningStart,
+  } = project;
+
+  const datesToUse = {
+    estPlanningStart: forcedToFrame ? frameEstPlanningStart : estPlanningStart,
+    estPlanningEnd: forcedToFrame ? frameEstPlanningEnd : estPlanningEnd,
+    estConstructionStart: forcedToFrame ? frameEstConstructionStart : estConstructionStart,
+    estConstructionEnd: forcedToFrame ? frameEstConstructionEnd : estConstructionEnd,
+  };
+
+  const timelineDates = getTimelineDates(project, datesToUse);
 
   // Create cells
   const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {
@@ -446,10 +468,7 @@ const getProjectCells = (project: IProject) => {
       affectsDates,
       monthlyDataList,
       projectEstDates: {
-        estConstructionEnd,
-        estConstructionStart,
-        estPlanningEnd,
-        estPlanningStart,
+        ...datesToUse,
       },
     };
   });
@@ -506,6 +525,7 @@ interface IProjectRowsState {
  * @returns a list of IProjectCell
  */
 const useProjectRow = (project: IProject) => {
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   const [projectRowsState, setProjectRowsState] = useState<IProjectRowsState>({
     cells: [],
     sums: { availableFrameBudget: '0', costEstimateBudget: '0' },
@@ -516,12 +536,12 @@ const useProjectRow = (project: IProject) => {
     if (project) {
       setProjectRowsState((current) => ({
         ...current,
-        cells: getProjectCells(project),
+        cells: getProjectCells(project, forcedToFrame),
         sums: calculateProjectRowSums(project),
         projectFinances: project.finances,
       }));
     }
-  }, [project]);
+  }, [project, forcedToFrame]);
 
   return projectRowsState;
 };

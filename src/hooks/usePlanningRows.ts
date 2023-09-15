@@ -13,6 +13,7 @@ import { selectGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
+  selectForcedToFrame,
   selectPlanningMode,
   selectPlanningRows,
   selectProjects,
@@ -221,6 +222,7 @@ const usePlanningRows = () => {
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
+  const forcedToFrame = useAppSelector(selectForcedToFrame);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
@@ -228,19 +230,21 @@ const usePlanningRows = () => {
 
   // Fetch projects when selections change
   useEffect(() => {
+    // Don't fetch projects if mode isn't planning or the selections are the same as previously
     if (mode !== 'planning') {
       return;
     }
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
+
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id)
+      fetchProjectsByRelation(type as PlanningRowType, id, false)
         .then((res) => {
           dispatch(setProjects(res));
         })
         .catch(Promise.reject);
     }
-  }, [selections, groups, mode]);
+  }, [selections, groups, mode, forcedToFrame]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {
@@ -280,7 +284,15 @@ const usePlanningRows = () => {
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [batchedPlanningClasses, batchedPlanningLocations, groups, projects, selections, mode]);
+  }, [
+    batchedPlanningClasses,
+    batchedPlanningLocations,
+    groups,
+    projects,
+    selections,
+    mode,
+    forcedToFrame,
+  ]);
 };
 
 export default usePlanningRows;

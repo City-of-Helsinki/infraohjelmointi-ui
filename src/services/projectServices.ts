@@ -66,8 +66,10 @@ export const getProjectsWithParams = async (
   req: IProjectSearchRequest,
   isCoordinator?: boolean,
 ): Promise<IProjectsResponse> => {
-  const { params, direct, programmed } = req;
-  const allParams = `${params}&direct=${direct}${programmed ? '&programmed=true' : ''}`;
+  const { params, direct, programmed, forcedToFrame } = req;
+  const allParams = `${params}&forcedToFrame=${forcedToFrame}&direct=${direct}${
+    programmed ? '&programmed=true' : ''
+  }`;
 
   const url = isCoordinator
     ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`

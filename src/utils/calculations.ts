@@ -86,6 +86,9 @@ export const calculatePlanningCells = (
     const { frameBudget, plannedBudget, budgetChange, isFrameBudgetOverlap } = value;
     const deviation = frameBudget - plannedBudget;
 
+    // Frame budget is always displayed along with the budgetChange
+    const displayFrameBudget = budgetChange ? budgetChange + frameBudget : frameBudget;
+
     return {
       key,
       year: year + i,
@@ -97,6 +100,7 @@ export const calculatePlanningCells = (
         // we don't return frameBudget or deviation for a group
         ...(type !== 'group' && {
           frameBudget: formatNumber(frameBudget),
+          displayFrameBudget: formatNumber(displayFrameBudget),
           deviation: formatNumber(deviation),
           budgetChange: formatNumber(budgetChange),
         }),

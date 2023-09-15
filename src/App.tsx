@@ -9,18 +9,13 @@ import { Route, Routes } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
 import {
   getCoordinationClassesThunk,
+  getForcedToFrameClassesThunk,
   getPlanningClassesThunk,
-  updateClass,
-  updateCollectiveSubLevel,
-  updateMasterClass,
-  updateOtherClassification,
-  updateOtherClassificationSubLevel,
-  updateSubClass,
 } from './reducers/classSlice';
 import {
   getCoordinationLocationsThunk,
+  getForcedToFrameLocationsThunk,
   getPlanningLocationsThunk,
-  updateDistrict,
 } from './reducers/locationSlice';
 import ProjectView from './views/ProjectView';
 import PlanningView from './views/PlanningView';
@@ -29,20 +24,12 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getGroupsThunk, updateGroup } from './reducers/groupSlice';
+import { getGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
-import { eventSource } from './utils/events';
-import {
-  addFinanceUpdateEventListener,
-  removeFinanceUpdateEventListener,
-  addProjectUpdateEventListener,
-  removeProjectUpdateEventListener,
-} from '@/utils/events';
 import moment from 'moment';
 import 'moment/locale/fi';
 import ScrollHandler from './components/shared/ScrollHandler';
-import { selectFinanceUpdate } from './reducers/eventsSlice';
 import { ProjectBasics } from './components/Project/ProjectBasics';
 import { notifyError } from './reducers/notificationSlice';
 import ConfirmDialog from './components/shared/ConfirmDialog';
@@ -51,25 +38,29 @@ import AdminView from './views/AdminView/AdminView';
 import AdminHashtags from './components/Admin/AdminHashtags';
 import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
+import useFinanceUpdates from './hooks/useFinanceUpdates';
 
 const LOADING_APP_ID = 'loading-app-data';
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
   const [appDataReady, setAppDataReady] = useState(false);
-  const financeUpdate = useAppSelector(selectFinanceUpdate);
   const user = useAppSelector(selectUser);
+
+  useFinanceUpdates();
 
   const initalizeStates = async () => {
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
     await Promise.all([
       dispatch(getListsThunk()),
       dispatch(getHashTagsThunk()),
+      dispatch(getGroupsThunk()),
       dispatch(getPlanningClassesThunk()),
       dispatch(getPlanningLocationsThunk()),
-      dispatch(getGroupsThunk()),
       dispatch(getCoordinationClassesThunk()),
       dispatch(getCoordinationLocationsThunk()),
+      dispatch(getForcedToFrameClassesThunk()),
+      dispatch(getForcedToFrameLocationsThunk()),
     ])
       .then(() => {
         setAppDataReady(true);
@@ -91,58 +82,6 @@ const App: FC = () => {
       initalizeStates().catch(Promise.reject);
     }
   }, [user]);
-
-  // Listen to finance-update and project-update events
-  useEffect(() => {
-    eventSource.onerror = (e) => {
-      console.log('Error opening a connection to events: ', e);
-    };
-    eventSource.onopen = (e) => {
-      console.log('Listening to finance-update and project-update events: ', e);
-    };
-
-    addFinanceUpdateEventListener(dispatch);
-    addProjectUpdateEventListener(dispatch);
-
-    return () => {
-      removeFinanceUpdateEventListener(dispatch);
-      removeProjectUpdateEventListener(dispatch);
-      eventSource.close();
-    };
-  }, []);
-
-  // Listen to finance-update from redux to see if an update event was triggered
-  useEffect(() => {
-    if (financeUpdate) {
-      const { coordination, planning } = financeUpdate;
-
-      // Update all planning finances
-      if (planning) {
-        const type = 'planning';
-        Promise.all([
-          dispatch(updateMasterClass({ data: planning.masterClass, type })),
-          dispatch(updateClass({ data: planning.class, type })),
-          dispatch(updateSubClass({ data: planning.subClass, type })),
-          dispatch(updateDistrict({ data: planning.district, type })),
-          dispatch(updateGroup(planning.group)),
-        ]).catch((e) => console.log('Error updating planning finances: ', e));
-      }
-
-      // Update all coordination finances
-      if (coordination) {
-        const type = 'coordination';
-        Promise.all([
-          dispatch(updateMasterClass({ data: coordination.masterClass, type })),
-          dispatch(updateClass({ data: coordination.class, type })),
-          dispatch(updateSubClass({ data: coordination.subClass, type })),
-          dispatch(updateCollectiveSubLevel(coordination.collectiveSubLevel)),
-          dispatch(updateOtherClassification(coordination.otherClassification)),
-          dispatch(updateOtherClassificationSubLevel(coordination.otherClassificationSubLevel)),
-          dispatch(updateDistrict({ data: coordination.district, type })),
-        ]).catch((e) => console.log('Error updating coordination finances: ', e));
-      }
-    }
-  }, [financeUpdate]);
 
   return (
     <div>

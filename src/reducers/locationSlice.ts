@@ -15,12 +15,13 @@ export interface ILocationHierarchy {
 interface ILocationState {
   planning: ILocationHierarchy;
   coordination: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
+  forcedToFrame: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
   error: unknown;
 }
 
 interface ILocationUpdatePayload {
   data: ILocation | null;
-  type: 'coordination' | 'planning';
+  type: 'coordination' | 'planning' | 'forcedToFrame';
 }
 
 const initialLocations = {
@@ -39,6 +40,7 @@ const initialCoordinatorLocations = {
 const initialState: ILocationState = {
   planning: initialLocations,
   coordination: initialCoordinatorLocations,
+  forcedToFrame: initialCoordinatorLocations,
   error: null,
 };
 
@@ -54,7 +56,16 @@ export const getPlanningLocationsThunk = createAsyncThunk(
 export const getCoordinationLocationsThunk = createAsyncThunk(
   'location/getAllCoordinator',
   async (_, thunkAPI) => {
-    return await getCoordinatorLocations()
+    return await getCoordinatorLocations(false)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getForcedToFrameLocationsThunk = createAsyncThunk(
+  'location/getAllForcedToFrame',
+  async (_, thunkAPI) => {
+    return await getCoordinatorLocations(true)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -133,6 +144,22 @@ export const locationSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
+    // GET ALL FORCED TO FRAME
+    builder.addCase(
+      getForcedToFrameLocationsThunk.fulfilled,
+      (state, action: PayloadAction<Array<ILocation>>) => {
+        return {
+          ...state,
+          forcedToFrame: separateLocationsIntoHierarchy(action.payload, true),
+        };
+      },
+    );
+    builder.addCase(
+      getForcedToFrameLocationsThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 
@@ -144,6 +171,8 @@ export const selectPlanningSubDivisions = (state: RootState) =>
   state.location.planning.subDivisions;
 export const selectBatchedPlanningLocations = (state: RootState) => state.location.planning;
 export const selectBatchedCoordinationLocations = (state: RootState) => state.location.coordination;
+export const selectBatchedForcedToFrameLocations = (state: RootState) =>
+  state.location.forcedToFrame;
 export const selectCoordinationDistricts = (state: RootState) =>
   state.location.coordination.districts;
 

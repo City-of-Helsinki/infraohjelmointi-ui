@@ -137,6 +137,10 @@ const mockProject: { data: IProject } = {
       id: 'a674d7aa-2bdf-429d-bcf7-9156eed81c40',
       value: 'planning',
     },
+    frameEstPlanningStart: '01.01.2021',
+    frameEstPlanningEnd: '01.04.2025',
+    frameEstConstructionStart: '10.04.2025',
+    frameEstConstructionEnd: '10.04.2031',
   },
 };
 

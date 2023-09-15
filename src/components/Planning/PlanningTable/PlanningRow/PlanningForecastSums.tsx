@@ -5,7 +5,7 @@ import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classServices';
-import { FC, memo, useCallback, useRef, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface IPlanningForecastSums {
@@ -28,6 +28,11 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
   const { value, onChange } = useNumberInput(budgetChange);
 
   const onEditBudgetChange = useCallback(() => setEditBudgetChange((current) => !current), []);
+
+  const displayBudgetChange = useMemo(
+    () => mode === 'coordination' && type !== 'group',
+    [mode, type],
+  );
 
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
 
@@ -61,15 +66,17 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
         <div className={`planning-forecast-sums ${type} mt-[0.2rem]`}>
           <span className="!text-left">{t('implementedAndBound')}</span>
           <span className="!text-left">{t('deviationFromBudget')}</span>
-          <span className="!text-left font-thin">{t('budgetChange')}</span>
+          {displayBudgetChange && <span className="!text-left font-thin">{t('budgetChange')}</span>}
         </div>
         {!editBudgetChange && (
           <div className={`planning-forecast-sums ${type} mt-[0.2rem]`}>
             <span data-testid={`planning-forecast-implemented-${id}`}>0</span>
             <span data-testid={`planning-forecast-bound-${id}`}>0</span>
-            <span className="font-thin" data-testid={`budget-change-${id}`}>
-              {budgetChange ?? '0'}
-            </span>
+            {displayBudgetChange && (
+              <span className="font-thin" data-testid={`budget-change-${id}`}>
+                {budgetChange ?? '0'}
+              </span>
+            )}
           </div>
         )}
         {editBudgetChange && (

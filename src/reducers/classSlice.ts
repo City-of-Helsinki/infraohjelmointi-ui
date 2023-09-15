@@ -21,12 +21,13 @@ export interface ICoordinatorClassHierarchy extends IClassHierarchy {
 interface IClassState {
   planning: IClassHierarchy;
   coordination: ICoordinatorClassHierarchy;
+  forcedToFrame: ICoordinatorClassHierarchy;
   error: unknown;
 }
 
 interface IClassUpdatePayload {
   data: IClass | null;
-  type: 'coordination' | 'planning';
+  type: 'coordination' | 'planning' | 'forcedToFrame';
 }
 
 const initialClasses = {
@@ -47,6 +48,7 @@ const initialCoordinationClasses = {
 const initialState: IClassState = {
   planning: initialClasses,
   coordination: initialCoordinationClasses,
+  forcedToFrame: initialCoordinationClasses,
   error: null,
 };
 
@@ -62,7 +64,16 @@ export const getPlanningClassesThunk = createAsyncThunk(
 export const getCoordinationClassesThunk = createAsyncThunk(
   'class/getAllCoordination',
   async (_, thunkAPI) => {
-    return await getCoordinationClasses()
+    return await getCoordinationClasses(false)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const getForcedToFrameClassesThunk = createAsyncThunk(
+  'class/getAllForcedToFrame',
+  async (_, thunkAPI) => {
+    return await getCoordinationClasses(true)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -210,6 +221,25 @@ export const classSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
+    // GET ALL FORCED TO FRAME
+    builder.addCase(
+      getForcedToFrameClassesThunk.fulfilled,
+      (state, action: PayloadAction<Array<IClass>>) => {
+        return {
+          ...state,
+          forcedToFrame: separateClassesIntoHierarchy(
+            action.payload,
+            true,
+          ) as ICoordinatorClassHierarchy,
+        };
+      },
+    );
+    builder.addCase(
+      getForcedToFrameClassesThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 
@@ -228,5 +258,6 @@ export const selectPlanningClasses = (state: RootState) => state.class.planning.
 export const selectPlanningSubClasses = (state: RootState) => state.class.planning.subClasses;
 export const selectBatchedPlanningClasses = (state: RootState) => state.class.planning;
 export const selectBatchedCoordinationClasses = (state: RootState) => state.class.coordination;
+export const selectBatchedForcedToFrameClasses = (state: RootState) => state.class.forcedToFrame;
 
 export default classSlice.reducer;
