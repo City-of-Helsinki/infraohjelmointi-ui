@@ -21,12 +21,13 @@ describe('ReportsView', () => {
       expect(await findByTestId(`report-row-${r}`)).toBeInTheDocument();
     });
   });
+
   it('renders a row for each report type', async () => {
     const { findByTestId } = await render();
 
     reports.forEach(async (r) => {
       expect(await findByTestId(`report-row-${r}`)).toBeInTheDocument();
-      expect(await findByTestId(`report-title-${r}`)).toHaveTextContent(`reports.${r}.title`);
+      expect(await findByTestId(`report-title-${r}`)).toHaveTextContent(`report.${r}.rowTitle`);
       expect(await findByTestId(`last-updated-${r}`)).toBeInTheDocument();
       expect(await findByTestId(`download-pdf-${r}`)).toHaveTextContent('downloadPdf');
       expect(await findByTestId(`download-xlsx-${r}`)).toHaveTextContent('downloadXlsx');

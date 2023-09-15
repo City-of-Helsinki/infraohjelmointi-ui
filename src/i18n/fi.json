@@ -403,33 +403,37 @@
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
-  "reports": {
+  "report": {
     "budgetProposal": {
-      "title": "Talousarvioehdotus",
-      "documentName": "talousarvioehdotus"
+      "rowTitle": "Talousarvioehdotus",
+      "documentName": "talousarvioehdotus",
+      "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}} - {{endYear}}",
+      "subtitleOne": "Maankäyttö ja kaupunkirakenne",
+      "subtitleTwo": "LIKE/Toiminnanohjaus",
+      "tableTitle": "Talousarvioehdotus {{startYear}} & {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}"
     },
     "strategy": {
-      "title": "Toimintasuunnitelma",
+      "rowTitle": "Toimintasuunnitelma",
       "documentName": "toimintasuunnitelma"
     },
     "constructionProgram": {
-      "title": "Rakentamisohjelma (yli 1 milj hankkeet)",
-      "documentName": "rakentamisohjelma"
+      "rowTitle": "Rakentamisohjelma (yli 1 milj hankkeet)",
+      "documentName": "rakentamisohjelma",
+      "title": "Helsingin kaupunki",
+      "subtitle": "Katujen ja liikenneväylien rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)"
     },
     "budgetBookSummary": {
-      "title": "Talousarviokirjan kooste",
+      "rowTitle": "Talousarviokirjan kooste",
       "documentName": "talousarviokirjan kooste"
     },
     "financialStatement": {
-      "title": "Tilinpäätös (yli 1 milj hankkeet)",
+      "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",
       "documentName": "tilinpäätös"
     }
   },
-  "lastUpdated": "Päivitetty viimeksi",
   "downloadPdf": "Lataa {{name}} (.pdf)",
   "downloadXlsx": "Lataa {{name}} (.xlsx)",
   "reportsTitle": "Raportit",
-  "deleteProject": "Poista Hanke",
   "forcedToFrame": "Sovitettu budjetti",
   "implementedAndBound": "Toteutettu ja sidottu",
   "deviationFromBudget": "Erotus budjettiin",
@@ -467,5 +471,15 @@
   "archive": "Arkistoi",
   "restore": "Palauta",
   "archived": "Arkistoitu",
-  "inUse": "Käytössä"
+  "inUse": "Käytössä",
+  "reports": "Raportit",
+  "deleteProject": "Poista Hanke",
+  "target": "Kohde",
+  "content": "Sisältö",
+  "division": "Kaupunginosa",
+  "costForecast": "Kustannusennuste",
+  "millionEuro": "milj. €",
+  "planningAnd": "Suunnittelun ja",
+  "constructionTiming": "rakentamisen ajoitus",
+  "previouslyUsed": "Aiemmin käytetty"
 }

@@ -79,7 +79,7 @@ export interface IProject {
   trafficPlanNumber?: string;
   bridgeNumber?: string;
   projectGroup: string | null;
-  spentBudget: number;
+  spentBudget: string;
   pwFolderLink?: string | null;
 }
 

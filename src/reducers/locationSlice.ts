@@ -4,7 +4,7 @@ import { getCoordinatorLocations, getPlanningLocations } from '@/services/locati
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ILocationHierarchy {
+export interface ILocationHierarchy {
   allLocations: Array<ILocation>;
   districts: Array<ILocation>;
   divisions: Array<ILocation>;
