@@ -43,6 +43,7 @@ const getConstructionProgramReportData = async (
       direct: false,
       programmed: false,
       params: 'overMillion=true',
+      forcedToFrame: false,
     });
 
     const projects = res.results;

@@ -66,6 +66,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
         direct: false,
         programmed: false,
         params: 'overMillion=true',
+        forcedToFrame: false,
       });
 
       if (res.results.length > 0) {
