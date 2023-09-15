@@ -176,12 +176,10 @@ export const calculateProjectRowSums = (project: IProject): IProjectSums => {
 export const calcPercentage = (value: number, total: number) => Math.round((value / total) * 100);
 
 export const keurToMillion = (value?: string | null) => {
-  if (value) {
-    // Parse the two decimals that the backend might return
-    const valueAsNumber = parseFloat(value);
-    const millionValue = (valueAsNumber / 1000).toFixed(1);
+  if (!value) return '0,0';
 
-    return millionValue.toString().replace('.', ',');
-  }
-  return '0,0';
+  const valueAsNumber = parseFloat(value);
+  const millionValue = (valueAsNumber / 1000).toFixed(1);
+
+  return millionValue.toString().replace('.', ',');
 };

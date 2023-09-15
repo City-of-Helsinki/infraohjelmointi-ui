@@ -83,7 +83,7 @@ interface IConstructionProgramTableRowProps {
   depth: number;
 }
 
-const Row: FC<IConstructionProgramTableRowProps> = ({ row, depth }) => {
+const Row: FC<IConstructionProgramTableRowProps> = memo(({ row, depth }) => {
   return (
     <View style={depth % 2 ? styles.evenRow : styles.oddRow} key={row.id}>
       <Text style={row.type === 'class' ? styles.classNameCell : styles.nameCell}>{row.name}</Text>
@@ -96,7 +96,9 @@ const Row: FC<IConstructionProgramTableRowProps> = ({ row, depth }) => {
       <Text style={styles.lastCell}>{row.budgetProposalCurrentYearPlus2}</Text>
     </View>
   );
-};
+});
+
+Row.displayName = 'Row';
 
 const ConstructionProgramTableRow: FC<IConstructionProgramTableRowProps> = ({ row, depth }) => {
   return (

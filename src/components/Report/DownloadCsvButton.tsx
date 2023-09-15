@@ -1,5 +1,5 @@
 import { Button, IconDownload } from 'hds-react';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IConstructionProgramTableRow, ReportType } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
@@ -50,18 +50,19 @@ const getConstructionProgramReportData = async (
   divisions: Array<ILocation>,
   t: TFunction<'translation', undefined>,
 ): Promise<Array<IConstructionProgramCsvRow>> => {
-  const projects = await getProjectsWithParams({
-    direct: false,
-    programmed: false,
-    params: 'overMillion=true',
-  })
-    .then((res) => res.results)
-    .catch((e) => {
-      console.log('Error downloading CSV: ', e);
-      return [];
+  try {
+    const res = await getProjectsWithParams({
+      direct: false,
+      programmed: false,
+      params: 'overMillion=true',
     });
 
-  if (projects) {
+    const projects = res.results;
+
+    if (!projects) {
+      return [];
+    }
+
     // Get report rows the same way as for the pdf table
     const reportRows = getReportRows(projects, classes, divisions);
     // Flatten rows into one dimension
@@ -79,10 +80,13 @@ const getConstructionProgramReportData = async (
     }));
 
     return csvRows;
+  } catch (e) {
+    console.log('Error building csv rows: ', e);
+    return [];
   }
-
-  return [];
 };
+
+const downloadIcon = <IconDownload />;
 
 /**
  * We're using pdf-react to create pdf's.
@@ -92,8 +96,6 @@ const getConstructionProgramReportData = async (
 const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, classes }) => {
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow>>([]);
-
-  const downloadIcon = useMemo(() => <IconDownload />, []);
 
   useEffect(() => {
     if (csvData.length > 0) {
@@ -107,7 +109,8 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
         setCsvData(await getConstructionProgramReportData(classes, divisions, t));
         break;
       default:
-        // implemented later...
+        // In the MVP stage we only had time to implement the construction program report, the other
+        // report cases should come here
         break;
     }
   }, []);
@@ -129,4 +132,4 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
   );
 };
 
-export default DownloadCsvButton;
+export default memo(DownloadCsvButton);

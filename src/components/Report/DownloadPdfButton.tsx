@@ -1,5 +1,5 @@
 import { Button, IconDownload } from 'hds-react';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
@@ -42,6 +42,8 @@ const getPdfDocument = (
   return pdfDocument[type];
 };
 
+const downloadIcon = <IconDownload />;
+
 interface IDownloadPdfButtonProps {
   type: ReportType;
   divisions: Array<ILocation>;
@@ -57,8 +59,6 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
   const { t } = useTranslation();
 
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
-
-  const downloadIcon = useMemo(() => <IconDownload />, []);
 
   const downloadPdf = useCallback(async () => {
     try {
@@ -90,4 +90,4 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
   );
 };
 
-export default DownloadPdfButton;
+export default memo(DownloadPdfButton);
