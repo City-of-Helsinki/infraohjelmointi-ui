@@ -71,11 +71,15 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockPersons);
       case url === '/project-classes/':
         return Promise.resolve(mockProjectClasses);
-      case url === '/project-classes/coordinator/':
+      case url === '/project-classes/coordinator/?forcedToFrame=false':
         return Promise.resolve(mockProjectCoordinatorClasses);
+      case url === '/project-classes/coordinator/?forcedToFrame=true':
+        return Promise.resolve(mockCoordinatorLocations);
       case url === '/project-locations/':
         return Promise.resolve(mockLocations);
-      case url === '/project-locations/coordinator/':
+      case url === '/project-locations/coordinator/?forcedToFrame=false':
+        return Promise.resolve(mockCoordinatorLocations);
+      case url === '/project-locations/coordinator/?forcedToFrame=true':
         return Promise.resolve(mockCoordinatorLocations);
       case url === `/projects/${mockProject.data.id}/notes/`:
         return Promise.resolve(mockNotes);
@@ -86,6 +90,8 @@ export const mockGetResponseProvider = () =>
       case url.toLocaleLowerCase().includes(`/projects/`):
         return Promise.resolve(mockPlanningViewProjects);
       default:
+        console.log('not found!: ', url);
+
         return Promise.reject(new Error('not found'));
     }
   });

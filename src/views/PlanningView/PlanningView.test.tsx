@@ -144,7 +144,7 @@ describe('PlanningView', () => {
 
     const getMock = mockedAxios.get.mock.lastCall;
 
-    expect(getMock[0]).toBe('localhost:4000/projects/?test=123&direct=false');
+    expect(getMock[0]).toBe('localhost:4000/projects/?test=123&forcedToFrame=false&direct=false');
   });
 
   it('updates table sums if the finance-update event triggers', async () => {
@@ -2035,7 +2035,7 @@ describe('PlanningView', () => {
           const getRequest = mockedAxios.get.mock;
           // Check that the correct url was called
           expect(getRequest.lastCall[0]).toBe(
-            'localhost:4000/projects/?subClass=test-sub-class-1&projectName=not-in&inGroup=false&programmed=true&direct=true',
+            'localhost:4000/projects/?subClass=test-sub-class-1&projectName=not-in&inGroup=false&programmed=true&forcedToFrame=false&direct=true',
           );
           const submitButton = await groupEditDialog.findByTestId('save-group-button');
           expect(submitButton).toBeInTheDocument();
