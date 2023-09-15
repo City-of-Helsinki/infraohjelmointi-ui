@@ -10,31 +10,23 @@ import { CSVDownload } from 'react-csv';
 import { TFunction } from 'i18next';
 import './styles.css';
 
+const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
+  a,
+  ...a.projects,
+  ...(a.children.map(flatten) as unknown as Array<IConstructionProgramTableRow>),
+];
+
 /**
  * Create a flattened version of construction program table rows, since the react-csv needs a one-dimensional array
  */
-const flattenConstructionProgramTableRows = (arr: Array<IConstructionProgramTableRow>) => {
-  const result: Array<IConstructionProgramTableRow> = [];
-
-  function flattenRecursive(input: Array<IConstructionProgramTableRow>) {
-    for (const item of input) {
-      result.push(item);
-
-      if (item.projects.length > 0) {
-        item.projects.forEach((p: IConstructionProgramTableRow) => result.push(p));
-      }
-
-      if (item.children.length > 0) {
-        flattenRecursive(item.children);
-      }
-    }
-  }
-
-  flattenRecursive(arr);
-
-  return result;
-};
-
+const flattenConstructionProgramTableRows = (
+  tableRows: Array<IConstructionProgramTableRow>,
+): Array<IConstructionProgramTableRow> =>
+  tableRows
+    .map((v: IConstructionProgramTableRow) => {
+      return flatten(v);
+    })
+    .flat(Infinity) as Array<IConstructionProgramTableRow>;
 interface IConstructionProgramCsvRow {
   [key: string]: string;
 }
