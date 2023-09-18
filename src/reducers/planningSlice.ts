@@ -1,5 +1,6 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import {
+  IPlanningNotesDialogData,
   IPlanningRow,
   IPlanningRowSelections,
   PlanningMode,
@@ -20,6 +21,8 @@ interface IPlanningState {
   mode: PlanningMode;
   forcedToFrame: boolean;
   isLoading: boolean;
+  notesDialogOpen: boolean;
+  notesDialogData: IPlanningNotesDialogData;
 }
 
 const initialState: IPlanningState = {
@@ -41,6 +44,8 @@ const initialState: IPlanningState = {
   rows: [],
   forcedToFrame: false,
   isLoading: false,
+  notesDialogOpen: false,
+  notesDialogData: {name: '', id: ''},
 };
 
 export const planningSlice = createSlice({
@@ -104,6 +109,12 @@ export const planningSlice = createSlice({
     setIsPlanningLoading(state, action: PayloadAction<boolean>) {
       return { ...state, isLoading: action.payload };
     },
+    setNotesDialogOpen(state, action: PayloadAction<boolean>) {
+      return { ...state, notesDialogOpen: action.payload}
+    },
+    setNotesDialogData(state, action: PayloadAction<IPlanningNotesDialogData>) {
+      return { ...state, notesDialogData: action.payload}
+    }
   },
 });
 
@@ -116,6 +127,8 @@ export const selectGroupsExpanded = (state: RootState) => state.planning.groupsE
 export const selectPlanningMode = (state: RootState) => state.planning.mode;
 export const selectForcedToFrame = (state: RootState) => state.planning.forcedToFrame;
 export const selectIsPlanningLoading = (state: RootState) => state.planning.isLoading;
+export const selectNotesDialogOpen = (state: RootState) => state.planning.notesDialogOpen;
+export const selectNotesDialogData = (state: RootState) => state.planning.notesDialogData;
 
 export const {
   setSelectedYear,
@@ -134,6 +147,8 @@ export const {
   resetSelections,
   setForcedToFrame,
   setIsPlanningLoading,
+  setNotesDialogOpen,
+  setNotesDialogData,
 } = planningSlice.actions;
 
 export default planningSlice.reducer;

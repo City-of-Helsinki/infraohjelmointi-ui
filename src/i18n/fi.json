@@ -365,6 +365,8 @@
   "delete": "Poista",
   "edit": "Muokkaa",
   "cancel": "Peruuta",
+  "note": "Muistiinpano",
+  "addNote": "Lisää muistiinpano",
   "editNote": "Muokkaa muistiinpanoa",
   "deleteNote": "Poista muistiinpano",
   "deleteNoteConfirm": "Oletko varma että haluat poistaa tämän muistiinpanon?",
