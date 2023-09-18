@@ -8,6 +8,8 @@ import {
   selectPlanningMode,
   selectSelectedYear,
   selectStartYear,
+  setNotesDialogData,
+  setNotesDialogOpen,
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import { patchCoordinationClass } from '@/services/classServices';
@@ -23,6 +25,7 @@ import { formattedNumberToNumber } from '@/utils/calculations';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
+import { IconSpeechbubble } from 'hds-react';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -30,7 +33,8 @@ interface IPlanningCellProps extends IPlanningRow {
   id: string;
 }
 
-const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
+const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
+  const dispatch = useAppDispatch();
   const {
     plannedBudget,
     deviation,
@@ -41,7 +45,6 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     budgetChange,
   } = cell;
 
-  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const mode = useAppSelector(selectPlanningMode);
   const [editFrameBudget, setEditFrameBudget] = useState(false);
@@ -188,6 +191,23 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
             <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />
           )}
           {moment.months().map((m) => (
+            m === 'tammikuu' ?
+            <>
+              <td
+                key={m}
+                className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
+                onMouseOver={() => setHoveredClassToMonth(m)}
+                onMouseLeave={() => removeHoveredClassFromMonth(m)}
+              >
+                <span onClick={() => {
+                  dispatch(setNotesDialogOpen(true));
+                  dispatch(setNotesDialogData({name: name, id: id}))
+                }}>
+                  <IconSpeechbubble color="white" />
+                </span>
+              </td>
+            </>
+            :
             <td
               key={m}
               className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}

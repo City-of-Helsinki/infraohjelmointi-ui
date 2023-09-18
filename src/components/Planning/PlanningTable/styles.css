@@ -56,6 +56,7 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 .monthly-cell.masterClass,
 .monthly-summary-cell.masterClass {
   @apply border-b border-white bg-[var(--color-masterClass)];
+  text-align: center;
 }
 
 .monthly-cell.masterClass.framed,
