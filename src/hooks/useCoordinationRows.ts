@@ -92,18 +92,17 @@ const buildCoordinatorTableRows = (
   // groups can be mapped under subclass, collectiveSubLevel, otherClassification or subLevelDistrict or district
   const getSortedGroupRows = (id: string, type: PlanningRowType) => {
     const filteredGroups = [];
-    
+
     if (type === 'subClass' || type === 'collectiveSubLevel' || type === 'otherClassification') {
       filteredGroups.push(
         ...groups.filter((group) => group.classRelation === id && !group.locationRelation),
       );
     }
     // Filter groups under subClass-preview only if there are is no locationRelation
-    else if (type === 'district' || type === 'subLevelDistrict' || type==='districtPreview') {
-      
+    else if (type === 'district' || type === 'subLevelDistrict' || type === 'districtPreview') {
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
-    
+
     return sortByName(filteredGroups).map((group) => ({
       ...getRow({
         item: group as IGroup,
@@ -124,7 +123,6 @@ const buildCoordinatorTableRows = (
     expanded?: boolean;
     districts: Array<ILocation>;
   }) => {
-    
     const filteredDistricts = districts.filter((district) => district.parentClass === parent.id);
     return filteredDistricts.map((filteredDistrict) => ({
       ...getRow({
@@ -377,7 +375,7 @@ const useCoordinationRows = () => {
       ? batchedForcedToFrameLocations.districts
       : batchedCoordinationLocations.districts;
 
-    const nextRows = getCoordinationTableRows(allClasses, districts, selections, projects,groups);
+    const nextRows = getCoordinationTableRows(allClasses, districts, selections, projects, groups);
 
     // Re-build planning rows if the existing rows are not equal
     if (!_.isEqual(nextRows, rows)) {
