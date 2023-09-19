@@ -33,8 +33,15 @@ const ProjectView = () => {
 
   // Update selectedProject to redux with a project-update event
   useEffect(() => {
-    if (projectUpdate?.project && !_.isEqual(projectUpdate?.project, selectedProject)) {
-      dispatch(setSelectedProject(projectUpdate.project));
+    const project = projectUpdate?.project;
+
+    // Don't update the selectedProject if the user is viewing another project
+    if (project && selectedProject && project.id !== selectedProject.id) {
+      return;
+    }
+    // Update the selectedProject if the project-update event gives different values
+    if (project && !_.isEqual(project, selectedProject)) {
+      dispatch(setSelectedProject(project));
     }
   }, [projectUpdate]);
 
