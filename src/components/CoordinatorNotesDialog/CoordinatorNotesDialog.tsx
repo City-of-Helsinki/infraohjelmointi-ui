@@ -2,6 +2,7 @@ import { FC, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
 import { t } from "i18next";
 import { selectNotesDialogData, selectNotesDialogOpen, setNotesDialogOpen } from "@/reducers/planningSlice";
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, IconCross } from "hds-react";
 import { Dialog } from 'hds-react/components/Dialog';
 import './styles.css';
@@ -19,6 +20,25 @@ const CoordinatorNotesDialog: FC = () => {
     const dialogOpen = useAppSelector(selectNotesDialogOpen);
     const dialogData = useAppSelector(selectNotesDialogData);
 
+    const setSuccessNotification = (planningClass: string) => {
+        try {
+            dispatch(notifySuccess({
+                message: 'noteAddedToClass',
+                title: 'noteAddSuccess',
+                type: 'toast',
+                duration: 3000,
+                parameter: planningClass
+                }),
+            );
+        } catch (e) {
+            dispatch(notifyError({
+                title: 'noteAddError',
+                type: 'toast',
+                duration: 3000,
+                }),
+            );
+        }
+    };
     return( 
         <>
             {dialogOpen && 
@@ -28,7 +48,7 @@ const CoordinatorNotesDialog: FC = () => {
                     aria-describedby={descriptionId}
                     isOpen={dialogOpen}
                     close={handleClose}
-                    closeButtonLabelText="Close add hashtag dialog"
+                    closeButtonLabelText={t('closeCoordinatorNotesDialog')}
                 >
                     <section className="dialog-top-part">
                         <h1>{t('addNote')} {dialogData.name} </h1>
@@ -41,7 +61,7 @@ const CoordinatorNotesDialog: FC = () => {
                     </section>
                     <hr />
                     <section className="dialog-bottom-part">
-                        <Button id="add-note-button" onClick={() => handleClose()} variant="primary" data-testid="cancel-note">
+                        <Button id="add-note-button" onClick={() => {handleClose(); setSuccessNotification(dialogData.name);}} variant="primary" data-testid="cancel-note">
                             {t('addNote')}
                         </Button>
                         <Button onClick={() => handleClose()} variant="secondary" data-testid="cancel-note">

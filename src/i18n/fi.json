@@ -266,13 +266,16 @@
       "hashtagPostSuccess": "Tunniste tallennettu",
       "postError": "Luonti epäonnistui",
       "accessDenied": "Pääsy evätty",
-      "undefined": "Virhe"
+      "undefined": "Virhe",
+      "noteAddSuccess": "Muistiinpano lisätty",
+      "noteAddError": "Muistiinpanon lisääminen epäonnistui"
     },
     "message": {
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
       "formSaveError": "Lomakkeen tallennus ei onnistunut.",
       "projectCreatingError": "Uuden hankkeen luominen epäonnistui.",
       "formFillError": "Pakollisia kenttiä puuttuu.",
+      "noteAddedToClass": "Muistiinpano lisätty luokkaan {{parameter}}",
       "noteDeleteSuccess": "Muistiinpano poistettu onnistuneesti",
       "notePatchSuccess": "Muistiinpano muokattu onnistuneesti",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
@@ -336,6 +339,7 @@
   "removeFavourite": "Poista suosikeista",
   "addFavourite": "Lisää suosikkeihin",
   "inGroup": "Kuuluu ryhmään",
+  "closeCoordinatorNotesDialog": "Sulje muistiinpanodialogi",
   "closeNotification": "Sulje ilmoitus",
   "removeHashTag": "Poista tunniste",
   "closeHashTagsWindow": "Sulje tunnisteikkuna",

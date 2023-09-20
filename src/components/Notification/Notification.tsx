@@ -10,6 +10,13 @@ const Notification: FC = () => {
   const notifications = useAppSelector(selectNotification);
   const { t } = useTranslation();
 
+const setNotificationMessage = (message?: string, extraParameter?: string) => {
+  if(message && extraParameter) {
+    return message && t(`notification.message.${message}`, {parameter: extraParameter});
+  } else {
+    return message && t(`notification.message.${message}`);
+  }
+}
   return (
     <>
       {notifications.length > 0 && (
@@ -26,7 +33,8 @@ const Notification: FC = () => {
                 closeButtonLabelText={t('closeNotification') ?? ''}
                 onClose={() => dispatch(clearNotification(n.id ?? 0))}
               >
-                {t(`notification.message.${n.message}`)}
+                {setNotificationMessage(n.message, n.parameter)}
+               
               </HDSNotification>
             </div>
           ))}
