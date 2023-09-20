@@ -18,7 +18,7 @@
   @apply absolute right-0 h-[14px] w-[236px] -translate-x-[0.34rem] border-[1px] border-bus bg-bus-l;
 }
 
-.year-slider-selected.previous {
+.year-slider-selected.past-years {
   @apply w-[230px] -translate-x-[1.9rem];
 }
 

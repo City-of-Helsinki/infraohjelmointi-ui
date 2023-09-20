@@ -1,5 +1,7 @@
 import { IconAngleLeft, IconAngleRight } from 'hds-react';
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { selectStartYear, setStartYear } from '@/reducers/planningSlice';
 import './styles.css';
 
 const iconRight = <IconAngleLeft className="left-year-button-icon" />;
@@ -7,9 +9,8 @@ const iconLeft = <IconAngleRight className="right-year-button-icon" />;
 const currentYear = new Date().getFullYear();
 
 const YearSelector = () => {
-  // TODO: this should actually change the startYear in the planning slice, which in turn should trigger a re-fetch of all
-  // classes, location, groups and projects to start during that year
-  const [startYear, setStartYear] = useState(2023);
+  const dispatch = useAppDispatch();
+  const startYear = useAppSelector(selectStartYear);
 
   const startNumber = useMemo(() => {
     if (startYear === currentYear) {
@@ -29,7 +30,7 @@ const YearSelector = () => {
     return mylist;
   }, [startNumber]);
 
-  const isPreviousYear = useMemo(() => startYear < currentYear, [startYear]);
+  const isStartInThePast = useMemo(() => startYear < currentYear, [startYear]);
 
   return (
     <div className="year-selector-container">
@@ -42,19 +43,19 @@ const YearSelector = () => {
         ))}
       </div>
       <div className="year-slider">
-        <div className={`year-slider-selected ${isPreviousYear ? 'previous' : ''}`}>
+        <div className={`year-slider-selected ${isStartInThePast ? 'past-years' : ''}`}>
           <div className="year-slider-buttons-container">
             <button
               className="left-year-button"
               aria-label="Previous year"
-              onClick={() => setStartYear((current) => current - 1)}
+              onClick={() => dispatch(setStartYear(startYear - 1))}
             >
               {iconRight}
             </button>
             <button
               className="right-year-button"
               aria-label="Next year"
-              onClick={() => setStartYear((current) => current + 1)}
+              onClick={() => dispatch(setStartYear(startYear + 1))}
             >
               {iconLeft}
             </button>
