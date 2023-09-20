@@ -7,11 +7,15 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { matchExact } from '@/utils/common';
 import { act } from 'react-dom/test-utils';
 import { Route } from 'react-router';
+import { setupStore } from '@/store';
+import { mockGroups } from '@/mocks/mockGroups';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+const store = setupStore();
 
 const render = async () =>
   await act(async () =>
@@ -24,6 +28,10 @@ const render = async () =>
           page: 1,
           isSaving: false,
           mode: 'edit',
+        },
+        group: {
+          ...store.getState().group,
+          groups: mockGroups.data,
         },
       },
     }),
@@ -62,7 +70,7 @@ describe('ProjectHeader', () => {
     expect(getByTestId('project-favourite')).toBeInTheDocument();
     expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
     expect(getByText(/inGroup/i)).toBeInTheDocument();
-    expect(getByText(matchExact('Hakaniemi'))).toBeInTheDocument();
+    expect(getByText('Test Group 1')).toBeInTheDocument();
   });
 
   it('can autosave patch a form value', async () => {
