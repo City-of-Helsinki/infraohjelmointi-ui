@@ -35,12 +35,17 @@ const ProjectView = () => {
   useEffect(() => {
     const project = projectUpdate?.project;
 
-    // Don't update the selectedProject if the user is viewing another project
-    if (project && selectedProject && project.id !== selectedProject.id) {
+    if (!project) {
       return;
     }
+
+    // Don't update the selectedProject if the user is viewing another project
+    if (selectedProject && project.id !== selectedProject.id) {
+      return;
+    }
+
     // Update the selectedProject if the project-update event gives different values
-    if (project && !_.isEqual(project, selectedProject)) {
+    if (!_.isEqual(project, selectedProject)) {
       dispatch(setSelectedProject(project));
     }
   }, [projectUpdate]);
