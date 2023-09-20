@@ -63,6 +63,15 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
       let inRow = false;
       let pIndex = -1;
 
+      // If the project has become not-programmed then we filter it out and end the useEffect
+      if (!projectToUpdate.programmed) {
+        setPlanningRowState((current) => ({
+          ...current,
+          projects: current.projects.filter((p) => p.id !== projectToUpdate.id),
+        }));
+        return;
+      }
+
       // We add the project returned by the project-update event to a new "updatedProjects" list
       const updatedProjects = projects.map((p, index) => {
         if (p.id === projectToUpdate.id) {
