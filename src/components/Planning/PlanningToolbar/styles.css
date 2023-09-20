@@ -15,7 +15,7 @@
 }
 
 .planning-toolbar-right {
-  @apply pr-2;
+  @apply flex gap-8 pr-2;
 }
 
 .planning-toolbar-right.monthly-view-open {
@@ -38,4 +38,24 @@
   /* border-2 border-bus won't work for some reason */
   border: 1px solid var(--color-bus);
   @apply bg-bus-l;
+}
+
+.left-year-button {
+  border: 1px solid var(--color-bus);
+  border-radius: 2px;
+  @apply h-6 w-4 -translate-x-[1px] items-center justify-center bg-bus-l;
+}
+
+.right-year-button {
+  border: 1px solid var(--color-bus);
+  border-radius: 2px;
+  @apply h-6 w-4 translate-x-[1px] items-center justify-center bg-bus-l;
+}
+
+.left-year-button svg {
+  @apply -translate-x-[4.5px] -translate-y-[2px] text-bus;
+}
+
+.right-year-button svg {
+  @apply -translate-x-[4.5px] -translate-y-[2px] text-bus;
 }

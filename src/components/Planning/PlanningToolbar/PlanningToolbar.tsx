@@ -9,6 +9,8 @@ import {
   IconDownload,
   IconMoneyBag,
   IconMoneyBagFill,
+  IconAngleLeft,
+  IconAngleRight,
 } from 'hds-react/icons/';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent } from '@/utils/events';
@@ -231,22 +233,55 @@ const PlanningToolbar = () => {
       }
       right={
         <div className={`planning-toolbar-right ${selectedYear ? 'monthly-view-open' : ''}`}>
-          <button
-            aria-label="ideal budget view"
-            className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
-            disabled={!forcedToFrame || mode === 'planning'}
-            onClick={moveToIdealView}
-          >
-            <IconMoneyBag />
-          </button>
-          <button
-            aria-label="force framed budget view"
-            className={`money-button ${forcedToFrame ? 'selected' : ''}`}
-            disabled={forcedToFrame || mode === 'coordination'}
-            onClick={moveToForcedToFrameView}
-          >
-            <IconMoneyBagFill />
-          </button>
+          <div>
+            <button
+              aria-label="ideal budget view"
+              className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
+              disabled={!forcedToFrame || mode === 'planning'}
+              onClick={moveToIdealView}
+            >
+              <IconMoneyBag />
+            </button>
+            <button
+              aria-label="force framed budget view"
+              className={`money-button ${forcedToFrame ? 'selected' : ''}`}
+              disabled={forcedToFrame || mode === 'coordination'}
+              onClick={moveToForcedToFrameView}
+            >
+              <IconMoneyBagFill />
+            </button>
+          </div>
+
+          <div className="flex flex-col items-center justify-between">
+            {/* Labels */}
+            <div className="flex gap-1 text-sm">
+              <span className="w-[18px]">-1</span>
+              <span className="w-[18px]">0</span>
+              <span className="w-[18px]">1</span>
+              <span className="w-[18px]">2</span>
+              <span className="w-[18px]">3</span>
+              <span className="w-[18px]">4</span>
+              <span className="w-[18px]">5</span>
+              <span className="w-[18px]">6</span>
+              <span className="w-[18px]">7</span>
+              <span className="w-[18px]">8</span>
+              <span className="w-[18px]">9</span>
+              <span className="w-[18px]">10</span>
+            </div>
+            {/* Timeline */}
+            <div className="relative mb-1 h-[14px] w-[264px] rounded-md bg-gray">
+              <div className="absolute right-0 h-[14px] w-[238px] -translate-x-[0.35rem] border-[1px] border-bus bg-bus-l">
+                <div className="flex -translate-y-[0.4rem] justify-between">
+                  <button className="left-year-button">
+                    <IconAngleLeft className="left-year-button-icon" />
+                  </button>
+                  <button className="right-year-button">
+                    <IconAngleRight className="right-year-button-icon" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       }
     />
