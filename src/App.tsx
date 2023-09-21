@@ -70,7 +70,6 @@ const App: FC = () => {
       });
   };
 
-  // TODO: use the startYear to fetch data starting from that year
   const loadPlanningData = async (year: number) => {
     dispatch(setIsPlanningLoading(true));
     await Promise.all([
