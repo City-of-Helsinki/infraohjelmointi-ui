@@ -56,38 +56,34 @@ const App: FC = () => {
     // Set moments locale to finnish for the app
     moment().locale('fi');
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
-    await Promise.all([dispatch(getListsThunk()), dispatch(getHashTagsThunk())])
-      .then(() => {
-        setAppDataReady(true);
-      })
-      .catch((e) => {
-        console.log('Error getting app data: ', e);
-        dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-      })
-
-      .finally(() => {
-        dispatch(clearLoading(LOADING_APP_ID));
-      });
+    try {
+      await dispatch(getListsThunk());
+      await dispatch(getHashTagsThunk());
+    } catch (e) {
+      console.log('Error getting app data: ', e);
+      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+    } finally {
+      setAppDataReady(true);
+      dispatch(clearLoading(LOADING_APP_ID));
+    }
   };
 
   const loadPlanningData = async (year: number) => {
     dispatch(setIsPlanningLoading(true));
-    await Promise.all([
-      dispatch(getGroupsThunk(year)),
-      dispatch(getPlanningClassesThunk(year)),
-      dispatch(getPlanningLocationsThunk(year)),
-      dispatch(getCoordinationClassesThunk(year)),
-      dispatch(getCoordinationLocationsThunk(year)),
-      dispatch(getForcedToFrameClassesThunk(year)),
-      dispatch(getForcedToFrameLocationsThunk(year)),
-    ])
-      .catch((e) => {
-        console.log('Error loading planning data: ', e);
-        dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-      })
-      .finally(() => {
-        dispatch(setIsPlanningLoading(false));
-      });
+    try {
+      await dispatch(getGroupsThunk(year));
+      await dispatch(getPlanningClassesThunk(year));
+      await dispatch(getPlanningLocationsThunk(year));
+      await dispatch(getCoordinationClassesThunk(year));
+      await dispatch(getCoordinationLocationsThunk(year));
+      await dispatch(getForcedToFrameClassesThunk(year));
+      await dispatch(getForcedToFrameLocationsThunk(year));
+    } catch (e) {
+      console.log('Error loading planning data: ', e);
+      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+    } finally {
+      dispatch(setIsPlanningLoading(false));
+    }
   };
 
   // Initialize states that are used everywhere in the app

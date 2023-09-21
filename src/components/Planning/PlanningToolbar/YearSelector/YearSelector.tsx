@@ -12,23 +12,17 @@ const YearSelector = () => {
   const dispatch = useAppDispatch();
   const startYear = useAppSelector(selectStartYear);
 
-  const startNumber = useMemo(() => {
-    if (startYear === currentYear) {
-      return -1;
-    } else {
-      return startYear - currentYear;
-    }
-  }, [startYear]);
+  // The first displayed number in the list
+  const startNumber = useMemo(
+    () => (startYear === currentYear ? -1 : startYear - currentYear),
+    [startYear],
+  );
 
-  const numberList = useMemo(() => {
-    const mylist = [];
-
-    for (let i = startNumber; i < startNumber + 12; i++) {
-      mylist.push(i);
-    }
-
-    return mylist;
-  }, [startNumber]);
+  // A list to indicate which years we are browsing
+  const numberList = useMemo(
+    () => Array.from({ length: startNumber + 13 }, (_, i) => startNumber + i),
+    [startNumber],
+  );
 
   const isStartInThePast = useMemo(() => startYear < currentYear, [startYear]);
 
