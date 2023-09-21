@@ -202,7 +202,7 @@ describe('App', () => {
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getPlanningClassesThunk());
+    await store.dispatch(getPlanningClassesThunk(new Date().getFullYear()));
 
     const storeError = store.getState().class.error as IError;
     expect(storeError.message).toBe(mockError.message);
@@ -214,7 +214,7 @@ describe('App', () => {
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await store.dispatch(getPlanningLocationsThunk());
+    await store.dispatch(getPlanningLocationsThunk(new Date().getFullYear()));
 
     const storeError = store.getState().location.error as IError;
     expect(storeError.message).toBe(mockError.message);
@@ -251,7 +251,7 @@ describe('App', () => {
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await waitFor(() => store.dispatch(getGroupsThunk()));
+    await waitFor(() => store.dispatch(getGroupsThunk(new Date().getFullYear())));
 
     const storeError = store.getState().group.error as IError;
 

@@ -18,6 +18,7 @@ import {
   selectPlanningRows,
   selectProjects,
   selectSelections,
+  selectStartYear,
   setPlanningRows,
   setProjects,
 } from '@/reducers/planningSlice';
@@ -223,6 +224,7 @@ const usePlanningRows = () => {
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const startYear = useAppSelector(selectStartYear);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
@@ -238,7 +240,9 @@ const usePlanningRows = () => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id, false)
+      const year = startYear ?? new Date().getFullYear();
+
+      fetchProjectsByRelation(type as PlanningRowType, id, false, year)
         .then((res) => {
           dispatch(setProjects(res));
         })

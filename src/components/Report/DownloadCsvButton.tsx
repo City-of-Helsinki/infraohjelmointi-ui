@@ -38,12 +38,15 @@ const getConstructionProgramReportData = async (
   divisions: Array<ILocation>,
   t: TFunction<'translation', undefined>,
 ): Promise<Array<IConstructionProgramCsvRow>> => {
+  const year = new Date().getFullYear();
+
   try {
     const res = await getProjectsWithParams({
       direct: false,
       programmed: false,
       params: 'overMillion=true',
       forcedToFrame: false,
+      year,
     });
 
     const projects = res.results;

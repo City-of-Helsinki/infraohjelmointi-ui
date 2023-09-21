@@ -31,8 +31,8 @@ export const deleteGroupThunk = createAsyncThunk('group/delete', async (id: stri
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });
 
-export const getGroupsThunk = createAsyncThunk('group/getAll', async (_, thunkAPI) => {
-  return await getGroups()
+export const getGroupsThunk = createAsyncThunk('group/getAll', async (year: number, thunkAPI) => {
+  return await getGroups(year)
     .then((res) => res)
     .catch((err: IError) => thunkAPI.rejectWithValue(err));
 });

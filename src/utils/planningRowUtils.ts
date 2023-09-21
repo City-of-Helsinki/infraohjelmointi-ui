@@ -182,6 +182,7 @@ export const fetchProjectsByRelation = async (
   type: PlanningRowType,
   id: string | undefined,
   forcedToFrame: boolean,
+  year: number,
   isCoordinator?: boolean,
 ): Promise<Array<IProject>> => {
   const direct = type === 'class' || type === 'subClass' || type === 'subClassDistrict';
@@ -192,6 +193,7 @@ export const fetchProjectsByRelation = async (
         direct: direct,
         programmed: true,
         forcedToFrame,
+        year: year,
       },
       isCoordinator,
     );

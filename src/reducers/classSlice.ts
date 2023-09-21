@@ -54,8 +54,8 @@ const initialState: IClassState = {
 
 export const getPlanningClassesThunk = createAsyncThunk(
   'class/getAllPlanning',
-  async (_, thunkAPI) => {
-    return await getPlanningClasses()
+  async (year: number, thunkAPI) => {
+    return await getPlanningClasses(year)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -63,8 +63,8 @@ export const getPlanningClassesThunk = createAsyncThunk(
 
 export const getCoordinationClassesThunk = createAsyncThunk(
   'class/getAllCoordination',
-  async (_, thunkAPI) => {
-    return await getCoordinationClasses(false)
+  async (year: number, thunkAPI) => {
+    return await getCoordinationClasses({ forcedToFrame: false, year })
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -72,8 +72,8 @@ export const getCoordinationClassesThunk = createAsyncThunk(
 
 export const getForcedToFrameClassesThunk = createAsyncThunk(
   'class/getAllForcedToFrame',
-  async (_, thunkAPI) => {
-    return await getCoordinationClasses(true)
+  async (year: number, thunkAPI) => {
+    return await getCoordinationClasses({ forcedToFrame: true, year })
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },

@@ -71,19 +71,19 @@ const App: FC = () => {
   };
 
   // TODO: use the startYear to fetch data starting from that year
-  const loadPlanningData = async (startYear: number) => {
+  const loadPlanningData = async (year: number) => {
     dispatch(setIsPlanningLoading(true));
     await Promise.all([
-      dispatch(getGroupsThunk()),
-      dispatch(getPlanningClassesThunk()),
-      dispatch(getPlanningLocationsThunk()),
-      dispatch(getCoordinationClassesThunk()),
-      dispatch(getCoordinationLocationsThunk()),
-      dispatch(getForcedToFrameClassesThunk()),
-      dispatch(getForcedToFrameLocationsThunk()),
+      dispatch(getGroupsThunk(year)),
+      dispatch(getPlanningClassesThunk(year)),
+      dispatch(getPlanningLocationsThunk(year)),
+      dispatch(getCoordinationClassesThunk(year)),
+      dispatch(getCoordinationLocationsThunk(year)),
+      dispatch(getForcedToFrameClassesThunk(year)),
+      dispatch(getForcedToFrameLocationsThunk(year)),
     ])
       .catch((e) => {
-        console.log('Error planning app data: ', e);
+        console.log('Error loading planning data: ', e);
         dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
       })
       .finally(() => {

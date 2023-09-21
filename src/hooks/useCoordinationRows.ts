@@ -23,6 +23,7 @@ import {
   selectPlanningRows,
   selectProjects,
   selectSelections,
+  selectStartYear,
   setPlanningRows,
   setProjects,
 } from '@/reducers/planningSlice';
@@ -283,6 +284,7 @@ const useCoordinationRows = () => {
   const groups = useAppSelector(selectGroups);
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
+  const startYear = useAppSelector(selectStartYear);
   const selections = useAppSelector(selectSelections);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const batchedCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
@@ -299,10 +301,11 @@ const useCoordinationRows = () => {
       return;
     }
 
+    const year = startYear ?? new Date().getFullYear();
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id, forcedToFrame, true)
+      fetchProjectsByRelation(type as PlanningRowType, id, forcedToFrame, year, true)
         .then((res) => {
           dispatch(setProjects(res));
         })

@@ -3,6 +3,7 @@ import { IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInter
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
+
 export const postGroup = async (request: IGroupRequest) => {
   return axios
     .post(`${REACT_APP_API_URL}/project-groups/`, request)
@@ -10,9 +11,9 @@ export const postGroup = async (request: IGroupRequest) => {
     .catch((err: IError) => Promise.reject(err));
 };
 
-export const getGroups = async () => {
+export const getGroups = async (year: number) => {
   return axios
-    .get(`${REACT_APP_API_URL}/project-groups/`)
+    .get(`${REACT_APP_API_URL}/project-groups/?year=${year}`)
     .then((res) => res.data)
     .catch((err: IError) => Promise.reject(err));
 };

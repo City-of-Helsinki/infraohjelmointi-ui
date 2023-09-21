@@ -79,3 +79,8 @@ export interface IFreeSearchResults {
 
 export type FreeSearchFormItem = IOption & { type: string };
 export type FreeSearchFormObject = { [k: string]: FreeSearchFormItem };
+
+export interface ICoordinatorRequestParams {
+  forcedToFrame: boolean;
+  year: number;
+}

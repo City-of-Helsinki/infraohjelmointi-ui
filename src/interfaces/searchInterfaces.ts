@@ -54,6 +54,7 @@ export interface IProjectSearchRequest
   direct: boolean;
   programmed?: boolean;
   forcedToFrame: boolean;
+  year: number;
 }
 
 export type SearchLimit = '10' | '20' | '30';

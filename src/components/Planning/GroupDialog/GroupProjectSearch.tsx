@@ -31,6 +31,8 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     (projectName: string): IProjectSearchRequest => {
       const searchParams = [];
 
+      const year = new Date().getFullYear();
+
       searchParams.push(`subClass=${getValues('subClass').value}`);
       if (getValues('subDivision').value) {
         searchParams.push(`subDivision=${getValues('subDivision').value}`);
@@ -43,7 +45,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       searchParams.push('inGroup=false');
       searchParams.push('programmed=true');
 
-      return { params: searchParams.join('&'), direct: !showAdvanceFields, forcedToFrame };
+      return { params: searchParams.join('&'), direct: !showAdvanceFields, forcedToFrame, year };
     },
     [getValues, showAdvanceFields, forcedToFrame],
   );

@@ -46,8 +46,8 @@ const initialState: ILocationState = {
 
 export const getPlanningLocationsThunk = createAsyncThunk(
   'location/getAllPlanning',
-  async (_, thunkAPI) => {
-    return await getPlanningLocations()
+  async (year: number, thunkAPI) => {
+    return await getPlanningLocations(year)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -55,8 +55,8 @@ export const getPlanningLocationsThunk = createAsyncThunk(
 
 export const getCoordinationLocationsThunk = createAsyncThunk(
   'location/getAllCoordinator',
-  async (_, thunkAPI) => {
-    return await getCoordinatorLocations(false)
+  async (year: number, thunkAPI) => {
+    return await getCoordinatorLocations({ forcedToFrame: false, year })
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -64,8 +64,8 @@ export const getCoordinationLocationsThunk = createAsyncThunk(
 
 export const getForcedToFrameLocationsThunk = createAsyncThunk(
   'location/getAllForcedToFrame',
-  async (_, thunkAPI) => {
-    return await getCoordinatorLocations(true)
+  async (year: number, thunkAPI) => {
+    return await getCoordinatorLocations({ forcedToFrame: true, year })
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
