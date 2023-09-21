@@ -10,8 +10,8 @@ import './styles.css';
 const CoordinatorNotesDialog: FC = () => {
     const dispatch = useAppDispatch();
 
-    const titleId = 'add-hashtag-title';
-    const descriptionId = 'add-hashtag-content';
+    const noteId = 'add-coordinator-note-title';
+    const descriptionId = 'add-coordinator-note-content';
 
     const handleClose = useCallback(async () => {
         dispatch(setNotesDialogOpen(false))
@@ -43,8 +43,8 @@ const CoordinatorNotesDialog: FC = () => {
         <>
             {dialogOpen && 
                 <Dialog
-                    id="add-hashtag-dialog"
-                    aria-labelledby={titleId}
+                    id={noteId}
+                    aria-labelledby={noteId}
                     aria-describedby={descriptionId}
                     isOpen={dialogOpen}
                     close={handleClose}

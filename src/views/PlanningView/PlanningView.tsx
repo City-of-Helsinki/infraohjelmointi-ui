@@ -12,14 +12,14 @@ import usePlanningRoutes from '@/hooks/usePlanningRoutes';
 import useCoordinationRows from '@/hooks/useCoordinationRows';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import './styles.css';
-
+import { useLocation } from 'react-router';
 const LOADING_PLANNING_DATA_ID = 'loading-planning-data';
 
 const PlanningView: FC = () => {
   const dispatch = useAppDispatch();
   const selectedYear = useAppSelector(selectSelectedYear);
   const isPlanningLoading = useAppSelector(selectIsPlanningLoading);
-
+  const { pathname } = useLocation();
   useEffect(() => {
     if (isPlanningLoading) {
       dispatch(setLoading({ text: 'Loading planning data', id: LOADING_PLANNING_DATA_ID }));
@@ -42,6 +42,9 @@ const PlanningView: FC = () => {
           id="planning-view"
         >
           <div className="planning-header-container">
+            { pathname.includes('coordination') &&
+              <CoordinatorNotesDialog />
+            }
             <CoordinatorNotesDialog />
             <PlanningInfoPanel />
             <PlanningSummaryTable />

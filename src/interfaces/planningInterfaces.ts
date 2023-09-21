@@ -69,6 +69,13 @@ export interface IPlanningNotesDialogData {
   id: string;
 }
 
+export interface IPlanningNotesModalData {
+  name: string;
+  id: string;
+ // date: string;
+ //updatedBy: string;
+}
+
 export interface IPlanningRow extends IPlanningSums {
   type: PlanningRowType;
   name: string;

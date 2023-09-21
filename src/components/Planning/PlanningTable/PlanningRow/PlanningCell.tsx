@@ -8,8 +8,8 @@ import {
   selectPlanningMode,
   selectSelectedYear,
   selectStartYear,
-  setNotesDialogData,
-  setNotesDialogOpen,
+  setNotesModalData,
+  setNotesModalOpen,
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import { patchCoordinationClass } from '@/services/classServices';
@@ -25,7 +25,9 @@ import { formattedNumberToNumber } from '@/utils/calculations';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
+import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconSpeechbubble } from 'hds-react';
+import { useLocation } from 'react-router';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -46,6 +48,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   } = cell;
 
   const user = useAppSelector(selectUser);
+  const { pathname } = useLocation();
   const mode = useAppSelector(selectPlanningMode);
   const [editFrameBudget, setEditFrameBudget] = useState(false);
   const selectedYear = useAppSelector(selectSelectedYear);
@@ -187,24 +190,23 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
       {/* There will be data generated here (at least for the first year) in future tasks */}
       {year === selectedYear && (
         <>
-          {isCurrentYear && (
-            <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />
-          )}
-          {moment.months().map((m) => (
-            m === 'tammikuu' ?
+          {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />}
+          {moment.months().map((m, index) => (
+            pathname.includes('coordination') && m === 'tammikuu' ?
             <>
               <td
-                key={m}
+                key={`m-${index}`}
                 className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
                 onMouseOver={() => setHoveredClassToMonth(m)}
                 onMouseLeave={() => removeHoveredClassFromMonth(m)}
               >
                 <span onClick={() => {
-                  dispatch(setNotesDialogOpen(true));
-                  dispatch(setNotesDialogData({name: name, id: id}))
+                  dispatch(setNotesModalOpen(true));
+                  dispatch(setNotesModalData({name: name, id: id}))
                 }}>
                   <IconSpeechbubble color="white" />
                 </span>
+                <CoordinatorNotesModal id={`m-${index}`}/>
               </td>
             </>
             :

@@ -371,6 +371,7 @@
   "cancel": "Peruuta",
   "note": "Muistiinpano",
   "addNote": "Lisää muistiinpano",
+  "memo": "Muistio", 
   "editNote": "Muokkaa muistiinpanoa",
   "deleteNote": "Poista muistiinpano",
   "deleteNoteConfirm": "Oletko varma että haluat poistaa tämän muistiinpanon?",
