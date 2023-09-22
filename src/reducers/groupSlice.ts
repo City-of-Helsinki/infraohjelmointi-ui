@@ -19,22 +19,31 @@ const initialState: IGroupsState = {
 export const postGroupThunk = createAsyncThunk(
   'group/post',
   async (request: IGroupRequest, thunkAPI) => {
-    return await postGroup(request)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+    try {
+      const group = await postGroup(request);
+      return group;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const deleteGroupThunk = createAsyncThunk('group/delete', async (id: string, thunkAPI) => {
-  return await deleteGroup(id)
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  try {
+    const res = await deleteGroup(id);
+    return res;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e);
+  }
 });
 
 export const getGroupsThunk = createAsyncThunk('group/getAll', async (year: number, thunkAPI) => {
-  return await getGroups(year)
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  try {
+    const groups = await getGroups(year);
+    return groups;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e);
+  }
 });
 
 export const groupSlice = createSlice({

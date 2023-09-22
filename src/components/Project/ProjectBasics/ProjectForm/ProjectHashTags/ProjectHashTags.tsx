@@ -151,16 +151,17 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
 
     // Submit hashTagsForSubmit and close the dialog
     const onSubmit = useCallback(
-      (e: MouseEvent<HTMLButtonElement>) => {
-        patchProject({
-          id: projectId,
-          data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
-        })
-          .then(() => {
-            onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
-            toggleOpenDialog(e);
-          })
-          .catch(Promise.reject);
+      async (event: MouseEvent<HTMLButtonElement>) => {
+        try {
+          await patchProject({
+            id: projectId,
+            data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
+          });
+          onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
+          toggleOpenDialog(event);
+        } catch (e) {
+          console.log('Error patching project hashtags: ', e);
+        }
       },
       [hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
     );

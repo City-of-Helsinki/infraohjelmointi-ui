@@ -18,51 +18,63 @@ const initialState: INotesState = {
 export const getNotesByProjectThunk = createAsyncThunk(
   'notes/getByProject',
   async (projectId: string, thunkAPI) => {
-    return await getNotesByProject(projectId)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+    try {
+      const notes = await getNotesByProject(projectId);
+      return notes;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const postNoteThunk = createAsyncThunk(
   'note/post',
   async (request: INoteRequest, thunkAPI) => {
-    return await postNote(request)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+    try {
+      const note = await postNote(request);
+      return note;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const deleteNoteThunk = createAsyncThunk('note/delete', async (id: string, thunkAPI) => {
-  return await deleteNote(id)
-    .then((res) => {
-      thunkAPI.dispatch(
-        notifySuccess({
-          title: 'deleteSuccess',
-          message: 'noteDeleteSuccess',
-          type: 'toast',
-        }),
-      );
-      return res;
-    })
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  try {
+    const note = await deleteNote(id);
+
+    thunkAPI.dispatch(
+      notifySuccess({
+        title: 'deleteSuccess',
+        message: 'noteDeleteSuccess',
+        type: 'toast',
+      }),
+    );
+
+    return note;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e);
+  }
 });
 
 export const patchNoteThunk = createAsyncThunk(
   'note/patch',
   async (request: INoteRequest, thunkAPI) => {
-    return await patchNote(request)
-      .then((res) => {
-        thunkAPI.dispatch(
-          notifySuccess({
-            title: 'patchSuccess',
-            message: 'notePatchSuccess',
-            type: 'toast',
-          }),
-        );
-        return res;
-      })
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+    try {
+      const note = await patchNote(request);
+
+      thunkAPI.dispatch(
+        notifySuccess({
+          title: 'patchSuccess',
+          message: 'notePatchSuccess',
+          type: 'toast',
+        }),
+      );
+
+      return note;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 

@@ -56,50 +56,57 @@ const FreeSearchForm = ({
   const { searchWord, resultObject } = searchState;
 
   const getSuggestions = useCallback(
-    (inputValue: string) =>
-      new Promise<{ value: string; label: string }[]>((resolve, reject) => {
-        getProjectsWithFreeSearch(inputValue)
-          .then((res) => {
-            const formValue = getValues('freeSearchParams');
-            // Create a combined list of all results and filter already added values
-            const resultListWithDuplicates = freeSearchResultsToList(res || {}).filter(
-              (f) => !arrayHasValue(Object.keys(formValue), f.value),
-            );
-            // reset duplicates
-            searchWordDuplicates = {};
-            const resultList = Object.values(
-              resultListWithDuplicates.reduce((accumulator, current) => {
-                // catch duplicates
-                if (accumulator[current.value]) {
-                  searchWordDuplicates[current.value] = [
-                    ...(searchWordDuplicates[current.value] ?? []),
-                    current,
-                  ];
-                } else {
-                  // kep only one copy of each element
-                  accumulator[current.value] = current;
-                }
-                return accumulator;
-              }, {} as Record<string, FreeSearchFormListItem>),
-            );
+    async (inputValue: string) => {
+      try {
+        const res = await getProjectsWithFreeSearch(inputValue);
 
-            // Convert the resultList to options for the suggestion dropdown
-            const freeSearchFormItemList: Array<FreeSearchFormItem> | [] = resultList
-              ? resultList.map((r) => ({ ...listItemToOption(r), type: r.type }))
-              : [];
+        const formValue = getValues('freeSearchParams');
 
-            // This resultObject is needed to be able to add the type, value and name of the selected option,
-            // since the callback for selecting an option only returns the displayed value instead of the mapped object.
-            if (freeSearchFormItemList.length > 0) {
-              setSearchState((current) => ({
-                ...current,
-                resultObject: _.keyBy(freeSearchFormItemList, 'label'),
-              }));
+        // Create a combined list of all results and filter already added values
+        const resultListWithDuplicates = freeSearchResultsToList(res || {}).filter(
+          (f) => !arrayHasValue(Object.keys(formValue), f.value),
+        );
+
+        // reset duplicates
+        searchWordDuplicates = {};
+
+        const resultList = Object.values(
+          resultListWithDuplicates.reduce((accumulator, current) => {
+            // catch duplicates
+            if (accumulator[current.value]) {
+              searchWordDuplicates[current.value] = [
+                ...(searchWordDuplicates[current.value] ?? []),
+                current,
+              ];
+            } else {
+              // kep only one copy of each element
+              accumulator[current.value] = current;
             }
-            resolve(freeSearchFormItemList || []);
-          })
-          .catch(() => reject([]));
-      }),
+            return accumulator;
+          }, {} as Record<string, FreeSearchFormListItem>),
+        );
+
+        // Convert the resultList to options for the suggestion dropdown
+        const freeSearchFormItemList: Array<FreeSearchFormItem> | [] = resultList
+          ? resultList.map((r) => ({ ...listItemToOption(r), type: r.type }))
+          : [];
+
+        // This resultObject is needed to be able to add the type, value and name of the selected option,
+        // since the callback for selecting an option only returns the displayed value instead of the mapped object.
+        if (freeSearchFormItemList.length > 0) {
+          setSearchState((current) => ({
+            ...current,
+            resultObject: _.keyBy(freeSearchFormItemList, 'label'),
+          }));
+        }
+
+        return freeSearchFormItemList || [];
+      } catch (e) {
+        console.log('Error getting free search results: ', e);
+        return [];
+      }
+    },
+
     [getValues],
   );
 

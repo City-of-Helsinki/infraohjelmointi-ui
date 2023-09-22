@@ -19,7 +19,12 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
   const dispatch = useAppDispatch();
 
   const handleDeleteNote = useCallback(async () => {
-    await dispatch(deleteNoteThunk(noteId)).then(() => close());
+    try {
+      await dispatch(deleteNoteThunk(noteId));
+      close();
+    } catch (e) {
+      console.log('Error deleting note: ', e);
+    }
   }, [close, dispatch, noteId]);
 
   return (

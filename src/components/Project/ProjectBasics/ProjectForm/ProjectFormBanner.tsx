@@ -28,16 +28,17 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
     });
 
     if (confirm !== false && project?.id) {
-      deleteProject(project.id)
-        .then(() => {
-          // navigate back to history or if no history, go to planning view
-          if (window.history.state && window.history.state.idx > 0) {
-            navigate(-1);
-          } else {
-            navigate('/planning', { replace: true });
-          }
-        })
-        .catch(Promise.reject);
+      try {
+        await deleteProject(project.id);
+        // navigate back to history or if no history, go to planning view
+        if (window.history.state && window.history.state.idx > 0) {
+          navigate(-1);
+        } else {
+          navigate('/planning', { replace: true });
+        }
+      } catch (e) {
+        console.log('Error deleting project');
+      }
     }
   }, [isConfirmed]);
 

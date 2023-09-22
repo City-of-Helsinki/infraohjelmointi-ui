@@ -24,20 +24,32 @@ const AuthGuard: FC = () => {
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
     if (oidcUser?.access_token) {
-      getApiToken().then(() => {
-        // Get user from our API if the user doesn't exist oidcUser's id doesn't match the current user
+      const getApiTokenAndUser = async () => {
+        // Get API token
+        try {
+          await getApiToken();
+        } catch (e) {
+          console.log('Error getting API token: ', e);
+        }
+        // Get user
         if (!user || (user?.uuid !== oidcUser.profile.sub && !auth.isLoading)) {
-          dispatch(getUserThunk()).then(() => {
+          try {
+            await dispatch(getUserThunk());
             // Since the redirect from login will bring the url back to REACT_APP_REDIRECT_URI path, we need to
             // return the user to the path that it initially navigated to when opening the app
             const initialPath = localStorage.getItem(INITIAL_PATH);
+
             if (initialPath) {
               navigate(initialPath);
               localStorage.removeItem(INITIAL_PATH);
             }
-          });
+          } catch (e) {
+            console.log('Error getting user: ', e);
+          }
         }
-      });
+      };
+
+      getApiTokenAndUser();
     }
   }, [oidcUser, API_TOKEN]);
 

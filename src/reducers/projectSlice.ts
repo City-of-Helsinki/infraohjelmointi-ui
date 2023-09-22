@@ -1,4 +1,3 @@
-import { IError } from '@/interfaces/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProject } from '@/services/projectServices';
 import { RootState } from '@/store';
@@ -24,9 +23,12 @@ const initialState: IProjectState = {
 
 export const getProjectThunk = createAsyncThunk('project/getOne', async (id: string, thunkAPI) => {
   thunkAPI.dispatch(resetProject());
-  return await getProject(id)
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  try {
+    const project = await getProject(id);
+    return project;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e);
+  }
 });
 
 export const projectSlice = createSlice({

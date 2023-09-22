@@ -21,8 +21,14 @@ const ProjectNewNoteForm = () => {
   const dispatch = useAppDispatch();
 
   const onSubmit = useCallback(
-    async (form: IProjectNoteForm) =>
-      await dispatch(postNoteThunk(form as INoteRequest)).then(() => reset(formValues)),
+    async (form: IProjectNoteForm) => {
+      try {
+        await dispatch(postNoteThunk(form as INoteRequest));
+        reset(formValues);
+      } catch (e) {
+        console.log('Error posting note: ', e);
+      }
+    },
     [dispatch, formValues, reset],
   );
 

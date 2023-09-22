@@ -144,14 +144,17 @@ const useSearchTerms = () => {
   const [searchTerms, setSearchTerms] = useState<Array<ISearchTerm>>([]);
 
   const deleteTerm = useCallback(
-    (term: ISearchTerm) => {
+    async (term: ISearchTerm) => {
       const formAfterDelete = deleteSearchFormValue(submittedForm, term);
       const searchParams = buildSearchParams(formAfterDelete);
       if (searchParams) {
-        dispatch(getSearchResultsThunk({ params: searchParams })).then(() => {
+        try {
+          await dispatch(getSearchResultsThunk({ params: searchParams }));
           dispatch(setSubmittedSearchForm(formAfterDelete));
           dispatch(setLastSearchParams(searchParams));
-        });
+        } catch (e) {
+          console.log('Error deleting search term: ', e);
+        }
       } else {
         dispatch(clearSearchState());
       }

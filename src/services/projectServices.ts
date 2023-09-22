@@ -1,4 +1,4 @@
-import { IError, IFreeSearchResults } from '@/interfaces/common';
+import { IFreeSearchResults } from '@/interfaces/common';
 import {
   IProject,
   IProjectPatchRequestObject,
@@ -16,50 +16,62 @@ import axios from 'axios';
 const { REACT_APP_API_URL } = process.env;
 
 export const getProject = async (id: string): Promise<IProject> => {
-  return axios
-    .get(`${REACT_APP_API_URL}/projects/${id}/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/projects/${id}/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const deleteProject = async (id: string): Promise<{ id: string }> => {
-  return axios
-    .delete(`${REACT_APP_API_URL}/projects/${id}/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.delete(`${REACT_APP_API_URL}/projects/${id}/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProject> => {
-  return axios
-    .patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const postProject = async (request: IProjectPostRequestObject): Promise<IProject> => {
-  return axios
-    .post(`${REACT_APP_API_URL}/projects/`, request.data)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.post(`${REACT_APP_API_URL}/projects/`, request.data);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResults> => {
-  return axios
-    .get(
+  try {
+    const res = await axios.get(
       req.fullPath ||
         `${REACT_APP_API_URL}/projects/search-results/?${req.params}&limit=${req.limit}&order=${req.order}`,
-    )
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+    );
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const patchProjects = async (
   request: IProjectsPatchRequestObject,
 ): Promise<Array<IProject>> => {
-  return axios
-    .patch(`${REACT_APP_API_URL}/projects/bulk-update/`, request.data)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.patch(`${REACT_APP_API_URL}/projects/bulk-update/`, request.data);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getProjectsWithParams = async (
@@ -76,17 +88,23 @@ export const getProjectsWithParams = async (
     ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`
     : `${REACT_APP_API_URL}/projects/?${allParams}`;
 
-  return axios
-    .get(url)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(url);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getProjectsWithFreeSearch = async (
   searchWord: string,
 ): Promise<IFreeSearchResults> => {
-  return axios
-    .get(`${REACT_APP_API_URL}/projects/search-results/?freeSearch=${searchWord}`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(
+      `${REACT_APP_API_URL}/projects/search-results/?freeSearch=${searchWord}`,
+    );
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };

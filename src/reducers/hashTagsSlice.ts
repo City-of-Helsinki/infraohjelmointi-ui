@@ -1,4 +1,3 @@
-import { IError } from '@/interfaces/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   IHashTag,
@@ -20,28 +19,35 @@ const initialState: IHashTagState = {
 };
 
 export const getHashTagsThunk = createAsyncThunk('hashtag/getAll', async (_, thunkAPI) => {
-  return await getHashTags()
-    .then((res) => {
-      return res;
-    })
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  try {
+    const hashtags = await getHashTags();
+    return hashtags;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e);
+  }
 });
 
 export const patchHashTagThunk = createAsyncThunk(
   'hashtag/patch',
   async (request: IHashTagPatchRequest, thunkAPI) => {
-    return await patchHashTag(request)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+    try {
+      const hashtag = await patchHashTag(request);
+      return hashtag;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const postHashTagThunk = createAsyncThunk(
   'hashtag/post',
   async (request: IHashTagPostRequest, thunkAPI) => {
-    return await postHashTag(request)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+    try {
+      const hashtag = await postHashTag(request);
+      return hashtag;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 

@@ -190,7 +190,8 @@ describe('PlanningView', () => {
 
     // Simulate what App.tsx does when receiving a finance-update event
     await waitFor(async () => {
-      await sendFinanceUpdateEvent(financeUpdateData).then(() => {
+      try {
+        await sendFinanceUpdateEvent(financeUpdateData);
         store.dispatch(
           updateMasterClass({
             data: financeUpdateData.planning.masterClass,
@@ -198,7 +199,9 @@ describe('PlanningView', () => {
           }),
         );
         store.dispatch(updateClass({ data: financeUpdateData.planning.class, type: 'planning' }));
-      });
+      } catch (e) {
+        console.log('Error sending finance update event: ', e);
+      }
     });
 
     expect(store.getState().events.financeUpdate).toStrictEqual(financeUpdateData);

@@ -239,14 +239,18 @@ const usePlanningRows = () => {
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
-    if (type && id) {
-      const year = startYear ?? new Date().getFullYear();
+    const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
+      try {
+        const year = startYear ?? new Date().getFullYear();
+        const projects = await fetchProjectsByRelation(type as PlanningRowType, id, false, year);
+        dispatch(setProjects(projects));
+      } catch (e) {
+        console.log('Error fetching projects for planning selections: ', e);
+      }
+    };
 
-      fetchProjectsByRelation(type as PlanningRowType, id, false, year)
-        .then((res) => {
-          dispatch(setProjects(res));
-        })
-        .catch(Promise.reject);
+    if (type && id) {
+      getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
   }, [selections, groups, mode, forcedToFrame]);
 

@@ -44,29 +44,39 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
   }, [pageCount, searchOrder]);
 
   const handleGetSearchResults = useCallback(
-    (event: MouseEvent<HTMLAnchorElement> | MouseEvent<HTMLButtonElement>) => {
+    async (event: MouseEvent<HTMLAnchorElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       const buttonText = event.currentTarget.textContent;
 
       // Call next url
       if (buttonText === ButtonText.next && next) {
-        return dispatch(getSearchResultsThunk({ fullPath: next })).then(() =>
-          handlePageChange(searchPage + 1),
-        );
+        try {
+          await dispatch(getSearchResultsThunk({ fullPath: next }));
+          handlePageChange(searchPage + 1);
+        } catch (e) {
+          console.log('Error getting next search results: ', e);
+        }
       }
       // Call previous url
-      if (buttonText === ButtonText.previous && previous) {
-        return dispatch(getSearchResultsThunk({ fullPath: previous })).then(() =>
-          handlePageChange(searchPage === 0 ? 0 : searchPage - 1),
-        );
+      else if (buttonText === ButtonText.previous && previous) {
+        try {
+          await dispatch(getSearchResultsThunk({ fullPath: previous }));
+          handlePageChange(searchPage === 0 ? 0 : searchPage - 1);
+        } catch (e) {
+          console.log('Error getting previous search results: ', e);
+        }
       }
       // Call by number clicked
-      if (buttonText) {
+      else if (buttonText) {
         const buttonNumber = parseInt(buttonText);
         handlePageChange(buttonNumber);
-        return dispatch(
-          getSearchResultsThunk({ params: `${lastSearchParams}&page=${buttonNumber}` }),
-        );
+        try {
+          await dispatch(
+            getSearchResultsThunk({ params: `${lastSearchParams}&page=${buttonNumber}` }),
+          );
+        } catch (e) {
+          console.log(`Error getting search results for page ${buttonNumber}: `, e);
+        }
       }
     },
     [next, previous, dispatch, handlePageChange, searchPage, lastSearchParams],

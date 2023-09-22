@@ -89,45 +89,48 @@ const ProjectProgrammedSearch: FC<IProjectSearchProps> = ({
   );
 
   const getSuggestions = useCallback(
-    (inputValue: string) => {
-      return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+    async (inputValue: string) => {
+      try {
         const queryString = buildQueryParamString(inputValue);
 
-        getSearchResults(queryString)
-          .then((res) => {
-            // Filter out only the projects which haven't yet been added to be the submitted list from the result
-            const projectsIdList = projectsForSubmit.map((p) => p.value);
-            const resultListWithDuplicates = res.results.filter(
-              (result) => result.type == 'projects' && !arrayHasValue(projectsIdList, result.id),
-            );
-            // reset duplicates
+        const res = await getSearchResults(queryString);
 
-            const resultList = Object.values(
-              resultListWithDuplicates.reduce((accumulator, current) => {
-                // kep only one copy of each element
-                return { ...accumulator, [current.name]: current };
-              }, {} as Record<string, ISearchResultPayloadItem>),
-            );
+        // Filter out only the projects which haven't yet been added to be the submitted list from the result
+        const projectsIdList = projectsForSubmit.map((p) => p.value);
 
-            // Convert the resultList to options for the suggestion dropdown
-            const searchProjectsItemList: Array<IProgrammedProjectSuggestions> | [] = resultList
-              ? resultList.map((project) => ({
-                  label: project.name,
-                  value: project.id,
-                  breadCrumbs: buildBreadCrumbs(project.path, classes, districts),
-                }))
-              : [];
-            if (searchProjectsItemList.length > 0) {
-              setSearchState((current) => ({
-                ...current,
-                searchedProjects: searchProjectsItemList,
-              }));
-            }
+        const resultListWithDuplicates = res.results.filter(
+          (result) => result.type == 'projects' && !arrayHasValue(projectsIdList, result.id),
+        );
 
-            resolve(searchProjectsItemList);
-          })
-          .catch(() => reject([]));
-      });
+        // reset duplicates
+        const resultList = Object.values(
+          resultListWithDuplicates.reduce((accumulator, current) => {
+            // kep only one copy of each element
+            return { ...accumulator, [current.name]: current };
+          }, {} as Record<string, ISearchResultPayloadItem>),
+        );
+
+        // Convert the resultList to options for the suggestion dropdown
+        const searchProjectsItemList: Array<IProgrammedProjectSuggestions> | [] = resultList
+          ? resultList.map((project) => ({
+              label: project.name,
+              value: project.id,
+              breadCrumbs: buildBreadCrumbs(project.path, classes, districts),
+            }))
+          : [];
+
+        if (searchProjectsItemList.length > 0) {
+          setSearchState((current) => ({
+            ...current,
+            searchedProjects: searchProjectsItemList,
+          }));
+        }
+
+        return searchProjectsItemList;
+      } catch (e) {
+        console.log('Error getting project suggestions: ', e);
+        return [];
+      }
     },
     [projectsForSubmit, buildQueryParamString, classes, districts],
   );

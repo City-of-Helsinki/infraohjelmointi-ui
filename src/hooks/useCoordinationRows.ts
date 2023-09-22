@@ -304,12 +304,23 @@ const useCoordinationRows = () => {
     const year = startYear ?? new Date().getFullYear();
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
+    const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
+      try {
+        const projects = await fetchProjectsByRelation(
+          type as PlanningRowType,
+          id,
+          forcedToFrame,
+          year,
+          true,
+        );
+        dispatch(setProjects(projects));
+      } catch (e) {
+        console.log('Error fetching projects for coordination selections: ', e);
+      }
+    };
+
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id, forcedToFrame, year, true)
-        .then((res) => {
-          dispatch(setProjects(res));
-        })
-        .catch(Promise.reject);
+      getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
   }, [selections, groups, mode, forcedToFrame]);
 

@@ -74,14 +74,14 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = memo(
             id: 'loading-programmed-projects-patched',
           }),
         );
-        patchProjects(buildRequestPayload(projectsForSubmit))
-          .then(() => {
-            setProjectsForSubmit([]);
-          })
-          .finally(() => {
-            dispatch(clearLoading('loading-programmed-projects-patched'));
-          })
-          .catch(() => Promise.reject);
+        try {
+          await patchProjects(buildRequestPayload(projectsForSubmit));
+          setProjectsForSubmit([]);
+        } catch (e) {
+          console.log('Error setting project to programmed: ', e);
+        } finally {
+          dispatch(clearLoading('loading-programmed-projects-patched'));
+        }
       },
 
       [buildRequestPayload, projectsForSubmit, dispatch],
