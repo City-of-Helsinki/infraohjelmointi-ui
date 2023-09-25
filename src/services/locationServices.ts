@@ -1,29 +1,40 @@
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
-import { IError } from '@/interfaces/common';
+import { ICoordinatorRequestParams } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const getPlanningLocations = async (): Promise<Array<ILocation>> => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-locations/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+export const getPlanningLocations = async (year: number): Promise<Array<ILocation>> => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-locations/?year=${year}`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getCoordinatorLocations = async (
-  forcedToFrame: boolean,
+  req: ICoordinatorRequestParams,
 ): Promise<Array<ILocation>> => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-locations/coordinator/?forcedToFrame=${forcedToFrame}`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(
+      `${REACT_APP_API_URL}/project-locations/coordinator/?forcedToFrame=${req.forcedToFrame}&year=${req.year}`,
+    );
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const patchCoordinationLocation = async (request: IClassPatchRequest) => {
-  return axios
-    .patch(`${REACT_APP_API_URL}/project-locations/coordinator/${request.id}/`, request.data)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.patch(
+      `${REACT_APP_API_URL}/project-locations/coordinator/${request.id}/`,
+      request.data,
+    );
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };

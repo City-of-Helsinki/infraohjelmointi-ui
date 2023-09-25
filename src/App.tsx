@@ -39,6 +39,7 @@ import AdminHashtags from './components/Admin/AdminHashtags';
 import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
 import useFinanceUpdates from './hooks/useFinanceUpdates';
+import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -47,41 +48,57 @@ const App: FC = () => {
   const [appDataReady, setAppDataReady] = useState(false);
   const user = useAppSelector(selectUser);
 
+  const startYear = useAppSelector(selectStartYear);
+
   useFinanceUpdates();
 
-  const initalizeStates = async () => {
+  const initializeStates = async () => {
+    // Set moments locale to finnish for the app
+    moment().locale('fi');
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
-    await Promise.all([
-      dispatch(getListsThunk()),
-      dispatch(getHashTagsThunk()),
-      dispatch(getGroupsThunk()),
-      dispatch(getPlanningClassesThunk()),
-      dispatch(getPlanningLocationsThunk()),
-      dispatch(getCoordinationClassesThunk()),
-      dispatch(getCoordinationLocationsThunk()),
-      dispatch(getForcedToFrameClassesThunk()),
-      dispatch(getForcedToFrameLocationsThunk()),
-    ])
-      .then(() => {
-        setAppDataReady(true);
-      })
-      .catch((e) => {
-        console.log('Error getting app data: ', e);
-        dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-      })
-      .finally(() => {
-        dispatch(clearLoading(LOADING_APP_ID));
-      });
+    try {
+      await dispatch(getListsThunk());
+      await dispatch(getHashTagsThunk());
+    } catch (e) {
+      console.log('Error getting app data: ', e);
+      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+    } finally {
+      setAppDataReady(true);
+      dispatch(clearLoading(LOADING_APP_ID));
+    }
+  };
+
+  const loadPlanningData = async (year: number) => {
+    dispatch(setIsPlanningLoading(true));
+    try {
+      await dispatch(getGroupsThunk(year));
+      await dispatch(getPlanningClassesThunk(year));
+      await dispatch(getPlanningLocationsThunk(year));
+      await dispatch(getCoordinationClassesThunk(year));
+      await dispatch(getCoordinationLocationsThunk(year));
+      await dispatch(getForcedToFrameClassesThunk(year));
+      await dispatch(getForcedToFrameLocationsThunk(year));
+    } catch (e) {
+      console.log('Error loading planning data: ', e);
+      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+    } finally {
+      dispatch(setIsPlanningLoading(false));
+    }
   };
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
-    // Set moments locale to finnish for the app
     if (user) {
-      moment().locale('fi');
-      initalizeStates().catch(Promise.reject);
+      initializeStates().catch(Promise.reject);
     }
   }, [user]);
+
+  // Changing the startYear in the planning view will trigger a re-fetch of all the planning data
+  useEffect(() => {
+    if (startYear) {
+      loadPlanningData(startYear);
+    }
+  }, [startYear]);
 
   return (
     <div>

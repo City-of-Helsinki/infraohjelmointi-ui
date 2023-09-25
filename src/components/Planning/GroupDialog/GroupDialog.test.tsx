@@ -212,9 +212,11 @@ describe('GroupDialog', () => {
 
     const getRequest = mockedAxios.get.mock;
 
+    const year = new Date().getFullYear();
+
     // Check that the correct url was called
     expect(getRequest.calls[0][0]).toBe(
-      'localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&district=koilinen-district-test&projectName=Vanha&inGroup=false&programmed=true&forcedToFrame=false&direct=false',
+      `localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&district=koilinen-district-test&projectName=Vanha&inGroup=false&programmed=true&year=${year}&forcedToFrame=false&direct=false`,
     );
 
     expect(submitButton).toBeEnabled();

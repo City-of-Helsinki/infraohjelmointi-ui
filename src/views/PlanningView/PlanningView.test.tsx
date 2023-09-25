@@ -136,15 +136,19 @@ describe('PlanningView', () => {
   it('catches a failed getProjectsWithParams request', async () => {
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
+    const year = new Date().getFullYear();
+
     await render();
 
     await waitFor(() =>
-      getProjectsWithParams({ params: 'test=123', direct: false, forcedToFrame: false }),
+      getProjectsWithParams({ params: 'test=123', direct: false, forcedToFrame: false, year }),
     );
 
     const getMock = mockedAxios.get.mock.lastCall;
 
-    expect(getMock[0]).toBe('localhost:4000/projects/?test=123&forcedToFrame=false&direct=false');
+    expect(getMock[0]).toBe(
+      `localhost:4000/projects/?test=123&year=${year}&forcedToFrame=false&direct=false`,
+    );
   });
 
   it('updates table sums if the finance-update event triggers', async () => {
@@ -186,7 +190,8 @@ describe('PlanningView', () => {
 
     // Simulate what App.tsx does when receiving a finance-update event
     await waitFor(async () => {
-      await sendFinanceUpdateEvent(financeUpdateData).then(() => {
+      try {
+        await sendFinanceUpdateEvent(financeUpdateData);
         store.dispatch(
           updateMasterClass({
             data: financeUpdateData.planning.masterClass,
@@ -194,7 +199,9 @@ describe('PlanningView', () => {
           }),
         );
         store.dispatch(updateClass({ data: financeUpdateData.planning.class, type: 'planning' }));
-      });
+      } catch (e) {
+        console.log('Error sending finance update event: ', e);
+      }
     });
 
     expect(store.getState().events.financeUpdate).toStrictEqual(financeUpdateData);
@@ -2033,9 +2040,11 @@ describe('PlanningView', () => {
             expect((await findAllByTestId('project-selections')).length).toBe(2);
           });
           const getRequest = mockedAxios.get.mock;
+
+          const year = new Date().getFullYear();
           // Check that the correct url was called
           expect(getRequest.lastCall[0]).toBe(
-            'localhost:4000/projects/?subClass=test-sub-class-1&projectName=not-in&inGroup=false&programmed=true&forcedToFrame=false&direct=true',
+            `localhost:4000/projects/?subClass=test-sub-class-1&projectName=not-in&inGroup=false&programmed=true&year=${year}&forcedToFrame=false&direct=true`,
           );
           const submitButton = await groupEditDialog.findByTestId('save-group-button');
           expect(submitButton).toBeInTheDocument();

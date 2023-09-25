@@ -39,6 +39,7 @@ const { REACT_APP_API_URL } = process.env;
 export const mockGetResponseProvider = () =>
   mockedAxios.get.mockImplementation((url) => {
     url = url.replace(`${REACT_APP_API_URL}`, '');
+    const year = new Date().getFullYear();
 
     switch (true) {
       case url === '/projects/':
@@ -69,21 +70,21 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockResponsibleZones);
       case url === '/persons/':
         return Promise.resolve(mockPersons);
-      case url === '/project-classes/':
+      case url === `/project-classes/?year=${year}`:
         return Promise.resolve(mockProjectClasses);
-      case url === '/project-classes/coordinator/?forcedToFrame=false':
+      case url === `/project-classes/coordinator/?forcedToFrame=false&year=${year}`:
         return Promise.resolve(mockProjectCoordinatorClasses);
-      case url === '/project-classes/coordinator/?forcedToFrame=true':
+      case url === `/project-classes/coordinator/?forcedToFrame=true&year=${year}`:
         return Promise.resolve(mockCoordinatorLocations);
-      case url === '/project-locations/':
+      case url === `/project-locations/?year=${year}`:
         return Promise.resolve(mockLocations);
-      case url === '/project-locations/coordinator/?forcedToFrame=false':
+      case url === `/project-locations/coordinator/?forcedToFrame=false&year=${year}`:
         return Promise.resolve(mockCoordinatorLocations);
-      case url === '/project-locations/coordinator/?forcedToFrame=true':
+      case url === `/project-locations/coordinator/?forcedToFrame=true&year=${year}`:
         return Promise.resolve(mockCoordinatorLocations);
       case url === `/projects/${mockProject.data.id}/notes/`:
         return Promise.resolve(mockNotes);
-      case url === `/project-groups/`:
+      case url === `/project-groups/?year=${year}`:
         return Promise.resolve(mockGroups);
       case url.toLocaleLowerCase().includes(`/projects/search-results/`):
         return Promise.resolve(mockSearchResults);

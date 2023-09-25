@@ -10,7 +10,7 @@ import useGroupForm from '@/forms/useGroupForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IGroupForm } from '@/interfaces/formInterfaces';
 import { postGroupThunk, updateGroup } from '@/reducers/groupSlice';
-import { IGroup, IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
+import { IGroupPatchRequestObject, IGroupRequest } from '@/interfaces/groupInterfaces';
 import { useNavigate } from 'react-router';
 import { patchGroup } from '@/services/groupServices';
 import './styles.css';
@@ -112,21 +112,25 @@ const DialogContainer: FC<IDialogProps> = memo(
     }, [handleClose, formValues, reset]);
 
     const onSubmit = useCallback(
-      (form: IGroupForm) => {
+      async (form: IGroupForm) => {
         if (editMode && id) {
-          patchGroup(buildRequestPayload(form, id) as IGroupPatchRequestObject)
-            .then((group: IGroup) => {
-              dispatch(updateGroup(group));
-              handleDialogClose();
-            })
-            .catch(Promise.reject);
+          try {
+            const group = await patchGroup(
+              buildRequestPayload(form, id) as IGroupPatchRequestObject,
+            );
+            dispatch(updateGroup(group));
+            handleDialogClose();
+          } catch (e) {
+            console.log('Error patching group: ', e);
+          }
         } else {
-          dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest))
-            .then(() => {
-              handleDialogClose();
-              navigateToGroupLocation(form);
-            })
-            .catch(Promise.reject);
+          try {
+            await dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest));
+            handleDialogClose();
+            navigateToGroupLocation(form);
+          } catch (e) {
+            console.log('Error posting group: ', e);
+          }
         }
       },
 

@@ -47,6 +47,19 @@ const initialState: IListState = {
   error: null,
 };
 
+const getResponsiblePersons = async () => {
+  try {
+    const persons = await getPersons();
+    return persons.map(({ firstName, lastName, id }) => ({
+      value: `${firstName} ${lastName}`,
+      id,
+    }));
+  } catch (e) {
+    console.log('Error getting responsible persons: ', e);
+    return [];
+  }
+};
+
 export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) => {
   try {
     return {
@@ -60,12 +73,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       planningPhases: await getPlanningPhases(),
       constructionPhases: await getConstructionPhases(),
       responsibleZones: await getResponsibleZones(),
-      responsiblePersons: await getPersons().then((res) =>
-        res.map(({ firstName, lastName, id }) => ({
-          value: `${firstName} ${lastName}`,
-          id,
-        })),
-      ),
+      responsiblePersons: await getResponsiblePersons(),
       programmedYears: setProgrammedYears(),
     };
   } catch (err) {

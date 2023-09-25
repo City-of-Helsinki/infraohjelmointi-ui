@@ -23,6 +23,7 @@ import {
   selectPlanningRows,
   selectProjects,
   selectSelections,
+  selectStartYear,
   setPlanningRows,
   setProjects,
 } from '@/reducers/planningSlice';
@@ -283,6 +284,7 @@ const useCoordinationRows = () => {
   const groups = useAppSelector(selectGroups);
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
+  const startYear = useAppSelector(selectStartYear);
   const selections = useAppSelector(selectSelections);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const batchedCoordinationClasses = useAppSelector(selectBatchedCoordinationClasses);
@@ -299,14 +301,26 @@ const useCoordinationRows = () => {
       return;
     }
 
+    const year = startYear ?? new Date().getFullYear();
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
+    const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
+      try {
+        const projects = await fetchProjectsByRelation(
+          type as PlanningRowType,
+          id,
+          forcedToFrame,
+          year,
+          true,
+        );
+        dispatch(setProjects(projects));
+      } catch (e) {
+        console.log('Error fetching projects for coordination selections: ', e);
+      }
+    };
+
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id, forcedToFrame, true)
-        .then((res) => {
-          dispatch(setProjects(res));
-        })
-        .catch(Promise.reject);
+      getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
   }, [selections, groups, mode, forcedToFrame]);
 

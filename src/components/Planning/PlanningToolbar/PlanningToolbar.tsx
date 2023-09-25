@@ -39,6 +39,7 @@ import {
   getCoordinationUrlFromPlanningSelections,
   getPlanningUrlFromCoordinationSelections,
 } from '@/utils/planningRowUtils';
+import YearSelector from './YearSelector/YearSelector';
 
 const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
@@ -231,22 +232,25 @@ const PlanningToolbar = () => {
       }
       right={
         <div className={`planning-toolbar-right ${selectedYear ? 'monthly-view-open' : ''}`}>
-          <button
-            aria-label="ideal budget view"
-            className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
-            disabled={!forcedToFrame || mode === 'planning'}
-            onClick={moveToIdealView}
-          >
-            <IconMoneyBag />
-          </button>
-          <button
-            aria-label="force framed budget view"
-            className={`money-button ${forcedToFrame ? 'selected' : ''}`}
-            disabled={forcedToFrame || mode === 'coordination'}
-            onClick={moveToForcedToFrameView}
-          >
-            <IconMoneyBagFill />
-          </button>
+          <div>
+            <button
+              aria-label="ideal budget view"
+              className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
+              disabled={!forcedToFrame || mode === 'planning'}
+              onClick={moveToIdealView}
+            >
+              <IconMoneyBag />
+            </button>
+            <button
+              aria-label="force framed budget view"
+              className={`money-button ${forcedToFrame ? 'selected' : ''}`}
+              disabled={forcedToFrame || mode === 'coordination'}
+              onClick={moveToForcedToFrameView}
+            >
+              <IconMoneyBagFill />
+            </button>
+          </div>
+          <YearSelector />
         </div>
       }
     />

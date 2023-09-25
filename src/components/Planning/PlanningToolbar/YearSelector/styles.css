@@ -1,0 +1,47 @@
+.year-selector-container {
+  @apply flex flex-col items-center justify-between;
+}
+
+.selected-years-container {
+  @apply flex w-[250px] items-center justify-between text-sm;
+}
+
+.selected-year-label {
+  @apply w-[10px];
+}
+
+.year-slider {
+  @apply relative mb-1 h-[14px] w-[270px] rounded-md bg-gray;
+}
+
+.year-slider-selected {
+  @apply absolute right-0 h-[14px] w-[236px] -translate-x-[0.34rem] border-[1px] border-bus bg-bus-l;
+}
+
+.year-slider-selected.past-years {
+  @apply w-[230px] -translate-x-[1.9rem];
+}
+
+.year-slider-buttons-container {
+  @apply flex -translate-y-[0.4rem] justify-between;
+}
+
+.left-year-button {
+  border: 1px solid var(--color-bus);
+  border-radius: 2px;
+  @apply h-6 w-4 -translate-x-[1px] items-center justify-center bg-bus-l;
+}
+
+.right-year-button {
+  border: 1px solid var(--color-bus);
+  border-radius: 2px;
+  @apply h-6 w-4 translate-x-[1px] items-center justify-center bg-bus-l;
+}
+
+.left-year-button svg {
+  @apply -translate-x-[4.5px] -translate-y-[2px] text-bus;
+}
+
+.right-year-button svg {
+  @apply -translate-x-[4.5px] -translate-y-[2px] text-bus;
+}

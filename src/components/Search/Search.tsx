@@ -45,12 +45,17 @@ const Search = () => {
   const onSubmit = useCallback(
     async (form: ISearchForm) => {
       const searchParams = buildSearchParams(form);
+
       navigate('/search-results');
       dispatch(toggleSearch());
-      dispatch(getSearchResultsThunk({ params: searchParams })).then(() => {
+
+      try {
+        await dispatch(getSearchResultsThunk({ params: searchParams }));
         dispatch(setSubmittedSearchForm(form));
         dispatch(setLastSearchParams(searchParams));
-      });
+      } catch (e) {
+        console.log('Error getting search results: ', e);
+      }
     },
     [dispatch, navigate],
   );

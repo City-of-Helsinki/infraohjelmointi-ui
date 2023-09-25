@@ -15,7 +15,7 @@
 }
 
 .planning-toolbar-right {
-  @apply pr-2;
+  @apply flex gap-8 pr-2;
 }
 
 .planning-toolbar-right.monthly-view-open {

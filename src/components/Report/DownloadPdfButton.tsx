@@ -62,11 +62,14 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
 
   const downloadPdf = useCallback(async () => {
     try {
+      const year = new Date().getFullYear();
+
       const res = await getProjectsWithParams({
         direct: false,
         programmed: false,
         params: 'overMillion=true',
         forcedToFrame: false,
+        year,
       });
 
       if (res.results.length > 0) {

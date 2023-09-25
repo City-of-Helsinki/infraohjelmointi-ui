@@ -10,9 +10,12 @@ interface IUserState {
 }
 
 export const getUserThunk = createAsyncThunk('auth/getUsers', async (_, thunkAPI) => {
-  return await getUser()
-    .then((res) => res)
-    .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  try {
+    const user = await getUser();
+    return user;
+  } catch (e) {
+    return thunkAPI.rejectWithValue(e);
+  }
 });
 
 const initialState: IUserState = {

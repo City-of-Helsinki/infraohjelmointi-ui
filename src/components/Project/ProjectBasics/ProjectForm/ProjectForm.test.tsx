@@ -100,7 +100,12 @@ const render = async () =>
  * simulate event and setting selected project since it happens in projectview
  */
 const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project: IProject) => {
-  await sendProjectUpdateEvent(project).then(() => dispatch(setSelectedProject(project)));
+  try {
+    await sendProjectUpdateEvent(project);
+    dispatch(setSelectedProject(project));
+  } catch (e) {
+    console.log('Error setting project update event listener: ', e);
+  }
 };
 
 describe('projectForm', () => {

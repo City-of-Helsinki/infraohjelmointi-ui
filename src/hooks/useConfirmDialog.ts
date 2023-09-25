@@ -28,6 +28,7 @@ const useConfirmDialog = () => {
     confirmButtonText?: string;
   }) => {
     setNeedsCleanup(true);
+
     return new Promise((resolve, reject) => {
       setConfirm({
         dialogType: dialogType || 'confirm',

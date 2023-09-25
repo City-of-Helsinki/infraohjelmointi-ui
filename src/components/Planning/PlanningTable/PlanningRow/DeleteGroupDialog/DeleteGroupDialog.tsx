@@ -18,11 +18,16 @@ const DeleteGroupDialog: FC<DeleteGroupDialogProps> = memo(
   ({ isVisible, onCloseDeleteGroupDialog, groupName, id }) => {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const handleDeleteGroup = useCallback(() => {
-      dispatch(deleteGroupThunk(id))
-        .then(() => onCloseDeleteGroupDialog())
-        .catch(Promise.reject);
+
+    const handleDeleteGroup = useCallback(async () => {
+      try {
+        await dispatch(deleteGroupThunk(id));
+        onCloseDeleteGroupDialog();
+      } catch (e) {
+        console.log('Error deleting group: ', e);
+      }
     }, [dispatch, id, onCloseDeleteGroupDialog]);
+
     const { Header, Content, ActionButtons } = Dialog;
 
     return (

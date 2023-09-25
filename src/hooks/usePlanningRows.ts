@@ -18,6 +18,7 @@ import {
   selectPlanningRows,
   selectProjects,
   selectSelections,
+  selectStartYear,
   setPlanningRows,
   setProjects,
 } from '@/reducers/planningSlice';
@@ -223,6 +224,7 @@ const usePlanningRows = () => {
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const startYear = useAppSelector(selectStartYear);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
@@ -237,12 +239,18 @@ const usePlanningRows = () => {
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
+    const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
+      try {
+        const year = startYear ?? new Date().getFullYear();
+        const projects = await fetchProjectsByRelation(type as PlanningRowType, id, false, year);
+        dispatch(setProjects(projects));
+      } catch (e) {
+        console.log('Error fetching projects for planning selections: ', e);
+      }
+    };
+
     if (type && id) {
-      fetchProjectsByRelation(type as PlanningRowType, id, false)
-        .then((res) => {
-          dispatch(setProjects(res));
-        })
-        .catch(Promise.reject);
+      getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
   }, [selections, groups, mode, forcedToFrame]);
 

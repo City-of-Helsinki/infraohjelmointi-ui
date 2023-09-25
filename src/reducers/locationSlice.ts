@@ -1,4 +1,3 @@
-import { IError } from '@/interfaces/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { RootState } from '@/store';
@@ -46,28 +45,37 @@ const initialState: ILocationState = {
 
 export const getPlanningLocationsThunk = createAsyncThunk(
   'location/getAllPlanning',
-  async (_, thunkAPI) => {
-    return await getPlanningLocations()
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  async (year: number, thunkAPI) => {
+    try {
+      const locations = await getPlanningLocations(year);
+      return locations;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const getCoordinationLocationsThunk = createAsyncThunk(
   'location/getAllCoordinator',
-  async (_, thunkAPI) => {
-    return await getCoordinatorLocations(false)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  async (year: number, thunkAPI) => {
+    try {
+      const locations = await getCoordinatorLocations({ forcedToFrame: false, year });
+      return locations;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const getForcedToFrameLocationsThunk = createAsyncThunk(
   'location/getAllForcedToFrame',
-  async (_, thunkAPI) => {
-    return await getCoordinatorLocations(true)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  async (year: number, thunkAPI) => {
+    try {
+      const locations = await getCoordinatorLocations({ forcedToFrame: true, year });
+      return locations;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 

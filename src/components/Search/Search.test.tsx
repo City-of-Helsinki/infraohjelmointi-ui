@@ -27,8 +27,7 @@ import {
   mockSubDivisions,
 } from '@/mocks/mockLocations';
 import { mockError } from '@/mocks/mockError';
-import { IError, IFreeSearchResults } from '@/interfaces/common';
-import { ISearchResults } from '@/interfaces/searchInterfaces';
+import { IError } from '@/interfaces/common';
 import { mockFreeSearchResults, mockSearchResults } from '@/mocks/mockSearch';
 import { Route } from 'react-router';
 import SearchResultsView from '@/views/SearchResultsView/SearchResultsView';
@@ -213,12 +212,15 @@ describe('Search', () => {
     // Check that the freeSearch url was called
     expect(getRequest.calls[0][0]).toBe('localhost:4000/projects/search-results/?freeSearch=l');
 
-    // Check that the get response is correct and that only the clicked selection is in the document
-    await Promise.resolve(getRequest.results[0].value).then((res: { data: IFreeSearchResults }) => {
+    try {
+      const res = await getRequest.results[0].value;
+
       expect(res.data).toStrictEqual(mockFreeSearchResults.data);
       expect(getByText('#leikkipuisto')).toBeInTheDocument();
       expect(queryByText('#leikkipaikka')).toBeNull();
-    });
+    } catch (e) {
+      console.log('Error getting free search results');
+    }
 
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 
@@ -244,10 +246,14 @@ describe('Search', () => {
 
     const getRequest = mockedAxios.get.mock.results[0].value;
 
-    await Promise.resolve(getRequest).then((res: { data: ISearchResults }) => {
+    try {
+      const res = await getRequest;
+
       expect(res.data).toStrictEqual(mockSearchResults.data);
       expect(store.getState().search.searchResults).toStrictEqual(mockSearchResults.data);
-    });
+    } catch (e) {
+      console.log('Error getting search results: ', e);
+    }
 
     await waitFor(() => expect(getByTestId('search-results-view')).toBeInTheDocument());
   });

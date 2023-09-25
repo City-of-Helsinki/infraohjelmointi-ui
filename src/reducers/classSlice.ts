@@ -1,5 +1,4 @@
 import { IClass } from '@/interfaces/classInterfaces';
-import { IError } from '@/interfaces/common';
 import { getCoordinationClasses, getPlanningClasses } from '@/services/classServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -54,28 +53,37 @@ const initialState: IClassState = {
 
 export const getPlanningClassesThunk = createAsyncThunk(
   'class/getAllPlanning',
-  async (_, thunkAPI) => {
-    return await getPlanningClasses()
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  async (year: number, thunkAPI) => {
+    try {
+      const classes = await getPlanningClasses(year);
+      return classes;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const getCoordinationClassesThunk = createAsyncThunk(
   'class/getAllCoordination',
-  async (_, thunkAPI) => {
-    return await getCoordinationClasses(false)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  async (year: number, thunkAPI) => {
+    try {
+      const classes = await getCoordinationClasses({ forcedToFrame: false, year });
+      return classes;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 
 export const getForcedToFrameClassesThunk = createAsyncThunk(
   'class/getAllForcedToFrame',
-  async (_, thunkAPI) => {
-    return await getCoordinationClasses(true)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  async (year: number, thunkAPI) => {
+    try {
+      const classes = await getCoordinationClasses({ forcedToFrame: true, year });
+      return classes;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 

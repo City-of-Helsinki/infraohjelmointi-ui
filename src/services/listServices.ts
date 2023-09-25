@@ -1,82 +1,103 @@
-import { IError } from '@/interfaces/common';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
 export const getProjectTypes = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-types/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-types/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getProjectPhases = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-phases/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-phases/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getProjectAreas = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-areas/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-areas/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getConstructionPhaseDetails = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/construction-phase-details/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/construction-phase-details/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getProjectCategories = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-categories/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-categories/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getProjectRisks = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-risks/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-risks/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getProjectQualityLevels = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/project-quality-levels/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-quality-levels/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getPlanningPhases = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/planning-phases/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/planning-phases/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getConstructionPhases = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/construction-phases/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/construction-phases/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getResponsibleZones = async () => {
-  return axios
-    .get(`${REACT_APP_API_URL}/responsible-zones/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/responsible-zones/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 export const getPersons = async (): Promise<Array<IPerson>> => {
-  return axios
-    .get(`${REACT_APP_API_URL}/persons/`)
-    .then((res) => res.data)
-    .catch((err: IError) => Promise.reject(err));
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/persons/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
