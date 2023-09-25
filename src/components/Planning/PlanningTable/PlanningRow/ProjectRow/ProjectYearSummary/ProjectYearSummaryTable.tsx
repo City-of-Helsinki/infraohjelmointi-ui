@@ -1,13 +1,25 @@
 import { CellType } from '@/interfaces/projectInterfaces';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 import { IconHammers, IconScrollContent } from 'hds-react/icons';
-import { FC, memo } from 'react';
+import { FC, memo, useMemo } from 'react';
 
 interface IProjectYearSummaryTableProps {
   cellType: CellType;
   id: string;
+  sapCosts: Record<string, IProjectSapCost>;
 }
 
-const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, id }) => {
+const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, id, sapCosts }) => {
+  const costs = useMemo(() => {
+    const projectCosts = sapCosts[id];
+
+    return {
+      projectTaskCosts: Number(projectCosts?.project_task_costs || 0),
+      projectTaskCommitments: Number(projectCosts?.project_task_commitments || 0),
+      productionTaskCosts: Number(projectCosts?.production_task_costs || 0),
+      productionTaskCommitments: Number(projectCosts?.production_task_commitments || 0),
+    };
+  }, []);
   // All the values in the table are retrieved from SAP and mocked as 0 for now
   return (
     <td
@@ -39,13 +51,15 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                   <IconScrollContent size="xs" />
                 </td>
                 <td>
-                  <span className="text-sm font-light">400</span>
+                  <span className="text-sm font-light">{costs.projectTaskCosts}</span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">200</span>
+                  <span className="text-sm font-light">{costs.projectTaskCommitments}</span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">600</span>
+                  <span className="text-sm font-light">
+                    {Number(costs.projectTaskCosts + costs.projectTaskCommitments).toFixed(2)}
+                  </span>
                 </td>
               </tr>
               <tr>
@@ -55,13 +69,15 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                   <IconHammers size="xs" />
                 </td>
                 <td>
-                  <span className="text-sm font-light">600</span>
+                  <span className="text-sm font-light">{costs.productionTaskCosts}</span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">0</span>
+                  <span className="text-sm font-light">{costs.productionTaskCommitments}</span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">600</span>
+                  <span className="text-sm font-light">
+                    {Number(costs.productionTaskCosts + costs.productionTaskCommitments).toFixed(2)}
+                  </span>
                 </td>
               </tr>
               <tr>
@@ -71,13 +87,26 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                   <span className="text-sm">yht.</span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">1000</span>
+                  <span className="text-sm font-light">
+                    {Number(costs.projectTaskCosts + costs.productionTaskCosts).toFixed(2)}
+                  </span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">200</span>
+                  <span className="text-sm font-light">
+                    {Number(costs.projectTaskCommitments + costs.productionTaskCommitments).toFixed(
+                      2,
+                    )}
+                  </span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">1200</span>
+                  <span className="text-sm font-light">
+                    {Number(
+                      costs.projectTaskCosts +
+                        costs.productionTaskCosts +
+                        costs.projectTaskCommitments +
+                        costs.productionTaskCommitments,
+                    ).toFixed(2)}
+                  </span>
                 </td>
               </tr>
             </tbody>

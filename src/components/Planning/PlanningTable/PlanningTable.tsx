@@ -7,10 +7,12 @@ import { useAppSelector } from '@/hooks/common';
 import { selectPlanningMode, selectPlanningRows } from '@/reducers/planningSlice';
 import './styles.css';
 import { HoverTooltip } from './PlanningRow/HoverTooltip';
+import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 
 const PlanningTable = () => {
   const rows = useAppSelector(selectPlanningRows);
   const mode = useAppSelector(selectPlanningMode);
+  const projetSapCosts = useAppSelector(getProjectSapCosts);
   return (
     <>
       <div className="planning-table-container" id="planning-table-container">
@@ -18,7 +20,7 @@ const PlanningTable = () => {
           <tbody>
             {/* Rows have a dynamic length, the PlanningRow component renders itself recursively */}
             {rows.map((row: IPlanningRow) => (
-              <PlanningRow {...row} />
+              <PlanningRow {...row} sapCosts={projetSapCosts} />
             ))}
           </tbody>
         </table>

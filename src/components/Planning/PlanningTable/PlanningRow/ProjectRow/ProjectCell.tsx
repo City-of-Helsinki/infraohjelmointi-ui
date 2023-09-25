@@ -38,10 +38,12 @@ import {
 import { notifyError } from '@/reducers/notificationSlice';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
+  sapCosts: Record<string, IProjectSapCost>;
 }
 
 interface IProjectCellState {
@@ -49,7 +51,7 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapCosts }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -270,7 +272,9 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
             />
           ))}
       </td>
-      {selectedYearClass && <ProjectYearSummary cellType={cellTypeClass} {...cell} />}
+      {selectedYearClass && (
+        <ProjectYearSummary cellType={cellTypeClass} {...cell} sapCosts={sapCosts} />
+      )}
     </>
   );
 };
