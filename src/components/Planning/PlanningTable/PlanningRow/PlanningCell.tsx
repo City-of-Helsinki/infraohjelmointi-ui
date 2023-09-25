@@ -195,18 +195,18 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
             pathname.includes('coordination') && m === 'tammikuu' ?
             <>
               <td
-                key={`m-${index}`}
+                key={id}
                 className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
                 onMouseOver={() => setHoveredClassToMonth(m)}
                 onMouseLeave={() => removeHoveredClassFromMonth(m)}
               >
                 <span onClick={() => {
-                  dispatch(setNotesModalOpen(true));
+                  dispatch(setNotesModalOpen({isOpen: true, id: id}));
                   dispatch(setNotesModalData({name: name, id: id}))
                 }}>
                   <IconSpeechbubble color="white" />
                 </span>
-                <CoordinatorNotesModal id={`m-${index}`}/>
+                <CoordinatorNotesModal id={id}/>
               </td>
             </>
             :

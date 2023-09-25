@@ -1,30 +1,55 @@
-.check-notes-dialog {
-    background-color: white;
-    border: 1px solid black;
+.dialog-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    min-height: 50px;
-    padding: 20px;
-    font-weight: 500;
     position: absolute;
-    width: 300px;
-    margin-left: 50px;
-    margin-top: -20px;
+    margin-top: 8px;
+    margin-left: 5px;
+    background-color: white;
+    border: 1px solid black;
+    text-align: start;
+  }
+
+  .dialog-top-part {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch !important; /*cross and text start from the same height*/
+    width: 100%;
+    padding: 15px !important;
+  }
+
+  .dialog-top-part h1 {
+    font-weight: normal;
+  }
+  .dialog-top-part h2 {
+    font-weight: 600;
+    margin-top: 8px;
   }
   
-  .check-notes-dialog-middle-part {
+  #left {
+    display: flex;
+    flex-flow: column wrap;
+    white-space: normal;
+    width: 90%;
+  }
+
+  #right {
+    width: 10%;
+  }
+
+  .dialog-middle-part {
     font-weight: normal;
   }
   
-  .check-notes-dialog-bottom-part {
-    padding: 20px;
+  .dialog-bottom-part {
+    width: 100%;
+    padding: 15px !important;
   }
   
-  .check-notes-dialog-add-note {
+  .dialog-add-note {
     @apply text-sm font-bold text-bus;
     font-weight: 500;
+    font-size: 15px;
     text-decoration: underline;
   }
-  
-  
