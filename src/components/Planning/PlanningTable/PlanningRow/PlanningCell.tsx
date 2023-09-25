@@ -22,6 +22,7 @@ import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
+import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
