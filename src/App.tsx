@@ -27,6 +27,7 @@ import { CustomContextMenu } from './components/CustomContextMenu';
 import { getGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
+import { getSapCostsThunk } from './reducers/sapCostSlice';
 import moment from 'moment';
 import 'moment/locale/fi';
 import ScrollHandler from './components/shared/ScrollHandler';
@@ -97,6 +98,7 @@ const App: FC = () => {
   useEffect(() => {
     if (startYear) {
       loadPlanningData(startYear);
+      dispatch(getSapCostsThunk(startYear));
     }
   }, [startYear]);
 

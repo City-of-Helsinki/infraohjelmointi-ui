@@ -3,6 +3,7 @@ import useNumberInput from '@/hooks/useNumberInput';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
+import { IGroupSapCost } from '@/interfaces/sapCostsInterfaces';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classServices';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
@@ -12,10 +13,11 @@ interface IPlanningForecastSums {
   type: PlanningRowType;
   id: string;
   cell: IPlanningCell;
+  sapCosts: Record<string, IGroupSapCost>;
 }
 
 /** The data displayed here will be provided from SAP */
-const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => {
+const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCosts }) => {
   const { budgetChange, year } = cell;
   const { t } = useTranslation();
   const forcedToFrame = useAppSelector(selectForcedToFrame);
@@ -33,6 +35,17 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
     () => mode === 'coordination' && type !== 'group',
     [mode, type],
   );
+
+  const forecastCostsForGroups = useMemo(() => {
+    const groupSapCosts = sapCosts[id];
+    if (!groupSapCosts) {
+      return 0;
+    }
+
+    return Number(
+      Number(groupSapCosts.group_combined_commitments) + Number(groupSapCosts.group_combined_costs),
+    ).toFixed(2);
+  }, []);
 
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
 
@@ -70,7 +83,9 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
         </div>
         {!editBudgetChange && (
           <div className={`planning-forecast-sums ${type} mt-[0.2rem]`}>
-            <span data-testid={`planning-forecast-implemented-${id}`}>0</span>
+            <span data-testid={`planning-forecast-implemented-${id}`}>
+              {forecastCostsForGroups}
+            </span>
             <span data-testid={`planning-forecast-bound-${id}`}>0</span>
             {displayBudgetChange && (
               <span className="font-thin" data-testid={`budget-change-${id}`}>
