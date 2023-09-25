@@ -50,7 +50,7 @@ import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
-import { getGroupsThunk } from './reducers/groupSlice';
+import { getPlanningGroupsThink } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
 import { mockUser } from './mocks/mockUsers';
 

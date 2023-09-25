@@ -24,7 +24,7 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getCoordinationGroupsThunk, getGroupsThunk } from './reducers/groupSlice';
+import { getCoordinationGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
 import { getSapCostsThunk } from './reducers/sapCostSlice';
