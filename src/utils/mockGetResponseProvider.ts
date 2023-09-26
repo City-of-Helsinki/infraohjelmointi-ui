@@ -18,6 +18,7 @@ import mockNotes from '@/mocks/mockNotes';
 import mockPersons from '@/mocks/mockPersons';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import mockProject from '@/mocks/mockProject';
+import { mockSapCosts } from '@/mocks/mockSapCosts';
 import { mockSearchResults } from '@/mocks/mockSearch';
 import axios from 'axios';
 
@@ -90,6 +91,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockSearchResults);
       case url.toLocaleLowerCase().includes(`/projects/`):
         return Promise.resolve(mockPlanningViewProjects);
+      case url.toLocaleLowerCase().includes(`/sap-costs/${year}/`):
+        return Promise.resolve(mockSapCosts);
       default:
         console.log('not found!: ', url);
 
