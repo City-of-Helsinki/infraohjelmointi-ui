@@ -3,7 +3,6 @@ import useNumberInput from '@/hooks/useNumberInput';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
-import { selectUser } from '@/reducers/authSlice';
 import { IGroupSapCost } from '@/interfaces/sapCostsInterfaces';
 import { selectUser } from '@/reducers/authSlice';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';

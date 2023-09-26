@@ -39,9 +39,6 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
-import { selectUser } from '@/reducers/authSlice';
-import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
-import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 interface IProjectCellProps {
   cell: IProjectCell;
