@@ -21,6 +21,7 @@ import { Route } from 'react-router';
 import mockProject from '@/mocks/mockProject';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -70,6 +71,10 @@ const render = async () =>
           lists: {
             ...store.getState().lists,
             phases: mockProjectPhases.data,
+          },
+          auth: {
+            ...store.getState().auth,
+            user: mockUser.data,
           },
         },
       },

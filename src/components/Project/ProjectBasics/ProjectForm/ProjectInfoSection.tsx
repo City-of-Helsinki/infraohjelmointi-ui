@@ -20,9 +20,15 @@ interface IProjectInfoSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
+  isInputDisabled: boolean;
 }
 
-const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({ project, getFieldProps, control }) => {
+const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
+  project,
+  getFieldProps,
+  control,
+  isInputDisabled,
+}) => {
   const areas = useOptions('areas');
   const types = useOptions('types');
   const { t } = useTranslation();
@@ -44,22 +50,32 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({ project, getFieldPro
           <SelectField
             {...getFieldProps('type')}
             options={types}
+            disabled={isInputDisabled}
             rules={{ required: t('validation.required', { field: t('validation.phase') }) ?? '' }}
           />
         </div>
         <div className="form-col-xl">
-          <NumberField {...getFieldProps('hkrId')} rules={validateMaxLength(5, t)} />
+          <NumberField
+            {...getFieldProps('hkrId')}
+            rules={validateMaxLength(5, t)}
+            disabled={isInputDisabled}
+          />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <TextField {...getFieldProps('entityName')} rules={validateMaxLength(30, t)} />
+          <TextField
+            {...getFieldProps('entityName')}
+            rules={validateMaxLength(30, t)}
+            disabled={isInputDisabled}
+          />
         </div>
         <div className="form-col-xl">
           <TextField
             {...getFieldProps('sapProject')}
             control={control}
             rules={validateMaxLength(15, t)}
+            disabled={isInputDisabled}
           />
         </div>
       </div>

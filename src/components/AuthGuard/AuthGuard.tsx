@@ -4,7 +4,7 @@ import { getApiToken } from '@/services/userServices';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { getUserThunk, selectUser } from '@/reducers/authSlice';
 import { useLocation, useNavigate } from 'react-router';
-import { isUserAdmin, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -83,6 +83,10 @@ const AuthGuard: FC = () => {
     // Redirect to planning view if a viewer is trying to access anything but the planning view
     if (!pathname.includes('planning') && isUserOnlyViewer(user)) {
       return navigate('planning');
+    }
+
+    if (pathname.includes('project/new') && isUserOnlyProjectManager(user)) {
+      return navigate(-1);
     }
   }, [location, user]);
 

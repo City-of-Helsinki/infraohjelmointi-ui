@@ -12,6 +12,7 @@ interface ITextFieldProps {
   readOnly?: boolean;
   hideLabel?: boolean;
   tooltip?: string;
+  disabled?: boolean;
 }
 
 const TextField: FC<ITextFieldProps> = ({
@@ -22,9 +23,11 @@ const TextField: FC<ITextFieldProps> = ({
   readOnly,
   hideLabel,
   tooltip,
+  disabled,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
+
   return (
     <Controller
       name={name}
@@ -45,6 +48,7 @@ const TextField: FC<ITextFieldProps> = ({
             errorText={error?.message}
             helperText={tooltip}
             style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
+            disabled={disabled}
           />
         </div>
       )}

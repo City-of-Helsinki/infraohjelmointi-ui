@@ -27,11 +27,13 @@ interface IProjectFinancialSectionProps {
     classes: IOption[];
     subClasses: IOption[];
   };
+  isInputDisabled: boolean;
 }
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getFieldProps,
   control,
   classOptions,
+  isInputDisabled,
 }) => {
   const { t } = useTranslation();
 
@@ -53,18 +55,25 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             options={masterClasses}
             size="full"
             shouldTranslate={false}
+            disabled={isInputDisabled}
           />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <SelectField {...getFieldProps('class')} options={classes} shouldTranslate={false} />
+          <SelectField
+            {...getFieldProps('class')}
+            options={classes}
+            shouldTranslate={false}
+            disabled={isInputDisabled}
+          />
         </div>
         <div className="form-col-md">
           <SelectField
             {...getFieldProps('subClass')}
             options={subClasses}
             shouldTranslate={false}
+            disabled={isInputDisabled}
           />
         </div>
       </div>
@@ -83,7 +92,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         <div className="form-col-sm">
           <NumberField
             {...getFieldProps('projectWorkQuantity')}
-            tooltip="keur"
+            tooltip="m2"
             rules={validateMaxLength(10, t)}
           />
         </div>
@@ -103,7 +112,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         <div className="form-col-sm">
           <NumberField
             {...getFieldProps('planningWorkQuantity')}
-            tooltip="keur"
+            tooltip="m2"
             rules={validateMaxLength(10, t)}
           />
         </div>
@@ -123,13 +132,14 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         <div className="form-col-sm">
           <NumberField
             {...getFieldProps('constructionWorkQuantity')}
-            tooltip="keur"
+            tooltip="m2"
             rules={validateMaxLength(10, t)}
           />
         </div>
       </div>
       <ListField
         {...getFieldProps('realizedCostLabel')}
+        disabled={isInputDisabled}
         fields={[
           { ...getFieldProps('costForecast'), rules: validateMaxLength(15, t) },
           {
