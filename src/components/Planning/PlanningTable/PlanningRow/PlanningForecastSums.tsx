@@ -3,8 +3,10 @@ import useNumberInput from '@/hooks/useNumberInput';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
+import { selectUser } from '@/reducers/authSlice';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classServices';
+import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +20,7 @@ interface IPlanningForecastSums {
 const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => {
   const { budgetChange, year } = cell;
   const { t } = useTranslation();
+  const user = useAppSelector(selectUser);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const mode = useAppSelector(selectPlanningMode);
   const startYear = useAppSelector(selectStartYear);
@@ -51,6 +54,11 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
     patchCoordinationClass(request);
   };
 
+  const isEditBudgetChangeDisabled = useMemo(
+    () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame || editBudgetChange,
+    [forcedToFrame, mode, user],
+  );
+
   return (
     <td
       key={`${year}-monthly-cell`}
@@ -59,7 +67,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell }) => 
       <button
         className={`planning-forecast-sums-container ${type}`}
         data-testid={`planning-forecast-sums-${id}`}
-        disabled={mode !== 'coordination' || forcedToFrame || editBudgetChange}
+        disabled={isEditBudgetChangeDisabled}
         onClick={onEditBudgetChange}
         aria-label="edit budget change"
       >

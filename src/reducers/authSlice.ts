@@ -42,11 +42,11 @@ export const authSlice = createSlice({
             name: 'sg_kymp_sso_io_projektialueiden_ohjelmoijat' as UserRole,
             display_name: 'sg_KYMP_sso_IO_Projektialueiden_ohjelmoijat',
           },
-          {
-            id: '86b826df-589c-40f9-898f-1584e80b5482',
-            name: 'sg_kymp_sso_io_koordinaattorit' as UserRole,
-            display_name: 'sg_KYMP_sso_IO_Koordinaattorit',
-          },
+          // {
+          //   id: '86b826df-589c-40f9-898f-1584e80b5482',
+          //   name: 'sg_kymp_sso_io_koordinaattorit' as UserRole,
+          //   display_name: 'sg_KYMP_sso_IO_Koordinaattorit',
+          // },
           {
             id: 'da48bfe9-6a99-481f-a252-077d31473c4c',
             name: 'sg_kymp_sso_io_ohjelmoijat' as UserRole,
