@@ -12,6 +12,7 @@ import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { selectGroupsExpanded } from '@/reducers/planningSlice';
 import _ from 'lodash';
 import './styles.css';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 interface IPlanningRowState {
   expanded: boolean;
@@ -19,8 +20,8 @@ interface IPlanningRowState {
   searchedProjectId: string;
 }
 
-const PlanningRow: FC<IPlanningRow> = (props) => {
-  const { defaultExpanded, projectRows, cells, id, type } = props;
+const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost> }> = (props) => {
+  const { defaultExpanded, projectRows, cells, id, type, sapCosts } = props;
   const projectToUpdate = useAppSelector(selectProjectUpdate)?.project;
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
@@ -204,11 +205,12 @@ const PlanningRow: FC<IPlanningRow> = (props) => {
               project={p}
               isSearched={p.id === searchedProjectId}
               parentId={id}
+              sapCosts={sapCosts}
             />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} />
+            <PlanningRow {...c} sapCosts={sapCosts} />
           ))}
         </>
       )}

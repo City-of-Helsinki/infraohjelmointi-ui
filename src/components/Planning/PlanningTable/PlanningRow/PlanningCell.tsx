@@ -17,6 +17,7 @@ import { IconAlertCircle } from 'hds-react';
 import './styles.css';
 import useNumberInput from '@/hooks/useNumberInput';
 import { patchCoordinationLocation } from '@/services/locationServices';
+import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -39,6 +40,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const selectedYear = useAppSelector(selectSelectedYear);
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const groupSapCosts = useAppSelector(getGroupSapCosts);
 
   const { value, onChange } = useNumberInput(displayFrameBudget);
 
@@ -146,7 +148,9 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       {/* There will be data generated here (at least for the first year) in future tasks */}
       {year === selectedYear && (
         <>
-          {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} />}
+          {isCurrentYear && (
+            <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />
+          )}
           {moment.months().map((m) => (
             <td
               key={m}

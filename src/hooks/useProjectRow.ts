@@ -24,6 +24,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from './common';
 import { selectForcedToFrame } from '@/reducers/planningSlice';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 /**
  * Creates the timeline dates to be used with drawing the timeline and building the cells.
@@ -220,7 +221,7 @@ const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<
  */
 const getCellType = (
   cellYear: number,
-  value: string | null,
+  value: string | IProjectSapCost,
   timelineDates: ITimelineDates,
 ): CellType => {
   const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
@@ -403,7 +404,7 @@ const getAffectsDates = (
   return isLastOfType || isStartOfTimeline || isEndOfTimeline;
 };
 
-const getProjectCells = (project: IProject, forcedToFrame: boolean) => {
+const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IProjectSapCost) => {
   const { year, ...finances } = project.finances;
 
   const {
@@ -432,7 +433,7 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean) => {
   const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {
     const cellYear = year + i;
 
-    const type = getCellType(cellYear, value, timelineDates);
+    const type = getCellType(cellYear, value || sapCosts, timelineDates);
 
     const isStartOfTimeline = getIsStartOfTimeline(cellYear, timelineDates);
     const isEndOfTimeline = getIsEndOfTimeline(cellYear, timelineDates);
@@ -524,7 +525,7 @@ interface IProjectRowsState {
  * @param project
  * @returns a list of IProjectCell
  */
-const useProjectRow = (project: IProject) => {
+const useProjectRow = (project: IProject, sapCosts: IProjectSapCost) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const [projectRowsState, setProjectRowsState] = useState<IProjectRowsState>({
     cells: [],
@@ -536,7 +537,7 @@ const useProjectRow = (project: IProject) => {
     if (project) {
       setProjectRowsState((current) => ({
         ...current,
-        cells: getProjectCells(project, forcedToFrame),
+        cells: getProjectCells(project, forcedToFrame, sapCosts),
         sums: calculateProjectRowSums(project),
         projectFinances: project.finances,
       }));
