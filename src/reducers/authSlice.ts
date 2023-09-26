@@ -43,15 +43,10 @@ export const authSlice = createSlice({
             display_name: 'sg_KYMP_sso_IO_Projektipaallikot',
           },
           {
-            id: '4d229780-b511-4652-b32b-362ad88a7b55',
-            name: 'sg_kymp_sso_io_projektialueiden_ohjelmoijat' as UserRole,
-            display_name: 'sg_KYMP_sso_IO_Projektialueiden_ohjelmoijat',
+            id: 'test-admin-role',
+            name: 'sg_kymp_sso_io_admin' as UserRole,
+            display_name: 'sg_KYMP_sso_IO_Admin',
           },
-          // {
-          //   id: '86b826df-589c-40f9-898f-1584e80b5482',
-          //   name: 'sg_kymp_sso_io_koordinaattorit' as UserRole,
-          //   display_name: 'sg_KYMP_sso_IO_Koordinaattorit',
-          // },
           {
             id: 'test-admin-role',
             name: 'sg_kymp_sso_io_admin' as UserRole,
