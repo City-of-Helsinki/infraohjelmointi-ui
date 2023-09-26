@@ -1,0 +1,261 @@
+/* TABLE HEAD */
+.planning-head {
+  /* max-width: 1rem makes it so that the head doesn't grow beyond its max width */
+  @apply sticky left-0 z-50 h-11 w-[32rem] min-w-[32rem] max-w-[32rem] border-b border-white bg-bus py-1 pr-4 text-white;
+}
+
+.planning-head-content {
+  --head-width: calc(100% - var(--planning-cell-width));
+  @apply flex w-[var(--head-width)] items-center gap-1 overflow-ellipsis;
+}
+
+.planning-head.masterClass {
+  @apply bg-[var(--color-masterClass)] pl-4;
+}
+
+.planning-head.masterClass.framed {
+  @apply bg-[var(--color-masterClass-framed)];
+}
+
+.planning-head.class {
+  @apply bg-[var(--color-class)] pl-10;
+}
+
+.planning-head.class.framed {
+  @apply bg-[var(--color-class-framed)];
+}
+
+.planning-head.subClass {
+  @apply bg-[var(--color-subClass)] pl-16;
+}
+
+.planning-head.subClass.framed {
+  @apply bg-[var(--color-subClass-framed)];
+}
+
+.planning-head.districtPreview,
+.planning-head.collectiveSubLevel {
+  @apply bg-[var(--color-districtPreview)] pl-[5.5rem];
+}
+
+.planning-head.subLevelDistrict,
+.planning-head.otherClassification {
+  @apply bg-[var(--color-districtPreview)] pl-[7rem];
+}
+
+.planning-head.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview)] pl-[8.5rem];
+}
+
+.planning-head.districtPreview.framed,
+.planning-head.collectiveSubLevel.framed,
+.planning-head.subLevelDistrict.framed,
+.planning-head.otherClassification.framed,
+.planning-cell.otherClassificationSubLevel.framed {
+  @apply bg-[var(--color-districtPreview-framed)];
+}
+
+.planning-head.district,
+.planning-head.subClassDistrict {
+  @apply bg-[var(--color-district)] pl-4 text-xl;
+}
+
+.planning-head.division {
+  @apply border-b border-black-70 bg-[var(--color-division)] pl-10 text-l font-medium text-black-90;
+}
+
+.planning-head.division .planning-head-content {
+  @apply gap-4;
+}
+
+.planning-head.group {
+  @apply border-b border-black-70 bg-[var(--color-group)] font-medium text-black;
+}
+
+/* Group row under a subClass */
+.subClass ~ .group .planning-head.group {
+  @apply pl-[5.5rem];
+}
+
+/* Group row under a district or subClassDistrict */
+.district ~ .group .planning-head.group,
+.subClassDistrict ~ .group .planning-head.group {
+  @apply pl-10;
+}
+
+/* Group row under a division */
+.division ~ .group .planning-head.group {
+  @apply pl-16;
+}
+
+.planning-head .planning-title-button {
+  @apply flex overflow-hidden;
+}
+
+.planning-head .planning-title-container {
+  @apply relative flex max-w-[85%];
+}
+
+.planning-head .planning-title-button:hover {
+  @apply cursor-pointer;
+}
+
+.planning-head .planning-title-button .planning-head-title {
+  @apply w-full overflow-hidden text-ellipsis text-left;
+}
+
+.custom-tooltip button {
+  @apply absolute left-48 w-56;
+}
+
+.custom-tooltip section {
+  @apply text-black;
+}
+
+.custom-tooltip svg {
+  @apply text-transparent;
+}
+
+/* TABLE CELL */
+/* setting max width to 0px will cause the table cell to stay in place when we're editing the frame budget in coordination view */
+.planning-cell {
+  @apply min-w-[var(--planning-cell-width)] max-w-0 border-b border-white bg-bus py-1 pr-4 align-text-top text-white;
+}
+
+.planning-cell.masterClass {
+  @apply bg-[var(--color-masterClass)];
+}
+
+.planning-cell.masterClass.framed {
+  @apply bg-[var(--color-masterClass-framed)];
+}
+
+.planning-cell.class {
+  @apply bg-[var(--color-class)];
+}
+
+.planning-cell.class.framed {
+  @apply bg-[var(--color-class-framed)];
+}
+
+.planning-cell.subClass {
+  @apply bg-[var(--color-subClass)];
+}
+
+.planning-cell.subClass.framed {
+  @apply bg-[var(--color-subClass-framed)];
+}
+
+.planning-cell.districtPreview,
+.planning-cell.subLevelDistrict,
+.planning-cell.collectiveSubLevel,
+.planning-cell.otherClassification,
+.planning-cell.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview)];
+}
+
+.planning-cell.districtPreview.framed,
+.planning-cell.collectiveSubLevel.framed,
+.planning-cell.subLevelDistrict.framed,
+.planning-cell.otherClassification.framed,
+.planning-cell.otherClassificationSubLevel.framed {
+  @apply bg-[var(--color-districtPreview-framed)];
+}
+
+.planning-cell.district,
+.planning-cell.subClassDistrict {
+  @apply bg-[var(--color-district)];
+}
+
+.planning-cell.division {
+  @apply border-b border-black-70 bg-[var(--color-division)] text-black-90;
+}
+
+.planning-cell.group {
+  @apply border-b border-black-70 bg-[var(--color-group)] text-black;
+}
+
+.planning-cell .planning-cell-container {
+  @apply grid grid-flow-row;
+}
+
+.planning-cell .planning-cell-container span {
+  @apply text-sm;
+}
+
+.planning-budget {
+  @apply !text-base !font-bold;
+}
+
+.planning-cell-deviation {
+  @apply !font-bold text-suomenlinna;
+}
+
+.planning-cell-deviation.framed {
+  @apply text-engel;
+}
+
+.planning-head-deviation {
+  @apply text-sm font-bold text-suomenlinna;
+}
+
+.planning-head-content-dots {
+  @apply mr-2 flex;
+}
+
+.planning-head .total-budgets {
+  @apply grid w-[5.5rem] grid-flow-row text-right;
+}
+
+.planning-forecast-sums-container {
+  @apply flex h-[4.25rem] w-full items-start justify-between px-2;
+}
+
+.planning-forecast-sums-container.group {
+  @apply h-12;
+}
+
+.planning-forecast-sums-container.division {
+  @apply hidden;
+}
+
+.planning-forecast-sums-container > .planning-forecast-sums {
+  @apply flex flex-col text-sm font-bold text-white;
+}
+
+.planning-forecast-sums-container > .planning-forecast-sums.group {
+  @apply text-black;
+}
+
+.planning-forecast-sums-container > .planning-forecast-sums.division {
+  @apply hidden;
+}
+
+.frame-budget-container {
+  @apply flex h-[0px] items-center justify-center;
+}
+
+.frame-budget-input {
+  @apply h-[44px] w-full translate-y-[20px] rounded-sm p-2 text-right text-black-80;
+}
+
+/* Hide arrows from number input in Chrome, Safari, Edge, Opera */
+.frame-budget-input::-webkit-outer-spin-button,
+.frame-budget-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.budget-change-input {
+  @apply mt-[1.2rem] h-[44px] w-[74px] rounded-sm p-2 text-right text-black-80;
+}
+/* Hide arrows from number input in Chrome, Safari, Edge, Opera */
+.budget-change-input::-webkit-outer-spin-button,
+.budget-change-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.budget-overlap-circle {
+  @apply h-[16px] -translate-y-[1.5px];
+}

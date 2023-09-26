@@ -1,0 +1,53 @@
+import { Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { FC, memo } from 'react';
+import logo from '@/assets/logo.png';
+
+// Create styles (pdf docs can't be given rem for some reason)
+const styles = StyleSheet.create({
+  header: {
+    maxWidth: '100%',
+    width: '100%',
+    marginBottom: '16px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  textAndLogo: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  logo: {
+    width: '80px',
+    height: '37px',
+    marginRight: '16px',
+  },
+  text: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});
+
+interface IDocumentHeaderProps {
+  title: string;
+  subtitleOne?: string;
+  subtitleTwo?: string;
+  date?: string;
+}
+
+const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, subtitleOne, subtitleTwo, date }) => {
+  return (
+    <View style={styles.header}>
+      <View style={styles.textAndLogo}>
+        <Image style={styles.logo} src={logo} />
+        <View style={styles.text}>
+          <Text style={{ fontWeight: 'bold' }}>{title}</Text>
+          <Text>{subtitleOne}</Text>
+          <Text>{subtitleTwo}</Text>
+        </View>
+      </View>
+      <Text>{date}</Text>
+    </View>
+  );
+};
+
+export default memo(DocumentHeader);

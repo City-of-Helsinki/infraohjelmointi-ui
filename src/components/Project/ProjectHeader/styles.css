@@ -1,0 +1,16 @@
+.project-name-form {
+  @apply mb-6 flex justify-between;
+}
+
+.project-header-container {
+  @apply flex flex-wrap bg-bus py-16;
+}
+
+.project-header-phase-select-container {
+  @apply ml-8 w-96;
+}
+
+/* the select field empty selection button needs a custom position here */
+.project-header-phase-select-container .empty-select-field-button {
+  @apply top-4;
+}

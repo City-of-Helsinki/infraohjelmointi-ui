@@ -1,0 +1,23 @@
+.breadcrumbs-list {
+  @apply flex h-16 list-none items-center border-b border-gray p-8;
+}
+
+.breadcrumbs-list > li > a {
+  @apply mr-1 text-black no-underline;
+}
+
+.breadcrumbs-list > li {
+  @apply underline;
+}
+
+.breadcrumbs-list > li:last-child {
+  @apply font-bold no-underline;
+}
+
+.breadcrumbs-list svg {
+  @apply mr-1;
+}
+
+.breadcrumbs-list .breadcrumb {
+  @apply max-w-[16rem] overflow-x-hidden overflow-ellipsis whitespace-nowrap;
+}

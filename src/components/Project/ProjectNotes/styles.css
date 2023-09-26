@@ -1,0 +1,51 @@
+.note-history {
+  @apply pb-5;
+}
+
+.note-history:last-child {
+  @apply pb-0;
+}
+
+/* adds a border with padding to each element */
+.note-history:after {
+  @apply mx-auto my-0 block w-[93%] border-t border-gray content-[''];
+}
+
+/* last history row will not have a border */
+.note-history:last-child:after {
+  @apply border-none;
+}
+
+.note-history-container {
+  @apply grid grid-cols-3 px-6 pb-4;
+}
+
+.note-history-container #modifiedDate {
+  @apply col-span-1;
+}
+.note-history-container #title {
+  @apply col-span-2;
+}
+.note-history-container #modifiedBy {
+  @apply col-span-3 row-span-2;
+}
+
+.notes-page {
+  @apply mx-24 my-16 w-[80%] max-w-[40.5rem];
+}
+
+.note-container {
+  @apply mb-6 rounded-md border-none bg-silver-l;
+}
+
+.note-header-container {
+  @apply flex justify-between px-6 pt-6;
+}
+
+.note-footer {
+  @apply flex justify-between px-3 pb-4;
+}
+
+.new-note-form-container {
+  @apply my-6 flex flex-col items-end border-[0.125rem] border-gray p-6;
+}

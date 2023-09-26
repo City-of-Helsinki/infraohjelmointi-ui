@@ -1,0 +1,24 @@
+.sidebar {
+  @apply fixed top-0 mr-auto flex h-screen w-12 flex-col pt-11 shadow-2xl;
+}
+
+.sidebar-button {
+  @apply mb-0 ml-auto mr-auto mt-2 cursor-pointer p-2 duration-300 first:mt-3 hover:rounded-md hover:bg-silver;
+}
+
+.sidebar-button.selected {
+  @apply rounded-sm bg-silver duration-300;
+}
+
+.sidebar-button[disabled] {
+  @apply cursor-not-allowed !text-black-40 hover:bg-white;
+}
+
+.sidebar-button:nth-child(7) {
+  box-shadow: inset 0px 1px 0px 0px var(--color-black-20);
+  @apply pt-4;
+}
+
+.sidebar-button:nth-child(7):hover {
+  @apply rounded-none;
+}

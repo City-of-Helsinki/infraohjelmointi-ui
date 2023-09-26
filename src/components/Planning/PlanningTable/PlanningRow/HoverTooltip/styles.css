@@ -1,0 +1,54 @@
+.tooltip-container {
+  position: absolute;
+  inset: auto auto 2rem 0px;
+  color: black !important;
+  background-color: var(--color-coat-of-arms-light);
+  padding: var(--spacing-s);
+  margin-bottom: 8px;
+  font-size: var(--fontsize-body-s);
+  line-height: 24px;
+  z-index: 999;
+  font-weight: 400;
+  display: none;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  bottom: calc(-1 * var(--spacing-s));
+  border: 8px solid transparent;
+  border-top: 8px solid var(--color-coat-of-arms);
+  border-bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto 0 auto;
+  width: 0;
+}
+
+.tooltip-arrow-container {
+  border-bottom: 8px solid var(--color-coat-of-arms);
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.monthly-planning-bar-container:hover .tooltip-container,
+.monthly-planning-bar-container:hover .tooltip-arrow-container,
+.monthly-construction-bar-container:hover .tooltip-container,
+.monthly-construction-bar-container:hover .tooltip-arrow-container {
+  @apply block;
+}
+
+/* We position the tooltip differently for the planning and construction bar.
+* This is done because the tooltip currently only works correctly if it's as wide as its parent container.
+* 
+* It could probably be implemented better by somehow positioning the 
+* tooltip-arrow at the center of the container.
+**/
+.monthly-construction-bar-container:hover .tooltip-container {
+  inset: auto auto 1rem -4.1rem;
+}
+.monthly-planning-bar-container:hover .tooltip-container {
+  inset: auto auto 2rem -4.1rem;
+}

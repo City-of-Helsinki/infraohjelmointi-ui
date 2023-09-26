@@ -1,0 +1,43 @@
+.planning-info-panel-container {
+  @apply z-50 h-36 bg-white;
+}
+
+.planning-info-panel {
+  @apply flex w-[32rem] min-w-[32rem] max-w-[32rem] justify-between pl-2 pr-3;
+}
+
+.planning-info-panel .buttons-container {
+  @apply flex flex-col justify-between;
+}
+
+.planning-info-panel .selected-class-container {
+  @apply flex w-[50%] items-center justify-end;
+}
+
+.selected-class {
+  @apply block overflow-hidden text-ellipsis pl-4 text-sm font-bold;
+}
+
+.mode-indicator {
+  @apply flex h-11 items-center justify-center border-success bg-success px-8 font-medium text-white;
+}
+
+.mode-indicator.framed {
+  @apply bg-brick;
+}
+
+#previousButton button {
+  @apply h-8 min-h-[unset] w-[7.5rem] min-w-[unset] pl-3;
+}
+
+#previousButton button div {
+  @apply m-0;
+}
+
+#previousButton button span {
+  @apply pl-2;
+}
+
+#previousButton button svg {
+  @apply max-w-[unset];
+}

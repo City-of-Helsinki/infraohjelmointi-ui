@@ -1,0 +1,186 @@
+:root {
+  --amount-of-month: 0%;
+}
+
+.project-row.searched {
+  @apply border-[1px] border-l-[3px] border-black-80;
+}
+
+/* 
+  * - setting max-width: 1rem will cause the table head to not grow bigger than the group table head
+  * - the head cell is sticky to keep it in place when scrolling horizontally
+  **/
+.project-head-cell {
+  box-shadow: inset -0.5px 0 0 0 #ccf, inset 0.5px 0 0 0 #ccf, inset 0px 0.5px 0 0 #ccf;
+  @apply sticky left-0 z-50 max-w-[1rem] bg-white px-4 py-1;
+}
+
+.project-head-cell-container {
+  /* setting max-width: 1rem will cause the table head to not grow bigger than the group table head */
+  @apply flex w-full justify-between;
+}
+
+.project-head-cell .project-left-icons-container {
+  @apply flex items-center gap-2 pr-2;
+}
+
+.project-head-cell .project-name-container {
+  @apply flex w-[65%] items-center gap-2 overflow-hidden pr-4 text-left font-normal;
+}
+
+.project-head-cell .project-name-button {
+  @apply max-w-[100%] overflow-hidden overflow-ellipsis text-sm;
+}
+
+.project-head-cell .project-right-icons-container {
+  @apply flex w-[35%] items-center justify-between;
+}
+
+.table-input input {
+  @apply absolute -top-6 bottom-0 left-[0.65rem] !h-11 !w-[80%] cursor-pointer !rounded-sm  text-center !text-sm font-light;
+}
+
+.project-cell {
+  @apply relative border-b-[0.05rem] border-bus-m bg-bus-l;
+}
+
+.project-cell.planning {
+  box-shadow: inset 0 -4px 0 var(--color-black-80);
+  @apply bg-white;
+}
+
+.project-cell.construction {
+  box-shadow: inset 0 -4px 0 var(--color-copper);
+  @apply bg-white;
+}
+
+.construction,
+.planning,
+.overlap,
+.none {
+  position: relative;
+}
+
+/* add a left border to cell with the none-class after the last colored cell */
+.construction + .none::after,
+.planning + .none::after,
+.overlap + .none::after,
+/* add a right border to a colored cell if it's the first colored cell  */
+.none + .planning::after,
+.none + .construction::after,
+.none + .overlap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--color-black-20);
+}
+
+/* remove the left border when a monthly-cell is expanded next to a none cell */
+.construction + .monthly-cell + .none::after,
+.planning + .monthly-cell + .none::after,
+.overlap + .monthly-cell + .none::after {
+  width: 0px;
+}
+
+/* add a left border to an ACTIVE cell with the none-class after the last colored cell */
+tr.active .construction + .none::after,
+tr.active .planning + .none::after,
+tr.active .overlap + .none::after,
+/* add a left border to a colored ACTIVE cell if it's the first colored cell */
+tr.active .none + .planning::after,
+tr.active .none + .construction::after,
+tr.active .none + .overlap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--color-black-70);
+}
+
+/* creates a border bottom with both planning and construction colors with the :before effect */
+.project-cell.overlap {
+  box-shadow: inset 0 -4px 0 var(--color-copper);
+  @apply relative bg-white;
+}
+
+.project-cell.overlap:before {
+  box-shadow: inset 0 -4px 0 var(--color-black-80);
+  @apply absolute bottom-0 left-0 h-[4px] w-[50%] content-[''];
+}
+
+.edit-timeline-button {
+  @apply absolute z-[999] hidden h-[0.9rem] w-[0.7rem] -translate-x-2 -translate-y-2 rounded-[1px] bg-[var(--color-black-70)];
+}
+
+tr.active .edit-timeline-button {
+  @apply inline-block translate-y-[-1.75rem];
+}
+
+.project-cell .edit-timeline-button svg {
+  @apply h-4 w-4 translate-x-[-2px] translate-y-[-3px] text-white;
+}
+
+.edit-timeline-button.right {
+  @apply right-0 translate-x-[0.4rem];
+}
+
+.edit-timeline-button.right svg {
+  @apply rotate-180;
+}
+
+.edit-timeline-button.left {
+  @apply translate-x-[-5px];
+}
+
+.project-cell-input {
+  @apply h-10 w-[85%] border-2 border-transparent !bg-transparent pr-2 text-right;
+}
+
+.project-cell-input-container {
+  @apply flex h-full w-full justify-center;
+}
+
+.project-cell-input:focus {
+  @apply rounded-[3px] border-2 border-coat-of-arms outline-none;
+}
+/* Hide arrows from number input in Chrome, Safari, Edge, Opera */
+.project-cell-input::-webkit-outer-spin-button,
+.project-cell-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide arrows from number input in Firefox */
+.project-cell-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* When a year is selected overwrite the box shadow for indicating the cell type */
+.project-cell.selected-year.current-year {
+  /* adding height 0 will make the .project-cell-input-container height: 100% work */
+  @apply h-[0] p-0 shadow-none;
+}
+
+.project-cell.selected-year.current-year:before {
+  @apply shadow-none;
+}
+
+/* Black border bottom when viewing a selected year */
+.project-cell.selected-year.current-year .project-cell-input-wrapper {
+  @apply box-content h-full shadow-none;
+}
+
+/* Gray border bottom on top of black border bottom when viewing a selected year */
+.project-cell.selected-year.current-year .project-cell-input-container {
+  @apply flex h-full items-center border-b-2 border-gray p-0 font-bold;
+}
+
+/* If viewing a selected year with a none type the gray border bottom is removed */
+.project-cell.none.selected-year.current-year .project-cell-input-container {
+  @apply border-none;
+}

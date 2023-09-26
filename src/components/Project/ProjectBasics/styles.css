@@ -1,0 +1,3 @@
+.project-basics-container {
+  @apply flex h-full w-full flex-wrap;
+}

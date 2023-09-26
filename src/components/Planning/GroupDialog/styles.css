@@ -1,0 +1,40 @@
+#summing-group-dialog .search-input ul {
+  max-height: 200px !important;
+}
+
+#summing-group-dialog hr {
+  border-top: 0.0625rem solid var(--color-black-20);
+  margin: 0;
+}
+
+#open-group-form-container {
+  cursor: pointer;
+}
+#summing-group-dialog .search-form .advance-fields-button {
+  color: var(--color-bus);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.search-form-content {
+  padding: var(--spacing-s) 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.search-selections-container {
+  @apply mt-3 flex h-auto w-full flex-wrap;
+}
+
+.search-selections-container .search-selections {
+  @apply mb-3 mr-3;
+}
+
+.dialog-section .button-container {
+  @apply fixed;
+}
+#summing-group-dialog .group-form-search-input button {
+  @apply z-[1];
+}

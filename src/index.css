@@ -1,0 +1,171 @@
+/* @import '~hds-core/lib/utils/helpers.css'; */
+@import 'fonts.css';
+
+/* New to tailwind? check out this cheat sheet: https://nerdcave.com/tailwind-cheat-sheet */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
+  --planning-cell-width: 5.5rem;
+  --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  font-family: var(--infra-font-default);
+  overflow-x: hidden;
+  @apply text-black-90;
+}
+
+/* completely remove styling from the default button */
+button,
+input[type='submit'],
+input[type='reset'] {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+p {
+  @apply my-2;
+}
+
+span {
+  @apply leading-[var(--lineheight-l)];
+}
+
+table p {
+  @apply m-0;
+}
+
+.app-content {
+  /* Hacky calc, since the TopBar has a 1px border bottom */
+  @apply flex min-h-[var(--app-min-height)] w-full;
+}
+
+/* 
+the sidebar has a fixed position and is 3rem wide when collapsed and that's why
+we give the container a 3rem margin left
+*/
+.app-container {
+  @apply ml-12 w-full;
+}
+
+#radio-checkbox label,
+.checkbox-field label {
+  @apply w-auto;
+}
+
+.input-l {
+  max-width: 24rem;
+}
+
+/* 
+  hide overflow from all selects used with the SelectField-component, max width is calculated to
+  prevent the text from overflowing on top of the empty-selections button
+*/
+.select-field-wrapper > div > div > button > span {
+  --max-w: calc(100% - 2rem);
+  @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.select-field-wrapper.with-icon > div > div > button > span {
+  --max-w: calc(100% - 4rem);
+  @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.select-field-wrapper.placeholder > div > div > button {
+  @apply !text-[#666];
+}
+
+.input-xl {
+  max-width: 100%;
+}
+
+.toolbar-button {
+  @apply max-h-[3.25rem] whitespace-nowrap !p-0 !text-sm !font-normal !text-black;
+}
+
+.toolbar-button[disabled] {
+  @apply !text-black-40;
+}
+
+.textarea-field textarea {
+  max-height: 27rem !important;
+  min-height: 3.5rem !important;
+  resize: none !important;
+}
+
+.textarea-field.input-l textarea {
+  /* overwrite the HDS textarea height token, since setting height with important will force it to always be that height */
+  --textarea-height: 3.5rem !important;
+}
+
+.legend-margin {
+  display: block;
+  font-size: var(--fontsize-body-m);
+  font-weight: 500;
+  margin-bottom: var(--spacing-m);
+  @apply text-black-90;
+}
+
+.big-dialog {
+  @apply w-[65%];
+}
+
+input {
+  @apply z-[1];
+}
+
+.list-field-input {
+  @apply flex;
+}
+
+.list-field-input input {
+  @apply !h-8;
+}
+
+#overrunRight .list-field-input {
+  @apply my-2;
+}
+
+.pen-and-label-text {
+  @apply !w-auto font-medium;
+}
+
+.input-wrapper button {
+  @apply z-[1];
+}
+
+.input-l.error {
+  @apply border-2 border-error;
+}
+
+/* 
+  box-sizing: border-box causes the HDS-Select dropdown list to be too small, this sets
+  the list to its intended size
+*/
+.custom-select ul {
+  @apply !w-[101%];
+}
+
+/* display block to center check-marks in HDS-MultiSelect components */
+ul > li > span > svg {
+  @apply !block;
+}
+
+/* restores the inteded look for HDS pagination with box-sizing: border-box; */
+.custom-pagination a {
+  @apply min-w-[2.5rem];
+}

@@ -1,0 +1,73 @@
+#hashtags-dialog {
+  @apply !w-[65%];
+}
+
+#hashtags-dialog h2 {
+  @apply mb-6 mt-2 text-heading-s font-medium;
+}
+
+#hashtags-dialog .content-container {
+  @apply mb-3 mt-6 flex flex-col;
+}
+
+#hashtags-dialog hr {
+  @apply m-0 border-t border-gray;
+}
+
+#hashtags-dialog .dialog-footer {
+  @apply flex w-full flex-col items-end;
+}
+
+#hashtags-dialog p {
+  @apply mb-6;
+}
+
+.dialog-section {
+  @apply mb-6;
+}
+
+.dialog-section button {
+  @apply max-h-14;
+}
+
+.dialog-section .new-hashtags-form {
+  @apply flex items-end justify-between;
+}
+
+.dialog-section .new-hashtags-input {
+  @apply flex items-end gap-6;
+}
+
+.dialog-section .new-hashtags-input .hashtag-created {
+  @apply gap-12;
+}
+
+.hashtag-created .hashtag-created-text {
+  @apply flex h-14 items-center justify-center gap-2;
+}
+
+.hashtag-created-text button {
+  @apply font-medium leading-[0] text-bus underline;
+}
+
+.dialog-section .new-hashtags-form input {
+  @apply w-96;
+}
+
+.hashtags-container {
+  @apply flex h-auto w-full flex-wrap;
+}
+
+.hashtags-container .hashtags-wrapper {
+  @apply mb-3 mr-3;
+}
+
+.hashtags-label {
+  @apply mb-2;
+}
+
+@media (max-width: 1300px) {
+  .dialog-section .new-hashtags-form input {
+    @apply w-full;
+  }
+}

@@ -1,0 +1,46 @@
+#search-dialog {
+  @apply absolute right-0 min-h-screen;
+}
+
+.search-form .search-form-content {
+  @apply grid grid-cols-2 py-4;
+}
+
+.search-form .search-form-content .input-wrapper {
+  @apply col-span-2 mb-6 w-full;
+}
+
+.search-form .search-form-content .input-l {
+  @apply max-w-full;
+}
+
+/* programmed fieldset legend same properties as the labels */
+.search-form .search-form-content #programmed legend {
+  @apply mb-3 block font-medium text-black-90;
+}
+
+/* programmed fieldset flex to get the checkboxes next to eachother */
+.search-form .search-form-content fieldset#programmed {
+  @apply flex w-0 gap-8 pb-0;
+}
+
+.free-search {
+  @apply mt-4 border-b border-gray;
+}
+
+.free-search .search-selections {
+  @apply my-2 flex flex-wrap gap-2;
+}
+
+.search-form .search-form-content .input-wrapper#programmedYearMin {
+  --input-width: calc(100% - 20px);
+  @apply col-span-1 row-start-6 mr-10 w-[var(--input-width)];
+}
+
+.search-form .search-form-content .input-wrapper#programmedYearMax {
+  @apply col-span-1 row-start-6;
+}
+
+.free-search div div div button {
+  @apply z-10;
+}

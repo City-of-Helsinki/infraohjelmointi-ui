@@ -1,0 +1,7 @@
+.reports-view {
+  @apply my-10 ml-14 mr-20 flex flex-col;
+}
+
+.reports-title {
+  @apply text-heading-l;
+}

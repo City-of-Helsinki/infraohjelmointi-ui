@@ -1,0 +1,18 @@
+.planning-view-container {
+  @apply mx-8 mb-8 whitespace-nowrap leading-5;
+}
+
+.planning-header-container {
+  @apply sticky top-0 z-[100] mt-2 flex bg-white pt-8;
+}
+
+/* All spans have are aligned right */
+.planning-view-container span {
+  @apply text-right;
+}
+
+@media (max-width: 1600px) {
+  .planning-view-container {
+    @apply mr-20;
+  }
+}

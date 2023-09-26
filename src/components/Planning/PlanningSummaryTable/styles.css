@@ -1,0 +1,86 @@
+.planning-summary-table-container {
+  --summary-table-width: calc(100% - 32rem);
+  @apply relative w-[var(--summary-table-width)];
+}
+.scrollable-planning-summary-table {
+  /* position is to the left of the info panel by giving it the same margin-left as the width of the info-panel */
+  @apply left-0 top-0 z-[100] flex  overflow-y-hidden overflow-x-scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollable-planning-summary-table::-webkit-scrollbar {
+  display: none;
+}
+
+.planning-summary-table {
+  @apply w-full text-right;
+}
+
+.planning-summary-head-cell {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
+}
+
+.planning-summary-frame-and-deviation-cell {
+  @apply min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] py-1 pr-4;
+}
+
+.planning-summary-table span {
+  @apply block w-full;
+}
+
+.planned-budget-cell {
+  @apply h-[36px] min-w-[var(--planning-cell-width)] max-w-[var(--planning-cell-width)] bg-bus-d py-1 pr-4 text-white first:bg-bus;
+}
+
+.planned-budget-cell.framed {
+  @apply bg-brick-d first:bg-brick;
+}
+
+.planned-budget-cell span {
+  @apply text-sm font-light text-white;
+}
+
+.planning-summary-frame-and-deviation-container {
+  @apply grid grid-flow-row;
+}
+
+.planning-summary-frame-and-deviation-container .frame-budget {
+  @apply min-h-[21px] text-sm font-light;
+}
+
+.planning-summary-frame-and-deviation-container .deviation {
+  @apply min-h-[21px] text-sm font-bold text-[#007a64];
+}
+
+.planning-summary-frame-and-deviation-container .deviation.negative {
+  @apply text-[#b01038];
+}
+
+.monthly-cell-container {
+  @apply flex h-10 items-end;
+}
+
+.monthly-cell-container span {
+  @apply !text-center text-sm font-light;
+}
+
+.arrows-container {
+  @apply relative flex w-14 items-center justify-start;
+}
+
+.arrows-container svg {
+  @apply absolute h-5 w-5;
+}
+
+.arrows-container svg:first-child {
+  left: -10px;
+}
+
+.date-indicator {
+  @apply absolute top-8 z-50 hidden h-screen !w-[2px] bg-metro;
+}
+
+.date-indicator.framed {
+  @apply bg-engel-d;
+}

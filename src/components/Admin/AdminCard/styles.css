@@ -1,0 +1,14 @@
+.admin-card-container {
+  --admin-card-width: calc(50% - 1.5rem);
+  @apply mb-6 mr-6 flex basis-[var(--admin-card-width)] flex-col justify-center;
+}
+
+/* we style the HDS cards to be full height so that the cards on the same row are always the same height */
+.admin-card-container > div {
+  @apply flex h-full flex-col justify-between;
+}
+
+/* since we're setting the HDS card's container to flex, we need to change the buttons width to fit-content */
+.admin-card-container > div > button {
+  @apply w-fit;
+}

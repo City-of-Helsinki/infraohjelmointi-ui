@@ -1,0 +1,60 @@
+/* set a fixed height to keep the pagination in place */
+.admin-hashtags-table-container {
+  @apply mt-8 h-[540px];
+}
+
+/* hashtag name cell */
+#admin-hashtags-table td:nth-child(1) {
+  @apply !w-[30%];
+}
+
+/* usage count cell */
+#admin-hashtags-table td:nth-child(2) {
+  @apply !w-[190px];
+}
+
+/* archive/restore button cell */
+#admin-hashtags-table td:nth-child(5) {
+  @apply !w-[190px] !p-0;
+}
+
+.admin-hashtags-toolbar {
+  @apply flex items-end justify-between;
+}
+
+.admin-hashtags-search {
+  @apply w-[22.5rem];
+}
+
+/* hide the clear button for hashtags search */
+.admin-hashtags-search > div > div > button:nth-child(1) {
+  @apply hidden;
+}
+
+.add-hashtag-button {
+  @apply h-[3.5rem];
+}
+
+.archived-icon-container {
+  @apply flex !w-[6.5rem] items-center gap-2;
+}
+
+/* we set the containers height to 0 since otherwise the HDS Button forces the table row to become too high */
+.archived-button-container {
+  @apply flex h-0 items-center justify-end;
+}
+
+/* we remove the padding and margin from the span inside the button since otherwise it overflows the table */
+.archived-button span {
+  @apply m-0 p-0 pr-4;
+}
+
+/* border to header */
+#add-hashtag-dialog > div:nth-child(1) {
+  @apply border-b-[1px] border-black-60;
+}
+
+/* padding and border to content */
+#add-hashtag-dialog > div:nth-child(2) {
+  @apply border-b-[1px] border-black-60 pb-24 pt-8;
+}

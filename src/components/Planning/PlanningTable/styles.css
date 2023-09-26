@@ -1,0 +1,139 @@
+/*
+1. $color-brick
+2. #A80E00
+3. #9C0D00
+4. $color-brick-dark
+
+if there’s more levels than four in the class structure they will use the $color-brick-dark 
+and the indentation (sisennys) in the text continues as long as the text can be intended.
+*/
+:root {
+  --color-masterClass: var(--color-bus);
+  --color-masterClass-framed: var(--color-brick);
+  --color-class: #0000a3; /* color had to be improvised */
+  --color-class-framed: #a80e00;
+  --color-subClass: #00007a; /* color had to be improvised */
+  --color-subClass-framed: #9c0d00;
+  --color-districtPreview: var(--color-bus-dark);
+  --color-districtPreview-framed: var(--color-brick-dark);
+  --color-district: var(--color-bus);
+  --color-division: var(--color-fog-medium-light);
+  --color-group: var(--color-fog-light);
+}
+
+/* we set table-fixed to be able to set the head-cells of every row to position: sticky; */
+.planning-table-container {
+  @apply w-full overflow-x-scroll;
+}
+
+.planning-table {
+  @apply w-full;
+}
+
+.monthly-cell {
+  @apply w-[39px] min-w-[39px] max-w-[39px] cursor-pointer !p-0 !pr-0;
+}
+
+/* this creates a shadow over the hovered monthly cell */
+.monthly-cell.hovered {
+  box-shadow: inset 0 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.monthly-summary-cell {
+  @apply w-56 min-w-[14rem] max-w-[14rem];
+}
+
+.monthly-cell.summary-budget.start-month,
+.monthly-summary-cell.summary-budget.start-month {
+  @apply bg-bus;
+}
+
+.monthly-cell.summary-budget,
+.monthly-summary-cell.summary-budget {
+  @apply bg-bus-d;
+}
+
+.monthly-cell.masterClass,
+.monthly-summary-cell.masterClass {
+  @apply border-b border-white bg-[var(--color-masterClass)];
+}
+
+.monthly-cell.masterClass.framed,
+.monthly-summary-cell.masterClass.framed {
+  @apply bg-[var(--color-masterClass-framed)];
+}
+
+.monthly-cell.class,
+.monthly-summary-cell.class {
+  @apply border-b border-white bg-[var(--color-class)];
+}
+
+.monthly-cell.class.framed,
+.monthly-summary-cell.class.framed {
+  @apply bg-[var(--color-class-framed)];
+}
+
+.monthly-cell.subClass,
+.monthly-summary-cell.subClass {
+  @apply border-b border-white bg-[var(--color-subClass)];
+}
+
+.monthly-cell.subClass.framed,
+.monthly-summary-cell.subClass.framed {
+  @apply bg-[var(--color-subClass-framed)];
+}
+
+.monthly-cell.districtPreview,
+.monthly-summary-cell.districtPreview,
+.monthly-cell.subLevelDistrict,
+.monthly-summary-cell.subLevelDistrict,
+.monthly-cell.collectiveSubLevel,
+.monthly-summary-cell.collectiveSubLevel,
+.monthly-cell.otherClassification,
+.monthly-summary-cell.otherClassification,
+.monthly-cell.otherClassificationSubLevel,
+.monthly-summary-cell.otherClassificationSubLevel {
+  @apply border-b border-white bg-[var(--color-districtPreview)];
+}
+
+.monthly-cell.districtPreview.framed,
+.monthly-summary-cell.districtPreview.framed,
+.monthly-cell.subLevelDistrict.framed,
+.monthly-summary-cell.subLevelDistrict.framed,
+.monthly-cell.collectiveSubLevel.framed,
+.monthly-summary-cell.collectiveSubLevel.framed,
+.monthly-cell.otherClassification.framed,
+.monthly-summary-cell.otherClassification.framed,
+.monthly-cell.otherClassificationSubLevel.framed,
+.monthly-summary-cell.otherClassificationSubLevel {
+  @apply bg-[var(--color-districtPreview-framed)];
+}
+
+.monthly-cell.district,
+.monthly-summary-cell.district,
+.monthly-cell.subClassDistrict,
+.monthly-summary-cell.subClassDistrict {
+  @apply border-b border-white bg-[var(--color-district)];
+}
+
+.monthly-cell.division,
+.monthly-summary-cell.division {
+  @apply border-b border-black-70 bg-[var(--color-division)];
+}
+
+.monthly-cell.group,
+.monthly-summary-cell.group {
+  @apply border-b border-black-70 bg-[var(--color-group)];
+}
+
+.monthly-summary-cell.project,
+.monthly-cell.project {
+  /* setting height to 0 will allow height: 100% to work for child elements */
+  @apply h-24 border-b-[0.05rem] border-bus-m p-0;
+}
+
+.monthly-summary-cell.project.none,
+.monthly-cell.project.none {
+  /* setting height to 0 will allow height: 100% to work for child elements */
+  @apply h-0 p-0;
+}
