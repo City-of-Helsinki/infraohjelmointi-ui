@@ -20,6 +20,8 @@ import { patchCoordinationLocation } from '@/services/locationServices';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserCoordinator } from '@/utils/userRoleHelpers';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
