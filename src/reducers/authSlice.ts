@@ -48,11 +48,6 @@ export const authSlice = createSlice({
             display_name: 'sg_KYMP_sso_IO_Admin',
           },
           {
-            id: 'test-admin-role',
-            name: 'sg_kymp_sso_io_admin' as UserRole,
-            display_name: 'sg_KYMP_sso_IO_Admin',
-          },
-          {
             id: 'da48bfe9-6a99-481f-a252-077d31473c4c',
             name: 'sg_kymp_sso_io_ohjelmoijat' as UserRole,
             display_name: 'sg_KYMP_sso_IO_Ohjelmoijat',
