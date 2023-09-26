@@ -45,7 +45,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
     return Number(
       Number(groupSapCosts.group_combined_commitments) + Number(groupSapCosts.group_combined_costs),
     ).toFixed(2);
-  }, []);
+  }, [type, id, cell]);
 
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
 
