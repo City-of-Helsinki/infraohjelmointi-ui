@@ -24,7 +24,6 @@ import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(10000);
 
 const store = setupStore();
 
@@ -127,6 +126,7 @@ describe('GroupDialog', () => {
   });
 
   it('can create new group with the groups form', async () => {
+    jest.setTimeout(10000);
     const renderResult = await render();
 
     const mockPostResponse = {
