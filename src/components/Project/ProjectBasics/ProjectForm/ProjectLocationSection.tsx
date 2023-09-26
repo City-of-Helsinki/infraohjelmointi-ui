@@ -17,10 +17,12 @@ interface IProjectLocationSectionProps {
     divisions: IOption[];
     subDivisions: IOption[];
   };
+  isInputDisabled: boolean;
 }
 const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
   getFieldProps,
   locationOptions,
+  isInputDisabled,
 }) => {
   const { t } = useTranslation();
 
@@ -40,6 +42,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
               required: t('validation.required', { field: 'Alueen vastuujaon mukaan' }) ?? '',
             }}
             size="full"
+            disabled={isInputDisabled}
           />
         </div>
       </div>
@@ -51,6 +54,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             options={districts}
             size="full"
             shouldTranslate={false}
+            disabled={isInputDisabled}
           />
         </div>
       </div>
@@ -61,6 +65,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             iconKey="location"
             options={divisions}
             shouldTranslate={false}
+            disabled={isInputDisabled}
           />
         </div>
         <div className="form-col-md">
@@ -69,6 +74,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             iconKey="location"
             options={subDivisions}
             shouldTranslate={false}
+            disabled={isInputDisabled}
           />
         </div>
       </div>

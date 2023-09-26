@@ -12,6 +12,7 @@ interface INumberFieldProps {
   readOnly?: boolean;
   tooltip?: string;
   hideLabel?: boolean;
+  disabled?: boolean;
 }
 
 const NumberField: FC<INumberFieldProps> = ({
@@ -22,6 +23,7 @@ const NumberField: FC<INumberFieldProps> = ({
   readOnly,
   tooltip,
   hideLabel,
+  disabled,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
@@ -44,6 +46,7 @@ const NumberField: FC<INumberFieldProps> = ({
             invalid={error ? true : false}
             errorText={error?.message}
             helperText={tooltip}
+            disabled={disabled}
           />
         </div>
       )}

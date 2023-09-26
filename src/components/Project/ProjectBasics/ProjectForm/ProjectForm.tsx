@@ -24,13 +24,16 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import _ from 'lodash';
 import './styles.css';
+import { canUserEditProjectFormField } from '@/utils/validation';
+import { selectUser } from '@/reducers/authSlice';
 
 const ProjectForm = () => {
-  const { formMethods, classOptions, locationOptions } = useProjectForm();
+  const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const user = useAppSelector(selectUser);
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
 
@@ -154,6 +157,11 @@ const ProjectForm = () => {
     return handleSubmit(onSubmit);
   }, [handleSubmit, onSubmit, datePickerVisible]);
 
+  const isInputDisabled = useMemo(
+    () => canUserEditProjectFormField(selectedMasterClassName, user),
+    [selectedMasterClassName, user],
+  );
+
   return (
     <form
       onBlur={projectMode !== 'new' ? submitCallback() : undefined}
@@ -161,17 +169,25 @@ const ProjectForm = () => {
       className="project-form"
     >
       {/* SECTION 1 - BASIC INFO */}
-      <ProjectInfoSection {...formProps} project={project} />
+      <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} />
       {/* SECTION 2 - STATUS */}
-      <ProjectStatusSection {...formProps} />
+      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
       {/* SECTION 3 - SCHEDULE */}
       <ProjectScheduleSection {...formProps} />
       {/* SECTION 4 - FINANCIALS */}
-      <ProjectFinancialSection {...formProps} classOptions={classOptions} />
+      <ProjectFinancialSection
+        {...formProps}
+        classOptions={classOptions}
+        isInputDisabled={isInputDisabled}
+      />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
-      <ProjectResponsiblePersonsSection {...formProps} />
+      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
       {/* SECTION 6 - LOCATION */}
-      <ProjectLocationSection {...formProps} locationOptions={locationOptions} />
+      <ProjectLocationSection
+        {...formProps}
+        locationOptions={locationOptions}
+        isInputDisabled={isInputDisabled}
+      />
       {/* SECTION 7 - PROJECT PROGRAM */}
       <ProjectProgramSection {...formProps} />
       {/* BANNER */}

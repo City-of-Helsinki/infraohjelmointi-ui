@@ -18,9 +18,14 @@ interface IProjectStatusSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
+  isInputDisabled: boolean;
 }
 
-const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, getValues }) => {
+const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
+  getFieldProps,
+  getValues,
+  isInputDisabled,
+}) => {
   const phases = useOptions('phases');
   const categories = useOptions('categories');
   const riskAssessments = useOptions('riskAssessments');
@@ -320,11 +325,19 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
       )}
 
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('programmed')} rules={validateProgrammed} />
+        <RadioCheckboxField
+          {...getFieldProps('programmed')}
+          rules={validateProgrammed}
+          disabled={isInputDisabled}
+        />
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <NumberField {...getFieldProps('planningStartYear')} rules={validatePlanningStartYear} />
+          <NumberField
+            {...getFieldProps('planningStartYear')}
+            rules={validatePlanningStartYear}
+            disabled={isInputDisabled}
+          />
         </div>
       </div>
       <div className="form-row">
@@ -332,6 +345,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
           <NumberField
             {...getFieldProps('constructionEndYear')}
             rules={validateConstructionEndYear}
+            disabled={isInputDisabled}
           />
         </div>
       </div>
@@ -347,15 +361,20 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({ getFieldProps, g
             {...getFieldProps('category')}
             options={categories}
             rules={validateCategory}
+            disabled={isInputDisabled}
           />
         </div>
       </div>
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('effectHousing')} />
+        <RadioCheckboxField {...getFieldProps('effectHousing')} disabled={isInputDisabled} />
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('riskAssessment')} options={riskAssessments} />
+          <SelectField
+            {...getFieldProps('riskAssessment')}
+            options={riskAssessments}
+            disabled={isInputDisabled}
+          />
         </div>
       </div>
     </div>

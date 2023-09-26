@@ -3,6 +3,9 @@ import { AdminFunctionType } from '@/interfaces/adminInterfaces';
 import { useTranslation } from 'react-i18next';
 import { Button, Card } from 'hds-react';
 import { useNavigate } from 'react-router';
+import { useAppSelector } from '@/hooks/common';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserAdmin } from '@/utils/userRoleHelpers';
 import './styles.css';
 
 const adminCardTheme = {
@@ -18,16 +21,19 @@ interface IAdminCardProps {
 const AdminCard: FC<IAdminCardProps> = ({ type }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
 
   const navigateToAdminFunction = useCallback(() => {
     navigate(`/admin/${type.toLocaleLowerCase()}`);
   }, [navigate, type]);
 
   // Remove these disabled buttons as we implement more admin functionalities
-  const buttonDisabled = useMemo(
-    () => type === 'auditlog' || type === 'financialstatements' || type === 'menus',
-    [type],
-  );
+  const buttonDisabled = useMemo(() => {
+    if (!user || !isUserAdmin(user)) {
+      return true;
+    }
+    return type === 'auditlog' || type === 'financialstatements' || type === 'menus';
+  }, [type, user]);
 
   return (
     <div className="admin-card-container">

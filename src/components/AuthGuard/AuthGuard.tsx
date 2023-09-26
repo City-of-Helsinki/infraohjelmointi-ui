@@ -4,6 +4,7 @@ import { getApiToken } from '@/services/userServices';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { getUserThunk, selectUser } from '@/reducers/authSlice';
 import { useLocation, useNavigate } from 'react-router';
+import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -65,6 +66,29 @@ const AuthGuard: FC = () => {
       setHasTriedSignin(true);
     }
   }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin]);
+
+  // Redirect user from forbidden paths
+  useEffect(() => {
+    const { pathname } = location;
+
+    if (!user) {
+      return;
+    }
+
+    // Redirect to previous url if a non admin tries to access the admin view
+    if (pathname.includes('admin') && !isUserAdmin(user)) {
+      return navigate(-1);
+    }
+
+    // Redirect to planning view if a viewer is trying to access anything but the planning view
+    if (!pathname.includes('planning') && isUserOnlyViewer(user)) {
+      return navigate('planning');
+    }
+
+    if (pathname.includes('project/new') && isUserOnlyProjectManager(user)) {
+      return navigate(-1);
+    }
+  }, [location, user]);
 
   return <></>;
 };
