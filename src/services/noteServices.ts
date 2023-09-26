@@ -1,4 +1,5 @@
-import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
+import { INote, INoteRequest, ICoordinatorNoteRequest } from '@/interfaces/noteInterfaces';
+import { IError } from '@/interfaces/common';
 import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
@@ -46,4 +47,20 @@ export const deleteNote = async (id: string): Promise<INote> => {
   } catch (e) {
     return Promise.reject(e);
   }
+};
+
+
+// Coordinator notes -->
+export const getCoordinatorNotesByProject = async (projectId: string) => {
+  return axios
+    .get(`${REACT_APP_API_URL}/coordinator-notes/${projectId}`)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
+};
+
+export const postCoordinatorNoteToProject = async (request: ICoordinatorNoteRequest) => {
+  return axios
+    .post(`${REACT_APP_API_URL}/coordinator-notes/`, request)
+    .then((res) => res.data)
+    .catch((err: IError) => Promise.reject(err));
 };

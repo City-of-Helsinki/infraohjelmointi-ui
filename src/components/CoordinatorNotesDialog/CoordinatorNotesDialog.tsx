@@ -1,24 +1,40 @@
-import { FC, useCallback } from "react";
+import { FC, useState, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
 import { t } from "i18next";
-import { selectNotesDialogData, selectNotesDialogOpen, setNotesDialogOpen } from "@/reducers/planningSlice";
+import { postCoordinatorNoteToProjectThunk, selectNotesDialogData, selectNotesDialogOpen, setNotesDialogOpen } from "@/reducers/planningSlice";
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, IconCross } from "hds-react";
 import { Dialog } from 'hds-react/components/Dialog';
 import './styles.css';
+import { ICoordinatorNoteRequest } from "@/interfaces/noteInterfaces";
+import { selectUser } from "@/reducers/authSlice";
 
 const CoordinatorNotesDialog: FC = () => {
     const dispatch = useAppDispatch();
+    const user = useAppSelector(selectUser);
+    const dialogOpen = useAppSelector(selectNotesDialogOpen);
+    const dialogData = useAppSelector(selectNotesDialogData);
 
+    const [textAreaContent, setTextAreaContent] = useState('');
     const noteId = 'add-coordinator-note-title';
     const descriptionId = 'add-coordinator-note-content';
 
     const handleClose = useCallback(async () => {
         dispatch(setNotesDialogOpen(false))
-      }, []);
+    }, []);
 
-    const dialogOpen = useAppSelector(selectNotesDialogOpen);
-    const dialogData = useAppSelector(selectNotesDialogData);
+    const handleSubmit = () => {
+        const data = {
+            coordinatorNote: textAreaContent, 
+            planningClass: dialogData.name,
+            planningClassId: dialogData.id,
+            updatedByFirstName: user?.first_name || 'null',
+            updatedByLastName: user?.last_login || 'null',
+            updatedById: user?.uuid || 'null',
+        }
+
+       dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNoteRequest)).then(() => setTextAreaContent(''));
+    }
 
     const setSuccessNotification = (planningClass: string) => {
         try {
@@ -50,24 +66,30 @@ const CoordinatorNotesDialog: FC = () => {
                     close={handleClose}
                     closeButtonLabelText={t('closeCoordinatorNotesDialog')}
                 >
-                    <section className="dialog-top-part">
-                        <h1>{t('addNote')} {dialogData.name} </h1>
-                        <IconCross className="close-icon" onClick={() => handleClose()} />
-                    </section>
-                    <hr />
-                    <section className="dialog-middle-part">
-                        <h2>{t('note')} *</h2>
-                        <textarea className="dialog-textarea"></textarea>
-                    </section>
-                    <hr />
-                    <section className="dialog-bottom-part">
-                        <Button id="add-note-button" onClick={() => {handleClose(); setSuccessNotification(dialogData.name);}} variant="primary" data-testid="cancel-note">
-                            {t('addNote')}
-                        </Button>
-                        <Button onClick={() => handleClose()} variant="secondary" data-testid="cancel-note">
-                            {t('cancel')}
-                        </Button>
-                    </section>
+                    <form>
+                        <section className="dialog-top-part">
+                            <h1>{t('addNote')} {dialogData.name} </h1>
+                            <IconCross className="close-icon" onClick={() => handleClose()} />
+                        </section>
+                        <hr />
+                        <section className="dialog-middle-part">
+                            <h2>{t('note')} *</h2>
+                            <textarea 
+                                className="dialog-textarea"
+                                value={textAreaContent}
+                                onChange={e => setTextAreaContent(e.target.value)}
+                            ></textarea>
+                        </section>
+                        <hr />
+                        <section className="dialog-bottom-part">
+                            <Button id="add-note-button" onClick={() => {handleSubmit(); setSuccessNotification(dialogData.name);}} variant="primary" data-testid="cancel-note">
+                                {t('addNote')}
+                            </Button>
+                            <Button onClick={() => handleClose()} variant="secondary" data-testid="cancel-note">
+                                {t('cancel')}
+                            </Button>
+                        </section>
+                    </form>
                 </Dialog>
             }
         </>

@@ -9,8 +9,15 @@ import {
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { RootState } from '@/store';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getCoordinatorNotesByProject, postCoordinatorNoteToProject } from '@/services/noteServices';
+import { IError } from '@/interfaces/common';
+import { ICoordinatorNoteRequest } from '@/interfaces/noteInterfaces';
 
+interface ICoordinatorNotesModalOpen {
+  isOpen: boolean;
+  id: string;
+}
 interface IPlanningState {
   selectedYear: number | null;
   startYear: number;
@@ -24,9 +31,27 @@ interface IPlanningState {
   isLoading: boolean;
   notesDialogOpen: boolean;
   notesDialogData: IPlanningNotesDialogData;
-  notesModalOpen: boolean;
+  notesModalOpen: ICoordinatorNotesModalOpen;
   notesModalData: IPlanningNotesModalData;
 }
+
+export const getCoordinatorNotesByProjectThunk = createAsyncThunk(
+  'coordinatorNotes/getByProject',
+  async (projectId: string, thunkAPI) => {
+    return await getCoordinatorNotesByProject(projectId)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const postCoordinatorNoteToProjectThunk = createAsyncThunk(
+  'coordinatorNotes/postNote',
+  async (request: ICoordinatorNoteRequest, thunkAPI) => {
+    return await postCoordinatorNoteToProject(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
 
 const initialState: IPlanningState = {
   selectedYear: null,
@@ -49,7 +74,7 @@ const initialState: IPlanningState = {
   isLoading: false,
   notesDialogOpen: false,
   notesDialogData: {name: '', id: ''},
-  notesModalOpen: false,
+  notesModalOpen: {isOpen: false, id: ''},
   notesModalData: {name: '', id: ''},
 };
 
@@ -120,13 +145,28 @@ export const planningSlice = createSlice({
     setNotesDialogData(state, action: PayloadAction<IPlanningNotesDialogData>) {
       return { ...state, notesDialogData: action.payload}
     },
-    setNotesModalOpen(state, action: PayloadAction<boolean>) {
+    setNotesModalOpen(state, action: PayloadAction<ICoordinatorNotesModalOpen>) {
       return { ...state, notesModalOpen: action.payload}
     },
     setNotesModalData(state, action: PayloadAction<IPlanningNotesModalData>) {
       return { ...state, notesModalData: action.payload}
     }
   },
+  extraReducers: (builder) => {
+    // NOTES GET
+    builder.addCase(
+      getCoordinatorNotesByProjectThunk.fulfilled,
+      (state, action: PayloadAction<Array</*INote*/ any>>) => {
+        return { ...state, notes: action.payload };
+      },
+    );
+    builder.addCase(
+      getCoordinatorNotesByProjectThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+  }
 });
 
 export const selectSelectedYear = (state: RootState) => state.planning.selectedYear;

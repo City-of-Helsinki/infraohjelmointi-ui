@@ -25,3 +25,12 @@ interface INotePerson {
   first_name: string;
   last_name: string;
 }
+
+export interface ICoordinatorNoteRequest {
+  coordinatorNote: string, 
+  planningClass: string,
+  planningClassId: string,
+  updatedByFirstName: string;
+  updatedByLastName: string;
+  updatedById: string;
+}

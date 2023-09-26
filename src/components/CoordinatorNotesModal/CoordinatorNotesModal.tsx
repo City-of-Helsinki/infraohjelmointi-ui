@@ -1,7 +1,7 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
 import { t } from "i18next";
-import { selectNotesModalData, selectNotesModalOpen, setNotesDialogData, setNotesDialogOpen, setNotesModalOpen } from "@/reducers/planningSlice";
+import { getCoordinatorNotesByProjectThunk, selectNotesModalData, selectNotesModalOpen, setNotesDialogData, setNotesDialogOpen, setNotesModalOpen } from "@/reducers/planningSlice";
 import { IconCross } from "hds-react";
 import './styles.css';
 
@@ -14,6 +14,11 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
     const handleClose = useCallback(async () => {
         dispatch(setNotesModalOpen({isOpen: false, id: props.id}))
     }, []);
+
+
+    useEffect(() => {
+        if (props.id) dispatch(getCoordinatorNotesByProjectThunk(props.id));
+    }, [props.id]);
 
     const modalOpen = useAppSelector(selectNotesModalOpen);
     const modalData = useAppSelector(selectNotesModalData);
