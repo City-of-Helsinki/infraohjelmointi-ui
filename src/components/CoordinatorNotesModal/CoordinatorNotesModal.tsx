@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, Fragment } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
 import { t } from "i18next";
-import { getCoordinatorNotesByProjectThunk, selectNotesModalData, selectNotesModalOpen, setNotesDialogData, setNotesDialogOpen, setNotesModalOpen } from "@/reducers/planningSlice";
+import { selectNotes, selectNotesModalData, selectNotesModalOpen, setNotesDialogData, setNotesDialogOpen, setNotesModalOpen } from "@/reducers/planningSlice";
 import { IconCross } from "hds-react";
 import './styles.css';
 
@@ -15,14 +15,26 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
         dispatch(setNotesModalOpen({isOpen: false, id: props.id}))
     }, []);
 
-
-    useEffect(() => {
-        if (props.id) dispatch(getCoordinatorNotesByProjectThunk(props.id));
-    }, [props.id]);
-
+    const notes = useAppSelector(selectNotes);
     const modalOpen = useAppSelector(selectNotesModalOpen);
     const modalData = useAppSelector(selectNotesModalData);
 
+    const Notes = () => {
+        if (notes.length) {
+            const matchingNotes = notes.filter((note) => note.planningClassId === props.id);
+            const mappedNotes = matchingNotes.map((note, index) => {
+                return (
+                    <Fragment key={index}>
+                        <p>{note.coordinatorNote}</p>
+                        <p id="coordinator">{note.updatedByFirstName} {note.updatedByLastName}</p>
+                    </Fragment>
+                )
+            });
+            return mappedNotes.length ? <p>{mappedNotes}</p> : <p>{t('noNotesYet')}</p>;
+        }
+        return <p>{t('noNotesYet')}</p>;
+    };
+    
     return( 
         <>
             { modalOpen.isOpen && modalOpen.id === props.id &&
@@ -38,7 +50,7 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
                     </section>
                     <hr />
                     <section className="dialog-middle-part">
-                        <p>{t('noNotesYet')}</p>
+                        <Notes />
                     </section>
                     <hr />
                     <section className="dialog-bottom-part">

@@ -33,6 +33,7 @@ interface IPlanningState {
   notesDialogData: IPlanningNotesDialogData;
   notesModalOpen: ICoordinatorNotesModalOpen;
   notesModalData: IPlanningNotesModalData;
+  coordinatorNotes: ICoordinatorNoteRequest[];
 }
 
 export const getCoordinatorNotesByProjectThunk = createAsyncThunk(
@@ -76,6 +77,7 @@ const initialState: IPlanningState = {
   notesDialogData: {name: '', id: ''},
   notesModalOpen: {isOpen: false, id: ''},
   notesModalData: {name: '', id: ''},
+  coordinatorNotes: [],
 };
 
 export const planningSlice = createSlice({
@@ -156,14 +158,14 @@ export const planningSlice = createSlice({
     // NOTES GET
     builder.addCase(
       getCoordinatorNotesByProjectThunk.fulfilled,
-      (state, action: PayloadAction<Array</*INote*/ any>>) => {
-        return { ...state, notes: action.payload };
+      (state, action: PayloadAction<Array<ICoordinatorNoteRequest>>) => {
+        return { ...state, coordinatorNotes: action.payload };
       },
     );
     builder.addCase(
       getCoordinatorNotesByProjectThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
+        return { ...state, coordinatorNotesError: action.payload };
       },
     );
   }
@@ -182,6 +184,7 @@ export const selectNotesDialogOpen = (state: RootState) => state.planning.notesD
 export const selectNotesDialogData = (state: RootState) => state.planning.notesDialogData;
 export const selectNotesModalOpen = (state: RootState) => state.planning.notesModalOpen;
 export const selectNotesModalData = (state: RootState) => state.planning.notesModalData;
+export const selectNotes = (state: RootState) => state.planning.coordinatorNotes;
 
 export const {
   setSelectedYear,

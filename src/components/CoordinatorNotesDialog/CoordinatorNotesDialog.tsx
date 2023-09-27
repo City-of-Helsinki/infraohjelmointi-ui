@@ -29,8 +29,8 @@ const CoordinatorNotesDialog: FC = () => {
             planningClass: dialogData.name,
             planningClassId: dialogData.id,
             updatedByFirstName: user?.first_name || 'null',
-            updatedByLastName: user?.last_login || 'null',
-            updatedById: user?.uuid || 'null',
+            updatedByLastName: user?.last_name || 'null',
+            updatedById: user?.id || 'null',
         }
 
        dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNoteRequest)).then(() => setTextAreaContent(''));

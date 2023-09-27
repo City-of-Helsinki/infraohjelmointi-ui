@@ -1,4 +1,6 @@
 .dialog-container {
+    width: 300px;
+    max-height: 450px;
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -10,13 +12,13 @@
   }
 
   .dialog-top-part {
-    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: stretch !important; /*cross and text start from the same height*/
-    width: 100%;
     padding: 15px !important;
+    padding-bottom: 0px;
+    margin-bottom: 5px;
   }
 
   .dialog-top-part h1 {
@@ -29,7 +31,7 @@
   
   #left {
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: column;
     white-space: normal;
     width: 90%;
   }
@@ -39,11 +41,22 @@
   }
 
   .dialog-middle-part {
+    max-height: 290px;
     font-weight: normal;
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+
+  .dialog-middle-part p {
+    white-space: normal;
+  }
+
+  #coordinator {
+    margin-top: 10px;
+    margin-bottom: 20px;
   }
   
   .dialog-bottom-part {
-    width: 100%;
     padding: 15px !important;
   }
   
@@ -52,4 +65,8 @@
     font-weight: 500;
     font-size: 15px;
     text-decoration: underline;
+  }
+
+  hr {
+    color: var(--color-black-40);
   }

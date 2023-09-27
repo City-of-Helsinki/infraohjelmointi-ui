@@ -1,9 +1,10 @@
-import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
+  getCoordinatorNotesByProjectThunk,
   selectForcedToFrame,
   selectPlanningMode,
   selectSelectedYear,
@@ -127,7 +128,11 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const budgetOverlapAlertIcon = useMemo(
     () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
     [isFrameBudgetOverlap],
-  );
+  ); 
+  
+  useEffect(() => {
+        dispatch(getCoordinatorNotesByProjectThunk(id));
+  }, []);
 
   const isEditFrameBudgetDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame,
