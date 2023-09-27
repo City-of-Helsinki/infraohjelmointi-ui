@@ -1,0 +1,8 @@
+.access-denied-view {
+  --access-denied-view-width: calc(100% - 3rem);
+  @apply flex h-[80%] w-[var(--access-denied-view-width)] justify-center;
+}
+
+.access-denied-view-container {
+  @apply flex flex-col justify-center text-center;
+}

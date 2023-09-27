@@ -85,8 +85,14 @@ const AuthGuard: FC = () => {
       return navigate('planning');
     }
 
+    // Redirect project managers away from new project form
     if (pathname.includes('project/new') && isUserOnlyProjectManager(user)) {
       return navigate(-1);
+    }
+
+    // Redirect users without roles to /access-denied
+    if (user.ad_groups.length === 0) {
+      return navigate('access-denied');
     }
   }, [location, user]);
 
