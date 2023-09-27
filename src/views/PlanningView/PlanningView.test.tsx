@@ -90,7 +90,7 @@ const render = async () =>
           },
           group: {
             ...store.getState().group,
-            groups: mockGroups.data,
+            planning: { ...store.getState().group.planning, groups: mockGroups.data },
           },
           lists: {
             ...store.getState().lists,
@@ -520,7 +520,7 @@ describe.skip('PlanningView', () => {
 
       const { masterClasses, classes, subClasses } = store.getState().class.planning;
       const { districts, divisions } = store.getState().location.planning;
-      const { groups } = store.getState().group;
+      const { groups } = store.getState().group.planning;
 
       classes.forEach(({ id }) => expect(queryByTestId(`row-${id}`)).toBeNull());
 
@@ -541,7 +541,7 @@ describe.skip('PlanningView', () => {
 
       const { masterClasses, classes, subClasses } = store.getState().class.planning;
       const { districts, divisions } = store.getState().location.planning;
-      const { groups } = store.getState().group;
+      const { groups } = store.getState().group.planning;
 
       const projects = mockPlanningViewProjects.data.results;
 

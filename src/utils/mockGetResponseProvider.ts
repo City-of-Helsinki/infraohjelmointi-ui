@@ -87,6 +87,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockNotes);
       case url === `/project-groups/?year=${year}`:
         return Promise.resolve(mockGroups);
+      case url === `/project-groups/coordinator/`:
+        return Promise.resolve(mockGroups);
       case url.toLocaleLowerCase().includes(`/projects/search-results/`):
         return Promise.resolve(mockSearchResults);
       case url.toLocaleLowerCase().includes(`/projects/`):

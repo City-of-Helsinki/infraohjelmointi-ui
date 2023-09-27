@@ -9,7 +9,7 @@ import {
   IPlanningRowSelections,
   PlanningRowType,
 } from '@/interfaces/planningInterfaces';
-import { selectGroups } from '@/reducers/groupSlice';
+import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
@@ -219,7 +219,7 @@ const buildPlanningTableRows = (
  */
 const usePlanningRows = () => {
   const dispatch = useAppDispatch();
-  const groups = useAppSelector(selectGroups);
+  const groups = useAppSelector(selectPlanningGroups);
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const selections = useAppSelector(selectSelections);

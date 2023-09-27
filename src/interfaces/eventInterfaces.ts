@@ -57,7 +57,7 @@ interface IFinancePlanningData {
   group: IGroup | null;
 }
 
-interface IFinanceCoordinationData extends Omit<IFinancePlanningData, 'group'> {
+interface IFinanceCoordinationData extends IFinancePlanningData {
   collectiveSubLevel: IClass | null;
   otherClassification: IClass | null;
   otherClassificationSubLevel: IClass | null;

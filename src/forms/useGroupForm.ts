@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 import { IGroup } from '@/interfaces/groupInterfaces';
-import { selectGroups } from '@/reducers/groupSlice';
+import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { useAppSelector } from '../hooks/common';
 import {
   selectPlanningClasses,
@@ -28,7 +28,7 @@ interface ISelectionState {
 }
 
 const useGroupValues = (projects?: IOption[], id?: string | null) => {
-  const group = useAppSelector(selectGroups).find((g) => g.id === id) || null;
+  const group = useAppSelector(selectPlanningGroups).find((g) => g.id === id) || null;
   const masterClasses = useAppSelector(selectAllPlanningClasses);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);

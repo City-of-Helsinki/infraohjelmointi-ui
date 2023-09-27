@@ -49,7 +49,7 @@ const defaultState: RootState = {
   },
   group: {
     ...store.getState().group,
-    groups: mockGroups.data,
+    coordination: { ...store.getState().group.coordination, groups: mockGroups.data },
   },
   lists: {
     ...store.getState().lists,

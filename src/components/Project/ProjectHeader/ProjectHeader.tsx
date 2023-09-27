@@ -14,7 +14,7 @@ import { useOptions } from '@/hooks/useOptions';
 import { useTranslation } from 'react-i18next';
 import { patchProject } from '@/services/projectServices';
 import _ from 'lodash';
-import { selectGroups } from '@/reducers/groupSlice';
+import { selectPlanningGroups } from '@/reducers/groupSlice';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -24,7 +24,7 @@ const ProjectHeader: FC = () => {
   const project = useAppSelector(selectProject);
   const projectId = project?.id;
   const user = useAppSelector(selectUser);
-  const groups = useAppSelector(selectGroups);
+  const groups = useAppSelector(selectPlanningGroups);
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
   const { formMethods } = useProjectHeaderForm();

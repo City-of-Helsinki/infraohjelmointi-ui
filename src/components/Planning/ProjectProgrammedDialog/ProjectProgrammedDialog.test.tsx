@@ -73,7 +73,7 @@ const render = async () =>
           },
           group: {
             ...store.getState().group,
-            groups: mockGroups.data,
+            planning: { ...store.getState().group.planning, groups: mockGroups.data },
           },
           lists: {
             ...store.getState().lists,

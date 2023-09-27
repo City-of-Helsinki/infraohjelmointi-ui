@@ -24,7 +24,7 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getGroupsThunk } from './reducers/groupSlice';
+import { getCoordinationGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
 import { getSapCostsThunk } from './reducers/sapCostSlice';
@@ -72,7 +72,8 @@ const App: FC = () => {
   const loadPlanningData = async (year: number) => {
     dispatch(setIsPlanningLoading(true));
     try {
-      await dispatch(getGroupsThunk(year));
+      await dispatch(getPlanningGroupsThunk(year));
+      await dispatch(getCoordinationGroupsThunk(year));
       await dispatch(getPlanningClassesThunk(year));
       await dispatch(getPlanningLocationsThunk(year));
       await dispatch(getCoordinationClassesThunk(year));
