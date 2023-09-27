@@ -12,7 +12,7 @@ export const postGroup = async (request: IGroupRequest): Promise<IGroup> => {
   }
 };
 
-export const getGroups = async (year: number): Promise<Array<IGroup>> => {
+export const getPlanningGroups = async (year: number): Promise<Array<IGroup>> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-groups/?year=${year}`);
     return res.data;
@@ -21,9 +21,9 @@ export const getGroups = async (year: number): Promise<Array<IGroup>> => {
   }
 };
 
-export const getCoordinatorGroups = async () => {
+export const getCoordinatorGroups = async (year: number) => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-groups/coordinator/`);
+    const res = await axios.get(`${REACT_APP_API_URL}/project-groups/coordinator/?year=${year}`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

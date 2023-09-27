@@ -118,7 +118,7 @@ const DialogContainer: FC<IDialogProps> = memo(
             const group = await patchGroup(
               buildRequestPayload(form, id) as IGroupPatchRequestObject,
             );
-            dispatch(updateGroup(group));
+            dispatch(updateGroup({ data: group, type: 'planning' }));
             handleDialogClose();
           } catch (e) {
             console.log('Error patching group: ', e);

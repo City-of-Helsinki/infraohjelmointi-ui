@@ -50,7 +50,7 @@ import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
 import { getListsThunk } from './reducers/listsSlice';
-import { getPlanningGroupsThink } from './reducers/groupSlice';
+import { getPlanningGroupsThunk } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
 import { mockUser } from './mocks/mockUsers';
 
@@ -251,7 +251,7 @@ describe('App', () => {
 
     mockedAxios.get.mockRejectedValueOnce(mockError);
 
-    await waitFor(() => store.dispatch(getGroupsThunk(new Date().getFullYear())));
+    await waitFor(() => store.dispatch(getPlanningGroupsThunk(new Date().getFullYear())));
 
     const storeError = store.getState().group.error as IError;
 

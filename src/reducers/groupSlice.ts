@@ -1,6 +1,6 @@
 import { IError } from '@/interfaces/common';
 import { IGroup, IGroupRequest } from '@/interfaces/groupInterfaces';
-import { deleteGroup, getCoordinatorGroups, getGroups, postGroup } from '@/services/groupServices';
+import { deleteGroup, getCoordinatorGroups, getPlanningGroups, postGroup } from '@/services/groupServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -21,8 +21,8 @@ const initialState: IGroupsState = {
 };
 export const getCoordinationGroupsThunk = createAsyncThunk(
   'group/getAllCoordinator',
-  async (_, thunkAPI) => {
-    return await getCoordinatorGroups()
+  async (year:number, thunkAPI) => {
+    return await getCoordinatorGroups(year)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -50,7 +50,7 @@ export const deleteGroupThunk = createAsyncThunk('group/delete', async (id: stri
 
 export const getPlanningGroupsThunk = createAsyncThunk('group/getAllPlanning', async (year: number, thunkAPI) => {
   try {
-    const groups = await getGroups(year);
+    const groups = await getPlanningGroups(year);
     return groups;
   } catch (e) {
     return thunkAPI.rejectWithValue(e);
