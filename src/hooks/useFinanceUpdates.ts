@@ -55,7 +55,7 @@ const useFinanceUpdates = () => {
           dispatch(updateClass({ data: planning.class, type })),
           dispatch(updateSubClass({ data: planning.subClass, type })),
           dispatch(updateDistrict({ data: planning.district, type })),
-          dispatch(updateGroup(planning.group)),
+          dispatch(updateGroup({ data: planning.group, type })),
         ]).catch((e) => console.log('Error updating planning finances: ', e));
       }
 
@@ -69,6 +69,7 @@ const useFinanceUpdates = () => {
           dispatch(updateCollectiveSubLevel(coordination.collectiveSubLevel)),
           dispatch(updateOtherClassification(coordination.otherClassification)),
           dispatch(updateOtherClassificationSubLevel(coordination.otherClassificationSubLevel)),
+          dispatch(updateGroup({ data: coordination.group, type })),
           dispatch(updateDistrict({ data: coordination.district, type })),
         ]).catch((e) => console.log('Error updating coordination finances: ', e));
       }

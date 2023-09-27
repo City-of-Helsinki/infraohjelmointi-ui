@@ -12,6 +12,7 @@ import searchReducer from './reducers/searchSlice';
 import groupReducer from './reducers/groupSlice';
 import eventsReducer from './reducers/eventsSlice';
 import planningReducer from './reducers/planningSlice';
+import sapCostReducer from './reducers/sapCostSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
@@ -28,6 +29,7 @@ export const storeItems = {
   group: groupReducer,
   events: eventsReducer,
   planning: planningReducer,
+  sapCosts: sapCostReducer,
 };
 
 const rootReducer = combineReducers(storeItems);

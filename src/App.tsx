@@ -24,9 +24,10 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getGroupsThunk } from './reducers/groupSlice';
+import { getCoordinationGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
+import { getSapCostsThunk } from './reducers/sapCostSlice';
 import moment from 'moment';
 import 'moment/locale/fi';
 import ScrollHandler from './components/shared/ScrollHandler';
@@ -40,6 +41,7 @@ import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
 import useFinanceUpdates from './hooks/useFinanceUpdates';
 import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
+import AccessDeniedView from './views/AccessDeniedView';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -71,7 +73,8 @@ const App: FC = () => {
   const loadPlanningData = async (year: number) => {
     dispatch(setIsPlanningLoading(true));
     try {
-      await dispatch(getGroupsThunk(year));
+      await dispatch(getPlanningGroupsThunk(year));
+      await dispatch(getCoordinationGroupsThunk(year));
       await dispatch(getPlanningClassesThunk(year));
       await dispatch(getPlanningLocationsThunk(year));
       await dispatch(getCoordinationClassesThunk(year));
@@ -88,7 +91,13 @@ const App: FC = () => {
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
-    if (user) {
+    if (!user) {
+      return;
+    }
+
+    if (user.ad_groups.length === 0) {
+      return setAppDataReady(true);
+    } else {
       initializeStates().catch(Promise.reject);
     }
   }, [user]);
@@ -97,6 +106,7 @@ const App: FC = () => {
   useEffect(() => {
     if (startYear) {
       loadPlanningData(startYear);
+      dispatch(getSapCostsThunk(startYear));
     }
   }, [startYear]);
 
@@ -124,6 +134,7 @@ const App: FC = () => {
                 <Route path="functions" element={<AdminFunctions />} />
                 <Route path="hashtags" element={<AdminHashtags />} />
               </Route>
+              <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="*" element={<ErrorView />} />
             </Routes>
           )}

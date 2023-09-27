@@ -40,6 +40,8 @@ import {
   getPlanningUrlFromCoordinationSelections,
 } from '@/utils/planningRowUtils';
 import YearSelector from './YearSelector/YearSelector';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
@@ -57,6 +59,7 @@ const PlanningToolbar = () => {
   const planningClasses = useAppSelector(selectBatchedPlanningClasses);
   const selections = useAppSelector(selectSelections);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const user = useAppSelector(selectUser);
 
   const groupsExpandIcon = useMemo(
     () => (groupsExpanded ? <IconCollapse /> : <IconSort />),
@@ -70,6 +73,12 @@ const PlanningToolbar = () => {
   const downloadIcon = useMemo(() => <IconDownload />, []);
 
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
+
+  // Only roles above "project planner" can create projects or groups
+  const isNewItemButtonDisabled = useMemo(
+    () => mode === 'coordination' || isUserOnlyViewer(user) || isUserOnlyProjectManager(user),
+    [user, mode],
+  );
 
   const navigate = useNavigate();
   const toggleGroupsExpanded = useCallback(() => {
@@ -155,6 +164,15 @@ const PlanningToolbar = () => {
     dispatch(setForcedToFrame(false));
   }, [dispatch, navigate, planningClasses, planningDistricts, selections]);
 
+  const isPlanningModeButtonDisabled = useMemo(
+    () => !forcedToFrame || mode === 'planning' || isUserOnlyViewer(user),
+    [forcedToFrame, mode, user],
+  );
+  const isForcedToFrameModeButtonDisabled = useMemo(
+    () => forcedToFrame || mode === 'coordination' || isUserOnlyViewer(user),
+    [forcedToFrame, mode, user],
+  );
+
   return (
     <Toolbar
       left={
@@ -196,7 +214,7 @@ const PlanningToolbar = () => {
               iconLeft={plusIcon}
               data-testid="new-item-button"
               onMouseDown={handleNewItemMenu}
-              disabled={mode === 'coordination'}
+              disabled={isNewItemButtonDisabled}
             >
               {t('new')}
             </Button>
@@ -236,7 +254,7 @@ const PlanningToolbar = () => {
             <button
               aria-label="ideal budget view"
               className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
-              disabled={!forcedToFrame || mode === 'planning'}
+              disabled={isPlanningModeButtonDisabled}
               onClick={moveToIdealView}
             >
               <IconMoneyBag />
@@ -244,7 +262,7 @@ const PlanningToolbar = () => {
             <button
               aria-label="force framed budget view"
               className={`money-button ${forcedToFrame ? 'selected' : ''}`}
-              disabled={forcedToFrame || mode === 'coordination'}
+              disabled={isForcedToFrameModeButtonDisabled}
               onClick={moveToForcedToFrameView}
             >
               <IconMoneyBagFill />

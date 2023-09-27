@@ -4,6 +4,8 @@ import { TFunction } from 'i18next';
 import { UseFormGetValues } from 'react-hook-form';
 import _ from 'lodash';
 import { isBefore } from './dates';
+import { isUserOnlyProjectAreaPlanner, isUserOnlyProjectManager } from './userRoleHelpers';
+import { IUser } from '@/interfaces/userInterfaces';
 
 export const validateMaxLength = (
   value: number,
@@ -96,4 +98,32 @@ export const getErrorText = (
   } else {
     return '';
   }
+};
+
+/**
+ *  Input is disabled based on user roles:
+ * - if the user is a project planner then all fields can be edited if the masterClass is 808,
+ * otherwise the given fields will be disabled
+ * - if the user is a project manager then all the given fields will be disabled
+ */
+export const canUserEditProjectFormField = (
+  selectedMasterClassName: string,
+  user: IUser | null,
+) => {
+  // If user is only project area planner then the form field will be disabled if
+  // the master class is selected and not 8 08
+  if (isUserOnlyProjectAreaPlanner(user)) {
+    if (!selectedMasterClassName) {
+      return false;
+    }
+
+    if (selectedMasterClassName?.startsWith('808') || selectedMasterClassName?.startsWith('8 08')) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // The form field is always disabled if the user is project manager
+  return isUserOnlyProjectManager(user);
 };

@@ -21,10 +21,10 @@ import { Route } from 'react-router';
 import mockProject from '@/mocks/mockProject';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
+import { mockUser } from '@/mocks/mockUsers';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(10000);
 
 const store = setupStore();
 
@@ -65,11 +65,15 @@ const render = async () =>
           },
           group: {
             ...store.getState().group,
-            groups: mockGroups.data,
+            planning: { ...store.getState().group.planning, groups: mockGroups.data },
           },
           lists: {
             ...store.getState().lists,
             phases: mockProjectPhases.data,
+          },
+          auth: {
+            ...store.getState().auth,
+            user: mockUser.data,
           },
         },
       },
@@ -127,6 +131,7 @@ describe('GroupDialog', () => {
   });
 
   it('can create new group with the groups form', async () => {
+    jest.setTimeout(10000);
     const renderResult = await render();
 
     const mockPostResponse = {

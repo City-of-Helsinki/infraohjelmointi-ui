@@ -103,7 +103,7 @@ const mockProject: { data: IProject } = {
     budgetForecast4CurrentYear: '0.00',
     projectProgram: 'Test program',
     updatedDate: '2023-06-19T15:12:02.526074+03:00',
-    projectGroup: null,
+    projectGroup: 'test-group-1',
     favPersons: [],
     hashTags: ['hashtag-1', 'hashtag-2'],
     pwFolderLink:

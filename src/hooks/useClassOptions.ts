@@ -6,6 +6,13 @@ import {
 import { classesToOptions } from '@/utils/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
+import { selectUser } from '@/reducers/authSlice';
+import {
+  isUserAdmin,
+  isUserCoordinator,
+  isUserOnlyProjectAreaPlanner,
+  isUserPlanner,
+} from '@/utils/userRoleHelpers';
 
 /**
  * Creates lists of masterClasses, classes and subClasses. If filtering is used, then all
@@ -14,6 +21,7 @@ import { useAppSelector } from './common';
  * @param withFilter boolean if filtering should be used
  */
 const useClassOptions = (currentClass: string | undefined) => {
+  const user = useAppSelector(selectUser);
   const masterClasses = useAppSelector(selectPlanningMasterClasses);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
@@ -59,8 +67,20 @@ const useClassOptions = (currentClass: string | undefined) => {
     }
   }, [classes, currentClass, selectedClass, selectedSubClass, subClasses]);
 
+  const filteredMasterClasses = useMemo(() => {
+    if (
+      isUserOnlyProjectAreaPlanner(user) &&
+      (!selectedMasterClass?.name.startsWith('808') ||
+        !selectedMasterClass?.name.startsWith('8 08'))
+    ) {
+      return masterClasses.filter((mc) => mc.name.startsWith('808') || mc.name.startsWith('8 08'));
+    } else if (isUserPlanner(user) || isUserCoordinator(user) || isUserAdmin(user)) {
+      return masterClasses;
+    } else return [];
+  }, [user, masterClasses]);
+
   return {
-    masterClasses: classesToOptions(masterClasses),
+    masterClasses: classesToOptions(filteredMasterClasses),
     classes: classesToOptions(getNextClasses()),
     subClasses: classesToOptions(getNextSubClasses()),
   };

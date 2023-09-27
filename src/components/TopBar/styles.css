@@ -2,6 +2,10 @@
   @apply !p-0 !font-light !text-black-80;
 }
 
+.search-button:disabled {
+  color: var(--color-black-20) !important;
+}
+
 /* 
 add HDS navigation border to make the top-bar-container look like the HDS navigation and add some padding 
 to center the navigation, this is needed because the .back-button-container otherwise makes the navigation un-even

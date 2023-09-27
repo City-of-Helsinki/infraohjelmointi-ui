@@ -11,9 +11,17 @@ interface IListFieldProps {
   fields?: Array<IForm>;
   readOnly?: boolean;
   cancelEdit?: boolean;
+  disabled?: boolean;
 }
 
-const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly, cancelEdit }) => {
+const ListField: FC<IListFieldProps> = ({
+  name,
+  label,
+  fields,
+  readOnly,
+  cancelEdit,
+  disabled,
+}) => {
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
 
@@ -32,7 +40,11 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly, cancelE
     <div className="input-wrapper" id={name} data-testid={name}>
       <div className="flex flex-col">
         <div style={{ marginBottom: '1rem' }}>
-          <FormFieldLabel text={t(label)} onClick={readOnly ? undefined : handleSetEditing} />
+          <FormFieldLabel
+            disabled={disabled}
+            text={t(label)}
+            onClick={readOnly ? undefined : handleSetEditing}
+          />
         </div>
         {fields?.map((f) => (
           <Controller
@@ -48,6 +60,7 @@ const ListField: FC<IListFieldProps> = ({ name, label, fields, readOnly, cancelE
                 ) : (
                   <>
                     <NumberInput
+                      disabled={disabled}
                       className="list-field-input"
                       {...field}
                       label={''}

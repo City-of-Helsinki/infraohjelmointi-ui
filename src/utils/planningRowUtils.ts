@@ -33,9 +33,12 @@ export const filterProjectsForCoordinatorRow = (
   projects: Array<IProject>,
 ) => {
   const getProjectsForClasses = () =>
-    projects.filter((p) => !p.projectLocation && p.projectClass === id);
+    projects.filter((p) => !p.projectLocation && !p.projectGroup && p.projectClass === id);
 
-  const getProjectsForLocation = () => projects.filter((p) => p.projectLocation === id);
+  const getProjectsForGroup = () => projects.filter((p) => p.projectGroup === id);
+
+  const getProjectsForLocation = () =>
+    projects.filter((p) => p.projectLocation === id && !p.projectGroup);
 
   switch (type) {
     case 'class':
@@ -43,6 +46,8 @@ export const filterProjectsForCoordinatorRow = (
     case 'collectiveSubLevel':
     case 'otherClassification':
       return sortByName(getProjectsForClasses()) as Array<IProject>;
+    case 'group':
+      return sortByName(getProjectsForGroup()) as Array<IProject>;
     case 'district':
     case 'subLevelDistrict':
     case 'division':

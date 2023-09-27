@@ -131,7 +131,9 @@ export const getCellTypeUpdateRequestData = (
     updateConstructionStart();
 
     if (prevCellIsPlanning) {
-      req.estPlanningEnd = estPlanningEnd ?addYear(estPlanningEnd) : createDateToEndOfYear(cell.year);;
+      req.estPlanningEnd = estPlanningEnd
+        ? addYear(estPlanningEnd)
+        : createDateToEndOfYear(cell.year);
       return;
     }
 

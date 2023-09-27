@@ -11,6 +11,9 @@ import {
   IconLocation,
   IconScrollCogwheel,
 } from 'hds-react';
+import { useAppSelector } from '@/hooks/common';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserAdmin, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 /**
  * Custom Sidebar, since the HDS sidebar wasn't suited for our needs
@@ -18,6 +21,7 @@ import {
 const SideBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const user = useAppSelector(selectUser);
 
   const { t } = useTranslation();
 
@@ -28,13 +32,13 @@ const SideBar = () => {
       route: 'coordination',
       label: t('coordination'),
       component: <IconBinoculars style={iconStyles} />,
-      disabled: false,
+      disabled: isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
     {
       route: 'planning',
       label: t('planning'),
       component: <IconScrollCogwheel style={iconStyles} />,
-      disabled: false,
+      disabled: user?.ad_groups.length === 0,
     },
     {
       route: 'placeholder 1',
@@ -52,7 +56,7 @@ const SideBar = () => {
       route: 'reports',
       label: t('reports'),
       component: <IconGraphColumns style={iconStyles} />,
-      disabled: false,
+      disabled: isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
     {
       route: 'placeholder 4',
@@ -64,7 +68,7 @@ const SideBar = () => {
       route: 'admin/functions',
       label: t('admin'),
       component: <IconCogwheel style={iconStyles} />,
-      disabled: false,
+      disabled: !isUserAdmin(user),
     },
   ];
 

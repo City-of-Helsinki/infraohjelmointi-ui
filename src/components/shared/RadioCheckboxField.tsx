@@ -11,9 +11,16 @@ interface IRadioCheckboxFieldProps {
   control: HookFormControlType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
+  disabled?: boolean;
 }
 
-const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control, rules }) => {
+const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({
+  name,
+  label,
+  control,
+  rules,
+  disabled,
+}) => {
   const { t } = useTranslation();
   const options = [
     { value: 'yes', label: 'Kyllä' },
@@ -40,6 +47,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({ name, label, control
             id="radio-checkbox"
             errorText={error?.message}
             required={true}
+            disabled={disabled}
           >
             {options?.map((o, i) => (
               <HDSRadioButton

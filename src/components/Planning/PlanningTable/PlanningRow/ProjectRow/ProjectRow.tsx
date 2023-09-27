@@ -5,16 +5,18 @@ import useProjectRow from '@/hooks/useProjectRow';
 import useClickOutsideRef from '@/hooks/useClickOutsideRef';
 import ProjectHead from './ProjectHead';
 import './styles.css';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 interface IProjectRowProps {
   project: IProject;
   isSearched?: boolean;
   parentId: string;
+  sapCosts: Record<string, IProjectSapCost>;
 }
 
-const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId }) => {
+const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCosts }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
-  const { cells, sums, projectFinances } = useProjectRow(project);
+  const { cells, sums, projectFinances } = useProjectRow(project, sapCosts[project.id]);
 
   // Remove the active css-class from the current row if the user clicks outside of it
   useClickOutsideRef(
@@ -36,7 +38,12 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId }) => 
       {/* HEADER */}
       <ProjectHead project={project} sums={sums} />
       {cells.map((c) => (
-        <ProjectCell key={c.financeKey} cell={c} projectFinances={projectFinances} />
+        <ProjectCell
+          key={c.financeKey}
+          cell={c}
+          projectFinances={projectFinances}
+          sapCosts={sapCosts}
+        />
       ))}
     </tr>
   );

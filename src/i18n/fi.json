@@ -1,7 +1,9 @@
 {
   "error": {
     "404": "404",
+    "accessDenied": "Pääsy evätty",
     "pageNotFound": "Sivua ei löytynyt",
+    "accessDeniedContactSupport": "Sinun käyttäjälläsi ei ole oikeuksia infrahankkeiden ohjelmointi -työkalun käyttöön, ohta yhteyttä ylläpitoon.",
     "returnToFrontPage": "Palaa etusivulle",
     "hashtagUnique": "Tunniste on jo olemassa."
   },

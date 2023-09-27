@@ -187,6 +187,8 @@ const useProjectForm = () => {
     mode: 'onBlur',
   });
 
+  const [selectedMasterClassName, setSelectedMasterClassName] = useState<string>('');
+
   const [selections, setSelections] = useState({ selectedClass: '', selectedLocation: '' });
 
   // using this useEffect to populate class/location selections with initial values if a project has them
@@ -196,6 +198,7 @@ const useProjectForm = () => {
     const lowestSelectedLocation =
       formValues.subDivision.value || formValues.division.value || formValues.district.value;
     setSelections({ selectedClass: lowestSelectedClass, selectedLocation: lowestSelectedLocation });
+    setSelectedMasterClassName(formValues.masterClass.label ?? '');
   }, [formValues]);
 
   // control,
@@ -267,7 +270,7 @@ const useProjectForm = () => {
     }
   }, [project, projectMode]);
 
-  return { formMethods, classOptions, locationOptions };
+  return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
 
 export default useProjectForm;

@@ -22,7 +22,11 @@ import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
 import _ from 'lodash';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectForcedToFrame, selectSelectedYear } from '@/reducers/planningSlice';
+import {
+  selectForcedToFrame,
+  selectSelectedYear,
+  selectSelections,
+} from '@/reducers/planningSlice';
 import {
   getCellTypeUpdateRequestData,
   getRemoveRequestData,
@@ -32,10 +36,14 @@ import {
   convertToForcedToFrameProjectRequest,
 } from './projectCellUtils';
 import { notifyError } from '@/reducers/notificationSlice';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
+  sapCosts: Record<string, IProjectSapCost>;
 }
 
 interface IProjectCellState {
@@ -43,12 +51,15 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapCosts }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+
+  const user = useAppSelector(selectUser);
+  const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
 
   const [projectCellState, setProjectCellState] = useState<IProjectCellState>({
     isReadOnly: true,
@@ -63,7 +74,21 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
     [formValue, type],
   );
 
-  const inputDisabled = useMemo(() => type === 'none', [type]);
+  const inputDisabled = useMemo(() => {
+    if (type === 'none') {
+      return true;
+    }
+
+    // Project area planner can only edit projects under masterclass 808
+    if (isUserOnlyProjectAreaPlanner(user)) {
+      return !(
+        selectedMasterClass?.name.startsWith('808') || selectedMasterClass?.name.startsWith('8 08')
+      );
+    }
+
+    // Disable editing project budgets if user is only a viewer
+    return isUserOnlyViewer(user);
+  }, [type, user, selectedMasterClass]);
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
@@ -247,7 +272,9 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances }) => {
             />
           ))}
       </td>
-      {selectedYearClass && <ProjectYearSummary cellType={cellTypeClass} {...cell} />}
+      {selectedYearClass && (
+        <ProjectYearSummary cellType={cellTypeClass} {...cell} sapCosts={sapCosts} />
+      )}
     </>
   );
 };
