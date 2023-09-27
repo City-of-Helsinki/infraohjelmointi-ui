@@ -164,6 +164,15 @@ const PlanningToolbar = () => {
     dispatch(setForcedToFrame(false));
   }, [dispatch, navigate, planningClasses, planningDistricts, selections]);
 
+  const isPlanningModeButtonDisabled = useMemo(
+    () => !forcedToFrame || mode === 'planning' || isUserOnlyViewer(user),
+    [forcedToFrame, mode, user],
+  );
+  const isForcedToFrameModeButtonDisabled = useMemo(
+    () => forcedToFrame || mode === 'coordination' || isUserOnlyViewer(user),
+    [forcedToFrame, mode, user],
+  );
+
   return (
     <Toolbar
       left={
@@ -245,7 +254,7 @@ const PlanningToolbar = () => {
             <button
               aria-label="ideal budget view"
               className={`money-button ${!forcedToFrame ? 'selected' : ''}`}
-              disabled={!forcedToFrame || mode === 'planning'}
+              disabled={isPlanningModeButtonDisabled}
               onClick={moveToIdealView}
             >
               <IconMoneyBag />
@@ -253,7 +262,7 @@ const PlanningToolbar = () => {
             <button
               aria-label="force framed budget view"
               className={`money-button ${forcedToFrame ? 'selected' : ''}`}
-              disabled={forcedToFrame || mode === 'coordination'}
+              disabled={isForcedToFrameModeButtonDisabled}
               onClick={moveToForcedToFrameView}
             >
               <IconMoneyBagFill />
