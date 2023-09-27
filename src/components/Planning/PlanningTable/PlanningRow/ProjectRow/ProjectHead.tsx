@@ -8,8 +8,10 @@ import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
 import { IconMenuDots } from 'hds-react/icons';
 import optionIcon from '@/utils/optionIcon';
-import { useAppDispatch } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { notifyError } from '@/reducers/notificationSlice';
+import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { selectUser } from '@/reducers/authSlice';
 
 interface IProjectHeadProps {
   project: IProject;
@@ -18,6 +20,7 @@ interface IProjectHeadProps {
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
+  const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
 
   const projectPhase = project.phase?.value;
@@ -53,7 +56,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         <div className="project-left-icons-container">
           <IconMenuDots
             size="xs"
-            className="cursor-pointer"
+            className={isUserOnlyViewer(user) ? 'pointer-events-none' : 'cursor-pointer'}
             data-testid={`edit-phase-${project.id}`}
             onMouseDown={handleOpenPhaseMenu}
           />
@@ -63,7 +66,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         <div className="project-name-container">
           <Link
             to={`/project/${project.id}/basics`}
-            className="project-name-button"
+            className={`project-name-button ${isUserOnlyViewer(user) ? 'pointer-events-none' : ''}`}
             data-testid={`navigate-${project.id}`}
           >
             {project.name}

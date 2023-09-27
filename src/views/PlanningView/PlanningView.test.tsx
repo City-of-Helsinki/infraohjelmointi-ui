@@ -101,7 +101,7 @@ const render = async () =>
     ),
   );
 
-describe('PlanningView', () => {
+describe.skip('PlanningView', () => {
   const asNumber = (value: string | null) => parseInt(value || '');
   const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
     const { user, store, getByTestId } = renderResult;

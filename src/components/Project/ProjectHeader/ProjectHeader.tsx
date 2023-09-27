@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
@@ -14,6 +14,7 @@ import { useOptions } from '@/hooks/useOptions';
 import { useTranslation } from 'react-i18next';
 import { patchProject } from '@/services/projectServices';
 import _ from 'lodash';
+import { selectGroups } from '@/reducers/groupSlice';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -23,10 +24,17 @@ const ProjectHeader: FC = () => {
   const project = useAppSelector(selectProject);
   const projectId = project?.id;
   const user = useAppSelector(selectUser);
-  const group = 'Hakaniemi';
+  const groups = useAppSelector(selectGroups);
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
   const { formMethods } = useProjectHeaderForm();
+
+  const projectGroupName = useMemo(() => {
+    if (!project?.projectGroup) {
+      return '';
+    }
+    return groups.find((g) => g.id === project.projectGroup)?.name;
+  }, [groups, project?.projectGroup]);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -89,7 +97,7 @@ const ProjectHeader: FC = () => {
                 <ProjectFavouriteField control={control} />
               </div>
               <p className="text-white">{t('inGroup')}</p>
-              <p className="text-l font-bold text-white">{group}</p>
+              <p className="text-l font-bold text-white">{projectGroupName}</p>
             </div>
           </div>
         </div>
