@@ -32,13 +32,13 @@ const SideBar = () => {
       route: 'coordination',
       label: t('coordination'),
       component: <IconBinoculars style={iconStyles} />,
-      disabled: isUserOnlyViewer(user),
+      disabled: isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
     {
       route: 'planning',
       label: t('planning'),
       component: <IconScrollCogwheel style={iconStyles} />,
-      disabled: false,
+      disabled: user?.ad_groups.length === 0,
     },
     {
       route: 'placeholder 1',
@@ -56,7 +56,7 @@ const SideBar = () => {
       route: 'reports',
       label: t('reports'),
       component: <IconGraphColumns style={iconStyles} />,
-      disabled: isUserOnlyViewer(user),
+      disabled: isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
     {
       route: 'placeholder 4',

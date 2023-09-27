@@ -16,7 +16,7 @@ const TopBar: FC = () => {
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
-  const { Dropdown, Actions, User, Item } = Navigation;
+  const { Dropdown, Actions, User } = Navigation;
 
   const handleOpenSearch = useCallback(() => dispatch(toggleSearch()), [dispatch]);
 
@@ -50,6 +50,7 @@ const TopBar: FC = () => {
             <Button
               variant="supplementary"
               iconLeft={<IconSearch />}
+              disabled={user?.ad_groups.length === 0}
               onClick={handleOpenSearch}
               data-testid="search-projects"
               className="search-button"
@@ -62,14 +63,9 @@ const TopBar: FC = () => {
               // temporary uuid here until we get the user's name from helsinki-profiili
               userName={`${user?.first_name} ${user?.last_name}`}
               authenticated={!!user}
-            >
-              <Item label={'Tietoa käyttäjästä'} />
-            </User>
+            />
             {/* notifications */}
-            <Dropdown label={t('nav.notifications')} icon={<IconBell />}>
-              <Item label={'Ilmoitus'} />
-              <Item label={'Ilmoitus'} />
-            </Dropdown>
+            <Dropdown label={t('nav.notifications')} icon={<IconBell />} />
           </Actions>
         </Navigation>
       </div>

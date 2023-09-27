@@ -41,6 +41,7 @@ import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
 import useFinanceUpdates from './hooks/useFinanceUpdates';
 import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
+import AccessDeniedView from './views/AccessDeniedView';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -90,7 +91,13 @@ const App: FC = () => {
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
-    if (user) {
+    if (!user) {
+      return;
+    }
+
+    if (user.ad_groups.length === 0) {
+      return setAppDataReady(true);
+    } else {
       initializeStates().catch(Promise.reject);
     }
   }, [user]);
@@ -127,6 +134,7 @@ const App: FC = () => {
                 <Route path="functions" element={<AdminFunctions />} />
                 <Route path="hashtags" element={<AdminHashtags />} />
               </Route>
+              <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="*" element={<ErrorView />} />
             </Routes>
           )}
