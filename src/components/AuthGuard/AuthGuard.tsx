@@ -8,8 +8,6 @@ import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils
 
 const INITIAL_PATH = 'initialPath';
 
-const API_TOKEN = sessionStorage.getItem('infraohjelmointi_api_token');
-
 /**
  * Component to handle authentication stuff
  */
@@ -36,6 +34,12 @@ const AuthGuard: FC = () => {
         if (!user || (user?.uuid !== oidcUser.profile.sub && !auth.isLoading)) {
           try {
             await dispatch(getUserThunk());
+
+            if (!user || user.ad_groups.length === 0) {
+              localStorage.removeItem(INITIAL_PATH);
+              return;
+            }
+
             // Since the redirect from login will bring the url back to REACT_APP_REDIRECT_URI path, we need to
             // return the user to the path that it initially navigated to when opening the app
             const initialPath = localStorage.getItem(INITIAL_PATH);
@@ -52,7 +56,7 @@ const AuthGuard: FC = () => {
 
       getApiTokenAndUser();
     }
-  }, [oidcUser, API_TOKEN]);
+  }, [oidcUser, user, auth.isLoading, dispatch, navigate]);
 
   // Check if user exists and sign in
   useEffect(() => {
@@ -65,7 +69,7 @@ const AuthGuard: FC = () => {
       auth.signinRedirect();
       setHasTriedSignin(true);
     }
-  }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin]);
+  }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin, location, auth]);
 
   // Redirect user from forbidden paths
   useEffect(() => {
@@ -91,10 +95,10 @@ const AuthGuard: FC = () => {
     }
 
     // Redirect users without roles to /access-denied
-    if (user.ad_groups.length === 0) {
+    if (!pathname.includes('access-denied') && user.ad_groups.length === 0) {
       return navigate('access-denied');
     }
-  }, [location, user]);
+  }, [location, navigate, user]);
 
   return <></>;
 };

@@ -91,15 +91,7 @@ const App: FC = () => {
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    if (user.ad_groups.length === 0) {
-      return setAppDataReady(true);
-    } else {
-      initializeStates().catch(Promise.reject);
-    }
+    initializeStates().catch(Promise.reject);
   }, [user]);
 
   // Changing the startYear in the planning view will trigger a re-fetch of all the planning data
@@ -108,7 +100,7 @@ const App: FC = () => {
       loadPlanningData(startYear);
       dispatch(getSapCostsThunk(startYear));
     }
-  }, [startYear]);
+  }, [startYear, user]);
 
   return (
     <div>
