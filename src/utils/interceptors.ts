@@ -8,6 +8,8 @@ let store: AppStore;
 
 const API_TOKEN_KEY = 'infraohjelmointi_api_token';
 
+const { REACT_APP_AUTHORITY } = process.env;
+
 // Add urls here that you don't want the interceptor to add a loader to
 const urlsToExclueFromLoading = [
   '/project-types/',
@@ -60,6 +62,17 @@ axios.interceptors.response.use(
 );
 
 const handleRequest = (req: InternalAxiosRequestConfig) => {
+  if (req.url?.startsWith(REACT_APP_AUTHORITY as string)) {
+    return req;
+  }
+
+  const user = store.getState().auth.user;
+
+  if ((!user || user?.ad_groups.length === 0) && !req.url?.includes('/who-am-i/')) {
+    throw new axios.Cancel('Operation canceled.');
+  }
+
+  // if(req.url )
   // Check if the url should add a loader to redux
   if (shouldTriggerLoading(req?.url)) {
     store.dispatch(setLoading({ text: 'Loading request', id: req?.url ?? '' }));
@@ -105,6 +118,11 @@ const getErrorNotification = (error: AxiosError): INotification => {
 
 const handleError = (error: AxiosError): Promise<IError> => {
   const errorData = error.response?.data as IErrorResponse;
+
+  // Don't handle errors
+  if (error?.code === AxiosError.ERR_CANCELED) {
+    return Promise.reject();
+  }
 
   const parsedError: IError = {
     status: error.response?.status,
