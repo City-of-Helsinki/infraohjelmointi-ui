@@ -67,13 +67,12 @@ export interface IPlanningRowSelections {
 export interface IPlanningNotesDialogData {
   name: string;
   id: string;
+  selectedYear: number | null;
 }
 
 export interface IPlanningNotesModalData {
   name: string;
   id: string;
- // date: string;
- //updatedBy: string;
 }
 
 export interface IPlanningRow extends IPlanningSums {

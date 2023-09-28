@@ -4,9 +4,11 @@ import { t } from "i18next";
 import { selectNotes, selectNotesModalData, selectNotesModalOpen, setNotesDialogData, setNotesDialogOpen, setNotesModalOpen } from "@/reducers/planningSlice";
 import { IconCross } from "hds-react";
 import './styles.css';
+import { dateStringToMoment } from "@/utils/dates";
 
 interface ICoordinatorNotesProps {
     id: string;
+    selectedYear: number|null;
 }
 
 const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
@@ -21,12 +23,15 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
 
     const Notes = () => {
         if (notes.length) {
-            const matchingNotes = notes.filter((note) => note.planningClassId === props.id);
+            const matchingNotes = notes.filter((note) => (
+                note.year === String(props.selectedYear) && note.planningClassId === props.id
+            ));
             const mappedNotes = matchingNotes.map((note, index) => {
                 return (
                     <Fragment key={index}>
                         <p>{note.coordinatorNote}</p>
                         <p id="coordinator">{note.updatedByFirstName} {note.updatedByLastName}</p>
+                        <p id="date">{dateStringToMoment(note.createdDate)}</p>
                     </Fragment>
                 )
             });
@@ -54,7 +59,11 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
                     </section>
                     <hr />
                     <section className="dialog-bottom-part">
-                        <button className="dialog-add-note" onClick={() => {dispatch(setNotesDialogOpen(true)); dispatch(setNotesDialogData({name: modalData.name, id: props.id}))}}>{t('addNewNote')}</button>
+                        <button className="dialog-add-note" onClick={() => {
+                                dispatch(setNotesDialogOpen(true)); 
+                                dispatch(setNotesDialogData({name: modalData.name, id: props.id, selectedYear: props.selectedYear}))}
+                            }>{t('addNewNote')}
+                        </button>
                     </section>
                 </section>
             }

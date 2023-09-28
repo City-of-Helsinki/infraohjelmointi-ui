@@ -1,7 +1,7 @@
 import { FC, useState, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
 import { t } from "i18next";
-import { postCoordinatorNoteToProjectThunk, selectNotesDialogData, selectNotesDialogOpen, setNotesDialogOpen } from "@/reducers/planningSlice";
+import { getCoordinatorNotesByProjectThunk, postCoordinatorNoteToProjectThunk, selectNotesDialogData, selectNotesDialogOpen, setNotesDialogOpen } from "@/reducers/planningSlice";
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, IconCross } from "hds-react";
 import { Dialog } from 'hds-react/components/Dialog';
@@ -14,7 +14,6 @@ const CoordinatorNotesDialog: FC = () => {
     const user = useAppSelector(selectUser);
     const dialogOpen = useAppSelector(selectNotesDialogOpen);
     const dialogData = useAppSelector(selectNotesDialogData);
-
     const [textAreaContent, setTextAreaContent] = useState('');
     const noteId = 'add-coordinator-note-title';
     const descriptionId = 'add-coordinator-note-content';
@@ -23,7 +22,7 @@ const CoordinatorNotesDialog: FC = () => {
         dispatch(setNotesDialogOpen(false))
     }, []);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const data = {
             coordinatorNote: textAreaContent, 
             planningClass: dialogData.name,
@@ -31,22 +30,21 @@ const CoordinatorNotesDialog: FC = () => {
             updatedByFirstName: user?.first_name || 'null',
             updatedByLastName: user?.last_name || 'null',
             updatedById: user?.id || 'null',
+            year: String(dialogData.selectedYear),
         }
+        
+        const setSuccessNotification = (name: string) => {
+                dispatch(notifySuccess({
+                    message: 'noteAddedToClass',
+                    title: 'noteAddSuccess',
+                    type: 'toast',
+                    duration: 3000,
+                    parameter: name
+                    }),
+                );
+        };
 
-       dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNoteRequest)).then(() => setTextAreaContent(''));
-    }
-
-    const setSuccessNotification = (planningClass: string) => {
-        try {
-            dispatch(notifySuccess({
-                message: 'noteAddedToClass',
-                title: 'noteAddSuccess',
-                type: 'toast',
-                duration: 3000,
-                parameter: planningClass
-                }),
-            );
-        } catch (e) {
+        const setErrorNotification = () => {
             dispatch(notifyError({
                 title: 'noteAddError',
                 type: 'toast',
@@ -54,7 +52,22 @@ const CoordinatorNotesDialog: FC = () => {
                 }),
             );
         }
-    };
+
+        const res = await dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNoteRequest))
+        try {
+            if (!res.type.includes('rejected')) {
+                setSuccessNotification(dialogData.name);
+                setTextAreaContent('');
+                handleClose();
+                dispatch(getCoordinatorNotesByProjectThunk());
+            }  else {
+                setErrorNotification();
+            }
+        } catch (e) {
+            setErrorNotification();
+        }
+    }
+
     return( 
         <>
             {dialogOpen && 
@@ -82,7 +95,7 @@ const CoordinatorNotesDialog: FC = () => {
                         </section>
                         <hr />
                         <section className="dialog-bottom-part">
-                            <Button id="add-note-button" onClick={() => {handleSubmit(); setSuccessNotification(dialogData.name);}} variant="primary" data-testid="cancel-note">
+                            <Button id="add-note-button" onClick={() => handleSubmit()} variant="primary" data-testid="cancel-note">
                                 {t('addNote')}
                             </Button>
                             <Button onClick={() => handleClose()} variant="secondary" data-testid="cancel-note">

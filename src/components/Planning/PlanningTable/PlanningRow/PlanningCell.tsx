@@ -1,10 +1,9 @@
-import { FC, memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
-  getCoordinatorNotesByProjectThunk,
   selectForcedToFrame,
   selectPlanningMode,
   selectSelectedYear,
@@ -129,10 +128,6 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
     () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
     [isFrameBudgetOverlap],
   ); 
-  
-  useEffect(() => {
-        dispatch(getCoordinatorNotesByProjectThunk(id));
-  }, []);
 
   const isEditFrameBudgetDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame,
@@ -206,12 +201,12 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                 onMouseLeave={() => removeHoveredClassFromMonth(m)}
               >
                 <span onClick={() => {
-                  dispatch(setNotesModalOpen({isOpen: true, id: id}));
-                  dispatch(setNotesModalData({name: name, id: id}))
+                  dispatch(setNotesModalOpen({isOpen: true, id}));
+                  dispatch(setNotesModalData({name, id}))
                 }}>
                   <IconSpeechbubble color="white" />
                 </span>
-                <CoordinatorNotesModal id={id}/>
+                <CoordinatorNotesModal id={id} selectedYear={selectedYear}/>
               </td>
             </>
             :

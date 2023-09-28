@@ -38,8 +38,8 @@ interface IPlanningState {
 
 export const getCoordinatorNotesByProjectThunk = createAsyncThunk(
   'coordinatorNotes/getByProject',
-  async (projectId: string, thunkAPI) => {
-    return await getCoordinatorNotesByProject(projectId)
+  async (_, thunkAPI) => {
+    return await getCoordinatorNotesByProject()
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -74,7 +74,7 @@ const initialState: IPlanningState = {
   forcedToFrame: false,
   isLoading: false,
   notesDialogOpen: false,
-  notesDialogData: {name: '', id: ''},
+  notesDialogData: {name: '', id: '', selectedYear: null},
   notesModalOpen: {isOpen: false, id: ''},
   notesModalData: {name: '', id: ''},
   coordinatorNotes: [],
@@ -155,10 +155,9 @@ export const planningSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    // NOTES GET
     builder.addCase(
       getCoordinatorNotesByProjectThunk.fulfilled,
-      (state, action: PayloadAction<Array<ICoordinatorNoteRequest>>) => {
+      (state, action: PayloadAction<ICoordinatorNoteRequest[]>) => {
         return { ...state, coordinatorNotes: action.payload };
       },
     );
