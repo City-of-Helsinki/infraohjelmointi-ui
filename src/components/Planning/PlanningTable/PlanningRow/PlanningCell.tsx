@@ -5,6 +5,7 @@ import PlanningForecastSums from './PlanningForecastSums';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
+  selectNotes,
   selectPlanningMode,
   selectSelectedYear,
   selectStartYear,
@@ -26,7 +27,7 @@ import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
-import { IconSpeechbubble } from 'hds-react';
+import { IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
 
 interface IPlanningCellProps extends IPlanningRow {
@@ -60,6 +61,12 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const UPDATE_CELL_DATA = 'update-cell-data';
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
+
+  const notes = useAppSelector(selectNotes);
+ 
+  const matchingNotes = notes.filter((note) => (
+      note.year === String(selectedYear) && note.planningClassId === id
+  ));
 
   const onEditFrameBudget = useCallback(() => {
     setEditFrameBudget((current) => !current);
@@ -204,7 +211,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                   dispatch(setNotesModalOpen({isOpen: true, id}));
                   dispatch(setNotesModalData({name, id}))
                 }}>
-                  <IconSpeechbubble color="white" />
+                  { matchingNotes.length ? <IconSpeechbubbleText color="white" /> : <IconSpeechbubble color="white" /> }
                 </span>
                 <CoordinatorNotesModal id={id} selectedYear={selectedYear}/>
               </td>
