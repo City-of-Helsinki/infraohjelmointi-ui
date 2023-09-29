@@ -71,7 +71,7 @@ const App: FC = () => {
   };
 
   const loadPlanningData = async (year: number) => {
-    dispatch(setIsPlanningLoading(true));
+    await dispatch(setIsPlanningLoading(true));
     try {
       await dispatch(getPlanningGroupsThunk(year));
       await dispatch(getCoordinationGroupsThunk(year));
@@ -83,9 +83,9 @@ const App: FC = () => {
       await dispatch(getForcedToFrameLocationsThunk(year));
     } catch (e) {
       console.log('Error loading planning data: ', e);
-      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+      await dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
     } finally {
-      dispatch(setIsPlanningLoading(false));
+      await dispatch(setIsPlanningLoading(false));
     }
   };
 
