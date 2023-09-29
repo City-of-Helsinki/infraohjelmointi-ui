@@ -52,19 +52,20 @@ const CoordinatorNotesDialog: FC = () => {
                 }),
             );
         }
-
-        const res = await dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNoteRequest))
-        try {
-            if (!res.type.includes('rejected')) {
-                setSuccessNotification(dialogData.name);
-                setTextAreaContent('');
-                handleClose();
-                dispatch(getCoordinatorNotesByProjectThunk());
-            }  else {
+        if (textAreaContent.length > 0) {
+            const res = await dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNoteRequest))
+            try {
+                if (!res.type.includes('rejected')) {
+                    setSuccessNotification(dialogData.name);
+                    setTextAreaContent('');
+                    handleClose();
+                    dispatch(getCoordinatorNotesByProjectThunk());
+                }  else {
+                    setErrorNotification();
+                }
+            } catch (e) {
                 setErrorNotification();
             }
-        } catch (e) {
-            setErrorNotification();
         }
     }
 
@@ -91,6 +92,7 @@ const CoordinatorNotesDialog: FC = () => {
                                 className="dialog-textarea"
                                 value={textAreaContent}
                                 onChange={e => setTextAreaContent(e.target.value)}
+                                required
                             ></textarea>
                         </section>
                         <hr />

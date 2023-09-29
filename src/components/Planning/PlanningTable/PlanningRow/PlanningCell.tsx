@@ -213,7 +213,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                 }}>
                   { matchingNotes.length ? <IconSpeechbubbleText color="white" /> : <IconSpeechbubble color="white" /> }
                 </span>
-                <CoordinatorNotesModal id={id} selectedYear={selectedYear}/>
+                <CoordinatorNotesModal id={id} type={type} selectedYear={selectedYear}/>
               </td>
             </>
             :

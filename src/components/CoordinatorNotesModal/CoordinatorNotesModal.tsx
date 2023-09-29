@@ -8,6 +8,7 @@ import { dateStringToMoment } from "@/utils/dates";
 
 interface ICoordinatorNotesProps {
     id: string;
+    type: string;
     selectedYear: number|null;
 }
 
@@ -40,13 +41,33 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
         return <p>{t('noNotesYet')}</p>;
     };
     
+    const split = (str: string, index: number) => [str.slice(0, index), str.slice(index)][1];
+
+    const formatClassName = () => {
+        // delete numbers from the start of the name
+        switch(props.type) {
+            case 'masterClass': {
+                return split(modalData.name, 4);
+            }   
+            case 'class': {
+                return split(modalData.name, 8);
+            }
+            case 'subClass': {
+                return split(modalData.name, 11);
+            }
+            default: {
+                return modalData.name;
+            }
+        }
+    }
+
     return( 
         <>
             { modalOpen.isOpen && modalOpen.id === props.id &&
                 <section className="dialog-container">
                     <section className="dialog-top-part">
                         <div id="left">
-                            <h1>{modalData.name}</h1>
+                            <h1>{formatClassName()}</h1>
                             <h2>{t('memo')}</h2>
                         </div>
                         <div id="right">
