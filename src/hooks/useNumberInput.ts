@@ -15,7 +15,7 @@ const useNumberInput = (value?: string) => {
     }
     // If value is just a zero replace it
     else {
-      setInputValue(e.target.value ? +e.target.value : 0);
+      setInputValue(e.target.value ? e.target.value : 0);
     }
   }, []);
 
