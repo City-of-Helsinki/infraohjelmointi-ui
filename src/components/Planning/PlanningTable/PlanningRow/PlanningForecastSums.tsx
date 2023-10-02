@@ -69,7 +69,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
 
   const isEditBudgetChangeDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame || editBudgetChange,
-    [forcedToFrame, mode, user],
+    [forcedToFrame, mode, user, editBudgetChange],
   );
 
   return (
