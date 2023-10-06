@@ -53,6 +53,14 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
 
   const onPatchBudgetChange = () => {
+    // DEBUG
+    console.log(value);
+
+    // Don't send request including empty budgetChange info
+    if (!value) {
+      return;
+    }
+
     const request: IClassPatchRequest = {
       id,
       data: {
@@ -65,6 +73,9 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
       },
     };
     patchCoordinationClass(request);
+    
+    // DEBUG
+    console.log(request);
   };
 
   const isEditBudgetChangeDisabled = useMemo(
