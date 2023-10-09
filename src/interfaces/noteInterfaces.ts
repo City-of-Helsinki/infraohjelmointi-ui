@@ -28,11 +28,11 @@ interface INotePerson {
 
 export interface ICoordinatorNoteRequest {
   coordinatorNote: string;
-  year: string;
-  planningClass: string;
-  planningClassId: string;
+  year: number;
+  coordinatorClassName: string;
+  coordinatorClass: string;
   updatedByFirstName: string;
   updatedByLastName: string;
-  updatedById: string;
+  updatedBy: string;
   createdDate: string;
 }

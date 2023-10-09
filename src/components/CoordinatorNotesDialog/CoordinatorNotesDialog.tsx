@@ -25,12 +25,12 @@ const CoordinatorNotesDialog: FC = () => {
     const handleSubmit = async () => {
         const data = {
             coordinatorNote: textAreaContent, 
-            planningClass: dialogData.name,
-            planningClassId: dialogData.id,
+            coordinatorClassName: dialogData.name,
+            coordinatorClass: dialogData.id,
             updatedByFirstName: user?.first_name || 'null',
             updatedByLastName: user?.last_name || 'null',
-            updatedById: user?.id || 'null',
-            year: String(dialogData.selectedYear),
+            updatedBy: user?.id || 'null',
+            year: dialogData.selectedYear,
         }
         
         const setSuccessNotification = (name: string) => {

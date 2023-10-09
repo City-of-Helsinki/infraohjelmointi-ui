@@ -148,7 +148,7 @@ export const planningSlice = createSlice({
       return { ...state, notesDialogData: action.payload}
     },
     setNotesModalOpen(state, action: PayloadAction<ICoordinatorNotesModalOpen>) {
-      return { ...state, notesModalOpen: action.payload}
+      return { ...state, notesModalOpen: {id: action.payload.id, isOpen:!state.notesModalOpen.isOpen}}
     },
     setNotesModalData(state, action: PayloadAction<IPlanningNotesModalData>) {
       return { ...state, notesModalData: action.payload}

@@ -25,7 +25,7 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
     const Notes = () => {
         if (notes.length) {
             const matchingNotes = notes.filter((note) => (
-                note.year === String(props.selectedYear) && note.planningClassId === props.id
+                note.year === props.selectedYear && note.coordinatorClass === props.id
             ));
             const mappedNotes = matchingNotes.map((note, index) => {
                 return (

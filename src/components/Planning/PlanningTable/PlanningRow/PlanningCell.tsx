@@ -65,7 +65,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const notes = useAppSelector(selectNotes);
  
   const matchingNotes = notes.filter((note) => (
-      note.year === String(selectedYear) && note.planningClassId === id
+      note.year === selectedYear && note.coordinatorClass === id
   ));
 
   const onEditFrameBudget = useCallback(() => {
