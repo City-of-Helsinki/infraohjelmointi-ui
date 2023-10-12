@@ -110,13 +110,37 @@ const users = [
   {
     "id": "d1d8595c-2edf-42df-b1bf-43e758393e83",
     "role": "programmer"
+  },
+  {
+    "id": "76e2bcbd-5a69-48da-8f0c-bb687d7b5c75",
+    "role": "admin"
+  },
+  {
+    "id": "30b7f70a-15db-45bb-b143-30ce59a1d6de",
+    "role": "admin"
+  },
+  {
+    "id": "5869874f-5fb5-4dea-ac7c-b3da45a1e6ee",
+    "role": "admin"
+  },
+  {
+    "id": "bf60ad56-75ef-4584-92ee-53623b1734d1",
+    "role": "admin"
+  },
+  {
+    "id": "ff2c6c27-a671-4502-a5c3-a4c221b62f0a",
+    "role": "admin"
+  },
+  {
+    "id": "d96f104c-6b59-43fb-ac6d-60fe5101973c",
+    "role": "admin"
   }
+
 ]
 
 const setHardCodedUserRoles = (payload: IUser) => {
   // Check if user is found from the list and then assign the correct role
   const user = users.find(user => user.id === payload.uuid);
-  
   switch (user?.role) {
     case "admin":
       return {
