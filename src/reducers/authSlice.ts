@@ -34,7 +34,7 @@ const projectManager = {
   "display_name": 'sg_KYMP_sso_IO_Projektipaallikot',
 }*/
 const admin = {
-  "id": 'test-admin-role',
+  "id": 'sg_kymp_sso_io_admin',
   "name": 'sg_kymp_sso_io_admin' as UserRole,
   "display_name": 'sg_KYMP_sso_IO_Admin',
 }
@@ -133,6 +133,10 @@ const users = [
   },
   {
     "id": "d96f104c-6b59-43fb-ac6d-60fe5101973c",
+    "role": "admin"
+  },
+  {
+    "id": "2d92453f-bcbf-4e0e-93a5-55cfe8d73cf0",
     "role": "admin"
   }
 
