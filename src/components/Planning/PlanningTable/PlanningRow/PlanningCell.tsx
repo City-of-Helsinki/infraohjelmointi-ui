@@ -67,6 +67,11 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       return;
     }
 
+    // If negative value, do not send request
+    if (parseInt(value) < 0){
+      return;
+    }
+
     const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '')) : 0;
     const valueNumber = parseInt(value);
 
@@ -93,6 +98,16 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       patchCoordinationClass(request);
     }
   };
+
+  const checkValue = () => {
+    // Insert previous value if new value was not accepted
+    const inputElement = document.getElementsByClassName("frame-budget-input");
+    if(editFrameBudget){
+      const val = displayFrameBudget ?? "";
+
+      inputElement[0].setAttribute("value", val);
+    }
+  }
 
   const budgetOverlapAlertIcon = useMemo(
     () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
@@ -143,7 +158,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         {editFrameBudget && (
           // height 0 prevents the table cell from growing
           <div className="frame-budget-container">
-            <input
+            <input autoFocus
               id="edit-frame-budget-input"
               className="frame-budget-input"
               type="number"
@@ -151,6 +166,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
               ref={editFrameBudgetInputRef}
               value={value}
               onChange={onChange}
+              onFocus={checkValue}
             />
           </div>
         )}
