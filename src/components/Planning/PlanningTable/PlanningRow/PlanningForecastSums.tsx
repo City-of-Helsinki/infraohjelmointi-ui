@@ -30,7 +30,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
 
   const [editBudgetChange, setEditBudgetChange] = useState(false);
 
-  const { value, onChange } = useNumberInput(budgetChange);
+  const { value, onChange, setInputValue } = useNumberInput(budgetChange);
 
   const onEditBudgetChange = useCallback(() => setEditBudgetChange((current) => !current), []);
 
@@ -73,10 +73,8 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   };
 
   const checkValue = () => {
-    const inputElement = document.getElementsByClassName("budget-change-input");
     if(!value && editBudgetChange){
-      const val = budgetChange ?? "";
-      inputElement[0].setAttribute("value", val.replace("−", "-"));
+      setInputValue(budgetChange);
     }
   }
 
