@@ -18,7 +18,7 @@ const useNumberInput = (v?: string) => {
     setInputValue(value ? parseInt(value.replace(/\s/g, '')) : '0');
   }, [value]);
 
-  return { value: parsedValue, onChange };
+  return { value: parsedValue, onChange, setInputValue };
 };
 
 export default useNumberInput;

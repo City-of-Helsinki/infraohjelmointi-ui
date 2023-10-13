@@ -47,7 +47,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const groupSapCosts = useAppSelector(getGroupSapCosts);
 
-  const { value, onChange } = useNumberInput(displayFrameBudget);
+  const { value, onChange, setInputValue } = useNumberInput(displayFrameBudget);
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
@@ -101,12 +101,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
 
   const checkValue = () => {
     // Insert previous value if new value was not accepted
-    const inputElement = document.getElementsByClassName("frame-budget-input");
-    if(editFrameBudget){
-      const val = displayFrameBudget ?? "";
+    // const inputElement = document.getElementsByClassName("frame-budget-input");
+    // if(editFrameBudget){
+    //   const val = displayFrameBudget ?? "";
 
-      inputElement[0].setAttribute("value", val);
-    }
+    //   inputElement[0].setAttribute("value", val);
+    // }
+    setInputValue(displayFrameBudget);
   }
 
   const budgetOverlapAlertIcon = useMemo(
