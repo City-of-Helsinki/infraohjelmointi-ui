@@ -100,13 +100,6 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   };
 
   const checkValue = () => {
-    // Insert previous value if new value was not accepted
-    // const inputElement = document.getElementsByClassName("frame-budget-input");
-    // if(editFrameBudget){
-    //   const val = displayFrameBudget ?? "";
-
-    //   inputElement[0].setAttribute("value", val);
-    // }
     setInputValue(displayFrameBudget);
   }
 
