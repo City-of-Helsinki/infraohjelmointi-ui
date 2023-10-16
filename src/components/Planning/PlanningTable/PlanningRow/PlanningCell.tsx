@@ -72,7 +72,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       return;
     }
 
-    const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '')) : 0;
+    const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '').replace("−", "-")) : 0;
     const valueNumber = parseInt(value);
 
     // If the budget change is greater than the patched value we will only patch the input value
