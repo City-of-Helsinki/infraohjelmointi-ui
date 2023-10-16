@@ -30,7 +30,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
 
   const [editBudgetChange, setEditBudgetChange] = useState(false);
 
-  const { value, onChange } = useNumberInput(budgetChange);
+  const { value, onChange, setInputValue } = useNumberInput(budgetChange);
 
   const onEditBudgetChange = useCallback(() => setEditBudgetChange((current) => !current), []);
 
@@ -53,6 +53,11 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
 
   const onPatchBudgetChange = () => {
+    // Don't send request including empty budgetChange info
+    if (!value) {
+      return;
+    }
+
     const request: IClassPatchRequest = {
       id,
       data: {
@@ -67,9 +72,15 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
     patchCoordinationClass(request);
   };
 
+  const checkValue = () => {
+    if(!value && editBudgetChange){
+      setInputValue(budgetChange);
+    }
+  }
+
   const isEditBudgetChangeDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame || editBudgetChange,
-    [forcedToFrame, mode, user],
+    [forcedToFrame, mode, user, editBudgetChange],
   );
 
   return (
@@ -103,7 +114,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
           </div>
         )}
         {editBudgetChange && (
-          <input
+          <input autoFocus
             id="edit-budget-change-input"
             className="budget-change-input"
             type="number"
@@ -111,6 +122,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
             ref={editBudgetChangeInputRef}
             value={value}
             onChange={onChange}
+            onFocus={checkValue}
           />
         )}
       </button>

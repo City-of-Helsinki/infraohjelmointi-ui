@@ -47,7 +47,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const groupSapCosts = useAppSelector(getGroupSapCosts);
 
-  const { value, onChange } = useNumberInput(displayFrameBudget);
+  const { value, onChange, setInputValue } = useNumberInput(displayFrameBudget);
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
@@ -67,7 +67,12 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       return;
     }
 
-    const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '')) : 0;
+    // If negative value, do not send request
+    if (parseInt(value) < 0){
+      return;
+    }
+
+    const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '').replace("−", "-")) : 0;
     const valueNumber = parseInt(value);
 
     // If the budget change is greater than the patched value we will only patch the input value
@@ -93,6 +98,10 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       patchCoordinationClass(request);
     }
   };
+
+  const checkValue = () => {
+    setInputValue(displayFrameBudget);
+  }
 
   const budgetOverlapAlertIcon = useMemo(
     () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
@@ -143,7 +152,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         {editFrameBudget && (
           // height 0 prevents the table cell from growing
           <div className="frame-budget-container">
-            <input
+            <input autoFocus
               id="edit-frame-budget-input"
               className="frame-budget-input"
               type="number"
@@ -151,6 +160,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
               ref={editFrameBudgetInputRef}
               value={value}
               onChange={onChange}
+              onFocus={checkValue}
             />
           </div>
         )}
