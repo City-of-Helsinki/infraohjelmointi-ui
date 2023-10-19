@@ -4,7 +4,7 @@ import { PlanningInfoPanel } from '@/components/Planning/PlanningInfoPanel';
 import { PlanningBreadcrumbs } from '@/components/Planning/PlanningBreadcrumbs';
 import { PlanningSummaryTable } from '@/components/Planning/PlanningSummaryTable';
 import { PlanningTable } from '@/components/Planning/PlanningTable';
-import { CoordinatorNotesDialog } from '@/components/CoordinatorNotesDialog';
+import { CoordinatorNotesDialog } from '../../components/CoordinatorNotesDialog/CoordinatorNotesDialog'
 import usePlanningRows from '@/hooks/usePlanningRows';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectIsPlanningLoading, selectSelectedYear } from '@/reducers/planningSlice';

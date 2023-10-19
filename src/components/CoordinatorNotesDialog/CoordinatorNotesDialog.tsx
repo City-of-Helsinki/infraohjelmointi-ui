@@ -9,7 +9,7 @@ import './styles.css';
 import { ICoordinatorNoteRequest } from "@/interfaces/noteInterfaces";
 import { selectUser } from "@/reducers/authSlice";
 
-const CoordinatorNotesDialog: FC = () => {
+export const CoordinatorNotesDialog = () => {
     const dispatch = useAppDispatch();
     const user = useAppSelector(selectUser);
     const dialogOpen = useAppSelector(selectNotesDialogOpen);

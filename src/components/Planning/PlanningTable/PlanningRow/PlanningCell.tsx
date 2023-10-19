@@ -198,7 +198,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
       {year === selectedYear && (
         <>
           {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />}
-          {moment.months().map((m, index) => (
+          {moment.months().map((m) => (
             pathname.includes('coordination') && m === 'tammikuu' ?
             <>
               <td

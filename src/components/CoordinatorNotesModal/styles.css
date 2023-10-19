@@ -12,6 +12,12 @@
     z-index: 100;
   }
 
+  @media (max-width: 1300px) {
+    .dialog-container {
+      width: 250px;
+    }
+  }
+
   .dialog-top-part {
     display: flex;
     flex-direction: row;
