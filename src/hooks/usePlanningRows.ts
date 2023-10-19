@@ -62,11 +62,14 @@ const buildPlanningTableRows = (
   projects: Array<IProject>,
   selections: IPlanningRowSelections,
 ) => {
-  const { masterClasses, classes, subClasses, districts, divisions, groups } = list;
+  const { masterClasses, classes, subClasses, districts, divisions, otherClassifications, groups } = list;
 
-  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
+  const { selectedMasterClass, selectedClass, selectedSubClass, selectedOtherClassification, selectedDistrict } = selections;
+
+
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
+  const otherClassificationType = selectedOtherClassification ? 'otherClassification' : 'otherClassification';
 
   const subClassType = /suurpiiri|östersundom/.test(
     selectedSubClass?.name.toLocaleLowerCase() ?? '',
@@ -98,7 +101,7 @@ const buildPlanningTableRows = (
       );
     }
     // Filter groups under subClass-preview only if there are is no locationRelation
-    else if (type === 'subClass') {
+    else if (type === 'subClass' || type === 'otherClassification') {
       filteredGroups.push(
         ...groups.filter((group) => !group.locationRelation && group.classRelation === id),
       );
@@ -107,6 +110,7 @@ const buildPlanningTableRows = (
     else if (type === 'division' || type == 'district') {
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
+
     return sortByName(filteredGroups).map((group) => ({
       ...getRow(group as IGroup, 'group'),
     }));
@@ -114,6 +118,7 @@ const buildPlanningTableRows = (
 
   // Map the class rows going from masterClasses to districts
   const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
+    console.log(otherClassifications);
     return {
       // MASTER CLASSES
       ...getRow(masterClass, 'masterClass', !!selectedMasterClass),
@@ -137,6 +142,11 @@ const buildPlanningTableRows = (
                   .map((filteredDistrict) => ({
                     ...getRow(filteredDistrict, districtType),
                   })),
+                ...otherClassifications
+                .filter((otherClassifications) => otherClassifications.parent === filteredSubClass.id)
+                .map((filteredOthers) => ({
+                  ...getRow(filteredOthers, otherClassificationType),
+                }))
               ],
             })),
         })),
@@ -260,8 +270,8 @@ const usePlanningRows = () => {
       return;
     }
 
-    const { masterClasses, classes, subClasses } = batchedPlanningClasses;
-    const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass } = selections;
+    const { masterClasses, classes, subClasses, otherClassifications } = batchedPlanningClasses;
+    const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass, selectedOtherClassification} = selections;
     const { districts, divisions } = batchedPlanningLocations;
 
     const finalDistricts = [];
@@ -280,7 +290,7 @@ const usePlanningRows = () => {
       subClasses: getSelectedOrAll(selectedSubClass, subClasses),
       collectiveSubLevels: [],
       districts: finalDistricts,
-      otherClassifications: [],
+      otherClassifications: getSelectedOrAll(selectedOtherClassification, otherClassifications),
       otherClassificationSubLevels: [],
       divisions,
       groups,
