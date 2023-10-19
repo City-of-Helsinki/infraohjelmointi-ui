@@ -8,6 +8,7 @@ export interface IClassHierarchy {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
+  otherClassifications: Array<IClass>;
   year: number;
 }
 
@@ -34,6 +35,7 @@ const initialClasses = {
   masterClasses: [],
   classes: [],
   subClasses: [],
+  otherClassifications: [],
   year: new Date().getFullYear(),
 };
 
@@ -96,6 +98,8 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
   const masterClasses = allClasses?.filter((ac) => !ac.parent);
   const classes = getClasses(masterClasses);
   const subClasses = getClasses(classes);
+  const collectiveSubLevels = getClasses(subClasses);
+  const otherClassifications = getClasses(collectiveSubLevels);
 
   if (!forCoordinator) {
     return {
@@ -103,12 +107,11 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
       masterClasses,
       classes,
       subClasses,
+      otherClassifications,
       year: classes[0]?.finances?.year,
     };
   }
 
-  const collectiveSubLevels = getClasses(subClasses);
-  const otherClassifications = getClasses(collectiveSubLevels);
   const otherClassificationSubLevels = getClasses(otherClassifications);
 
   return {
