@@ -29,6 +29,7 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
+import React from 'react';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -198,9 +199,9 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
       {year === selectedYear && (
         <>
           {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />}
-          {moment.months().map((m) => (
+          {moment.months().map((m, index) => (
             pathname.includes('coordination') && m === 'tammikuu' ?
-            <>
+            <React.Fragment key={index}>
               <td
                 key={id}
                 className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
@@ -215,7 +216,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                 </span>
                 <CoordinatorNotesModal id={id} type={type} selectedYear={selectedYear}/>
               </td>
-            </>
+            </React.Fragment>
             :
             <td
               key={m}
