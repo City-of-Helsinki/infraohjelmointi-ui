@@ -99,9 +99,10 @@ and the indentation (sisennys) in the text continues as long as the text can be 
   @apply border-b border-white bg-[var(--color-districtPreview)];
 }
 
-.monthly-cell.monthly-cell.districtPreview svg,
-.monthly-cell.monthly-cell.collectiveSubLevel svg,
-.monthly-cell.collectiveSubLevel svg {
+.monthly-cell.monthly-cell.districtPreview #coordinator-note,
+.monthly-cell.monthly-cell.collectiveSubLevel #coordinator-note,
+.monthly-cell.collectiveSubLevel #coordinator-note,
+.group #coordinator-note {
   display: none;
 } 
 

@@ -10,7 +10,7 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getCoordinatorNotesByProject, postCoordinatorNoteToProject } from '@/services/noteServices';
+import { getCoordinatorNotes, postCoordinatorNoteToProject } from '@/services/noteServices';
 import { IError } from '@/interfaces/common';
 import { ICoordinatorNoteRequest } from '@/interfaces/noteInterfaces';
 
@@ -36,10 +36,10 @@ interface IPlanningState {
   coordinatorNotes: ICoordinatorNoteRequest[];
 }
 
-export const getCoordinatorNotesByProjectThunk = createAsyncThunk(
+export const getCoordinatorNotesThunk = createAsyncThunk(
   'coordinatorNotes/getByProject',
   async (_, thunkAPI) => {
-    return await getCoordinatorNotesByProject()
+    return await getCoordinatorNotes()
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
   },
@@ -156,13 +156,13 @@ export const planningSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(
-      getCoordinatorNotesByProjectThunk.fulfilled,
+      getCoordinatorNotesThunk.fulfilled,
       (state, action: PayloadAction<ICoordinatorNoteRequest[]>) => {
         return { ...state, coordinatorNotes: action.payload };
       },
     );
     builder.addCase(
-      getCoordinatorNotesByProjectThunk.rejected,
+      getCoordinatorNotesThunk.rejected,
       (state, action: PayloadAction<IError | unknown>) => {
         return { ...state, coordinatorNotesError: action.payload };
       },

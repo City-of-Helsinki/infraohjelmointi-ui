@@ -208,7 +208,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                 onMouseOver={() => setHoveredClassToMonth(m)}
                 onMouseLeave={() => removeHoveredClassFromMonth(m)}
               >
-                <span onClick={() => {
+                <span id="coordinator-note" onClick={() => {
                   dispatch(setNotesModalOpen({isOpen: true, id}));
                   dispatch(setNotesModalData({name, id}))
                 }}>

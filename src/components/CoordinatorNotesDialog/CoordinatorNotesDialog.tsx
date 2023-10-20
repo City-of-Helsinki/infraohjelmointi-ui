@@ -1,7 +1,7 @@
-import { FC, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
 import { t } from "i18next";
-import { getCoordinatorNotesByProjectThunk, postCoordinatorNoteToProjectThunk, selectNotesDialogData, selectNotesDialogOpen, setNotesDialogOpen } from "@/reducers/planningSlice";
+import { getCoordinatorNotesThunk, postCoordinatorNoteToProjectThunk, selectNotesDialogData, selectNotesDialogOpen, setNotesDialogOpen } from "@/reducers/planningSlice";
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, IconCross } from "hds-react";
 import { Dialog } from 'hds-react/components/Dialog';
@@ -59,7 +59,7 @@ export const CoordinatorNotesDialog = () => {
                     setSuccessNotification(dialogData.name);
                     setTextAreaContent('');
                     handleClose();
-                    dispatch(getCoordinatorNotesByProjectThunk());
+                    dispatch(getCoordinatorNotesThunk());
                 }  else {
                     setErrorNotification();
                 }

@@ -51,7 +51,7 @@ export const deleteNote = async (id: string): Promise<INote> => {
 
 
 // Coordinator notes -->
-export const getCoordinatorNotesByProject = async () => {
+export const getCoordinatorNotes = async () => {
   return axios
     .get(`${REACT_APP_API_URL}/coordinator-notes/`)
     .then((res) => res.data)
