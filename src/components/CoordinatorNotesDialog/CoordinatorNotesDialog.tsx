@@ -29,7 +29,7 @@ export const CoordinatorNotesDialog = () => {
             coordinatorClass: dialogData.id,
             updatedByFirstName: user?.first_name || 'null',
             updatedByLastName: user?.last_name || 'null',
-            updatedBy: user?.id || 'null',
+            updatedBy: user?.uuid || 'null',
             year: dialogData.selectedYear,
         }
         
