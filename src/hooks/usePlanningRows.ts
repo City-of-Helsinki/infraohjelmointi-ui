@@ -118,7 +118,6 @@ const buildPlanningTableRows = (
 
   // Map the class rows going from masterClasses to districts
   const classRows: Array<IPlanningRow> = masterClasses.map((masterClass) => {
-    console.log(otherClassifications);
     return {
       // MASTER CLASSES
       ...getRow(masterClass, 'masterClass', !!selectedMasterClass),
