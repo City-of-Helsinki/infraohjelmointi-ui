@@ -14,7 +14,6 @@ export interface IClassHierarchy {
 
 export interface ICoordinatorClassHierarchy extends IClassHierarchy {
   collectiveSubLevels: Array<IClass>;
-  otherClassifications: Array<IClass>;
   otherClassificationSubLevels: Array<IClass>;
 }
 
@@ -42,7 +41,6 @@ const initialClasses = {
 const initialCoordinationClasses = {
   ...initialClasses,
   collectiveSubLevels: [],
-  otherClassifications: [],
   otherClassificationSubLevels: [],
 };
 
