@@ -26,7 +26,7 @@ interface INotePerson {
   last_name: string;
 }
 
-export interface ICoordinatorNoteRequest {
+export interface ICoordinatorNote {
   id: string;
   coordinatorNote: string;
   year: number;
