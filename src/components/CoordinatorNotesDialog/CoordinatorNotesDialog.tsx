@@ -6,7 +6,7 @@ import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, IconCross } from "hds-react";
 import { Dialog } from 'hds-react/components/Dialog';
 import './styles.css';
-import { ICoordinatorNoteRequest } from "@/interfaces/noteInterfaces";
+import { ICoordinatorNote } from "@/interfaces/noteInterfaces";
 import { selectUser } from "@/reducers/authSlice";
 
 export const CoordinatorNotesDialog = () => {
@@ -53,7 +53,7 @@ export const CoordinatorNotesDialog = () => {
             );
         }
         if (textAreaContent.length > 0) {
-            const res = await dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNoteRequest))
+            const res = await dispatch(postCoordinatorNoteToProjectThunk(data as ICoordinatorNote))
             try {
                 if (!res.type.includes('rejected')) {
                     setSuccessNotification(dialogData.name);

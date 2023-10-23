@@ -12,7 +12,7 @@ import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getCoordinatorNotes, postCoordinatorNoteToProject } from '@/services/noteServices';
 import { IError } from '@/interfaces/common';
-import { ICoordinatorNoteRequest } from '@/interfaces/noteInterfaces';
+import { ICoordinatorNote } from '@/interfaces/noteInterfaces';
 
 interface ICoordinatorNotesModalOpen {
   isOpen: boolean;
@@ -33,7 +33,7 @@ interface IPlanningState {
   notesDialogData: IPlanningNotesDialogData;
   notesModalOpen: ICoordinatorNotesModalOpen;
   notesModalData: IPlanningNotesModalData;
-  coordinatorNotes: ICoordinatorNoteRequest[];
+  coordinatorNotes: ICoordinatorNote[];
 }
 
 export const getCoordinatorNotesThunk = createAsyncThunk(
@@ -47,7 +47,7 @@ export const getCoordinatorNotesThunk = createAsyncThunk(
 
 export const postCoordinatorNoteToProjectThunk = createAsyncThunk(
   'coordinatorNotes/postNote',
-  async (request: ICoordinatorNoteRequest, thunkAPI) => {
+  async (request: ICoordinatorNote, thunkAPI) => {
     return await postCoordinatorNoteToProject(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
@@ -157,7 +157,7 @@ export const planningSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(
       getCoordinatorNotesThunk.fulfilled,
-      (state, action: PayloadAction<ICoordinatorNoteRequest[]>) => {
+      (state, action: PayloadAction<ICoordinatorNote[]>) => {
         return { ...state, coordinatorNotes: action.payload };
       },
     );
