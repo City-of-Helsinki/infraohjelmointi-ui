@@ -27,9 +27,10 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
             const matchingNotes = notes.filter((note) => (
                 note.year === props.selectedYear && note.coordinatorClass === props.id
             ));
-            const mappedNotes = matchingNotes.map((note, index) => {
+
+            const mappedNotes = matchingNotes.map((note) => {
                 return (
-                    <Fragment key={index}>
+                    <Fragment key={note.id}>
                         <p>{note.coordinatorNote}</p>
                         <p id="coordinator">{note.updatedByFirstName} {note.updatedByLastName}</p>
                         <p id="date">{dateStringToMoment(note.createdDate)}</p>

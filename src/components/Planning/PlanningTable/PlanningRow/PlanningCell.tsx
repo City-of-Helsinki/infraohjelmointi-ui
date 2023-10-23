@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState, Fragment } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
@@ -16,7 +16,6 @@ import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/com
 import { patchCoordinationClass } from '@/services/classServices';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
-import { IconAlertCircle } from 'hds-react';
 import './styles.css';
 import useNumberInput from '@/hooks/useNumberInput';
 import { patchCoordinationLocation } from '@/services/locationServices';
@@ -27,9 +26,8 @@ import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
-import { IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
+import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
-import React from 'react';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -199,9 +197,9 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
       {year === selectedYear && (
         <>
           {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />}
-          {moment.months().map((m, index) => (
+          {moment.months().map((m) => (
             pathname.includes('coordination') && m === 'tammikuu' ?
-            <React.Fragment key={index}>
+            <Fragment key={id}>
               <td
                 key={id}
                 className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
@@ -216,7 +214,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                 </span>
                 <CoordinatorNotesModal id={id} type={type} selectedYear={selectedYear}/>
               </td>
-            </React.Fragment>
+            </Fragment>
             :
             <td
               key={m}

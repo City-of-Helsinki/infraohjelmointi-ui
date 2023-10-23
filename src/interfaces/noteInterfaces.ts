@@ -27,6 +27,7 @@ interface INotePerson {
 }
 
 export interface ICoordinatorNoteRequest {
+  id: string;
   coordinatorNote: string;
   year: number;
   coordinatorClassName: string;

@@ -27,9 +27,9 @@ export const CoordinatorNotesDialog = () => {
             coordinatorNote: textAreaContent, 
             coordinatorClassName: dialogData.name,
             coordinatorClass: dialogData.id,
-            updatedByFirstName: user?.first_name || 'null',
-            updatedByLastName: user?.last_name || 'null',
-            updatedBy: user?.uuid || 'null',
+            updatedByFirstName: user?.first_name ?? 'null',
+            updatedByLastName: user?.last_name ?? 'null',
+            updatedBy: user?.uuid ?? 'null',
             year: dialogData.selectedYear,
         }
         

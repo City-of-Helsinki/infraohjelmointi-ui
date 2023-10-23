@@ -12,7 +12,7 @@ const Notification: FC = () => {
 
 const setNotificationMessage = (message?: string, extraParameter?: string) => {
   if(message && extraParameter) {
-    return message && t(`notification.message.${message}`, {parameter: extraParameter});
+    return t(`notification.message.${message}`, {parameter: extraParameter});
   } else {
     return message && t(`notification.message.${message}`);
   }
