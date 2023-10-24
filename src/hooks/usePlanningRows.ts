@@ -69,7 +69,6 @@ const buildPlanningTableRows = (
 
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
-  const otherClassificationType = selectedOtherClassification ? 'otherClassification' : 'otherClassification';
 
   const subClassType = /suurpiiri|östersundom/.test(
     selectedSubClass?.name.toLocaleLowerCase() ?? '',
@@ -101,7 +100,7 @@ const buildPlanningTableRows = (
       );
     }
     // Filter groups under subClass-preview only if there are is no locationRelation
-    else if (type === 'subClass' || type === 'otherClassification') {
+    else if (type === 'subClass') {
       filteredGroups.push(
         ...groups.filter((group) => !group.locationRelation && group.classRelation === id),
       );
@@ -144,7 +143,7 @@ const buildPlanningTableRows = (
                 ...otherClassifications
                 .filter((otherClassifications) => otherClassifications.parent === filteredSubClass.id)
                 .map((filteredOthers) => ({
-                  ...getRow(filteredOthers, otherClassificationType),
+                  ...getRow(filteredOthers, 'otherClassification'),
                 }))
               ],
             })),
