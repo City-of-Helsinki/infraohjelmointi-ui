@@ -99,7 +99,9 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
   const collectiveSubLevels = getClasses(subClasses);
   const otherClassifications = getClasses(collectiveSubLevels);
 
-  if (!forCoordinator) {
+  if (!forCoordinator ) {
+    // other classifications are on the same level as districts in planning view so we need to fetch the data differently for plannig view
+    const otherClassifications = getClasses(subClasses);
     return {
       allClasses,
       masterClasses,
@@ -169,7 +171,6 @@ export const classSlice = createSlice({
     },
     updateOtherClassification(state, action: PayloadAction<IClass | null>) {
       const data = action.payload;
-
       if (data) {
         const otherClassifications = [...state.coordination.otherClassifications].map((oc) =>
           oc.id === data.id ? data : oc,
