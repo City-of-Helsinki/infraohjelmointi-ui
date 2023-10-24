@@ -119,7 +119,7 @@ const render = async (customState?: object) =>
     ),
   );
 
-describe.skip('SearchResultsView', () => {
+describe('SearchResultsView', () => {
   beforeEach(() => {
     mockGetResponseProvider();
   });
@@ -356,7 +356,7 @@ describe.skip('SearchResultsView', () => {
       );
     });
 
-    it('navigates to the planning view when clicking a result project and focuses the project: ', async () => {
+    it.skip('navigates to the planning view when clicking a result project and focuses the project: ', async () => {
       const { container, user, findByTestId, store } = await render(searchActiveState);
 
       const scrollIntoViewMock = jest.fn();
