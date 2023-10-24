@@ -27,6 +27,7 @@ const SearchTerms = () => {
       <div>
         {searchTerms.length > 0 && (
           <Tag
+            key="0"
             id="empty-all-btn"
             className="h-4 whitespace-nowrap !bg-transparent"
             onDelete={deleteAllTerms}
