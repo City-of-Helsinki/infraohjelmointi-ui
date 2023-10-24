@@ -176,7 +176,6 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
     const element = document.getElementById(`project-row-${searchedProjectId}`);
 
     if (element) {
-      console.log("heiiii")
       element.scrollIntoView({
         behavior: 'auto',
         block: 'center',
