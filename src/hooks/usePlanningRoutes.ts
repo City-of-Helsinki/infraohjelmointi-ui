@@ -88,7 +88,7 @@ const usePlanningRoutes = () => {
     const nextClass = getSelectedItemOrNull(classes, classId);
     const nextSubClass = getSelectedItemOrNull(subClasses, subClassId);
     const nextDistrict = getSelectedItemOrNull(planningDistricts, districtId) as ILocation;
-    const nextOtherClassification = getSelectedItemOrNull(otherClassifications, otherClassificationId)
+    const nextOtherClassification = getSelectedItemOrNull(otherClassifications, otherClassificationId);
 
     dispatch(setSelectedMasterClass(nextMasterClass));
     dispatch(setSelectedClass(nextClass));
