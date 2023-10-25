@@ -64,7 +64,7 @@ const buildPlanningTableRows = (
 ) => {
   const { masterClasses, classes, subClasses, districts, divisions, otherClassifications, groups } = list;
 
-  const { selectedMasterClass, selectedClass, selectedSubClass, selectedOtherClassification, selectedDistrict } = selections;
+  const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
 
 
