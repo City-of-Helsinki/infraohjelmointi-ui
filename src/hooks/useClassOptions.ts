@@ -71,8 +71,8 @@ const useClassOptions = (currentClass: string | undefined) => {
 
   const getNextOtherClassifications = useCallback(() => {
     if (selectedSubClass){
-      const asd = subClasses.find((sc) => sc.parent === selectedSubClass.parent);
-      return otherClassifications.filter((oc) => oc.parent === asd?.id);
+      const subClassParent = subClasses.find((sc) => sc.parent === selectedSubClass.parent);
+      return otherClassifications.filter((oc) => oc.parent === subClassParent?.id);
     } else {
       return [];
     }
