@@ -46,14 +46,6 @@ const useMultiClassOptions = (
     [allSubClasses, subClasses],
   );
 
-  const selectedOtherClassifications = useMemo(
-    () => 
-      allSubClasses
-        .filter((asc) => subClasses.findIndex((sc) => sc.value === asc.id) !== -1)
-        .map((sc) => sc.parent),
-    [allSubClasses, subClasses],
-  )
-
   const getNextClasses = useCallback(() => {
     if (!_.isEmpty(otherClassifications)) {
       return allOtherClassifications.filter(
