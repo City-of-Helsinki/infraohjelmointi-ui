@@ -21,6 +21,7 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import {
   selectBatchedCoordinationClasses,
   selectBatchedPlanningClasses,
+  selectPlanningOtherClassifications,
 } from '@/reducers/classSlice';
 import { selectCoordinationDistricts, selectPlanningDistricts } from '@/reducers/locationSlice';
 
@@ -44,6 +45,7 @@ const usePlanningRoutes = () => {
   const batchedCoordinatorClasses = useAppSelector(selectBatchedCoordinationClasses);
   const planningDistricts = useAppSelector(selectPlanningDistricts);
   const coordinationDistricts = useAppSelector(selectCoordinationDistricts);
+  const otherClassifications = useAppSelector(selectPlanningOtherClassifications);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const mode = useAppSelector(selectPlanningMode);
@@ -80,17 +82,20 @@ const usePlanningRoutes = () => {
     const classId = params.get('class');
     const subClassId = params.get('subClass');
     const districtId = params.get('district');
+    const otherClassificationId = params.get('otherClassification');
 
     const nextMasterClass = getSelectedItemOrNull(masterClasses, masterClassId);
     const nextClass = getSelectedItemOrNull(classes, classId);
     const nextSubClass = getSelectedItemOrNull(subClasses, subClassId);
     const nextDistrict = getSelectedItemOrNull(planningDistricts, districtId) as ILocation;
+    const nextOtherClassification = getSelectedItemOrNull(otherClassifications, otherClassificationId);
 
     dispatch(setSelectedMasterClass(nextMasterClass));
     dispatch(setSelectedClass(nextClass));
     dispatch(setSelectedSubClass(nextSubClass));
     dispatch(setSelectedDistrict(nextDistrict));
-  }, [mode, search, planningDistricts, batchedPlanningClasses]);
+    dispatch(setSelectedOtherClassification(nextOtherClassification));
+  }, [mode, search, planningDistricts, otherClassifications, batchedPlanningClasses]);
 
   // Listen to search params and add the coordinator selections to redux
   useEffect(() => {

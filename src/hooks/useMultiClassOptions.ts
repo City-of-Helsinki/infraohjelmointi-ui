@@ -2,6 +2,7 @@ import { IOption } from '@/interfaces/common';
 import {
   selectPlanningClasses,
   selectPlanningMasterClasses,
+  selectPlanningOtherClassifications,
   selectPlanningSubClasses,
 } from '@/reducers/classSlice';
 import { useCallback, useMemo } from 'react';
@@ -16,15 +17,18 @@ import { classesToOptions } from '@/utils/common';
  * @param masterClasses selected masterClass options
  * @param classes selected class options
  * @param subClasses selected subClass options
+ * @param otherClassifications selected OtherClassification options
  */
 const useMultiClassOptions = (
   masterClasses: Array<IOption>,
   classes: Array<IOption>,
   subClasses: Array<IOption>,
+  otherClassifications: Array<IOption>,
 ) => {
   const allMasterClasses = useAppSelector(selectPlanningMasterClasses);
   const allClasses = useAppSelector(selectPlanningClasses);
   const allSubClasses = useAppSelector(selectPlanningSubClasses);
+  const allOtherClassifications = useAppSelector(selectPlanningOtherClassifications);
 
   const selectedClassParents = useMemo(
     () =>
@@ -43,7 +47,11 @@ const useMultiClassOptions = (
   );
 
   const getNextClasses = useCallback(() => {
-    if (!_.isEmpty(subClasses)) {
+    if (!_.isEmpty(otherClassifications)) {
+      return allOtherClassifications.filter(
+        (c) => selectedSubClassParents.findIndex((sc) => sc === c.id) !== -1,
+      );
+    } else if (!_.isEmpty(subClasses)) {
       return allClasses.filter(
         (c) => selectedSubClassParents.findIndex((sc) => sc === c.id) !== -1,
       );
@@ -54,7 +62,15 @@ const useMultiClassOptions = (
     } else {
       return allClasses;
     }
-  }, [allClasses, masterClasses, selectedSubClassParents, subClasses]);
+  }, [allClasses, masterClasses, selectedSubClassParents, allOtherClassifications, subClasses]);
+
+  const getNextOtherClassifications = useCallback(() => {
+    if (!_.isEmpty(classes)) {
+      return allOtherClassifications.filter((aoc) => classes.findIndex((fc) => aoc.parent === fc.value) !== -1);
+    } else {
+      return allOtherClassifications;
+    }
+  }, [allOtherClassifications, classes]);
 
   const getNextSubClasses = useCallback(() => {
     if (!_.isEmpty(classes)) {
@@ -86,6 +102,7 @@ const useMultiClassOptions = (
     masterClasses: classesToOptions(getNextMasterClasses()),
     classes: classesToOptions(getNextClasses()),
     subClasses: classesToOptions(getNextSubClasses()),
+    otherClassifications: classesToOptions(getNextOtherClassifications())
   };
 };
 
