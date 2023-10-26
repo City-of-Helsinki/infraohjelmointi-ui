@@ -58,6 +58,18 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
       return;
     }
 
+    const frameBudgetElement = document.getElementById(`frame-budget-${id}-${year}`);
+    const frameBudget = parseInt(frameBudgetElement?.innerHTML||'0');
+    const parsedValue = parseInt(value || '0');
+
+    console.log("Frame budget:", frameBudget);
+    console.log("value:", parsedValue);
+
+    // We don't want the frame budget to be a negative value
+    if (frameBudget + parsedValue < 0) {
+      return;
+    }
+
     const request: IClassPatchRequest = {
       id,
       data: {
@@ -73,7 +85,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   };
 
   const checkValue = () => {
-    if(!value && editBudgetChange){
+    if((!value && editBudgetChange) || budgetChange != value){
       setInputValue(budgetChange);
     }
   }
