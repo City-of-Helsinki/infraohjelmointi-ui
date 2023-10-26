@@ -134,6 +134,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
                 </span>
                 <span
                   data-testid={`frame-budget-${id}-${year}`}
+                  id={`frame-budget-${id}-${year}`}
                   className={isFrameBudgetOverlap ? 'text-engel' : 'text-white'}
                 >
                   {budgetOverlapAlertIcon}
