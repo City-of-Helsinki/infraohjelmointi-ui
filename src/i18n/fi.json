@@ -257,6 +257,7 @@
       "projectNotFound": "Hanketta ei löytnyt",
       "hashtagPatchSuccess": "Tunniste päivitetty",
       "patchError": "Päivitys epäonnistui",
+      "saveError": "Tallennus epäonnistui",
       "hashtagPostSuccess": "Tunniste tallennettu",
       "postError": "Luonti epäonnistui"
     },
@@ -274,7 +275,8 @@
       "hashtagPostSuccess": "Uusi tunniste tallennettu onnistuneesti!",
       "hashtagPostError": "Tunnisteen luonti epäonnistui.",
       "phaseChangeError": "Haluamasi vaihemuutos vaatii lisää tietoja hankekorttiin. Tee vaihemuutos hankekortilla.",
-      "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla."
+      "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
+      "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen."
     }
   },
   "searchOrder": {
