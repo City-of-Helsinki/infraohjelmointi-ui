@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IError } from '@/interfaces/common';
 import { postHashTagThunk, selectHashTags } from '@/reducers/hashTagsSlice';
-import { notifySuccess } from '@/reducers/notificationSlice';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { getErrorText } from '@/utils/validation';
 import { Button, Dialog, TextInput } from 'hds-react';
 import { ChangeEvent, FC, memo, useCallback, useState } from 'react';
@@ -48,7 +48,7 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
       }
     } catch (e) {
       dispatch(
-        notifySuccess({
+        notifyError({
           message: 'hashtagPostError',
           title: 'postError',
           type: 'toast',

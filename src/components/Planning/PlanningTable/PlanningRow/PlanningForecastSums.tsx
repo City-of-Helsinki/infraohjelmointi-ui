@@ -1,10 +1,11 @@
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import useNumberInput from '@/hooks/useNumberInput';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { IGroupSapCost } from '@/interfaces/sapCostsInterfaces';
 import { selectUser } from '@/reducers/authSlice';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classServices';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
@@ -24,6 +25,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const dispatch = useAppDispatch();
   const mode = useAppSelector(selectPlanningMode);
   const startYear = useAppSelector(selectStartYear);
   const editBudgetChangeInputRef = useRef<HTMLInputElement>(null);
@@ -64,6 +66,14 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
 
     // We don't want the frame budget to be a negative value
     if (frameBudget + parsedValue < 0) {
+      dispatch(
+        notifyError({
+          message: 'frameBudgetError',
+          title: 'saveError',
+          type: 'toast',
+          duration: 5000,
+        }),
+      );
       return;
     }
 
