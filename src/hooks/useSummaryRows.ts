@@ -21,16 +21,18 @@ interface IPlanningSummaryTableState {
 
 export const getPlanningRowTitle = (startYear: number) => {
   const currentYear = new Date().getFullYear();
-  if (startYear === currentYear) {
+  const diff = startYear - currentYear;
+
+  if (diff === 0) {
     return "kuluva TA";
   }
-  else if (startYear === currentYear + 1) {
+  else if (diff === 1) {
     return "TAE";
   }
-  else if (startYear < currentYear) {
-    return "TP";
+  else if (diff < 0) {
+    return "TA";
   }
-  else if (startYear <= (currentYear + 3)) {
+  else if (diff <= 3) {
     return "TSE";
   } else {
     return "alustava";
