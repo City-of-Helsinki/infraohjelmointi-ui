@@ -370,7 +370,7 @@ describe('PlanningView', () => {
       expect(getByTestId('planning-summary-head-row')).toBeInTheDocument();
 
       for (let i = 0; i < 11; i++) {
-        const title = getPlanningRowTitle(i);
+        const title = getPlanningRowTitle(year + i);
         const headCell = getByTestId(`head-${year + i}`);
         expect(headCell).toHaveTextContent((year + i).toString());
         expect(headCell).toHaveTextContent(title);

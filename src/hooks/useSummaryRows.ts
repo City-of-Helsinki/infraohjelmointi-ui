@@ -89,7 +89,6 @@ const useSummaryRows = () => {
         ...current,
         heads: buildPlanningSummaryHeadCells(startYear),
       }));
-      console.log(planningSummaryRows);
     }
   }, [startYear]);
 
