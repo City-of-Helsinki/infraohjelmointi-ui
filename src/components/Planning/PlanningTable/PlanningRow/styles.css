@@ -33,12 +33,13 @@
   @apply bg-[var(--color-subClass-framed)];
 }
 
+.planning-head.otherClassification.planning,
 .planning-head.districtPreview,
-.planning-head.collectiveSubLevel,
-.planning-head.otherClassification {
+.planning-head.collectiveSubLevel {
   @apply bg-[var(--color-districtPreview)] pl-[5.5rem];
 }
 
+.planning-head.otherClassification.coordination,
 .planning-head.subLevelDistrict
  {
   @apply bg-[var(--color-districtPreview)] pl-[7rem];

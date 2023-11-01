@@ -107,7 +107,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
 
   return (
     <th
-      className={`planning-head ${type} ${forcedToFrame ? 'framed' : ''}`}
+      className={`planning-head ${type} ${mode} ${forcedToFrame ? 'framed' : ''}`}
       data-testid={`head-${id}`}
     >
       <div className="flex w-full justify-between">
