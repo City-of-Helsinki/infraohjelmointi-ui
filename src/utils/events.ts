@@ -31,7 +31,7 @@ export const dispatchContextMenuEvent = (
 };
 
 export const dispatchTooltipEvent = (
-  e: MouseEvent<HTMLElement | SVGElement>,
+  e: React.SyntheticEvent<HTMLElement | SVGElement>,
   type: 'show' | 'hide',
   data: ITooltipEventData,
 ) => {

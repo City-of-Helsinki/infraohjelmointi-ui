@@ -95,13 +95,13 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     [handleExpand, mode, navigate, search, urlSearchParam],
   );
 
-  const showTooltip = useCallback((event: ReactMouseEvent<HTMLSpanElement>) => {
+  const showTooltip = useCallback((event: React.SyntheticEvent<HTMLSpanElement>) => {
     const targetElement = event.target as HTMLElement;
     const text = targetElement.textContent || targetElement.innerText;
     dispatchTooltipEvent(event, 'show', { text });
   }, []);
 
-  const hideTooltip = useCallback((event: ReactMouseEvent<HTMLSpanElement>) => {
+  const hideTooltip = useCallback((event: React.SyntheticEvent<HTMLSpanElement>) => {
     dispatchTooltipEvent(event, 'hide', { text: '' });
   }, []);
 
@@ -155,6 +155,9 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
                 className="planning-head-title"
                 onMouseOver={showTooltip}
                 onMouseLeave={hideTooltip}
+                onFocus={showTooltip}
+                onBlur={hideTooltip}
+                tabIndex={0}
               >
                 {name}
               </span>
