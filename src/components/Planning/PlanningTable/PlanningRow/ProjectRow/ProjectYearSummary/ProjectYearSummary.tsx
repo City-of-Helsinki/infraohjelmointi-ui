@@ -12,6 +12,7 @@ interface IProjectYearSummaryProps {
   monthlyDataList: Array<IMonthlyData>;
   cellType: CellType;
   timelineDates: ITimelineDates;
+  sapProject: string | undefined;
   sapCosts: Record<string, IProjectSapCost>;
 }
 

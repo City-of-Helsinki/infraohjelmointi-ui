@@ -92,7 +92,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
         {!editBudgetChange && (
           <div className={`planning-forecast-sums ${type} mt-[0.2rem]`}>
             <span data-testid={`planning-forecast-implemented-${id}`}>
-              {forecastCostsForGroups}
+              {Number(forecastCostsForGroups).toFixed(0)}
             </span>
             <span data-testid={`planning-forecast-bound-${id}`}>0</span>
             {displayBudgetChange && (
