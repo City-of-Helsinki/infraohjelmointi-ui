@@ -25,6 +25,23 @@ const ListField: FC<IListFieldProps> = ({
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
 
+  function getSapCostValue(field: IForm):string {
+    let sapValue = 0;
+
+    if (field.name === 'realizedCost') {
+      sapValue = field.sapCosts?.project_task_costs || 0;
+    }
+    else if (field.name === 'comittedCost') {
+      sapValue = field.sapCosts?.project_task_commitments || 0;
+    }
+    else if (field.name === 'spentCost') {
+      const realizedCost = field.sapCosts?.project_task_costs || 0;
+      const comittedCost = field.sapCosts?.project_task_commitments || 0;
+      sapValue = Number(comittedCost) + Number(realizedCost);
+    }
+    return Number(sapValue).toFixed(0);
+  };
+
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setEditing((currentState) => !currentState);
@@ -56,7 +73,7 @@ const ListField: FC<IListFieldProps> = ({
               <div className="list-field-container" key={f.label}>
                 <label className="list-field-label">{t(f.label)}</label>
                 {!editing ? (
-                  <span>{`${field.value} €`}</span>
+                  <span>{f.sapCosts ? `${getSapCostValue(f)} €` : `${field.value} €`}</span>
                 ) : (
                   <>
                     <NumberInput

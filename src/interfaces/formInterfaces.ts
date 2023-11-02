@@ -1,5 +1,6 @@
 import { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
 import { FreeSearchFormObject, IOption } from './common';
+import { IProjectSapCost } from './sapCostsInterfaces';
 
 export enum FormField {
   Select,
@@ -30,6 +31,7 @@ export interface IForm {
   hideLabel?: boolean;
   icon?: string;
   placeholder?: string;
+  sapCosts?: IProjectSapCost | null;
 }
 
 export interface IProjectHeaderForm {
