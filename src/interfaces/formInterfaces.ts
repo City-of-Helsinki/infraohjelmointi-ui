@@ -32,6 +32,7 @@ export interface IForm {
   icon?: string;
   placeholder?: string;
   sapCosts?: IProjectSapCost | null;
+  isSapProject?: boolean;
 }
 
 export interface IProjectHeaderForm {

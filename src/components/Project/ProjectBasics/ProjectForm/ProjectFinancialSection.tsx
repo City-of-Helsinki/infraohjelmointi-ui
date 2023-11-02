@@ -147,14 +147,17 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           {
             ...getFieldProps('realizedCost'),
             readOnly: true,
+            isSapProject: true,
           },
           {
             ...getFieldProps('comittedCost'),
             readOnly: true,
+            isSapProject: true,
           },
           {
             ...getFieldProps('spentCost'),
             readOnly: true,
+            isSapProject: true,
           },
         ]}
         cancelEdit={isSaving}
