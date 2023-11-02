@@ -38,3 +38,4 @@ extends:
   template: azure-pipelines-build-infraohjelmointi-ui-stageprod.yml@infraohjelmointi-pipelines
   #parameters:
     #imagetag: ${{ parameters.imagetag }}
+    
