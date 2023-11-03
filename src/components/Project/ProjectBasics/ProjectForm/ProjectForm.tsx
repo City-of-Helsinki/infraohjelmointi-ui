@@ -26,6 +26,7 @@ import _ from 'lodash';
 import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
+import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -36,6 +37,7 @@ const ProjectForm = () => {
   const user = useAppSelector(selectUser);
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
+  const sapCosts = useAppSelector(getProjectSapCosts);
 
   const [newProjectId, setNewProjectId] = useState('');
 
@@ -104,6 +106,7 @@ const ProjectForm = () => {
         name: name,
         label: `projectForm.${name}`,
         control: control,
+        sapCosts: project ? sapCosts[project?.id] : null,
       };
     },
     [control],

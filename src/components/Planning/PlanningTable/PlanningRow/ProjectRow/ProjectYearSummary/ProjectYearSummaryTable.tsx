@@ -6,10 +6,11 @@ import { FC, memo, useMemo } from 'react';
 interface IProjectYearSummaryTableProps {
   cellType: CellType;
   id: string;
+  sapProject: string | undefined;
   sapCosts: Record<string, IProjectSapCost>;
 }
 
-const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, id, sapCosts }) => {
+const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, id, sapProject, sapCosts }) => {
   const costs = useMemo(() => {
     const projectCosts = sapCosts[id];
 
@@ -27,7 +28,8 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
       data-testid={`project-year-summary-${id}`}
     >
       <div className={`monthly-summary-table-container ${cellType}`}>
-        {cellType !== 'none' && (
+        {/* We want to display this information only when the project has a SAP id */}
+        {sapProject && (
           <table className="text-right">
             <thead>
               <tr>
@@ -51,14 +53,14 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                   <IconScrollContent size="xs" />
                 </td>
                 <td>
-                  <span className="text-sm font-light">{costs.projectTaskCosts}</span>
+                  <span className="text-sm font-light">{costs.projectTaskCosts.toFixed(0)}</span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">{costs.projectTaskCommitments}</span>
+                  <span className="text-sm font-light">{costs.projectTaskCommitments.toFixed(0)}</span>
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.projectTaskCosts + costs.projectTaskCommitments).toFixed(2)}
+                    {Number(costs.projectTaskCosts + costs.projectTaskCommitments).toFixed(0)}
                   </span>
                 </td>
               </tr>
@@ -69,14 +71,14 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                   <IconHammers size="xs" />
                 </td>
                 <td>
-                  <span className="text-sm font-light">{costs.productionTaskCosts}</span>
+                  <span className="text-sm font-light">{costs.productionTaskCosts.toFixed(0)}</span>
                 </td>
                 <td>
-                  <span className="text-sm font-light">{costs.productionTaskCommitments}</span>
+                  <span className="text-sm font-light">{costs.productionTaskCommitments.toFixed(0)}</span>
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.productionTaskCosts + costs.productionTaskCommitments).toFixed(2)}
+                    {Number(costs.productionTaskCosts + costs.productionTaskCommitments).toFixed(0)}
                   </span>
                 </td>
               </tr>
@@ -88,14 +90,12 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.projectTaskCosts + costs.productionTaskCosts).toFixed(2)}
+                    {Number(costs.projectTaskCosts + costs.productionTaskCosts).toFixed(0)}
                   </span>
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.projectTaskCommitments + costs.productionTaskCommitments).toFixed(
-                      2,
-                    )}
+                    {Number(costs.projectTaskCommitments + costs.productionTaskCommitments).toFixed(0)}
                   </span>
                 </td>
                 <td>
@@ -105,7 +105,7 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                         costs.productionTaskCosts +
                         costs.projectTaskCommitments +
                         costs.productionTaskCommitments,
-                    ).toFixed(2)}
+                    ).toFixed(0)}
                   </span>
                 </td>
               </tr>

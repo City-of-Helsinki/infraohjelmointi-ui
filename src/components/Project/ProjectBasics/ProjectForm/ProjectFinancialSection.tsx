@@ -14,6 +14,7 @@ import { validateMaxLength } from '@/utils/validation';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/common';
 import { selectIsProjectSaving } from '@/reducers/projectSlice';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
@@ -21,6 +22,7 @@ interface IProjectFinancialSectionProps {
     name: string;
     label: string;
     control: Control<IProjectForm>;
+    sapCosts: IProjectSapCost | null;
   };
   classOptions: {
     masterClasses: IOption[];
@@ -145,18 +147,22 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           {
             ...getFieldProps('realizedCost'),
             readOnly: true,
+            isSapProject: true,
           },
           {
             ...getFieldProps('comittedCost'),
             readOnly: true,
+            isSapProject: true,
           },
           {
             ...getFieldProps('spentCost'),
             readOnly: true,
+            isSapProject: true,
           },
         ]}
         cancelEdit={isSaving}
       />
+
       <OverrunRightField control={control} cancelEdit={isSaving} />
       <ListField
         {...getFieldProps('preliminaryBudgetDivision')}

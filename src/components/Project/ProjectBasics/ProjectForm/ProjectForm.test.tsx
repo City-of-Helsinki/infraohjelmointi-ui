@@ -32,6 +32,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogContext';
 import { mockUser } from '@/mocks/mockUsers';
 import { IPerson } from '@/interfaces/personsInterfaces';
+import { mockSapCostsProject } from '@/mocks/mockSapCosts';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -91,6 +92,11 @@ const render = async () =>
             popularHashTags: mockHashTags.data.popularHashTags,
             error: {},
           },
+          sapCosts: {
+            projects: mockSapCostsProject.data,
+            groups: {},
+            error: null,
+          }
         },
       },
     ),
@@ -126,7 +132,8 @@ describe('projectForm', () => {
     const { findByDisplayValue, findByText, findByTestId } = await render();
 
     const project = mockProject.data;
-    const euroFormat = (value: string) => `${value} €`;
+    const sapCost = mockSapCostsProject.data;
+    const sapCostsSum = Number(sapCost[project.id].project_task_commitments) + Number(sapCost[project.id].production_task_costs);
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
@@ -151,10 +158,10 @@ describe('projectForm', () => {
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);
     expectRadioBoolean('effectHousing-0', false);
-    expect(await findByText(euroFormat(project?.costForecast || ''))).toBeInTheDocument();
-    expect(await findByText(euroFormat(project?.realizedCost || ''))).toBeInTheDocument();
-    expect(await findByText(euroFormat(project?.comittedCost || ''))).toBeInTheDocument();
-    expect(await findByText(euroFormat(project?.spentCost || ''))).toBeInTheDocument();
+    expect(await findByText(Number(project?.costForecast).toFixed(0) + ' €'|| '')).toBeInTheDocument();
+    expect(await findByText(Number(sapCost[project.id]?.project_task_commitments).toFixed(0) + ' €' || '')).toBeInTheDocument();
+    expect(await findByText(Number(sapCost[project.id]?.project_task_costs).toFixed(0) + ' €' || '')).toBeInTheDocument();
+    expect(await findByText(sapCostsSum.toFixed(0) + ' €' || '')).toBeInTheDocument();
     expect(await findByText('overrunRightValue' || '')).toBeInTheDocument();
     expect(await findByText(`${project?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();
     expectDisplayValue(project?.description);
