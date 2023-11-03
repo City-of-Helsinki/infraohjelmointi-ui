@@ -15,10 +15,10 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
     const projectCosts = sapCosts[id];
 
     return {
-      projectTaskCosts: Number(projectCosts?.project_task_costs || 1),
-      projectTaskCommitments: Number(projectCosts?.project_task_commitments || 2),
-      productionTaskCosts: Number(projectCosts?.production_task_costs || 3),
-      productionTaskCommitments: Number(projectCosts?.production_task_commitments || 4),
+      projectTaskCosts: Number(projectCosts?.project_task_costs || 0),
+      projectTaskCommitments: Number(projectCosts?.project_task_commitments || 0),
+      productionTaskCosts: Number(projectCosts?.production_task_costs || 0),
+      productionTaskCommitments: Number(projectCosts?.production_task_commitments || 0),
     };
   }, [cellType, id]);
   // All the values in the table are retrieved from SAP and mocked as 0 for now
