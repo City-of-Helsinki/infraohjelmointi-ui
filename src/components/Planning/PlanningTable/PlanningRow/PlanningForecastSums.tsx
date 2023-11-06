@@ -5,7 +5,7 @@ import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { IGroupSapCost } from '@/interfaces/sapCostsInterfaces';
 import { selectUser } from '@/reducers/authSlice';
-import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
+import { notifyError } from '@/reducers/notificationSlice';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classServices';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
