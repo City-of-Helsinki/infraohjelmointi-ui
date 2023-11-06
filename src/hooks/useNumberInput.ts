@@ -1,10 +1,10 @@
+import { formattedNumberToNumber } from '@/utils/calculations';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-const useNumberInput = (v?: string) => {
-  const value = v ? v?.replace("−", "-") : '0';
-  
+const useNumberInput = (value?: string) => {
+ 
   const [inputValue, setInputValue] = useState<string | number | undefined>(
-    parseInt(value.replace(/\s/g, '')),
+    formattedNumberToNumber(value),
   );
   
   const parsedValue = useMemo(() => inputValue?.toString(), [inputValue]);
@@ -15,7 +15,7 @@ const useNumberInput = (v?: string) => {
 
   // Update frame budget when a new value is emitted
   useEffect(() => {
-    setInputValue(value ? parseInt(value.replace(/\s/g, '')) : '0');
+    setInputValue(formattedNumberToNumber(value) || '0');
   }, [value]);
 
   return { value: parsedValue, onChange, setInputValue };

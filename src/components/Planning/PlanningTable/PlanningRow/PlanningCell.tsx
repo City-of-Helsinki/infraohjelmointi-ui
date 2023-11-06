@@ -19,6 +19,7 @@ import useNumberInput from '@/hooks/useNumberInput';
 import { patchCoordinationLocation } from '@/services/locationServices';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
+import { formattedNumberToNumber } from '@/utils/calculations';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 
 
@@ -62,7 +63,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     if (
       !value ||
       !displayFrameBudget ||
-      parseInt(displayFrameBudget.replace(/\s/g, '')) === parseInt(value)
+      formattedNumberToNumber(displayFrameBudget) === parseInt(value)
     ) {
       return;
     }
@@ -72,8 +73,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       return;
     }
 
-    const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '').replace("−", "-")) : 0;
-    const valueNumber = parseInt(value);
+    const budgetChangeNumber = budgetChange ? formattedNumberToNumber(budgetChange) : 0;
+    const valueNumber = formattedNumberToNumber(value);
 
     // If the budget change is greater than the patched value we will only patch the input value
     // otherwise we patch the value - budget change
@@ -100,7 +101,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   };
 
   const checkValue = () => {
-    setInputValue(displayFrameBudget);
+    setInputValue(formattedNumberToNumber(displayFrameBudget));
   }
 
   const budgetOverlapAlertIcon = useMemo(
