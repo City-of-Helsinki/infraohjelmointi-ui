@@ -65,7 +65,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
     const parsedValue = parseInt(value || '0');
 
     // We don't want the frame budget to be a negative value
-    if (frameBudget + parsedValue < 0) {
+    if (frameBudget - parseInt(budgetChange || '0') + parsedValue < 0) {
       dispatch(
         notifyError({
           message: 'frameBudgetError',
@@ -83,7 +83,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
         finances: {
           year: startYear,
           [cell.key]: {
-            budgetChange: value,
+            budgetChange: parsedValue,
           },
         },
       },
