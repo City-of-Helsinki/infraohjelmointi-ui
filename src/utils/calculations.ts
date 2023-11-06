@@ -16,10 +16,10 @@ export const formattedNumberToNumber = (formattedNumber?: string) => {
     return 0;
   }
   // The character U+2212 is compared intentional here, since the number is formatted with toLocaleString('fi-FI')
-  if (formattedNumber.trim().startsWith('−')) {
-    return -parseInt(formattedNumber.replace(/\D/g, ''));
+  if (['−','-'].includes(formattedNumber.trim()[0])) {
+    return -parseInt(formattedNumber.trim().replace(/−|-/g, ''));
   } else {
-    return parseInt(formattedNumber.replace(/\D/g, ''));
+    return parseInt(formattedNumber.trim());
   }
 };
 
