@@ -62,8 +62,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
     }
 
     const frameBudgetElement = document.getElementById(`frame-budget-${id}-${year}`);
-    const frameBudget = formattedNumberToNumber(frameBudgetElement?.innerHTML || '0') 
-    
+    const frameBudget = formattedNumberToNumber(frameBudgetElement?.innerHTML || '0');
     const parsedValue = formattedNumberToNumber(value || '0');
     
     // We don't want the frame budget to be a negative value
