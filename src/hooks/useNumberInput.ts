@@ -10,7 +10,9 @@ const useNumberInput = (value?: string) => {
   const parsedValue = useMemo(() => inputValue?.toString(), [inputValue]);
 
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-      setInputValue(e.target.value);
+      if (!e.target.value.includes(",") && !e.target.value.includes(".")) {
+        setInputValue(e.target.value);
+      }
   }, []);
 
   // Update frame budget when a new value is emitted
