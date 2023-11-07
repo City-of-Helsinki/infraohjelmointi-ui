@@ -8,12 +8,12 @@ export interface IClassHierarchy {
   masterClasses: Array<IClass>;
   classes: Array<IClass>;
   subClasses: Array<IClass>;
+  otherClassifications: Array<IClass>;
   year: number;
 }
 
 export interface ICoordinatorClassHierarchy extends IClassHierarchy {
   collectiveSubLevels: Array<IClass>;
-  otherClassifications: Array<IClass>;
   otherClassificationSubLevels: Array<IClass>;
 }
 
@@ -34,13 +34,13 @@ const initialClasses = {
   masterClasses: [],
   classes: [],
   subClasses: [],
+  otherClassifications: [],
   year: new Date().getFullYear(),
 };
 
 const initialCoordinationClasses = {
   ...initialClasses,
   collectiveSubLevels: [],
-  otherClassifications: [],
   otherClassificationSubLevels: [],
 };
 
@@ -96,19 +96,22 @@ const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator:
   const masterClasses = allClasses?.filter((ac) => !ac.parent);
   const classes = getClasses(masterClasses);
   const subClasses = getClasses(classes);
+  const collectiveSubLevels = getClasses(subClasses);
+  const otherClassifications = getClasses(collectiveSubLevels);
 
-  if (!forCoordinator) {
+  if (!forCoordinator ) {
+    // other classifications are on the same level as districts in planning view so we need to fetch the data differently for plannig view
+    const otherClassifications = getClasses(subClasses);
     return {
       allClasses,
       masterClasses,
       classes,
       subClasses,
+      otherClassifications,
       year: classes[0]?.finances?.year,
     };
   }
 
-  const collectiveSubLevels = getClasses(subClasses);
-  const otherClassifications = getClasses(collectiveSubLevels);
   const otherClassificationSubLevels = getClasses(otherClassifications);
 
   return {
@@ -168,7 +171,6 @@ export const classSlice = createSlice({
     },
     updateOtherClassification(state, action: PayloadAction<IClass | null>) {
       const data = action.payload;
-
       if (data) {
         const otherClassifications = [...state.coordination.otherClassifications].map((oc) =>
           oc.id === data.id ? data : oc,
@@ -264,6 +266,7 @@ export const selectAllPlanningClasses = (state: RootState) => state.class.planni
 export const selectPlanningMasterClasses = (state: RootState) => state.class.planning.masterClasses;
 export const selectPlanningClasses = (state: RootState) => state.class.planning.classes;
 export const selectPlanningSubClasses = (state: RootState) => state.class.planning.subClasses;
+export const selectPlanningOtherClassifications = (state: RootState) => state.class.planning.otherClassifications;
 export const selectBatchedPlanningClasses = (state: RootState) => state.class.planning;
 export const selectBatchedCoordinationClasses = (state: RootState) => state.class.coordination;
 export const selectBatchedForcedToFrameClasses = (state: RootState) => state.class.forcedToFrame;

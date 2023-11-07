@@ -2,6 +2,7 @@ import {
   selectPlanningClasses,
   selectPlanningSubClasses,
   selectPlanningMasterClasses,
+  selectPlanningOtherClassifications,
 } from '@/reducers/classSlice';
 import { classesToOptions } from '@/utils/common';
 import { useCallback, useMemo } from 'react';
@@ -25,6 +26,7 @@ const useClassOptions = (currentClass: string | undefined) => {
   const masterClasses = useAppSelector(selectPlanningMasterClasses);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
+  const otherClassifications = useAppSelector(selectPlanningOtherClassifications);
 
   const selectedMasterClass = useMemo(
     () => masterClasses && masterClasses.find((mc) => mc.id === currentClass),
@@ -67,6 +69,15 @@ const useClassOptions = (currentClass: string | undefined) => {
     }
   }, [classes, currentClass, selectedClass, selectedSubClass, subClasses]);
 
+  const getNextOtherClassifications = useCallback(() => {
+    if (selectedSubClass){
+      const subClassParent = subClasses.find((sc) => sc.parent === selectedSubClass.parent);
+      return otherClassifications.filter((oc) => oc.parent === subClassParent?.id);
+    } else {
+      return [];
+    }
+  }, [classes, currentClass, selectedSubClass, subClasses, otherClassifications]);
+
   const filteredMasterClasses = useMemo(() => {
     if (
       isUserOnlyProjectAreaPlanner(user) &&
@@ -83,6 +94,7 @@ const useClassOptions = (currentClass: string | undefined) => {
     masterClasses: classesToOptions(filteredMasterClasses),
     classes: classesToOptions(getNextClasses()),
     subClasses: classesToOptions(getNextSubClasses()),
+    otherClassifications: classesToOptions(getNextOtherClassifications()),
   };
 };
 

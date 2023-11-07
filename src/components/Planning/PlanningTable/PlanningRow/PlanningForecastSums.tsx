@@ -1,13 +1,15 @@
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import useNumberInput from '@/hooks/useNumberInput';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import { IPlanningCell, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { IGroupSapCost } from '@/interfaces/sapCostsInterfaces';
 import { selectUser } from '@/reducers/authSlice';
+import { notifyError } from '@/reducers/notificationSlice';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classServices';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
+import { formattedNumberToNumber } from '@/utils/calculations';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -24,13 +26,14 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const dispatch = useAppDispatch();
   const mode = useAppSelector(selectPlanningMode);
   const startYear = useAppSelector(selectStartYear);
   const editBudgetChangeInputRef = useRef<HTMLInputElement>(null);
 
   const [editBudgetChange, setEditBudgetChange] = useState(false);
 
-  const { value, onChange } = useNumberInput(budgetChange);
+  const { value, onChange, setInputValue } = useNumberInput(budgetChange);
 
   const onEditBudgetChange = useCallback(() => setEditBudgetChange((current) => !current), []);
 
@@ -53,13 +56,35 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
 
   const onPatchBudgetChange = () => {
+    // Don't send request including empty budgetChange info
+    if (!value) {
+      return;
+    }
+
+    const frameBudgetElement = document.getElementById(`frame-budget-${id}-${year}`);
+    const frameBudget = formattedNumberToNumber(frameBudgetElement?.innerHTML || '0');
+    const parsedValue = formattedNumberToNumber(value || '0');
+    
+    // We don't want the frame budget to be a negative value
+    if (frameBudget - formattedNumberToNumber(budgetChange || '0') + parsedValue < 0) {
+      dispatch(
+        notifyError({
+          message: 'frameBudgetError',
+          title: 'saveError',
+          type: 'toast',
+          duration: 5000,
+        }),
+      );
+      return;
+    }
+
     const request: IClassPatchRequest = {
       id,
       data: {
         finances: {
           year: startYear,
           [cell.key]: {
-            budgetChange: value,
+            budgetChange: parsedValue,
           },
         },
       },
@@ -67,9 +92,15 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
     patchCoordinationClass(request);
   };
 
+  const checkValue = () => {
+    if((!value && editBudgetChange) || budgetChange != value){
+      setInputValue(formattedNumberToNumber(budgetChange));
+    }
+  }
+
   const isEditBudgetChangeDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame || editBudgetChange,
-    [forcedToFrame, mode, user],
+    [forcedToFrame, mode, user, editBudgetChange],
   );
 
   return (
@@ -92,7 +123,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
         {!editBudgetChange && (
           <div className={`planning-forecast-sums ${type} mt-[0.2rem]`}>
             <span data-testid={`planning-forecast-implemented-${id}`}>
-              {forecastCostsForGroups}
+              {Number(forecastCostsForGroups).toFixed(0)}
             </span>
             <span data-testid={`planning-forecast-bound-${id}`}>0</span>
             {displayBudgetChange && (
@@ -103,7 +134,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
           </div>
         )}
         {editBudgetChange && (
-          <input
+          <input autoFocus
             id="edit-budget-change-input"
             className="budget-change-input"
             type="number"
@@ -111,6 +142,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
             ref={editBudgetChangeInputRef}
             value={value}
             onChange={onChange}
+            onFocus={checkValue}
           />
         )}
       </button>

@@ -23,6 +23,7 @@ const useSearchForm = () => {
     district: [],
     division: [],
     subDivision: [],
+    otherClassification: [],
   });
 
   const locationOptions = useMultiLocationOptions(
@@ -35,6 +36,7 @@ const useSearchForm = () => {
     multiListsState.masterClass,
     multiListsState.class,
     multiListsState.subClass,
+    multiListsState.otherClassification,
   );
 
   const {
@@ -51,6 +53,7 @@ const useSearchForm = () => {
       case 'district':
       case 'division':
       case 'subDivision':
+      case 'otherClassification':
         setMultiListsState((current) => ({ ...current, [key]: value }));
         break;
       default:

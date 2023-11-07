@@ -1,6 +1,11 @@
 import { IError } from '@/interfaces/common';
 import { IGroup, IGroupRequest } from '@/interfaces/groupInterfaces';
-import { deleteGroup, getCoordinatorGroups, getPlanningGroups, postGroup } from '@/services/groupServices';
+import {
+  deleteGroup,
+  getCoordinatorGroups,
+  getPlanningGroups,
+  postGroup,
+} from '@/services/groupServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -21,10 +26,12 @@ const initialState: IGroupsState = {
 };
 export const getCoordinationGroupsThunk = createAsyncThunk(
   'group/getAllCoordinator',
-  async (year:number, thunkAPI) => {
-    return await getCoordinatorGroups(year)
-      .then((res) => res)
-      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  async (year: number, thunkAPI) => {
+    try {
+      return await getCoordinatorGroups(year);
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
   },
 );
 export const postGroupThunk = createAsyncThunk(
@@ -48,14 +55,17 @@ export const deleteGroupThunk = createAsyncThunk('group/delete', async (id: stri
   }
 });
 
-export const getPlanningGroupsThunk = createAsyncThunk('group/getAllPlanning', async (year: number, thunkAPI) => {
-  try {
-    const groups = await getPlanningGroups(year);
-    return groups;
-  } catch (e) {
-    return thunkAPI.rejectWithValue(e);
-  }
-});
+export const getPlanningGroupsThunk = createAsyncThunk(
+  'group/getAllPlanning',
+  async (year: number, thunkAPI) => {
+    try {
+      const groups = await getPlanningGroups(year);
+      return groups;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
 
 export const groupSlice = createSlice({
   name: 'group',
@@ -82,12 +92,15 @@ export const groupSlice = createSlice({
       return { ...state, error: action.payload };
     });
     // GROUP GET ALL
-    builder.addCase(getPlanningGroupsThunk.fulfilled, (state, action: PayloadAction<Array<IGroup>>) => {
-      return {
-        ...state,
-        planning: { year: action.payload[0]?.finances?.year, groups: action.payload },
-      };
-    });
+    builder.addCase(
+      getPlanningGroupsThunk.fulfilled,
+      (state, action: PayloadAction<Array<IGroup>>) => {
+        return {
+          ...state,
+          planning: { year: action.payload[0]?.finances?.year, groups: action.payload },
+        };
+      },
+    );
     builder.addCase(getPlanningGroupsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });

@@ -101,13 +101,13 @@ const render = async () =>
     ),
   );
 
-describe.skip('PlanningView', () => {
+describe('PlanningView', () => {
   const asNumber = (value: string | null) => parseInt(value || '');
   const navigateToProjectRows = async (renderResult: CustomRenderResult) => {
-    const { user, store, getByTestId } = renderResult;
+    const { user, store, findByTestId } = renderResult;
     const { masterClasses, classes } = store.getState().class.planning;
-    await user.click(getByTestId(`expand-${masterClasses[0].id}`));
-    await user.click(getByTestId(`expand-${classes[0].id}`));
+    await user.click(await findByTestId(`expand-${masterClasses[0].id}`));
+    await user.click(await findByTestId(`expand-${classes[0].id}`));
   };
 
   const openContextMenuForCell = async (
@@ -370,7 +370,7 @@ describe.skip('PlanningView', () => {
       expect(getByTestId('planning-summary-head-row')).toBeInTheDocument();
 
       for (let i = 0; i < 11; i++) {
-        const title = getPlanningRowTitle(i);
+        const title = getPlanningRowTitle(year + i);
         const headCell = getByTestId(`head-${year + i}`);
         expect(headCell).toHaveTextContent((year + i).toString());
         expect(headCell).toHaveTextContent(title);
@@ -910,7 +910,7 @@ describe.skip('PlanningView', () => {
       });
     });
 
-    describe('ProjectRow', () => {
+    describe.skip('ProjectRow', () => {
       it('renders all the elements and the row budgets to rows that have either est-dates or planningStartYear or constructionEndYear, and no financial data to cells if there is no planning or construction', async () => {
         const renderResult = await render();
 

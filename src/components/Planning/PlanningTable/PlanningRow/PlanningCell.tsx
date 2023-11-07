@@ -19,6 +19,7 @@ import useNumberInput from '@/hooks/useNumberInput';
 import { patchCoordinationLocation } from '@/services/locationServices';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
+import { formattedNumberToNumber } from '@/utils/calculations';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 
 
@@ -47,7 +48,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const groupSapCosts = useAppSelector(getGroupSapCosts);
 
-  const { value, onChange } = useNumberInput(displayFrameBudget);
+  const { value, onChange, setInputValue } = useNumberInput(displayFrameBudget);
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,13 +63,18 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     if (
       !value ||
       !displayFrameBudget ||
-      parseInt(displayFrameBudget.replace(/\s/g, '')) === parseInt(value)
+      formattedNumberToNumber(displayFrameBudget) === parseInt(value)
     ) {
       return;
     }
 
-    const budgetChangeNumber = budgetChange ? parseInt(budgetChange.replace(/\s/g, '')) : 0;
-    const valueNumber = parseInt(value);
+    // If negative value, do not send request
+    if (parseInt(value) < 0){
+      return;
+    }
+
+    const budgetChangeNumber = budgetChange ? formattedNumberToNumber(budgetChange) : 0;
+    const valueNumber = formattedNumberToNumber(value);
 
     // If the budget change is greater than the patched value we will only patch the input value
     // otherwise we patch the value - budget change
@@ -93,6 +99,10 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       patchCoordinationClass(request);
     }
   };
+
+  const checkValue = () => {
+    setInputValue(formattedNumberToNumber(displayFrameBudget));
+  }
 
   const budgetOverlapAlertIcon = useMemo(
     () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
@@ -125,6 +135,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
                 </span>
                 <span
                   data-testid={`frame-budget-${id}-${year}`}
+                  id={`frame-budget-${id}-${year}`}
                   className={isFrameBudgetOverlap ? 'text-engel' : 'text-white'}
                 >
                   {budgetOverlapAlertIcon}
@@ -143,7 +154,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
         {editFrameBudget && (
           // height 0 prevents the table cell from growing
           <div className="frame-budget-container">
-            <input
+            <input autoFocus
               id="edit-frame-budget-input"
               className="frame-budget-input"
               type="number"
@@ -151,6 +162,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
               ref={editFrameBudgetInputRef}
               value={value}
               onChange={onChange}
+              onFocus={checkValue}
             />
           </div>
         )}
@@ -166,6 +178,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
               key={m}
               className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
               onMouseOver={() => setHoveredClassToMonth(m)}
+              onFocus={() => setHoveredClassToMonth(m)}
               onMouseLeave={() => removeHoveredClassFromMonth(m)}
             />
           ))}

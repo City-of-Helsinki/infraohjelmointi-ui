@@ -19,17 +19,23 @@ interface IPlanningSummaryTableState {
   cells: Array<IPlanningCell>;
 }
 
-export const getPlanningRowTitle = (index: number) => {
-  switch (index) {
-    case 0:
-      return 'kuluva TA';
-    case 1:
-      return 'TAE';
-    case 2:
-    case 3:
-      return 'TSE';
-    default:
-      return 'alustava';
+export const getPlanningRowTitle = (startYear: number) => {
+  const currentYear = new Date().getFullYear();
+  const diff = startYear - currentYear;
+
+  if (diff === 0) {
+    return "kuluva TA";
+  }
+  else if (diff === 1) {
+    return "TAE";
+  }
+  else if (diff < 0) {
+    return "TA";
+  }
+  else if (diff <= 3) {
+    return "TSE";
+  } else {
+    return "alustava";
   }
 };
 
@@ -41,7 +47,7 @@ const buildPlanningSummaryHeadCells = (startYear: number) => {
   for (let i = 0; i < 11; i++) {
     cells.push({
       year: startYear + i,
-      title: getPlanningRowTitle(i),
+      title: getPlanningRowTitle(startYear + i),
       isCurrentYear: startYear + i === startYear,
     });
   }

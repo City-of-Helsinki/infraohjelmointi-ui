@@ -62,9 +62,11 @@ const buildPlanningTableRows = (
   projects: Array<IProject>,
   selections: IPlanningRowSelections,
 ) => {
-  const { masterClasses, classes, subClasses, districts, divisions, groups } = list;
+  const { masterClasses, classes, subClasses, districts, divisions, otherClassifications, groups } = list;
 
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
+
+
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
 
@@ -107,6 +109,7 @@ const buildPlanningTableRows = (
     else if (type === 'division' || type == 'district') {
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
+
     return sortByName(filteredGroups).map((group) => ({
       ...getRow(group as IGroup, 'group'),
     }));
@@ -137,6 +140,11 @@ const buildPlanningTableRows = (
                   .map((filteredDistrict) => ({
                     ...getRow(filteredDistrict, districtType),
                   })),
+                ...otherClassifications
+                .filter((otherClassifications) => otherClassifications.parent === filteredSubClass.id)
+                .map((filteredOthers) => ({
+                  ...getRow(filteredOthers, 'otherClassification'),
+                }))
               ],
             })),
         })),
@@ -260,8 +268,8 @@ const usePlanningRows = () => {
       return;
     }
 
-    const { masterClasses, classes, subClasses } = batchedPlanningClasses;
-    const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass } = selections;
+    const { masterClasses, classes, subClasses, otherClassifications } = batchedPlanningClasses;
+    const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass, selectedOtherClassification} = selections;
     const { districts, divisions } = batchedPlanningLocations;
 
     const finalDistricts = [];
@@ -280,7 +288,7 @@ const usePlanningRows = () => {
       subClasses: getSelectedOrAll(selectedSubClass, subClasses),
       collectiveSubLevels: [],
       districts: finalDistricts,
-      otherClassifications: [],
+      otherClassifications: getSelectedOrAll(selectedOtherClassification, otherClassifications),
       otherClassificationSubLevels: [],
       divisions,
       groups,
