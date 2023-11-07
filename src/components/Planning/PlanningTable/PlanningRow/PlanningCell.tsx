@@ -178,6 +178,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
               key={m}
               className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
               onMouseOver={() => setHoveredClassToMonth(m)}
+              onFocus={() => setHoveredClassToMonth(m)}
               onMouseLeave={() => removeHoveredClassFromMonth(m)}
             />
           ))}
