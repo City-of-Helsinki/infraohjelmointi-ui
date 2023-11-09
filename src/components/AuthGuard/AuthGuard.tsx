@@ -79,6 +79,10 @@ const AuthGuard: FC = () => {
       return;
     }
 
+    if(pathname.includes('auth/helsinki/return')) {
+      return navigate('planning');
+    }
+
     // Redirect to previous url if a non admin tries to access the admin view
     if (pathname.includes('admin') && !isUserAdmin(user)) {
       return navigate(-1);
