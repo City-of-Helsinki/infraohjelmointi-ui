@@ -19,7 +19,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openModifiedInfo, setOpenModifiedInfo] = useState(false);
-  const author = `${note.updatedBy?.firstName} ${note.updatedBy?.lastName}`;
+  const author = `${note.updatedBy?.first_name} ${note.updatedBy?.last_name}`;
   const hasHistory = note.history?.length > 0;
 
   const handleOpenDeleteDialog = useCallback(

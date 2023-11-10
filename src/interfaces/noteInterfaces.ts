@@ -22,6 +22,6 @@ export interface INoteHistory {
 
 interface INotePerson {
   id: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
 }
