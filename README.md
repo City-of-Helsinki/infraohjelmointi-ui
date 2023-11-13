@@ -73,6 +73,14 @@ We use i18next-react for localization. You can find the localization files under
 
 > **_NOTE:_** Localization will not be included in the MVP version of the app. The app will only be using the constants from `fi.json` until the full release.
 
+### How to: production release
+
+1. Create a release PR from develop to main
+2. Wait for the PR pipeline to run and check that all checks pass
+3. Merge the PR
+4. Trigger build-infraohjelmointi-ui-stageprod pipeline in azure
+5. Approve pipeline run in azure. Deploy pipelines are triggered by the build pipeline but prod deploy needs to be approved separately (=2 approvals in total). To approve, open the pipeline run you want to approve (from menu, select pipelines, then select the correct pipeline and then select the run you need to approve) and there should be a button to approve it (pipeline run is paused until you approve).
+
 ### Collection of scripts
 
 - **Install packages** : `yarn install`
