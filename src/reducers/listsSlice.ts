@@ -48,7 +48,7 @@ const initialState: IListState = {
 };
 
 // Sorting the list of responsible persons by value which has the person name with lastname first
-const sortPersons = (persons: Array<IListItem>) =>
+export const sortPersons = (persons: Array<IListItem>) =>
   [...persons].sort((a, b) => a.value < b.value ? -1 : (a.value > b.value ? 1 : 0));
 
 const getResponsiblePersons = async () => {
