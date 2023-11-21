@@ -297,19 +297,19 @@ export const mockResponsibleZones: { data: Array<IListItem> } = {
 export const mockResponsiblePersons: { data: Array<IListItem> } = {
   data: [
     {
-      value: 'Matti Meikäläinen',
+      value: 'Meikäläinen Matti',
       id: 'd53239df-b105-4ef0-9b20-a6f5a0281f7b',
     },
     {
-      value: 'Matti Kimari',
+      value: 'Kimari Matti',
       id: '63e71910-07de-4ba3-814f-f54315432d97',
     },
     {
-      value: 'Matti Nn',
+      value: 'Nn Matti',
       id: 'c60f6c51-8ccd-4414-ad00-b10e3e624fed',
     },
     {
-      value: 'Matti Kaalikoski',
+      value: 'Kaalikoski Matti',
       id: '92521a1d-b1b4-41c6-be4b-11d526112d15',
     },
   ],
