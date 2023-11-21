@@ -67,7 +67,7 @@ describe('ProjectNotes', () => {
     const { getByText } = await render();
 
     mockNotes.data.forEach((n) => {
-      const author = `${n.updatedBy.firstName} ${n.updatedBy.lastName}`;
+      const author = `${n.updatedBy.first_name} ${n.updatedBy.last_name}`;
 
       expect(getByText(stringToDateTime(n.createdDate))).toBeInTheDocument();
       expect(getByText(author)).toBeInTheDocument();
@@ -97,7 +97,7 @@ describe('ProjectNotes', () => {
     expect(container.getElementsByClassName('note-history').length).toBe(2);
 
     mockNotes.data[0].history.forEach((h) => {
-      const author = `${h.updatedBy.firstName} ${h.updatedBy.lastName}`;
+      const author = `${h.updatedBy.first_name} ${h.updatedBy.last_name}`;
 
       expect(getByText(stringToDateTime(h.updatedDate))).toBeInTheDocument();
       expect(getByText(author)).toBeInTheDocument();
