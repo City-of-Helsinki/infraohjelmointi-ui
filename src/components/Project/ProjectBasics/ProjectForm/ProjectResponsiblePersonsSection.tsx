@@ -121,7 +121,9 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
           <SelectField
             {...getFieldProps('personProgramming')}
             iconKey="person"
-            options={responsiblePersons}
+            // Options is empty for now because this is not implemented yet, and we
+            // don't get this list from ProjectWise
+            options={[]}
             shouldTranslate={false}
             disabled={isInputDisabled}
           />
