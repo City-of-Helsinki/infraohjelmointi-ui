@@ -127,8 +127,8 @@ const App: FC = () => {
                 <Route path="hashtags" element={<AdminHashtags />} />
               </Route>
               <Route path="/access-denied" element={<AccessDeniedView />} />
-              <Route path="/auth/helsinki/return"></Route>
-              <Route path="/"></Route>
+              <Route path="/auth/helsinki/return" element={<></>}></Route>
+              <Route path="/" element={<></>}></Route>
               <Route path="*" element={<ErrorView />} />
             </Routes>
           )}

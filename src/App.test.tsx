@@ -49,7 +49,7 @@ import { getPlanningLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
-import { getListsThunk } from './reducers/listsSlice';
+import { getListsThunk, sortPersons } from './reducers/listsSlice';
 import { getPlanningGroupsThunk } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
 import { mockUser } from './mocks/mockUsers';
@@ -89,7 +89,7 @@ describe('App', () => {
 
     await waitFor(() => {
       expect(lists.categories).toStrictEqual(mockProjectCategories.data);
-      expect(lists.responsiblePersons).toStrictEqual(mockResponsiblePersons.data);
+      expect(lists.responsiblePersons).toStrictEqual(sortPersons(mockResponsiblePersons.data));
       expect(lists.phases).toStrictEqual(mockProjectPhases.data);
       expect(lists.areas).toStrictEqual(mockProjectAreas.data);
       expect(lists.types).toStrictEqual(mockProjectTypes.data);
