@@ -153,6 +153,7 @@ export interface IProjectRequest {
   frameEstPlanningEnd?: string | null;
   frameEstConstructionStart?: string | null;
   frameEstConstructionEnd?: string | null;
+  classOptions?: unknown;
 }
 
 export interface IProjectPatchRequestObject {

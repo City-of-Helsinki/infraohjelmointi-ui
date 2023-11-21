@@ -126,7 +126,9 @@ const buildPlanningTableRows = (
         .map((filteredClass) => ({
           ...getRow(filteredClass, 'class', !!selectedClass),
           // SUB CLASSES
-          children: subClasses
+          children: //[
+            ///...subClasses
+            subClasses
             .filter((subClass) => subClass.parent === filteredClass.id)
             .map((filteredSubClass) => ({
               ...getRow(filteredSubClass, subClassType, !!selectedSubClass),
@@ -146,7 +148,13 @@ const buildPlanningTableRows = (
                   ...getRow(filteredOthers, 'otherClassification'),
                 }))
               ],
+          }))/*,
+          ...districts
+            .filter((district) => district.parentClass === filteredClass.id)
+            .map((filteredDistrict) => ({
+              ...getRow(filteredDistrict, districtType),
             })),
+        ],*/
         })),
     };
   });

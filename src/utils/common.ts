@@ -119,7 +119,7 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
       }
     };
 
-    _.assign(request, { [getKey()]: parseValue(form[key as keyof IAppForms]) });
+    _.assign(request, { [getKey()]: parseValue(form[key as keyof IAppForms]), });
   }
 
   // Remove the project location when the class is patched since the relation changes

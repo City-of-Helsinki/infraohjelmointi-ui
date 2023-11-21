@@ -87,7 +87,7 @@ export const getForcedToFrameClassesThunk = createAsyncThunk(
   },
 );
 
-const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
+export const getClassesForParents = (allClasses: Array<IClass>, parents: Array<IClass>) =>
   parent ? allClasses?.filter((ac) => parents.findIndex((p) => p.id === ac.parent) !== -1) : [];
 
 const separateClassesIntoHierarchy = (allClasses: Array<IClass>, forCoordinator: boolean) => {

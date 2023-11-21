@@ -27,6 +27,9 @@ import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
+import { selectPlanningSubClasses, getClassesForParents } from '@/reducers/classSlice';
+import { selectPlanningRows, selectSelections } from '@/reducers/planningSlice';
+import { useSelector } from 'react-redux';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -38,6 +41,8 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
   const sapCosts = useAppSelector(getProjectSapCosts);
+
+  const subClasses = useAppSelector(selectPlanningSubClasses);
 
   const [newProjectId, setNewProjectId] = useState('');
 
@@ -71,10 +76,28 @@ const ProjectForm = () => {
       if (isDirty) {
         dispatch(setIsSaving(true));
 
-        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+        let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+
+        //const testi = getClassesForParents(subClasses, [project?.projectClass])
+        //console.log(dirtyFields);
+        //console.log(data);
+        console.log(project);
+        console.log(classOptions);
+        /*console.log(project?.projectClass);
+        console.log(project);
+*/
+        //console.log(subClasses);
 
         // Patch project
         if (project?.id && projectMode === 'edit') {
+
+          console.log(data.projectLocation);
+
+          if (data.projectLocation){
+            data = { ...data, 'classOptions': classOptions }
+          }
+
+
           try {
             await patchProject({ id: project?.id, data });
           } catch (error) {

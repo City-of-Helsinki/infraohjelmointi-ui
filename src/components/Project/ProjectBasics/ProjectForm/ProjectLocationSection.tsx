@@ -30,6 +30,8 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
 
   const responsibleZones = useOptions('responsibleZones');
 
+  //console.log("a", districts, "b", divisions,"c", subDivisions);
+
   return (
     <div className="w-full" id="basics-location-section">
       <FormSectionTitle {...getFieldProps('location')} />

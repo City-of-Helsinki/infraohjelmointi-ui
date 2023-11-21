@@ -193,10 +193,19 @@ const useProjectForm = () => {
 
   // using this useEffect to populate class/location selections with initial values if a project has them
   useEffect(() => {
-    const lowestSelectedClass =
-      formValues.subClass.value || formValues.class.value || formValues.masterClass.value;
+    const lowestSelectedClass = formValues.subDivision.value ? 
+    (formValues.subClass.value || formValues.class.value || formValues.masterClass.value) : (formValues.class.value || formValues.masterClass.value)
     const lowestSelectedLocation =
       formValues.subDivision.value || formValues.division.value || formValues.district.value;
+
+    console.log(formValues.subClass)
+    console.log(formValues.class)
+    console.log(formValues.masterClass)
+    console.log(formValues.subDivision)
+    console.log(formValues.division)
+    console.log(formValues.district)
+    console.log(lowestSelectedClass);
+    console.log(lowestSelectedLocation);
     setSelections({ selectedClass: lowestSelectedClass, selectedLocation: lowestSelectedLocation });
     setSelectedMasterClassName(formValues.masterClass.label ?? '');
   }, [formValues]);
