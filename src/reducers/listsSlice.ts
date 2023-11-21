@@ -47,13 +47,17 @@ const initialState: IListState = {
   error: null,
 };
 
+// Sorting the list of responsible persons by value which has the person name with lastname first
+const sortPersons = (persons: Array<IListItem>) =>
+  [...persons].sort((a, b) => a.value < b.value ? -1 : (a.value > b.value ? 1 : 0));
+
 const getResponsiblePersons = async () => {
   try {
     const persons = await getPersons();
-    return persons.map(({ firstName, lastName, id }) => ({
-      value: `${firstName} ${lastName}`,
+    return sortPersons(persons.map(({ firstName, lastName, id }) => ({
+      value: `${lastName} ${firstName}`,
       id,
-    }));
+    })));
   } catch (e) {
     console.log('Error getting responsible persons: ', e);
     return [];
