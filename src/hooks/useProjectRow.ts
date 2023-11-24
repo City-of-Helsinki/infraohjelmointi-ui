@@ -107,7 +107,7 @@ const getTimelineDates = (
       effectivePlanningStartYear &&
       effectiveConstructionEndYear !== getYear(estPlanningEnd)
     ) {
-      return createDateToStartOfYear(getYear(estPlanningEnd) + 1);
+      return createDateToStartOfYear((getYear(estPlanningEnd) || 0) + 1);
     }
 
     return createDateToStartOfYear(effectiveConstructionEndYear);
@@ -163,7 +163,7 @@ const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<
 
     const isStartYear = getYear(start) === year;
     const isEndYear = getYear(end) === year;
-    const isLaterYear = getYear(end) > year && getYear(start) < year;
+    const isLaterYear = (getYear(end) || 0) > year && (getYear(start) || 0) < year;
 
     let percent = isLaterYear ? '100%' : '0%';
 

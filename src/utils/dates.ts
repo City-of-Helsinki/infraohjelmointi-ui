@@ -89,8 +89,8 @@ export const getFirstDate = (date: string | null | undefined) => {
   return date ? moment(momentFromHDSDate(date)).startOf('year').format('DD.MM.YYYY') : null;
 };
 
-export const getYear = (date?: string | null): number =>
-  date ? parseInt(momentFromHDSDate(date).format('YYYY')) : 0;
+export const getYear = (date?: string | null): number | null =>
+  date ? parseInt(momentFromHDSDate(date).format('YYYY')) : null;
 
 export const updateYear = (year: number | undefined, date?: string | null) => {
   if (date && year) {

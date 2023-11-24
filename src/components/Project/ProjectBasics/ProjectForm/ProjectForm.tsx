@@ -8,7 +8,7 @@ import {
   setIsSaving,
   setSelectedProject,
 } from '@/reducers/projectSlice';
-import { IProjectRequest } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
 import { patchProject, postProject } from '@/services/projectServices';
 import ProjectStatusSection from './ProjectStatusSection';
@@ -27,6 +27,8 @@ import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
+import useProjectRow from '@/hooks/useProjectRow';
+import { getYear } from '@/utils/dates';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -54,6 +56,116 @@ const ProjectForm = () => {
     when: isDirty,
   });
 
+  const getFinanceYearName = (finances: IProjectFinances, year: number) => {
+    const index = year - finances.year;
+    if (index < 3) {
+      return "budgetProposalCurrentYearPlus" + index as keyof IProjectFinances;
+    }
+    else {
+      return "preliminaryCurrentYearPlus" + index as keyof IProjectFinances;
+    }
+  }
+
+  const moveBudgetForwards = (finances: IProjectFinances, previousStartYear: number, startYear: number) => {
+    let financesCopy = finances
+    const numberOfYears = startYear - previousStartYear;
+    let budgetToMove = 0.00;
+    for (let i=0; i<numberOfYears; ++i) {
+      const financeYearName = getFinanceYearName(finances, previousStartYear + i);
+      const financeValue = finances[financeYearName];
+      budgetToMove += parseFloat(financeValue as string);
+      financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
+    }
+    const startYearName = getFinanceYearName(finances, startYear);
+    const newBudget = (parseFloat(finances[startYearName] as string) || 0.00) + budgetToMove;
+
+    financesCopy = { ...financesCopy, [startYearName]: newBudget.toFixed(2)}
+    return financesCopy;
+  }
+
+  const moveBudgetBackwards = (finances: IProjectFinances, previousEndYear: number, endYear: number) => {
+    let financesCopy = finances;
+    const numberOfYears = previousEndYear - endYear;
+    const maxIndex = 10 - (endYear - finances.year);
+    let budgetToMove = 0.00;
+    for (let i=1; i<=numberOfYears && i<=maxIndex; ++i) {
+      const financeYearName = getFinanceYearName(finances, endYear + i);
+      const financeValue = finances[financeYearName];
+      budgetToMove += parseFloat(financeValue as string);
+      financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
+    }
+    const endYearName = getFinanceYearName(finances, endYear);
+    const newBudget = (parseFloat(finances[endYearName] as string) || 0.00) + budgetToMove;
+
+    financesCopy =  { ...financesCopy, [endYearName]: newBudget.toFixed(2)}
+    return financesCopy;
+  }
+
+  const updateFinances = (data: IProjectRequest, project: IProject) => {
+    let finances = project.finances;
+    if (data.planningStartYear) {
+      const planningStartYear = project.planningStartYear;
+      // If new planning start year is bigger than the previous one, budget from years that are not within the schedule of the project
+      // need to be moved to the new planning start year
+      if(planningStartYear && data.planningStartYear > planningStartYear) {
+        const updatedFinances = moveBudgetForwards(finances, planningStartYear, data.planningStartYear);
+        data = {...data, "finances": updatedFinances}
+        finances = updatedFinances;
+      }
+    }
+    if (data.estPlanningEnd) {
+      const previousPlanningEndYear = getYear(project.estPlanningEnd);
+      const planningEndYear = getYear(data.estPlanningEnd);
+      const constructionStartYear = getYear(project.estConstructionStart);
+      // If new planning end year is smaller that the previous one, budget from the years that are not within the schedule need to
+      // be moved backwards to the new end year
+      if (previousPlanningEndYear && planningEndYear && planningEndYear < previousPlanningEndYear) {
+        // If there was an overlap between planning end year and construction start year, budget shouldn't be moved from that year
+        // but still needs to be moved from all the years that are not within the schedule anymore
+        if (constructionStartYear == previousPlanningEndYear &&  previousPlanningEndYear - planningEndYear > 1) {
+          const updatedFinances = moveBudgetBackwards(finances, previousPlanningEndYear - 1, planningEndYear);
+          finances = updatedFinances;
+        } else if (constructionStartYear != previousPlanningEndYear) {
+          const updatedFinances = moveBudgetBackwards(finances, previousPlanningEndYear, planningEndYear);
+          data = {...data, "finances": updatedFinances};
+          finances = updatedFinances;
+        }
+      }
+    }
+    if (data.estConstructionStart) {
+      const previousConstructionStartYear = getYear(project.estConstructionStart);
+      const constructionStartYear = getYear(data.estConstructionStart);
+      const planningEndYear = getYear(project.estPlanningEnd);
+      // If new construction start year is bigger than the previous one, budget from years that are not within the schedule of the project
+      // need to be moved to the new construction start year
+      if (previousConstructionStartYear && constructionStartYear && constructionStartYear > previousConstructionStartYear) {
+        // If there was an overlap between planning end year and construction start year, budget shouldn't be moved from that year
+        // but still needs to be moved from all the years that are not within the schedule anymore
+        if (planningEndYear == previousConstructionStartYear && constructionStartYear - previousConstructionStartYear > 1) {
+          const updatedFinances = moveBudgetForwards(finances, previousConstructionStartYear + 1, constructionStartYear);
+          data = {...data, "finances": updatedFinances};
+          finances = updatedFinances;
+        } else if (planningEndYear != previousConstructionStartYear) {
+          const updatedFinances = moveBudgetForwards(finances, previousConstructionStartYear, constructionStartYear);
+          data = {...data, "finances": updatedFinances};
+          finances = updatedFinances;
+        }
+      }
+    }
+    if (data.constructionEndYear) {
+      const constructionEndYear = project.constructionEndYear;
+      // If new construction end year is smaller that the previous one, budget from the years that are not within the schedule need to
+      // be moved backwards to the new end year
+      if (constructionEndYear && data.constructionEndYear < constructionEndYear) {
+        if (constructionEndYear && data.constructionEndYear < constructionEndYear) {
+          const updatedFinances = moveBudgetBackwards(finances, constructionEndYear, data.constructionEndYear);
+          data = {...data, "finances": updatedFinances};
+        }
+      }
+    }
+    return data;
+  }
+
   // useEffect which triggers when form fields are reset by setting selectedProject after successful POST request
   useEffect(() => {
     if (projectMode !== 'new') {
@@ -71,10 +183,16 @@ const ProjectForm = () => {
       if (isDirty) {
         dispatch(setIsSaving(true));
 
-        const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+        let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
         // Patch project
         if (project?.id && projectMode === 'edit') {
+          // If any of these is modified there's a chance that some finance years might be out of schedule, so budgets from those years need
+          // to be moved to years that are within schedule
+          if (data.planningStartYear || data.estPlanningEnd || data.estConstructionStart || data.constructionEndYear) {
+            data = updateFinances(data, project);
+          }
+
           try {
             await patchProject({ id: project?.id, data });
           } catch (error) {
