@@ -27,7 +27,6 @@ import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
-import useProjectRow from '@/hooks/useProjectRow';
 import { getYear } from '@/utils/dates';
 
 const ProjectForm = () => {
