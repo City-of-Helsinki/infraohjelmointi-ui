@@ -65,6 +65,7 @@ const ProjectForm = () => {
     }
   }
 
+  // Function to move budget/budgets to the first year that's within the project schedule
   const moveBudgetForwards = (finances: IProjectFinances, previousStartYear: number, startYear: number) => {
     let financesCopy = finances
     const numberOfYears = startYear - previousStartYear;
@@ -82,6 +83,7 @@ const ProjectForm = () => {
     return financesCopy;
   }
 
+  // Function to move budget/budgets to the last year that's within the project schedule
   const moveBudgetBackwards = (finances: IProjectFinances, previousEndYear: number, endYear: number) => {
     let financesCopy = finances;
     const numberOfYears = previousEndYear - endYear;
