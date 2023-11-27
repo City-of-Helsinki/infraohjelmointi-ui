@@ -156,10 +156,8 @@ const ProjectForm = () => {
       // If new construction end year is smaller that the previous one, budget from the years that are not within the schedule need to
       // be moved backwards to the new end year
       if (constructionEndYear && data.constructionEndYear < constructionEndYear) {
-        if (constructionEndYear && data.constructionEndYear < constructionEndYear) {
-          const updatedFinances = moveBudgetBackwards(finances, constructionEndYear, data.constructionEndYear);
-          data = {...data, "finances": updatedFinances};
-        }
+        const updatedFinances = moveBudgetBackwards(finances, constructionEndYear, data.constructionEndYear);
+        data = {...data, "finances": updatedFinances};
       }
     }
     return data;
