@@ -47,8 +47,8 @@ const getTimelineDates = (
   const { planningStartYear, constructionEndYear } = project;
   const { estPlanningStart, estPlanningEnd, estConstructionStart, estConstructionEnd } = dates;
 
-  const effectiveConstructionEndYear = getYear(estConstructionEnd) || constructionEndYear;
-  const effectivePlanningStartYear = getYear(estPlanningStart) || planningStartYear;
+  const effectiveConstructionEndYear = getYear(estConstructionEnd) ?? constructionEndYear;
+  const effectivePlanningStartYear = getYear(estPlanningStart) ?? planningStartYear;
 
   const getPlanningStartDate = () => {
     if (estPlanningStart) {
@@ -163,7 +163,7 @@ const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<
 
     const isStartYear = getYear(start) === year;
     const isEndYear = getYear(end) === year;
-    const isLaterYear = (getYear(end) || 0) > year && (getYear(start) || 0) < year;
+    const isLaterYear = (getYear(end) ?? 0) > year && (getYear(start) ?? 0) < year;
 
     let percent = isLaterYear ? '100%' : '0%';
 

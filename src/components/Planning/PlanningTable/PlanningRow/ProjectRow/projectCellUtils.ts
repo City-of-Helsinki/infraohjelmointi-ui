@@ -225,14 +225,14 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
       updateIfValueExists('estPlanningStart', addYear(planningStart));
       updateIfValueExists('estPlanningEnd', addYear(planningEnd));
       updateIfValueExists('estConstructionStart', addYear(constructionStart));
-      req.planningStartYear = (getYear(planningEnd) || 0) + 1;
+      req.planningStartYear = (getYear(planningEnd) ?? 0) + 1;
     };
 
     const updateEndOfTimeline = () => {
       updateIfValueExists('estConstructionStart', removeYear(constructionStart));
       updateIfValueExists('estConstructionEnd', removeYear(constructionEnd));
       updateIfValueExists('estPlanningEnd', removeYear(planningEnd));
-      req.constructionEndYear = (getYear(constructionEnd) || 0) - 1;
+      req.constructionEndYear = (getYear(constructionEnd) ?? 0) - 1;
     };
 
     const updateMiddleOfTimeline = () => {
