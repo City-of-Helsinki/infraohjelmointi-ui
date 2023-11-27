@@ -107,7 +107,7 @@ const getTimelineDates = (
       effectivePlanningStartYear &&
       effectiveConstructionEndYear !== getYear(estPlanningEnd)
     ) {
-      return createDateToStartOfYear((getYear(estPlanningEnd) || 0) + 1);
+      return createDateToStartOfYear((getYear(estPlanningEnd) ?? 0) + 1);
     }
 
     return createDateToStartOfYear(effectiveConstructionEndYear);

@@ -127,7 +127,6 @@ const ProjectForm = () => {
       } else if (!yearIsOverlap) {
         updatedFinances = moveBudgetBackwards(finances, previousEndYear, endYear);
       }
-      finances = updatedFinances || finances;
     }
     return updatedFinances;
   }
@@ -148,7 +147,6 @@ const ProjectForm = () => {
           updatedFinances = moveBudgetForwards(finances, previousStartYear, startYear);
         }
 
-        finances = updatedFinances || finances;
       }
       return updatedFinances;
   }
