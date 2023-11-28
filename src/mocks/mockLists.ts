@@ -155,10 +155,6 @@ export const mockProjectCategories: { data: Array<IListItem> } = {
       value: 'K4',
     },
     {
-      id: 'd2585121-c729-41bc-b081-cee29a81addb',
-      value: 'K5',
-    },
-    {
       id: 'c9381886-36d7-4eaf-ab52-f0c9785f7536',
       value: 'K5.1',
     },
