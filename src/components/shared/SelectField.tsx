@@ -65,7 +65,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   const translatedOptions = useMemo(
     () =>
       translate
-        ? options.map(({ value, label }) => ({ value, label: t(`option.${label}`) }))
+        ? options.map(({ value, label }) => ({ value, label: t(`option.${label.replace(".", "")}`) }))
         : options,
     [options, t, translate],
   );
