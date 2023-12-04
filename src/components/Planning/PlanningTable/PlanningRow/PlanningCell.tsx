@@ -2,7 +2,7 @@ import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
   selectPlanningMode,
@@ -21,6 +21,7 @@ import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { formattedNumberToNumber } from '@/utils/calculations';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 
 interface IPlanningCellProps extends IPlanningRow {
@@ -40,6 +41,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     budgetChange,
   } = cell;
 
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const mode = useAppSelector(selectPlanningMode);
   const [editFrameBudget, setEditFrameBudget] = useState(false);
@@ -49,6 +51,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const groupSapCosts = useAppSelector(getGroupSapCosts);
 
   const { value, onChange, setInputValue } = useNumberInput(displayFrameBudget);
+  const UPDATE_CELL_DATA = 'update-cell-data';
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,6 +76,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       return;
     }
 
+    dispatch(
+      setLoading({
+        text: 'Update data',
+        id: UPDATE_CELL_DATA,
+      }),
+    );
+
     const budgetChangeNumber = budgetChange ? formattedNumberToNumber(budgetChange) : 0;
     const valueNumber = formattedNumberToNumber(value);
 
@@ -94,9 +104,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     };
 
     if (type === 'district' || type === 'districtPreview' || type === 'subLevelDistrict') {
-      patchCoordinationLocation(request);
+      patchCoordinationLocation(request).finally(() => {
+        dispatch(clearLoading(UPDATE_CELL_DATA));
+      })
     } else {
-      patchCoordinationClass(request);
+      patchCoordinationClass(request).finally(() => {
+        dispatch(clearLoading(UPDATE_CELL_DATA));
+      })
     }
   };
 
