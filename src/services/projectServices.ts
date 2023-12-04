@@ -36,7 +36,8 @@ export const deleteProject = async (id: string): Promise<{ id: string }> => {
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProject> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data);
-    return res.data;
+    console.log("single",res.data)
+    return res.data;  
   } catch (e) {
     return Promise.reject(e);
   }
@@ -68,6 +69,7 @@ export const patchProjects = async (
 ): Promise<Array<IProject>> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/bulk-update/`, request.data);
+    console.log("bulk", res.data)
     return res.data;
   } catch (e) {
     return Promise.reject(e);
