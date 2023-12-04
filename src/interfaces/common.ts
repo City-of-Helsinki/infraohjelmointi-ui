@@ -42,6 +42,7 @@ export interface INotification {
 export interface IListItem {
   id: string;
   value: string;
+  parent?: string;
 }
 
 export type ListType =

@@ -85,6 +85,7 @@ const render = async () =>
             responsibleZones: mockResponsibleZones.data,
             responsiblePersons: mockResponsiblePersons.data,
             programmedYears: [],
+            projectDistricts: [],
             error: {},
           },
           hashTags: {

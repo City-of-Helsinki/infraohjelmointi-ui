@@ -11,6 +11,7 @@ import {
   getProjectRisks,
   getResponsibleZones,
   getPersons,
+  getDistricts,
 } from '@/services/listServices';
 import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -28,6 +29,7 @@ export interface IListState {
   responsibleZones: Array<IListItem>;
   responsiblePersons: Array<IListItem>;
   programmedYears: Array<IListItem>;
+  projectDistricts: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -43,6 +45,7 @@ const initialState: IListState = {
   constructionPhases: [],
   responsibleZones: [],
   responsiblePersons: [],
+  projectDistricts: [],
   programmedYears: setProgrammedYears(),
   error: null,
 };
@@ -64,6 +67,22 @@ const getResponsiblePersons = async () => {
   }
 };
 
+const getProjectDistricts = async () => {
+  try {
+    const districts = await getDistricts();
+    const mapped = districts.map(({ id, name, parent }) => ({
+      value: name,
+      id,
+      parent: parent
+    }))
+    console.log(mapped);
+    return [];
+  } catch (e) {
+    console.log("error getting districts: ", e);
+    return [];
+  }
+}
+
 export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) => {
   try {
     return {
@@ -79,6 +98,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       responsibleZones: await getResponsibleZones(),
       responsiblePersons: await getResponsiblePersons(),
       programmedYears: setProgrammedYears(),
+      projectDistricts: await getProjectDistricts(),
     };
   } catch (err) {
     return thunkAPI.rejectWithValue(err);
