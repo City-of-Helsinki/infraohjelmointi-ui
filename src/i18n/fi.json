@@ -231,7 +231,7 @@
     "programmedYearMax": "Ohjelmoitu vuosi max"
   },
   "groupForm": {
-    "name": "Ryhman nimi",
+    "name": "Ryhmän nimi",
     "masterClass": "Pääluokka",
     "class": "Luokka",
     "subClass": "Alaluokka",
@@ -239,6 +239,7 @@
     "division": "Kaupunginosa",
     "subDivision": "Osa-alue",
     "openAdvanceFilters": "Avaa lisävalinnat",
+    "closeAdvanceFilters": "Sulje lisävalinnat",
     "groupCreationDescription1": "Ryhmään voi valita vain Ohjelmoituja hankkeita.",
     "groupCreationDescription2": "Tähdellä (*) merkityt kentat ovat pakollisia.",
     "suggestionHelperText": "Täytä pakolliset kentät saadaksesi ehdotuksia",

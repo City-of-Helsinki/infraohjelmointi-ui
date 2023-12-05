@@ -59,6 +59,8 @@ const DialogContainer: FC<IDialogProps> = memo(
     const districtField = watch('district');
     const divisionField = watch('division');
 
+    console.log("classoptionit", classOptions.subClasses);
+
     useEffect(() => {
       if (formValues.district.value || formValues.division.value) {
         setShowAdvanceFields(true);
@@ -85,6 +87,7 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
+    let requiredOptions;// = true;
 
     const navigateToGroupLocation = useCallback(
       (form: IGroupForm) => {
@@ -230,7 +233,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                         <TextField
                           {...formProps('name')}
                           rules={{
-                            required: t('validation.required', { value: 'Ryhman nimi' }) || '',
+                            required: t('validation.required', { value: 'Ryhmän nimi' }) || '',
                           }}
                         />
                         <SelectField
@@ -257,13 +260,17 @@ const DialogContainer: FC<IDialogProps> = memo(
                           }}
                           options={classOptions.classes}
                         />
+                        {classOptions.subClasses.length > 0 && (requiredOptions = t('validation.required', { value: 'Alaluokka' }) || '') 
+                          //classOptions.subClasses.length > 0 ? (requiredOptions = true) : ( requiredOptions = false)
+                        
+                        }
                         <SelectField
                           clearable={!editMode}
                           disabled={editMode}
                           {...formProps('subClass')}
                           options={classOptions.subClasses}
                           rules={{
-                            required: t('validation.required', { value: 'Alaluokka' }) || '',
+                            required: requiredOptions, // ? (t('validation.required', { value: 'Alaluokka' }) || '') : (''),
                             validate: {
                               isPopulated: (c: IOption) => customValidation(c, 'Alaluokka'),
                             },
@@ -298,7 +305,10 @@ const DialogContainer: FC<IDialogProps> = memo(
                       {/* Divider to click */}
                       <div className="advance-fields-button">
                         <button onClick={toggleAdvanceFields}>
-                          {t(`groupForm.openAdvanceFilters`)}
+                          { !showAdvanceFields ? 
+                          (t(`groupForm.openAdvanceFilters`)
+                          ) : (
+                          (t(`groupForm.closeAdvanceFilters`))) }
                         </button>
                         {advanceFieldIcons}
                       </div>
