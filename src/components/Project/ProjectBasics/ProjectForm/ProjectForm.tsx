@@ -230,7 +230,6 @@ const ProjectForm = () => {
         // Post project
         if (projectMode === 'new') {
           try {
-            dispatch(setIsSaving(true));
             const response = await postProject({ data });
             dispatch(setSelectedProject(response));
             setNewProjectId(response.id);
