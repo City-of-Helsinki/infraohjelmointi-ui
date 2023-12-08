@@ -134,7 +134,8 @@
     "name": "Hankkeen nimi",
     "subClass": "Alaluokka",
     "class": "Luokka",
-    "masterClass": "Pääluokka"
+    "masterClass": "Pääluokka",
+    "district": "Suurpiiri"
   },
   "projectForm": {
     "name": "Hankkeen nimi",
@@ -275,7 +276,8 @@
       "hashtagPostError": "Tunnisteen luonti epäonnistui.",
       "phaseChangeError": "Haluamasi vaihemuutos vaatii lisää tietoja hankekorttiin. Tee vaihemuutos hankekortilla.",
       "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
-      "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen."
+      "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen.",
+      "Network Error": "Verkkovirhe"
     }
   },
   "searchOrder": {
