@@ -72,6 +72,7 @@ export interface IProject {
   planningStartYear: number | null;
   projectClass?: string;
   projectLocation?: string;
+  projectDistrict?: string;
   projectProgram?: string;
   otherPersons?: string;
   responsibleZone?: IListItem;

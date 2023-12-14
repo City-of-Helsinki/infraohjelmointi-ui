@@ -7,6 +7,7 @@ export interface ILocation extends IClass {
 export interface IProjectDistrict {
   id: string,
   name: string,
-  parent?: IProjectDistrict
+  parent?: string,
+  level: string,
   path: string
 }

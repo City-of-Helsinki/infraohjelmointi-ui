@@ -15,6 +15,12 @@ export const listItemToOption = (listItem: IListItem | undefined): IOption => ({
   value: listItem?.id ?? '',
 });
 
+export const listItemsToOption = (listItems: Array<IListItem>): Array<IOption> =>
+  listItems.map((listItem) => ({
+    label: listItem?.value ?? '',
+    value: listItem?.id ?? '',
+  }));
+
 export const booleanToString = (
   boolVal: boolean | undefined,
   translate?: TFunction<'translation'>,
@@ -109,22 +115,36 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
   };
 
   for (const key in dirtyFields) {
+    console.log(key);
     const getKey = () => {
       if (['masterClass', 'class', 'subClass'].includes(key)) {
         return 'projectClass';
       } else if (['district', 'division', 'subDivision'].includes(key)) {
-        return 'projectLocation';
+        return 'projectDistrict';
       } else {
         return key;
       }
     };
 
-    _.assign(request, { [getKey()]: parseValue(form[key as keyof IAppForms]) });
+    const parsedValue = parseValue(form[key as keyof IAppForms]);
+    const convertedKey = getKey();
+
+    // if subDivision or division is removed, we need to set projectDistrict to be the new lowest
+    // selected location class (e.g. if subDivision is removed, new lowest selected would be division)
+    if (!parsedValue) {
+      if (key === "subDivision") {
+        _.assign(request, { [convertedKey]: parseValue(form["division" as keyof IAppForms]) });
+      } else if (key === "division") {
+        _.assign(request, { [convertedKey]: parseValue(form["district" as keyof IAppForms]) });
+      }
+    } else {
+      _.assign(request, { [convertedKey]: parsedValue });
+    }
   }
 
   // Remove the project location when the class is patched since the relation changes
   if (_.has(request, 'projectClass')) {
-    _.assign(request, { projectLocation: null });
+    _.assign(request, { projectDistrict: null });
   }
 
   syncPlanningDates(request, form);

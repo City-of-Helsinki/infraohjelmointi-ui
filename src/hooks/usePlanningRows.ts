@@ -31,6 +31,7 @@ import {
   sortByName,
 } from '@/utils/planningRowUtils';
 import { IClass } from '@/interfaces/classInterfaces';
+import { selectProjectDistricts, selectProjectSubDistricts } from '@/reducers/listsSlice';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -234,7 +235,8 @@ const usePlanningRows = () => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const startYear = useAppSelector(selectStartYear);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
-  const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
+  const batchedPlanningDistricts = useAppSelector(selectProjectDistricts);
+  const batchedPlanningDivisions = useAppSelector(selectProjectSubDistricts);
 
   const mode = useAppSelector(selectPlanningMode);
 
@@ -270,7 +272,8 @@ const usePlanningRows = () => {
 
     const { masterClasses, classes, subClasses, otherClassifications } = batchedPlanningClasses;
     const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass, selectedOtherClassification} = selections;
-    const { districts, divisions } = batchedPlanningLocations;
+    const districts = batchedPlanningDistricts;
+    const divisions = batchedPlanningDivisions;
 
     const finalDistricts = [];
 
@@ -302,7 +305,8 @@ const usePlanningRows = () => {
     }
   }, [
     batchedPlanningClasses,
-    batchedPlanningLocations,
+    batchedPlanningDistricts,
+    batchedPlanningDivisions,
     groups,
     projects,
     selections,

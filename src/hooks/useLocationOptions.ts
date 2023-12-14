@@ -1,11 +1,7 @@
-import {
-  selectPlanningDistricts,
-  selectPlanningDivisions,
-  selectPlanningSubDivisions,
-} from '@/reducers/locationSlice';
-import { classesToOptions } from '@/utils/common';
+import { listItemsToOption } from '@/utils/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
+import { selectProjectDistricts, selectProjectSubDistricts, selectProjectSubSubDistricts } from '@/reducers/listsSlice';
 
 /**
  * Creates lists of districts, divisions and subDivisions. If filtering is used, then all
@@ -17,9 +13,9 @@ const useLocationOptions = (
   currentLocation: string | undefined,
   currentClass: string | undefined,
 ) => {
-  const allDistricts = useAppSelector(selectPlanningDistricts);
-  const allDivisions = useAppSelector(selectPlanningDivisions);
-  const allSubDivisions = useAppSelector(selectPlanningSubDivisions);
+  const allDistricts = useAppSelector(selectProjectDistricts);
+  const allDivisions = useAppSelector(selectProjectSubDistricts);
+  const allSubDivisions = useAppSelector(selectProjectSubSubDistricts);
 
   const selectedDistrict = useMemo(
     () => allDistricts && allDistricts.find((mc) => mc.id === currentLocation),
@@ -36,17 +32,9 @@ const useLocationOptions = (
     [currentLocation, allSubDivisions],
   );
 
-  const getNextDistricts = useCallback(() => {
-    if (currentClass) {
-      return allDistricts.filter((d) => currentClass === d.parentClass || d.parentClass === null);
-    } else {
-      return [];
-    }
-  }, [allDistricts, currentClass]);
-
   const getNextDivisions = useCallback(() => {
     if (selectedDistrict) {
-      return allDivisions.filter((d) => d.parent === currentLocation);
+      return allDivisions.filter((d) => d.parent === selectedDistrict.id);
     } else if (selectedDivision) {
       const divisionParent = allDistricts.find((d) => d.id === selectedDivision.parent);
       return allDivisions.filter((d) => d.parent === divisionParent?.id);
@@ -78,9 +66,9 @@ const useLocationOptions = (
   }, [allDivisions, currentLocation, selectedDivision, selectedSubDivision, allSubDivisions]);
 
   return {
-    districts: classesToOptions(getNextDistricts()),
-    divisions: classesToOptions(getNextDivisions()),
-    subDivisions: classesToOptions(getNextSubDivisions()),
+    districts: listItemsToOption(allDistricts),
+    divisions: listItemsToOption(getNextDivisions()),
+    subDivisions: listItemsToOption(getNextSubDivisions()),
   };
 };
 

@@ -1,4 +1,5 @@
 import { IClass } from './classInterfaces';
+import { IListItem } from './common';
 import { IGroup } from './groupInterfaces';
 import { ILocation } from './locationInterfaces';
 import { IProject } from './projectInterfaces';
@@ -47,10 +48,10 @@ export interface IPlanningRowList {
   classes: Array<IClass>;
   subClasses: Array<IClass>;
   collectiveSubLevels: Array<IClass>;
-  districts: Array<ILocation>;
+  districts: Array<IListItem>;
   otherClassifications: Array<IClass>;
   otherClassificationSubLevels: Array<IClass>;
-  divisions: Array<ILocation>;
+  divisions: Array<IListItem>;
   groups: Array<IGroup>;
 }
 

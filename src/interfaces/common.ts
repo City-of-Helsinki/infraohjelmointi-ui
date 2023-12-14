@@ -64,7 +64,10 @@ export type ListType =
   | 'projectQualityLevels'
   | 'planningPhases'
   | 'constructionPhases'
-  | 'programmedYears';
+  | 'programmedYears'
+  | 'projectDistricts'
+  | 'projectSubDistricts'
+  | 'projectSubSubDistricts';
 
 type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

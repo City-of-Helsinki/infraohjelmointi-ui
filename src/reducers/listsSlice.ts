@@ -1,4 +1,5 @@
 import { IError, IListItem } from '@/interfaces/common';
+import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import {
   getConstructionPhases,
   getPlanningPhases,
@@ -13,6 +14,7 @@ import {
   getPersons,
   getDistricts,
 } from '@/services/listServices';
+import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -30,6 +32,8 @@ export interface IListState {
   responsiblePersons: Array<IListItem>;
   programmedYears: Array<IListItem>;
   projectDistricts: Array<IListItem>;
+  projectSubDistricts: Array<IListItem>;
+  projectSubSubDistricts: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -46,18 +50,20 @@ const initialState: IListState = {
   responsibleZones: [],
   responsiblePersons: [],
   projectDistricts: [],
+  projectSubDistricts: [],
+  projectSubSubDistricts: [],
   programmedYears: setProgrammedYears(),
   error: null,
 };
 
 // Sorting the list of responsible persons by value which has the person name with lastname first
-export const sortPersons = (persons: Array<IListItem>) =>
+export const sortOptions = (persons: Array<IListItem>) =>
   [...persons].sort((a, b) => a.value < b.value ? -1 : (a.value > b.value ? 1 : 0));
 
 const getResponsiblePersons = async () => {
   try {
     const persons = await getPersons();
-    return sortPersons(persons.map(({ firstName, lastName, id }) => ({
+    return sortOptions(persons.map(({ firstName, lastName, id }) => ({
       value: `${lastName} ${firstName}`,
       id,
     })));
@@ -67,24 +73,19 @@ const getResponsiblePersons = async () => {
   }
 };
 
-const getProjectDistricts = async () => {
-  try {
-    const districts = await getDistricts();
-    const mapped = districts.map(({ id, name, parent }) => ({
+const getProjectDistricts = (districts: IProjectDistrict[], districtLevel: string) => {
+    const filtered = districts.filter(({ level }) => level == districtLevel);
+    const mapped = filtered.map(({ id, name, parent }) => ({
       value: name,
       id,
-      parent: parent
+      ... (parent && {parent: parent})
     }))
-    console.log(mapped);
-    return [];
-  } catch (e) {
-    console.log("error getting districts: ", e);
-    return [];
-  }
+    return sortOptions(mapped);
 }
 
 export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) => {
   try {
+    const districts = await getDistricts();
     return {
       types: await getProjectTypes(),
       phases: await getProjectPhases(),
@@ -98,7 +99,9 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       responsibleZones: await getResponsibleZones(),
       responsiblePersons: await getResponsiblePersons(),
       programmedYears: setProgrammedYears(),
-      projectDistricts: await getProjectDistricts(),
+      projectDistricts: getProjectDistricts(districts, "district"),
+      projectSubDistricts: getProjectDistricts(districts, "subDistrict"),
+      projectSubSubDistricts: getProjectDistricts(districts, "subSubDistrict")
     };
   } catch (err) {
     return thunkAPI.rejectWithValue(err);
@@ -122,5 +125,9 @@ export const listsSlice = createSlice({
     });
   },
 });
+
+export const selectProjectDistricts = (state: RootState) => state.lists.projectDistricts;
+export const selectProjectSubDistricts = (state: RootState) => state.lists.projectSubDistricts;
+export const selectProjectSubSubDistricts = (state: RootState) => state.lists.projectSubSubDistricts;
 
 export default listsSlice.reducer;
