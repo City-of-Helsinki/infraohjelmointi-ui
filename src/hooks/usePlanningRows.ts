@@ -100,7 +100,7 @@ const buildPlanningTableRows = (
       );
     }
     // Filter groups under subClass-preview only if there are is no locationRelation
-    else if (type === 'subClass') {
+    else if (type === 'subClass' || type === 'class') {
       filteredGroups.push(
         ...groups.filter((group) => !group.locationRelation && group.classRelation === id),
       );
@@ -120,14 +120,14 @@ const buildPlanningTableRows = (
     return {
       // MASTER CLASSES
       ...getRow(masterClass, 'masterClass', !!selectedMasterClass),
-      // CLASSES
+      // CLASSES AND SUBCLASSES
       children: classes
         .filter((c) => c.parent === masterClass.id)
         .map((filteredClass) => ({
           ...getRow(filteredClass, 'class', !!selectedClass),
-          // SUB CLASSES
-          children: subClasses
-            .filter((subClass) => subClass.parent === filteredClass.id)
+          children: [
+            ...getSortedGroupRows(filteredClass.id, 'class'),
+            ...subClasses.filter((subClass) => subClass.parent === filteredClass.id)
             .map((filteredSubClass) => ({
               ...getRow(filteredSubClass, subClassType, !!selectedSubClass),
               // DISTRICTS & GROUPS
@@ -147,6 +147,7 @@ const buildPlanningTableRows = (
                 }))
               ],
             })),
+          ]
         })),
     };
   });

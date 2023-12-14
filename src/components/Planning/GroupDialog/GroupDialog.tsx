@@ -30,9 +30,10 @@ const buildRequestPayload = (
   id: string | null,
 ): IGroupRequest | IGroupPatchRequestObject => {
   // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
+  console.log(form)
   const data = {
     name: form.name,
-    classRelation: form.subClass?.value || '',
+    classRelation: form.subClass?.value || form.class?.value || '',
     locationRelation: form.division?.value || form.district?.value || '',
     projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
@@ -56,10 +57,10 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const nameField = watch('name');
     const subClassField = watch('subClass');
+    const classField = watch('class');
+    const masterClassField = watch('masterClass');
     const districtField = watch('district');
     const divisionField = watch('division');
-
-    console.log("classoptionit", classOptions.subClasses);
 
     useEffect(() => {
       if (formValues.district.value || formValues.division.value) {
@@ -70,11 +71,11 @@ const DialogContainer: FC<IDialogProps> = memo(
     const isButtonDisabled = useCallback(() => {
       return (
         !nameField ||
-        (showAdvanceFields &&
+        !masterClassField.value ||
+        !classField.value ||
+        (showAdvanceFields && 
           (!districtField.value ||
-            (locationOptions.divisions.length > 0 && !divisionField.value) ||
-            !subClassField.value)) ||
-        (!showAdvanceFields && !subClassField.value)
+            (locationOptions.divisions.length > 0 && !divisionField.value))) 
       );
     }, [
       districtField.value,
@@ -83,11 +84,12 @@ const DialogContainer: FC<IDialogProps> = memo(
       showAdvanceFields,
       subClassField.value,
       locationOptions,
+      masterClassField.value,
+      classField.value
     ]);
 
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
-    let requiredOptions;// = true;
 
     const navigateToGroupLocation = useCallback(
       (form: IGroupForm) => {
@@ -260,19 +262,15 @@ const DialogContainer: FC<IDialogProps> = memo(
                           }}
                           options={classOptions.classes}
                         />
-                        {classOptions.subClasses.length > 0 && (requiredOptions = t('validation.required', { value: 'Alaluokka' }) || '') 
-                          //classOptions.subClasses.length > 0 ? (requiredOptions = true) : ( requiredOptions = false)
-                        
-                        }
                         <SelectField
                           clearable={!editMode}
                           disabled={editMode}
                           {...formProps('subClass')}
                           options={classOptions.subClasses}
                           rules={{
-                            required: requiredOptions, // ? (t('validation.required', { value: 'Alaluokka' }) || '') : (''),
+                            required: classOptions.subClasses.length > 0 ? t('validation.required', { value: 'Alaluokka' }) || '' : '',
                             validate: {
-                              isPopulated: (c: IOption) => customValidation(c, 'Alaluokka'),
+                              isPopulated: (c: IOption) => classOptions.subClasses.length > 0 ? customValidation(c, 'Alaluokka') || '' : true,
                             },
                           }}
                         />
