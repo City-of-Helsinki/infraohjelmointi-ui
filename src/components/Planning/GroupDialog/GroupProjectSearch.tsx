@@ -33,7 +33,9 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
 
       const year = new Date().getFullYear();
 
-      searchParams.push(`subClass=${getValues('subClass').value}`);
+      if (getValues('subClass').value) {
+        searchParams.push(`subClass=${getValues('subClass').value}`);
+      }
       if (getValues('subDivision').value) {
         searchParams.push(`subDivision=${getValues('subDivision').value}`);
       } else if (getValues('division').value) {
@@ -62,8 +64,8 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
         (showAdvanceFields &&
           (!getValues('district')?.value ||
             (divisions.length > 0 && !getValues('division')?.value) ||
-            !getValues('subClass')?.value)) ||
-        (!showAdvanceFields && !getValues('subClass')?.value)
+            !getValues('subClass')?.value)) //||
+        //(!showAdvanceFields && !getValues('subClass')?.value)
       ) {
         return Promise.resolve([]);
       }
