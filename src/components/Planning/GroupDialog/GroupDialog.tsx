@@ -30,7 +30,6 @@ const buildRequestPayload = (
   id: string | null,
 ): IGroupRequest | IGroupPatchRequestObject => {
   // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
-  console.log(form)
   const data = {
     name: form.name,
     classRelation: form.subClass?.value || form.class?.value || '',
