@@ -320,6 +320,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                     control={control}
                     showAdvanceFields={showAdvanceFields}
                     divisions={locationOptions.divisions}
+                    subClasses={classOptions.subClasses}
                   />
                 </div>
               </div>
