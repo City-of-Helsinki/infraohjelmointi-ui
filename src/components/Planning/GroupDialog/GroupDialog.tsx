@@ -71,10 +71,7 @@ const DialogContainer: FC<IDialogProps> = memo(
       return (
         !nameField ||
         !masterClassField.value ||
-        !classField.value ||
-        (showAdvanceFields && 
-          (!districtField.value ||
-            (locationOptions.divisions.length > 0 && !divisionField.value))) 
+        !classField.value
       );
     }, [
       districtField.value,
@@ -180,13 +177,6 @@ const DialogContainer: FC<IDialogProps> = memo(
       [t],
     );
     const getDivisionValidation = useCallback(() => {
-      if (locationOptions.divisions.length > 0)
-        return {
-          required: t('validation.required', { value: 'Kaupunginosa' }) || '',
-          validate: {
-            isPopulated: (d: IOption) => customValidation(d, 'Kaupunginosa'),
-          },
-        };
       return {};
     }, [locationOptions, customValidation, t]);
     const advanceFieldIcons = useMemo(
@@ -279,12 +269,6 @@ const DialogContainer: FC<IDialogProps> = memo(
                         <div className="search-form-content">
                           <SelectField
                             {...formProps('district')}
-                            rules={{
-                              required: t('validation.required', { value: 'Suurpiiri' }) || '',
-                              validate: {
-                                isPopulated: (d: IOption) => customValidation(d, 'Suurpiiri'),
-                              },
-                            }}
                             options={locationOptions.districts}
                           />
                           <SelectField
