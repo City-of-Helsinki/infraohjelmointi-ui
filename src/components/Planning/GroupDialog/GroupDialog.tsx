@@ -224,7 +224,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                         <TextField
                           {...formProps('name')}
                           rules={{
-                            required: t('validation.required', { value: 'Ryhmän nimi' }) || '',
+                            required: t('validation.required', { value: 'Ryhmän nimi' }) ?? '',
                           }}
                         />
                         <SelectField
@@ -232,7 +232,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           disabled={editMode}
                           {...formProps('masterClass')}
                           rules={{
-                            required: t('validation.required', { value: 'Pääluokka' }) || '',
+                            required: t('validation.required', { value: 'Pääluokka' }) ?? '',
                             validate: {
                               isPopulated: (mc: IOption) => customValidation(mc, 'Pääluokka'),
                             },
@@ -244,7 +244,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           disabled={editMode}
                           {...formProps('class')}
                           rules={{
-                            required: t('validation.required', { value: 'Luokka' }) || '',
+                            required: t('validation.required', { value: 'Luokka' }) ?? '',
                             validate: {
                               isPopulated: (c: IOption) => customValidation(c, 'Luokka'),
                             },
@@ -257,9 +257,9 @@ const DialogContainer: FC<IDialogProps> = memo(
                           {...formProps('subClass')}
                           options={classOptions.subClasses}
                           rules={{
-                            required: classOptions.subClasses.length > 0 ? t('validation.required', { value: 'Alaluokka' }) || '' : '',
+                            required: classOptions.subClasses.length > 0 ? t('validation.required', { value: 'Alaluokka' }) ?? '' : '',
                             validate: {
-                              isPopulated: (c: IOption) => classOptions.subClasses.length > 0 ? customValidation(c, 'Alaluokka') || '' : true,
+                              isPopulated: (c: IOption) => classOptions.subClasses.length > 0 ? customValidation(c, 'Alaluokka') ?? '' : true,
                             },
                           }}
                         />
