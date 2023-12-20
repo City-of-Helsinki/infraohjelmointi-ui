@@ -60,7 +60,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
   const selectedYear = useAppSelector(selectSelectedYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
-    const UPDATE_CELL_DATA = 'update-cell-data';
+  const UPDATE_CELL_DATA = 'update-cell-data';
 
   const user = useAppSelector(selectUser);
   const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
@@ -96,6 +96,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
+      dispatch(
+        setLoading({
+          text: 'Update data',
+          id: UPDATE_CELL_DATA,
+        }),
+      );
       // if there's only the year property in the finances object, delete it
       if (_.size(req.finances) === 1) {
         delete req.finances;
@@ -112,7 +118,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
         dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
       }).finally(() => {
         dispatch(clearLoading(UPDATE_CELL_DATA));;
-      });      
+      });
     },
     [forcedToFrame, id, dispatch],
   );
@@ -155,13 +161,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
 
   // Blurring the input field will patch the current budget
   const handleBlur = useCallback((): void => {
-    dispatch(
-      setLoading({
-        text: 'Update data',
-        id: UPDATE_CELL_DATA,
-      }),
-    );
-
     setProjectCellState((current) => ({ ...current, isReadOnly: !current.isReadOnly }));
     if (formValue !== parseInt(budget ?? '0')) {
       updateCell({
