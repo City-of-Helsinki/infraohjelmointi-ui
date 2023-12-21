@@ -115,7 +115,6 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
   };
 
   for (const key in dirtyFields) {
-    console.log(key);
     const getKey = () => {
       if (['masterClass', 'class', 'subClass'].includes(key)) {
         return 'projectClass';
@@ -139,13 +138,16 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
       }
     } else {
       _.assign(request, { [convertedKey]: parsedValue });
+      if (key === 'district') {
+        _.assign(request, { 'projectClass': parseValue(form["subClass" as keyof IAppForms])});
+      }
     }
   }
 
   // Remove the project location when the class is patched since the relation changes
-  if (_.has(request, 'projectClass')) {
+  /* if (_.has(request, 'projectClass')) {
     _.assign(request, { projectDistrict: null });
-  }
+  } */
 
   syncPlanningDates(request, form);
   syncConstructionDates(request, form);

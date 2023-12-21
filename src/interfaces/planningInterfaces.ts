@@ -48,10 +48,10 @@ export interface IPlanningRowList {
   classes: Array<IClass>;
   subClasses: Array<IClass>;
   collectiveSubLevels: Array<IClass>;
-  districts: Array<IListItem>;
+  districts: Array<ILocation>;
   otherClassifications: Array<IClass>;
   otherClassificationSubLevels: Array<IClass>;
-  divisions: Array<IListItem>;
+  divisions: Array<ILocation>;
   groups: Array<IGroup>;
 }
 

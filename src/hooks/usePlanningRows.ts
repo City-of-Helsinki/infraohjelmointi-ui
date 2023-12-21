@@ -235,8 +235,7 @@ const usePlanningRows = () => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const startYear = useAppSelector(selectStartYear);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
-  const batchedPlanningDistricts = useAppSelector(selectProjectDistricts);
-  const batchedPlanningDivisions = useAppSelector(selectProjectSubDistricts);
+  const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
 
   const mode = useAppSelector(selectPlanningMode);
 
@@ -272,8 +271,7 @@ const usePlanningRows = () => {
 
     const { masterClasses, classes, subClasses, otherClassifications } = batchedPlanningClasses;
     const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass, selectedOtherClassification} = selections;
-    const districts = batchedPlanningDistricts;
-    const divisions = batchedPlanningDivisions;
+    const { districts, divisions } = batchedPlanningLocations;
 
     const finalDistricts = [];
 
@@ -305,8 +303,7 @@ const usePlanningRows = () => {
     }
   }, [
     batchedPlanningClasses,
-    batchedPlanningDistricts,
-    batchedPlanningDivisions,
+    batchedPlanningLocations,
     groups,
     projects,
     selections,

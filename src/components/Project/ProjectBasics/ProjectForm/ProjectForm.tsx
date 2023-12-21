@@ -209,8 +209,8 @@ const ProjectForm = () => {
     async (form: IProjectForm) => {
       if (isDirty) {
         dispatch(setIsSaving(true));
-
         let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+        console.log(data);
 
         // Patch project
         if (project?.id && projectMode === 'edit') {
@@ -312,7 +312,6 @@ const ProjectForm = () => {
 
   return (
     <form
-      onBlur={projectMode !== 'new' ? submitCallback() : undefined}
       data-testid="project-form"
       className="project-form"
     >

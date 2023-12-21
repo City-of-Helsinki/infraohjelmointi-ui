@@ -23,6 +23,7 @@ import useLocationOptions from '@/hooks/useLocationOptions';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { useOptions } from '@/hooks/useOptions';
 import { selectProjectDistricts, selectProjectSubDistricts, selectProjectSubSubDistricts } from '@/reducers/listsSlice';
+import { current } from '@reduxjs/toolkit';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -38,7 +39,9 @@ const useProjectFormValues = () => {
   const subClasses = useAppSelector(selectPlanningSubClasses);
 
   const districts = useAppSelector(selectProjectDistricts);
+  const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
   const divisions = useAppSelector(selectProjectSubDistricts);
+  const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
   const subDivisions = useAppSelector(selectProjectSubSubDistricts);
 
   const value = (value: string | undefined | null) => value ?? '';
@@ -227,8 +230,19 @@ const useProjectForm = () => {
         selectedClass: optionValue,
       }));
     }
-    console.log(selections.selectedClass);
   };
+
+  const setLocationSubClass = (name: string) => {
+    const newSubClass = classOptions.subClasses.find(({label}) => label.includes(name));
+    if (newSubClass) {
+      console.log(newSubClass);
+      setValue('subClass', newSubClass);
+      setSelections((current) => ({
+        ...current,
+        selectedClass: newSubClass.value,
+      }));
+    }
+  }
 
   // Set the selected location and empty the other locations if a parent location is selected
   const setSelectedLocation = (name: string, form: IProjectForm) => {
@@ -237,7 +251,7 @@ const useProjectForm = () => {
     if (name === 'district') {
       setValue('division', { label: '', value: '' });
       if (["suurpiiri", "östersundom"].some(substring => formValues.subClass.label.includes(substring))) {
-        setSelectedClass("class", form as IProjectForm);
+        setLocationSubClass(form.district.label);
       }
     }
     if (name === 'district' || name === 'division') {
