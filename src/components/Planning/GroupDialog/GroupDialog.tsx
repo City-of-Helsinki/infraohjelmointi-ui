@@ -32,7 +32,7 @@ const buildRequestPayload = (
   // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
   const data = {
     name: form.name,
-    classRelation: form.subClass?.value || '',
+    classRelation: form.subClass?.value || form.class?.value || '',
     locationRelation: form.division?.value || form.district?.value || '',
     projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
@@ -56,6 +56,8 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const nameField = watch('name');
     const subClassField = watch('subClass');
+    const classField = watch('class');
+    const masterClassField = watch('masterClass');
     const districtField = watch('district');
     const divisionField = watch('division');
 
@@ -68,11 +70,8 @@ const DialogContainer: FC<IDialogProps> = memo(
     const isButtonDisabled = useCallback(() => {
       return (
         !nameField ||
-        (showAdvanceFields &&
-          (!districtField.value ||
-            (locationOptions.divisions.length > 0 && !divisionField.value) ||
-            !subClassField.value)) ||
-        (!showAdvanceFields && !subClassField.value)
+        !masterClassField.value ||
+        !classField.value
       );
     }, [
       districtField.value,
@@ -81,6 +80,8 @@ const DialogContainer: FC<IDialogProps> = memo(
       showAdvanceFields,
       subClassField.value,
       locationOptions,
+      masterClassField.value,
+      classField.value
     ]);
 
     const dispatch = useAppDispatch();
@@ -176,13 +177,6 @@ const DialogContainer: FC<IDialogProps> = memo(
       [t],
     );
     const getDivisionValidation = useCallback(() => {
-      if (locationOptions.divisions.length > 0)
-        return {
-          required: t('validation.required', { value: 'Kaupunginosa' }) || '',
-          validate: {
-            isPopulated: (d: IOption) => customValidation(d, 'Kaupunginosa'),
-          },
-        };
       return {};
     }, [locationOptions, customValidation, t]);
     const advanceFieldIcons = useMemo(
@@ -230,7 +224,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                         <TextField
                           {...formProps('name')}
                           rules={{
-                            required: t('validation.required', { value: 'Ryhman nimi' }) || '',
+                            required: t('validation.required', { value: 'Ryhmän nimi' }) ?? '',
                           }}
                         />
                         <SelectField
@@ -238,7 +232,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           disabled={editMode}
                           {...formProps('masterClass')}
                           rules={{
-                            required: t('validation.required', { value: 'Pääluokka' }) || '',
+                            required: t('validation.required', { value: 'Pääluokka' }) ?? '',
                             validate: {
                               isPopulated: (mc: IOption) => customValidation(mc, 'Pääluokka'),
                             },
@@ -250,7 +244,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           disabled={editMode}
                           {...formProps('class')}
                           rules={{
-                            required: t('validation.required', { value: 'Luokka' }) || '',
+                            required: t('validation.required', { value: 'Luokka' }) ?? '',
                             validate: {
                               isPopulated: (c: IOption) => customValidation(c, 'Luokka'),
                             },
@@ -263,9 +257,9 @@ const DialogContainer: FC<IDialogProps> = memo(
                           {...formProps('subClass')}
                           options={classOptions.subClasses}
                           rules={{
-                            required: t('validation.required', { value: 'Alaluokka' }) || '',
+                            required: classOptions.subClasses.length > 0 ? t('validation.required', { value: 'Alaluokka' }) ?? '' : '',
                             validate: {
-                              isPopulated: (c: IOption) => customValidation(c, 'Alaluokka'),
+                              isPopulated: (c: IOption) => classOptions.subClasses.length > 0 ? customValidation(c, 'Alaluokka') ?? '' : true,
                             },
                           }}
                         />
@@ -275,12 +269,6 @@ const DialogContainer: FC<IDialogProps> = memo(
                         <div className="search-form-content">
                           <SelectField
                             {...formProps('district')}
-                            rules={{
-                              required: t('validation.required', { value: 'Suurpiiri' }) || '',
-                              validate: {
-                                isPopulated: (d: IOption) => customValidation(d, 'Suurpiiri'),
-                              },
-                            }}
                             options={locationOptions.districts}
                           />
                           <SelectField
@@ -298,7 +286,10 @@ const DialogContainer: FC<IDialogProps> = memo(
                       {/* Divider to click */}
                       <div className="advance-fields-button">
                         <button onClick={toggleAdvanceFields}>
-                          {t(`groupForm.openAdvanceFilters`)}
+                          { !showAdvanceFields ? 
+                          (t(`groupForm.openAdvanceFilters`)
+                          ) : (
+                          (t(`groupForm.closeAdvanceFilters`))) }
                         </button>
                         {advanceFieldIcons}
                       </div>
@@ -312,6 +303,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                     control={control}
                     showAdvanceFields={showAdvanceFields}
                     divisions={locationOptions.divisions}
+                    subClasses={classOptions.subClasses}
                   />
                 </div>
               </div>
