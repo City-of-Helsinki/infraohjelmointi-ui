@@ -41,10 +41,13 @@ const AuthGuard: FC = () => {
             const userPayload = userDispatch.payload as IUser;
 
             //if (!user || user.ad_groups.length === 0) {
-            if (userDispatch.type.includes("fulfilled") && userPayload.ad_groups.length === 0) {
+            if (!userPayload.ad_groups || userPayload.ad_groups.length === 0) {
               // Do not redirect user to the path where tried to access
               localStorage.removeItem(INITIAL_PATH);
-              getApiToken();
+
+              // No AD groups, no access.
+              navigate('access-denied');
+              return;
             }
 
             // Since the redirect from login will bring the url back to REACT_APP_REDIRECT_URI path, we need to
@@ -108,6 +111,11 @@ const AuthGuard: FC = () => {
     // Redirect users without roles to /access-denied
     if (!pathname.includes('access-denied') && user.ad_groups.length === 0) {
       return navigate('access-denied');
+    }
+
+    // Redirect users with roles to planning view if they accidentally opens 'access-denied' page
+    if (pathname.includes('access-denied') && user.ad_groups.length > 0) {
+      return navigate('planning');
     }
   }, [location, navigate, user]);
 
