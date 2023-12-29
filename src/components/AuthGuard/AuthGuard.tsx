@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { getUserThunk, selectUser } from '@/reducers/authSlice';
 import { useLocation, useNavigate } from 'react-router';
 import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { IUser } from '@/interfaces/userInterfaces';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -33,11 +34,17 @@ const AuthGuard: FC = () => {
         // Get user
         if (!user || (user?.uuid !== oidcUser.profile.sub && !auth.isLoading)) {
           try {
-            await dispatch(getUserThunk());
+            //await dispatch(getUserThunk());
 
-            if (!user || user.ad_groups.length === 0) {
+            // Get user payload to check AD groups
+            const userDispatch = await dispatch(getUserThunk());
+            const userPayload = userDispatch.payload as IUser;
+
+            //if (!user || user.ad_groups.length === 0) {
+            if (userDispatch.type.includes("fulfilled") && userPayload.ad_groups.length === 0) {
+              // Do not redirect user to the path where tried to access
               localStorage.removeItem(INITIAL_PATH);
-              return;
+              getApiToken();
             }
 
             // Since the redirect from login will bring the url back to REACT_APP_REDIRECT_URI path, we need to
@@ -56,7 +63,7 @@ const AuthGuard: FC = () => {
 
       getApiTokenAndUser();
     }
-  }, [oidcUser, user, auth.isLoading, dispatch, navigate]);
+  }, [oidcUser, user, auth.isLoading]);
 
   // Check if user exists and sign in
   useEffect(() => {
@@ -79,7 +86,7 @@ const AuthGuard: FC = () => {
       return;
     }
 
-    if(pathname.includes('auth/helsinki/return')) {
+    if (pathname.includes('auth/helsinki/return')) {
       return navigate('planning');
     }
 
