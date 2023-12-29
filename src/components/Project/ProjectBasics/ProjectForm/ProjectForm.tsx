@@ -28,6 +28,7 @@ import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { getYear } from '@/utils/dates';
+import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -205,11 +206,15 @@ const ProjectForm = () => {
     }
   }, [isDirty, newProjectId]);
 
+  const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
+  const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
+  const hierarchySubDivisions = useAppSelector(selectPlanningSubDivisions);
+
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
       if (isDirty) {
         dispatch(setIsSaving(true));
-        let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
+        let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms, hierarchyDistricts, hierarchyDivisions, hierarchySubDivisions);
         console.log(data);
 
         // Patch project

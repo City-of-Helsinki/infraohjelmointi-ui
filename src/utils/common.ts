@@ -5,6 +5,9 @@ import { TFunction } from 'i18next';
 import { getYear, updateYear } from './dates';
 import _ from 'lodash';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
+import { selectPlanningDistricts } from '@/reducers/locationSlice';
+import { useAppSelector } from '@/hooks/common';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
 
@@ -100,7 +103,7 @@ const syncConstructionDates = (request: IProjectRequest, form: IAppForms) => {
  * @param form form object
  * @returns data object that can be used for a patch request
  */
-export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms) => {
+export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms, hierarchyDistricts?: ILocation[], hierarchyDivisions?: ILocation[], hierarchySubDivisions?: ILocation[]) => {
   const request: IProjectRequest = {};
 
   const parseValue = (value: FormValueType) => {
@@ -113,6 +116,42 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
         return value;
     }
   };
+
+  const getLocation = (list: ILocation[], locationName: string) => {
+    const location = list.find(({ name }) => name.includes(locationName));
+    return location;
+  }
+
+  const getLocationList = (list: ILocation[], parentId?: string, pClass?: string) => {
+    let locationList: ILocation[] = [];
+    if (pClass) {
+      locationList = list.filter(({ parentClass }) => parentClass === pClass);
+    } 
+    else if (parentId) {
+      locationList = list.filter(({ parent }) => parent === parentId);
+    }
+    return locationList;
+  }
+
+  const getLowestLocationId = () => {
+    let lowestLocationId: string | undefined;
+    if (hierarchyDistricts) {
+      const districts = getLocationList(hierarchyDistricts, undefined, form.subClass.value);
+      const district = getLocation(districts, form.district.label);
+      lowestLocationId = district?.id;
+      if (form.division.value && district && hierarchyDivisions) {
+        const divisions = getLocationList(hierarchyDivisions, district?.id);
+        const division = getLocation(divisions, form.division.label);
+        lowestLocationId = division?.id || district.id;
+        if (form.subDivision.value && division && hierarchySubDivisions) {
+          const subDivisions = getLocationList(hierarchySubDivisions, division.id);
+          const subDivision = getLocation(subDivisions, form.subDivision.label);
+          lowestLocationId = subDivision?.id || division.id;
+        }
+      }
+    }
+    return lowestLocationId;
+  }
 
   for (const key in dirtyFields) {
     const getKey = () => {
@@ -128,6 +167,10 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
     const parsedValue = parseValue(form[key as keyof IAppForms]);
     const convertedKey = getKey();
 
+    if ((key === "district" || key === "division" || key === "subDivision") && parsedValue) {
+      _.assign(request, { 'projectLocation': getLowestLocationId()});
+    }
+
     // if subDivision or division is removed, we need to set projectDistrict to be the new lowest
     // selected location class (e.g. if subDivision is removed, new lowest selected would be division)
     if (!parsedValue) {
@@ -139,7 +182,10 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms)
     } else {
       _.assign(request, { [convertedKey]: parsedValue });
       if (key === 'district') {
-        _.assign(request, { 'projectClass': parseValue(form["subClass" as keyof IAppForms])});
+        const subClass = parseValue(form["subClass" as keyof IAppForms]);
+        if (subClass && hierarchyDistricts) {
+          _.assign(request, { 'projectClass': subClass});
+        }
       }
     }
   }

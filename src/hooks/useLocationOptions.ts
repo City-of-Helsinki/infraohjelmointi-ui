@@ -11,7 +11,6 @@ import { selectProjectDistricts, selectProjectSubDistricts, selectProjectSubSubD
  */
 const useLocationOptions = (
   currentLocation: string | undefined,
-  currentClass: string | undefined,
 ) => {
   const allDistricts = useAppSelector(selectProjectDistricts);
   const allDivisions = useAppSelector(selectProjectSubDistricts);

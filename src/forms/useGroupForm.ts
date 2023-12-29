@@ -116,13 +116,13 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const { formValues, group } = useGroupValues(projects, id);
 
   const [selections, setSelections] = useState<ISelectionState>({
-    selectedClass: '',
-    selectedLocation: '',
+    selectedClass: group?.classRelation || '',
+    selectedLocation: group?.locationRelation || '',
   });
 
   const { selectedClass, selectedLocation } = selections;
   const classOptions = useClassOptions(selectedClass);
-  const locationOptions = useLocationOptions(selectedLocation, selectedClass);
+  const locationOptions = useLocationOptions(selectedLocation);
 
   const formMethods = useForm<IGroupForm>({
     defaultValues: useMemo(() => formValues, [formValues]),

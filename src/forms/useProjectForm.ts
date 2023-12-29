@@ -39,9 +39,7 @@ const useProjectFormValues = () => {
   const subClasses = useAppSelector(selectPlanningSubClasses);
 
   const districts = useAppSelector(selectProjectDistricts);
-  const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
   const divisions = useAppSelector(selectProjectSubDistricts);
-  const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
   const subDivisions = useAppSelector(selectProjectSubSubDistricts);
 
   const value = (value: string | undefined | null) => value ?? '';
@@ -190,28 +188,19 @@ const useProjectForm = () => {
     mode: 'onBlur',
   });
 
-  const [selectedMasterClassName, setSelectedMasterClassName] = useState<string>('');
-
-  const [selections, setSelections] = useState({ selectedClass: '', selectedLocation: '' });
-
-  // using this useEffect to populate class/location selections with initial values if a project has them
-  useEffect(() => {
-    const lowestSelectedClass =
-      formValues.subClass.value || formValues.class.value || formValues.masterClass.value;
-    const lowestSelectedLocation =
-      formValues.subDivision.value || formValues.division.value || formValues.district.value;
-    setSelections({ selectedClass: lowestSelectedClass, selectedLocation: lowestSelectedLocation });
-    setSelectedMasterClassName(formValues.masterClass.label ?? '');
-  }, [formValues]);
+  const [selections, setSelections] = useState({ selectedClass: project?.projectClass, selectedLocation: project?.projectDistrict });
 
   // control,
   const { reset, watch, setValue } = formMethods;
 
+  const selectedMasterClassName = formValues.masterClass.label;
+
   const classOptions = useClassOptions(selections?.selectedClass);
+
+  console.log(selections.selectedLocation);
 
   const locationOptions = useLocationOptions(
     selections?.selectedLocation,
-    selections?.selectedClass,
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected
@@ -234,6 +223,7 @@ const useProjectForm = () => {
 
   const setLocationSubClass = (name: string) => {
     const newSubClass = classOptions.subClasses.find(({label}) => label.includes(name));
+    console.log(classOptions.subClasses);
     if (newSubClass) {
       console.log(newSubClass);
       setValue('subClass', newSubClass);

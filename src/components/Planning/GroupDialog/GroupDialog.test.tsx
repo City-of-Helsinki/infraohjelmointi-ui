@@ -13,7 +13,7 @@ import {
   mockProjectClasses,
   mockSubClasses,
 } from '@/mocks/mockClasses';
-import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocations';
+import { mockDistrictOptions, mockDistricts, mockDivisionOptions, mockDivisions, mockLocations, mockSubDivisionOptions } from '@/mocks/mockLocations';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
 import { mockGroups } from '@/mocks/mockGroups';
 import PlanningView from '@/views/PlanningView';
@@ -70,6 +70,9 @@ const render = async () =>
           lists: {
             ...store.getState().lists,
             phases: mockProjectPhases.data,
+            projectDistricts: mockDistrictOptions.data,
+            projectSubDistricts: mockDivisionOptions.data,
+            projectSubSubDistricts: mockSubDivisionOptions.data
           },
           auth: {
             ...store.getState().auth,
@@ -152,6 +155,7 @@ describe('GroupDialog', () => {
             name: 'Vanha yrttimaantie',
             projectClass: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
             projectLocation: 'koilinen-district-test',
+            projectDistrict: 'test-mock-district-option-1'
           },
         ],
         count: 1,
@@ -206,6 +210,7 @@ describe('GroupDialog', () => {
       document.getElementById('select-field-subDivision-toggle-button') as HTMLElement,
     ).toBeInTheDocument();
     await user.type(await dialog.findByText('groupForm.searchForProjects'), 'Vanha');
+    console.log((await findByRole('dialog')).outerHTML);
 
     await waitFor(async () => {
       const project = await dialog.findByText('Vanha yrttimaantie');
