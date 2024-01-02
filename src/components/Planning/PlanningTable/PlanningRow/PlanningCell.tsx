@@ -206,12 +206,12 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                 onMouseOver={() => setHoveredClassToMonth(m)}
                 onMouseLeave={() => removeHoveredClassFromMonth(m)}
               >
-                <span id="coordinator-note" onClick={() => {
+                <button id="coordinator-note" onClick={() => {
                   dispatch(setNotesModalOpen({isOpen: true, id}));
                   dispatch(setNotesModalData({name, id}))
                 }}>
                   { matchingNotes.length ? <IconSpeechbubbleText color="white" /> : <IconSpeechbubble color="white" /> }
-                </span>
+                </button>
                 <CoordinatorNotesModal id={id} type={type} selectedYear={selectedYear}/>
               </td>
             </Fragment>

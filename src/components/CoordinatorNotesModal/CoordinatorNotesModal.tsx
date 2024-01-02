@@ -5,12 +5,39 @@ import { selectNotes, selectNotesModalData, selectNotesModalOpen, setNotesDialog
 import { IconCross } from "hds-react";
 import './styles.css';
 import { dateStringToMoment } from "@/utils/dates";
+import { ICoordinatorNote } from "@/interfaces/noteInterfaces";
 
 interface ICoordinatorNotesProps {
     id: string;
     type: string;
     selectedYear: number|null;
 }
+
+interface NotesProps {
+    notes: ICoordinatorNote[];
+    selectedYear: number | null;
+    id: string;
+}
+
+const Notes = (props: NotesProps) => {
+    if (props.notes.length) {
+        const matchingNotes = props.notes.filter((note) => (
+            note.year === props.selectedYear && note.coordinatorClass === props.id
+        ));
+
+        const mappedNotes = matchingNotes.map((note) => {
+            return (
+                <Fragment key={note.id}>
+                    <p>{note.coordinatorNote}</p>
+                    <p id="coordinator">{note.updatedByFirstName} {note.updatedByLastName}</p>
+                    <p id="date">{dateStringToMoment(note.createdDate)}</p>
+                </Fragment>
+            )
+        });
+        return mappedNotes.length ? <p>{mappedNotes}</p> : <p>{t('noNotesYet')}</p>;
+    }
+    return <p>{t('noNotesYet')}</p>;
+};
 
 const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
     const dispatch = useAppDispatch();
@@ -21,26 +48,6 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
     const notes = useAppSelector(selectNotes);
     const modalOpen = useAppSelector(selectNotesModalOpen);
     const modalData = useAppSelector(selectNotesModalData);
-
-    const Notes = () => {
-        if (notes.length) {
-            const matchingNotes = notes.filter((note) => (
-                note.year === props.selectedYear && note.coordinatorClass === props.id
-            ));
-
-            const mappedNotes = matchingNotes.map((note) => {
-                return (
-                    <Fragment key={note.id}>
-                        <p>{note.coordinatorNote}</p>
-                        <p id="coordinator">{note.updatedByFirstName} {note.updatedByLastName}</p>
-                        <p id="date">{dateStringToMoment(note.createdDate)}</p>
-                    </Fragment>
-                )
-            });
-            return mappedNotes.length ? <p>{mappedNotes}</p> : <p>{t('noNotesYet')}</p>;
-        }
-        return <p>{t('noNotesYet')}</p>;
-    };
     
     const split = (str: string, index: number) => [str.slice(0, index), str.slice(index)][1];
 
@@ -77,7 +84,7 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
                     </section>
                     <hr />
                     <section className="dialog-middle-part">
-                        <Notes />
+                        <Notes notes={notes} selectedYear={props.selectedYear} id={props.id} />
                     </section>
                     <hr />
                     <section className="dialog-bottom-part">
