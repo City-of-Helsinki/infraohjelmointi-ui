@@ -76,13 +76,12 @@ const SideBar = () => {
     <div className="sidebar" data-testid="sidebar">
       {navItems.map((n) => (
         <button
-          className={`sidebar-button ${pathname.includes(n.route) ? 'selected' : ''} ${
-            n.disabled ? 'disabled' : ''
-          }`}
+          className={`sidebar-button ${pathname.includes(n.route) ? 'selected' : ''} ${n.disabled ? 'disabled' : ''
+            }`}
           onClick={() => navigate(n.route)}
           aria-label={n.label}
           key={n.route}
-          disabled={n.disabled}
+          disabled={!user || n.disabled}
         >
           {n.component}
         </button>
