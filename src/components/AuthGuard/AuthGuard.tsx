@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { getUserThunk, selectUser } from '@/reducers/authSlice';
 import { useLocation, useNavigate } from 'react-router';
 import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
-import { IUser } from '@/interfaces/userInterfaces';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -25,42 +24,40 @@ const AuthGuard: FC = () => {
   useEffect(() => {
     if (oidcUser?.access_token) {
       const getApiTokenAndUser = async () => {
+
         // Get API token
         try {
           await getApiToken();
         } catch (e) {
           console.log('Error getting API token: ', e);
         }
+
         // Get user
         if (!user || (user?.uuid !== oidcUser.profile.sub && !auth.isLoading)) {
           try {
-            //await dispatch(getUserThunk());
-
-            // Get user payload to check AD groups
-            const userDispatch = await dispatch(getUserThunk());
-            const userPayload = userDispatch.payload as IUser;
-
-            //if (!user || user.ad_groups.length === 0) {
-            if (!userPayload.ad_groups || userPayload.ad_groups.length === 0) {
-              // Do not redirect user to the path where tried to access
-              localStorage.removeItem(INITIAL_PATH);
-
-              // No AD groups, no access.
-              navigate('access-denied');
-              return;
-            }
-
-            // Since the redirect from login will bring the url back to REACT_APP_REDIRECT_URI path, we need to
-            // return the user to the path that it initially navigated to when opening the app
-            const initialPath = localStorage.getItem(INITIAL_PATH);
-
-            if (initialPath) {
-              navigate(initialPath);
-              localStorage.removeItem(INITIAL_PATH);
-            }
+            await dispatch(getUserThunk());
           } catch (e) {
             console.log('Error getting user: ', e);
           }
+          return;
+        }
+
+        if (user.ad_groups.length === 0) {
+          // Do not redirect user to the path where tried to access
+          localStorage.removeItem(INITIAL_PATH);
+
+          // No AD groups, no access.
+          navigate('access-denied');
+          return;
+        }
+
+        // Since the redirect from login will bring the url back to REACT_APP_REDIRECT_URI path, we need to
+        // return the user to the path that it initially navigated to when opening the app
+        const initialPath = localStorage.getItem(INITIAL_PATH);
+
+        if (initialPath) {
+          navigate(initialPath);
+          localStorage.removeItem(INITIAL_PATH);
         }
       };
 
