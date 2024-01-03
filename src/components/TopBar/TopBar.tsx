@@ -50,7 +50,7 @@ const TopBar: FC = () => {
             <Button
               variant="supplementary"
               iconLeft={<IconSearch />}
-              disabled={user?.ad_groups.length === 0}
+              disabled={!user || user?.ad_groups.length === 0}
               onClick={handleOpenSearch}
               data-testid="search-projects"
               className="search-button"
