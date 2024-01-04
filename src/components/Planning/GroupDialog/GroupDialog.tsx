@@ -16,6 +16,8 @@ import { patchGroup } from '@/services/groupServices';
 import './styles.css';
 import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
+import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -28,12 +30,15 @@ interface IDialogProps {
 const buildRequestPayload = (
   form: IGroupForm,
   id: string | null,
+  hierarchyDistricts: ILocation[],
+  hierarchyDivisions: ILocation[],
 ): IGroupRequest | IGroupPatchRequestObject => {
   // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
   const data = {
     name: form.name,
+    location: form.subDivision?.value || form.division?.value || form.district?.value || '',
     classRelation: form.subClass?.value || '',
-    locationRelation: form.division?.value || form.district?.value || '',
+    locationRelation: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions),
     projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
   if (id) {
@@ -45,10 +50,29 @@ const buildRequestPayload = (
   return data;
 };
 
+const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
+  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value || form.class.value);
+  if (form.district.label) {
+    const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(form.district.label));
+    if (form.division.label && relatedDistrict) {
+      const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
+      const relatedDivision = relatedDivisions.find(({ name }) => name.includes(form.division.label));
+      if (relatedDivision) {
+        return relatedDivision.id;
+      }
+      return relatedDistrict.id;
+    }
+  }
+  return '';
+}
+
 const DialogContainer: FC<IDialogProps> = memo(
   ({ isOpen, handleClose, editMode, projects, id }) => {
     const mode = useAppSelector(selectPlanningMode);
     const navigate = useNavigate();
+
+    const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
+    const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
 
     const [showAdvanceFields, setShowAdvanceFields] = useState(false);
     const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(projects, id);
@@ -116,7 +140,7 @@ const DialogContainer: FC<IDialogProps> = memo(
         if (editMode && id) {
           try {
             const group = await patchGroup(
-              buildRequestPayload(form, id) as IGroupPatchRequestObject,
+              buildRequestPayload(form, id, hierarchyDistricts, hierarchyDivisions) as IGroupPatchRequestObject,
             );
             dispatch(updateGroup({ data: group, type: 'planning' }));
             handleDialogClose();
@@ -125,7 +149,7 @@ const DialogContainer: FC<IDialogProps> = memo(
           }
         } else {
           try {
-            await dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest));
+            await dispatch(postGroupThunk(buildRequestPayload(form, null, hierarchyDistricts, hierarchyDivisions) as IGroupRequest));
             handleDialogClose();
             navigateToGroupLocation(form);
           } catch (e) {
@@ -173,6 +197,13 @@ const DialogContainer: FC<IDialogProps> = memo(
         Object.keys(d).includes('value') && d.value !== ''
           ? true
           : t('validation.required', { value: fieldName }) || '',
+      [t],
+    );
+    const districtValidation = useCallback(
+      (d: IOption, subClass: string) =>
+        Object.keys(d).includes('value') && d.value !== ''
+          ? (["suurpiiri", "östersundom"].some(substring => subClass.includes(substring))) && subClass.includes(d.label) ? true : t('validation.incorrectLocation', { field: 'suurpiiri' }) || ''
+          : t('validation.required', { value: 'Suurpiiri' }) || '',
       [t],
     );
     const getDivisionValidation = useCallback(() => {
@@ -278,7 +309,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                             rules={{
                               required: t('validation.required', { value: 'Suurpiiri' }) || '',
                               validate: {
-                                isPopulated: (d: IOption) => customValidation(d, 'Suurpiiri'),
+                                isPopulated: (d: IOption) => districtValidation(d, subClassField.label),
                               },
                             }}
                             options={locationOptions.districts}

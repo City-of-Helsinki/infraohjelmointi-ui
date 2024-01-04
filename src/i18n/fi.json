@@ -103,6 +103,7 @@
   },
   "validation": {
     "required": "Täytä {{field}}",
+    "incorrectLocation": "Valittu {{field}} ei voi kuulua valitun alaluokan alle.",
     "isBefore": "Aika on oltava ennen kuin {{value}}",
     "isAfter": "Aika on oltava myöhemmin kuin {{value}}",
     "maxLength": "Maksimipituus on {{value}} merkkiä",
