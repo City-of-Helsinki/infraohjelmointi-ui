@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useAuth, hasAuthParams } from 'react-oidc-context';
 import { getApiToken } from '@/services/userServices';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { getUserThunk, selectUser } from '@/reducers/authSlice';
+import { getUserThunk, selectAuthError, selectUser } from '@/reducers/authSlice';
 import { useLocation, useNavigate } from 'react-router';
 import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
@@ -16,6 +16,7 @@ const AuthGuard: FC = () => {
   const dispatch = useAppDispatch();
   const [hasTriedSignin, setHasTriedSignin] = useState(false);
   const user = useAppSelector(selectUser);
+  const authError = useAppSelector(selectAuthError);
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, activeNavigator, isLoading, user: oidcUser } = auth;
@@ -24,7 +25,10 @@ const AuthGuard: FC = () => {
     ACCESS_DENIED: 'access-denied',
     AUTH_HELSINKI_RETURN: 'auth/helsinki/return',
     PLANNING: 'planning',
+    PROJECT: 'project',
     PROJECT_NEW: 'project/new',
+    PROJECT_BASICS: 'basics',
+    PROJECT_NOTES: 'notes',
     ADMIN: 'admin',
   }
 
@@ -87,14 +91,37 @@ const AuthGuard: FC = () => {
   }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin, location, auth]);
 
   // Redirect user from forbidden paths
+  // If user can log in (isAuthenticated) but does not have access rights (!user),
+  // always redirect them to /access-denied
   useEffect(() => {
     const { pathname } = location;
 
-    if (!user) {
+    //const initialPath = localStorage.getItem(INITIAL_PATH);
+    const initialPath = localStorage.getItem(INITIAL_PATH);
+
+    // When user is not logged in, return and wait that user is authenticated
+    if (!isAuthenticated) {
       return;
     }
 
+    // User is authenticated, but they are not authorizated to see any resources
+    if (isAuthenticated && !user) {
+      // To break possible loop, we don't redirect user
+      if (pathname.includes(PAGES.ACCESS_DENIED)) {
+        return;
+      }
+
+      // Redirect to /access-denied if user is not authorizated
+      if (authError) {
+        return navigate(PAGES.ACCESS_DENIED);
+      }
+    }
+
+    // Redirect user to the initial path or on planning view if authenticated
     if (pathname.includes(PAGES.AUTH_HELSINKI_RETURN) && user) {
+      if (initialPath) {
+        return;
+      }
       return navigate(PAGES.PLANNING);
     }
 
@@ -114,15 +141,27 @@ const AuthGuard: FC = () => {
     }
 
     // Redirect users without roles to /access-denied
-    if (!pathname.includes(PAGES.ACCESS_DENIED) && user.ad_groups.length === 0) {
+    if (!pathname.includes(PAGES.ACCESS_DENIED) && user && user.ad_groups.length === 0) {
       return navigate(PAGES.ACCESS_DENIED);
     }
 
     // Redirect users with roles to planning view if they accidentally opens 'access-denied' page
-    if (pathname.includes(PAGES.ACCESS_DENIED) && user.ad_groups.length > 0) {
+    if (pathname.includes(PAGES.ACCESS_DENIED) && user && user.ad_groups.length > 0) {
+      // Before login user tried to access a specific page
+      // Because of this don't redirect to /planning view
+      if (initialPath) {
+        return;
+      }
       return navigate(PAGES.PLANNING);
     }
-  }, [location, navigate, user]);
+
+    // Redirect user to full project view if /basics or /new
+    if (pathname.includes(PAGES.PROJECT) && (!pathname.includes(PAGES.PROJECT_BASICS) && !pathname.includes(PAGES.PROJECT_NOTES))) {
+      return navigate(`${pathname.replace(/\/$/, "")}/${PAGES.PROJECT_BASICS}`);
+    }
+
+    return;
+  }, [location, navigate, user, isAuthenticated, authError]);
 
   return <></>;
 };
