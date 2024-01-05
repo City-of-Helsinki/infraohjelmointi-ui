@@ -96,7 +96,6 @@ const AuthGuard: FC = () => {
   useEffect(() => {
     const { pathname } = location;
 
-    //const initialPath = localStorage.getItem(INITIAL_PATH);
     const initialPath = localStorage.getItem(INITIAL_PATH);
 
     // When user is not logged in, return and wait that user is authenticated
@@ -155,7 +154,7 @@ const AuthGuard: FC = () => {
       return navigate(PAGES.PLANNING);
     }
 
-    // Redirect user to full project view if /basics or /new
+    // Redirect user to full project view if /basics or /notes is missing
     if (pathname.includes(PAGES.PROJECT) && (!pathname.includes(PAGES.PROJECT_BASICS) && !pathname.includes(PAGES.PROJECT_NOTES))) {
       return navigate(`${pathname.replace(/\/$/, "")}/${PAGES.PROJECT_BASICS}`);
     }
