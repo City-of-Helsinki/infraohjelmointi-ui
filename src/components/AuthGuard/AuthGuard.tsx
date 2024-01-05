@@ -20,6 +20,14 @@ const AuthGuard: FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, activeNavigator, isLoading, user: oidcUser } = auth;
 
+  const PAGES = {
+    ACCESS_DENIED: 'access-denied',
+    AUTH_HELSINKI_RETURN: 'auth/helsinki/return',
+    PLANNING: 'planning',
+    PROJECT_NEW: 'project/new',
+    ADMIN: 'admin',
+  }
+
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
     if (oidcUser?.access_token) {
@@ -47,7 +55,7 @@ const AuthGuard: FC = () => {
           localStorage.removeItem(INITIAL_PATH);
 
           // No AD groups, no access.
-          navigate('access-denied');
+          navigate(PAGES.ACCESS_DENIED);
           return;
         }
 
@@ -86,33 +94,33 @@ const AuthGuard: FC = () => {
       return;
     }
 
-    if (pathname.includes('auth/helsinki/return')) {
-      return navigate('planning');
+    if (pathname.includes(PAGES.AUTH_HELSINKI_RETURN) && user) {
+      return navigate(PAGES.PLANNING);
     }
 
     // Redirect to previous url if a non admin tries to access the admin view
-    if (pathname.includes('admin') && !isUserAdmin(user)) {
+    if (pathname.includes(PAGES.ADMIN) && !isUserAdmin(user)) {
       return navigate(-1);
     }
 
     // Redirect to planning view if a viewer is trying to access anything but the planning view
-    if (!pathname.includes('planning') && isUserOnlyViewer(user)) {
-      return navigate('planning');
+    if (!pathname.includes(PAGES.PLANNING) && isUserOnlyViewer(user)) {
+      return navigate(PAGES.PLANNING);
     }
 
     // Redirect project managers away from new project form
-    if (pathname.includes('project/new') && isUserOnlyProjectManager(user)) {
+    if (pathname.includes(PAGES.PROJECT_NEW) && isUserOnlyProjectManager(user)) {
       return navigate(-1);
     }
 
     // Redirect users without roles to /access-denied
-    if (!pathname.includes('access-denied') && user.ad_groups.length === 0) {
-      return navigate('access-denied');
+    if (!pathname.includes(PAGES.ACCESS_DENIED) && user.ad_groups.length === 0) {
+      return navigate(PAGES.ACCESS_DENIED);
     }
 
     // Redirect users with roles to planning view if they accidentally opens 'access-denied' page
-    if (pathname.includes('access-denied') && user.ad_groups.length > 0) {
-      return navigate('planning');
+    if (pathname.includes(PAGES.ACCESS_DENIED) && user.ad_groups.length > 0) {
+      return navigate(PAGES.PLANNING);
     }
   }, [location, navigate, user]);
 
