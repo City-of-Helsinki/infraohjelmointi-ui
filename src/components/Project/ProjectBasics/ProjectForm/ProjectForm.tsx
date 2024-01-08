@@ -215,7 +215,6 @@ const ProjectForm = () => {
       if (isDirty) {
         dispatch(setIsSaving(true));
         let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms, hierarchyDistricts, hierarchyDivisions, hierarchySubDivisions);
-        console.log(data);
 
         // Patch project
         if (project?.id && projectMode === 'edit') {

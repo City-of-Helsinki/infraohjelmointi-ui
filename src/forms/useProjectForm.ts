@@ -197,8 +197,6 @@ const useProjectForm = () => {
 
   const classOptions = useClassOptions(selections?.selectedClass);
 
-  console.log(selections.selectedLocation);
-
   const locationOptions = useLocationOptions(
     selections?.selectedLocation,
   );
@@ -223,9 +221,7 @@ const useProjectForm = () => {
 
   const setLocationSubClass = (name: string) => {
     const newSubClass = classOptions.subClasses.find(({label}) => label.includes(name));
-    console.log(classOptions.subClasses);
     if (newSubClass) {
-      console.log(newSubClass);
       setValue('subClass', newSubClass);
       setSelections((current) => ({
         ...current,

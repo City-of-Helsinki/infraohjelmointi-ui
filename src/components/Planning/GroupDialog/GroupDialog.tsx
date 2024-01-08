@@ -48,7 +48,6 @@ const buildRequestPayload = (
       data,
     };
   }
-  console.log(data);
   return data;
 };
 
@@ -64,7 +63,6 @@ const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[]
       }
       return relatedDistrict.id;
     } else if (relatedDistrict) {
-      console.log(relatedDistricts);
       return relatedDistrict.id;
     }
   }
@@ -136,7 +134,6 @@ const DialogContainer: FC<IDialogProps> = memo(
             district: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions)
           }),
         };
-        console.log(searchParams);
 
         navigate({
           pathname: `/${mode}`,

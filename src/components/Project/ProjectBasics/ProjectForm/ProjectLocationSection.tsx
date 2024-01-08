@@ -27,7 +27,6 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
   const { t } = useTranslation();
 
   const { districts, divisions, subDivisions } = locationOptions;
-  //console.log(locationOptions);
 
   const responsibleZones = useOptions('responsibleZones');
 

@@ -73,7 +73,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       searchParams.push(`projectName=${projectName}`);
       searchParams.push('inGroup=false');
       searchParams.push('programmed=true');
-      console.log(searchParams.join('&'));
 
       return { params: searchParams.join('&'), direct: !showAdvanceFields, forcedToFrame, year };
     },
