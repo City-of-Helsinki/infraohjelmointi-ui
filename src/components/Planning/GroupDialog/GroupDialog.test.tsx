@@ -265,12 +265,9 @@ describe('GroupDialog', () => {
     expect(
       await findByTestId(`head-${mockPostResponse.data.locationRelation}`),
     ).toBeInTheDocument();
-    await waitFor(async () => {
-      await user.click(await findByTestId(`title-${mockPostResponse.data.locationRelation}`));
-    });
     // Check if new created group header exists
     expect(await findByTestId(`head-${mockPostResponse.data.id}`)).toBeInTheDocument();
-    /* await user.click(await findByTestId(`expand-${mockPostResponse.data.id}`)); */
+    await user.click(await findByTestId(`expand-${mockPostResponse.data.id}`));
     expect(await findByText('Vanha yrttimaantie')).toBeInTheDocument();
   });
 });

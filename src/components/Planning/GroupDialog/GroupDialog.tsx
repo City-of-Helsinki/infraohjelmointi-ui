@@ -132,10 +132,11 @@ const DialogContainer: FC<IDialogProps> = memo(
           masterClass: form.masterClass.value,
           class: form.class.value,
           subClass: form.subClass.value,
-          ...(form.district.value && {
-            district: form.district.value,
+          ...(form.district.value && !form.division.value && { 
+            district: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions)
           }),
         };
+        console.log(searchParams);
 
         navigate({
           pathname: `/${mode}`,
