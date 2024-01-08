@@ -18,6 +18,7 @@ interface IProjectSearchProps {
   control: Control<IGroupForm>;
   showAdvanceFields: boolean;
   divisions: IOption[];
+  subClasses: IOption[];
 }
 
 const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
@@ -43,6 +44,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   control,
   showAdvanceFields,
   divisions,
+  subClasses
 }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -56,7 +58,13 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       const year = new Date().getFullYear();
       const lowestLocationId = getLocationRelationId(getValues(), hierarchyDistricts, hierarchyDivisions);
 
-      searchParams.push(`subClass=${getValues('subClass').value}`);
+      if (subClasses.length > 0){
+        searchParams.push(`subClass=${getValues('subClass').value}`);
+      }
+      else {
+        searchParams.push(`class=${getValues('class').value}`);
+      }
+
       if (getValues("division").value) {
         searchParams.push(`division=${lowestLocationId}`);
       } else if (getValues('district').value) {
@@ -69,7 +77,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
 
       return { params: searchParams.join('&'), direct: !showAdvanceFields, forcedToFrame, year };
     },
-    [getValues, showAdvanceFields, forcedToFrame],
+    [getValues, showAdvanceFields, forcedToFrame, subClasses],
   );
 
   const { t } = useTranslation();
@@ -83,8 +91,8 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       if (
         (showAdvanceFields &&
           (!getValues('district')?.value ||
-            !getValues('subClass')?.value)) ||
-        (!showAdvanceFields && !getValues('subClass')?.value)
+            (divisions.length > 0 && !getValues('division')?.value) ||
+            !getValues('subClass')?.value))
       ) {
         return Promise.resolve([]);
       }

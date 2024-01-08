@@ -93,7 +93,7 @@ const buildCoordinatorTableRows = (
   const getSortedGroupRows = (id: string, type: PlanningRowType) => {
     const filteredGroups = [];
 
-    if (type === 'subClass' || type === 'collectiveSubLevel' || type === 'otherClassification') {
+    if (type === 'class' || type === 'subClass' || type === 'collectiveSubLevel' || type === 'otherClassification') {
       filteredGroups.push(
         ...groups.filter((group) => group.classRelation === id && !group.locationRelation),
       );
@@ -155,12 +155,15 @@ const buildCoordinatorTableRows = (
         );
         return {
           ...classRow,
-          children: filteredSubClasses.map((filteredSubClass) => {
+          children: [
+          ...getSortedGroupRows(filteredClass.id, 'class'),
+          ...filteredSubClasses.map((filteredSubClass) => {
             const subClassRow = getRow({
               item: filteredSubClass,
               type: 'subClass',
               expanded: !!selectedSubClass,
             });
+          
             const filteredCollectiveSubLevels = collectiveSubLevels.filter(
               (collectiveSubLevel) => collectiveSubLevel.parent === filteredSubClass.id,
             );
@@ -236,7 +239,7 @@ const buildCoordinatorTableRows = (
               ],
             };
           }),
-        };
+        ]};
       }),
     };
   });
