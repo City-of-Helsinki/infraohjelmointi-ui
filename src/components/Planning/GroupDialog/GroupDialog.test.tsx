@@ -140,7 +140,8 @@ describe('GroupDialog', () => {
     const mockPostResponse = {
       data: {
         id: 'e39a5f66-8be5-4cd8-9a8a-16f69cc02c18',
-        name: 'test-group',
+        name: 'test-group-1',
+        location: 'test-mock-district-option-1',
         locationRelation: 'koilinen-district-test',
         classRelation: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
         finances: mockClassFinances,
@@ -179,7 +180,7 @@ describe('GroupDialog', () => {
     const submitButton = await dialog.findByTestId('create-group-button');
     expect(submitButton).toBeDisabled();
 
-    await user.type(await dialog.findByText('groupForm.name'), 'test-group');
+    await user.type(await dialog.findByText('groupForm.name'), 'test-group-1');
 
     await user.click(
       document.getElementById('select-field-masterClass-toggle-button') as HTMLElement,
@@ -210,7 +211,6 @@ describe('GroupDialog', () => {
       document.getElementById('select-field-subDivision-toggle-button') as HTMLElement,
     ).toBeInTheDocument();
     await user.type(await dialog.findByText('groupForm.searchForProjects'), 'Vanha');
-    console.log((await findByRole('dialog')).outerHTML);
 
     await waitFor(async () => {
       const project = await dialog.findByText('Vanha yrttimaantie');
@@ -254,6 +254,7 @@ describe('GroupDialog', () => {
 
       expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
       expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
+      expect(formPostRequest.location).toEqual(mockPostResponse.data.location);
     });
 
     // Check if the planning view has navigated to correct subclass/district
@@ -261,9 +262,12 @@ describe('GroupDialog', () => {
     expect(
       await findByTestId(`head-${mockPostResponse.data.locationRelation}`),
     ).toBeInTheDocument();
+    await waitFor(async () => {
+      await user.click(await findByTestId(`title-${mockPostResponse.data.locationRelation}`));
+    });
     // Check if new created group header exists
     expect(await findByTestId(`head-${mockPostResponse.data.id}`)).toBeInTheDocument();
-    await user.click(await findByTestId(`expand-${mockPostResponse.data.id}`));
+    /* await user.click(await findByTestId(`expand-${mockPostResponse.data.id}`)); */
     expect(await findByText('Vanha yrttimaantie')).toBeInTheDocument();
   });
 });

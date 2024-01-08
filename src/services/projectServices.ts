@@ -84,6 +84,7 @@ export const getProjectsWithParams = async (
   const allParams = `${params}&year=${year}&forcedToFrame=${forcedToFrame}&direct=${direct}${
     programmed ? '&programmed=true' : ''
   }`;
+  console.log(allParams);
 
   const url = isCoordinator
     ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`

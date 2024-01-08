@@ -10,12 +10,32 @@ import { IGroupForm } from '@/interfaces/formInterfaces';
 import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectForcedToFrame } from '@/reducers/planningSlice';
+import { ILocation } from '@/interfaces/locationInterfaces';
+import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
   control: Control<IGroupForm>;
   showAdvanceFields: boolean;
   divisions: IOption[];
+}
+
+const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
+  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value ? true : parentClass === form.class.value);
+  if (form.district.label) {
+    const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(form.district.label));
+    if (form.division.label && relatedDistrict) {
+      const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
+      const relatedDivision = relatedDivisions.find(({ name }) => name.includes(form.division.label));
+      if (relatedDivision) {
+        return relatedDivision.id;
+      }
+      return relatedDistrict.id;
+    } else if (relatedDistrict) {
+      return relatedDistrict.id
+    }
+  }
+  return '';
 }
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({
@@ -26,24 +46,26 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
 }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
+  const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
 
   const buildQueryParamString = useCallback(
     (projectName: string): IProjectSearchRequest => {
       const searchParams = [];
 
       const year = new Date().getFullYear();
+      const lowestLocationId = getLocationRelationId(getValues(), hierarchyDistricts, hierarchyDivisions);
 
       searchParams.push(`subClass=${getValues('subClass').value}`);
-      if (getValues('subDivision').value) {
-        searchParams.push(`subDivision=${getValues('subDivision').value}`);
-      } else if (getValues('division').value) {
-        searchParams.push(`division=${getValues('division').value}`);
+      if (getValues("division").value) {
+        searchParams.push(`division=${lowestLocationId}`);
       } else if (getValues('district').value) {
-        searchParams.push(`district=${getValues('district').value}`);
+        searchParams.push(`district=${lowestLocationId}`);
       }
       searchParams.push(`projectName=${projectName}`);
       searchParams.push('inGroup=false');
       searchParams.push('programmed=true');
+      console.log(searchParams.join('&'));
 
       return { params: searchParams.join('&'), direct: !showAdvanceFields, forcedToFrame, year };
     },
@@ -61,7 +83,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       if (
         (showAdvanceFields &&
           (!getValues('district')?.value ||
-            (divisions.length > 0 && !getValues('division')?.value) ||
             !getValues('subClass')?.value)) ||
         (!showAdvanceFields && !getValues('subClass')?.value)
       ) {

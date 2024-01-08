@@ -5,8 +5,6 @@ import { TFunction } from 'i18next';
 import { getYear, updateYear } from './dates';
 import _ from 'lodash';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { selectPlanningDistricts } from '@/reducers/locationSlice';
-import { useAppSelector } from '@/hooks/common';
 import { ILocation } from '@/interfaces/locationInterfaces';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
@@ -23,6 +21,12 @@ export const listItemsToOption = (listItems: Array<IListItem>): Array<IOption> =
     label: listItem?.value ?? '',
     value: listItem?.id ?? '',
   }));
+
+export const locationItemsToOptions = (locationList: ILocation[]): IOption[] =>
+locationList.map((locationItem) => ({
+  label: locationItem?.name ?? '',
+  value: locationItem?.id ?? '',
+}));
 
 export const booleanToString = (
   boolVal: boolean | undefined,

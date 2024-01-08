@@ -18,6 +18,7 @@ import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import { locationItemsToOptions } from '@/utils/common';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -47,11 +48,12 @@ const buildRequestPayload = (
       data,
     };
   }
+  console.log(data);
   return data;
 };
 
 const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
-  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value || form.class.value);
+  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value ? true : parentClass === form.class.value );
   if (form.district.label) {
     const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(form.district.label));
     if (form.division.label && relatedDistrict) {
@@ -61,9 +63,22 @@ const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[]
         return relatedDivision.id;
       }
       return relatedDistrict.id;
+    } else if (relatedDistrict) {
+      console.log(relatedDistricts);
+      return relatedDistrict.id;
     }
   }
   return '';
+}
+
+const hierarchyDivisionsAsIoptions = (districtName: string, subClassId: string, classId: string, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
+  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === subClassId || classId);
+  const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(districtName));
+  if (relatedDistrict) {
+    const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
+    return locationItemsToOptions(relatedDivisions);
+  }
+  return [];
 }
 
 const DialogContainer: FC<IDialogProps> = memo(
@@ -79,6 +94,8 @@ const DialogContainer: FC<IDialogProps> = memo(
     const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
 
     const nameField = watch('name');
+    const masterClassField = watch('masterClass');
+    const classField = watch('class');
     const subClassField = watch('subClass');
     const districtField = watch('district');
     const divisionField = watch('division');
@@ -92,11 +109,8 @@ const DialogContainer: FC<IDialogProps> = memo(
     const isButtonDisabled = useCallback(() => {
       return (
         !nameField ||
-        (showAdvanceFields &&
-          (!districtField.value ||
-            (locationOptions.divisions.length > 0 && !divisionField.value) ||
-            !subClassField.value)) ||
-        (!showAdvanceFields && !subClassField.value)
+        !masterClassField.value ||
+        !classField.value
       );
     }, [
       districtField.value,
@@ -105,6 +119,8 @@ const DialogContainer: FC<IDialogProps> = memo(
       showAdvanceFields,
       subClassField.value,
       locationOptions,
+      masterClassField.value,
+      classField.value
     ]);
 
     const dispatch = useAppDispatch();
@@ -172,10 +188,6 @@ const DialogContainer: FC<IDialogProps> = memo(
       (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setShowAdvanceFields((current) => !current);
-        setValue('district', { label: '', value: '' });
-        setValue('division', { label: '', value: '' });
-        setValue('subDivision', { label: '', value: '' });
-        setValue('projectsForSubmit', []);
       },
       [setValue],
     );
@@ -202,18 +214,11 @@ const DialogContainer: FC<IDialogProps> = memo(
     const districtValidation = useCallback(
       (d: IOption, subClass: string) =>
         Object.keys(d).includes('value') && d.value !== ''
-          ? (["suurpiiri", "östersundom"].some(substring => subClass.includes(substring))) && subClass.includes(d.label) ? true : t('validation.incorrectLocation', { field: 'suurpiiri' }) || ''
+          ? (["suurpiiri", "östersundom"].some(substring => subClass.includes(substring))) && !subClass.includes(d.label) ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || '' : true
           : t('validation.required', { value: 'Suurpiiri' }) || '',
       [t],
     );
     const getDivisionValidation = useCallback(() => {
-      if (locationOptions.divisions.length > 0)
-        return {
-          required: t('validation.required', { value: 'Kaupunginosa' }) || '',
-          validate: {
-            isPopulated: (d: IOption) => customValidation(d, 'Kaupunginosa'),
-          },
-        };
       return {};
     }, [locationOptions, customValidation, t]);
     const advanceFieldIcons = useMemo(
@@ -342,7 +347,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                     getValues={getValues}
                     control={control}
                     showAdvanceFields={showAdvanceFields}
-                    divisions={locationOptions.divisions}
+                    divisions={hierarchyDivisionsAsIoptions(districtField.label, subClassField.value, classField.value, hierarchyDistricts, hierarchyDivisions)}
                   />
                 </div>
               </div>

@@ -6,9 +6,9 @@ export const mockGroups: { data: Array<IGroup> } = {
     {
       id: 'test-group-1',
       name: 'Test Group 1',
-      location: 'test-division-1',
-      locationRelation: 'test-division-1',
-      classRelation: 'test-sub-division-1',
+      location: 'test-mock-district-option-1',
+      locationRelation: 'test-district-1',
+      classRelation: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
       finances: mockClassFinances,
     },
     {
