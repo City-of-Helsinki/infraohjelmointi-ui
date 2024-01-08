@@ -312,7 +312,6 @@ const DialogContainer: FC<IDialogProps> = memo(
                           <SelectField
                             {...formProps('district')}
                             rules={{
-                              required: t('validation.required', { value: 'Suurpiiri' }) || '',
                               validate: {
                                 isPopulated: (d: IOption) => districtValidation(d, subClassField.label),
                               },

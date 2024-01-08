@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
-import { IGroup } from '@/interfaces/groupInterfaces';
+import { IGroup, IGroupRequest } from '@/interfaces/groupInterfaces';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
 import { waitFor, within } from '@testing-library/react';
@@ -22,6 +22,7 @@ import mockProject from '@/mocks/mockProject';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { mockUser } from '@/mocks/mockUsers';
+import {screen} from '@testing-library/dom'
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -141,6 +142,7 @@ describe('GroupDialog', () => {
       data: {
         id: 'e39a5f66-8be5-4cd8-9a8a-16f69cc02c18',
         name: 'test-group-1',
+        projects: ['mock-project-id'],
         location: 'test-mock-district-option-1',
         locationRelation: 'koilinen-district-test',
         classRelation: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
@@ -250,11 +252,12 @@ describe('GroupDialog', () => {
     });
 
     await act(async () => {
-      const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
+      const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroupRequest;
 
       expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
       expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
       expect(formPostRequest.location).toEqual(mockPostResponse.data.location);
+      expect(formPostRequest.projects).toEqual(mockPostResponse.data.projects);
     });
 
     // Check if the planning view has navigated to correct subclass/district

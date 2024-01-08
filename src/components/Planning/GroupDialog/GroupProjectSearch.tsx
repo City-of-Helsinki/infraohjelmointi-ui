@@ -89,10 +89,8 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   const getSuggestions = useCallback(
     async (inputValue: string) => {
       if (
-        (showAdvanceFields &&
-          (!getValues('district')?.value ||
-            (divisions.length > 0 && !getValues('division')?.value) ||
-            !getValues('subClass')?.value))
+          (subClasses.length > 0 && !getValues('subClass').value) ||
+          !getValues('class').value
       ) {
         return Promise.resolve([]);
       }
