@@ -182,6 +182,7 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
 
     const parsedValue = parseValue(form[key as keyof IAppForms]);
     const convertedKey = getKey(key);
+    const assignValueToKey = (key: string, value: any) => request[key as keyof IAppForms] = value;
 
     if (compareKeyToValues(key, ['district', 'division', 'subDivision']) && parsedValue) {
       _.assign(request, { 'projectLocation': getLowestLocationId(hierarchyDistricts, hierarchyDivisions, hierarchySubDivisions, form)});
@@ -189,18 +190,23 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
 
     // if subDivision or division is removed, we need to set projectDistrict to be the new lowest
     // selected location class (e.g. if subDivision is removed, new lowest selected would be division)
-    if (!parsedValue && compareKeyToValues(key, ["subDivision"])) {
-      request[convertedKey] = parseValue(form["division" as keyof IAppForms]);
-    } else if (!parsedValue && compareKeyToValues(key, ["division"])) {
-      request[convertedKey] = parseValue(form["district" as keyof IAppForms]);
-    } else {
-      request[convertedKey] = parsedValue;
-      if (compareKeyToValues(key, ["district"])) {
+    switch (true) {
+      case !parsedValue && compareKeyToValues(key, ["subDivision"]):
+        assignValueToKey(convertedKey, parseValue(form["division" as keyof IAppForms]));
+        break;
+      case !parsedValue && compareKeyToValues(key, ["division"]):
+        assignValueToKey(convertedKey, parseValue(form["district" as keyof IAppForms]));
+        break;
+      default:
+        assignValueToKey(convertedKey, parsedValue);
+        
+        if (compareKeyToValues(key, ["district"]) && hierarchyDistricts) {
           const subClass = parseValue(form["subClass" as keyof IAppForms]);
-          if (subClass && hierarchyDistricts) {
-            request['projectClass'] = subClass as string;
+          
+          if (subClass) {
+            assignValueToKey('projectClass', subClass);
           }
-      }
+        }
     }
   }
 

@@ -68,7 +68,6 @@ export const patchProjects = async (
 ): Promise<Array<IProject>> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/bulk-update/`, request.data);
-    console.log("bulk", res.data)
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -84,7 +83,6 @@ export const getProjectsWithParams = async (
   const allParams = `${params}&year=${year}&forcedToFrame=${forcedToFrame}&direct=${direct}${
     programmed ? '&programmed=true' : ''
   }`;
-  console.log(allParams);
 
   const url = isCoordinator
     ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`
