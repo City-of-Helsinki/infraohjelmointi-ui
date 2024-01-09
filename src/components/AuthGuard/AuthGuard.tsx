@@ -3,8 +3,9 @@ import { useAuth, hasAuthParams } from 'react-oidc-context';
 import { getApiToken } from '@/services/userServices';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { getUserThunk, selectAuthError, selectUser } from '@/reducers/authSlice';
-import { useLocation, useNavigate } from 'react-router';
+import { NavigateFunction, useLocation, useNavigate } from 'react-router';
 import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { IUser } from '@/interfaces/userInterfaces';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -90,32 +91,25 @@ const AuthGuard: FC = () => {
     }
   }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin, location, auth]);
 
-  // Redirect user from forbidden paths
-  // If user can log in (isAuthenticated) but does not have access rights (!user),
-  // always redirect them to /access-denied
-  useEffect(() => {
-    const { pathname } = location;
-
-    const initialPath = localStorage.getItem(INITIAL_PATH);
-
-    // When user is not logged in, return and wait that user is authenticated
-    if (!isAuthenticated) {
+  /**
+   * Access denied view handler
+   */
+  const redirectToAccessDenied = (pathname: string, authError: unknown, navigate: NavigateFunction) => {
+    // To break possible loop, we don't redirect user
+    if (pathname.includes(PAGES.ACCESS_DENIED)) {
       return;
     }
 
-    // User is authenticated, but they are not authorizated to see any resources
-    if (isAuthenticated && !user) {
-      // To break possible loop, we don't redirect user
-      if (pathname.includes(PAGES.ACCESS_DENIED)) {
-        return;
-      }
-
-      // Redirect to /access-denied if user is not authorizated
-      if (authError) {
-        return navigate(PAGES.ACCESS_DENIED);
-      }
+    // Redirect to /access-denied if user is not authorizated
+    if (authError) {
+      return navigate(PAGES.ACCESS_DENIED);
     }
+  }
 
+  /**
+   * Authenticated User Handler
+   */
+  const handleAuthenticatedUser = (pathname: string, user: IUser | null, navigate: NavigateFunction, initialPath: string | null) => {
     // Redirect user to the initial path or on planning view if authenticated
     if (pathname.includes(PAGES.AUTH_HELSINKI_RETURN) && user) {
       if (initialPath) {
@@ -123,7 +117,12 @@ const AuthGuard: FC = () => {
       }
       return navigate(PAGES.PLANNING);
     }
+  }
 
+  /**
+   * User Roles Handler
+   */
+  const handleUserRoles = (pathname: string, user: IUser | null, navigate: NavigateFunction, initialPath: string | null) => {
     // Redirect to previous url if a non admin tries to access the admin view
     if (pathname.includes(PAGES.ADMIN) && !isUserAdmin(user)) {
       return navigate(-1);
@@ -153,13 +152,43 @@ const AuthGuard: FC = () => {
       }
       return navigate(PAGES.PLANNING);
     }
+  }
 
+  /**
+   * Other Page Redirecting Handler
+   */
+  const handlePageRedirects = (pathname: string) => {
     // Redirect user to full project view if /basics or /notes is missing
     if (pathname.includes(PAGES.PROJECT) && (!pathname.includes(PAGES.PROJECT_BASICS) && !pathname.includes(PAGES.PROJECT_NOTES))) {
       return navigate(`${pathname.replace(/\/$/, "")}/${PAGES.PROJECT_BASICS}`);
     }
+  }
 
-    return;
+  // Redirect user from forbidden paths
+  // If user can log in (isAuthenticated) but does not have access rights (!user),
+  // always redirect them to /access-denied
+  useEffect(() => {
+    const { pathname } = location;
+
+    const initialPath = localStorage.getItem(INITIAL_PATH);
+
+    // When user is not logged in, return and wait that user is authenticated
+    if (!isAuthenticated) {
+      return;
+    }
+
+    // User is authenticated, but they are not authorizated to see any resources
+    if (isAuthenticated && !user) {
+      redirectToAccessDenied(pathname, authError, navigate);
+    } else {
+      // Check if user had a path where tried to access
+      handleAuthenticatedUser(pathname, user, navigate, initialPath);
+      // User is authorizated
+      handleUserRoles(pathname, user, navigate, initialPath);
+      // Other redirects
+      handlePageRedirects(pathname);
+    }
+
   }, [location, navigate, user, isAuthenticated, authError]);
 
   return <></>;
