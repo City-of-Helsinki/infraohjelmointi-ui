@@ -89,6 +89,7 @@ export interface IProject {
 }
 
 export interface IProjectRequest {
+  [key: string]: any,
   type?: string | null;
   description?: string;
   entityName?: string | null;
