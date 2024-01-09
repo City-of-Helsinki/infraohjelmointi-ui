@@ -357,11 +357,9 @@ describe('SearchResultsView', () => {
     });
 
     it.skip('navigates to the planning view when clicking a result project and focuses the project: ', async () => {
-      const { container, user, findByTestId, /* store */ } = await render(searchActiveState);
+      const { container, user, findByTestId } = await render(searchActiveState);
 
       const scrollIntoViewMock = jest.fn();
-
-      //console.log(store.getState());
 
       window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
 
