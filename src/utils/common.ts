@@ -182,7 +182,11 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
 
     const parsedValue = parseValue(form[key as keyof IAppForms]);
     const convertedKey = getKey(key);
-    const assignValueToKey = (key: string, value: any) => request[key as keyof IAppForms] = value;
+    const assignValueToKey = (key: string, value: any) => {
+      if (value !== undefined) {
+        request[key as keyof IAppForms] = value;
+      }
+    }
 
     if (compareKeyToValues(key, ['district', 'division', 'subDivision']) && parsedValue) {
       _.assign(request, { 'projectLocation': getLowestLocationId(hierarchyDistricts, hierarchyDivisions, hierarchySubDivisions, form)});
@@ -202,10 +206,7 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
         
         if (compareKeyToValues(key, ["district"]) && hierarchyDistricts) {
           const subClass = parseValue(form["subClass" as keyof IAppForms]);
-          
-          if (subClass) {
-            assignValueToKey('projectClass', subClass);
-          }
+          assignValueToKey('projectClass', subClass);
         }
     }
   }
