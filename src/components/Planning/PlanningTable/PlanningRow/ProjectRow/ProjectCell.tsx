@@ -39,6 +39,7 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 interface IProjectCellProps {
   cell: IProjectCell;
@@ -58,6 +59,8 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
   const cellRef = useRef<HTMLTableCellElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+
+  const UPDATE_CELL_DATA = 'update-cell-data';
 
   const user = useAppSelector(selectUser);
   const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
@@ -93,6 +96,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
+      dispatch(
+        setLoading({
+          text: 'Update data',
+          id: UPDATE_CELL_DATA,
+        }),
+      );
       // if there's only the year property in the finances object, delete it
       if (_.size(req.finances) === 1) {
         delete req.finances;
@@ -107,6 +116,8 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
         data: req,
       }).catch(() => {
         dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
+      }).finally(() => {
+        dispatch(clearLoading(UPDATE_CELL_DATA));;
       });
     },
     [forcedToFrame, id, dispatch],

@@ -1,5 +1,5 @@
 .loader-container {
-  @apply fixed z-[9] -mt-20 h-full w-full overflow-hidden;
+  @apply fixed z-[110] -mt-20 h-full w-full overflow-hidden;
 }
 
 .loader-wrapper {
