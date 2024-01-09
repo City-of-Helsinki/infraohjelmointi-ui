@@ -191,13 +191,15 @@ const DialogContainer: FC<IDialogProps> = memo(
           : t('validation.required', { value: fieldName }) || '',
       [t],
     );
+
     const districtValidation = useCallback(
       (d: IOption, subClass: string) =>
-        Object.keys(d).includes('value') && d.value !== ''
-          ? (["suurpiiri", "östersundom"].some(substring => subClass.includes(substring))) && !subClass.includes(d.label) ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || '' : true
-          : t('validation.required', { value: 'Suurpiiri' }) || '',
+        ((["suurpiiri", "östersundom"].some(substring => subClass.includes(substring))) && !subClass.includes(d.label))
+        ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || '' 
+        : true,
       [t],
     );
+
     const getDivisionValidation = useCallback(() => {
       return {};
     }, [locationOptions, customValidation, t]);
@@ -293,7 +295,8 @@ const DialogContainer: FC<IDialogProps> = memo(
                             {...formProps('district')}
                             rules={{
                               validate: {
-                                isPopulated: (d: IOption) => districtValidation(d, subClassField.label),
+                                isPopulated: (d: IOption) => customValidation(d, subClassField.label),
+                                isValidDistrict: (d: IOption) => districtValidation(d, subClassField.label),
                               },
                             }}
                             options={locationOptions.districts}
