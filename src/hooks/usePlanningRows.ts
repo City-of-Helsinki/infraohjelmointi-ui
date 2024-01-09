@@ -31,7 +31,6 @@ import {
   sortByName,
 } from '@/utils/planningRowUtils';
 import { IClass } from '@/interfaces/classInterfaces';
-import { selectProjectDistricts, selectProjectSubDistricts } from '@/reducers/listsSlice';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.

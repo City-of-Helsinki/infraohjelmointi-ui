@@ -106,8 +106,8 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const { formValues, group } = useGroupValues(projects, id);
 
   const [selections, setSelections] = useState<ISelectionState>({
-    selectedClass: group?.classRelation || '',
-    selectedLocation: group?.location || '',
+    selectedClass: group?.classRelation ?? '',
+    selectedLocation: group?.location ?? '',
   });
 
   const { selectedClass, selectedLocation } = selections;

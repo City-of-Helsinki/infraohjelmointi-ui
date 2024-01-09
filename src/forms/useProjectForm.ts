@@ -6,13 +6,7 @@ import { listItemToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
-import {
-  selectPlanningDistricts,
-  selectPlanningDivisions,
-  selectPlanningSubDivisions,
-} from '@/reducers/locationSlice';
 import {
   selectPlanningClasses,
   selectAllPlanningClasses,
@@ -21,9 +15,7 @@ import {
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 import { IPerson } from '@/interfaces/personsInterfaces';
-import { useOptions } from '@/hooks/useOptions';
 import { selectProjectDistricts, selectProjectSubDistricts, selectProjectSubSubDistricts } from '@/reducers/listsSlice';
-import { current } from '@reduxjs/toolkit';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -76,6 +68,10 @@ const useProjectFormValues = () => {
     };
   };
 
+  const getSelectedLocation = (locationList: IListItem[], parentId?: string, locationId?: string) => {
+    return locationList.find(({ id }) => id === parentId) ?? locationList.find(({ id }) => id === locationId);
+  };
+
   /**
    * There are three project locations, but only one id is saved. We create a list item of each location based on the id.
    */
@@ -85,17 +81,11 @@ const useProjectFormValues = () => {
       value: projectLocation?.value ?? '',
     });
 
-    const selectedSubDivision = project
-      ? subDivisions.find(({ id }) => id === project.projectDistrict)
-      : undefined;
+    const selectedSubDivision = getSelectedLocation(subDivisions, project?.projectDistrict);
 
-    const selectedDivision = selectedSubDivision
-      ? divisions.find(({ id }) => id === selectedSubDivision.parent)
-      : project ? divisions.find(({ id }) => id === project.projectDistrict) : undefined;
+    const selectedDivision = getSelectedLocation(divisions, selectedSubDivision?.parent, project?.projectDistrict);
 
-    const selectedDistrict = selectedDivision
-      ? districts.find(({ id }) => id === selectedDivision.parent)
-      : project ? districts.find(({ id }) => id === project.projectDistrict) : undefined;
+    const selectedDistrict = getSelectedLocation(districts, selectedDivision?.parent, project?.projectDistrict);
 
     return {
       district: listItemToOption(locationAsListItem(selectedDistrict) ?? []),

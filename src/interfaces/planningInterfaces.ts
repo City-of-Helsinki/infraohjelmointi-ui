@@ -1,5 +1,4 @@
 import { IClass } from './classInterfaces';
-import { IListItem } from './common';
 import { IGroup } from './groupInterfaces';
 import { ILocation } from './locationInterfaces';
 import { IProject } from './projectInterfaces';

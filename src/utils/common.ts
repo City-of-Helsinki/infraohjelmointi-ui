@@ -101,6 +101,29 @@ const syncConstructionDates = (request: IProjectRequest, form: IAppForms) => {
   }
 };
 
+const getLocation = (list: ILocation[], locationName: string) => {
+  const location = list.find(({ name }) => name.includes(locationName));
+  return location;
+}
+
+const getLocationList = (list: ILocation[] | undefined, parentId?: string, pClass?: string) => {
+  let locationList: ILocation[] = [];
+  if (pClass && list) {
+    locationList = list.filter(({ parentClass }) => parentClass === pClass);
+  } 
+  else if (parentId && list) {
+    locationList = list.filter(({ parent }) => parent === parentId);
+  }
+  return locationList;
+}
+
+const canGetNextLevel = (currentLevelId: string | undefined, previousLevelLocation: ILocation | undefined, nextLevelLocationList: ILocation[] | undefined): boolean => {
+  if (currentLevelId && previousLevelLocation && nextLevelLocationList) {
+    return true;
+  }
+  return false;
+}
+
 /**
  *
  * @param dirtyFields dirtyFields from react-hook-forms
@@ -121,36 +144,20 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
     }
   };
 
-  const getLocation = (list: ILocation[], locationName: string) => {
-    const location = list.find(({ name }) => name.includes(locationName));
-    return location;
-  }
-
-  const getLocationList = (list: ILocation[], parentId?: string, pClass?: string) => {
-    let locationList: ILocation[] = [];
-    if (pClass) {
-      locationList = list.filter(({ parentClass }) => parentClass === pClass);
-    } 
-    else if (parentId) {
-      locationList = list.filter(({ parent }) => parent === parentId);
-    }
-    return locationList;
-  }
-
   const getLowestLocationId = () => {
     let lowestLocationId: string | undefined;
     if (hierarchyDistricts) {
       const districts = getLocationList(hierarchyDistricts, undefined, form.subClass.value);
       const district = getLocation(districts, form.district.label);
       lowestLocationId = district?.id;
-      if (form.division.value && district && hierarchyDivisions) {
+      if (canGetNextLevel(form.division.value, district, hierarchyDivisions)) {
         const divisions = getLocationList(hierarchyDivisions, district?.id);
         const division = getLocation(divisions, form.division.label);
-        lowestLocationId = division?.id || district.id;
-        if (form.subDivision.value && division && hierarchySubDivisions) {
-          const subDivisions = getLocationList(hierarchySubDivisions, division.id);
+        lowestLocationId = division?.id ?? district?.id;
+        if (canGetNextLevel(form.subDivision.value, division, hierarchySubDivisions)) {
+          const subDivisions = getLocationList(hierarchySubDivisions, division?.id);
           const subDivision = getLocation(subDivisions, form.subDivision.label);
-          lowestLocationId = subDivision?.id || division.id;
+          lowestLocationId = subDivision?.id ?? division?.id;
         }
       }
     }
