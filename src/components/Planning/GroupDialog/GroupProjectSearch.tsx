@@ -1,6 +1,6 @@
 import { IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { arrayHasValue, listItemToOption } from '@/utils/common';
+import { arrayHasValue, getLocationRelationId, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useRef, useState } from 'react';
@@ -10,7 +10,6 @@ import { IGroupForm } from '@/interfaces/formInterfaces';
 import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectForcedToFrame } from '@/reducers/planningSlice';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
 
 interface IProjectSearchProps {
@@ -21,23 +20,6 @@ interface IProjectSearchProps {
   subClasses: IOption[];
 }
 
-const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
-  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value ? true : parentClass === form.class.value);
-  if (form.district.label) {
-    const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(form.district.label));
-    if (form.division.label && relatedDistrict) {
-      const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
-      const relatedDivision = relatedDivisions.find(({ name }) => name.includes(form.division.label));
-      if (relatedDivision) {
-        return relatedDivision.id;
-      }
-      return relatedDistrict.id;
-    } else if (relatedDistrict) {
-      return relatedDistrict.id
-    }
-  }
-  return '';
-}
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({
   getValues,

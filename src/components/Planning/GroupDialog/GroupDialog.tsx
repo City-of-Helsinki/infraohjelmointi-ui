@@ -16,9 +16,9 @@ import { patchGroup } from '@/services/groupServices';
 import './styles.css';
 import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
-import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
+import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { locationItemsToOptions } from '@/utils/common';
+import { getLocationRelationId, locationItemsToOptions } from '@/utils/common';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -50,24 +50,6 @@ const buildRequestPayload = (
   }
   return data;
 };
-
-const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
-  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value ? true : parentClass === form.class.value );
-  if (form.district.label) {
-    const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(form.district.label));
-    if (form.division.label && relatedDistrict) {
-      const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
-      const relatedDivision = relatedDivisions.find(({ name }) => name.includes(form.division.label));
-      if (relatedDivision) {
-        return relatedDivision.id;
-      }
-      return relatedDistrict.id;
-    } else if (relatedDistrict) {
-      return relatedDistrict.id;
-    }
-  }
-  return '';
-}
 
 const hierarchyDivisionsAsIoptions = (districtName: string, subClassId: string, classId: string, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
   const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === subClassId || classId);

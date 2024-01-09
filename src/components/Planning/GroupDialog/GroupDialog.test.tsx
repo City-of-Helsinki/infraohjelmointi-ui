@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
-import { IGroup, IGroupRequest } from '@/interfaces/groupInterfaces';
+import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
 import { waitFor, within } from '@testing-library/react';
@@ -22,7 +22,6 @@ import mockProject from '@/mocks/mockProject';
 import { mockClassFinances } from '@/mocks/mockClassFinances';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { mockUser } from '@/mocks/mockUsers';
-import {screen} from '@testing-library/dom'
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());

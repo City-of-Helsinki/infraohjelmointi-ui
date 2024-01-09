@@ -1,6 +1,6 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
-import { IAppForms, FormValueType } from '@/interfaces/formInterfaces';
+import { IAppForms, FormValueType, IGroupForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import { getYear, updateYear } from './dates';
 import _ from 'lodash';
@@ -194,16 +194,29 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
     }
   }
 
-  // Remove the project location when the class is patched since the relation changes
-  /* if (_.has(request, 'projectClass')) {
-    _.assign(request, { projectDistrict: null });
-  } */
-
   syncPlanningDates(request, form);
   syncConstructionDates(request, form);
 
   return request;
 };
+
+export const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
+  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value ? true : parentClass === form.class.value);
+  if (form.district.label) {
+    const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(form.district.label));
+    if (form.division.label && relatedDistrict) {
+      const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
+      const relatedDivision = relatedDivisions.find(({ name }) => name.includes(form.division.label));
+      if (relatedDivision) {
+        return relatedDivision.id;
+      }
+      return relatedDistrict.id;
+    } else if (relatedDistrict) {
+      return relatedDistrict.id
+    }
+  }
+  return '';
+}
 
 export const setProgrammedYears = () => {
   const currentYear = new Date().getFullYear();
