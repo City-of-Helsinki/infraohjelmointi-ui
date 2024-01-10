@@ -89,7 +89,7 @@ export interface IProject {
 }
 
 export interface IProjectRequest {
-  [key: string]: any,
+  [key: string]: string | null | Array<string> | [] | boolean | IProjectFinancesRequestObject | number | undefined,
   type?: string | null;
   description?: string;
   entityName?: string | null;
