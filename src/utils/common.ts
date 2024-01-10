@@ -106,13 +106,17 @@ const getLocation = (list: ILocation[], locationName: string) => {
   return location;
 }
 
-const getLocationList = (list: ILocation[] | undefined, parentId?: string, pClass?: string) => {
+const getLocationList = (list: ILocation[] | undefined, parentClassId?: string, projectClass?: string) => {
   let locationList: ILocation[] = [];
-  if (pClass && list) {
-    locationList = list.filter(({ parentClass }) => parentClass === pClass);
+  // projectClass is given as a parameter when we want to get a list of districts filtered by project's subclass or class
+  // The list of distrcits is always filtered by parentClass, which is the projects class or subclass the project belongs to
+  if (projectClass && list) {
+    locationList = list.filter(({ parentClass }) => parentClass === projectClass);
   } 
-  else if (parentId && list) {
-    locationList = list.filter(({ parent }) => parent === parentId);
+  // parentClassId is given as a parameter when we want to get a list of divisions or sub divisions filtered based on the
+  // district or division id as divisions or sub divisions parent id
+  else if (parentClassId && list) {
+    locationList = list.filter(({ parent }) => parent === parentClassId);
   }
   return locationList;
 }
