@@ -194,7 +194,7 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const districtValidation = useCallback(
       (d: IOption, subClass: string) =>
-        ((["suurpiiri", "östersundom"].some(substring => subClass.includes(substring))) && !subClass.includes(d.label))
+        ((["suurpiiri", "östersundom"].some(subClassSubstring => subClass.includes(subClassSubstring))) && !subClass.includes(d.label))
         ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || '' 
         : true,
       [t],

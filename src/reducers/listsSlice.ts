@@ -32,8 +32,8 @@ export interface IListState {
   responsiblePersons: Array<IListItem>;
   programmedYears: Array<IListItem>;
   projectDistricts: Array<IListItem>;
-  projectSubDistricts: Array<IListItem>;
-  projectSubSubDistricts: Array<IListItem>;
+  projectDivisions: Array<IListItem>;
+  projectSubDivisions: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -50,8 +50,8 @@ const initialState: IListState = {
   responsibleZones: [],
   responsiblePersons: [],
   projectDistricts: [],
-  projectSubDistricts: [],
-  projectSubSubDistricts: [],
+  projectDivisions: [],
+  projectSubDivisions: [],
   programmedYears: setProgrammedYears(),
   error: null,
 };
@@ -100,8 +100,8 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       responsiblePersons: await getResponsiblePersons(),
       programmedYears: setProgrammedYears(),
       projectDistricts: getProjectDistricts(districts, "district"),
-      projectSubDistricts: getProjectDistricts(districts, "subDistrict"),
-      projectSubSubDistricts: getProjectDistricts(districts, "subSubDistrict")
+      projectDivisions: getProjectDistricts(districts, "division"),
+      projectSubDivisions: getProjectDistricts(districts, "subDivision")
     };
   } catch (err) {
     return thunkAPI.rejectWithValue(err);
@@ -127,7 +127,7 @@ export const listsSlice = createSlice({
 });
 
 export const selectProjectDistricts = (state: RootState) => state.lists.projectDistricts;
-export const selectProjectSubDistricts = (state: RootState) => state.lists.projectSubDistricts;
-export const selectProjectSubSubDistricts = (state: RootState) => state.lists.projectSubSubDistricts;
+export const selectProjectDivisions = (state: RootState) => state.lists.projectDivisions;
+export const selectProjectSubDivisions = (state: RootState) => state.lists.projectSubDivisions;
 
 export default listsSlice.reducer;

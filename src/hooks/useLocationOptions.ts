@@ -1,7 +1,7 @@
 import { listItemsToOption } from '@/utils/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
-import { selectProjectDistricts, selectProjectSubDistricts, selectProjectSubSubDistricts } from '@/reducers/listsSlice';
+import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 
 /**
  * Creates lists of districts, divisions and subDivisions. If filtering is used, then all
@@ -13,8 +13,8 @@ const useLocationOptions = (
   currentLocation: string | undefined,
 ) => {
   const allDistricts = useAppSelector(selectProjectDistricts);
-  const allDivisions = useAppSelector(selectProjectSubDistricts);
-  const allSubDivisions = useAppSelector(selectProjectSubSubDistricts);
+  const allDivisions = useAppSelector(selectProjectDivisions);
+  const allSubDivisions = useAppSelector(selectProjectSubDivisions);
 
   const selectedDistrict = useMemo(
     () => allDistricts && allDistricts.find((mc) => mc.id === currentLocation),

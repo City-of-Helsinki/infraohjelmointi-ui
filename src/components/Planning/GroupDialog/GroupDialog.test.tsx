@@ -71,8 +71,8 @@ const render = async () =>
             ...store.getState().lists,
             phases: mockProjectPhases.data,
             projectDistricts: mockDistrictOptions.data,
-            projectSubDistricts: mockDivisionOptions.data,
-            projectSubSubDistricts: mockSubDivisionOptions.data
+            projectDivisions: mockDivisionOptions.data,
+            projectSubDivisions: mockSubDivisionOptions.data
           },
           auth: {
             ...store.getState().auth,

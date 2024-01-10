@@ -16,7 +16,7 @@ import {
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { listItemToOption } from '@/utils/common';
-import { selectProjectDistricts, selectProjectSubDistricts, selectProjectSubSubDistricts } from '@/reducers/listsSlice';
+import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
@@ -29,8 +29,8 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
   const subClasses = useAppSelector(selectPlanningSubClasses);
 
   const districts = useAppSelector(selectProjectDistricts);
-  const divisions = useAppSelector(selectProjectSubDistricts);
-  const subDivisions = useAppSelector(selectProjectSubSubDistricts);
+  const divisions = useAppSelector(selectProjectDivisions);
+  const subDivisions = useAppSelector(selectProjectSubDivisions);
 
   /**
    * There are three project classes, but only one id is saved. We create a list item of each class based on the id.

@@ -15,7 +15,7 @@ import {
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 import { IPerson } from '@/interfaces/personsInterfaces';
-import { selectProjectDistricts, selectProjectSubDistricts, selectProjectSubSubDistricts } from '@/reducers/listsSlice';
+import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -31,8 +31,8 @@ const useProjectFormValues = () => {
   const subClasses = useAppSelector(selectPlanningSubClasses);
 
   const districts = useAppSelector(selectProjectDistricts);
-  const divisions = useAppSelector(selectProjectSubDistricts);
-  const subDivisions = useAppSelector(selectProjectSubSubDistricts);
+  const divisions = useAppSelector(selectProjectDivisions);
+  const subDivisions = useAppSelector(selectProjectSubDivisions);
 
   const value = (value: string | undefined | null) => value ?? '';
 
