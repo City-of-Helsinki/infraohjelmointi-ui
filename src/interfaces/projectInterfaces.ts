@@ -72,6 +72,7 @@ export interface IProject {
   planningStartYear: number | null;
   projectClass?: string;
   projectLocation?: string;
+  projectDistrict?: string;
   projectProgram?: string;
   otherPersons?: string;
   responsibleZone?: IListItem;
@@ -88,6 +89,7 @@ export interface IProject {
 }
 
 export interface IProjectRequest {
+  [key: string]: string | null | Array<string> | [] | boolean | IProjectFinancesRequestObject | number | undefined,
   type?: string | null;
   description?: string;
   entityName?: string | null;

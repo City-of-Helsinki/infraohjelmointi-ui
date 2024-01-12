@@ -13,15 +13,10 @@ import {
   selectAllPlanningClasses,
   selectPlanningSubClasses,
 } from '@/reducers/classSlice';
-import {
-  selectPlanningDistricts,
-  selectPlanningDivisions,
-  selectPlanningSubDivisions,
-} from '@/reducers/locationSlice';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { listItemToOption } from '@/utils/common';
-import { ILocation } from '@/interfaces/locationInterfaces';
+import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
@@ -33,9 +28,9 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
 
-  const districts = useAppSelector(selectPlanningDistricts);
-  const divisions = useAppSelector(selectPlanningDivisions);
-  const subDivisions = useAppSelector(selectPlanningSubDivisions);
+  const districts = useAppSelector(selectProjectDistricts);
+  const divisions = useAppSelector(selectProjectDivisions);
+  const subDivisions = useAppSelector(selectProjectSubDivisions);
 
   /**
    * There are three project classes, but only one id is saved. We create a list item of each class based on the id.
@@ -73,29 +68,24 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
    * There are three project locations, but only one id is saved. We create a list item of each location based on the id.
    */
   const getGroupLocationFields = (group: IGroup | null) => {
-    const locationAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
-      id: projectLocation?.id ?? '',
-      value: projectLocation?.name ?? '',
-    });
-
     const selectedSubDivision = group
-      ? subDivisions.find(({ id }) => id === group.locationRelation)
+      ? subDivisions.find(({ id }) => id === group.location)
       : undefined;
 
-    const projectLocationId = selectedSubDivision?.parent ?? group?.locationRelation;
+    const projectLocationId = selectedSubDivision?.parent ?? group?.location;
 
     const selectedDivision = projectLocationId
       ? divisions.find(({ id }) => id === projectLocationId)
       : undefined;
 
-    const districtId = selectedDivision?.parent ?? group?.locationRelation;
+    const districtId = selectedDivision?.parent ?? group?.location;
 
     const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
 
     return {
-      district: listItemToOption(locationAsListItem(selectedDistrict) ?? []),
-      division: listItemToOption(locationAsListItem(selectedDivision) ?? []),
-      subDivision: listItemToOption(locationAsListItem(selectedSubDivision) ?? []),
+      district: listItemToOption(selectedDistrict),
+      division: listItemToOption(selectedDivision),
+      subDivision: listItemToOption(selectedSubDivision),
     };
   };
 
@@ -116,13 +106,13 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const { formValues, group } = useGroupValues(projects, id);
 
   const [selections, setSelections] = useState<ISelectionState>({
-    selectedClass: '',
-    selectedLocation: '',
+    selectedClass: group?.classRelation ?? '',
+    selectedLocation: group?.location ?? '',
   });
 
   const { selectedClass, selectedLocation } = selections;
   const classOptions = useClassOptions(selectedClass);
-  const locationOptions = useLocationOptions(selectedLocation, selectedClass);
+  const locationOptions = useLocationOptions(selectedLocation);
 
   const formMethods = useForm<IGroupForm>({
     defaultValues: useMemo(() => formValues, [formValues]),

@@ -13,7 +13,7 @@ import {
   mockProjectTypes,
   mockResponsibleZones,
 } from '@/mocks/mockLists';
-import { mockCoordinatorLocations, mockLocations } from '@/mocks/mockLocations';
+import { mockCoordinatorLocations, mockDistrictOptions, mockDivisionOptions, mockLocations, mockSubDivisionOptions } from '@/mocks/mockLocations';
 import mockNotes from '@/mocks/mockNotes';
 import mockPersons from '@/mocks/mockPersons';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
@@ -51,6 +51,12 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockHashTags);
       case url === '/project-types/':
         return Promise.resolve(mockProjectTypes);
+      case url === '/project-districts/':
+        return Promise.resolve(mockDistrictOptions);
+      case url === '/project-divisions/':
+        return Promise.resolve(mockDivisionOptions);
+      case url === '/project-sub-divisions/':
+        return Promise.resolve(mockSubDivisionOptions);
       case url === '/project-phases/':
         return Promise.resolve(mockProjectPhases);
       case url === '/project-areas/':

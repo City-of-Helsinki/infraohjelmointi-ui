@@ -16,6 +16,9 @@ import { patchGroup } from '@/services/groupServices';
 import './styles.css';
 import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
+import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
+import { ILocation } from '@/interfaces/locationInterfaces';
+import { getLocationRelationId, locationItemsToOptions } from '@/utils/common';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -28,12 +31,15 @@ interface IDialogProps {
 const buildRequestPayload = (
   form: IGroupForm,
   id: string | null,
+  hierarchyDistricts: ILocation[],
+  hierarchyDivisions: ILocation[],
 ): IGroupRequest | IGroupPatchRequestObject => {
   // submit Class or subclass if present, submit division or district if present, submit a name, submit projects
   const data = {
     name: form.name,
+    location: form.subDivision?.value || form.division?.value || form.district?.value || '',
     classRelation: form.subClass?.value || form.class?.value || '',
-    locationRelation: form.division?.value || form.district?.value || '',
+    locationRelation: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions),
     projects: form.projectsForSubmit.length > 0 ? form.projectsForSubmit.map((p) => p.value) : [],
   };
   if (id) {
@@ -45,19 +51,32 @@ const buildRequestPayload = (
   return data;
 };
 
+const hierarchyDivisionsAsIoptions = (districtName: string, subClassId: string, classId: string, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
+  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === subClassId || classId);
+  const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(districtName));
+  if (relatedDistrict) {
+    const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
+    return locationItemsToOptions(relatedDivisions);
+  }
+  return [];
+}
+
 const DialogContainer: FC<IDialogProps> = memo(
   ({ isOpen, handleClose, editMode, projects, id }) => {
     const mode = useAppSelector(selectPlanningMode);
     const navigate = useNavigate();
+
+    const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
+    const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
 
     const [showAdvanceFields, setShowAdvanceFields] = useState(false);
     const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(projects, id);
     const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
 
     const nameField = watch('name');
-    const subClassField = watch('subClass');
-    const classField = watch('class');
     const masterClassField = watch('masterClass');
+    const classField = watch('class');
+    const subClassField = watch('subClass');
     const districtField = watch('district');
     const divisionField = watch('division');
 
@@ -93,8 +112,8 @@ const DialogContainer: FC<IDialogProps> = memo(
           masterClass: form.masterClass.value,
           class: form.class.value,
           subClass: form.subClass.value,
-          ...(form.district.value && {
-            district: form.district.value,
+          ...(form.district.value && !form.division.value && { 
+            district: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions)
           }),
         };
 
@@ -117,7 +136,7 @@ const DialogContainer: FC<IDialogProps> = memo(
         if (editMode && id) {
           try {
             const group = await patchGroup(
-              buildRequestPayload(form, id) as IGroupPatchRequestObject,
+              buildRequestPayload(form, id, hierarchyDistricts, hierarchyDivisions) as IGroupPatchRequestObject,
             );
             dispatch(updateGroup({ data: group, type: 'planning' }));
             handleDialogClose();
@@ -126,7 +145,7 @@ const DialogContainer: FC<IDialogProps> = memo(
           }
         } else {
           try {
-            await dispatch(postGroupThunk(buildRequestPayload(form, null) as IGroupRequest));
+            await dispatch(postGroupThunk(buildRequestPayload(form, null, hierarchyDistricts, hierarchyDivisions) as IGroupRequest));
             handleDialogClose();
             navigateToGroupLocation(form);
           } catch (e) {
@@ -149,10 +168,6 @@ const DialogContainer: FC<IDialogProps> = memo(
       (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setShowAdvanceFields((current) => !current);
-        setValue('district', { label: '', value: '' });
-        setValue('division', { label: '', value: '' });
-        setValue('subDivision', { label: '', value: '' });
-        setValue('projectsForSubmit', []);
       },
       [setValue],
     );
@@ -176,6 +191,15 @@ const DialogContainer: FC<IDialogProps> = memo(
           : t('validation.required', { value: fieldName }) || '',
       [t],
     );
+
+    const districtValidation = useCallback(
+      (d: IOption, subClass: string) =>
+        ((["suurpiiri", "östersundom"].some(subClassSubstring => subClass.includes(subClassSubstring))) && !subClass.includes(d.label))
+        ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || '' 
+        : true,
+      [t],
+    );
+
     const getDivisionValidation = useCallback(() => {
       return {};
     }, [locationOptions, customValidation, t]);
@@ -269,6 +293,11 @@ const DialogContainer: FC<IDialogProps> = memo(
                         <div className="search-form-content">
                           <SelectField
                             {...formProps('district')}
+                            rules={{
+                              validate: {
+                                isValidDistrict: (d: IOption) => districtValidation(d, subClassField.label),
+                              },
+                            }}
                             options={locationOptions.districts}
                           />
                           <SelectField
@@ -302,7 +331,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                     getValues={getValues}
                     control={control}
                     showAdvanceFields={showAdvanceFields}
-                    divisions={locationOptions.divisions}
+                    divisions={hierarchyDivisionsAsIoptions(districtField.label, subClassField.value, classField.value, hierarchyDistricts, hierarchyDivisions)}
                     subClasses={classOptions.subClasses}
                   />
                 </div>

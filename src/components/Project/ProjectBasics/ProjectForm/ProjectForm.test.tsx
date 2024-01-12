@@ -85,6 +85,9 @@ const render = async () =>
             responsibleZones: mockResponsibleZones.data,
             responsiblePersons: mockResponsiblePersons.data,
             programmedYears: [],
+            projectDistricts: [],
+            projectDivisions: [],
+            projectSubDivisions: [],
             error: {},
           },
           hashTags: {
@@ -301,7 +304,7 @@ describe('projectForm', () => {
     removeProjectUpdateEventListener(dispatch);
   });
 
-  it('can autosave patch a NumberField', async () => {
+  it('can patch a NumberField', async () => {
     const project = mockProject.data;
     const expectedValue = '1234';
     const responseProject: { data: IProject } = {
@@ -312,20 +315,20 @@ describe('projectForm', () => {
 
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
-    const parentContainer = await findByTestId('project-form');
+    const formSubmitButton = await findByTestId('submit-project-button');
 
     const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
 
     await user.clear(hkrIdField);
     await user.type(hkrIdField, expectedValue);
-    await user.click(parentContainer);
+    await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.hkrId).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
-  it('can autosave patch a SelectField', async () => {
+  it('can patch a SelectField', async () => {
     const expectedValue = { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' };
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -336,20 +339,20 @@ describe('projectForm', () => {
 
     const { user, findByText, findByTestId } = await render();
 
-    const parentContainer = await findByTestId('project-form');
+    const formSubmitButton = await findByTestId('submit-project-button');
 
     await user.click(
       document.getElementById('select-field-area-toggle-button') as unknown as Element,
     );
     await user.click(await findByText('option.lansisatama'));
-    await user.click(parentContainer);
+    await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.area).toEqual(expectedValue.id);
     expect(await findByText(matchExact(expectedValue.value))).toBeInTheDocument();
   });
 
-  it('can autosave patch a DateField', async () => {
+  it('can patch a DateField', async () => {
     const { user, findByRole, findByDisplayValue, findByTestId } = await render();
     const expectedValue = '13.12.2020';
     const project = mockProject.data;
@@ -359,21 +362,21 @@ describe('projectForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const parentContainer = await findByTestId('project-form');
+    const formSubmitButton = await findByTestId('submit-project-button');
     const estPlanningStart = await findByRole('textbox', {
       name: getFormField('estPlanningStart'),
     });
 
     await user.clear(estPlanningStart);
     await user.type(estPlanningStart, expectedValue);
-    await user.click(parentContainer);
+    await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.estPlanningStart).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
-  it('can autosave patch a TextField', async () => {
+  it('can patch a TextField', async () => {
     const expectedValue = 'New description';
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -385,18 +388,18 @@ describe('projectForm', () => {
     const { user, findByDisplayValue, findByTestId, findByRole } = await render();
 
     const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
-    const parentContainer = await findByTestId('project-form');
+    const formSubmitButton = await findByTestId('submit-project-button');
 
     await user.clear(descriptionField);
     await user.type(descriptionField, expectedValue);
-    await user.click(parentContainer);
+    await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     expect(formPatchRequest.description).toEqual(expectedValue);
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
-  it('can autosave patch a RadioCheckboxField', async () => {
+  it('can patch a RadioCheckboxField', async () => {
     const expectedValue = true;
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
@@ -408,10 +411,10 @@ describe('projectForm', () => {
     const { user, findByTestId } = await render();
 
     const louhiField = (await findByTestId('louhi-0')) as HTMLInputElement;
-    const parentContainer = await findByTestId('project-form');
+    const formSubmitButton = await findByTestId('submit-project-button');
 
     await user.click(louhiField);
-    await user.click(parentContainer);
+    await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
 

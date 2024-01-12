@@ -6,13 +6,7 @@ import { listItemToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
-import {
-  selectPlanningDistricts,
-  selectPlanningDivisions,
-  selectPlanningSubDivisions,
-} from '@/reducers/locationSlice';
 import {
   selectPlanningClasses,
   selectAllPlanningClasses,
@@ -21,6 +15,7 @@ import {
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 import { IPerson } from '@/interfaces/personsInterfaces';
+import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -35,9 +30,9 @@ const useProjectFormValues = () => {
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
 
-  const districts = useAppSelector(selectPlanningDistricts);
-  const divisions = useAppSelector(selectPlanningDivisions);
-  const subDivisions = useAppSelector(selectPlanningSubDivisions);
+  const districts = useAppSelector(selectProjectDistricts);
+  const divisions = useAppSelector(selectProjectDivisions);
+  const subDivisions = useAppSelector(selectProjectSubDivisions);
 
   const value = (value: string | undefined | null) => value ?? '';
 
@@ -73,28 +68,24 @@ const useProjectFormValues = () => {
     };
   };
 
+  const getSelectedLocation = (locationList: IListItem[], parentId?: string, locationId?: string) => {
+    return locationList.find(({ id }) => id === parentId) ?? locationList.find(({ id }) => id === locationId);
+  };
+
   /**
    * There are three project locations, but only one id is saved. We create a list item of each location based on the id.
    */
   const getProjectLocationFields = (project: IProject | null) => {
-    const locationAsListItem = (projectLocation: ILocation | undefined): IListItem => ({
+    const locationAsListItem = (projectLocation: IListItem | undefined): IListItem => ({
       id: projectLocation?.id ?? '',
-      value: projectLocation?.name ?? '',
+      value: projectLocation?.value ?? '',
     });
 
-    const selectedSubDivision = project
-      ? subDivisions.find(({ id }) => id === project.projectLocation)
-      : undefined;
+    const selectedSubDivision = getSelectedLocation(subDivisions, project?.projectDistrict);
 
-    const projectLocationId = selectedSubDivision?.parent ?? project?.projectLocation;
+    const selectedDivision = getSelectedLocation(divisions, selectedSubDivision?.parent, project?.projectDistrict);
 
-    const selectedDivision = projectLocationId
-      ? divisions.find(({ id }) => id === projectLocationId)
-      : undefined;
-
-    const districtId = selectedDivision?.parent ?? project?.projectLocation;
-
-    const selectedDistrict = districtId ? districts.find(({ id }) => id === districtId) : undefined;
+    const selectedDistrict = getSelectedLocation(districts, selectedDivision?.parent, project?.projectDistrict);
 
     return {
       district: listItemToOption(locationAsListItem(selectedDistrict) ?? []),
@@ -187,28 +178,17 @@ const useProjectForm = () => {
     mode: 'onBlur',
   });
 
-  const [selectedMasterClassName, setSelectedMasterClassName] = useState<string>('');
-
-  const [selections, setSelections] = useState({ selectedClass: '', selectedLocation: '' });
-
-  // using this useEffect to populate class/location selections with initial values if a project has them
-  useEffect(() => {
-    const lowestSelectedClass =
-      formValues.subClass.value || formValues.class.value || formValues.masterClass.value;
-    const lowestSelectedLocation =
-      formValues.subDivision.value || formValues.division.value || formValues.district.value;
-    setSelections({ selectedClass: lowestSelectedClass, selectedLocation: lowestSelectedLocation });
-    setSelectedMasterClassName(formValues.masterClass.label ?? '');
-  }, [formValues]);
+  const [selections, setSelections] = useState({ selectedClass: project?.projectClass, selectedLocation: project?.projectDistrict });
 
   // control,
   const { reset, watch, setValue } = formMethods;
+
+  const selectedMasterClassName = formValues.masterClass.label;
 
   const classOptions = useClassOptions(selections?.selectedClass);
 
   const locationOptions = useLocationOptions(
     selections?.selectedLocation,
-    selections?.selectedClass,
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected
@@ -229,12 +209,26 @@ const useProjectForm = () => {
     }
   };
 
+  const setLocationSubClass = (name: string) => {
+    const newSubClass = classOptions.subClasses.find(({label}) => label.includes(name));
+    if (newSubClass) {
+      setValue('subClass', newSubClass);
+      setSelections((current) => ({
+        ...current,
+        selectedClass: newSubClass.value,
+      }));
+    }
+  }
+
   // Set the selected location and empty the other locations if a parent location is selected
   const setSelectedLocation = (name: string, form: IProjectForm) => {
     const optionValue = (form[name as unknown as keyof IProjectForm] as IOption)?.value;
 
     if (name === 'district') {
       setValue('division', { label: '', value: '' });
+      if (["suurpiiri", "östersundom"].some(substring => formValues.subClass.label.includes(substring))) {
+        setLocationSubClass(form.district.label);
+      }
     }
     if (name === 'district' || name === 'division') {
       setValue('subDivision', { label: '', value: '' });
