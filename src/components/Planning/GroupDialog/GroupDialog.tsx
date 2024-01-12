@@ -295,7 +295,6 @@ const DialogContainer: FC<IDialogProps> = memo(
                             {...formProps('district')}
                             rules={{
                               validate: {
-                                isPopulated: (d: IOption) => customValidation(d, subClassField.label),
                                 isValidDistrict: (d: IOption) => districtValidation(d, subClassField.label),
                               },
                             }}
