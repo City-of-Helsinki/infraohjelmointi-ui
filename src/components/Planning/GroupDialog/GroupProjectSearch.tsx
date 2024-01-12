@@ -47,10 +47,12 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
         searchParams.push(`class=${getValues('class').value}`);
       }
 
-      if (getValues("division").value) {
-        searchParams.push(`division=${lowestLocationId}`);
-      } else if (getValues('district').value) {
-        searchParams.push(`district=${lowestLocationId}`);
+      if (lowestLocationId) {
+        if (getValues("division").value) {
+          searchParams.push(`division=${lowestLocationId}`);
+        } else if (getValues('district').value) {
+          searchParams.push(`district=${lowestLocationId}`);
+        }
       }
       searchParams.push(`projectName=${projectName}`);
       searchParams.push('inGroup=false');
