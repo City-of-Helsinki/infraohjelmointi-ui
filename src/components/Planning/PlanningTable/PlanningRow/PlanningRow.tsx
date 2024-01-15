@@ -185,7 +185,8 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
 
 /*  districts' (suurpiiri) framebudget is not available on a subClass level in 'cells' even though it probably should, however 
     the data can be found one level lower from the childrens' 'cells'. The problem with the data might happen because the districts
-    that are on the subclass level, are marked as projectGroup now and they probably should be projectClass instead. */
+    that are on the subclass level, are marked as projectGroup now and they probably should be projectClass instead. TODO: investigate
+    the possible problem with projectGroup/projectClass */
 const cellData = props.name.includes("suurpiiri") && children && children[0] ? children[0].cells : cells;
   return (
     <>
