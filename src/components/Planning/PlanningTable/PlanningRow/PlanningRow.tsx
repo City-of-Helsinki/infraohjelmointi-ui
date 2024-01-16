@@ -186,7 +186,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
   the data can be found one level lower from the childrens' 'cells'. The problem with the data might happen because the districts
   that are on the subclass level, are marked as projectGroup now and they probably should be projectClass instead. TODO: investigate
   the possible problem with projectGroup/projectClass */
-  const cellDataWithFrameBudget = children && children[0] ? children[0].cells : undefined;
+  const cellDataWithFrameBudget = children[0]?.cells;
   const cellData = props.name.includes("suurpiiri") && cellDataWithFrameBudget && !search.includes("subClass") ? cellDataWithFrameBudget : cells;
   
   return (
