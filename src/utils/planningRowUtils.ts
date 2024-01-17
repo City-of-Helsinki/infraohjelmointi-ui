@@ -11,8 +11,6 @@ import { calculatePlanningCells, calculatePlanningRowSums } from './calculations
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
-import { useAppSelector } from '@/hooks/common';
-import { selectPlanningSubDivisions } from '@/reducers/locationSlice';
 
 // These utils are used by the usePlanningRows and useCoordinationRows
 
