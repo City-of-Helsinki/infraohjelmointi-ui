@@ -238,7 +238,6 @@ const usePlanningRows = () => {
   const startYear = useAppSelector(selectStartYear);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
-  const subDivisions = useAppSelector(selectPlanningSubDivisions);
 
   const mode = useAppSelector(selectPlanningMode);
 
