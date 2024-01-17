@@ -238,6 +238,7 @@ const usePlanningRows = () => {
   const startYear = useAppSelector(selectStartYear);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
+  const subDivisions = useAppSelector(selectPlanningSubDivisions);
 
   const mode = useAppSelector(selectPlanningMode);
 
@@ -297,7 +298,7 @@ const usePlanningRows = () => {
       groups,
     };
 
-    const nextRows = buildPlanningTableRows(list, projects, selections);
+    const nextRows = buildPlanningTableRows(list, projects, selections, subDivisions);
 
     // Re-build planning rows if the existing rows are not equal
     if (!_.isEqual(nextRows, rows)) {
