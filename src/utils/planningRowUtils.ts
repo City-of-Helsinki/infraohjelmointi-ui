@@ -83,7 +83,7 @@ export const filterProjectsForPlanningRow = (
 
   const getProjectsForSubClassDistrict = () => {
     const projectHasDistrictOrNoLocation = (p: IProject) =>
-      districtsForSubClass?.some((d) => d.id === p.projectLocation) ?? !p.projectLocation;
+      !p.projectLocation || districtsForSubClass?.some((d) => d.id === p.projectLocation) || false;
 
     return projects.filter(
       (p) => !p.projectGroup && projectHasDistrictOrNoLocation(p) && p.projectClass === id,
