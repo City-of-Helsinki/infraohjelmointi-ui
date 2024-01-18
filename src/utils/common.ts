@@ -210,7 +210,8 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
         
         if (compareKeyToValues(key, ["district"]) && hierarchyDistricts) {
           const subClass = parseValue(form["subClass" as keyof IAppForms]);
-          assignValueToKey('projectClass', subClass);
+          const projectClass = parseValue(form["class" as keyof IAppForms]);
+          assignValueToKey('projectClass', subClass ?? projectClass);
         }
     }
   }
@@ -218,6 +219,7 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
   syncPlanningDates(request, form);
   syncConstructionDates(request, form);
 
+  console.log(request);
   return request;
 };
 
