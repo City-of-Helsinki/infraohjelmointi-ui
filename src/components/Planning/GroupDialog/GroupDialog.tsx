@@ -90,7 +90,8 @@ const DialogContainer: FC<IDialogProps> = memo(
       return (
         !nameField ||
         !masterClassField.value ||
-        !classField.value
+        !classField.value || 
+        (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring)) && !districtField.value)
       );
     }, [
       districtField.value,
@@ -294,7 +295,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           <SelectField
                             {...formProps('district')}
                             rules={{
-                              required: (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring))) ? t('validation.required', { value: 'Suurpiiri' }) || '' : '',
+                              required: (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring))) ? t('validation.required', { value: 'Suurpiiri' }) ?? '' : '',
                               validate: {
                                 isValidDistrict: (d: IOption) => districtValidation(d, subClassField.label),
                               },
