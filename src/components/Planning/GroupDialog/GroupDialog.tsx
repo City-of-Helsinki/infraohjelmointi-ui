@@ -90,7 +90,8 @@ const DialogContainer: FC<IDialogProps> = memo(
       return (
         !nameField ||
         !masterClassField.value ||
-        !classField.value
+        !classField.value || 
+        (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring)) && !districtField.value)
       );
     }, [
       districtField.value,
@@ -112,7 +113,7 @@ const DialogContainer: FC<IDialogProps> = memo(
           masterClass: form.masterClass.value,
           class: form.class.value,
           subClass: form.subClass.value,
-          ...(form.district.value && !form.division.value && { 
+          ...(form.district.value && !form.division.value && {
             district: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions)
           }),
         };
@@ -195,8 +196,8 @@ const DialogContainer: FC<IDialogProps> = memo(
     const districtValidation = useCallback(
       (d: IOption, subClass: string) =>
         ((["suurpiiri", "östersundom"].some(subClassSubstring => subClass.includes(subClassSubstring))) && !subClass.includes(d.label))
-        ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || '' 
-        : true,
+          ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || ''
+          : true,
       [t],
     );
 
@@ -294,6 +295,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           <SelectField
                             {...formProps('district')}
                             rules={{
+                              required: (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring))) ? t('validation.required', { value: 'Suurpiiri' }) ?? '' : '',
                               validate: {
                                 isValidDistrict: (d: IOption) => districtValidation(d, subClassField.label),
                               },
@@ -315,10 +317,10 @@ const DialogContainer: FC<IDialogProps> = memo(
                       {/* Divider to click */}
                       <div className="advance-fields-button">
                         <button onClick={toggleAdvanceFields}>
-                          { !showAdvanceFields ? 
-                          (t(`groupForm.openAdvanceFilters`)
-                          ) : (
-                          (t(`groupForm.closeAdvanceFilters`))) }
+                          {!showAdvanceFields ?
+                            (t(`groupForm.openAdvanceFilters`)
+                            ) : (
+                              (t(`groupForm.closeAdvanceFilters`)))}
                         </button>
                         {advanceFieldIcons}
                       </div>
