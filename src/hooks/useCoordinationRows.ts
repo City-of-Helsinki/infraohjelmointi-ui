@@ -171,6 +171,13 @@ const buildCoordinatorTableRows = (
               ...subClassRow,
               children: [
                 ...getSortedGroupRows(filteredSubClass.id, 'subClass'),
+                // Districts that come after a subClass
+                ...getDistrictRowsForParent({
+                  type: 'districtPreview',
+                  expanded: !!selectedDistrict,
+                  parent: filteredSubClass,
+                  districts: districtsBeforeCollectiveSubLevel,
+                }),
                 ...filteredCollectiveSubLevels.map((filteredCollectiveSubLevel) => {
                   const collectiveSubLevelRow = getRow({
                     item: filteredCollectiveSubLevel,
@@ -228,13 +235,6 @@ const buildCoordinatorTableRows = (
                       }),
                     ],
                   };
-                }),
-                // Districts that come after a subClass
-                ...getDistrictRowsForParent({
-                  type: 'districtPreview',
-                  expanded: !!selectedDistrict,
-                  parent: filteredSubClass,
-                  districts: districtsBeforeCollectiveSubLevel,
                 }),
               ],
             };
