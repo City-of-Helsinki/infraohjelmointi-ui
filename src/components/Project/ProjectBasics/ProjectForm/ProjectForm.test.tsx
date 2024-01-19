@@ -161,7 +161,7 @@ describe('projectForm', () => {
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);
     expectRadioBoolean('effectHousing-0', false);
-    expect(await findByText(Number(project?.costForecast).toFixed(0) + ' €'|| '')).toBeInTheDocument();
+    expect(await findByText(Number(project?.costForecast).toFixed(0) + ' keur'|| '')).toBeInTheDocument();
     expect(await findByText(Number(sapCost[project.id]?.project_task_commitments).toFixed(0) + ' €' || '')).toBeInTheDocument();
     expect(await findByText(Number(sapCost[project.id]?.project_task_costs).toFixed(0) + ' €' || '')).toBeInTheDocument();
     expect(await findByText(sapCostsSum.toFixed(0) + ' €' || '')).toBeInTheDocument();
