@@ -19,8 +19,6 @@ import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection
 import ProjectLocationSection from './ProjectLocationSection';
 import ProjectProgramSection from './ProjectProgramSection';
 import ProjectFormBanner from './ProjectFormBanner';
-import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import _ from 'lodash';
 import './styles.css';
@@ -29,10 +27,14 @@ import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { getYear } from '@/utils/dates';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
+import ConfirmPrompt from '@/components/ConfirmPrompt';
 
-const ProjectForm = () => {
+interface ProjectFormProps {
+  getIsDirty?: (isDirty: boolean) => void;
+};
+
+const ProjectForm = ({getIsDirty}: ProjectFormProps) => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
-  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -50,11 +52,11 @@ const ProjectForm = () => {
     getValues,
   } = formMethods;
 
-  usePromptConfirmOnNavigate({
-    title: t('confirmLeaveTitle'),
-    description: t('confirmLeaveDescription'),
-    when: isDirty,
-  });
+  useEffect(()=> {
+    if (getIsDirty) {
+      getIsDirty(isDirty);
+    }
+  },[isDirty])
 
   const getFinanceYearName = (finances: IProjectFinances, year: number) => {
     const index = year - finances.year;
@@ -314,35 +316,38 @@ const ProjectForm = () => {
   );
 
   return (
-    <form
-      data-testid="project-form"
-      className="project-form"
-    >
-      {/* SECTION 1 - BASIC INFO */}
-      <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} />
-      {/* SECTION 2 - STATUS */}
-      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
-      {/* SECTION 3 - SCHEDULE */}
-      <ProjectScheduleSection {...formProps} />
-      {/* SECTION 4 - FINANCIALS */}
-      <ProjectFinancialSection
-        {...formProps}
-        classOptions={classOptions}
-        isInputDisabled={isInputDisabled}
-      />
-      {/* SECTION 5 - RESPONSIBLE PERSONS */}
-      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
-      {/* SECTION 6 - LOCATION */}
-      <ProjectLocationSection
-        {...formProps}
-        locationOptions={locationOptions}
-        isInputDisabled={isInputDisabled}
-      />
-      {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection {...formProps} />
-      {/* BANNER */}
-      <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
-    </form>
+    <>
+      <ConfirmPrompt />
+      <form
+        data-testid="project-form"
+        className="project-form"
+      >
+        {/* SECTION 1 - BASIC INFO */}
+        <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} />
+        {/* SECTION 2 - STATUS */}
+        <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
+        {/* SECTION 3 - SCHEDULE */}
+        <ProjectScheduleSection {...formProps} />
+        {/* SECTION 4 - FINANCIALS */}
+        <ProjectFinancialSection
+          {...formProps}
+          classOptions={classOptions}
+          isInputDisabled={isInputDisabled}
+        />
+        {/* SECTION 5 - RESPONSIBLE PERSONS */}
+        <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
+        {/* SECTION 6 - LOCATION */}
+        <ProjectLocationSection
+          {...formProps}
+          locationOptions={locationOptions}
+          isInputDisabled={isInputDisabled}
+        />
+        {/* SECTION 7 - PROJECT PROGRAM */}
+        <ProjectProgramSection {...formProps} />
+        {/* BANNER */}
+        <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
+      </form>
+    </>
   );
 };
 

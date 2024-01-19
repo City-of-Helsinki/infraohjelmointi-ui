@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   getProjectThunk,
@@ -85,12 +85,18 @@ const ProjectView = () => {
     }
   }, [projectId, projectMode, navigate, dispatch]);
 
+  const [dirty, setDirty] = useState(false);
+
+  const getIsDirty = (isDirty: boolean) => {
+      setDirty(isDirty)
+  }
+
   const getNavItems = useCallback(() => {
     const navItems: Array<INavigationItem> = [
       {
         route: projectMode === 'new' ? 'new' : 'basics',
         label: t('basicInfo'),
-        component: <ProjectBasics />,
+        component: <ProjectBasics getIsDirty={getIsDirty} />,
       },
     ];
     if (projectMode !== 'new') {
@@ -105,7 +111,7 @@ const ProjectView = () => {
         <>
           <ProjectToolbar />
           <ProjectHeader />
-          <TabList navItems={getNavItems()} />
+          <TabList isDirty={dirty} navItems={getNavItems()} projectMode={projectMode} />
         </>
       )}
     </div>

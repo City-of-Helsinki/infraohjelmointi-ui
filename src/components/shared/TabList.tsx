@@ -1,42 +1,44 @@
-import { Tabs, TabsCustomTheme } from 'hds-react/components/Tabs';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { INavigationItem } from '@/interfaces/common';
 import { FC } from 'react';
-
+import { useAppDispatch } from '@/hooks/common';
+import { setConfirmPromptOpen } from '@/reducers/planningSlice';
+import { t } from "i18next";
 interface ITabListProps {
   navItems: Array<INavigationItem>;
+  isDirty?: boolean;
+  projectMode: 'edit' | 'new';
 }
 
-/**
- * Add tabItems and the items will be rendered below this component
- */
-const TabList: FC<ITabListProps> = ({ navItems }) => {
+const TabList: FC<ITabListProps> = ({ navItems, isDirty, projectMode }) => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const path = useLocation().pathname;
+  const location = useLocation().pathname;
 
-  const tabThemeOverrides: TabsCustomTheme = {
-    '--tablist-border-color': 'white',
-    '--tab-focus-outline-size': '0.0625rem',
-  };
+  const basics = navItems.find((item) => item.route.includes('basics'));
+  const notes = navItems.find((item) => item.route.includes('notes'));
+  const newProject = navItems.find((item) => item.route.includes('new'));
 
-  const getActiveTab = () => navItems.findIndex((n) => path.includes(n.route));
+  const checkIsDirty = (route: string) => {
+    /* isDirty doesn't turn back to false while navigating from basics to notes so 
+      we don't do a check for dirty values when going from notes to basics */
+    if (isDirty && route !== 'basics') {
+        dispatch(setConfirmPromptOpen(true));
+      } else {
+        navigate(route);
+      }
+    };
 
   return (
     <div data-testid="tabs-list">
-      <Tabs initiallyActiveTab={getActiveTab()} theme={tabThemeOverrides}>
-        {/* tabs */}
-        <Tabs.TabList className="tab-list">
-          {navItems.map((n) => (
-            <Tabs.Tab key={n.route} onClick={() => navigate(n.route)}>
-              {n.label}
-            </Tabs.Tab>
-          ))}
-        </Tabs.TabList>
-        {/* panel (active view is rendered here) */}
-        {navItems.map((n) => (
-          <Tabs.TabPanel key={n.route}>{n.component}</Tabs.TabPanel>
-        ))}
-      </Tabs>
+      <div>
+        <button onClick={() => checkIsDirty('basics')}>{t('basicInfo')}</button>
+        { projectMode !== 'new' &&
+          <button onClick={() => checkIsDirty('notes')}>{t('notes')}</button>
+        }
+      </div>
+      {location.includes("basics") ? basics?.component : notes?.component}
+      {projectMode && projectMode === 'new' && newProject?.component}
     </div>
   );
 };
