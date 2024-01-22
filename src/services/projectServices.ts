@@ -36,7 +36,7 @@ export const deleteProject = async (id: string): Promise<{ id: string }> => {
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProject> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data);
-    return res.data;
+    return res.data;  
   } catch (e) {
     return Promise.reject(e);
   }

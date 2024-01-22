@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import { renderWithProviders } from '@/utils/testUtils';
 import { matchExact } from '@/utils/common';
-import { IGroup } from '@/interfaces/groupInterfaces';
+import { IGroupRequest } from '@/interfaces/groupInterfaces';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { act } from 'react-dom/test-utils';
 import { waitFor, within } from '@testing-library/react';
@@ -13,7 +13,7 @@ import {
   mockProjectClasses,
   mockSubClasses,
 } from '@/mocks/mockClasses';
-import { mockDistricts, mockDivisions, mockLocations } from '@/mocks/mockLocations';
+import { mockDistrictOptions, mockDistricts, mockDivisionOptions, mockDivisions, mockLocations, mockSubDivisionOptions } from '@/mocks/mockLocations';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
 import { mockGroups } from '@/mocks/mockGroups';
 import PlanningView from '@/views/PlanningView';
@@ -70,6 +70,9 @@ const render = async () =>
           lists: {
             ...store.getState().lists,
             phases: mockProjectPhases.data,
+            projectDistricts: mockDistrictOptions.data,
+            projectDivisions: mockDivisionOptions.data,
+            projectSubDivisions: mockSubDivisionOptions.data
           },
           auth: {
             ...store.getState().auth,
@@ -137,7 +140,9 @@ describe('GroupDialog', () => {
     const mockPostResponse = {
       data: {
         id: 'e39a5f66-8be5-4cd8-9a8a-16f69cc02c18',
-        name: 'test-group',
+        name: 'test-group-1',
+        projects: ['mock-project-id'],
+        location: 'test-mock-district-option-1',
         locationRelation: 'koilinen-district-test',
         classRelation: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
         finances: mockClassFinances,
@@ -152,6 +157,7 @@ describe('GroupDialog', () => {
             name: 'Vanha yrttimaantie',
             projectClass: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
             projectLocation: 'koilinen-district-test',
+            projectDistrict: 'test-mock-district-option-1'
           },
         ],
         count: 1,
@@ -175,7 +181,7 @@ describe('GroupDialog', () => {
     const submitButton = await dialog.findByTestId('create-group-button');
     expect(submitButton).toBeDisabled();
 
-    await user.type(await dialog.findByText('groupForm.name'), 'test-group');
+    await user.type(await dialog.findByText('groupForm.name'), 'test-group-1');
 
     await user.click(
       document.getElementById('select-field-masterClass-toggle-button') as HTMLElement,
@@ -245,10 +251,12 @@ describe('GroupDialog', () => {
     });
 
     await act(async () => {
-      const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroup;
+      const formPostRequest = mockedAxios.post.mock.lastCall[1] as IGroupRequest;
 
       expect(formPostRequest.classRelation).toEqual(mockPostResponse.data.classRelation);
       expect(formPostRequest.locationRelation).toEqual(mockPostResponse.data.locationRelation);
+      expect(formPostRequest.location).toEqual(mockPostResponse.data.location);
+      expect(formPostRequest.projects).toEqual(mockPostResponse.data.projects);
     });
 
     // Check if the planning view has navigated to correct subclass/district

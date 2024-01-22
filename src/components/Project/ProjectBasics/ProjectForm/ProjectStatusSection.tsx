@@ -69,6 +69,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             'category',
             'masterClass',
             'class',
+            'district',
           ];
 
           const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];

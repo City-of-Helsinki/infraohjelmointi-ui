@@ -70,13 +70,20 @@ export const filterProjectsForPlanningRow = (
   type: PlanningRowType,
   projects: Array<IProject>,
   districtsForSubClass?: Array<IClass>,
+  allSubDivisions?: Array<ILocation>,
 ) => {
+
+  const getSubDivisionParentId = (locationId: string | undefined) => {
+    const subDivision = allSubDivisions?.find(({ id }) => id === locationId);
+    return subDivision?.parentClass;
+  }
+
   const getProjectsForClasses = () =>
     projects.filter((p) => !p.projectGroup && !p.projectLocation && p.projectClass === id);
 
   const getProjectsForSubClassDistrict = () => {
     const projectHasDistrictOrNoLocation = (p: IProject) =>
-      districtsForSubClass?.some((d) => d.id === p.projectLocation) ?? !p.projectLocation;
+      !p.projectLocation || districtsForSubClass?.some((d) => d.id === p.projectLocation);
 
     return projects.filter(
       (p) => !p.projectGroup && projectHasDistrictOrNoLocation(p) && p.projectClass === id,
@@ -87,7 +94,7 @@ export const filterProjectsForPlanningRow = (
     projects.filter((p) => p.projectGroup).filter((p) => p.projectGroup === id);
 
   const getProjectsForLocation = () =>
-    projects.filter((p) => !p.projectGroup).filter((p) => p.projectLocation === id);
+    projects.filter((p) => !p.projectGroup).filter((p) => p.projectLocation === id || getSubDivisionParentId(p.projectLocation) === id);
 
   switch (type) {
     case 'class':
@@ -113,6 +120,7 @@ interface IBuildPlanningRowParams {
   isCoordinator?: boolean;
   siblings?: Array<IClass> | Array<ILocation>;
   parentRow?: IPlanningRow | null;
+  subDivisions?: Array<ILocation>;
 }
 
 /**
@@ -133,10 +141,11 @@ export const buildPlanningRow = ({
   expanded,
   districtsForSubClass,
   isCoordinator,
+  subDivisions,
 }: IBuildPlanningRowParams): IPlanningRow => {
   const projectRows = isCoordinator
     ? filterProjectsForCoordinatorRow(item.id, type, projects)
-    : filterProjectsForPlanningRow(item.id, type, projects, districtsForSubClass);
+    : filterProjectsForPlanningRow(item.id, type, projects, districtsForSubClass, subDivisions);
   const defaultExpanded = expanded || (type === 'division' && projectRows.length > 0);
   const urlSearchParamKey = type === 'districtPreview' ? 'district' : type;
   const nonNavigableTypes = [

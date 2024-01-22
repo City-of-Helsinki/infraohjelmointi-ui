@@ -1,6 +1,6 @@
 import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectBatchedPlanningLocations } from '@/reducers/locationSlice';
+import { selectBatchedPlanningLocations, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
@@ -61,6 +61,7 @@ const buildPlanningTableRows = (
   list: IPlanningRowList,
   projects: Array<IProject>,
   selections: IPlanningRowSelections,
+  subDivisions?: Array<ILocation>
 ) => {
   const { masterClasses, classes, subClasses, districts, divisions, otherClassifications, groups } = list;
 
@@ -81,7 +82,8 @@ const buildPlanningTableRows = (
     type: PlanningRowType,
     defaultExpanded?: boolean,
     districtsForSubClass?: IClass[],
-  ) => buildPlanningRow({ item, type, projects, expanded: defaultExpanded, districtsForSubClass });
+    subDivisions?: Array<ILocation>,
+  ) => buildPlanningRow({ item, type, projects, expanded: defaultExpanded, districtsForSubClass, subDivisions: subDivisions });
 
   // Groups can get mapped under subClasses, districts and divisions and sorts them by name
   const getSortedGroupRows = (id: string, type: PlanningRowType) => {
@@ -111,7 +113,7 @@ const buildPlanningTableRows = (
     }
 
     return sortByName(filteredGroups).map((group) => ({
-      ...getRow(group as IGroup, 'group'),
+      ...getRow(group as IGroup, 'group', undefined, undefined, subDivisions),
     }));
   };
 
@@ -236,6 +238,7 @@ const usePlanningRows = () => {
   const startYear = useAppSelector(selectStartYear);
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
+  const subDivisions = useAppSelector(selectPlanningSubDivisions);
 
   const mode = useAppSelector(selectPlanningMode);
 
@@ -295,7 +298,7 @@ const usePlanningRows = () => {
       groups,
     };
 
-    const nextRows = buildPlanningTableRows(list, projects, selections);
+    const nextRows = buildPlanningTableRows(list, projects, selections, subDivisions);
 
     // Re-build planning rows if the existing rows are not equal
     if (!_.isEqual(nextRows, rows)) {

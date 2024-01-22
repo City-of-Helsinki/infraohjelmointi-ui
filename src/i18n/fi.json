@@ -50,7 +50,7 @@
     "sports": "Liikunta",
     "omaStadi": "OmaStadi",
     "projectArea": "Projektialue",
-    "park": "Puisto tai taitorakenne",
+    "park": "Puisto",
     "honkasuo": "Honkasuo",
     "kalasatama": "Kalasatama",
     "kruunuvuori": "Kruunuvuori",
@@ -103,6 +103,7 @@
   },
   "validation": {
     "required": "Täytä {{field}}",
+    "incorrectLocation": "Valittu {{field}} ei voi kuulua valitun alaluokan alle.",
     "isBefore": "Aika on oltava ennen kuin {{value}}",
     "isAfter": "Aika on oltava myöhemmin kuin {{value}}",
     "maxLength": "Maksimipituus on {{value}} merkkiä",
@@ -134,7 +135,8 @@
     "name": "Hankkeen nimi",
     "subClass": "Alaluokka",
     "class": "Luokka",
-    "masterClass": "Pääluokka"
+    "masterClass": "Pääluokka",
+    "district": "Suurpiiri"
   },
   "projectForm": {
     "name": "Hankkeen nimi",
@@ -276,7 +278,8 @@
       "hashtagPostError": "Tunnisteen luonti epäonnistui.",
       "phaseChangeError": "Haluamasi vaihemuutos vaatii lisää tietoja hankekorttiin. Tee vaihemuutos hankekortilla.",
       "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
-      "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen."
+      "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen.",
+      "Network Error": "Verkkovirhe"
     }
   },
   "searchOrder": {

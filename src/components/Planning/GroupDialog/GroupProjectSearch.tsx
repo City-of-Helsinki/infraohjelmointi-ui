@@ -1,6 +1,6 @@
 import { IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { arrayHasValue, listItemToOption } from '@/utils/common';
+import { arrayHasValue, getLocationRelationId, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import { IGroupForm } from '@/interfaces/formInterfaces';
 import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
 import { useAppSelector } from '@/hooks/common';
 import { selectForcedToFrame } from '@/reducers/planningSlice';
+import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
@@ -18,6 +19,7 @@ interface IProjectSearchProps {
   divisions: IOption[];
   subClasses: IOption[];
 }
+
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({
   getValues,
@@ -28,12 +30,15 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
 }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
+  const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
 
   const buildQueryParamString = useCallback(
     (projectName: string): IProjectSearchRequest => {
       const searchParams = [];
 
       const year = new Date().getFullYear();
+      const lowestLocationId = getLocationRelationId(getValues(), hierarchyDistricts, hierarchyDivisions);
 
       if (subClasses.length > 0){
         searchParams.push(`subClass=${getValues('subClass').value}`);
@@ -42,12 +47,12 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
         searchParams.push(`class=${getValues('class').value}`);
       }
 
-      if (getValues('subDivision').value) {
-        searchParams.push(`subDivision=${getValues('subDivision').value}`);
-      } else if (getValues('division').value) {
-        searchParams.push(`division=${getValues('division').value}`);
-      } else if (getValues('district').value) {
-        searchParams.push(`district=${getValues('district').value}`);
+      if (lowestLocationId) {
+        if (getValues("division").value) {
+          searchParams.push(`division=${lowestLocationId}`);
+        } else if (getValues('district').value) {
+          searchParams.push(`district=${lowestLocationId}`);
+        }
       }
       searchParams.push(`projectName=${projectName}`);
       searchParams.push('inGroup=false');
@@ -67,10 +72,8 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   const getSuggestions = useCallback(
     async (inputValue: string) => {
       if (
-        (showAdvanceFields &&
-          (!getValues('district')?.value ||
-            (divisions.length > 0 && !getValues('division')?.value) ||
-            !getValues('subClass')?.value))
+          (subClasses.length > 0 && !getValues('subClass').value) ||
+          !getValues('class').value
       ) {
         return Promise.resolve([]);
       }
