@@ -25,7 +25,10 @@ describe('AuthGuard', () => {
 
     const { store } = await render();
 
-    await store.dispatch(getUserThunk());
+    await act(async () => {
+      await store.dispatch(getUserThunk());
+    });
+
     const storeError = store.getState().auth.error as IError;
 
     expect(storeError.message).toBe(mockError.message);

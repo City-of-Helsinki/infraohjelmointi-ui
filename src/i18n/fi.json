@@ -3,7 +3,7 @@
     "404": "404",
     "accessDenied": "Pääsy evätty",
     "pageNotFound": "Sivua ei löytynyt",
-    "accessDeniedContactSupport": "Sinun käyttäjälläsi ei ole oikeuksia infrahankkeiden ohjelmointi -työkalun käyttöön, ohta yhteyttä ylläpitoon.",
+    "accessDeniedContactSupport": "Sinun käyttäjälläsi ei ole oikeuksia Infrahankkeiden ohjelmointi -työkalun käyttöön. Ota yhteyttä ylläpitoon.",
     "returnToFrontPage": "Palaa etusivulle",
     "hashtagUnique": "Tunniste on jo olemassa."
   },
