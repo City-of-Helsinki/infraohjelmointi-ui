@@ -219,7 +219,6 @@ export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms,
   syncPlanningDates(request, form);
   syncConstructionDates(request, form);
 
-  console.log(request);
   return request;
 };
 
