@@ -9,6 +9,7 @@ import ProjectView from '@/views/ProjectView/ProjectView';
 import PlanningView from '@/views/PlanningView/PlanningView';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
+import { mockConstructionPhaseDetails, mockConstructionPhases, mockPlanningPhases, mockProjectAreas, mockProjectCategories, mockProjectPhases, mockProjectQualityLevels, mockProjectRisks, mockProjectTypes, mockResponsiblePersons, mockResponsibleZones } from '@/mocks/mockLists';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
@@ -23,7 +24,7 @@ const render = async (customRoute?: string) =>
       <>
         <Route path="/" element={<TopBar />}></Route>
         <Route
-          path="/project/:projectId"
+          path="/project/:projectId/basics"
           element={
             <>
               <TopBar />
@@ -38,6 +39,24 @@ const render = async (customRoute?: string) =>
         preloadedState: {
           auth: { user: null, error: {} },
           project: { ...store.getState().project, selectedProject: mockProject.data },
+          lists: {
+            areas: mockProjectAreas.data,
+            phases: mockProjectPhases.data,
+            types: mockProjectTypes.data,
+            constructionPhaseDetails: mockConstructionPhaseDetails.data,
+            categories: mockProjectCategories.data,
+            riskAssessments: mockProjectRisks.data,
+            projectQualityLevels: mockProjectQualityLevels.data,
+            planningPhases: mockPlanningPhases.data,
+            constructionPhases: mockConstructionPhases.data,
+            responsibleZones: mockResponsibleZones.data,
+            responsiblePersons: mockResponsiblePersons.data,
+            programmedYears: [],
+            projectDistricts: [],
+            projectDivisions: [],
+            projectSubDivisions: [],
+            error: {},
+          },
         },
       },
       { route: customRoute ? customRoute : '/' },
@@ -72,7 +91,7 @@ describe('TopBar', () => {
   it('renders the back button when the project route', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockProject);
 
-    const { getByTestId, user } = await render(`/project/${mockProject.data.id}`);
+    const { getByTestId, user } = await render(`/project/${mockProject.data.id}/basics`);
 
     expect(getByTestId('top-bar-back-button')).toBeInTheDocument();
 
