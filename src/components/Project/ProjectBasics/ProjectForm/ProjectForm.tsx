@@ -316,8 +316,6 @@ const ProjectForm = ({getIsDirty}: ProjectFormProps) => {
   );
 
   return (
-    <>
-      <ConfirmPrompt />
       <form
         data-testid="project-form"
         className="project-form"
@@ -347,7 +345,6 @@ const ProjectForm = ({getIsDirty}: ProjectFormProps) => {
         {/* BANNER */}
         <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
       </form>
-    </>
   );
 };
 

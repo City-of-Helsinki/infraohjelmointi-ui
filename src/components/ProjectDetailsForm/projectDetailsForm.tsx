@@ -6,6 +6,7 @@ import './style.css';
 import { ProjectNotes } from '../Project/ProjectNotes';
 import { ProjectBasics } from '../Project/ProjectBasics';
 import { useState } from 'react';
+import ConfirmPrompt from '../ConfirmPrompt';
 
 interface IProjectDetailsProps {
   projectMode: 'edit' | 'new';
@@ -26,9 +27,7 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
   const creatingNewProject = location.includes('new');
 
   const checkIsDirty = (route: string) => {
-    /* isDirty doesn't turn back to false (if there were some unsaved changes in the form) when navigating from basics
-       to notes so we don't do a check for dirty values when going back from notes to basics */
-    if (isDirty && route !== 'basics') {
+    if (isDirty) {
         dispatch(setConfirmPromptOpen(true));
       } else {
         navigate(route);
@@ -36,19 +35,22 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
     };
 
   return (
-    <div data-testid="tabs-list">
-      <div className='button-container'>
-        <button className={onNotesPage ? 'button' : 'buttonHighlighted'} onClick={() => checkIsDirty('basics')}>{t('basicInfo')}</button>
-        { projectMode !== 'new' &&
-          <button className={onBasicsPage ? 'button' : 'buttonHighlighted'} onClick={() => checkIsDirty('notes')}>{t('notes')}</button>
-        }
+    <>
+      <ConfirmPrompt />
+      <div data-testid="tabs-list">
+        <div className='button-container'>
+          <button className={onNotesPage ? 'button' : 'buttonHighlighted'} onClick={() => checkIsDirty('basics')}>{t('basicInfo')}</button>
+          { projectMode !== 'new' &&
+            <button className={onBasicsPage ? 'button' : 'buttonHighlighted'} onClick={() => checkIsDirty('notes')}>{t('notes')}</button>
+          }
+        </div>
+          {onBasicsPage || creatingNewProject ? 
+              <ProjectBasics getIsDirty={getIsDirty} />
+              : 
+              <ProjectNotes getIsDirty={getIsDirty} />
+          }
       </div>
-        {onBasicsPage ||  creatingNewProject? 
-            <ProjectBasics getIsDirty={getIsDirty} />
-            : 
-            <ProjectNotes />
-        }
-    </div>
+    </>
   );
 };
 
