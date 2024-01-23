@@ -9,7 +9,7 @@ import ProjectView from '@/views/ProjectView/ProjectView';
 import PlanningView from '@/views/PlanningView/PlanningView';
 import { setupStore } from '@/store';
 import mockProject from '@/mocks/mockProject';
-import { mockConstructionPhaseDetails, mockConstructionPhases, mockPlanningPhases, mockProjectAreas, mockProjectCategories, mockProjectPhases, mockProjectQualityLevels, mockProjectRisks, mockProjectTypes, mockResponsiblePersons, mockResponsibleZones } from '@/mocks/mockLists';
+import * as mockLists from '@/mocks/mockLists';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
@@ -40,17 +40,17 @@ const render = async (customRoute?: string) =>
           auth: { user: null, error: {} },
           project: { ...store.getState().project, selectedProject: mockProject.data },
           lists: {
-            areas: mockProjectAreas.data,
-            phases: mockProjectPhases.data,
-            types: mockProjectTypes.data,
-            constructionPhaseDetails: mockConstructionPhaseDetails.data,
-            categories: mockProjectCategories.data,
-            riskAssessments: mockProjectRisks.data,
-            projectQualityLevels: mockProjectQualityLevels.data,
-            planningPhases: mockPlanningPhases.data,
-            constructionPhases: mockConstructionPhases.data,
-            responsibleZones: mockResponsibleZones.data,
-            responsiblePersons: mockResponsiblePersons.data,
+            areas: mockLists.mockProjectAreas.data,
+            phases: mockLists.mockProjectPhases.data,
+            types: mockLists.mockProjectTypes.data,
+            constructionPhaseDetails: mockLists.mockConstructionPhaseDetails.data,
+            categories: mockLists.mockProjectCategories.data,
+            riskAssessments: mockLists.mockProjectRisks.data,
+            projectQualityLevels: mockLists.mockProjectQualityLevels.data,
+            planningPhases: mockLists.mockPlanningPhases.data,
+            constructionPhases: mockLists.mockConstructionPhases.data,
+            responsibleZones: mockLists.mockResponsibleZones.data,
+            responsiblePersons: mockLists.mockResponsiblePersons.data,
             programmedYears: [],
             projectDistricts: [],
             projectDivisions: [],
