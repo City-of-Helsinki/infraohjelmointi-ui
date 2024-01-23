@@ -159,7 +159,8 @@ const AuthGuard: FC = () => {
    */
   const handlePageRedirects = (pathname: string) => {
     // Redirect user to full project view if /basics or /notes is missing
-    if (pathname.includes(PAGES.PROJECT) && (!pathname.includes(PAGES.PROJECT_BASICS) && !pathname.includes(PAGES.PROJECT_NOTES))) {
+    const pathIsInvalid = !pathname.includes(PAGES.PROJECT_BASICS) && !pathname.includes(PAGES.PROJECT_NOTES) && !pathname.includes(PAGES.PROJECT_NEW);
+    if (pathname.includes(PAGES.PROJECT) && pathIsInvalid) {
       return navigate(`${pathname.replace(/\/$/, "")}/${PAGES.PROJECT_BASICS}`);
     }
   }
