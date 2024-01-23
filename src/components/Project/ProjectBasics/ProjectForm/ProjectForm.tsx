@@ -27,7 +27,6 @@ import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { getYear } from '@/utils/dates';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
-import ConfirmPrompt from '@/components/ConfirmPrompt';
 
 interface ProjectFormProps {
   getIsDirty?: (isDirty: boolean) => void;
