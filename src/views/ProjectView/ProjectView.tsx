@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   getProjectThunk,
@@ -8,15 +8,11 @@ import {
   setProjectMode,
   setSelectedProject,
 } from '@/reducers/projectSlice';
-import { TabList } from '@/components/shared';
+import ProjectDetailsForm from '@/components/ProjectDetailsForm'
 import { useNavigate, useParams } from 'react-router-dom';
-import { INavigationItem } from '@/interfaces/common';
-import { useTranslation } from 'react-i18next';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
-import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
-import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { selectUser } from '@/reducers/authSlice';
 import _ from 'lodash';
@@ -25,7 +21,6 @@ const LOADING_PROJECT = 'loading-project';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
   const { projectId } = useParams();
   const navigate = useNavigate();
   const selectedProject = useAppSelector(selectProject);
@@ -87,27 +82,13 @@ const ProjectView = () => {
     }
   }, [projectId, projectMode, user]);
 
-  const getNavItems = useCallback(() => {
-    const navItems: Array<INavigationItem> = [
-      {
-        route: projectMode === 'new' ? 'new' : 'basics',
-        label: t('basicInfo'),
-        component: <ProjectBasics />,
-      },
-    ];
-    if (projectMode !== 'new') {
-      navItems.push({ route: 'notes', label: t('notes'), component: <ProjectNotes /> });
-    }
-    return navItems;
-  }, [projectMode]);
-
   return (
     <div className="w-full" data-testid="project-view">
       {(selectedProject || projectMode === 'new') && (
         <>
           <ProjectToolbar />
           <ProjectHeader />
-          <TabList navItems={getNavItems()} />
+          <ProjectDetailsForm projectMode={projectMode} />
         </>
       )}
     </div>

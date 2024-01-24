@@ -5,11 +5,15 @@ import { INoteRequest } from '@/interfaces/noteInterfaces';
 import { postNoteThunk } from '@/reducers/noteSlice';
 import { Button } from 'hds-react/components/Button';
 import { TextArea } from 'hds-react/components/Textarea';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-const ProjectNewNoteForm = () => {
+interface ProjectNewNoteProps {
+  getIsDirty?: (isDirty: boolean) => void;
+};
+
+const ProjectNewNoteForm = ({getIsDirty}: ProjectNewNoteProps) => {
   const { formMethods, formValues } = useProjectNoteForm();
   const { t } = useTranslation();
   const {
@@ -19,6 +23,12 @@ const ProjectNewNoteForm = () => {
     formState: { isDirty },
   } = formMethods;
   const dispatch = useAppDispatch();
+
+  useEffect(()=> {
+    if (getIsDirty) {
+      getIsDirty(isDirty);
+    }
+  },[isDirty])
 
   const onSubmit = useCallback(
     async (form: IProjectNoteForm) => {

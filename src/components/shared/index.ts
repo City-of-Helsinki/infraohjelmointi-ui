@@ -1,7 +1,6 @@
 export { default as Icon } from './Icon';
 export { default as ProgressCircle } from './ProgressCircle';
 export { default as IconButton } from './IconButton';
-export { default as TabList } from './TabList';
 export { default as SideNavigation } from './SideNavigation';
 export { default as TextField } from './TextField';
 export { default as SelectField } from './SelectField';
