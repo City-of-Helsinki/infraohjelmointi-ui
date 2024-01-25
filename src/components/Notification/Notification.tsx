@@ -9,7 +9,6 @@ const Notification: FC = () => {
   const dispatch = useAppDispatch();
   const notifications = useAppSelector(selectNotification);
   const { t } = useTranslation();
-  console.log(notifications);
 
   return (
     <>
