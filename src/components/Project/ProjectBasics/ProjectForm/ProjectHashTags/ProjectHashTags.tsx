@@ -38,6 +38,7 @@ interface IProjectHashTagsDialogProps {
   openDialog: boolean;
   projectId?: string;
   projectName?: string;
+  projectMode: "edit" | "new";
 }
 
 interface IFormState {
@@ -47,14 +48,27 @@ interface IFormState {
   popularHashTags: Array<IListItem>;
 }
 
+const getHashtagsFromLocalStorage = () => {
+  const hashTagsInLocalStorage = localStorage.getItem('hashTagsToBeSaved');
+  return hashTagsInLocalStorage && JSON.parse(hashTagsInLocalStorage);
+}
+
 const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
   (
-    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName },
+    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName, projectMode },
     ref: Ref<HTMLDivElement>,
   ) => {
     const { Header, Content, ActionButtons } = Dialog;
     const allHashTags = useAppSelector(selectHashTags);
     const { t } = useTranslation();
+
+    const initialHashTagsForNewProject = getHashtagsFromLocalStorage();
+
+    /* Here are the 'initial' values to be saved to a project. When user creates a new project and inserts hashtags 
+      for the first time, those will be stored here. If the user goes back to change the hashtags when they are still 
+      creating the project and they decide not to change those after all (after changing the values in the modal), 
+      these values will be set to the local storage and not the 'unsaved' values */
+    const [savedHashtags] = useState(initialHashTagsForNewProject);
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
@@ -109,6 +123,12 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       setFormState((current) => {
         const hashTagsForSubmit = current.hashTagsForSubmit.filter((hv) => hv.value !== value);
 
+        const hashTagsForNewProject = getHashtagsFromLocalStorage();
+        if (hashTagsForNewProject && projectMode === 'new') {
+          localStorage.setItem('hashTagsToBeSaved', JSON.stringify(hashTagsForNewProject.filter((hashTag: IListItem) => 
+          hashTag.value !== value)));
+        }
+     
         return {
           ...current,
           hashTagsForSubmit: hashTagsForSubmit,
@@ -122,6 +142,25 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       });
     }, []);
 
+    const handleConcat = (hashTagsForSubmit: { value: string; id: string; }[]) => {
+      let hashTagsForNewProject = getHashtagsFromLocalStorage();
+
+      // push those objects from hashTagsForSubmit to hashTagsForNewProject that don't exist there yet
+      if (hashTagsForNewProject) {
+        hashTagsForSubmit.forEach((hashTagForSubmit) => {
+          if (!hashTagsForNewProject.some((hashTag: { id: string; value: string; }) => 
+            hashTag.id === hashTagForSubmit.id && hashTag.value === hashTagForSubmit.value)) {
+              hashTagsForNewProject.push(hashTagForSubmit);
+            }
+        });
+      } else {
+        // If the local storage doesn't have any values yet
+        hashTagsForNewProject = hashTagsForSubmit;
+      }
+      const combinedHashtags = hashTagsForNewProject && JSON.stringify(hashTagsForNewProject);
+      localStorage.setItem('hashTagsToBeSaved', combinedHashtags);
+    }
+
     // Set a hashtag to be submitted, make sure that the hashtag exists
     // Make sure the value doesn't already exist in hashTagsForSubmit
     const onHashTagClick = useCallback(
@@ -132,6 +171,11 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
         ) {
           setFormState((current) => {
             const hashTagsForSubmit = [...current.hashTagsForSubmit, hashTagsObject[value]];
+
+            if (projectMode === 'new') {
+              // Combine the hashtags that aren't yet in the local storage with the ones that are there
+              handleConcat(hashTagsForSubmit);
+            }
 
             return {
               ...current,
@@ -152,21 +196,30 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     // Submit hashTagsForSubmit and close the dialog
     const onSubmit = useCallback(
       async (event: MouseEvent<HTMLButtonElement>) => {
-        try {
-          await patchProject({
-            id: projectId,
-            data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
-          });
-          onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
+        if (projectMode === 'new') {
           toggleOpenDialog(event);
-        } catch (e) {
-          console.log('Error patching project hashtags: ', e);
+        } else {
+          try {
+            await patchProject({
+              id: projectId,
+              data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
+            });
+            onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
+            toggleOpenDialog(event);
+          } catch (e) {
+            console.log('Error patching project hashtags: ', e);
+          }
         }
       },
       [hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
     );
 
     const handleClose = useCallback(() => {
+      if (projectMode === 'new') {
+        // If dialog is closed (not saved) set the initial values (values before making changes to hashtags) back to the local storage
+        localStorage.setItem('hashTagsToBeSaved', JSON.stringify(savedHashtags));
+      }
+      
       setFormState((current) => ({
         ...current,
         hashTagsForSubmit: allHashTags.hashTags.filter(({ id }) =>
@@ -179,7 +232,6 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     return (
       <div className="input-wrapper" ref={ref}>
         {/* Dialog */}
-
         <Dialog
           id="hashtags-dialog"
           aria-labelledby={label}
@@ -196,7 +248,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             <div className="content-container">
               <p className="font-bold">{t('projectHashTags')}</p>
               <HashTagsContainer
-                tags={hashTagsForSubmit}
+                tags={projectMode === 'new' ? getHashtagsFromLocalStorage() : hashTagsForSubmit}
                 onDelete={onHashTagDelete}
                 id={'project-hashtags'}
               />
@@ -237,6 +289,7 @@ interface IProjectHashTagsProps {
   label: string;
   control: HookFormControlType;
   project: IProject | null;
+  projectMode: "edit" | "new";
 }
 
 interface IProjectHashTagsState {
@@ -244,7 +297,7 @@ interface IProjectHashTagsState {
   projectHashTags: IListItem[];
 }
 
-const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, project }) => {
+const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, project, projectMode }) => {
   const { t } = useTranslation();
   const allHashTags = useAppSelector(selectHashTags);
   const [state, setState] = useState<IProjectHashTagsState>({
@@ -276,6 +329,9 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
 
   const { openDialog, projectHashTags } = state;
 
+  // HashTags are stored into local storage when the user is creating a new project and saving hashTags for that project
+  const hashTagsToBeShown = projectMode === 'new' ? getHashtagsFromLocalStorage() : projectHashTags;
+
   return (
     <div className="input-wrapper" id="hashTags" data-testid="hashTags">
       {openDialog && (
@@ -292,6 +348,7 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
               openDialog={openDialog}
               projectId={projectId}
               projectName={projectName}
+              projectMode={projectMode}
             />
           )}
         />
@@ -303,7 +360,7 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
         onClick={toggleOpenDialog}
       />
       {/* Displayed on form (Project hashtags) */}
-      <HashTagsContainer tags={projectHashTags} />
+      <HashTagsContainer tags={hashTagsToBeShown} />
     </div>
   );
 };

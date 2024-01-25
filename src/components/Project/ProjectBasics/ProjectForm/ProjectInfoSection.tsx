@@ -21,6 +21,7 @@ interface IProjectInfoSectionProps {
     control: Control<IProjectForm>;
   };
   isInputDisabled: boolean;
+  projectMode: "edit" | "new";
 }
 
 const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
@@ -107,6 +108,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           label={'projectForm.hashTags'}
           control={control}
           project={project}
+          projectMode={projectMode}
         />
       </div>
     </div>

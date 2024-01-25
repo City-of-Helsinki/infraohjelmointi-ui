@@ -29,6 +29,7 @@ import { getYear } from '@/utils/dates';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
+import { IListItem } from '@/interfaces/common';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -232,6 +233,13 @@ const ProjectForm = () => {
 
         // Post project
         if (projectMode === 'new') {
+            // when creating a new project, the hashtags that are to be saved are stored in the local storage
+            const hashTagsInLocalStorage = localStorage.getItem('hashTagsToBeSaved');
+            const hashTags: IListItem[] = hashTagsInLocalStorage && JSON.parse(hashTagsInLocalStorage);
+    
+            const hashtagIds = hashTags.map((hashtag) => hashtag.id);
+            data.hashTags = hashtagIds;
+          
           try {
             const response = await postProject({ data });
             dispatch(setSelectedProject(response));
@@ -313,35 +321,35 @@ const ProjectForm = () => {
   );
 
   return (
-      <form
-        data-testid="project-form"
-        className="project-form"
-      >
-        {/* SECTION 1 - BASIC INFO */}
-        <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} />
-        {/* SECTION 2 - STATUS */}
-        <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
-        {/* SECTION 3 - SCHEDULE */}
-        <ProjectScheduleSection {...formProps} />
-        {/* SECTION 4 - FINANCIALS */}
-        <ProjectFinancialSection
-          {...formProps}
-          classOptions={classOptions}
-          isInputDisabled={isInputDisabled}
-        />
-        {/* SECTION 5 - RESPONSIBLE PERSONS */}
-        <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
-        {/* SECTION 6 - LOCATION */}
-        <ProjectLocationSection
-          {...formProps}
-          locationOptions={locationOptions}
-          isInputDisabled={isInputDisabled}
-        />
-        {/* SECTION 7 - PROJECT PROGRAM */}
-        <ProjectProgramSection {...formProps} />
-        {/* BANNER */}
-        <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
-      </form>
+    <form
+      data-testid="project-form"
+      className="project-form"
+    >
+      {/* SECTION 1 - BASIC INFO */}
+      <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} projectMode={projectMode} />
+      {/* SECTION 2 - STATUS */}
+      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
+      {/* SECTION 3 - SCHEDULE */}
+      <ProjectScheduleSection {...formProps} />
+      {/* SECTION 4 - FINANCIALS */}
+      <ProjectFinancialSection
+        {...formProps}
+        classOptions={classOptions}
+        isInputDisabled={isInputDisabled}
+      />
+      {/* SECTION 5 - RESPONSIBLE PERSONS */}
+      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
+      {/* SECTION 6 - LOCATION */}
+      <ProjectLocationSection
+        {...formProps}
+        locationOptions={locationOptions}
+        isInputDisabled={isInputDisabled}
+      />
+      {/* SECTION 7 - PROJECT PROGRAM */}
+      <ProjectProgramSection {...formProps} />
+      {/* BANNER */}
+      <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
+    </form>
   );
 };
 
