@@ -9,6 +9,7 @@ const Notification: FC = () => {
   const dispatch = useAppDispatch();
   const notifications = useAppSelector(selectNotification);
   const { t } = useTranslation();
+  console.log(notifications);
 
   return (
     <>
@@ -17,7 +18,7 @@ const Notification: FC = () => {
           {notifications.map((n) => (
             <div key={n.id} className="notification-wrapper">
               <HDSNotification
-                label={n?.title && t(`notification.title.${n.title}`)}
+                label={n.title ? t(`notification.title.${n.title}`) : t(`notification.title.${n.status}`)}
                 type={n.color}
                 dismissible
                 position={n.type === 'toast' ? 'top-right' : 'inline'}
