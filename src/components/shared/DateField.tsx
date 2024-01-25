@@ -15,6 +15,8 @@ interface IDateFieldProps {
 const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
+  const currentDate = new Date();
+  const datePlus10Years = new Date(currentDate.getFullYear() + 10, 11, 31);
 
   return (
     <Controller
@@ -37,6 +39,7 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
               initialMonth={new Date()}
               invalid={error ? true : false}
               errorText={error?.message}
+              maxDate={datePlus10Years}
             />
           </div>
         );
