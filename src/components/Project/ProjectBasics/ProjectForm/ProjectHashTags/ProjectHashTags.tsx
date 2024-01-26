@@ -61,14 +61,12 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const allHashTags = useAppSelector(selectHashTags);
     const { t } = useTranslation();
-
-    const initialHashtagsForNewProject = getHashtagsFromLocalStorage();
-
+    
     /* Here are the 'initial' values to be saved to a project. When user creates a new project and inserts hashtags 
       for the first time, those will be stored here. If the user goes back to change the hashtags when they are still 
       creating the project and they decide not to change those after all (after changing the values in the modal), 
       these values will be set to the local storage and not the 'unsaved' values */
-    const [savedHashtags] = useState(initialHashtagsForNewProject);
+    const initialHashtagsForNewProject = getHashtagsFromLocalStorage();
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
@@ -213,7 +211,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const handleClose = useCallback(() => {
       if (projectMode === 'new') {
         // If dialog is closed (not saved) set the initial values (values before making changes to hashtags) back to the local storage
-        localStorage.setItem('hashtagsForNewProject', JSON.stringify(savedHashtags));
+        localStorage.setItem('hashtagsForNewProject', JSON.stringify(initialHashtagsForNewProject));
       }
       
       setFormState((current) => ({
