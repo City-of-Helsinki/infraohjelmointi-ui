@@ -237,7 +237,7 @@ const ProjectForm = () => {
             const hashTagsInLocalStorage = localStorage.getItem('hashtagsForNewProject');
             const hashTags: IListItem[] = hashTagsInLocalStorage && JSON.parse(hashTagsInLocalStorage);
     
-            const hashtagIds = hashTags.map((hashtag) => hashtag.id);
+            const hashtagIds = hashTags ? hashTags.map((hashtag) => hashtag.id) : [];
             data.hashTags = hashtagIds;
           
           try {
