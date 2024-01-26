@@ -264,7 +264,8 @@
       "saveError": "Tallennus epäonnistui",
       "hashtagPostSuccess": "Tunniste tallennettu",
       "postError": "Luonti epäonnistui",
-      "accessDenied": "Pääsy evätty"
+      "accessDenied": "Pääsy evätty",
+      "undefined": "Virhe"
     },
     "message": {
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
