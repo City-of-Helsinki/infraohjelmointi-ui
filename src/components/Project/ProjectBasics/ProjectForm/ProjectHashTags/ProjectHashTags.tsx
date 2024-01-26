@@ -49,8 +49,8 @@ interface IFormState {
 }
 
 const getHashtagsFromLocalStorage = () => {
-  const hashTagsInLocalStorage = localStorage.getItem('hashTagsToBeSaved');
-  return hashTagsInLocalStorage && JSON.parse(hashTagsInLocalStorage);
+  const hashtagsInLocalStorage = localStorage.getItem('hashtagsForNewProject');
+  return hashtagsInLocalStorage && JSON.parse(hashtagsInLocalStorage);
 }
 
 const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
@@ -62,13 +62,13 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const allHashTags = useAppSelector(selectHashTags);
     const { t } = useTranslation();
 
-    const initialHashTagsForNewProject = getHashtagsFromLocalStorage();
+    const initialHashtagsForNewProject = getHashtagsFromLocalStorage();
 
     /* Here are the 'initial' values to be saved to a project. When user creates a new project and inserts hashtags 
       for the first time, those will be stored here. If the user goes back to change the hashtags when they are still 
       creating the project and they decide not to change those after all (after changing the values in the modal), 
       these values will be set to the local storage and not the 'unsaved' values */
-    const [savedHashtags] = useState(initialHashTagsForNewProject);
+    const [savedHashtags] = useState(initialHashtagsForNewProject);
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
@@ -125,7 +125,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
 
         const hashTagsForNewProject = getHashtagsFromLocalStorage();
         if (hashTagsForNewProject && projectMode === 'new') {
-          localStorage.setItem('hashTagsToBeSaved', JSON.stringify(hashTagsForNewProject.filter((hashTag: IListItem) => 
+          localStorage.setItem('hashtagsForNewProject', JSON.stringify(hashTagsForNewProject.filter((hashTag: IListItem) => 
           hashTag.value !== value)));
         }
      
@@ -142,23 +142,19 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       });
     }, []);
 
-    const handleConcat = (hashTagsForSubmit: { value: string; id: string; }[]) => {
-      let hashTagsForNewProject = getHashtagsFromLocalStorage();
-
-      // push those objects from hashTagsForSubmit to hashTagsForNewProject that don't exist there yet
-      if (hashTagsForNewProject) {
-        hashTagsForSubmit.forEach((hashTagForSubmit) => {
-          if (!hashTagsForNewProject.some((hashTag: { id: string; value: string; }) => 
-            hashTag.id === hashTagForSubmit.id && hashTag.value === hashTagForSubmit.value)) {
-              hashTagsForNewProject.push(hashTagForSubmit);
-            }
-        });
+    const handleConcat = (hashtagsForSubmit: { value: string; id: string; }[]) => {
+      let hashtagsForNewProject: IListItem[] = getHashtagsFromLocalStorage();
+   
+      if (hashtagsForNewProject) {
+        const existingHashtagIds = new Set(hashtagsForNewProject.map((hashtag) => hashtag.id));
+        // Filter out the hashtags that already exist in the local storage and after that combine the new values with the ones in the local storage
+        const newHashtags = hashtagsForSubmit.filter(hashtag => !existingHashtagIds.has(hashtag.id));
+        hashtagsForNewProject = [...hashtagsForNewProject, ...newHashtags];
+        localStorage.setItem('hashtagsForNewProject', JSON.stringify(hashtagsForNewProject));
       } else {
-        // If the local storage doesn't have any values yet
-        hashTagsForNewProject = hashTagsForSubmit;
-      }
-      const combinedHashtags = hashTagsForNewProject && JSON.stringify(hashTagsForNewProject);
-      localStorage.setItem('hashTagsToBeSaved', combinedHashtags);
+        // If the local storage doesn't have any values yet, save hashtagsForSubmit there
+        localStorage.setItem('hashtagsForNewProject', JSON.stringify(hashtagsForSubmit));
+      }  
     }
 
     // Set a hashtag to be submitted, make sure that the hashtag exists
@@ -217,7 +213,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const handleClose = useCallback(() => {
       if (projectMode === 'new') {
         // If dialog is closed (not saved) set the initial values (values before making changes to hashtags) back to the local storage
-        localStorage.setItem('hashTagsToBeSaved', JSON.stringify(savedHashtags));
+        localStorage.setItem('hashtagsForNewProject', JSON.stringify(savedHashtags));
       }
       
       setFormState((current) => ({

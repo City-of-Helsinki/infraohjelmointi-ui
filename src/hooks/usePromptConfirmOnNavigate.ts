@@ -46,8 +46,6 @@ const usePromptConfirmOnNavigate = ({
         // Await for the isConfirmed to either return true or false, depending on the users input
         const confirm = await isConfirmed({ title, description });
         if (confirm !== false) {
-
-          
           push(...args);
         }
       };

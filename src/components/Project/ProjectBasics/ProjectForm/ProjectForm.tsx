@@ -234,7 +234,7 @@ const ProjectForm = () => {
         // Post project
         if (projectMode === 'new') {
             // when creating a new project, the hashtags that are to be saved are stored in the local storage
-            const hashTagsInLocalStorage = localStorage.getItem('hashTagsToBeSaved');
+            const hashTagsInLocalStorage = localStorage.getItem('hashtagsForNewProject');
             const hashTags: IListItem[] = hashTagsInLocalStorage && JSON.parse(hashTagsInLocalStorage);
     
             const hashtagIds = hashTags.map((hashtag) => hashtag.id);

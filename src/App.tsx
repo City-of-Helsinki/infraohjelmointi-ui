@@ -5,7 +5,7 @@ import Notification from '@/components/Notification';
 import Loader from '@/components/Loader';
 import { Search } from '@/components/Search';
 import { useAppDispatch, useAppSelector } from './hooks/common';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { getListsThunk } from './reducers/listsSlice';
 import {
   getCoordinationClassesThunk,
@@ -118,6 +118,15 @@ const App: FC = () => {
     }
   }, [startYear, user]);
 
+  const location = useLocation();
+  useEffect(() => {
+    /* When user creates a new project, hashtags are stored into local storage until the user saves the project. If
+      user exits the project form while creating a new project, this will empty the local storage values */
+    if (!location.pathname.includes('new')) {
+      localStorage.removeItem('hashtagsForNewProject');
+    }
+
+  },[location])
   return (
     <div>
       <Search />
