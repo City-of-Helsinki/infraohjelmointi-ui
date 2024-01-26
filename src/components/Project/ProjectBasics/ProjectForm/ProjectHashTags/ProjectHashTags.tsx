@@ -12,6 +12,8 @@ import {
   memo,
   useCallback,
   useMemo,
+  SetStateAction,
+  Dispatch,
 } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +27,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
 import './styles.css';
 import _ from 'lodash';
+import { current } from '@reduxjs/toolkit';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -32,12 +35,13 @@ export interface IHashTagsObject {
 
 interface IProjectHashTagsDialogProps {
   label: string;
-  projectHashTags: Array<string>;
+  projectHashTags: IListItem[];
   onChange: (tags: Array<string>) => void;
   toggleOpenDialog: (e: MouseEvent<HTMLButtonElement>) => void;
   openDialog: boolean;
   projectId?: string;
   projectName?: string;
+  setHashTagsState?: Dispatch<SetStateAction<IProjectHashTagsState>>;
 }
 
 interface IFormState {
@@ -49,7 +53,7 @@ interface IFormState {
 
 const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
   (
-    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName },
+    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName, setHashTagsState },
     ref: Ref<HTMLDivElement>,
   ) => {
     const { Header, Content, ActionButtons } = Dialog;
@@ -153,10 +157,16 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const onSubmit = useCallback(
       async (event: MouseEvent<HTMLButtonElement>) => {
         try {
-          await patchProject({
+          /* await patchProject({
             id: projectId,
             data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
-          });
+          }); */
+          if (setHashTagsState) {
+            setHashTagsState((current) => ({
+              ...current,
+              projectHashTags: hashTagsForSubmit
+            }));
+          }
           onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
           toggleOpenDialog(event);
         } catch (e) {
@@ -292,6 +302,7 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
               openDialog={openDialog}
               projectId={projectId}
               projectName={projectName}
+              setHashTagsState={setState}
             />
           )}
         />
