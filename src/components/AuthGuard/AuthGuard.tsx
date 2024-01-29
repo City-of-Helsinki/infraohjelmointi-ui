@@ -34,7 +34,7 @@ const AuthGuard: FC = () => {
     PROJECT_NOTES: 'notes',
   }
 
-  const MAINTENANCE_MODE = process.env.REACT_APP_MAINTENANCE_MODE;
+  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
