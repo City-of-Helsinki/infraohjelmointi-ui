@@ -206,7 +206,6 @@ const AuthGuard: FC = () => {
 
     // Maintenance mode
     handleMaintenanceModeRedirects(pathname);
-    console.log(MAINTENANCE_MODE)
 
     // User is authenticated, but they are not authorizated to see any resources
     if (isAuthenticated && !user) {
