@@ -24,14 +24,17 @@ const AuthGuard: FC = () => {
 
   const PAGES = {
     ACCESS_DENIED: 'access-denied',
+    ADMIN: 'admin',
     AUTH_HELSINKI_RETURN: 'auth/helsinki/return',
+    MAINTENANCE_MODE: 'maintenance',
     PLANNING: 'planning',
     PROJECT: 'project',
     PROJECT_NEW: 'project/new',
     PROJECT_BASICS: 'basics',
     PROJECT_NOTES: 'notes',
-    ADMIN: 'admin',
   }
+
+  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
@@ -165,6 +168,27 @@ const AuthGuard: FC = () => {
     }
   }
 
+  /**
+   * Maintenance Mode Handler
+   */
+  const handleMaintenanceModeRedirects = (pathname: string) => {
+    if (MAINTENANCE_MODE) {
+      if (pathname.includes(PAGES.ACCESS_DENIED) || pathname.includes(PAGES.AUTH_HELSINKI_RETURN)) {
+        return;
+      }
+
+      if (!pathname.includes(PAGES.MAINTENANCE_MODE)) {
+        return navigate(PAGES.MAINTENANCE_MODE);
+      }
+      return;
+    }
+
+    // Redirect from maintenance page if not set true
+    if (pathname.includes(PAGES.MAINTENANCE_MODE)) {
+      return navigate(PAGES.PLANNING);
+    }
+  }
+
   // Redirect user from forbidden paths
   // If user can log in (isAuthenticated) but does not have access rights (!user),
   // always redirect them to /access-denied
@@ -178,6 +202,9 @@ const AuthGuard: FC = () => {
       return;
     }
 
+    // Maintenance mode
+    handleMaintenanceModeRedirects(pathname);
+
     // User is authenticated, but they are not authorizated to see any resources
     if (isAuthenticated && !user) {
       redirectToAccessDenied(pathname, authError, navigate);
@@ -189,7 +216,6 @@ const AuthGuard: FC = () => {
       // Other redirects
       handlePageRedirects(pathname);
     }
-
   }, [location, navigate, user, isAuthenticated, authError]);
 
   return <></>;
