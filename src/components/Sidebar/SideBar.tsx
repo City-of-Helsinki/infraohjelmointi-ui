@@ -27,18 +27,20 @@ const SideBar = () => {
 
   const iconStyles = { height: '1.5rem', width: '1.5rem' };
 
+  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
+
   const navItems: Array<INavigationItem> = [
     {
       route: 'coordination',
       label: t('coordination'),
       component: <IconBinoculars style={iconStyles} />,
-      disabled: isUserOnlyViewer(user) || user?.ad_groups.length === 0,
+      disabled: MAINTENANCE_MODE || isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
     {
       route: 'planning',
       label: t('planning'),
       component: <IconScrollCogwheel style={iconStyles} />,
-      disabled: user?.ad_groups.length === 0,
+      disabled: MAINTENANCE_MODE || user?.ad_groups.length === 0,
     },
     {
       route: 'placeholder 1',
@@ -56,7 +58,7 @@ const SideBar = () => {
       route: 'reports',
       label: t('reports'),
       component: <IconGraphColumns style={iconStyles} />,
-      disabled: isUserOnlyViewer(user) || user?.ad_groups.length === 0,
+      disabled: MAINTENANCE_MODE || isUserOnlyViewer(user) || user?.ad_groups.length === 0,
     },
     {
       route: 'placeholder 4',
@@ -68,7 +70,7 @@ const SideBar = () => {
       route: 'admin/functions',
       label: t('admin'),
       component: <IconCogwheel style={iconStyles} />,
-      disabled: !isUserAdmin(user),
+      disabled: MAINTENANCE_MODE || !isUserAdmin(user),
     },
   ];
 
