@@ -44,7 +44,6 @@ import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice'
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
-import { mainModule } from 'process';
 
 const LOADING_APP_ID = 'loading-app-data';
 
