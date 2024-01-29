@@ -15,6 +15,7 @@ process.env.REACT_APP_CLIENT_ID = 'test-client-id';
 process.env.REACT_APP_REDIRECT_URI = 'localhost:4000/auth/helsinki/return';
 process.env.REACT_APP_API_TOKEN_GRANT_TYPE = 'test-grant';
 process.env.REACT_APP_OPEN_ID_CONFIG = 'test-open-id-config';
+process.env.REACT_APP_MAINTENANCE_MODE = 'false';
 
 // remove specific test timeouts if this works
 jest.setTimeout(15000);

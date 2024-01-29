@@ -25,13 +25,13 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const responsiblePersons = useOptions('responsiblePersons');
   const phases = useOptions('phases');
 
-  const draftInitiationPhase = phases[3].value;
-  const draftApprovalPhase = phases[4].value;
-  const constructionPlanPhase = phases[5].value;
-  const constructionWaitPhase = phases[6].value;
-  const constructionPhase = phases[7].value;
-  const warrantyPeriodPhase = phases[8].value;
-  const completedPhase = phases[9].value;
+  const draftInitiationPhase = phases[3]?.value ?? "";
+  const draftApprovalPhase = phases[4]?.value ?? "";
+  const constructionPlanPhase = phases[5]?.value ?? "";
+  const constructionWaitPhase = phases[6]?.value ?? "";
+  const constructionPhase = phases[7]?.value ?? "";
+  const warrantyPeriodPhase = phases[8]?.value ?? "";
+  const completedPhase = phases[9]?.value ?? "";
 
   const phasesThatNeedResponsiblePerson = useMemo(
     () => [

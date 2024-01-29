@@ -73,7 +73,7 @@ const ListField: FC<IListFieldProps> = ({
               <div className="list-field-container" key={f.label}>
                 <label className="list-field-label">{t(f.label)}</label>
                 {!editing || f.readOnly ? (
-                  <span>{f.isSapProject ? `${getSapCostValue(f)} €` : `${Number(field.value).toFixed(0)} €`}</span>
+                  <span>{f.isSapProject ? `${getSapCostValue(f)} €` : `${Number(field.value).toFixed(0)} keur`}</span>
                 ) : (
                   <>
                     <NumberInput

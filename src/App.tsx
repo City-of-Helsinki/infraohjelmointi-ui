@@ -42,6 +42,8 @@ import { selectUser } from './reducers/authSlice';
 import useFinanceUpdates from './hooks/useFinanceUpdates';
 import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
 import AccessDeniedView from './views/AccessDeniedView';
+import { isUserOnlyViewer } from './utils/userRoleHelpers';
+import MaintenanceView from './views/Maintenance';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -52,11 +54,20 @@ const App: FC = () => {
 
   const startYear = useAppSelector(selectStartYear);
 
+  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
+
   useFinanceUpdates();
 
   const initializeStates = async () => {
     // Set moments locale to finnish for the app
     moment().locale('fi');
+
+    // When maintenance mode is on, don't fetch data
+    if (MAINTENANCE_MODE) {
+      setAppDataReady(true);
+      return;
+    }
+
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
     try {
       await dispatch(getListsThunk());
@@ -71,23 +82,34 @@ const App: FC = () => {
   };
 
   const loadPlanningData = async (year: number) => {
-    await dispatch(setIsPlanningLoading(true));
+    dispatch(setIsPlanningLoading(true));
     try {
       await dispatch(getPlanningGroupsThunk(year));
-      await dispatch(getCoordinationGroupsThunk(year));
       await dispatch(getPlanningClassesThunk(year));
       await dispatch(getPlanningLocationsThunk(year));
+    } catch (e) {
+      console.log('Error loading planning data: ', e);
+      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+    } finally {
+      dispatch(setIsPlanningLoading(false));
+    }
+  };
+
+  const loadCoordinationData = async (year: number) => {
+    dispatch(setIsPlanningLoading(true));
+    try {
+      await dispatch(getCoordinationGroupsThunk(year));
       await dispatch(getCoordinationClassesThunk(year));
       await dispatch(getCoordinationLocationsThunk(year));
       await dispatch(getForcedToFrameClassesThunk(year));
       await dispatch(getForcedToFrameLocationsThunk(year));
     } catch (e) {
-      console.log('Error loading planning data: ', e);
-      await dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+      console.log('Error loading coordination data: ', e);
+      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
     } finally {
-      await dispatch(setIsPlanningLoading(false));
+      dispatch(setIsPlanningLoading(false));
     }
-  };
+  }
 
   // Initialize states that are used everywhere in the app
   useEffect(() => {
@@ -96,8 +118,17 @@ const App: FC = () => {
 
   // Changing the startYear in the planning view will trigger a re-fetch of all the planning data
   useEffect(() => {
+    // Don't fetch data if maintenance mode is on
+    if (MAINTENANCE_MODE) {
+      return;
+    }
+
     if (startYear) {
       loadPlanningData(startYear);
+      // viewers can access only planning view & planning data, so coordination data is not fetched if user has viewer role only
+      if (!isUserOnlyViewer(user)) {
+        loadCoordinationData(startYear);
+      }
       dispatch(getSapCostsThunk(startYear));
     }
   }, [startYear, user]);
@@ -128,6 +159,7 @@ const App: FC = () => {
               </Route>
               <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="/auth/helsinki/return" element={<></>}></Route>
+              <Route path="/maintenance" element={<MaintenanceView />} />
               <Route path="/" element={<></>}></Route>
               <Route path="*" element={<ErrorView />} />
             </Routes>

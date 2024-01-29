@@ -22,6 +22,8 @@ const TopBar: FC = () => {
 
   const navigateBack = useCallback(() => navigate(-1), [navigate]);
 
+  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
+
   return (
     <div data-testid="top-bar" className="top-bar-container">
       {/* Back button (appears when the projects route is active) */}
@@ -50,7 +52,7 @@ const TopBar: FC = () => {
             <Button
               variant="supplementary"
               iconLeft={<IconSearch />}
-              disabled={user?.ad_groups.length === 0}
+              disabled={MAINTENANCE_MODE || !user || user?.ad_groups.length === 0}
               onClick={handleOpenSearch}
               data-testid="search-projects"
               className="search-button"

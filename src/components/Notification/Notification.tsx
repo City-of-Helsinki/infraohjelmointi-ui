@@ -17,7 +17,7 @@ const Notification: FC = () => {
           {notifications.map((n) => (
             <div key={n.id} className="notification-wrapper">
               <HDSNotification
-                label={n?.title && t(`notification.title.${n.title}`)}
+                label={n.title ? t(`notification.title.${n.title}`) : t(`notification.title.${n.status}`)}
                 type={n.color}
                 dismissible
                 position={n.type === 'toast' ? 'top-right' : 'inline'}

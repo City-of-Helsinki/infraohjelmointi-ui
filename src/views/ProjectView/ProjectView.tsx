@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   getProjectThunk,
@@ -8,28 +8,25 @@ import {
   setProjectMode,
   setSelectedProject,
 } from '@/reducers/projectSlice';
-import { TabList } from '@/components/shared';
+import ProjectDetailsForm from '@/components/ProjectDetailsForm'
 import { useNavigate, useParams } from 'react-router-dom';
-import { INavigationItem } from '@/interfaces/common';
-import { useTranslation } from 'react-i18next';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
-import { ProjectNotes } from '@/components/Project/ProjectNotes';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
-import { ProjectBasics } from '@/components/Project/ProjectBasics';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import { selectUser } from '@/reducers/authSlice';
 import _ from 'lodash';
 
 const LOADING_PROJECT = 'loading-project';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
   const { projectId } = useParams();
   const navigate = useNavigate();
   const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
   const projectMode = useAppSelector(selectProjectMode);
+  const user = useAppSelector(selectUser);
 
   // Update selectedProject to redux with a project-update event
   useEffect(() => {
@@ -40,7 +37,7 @@ const ProjectView = () => {
     }
 
     // Don't update the selectedProject if the user is viewing another project
-    if (selectedProject && project.id !== selectedProject.id) {
+    if (!selectedProject || project.id !== selectedProject.id) {
       return;
     }
 
@@ -56,7 +53,8 @@ const ProjectView = () => {
 
       try {
         const res = await dispatch(getProjectThunk(id));
-        if (res.type.includes('rejected')) {
+        if (res.type.includes('rejected') && projectId && user) {
+          // If the project is not found
           navigate('/not-found');
         }
       } catch (e) {
@@ -66,12 +64,13 @@ const ProjectView = () => {
       }
     };
 
-    if (projectId) {
-      // if a new project is added after a successfull POST request goes through we want to change the mode to edit
+    // Before loading user information, check user is authenticated to make project fetch successfully.
+    if (projectId && user) {
+      // If a new project is added after a successfull POST request goes through we want to change the mode to edit
       if (projectMode === 'new') {
         dispatch(setProjectMode('edit'));
       }
-      // if project mode is not new then we fetch the project to make sure we got the latest changes
+      // If project mode is not new then we fetch the project to make sure we got the latest changes
       else {
         getProjectById(projectId);
       }
@@ -80,24 +79,8 @@ const ProjectView = () => {
       if (!projectId) {
         dispatch(resetProject());
       }
-    } else {
-      navigate('/planning');
     }
-  }, [projectId, projectMode, navigate, dispatch]);
-
-  const getNavItems = useCallback(() => {
-    const navItems: Array<INavigationItem> = [
-      {
-        route: projectMode === 'new' ? 'new' : 'basics',
-        label: t('basicInfo'),
-        component: <ProjectBasics />,
-      },
-    ];
-    if (projectMode !== 'new') {
-      navItems.push({ route: 'notes', label: t('notes'), component: <ProjectNotes /> });
-    }
-    return navItems;
-  }, [projectMode]);
+  }, [projectId, projectMode, user]);
 
   return (
     <div className="w-full" data-testid="project-view">
@@ -105,7 +88,7 @@ const ProjectView = () => {
         <>
           <ProjectToolbar />
           <ProjectHeader />
-          <TabList navItems={getNavItems()} />
+          <ProjectDetailsForm projectMode={projectMode} />
         </>
       )}
     </div>

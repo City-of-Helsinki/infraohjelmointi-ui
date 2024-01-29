@@ -159,12 +159,16 @@ const buildPlanningTableRows = (
       ? divisions.filter((division) => division.parentClass === subClass.id)
       : [];
 
+    const districtForSubClass = /suurpiiri|östersundom/.test(subClass.name.toLocaleLowerCase())
+    ? districts.find((district) => district.parentClass === subClass.id) as IClass
+    : undefined;
+
     const districtsForSubClass = districts.filter(
       (d) => d.parentClass === subClass.id && !d.parent,
     );
 
-    return {
-      ...getRow(subClass, subClassType, !!selectedSubClass, districtsForSubClass),
+    const subClassDistrictRows = {
+      ...getRow({ ...subClass, ...(districtForSubClass ? {finances: districtForSubClass.finances} : {})}, subClassType, !!selectedSubClass, districtsForSubClass),
       // DIVISIONS & GROUPS
       children: [
         // groups
@@ -180,6 +184,8 @@ const buildPlanningTableRows = (
         }),
       ],
     };
+
+    return subClassDistrictRows;
   });
 
   // Map the selected districts divisions and the groups & projects that belong to those divisions
