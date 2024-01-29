@@ -44,6 +44,7 @@ import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice'
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
+import { mainModule } from 'process';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -54,11 +55,20 @@ const App: FC = () => {
 
   const startYear = useAppSelector(selectStartYear);
 
+  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
+
   useFinanceUpdates();
 
   const initializeStates = async () => {
     // Set moments locale to finnish for the app
     moment().locale('fi');
+
+    // When maintenance mode is on, don't fetch data
+    if (MAINTENANCE_MODE) {
+      setAppDataReady(true);
+      return;
+    }
+
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
     try {
       await dispatch(getListsThunk());
@@ -109,6 +119,11 @@ const App: FC = () => {
 
   // Changing the startYear in the planning view will trigger a re-fetch of all the planning data
   useEffect(() => {
+    // Don't fetch data if maintenance mode is on
+    if (MAINTENANCE_MODE) {
+      return;
+    }
+
     if (startYear) {
       loadPlanningData(startYear);
       // viewers can access only planning view & planning data, so coordination data is not fetched if user has viewer role only

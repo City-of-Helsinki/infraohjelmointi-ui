@@ -187,8 +187,6 @@ const AuthGuard: FC = () => {
     if (pathname.includes(PAGES.MAINTENANCE_MODE)) {
       return navigate(PAGES.PLANNING);
     }
-
-    return;
   }
 
   // Redirect user from forbidden paths
