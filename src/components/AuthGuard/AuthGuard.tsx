@@ -24,14 +24,17 @@ const AuthGuard: FC = () => {
 
   const PAGES = {
     ACCESS_DENIED: 'access-denied',
+    ADMIN: 'admin',
     AUTH_HELSINKI_RETURN: 'auth/helsinki/return',
+    MAINTENANCE_MODE: 'maintenance',
     PLANNING: 'planning',
     PROJECT: 'project',
     PROJECT_NEW: 'project/new',
     PROJECT_BASICS: 'basics',
     PROJECT_NOTES: 'notes',
-    ADMIN: 'admin',
   }
+
+  const MAINTENANCE_MODE = process.env.REACT_APP_MAINTENANCE_MODE;
 
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {
@@ -188,6 +191,16 @@ const AuthGuard: FC = () => {
       handleUserRoles(pathname, user, navigate, initialPath);
       // Other redirects
       handlePageRedirects(pathname);
+    }
+
+    // Maintenance mode
+    if (MAINTENANCE_MODE) {
+      if (pathname.includes(PAGES.MAINTENANCE_MODE)) {
+        return;
+      }
+
+      // Redirect to maintenance page if set true
+      navigate(PAGES.MAINTENANCE_MODE);
     }
 
   }, [location, navigate, user, isAuthenticated, authError]);

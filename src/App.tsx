@@ -43,6 +43,7 @@ import useFinanceUpdates from './hooks/useFinanceUpdates';
 import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
+import MaintenanceView from './views/Maintenance';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -144,6 +145,7 @@ const App: FC = () => {
               </Route>
               <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="/auth/helsinki/return" element={<></>}></Route>
+              <Route path="/maintenance" element={<MaintenanceView />} />
               <Route path="/" element={<></>}></Route>
               <Route path="*" element={<ErrorView />} />
             </Routes>
