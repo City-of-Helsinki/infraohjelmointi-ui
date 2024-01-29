@@ -8,11 +8,7 @@ import { t } from 'i18next';
 import { selectProject } from '@/reducers/projectSlice';
 import { sortArrayByDates } from '@/utils/dates';
 
-interface ProjectNotesProps {
-  getIsDirty?: (isDirty: boolean) => void;
-};
-
-const ProjectNotes = ({getIsDirty}: ProjectNotesProps) => {
+const ProjectNotes = () => {
   const dispatch = useAppDispatch();
   const projectId = useAppSelector(selectProject)?.id;
   const notes = useAppSelector(selectNotes);
@@ -28,7 +24,7 @@ const ProjectNotes = ({getIsDirty}: ProjectNotesProps) => {
       <h1 className="text-heading-m">Muistiinpanot</h1>
       <p>{t('newNoteInfo')}</p>
       {/* note form */}
-      <NewNoteForm getIsDirty={getIsDirty}/>
+      <NewNoteForm />
       {/* notes (sorted by created) */}
       {sortedNotes()?.map((n) => (
         <ProjectNote key={n.id} note={n} />

@@ -27,12 +27,10 @@ import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { getYear } from '@/utils/dates';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
+import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
+import { t } from 'i18next';
 
-interface ProjectFormProps {
-  getIsDirty?: (isDirty: boolean) => void;
-};
-
-const ProjectForm = ({getIsDirty}: ProjectFormProps) => {
+const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -51,11 +49,11 @@ const ProjectForm = ({getIsDirty}: ProjectFormProps) => {
     getValues,
   } = formMethods;
 
-  useEffect(()=> {
-    if (getIsDirty) {
-      getIsDirty(isDirty);
-    }
-  },[isDirty])
+  usePromptConfirmOnNavigate({
+    title: t('confirmLeaveTitle'),
+    description: t('confirmLeaveDescription'),
+    when: isDirty,
+  });
 
   const getFinanceYearName = (finances: IProjectFinances, year: number) => {
     const index = year - finances.year;

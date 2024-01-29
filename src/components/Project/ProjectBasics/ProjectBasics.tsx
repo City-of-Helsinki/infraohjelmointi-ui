@@ -4,11 +4,7 @@ import ProjectSidePanel from './ProjectFormSidePanel/ProjectFormSidePanel';
 import ProjectForm from './ProjectForm/ProjectForm';
 import './styles.css';
 
-interface ProjectBasicsProps {
-  getIsDirty?: (isDirty: boolean) => void;
-};
-
-const ProjectBasics = ({getIsDirty}: ProjectBasicsProps) => {
+const ProjectBasics = () => {
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
   return (
@@ -19,7 +15,7 @@ const ProjectBasics = ({getIsDirty}: ProjectBasicsProps) => {
             <ProjectSidePanel pwFolderLink={project?.pwFolderLink} />
           </div>
           <div className="flex w-[65%]" data-testid="form-panel">
-            <ProjectForm getIsDirty={getIsDirty}/>
+            <ProjectForm />
           </div>
         </>
       )}
