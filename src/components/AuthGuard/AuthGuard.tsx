@@ -168,6 +168,29 @@ const AuthGuard: FC = () => {
     }
   }
 
+  /**
+   * Maintenance Mode Handler
+   */
+  const handleMaintenanceModeRedirects = (pathname: string) => {
+    if (MAINTENANCE_MODE) {
+      if (pathname.includes(PAGES.ACCESS_DENIED) || pathname.includes(PAGES.AUTH_HELSINKI_RETURN)) {
+        return;
+      }
+
+      if (!pathname.includes(PAGES.MAINTENANCE_MODE)) {
+        return navigate(PAGES.MAINTENANCE_MODE);
+      }
+      return;
+    }
+
+    // Redirect from maintenance page if not set true
+    if (pathname.includes(PAGES.MAINTENANCE_MODE)) {
+      return navigate(PAGES.PLANNING);
+    }
+
+    return;
+  }
+
   // Redirect user from forbidden paths
   // If user can log in (isAuthenticated) but does not have access rights (!user),
   // always redirect them to /access-denied
@@ -181,6 +204,10 @@ const AuthGuard: FC = () => {
       return;
     }
 
+    // Maintenance mode
+    handleMaintenanceModeRedirects(pathname);
+    console.log(MAINTENANCE_MODE)
+
     // User is authenticated, but they are not authorizated to see any resources
     if (isAuthenticated && !user) {
       redirectToAccessDenied(pathname, authError, navigate);
@@ -192,17 +219,6 @@ const AuthGuard: FC = () => {
       // Other redirects
       handlePageRedirects(pathname);
     }
-
-    // Maintenance mode
-    if (MAINTENANCE_MODE) {
-      if (pathname.includes(PAGES.MAINTENANCE_MODE)) {
-        return;
-      }
-
-      // Redirect to maintenance page if set true
-      navigate(PAGES.MAINTENANCE_MODE);
-    }
-
   }, [location, navigate, user, isAuthenticated, authError]);
 
   return <></>;
