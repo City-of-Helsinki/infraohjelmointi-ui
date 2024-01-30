@@ -29,7 +29,6 @@ import { getYear } from '@/utils/dates';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
-import { IListItem } from '@/interfaces/common';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
