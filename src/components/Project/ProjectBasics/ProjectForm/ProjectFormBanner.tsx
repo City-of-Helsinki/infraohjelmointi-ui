@@ -6,11 +6,8 @@ import { selectProject } from '@/reducers/projectSlice';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
 import { deleteProject } from '@/services/projectServices';
 import { useNavigate } from 'react-router';
-import { getPlanningClassesThunk, getCoordinationClassesThunk, getForcedToFrameClassesThunk } from '@/reducers/classSlice';
-import { getPlanningGroupsThunk, getCoordinationGroupsThunk } from '@/reducers/groupSlice';
-import { getPlanningLocationsThunk, getCoordinationLocationsThunk, getForcedToFrameLocationsThunk } from '@/reducers/locationSlice';
-import { notifyError } from '@/reducers/notificationSlice';
-import { selectStartYear, setIsPlanningLoading } from '@/reducers/planningSlice';
+import { selectStartYear } from '@/reducers/planningSlice';
+import { loadCoordinationData, loadPlanningData } from '@/App';
 interface IProjectFormbannerProps {
   onSubmit: () =>
     | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
@@ -27,36 +24,6 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
 
   const { isConfirmed } = useConfirmDialog();
 
-  const loadPlanningData = async (year: number) => {
-    dispatch(setIsPlanningLoading(true));
-    try {
-      await dispatch(getPlanningGroupsThunk(year));
-      await dispatch(getPlanningClassesThunk(year));
-      await dispatch(getPlanningLocationsThunk(year));
-    } catch (e) {
-      console.log('Error loading planning data: ', e);
-      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-    } finally {
-      dispatch(setIsPlanningLoading(false));
-    }
-  };
-
-  const loadCoordinationData = async (year: number) => {
-    dispatch(setIsPlanningLoading(true));
-    try {
-      await dispatch(getCoordinationGroupsThunk(year));
-      await dispatch(getCoordinationClassesThunk(year));
-      await dispatch(getCoordinationLocationsThunk(year));
-      await dispatch(getForcedToFrameClassesThunk(year));
-      await dispatch(getForcedToFrameLocationsThunk(year)); 
-    } catch (e) {
-      console.log('Error loading coordination data: ', e);
-      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-    } finally {
-      dispatch(setIsPlanningLoading(false));
-    }
-  }
-
   const handleProjectDelete = useCallback(async () => {
     const confirm = await isConfirmed({
       dialogType: 'delete',
@@ -68,8 +35,8 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
     if (confirm !== false && project?.id) {
       try {
         await deleteProject(project.id);
-        loadCoordinationData(startYear);
-        loadPlanningData(startYear);
+        loadCoordinationData(dispatch, startYear);
+        loadPlanningData(dispatch, startYear);
         
         // navigate back to history or if no history, go to planning view
         if (window.history.state && window.history.state.idx > 0) {
