@@ -42,7 +42,6 @@ interface IProjectHashTagsDialogProps {
   projectName?: string;
   projectMode: "edit" | "new";
   setHashTagsState: Dispatch<SetStateAction<IProjectHashTagsState>>;
-  state?: IProjectHashTagsState;
 }
 
 interface IFormState {
@@ -54,18 +53,12 @@ interface IFormState {
 
 const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
   (
-    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName, projectMode, setHashTagsState, state },
+    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName, projectMode, setHashTagsState },
     ref: Ref<HTMLDivElement>,
   ) => {
     const { Header, Content, ActionButtons } = Dialog;
     const allHashTags = useAppSelector(selectHashTags);
     const { t } = useTranslation();
-
-    /* Here are the 'initial' values to be saved to a project. When user creates a new project and inserts hashtags 
-      for the first time, those will be stored here. If the user goes back to change the hashtags when they are still 
-      creating the project and they decide not to change those after all (after changing the values in the modal), 
-      these values will be set to the state and not the 'unsaved' values */
-    const initialHashtagsForNewProject = state?.projectHashTags ?? [];
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
@@ -192,14 +185,6 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     );
 
     const handleClose = useCallback(() => {
-      if (projectMode === 'new') {
-        // If dialog is closed without saving set the initial values (values before making changes to the hashtags) back to the state
-       setHashTagsState((current) => ({
-          ...current,
-          projectHashTags: initialHashtagsForNewProject
-        }));
-      }
-      
       setFormState((current) => ({
         ...current,
         hashTagsForSubmit: allHashTags.hashTags.filter(({ id }) =>
@@ -327,7 +312,6 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
               projectName={projectName}
               projectMode={projectMode}
               setHashTagsState={setState}
-              state={state}
             />
           )}
         />
