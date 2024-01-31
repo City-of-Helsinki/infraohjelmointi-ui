@@ -67,8 +67,6 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       these values will be set to the state and not the 'unsaved' values */
     const initialHashtagsForNewProject = state?.projectHashTags ?? [];
 
-    const [hashtagClicked, setHashtagClicked] = useState(false);
-
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
       hashTagsForSearch: [],
@@ -149,13 +147,8 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           _.has(hashTagsObject, value) &&
           hashTagsForSubmit.findIndex((hfs) => hfs.value === value) === -1
         ) {
-          setHashtagClicked(true);
           setFormState((current) => {
             const hashTagsForSubmit = [...current.hashTagsForSubmit, hashTagsObject[value]];
-
-            /* When creating a new project, handleConcat and setHashTagsState should be called here 
-              but since it causes 'Cannot update a component ('ProjectHashTags') while rendering a 
-              different component ('ProjectHashTagsDialog')... it is done inside a useEffect below */
 
             return {
               ...current,
@@ -173,31 +166,6 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
       [hashTagsObject, hashTagsForSubmit],
     );
 
-    const handleConcat = (hashtagsForSubmit: IListItem[]) => {
-      
-      // Combine the hashtags that aren't yet in hashTagsForSubmit with the ones that are there
-      if (hashTagsForSubmit.length) {
-        const existingHashtagIds = new Set(hashTagsForSubmit.map((hashtag) => hashtag.id));
-        // Filter out the hashtags that already exist in hashTagsForSubmit and after that combine the new values with the ones in hashTagsForSubmit
-        const newHashtags = hashtagsForSubmit.filter(hashtag => !existingHashtagIds.has(hashtag.id));
-        const combinedHashtags = [...hashTagsForSubmit, ...newHashtags];
-        // when user searches for hashtags and adds one of the search results, the hashtag will come twice --> uniqWith deletes all duplicate objects
-        return _.uniqWith(combinedHashtags, _.isEqual);
-      } 
-      return _.uniqWith(hashTagsForSubmit, _.isEqual);
-    }
-
-    useEffect(() => {
-      if (projectMode === 'new' && hashTagsForSubmit) {
-        const hashtags = handleConcat(hashTagsForSubmit);
-        setHashTagsState((current) => ({
-          ...current,
-          projectHashTags: hashtags
-        }));
-      }
-      setHashtagClicked(false);
-    },[hashtagClicked])
-
     // Submit hashTagsForSubmit and close the dialog
     const onSubmit = useCallback(
       async (event: MouseEvent<HTMLButtonElement>) => {
@@ -205,7 +173,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
             if (projectMode === 'new' && setHashTagsState) {
               setHashTagsState((current) => ({
                 ...current,
-                projectHashTags: hashTagsForSubmit
+                projectHashTags: _.uniqWith(hashTagsForSubmit, _.isEqual)
               }));
             } else {
               await patchProject({

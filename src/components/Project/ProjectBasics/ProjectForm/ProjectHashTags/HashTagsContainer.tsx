@@ -48,15 +48,9 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) 
     onDelete: onDelete ? handleOnDelete : undefined,
   };
 
-  if (!tags || tags.length === 0) {
-    return (
-      <div className="hashtags-container"></div>
-    )
-  }
-
   return (
     <div className="hashtags-container">
-      {tags.map((tag) => {
+      {tags && tags.map((tag) => {
         if (tag) {
           return (
             <div
