@@ -10,9 +10,11 @@ import { updateGroup } from '@/reducers/groupSlice';
 import { updateDistrict } from '@/reducers/locationSlice';
 import {
   addFinanceUpdateEventListener,
+  addMaintenanceModeUpdateEventListener,
   addProjectUpdateEventListener,
   eventSource,
   removeFinanceUpdateEventListener,
+  removeMaintenanceModeUpdateEventListener,
   removeProjectUpdateEventListener,
 } from '@/utils/events';
 import { useEffect } from 'react';
@@ -34,10 +36,12 @@ const useFinanceUpdates = () => {
 
     addFinanceUpdateEventListener(dispatch);
     addProjectUpdateEventListener(dispatch);
+    addMaintenanceModeUpdateEventListener(dispatch);
 
     return () => {
       removeFinanceUpdateEventListener(dispatch);
       removeProjectUpdateEventListener(dispatch);
+      removeMaintenanceModeUpdateEventListener(dispatch);
       eventSource.close();
     };
   }, []);

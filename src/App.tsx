@@ -44,6 +44,7 @@ import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice'
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
+import { selectMaintenanceModeUpdate } from './reducers/eventsSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -53,8 +54,9 @@ const App: FC = () => {
   const user = useAppSelector(selectUser);
 
   const startYear = useAppSelector(selectStartYear);
+  const maintenanceMode = useAppSelector(selectMaintenanceModeUpdate);
 
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
+  const MAINTENANCE_MODE: boolean = maintenanceMode?.value == 'True' ? true : false;
 
   useFinanceUpdates();
 

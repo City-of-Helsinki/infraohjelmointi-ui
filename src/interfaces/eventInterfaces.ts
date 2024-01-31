@@ -72,3 +72,7 @@ export interface IFinanceEventData {
 export interface IProjectEventData {
   project: IProject;
 }
+
+export interface IMaintenanceModeEventData {
+  value: string;
+}

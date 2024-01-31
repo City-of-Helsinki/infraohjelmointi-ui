@@ -1,10 +1,11 @@
 import {
   IContextMenuData,
   IFinanceEventData,
+  IMaintenanceModeEventData,
   IProjectEventData,
   ITooltipEventData,
 } from '@/interfaces/eventInterfaces';
-import { setFinanceUpdate, setProjectUpdate } from '@/reducers/eventsSlice';
+import { setFinanceUpdate, setMaintenanceModeUpdate, setProjectUpdate } from '@/reducers/eventsSlice';
 import { Dispatch } from '@reduxjs/toolkit';
 import { MouseEvent } from 'react';
 
@@ -88,4 +89,21 @@ export const removeProjectUpdateEventListener = (dispatch: Dispatch) => {
     dispatch(setProjectUpdate(projectData));
   };
   eventSource.removeEventListener('project-update', projectUpdate);
+};
+
+export const addMaintenanceModeUpdateEventListener = (dispatch: Dispatch) => {
+  const maintenanceModeUpdate = (event: MessageEvent) => {
+    console.log(event.data)
+    const maintenanceModeData = JSON.parse(event.data) as IMaintenanceModeEventData;
+    dispatch(setMaintenanceModeUpdate(maintenanceModeData));
+  };
+  eventSource.addEventListener('maintenance-update', maintenanceModeUpdate);
+};
+
+export const removeMaintenanceModeUpdateEventListener = (dispatch: Dispatch) => {
+  const maintenanceModeUpdate = (event: MessageEvent) => {
+    const maintenanceModeData = JSON.parse(event.data) as IMaintenanceModeEventData;
+    dispatch(setMaintenanceModeUpdate(maintenanceModeData));
+  };
+  eventSource.removeEventListener('maintenance-update', maintenanceModeUpdate);
 };

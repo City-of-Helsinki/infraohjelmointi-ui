@@ -6,6 +6,7 @@ import { getUserThunk, selectAuthError, selectUser } from '@/reducers/authSlice'
 import { NavigateFunction, useLocation, useNavigate } from 'react-router';
 import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { IUser } from '@/interfaces/userInterfaces';
+import { selectMaintenanceModeUpdate } from '@/reducers/eventsSlice';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -33,8 +34,10 @@ const AuthGuard: FC = () => {
     PROJECT_BASICS: 'basics',
     PROJECT_NOTES: 'notes',
   }
+  
+  const maintenanceMode = useAppSelector(selectMaintenanceModeUpdate);
 
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
+  const MAINTENANCE_MODE: boolean = maintenanceMode?.value == 'True' ? true : false;
 
   // Check if user token exists and get the API token, set user to redux
   useEffect(() => {

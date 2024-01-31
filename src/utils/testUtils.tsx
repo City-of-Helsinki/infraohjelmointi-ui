@@ -107,3 +107,15 @@ export const sendFinanceUpdateEvent = async (data: object) => {
     }),
   );
 };
+
+export const sendMaintenanceModeUpdateEvent = async () => {
+  await waitFor(() => 
+    new EventSourceMock().emitMessage({
+      id: '',
+      type: 'maintenance-update',
+      data: JSON.stringify({
+        value: true,
+      })
+    })
+  )
+}

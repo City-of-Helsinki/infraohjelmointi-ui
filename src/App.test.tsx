@@ -5,6 +5,7 @@ import { act, waitFor } from '@testing-library/react';
 import {
   renderWithProviders,
   sendFinanceUpdateEvent,
+  sendMaintenanceModeUpdateEvent,
   sendProjectUpdateEvent,
 } from './utils/testUtils';
 import App from './App';
@@ -162,6 +163,16 @@ describe('App', () => {
 
     await waitFor(() => {
       expect(store.getState().events.projectUpdate?.project).toStrictEqual(mockProject.data);
+    });
+  });
+
+  it('listens to the maintenance-update event stream and updates redux eventSlice', async () => {
+    const { store } = await render();
+
+    await sendMaintenanceModeUpdateEvent();
+
+    await waitFor(() => {
+      expect(store.getState().events.maintenanceModeUpdate?.value).toStrictEqual(true);
     });
   });
 
