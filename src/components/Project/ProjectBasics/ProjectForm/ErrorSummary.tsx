@@ -6,7 +6,7 @@ import _ from 'lodash';
 interface IErrorSummaryProps {
   fields: Array<string>;
 }
-const ErroSummary: FC<IErrorSummaryProps> = ({ fields }) => {
+const ErrorSummary: FC<IErrorSummaryProps> = ({ fields }) => {
   const { t } = useTranslation();
 
   return (
@@ -28,4 +28,4 @@ const ErroSummary: FC<IErrorSummaryProps> = ({ fields }) => {
   );
 };
 
-export default memo(ErroSummary);
+export default memo(ErrorSummary);
