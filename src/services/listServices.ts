@@ -1,3 +1,4 @@
+import { IMaintenanceModeEventData } from '@/interfaces/eventInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
@@ -106,6 +107,15 @@ export const getPersons = async (): Promise<Array<IPerson>> => {
 export const getDistricts = async (): Promise<Array<IProjectDistrict>> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-districts/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}
+
+export const getMaintenance = async (): Promise<Array<any>> => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/maintenance/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

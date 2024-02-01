@@ -45,6 +45,7 @@ import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
 import { selectMaintenanceModeUpdate } from './reducers/eventsSlice';
+import { getMaintenance } from './services/listServices';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -73,6 +74,7 @@ const App: FC = () => {
     dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
     try {
       await dispatch(getListsThunk());
+      /* console.log(getMaintenance()); */
       await dispatch(getHashTagsThunk());
     } catch (e) {
       console.log('Error getting app data: ', e);
