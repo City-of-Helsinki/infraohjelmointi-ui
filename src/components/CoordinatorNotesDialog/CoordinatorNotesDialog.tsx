@@ -73,6 +73,7 @@ export const CoordinatorNotesDialog = () => {
         <>
             {dialogOpen && 
                 <Dialog
+                    data-testid="coordinator-notes-dialog"
                     id={noteId}
                     aria-labelledby={noteId}
                     aria-describedby={descriptionId}
