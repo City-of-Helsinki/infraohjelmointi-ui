@@ -72,7 +72,7 @@ const CoordinatorNotesModal = (props: ICoordinatorNotesProps) => {
     return( 
         <>
             { modalOpen.isOpen && modalOpen.id === props.id &&
-                <section className="dialog-container">
+                <section className="dialog-container" data-testid="coordinator-notes-modal">
                     <section className="dialog-top-part">
                         <div id="left">
                             <h1>{formatClassName()}</h1>
