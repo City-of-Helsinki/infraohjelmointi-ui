@@ -3,6 +3,7 @@ import {
   IProject,
   IProjectPatchRequestObject,
   IProjectPostRequestObject,
+  IProjectResponse,
   IProjectsPatchRequestObject,
   IProjectsResponse,
 } from '@/interfaces/projectInterfaces';
@@ -33,19 +34,20 @@ export const deleteProject = async (id: string): Promise<{ id: string }> => {
   }
 };
 
-export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProject> => {
+// TODO: etsi kaikki jotka tätä käyttää, ja muuta niille käyttöön res.data (kun ennen vain res)
+export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProjectResponse> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data);
-    return res.data;  
+    return res;
   } catch (e) {
     return Promise.reject(e);
   }
 };
 
-export const postProject = async (request: IProjectPostRequestObject): Promise<IProject> => {
+export const postProject = async (request: IProjectPostRequestObject): Promise<IProjectResponse> => {
   try {
     const res = await axios.post(`${REACT_APP_API_URL}/projects/`, request.data);
-    return res.data;
+    return res;
   } catch (e) {
     return Promise.reject(e);
   }
