@@ -44,7 +44,7 @@ const useProjectFormValues = () => {
       id: projectClass?.id ?? '',
       value: projectClass?.name ?? '',
     });
-
+    
     const selectedSubClass = project
       ? subClasses.find(({ id }) => id === project.projectClass)
       : undefined;
@@ -157,10 +157,10 @@ const useProjectFormValues = () => {
       otherPersons: value(project?.otherPersons),
     }),
 
-    [project],
+    [project, classes, subClasses, masterClasses, districts, divisions, subDivisions ],
   );
 
-  return { formValues, project };
+  return { formValues, project, classes, subClasses, masterClasses, districts, divisions, subDivisions };
 };
 
 /**
@@ -171,7 +171,7 @@ const useProjectFormValues = () => {
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectForm = () => {
-  const { formValues, project } = useProjectFormValues();
+  const { formValues, project, classes, subClasses, masterClasses, districts, divisions, subDivisions } = useProjectFormValues();
   const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -262,7 +262,7 @@ const useProjectForm = () => {
     if (project || projectMode === 'new') {
       reset(formValues);
     }
-  }, [project, projectMode]);
+  }, [project, projectMode, classes, subClasses, masterClasses, districts, divisions, subDivisions ]);
 
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
