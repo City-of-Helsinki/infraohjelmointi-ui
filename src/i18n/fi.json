@@ -351,7 +351,7 @@
   "keur": "keur",
   "basicInfoKA": ">< Perustiedot <> KA ja ohj.",
   "send:": "Lähetä",
-  "savedTime": "Tallennettu {{time}}",
+  "savedTime": "Viimeksi tallennettu {{time}}",
   "address": "Osoite",
   "name": "nimi",
   "overrunRightValue": "Ylitysoikeus {{value}}",
