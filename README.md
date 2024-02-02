@@ -81,6 +81,18 @@ We use i18next-react for localization. You can find the localization files under
 4. Trigger build-infraohjelmointi-ui-stageprod pipeline in azure
 5. Approve pipeline run in azure. Deploy pipelines are triggered by the build pipeline but prod deploy needs to be approved separately (=2 approvals in total). To approve, open the pipeline run you want to approve (from menu, select pipelines, then select the correct pipeline and then select the run you need to approve) and there should be a button to approve it (pipeline run is paused until you approve).
 
+### Adding env variables for UI
+New env variables need to be added to azure env variable library. Both adding and changing values of the variables requires building the corresponding environment (deploying again isn't enough). Here's instructions on how to add variables.
+
+1. Add the new variable to azure devops library for all environments correctly (they are under Pipelines -> Library)
+2. Create a new branch in azure (Repos -> Branches)
+3. Add the new variable to the list of variables in /devops/infraohjelmointi-ui-build-config.yml
+4. Commit changes to your branch
+5. Make a PR from your branch to master and add reviewers (someone from the dev team)
+6. Ask them to approve and then merge the PR
+
+Remember to also add the new variable to 1PW!
+
 ### Collection of scripts
 
 - **Install packages** : `yarn install`
