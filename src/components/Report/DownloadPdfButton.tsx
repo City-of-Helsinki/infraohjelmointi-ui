@@ -12,6 +12,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import './pdfFonts';
 import './styles.css';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import FinancialStatement from './PdfReports/FinancialStatement';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -36,7 +37,9 @@ const getPdfDocument = (
       <ConstructionProgram divisions={divisions} classes={classes} projects={projects} />
     ),
     budgetBookSummary: <EmptyDocument />,
-    financialStatement: <EmptyDocument />,
+    financialStatement: (
+      <FinancialStatement divisions={divisions} classes={classes} projects={projects} />
+    ),
   };
 
   return pdfDocument[type];
@@ -87,7 +90,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram'}
+      disabled={type !== 'constructionProgram' && type !== 'financialStatement'}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>
