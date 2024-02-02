@@ -44,8 +44,39 @@ import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice'
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
+import { AppDispatch } from './store';
 
 const LOADING_APP_ID = 'loading-app-data';
+
+export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
+  dispatch(setIsPlanningLoading(true));
+  try {
+    await dispatch(getPlanningGroupsThunk(year));
+    await dispatch(getPlanningClassesThunk(year));
+    await dispatch(getPlanningLocationsThunk(year));
+  } catch (e) {
+    console.log('Error loading planning data: ', e);
+    dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+  } finally {
+    dispatch(setIsPlanningLoading(false));
+  }
+};
+
+export const loadCoordinationData = async (dispatch: AppDispatch, year: number) => {
+  dispatch(setIsPlanningLoading(true));
+  try {
+    await dispatch(getCoordinationGroupsThunk(year));
+    await dispatch(getCoordinationClassesThunk(year));
+    await dispatch(getCoordinationLocationsThunk(year));
+    await dispatch(getForcedToFrameClassesThunk(year));
+    await dispatch(getForcedToFrameLocationsThunk(year));
+  } catch (e) {
+    console.log('Error loading coordination data: ', e);
+    dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+  } finally {
+    dispatch(setIsPlanningLoading(false));
+  }
+}
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
@@ -81,36 +112,6 @@ const App: FC = () => {
     }
   };
 
-  const loadPlanningData = async (year: number) => {
-    dispatch(setIsPlanningLoading(true));
-    try {
-      await dispatch(getPlanningGroupsThunk(year));
-      await dispatch(getPlanningClassesThunk(year));
-      await dispatch(getPlanningLocationsThunk(year));
-    } catch (e) {
-      console.log('Error loading planning data: ', e);
-      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-    } finally {
-      dispatch(setIsPlanningLoading(false));
-    }
-  };
-
-  const loadCoordinationData = async (year: number) => {
-    dispatch(setIsPlanningLoading(true));
-    try {
-      await dispatch(getCoordinationGroupsThunk(year));
-      await dispatch(getCoordinationClassesThunk(year));
-      await dispatch(getCoordinationLocationsThunk(year));
-      await dispatch(getForcedToFrameClassesThunk(year));
-      await dispatch(getForcedToFrameLocationsThunk(year));
-    } catch (e) {
-      console.log('Error loading coordination data: ', e);
-      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-    } finally {
-      dispatch(setIsPlanningLoading(false));
-    }
-  }
-
   // Initialize states that are used everywhere in the app
   useEffect(() => {
     initializeStates().catch(Promise.reject);
@@ -124,10 +125,10 @@ const App: FC = () => {
     }
 
     if (startYear) {
-      loadPlanningData(startYear);
+      loadPlanningData(dispatch, startYear);
       // viewers can access only planning view & planning data, so coordination data is not fetched if user has viewer role only
       if (!isUserOnlyViewer(user)) {
-        loadCoordinationData(startYear);
+        loadCoordinationData(dispatch, startYear);
       }
       dispatch(getSapCostsThunk(startYear));
     }
