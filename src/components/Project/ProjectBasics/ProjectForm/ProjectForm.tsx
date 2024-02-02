@@ -77,7 +77,7 @@ const ProjectForm = () => {
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
     }
     const startYearName = getFinanceYearName(finances, startYear);
-    const newBudget = (parseFloat(finances[startYearName] as string) || 0.00) + budgetToMove;
+    const newBudget = (parseFloat(finances[startYearName] as string) || 0.00) + budgetToMove || 0.00;
 
     financesCopy = { ...financesCopy, [startYearName]: newBudget.toFixed(2)}
     return financesCopy;
@@ -96,7 +96,7 @@ const ProjectForm = () => {
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
     }
     const endYearName = getFinanceYearName(finances, endYear);
-    const newBudget = (parseFloat(finances[endYearName] as string) || 0.00) + budgetToMove;
+    const newBudget = (parseFloat(finances[endYearName] as string) || 0.00) + budgetToMove || 0.00;
 
     financesCopy =  { ...financesCopy, [endYearName]: newBudget.toFixed(2)}
     return financesCopy;
