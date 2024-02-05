@@ -34,7 +34,6 @@ export const deleteProject = async (id: string): Promise<{ id: string }> => {
   }
 };
 
-// TODO: etsi kaikki jotka tätä käyttää, ja muuta niille käyttöön res.data (kun ennen vain res)
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProjectResponse> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data);
