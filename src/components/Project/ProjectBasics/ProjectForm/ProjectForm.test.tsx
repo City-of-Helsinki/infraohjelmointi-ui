@@ -3,7 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { arrayHasValue, matchExact } from '@/utils/common';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectResponse } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
@@ -432,7 +432,7 @@ describe('projectForm', () => {
     };
 
     const project = mockProject.data;
-    const mockPostResponse: { data: IProject } = {
+    const mockPostResponse: { data: IProject, status: number, statusText: string} = {
       data: {
         ...project,
         id: 'post-project-id',
@@ -441,6 +441,8 @@ describe('projectForm', () => {
         programmed: expectedProgrammed,
         phase: expectedPhase,
       },
+      status: 201,
+      statusText: ""
     };
     const mockGetResponse: { data: IProject } = {
       data: mockPostResponse.data,
@@ -466,7 +468,7 @@ describe('projectForm', () => {
     );
     await user.click(await within(parentContainer).findByText('option.proposal'));
     const submitProjectButton = await findByTestId('submit-project-button');
-    mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
+    mockedAxios.get.mockResolvedValueOnce(mockPostResponse);
     await waitFor(async () => {
       await user.click(submitProjectButton);
     });
