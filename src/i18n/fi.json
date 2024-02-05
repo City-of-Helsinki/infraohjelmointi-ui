@@ -352,6 +352,8 @@
   "basicInfoKA": ">< Perustiedot <> KA ja ohj.",
   "send:": "Lähetä",
   "savedTime": "Viimeksi tallennettu {{time}}",
+  "notSaved": "Ei tallennettu",
+  "saving": "Tallennetaan",
   "address": "Osoite",
   "name": "nimi",
   "overrunRightValue": "Ylitysoikeus {{value}}",

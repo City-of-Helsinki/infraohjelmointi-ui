@@ -11,31 +11,18 @@ const SaveIndicator = () => {
   const isSaving = useAppSelector(selectIsProjectSaving);
   const updatedMoment = moment(project?.updatedDate).format('D.M.YYYY HH:mm:ss');
   const projectMode = useAppSelector(selectProjectMode);
+  const updateText = projectMode === 'new' ? t('notSaved') : t('savedTime', { time: updatedMoment });
 
-  if (projectMode === 'new') {
-    return(
-    <div className="mt-4 flex justify-start">
-      <CustomTag
-        color={'var(--color-success)'}
-        text={isSaving ? 'Tallennetaan' : 'Ei tallennettu'}
-        weight={'light'}
-        textColor={'var(--color-white)'}
-        showLoading={isSaving}
-      />
-    </div>)
-  }
-  else {
     return (
     <div className="mt-4 flex justify-start">
       <CustomTag
         color={'var(--color-success)'}
-        text={isSaving ? 'Tallennetaan' : t('savedTime', { time: updatedMoment })}
+        text={isSaving ? t('saving') : updateText}
         weight={'light'}
         textColor={'var(--color-white)'}
         showLoading={isSaving}
       />
     </div>)
   }
-};
 
 export default SaveIndicator;
