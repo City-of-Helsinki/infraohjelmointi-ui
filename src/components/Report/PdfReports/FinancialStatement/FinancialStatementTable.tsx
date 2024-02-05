@@ -4,7 +4,6 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { getReportRows } from '@/utils/reportHelpers';
-import FinancialStatementTableHeader from './FinancialStatementTableHeader';
 import FinancialStatementTableRow from './FinancialStatementTableRow';
 
 const styles = StyleSheet.create({
@@ -30,9 +29,8 @@ const FinancialStatementTable: FC<IFinancialStatementTableProps> = ({
   return (
     <View>
       <View style={styles.table}>
-        <FinancialStatementTableHeader />
         {reportRows.map((r, i) => (
-          <FinancialStatementTableRow key={i} row={r} depth={0} />
+          <FinancialStatementTableRow key={i} row={r} />
         ))}
       </View>
     </View>

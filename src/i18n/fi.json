@@ -443,8 +443,9 @@
     "financialStatement": {
       "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",
       "documentName": "tilinpäätös",
-      "title": "Helsingin kaupunki",
-      "subtitle": "Vuoden {{startYear}} tilinpäätös (Vähintään 1,0 milj. euron hankkeet)"
+      "title": "Tilinpäätös {{year}}",
+      "subtitle": "(yli 1 milj hankkeet)",
+      "amount": "milj. euroa"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",

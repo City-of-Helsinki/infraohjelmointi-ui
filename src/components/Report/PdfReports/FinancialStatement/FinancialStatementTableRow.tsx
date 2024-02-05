@@ -1,6 +1,7 @@
 import { IFinancialStatementTableRow } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const cellStyles = {
   width: '56px',
@@ -10,9 +11,7 @@ const cellStyles = {
   paddingBottom: '4px',
   paddingLeft: '6px',
   alignItems: 'center' as unknown as 'center',
-  borderRight: '1px solid #808080',
   height: '100%',
-  borderBottom: '1px solid #808080',
 };
 
 const tableRowStyles = {
@@ -25,93 +24,78 @@ const tableRowStyles = {
 const styles = StyleSheet.create({
   oddRow: {
     ...tableRowStyles,
+    display: 'flex',
+    justifyContent: 'space-between',
   },
   evenRow: {
     ...tableRowStyles,
     backgroundColor: '#efeff0',
-  },
-  nameCell: {
-    ...cellStyles,
-    borderLeft: '1px solid #808080',
-    borderRight: 0,
-    paddingLeft: '21px',
-    paddingRight: '15px',
-    width: '214px',
-  },
-  classNameCell: {
-    ...cellStyles,
-    borderLeft: '1px solid #808080',
-    borderRight: 0,
-    paddingLeft: '21px',
-    paddingRight: '15px',
-    width: '214px',
-    fontWeight: 'bold',
-  },
-  divisionCell: {
-    ...cellStyles,
-    borderRight: 0,
-    borderLeft: 0,
-    width: '113px',
-    paddingRight: '15px',
+    display: 'flex',
+    justifyContent: 'space-between',
   },
   cell: {
     ...cellStyles,
+    paddingLeft: '21px',
+    paddingRight: '15px',
+    width: '100%',
+  },
+  classNameView: {
+    ...tableRowStyles,
+    paddingTop: '10px',
+  },
+  classNameCell: {
+    ...cellStyles,
+    paddingLeft: '21px',
+    paddingRight: '15px',
+    width: '214px',
+    fontSize: '10px',
+    fontWeight: 'bold',
   },
   costForecastCell: {
     ...cellStyles,
     width: '83px',
-    fontWeight: 'bold',
-    borderLeft: '1px solid #808080',
-  },
-  planAndConStartCell: {
-    ...cellStyles,
-    width: '111px',
-  },
-  previouslyUsedCell: {
-    ...cellStyles,
-    width: '86px',
-  },
-  lastCell: {
-    ...cellStyles,
-    paddingRight: '21px',
-    width: '72px',
   },
 });
 
 interface IFinancialStatementTableRowProps {
   row: IFinancialStatementTableRow;
-  depth: number;
+  index?: number;
 }
 
-const Row: FC<IFinancialStatementTableRowProps> = memo(({ row, depth }) => {
+const ClassNameRow: FC<IFinancialStatementTableRowProps> = memo(({ row }) => {
   return (
-    <View style={depth % 2 ? styles.evenRow : styles.oddRow} key={row.id}>
-      <Text style={row.type === 'class' ? styles.classNameCell : styles.nameCell}>{row.name}</Text>
-      <Text style={styles.divisionCell}>{row.location}</Text>
+    <View style={styles.classNameView} key={row.id}>
+      <Text style={styles.classNameCell}>{row.name}</Text>
       <Text style={styles.costForecastCell}>{row.costForecast}</Text>
-      <Text style={styles.planAndConStartCell}>{row.startAndEnd}</Text>
-      <Text style={styles.previouslyUsedCell}>{row.spentBudget}</Text>
-      <Text style={styles.cell}>{row.budgetProposalCurrentYearPlus1}</Text>
-      <Text style={styles.cell}>{row.budgetProposalCurrentYearPlus1}</Text>
-      <Text style={styles.lastCell}>{row.budgetProposalCurrentYearPlus2}</Text>
     </View>
   );
 });
 
-Row.displayName = 'Row';
+ClassNameRow.displayName = 'Row';
 
-const FinancialStatementTableRow: FC<IFinancialStatementTableRowProps> = ({ row, depth }) => {
+const ProjectRow: FC<IFinancialStatementTableRowProps> = memo(({ row, index }) => {
+  const { t } = useTranslation();
+  return (
+    <View style={index && index % 2 ? styles.evenRow : styles.oddRow} key={row.id}>
+      <Text style={styles.cell}>{row.name}</Text>
+      <Text style={styles.costForecastCell}>{row.costForecast} {t('report.financialStatement.amount')}</Text>
+    </View>
+  );
+});
+ProjectRow.displayName = 'Row';
+
+const FinancialStatementTableRow: FC<IFinancialStatementTableRowProps> = ({ row }) => {
   return (
     <>
       {/* Class */}
-      <Row row={row} depth={depth} />
+      <ClassNameRow row={row} />
       {/* Projects for class */}
-      {row.projects?.map((p) => (
-        <Row key={p.id} row={p} depth={depth + 1} />
+      {row.projects?.map((p, index) => (
+        <ProjectRow key={p.id} row={p} index={index}/>
       ))}
       {/* Iterate children recursively */}
       {row.children?.map((r) => (
-        <FinancialStatementTableRow key={r.id} row={r} depth={depth + 1} />
+        <FinancialStatementTableRow key={r.id} row={r} />
       ))}
     </>
   );

@@ -25,17 +25,21 @@ interface IFinancialStatementProps {
 
 const FinancialStatement: FC<IFinancialStatementProps> = ({ divisions, projects, classes }) => {
   const { t } = useTranslation();
-
+console.log("test2: ", t('report.financialStatement.subtitle', {
+  year: new Date().getFullYear(),
+}))
   return (
-    <Document title={t('report.financialStatement.title') ?? ''}>
+    <Document title={t('report.financialStatement.title', { year: new Date().getFullYear()}) ?? ''}>
       <Page size="A3" style={styles.page}>
         <View style={styles.document}>
           <DocumentHeader
-            title={t('report.financialStatement.title')}
+            title={t('report.financialStatement.title', {
+                year: new Date().getFullYear(),
+              }) as string
+            }
             subtitleOne={
               t('report.financialStatement.subtitle', {
-                startYear: new Date().getFullYear(),
-                endYear: new Date().getFullYear() + 2,
+                year: new Date().getFullYear(),
               }) as string
             }
           />
