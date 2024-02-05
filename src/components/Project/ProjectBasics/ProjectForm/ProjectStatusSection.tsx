@@ -73,7 +73,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
           const generalConstructionRequirements = [ 'estConstructionStart', 'estConstructionEnd', 'personConstruction'];
           const combinedRequirements = [...programmedRequirements, ...planningRequirements, ...generalConstructionRequirements];
-          
+
           // Check fields that cannot be empty
           switch (phaseToSubmit) {
             case programmedPhase:
@@ -153,7 +153,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           // Required after phase is changed to construction
           if (
             (phase.value === constructionPhase) &&
-            constructionPhaseDetail?.value === '' && constructionPhaseDetail.label === ''
+            constructionPhaseDetail?.value === ''
           ) {
             return t('validation.required', { field: t('validation.constructionPhaseDetail') });
           }
