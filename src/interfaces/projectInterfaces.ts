@@ -247,7 +247,6 @@ export interface IProjectsResponse {
 export interface IProjectResponse {
   data: IProject;
   status: number;
-  statusText: string;
 }
 
 export interface IProjectFinancesRequestObject {

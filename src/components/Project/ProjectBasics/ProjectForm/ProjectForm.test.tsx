@@ -3,7 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { arrayHasValue, matchExact } from '@/utils/common';
-import { IProject, IProjectResponse } from '@/interfaces/projectInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
   mockConstructionPhases,
@@ -432,7 +432,7 @@ describe('projectForm', () => {
     };
 
     const project = mockProject.data;
-    const mockPostResponse: { data: IProject, status: number, statusText: string} = {
+    const mockPostResponse: { data: IProject, status: number} = {
       data: {
         ...project,
         id: 'post-project-id',
@@ -442,10 +442,6 @@ describe('projectForm', () => {
         phase: expectedPhase,
       },
       status: 201,
-      statusText: ""
-    };
-    const mockGetResponse: { data: IProject } = {
-      data: mockPostResponse.data,
     };
 
     const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
