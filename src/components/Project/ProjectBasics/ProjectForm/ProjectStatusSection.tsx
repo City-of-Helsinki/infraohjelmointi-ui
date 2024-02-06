@@ -70,8 +70,9 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             'masterClass',
             'class',
           ];
-
           const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
+          const generalConstructionRequirements = [ 'estConstructionStart', 'estConstructionEnd', 'personConstruction'];
+          const combinedRequirements = [...programmedRequirements, ...planningRequirements, ...generalConstructionRequirements];
 
           // Check fields that cannot be empty
           switch (phaseToSubmit) {
@@ -85,22 +86,22 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
               break;
             case constructionPhase:
-            case warrantyPeriodPhase:
-            case completedPhase:
-              if (
-                (phaseToSubmit === warrantyPeriodPhase || phaseToSubmit === completedPhase) &&
-                isBefore(getToday(), getValues('estConstructionEnd'))
-              ) {
-                return t('validation.phaseTooEarly', { value: phase.label });
-              }
               fields.push(
                 ...fieldsIfEmpty([
-                  ...programmedRequirements,
-                  ...planningRequirements,
-                  'estConstructionStart',
-                  'estConstructionEnd',
-                  'personConstruction',
-                  'constructionPhaseDetail',
+                ...combinedRequirements,
+                  'constructionPhaseDetail'
+                ]),
+              );
+              break;
+            case warrantyPeriodPhase:
+            case completedPhase:
+              if (isBefore(getToday(), getValues('estConstructionEnd'))) {
+                return t('validation.phaseTooEarly', { value: phase.label });
+              }
+
+              fields.push(
+                ...fieldsIfEmpty([
+                ...combinedRequirements,
                 ]),
               );
               break;
@@ -145,9 +146,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const phase = getValues('phase');
           // Required after phase is changed to construction
           if (
-            (phase.value === constructionPhase ||
-              phase.value === warrantyPeriodPhase ||
-              phase.value === completedPhase) &&
+            (phase.value === constructionPhase) &&
             constructionPhaseDetail?.value === ''
           ) {
             return t('validation.required', { field: t('validation.constructionPhaseDetail') });
@@ -161,9 +160,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
 
   const isConstructionPhaseDetailsDisabled = useMemo(() => {
     return (
-      currentPhase !== constructionPhase &&
-      currentPhase !== warrantyPeriodPhase &&
-      currentPhase !== completedPhase
+      currentPhase !== constructionPhase
     );
   }, [currentPhase, constructionPhase, warrantyPeriodPhase, completedPhase]);
 
