@@ -29,6 +29,7 @@ import { getYear } from '@/utils/dates';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
+import { notifyError } from '@/reducers/notificationSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -224,9 +225,23 @@ const ProjectForm = () => {
           }
 
           try {
-            await patchProject({ id: project?.id, data });
+            const response = await patchProject({ id: project?.id, data });
+            if (response.status === 200) {
+              dispatch(setSelectedProject(response.data));
+              dispatch(setIsSaving(false));
+            }
+
           } catch (error) {
             console.log('project patch error: ', error);
+            dispatch(setIsSaving(false));
+            dispatch(
+              notifyError({
+                message: 'formSaveError',
+                title: 'saveError',
+                type: 'notification',
+              }),
+            );
+            return;
           }
         }
 
@@ -234,14 +249,23 @@ const ProjectForm = () => {
         if (projectMode === 'new') {
           try {
             const response = await postProject({ data });
-            dispatch(setSelectedProject(response));
-            setNewProjectId(response.id);
+            if (response.status === 201) {
+              dispatch(setIsSaving(false));
+              dispatch(setSelectedProject(response.data));
+              setNewProjectId(response.data.id);
+            }
           } catch (error) {
             console.log('project post error: ', error);
+            dispatch(setIsSaving(false));
+            dispatch(
+              notifyError({
+                message: 'projectCreatingError',
+                title: 'createError',
+                type: 'notification',
+              }),
+            );
           }
         }
-
-        dispatch(setIsSaving(false));
       }
     },
     [isDirty, project?.id, dirtyFields, dispatch, projectMode, navigate],
