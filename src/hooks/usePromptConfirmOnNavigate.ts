@@ -21,9 +21,6 @@ const usePromptConfirmOnNavigate = ({
 }) => {
   const { navigator } = useContext(NavigationContext);
 
-  // TODO: these could be gathered to some file with static data
-  const projectSideBarItems = ['#basics', '#status', '#schedule', '#financial', '#responsiblePersons', '#location', '#projectProgram'];
- 
   const { isConfirmed } = useConfirmDialog();
 
   // Toggle a warning when trying to close the window if "when" is true
@@ -53,7 +50,7 @@ const usePromptConfirmOnNavigate = ({
     navigator.push = (...args: Parameters<typeof push>) => {
       const promptConfirmOnNavigate = async (args: Parameters<typeof push>) => {
         const argsProperties = args[0] as IArgs;
-        if (argsProperties && argsProperties.hash && projectSideBarItems.includes(argsProperties.hash)) {
+        if (argsProperties && argsProperties.hash) {
           // Do not await for the isConfirmed if user clicks some of the project form sidebar items because the "exit confirm" modal will be shown otherwise
           push(...args);
         } else {
