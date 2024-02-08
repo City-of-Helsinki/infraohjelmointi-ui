@@ -78,6 +78,50 @@ const getConstructionProgramReportData = async (
   }
 };
 
+const getFinancialStatementReportData = async (
+  classes: IClassHierarchy,
+  divisions: Array<ILocation>,
+  t: TFunction<'translation', undefined>,
+): Promise<Array<IConstructionProgramCsvRow>> => {
+  const year = new Date().getFullYear();
+
+  try {
+    const res = await getProjectsWithParams({
+      direct: false,
+      programmed: false,
+      params: 'overMillion=true',
+      forcedToFrame: false,
+      year,
+    });
+
+    const projects = res.results;
+
+    if (!projects) {
+      return [];
+    }
+
+    // Get report rows the same way as for the pdf table
+    const reportRows = getReportRows(projects, classes, divisions);
+    // Flatten rows into one dimension
+    const flattenedRows = flattenConstructionProgramTableRows(reportRows);
+    // Transform them into csv rows
+    const csvRows = flattenedRows.map((r: IConstructionProgramTableRow) => ({
+      [t('target')]: r.name,
+    //  [t('content')]: r.location,
+    //  [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
+    //  [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
+    //  [t('previouslyUsed')]: r.spentBudget,
+      [`${t('report.financialStatement.amount')}`]: r.budgetProposalCurrentYearPlus0,
+    //  [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
+    //  [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
+    }));
+    return csvRows;
+  } catch (e) {
+    console.log('Error building csv rows: ', e);
+    return [];
+  }
+};
+
 const downloadIcon = <IconDownload />;
 
 /**
@@ -100,6 +144,9 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
       case 'constructionProgram':
         setCsvData(await getConstructionProgramReportData(classes, divisions, t));
         break;
+      case 'financialStatement':
+        setCsvData(await getFinancialStatementReportData(classes, divisions, t));
+        break;
       default:
         // In the MVP stage we only had time to implement the construction program report, the other
         // report cases should come here
@@ -114,7 +161,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
           iconLeft={downloadIcon}
           variant="secondary"
           onClick={getCsvData}
-          disabled={type !== 'constructionProgram'}
+          disabled={type !== 'constructionProgram' && type !== 'financialStatement'}
         >
           {t('downloadXlsx', { name: t(`report.${type}.documentName`) })}
         </Button>
