@@ -9,8 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
 import { validateMaxLength, validateRequired } from '@/utils/validation';
 import { useAppSelector } from '@/hooks/common';
-import { selectIsProjectSaving } from '@/reducers/projectSlice';
-import { selectProjectMode } from '@/reducers/projectSlice';
+import { selectIsProjectSaving, selectProjectMode } from '@/reducers/projectSlice';
 
 interface IProjectInfoSectionProps {
   project: IProject | null;
@@ -21,6 +20,7 @@ interface IProjectInfoSectionProps {
     control: Control<IProjectForm>;
   };
   isInputDisabled: boolean;
+  projectMode: "edit" | "new";
 }
 
 const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
@@ -107,6 +107,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           label={'projectForm.hashTags'}
           control={control}
           project={project}
+          projectMode={projectMode}
         />
       </div>
     </div>

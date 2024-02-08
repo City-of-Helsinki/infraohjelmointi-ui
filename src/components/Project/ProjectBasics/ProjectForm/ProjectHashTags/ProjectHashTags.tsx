@@ -12,6 +12,8 @@ import {
   memo,
   useCallback,
   useMemo,
+  Dispatch,
+  SetStateAction,
 } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -32,12 +34,14 @@ export interface IHashTagsObject {
 
 interface IProjectHashTagsDialogProps {
   label: string;
-  projectHashTags: Array<string>;
+  projectHashTags: IListItem[];
   onChange: (tags: Array<string>) => void;
   toggleOpenDialog: (e: MouseEvent<HTMLButtonElement>) => void;
   openDialog: boolean;
   projectId?: string;
   projectName?: string;
+  projectMode: "edit" | "new";
+  setHashTagsState: Dispatch<SetStateAction<IProjectHashTagsState>>;
 }
 
 interface IFormState {
@@ -49,7 +53,7 @@ interface IFormState {
 
 const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
   (
-    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName },
+    { label, projectHashTags, openDialog, onChange, toggleOpenDialog, projectId, projectName, projectMode, setHashTagsState },
     ref: Ref<HTMLDivElement>,
   ) => {
     const { Header, Content, ActionButtons } = Dialog;
@@ -108,7 +112,13 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const onHashTagDelete = useCallback((value: string) => {
       setFormState((current) => {
         const hashTagsForSubmit = current.hashTagsForSubmit.filter((hv) => hv.value !== value);
-
+        if (projectMode === 'new') {
+          setHashTagsState((current) => ({
+            ...current,
+            projectHashTags: hashTagsForSubmit
+          }));
+        }
+     
         return {
           ...current,
           hashTagsForSubmit: hashTagsForSubmit,
@@ -135,7 +145,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
 
             return {
               ...current,
-              hashTagsForSubmit: hashTagsForSubmit,
+              hashTagsForSubmit: _.uniqWith(hashTagsForSubmit, _.isEqual),
               hashTagsForSearch: allHashTags.hashTags.filter(
                 (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
               ),
@@ -152,16 +162,24 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     // Submit hashTagsForSubmit and close the dialog
     const onSubmit = useCallback(
       async (event: MouseEvent<HTMLButtonElement>) => {
-        try {
-          await patchProject({
-            id: projectId,
-            data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
-          });
-          onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
-          toggleOpenDialog(event);
-        } catch (e) {
-          console.log('Error patching project hashtags: ', e);
-        }
+          try {
+            if (projectMode === 'new' && setHashTagsState) {
+              setHashTagsState((current) => ({
+                ...current,
+                projectHashTags: _.uniqWith(hashTagsForSubmit, _.isEqual)
+              }));
+            } else {
+              await patchProject({
+                id: projectId,
+                data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
+              });
+            }
+            // Hashtags are saved to the form values in the onChange below
+            onChange(hashTagsForSubmit.map((h) => hashTagsObject[h.value].id));
+            toggleOpenDialog(event);
+          } catch (e) {
+            console.log('Error patching project hashtags: ', e);
+          }
       },
       [hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
     );
@@ -179,7 +197,6 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     return (
       <div className="input-wrapper" ref={ref}>
         {/* Dialog */}
-
         <Dialog
           id="hashtags-dialog"
           aria-labelledby={label}
@@ -237,6 +254,7 @@ interface IProjectHashTagsProps {
   label: string;
   control: HookFormControlType;
   project: IProject | null;
+  projectMode: "edit" | "new";
 }
 
 interface IProjectHashTagsState {
@@ -244,7 +262,7 @@ interface IProjectHashTagsState {
   projectHashTags: IListItem[];
 }
 
-const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, project }) => {
+const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, project, projectMode }) => {
   const { t } = useTranslation();
   const allHashTags = useAppSelector(selectHashTags);
   const [state, setState] = useState<IProjectHashTagsState>({
@@ -292,6 +310,8 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
               openDialog={openDialog}
               projectId={projectId}
               projectName={projectName}
+              projectMode={projectMode}
+              setHashTagsState={setState}
             />
           )}
         />

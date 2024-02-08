@@ -432,7 +432,7 @@ describe('projectForm', () => {
     };
 
     const project = mockProject.data;
-    const mockPostResponse: { data: IProject } = {
+    const mockPostResponse: { data: IProject, status: number} = {
       data: {
         ...project,
         id: 'post-project-id',
@@ -441,9 +441,7 @@ describe('projectForm', () => {
         programmed: expectedProgrammed,
         phase: expectedPhase,
       },
-    };
-    const mockGetResponse: { data: IProject } = {
-      data: mockPostResponse.data,
+      status: 201,
     };
 
     const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
@@ -466,7 +464,7 @@ describe('projectForm', () => {
     );
     await user.click(await within(parentContainer).findByText('option.proposal'));
     const submitProjectButton = await findByTestId('submit-project-button');
-    mockedAxios.get.mockResolvedValueOnce(mockGetResponse);
+    mockedAxios.get.mockResolvedValueOnce(mockPostResponse);
     await waitFor(async () => {
       await user.click(submitProjectButton);
     });

@@ -244,6 +244,11 @@ export interface IProjectsResponse {
   count: number;
 }
 
+export interface IProjectResponse {
+  data: IProject;
+  status: number;
+}
+
 export interface IProjectFinancesRequestObject {
   year: number;
   forcedToFrame?: boolean;

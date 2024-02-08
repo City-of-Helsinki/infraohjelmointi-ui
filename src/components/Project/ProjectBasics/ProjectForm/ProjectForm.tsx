@@ -29,6 +29,7 @@ import { getYear } from '@/utils/dates';
 import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
+import { notifyError } from '@/reducers/notificationSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -77,7 +78,7 @@ const ProjectForm = () => {
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
     }
     const startYearName = getFinanceYearName(finances, startYear);
-    const newBudget = (parseFloat(finances[startYearName] as string) || 0.00) + budgetToMove;
+    const newBudget = (parseFloat(finances[startYearName] as string) || 0.00) + budgetToMove || 0.00;
 
     financesCopy = { ...financesCopy, [startYearName]: newBudget.toFixed(2)}
     return financesCopy;
@@ -96,7 +97,7 @@ const ProjectForm = () => {
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
     }
     const endYearName = getFinanceYearName(finances, endYear);
-    const newBudget = (parseFloat(finances[endYearName] as string) || 0.00) + budgetToMove;
+    const newBudget = (parseFloat(finances[endYearName] as string) || 0.00) + budgetToMove || 0.00;
 
     financesCopy =  { ...financesCopy, [endYearName]: newBudget.toFixed(2)}
     return financesCopy;
@@ -223,10 +224,40 @@ const ProjectForm = () => {
             data = updateFinances(data, project);
           }
 
+          /* If project belongs to some group and then class is changed, the project will disappear as 
+             the group that it belongs to and the project exist under different subclasses */
+          if (data?.projectClass && project.projectGroup) {
+              data = {...data, "projectGroup": null} 
+          }
+
+          /* If project is under a district and user changes the class, the district has to be removed or the
+             project will remain under that district in the new class, which isn't intended behavior */
+          if (data?.projectClass && project.projectLocation) {
+            data = {...data, "projectLocation": null} 
+          }
+          // The projectDistrict should also be deleted in order to not show it on the project form when class is changed
+          if (data?.projectClass && project.projectDistrict) {
+            data = {...data, "projectDistrict": null}
+          }
+
           try {
-            await patchProject({ id: project?.id, data });
+            const response = await patchProject({ id: project?.id, data });
+            if (response.status === 200) {
+              dispatch(setSelectedProject(response.data));
+              dispatch(setIsSaving(false));
+            }
+
           } catch (error) {
             console.log('project patch error: ', error);
+            dispatch(setIsSaving(false));
+            dispatch(
+              notifyError({
+                message: 'formSaveError',
+                title: 'saveError',
+                type: 'notification',
+              }),
+            );
+            return;
           }
         }
 
@@ -234,14 +265,23 @@ const ProjectForm = () => {
         if (projectMode === 'new') {
           try {
             const response = await postProject({ data });
-            dispatch(setSelectedProject(response));
-            setNewProjectId(response.id);
+            if (response.status === 201) {
+              dispatch(setIsSaving(false));
+              dispatch(setSelectedProject(response.data));
+              setNewProjectId(response.data.id);
+            }
           } catch (error) {
             console.log('project post error: ', error);
+            dispatch(setIsSaving(false));
+            dispatch(
+              notifyError({
+                message: 'projectCreatingError',
+                title: 'createError',
+                type: 'notification',
+              }),
+            );
           }
         }
-
-        dispatch(setIsSaving(false));
       }
     },
     [isDirty, project?.id, dirtyFields, dispatch, projectMode, navigate],
@@ -313,35 +353,35 @@ const ProjectForm = () => {
   );
 
   return (
-      <form
-        data-testid="project-form"
-        className="project-form"
-      >
-        {/* SECTION 1 - BASIC INFO */}
-        <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} />
-        {/* SECTION 2 - STATUS */}
-        <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
-        {/* SECTION 3 - SCHEDULE */}
-        <ProjectScheduleSection {...formProps} />
-        {/* SECTION 4 - FINANCIALS */}
-        <ProjectFinancialSection
-          {...formProps}
-          classOptions={classOptions}
-          isInputDisabled={isInputDisabled}
-        />
-        {/* SECTION 5 - RESPONSIBLE PERSONS */}
-        <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
-        {/* SECTION 6 - LOCATION */}
-        <ProjectLocationSection
-          {...formProps}
-          locationOptions={locationOptions}
-          isInputDisabled={isInputDisabled}
-        />
-        {/* SECTION 7 - PROJECT PROGRAM */}
-        <ProjectProgramSection {...formProps} />
-        {/* BANNER */}
-        <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
-      </form>
+    <form
+      data-testid="project-form"
+      className="project-form"
+    >
+      {/* SECTION 1 - BASIC INFO */}
+      <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} projectMode={projectMode} />
+      {/* SECTION 2 - STATUS */}
+      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
+      {/* SECTION 3 - SCHEDULE */}
+      <ProjectScheduleSection {...formProps} />
+      {/* SECTION 4 - FINANCIALS */}
+      <ProjectFinancialSection
+        {...formProps}
+        classOptions={classOptions}
+        isInputDisabled={isInputDisabled}
+      />
+      {/* SECTION 5 - RESPONSIBLE PERSONS */}
+      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
+      {/* SECTION 6 - LOCATION */}
+      <ProjectLocationSection
+        {...formProps}
+        locationOptions={locationOptions}
+        isInputDisabled={isInputDisabled}
+      />
+      {/* SECTION 7 - PROJECT PROGRAM */}
+      <ProjectProgramSection {...formProps} />
+      {/* BANNER */}
+      <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
+    </form>
   );
 };
 
