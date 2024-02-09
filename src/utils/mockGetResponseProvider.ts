@@ -1,4 +1,5 @@
 import { mockProjectClasses, mockProjectCoordinatorClasses } from '@/mocks/mockClasses';
+import { mockCoordinatorNotes } from '@/mocks/mockCoordinatorNotes';
 import { mockGroups } from '@/mocks/mockGroups';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import {
@@ -103,6 +104,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockPlanningViewProjects);
       case url.toLocaleLowerCase().includes(`/sap-costs/${year}/`):
         return Promise.resolve(mockSapCosts);
+      case url.toLocaleLowerCase().includes(`/coordinator-notes/`):
+        return Promise.resolve(mockCoordinatorNotes);
       default:
         console.log('not found!: ', url);
 

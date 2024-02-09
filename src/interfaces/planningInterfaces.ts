@@ -64,6 +64,17 @@ export interface IPlanningRowSelections {
   selectedOtherClassification: IClass | null;
 }
 
+export interface IPlanningNotesDialogData {
+  name: string;
+  id: string;
+  selectedYear: number | null;
+}
+
+export interface IPlanningNotesModalData {
+  name: string;
+  id: string;
+}
+
 export interface IPlanningRow extends IPlanningSums {
   type: PlanningRowType;
   name: string;

@@ -1,0 +1,83 @@
+.dialog-container {
+    width: 300px;
+    max-height: 450px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    margin-top: 8px;
+    margin-left: 5px;
+    background-color: white;
+    border: 1px solid black;
+    text-align: start;
+    z-index: 100;
+  }
+
+  @media (max-width: 1300px) {
+    .dialog-container {
+      width: 250px;
+    }
+  }
+
+  .dialog-top-part {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch !important; /*cross and text start from the same height*/
+    padding: 15px !important;
+    padding-bottom: 0px;
+    margin-bottom: 5px;
+  }
+
+  .dialog-top-part h1 {
+    font-weight: normal;
+  }
+  .dialog-top-part h2 {
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  
+  #left {
+    display: flex;
+    flex-flow: column;
+    white-space: normal;
+    width: 90%;
+  }
+
+  #right {
+    width: 10%;
+  }
+
+  .dialog-middle-part {
+    max-height: 290px;
+    font-weight: normal;
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+
+  .dialog-middle-part p {
+    white-space: normal;
+  }
+
+  #coordinator {
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+
+  #date {
+    margin-bottom: 20px;
+  }
+  
+  .dialog-bottom-part {
+    padding: 15px !important;
+  }
+  
+  .dialog-add-note {
+    @apply text-sm font-bold text-bus;
+    font-weight: 500;
+    font-size: 15px;
+    text-decoration: underline;
+  }
+
+  hr {
+    color: var(--color-black-40);
+  }

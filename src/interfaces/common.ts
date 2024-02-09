@@ -37,6 +37,7 @@ export interface INotification {
   status?: string;
   title?: string;
   duration?: number;
+  parameter?: string;
 }
 
 export interface IListItem {

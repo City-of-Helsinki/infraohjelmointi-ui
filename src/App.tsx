@@ -40,7 +40,7 @@ import AdminHashtags from './components/Admin/AdminHashtags';
 import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
 import useFinanceUpdates from './hooks/useFinanceUpdates';
-import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
+import { getCoordinatorNotesThunk, selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
@@ -103,6 +103,7 @@ const App: FC = () => {
     try {
       await dispatch(getListsThunk());
       await dispatch(getHashTagsThunk());
+      await dispatch(getCoordinatorNotesThunk())
     } catch (e) {
       console.log('Error getting app data: ', e);
       dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
