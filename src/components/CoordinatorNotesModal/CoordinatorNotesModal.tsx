@@ -25,7 +25,7 @@ const Notes = (props: NotesProps) => {
             note.year === props.selectedYear && note.coordinatorClass === props.id
         ));
 
-        const mappedNotes = matchingNotes.map((note) => {
+        const mappedNotes = matchingNotes.reverse().map((note) => {
             return (
                 <Fragment key={note.id}>
                     <p>{note.coordinatorNote}</p>
