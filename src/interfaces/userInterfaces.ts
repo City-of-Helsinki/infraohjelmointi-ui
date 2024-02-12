@@ -9,6 +9,7 @@ export interface IUser {
   date_joined: string;
   department_name: string | null;
   uuid: string;
+  id: number;
   ad_groups: Array<IAdGroup>;
 }
 

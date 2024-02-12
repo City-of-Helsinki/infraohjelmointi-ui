@@ -1,0 +1,39 @@
+.dialog-top-part {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 50px;
+    padding: 20px;
+}
+
+.dialog-top-part h1 {
+    font-weight: 500;
+}
+
+.dialog-middle-part {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.dialog-bottom-part {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+}
+
+.close-icon {
+    cursor: pointer;
+}
+
+.dialog-textarea {
+    height: 150px;
+    padding: 10px;
+    border: 1px solid black;
+    resize: none;
+}
+
+#add-note-button {
+    margin-right: 10px;
+}

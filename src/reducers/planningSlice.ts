@@ -1,5 +1,7 @@
 import { IClass } from '@/interfaces/classInterfaces';
 import {
+  IPlanningNotesDialogData,
+  IPlanningNotesModalData,
   IPlanningRow,
   IPlanningRowSelections,
   PlanningMode,
@@ -7,8 +9,15 @@ import {
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { RootState } from '@/store';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getCoordinatorNotes, postCoordinatorNoteToProject } from '@/services/noteServices';
+import { IError } from '@/interfaces/common';
+import { ICoordinatorNote } from '@/interfaces/noteInterfaces';
 
+interface ICoordinatorNotesModalOpen {
+  isOpen: boolean;
+  id: string;
+}
 interface IPlanningState {
   selectedYear: number | null;
   startYear: number;
@@ -20,7 +29,30 @@ interface IPlanningState {
   mode: PlanningMode;
   forcedToFrame: boolean;
   isLoading: boolean;
+  notesDialogOpen: boolean;
+  notesDialogData: IPlanningNotesDialogData;
+  notesModalOpen: ICoordinatorNotesModalOpen;
+  notesModalData: IPlanningNotesModalData;
+  coordinatorNotes: ICoordinatorNote[];
 }
+
+export const getCoordinatorNotesThunk = createAsyncThunk(
+  'coordinatorNotes/getByProject',
+  async (_, thunkAPI) => {
+    return await getCoordinatorNotes()
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const postCoordinatorNoteToProjectThunk = createAsyncThunk(
+  'coordinatorNotes/postNote',
+  async (request: ICoordinatorNote, thunkAPI) => {
+    return await postCoordinatorNoteToProject(request)
+      .then((res) => res)
+      .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
 
 const initialState: IPlanningState = {
   selectedYear: null,
@@ -41,6 +73,11 @@ const initialState: IPlanningState = {
   rows: [],
   forcedToFrame: false,
   isLoading: false,
+  notesDialogOpen: false,
+  notesDialogData: {name: '', id: '', selectedYear: null},
+  notesModalOpen: {isOpen: false, id: ''},
+  notesModalData: {name: '', id: ''},
+  coordinatorNotes: [],
 };
 
 export const planningSlice = createSlice({
@@ -104,7 +141,33 @@ export const planningSlice = createSlice({
     setIsPlanningLoading(state, action: PayloadAction<boolean>) {
       return { ...state, isLoading: action.payload };
     },
+    setNotesDialogOpen(state, action: PayloadAction<boolean>) {
+      return { ...state, notesDialogOpen: action.payload}
+    },
+    setNotesDialogData(state, action: PayloadAction<IPlanningNotesDialogData>) {
+      return { ...state, notesDialogData: action.payload}
+    },
+    setNotesModalOpen(state, action: PayloadAction<ICoordinatorNotesModalOpen>) {
+      return { ...state, notesModalOpen: {id: action.payload.id, isOpen:!state.notesModalOpen.isOpen}}
+    },
+    setNotesModalData(state, action: PayloadAction<IPlanningNotesModalData>) {
+      return { ...state, notesModalData: action.payload}
+    }
   },
+  extraReducers: (builder) => {
+    builder.addCase(
+      getCoordinatorNotesThunk.fulfilled,
+      (state, action: PayloadAction<ICoordinatorNote[]>) => {
+        return { ...state, coordinatorNotes: action.payload };
+      },
+    );
+    builder.addCase(
+      getCoordinatorNotesThunk.rejected,
+      (state, action: PayloadAction<IError | unknown>) => {
+        return { ...state, coordinatorNotesError: action.payload };
+      },
+    );
+  }
 });
 
 export const selectSelectedYear = (state: RootState) => state.planning.selectedYear;
@@ -116,6 +179,11 @@ export const selectGroupsExpanded = (state: RootState) => state.planning.groupsE
 export const selectPlanningMode = (state: RootState) => state.planning.mode;
 export const selectForcedToFrame = (state: RootState) => state.planning.forcedToFrame;
 export const selectIsPlanningLoading = (state: RootState) => state.planning.isLoading;
+export const selectNotesDialogOpen = (state: RootState) => state.planning.notesDialogOpen;
+export const selectNotesDialogData = (state: RootState) => state.planning.notesDialogData;
+export const selectNotesModalOpen = (state: RootState) => state.planning.notesModalOpen;
+export const selectNotesModalData = (state: RootState) => state.planning.notesModalData;
+export const selectNotes = (state: RootState) => state.planning.coordinatorNotes;
 
 export const {
   setSelectedYear,
@@ -134,6 +202,10 @@ export const {
   resetSelections,
   setForcedToFrame,
   setIsPlanningLoading,
+  setNotesDialogOpen,
+  setNotesDialogData,
+  setNotesModalOpen,
+  setNotesModalData,
 } = planningSlice.actions;
 
 export default planningSlice.reducer;

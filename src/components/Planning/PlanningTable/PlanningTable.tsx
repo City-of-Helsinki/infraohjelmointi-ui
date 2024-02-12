@@ -13,6 +13,7 @@ const PlanningTable = () => {
   const rows = useAppSelector(selectPlanningRows);
   const mode = useAppSelector(selectPlanningMode);
   const projetSapCosts = useAppSelector(getProjectSapCosts);
+
   return (
     <>
       <div className="planning-table-container" id="planning-table-container">

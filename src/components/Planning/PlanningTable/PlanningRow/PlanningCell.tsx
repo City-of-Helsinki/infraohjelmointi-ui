@@ -1,19 +1,21 @@
-import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState, Fragment } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
+  selectNotes,
   selectPlanningMode,
   selectSelectedYear,
   selectStartYear,
+  setNotesModalData,
+  setNotesModalOpen,
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import { patchCoordinationClass } from '@/services/classServices';
 import { IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
-import { IconAlertCircle } from 'hds-react';
 import './styles.css';
 import useNumberInput from '@/hooks/useNumberInput';
 import { patchCoordinationLocation } from '@/services/locationServices';
@@ -23,6 +25,9 @@ import { formattedNumberToNumber } from '@/utils/calculations';
 import { getGroupSapCosts } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
+import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
+import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
+import { useLocation } from 'react-router';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -30,7 +35,8 @@ interface IPlanningCellProps extends IPlanningRow {
   id: string;
 }
 
-const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
+const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
+  const dispatch = useAppDispatch();
   const {
     plannedBudget,
     deviation,
@@ -41,8 +47,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
     budgetChange,
   } = cell;
 
-  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
+  const { pathname } = useLocation();
   const mode = useAppSelector(selectPlanningMode);
   const [editFrameBudget, setEditFrameBudget] = useState(false);
   const selectedYear = useAppSelector(selectSelectedYear);
@@ -54,6 +60,12 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const UPDATE_CELL_DATA = 'update-cell-data';
 
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
+
+  const notes = useAppSelector(selectNotes);
+ 
+  const matchingNotes = notes.filter((note) => (
+      note.year === selectedYear && note.coordinatorClass === id
+  ));
 
   const onEditFrameBudget = useCallback(() => {
     setEditFrameBudget((current) => !current);
@@ -121,7 +133,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
   const budgetOverlapAlertIcon = useMemo(
     () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
     [isFrameBudgetOverlap],
-  );
+  ); 
 
   const isEditFrameBudgetDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame,
@@ -184,10 +196,27 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell }) => {
       {/* There will be data generated here (at least for the first year) in future tasks */}
       {year === selectedYear && (
         <>
-          {isCurrentYear && (
-            <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />
-          )}
+          {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />}
           {moment.months().map((m) => (
+            pathname.includes('coordination') && m === 'tammikuu' ?
+            <Fragment key={id}>
+              <td
+                key={id}
+                className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
+                onMouseOver={() => setHoveredClassToMonth(m)}
+                onFocus={() => setHoveredClassToMonth(m)}
+                onMouseLeave={() => removeHoveredClassFromMonth(m)}
+              >
+                <button id="coordinator-note" onClick={() => {
+                  dispatch(setNotesModalOpen({isOpen: true, id}));
+                  dispatch(setNotesModalData({name, id}))
+                }}>
+                  { matchingNotes.length ? <IconSpeechbubbleText color="white" /> : <IconSpeechbubble color="white" /> }
+                </button>
+                <CoordinatorNotesModal id={id} type={type} selectedYear={selectedYear}/>
+              </td>
+            </Fragment>
+            :
             <td
               key={m}
               className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}

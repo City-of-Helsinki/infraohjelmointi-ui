@@ -188,7 +188,13 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
   the possible problem with projectGroup/projectClass */
   const cellDataWithFrameBudget = children[0]?.cells;
   const cellData = props.name.includes("suurpiiri") && cellDataWithFrameBudget && !search.includes("subClass") ? cellDataWithFrameBudget : cells;
-  
+
+  /* Rows that type is districtPreview should only exist on a subClass level. If user chose a district as a subClass and then chose 
+     the same district as project's location a bit lower on the project form, the district were rendered twice in the planning view */
+  if (!search.includes('subClass') && props.name.includes('suurpiiri') && props.type === 'districtPreview') {
+    return <></>;
+  }
+
   return (
     <>
       <tr className={props.type} data-testid={`row-${props.id}`}>

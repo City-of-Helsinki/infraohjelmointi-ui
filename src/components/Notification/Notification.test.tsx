@@ -8,7 +8,6 @@ import { act } from 'react-dom/test-utils';
 import { waitFor } from '@testing-library/react';
 import { Route } from 'react-router';
 import { mockUser } from '@/mocks/mockUsers';
-
 jest.mock('react-i18next', () => mockI18next());
 
 const render = async () =>
@@ -31,7 +30,6 @@ describe('Notification', () => {
     const { getByTestId, getByText, getByRole, store } = await render();
 
     await waitFor(() => store.dispatch(notifyInfo(mockNotification)));
-
     expect(getByTestId('notifications-container')).toBeInTheDocument();
     expect(getByRole('button', { name: matchExact('closeNotification') })).toBeInTheDocument();
 
