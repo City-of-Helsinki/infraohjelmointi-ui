@@ -30,6 +30,7 @@ import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivi
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
 import { notifyError } from '@/reducers/notificationSlice';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -210,8 +211,12 @@ const ProjectForm = () => {
   const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
   const hierarchySubDivisions = useAppSelector(selectPlanningSubDivisions);
 
+  const CREATE_NEW_PROJECT = 'create-new-project';
+
   const onSubmit = useCallback(
     async (form: IProjectForm) => {
+      dispatch(setLoading({ text: 'Creating a new project', id: CREATE_NEW_PROJECT }));
+
       if (isDirty) {
         dispatch(setIsSaving(true));
         let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms, hierarchyDistricts, hierarchyDivisions, hierarchySubDivisions);
@@ -283,6 +288,7 @@ const ProjectForm = () => {
           }
         }
       }
+      dispatch(clearLoading(CREATE_NEW_PROJECT));
     },
     [isDirty, project?.id, dirtyFields, dispatch, projectMode, navigate],
   );
