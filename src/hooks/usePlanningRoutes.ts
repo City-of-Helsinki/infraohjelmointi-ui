@@ -66,7 +66,7 @@ const usePlanningRoutes = () => {
         dispatch(setForcedToFrame(false));
       }
     }
-  }, [pathname, mode]);
+  }, [pathname, mode, dispatch, forcedToFrame]);
 
   // Listen to search params and add the planning selections to redux
   useEffect(() => {
@@ -95,7 +95,7 @@ const usePlanningRoutes = () => {
     dispatch(setSelectedSubClass(nextSubClass));
     dispatch(setSelectedDistrict(nextDistrict));
     dispatch(setSelectedOtherClassification(nextOtherClassification));
-  }, [mode, search, planningDistricts, otherClassifications, batchedPlanningClasses]);
+  }, [mode, search, planningDistricts, otherClassifications, batchedPlanningClasses, dispatch]);
 
   // Listen to search params and add the coordinator selections to redux
   useEffect(() => {
@@ -137,7 +137,7 @@ const usePlanningRoutes = () => {
     dispatch(setSelectedCollectiveSubLevel(nextCollectiveSubLevel));
     dispatch(setSelectedSubLevelDistrict(nextSubLevelDistrict));
     dispatch(setSelectedOtherClassification(nextOtherClassification));
-  }, [mode, search, batchedPlanningClasses, coordinationDistricts]);
+  }, [mode, search, batchedPlanningClasses, coordinationDistricts, batchedCoordinatorClasses, dispatch]);
 };
 
 export default usePlanningRoutes;

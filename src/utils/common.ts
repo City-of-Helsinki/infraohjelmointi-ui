@@ -4,7 +4,7 @@ import { IAppForms, FormValueType, IGroupForm } from '@/interfaces/formInterface
 import { TFunction } from 'i18next';
 import { getYear, updateYear } from './dates';
 import _ from 'lodash';
-import { IProjectRequest } from '@/interfaces/projectInterfaces';
+import { IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
@@ -283,3 +283,44 @@ export const removeHoveredClassFromMonth = (month: string) => {
     });
   }
 };
+
+export const syncUpdatedFinancesWithStartYear = (finances: IProjectFinances, startYear: number) => {
+  let convertedFinances: IProjectFinances = {
+    year: startYear,
+    budgetProposalCurrentYearPlus0: "0.00",
+    budgetProposalCurrentYearPlus1: "0.00",
+    budgetProposalCurrentYearPlus2: "0.00",
+    preliminaryCurrentYearPlus3: "0.00",
+    preliminaryCurrentYearPlus4: "0.00",
+    preliminaryCurrentYearPlus5: "0.00",
+    preliminaryCurrentYearPlus6: "0.00",
+    preliminaryCurrentYearPlus7: "0.00",
+    preliminaryCurrentYearPlus8: "0.00",
+    preliminaryCurrentYearPlus9: "0.00",
+    preliminaryCurrentYearPlus10: "0.00"
+  }
+
+  const yearDifference = finances.year - startYear;
+
+  for (const key in finances) {
+    if (key != "year") {
+      const num =  parseInt(key.replace(/\D/g, ""));
+      const convertedNumber = num + yearDifference;
+      if (convertedNumber >= 0 && convertedNumber < 3) {
+        const convertedKey = ("budgetProposalCurrentYearPlus" + convertedNumber) as keyof IProjectFinances;
+        const updatedFinances = {
+          [convertedKey]: finances[key as keyof IProjectFinances]
+        };
+        convertedFinances = Object.assign({}, convertedFinances, updatedFinances);
+      } else if (convertedNumber <= 10) {
+        const convertedKey = ("preliminaryCurrentYearPlus" + convertedNumber) as keyof IProjectFinances;
+        const updatedFinances = {
+          [convertedKey]: finances[key as keyof IProjectFinances]
+        };
+        convertedFinances = Object.assign({}, convertedFinances, updatedFinances);
+      }
+    }
+  }
+  console.log(convertedFinances);
+  return convertedFinances;
+}

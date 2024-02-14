@@ -9,10 +9,11 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
-import { selectGroupsExpanded } from '@/reducers/planningSlice';
+import { selectGroupsExpanded, selectStartYear } from '@/reducers/planningSlice';
 import _ from 'lodash';
 import './styles.css';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { syncUpdatedFinancesWithStartYear } from '@/utils/common';
 
 interface IPlanningRowState {
   expanded: boolean;
@@ -22,8 +23,9 @@ interface IPlanningRowState {
 
 const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost> }> = (props) => {
   const { defaultExpanded, projectRows, cells, id, type, sapCosts, children } = props;
-  const projectToUpdate = useAppSelector(selectProjectUpdate)?.project;
+  const projectToUpdateFromState = useAppSelector(selectProjectUpdate)?.project;
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
+  const startYear = useAppSelector(selectStartYear);
   const { search } = useLocation();
 
   const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
@@ -49,7 +51,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
   // Set the projects to a local hook to be able to update it when the project-update event is triggered
   useEffect(() => {
     setPlanningRowState((current) => ({ ...current, projects: projectRows }));
-  }, [projectRows]);
+  }, [projectRows, startYear]);
 
   useEffect(() => {
     if (type === 'group') {
@@ -60,9 +62,18 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
   // usePlanningRows-hook sets a projectToUpdate when the project-update event is triggered,
   // this useEffect updates the project in the view with the projecToUpdate
   useEffect(() => {
+    if (!projectToUpdateFromState)
+      return;
+
+    const projectToUpdate: IProject = {...projectToUpdateFromState};
+
     if (projectToUpdate) {
       let inRow = false;
       let pIndex = -1;
+
+      if (projectToUpdate.finances && startYear != projectToUpdate.finances.year) {
+        projectToUpdate["finances"] = syncUpdatedFinancesWithStartYear(projectToUpdate.finances, startYear);
+      }
 
       // If the project has become not-programmed then we filter it out and end the useEffect
       if (!projectToUpdate.programmed) {
@@ -130,7 +141,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
         }));
       }
     }
-  }, [projectToUpdate]);
+  }, [id, projectToUpdateFromState, projects, startYear, type]);
 
   const resetSearchedProjectId = useCallback(() => {
     setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
@@ -182,6 +193,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
       });
     }
   }, [searchedProjectId]);
+
 /* districts' (suurpiiri) framebudget is not available on a subClass level in 'cells' even though it probably should, however 
   the data can be found one level lower from the childrens' 'cells'. The problem with the data might happen because the districts
   that are on the subclass level, are marked as projectGroup now and they probably should be projectClass instead. TODO: investigate

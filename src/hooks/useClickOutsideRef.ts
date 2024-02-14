@@ -21,7 +21,7 @@ const useClickOutsideRef = (ref: RefObject<HTMLDivElement>, callback: () => unkn
       document.removeEventListener('mouseup', handleClickOutside);
       document.removeEventListener('contextmenu', handleClickOutside);
     };
-  }, [ref]);
+  }, [callback, ref]);
 };
 
 export default useClickOutsideRef;

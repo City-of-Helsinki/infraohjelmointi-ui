@@ -40,7 +40,7 @@ const useFinanceUpdates = () => {
       removeProjectUpdateEventListener(dispatch);
       eventSource.close();
     };
-  }, []);
+  }, [dispatch]);
 
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {

@@ -31,7 +31,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })),
       );
     },
-    [project.id],
+    [dispatch, project.id],
   );
 
   // Open the custom context menu for editing the project phase on click

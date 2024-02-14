@@ -89,6 +89,7 @@ export const getProjectsWithParams = async (
     ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`
     : `${REACT_APP_API_URL}/projects/?${allParams}`;
 
+
   try {
     const res = await axios.get(url);
     return res.data;

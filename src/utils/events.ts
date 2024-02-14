@@ -77,6 +77,7 @@ export const removeFinanceUpdateEventListener = (dispatch: Dispatch) => {
 export const addProjectUpdateEventListener = (dispatch: Dispatch) => {
   const projectUpdate = (event: MessageEvent) => {
     const projectData = JSON.parse(event.data) as IProjectEventData;
+    console.log(projectData);
     dispatch(setProjectUpdate(projectData));
   };
   eventSource.addEventListener('project-update', projectUpdate);

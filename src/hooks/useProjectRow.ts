@@ -406,7 +406,7 @@ const getAffectsDates = (
 
 const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IProjectSapCost) => {
   const { year, ...finances } = project.finances;
-
+  
   const {
     name,
     id,
@@ -542,7 +542,7 @@ const useProjectRow = (project: IProject, sapCosts: IProjectSapCost) => {
         projectFinances: project.finances,
       }));
     }
-  }, [project, forcedToFrame]);
+  }, [project, forcedToFrame, sapCosts]);
 
   return projectRowsState;
 };

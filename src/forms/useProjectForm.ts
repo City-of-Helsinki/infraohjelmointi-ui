@@ -262,7 +262,7 @@ const useProjectForm = () => {
     if (project || projectMode === 'new') {
       reset(formValues);
     }
-  }, [project, projectMode, classes, subClasses, masterClasses, districts, divisions, subDivisions ]);
+  }, [project, projectMode, classes, subClasses, masterClasses, districts, divisions, subDivisions, reset, formValues]);
 
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
