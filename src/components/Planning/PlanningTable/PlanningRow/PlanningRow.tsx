@@ -17,7 +17,6 @@ import { syncUpdatedProjectFinancesWithStartYear } from '@/utils/common';
 
 interface IPlanningRowState {
   expanded: boolean;
-  projects: Array<IProject>;
   searchedProjectId: string;
 }
 
@@ -30,11 +29,10 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
 
   const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
     expanded: defaultExpanded,
-    projects: [],
     searchedProjectId: '',
   });
 
-  const { expanded, projects, searchedProjectId } = planningRowState;
+  const { expanded, /* projects, */ searchedProjectId } = planningRowState;
 
   /**
    * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
@@ -48,10 +46,6 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
     setPlanningRowState((current) => ({ ...current, expanded: defaultExpanded || false }));
   }, [defaultExpanded]);
 
-  // Set the projects to a local hook to be able to update it when the project-update event is triggered
-  useEffect(() => {
-    setPlanningRowState((current) => ({ ...current, projects: projectRows }));
-  }, [projectRows, startYear]);
 
   useEffect(() => {
     if (type === 'group') {
@@ -75,17 +69,8 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
         projectToUpdate["finances"] = syncUpdatedProjectFinancesWithStartYear(projectToUpdate.finances, startYear);
       }
 
-      // If the project has become not-programmed then we filter it out and end the useEffect
-      if (!projectToUpdate.programmed) {
-        setPlanningRowState((current) => ({
-          ...current,
-          projects: current.projects.filter((p) => p.id !== projectToUpdate.id),
-        }));
-        return;
-      }
-
       // We add the project returned by the project-update event to a new "updatedProjects" list
-      const updatedProjects = projects.map((p, index) => {
+      const updatedProjects = projectRows.map((p, index) => {
         if (p.id === projectToUpdate.id) {
           inRow = true;
           pIndex = index;
@@ -115,24 +100,23 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
         }
       }
       // updated project is in the current planning row check if the update has caused it to be removed from the row
-      else {
-        if (
-          (type === 'group' &&
-            projects[pIndex].projectGroup === id &&
-            !projectToUpdate.projectGroup) ||
-          ((type === 'district' || type === 'division') &&
-            projectToUpdate.projectGroup &&
-            projects[pIndex].projectLocation === id) ||
-          (type.toLowerCase().includes('class') &&
-            projectToUpdate.projectGroup &&
-            projectToUpdate.projectLocation &&
-            projects[pIndex].projectClass === id)
-        ) {
-          updatedProjects.splice(pIndex, 1);
-        }
-      }
+      else if (
+        (type === 'group' &&
+          projectRows[pIndex].projectGroup === id &&
+          !projectToUpdate.projectGroup) ||
+        ((type === 'district' || type === 'division') &&
+          projectToUpdate.projectGroup &&
+          projectRows[pIndex].projectLocation === id) ||
+        (type.toLowerCase().includes('class') &&
+          projectToUpdate.projectGroup &&
+          projectToUpdate.projectLocation &&
+          projectRows[pIndex].projectClass === id)
+      ) {
+        updatedProjects.splice(pIndex, 1);
+      } 
+
       // check if updated projects and projects are not equal and update the project currently displayed
-      if (!_.isEqual(projects, updatedProjects)) {
+      if (!_.isEqual(projectRows, updatedProjects)) {
         const sortedProjects = [...updatedProjects].sort((a, b) => a.name.localeCompare(b.name));
         setPlanningRowState((current) => ({
           ...current,
@@ -141,7 +125,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
         }));
       }
     }
-  }, [id, projectToUpdateFromState, projects, startYear, type]);
+  }, [id, projectRows, projectToUpdateFromState, startYear, type]);
 
   const resetSearchedProjectId = useCallback(() => {
     setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
@@ -176,7 +160,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
       searchedProjectId: project.id,
       expanded: true,
     }));
-  }, [search, projects]);
+  }, [search, projectRows, resetSearchedProjectId, searchedProjectId]);
 
   // Listens to searchedProjectId and scrolls the viewport to the project
   useEffect(() => {
@@ -208,7 +192,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
           handleExpand={handleExpand}
           expanded={expanded}
           {...props}
-          projectRows={projects}
+          projectRows={projectRows}
         />
         {cellData.map((c: IPlanningCell) => (
           <PlanningCell {...props} cell={c} key={c.key} />
@@ -217,7 +201,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
 
       {expanded && (
         <>
-          {projects.map((p) => (
+          {projectRows.map((p) => (
             <ProjectRow
               key={p.id}
               project={p}
