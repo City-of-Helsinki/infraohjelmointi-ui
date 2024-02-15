@@ -107,8 +107,7 @@ const useFinanceUpdates = () => {
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
-      let { coordination, planning } = financeUpdate;
-      const forcedToFrame = {...financeUpdate.forcedToFrame};
+      let { coordination, planning, forcedToFrame } = financeUpdate;
 
       // Update all planning finances
       if (planning) {
@@ -145,6 +144,11 @@ const useFinanceUpdates = () => {
 
       // Update all forced to frame finances
       if (forcedToFrame) {
+        const updatedCommonFinances = {
+          ...forcedToFrame,
+          ...syncFinances(forcedToFrame, startYear)
+        }
+        forcedToFrame = syncCoordinationFinances(updatedCommonFinances, startYear);
         const type = 'forcedToFrame';
         Promise.all([
           dispatch(updateMasterClass({ data: forcedToFrame.masterClass, type })),
