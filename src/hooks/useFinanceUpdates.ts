@@ -18,11 +18,12 @@ import {
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import { selectFinanceUpdate } from '@/reducers/eventsSlice';
-import { IFinancePlanningData } from '../interfaces/eventInterfaces'
+import { IFinanceCoordinationData, IFinancePlanningData } from '../interfaces/eventInterfaces'
 import { selectStartYear } from '@/reducers/planningSlice';
 import { syncUpdatedClassFinancesWithStartYear } from '@/utils/common';
 
-const syncFinances = (updatedFinances: IFinancePlanningData, startYear: number) => {
+const syncFinances = (finances: IFinancePlanningData | IFinanceCoordinationData, startYear: number) => {
+  const updatedFinances = {...finances};
   if (updatedFinances.class?.finances) {
     updatedFinances.class = {
       ...updatedFinances.class,
@@ -56,6 +57,29 @@ const syncFinances = (updatedFinances: IFinancePlanningData, startYear: number) 
   return updatedFinances;
 }
 
+const syncCoordinationFinances = (finances: IFinanceCoordinationData, startYear: number) => {
+  const updatedFinances = {...finances};
+  if (updatedFinances.collectiveSubLevel?.finances) {
+    updatedFinances.collectiveSubLevel = {
+      ...updatedFinances.collectiveSubLevel,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.collectiveSubLevel.finances, startYear)
+    };
+  }
+  if (updatedFinances.otherClassification?.finances) {
+    updatedFinances.otherClassification = {
+      ...updatedFinances.otherClassification,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.otherClassification.finances, startYear)
+    };
+  }
+  if (updatedFinances.otherClassificationSubLevel?.finances) {
+    updatedFinances.otherClassificationSubLevel = {
+      ...updatedFinances.otherClassificationSubLevel,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.otherClassificationSubLevel.finances, startYear)
+    };
+  }
+  return updatedFinances;
+}
+
 const useFinanceUpdates = () => {
   const dispatch = useAppDispatch();
   const financeUpdate = useAppSelector(selectFinanceUpdate);
@@ -83,8 +107,8 @@ const useFinanceUpdates = () => {
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
-      const { coordination, forcedToFrame } = financeUpdate;
-      let planning = {...financeUpdate.planning};
+      let { coordination, planning } = financeUpdate;
+      const forcedToFrame = {...financeUpdate.forcedToFrame};
 
       // Update all planning finances
       if (planning) {
@@ -101,6 +125,11 @@ const useFinanceUpdates = () => {
 
       // Update all coordination finances
       if (coordination) {
+        const updatedCommonFinances = {
+          ...coordination,
+          ...syncFinances(coordination, startYear)
+        }
+        coordination = syncCoordinationFinances(updatedCommonFinances, startYear);
         const type = 'coordination';
         Promise.all([
           dispatch(updateMasterClass({ data: coordination.masterClass, type })),
