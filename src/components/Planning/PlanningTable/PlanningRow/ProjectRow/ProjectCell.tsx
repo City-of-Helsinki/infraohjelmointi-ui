@@ -20,13 +20,11 @@ import {
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
-import _ from 'lodash';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
   selectSelectedYear,
   selectSelections,
-  selectStartYear,
 } from '@/reducers/planningSlice';
 import {
   getCellTypeUpdateRequestData,

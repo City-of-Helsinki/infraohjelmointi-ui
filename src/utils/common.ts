@@ -311,13 +311,13 @@ export const syncUpdatedProjectFinancesWithStartYear = (finances: IProjectFinanc
         const updatedFinances = {
           [convertedKey]: finances[key as keyof IProjectFinances]
         };
-        convertedFinances = Object.assign({}, convertedFinances, updatedFinances);
+        convertedFinances = { ...convertedFinances, ...updatedFinances };
       } else if (convertedNumber <= 10) {
         const convertedKey = ("preliminaryCurrentYearPlus" + convertedNumber) as keyof IProjectFinances;
         const updatedFinances = {
           [convertedKey]: finances[key as keyof IProjectFinances]
         };
-        convertedFinances = Object.assign({}, convertedFinances, updatedFinances);
+        convertedFinances = { ...convertedFinances, ...updatedFinances };
       }
     }
   }
@@ -357,7 +357,7 @@ export const syncUpdatedClassFinancesWithStartYear = (finances: IClassFinances, 
         const updatedFinances = {
           [convertedKey]: finances[key as keyof IClassFinances]
         };
-        convertedFinances = Object.assign({}, convertedFinances, updatedFinances);
+        convertedFinances = { ...convertedFinances, ...updatedFinances };
       }
     }
   }
