@@ -32,7 +32,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
     searchedProjectId: '',
   });
 
-  const { expanded, /* projects, */ searchedProjectId } = planningRowState;
+  const { expanded, searchedProjectId } = planningRowState;
 
   /**
    * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
