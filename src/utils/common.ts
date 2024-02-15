@@ -1,4 +1,4 @@
-import { IClass } from '@/interfaces/classInterfaces';
+import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IAppForms, FormValueType, IGroupForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
@@ -284,7 +284,7 @@ export const removeHoveredClassFromMonth = (month: string) => {
   }
 };
 
-export const syncUpdatedFinancesWithStartYear = (finances: IProjectFinances, startYear: number) => {
+export const syncUpdatedProjectFinancesWithStartYear = (finances: IProjectFinances, startYear: number) => {
   let convertedFinances: IProjectFinances = {
     year: startYear,
     budgetProposalCurrentYearPlus0: "0.00",
@@ -321,6 +321,45 @@ export const syncUpdatedFinancesWithStartYear = (finances: IProjectFinances, sta
       }
     }
   }
-  console.log(convertedFinances);
+  return convertedFinances;
+}
+
+export const syncUpdatedClassFinancesWithStartYear = (finances: IClassFinances, startYear: number) => {
+  const initialBudgets = {
+    plannedBudget: 0.00,
+    frameBudget: 0.00,
+    isFrameBudgetOverlap: false
+  }
+  let convertedFinances: IClassFinances = {
+    ...finances,
+    year: startYear,
+    year0: initialBudgets,
+    year1: initialBudgets,
+    year2: initialBudgets,
+    year3: initialBudgets,
+    year4: initialBudgets,
+    year5: initialBudgets,
+    year6: initialBudgets,
+    year7: initialBudgets,
+    year8: initialBudgets,
+    year9: initialBudgets,
+    year10: initialBudgets
+  }
+
+  const yearDifference = finances.year - startYear;
+
+  for (const key in finances) {
+    if (!["year", "budgetOverrunAmount", "projectBudgets"].includes(key)) {
+      const num =  parseInt(key.replace(/\D/g, ""));
+      const convertedNumber = num + yearDifference;
+      if (convertedNumber >= 0 && convertedNumber <= 10) {
+        const convertedKey = ("year" + convertedNumber) as keyof IClassFinances;
+        const updatedFinances = {
+          [convertedKey]: finances[key as keyof IClassFinances]
+        };
+        convertedFinances = Object.assign({}, convertedFinances, updatedFinances);
+      }
+    }
+  }
   return convertedFinances;
 }

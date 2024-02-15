@@ -13,7 +13,7 @@ import { selectGroupsExpanded, selectStartYear } from '@/reducers/planningSlice'
 import _ from 'lodash';
 import './styles.css';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
-import { syncUpdatedFinancesWithStartYear } from '@/utils/common';
+import { syncUpdatedProjectFinancesWithStartYear } from '@/utils/common';
 
 interface IPlanningRowState {
   expanded: boolean;
@@ -72,7 +72,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
       let pIndex = -1;
 
       if (projectToUpdate.finances && startYear != projectToUpdate.finances.year) {
-        projectToUpdate["finances"] = syncUpdatedFinancesWithStartYear(projectToUpdate.finances, startYear);
+        projectToUpdate["finances"] = syncUpdatedProjectFinancesWithStartYear(projectToUpdate.finances, startYear);
       }
 
       // If the project has become not-programmed then we filter it out and end the useEffect

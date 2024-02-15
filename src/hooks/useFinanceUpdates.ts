@@ -18,10 +18,48 @@ import {
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
 import { selectFinanceUpdate } from '@/reducers/eventsSlice';
+import { IFinancePlanningData } from '../interfaces/eventInterfaces'
+import { selectStartYear } from '@/reducers/planningSlice';
+import { syncUpdatedClassFinancesWithStartYear } from '@/utils/common';
+
+const syncFinances = (updatedFinances: IFinancePlanningData, startYear: number) => {
+  if (updatedFinances.class?.finances) {
+    updatedFinances.class = {
+      ...updatedFinances.class,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.class.finances, startYear)
+    };
+  }
+  if (updatedFinances.district?.finances) {
+    updatedFinances.district = {
+      ...updatedFinances.district,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.district.finances, startYear)
+    };
+  }
+  if (updatedFinances.group?.finances) {
+    updatedFinances.group = {
+      ...updatedFinances.group,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.group.finances, startYear)
+    };
+  }
+  if (updatedFinances.masterClass?.finances) {
+    updatedFinances.masterClass = {
+      ...updatedFinances.masterClass,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.masterClass.finances, startYear)
+    };
+  }
+  if (updatedFinances.subClass?.finances) {
+    updatedFinances.subClass = {
+      ...updatedFinances.subClass,
+      finances: syncUpdatedClassFinancesWithStartYear(updatedFinances.subClass.finances, startYear)
+    };
+  }
+  return updatedFinances;
+}
 
 const useFinanceUpdates = () => {
   const dispatch = useAppDispatch();
   const financeUpdate = useAppSelector(selectFinanceUpdate);
+  const startYear = useAppSelector(selectStartYear);
 
   // Listen to finance-update and project-update events
   useEffect(() => {
@@ -45,10 +83,12 @@ const useFinanceUpdates = () => {
   // Listen to finance-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
-      const { coordination, planning, forcedToFrame } = financeUpdate;
+      const { coordination, forcedToFrame } = financeUpdate;
+      let planning = {...financeUpdate.planning};
 
       // Update all planning finances
       if (planning) {
+        planning = syncFinances(planning, startYear);
         const type = 'planning';
         Promise.all([
           dispatch(updateMasterClass({ data: planning.masterClass, type })),
