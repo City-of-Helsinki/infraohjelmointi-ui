@@ -3,6 +3,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import {
   IConstructionProgramTableRow,
   ConstructionProgramTableRowType,
+  ReportType,
 } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { keurToMillion } from './calculations';
@@ -33,6 +34,7 @@ export const getReportRows = (
   projects: Array<IProject>,
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
+  reportType: ReportType,
 ): Array<IConstructionProgramTableRow> => {
   const { allClasses } = classes;
 
@@ -50,8 +52,39 @@ export const getReportRows = (
     type: 'class' as ConstructionProgramTableRowType,
   };
 
+  interface IYearCheck {
+    planningStart: number;
+    constructionEnd: number;
+  }
+  const checkYearRange = (props: IYearCheck ) => {
+    const nextYear = new Date().getFullYear() + 1;
+    const nextThreeYears = [nextYear, nextYear + 1, nextYear + 2];
+    const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd)) ? true : false;
+
+    if (inPlanningOrConstruction) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  let filteredProjects: IProject[];
+  
+  // Filtering rules for the projects for different reports
+  switch (reportType) {
+    case 'constructionProgram':
+      filteredProjects = projects.filter((p) => 
+        p.planningStartYear && p.constructionEndYear &&
+        checkYearRange({
+          planningStart: p.planningStartYear,
+          constructionEnd: p.constructionEndYear}));
+      break;
+    default:
+      filteredProjects = projects;
+  };
+
   const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow> =>
-    projects
+  filteredProjects
       .filter((p) => p.projectClass === id)
       .map((p) => ({
         ...initialValues,
@@ -72,7 +105,7 @@ export const getReportRows = (
 
   // Filter all classes that are included in the projects' parent classes
   const classesForProjects: Array<IConstructionProgramTableRow> = allClasses
-    .filter((ac) => projects.findIndex((p) => p.projectClass === ac.id) !== -1)
+    .filter((ac) => filteredProjects.findIndex((p) => p.projectClass === ac.id) !== -1)
     .map((c) => ({
       ...initialValues,
       name: c.name,

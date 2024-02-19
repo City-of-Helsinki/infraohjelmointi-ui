@@ -34,8 +34,8 @@ const ConstructionProgram: FC<IConstructionProgramProps> = ({ divisions, project
             title={t('report.constructionProgram.title')}
             subtitleOne={
               t('report.constructionProgram.subtitle', {
-                startYear: new Date().getFullYear(),
-                endYear: new Date().getFullYear() + 2,
+                startYear: new Date().getFullYear() + 1,
+                endYear: new Date().getFullYear() + 3,
               }) as string
             }
           />

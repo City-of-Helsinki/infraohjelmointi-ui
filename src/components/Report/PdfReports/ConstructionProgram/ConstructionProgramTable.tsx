@@ -25,8 +25,7 @@ const ConstructionProgramTable: FC<IConstructionProgramTableProps> = ({
   divisions,
   classes,
 }) => {
-  const reportRows = getReportRows(projects, classes, divisions);
-
+  const reportRows = getReportRows(projects, classes, divisions, 'constructionProgram');
   return (
     <View>
       <View style={styles.table}>
