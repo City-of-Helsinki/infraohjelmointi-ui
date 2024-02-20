@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
-import ConstructionProgram from './PdfReports/ConstructionProgram/ConstructionProgram';
 import { Page, Document } from '@react-pdf/renderer';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
@@ -12,7 +11,8 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import './pdfFonts';
 import './styles.css';
 import { ILocation } from '@/interfaces/locationInterfaces';
-
+import { PDFViewer } from '@react-pdf/renderer';
+import ReportContainer from './PdfReports/ReportContainer';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -33,7 +33,7 @@ const getPdfDocument = (
     budgetProposal: <EmptyDocument />,
     strategy: <EmptyDocument />,
     constructionProgram: (
-      <ConstructionProgram divisions={divisions} classes={classes} projects={projects} />
+      <ReportContainer data={{divisions: divisions, classes: classes, projects:projects}} reportType={'constructionProgram'}/>
     ),
     budgetBookSummary: <EmptyDocument />,
     financialStatement: <EmptyDocument />,
@@ -57,7 +57,6 @@ interface IDownloadPdfButtonProps {
  */
 const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, classes }) => {
   const { t } = useTranslation();
-
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
 
   const downloadPdf = useCallback(async () => {

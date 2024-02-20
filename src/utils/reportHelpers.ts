@@ -1,8 +1,8 @@
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
-  IConstructionProgramTableRow,
   ConstructionProgramTableRowType,
+  IConstructionProgramTableRow,
   ReportType,
 } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
@@ -35,18 +35,12 @@ export const getReportRows = (
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
   reportType: ReportType,
-): Array<IConstructionProgramTableRow> => {
+): Array<IConstructionProgramTableRow /* | put here another report type and to the switch cases too */> => {
   const { allClasses } = classes;
 
   const initialValues = {
     parent: null,
-    location: '',
     costForecast: '',
-    startAndEnd: '',
-    spentBudget: '',
-    budgetProposalCurrentYearPlus0: '',
-    budgetProposalCurrentYearPlus1: '',
-    budgetProposalCurrentYearPlus2: '',
     projects: [],
     children: [],
     type: 'class' as ConstructionProgramTableRowType,
@@ -69,7 +63,7 @@ export const getReportRows = (
   }
 
   let filteredProjects: IProject[];
-  
+
   // Filtering rules for the projects for different reports
   switch (reportType) {
     case 'constructionProgram':
@@ -78,68 +72,89 @@ export const getReportRows = (
         checkYearRange({
           planningStart: p.planningStartYear,
           constructionEnd: p.constructionEndYear}));
+          Object.assign(initialValues, {["location"]: ''})
+          Object.assign(initialValues, {["costForecast"]: ''})
+          Object.assign(initialValues, {["startAndEnd"]: ''})
+          Object.assign(initialValues, {["spentBudget"]: []})
+          Object.assign(initialValues, {["budgetProposalCurrentYearPlus0"]: ''})
+          Object.assign(initialValues, {["budgetProposalCurrentYearPlus1"]: ''})
+          Object.assign(initialValues, {["budgetProposalCurrentYearPlus2"]: ''})
       break;
     default:
       filteredProjects = projects;
   };
 
   const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow> =>
-  filteredProjects
-      .filter((p) => p.projectClass === id)
-      .map((p) => ({
-        ...initialValues,
-        name: p.name,
-        id: p.id,
-        location: getDivision(divisions, p.projectLocation),
-        costForecast: keurToMillion(p.costForecast),
-        startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
-        spentBudget: keurToMillion(p.spentBudget),
-        budgetProposalCurrentYearPlus0:
-          keurToMillion(p.finances.budgetProposalCurrentYearPlus0) ?? '',
-        budgetProposalCurrentYearPlus1:
-          keurToMillion(p.finances.budgetProposalCurrentYearPlus1) ?? '',
-        budgetProposalCurrentYearPlus2:
-          keurToMillion(p.finances.budgetProposalCurrentYearPlus2) ?? '',
-        type: 'project',
-      }));
+    filteredProjects
+        .filter((p) => p.projectClass === id)
+        .map((p) => ({
+          ...initialValues,
+          name: p.name,
+          id: p.id,
+          location: getDivision(divisions, p.projectLocation),
+          costForecast: keurToMillion(p.costForecast),
+          startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
+          spentBudget: keurToMillion(p.spentBudget),
+          budgetProposalCurrentYearPlus0:
+            keurToMillion(p.finances.budgetProposalCurrentYearPlus0) ?? '',
+          budgetProposalCurrentYearPlus1:
+            keurToMillion(p.finances.budgetProposalCurrentYearPlus1) ?? '',
+          budgetProposalCurrentYearPlus2:
+            keurToMillion(p.finances.budgetProposalCurrentYearPlus2) ?? '',
+          type: 'project',
+        }));
 
   // Filter all classes that are included in the projects' parent classes
-  const classesForProjects: Array<IConstructionProgramTableRow> = allClasses
-    .filter((ac) => filteredProjects.findIndex((p) => p.projectClass === ac.id) !== -1)
-    .map((c) => ({
-      ...initialValues,
-      name: c.name,
-      parent: c.parent,
-      id: c.id,
-      projects: getProjectsForClass(c.id),
-    }));
-
+  let classesForProjects: Array<IConstructionProgramTableRow> = [];
+  switch (reportType) {
+    case 'constructionProgram':
+      classesForProjects = allClasses
+        .filter((ac) => filteredProjects.findIndex((p) => p.projectClass === ac.id) !== -1)
+        .map((c) => ({
+          ...initialValues,
+          name: c.name,
+          parent: c.parent,
+          id: c.id,
+          projects: getProjectsForClass(c.id),
+        }));
+      break;
+  }
+  
   // Get the classes parents
-  const classParents = allClasses
-    .filter((ac) => classesForProjects.findIndex((cfp) => cfp.parent === ac.id) !== -1)
-    .map((c) => ({
-      ...initialValues,
-      id: c.id,
-      name: c.name,
-      parent: c.parent,
-      children: classesForProjects.filter((cfp) => cfp.parent === c.id),
-      projects: getProjectsForClass(c.id),
-    }));
+  let classParents: Array<IConstructionProgramTableRow> = [];
+  switch (reportType) {
+    case 'constructionProgram':
+      classParents = allClasses
+        .filter((ac) => classesForProjects.findIndex((cfp) => cfp.parent === ac.id) !== -1)
+        .map((c) => ({
+          ...initialValues,
+          id: c.id,
+          name: c.name,
+          parent: c.parent,
+          children: classesForProjects.filter((cfp) => cfp.parent === c.id),
+          projects: getProjectsForClass(c.id),
+        }));
+      break;
+  }
 
   // Get the parent classes parents
-  const classGrandParents = allClasses
-    .filter((ac) => classParents.findIndex((cp) => cp.parent === ac.id) !== -1)
-    .map((c) => ({
-      ...initialValues,
-      id: c.id,
-      name: c.name,
-      parent: c.parent,
-      children: classParents.filter((cp) => cp.parent === c.id),
-      projects: getProjectsForClass(c.id),
-    }));
-
-  const classesForProjectsWithNoParents = classesForProjects.filter((cfp) => cfp.parent === null);
-  const classParentsWithNoParents = classParents.filter((cp) => cp.parent === null);
+  let classGrandParents: Array<IConstructionProgramTableRow> = [];
+  switch (reportType) {
+    case 'constructionProgram':
+      classGrandParents = allClasses
+        .filter((ac) => classParents.findIndex((cp) => cp.parent === ac.id) !== -1)
+        .map((c) => ({
+          ...initialValues,
+          id: c.id,
+          name: c.name,
+          parent: c.parent,
+          children: classParents.filter((cp) => cp.parent === c.id),
+          projects: getProjectsForClass(c.id),
+        }));
+      break;
+  }
+  const classesForProjectsWithNoParents = classesForProjects && classesForProjects?.filter((cfp) => cfp.parent === null);
+  const classParentsWithNoParents = classParents && classParents?.filter((cp) => cp.parent === null);
 
   // We return all resulting rows that do not have parents as the first level in the array
   return [...classGrandParents, ...classParentsWithNoParents, ...classesForProjectsWithNoParents];
