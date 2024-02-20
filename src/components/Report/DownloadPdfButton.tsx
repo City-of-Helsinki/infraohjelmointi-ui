@@ -11,7 +11,6 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import './pdfFonts';
 import './styles.css';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { PDFViewer } from '@react-pdf/renderer';
 import ReportContainer from './PdfReports/ReportContainer';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that

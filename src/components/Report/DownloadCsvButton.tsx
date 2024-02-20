@@ -60,7 +60,7 @@ const getReportData = async (
     const reportRows = getReportRows(projects, classes, divisions, reportType);
 
     switch (reportType) {
-      case 'constructionProgram':
+      case 'constructionProgram': {
         // Flatten rows into one dimension
         const flattenedRows = flattenConstructionProgramTableRows(reportRows);
         // Transform them into csv rows
@@ -74,6 +74,7 @@ const getReportData = async (
           [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
           [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
         }));
+      }
         default:
           return [];
     }

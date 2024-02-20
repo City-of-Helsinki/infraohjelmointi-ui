@@ -38,7 +38,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
         return  t('report.constructionProgram.subtitle', {
             startYear: new Date().getFullYear() + 1,
             endYear: new Date().getFullYear() + 3,
-          }) as string;
+          });
       default:
         return '';
     }

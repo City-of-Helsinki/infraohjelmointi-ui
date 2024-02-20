@@ -53,7 +53,7 @@ export const getReportRows = (
   const checkYearRange = (props: IYearCheck ) => {
     const nextYear = new Date().getFullYear() + 1;
     const nextThreeYears = [nextYear, nextYear + 1, nextYear + 2];
-    const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd)) ? true : false;
+    const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
 
     if (inPlanningOrConstruction) {
       return true;
@@ -153,8 +153,8 @@ export const getReportRows = (
         }));
       break;
   }
-  const classesForProjectsWithNoParents = classesForProjects && classesForProjects?.filter((cfp) => cfp.parent === null);
-  const classParentsWithNoParents = classParents && classParents?.filter((cp) => cp.parent === null);
+  const classesForProjectsWithNoParents = classesForProjects?.filter((cfp) => cfp.parent === null);
+  const classParentsWithNoParents = classParents?.filter((cp) => cp.parent === null);
 
   // We return all resulting rows that do not have parents as the first level in the array
   return [...classGrandParents, ...classParentsWithNoParents, ...classesForProjectsWithNoParents];

@@ -35,8 +35,8 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
     <View>
       <View style={styles.table}>
         {tableHeader}
-        {reportRows && reportRows.map((r, i) => (
-          <TableRow key={i} row={r} depth={0} reportType={reportType}/>
+        {reportRows?.map((r, i) => (
+          <TableRow key={r.id ?? i} row={r} depth={0} reportType={reportType}/>
         ))}
       </View>
     </View>
