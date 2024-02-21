@@ -1,3 +1,7 @@
+import { IClassHierarchy } from "@/reducers/classSlice";
+import { ILocation } from "./locationInterfaces";
+import { IProject } from "./projectInterfaces";
+
 export const reports = [
   'budgetProposal',
   'strategy',
@@ -10,18 +14,29 @@ export type ReportType = (typeof reports)[number];
 
 export type ConstructionProgramTableRowType = 'class' | 'project';
 
-export interface IConstructionProgramTableRow {
+interface ITableRowEssentials {
   name: string;
   parent: string | null;
-  id: string;
-  location: string;
   costForecast: string;
-  startAndEnd: string;
-  spentBudget: string;
-  budgetProposalCurrentYearPlus0: string;
-  budgetProposalCurrentYearPlus1: string;
-  budgetProposalCurrentYearPlus2: string;
+}
+
+export interface IConstructionProgramTableRow extends ITableRowEssentials {
+  // These first three are should be typed depending on the report type
   children: Array<IConstructionProgramTableRow>;
   projects: Array<IConstructionProgramTableRow>;
   type: ConstructionProgramTableRowType;
+
+  id?: string;
+  location?: string;
+  startAndEnd?: string;
+  spentBudget?: string;
+  budgetProposalCurrentYearPlus0?: string;
+  budgetProposalCurrentYearPlus1?: string;
+  budgetProposalCurrentYearPlus2?: string;
+}
+
+export interface IBasicReportData {
+  divisions: Array<ILocation>;
+  projects: Array<IProject>;
+  classes: IClassHierarchy;
 }
