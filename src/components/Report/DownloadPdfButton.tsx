@@ -1,5 +1,5 @@
 import { Button, IconDownload } from 'hds-react';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
@@ -34,7 +34,9 @@ const getPdfDocument = (
     constructionProgram: (
       <ReportContainer data={{divisions: divisions, classes: classes, projects:projects}} reportType={'constructionProgram'}/>
     ),
-    budgetBookSummary: <EmptyDocument />,
+    budgetBookSummary: (
+      <ReportContainer data={{divisions: divisions, classes: classes, projects:projects}} reportType={'budgetBookSummary'}/>
+    ),
     financialStatement: <EmptyDocument />,
   };
 
@@ -85,7 +87,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram'}
+      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary'}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>

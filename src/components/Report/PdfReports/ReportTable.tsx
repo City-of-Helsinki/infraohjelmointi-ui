@@ -1,9 +1,10 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
-import ConstructionProgramTableHeader from './ConstructionProgram/ConstructionProgramTableHeader';
+import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
 import { getReportRows } from '@/utils/reportHelpers';
 import TableRow from './TableRow';
 import { IBasicReportData, ReportType } from '@/interfaces/reportInterfaces';
+import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
 
 const styles = StyleSheet.create({
   table: {
@@ -27,6 +28,8 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
     switch (reportType) {
       case 'constructionProgram':
         return <ConstructionProgramTableHeader />;
+      case 'budgetBookSummary':
+        return <BudgetBookSummaryTableHeader />;
     }
   }
   const tableHeader = getTableHeader();
