@@ -324,42 +324,26 @@ export const syncUpdatedProjectFinancesWithStartYear = (finances: IProjectFinanc
   return convertedFinances;
 }
 
-export const syncUpdatedClassFinancesWithStartYear = (finances: IClassFinances, startYear: number) => {
-  const initialBudgets = {
-    plannedBudget: 0.00,
-    frameBudget: 0.00,
-    isFrameBudgetOverlap: false
-  }
+export const syncUpdatedClassFinancesWithStartYear = (financesFromState: IClassFinances, financesFromUpdateEvent: IClassFinances, startYear: number) => {
   let convertedFinances: IClassFinances = {
-    ...finances,
+    ...financesFromState,
     year: startYear,
-    year0: initialBudgets,
-    year1: initialBudgets,
-    year2: initialBudgets,
-    year3: initialBudgets,
-    year4: initialBudgets,
-    year5: initialBudgets,
-    year6: initialBudgets,
-    year7: initialBudgets,
-    year8: initialBudgets,
-    year9: initialBudgets,
-    year10: initialBudgets
+    budgetOverrunAmount: financesFromUpdateEvent.budgetOverrunAmount,
+    projectBudgets: financesFromUpdateEvent.projectBudgets
   }
 
-  const yearDifference = finances.year - startYear;
+  const yearDifference = startYear - financesFromState.year;
+  const isWithinYearRange = (yearIndex: number) => (yearIndex >= 0 && yearIndex <=10);
+  const convertToFinanceKey = (yearIndex: number)=> ("year" + yearIndex) as keyof IClassFinances;
 
-  for (const key in finances) {
-    if (!["year", "budgetOverrunAmount", "projectBudgets"].includes(key)) {
-      const num =  parseInt(key.replace(/\D/g, ""));
-      const convertedNumber = num + yearDifference;
-      if (convertedNumber >= 0 && convertedNumber <= 10) {
-        const convertedKey = ("year" + convertedNumber) as keyof IClassFinances;
-        const updatedFinances = {
-          [convertedKey]: finances[key as keyof IClassFinances]
-        };
-        convertedFinances = { ...convertedFinances, ...updatedFinances };
-      }
+  for (let financeYearIndex = 0; financeYearIndex <= 10; financeYearIndex++) {
+    const adjustedFinanceYearIndex = financeYearIndex + yearDifference;
+    if (isWithinYearRange(adjustedFinanceYearIndex)) {
+      const sourceFinanceYearKey = convertToFinanceKey(financeYearIndex);
+      const destinationFinanceYearKey = convertToFinanceKey(adjustedFinanceYearIndex);
+      convertedFinances = { ...convertedFinances, [destinationFinanceYearKey]: financesFromUpdateEvent[sourceFinanceYearKey] };
     }
   }
+
   return convertedFinances;
 }
