@@ -5,7 +5,7 @@ import PlanningCell from './PlanningCell';
 import PlanningHead from './PlanningHead';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import ProjectRow from './ProjectRow/ProjectRow';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
@@ -20,9 +20,24 @@ interface IPlanningRowState {
   searchedProjectId: string;
 }
 
+const initalProjectFinances: IProjectFinances = {
+  year: 0,
+  budgetProposalCurrentYearPlus0: null,
+  budgetProposalCurrentYearPlus1: null,
+  budgetProposalCurrentYearPlus2: null,
+  preliminaryCurrentYearPlus3: null,
+  preliminaryCurrentYearPlus4: null,
+  preliminaryCurrentYearPlus5: null,
+  preliminaryCurrentYearPlus6: null,
+  preliminaryCurrentYearPlus7: null,
+  preliminaryCurrentYearPlus8: null,
+  preliminaryCurrentYearPlus9: null,
+  preliminaryCurrentYearPlus10: null
+}
+
 const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost> }> = (props) => {
   const { defaultExpanded, projectRows, cells, id, type, sapCosts, children } = props;
-  const projectToUpdateFromState = useAppSelector(selectProjectUpdate)?.project;
+  const projectUpdateEventData = useAppSelector(selectProjectUpdate)?.project;
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const startYear = useAppSelector(selectStartYear);
   const { search } = useLocation();
@@ -56,25 +71,27 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
   // usePlanningRows-hook sets a projectToUpdate when the project-update event is triggered,
   // this useEffect updates the project in the view with the projecToUpdate
   useEffect(() => {
-    if (!projectToUpdateFromState)
+    if (!projectUpdateEventData)
       return;
 
-    const projectToUpdate: IProject = {...projectToUpdateFromState};
+    const projectUpdate: IProject = {...projectUpdateEventData};
 
-    if (projectToUpdate) {
+    if (projectUpdate) {
       let inRow = false;
       let pIndex = -1;
 
-      if (projectToUpdate.finances && startYear != projectToUpdate.finances.year) {
-        projectToUpdate["finances"] = syncUpdatedProjectFinancesWithStartYear(projectToUpdate.finances, startYear);
+      if (projectUpdate.finances && startYear != projectUpdate.finances.year) {
+        const existingProject = projectRows.find(({ id }) => id === projectUpdate.id);
+        const projectToUpdate = existingProject?.finances ?? initalProjectFinances;
+        projectUpdate["finances"] = syncUpdatedProjectFinancesWithStartYear(projectToUpdate, projectUpdate.finances, startYear);
       }
 
       // We add the project returned by the project-update event to a new "updatedProjects" list
       const updatedProjects = projectRows.map((p, index) => {
-        if (p.id === projectToUpdate.id) {
+        if (p.id === projectUpdate.id) {
           inRow = true;
           pIndex = index;
-          return projectToUpdate;
+          return projectUpdate;
         }
         return p;
       });
@@ -82,34 +99,34 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
       // projectToUpdate does not already exist in this planning row if updatedProjects is the same check if project belongs to this row type
       if (!inRow) {
         const isGroupsProject =
-          type === 'group' && projectToUpdate.projectGroup && id === projectToUpdate.projectGroup;
+          type === 'group' && projectUpdate.projectGroup && id === projectUpdate.projectGroup;
 
         const isLocationsProject =
-          !projectToUpdate.projectGroup &&
+          !projectUpdate.projectGroup &&
           (type === 'district' || type === 'division') &&
-          id === projectToUpdate.projectLocation;
+          id === projectUpdate.projectLocation;
 
         const isClassesProject =
-          !projectToUpdate.projectLocation &&
-          !projectToUpdate.projectGroup &&
+          !projectUpdate.projectLocation &&
+          !projectUpdate.projectGroup &&
           type.toLowerCase().includes('class') &&
-          id === projectToUpdate.projectClass;
+          id === projectUpdate.projectClass;
 
         if (isGroupsProject || isLocationsProject || isClassesProject) {
-          updatedProjects.push(projectToUpdate);
+          updatedProjects.push(projectUpdate);
         }
       }
       // updated project is in the current planning row check if the update has caused it to be removed from the row
       else if (
         (type === 'group' &&
           projectRows[pIndex].projectGroup === id &&
-          !projectToUpdate.projectGroup) ||
+          !projectUpdate.projectGroup) ||
         ((type === 'district' || type === 'division') &&
-          projectToUpdate.projectGroup &&
+          projectUpdate.projectGroup &&
           projectRows[pIndex].projectLocation === id) ||
         (type.toLowerCase().includes('class') &&
-          projectToUpdate.projectGroup &&
-          projectToUpdate.projectLocation &&
+          projectUpdate.projectGroup &&
+          projectUpdate.projectLocation &&
           projectRows[pIndex].projectClass === id)
       ) {
         updatedProjects.splice(pIndex, 1);
@@ -125,7 +142,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
         }));
       }
     }
-  }, [id, projectRows, projectToUpdateFromState, startYear, type]);
+  }, [id, projectRows, projectUpdateEventData, startYear, type]);
 
   const resetSearchedProjectId = useCallback(() => {
     setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));

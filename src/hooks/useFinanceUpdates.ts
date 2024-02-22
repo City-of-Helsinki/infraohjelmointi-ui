@@ -5,7 +5,6 @@ import {
   updateCollectiveSubLevel,
   updateOtherClassification,
   updateOtherClassificationSubLevel,
-  selectAllPlanningClasses,
   selectBatchedPlanningClasses,
   IClassHierarchy,
   selectBatchedCoordinationClasses,
@@ -52,41 +51,9 @@ const initialClassFinances: IClassFinances = {
   year10: initialClassBudgets
 }
 
-const initialClassValues: IClass = {
-  id: '',
-  name: '',
-  path: '',
-  forCoordinatorOnly: false,
-  relatedTo: null,
-  parent: null,
-  finances: initialClassFinances
-}
-
-const initialGroupValues: IGroup = {
-  id: "",
-  name: "",
-  location: null,
-  classRelation: null,
-  locationRelation: null,
-  finances: initialClassFinances
-}
-
-const initialPlanningFinanceValues: IFinancePlanningData = {
-  masterClass: initialClassValues,
-  class: initialClassValues,
-  subClass: initialClassValues,
-  district: {
-    ...initialClassValues,
-    parentClass: null
-  },
-  group: initialGroupValues
-}
-
-const initialCoordinationFinanceValues: IFinanceCoordinationData = {
-  ...initialPlanningFinanceValues,
-  collectiveSubLevel: null,
-  otherClassification: null,
-  otherClassificationSubLevel: null
+const initialLocationFinances = {
+  ...initialClassFinances,
+  parentClass: null
 }
 
 const getExistingClassById = (classes: Array<IClass>, classId: string) => classes.find(({ id }) => id === classId);
@@ -94,22 +61,22 @@ const getExistingGroupById = (classes: Array<IGroup>, classId: string) => classe
 
 const syncClassFinances = (classDataFromState: IClassHierarchy, financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData, startYear: number) => {
   const updatedFinances = {...financesFromUpdateEvent};
-  if (updatedFinances.class?.finances && initialPlanningFinanceValues.class) {
-    const financeDataToUpdate = getExistingClassById(classDataFromState.classes, updatedFinances.class.id)?.finances ?? initialPlanningFinanceValues.class.finances;
+  if (updatedFinances.class?.finances) {
+    const financeDataToUpdate = getExistingClassById(classDataFromState.classes, updatedFinances.class.id)?.finances ?? initialClassFinances;
     updatedFinances.class = {
       ...updatedFinances.class,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.class.finances, startYear)
     };
   }
-  if (updatedFinances.masterClass?.finances && initialPlanningFinanceValues.masterClass) {
-    const financeDataToUpdate = getExistingClassById(classDataFromState.masterClasses, updatedFinances.masterClass.id)?.finances ?? initialPlanningFinanceValues.masterClass.finances;
+  if (updatedFinances.masterClass?.finances) {
+    const financeDataToUpdate = getExistingClassById(classDataFromState.masterClasses, updatedFinances.masterClass.id)?.finances ?? initialClassFinances;
     updatedFinances.masterClass = {
       ...updatedFinances.masterClass,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.masterClass.finances, startYear)
     };
   }
-  if (updatedFinances.subClass?.finances && initialPlanningFinanceValues.subClass) {
-    const financeDataToUpdate = getExistingClassById(classDataFromState.subClasses, updatedFinances.subClass.id)?.finances ?? initialPlanningFinanceValues.subClass.finances;
+  if (updatedFinances.subClass?.finances) {
+    const financeDataToUpdate = getExistingClassById(classDataFromState.subClasses, updatedFinances.subClass.id)?.finances ?? initialClassFinances;
     updatedFinances.subClass = {
       ...updatedFinances.subClass,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.subClass.finances, startYear)
@@ -120,8 +87,8 @@ const syncClassFinances = (classDataFromState: IClassHierarchy, financesFromUpda
 
 const syncLocationFinances = (locationDataFromState: ILocationHierarchy | Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>, financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData, startYear: number) => {
   const updatedFinances = {...financesFromUpdateEvent};
-  if (updatedFinances.district?.finances && initialPlanningFinanceValues.district) {
-    const financeDataToUpdate = getExistingClassById(locationDataFromState.districts, updatedFinances.district.id)?.finances ?? initialPlanningFinanceValues.district.finances;
+  if (updatedFinances.district?.finances) {
+    const financeDataToUpdate = getExistingClassById(locationDataFromState.districts, updatedFinances.district.id)?.finances ?? initialLocationFinances;
     updatedFinances.district = {
       ...updatedFinances.district,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.district.finances, startYear)
@@ -132,8 +99,8 @@ const syncLocationFinances = (locationDataFromState: ILocationHierarchy | Omit<I
 
 const syncGroupFinances = (groupDataFromState: IGroup[], financesFromUpdateEvent: IFinancePlanningData | IFinanceCoordinationData, startYear: number) => {
   const updatedFinances = {...financesFromUpdateEvent};
-  if (updatedFinances.group?.finances && initialPlanningFinanceValues.group) {
-    const financeDataToUpdate = getExistingGroupById(groupDataFromState, updatedFinances.group.id)?.finances ?? initialPlanningFinanceValues.group.finances;
+  if (updatedFinances.group?.finances) {
+    const financeDataToUpdate = getExistingGroupById(groupDataFromState, updatedFinances.group.id)?.finances ?? initialClassFinances;
     updatedFinances.group = {
       ...updatedFinances.group,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.group.finances, startYear)
@@ -144,22 +111,22 @@ const syncGroupFinances = (groupDataFromState: IGroup[], financesFromUpdateEvent
 
 const syncCoordinationFinances = (financesFromState: ICoordinatorClassHierarchy, financesFromUpdateEvent: IFinanceCoordinationData, startYear: number) => {
   const updatedFinances = {...financesFromUpdateEvent};
-  if (updatedFinances.collectiveSubLevel?.finances && initialCoordinationFinanceValues.collectiveSubLevel) {
-    const financeDataToUpdate = getExistingClassById(financesFromState.collectiveSubLevels, updatedFinances.collectiveSubLevel.id)?.finances ?? initialCoordinationFinanceValues.collectiveSubLevel.finances;
+  if (updatedFinances.collectiveSubLevel?.finances) {
+    const financeDataToUpdate = getExistingClassById(financesFromState.collectiveSubLevels, updatedFinances.collectiveSubLevel.id)?.finances ?? initialClassFinances;
     updatedFinances.collectiveSubLevel = {
       ...updatedFinances.collectiveSubLevel,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.collectiveSubLevel.finances, startYear)
     };
   }
-  if (updatedFinances.otherClassification?.finances && initialCoordinationFinanceValues.otherClassification) {
-    const financeDataToUpdate = getExistingClassById(financesFromState.otherClassifications, updatedFinances.otherClassification.id)?.finances ?? initialCoordinationFinanceValues.otherClassification.finances;
+  if (updatedFinances.otherClassification?.finances) {
+    const financeDataToUpdate = getExistingClassById(financesFromState.otherClassifications, updatedFinances.otherClassification.id)?.finances ?? initialClassFinances;
     updatedFinances.otherClassification = {
       ...updatedFinances.otherClassification,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.otherClassification.finances, startYear)
     };
   }
-  if (updatedFinances.otherClassificationSubLevel?.finances && initialCoordinationFinanceValues.otherClassificationSubLevel) {
-    const financeDataToUpdate = getExistingClassById(financesFromState.otherClassificationSubLevels, updatedFinances.otherClassificationSubLevel.id)?.finances ?? initialCoordinationFinanceValues.otherClassificationSubLevel.finances;
+  if (updatedFinances.otherClassificationSubLevel?.finances) {
+    const financeDataToUpdate = getExistingClassById(financesFromState.otherClassificationSubLevels, updatedFinances.otherClassificationSubLevel.id)?.finances ?? initialClassFinances;
     updatedFinances.otherClassificationSubLevel = {
       ...updatedFinances.otherClassificationSubLevel,
       finances: syncUpdatedClassFinancesWithStartYear(financeDataToUpdate, updatedFinances.otherClassificationSubLevel.finances, startYear)

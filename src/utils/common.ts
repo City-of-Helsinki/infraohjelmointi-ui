@@ -284,46 +284,50 @@ export const removeHoveredClassFromMonth = (month: string) => {
   }
 };
 
-export const syncUpdatedProjectFinancesWithStartYear = (finances: IProjectFinances, startYear: number) => {
+const isWithinYearRange = (yearIndex: number) => (yearIndex >= 0 && yearIndex <=10);
+
+/**
+ * This function is used to set the finance data from a project-update event to correct years to state. It's needed
+ * because the startYear of the finance data from the update event is different than what the user has selected
+ * when another user has modified project budgets after moving the timeline and triggers the update event. The function
+ * loops through 10 finance years, cause currently the backend returns 10 years of finance data at a time.
+ * 
+ * @param financesFromState finance data that already exists in the state and that needs to be modified
+ * @param financesFromUpdateEvent finance data from the update event that is used to update the data in state
+ * @param startYear the start year of the timeline that the user has selected
+ * @returns an IProjectFinances object with the updated finance data
+ */
+export const syncUpdatedProjectFinancesWithStartYear = (financesFromState: IProjectFinances, financesFromUpdateEvent: IProjectFinances, startYear: number) => {
   let convertedFinances: IProjectFinances = {
-    year: startYear,
-    budgetProposalCurrentYearPlus0: "0.00",
-    budgetProposalCurrentYearPlus1: "0.00",
-    budgetProposalCurrentYearPlus2: "0.00",
-    preliminaryCurrentYearPlus3: "0.00",
-    preliminaryCurrentYearPlus4: "0.00",
-    preliminaryCurrentYearPlus5: "0.00",
-    preliminaryCurrentYearPlus6: "0.00",
-    preliminaryCurrentYearPlus7: "0.00",
-    preliminaryCurrentYearPlus8: "0.00",
-    preliminaryCurrentYearPlus9: "0.00",
-    preliminaryCurrentYearPlus10: "0.00"
+    ...financesFromState,
+    year: startYear
   }
 
-  const yearDifference = finances.year - startYear;
+  const yearDifference = financesFromUpdateEvent.year - startYear;
+  const convertToFinanceKey = (yearIndex: number) => yearIndex <= 3 ? ("budgetProposalCurrentYearPlus" + yearIndex) as keyof IProjectFinances : ("preliminaryCurrentYearPlus" + yearIndex) as keyof IProjectFinances;
 
-  for (const key in finances) {
-    if (key != "year") {
-      const num =  parseInt(key.replace(/\D/g, ""));
-      const convertedNumber = num + yearDifference;
-      if (convertedNumber >= 0 && convertedNumber < 3) {
-        const convertedKey = ("budgetProposalCurrentYearPlus" + convertedNumber) as keyof IProjectFinances;
-        const updatedFinances = {
-          [convertedKey]: finances[key as keyof IProjectFinances]
-        };
-        convertedFinances = { ...convertedFinances, ...updatedFinances };
-      } else if (convertedNumber <= 10) {
-        const convertedKey = ("preliminaryCurrentYearPlus" + convertedNumber) as keyof IProjectFinances;
-        const updatedFinances = {
-          [convertedKey]: finances[key as keyof IProjectFinances]
-        };
-        convertedFinances = { ...convertedFinances, ...updatedFinances };
-      }
+  for (let financeYearIndex = 0; financeYearIndex <= 10; financeYearIndex++) {
+    const adjustedFinanceYearIndex = financeYearIndex + yearDifference;
+    if (isWithinYearRange(adjustedFinanceYearIndex)) {
+      const sourceFinanceYearKey = convertToFinanceKey(financeYearIndex);
+      const destinationFinanceYearKey = convertToFinanceKey(adjustedFinanceYearIndex);
+      convertedFinances = { ...convertedFinances, [destinationFinanceYearKey]: financesFromUpdateEvent[sourceFinanceYearKey] };
     }
   }
   return convertedFinances;
 }
 
+/**
+ * This function is used to set the finance data from a finance-update event to correct years to state. It's needed
+ * because the startYear of the finance data from the update event is different than what the user has selected
+ * when another user has modified project or class or group budgets after moving the timeline and triggers the update event.
+ * The function loops through 10 finance years, cause currently the backend returns 10 years of finance data at a time.
+ * 
+ * @param financesFromState finance data that already exists in the state and that needs to be modified
+ * @param financesFromUpdateEvent finance data from the update event that is used to update the data in state
+ * @param startYear the start year of the timeline that the user has selected
+ * @returns an IClassFinances object with the updated finance data
+ */
 export const syncUpdatedClassFinancesWithStartYear = (financesFromState: IClassFinances, financesFromUpdateEvent: IClassFinances, startYear: number) => {
   let convertedFinances: IClassFinances = {
     ...financesFromState,
@@ -333,8 +337,7 @@ export const syncUpdatedClassFinancesWithStartYear = (financesFromState: IClassF
   }
 
   const yearDifference = startYear - financesFromState.year;
-  const isWithinYearRange = (yearIndex: number) => (yearIndex >= 0 && yearIndex <=10);
-  const convertToFinanceKey = (yearIndex: number)=> ("year" + yearIndex) as keyof IClassFinances;
+  const convertToFinanceKey = (yearIndex: number) => ("year" + yearIndex) as keyof IClassFinances;
 
   for (let financeYearIndex = 0; financeYearIndex <= 10; financeYearIndex++) {
     const adjustedFinanceYearIndex = financeYearIndex + yearDifference;
