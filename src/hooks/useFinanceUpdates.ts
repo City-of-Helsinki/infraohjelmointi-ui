@@ -212,7 +212,7 @@ const useFinanceUpdates = () => {
         forcedToFrame = {...forcedToFrame, ...syncClassFinances(forcedToFrameClassDataFromState, forcedToFrame, startYear)};
         forcedToFrame = {...forcedToFrame, ...syncLocationFinances(forcedToFrameLocationDataFromState, forcedToFrame, startYear)};
         forcedToFrame = {...forcedToFrame, ...syncGroupFinances(coordinationGroupDataFromState, forcedToFrame, startYear)};
-        forcedToFrame = syncCoordinationFinances(forcedToFrameClassDataFromState, coordination, startYear);
+        forcedToFrame = syncCoordinationFinances(forcedToFrameClassDataFromState, forcedToFrame, startYear);
         const type = 'forcedToFrame';
         Promise.all([
           dispatch(updateMasterClass({ data: forcedToFrame.masterClass, type })),
