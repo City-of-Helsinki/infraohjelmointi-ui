@@ -132,7 +132,7 @@ const App: FC = () => {
       }
       dispatch(getSapCostsThunk(startYear));
     }
-  }, [startYear, user]);
+  }, [user, startYear]);
 
   return (
     <div>

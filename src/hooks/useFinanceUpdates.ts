@@ -225,7 +225,7 @@ const useFinanceUpdates = () => {
         ]).catch((e) => console.log('Error updating forced to frame finances: ', e));
       }
     }
-  }, [coordinationClassDataFromState, coordinationGroupDataFromState, coordinationLocationDataFromState, dispatch, financeUpdate, forcedToFrameClassDataFromState, forcedToFrameLocationDataFromState, plannigGroupsDataFromState, planningClassDataFromState, planningLocationDataFromState, startYear]);
+  }, [financeUpdate]);
 };
 
 export default useFinanceUpdates;
