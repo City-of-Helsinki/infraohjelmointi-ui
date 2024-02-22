@@ -17,6 +17,7 @@ import { syncUpdatedProjectFinancesWithStartYear } from '@/utils/common';
 
 interface IPlanningRowState {
   expanded: boolean;
+  projects: IProject[];
   searchedProjectId: string;
 }
 
@@ -44,10 +45,11 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
 
   const [planningRowState, setPlanningRowState] = useState<IPlanningRowState>({
     expanded: defaultExpanded,
+    projects: [],
     searchedProjectId: '',
   });
 
-  const { expanded, searchedProjectId } = planningRowState;
+  const { expanded, projects, searchedProjectId } = planningRowState;
 
   /**
    * Adds the currently clicked items id to the search params, expand the row and navigate to the new URL
@@ -67,6 +69,12 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
       setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
     }
   }, [type, groupsExpanded]);
+
+  // Adds the initial value to projects and modifies the value whenever projectRows changes
+  useEffect(() => {
+    setPlanningRowState((current) => ({ ...current, projects: projectRows}));
+  }, [projectRows]);
+
 
   // usePlanningRows-hook sets a projectToUpdate when the project-update event is triggered,
   // this useEffect updates the project in the view with the projecToUpdate
@@ -209,7 +217,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
           handleExpand={handleExpand}
           expanded={expanded}
           {...props}
-          projectRows={projectRows}
+          projectRows={projects}
         />
         {cellData.map((c: IPlanningCell) => (
           <PlanningCell {...props} cell={c} key={c.key} />
@@ -218,7 +226,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
 
       {expanded && (
         <>
-          {projectRows.map((p) => (
+          {projects.map((p) => (
             <ProjectRow
               key={p.id}
               project={p}
