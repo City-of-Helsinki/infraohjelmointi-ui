@@ -8,7 +8,6 @@ import ProjectRow from './ProjectRow/ProjectRow';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/common';
 import { selectGroupsExpanded } from '@/reducers/planningSlice';
-import _ from 'lodash';
 import './styles.css';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
