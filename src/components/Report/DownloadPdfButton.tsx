@@ -2,10 +2,10 @@ import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
-import { pdf } from '@react-pdf/renderer';
+import { PDFViewer, pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
-import { IClassHierarchy } from '@/reducers/classSlice';
+import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { IProject } from '@/interfaces/projectInterfaces';
 import './pdfFonts';
@@ -32,10 +32,10 @@ const getPdfDocument = (
     budgetProposal: <EmptyDocument />,
     strategy: <EmptyDocument />,
     constructionProgram: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects:projects}} reportType={'constructionProgram'}/>
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'constructionProgram'}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects:projects}} reportType={'budgetBookSummary'}/>
+      <ReportContainer data={{divisions: divisions, classes: classes, projects:[]}} reportType={'budgetBookSummary'}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -49,6 +49,7 @@ interface IDownloadPdfButtonProps {
   type: ReportType;
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
+  forcedToFrameClasses: ICoordinatorClassHierarchy;
 }
 
 /**
@@ -56,10 +57,10 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, classes }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
   const { t } = useTranslation();
+  const [result, setResult] = useState<any>();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
-
   const downloadPdf = useCallback(async () => {
     try {
       const year = new Date().getFullYear();
@@ -72,8 +73,20 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
         year,
       });
 
-      if (res.results.length > 0) {
-        const document = getPdfDocument(type, divisions, classes, res.results);
+      let document: JSX.Element | undefined = undefined;
+      switch(type) {
+        case 'budgetBookSummary':
+          document = getPdfDocument(type, divisions, forcedToFrameClasses, []);
+          break;
+        default: {
+          if (res.results.length > 0) {
+            setResult(res.results);
+            document = getPdfDocument(type, divisions, classes, res.results);
+          }
+        }
+      }
+        
+      if (document !== undefined) {
         const documentBlob = await pdf(document).toBlob();
 
         saveAs(documentBlob, `${documentName}.pdf`);
@@ -83,14 +96,32 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
     }
   }, [classes, documentName, divisions, type]);
 
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (result && result.length) {
+      console.log("result: ", result);
+      setShow(true);
+    }
+  }, [result])
+
   return (
-    <Button
-      iconLeft={downloadIcon}
-      onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary'}
-    >
-      {t('downloadPdf', { name: documentName })}
-    </Button>
+    <>
+      <Button
+        iconLeft={downloadIcon}
+        onClick={() => downloadPdf()}
+        disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary'}
+      >
+        {t('downloadPdf', { name: documentName })}
+      </Button>
+      { type == 'budgetBookSummary' && show && 
+        <div>
+          <PDFViewer style={{height: '800px', width: '900px'}}>
+            <ReportContainer data={{divisions: divisions, classes: classes, projects:result}} reportType={'budgetBookSummary'} />
+          </PDFViewer>
+        </div>
+      }
+    </>
   );
 };
 

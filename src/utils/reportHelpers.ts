@@ -2,11 +2,13 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   ConstructionProgramTableRowType,
+  IBudgetBookSummaryTableRow,
   IConstructionProgramTableRow,
   ReportType,
 } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { keurToMillion } from './calculations';
+import { IClass } from '@/interfaces/classInterfaces';
 
 /**
  * Gets the division name and removes the number infront of it.
@@ -31,16 +33,15 @@ export const getDivision = (divisions?: Array<ILocation>, projectLocation?: stri
  * @returns
  */
 export const getReportRows = (
-  projects: Array<IProject>,
+  reportType: ReportType,
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
-  reportType: ReportType,
-): Array<IConstructionProgramTableRow /* | put here another report type and to the switch cases too */> => {
+  projects: Array<IProject>,
+): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow/* | put here another report type and to the switch cases too */> => {
   const { allClasses } = classes;
 
   const initialValues = {
     parent: null,
-    costForecast: '',
     projects: [],
     children: [],
     type: 'class' as ConstructionProgramTableRowType,
@@ -50,6 +51,7 @@ export const getReportRows = (
     planningStart: number;
     constructionEnd: number;
   }
+
   const checkYearRange = (props: IYearCheck ) => {
     const nextYear = new Date().getFullYear() + 1;
     const nextThreeYears = [nextYear, nextYear + 1, nextYear + 2];
@@ -84,8 +86,28 @@ export const getReportRows = (
       filteredProjects = projects;
   };
 
-  const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow> =>
-    filteredProjects
+  const getBudgetBookSummaryProperties = (c: IClass) => {
+    return {
+      usage: '',
+      budgetEstimation: String(c.finances.year0.plannedBudget),
+      budgetEstimationSuggestion: String(c.finances.year1.plannedBudget),
+      budgetPlanSuggestion1: String(c.finances.year2.plannedBudget),
+      budgetPlanSuggestion2: String(c.finances.year3.plannedBudget),
+      initial1: String(c.finances.year4.plannedBudget),
+      initial2: String(c.finances.year5.plannedBudget),
+      initial3: String(c.finances.year6.plannedBudget),
+      initial4: String(c.finances.year7.plannedBudget),
+      initial5: String(c.finances.year8.plannedBudget),
+      initial6: String(c.finances.year9.plannedBudget),
+      initial7: String(c.finances.year10.plannedBudget),
+      type: 'class',
+    }
+  }
+
+  const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> => {
+    switch (reportType) {
+      case 'constructionProgram':
+        return filteredProjects
         .filter((p) => p.projectClass === id)
         .map((p) => ({
           ...initialValues,
@@ -103,9 +125,13 @@ export const getReportRows = (
             keurToMillion(p.finances.budgetProposalCurrentYearPlus2) ?? '',
           type: 'project',
         }));
+        default:
+          return [];
+    }
+  }
 
   // Filter all classes that are included in the projects' parent classes
-  let classesForProjects: Array<IConstructionProgramTableRow> = [];
+  let classesForProjects: Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> = [];
   switch (reportType) {
     case 'constructionProgram':
       classesForProjects = allClasses
@@ -118,27 +144,57 @@ export const getReportRows = (
           projects: getProjectsForClass(c.id),
         }));
       break;
-  }
-  
-  // Get the classes parents
-  let classParents: Array<IConstructionProgramTableRow> = [];
-  switch (reportType) {
-    case 'constructionProgram':
-      classParents = allClasses
-        .filter((ac) => classesForProjects.findIndex((cfp) => cfp.parent === ac.id) !== -1)
-        .map((c) => ({
+    case 'budgetBookSummary':
+      classesForProjects = allClasses
+        .map((c: IClass) => ({
           ...initialValues,
-          id: c.id,
           name: c.name,
           parent: c.parent,
-          children: classesForProjects.filter((cfp) => cfp.parent === c.id),
-          projects: getProjectsForClass(c.id),
+          id: c.id,
+          financeProperties: getBudgetBookSummaryProperties(c),
         }));
       break;
   }
 
+    // Get the classes parents
+    let classParents: Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> = [];
+    switch (reportType) {
+      case 'constructionProgram':
+        classParents = allClasses
+          .filter((ac) => classesForProjects.findIndex((cfp) => cfp.parent === ac.id) !== -1)
+          .map((c) => ({
+            ...initialValues,
+            id: c.id,
+            name: c.name,
+            parent: c.parent,
+            children: classesForProjects.filter((cfp) => cfp.parent === c.id),
+            projects: getProjectsForClass(c.id),
+          }));
+        break;
+      case 'budgetBookSummary': {
+        const helperClassGrandParents = allClasses
+        .filter((ac) => ac.parent === null)
+        .map((c) => ({
+          ...initialValues,
+          id: c.id,
+        }));
+
+        classParents = allClasses
+          .filter((ac) => helperClassGrandParents.findIndex((cdp) => cdp.id === ac.parent) !== -1)
+          .map((c) => ({
+            ...initialValues,
+            id: c.id,
+            name: c.name,
+            parent: c.parent,
+            children: classesForProjects.filter((cfp) => cfp.parent === c.id),
+            financeProperties: getBudgetBookSummaryProperties(c),
+          }));
+        break;
+      }
+    }
+
   // Get the parent classes parents
-  let classGrandParents: Array<IConstructionProgramTableRow> = [];
+  let classGrandParents: Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> = [];
   switch (reportType) {
     case 'constructionProgram':
       classGrandParents = allClasses
@@ -150,6 +206,18 @@ export const getReportRows = (
           parent: c.parent,
           children: classParents.filter((cp) => cp.parent === c.id),
           projects: getProjectsForClass(c.id),
+        }));
+      break;
+    case 'budgetBookSummary':
+      classGrandParents = allClasses
+        .filter((ac) => ac.parent === null)
+        .map((c) => ({
+          ...initialValues,
+          id: c.id,
+          name: c.name,
+          parent: c.parent,
+          children: classParents.filter((cp) => cp.parent === c.id),
+          financeProperties: getBudgetBookSummaryProperties(c),
         }));
       break;
   }

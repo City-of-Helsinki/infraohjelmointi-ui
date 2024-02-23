@@ -30,8 +30,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
         return t('report.constructionProgram.title');
       case 'budgetBookSummary':
         return t('report.budgetBookSummary.title', {
-          startYear: new Date().getFullYear(),
-          endYear: new Date().getFullYear() + 9,
+          startYear: new Date().getFullYear() + 1,
+          endYear: new Date().getFullYear() + 10,
         });
       default:
         return '';

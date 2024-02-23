@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   targetCell: {
-    width: '19%',
+    width: '26%',
     paddingLeft: '8px',
   },
   narrowerColumns: {
@@ -31,44 +31,44 @@ const styles = StyleSheet.create({
 
 const ConstructionProgramTableHeader = () => {
   const { t } = useTranslation();
-  const currentPlusYears = [3, 4, 5, 6, 7, 8, 9];
+  const currentPlusYears = [5, 6, 7, 8, 9, 10];
   return (
     <View style={styles.tableHeader}>
         <Text style={styles.targetCell}>{t('target')}</Text>
         <View style={styles.narrowerColumns}>
             <Text>{t('usage')}</Text>
             <Text>{t('usageSV')}</Text>
-            <Text>{new Date().getFullYear() - 3}</Text>
-            <Text>{t('millionEuro')}</Text>
-        </View>
-        <View style={styles.narrowerColumns}>
-            <Text>{t('TA')}</Text>
-            <Text>{t('taSV')}</Text>
-            <Text>{new Date().getFullYear() - 2}</Text>
-            <Text>{t('millionEuro')}</Text>
-        </View>
-        <View style={styles.narrowerColumns}>
-            <Text>{t('TA')}</Text>
-            <Text>{t('taSV')}</Text>
             <Text>{new Date().getFullYear() - 1}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
-            <Text>{t('TS')}</Text>
-            <Text>{t('tsSV')}</Text>
-            <Text>{new Date().getFullYear()}</Text>
+            <Text>{t('TA')}</Text>
+            <Text>{t('taSV')}</Text>
+            <Text>{new Date().getFullYear() }</Text>
+            <Text>{t('millionEuro')}</Text>
+        </View>
+        <View style={styles.narrowerColumns}>
+            <Text>{t('TA')}</Text>
+            <Text>{t('taSV')}</Text>
+            <Text>{new Date().getFullYear() + 1}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TS')}</Text>
             <Text>{t('tsSV')}</Text>
-            <Text>{new Date().getFullYear() + 1}</Text>
+            <Text>{new Date().getFullYear() +2 }</Text>
+            <Text>{t('millionEuro')}</Text>
+        </View>
+        <View style={styles.narrowerColumns}>
+            <Text>{t('TS')}</Text>
+            <Text>{t('tsSV')}</Text>
+            <Text>{new Date().getFullYear() + 3}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.widerColumns}>
             <Text>{t('initial')}</Text>
             <Text>{t('initialSV')}</Text>
-            <Text>{new Date().getFullYear() + 2}</Text>
+            <Text>{new Date().getFullYear() + 4}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         {currentPlusYears.map((year, index) => {

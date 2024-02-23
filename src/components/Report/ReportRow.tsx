@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportType } from '@/interfaces/reportInterfaces';
-import { IClassHierarchy } from '@/reducers/classSlice';
+import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import DownloadPdfButton from './DownloadPdfButton';
 import DownloadCsvButton from './DownloadCsvButton';
@@ -13,9 +13,10 @@ interface IReportRowProps {
   // We have to pass classes and locations as props to the react-pdf documents, since they are not wrapped in the redux context
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
+  forcedToFrameClasses: ICoordinatorClassHierarchy;
 }
 
-const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes }) => {
+const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
   const { t } = useTranslation();
 
   return (
@@ -25,7 +26,7 @@ const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes }) => {
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} divisions={divisions} classes={classes} />
+      <DownloadPdfButton type={type} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses}/>
       {/* download csv button */}
       <DownloadCsvButton type={type} divisions={divisions} classes={classes} />
     </div>

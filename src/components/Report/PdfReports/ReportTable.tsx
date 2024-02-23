@@ -22,8 +22,7 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   reportType,
   data
 }) => {
-  const reportRows = getReportRows(data.projects, data.classes, data.divisions, reportType);
-
+  const reportRows = getReportRows(reportType, data.classes, data.divisions, data.projects);
   const getTableHeader = () => {
     switch (reportType) {
       case 'constructionProgram':
