@@ -12,6 +12,7 @@ export const mockUser: { data: IUser } = {
     date_joined: '2023-09-05T15:07:29.432900+03:00',
     department_name: null,
     uuid: 'test-user-id',
+    id: 2,
     ad_groups: [
       {
         id: '31f86f09-b674-4c1d-81db-6d5fe2e587f9',

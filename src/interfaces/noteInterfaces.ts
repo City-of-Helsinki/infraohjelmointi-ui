@@ -25,3 +25,15 @@ interface INotePerson {
   first_name: string;
   last_name: string;
 }
+
+export interface ICoordinatorNote {
+  id: string;
+  coordinatorNote: string;
+  year: number;
+  coordinatorClassName: string;
+  coordinatorClass: string;
+  updatedByFirstName: string;
+  updatedByLastName: string;
+  updatedBy: string;
+  createdDate: string;
+}

@@ -56,6 +56,7 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 .monthly-cell.masterClass,
 .monthly-summary-cell.masterClass {
   @apply border-b border-white bg-[var(--color-masterClass)];
+  text-align: center;
 }
 
 .monthly-cell.masterClass.framed,
@@ -66,6 +67,7 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 .monthly-cell.class,
 .monthly-summary-cell.class {
   @apply border-b border-white bg-[var(--color-class)];
+  text-align: center;
 }
 
 .monthly-cell.class.framed,
@@ -76,6 +78,7 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 .monthly-cell.subClass,
 .monthly-summary-cell.subClass {
   @apply border-b border-white bg-[var(--color-subClass)];
+  text-align: center;
 }
 
 .monthly-cell.subClass.framed,
@@ -95,6 +98,13 @@ and the indentation (sisennys) in the text continues as long as the text can be 
 .monthly-summary-cell.otherClassificationSubLevel {
   @apply border-b border-white bg-[var(--color-districtPreview)];
 }
+
+.monthly-cell.monthly-cell.districtPreview #coordinator-note,
+.monthly-cell.monthly-cell.collectiveSubLevel #coordinator-note,
+.monthly-cell.collectiveSubLevel #coordinator-note,
+.group #coordinator-note {
+  display: none;
+} 
 
 .monthly-cell.districtPreview.framed,
 .monthly-summary-cell.districtPreview.framed,

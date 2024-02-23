@@ -24,7 +24,7 @@ const flattenConstructionProgramTableRows = (
 ): Array<IConstructionProgramTableRow> =>
   tableRows.map(flatten).flat(Infinity) as Array<IConstructionProgramTableRow>;
 interface IConstructionProgramCsvRow {
-  [key: string]: string;
+  [key: string]: string | undefined;
 }
 
 interface IDownloadCsvButtonProps {
@@ -33,10 +33,11 @@ interface IDownloadCsvButtonProps {
   classes: IClassHierarchy;
 }
 
-const getConstructionProgramReportData = async (
+const getReportData = async (
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
   t: TFunction<'translation', undefined>,
+  reportType: ReportType,
 ): Promise<Array<IConstructionProgramCsvRow>> => {
   const year = new Date().getFullYear();
 
@@ -56,22 +57,29 @@ const getConstructionProgramReportData = async (
     }
 
     // Get report rows the same way as for the pdf table
-    const reportRows = getReportRows(projects, classes, divisions);
-    // Flatten rows into one dimension
-    const flattenedRows = flattenConstructionProgramTableRows(reportRows);
-    // Transform them into csv rows
-    const csvRows = flattenedRows.map((r: IConstructionProgramTableRow) => ({
-      [t('target')]: r.name,
-      [t('content')]: r.location,
-      [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
-      [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
-      [t('previouslyUsed')]: r.spentBudget,
-      [`TAE ${new Date().getFullYear()}`]: r.budgetProposalCurrentYearPlus0,
-      [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
-      [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
-    }));
+    const reportRows = getReportRows(projects, classes, divisions, reportType);
 
-    return csvRows;
+    switch (reportType) {
+      case 'constructionProgram': {
+        // Flatten rows into one dimension
+        const flattenedRows = flattenConstructionProgramTableRows(reportRows);
+        // Transform them into csv rows
+        return flattenedRows.map((r: IConstructionProgramTableRow) => ({
+          [t('target')]: r.name,
+          [t('content')]: r.location,
+          [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
+          [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
+          [t('previouslyUsed')]: r.spentBudget,
+          [`TAE ${new Date().getFullYear()}`]: r.budgetProposalCurrentYearPlus0,
+          [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
+          [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
+        }));
+      }
+        default:
+          return [];
+    }
+
+
   } catch (e) {
     console.log('Error building csv rows: ', e);
     return [];
@@ -98,7 +106,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
   const getCsvData = useCallback(async () => {
     switch (type) {
       case 'constructionProgram':
-        setCsvData(await getConstructionProgramReportData(classes, divisions, t));
+        setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
         break;
       default:
         // In the MVP stage we only had time to implement the construction program report, the other
