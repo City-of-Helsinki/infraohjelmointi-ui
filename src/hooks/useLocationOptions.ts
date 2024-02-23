@@ -44,14 +44,7 @@ const useLocationOptions = (
     } else {
       return [];
     }
-  }, [
-    allDivisions,
-    currentLocation,
-    allDistricts,
-    selectedDivision,
-    selectedDistrict,
-    selectedSubDivision,
-  ]);
+  }, [allDivisions, allDistricts, selectedDivision, selectedDistrict, selectedSubDivision]);
 
   const getNextSubDivisions = useCallback(() => {
     if (selectedDivision) {

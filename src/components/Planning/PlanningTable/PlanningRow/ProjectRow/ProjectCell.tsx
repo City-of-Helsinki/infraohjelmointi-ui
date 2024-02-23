@@ -20,7 +20,6 @@ import {
 import EditTimelineButton from './EditTimelineButton';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
-import _ from 'lodash';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
@@ -102,10 +101,6 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
           id: UPDATE_CELL_DATA,
         }),
       );
-      // if there's only the year property in the finances object, delete it
-      if (_.size(req.finances) === 1) {
-        delete req.finances;
-      }
 
       if (forcedToFrame) {
         convertToForcedToFrameProjectRequest(req);
@@ -165,12 +160,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
     if (formValue !== parseInt(budget ?? '0')) {
       updateCell({
         finances: {
-          year: new Date().getFullYear(),
+          year: startYear,
           [financeKey]: formValue,
         },
       });
     }
-  }, [formValue, budget, updateCell, financeKey]);
+  }, [formValue, budget, updateCell, startYear, financeKey]);
 
   const onRemoveCell = useCallback(() => {
     updateCell(getRemoveRequestData(cell));
