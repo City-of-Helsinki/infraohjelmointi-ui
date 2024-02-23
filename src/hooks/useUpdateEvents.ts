@@ -22,12 +22,13 @@ import {
 } from '@/utils/events';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectFinanceUpdate } from '@/reducers/eventsSlice';
+import { selectFinanceUpdate, selectProjectUpdate } from '@/reducers/eventsSlice';
 import { IFinanceCoordinationData, IFinancePlanningData } from '../interfaces/eventInterfaces'
-import { selectStartYear } from '@/reducers/planningSlice';
-import { syncUpdatedClassFinancesWithStartYear } from '@/utils/common';
+import { selectProjects, selectStartYear, setProjects } from '@/reducers/planningSlice';
+import { syncUpdatedClassFinancesWithStartYear, syncUpdatedProjectFinancesWithStartYear } from '@/utils/common';
 import { IClass, IClassBudgets, IClassFinances } from '@/interfaces/classInterfaces';
 import { IGroup } from '@/interfaces/groupInterfaces';
+import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
 
 const initialClassBudgets: IClassBudgets = {
   plannedBudget: 0,
@@ -54,6 +55,21 @@ const initialClassFinances: IClassFinances = {
 const initialLocationFinances = {
   ...initialClassFinances,
   parentClass: null
+}
+
+const initalProjectFinances: IProjectFinances = {
+  year: 0,
+  budgetProposalCurrentYearPlus0: null,
+  budgetProposalCurrentYearPlus1: null,
+  budgetProposalCurrentYearPlus2: null,
+  preliminaryCurrentYearPlus3: null,
+  preliminaryCurrentYearPlus4: null,
+  preliminaryCurrentYearPlus5: null,
+  preliminaryCurrentYearPlus6: null,
+  preliminaryCurrentYearPlus7: null,
+  preliminaryCurrentYearPlus8: null,
+  preliminaryCurrentYearPlus9: null,
+  preliminaryCurrentYearPlus10: null
 }
 
 const getExistingClassById = (classes: Array<IClass>, classId: string) => classes.find(({ id }) => id === classId);
@@ -135,9 +151,11 @@ const syncCoordinationFinances = (financesFromState: ICoordinatorClassHierarchy,
   return updatedFinances;
 }
 
-const useFinanceUpdates = () => {
+const useUpdateEvents = () => {
   const dispatch = useAppDispatch();
   const financeUpdate = useAppSelector(selectFinanceUpdate);
+  const projectUpdateEventData = useAppSelector(selectProjectUpdate);
+  const projects = useAppSelector(selectProjects);
   const planningClassDataFromState = useAppSelector(selectBatchedPlanningClasses);
   const coordinationClassDataFromState = useAppSelector(selectBatchedCoordinationClasses);
   const forcedToFrameClassDataFromState = useAppSelector(selectBatchedForcedToFrameClasses);
@@ -168,7 +186,7 @@ const useFinanceUpdates = () => {
     };
   }, [dispatch]);
 
-  // Listen to finance-update from redux to see if an update event was triggered
+  // Listen to finance-update and project-update from redux to see if an update event was triggered
   useEffect(() => {
     if (financeUpdate) {
       let { coordination, planning, forcedToFrame } = financeUpdate;
@@ -225,7 +243,23 @@ const useFinanceUpdates = () => {
         ]).catch((e) => console.log('Error updating forced to frame finances: ', e));
       }
     }
-  }, [financeUpdate]);
+    if (projectUpdateEventData?.project) {
+      const projectUpdate: IProject = {...projectUpdateEventData.project};
+      // converting project finances to start from the selected startYear if it is 
+      // different than the start year from the update event
+      if (projectUpdate.finances && startYear != projectUpdate.finances.year) {
+        const existingProject = projects.find(({ id }) => id === projectUpdate.id);
+        const projectToUpdate = existingProject?.finances ?? initalProjectFinances;
+        projectUpdate["finances"] = syncUpdatedProjectFinancesWithStartYear(projectToUpdate, projectUpdate.finances, startYear);
+      }
+      const updatedProjects: IProject[] = projects.map((p) => {
+        return p.id === projectUpdate.id ? projectUpdate : p
+      });
+      Promise.all([
+        dispatch(setProjects(updatedProjects))
+      ]).catch((e) => console.log('Error updating project data: ', e));
+    }
+  }, [financeUpdate, projectUpdateEventData]);
 };
 
-export default useFinanceUpdates;
+export default useUpdateEvents;

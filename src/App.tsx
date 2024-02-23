@@ -39,7 +39,7 @@ import AdminView from './views/AdminView/AdminView';
 import AdminHashtags from './components/Admin/AdminHashtags';
 import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
-import useFinanceUpdates from './hooks/useFinanceUpdates';
+import useUpdateEvents from './hooks/useUpdateEvents';
 import { selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
@@ -87,7 +87,7 @@ const App: FC = () => {
 
   const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
-  useFinanceUpdates();
+  useUpdateEvents();
 
   const initializeStates = async () => {
     // Set moments locale to finnish for the app
