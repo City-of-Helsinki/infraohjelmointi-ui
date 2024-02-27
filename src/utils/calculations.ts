@@ -187,3 +187,12 @@ export const keurToMillion = (value?: string | null) => {
 
   return millionValue.toString().replace('.', ',');
 };
+
+// Specifically for budgetBookSummaryReport
+export const convertToMillions = (value?: string | number) => {
+  if (!value) return '0,00';
+  const valueWithCorrectType: number = typeof value === 'string' ? Number(value): value;
+  const convertedNumber = valueWithCorrectType / 1000000;
+  const splittedNumber = String(convertedNumber).slice(0,4);
+  return splittedNumber === '0' ? '0,00' : splittedNumber;
+};

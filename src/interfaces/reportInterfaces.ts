@@ -12,8 +12,7 @@ export const reports = [
 
 export type ReportType = (typeof reports)[number];
 
-export type ConstructionProgramTableRowType = 'class' | 'project';
-export type BudgetBookSummaryTableRowType = 'class';
+export type ReportTableRowType = 'class' | 'project' | 'investmentpart';
 
 interface ITableRowEssentials {
   id?: string;
@@ -25,7 +24,7 @@ export interface IConstructionProgramTableRow extends ITableRowEssentials {
   // These first three are should be typed depending on the report type
   children: Array<IConstructionProgramTableRow>;
   projects: Array<IConstructionProgramTableRow>;
-  type: ConstructionProgramTableRowType;
+  type: ReportTableRowType;
 
   costForecast?: string;
   location?: string;
@@ -36,11 +35,10 @@ export interface IConstructionProgramTableRow extends ITableRowEssentials {
   budgetProposalCurrentYearPlus2?: string;
 }
 
-
 export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {
   children: Array<IBudgetBookSummaryTableRow>;
   projects: Array<IBudgetBookSummaryTableRow>;
-  type: BudgetBookSummaryTableRowType;
+  type: ReportTableRowType;
   financeProperties: {
     usage?: string; 
     budgetEstimation?: string; //first TA column means talousarvio
@@ -54,6 +52,7 @@ export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {
     initial5?: string;
     initial6?: string;
     initial7?: string;
+    [key: string]: string | undefined;
   }
 }
 

@@ -166,8 +166,7 @@ const Row: FC<ITableRowProps> = memo(({ row, depth, reportType }) => {
           const budgetBookSummaryRow = row as IBudgetBookSummaryTableRow;
           tableRow =  
           <View style={depth % 2 ? styles.evenRow : styles.oddRow} key={budgetBookSummaryRow.id}>
-            
-              <Text style={row.type === 'class' ? styles.classNameTargetCell : styles.nameTargetCell}>{budgetBookSummaryRow.name}</Text>
+              <Text style={(row.type === 'class' || row.type === 'investmentpart') ? styles.classNameTargetCell : styles.nameTargetCell}>{budgetBookSummaryRow.name}</Text>
               <Text style={styles.unBoldedColumns}>{budgetBookSummaryRow.financeProperties.usage}</Text>
               <Text style={styles.unBoldedColumns}>{budgetBookSummaryRow.financeProperties.budgetEstimation}</Text>
               <Text style={styles.narrowerColumns}>{budgetBookSummaryRow.financeProperties.budgetEstimationSuggestion}</Text>
