@@ -4,7 +4,6 @@ import DocumentHeader from './DocumentHeader';
 import ReportTable from './ReportTable';
 import { FC, memo } from 'react';
 import { IBasicReportData, ReportType } from '@/interfaces/reportInterfaces';
-import _ from 'lodash';
 
 const styles = StyleSheet.create({
   page: {
@@ -57,7 +56,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
 
   return (
     <Document title={documentTitle}>
-      <Page orientation="landscape" size="A3" style={styles.page}>
+      <Page orientation={reportType !== 'constructionProgram' ? "landscape" : "portrait" } size="A3" style={styles.page}>
         <View style={styles.document}>
           <DocumentHeader
             title={documentTitle}

@@ -31,6 +31,13 @@ const budgetBookSummaryCommonStyles = {
   textAlign: 'center' as unknown as 'center',
 };
 
+const budgetBookSummaryNameCellCommonStyles = {
+  textAlign: 'left' as unknown as 'left',
+  borderRight: 0,
+  width: '26%',
+  paddingLeft: '8px',
+}
+
 const styles = StyleSheet.create({
   oddRow: {
     ...tableRowStyles,
@@ -98,19 +105,13 @@ const styles = StyleSheet.create({
   classNameTargetCell: {
     ...cellStyles,
     ...budgetBookSummaryCommonStyles,
-    textAlign: 'left' as unknown as 'left',
-    borderRight: 0,
+    ...budgetBookSummaryNameCellCommonStyles,
     fontWeight: 'bold',
-    width: '26%',
-    paddingLeft: '8px',
   },
   nameTargetCell: {
     ...cellStyles,
     ...budgetBookSummaryCommonStyles,
-    textAlign: 'left' as unknown as 'left',
-    borderRight: 0,
-    width: '26%',
-    paddingLeft: '8px',
+    ...budgetBookSummaryNameCellCommonStyles
   },
   unBoldedColumns: {
     ...cellStyles,
@@ -137,17 +138,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   }
 });
-
 interface ITableRowProps {
   row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow /*| another report row type */;
   flattenedRows?: IBudgetBookSummaryCsvRow[];
-  flattenedRow?: IBudgetBookSummaryCsvRow;
   depth: number;
   index?: number;
   reportType: ReportType;
 }
 
-const Row: FC<ITableRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
+interface IRowProps extends ITableRowProps{
+  flattenedRow?: IFlattenedBudgetBookSummaryProperties;
+}
+
+const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
     let tableRow;
     switch (reportType) {
         case 'constructionProgram': {
@@ -166,25 +169,29 @@ const Row: FC<ITableRowProps> = memo(({ row, flattenedRow, depth, index, reportT
             break;
         }
         case 'budgetBookSummary': {
-          const typedRow = flattenedRow as IFlattenedBudgetBookSummaryProperties;
-          tableRow =  
-            <View style={index && index % 2 ? styles.evenRow : styles.oddRow} key={typedRow.id}>
-                <Text style={(typedRow.type === 'class' || typedRow.type === 'investmentpart') ? styles.classNameTargetCell : styles.nameTargetCell}>
-                  {typedRow.name}
-                </Text>
-                <Text style={styles.unBoldedColumns}>{typedRow.usage}</Text>
-                <Text style={styles.unBoldedColumns}>{typedRow.budgetEstimation}</Text>
-                <Text style={styles.narrowerColumns}>{typedRow.budgetEstimationSuggestion}</Text>
-                <Text style={styles.narrowerColumns}>{typedRow.budgetPlanSuggestion1}</Text>
-                <Text style={styles.narrowerColumns}>{typedRow.budgetPlanSuggestion2}</Text>
-                <Text style={styles.widerColumns}>{typedRow.initial1}</Text>
-                <Text style={styles.widerColumns}>{typedRow.initial2}</Text>
-                <Text style={styles.widerColumns}>{typedRow.initial3}</Text>
-                <Text style={styles.widerColumns}>{typedRow.initial4}</Text>
-                <Text style={styles.widerColumns}>{typedRow.initial5}</Text>
-                <Text style={styles.widerColumns}>{typedRow.initial6}</Text>
-                <Text style={styles.lastWiderColumn}>{typedRow.initial7}</Text>
-            </View>;
+          if (flattenedRow) {
+            tableRow =  
+              <View style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
+                  <Text style={(flattenedRow.type === 'class' || flattenedRow.type === 'investmentpart') ? styles.classNameTargetCell : styles.nameTargetCell}>
+                    {flattenedRow.name}
+                  </Text>
+                  <Text style={styles.unBoldedColumns}>{flattenedRow.usage}</Text>
+                  <Text style={styles.unBoldedColumns}>{flattenedRow.budgetEstimation}</Text>
+                  <Text style={styles.narrowerColumns}>{flattenedRow.budgetEstimationSuggestion}</Text>
+                  <Text style={styles.narrowerColumns}>{flattenedRow.budgetPlanSuggestion1}</Text>
+                  <Text style={styles.narrowerColumns}>{flattenedRow.budgetPlanSuggestion2}</Text>
+                  <Text style={styles.widerColumns}>{flattenedRow.initial1}</Text>
+                  <Text style={styles.widerColumns}>{flattenedRow.initial2}</Text>
+                  <Text style={styles.widerColumns}>{flattenedRow.initial3}</Text>
+                  <Text style={styles.widerColumns}>{flattenedRow.initial4}</Text>
+                  <Text style={styles.widerColumns}>{flattenedRow.initial5}</Text>
+                  <Text style={styles.widerColumns}>{flattenedRow.initial6}</Text>
+                  <Text style={styles.lastWiderColumn}>{flattenedRow.initial7}</Text>
+              </View>;
+          } else {
+            tableRow = <View></View>;
+          }
+          
           break;
         }
         default:
@@ -206,9 +213,10 @@ const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, i
         { reportType === 'budgetBookSummary' ?
           <>
             {/* Class */}
-            { flattenedRows?.map((row, index) => 
-                <Row key={index} flattenedRow={row} depth={depth} index={index} reportType={reportType} />
-              )
+            { flattenedRows?.map((row, index) => {
+              const typedRow = row as IFlattenedBudgetBookSummaryProperties;
+                return <Row key={typedRow.id} flattenedRow={typedRow} depth={depth} index={index} reportType={reportType} />
+              })
             }
           </>
         :

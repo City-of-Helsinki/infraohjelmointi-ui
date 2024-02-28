@@ -294,7 +294,11 @@ export const getReportRows = (
       // convert the numbers into decimals and add investmentPart into classGrandParents
       classGrandParents = typedClassGrandParents.map((grandparent) => convertBudgetBookSummaryPropertiesToMillions(grandparent, 'grandParents')) as IConstructionProgramTableRow[] | IBudgetBookSummaryTableRow[];
       investmentPart = convertBudgetBookSummaryPropertiesToMillions(investmentPart, 'grandParents') as IBudgetBookSummaryTableRow;
-      classGrandParents.unshift(investmentPart);
+      if (classGrandParents.length) {
+        /* The investmentPart should only be added to classGrandParents if other grandParents
+        exist, otherwise it will cause duplicate investmentPart rows to the report */
+        classGrandParents.unshift(investmentPart);
+      }
       break;
     }
   }
@@ -312,27 +316,30 @@ const budgetBookSummaryCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
 const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
   tableRows.forEach((tableRow) => {
-    budgetBookSummaryCsvRows.push({
-      id: tableRow.id,
-      name: tableRow.name,
-      type: tableRow.type,
-      usage: tableRow.financeProperties.usage ?? '',
-      budgetEstimation: tableRow.financeProperties.budgetEstimation ?? '0',
-      budgetEstimationSuggestion: tableRow.financeProperties.budgetEstimationSuggestion ?? '0',
-      budgetPlanSuggestion1: tableRow.financeProperties.budgetPlanSuggestion1 ?? '0',
-      budgetPlanSuggestion2: tableRow.financeProperties.budgetPlanSuggestion2 ?? '0',
-      initial1: tableRow.financeProperties.initial1 ?? '0',
-      initial2: tableRow.financeProperties.initial2 ?? '0',
-      initial3: tableRow.financeProperties.initial3 ?? '0',
-      initial4: tableRow.financeProperties.initial4 ?? '0',
-      initial5: tableRow.financeProperties.initial5 ?? '0',
-      initial6: tableRow.financeProperties.initial6 ?? '0',
-      initial7: tableRow.financeProperties.initial7 ?? '0',
-    });
+    if (!budgetBookSummaryCsvRows.some(row => row.id === tableRow.id)) {
+      budgetBookSummaryCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: tableRow.type,
+        usage: tableRow.financeProperties.usage ?? '',
+        budgetEstimation: tableRow.financeProperties.budgetEstimation ?? '0.00',
+        budgetEstimationSuggestion: tableRow.financeProperties.budgetEstimationSuggestion ?? '0.00',
+        budgetPlanSuggestion1: tableRow.financeProperties.budgetPlanSuggestion1 ?? '0.00',
+        budgetPlanSuggestion2: tableRow.financeProperties.budgetPlanSuggestion2 ?? '0.00',
+        initial1: tableRow.financeProperties.initial1 ?? '0.00',
+        initial2: tableRow.financeProperties.initial2 ?? '0.00',
+        initial3: tableRow.financeProperties.initial3 ?? '0.00',
+        initial4: tableRow.financeProperties.initial4 ?? '0.00',
+        initial5: tableRow.financeProperties.initial5 ?? '0.00',
+        initial6: tableRow.financeProperties.initial6 ?? '0.00',
+        initial7: tableRow.financeProperties.initial7 ?? '0.00',
+      })
+    }
 
-    // Recursive calls for children and projects.
-    processTableRows(tableRow.projects);
-    processTableRows(tableRow.children);
+      // Recursive calls for children and projects.
+      processTableRows(tableRow.projects);
+      processTableRows(tableRow.children);
+    
   });
   return budgetBookSummaryCsvRows;
 };
@@ -406,18 +413,18 @@ export const getReportData = async (
         // Transform them into csv rows
         return flattenedRows.map((r) => ({
           [t('target')]: r.name,
-          [`${t('usage')} ${t('usageSV')} ${new Date().getFullYear() - 1}`]: '',
-          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear()}`]: r.budgetEstimation,
-          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear() + 1}`]: r.budgetEstimationSuggestion,
-          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 2}`]: r.budgetPlanSuggestion1,
-          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 3}`]: r.budgetPlanSuggestion2,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 4}`]: r.initial1,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 5}`]: r.initial2,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 6}`]: r.initial3,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 7}`]: r.initial4,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 8}`]: r.initial5,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 9}`]: r.initial6,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 10}`]: r.initial7,
+          [`${t('usage')} ${t('usageSV')} ${new Date().getFullYear() - 1} ${t('millionEuro')}`]: '',
+          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear()} ${t('millionEuro')}`]: r.budgetEstimation,
+          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear() + 1} ${t('millionEuro')}`]: r.budgetEstimationSuggestion,
+          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 2} ${t('millionEuro')}`]: r.budgetPlanSuggestion1,
+          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 3} ${t('millionEuro')}`]: r.budgetPlanSuggestion2,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 4} ${t('millionEuro')}`]: r.initial1,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 5} ${t('millionEuro')}`]: r.initial2,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 6} ${t('millionEuro')}`]: r.initial3,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 7} ${t('millionEuro')}`]: r.initial4,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 8} ${t('millionEuro')}`]: r.initial5,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 9} ${t('millionEuro')}`]: r.initial6,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 10} ${t('millionEuro')}`]: r.initial7,
         }));
       }
         default:

@@ -22,25 +22,16 @@ export type ReportType = (typeof reports)[number];
 
 export type ReportTableRowType = 'class' | 'project' | 'investmentpart';
 
+export interface IBasicReportData {
+  divisions: Array<ILocation>;
+  projects: Array<IProject>;
+  classes: IClassHierarchy;
+}
+
 interface ITableRowEssentials {
   id?: string;
   name: string;
   parent: string | null;
-}
-
-export interface IConstructionProgramTableRow extends ITableRowEssentials {
-  // These first three are should be typed depending on the report type
-  children: Array<IConstructionProgramTableRow>;
-  projects: Array<IConstructionProgramTableRow>;
-  type: ReportTableRowType;
-
-  costForecast?: string;
-  location?: string;
-  startAndEnd?: string;
-  spentBudget?: string;
-  budgetProposalCurrentYearPlus0?: string;
-  budgetProposalCurrentYearPlus1?: string;
-  budgetProposalCurrentYearPlus2?: string;
 }
 
 export interface IFinanceProperties {
@@ -59,7 +50,7 @@ export interface IFinanceProperties {
   [key: string]: string | undefined;
 }
 
-export interface IFlattenedBudgetBookSummaryProperties extends IFinanceProperties{
+export interface IFlattenedBudgetBookSummaryProperties extends IFinanceProperties {
   id: string;
   name: string;
 }
@@ -72,8 +63,17 @@ export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {
   financeProperties: IFinanceProperties;
 }
 
-export interface IBasicReportData {
-  divisions: Array<ILocation>;
-  projects: Array<IProject>;
-  classes: IClassHierarchy;
+export interface IConstructionProgramTableRow extends ITableRowEssentials {
+  // These first three are should be typed depending on the report type
+  children: Array<IConstructionProgramTableRow>;
+  projects: Array<IConstructionProgramTableRow>;
+  type: ReportTableRowType;
+
+  costForecast?: string;
+  location?: string;
+  startAndEnd?: string;
+  spentBudget?: string;
+  budgetProposalCurrentYearPlus0?: string;
+  budgetProposalCurrentYearPlus1?: string;
+  budgetProposalCurrentYearPlus2?: string;
 }

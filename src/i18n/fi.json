@@ -463,7 +463,7 @@
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
-  "downloadXlsx": "Lataa {{name}} (.xlsx)",
+  "downloadCsv": "Lataa {{name}} (.csv)",
   "reportsTitle": "Raportit",
   "forcedToFrame": "Sovitettu budjetti",
   "implementedAndBound": "Toteutettu ja sidottu",

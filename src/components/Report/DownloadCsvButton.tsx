@@ -49,14 +49,14 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
 
   return (
     <>
-      <div className="report-download-xlsx-button" data-testid={`download-xlsx-${type}`}>
+      <div className="report-download-csv-button" data-testid={`download-csv-${type}`}>
         <Button
           iconLeft={downloadIcon}
           variant="secondary"
           onClick={getCsvData}
           disabled={(type !== 'constructionProgram' && type !== 'budgetBookSummary')}
         >
-          {t('downloadXlsx', { name: t(`report.${type}.documentName`) })}
+          {t('downloadCsv', { name: t(`report.${type}.documentName`) })}
         </Button>
       </div>
       {csvData.length > 0 ? <CSVDownload data={csvData} target="_blank" /> : undefined}

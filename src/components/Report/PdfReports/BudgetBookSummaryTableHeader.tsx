@@ -71,9 +71,9 @@ const ConstructionProgramTableHeader = () => {
             <Text>{new Date().getFullYear() + 4}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
-        {currentPlusYears.map((year, index) => {
+        {currentPlusYears.map((year) => {
             return (
-                <View key={index} style={styles.widerColumns}>
+                <View key={year} style={styles.widerColumns}>
                     <Text>{t('initial')}</Text>
                     <Text>{t('initialSV')}</Text>
                     <Text>{new Date().getFullYear() + year}</Text>
