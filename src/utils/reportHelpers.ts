@@ -1,7 +1,9 @@
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
+  IBudgetBookSummaryCsvRow,
   IBudgetBookSummaryTableRow,
+  IConstructionProgramCsvRow,
   IConstructionProgramTableRow,
   ReportTableRowType,
   ReportType,
@@ -9,6 +11,8 @@ import {
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { convertToMillions, keurToMillion } from './calculations';
 import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
+import { getProjectsWithParams } from '@/services/projectServices';
+import { TFunction } from 'i18next';
 
 /**
  * Gets the division name and removes the number infront of it.
@@ -298,5 +302,129 @@ export const getReportRows = (
   const classParentsWithNoParents = classParents?.filter((cp) => cp.parent === null);
 
   // We return all resulting rows that do not have parents as the first level in the array
-  return [...classGrandParents, ...classParentsWithNoParents, ...classesForProjectsWithNoParents];
+  return reportType === 'budgetBookSummary' 
+    ? [...classGrandParents]
+    : [...classGrandParents, ...classParentsWithNoParents, ...classesForProjectsWithNoParents];
+};
+
+// For CSV reports -->
+const budgetBookSummaryCsvRows: IBudgetBookSummaryCsvRow[] = [];
+
+const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
+  tableRows.forEach((tableRow) => {
+    budgetBookSummaryCsvRows.push({
+      id: tableRow.id,
+      name: tableRow.name,
+      type: tableRow.type,
+      usage: tableRow.financeProperties.usage ?? '',
+      budgetEstimation: tableRow.financeProperties.budgetEstimation ?? '0',
+      budgetEstimationSuggestion: tableRow.financeProperties.budgetEstimationSuggestion ?? '0',
+      budgetPlanSuggestion1: tableRow.financeProperties.budgetPlanSuggestion1 ?? '0',
+      budgetPlanSuggestion2: tableRow.financeProperties.budgetPlanSuggestion2 ?? '0',
+      initial1: tableRow.financeProperties.initial1 ?? '0',
+      initial2: tableRow.financeProperties.initial2 ?? '0',
+      initial3: tableRow.financeProperties.initial3 ?? '0',
+      initial4: tableRow.financeProperties.initial4 ?? '0',
+      initial5: tableRow.financeProperties.initial5 ?? '0',
+      initial6: tableRow.financeProperties.initial6 ?? '0',
+      initial7: tableRow.financeProperties.initial7 ?? '0',
+    });
+
+    // Recursive calls for children and projects.
+    processTableRows(tableRow.projects);
+    processTableRows(tableRow.children);
+  });
+  return budgetBookSummaryCsvRows;
+};
+
+/**
+ * Create a flattened version of report table rows, since the react-csv needs a one-dimensional array
+ */
+export const flattenBudgetBookSummaryTableRows = (
+  tableRows: Array<IBudgetBookSummaryTableRow>,
+): Array<IBudgetBookSummaryCsvRow> =>
+  processTableRows(tableRows).flat(Infinity) as Array<IBudgetBookSummaryCsvRow>;
+
+const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
+  a,
+  ...a.projects,
+  ...(a.children.map(flatten) as unknown as Array<IConstructionProgramTableRow>),
+];
+
+const flattenConstructionProgramTableRows = (
+  tableRows: Array<IConstructionProgramTableRow>,
+): Array<IConstructionProgramTableRow> =>
+  tableRows.map(flatten).flat(Infinity) as Array<IConstructionProgramTableRow>;
+
+export const getReportData = async (
+  classes: IClassHierarchy,
+  divisions: Array<ILocation>,
+  t: TFunction<'translation', undefined>,
+  reportType: ReportType,
+): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow>> => {
+  const year = new Date().getFullYear();
+
+  try {
+    const res = await getProjectsWithParams({
+      direct: false,
+      programmed: false,
+      params: 'overMillion=true',
+      forcedToFrame: false,
+      year,
+    });
+
+    const projects = res.results;
+
+    if (!projects) {
+      return [];
+    }
+
+    // Get report rows the same way as for the pdf table
+    const reportRows = reportType === 'budgetBookSummary' 
+    ? getReportRows(reportType, classes, divisions, [])
+    : getReportRows(reportType, classes, divisions, projects);
+
+    switch (reportType) {
+      case 'constructionProgram': {
+        // Flatten rows into one dimension
+        const flattenedRows = flattenConstructionProgramTableRows(reportRows);
+        // Transform them into csv rows
+        return flattenedRows.map((r: IConstructionProgramTableRow) => ({
+          [t('target')]: r.name,
+          [t('content')]: r.location,
+          [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
+          [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
+          [t('previouslyUsed')]: r.spentBudget,
+          [`TAE ${new Date().getFullYear()}`]: r.budgetProposalCurrentYearPlus0,
+          [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
+          [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
+        }));
+      }
+      case 'budgetBookSummary': {
+        // Flatten rows into one dimension
+        const flattenedRows = flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
+        // Transform them into csv rows
+        return flattenedRows.map((r) => ({
+          [t('target')]: r.name,
+          [`${t('usage')} ${t('usageSV')} ${new Date().getFullYear() - 1}`]: '',
+          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear()}`]: r.budgetEstimation,
+          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear() + 1}`]: r.budgetEstimationSuggestion,
+          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 2}`]: r.budgetPlanSuggestion1,
+          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 3}`]: r.budgetPlanSuggestion2,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 4}`]: r.initial1,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 5}`]: r.initial2,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 6}`]: r.initial3,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 7}`]: r.initial4,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 8}`]: r.initial5,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 9}`]: r.initial6,
+          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 10}`]: r.initial7,
+        }));
+      }
+        default:
+          return [];
+    }
+  } catch (e) {
+    console.log('Error building csv rows: ', e);
+    return [];
+  }
 };

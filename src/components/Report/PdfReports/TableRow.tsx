@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryTableRow, IConstructionProgramTableRow, ReportType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, ReportType } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -139,12 +139,15 @@ const styles = StyleSheet.create({
 });
 
 interface ITableRowProps {
-  row: IConstructionProgramTableRow | IBudgetBookSummaryTableRow /*| another report row type */;
+  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow /*| another report row type */;
+  flattenedRows?: IBudgetBookSummaryCsvRow[];
+  flattenedRow?: IBudgetBookSummaryCsvRow;
   depth: number;
+  index?: number;
   reportType: ReportType;
 }
 
-const Row: FC<ITableRowProps> = memo(({ row, depth, reportType }) => {
+const Row: FC<ITableRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
     let tableRow;
     switch (reportType) {
         case 'constructionProgram': {
@@ -163,23 +166,25 @@ const Row: FC<ITableRowProps> = memo(({ row, depth, reportType }) => {
             break;
         }
         case 'budgetBookSummary': {
-          const budgetBookSummaryRow = row as IBudgetBookSummaryTableRow;
+          const typedRow = flattenedRow as IFlattenedBudgetBookSummaryProperties;
           tableRow =  
-          <View style={depth % 2 ? styles.evenRow : styles.oddRow} key={budgetBookSummaryRow.id}>
-              <Text style={(row.type === 'class' || row.type === 'investmentpart') ? styles.classNameTargetCell : styles.nameTargetCell}>{budgetBookSummaryRow.name}</Text>
-              <Text style={styles.unBoldedColumns}>{budgetBookSummaryRow.financeProperties.usage}</Text>
-              <Text style={styles.unBoldedColumns}>{budgetBookSummaryRow.financeProperties.budgetEstimation}</Text>
-              <Text style={styles.narrowerColumns}>{budgetBookSummaryRow.financeProperties.budgetEstimationSuggestion}</Text>
-              <Text style={styles.narrowerColumns}>{budgetBookSummaryRow.financeProperties.budgetPlanSuggestion1}</Text>
-              <Text style={styles.narrowerColumns}>{budgetBookSummaryRow.financeProperties.budgetPlanSuggestion2}</Text>
-              <Text style={styles.widerColumns}>{budgetBookSummaryRow.financeProperties.initial1}</Text>
-              <Text style={styles.widerColumns}>{budgetBookSummaryRow.financeProperties.initial2}</Text>
-              <Text style={styles.widerColumns}>{budgetBookSummaryRow.financeProperties.initial3}</Text>
-              <Text style={styles.widerColumns}>{budgetBookSummaryRow.financeProperties.initial4}</Text>
-              <Text style={styles.widerColumns}>{budgetBookSummaryRow.financeProperties.initial5}</Text>
-              <Text style={styles.widerColumns}>{budgetBookSummaryRow.financeProperties.initial6}</Text>
-              <Text style={styles.lastWiderColumn}>{budgetBookSummaryRow.financeProperties.initial7}</Text>
-          </View>
+            <View style={index && index % 2 ? styles.evenRow : styles.oddRow} key={typedRow.id}>
+                <Text style={(typedRow.type === 'class' || typedRow.type === 'investmentpart') ? styles.classNameTargetCell : styles.nameTargetCell}>
+                  {typedRow.name}
+                </Text>
+                <Text style={styles.unBoldedColumns}>{typedRow.usage}</Text>
+                <Text style={styles.unBoldedColumns}>{typedRow.budgetEstimation}</Text>
+                <Text style={styles.narrowerColumns}>{typedRow.budgetEstimationSuggestion}</Text>
+                <Text style={styles.narrowerColumns}>{typedRow.budgetPlanSuggestion1}</Text>
+                <Text style={styles.narrowerColumns}>{typedRow.budgetPlanSuggestion2}</Text>
+                <Text style={styles.widerColumns}>{typedRow.initial1}</Text>
+                <Text style={styles.widerColumns}>{typedRow.initial2}</Text>
+                <Text style={styles.widerColumns}>{typedRow.initial3}</Text>
+                <Text style={styles.widerColumns}>{typedRow.initial4}</Text>
+                <Text style={styles.widerColumns}>{typedRow.initial5}</Text>
+                <Text style={styles.widerColumns}>{typedRow.initial6}</Text>
+                <Text style={styles.lastWiderColumn}>{typedRow.initial7}</Text>
+            </View>;
           break;
         }
         default:
@@ -188,28 +193,40 @@ const Row: FC<ITableRowProps> = memo(({ row, depth, reportType }) => {
 
   return (
     <>
-        {tableRow}
-     </>
+      {tableRow}
+    </>
   );
 });
 
 Row.displayName = 'Row';
 
-const TableRow: FC<ITableRowProps> = ({ row, depth, reportType }) => {
-    return (
-        <>
+const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, index }) => {
+  return (
+      <>
+        { reportType === 'budgetBookSummary' ?
+          <>
             {/* Class */}
-            <Row row={row} depth={depth} reportType={reportType} />
+            { flattenedRows?.map((row, index) => 
+                <Row key={index} flattenedRow={row} depth={depth} index={index} reportType={reportType} />
+              )
+            }
+          </>
+        :
+          <>
+            {/* Class */}
+            <Row row={row} depth={depth} index={index} reportType={reportType} />
             {/* Projects for class */}
-            {row.projects?.map((p) => (
+            {row?.projects?.map((p) => (
                 <Row key={p.id} row={p} depth={depth + 1} reportType={reportType} />
             ))}
             {/* Iterate children recursively */}
-            {row.children?.map((r) => (
+            {row?.children?.map((r) => (
                 <TableRow key={r.id} row={r} depth={depth + 1} reportType={reportType}/>
             ))}
-        </>
-    );
+          </>
+        }
+      </>
+  );
 };
 
 export default memo(TableRow);

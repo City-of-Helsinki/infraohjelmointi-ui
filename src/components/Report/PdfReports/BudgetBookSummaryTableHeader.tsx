@@ -56,7 +56,7 @@ const ConstructionProgramTableHeader = () => {
         <View style={styles.narrowerColumns}>
             <Text>{t('TS')}</Text>
             <Text>{t('tsSV')}</Text>
-            <Text>{new Date().getFullYear() +2 }</Text>
+            <Text>{new Date().getFullYear() + 2 }</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>

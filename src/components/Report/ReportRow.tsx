@@ -26,9 +26,9 @@ const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFram
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses}/>
+      <DownloadPdfButton type={type} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
       {/* download csv button */}
-      <DownloadCsvButton type={type} divisions={divisions} classes={classes} />
+      <DownloadCsvButton type={type} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
     </div>
   );
 };

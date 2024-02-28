@@ -1,90 +1,19 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IConstructionProgramTableRow, ReportType } from '@/interfaces/reportInterfaces';
-import { IClassHierarchy } from '@/reducers/classSlice';
-import { getProjectsWithParams } from '@/services/projectServices';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType } from '@/interfaces/reportInterfaces';
+import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { getReportRows } from '@/utils/reportHelpers';
+import { getReportData } from '@/utils/reportHelpers';
 import { CSVDownload } from 'react-csv';
-import { TFunction } from 'i18next';
 import './styles.css';
-
-const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
-  a,
-  ...a.projects,
-  ...(a.children.map(flatten) as unknown as Array<IConstructionProgramTableRow>),
-];
-
-/**
- * Create a flattened version of construction program table rows, since the react-csv needs a one-dimensional array
- */
-const flattenConstructionProgramTableRows = (
-  tableRows: Array<IConstructionProgramTableRow>,
-): Array<IConstructionProgramTableRow> =>
-  tableRows.map(flatten).flat(Infinity) as Array<IConstructionProgramTableRow>;
-interface IConstructionProgramCsvRow {
-  [key: string]: string | undefined;
-}
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
+  forcedToFrameClasses: ICoordinatorClassHierarchy;
 }
-
-const getReportData = async (
-  classes: IClassHierarchy,
-  divisions: Array<ILocation>,
-  t: TFunction<'translation', undefined>,
-  reportType: ReportType,
-): Promise<Array<IConstructionProgramCsvRow>> => {
-  const year = new Date().getFullYear();
-
-  try {
-    const res = await getProjectsWithParams({
-      direct: false,
-      programmed: false,
-      params: 'overMillion=true',
-      forcedToFrame: false,
-      year,
-    });
-
-    const projects = res.results;
-
-    if (!projects) {
-      return [];
-    }
-
-    // Get report rows the same way as for the pdf table
-    const reportRows = getReportRows(projects, classes, divisions, reportType);
-
-    switch (reportType) {
-      case 'constructionProgram': {
-        // Flatten rows into one dimension
-        const flattenedRows = flattenConstructionProgramTableRows(reportRows);
-        // Transform them into csv rows
-        return flattenedRows.map((r: IConstructionProgramTableRow) => ({
-          [t('target')]: r.name,
-          [t('content')]: r.location,
-          [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
-          [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
-          [t('previouslyUsed')]: r.spentBudget,
-          [`TAE ${new Date().getFullYear()}`]: r.budgetProposalCurrentYearPlus0,
-          [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
-          [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
-        }));
-      }
-        default:
-          return [];
-    }
-
-
-  } catch (e) {
-    console.log('Error building csv rows: ', e);
-    return [];
-  }
-};
 
 const downloadIcon = <IconDownload />;
 
@@ -93,9 +22,9 @@ const downloadIcon = <IconDownload />;
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, classes }) => {
+const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
   const { t } = useTranslation();
-  const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow>>([]);
+  const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
 
   useEffect(() => {
     if (csvData.length > 0) {
@@ -107,6 +36,9 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
     switch (type) {
       case 'constructionProgram':
         setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
+        break;
+      case 'budgetBookSummary':
+        setCsvData(await getReportData(forcedToFrameClasses, divisions, t, 'budgetBookSummary'));
         break;
       default:
         // In the MVP stage we only had time to implement the construction program report, the other
@@ -122,7 +54,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
           iconLeft={downloadIcon}
           variant="secondary"
           onClick={getCsvData}
-          disabled={type !== 'constructionProgram'}
+          disabled={(type !== 'constructionProgram' && type !== 'budgetBookSummary')}
         >
           {t('downloadXlsx', { name: t(`report.${type}.documentName`) })}
         </Button>
