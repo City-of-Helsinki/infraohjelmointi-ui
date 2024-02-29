@@ -38,7 +38,7 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   return (
     <View>
       <View style={styles.table}>
-        {tableHeader}
+        <View fixed>{tableHeader}</View>
         { reportType === 'budgetBookSummary' ?
           <TableRow flattenedRows={flattenedRows} depth={0} reportType={reportType}/>
         :

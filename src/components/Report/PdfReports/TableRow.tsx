@@ -156,7 +156,7 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
         case 'constructionProgram': {
             const constructionRow = row as IConstructionProgramTableRow;
             tableRow =  
-            <View style={depth % 2 ? styles.evenRow : styles.oddRow} key={constructionRow.id}>
+            <View wrap={false} style={depth % 2 ? styles.evenRow : styles.oddRow} key={constructionRow.id}>
                 <Text style={constructionRow.type === 'class' ? styles.classNameCell : styles.nameCell}>{constructionRow.name}</Text>
                 <Text style={styles.divisionCell}>{constructionRow.location}</Text>
                 <Text style={styles.costForecastCell}>{constructionRow.costForecast}</Text>
@@ -171,7 +171,7 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
         case 'budgetBookSummary': {
           if (flattenedRow) {
             tableRow =  
-              <View style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
+              <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
                   <Text style={(flattenedRow.type === 'class' || flattenedRow.type === 'investmentpart') ? styles.classNameTargetCell : styles.nameTargetCell}>
                     {flattenedRow.name}
                   </Text>
