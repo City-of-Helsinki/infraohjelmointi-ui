@@ -12,6 +12,8 @@ import './pdfFonts';
 import './styles.css';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import ReportContainer from './PdfReports/ReportContainer';
+import { useAppDispatch } from '@/hooks/common';
+import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -58,12 +60,15 @@ interface IDownloadPdfButtonProps {
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
 const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
+  const LOADING_PDF_DATA = 'loading-pdf-data';
+
   const downloadPdf = useCallback(async () => {
     try {
       const year = new Date().getFullYear();
-
+      dispatch(setLoading({ text: 'Loading pdf data', id: LOADING_PDF_DATA }));
       const res = await getProjectsWithParams({
         direct: false,
         programmed: false,
@@ -90,6 +95,8 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
       }
     } catch (e) {
       console.log(`Error getting projects for ${documentName}: `, e);
+    } finally {
+      dispatch(clearLoading(LOADING_PDF_DATA));
     }
   }, [classes, documentName, divisions, type]);
 
