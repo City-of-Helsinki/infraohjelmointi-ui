@@ -27,6 +27,11 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
     switch (reportType) {
       case 'constructionProgram':
         return t('report.constructionProgram.title');
+      case 'budgetBookSummary':
+        return t('report.budgetBookSummary.title', {
+          startYear: new Date().getFullYear() + 1,
+          endYear: new Date().getFullYear() + 10,
+        });
       default:
         return '';
     }
@@ -35,10 +40,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
   const getDocumentSubtitle = () => {
     switch (reportType) {
       case 'constructionProgram':
-        return  t('report.constructionProgram.subtitle', {
+        return t('report.constructionProgram.subtitle', {
             startYear: new Date().getFullYear() + 1,
             endYear: new Date().getFullYear() + 3,
           });
+      case 'budgetBookSummary':
+        return t('report.budgetBookSummary.subtitle');
       default:
         return '';
     }
@@ -49,7 +56,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
 
   return (
     <Document title={documentTitle}>
-      <Page size="A3" style={styles.page}>
+      <Page orientation={reportType !== 'constructionProgram' ? "landscape" : "portrait" } size="A3" style={styles.page}>
         <View style={styles.document}>
           <DocumentHeader
             title={documentTitle}

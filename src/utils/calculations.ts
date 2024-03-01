@@ -187,3 +187,22 @@ export const keurToMillion = (value?: string | null) => {
 
   return millionValue.toString().replace('.', ',');
 };
+
+const roundUpInTensOfThousands = (number: number) => {
+  // e.g. 2 685 000 should become 2,69 when the number has been converted into millions
+  return Math.round(number / 10000) * 10000;
+}
+
+// Specifically for budgetBookSummaryReport
+export const convertToMillions = (value?: string | number) => {
+  if (!value) return '0.00';
+  const valueWithCorrectType: number = typeof value === 'string' ? Number(value): value;
+  const rounded = roundUpInTensOfThousands(valueWithCorrectType);
+  // convert to millions
+  const convertedNumber = rounded / 1000000;
+  // show the number with two decimals
+  const splitAtDecimal = convertedNumber === 0
+    ? '0'
+    : String(convertedNumber).split('.');
+  return splitAtDecimal === '0' ? '0.00' : `${splitAtDecimal[0]}.${splitAtDecimal[1].substring(0,2)}`;
+};
