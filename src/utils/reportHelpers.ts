@@ -281,12 +281,17 @@ export const getReportRows = (
 
       const typedClassGrandParents = classGrandParents as IBudgetBookSummaryTableRow[];
 
-      // Sum all the properties of classGrandparents in order to form 'Investointiosa' row
+      /* Loop through the financeProperties of each classGrandparent and create an object (investmentPart) that contains the summed values 
+        e.g. each classGrandparent has a property called budgetEstimation --> here we take the budgetEstimation of every classGrandParent and sum them 
+        together. Same thing is done to the other financeProperties as well */
       let investmentPart = typedClassGrandParents.reduce((investmentPart, row) => {
+        // Go through the financeProperties of classGrandParents (budgetEstimation, budgetEstimationSuggestion,...initial1, initial2... etc.)
           for (const property in row.financeProperties) {
               if (row.financeProperties[property] !== undefined) {
+                /* The financeProperty is calculated as follows: the property of investmentPart + the property from the classGrandParent. When all
+                    the classGrandParents have been looped, each property in the investmentPart has the sum of the properties of the classGrandParents */
                 investmentPart.financeProperties[property] = 
-                String((Number(investmentPart.financeProperties[property]) || 0) + Number(row.financeProperties[property]));
+                  String((Number(investmentPart.financeProperties[property]) || 0) + Number(row.financeProperties[property]));
               }
           }
           return investmentPart;
@@ -294,9 +299,10 @@ export const getReportRows = (
       // convert the numbers into decimals and add investmentPart into classGrandParents
       classGrandParents = typedClassGrandParents.map((grandparent) => convertBudgetBookSummaryPropertiesToMillions(grandparent, 'grandParents')) as IConstructionProgramTableRow[] | IBudgetBookSummaryTableRow[];
       investmentPart = convertBudgetBookSummaryPropertiesToMillions(investmentPart, 'grandParents') as IBudgetBookSummaryTableRow;
+      
+        // The investmentPart should only be added to classGrandParents if other grandParents exist, otherwise it will cause duplicate investmentPart rows to the report
       if (classGrandParents.length) {
-        /* The investmentPart should only be added to classGrandParents if other grandParents
-        exist, otherwise it will cause duplicate investmentPart rows to the report */
+        // The investmentPart is added as the first object among the classGrandParents as it should be the first row in the report
         classGrandParents.unshift(investmentPart);
       }
       break;
@@ -350,7 +356,7 @@ const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
 export const flattenBudgetBookSummaryTableRows = (
   tableRows: Array<IBudgetBookSummaryTableRow>,
 ): Array<IBudgetBookSummaryCsvRow> =>
-  processTableRows(tableRows).flat(Infinity) as Array<IBudgetBookSummaryCsvRow>;
+  processTableRows(tableRows).flat(Infinity);
 
 const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
   a,
@@ -372,24 +378,28 @@ export const getReportData = async (
   const year = new Date().getFullYear();
 
   try {
-    const res = await getProjectsWithParams({
-      direct: false,
-      programmed: false,
-      params: 'overMillion=true',
-      forcedToFrame: false,
-      year,
-    });
+    let projects;
 
-    const projects = res.results;
+    if (reportType !== 'budgetBookSummary') {
+      const res = await getProjectsWithParams({
+        direct: false,
+        programmed: false,
+        params: 'overMillion=true',
+        forcedToFrame: false,
+        year,
+      });
 
-    if (!projects) {
+      projects = res.results;
+    }
+   
+    if (!projects && reportType !== 'budgetBookSummary') {
       return [];
     }
 
     // Get report rows the same way as for the pdf table
     const reportRows = reportType === 'budgetBookSummary' 
     ? getReportRows(reportType, classes, divisions, [])
-    : getReportRows(reportType, classes, divisions, projects);
+    : getReportRows(reportType, classes, divisions, projects as IProject[]);
 
     switch (reportType) {
       case 'constructionProgram': {

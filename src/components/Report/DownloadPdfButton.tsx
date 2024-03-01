@@ -69,13 +69,6 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
     try {
       const year = new Date().getFullYear();
       dispatch(setLoading({ text: 'Loading pdf data', id: LOADING_PDF_DATA }));
-      const res = await getProjectsWithParams({
-        direct: false,
-        programmed: false,
-        params: 'overMillion=true',
-        forcedToFrame: false,
-        year,
-      });
 
       let document: JSX.Element | undefined = undefined;
       switch(type) {
@@ -83,6 +76,13 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
           document = getPdfDocument(type, divisions, forcedToFrameClasses, []);
           break;
         default: {
+          const res = await getProjectsWithParams({
+            direct: false,
+            programmed: false,
+            params: 'overMillion=true',
+            forcedToFrame: false,
+            year,
+          });
           if (res.results.length > 0) {
             document = getPdfDocument(type, divisions, classes, res.results);
           }

@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
 
 const ConstructionProgramTableHeader = () => {
   const { t } = useTranslation();
+  // This is used for looping the inital budgets for 5-10 years from now on
   const currentPlusYears = [5, 6, 7, 8, 9, 10];
   return (
     <View style={styles.tableHeader}>
