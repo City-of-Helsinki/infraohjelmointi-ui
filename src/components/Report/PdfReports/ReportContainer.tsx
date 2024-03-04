@@ -35,12 +35,17 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
           startYear: new Date().getFullYear() + 1,
           endYear: new Date().getFullYear() + 10,
         });
+      case 'operationalEnvironmentAnalysis':
+        return t('report.operationalEnvironmentAnalysis.title', {
+          startYear: new Date().getFullYear() + 1,
+          endYear: new Date().getFullYear() + 10,
+        });
       default:
         return '';
     }
   }
 
-  const getDocumentSubtitle = () => {
+  const getDocumentSubtitleOne = () => {
     switch (reportType) {
       case 'strategy':
         return t('report.strategy.subtitle')
@@ -51,21 +56,36 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
           });
       case 'budgetBookSummary':
         return t('report.budgetBookSummary.subtitle');
+      case 'operationalEnvironmentAnalysis':
+        return t('report.operationalEnvironmentAnalysis.subtitleOne');
+      default:
+        return '';
+    }
+  }
+  const getDocumentSubtitleTwo = () => {
+    switch (reportType) {
+      case 'operationalEnvironmentAnalysis':
+        return t('report.operationalEnvironmentAnalysis.subtitleTwo');
       default:
         return '';
     }
   }
 
   const documentTitle = getDocumentTitle();
-  const documentSubtitle = getDocumentSubtitle();
-
+  const documentSubtitleOne = getDocumentSubtitleOne();
+  const documentSubtitleTwo = getDocumentSubtitleTwo();
+  const date = new Date();
+  const currentDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
   return (
     <Document title={documentTitle}>
       <Page orientation={reportType !== 'constructionProgram' ? "landscape" : "portrait" } size="A3" style={styles.page}>
         <View style={styles.document}>
           <DocumentHeader
             title={documentTitle}
-            subtitleOne={documentSubtitle}
+            subtitleOne={documentSubtitleOne}
+            subtitleTwo={documentSubtitleTwo}
+            reportType={reportType}
+            date={reportType === 'operationalEnvironmentAnalysis' ? currentDate : ''}
           />
           <ReportTable reportType={reportType} data={data} />
           {reportType === 'strategy' &&

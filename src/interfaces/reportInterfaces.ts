@@ -19,7 +19,7 @@ export type getForcedToFrameDataType = Promise<{
     initialSelections: IPlanningRowSelections}>;
 
 export const reports = [
-  'budgetProposal',
+  'operationalEnvironmentAnalysis',
   'strategy',
   'constructionProgram',
   'budgetBookSummary',

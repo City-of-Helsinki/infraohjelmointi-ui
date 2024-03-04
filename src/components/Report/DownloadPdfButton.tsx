@@ -34,7 +34,7 @@ const getPdfDocument = (
   coordinatorRows?: IPlanningRow[],
 ) => {
   const pdfDocument = {
-    budgetProposal: <EmptyDocument />,
+    operationalEnvironmentAnalysis: <ReportContainer data={{divisions: divisions, classes: classes, projects:[]}} reportType={'operationalEnvironmentAnalysis'}/>,
     strategy: (
       <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={'strategy'}/>
     ),
@@ -87,6 +87,9 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           }
           break;
         }
+        case 'operationalEnvironmentAnalysis':
+          document = getPdfDocument(type, divisions, forcedToFrameClasses, []);
+          break;
         default: {
           const res = await getProjectsWithParams({
             direct: false,
@@ -116,7 +119,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'strategy'}
+      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'operationalEnvironmentAnalysis' && type !== 'strategy'}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>

@@ -6,6 +6,7 @@ import TableRow from './TableRow';
 import { IBasicReportData, IBudgetBookSummaryTableRow, ReportType } from '@/interfaces/reportInterfaces';
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
 import StrategyTableHeader from './StrategyTableHeader';
+import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
 
 const styles = StyleSheet.create({
   table: {
@@ -39,6 +40,8 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
         return <ConstructionProgramTableHeader />;
       case 'budgetBookSummary':
         return <BudgetBookSummaryTableHeader />;
+      case 'operationalEnvironmentAnalysis':
+        return <OperationalEnvironmentAnalysisTableHeader />
     }
   }
   const tableHeader = getTableHeader();
