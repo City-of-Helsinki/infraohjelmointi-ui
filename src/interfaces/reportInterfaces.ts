@@ -35,7 +35,11 @@ export interface IStrategyTableCsvRow {
 }
 
 export interface IBudgetBookSummaryCsvRow {
-  [key: string]: string | IFinanceProperties | undefined;
+  [key: string]: string | IBudgetBookFinanceProperties | undefined;
+}
+
+export interface IOperationalEnvironmentAnalysisCsvRow {
+  [key: string]: string | IOperationalEnvironmentAnalysisFinanceProperties | undefined;
 }
 
 export enum Reports {
@@ -62,8 +66,27 @@ interface ITableRowEssentials {
   name: string;
   parent: string | null;
 }
+export interface IOperationalEnvironmentAnalysisFinanceProperties {
+  costForecast?: string;
+  TAE?: string;
+  TSE1?: string;
+  TSE2?: string;
+  initial1?: string;
+  initial2?: string;
+  initial3?: string;
+  initial4?: string;
+  initial5?: string;
+  initial6?: string;
+  initial7?: string;
+  [key: string]: string | undefined;
+}
 
-export interface IFinanceProperties {
+export interface IOperationalEnvironmentAnalysisProperties extends IBudgetBookFinanceProperties {
+  id: string;
+  name: string;
+}
+
+export interface IBudgetBookFinanceProperties {
   usage?: string; 
   budgetEstimation?: string; //first TA column means talousarvio
   budgetEstimationSuggestion?: string; //second TA column means talousarvioehdotus
@@ -79,7 +102,7 @@ export interface IFinanceProperties {
   [key: string]: string | undefined;
 }
 
-export interface IFlattenedBudgetBookSummaryProperties extends IFinanceProperties {
+export interface IFlattenedBudgetBookSummaryProperties extends IBudgetBookFinanceProperties {
   id: string;
   name: string;
 }
@@ -112,11 +135,10 @@ export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {
   type: ReportTableRowType;
   objectType: PlanningRowType | '',
   
-  financeProperties: IFinanceProperties;
+  financeProperties: IBudgetBookFinanceProperties;
 }
 
 export interface IConstructionProgramTableRow extends ITableRowEssentials {
-  // These first three are should be typed depending on the report type
   children: Array<IConstructionProgramTableRow>;
   projects: Array<IConstructionProgramTableRow>;
   type: ReportTableRowType;
@@ -128,4 +150,12 @@ export interface IConstructionProgramTableRow extends ITableRowEssentials {
   budgetProposalCurrentYearPlus0?: string;
   budgetProposalCurrentYearPlus1?: string;
   budgetProposalCurrentYearPlus2?: string;
+}
+
+export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssentials {
+  children: Array<IOperationalEnvironmentAnalysisTableRow>;
+  projects: Array<IOperationalEnvironmentAnalysisTableRow>;
+  type: ReportTableRowType;
+
+  financeProperties: IOperationalEnvironmentAnalysisFinanceProperties;
 }

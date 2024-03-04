@@ -7,6 +7,8 @@ import {
   IConstructionProgramTableRow,
   IStrategyTableCsvRow,
   IStrategyTableRow,
+  IOperationalEnvironmentAnalysisCsvRow,
+  IOperationalEnvironmentAnalysisTableRow,
   ReportTableRowType,
   ReportType,
   Reports,
@@ -17,6 +19,7 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { TFunction } from 'i18next';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
+import { IClassFinances } from '@/interfaces/classInterfaces';
 
 interface IYearCheck {
   planningStart: number;
@@ -283,7 +286,7 @@ export const getReportRows = (
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
   projects: Array<IProject>,
-): Array<IConstructionProgramTableRow | IStrategyTableRow/* | put here another report type and to the switch cases too */> => {
+): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow | IOperationalEnvironmentAnalysisTableRow> => {
   const { allClasses } = classes;
 
   const initialValues = {
@@ -325,6 +328,23 @@ export const getReportRows = (
       break;
     default:
       filteredProjects = projects;
+  };
+
+   const mapOperationalEnvironmentAnalysisProperties = (finances: IClassFinances) => {
+    return {
+      costForecast: finances.year0.plannedBudget,
+      TAE: finances.year1.plannedBudget,
+      TSE1: finances.year2.plannedBudget,
+      TSE2: finances.year3.plannedBudget,
+      initial1: finances.year4.plannedBudget,
+      initial2: finances.year5.plannedBudget,
+      initial3: finances.year6.plannedBudget,
+      initial4: finances.year7.plannedBudget,
+      initial5: finances.year8.plannedBudget,
+      initial6: finances.year9.plannedBudget,
+      initial7: finances.year10.plannedBudget,
+      type: 'class',
+    }
   };
 
   const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
@@ -386,8 +406,49 @@ export const getReportRows = (
         break;
     }
 
+  const addInvestmentPart = () => {
+    const initialInvestmentPart: IBudgetBookSummaryTableRow = {
+      children: [],
+      projects: [],
+      type: 'class',
+      financeProperties: {},
+      name: 'Investointiosa',
+      parent: null,
+      id: 'investmentpart',
+    }
+
+    const typedClassGrandParents = classGrandParents as IBudgetBookSummaryTableRow[];
+
+    /* Loop through the financeProperties of each classGrandparent and create an object (investmentPart) that contains the summed values 
+      e.g. each classGrandparent has a property called budgetEstimation --> here we take the budgetEstimation of every classGrandParent and sum them 
+      together. Same thing is done to the other financeProperties as well */
+    let investmentPart = typedClassGrandParents.reduce((investmentPart, row) => {
+      // Go through the financeProperties of classGrandParents (budgetEstimation, budgetEstimationSuggestion,...initial1, initial2... etc.)
+        for (const property in row.financeProperties) {
+            if (row.financeProperties[property] !== undefined) {
+              /* The financeProperty is calculated as follows: the property of investmentPart + the property from the classGrandParent. When all
+                  the classGrandParents have been looped, each property in the investmentPart has the sum of the properties of the classGrandParents */
+              investmentPart.financeProperties[property] = 
+                String((Number(investmentPart.financeProperties[property]) || 0) + Number(row.financeProperties[property]));
+            }
+        }
+        return investmentPart;
+    }, initialInvestmentPart);
+
+    // convert the numbers into decimals and add investmentPart into classGrandParents
+    classGrandParents = typedClassGrandParents.map((grandparent) => convertBudgetBookSummaryPropertiesToMillions(grandparent, 'grandParents')) as IConstructionProgramTableRow[] | IBudgetBookSummaryTableRow[];
+    investmentPart = convertBudgetBookSummaryPropertiesToMillions(investmentPart, 'grandParents') as IBudgetBookSummaryTableRow;
+    
+      // The investmentPart should only be added to classGrandParents if other grandParents exist, otherwise it will cause duplicate investmentPart rows to the report
+    if (classGrandParents.length) {
+      // The investmentPart is added as the first object among the classGrandParents as it should be the first row in the report
+      classGrandParents.unshift(investmentPart);
+    }
+    return classGrandParents;
+  }
+
   // Get the parent classes parents
-  let classGrandParents: Array<IConstructionProgramTableRow> = [];
+  let classGrandParents: Array<IConstructionProgramTableRow | IOperationalEnvironmentAnalysisTableRow> = [];
   switch (reportType) {
     case Reports.ConstructionProgram:
       classGrandParents = allClasses
@@ -412,7 +473,7 @@ export const getReportRows = (
 // For CSV reports -->
 const budgetBookSummaryCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
-const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
+const processBudgetBookSummaryTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
   tableRows.forEach((tableRow) => {
     if (!budgetBookSummaryCsvRows.some(row => row.id === tableRow.id)) {
       budgetBookSummaryCsvRows.push({
@@ -474,10 +535,45 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
   });
   return strategyCsvRows;
 }
+const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
+
+const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalEnvironmentAnalysisTableRow[]) => {
+  tableRows.forEach((tableRow) => {
+    if (!operationalEnvironmentAnalysisCsvRows.some(row => row.id === tableRow.id)) {
+      operationalEnvironmentAnalysisCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: tableRow.type,
+        costForecast: tableRow.financeProperties.costForecast ?? '0.00',
+        TAE: tableRow.financeProperties.TAE ?? '0.00',
+        TSE1: tableRow.financeProperties.TSE1 ?? '0.00',
+        TSE2: tableRow.financeProperties.TSE2 ?? '0.00',
+        initial1: tableRow.financeProperties.initial1 ?? '0.00',
+        initial2: tableRow.financeProperties.initial2 ?? '0.00',
+        initial3: tableRow.financeProperties.initial3 ?? '0.00',
+        initial4: tableRow.financeProperties.initial4 ?? '0.00',
+        initial5: tableRow.financeProperties.initial5 ?? '0.00',
+        initial6: tableRow.financeProperties.initial6 ?? '0.00',
+        initial7: tableRow.financeProperties.initial7 ?? '0.00',
+      })
+    }
+
+    // Recursive calls for children and projects.
+    processOperationalEnvironmentAnalysisTableRows(tableRow.projects);
+    processOperationalEnvironmentAnalysisTableRows(tableRow.children);
+    
+  });
+  return operationalEnvironmentAnalysisCsvRows;
+};
 
 /**
  * Create a flattened version of report table rows, since the react-csv needs a one-dimensional array
  */
+export const flattenOperationalEnvironmentAnalysisTableRows = (
+  tableRows: Array<IOperationalEnvironmentAnalysisTableRow>,
+): Array<IOperationalEnvironmentAnalysisCsvRow> =>
+  processOperationalEnvironmentAnalysisTableRows(tableRows).flat(Infinity);
+
 export const flattenBudgetBookSummaryTableRows = (
   tableRows: Array<IBudgetBookSummaryTableRow>,
 ): Array<IBudgetBookSummaryCsvRow> =>

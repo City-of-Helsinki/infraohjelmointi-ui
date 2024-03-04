@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IStrategyTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IOperationalEnvironmentAnalysisProperties, IStrategyTableRow, IOperationalEnvironmentAnalysisTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -26,7 +26,7 @@ const constructionProgramCommonStyles = {
   borderRight: '1px solid #808080',
 };
 
-const budgetBookSummaryCommonStyles = {
+const budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles = {
   borderLeft: '1px solid #808080',
   textAlign: 'center' as unknown as 'center',
 };
@@ -104,35 +104,35 @@ const styles = StyleSheet.create({
   // For budgetBookSummary report:
   classNameTargetCell: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     ...budgetBookSummaryNameCellCommonStyles,
     fontWeight: 'bold',
   },
   nameTargetCell: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     ...budgetBookSummaryNameCellCommonStyles
   },
   unBoldedColumns: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     width: '5%',
   },
   narrowerColumns: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     width: '5%',
     fontWeight: 'bold',
   },
   widerColumns: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     width: '7%',
     fontWeight: 'bold',
   },
   lastWiderColumn: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     borderRight: '1px solid #808080',
     width: '7%',
     fontWeight: 'bold',
@@ -145,6 +145,28 @@ const styles = StyleSheet.create({
     paddingLeft: '45px',
     fontWeight: 'medium',
   },
+
+  // For operationalEnvironmentAnalysis report:
+  targetColumn: {
+    ...cellStyles,
+    borderLeft: '1px solid #808080',
+    width: '28.5%',
+    fontWeight: 'medium',
+  },
+  numberColumns: {
+    ...cellStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
+    width: '6.5%',
+    fontWeight: 'medium',
+  },
+  lastNumberColumn: {
+    ...cellStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
+    width: '6.5%',
+    borderRight: '1px solid #808080',
+    fontWeight: 'medium',
+  },
+
 });
 
 const strategyReportStyles = StyleSheet.create({
@@ -216,15 +238,15 @@ const strategyReportStyles = StyleSheet.create({
   },
 });
 interface ITableRowProps {
-  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow /*| another report row type */;
-  flattenedRows?: IBudgetBookSummaryCsvRow[];
+  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow | IOperationalEnvironmentAnalysisTableRow;
+  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[];
   depth: number;
   index?: number;
   reportType: ReportType;
 }
 
 interface IRowProps extends ITableRowProps{
-  flattenedRow?: IFlattenedBudgetBookSummaryProperties;
+  flattenedRow?: IFlattenedBudgetBookSummaryProperties | IOperationalEnvironmentAnalysisProperties;
 }
 
 const getMonthCellStyle = (monthCell: string | undefined) => {
@@ -340,7 +362,28 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
           } else {
             tableRow = <View></View>;
           }
-          
+          break;
+        }
+        case Reports.OperationalEnvironmentAnalysis: {
+          if (flattenedRow) {
+            tableRow =  
+              <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
+                  <Text style={styles.targetColumn}>
+                    {flattenedRow.name}
+                  </Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.costForecast}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.TAE}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.TSE1}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.TSE2}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.initial1}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.initial2}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.initial3}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.initial4}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.initial5}</Text>
+                  <Text style={styles.numberColumns}>{flattenedRow.initial6}</Text>
+                  <Text style={styles.lastNumberColumn}>{flattenedRow.initial7}</Text>
+              </View>;
+          }
           break;
         }
         default:
@@ -359,7 +402,7 @@ Row.displayName = 'Row';
 const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, index }) => {
   return (
       <>
-        { reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy ?
+        { reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy || reportType === Reports.OperationalEnvironmentAnalysis ?
           <>
             {/* Class */}
             { flattenedRows?.map((row, index) => {

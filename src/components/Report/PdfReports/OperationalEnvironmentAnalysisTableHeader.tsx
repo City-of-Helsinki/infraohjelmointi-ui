@@ -16,15 +16,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   targetCell: {
-    width: '26%',
+    width: '28.5%',
     paddingLeft: '8px',
   },
   narrowerColumns: {
     alignItems: 'center' as unknown as 'center',
-    width: '7.5%',
+    width: '6.5%',
   },
   yearContainer: {
-    width: '44%',
+    width: '45.5%',
     display: 'flex',
     flexDirection: 'column',
     textAlign: 'center' as unknown as 'center',
