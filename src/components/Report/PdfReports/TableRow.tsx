@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IStrategyTableRow, ReportType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IStrategyTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -256,7 +256,7 @@ const getRowStyle = (rowType: string, depth: number) => {
 const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
     let tableRow;
     switch (reportType) {
-        case 'strategy': {
+        case Reports.Strategy: {
             if (flattenedRow) {
               tableRow =
               <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
@@ -285,7 +285,7 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
             
             break;
         }
-        case 'constructionProgram': {
+        case Reports.ConstructionProgram: {
             const constructionRow = row as IConstructionProgramTableRow;
             tableRow =  
             <View wrap={false} style={depth % 2 ? styles.evenRow : styles.oddRow} key={constructionRow.id}>
@@ -300,7 +300,7 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
             </View>
             break;
         }
-        case 'budgetBookSummary': {
+        case Reports.BudgetBookSummary: {
           if (flattenedRow) {
             const getStyle = () => {
               const isFourthLevelRow = /^\d \d\d \d\d \d\d/.test(flattenedRow.name);
@@ -359,7 +359,7 @@ Row.displayName = 'Row';
 const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, index }) => {
   return (
       <>
-        { reportType === 'budgetBookSummary' || reportType === 'strategy' ?
+        { reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy ?
           <>
             {/* Class */}
             { flattenedRows?.map((row, index) => {

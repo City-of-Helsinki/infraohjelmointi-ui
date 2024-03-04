@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType, Reports } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { getReportData } from '@/utils/reportHelpers';
@@ -43,11 +43,8 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
-        case 'constructionProgram':
-          setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
-          break;
-        case 'budgetBookSummary':
-        case 'strategy': {
+        case Reports.BudgetBookSummary:
+        case Reports.Strategy: {
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
@@ -55,6 +52,9 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           }
           break;
         }
+        case Reports.ConstructionProgram:
+          setCsvData(await getReportData(classes, divisions, t, Reports.ConstructionProgram));
+          break;
         default:
           // In the MVP stage we only had time to implement the construction program report, the other
           // report cases should come here
@@ -74,7 +74,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           iconLeft={downloadIcon}
           variant="secondary"
           onClick={getCsvData}
-          disabled={(type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'strategy')}
+          disabled={(type !== Reports.ConstructionProgram && type !== Reports.BudgetBookSummary && type !== 'strategy')}
         >
           {t('downloadCsv', { name: t(`report.${type}.documentName`) })}
         </Button>

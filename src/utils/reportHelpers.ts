@@ -9,6 +9,7 @@ import {
   IStrategyTableRow,
   ReportTableRowType,
   ReportType,
+  Reports,
 } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { convertToMillions, keurToMillion } from './calculations';
@@ -308,7 +309,7 @@ export const getReportRows = (
 
   // Filtering rules for the projects for different reports
   switch (reportType) {
-    case 'constructionProgram':
+    case Reports.ConstructionProgram:
       filteredProjects = projects.filter((p) => 
         p.planningStartYear && p.constructionEndYear &&
         checkYearRange({
@@ -328,7 +329,7 @@ export const getReportRows = (
 
   const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
     switch (reportType) {
-      case 'constructionProgram':
+      case Reports.ConstructionProgram:
         return filteredProjects
         .filter((p) => p.projectClass === id)
         .map((p) => ({
@@ -355,7 +356,7 @@ export const getReportRows = (
   // Filter all classes that are included in the projects' parent classes
   let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
   switch (reportType) {
-    case 'constructionProgram':
+    case Reports.ConstructionProgram:
       classesForProjects = allClasses
         .filter((ac) => filteredProjects.findIndex((p) => p.projectClass === ac.id) !== -1)
         .map((c) => ({
@@ -371,7 +372,7 @@ export const getReportRows = (
     // Get the classes parents
     let classParents: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
     switch (reportType) {
-      case 'constructionProgram':
+      case Reports.ConstructionProgram:
         classParents = allClasses
           .filter((ac) => classesForProjects.findIndex((cfp) => cfp.parent === ac.id) !== -1)
           .map((c) => ({
@@ -388,7 +389,7 @@ export const getReportRows = (
   // Get the parent classes parents
   let classGrandParents: Array<IConstructionProgramTableRow> = [];
   switch (reportType) {
-    case 'constructionProgram':
+    case Reports.ConstructionProgram:
       classGrandParents = allClasses
         .filter((ac) => classParents.findIndex((cp) => cp.parent === ac.id) !== -1)
         .map((c) => ({
@@ -511,7 +512,7 @@ export const getReportData = async (
   try {
     let projects;
 
-    if (reportType !== 'budgetBookSummary' && reportType !== 'strategy') {
+    if (reportType !== Reports.BudgetBookSummary && reportType !== Reports.Strategy) {
       const res = await getProjectsWithParams({
         direct: false,
         programmed: false,
@@ -523,7 +524,7 @@ export const getReportData = async (
       projects = res.results;
     }
    
-    if (!projects && reportType !== 'budgetBookSummary' && reportType !== 'strategy') {
+    if (!projects && reportType !== Reports.BudgetBookSummary && reportType !== Reports.Strategy) {
       return [];
     }
 
@@ -537,7 +538,7 @@ export const getReportData = async (
     }
 
     switch (reportType) {
-      case 'strategy' : {
+      case Reports.Strategy : {
         //Flatten rows to one dimension
         const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyTableRow[]);
         return flattenedRows.map((r) => ({
@@ -560,7 +561,7 @@ export const getReportData = async (
           [`\n12`]: r.decemberStatus,
         }))
       }
-      case 'constructionProgram': {
+      case Reports.ConstructionProgram: {
         // Flatten rows into one dimension
         const flattenedRows = flattenConstructionProgramTableRows(reportRows);
         // Transform them into csv rows
@@ -575,7 +576,7 @@ export const getReportData = async (
           [`TSE ${year + 2}`]: r.budgetProposalCurrentYearPlus2,
         }));
       }
-      case 'budgetBookSummary': {
+      case Reports.BudgetBookSummary: {
         // Flatten rows into one dimension
         const flattenedRows = flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
         // Transform them into csv rows

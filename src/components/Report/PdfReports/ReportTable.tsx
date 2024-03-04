@@ -3,7 +3,7 @@ import { View, StyleSheet } from '@react-pdf/renderer';
 import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
 import { convertToReportRows, flattenBudgetBookSummaryTableRows, flattenStrategyTableRows, getReportRows } from '@/utils/reportHelpers';
 import TableRow from './TableRow';
-import { IBasicReportData, IBudgetBookSummaryTableRow, ReportType } from '@/interfaces/reportInterfaces';
+import { IBasicReportData, IBudgetBookSummaryTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
 import StrategyTableHeader from './StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
@@ -29,18 +29,17 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
     : getReportRows(reportType, data.classes, data.divisions, data.projects);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
-  const flattenedRows = reportType === 'budgetBookSummary' ? flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]) : [];
-  const strategyReportRows = reportType === 'strategy' ? flattenStrategyTableRows(reportRows) : [];
-  
+  const flattenedRows = reportType === Reports.BudgetBookSummary ? flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]) : [];
+  const strategyReportRows = reportType === Reports.Strategy ? flattenStrategyTableRows(reportRows) : [];
   const getTableHeader = () => {
     switch (reportType) {
-      case 'strategy':
+      case Reports.Strategy:
         return <StrategyTableHeader />;
-      case 'constructionProgram':
+      case Reports.ConstructionProgram:
         return <ConstructionProgramTableHeader />;
-      case 'budgetBookSummary':
+      case Reports.BudgetBookSummary:
         return <BudgetBookSummaryTableHeader />;
-      case 'operationalEnvironmentAnalysis':
+      case Reports.OperationalEnvironmentAnalysis:
         return <OperationalEnvironmentAnalysisTableHeader />
     }
   }
@@ -49,8 +48,8 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
     <View>
       <View style={styles.table}>
         <View fixed>{tableHeader}</View>
-        { reportType === 'budgetBookSummary' || reportType === 'strategy' ?
-          <TableRow flattenedRows={reportType === 'budgetBookSummary' ? flattenedRows : strategyReportRows} depth={0} reportType={reportType}/>
+        { reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy ?
+          <TableRow flattenedRows={reportType === Reports.BudgetBookSummary ? flattenedRows : strategyReportRows} depth={0} reportType={reportType}/>
         :
         reportRows?.map((r, i) => (
           <TableRow key={r.id ?? i} row={r} index={i} depth={0} reportType={reportType}/>

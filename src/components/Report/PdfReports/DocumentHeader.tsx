@@ -2,7 +2,7 @@ import { Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 import logo from '@/assets/logo.png';
 import { t } from 'i18next';
-import { ReportType } from '@/interfaces/reportInterfaces';
+import { ReportType, Reports } from '@/interfaces/reportInterfaces';
 
 // Create styles (pdf docs can't be given rem for some reason)
 const styles = StyleSheet.create({
@@ -55,7 +55,7 @@ const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, reportType, subtitleO
         </View>
         <Text>{date}</Text>
       </View>
-      { reportType === 'operationalEnvironmentAnalysis' &&
+      { reportType === Reports.OperationalEnvironmentAnalysis &&
         <View>
           <Text style={styles.extraTableHeader}>
             {t('report.operationalEnvironmentAnalysis.tableTitle', {

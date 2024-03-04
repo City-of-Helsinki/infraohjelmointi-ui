@@ -38,6 +38,14 @@ export interface IBudgetBookSummaryCsvRow {
   [key: string]: string | IFinanceProperties | undefined;
 }
 
+export enum Reports {
+  OperationalEnvironmentAnalysis = 'operationalEnvironmentAnalysis',
+  Strategy = 'strategy',
+  ConstructionProgram = 'constructionProgram',
+  BudgetBookSummary = 'budgetBookSummary',
+  FinancialStatement = 'financialStatement',
+}
+
 export type ReportType = (typeof reports)[number];
 
 export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location';

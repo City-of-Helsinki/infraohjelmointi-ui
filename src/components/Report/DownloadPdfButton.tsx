@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReportType, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
+import { ReportType, Reports, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -34,15 +34,16 @@ const getPdfDocument = (
   coordinatorRows?: IPlanningRow[],
 ) => {
   const pdfDocument = {
-    operationalEnvironmentAnalysis: <ReportContainer data={{divisions: divisions, classes: classes, projects:[]}} reportType={'operationalEnvironmentAnalysis'}/>,
-    strategy: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={'strategy'}/>
-    ),
+    operationalEnvironmentAnalysis:
+      <ReportContainer data={{divisions: divisions, classes: classes, projects:[]}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
+      strategy: (
+        <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={'strategy'}/>
+      ),
     constructionProgram: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'constructionProgram'}/>
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={Reports.ConstructionProgram}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects:[], coordinatorRows}} reportType={'budgetBookSummary'}/>
+      <ReportContainer data={{divisions: divisions, classes: classes, projects:[], coordinatorRows}} reportType={Reports.BudgetBookSummary}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -78,8 +79,8 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
 
       let document: JSX.Element | undefined = undefined;
       switch(type) {
-        case 'budgetBookSummary':
-        case 'strategy': {
+        case Reports.Strategy:
+        case Reports.BudgetBookSummary: {
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
@@ -87,7 +88,15 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           }
           break;
         }
-        case 'operationalEnvironmentAnalysis':
+        case Reports.Strategy: {
+          const res = await getForcedToFrameData(year - 1);
+          if (res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
+          }
+          break;
+        }
+        case Reports.OperationalEnvironmentAnalysis:
           document = getPdfDocument(type, divisions, forcedToFrameClasses, []);
           break;
         default: {
@@ -119,7 +128,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'operationalEnvironmentAnalysis' && type !== 'strategy'}
+      disabled={type !== Reports.ConstructionProgram && type !== Reports.BudgetBookSummary && type !== Reports.OperationalEnvironmentAnalysis && type !== 'strategy'}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>

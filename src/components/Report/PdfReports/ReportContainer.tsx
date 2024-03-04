@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import DocumentHeader from './DocumentHeader';
 import ReportTable from './ReportTable';
 import { FC, memo } from 'react';
-import { IBasicReportData, ReportType } from '@/interfaces/reportInterfaces';
 import StrategyReportFooter from './StrategyReportFooter';
+import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
 
 const styles = StyleSheet.create({
   page: {
@@ -30,12 +30,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
         return t('report.strategy.title', {startYear: new Date().getFullYear()});
       case 'constructionProgram':
         return t('report.constructionProgram.title');
-      case 'budgetBookSummary':
+      case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title', {
           startYear: new Date().getFullYear() + 1,
           endYear: new Date().getFullYear() + 10,
         });
-      case 'operationalEnvironmentAnalysis':
+      case Reports.OperationalEnvironmentAnalysis:
         return t('report.operationalEnvironmentAnalysis.title', {
           startYear: new Date().getFullYear() + 1,
           endYear: new Date().getFullYear() + 10,
@@ -49,14 +49,14 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
     switch (reportType) {
       case 'strategy':
         return t('report.strategy.subtitle')
-      case 'constructionProgram':
+      case Reports.ConstructionProgram:
         return t('report.constructionProgram.subtitle', {
             startYear: new Date().getFullYear() + 1,
             endYear: new Date().getFullYear() + 3,
           });
-      case 'budgetBookSummary':
+      case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.subtitle');
-      case 'operationalEnvironmentAnalysis':
+      case Reports.OperationalEnvironmentAnalysis:
         return t('report.operationalEnvironmentAnalysis.subtitleOne');
       default:
         return '';
@@ -64,7 +64,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
   }
   const getDocumentSubtitleTwo = () => {
     switch (reportType) {
-      case 'operationalEnvironmentAnalysis':
+      case Reports.OperationalEnvironmentAnalysis:
         return t('report.operationalEnvironmentAnalysis.subtitleTwo');
       default:
         return '';
@@ -78,14 +78,14 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
   const currentDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
   return (
     <Document title={documentTitle}>
-      <Page orientation={reportType !== 'constructionProgram' ? "landscape" : "portrait" } size="A3" style={styles.page}>
+      <Page orientation={reportType !== Reports.ConstructionProgram ? "landscape" : "portrait" } size="A3" style={styles.page}>
         <View style={styles.document}>
           <DocumentHeader
             title={documentTitle}
             subtitleOne={documentSubtitleOne}
             subtitleTwo={documentSubtitleTwo}
             reportType={reportType}
-            date={reportType === 'operationalEnvironmentAnalysis' ? currentDate : ''}
+            date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
           />
           <ReportTable reportType={reportType} data={data} />
           {reportType === 'strategy' &&
