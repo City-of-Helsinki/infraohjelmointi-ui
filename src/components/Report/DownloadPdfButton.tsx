@@ -14,8 +14,10 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import ReportContainer from './PdfReports/ReportContainer';
 import { useAppDispatch } from '@/hooks/common';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
-import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
+import { ILocationHierarchy } from '@/reducers/locationSlice';
+import { IPlanningRow, IPlanningRowSelections } from '@/interfaces/planningInterfaces';
+import { IGroup } from '@/interfaces/groupInterfaces';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -36,7 +38,7 @@ const getPdfDocument = (
   const pdfDocument = {
     budgetProposal: <EmptyDocument />,
     strategy: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'strategy'}/>
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={'strategy'}/>
     ),
     constructionProgram: (
       <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'constructionProgram'}/>
@@ -58,6 +60,9 @@ interface IDownloadPdfButtonProps {
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
   forcedToFrameClasses: ICoordinatorClassHierarchy;
+  forcedToFrameLocations: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
+  selections: IPlanningRowSelections;
+  coordinatorGroups: IGroup[];
 }
 
 /**
@@ -70,7 +75,6 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
   const LOADING_PDF_DATA = 'loading-pdf-data';
-  const isConstructedFromForcedToFrame = type === 'strategy';
 
   const downloadPdf = useCallback(async () => {
     try {
@@ -87,18 +91,24 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           }
           break;
         }
+        case 'strategy': {
+          const res = await getForcedToFrameData(year - 1);
+          if (res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
+          }
+          break;
+        }
         default: {
           const res = await getProjectsWithParams({
             direct: false,
             programmed: false,
             params: 'overMillion=true',
-            forcedToFrame: isConstructedFromForcedToFrame,
+            forcedToFrame: false,
             year,
-          }, isConstructedFromForcedToFrame);
+          });
           if (res.results.length > 0) {
-            console.log(res.results);
-            console.log(forcedToFrameClasses);
-            document = getPdfDocument(type, divisions, isConstructedFromForcedToFrame ? forcedToFrameClasses : classes, res.results);
+            document = getPdfDocument(type, divisions, classes, res.results);
           }
         }
       }

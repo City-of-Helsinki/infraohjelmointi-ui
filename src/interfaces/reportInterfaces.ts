@@ -76,22 +76,22 @@ export interface IStrategyTableRow extends ITableRowEssentials {
   projects: Array<IStrategyTableRow>
   children: Array<IStrategyTableRow>
   type: ReportTableRowType
-  projectManager: string;
-  projectPhase: string;
-  costPlan: string;
-  costForecast: string;
-  januaryStatus: string;
-  februaryStatus: string;
-  marchStatus: string;
-  aprilStatus: string;
-  mayStatus: string;
-  juneStatus: string;
-  julyStatus: string;
-  augustStatus: string;
-  septemberStatus: string;
-  octoberStatus: string;
-  novemberStatus: string;
-  decemberStatus: string;
+  projectManager?: string;
+  projectPhase?: string;
+  costPlan?: string;
+  costForecast?: string;
+  januaryStatus?: string;
+  februaryStatus?: string;
+  marchStatus?: string;
+  aprilStatus?: string;
+  mayStatus?: string;
+  juneStatus?: string;
+  julyStatus?: string;
+  augustStatus?: string;
+  septemberStatus?: string;
+  octoberStatus?: string;
+  novemberStatus?: string;
+  decemberStatus?: string;
 }
 
 export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {

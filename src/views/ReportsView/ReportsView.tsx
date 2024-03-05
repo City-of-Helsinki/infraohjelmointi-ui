@@ -2,12 +2,13 @@ import { ReportRow } from '@/components/Report';
 import { reports } from '@/interfaces/reportInterfaces';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectPlanningDivisions } from '@/reducers/locationSlice';
+import { selectBatchedForcedToFrameLocations, selectCoordinationDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
 import { selectBatchedForcedToFrameClasses, selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import './styles.css';
-import { selectIsPlanningLoading, setStartYear } from '@/reducers/planningSlice';
+import { selectIsPlanningLoading, selectSelections, setStartYear } from '@/reducers/planningSlice';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { useEffect } from 'react';
+import { selectCoordinationGroups } from '@/reducers/groupSlice';
 
 const ReportsView = () => {
   const { t } = useTranslation();
@@ -17,6 +18,9 @@ const ReportsView = () => {
   const divisions = useAppSelector(selectPlanningDivisions);
   const classes = useAppSelector(selectBatchedPlanningClasses);
   const forcedToFrameClasses = useAppSelector(selectBatchedForcedToFrameClasses);
+  const forcedToFrameLocations = useAppSelector(selectBatchedForcedToFrameLocations);
+  const selections = useAppSelector(selectSelections);
+  const coordinatorGroups = useAppSelector(selectCoordinationGroups);
   
   const year = new Date().getFullYear();
   useEffect(() => {
@@ -41,7 +45,7 @@ const ReportsView = () => {
         {t('reports')}
       </h1>
       {reports.map((r) => (
-        <ReportRow key={r} type={r} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses}/>
+        <ReportRow key={r} type={r} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} forcedToFrameLocations={forcedToFrameLocations} selections={selections} coordinatorGroups={coordinatorGroups} />
       ))}
     </div>
   );
