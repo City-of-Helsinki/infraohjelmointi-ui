@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, ReportType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IStrategyTableRow, ReportType } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -146,8 +146,59 @@ const styles = StyleSheet.create({
     fontWeight: 'medium',
   },
 });
+
+const strategyReportStyles = StyleSheet.create({
+  oddRow: {
+    ...tableRowStyles,
+  },
+  evenRow: {
+    ...tableRowStyles,
+    backgroundColor: '#f2f2f2',
+  },
+  projectCell: {
+    ...cellStyles,
+    paddingLeft: '21px',
+    width: '450px',
+  },
+  classRow: {
+    ...tableRowStyles,
+    backgroundColor: '#f0f0ff'
+  },
+  projectManagerCell: {
+    ...cellStyles,
+    width: '200px',
+    paddingRight: '15px',
+    paddingLeft: '21px'
+  },
+  projectPhaseCell: {
+    ...cellStyles,
+    width: '100px',
+  },
+  budgetCell: {
+    ...cellStyles,
+    width: '80px',
+  },
+  monthCell: {
+    ...cellStyles,
+    width: '30px',
+  },
+  monthCellGreen: {
+    ...cellStyles,
+    width: '30px',
+    backgroundColor: '#00d7a7'
+  },
+  monthCellBlack: {
+    ...cellStyles,
+    width: '30px',
+    backgroundColor: '#333333'
+  },
+  lastCell: {
+    ...cellStyles,
+    width: '30px',
+  },
+});
 interface ITableRowProps {
-  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow /*| another report row type */;
+  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow /*| another report row type */;
   flattenedRows?: IBudgetBookSummaryCsvRow[];
   depth: number;
   index?: number;
@@ -158,9 +209,45 @@ interface IRowProps extends ITableRowProps{
   flattenedRow?: IFlattenedBudgetBookSummaryProperties;
 }
 
+const getMonthCellStyle = (monthCell: string | undefined) => {
+  switch (monthCell) {
+    case 'planning':
+      return strategyReportStyles.monthCellBlack
+    case 'construction':
+      return strategyReportStyles.monthCellGreen
+    default:
+    return strategyReportStyles.monthCell
+  }
+}
+
 const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
     let tableRow;
     switch (reportType) {
+        case 'strategy': {
+            const strategyRow = row as IStrategyTableRow;
+            tableRow =
+            <View style={depth % 2 ? strategyReportStyles.evenRow : strategyReportStyles.oddRow} key={strategyRow.id}>
+                <Text style={strategyReportStyles.projectCell}>{strategyRow.name}</Text>
+                <Text style={strategyReportStyles.projectManagerCell}>{strategyRow.projectManager}</Text>
+                <Text style={strategyReportStyles.projectPhaseCell}>{strategyRow.projectPhase}</Text>
+                <Text style={strategyReportStyles.budgetCell}>{strategyRow.costPlan}</Text>
+                <Text style={strategyReportStyles.budgetCell}>{strategyRow.costForecast}</Text>
+                <Text style={getMonthCellStyle(strategyRow.januaryStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.februaryStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.marchStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.aprilStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.mayStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.juneStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.julyStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.augustStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.septemberStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.octoberStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.novemberStatus)}></Text>
+                <Text style={getMonthCellStyle(strategyRow.decemberStatus)}></Text>
+                <Text style={strategyReportStyles.lastCell}></Text>
+            </View>
+            break;
+        }
         case 'constructionProgram': {
             const constructionRow = row as IConstructionProgramTableRow;
             tableRow =  
