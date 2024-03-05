@@ -5,6 +5,7 @@ import { convertToReportRows, flattenBudgetBookSummaryTableRows,getReportRows } 
 import TableRow from './TableRow';
 import { IBasicReportData, IBudgetBookSummaryTableRow, ReportType } from '@/interfaces/reportInterfaces';
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
+import StrategyTableHeader from './StrategyTableHeader';
 
 const styles = StyleSheet.create({
   table: {
@@ -31,6 +32,8 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   
   const getTableHeader = () => {
     switch (reportType) {
+      case 'strategy':
+        return <StrategyTableHeader />;
       case 'constructionProgram':
         return <ConstructionProgramTableHeader />;
       case 'budgetBookSummary':
