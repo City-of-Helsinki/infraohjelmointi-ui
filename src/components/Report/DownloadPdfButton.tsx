@@ -96,7 +96,9 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
             year,
           }, isConstructedFromForcedToFrame);
           if (res.results.length > 0) {
-            document = getPdfDocument(type, divisions, classes, res.results);
+            console.log(res.results);
+            console.log(forcedToFrameClasses);
+            document = getPdfDocument(type, divisions, isConstructedFromForcedToFrame ? forcedToFrameClasses : classes, res.results);
           }
         }
       }

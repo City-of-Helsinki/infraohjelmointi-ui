@@ -5,6 +5,7 @@ import {
   IBudgetBookSummaryTableRow,
   IConstructionProgramCsvRow,
   IConstructionProgramTableRow,
+  IStrategyTableRow,
   ReportTableRowType,
   ReportType,
 } from '@/interfaces/reportInterfaces';
@@ -124,7 +125,7 @@ export const getReportRows = (
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
   projects: Array<IProject>,
-): Array<IConstructionProgramTableRow> => {
+): Array<IConstructionProgramTableRow | IStrategyTableRow/* | put here another report type and to the switch cases too */> => {
   const { allClasses } = classes;
 
   const initialValues = {
@@ -151,10 +152,45 @@ export const getReportRows = (
     }
   }
 
+  const isProjectInPlanningOrConstructionThisYear = (props: IYearCheck) => {
+    const thisYear = [new Date().getFullYear()];
+    const inPlanningOrConstruction = (thisYear.some(year => year >= props.planningStart && year <= props.constructionEnd));
+
+    if (inPlanningOrConstruction) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   let filteredProjects: IProject[];
 
   // Filtering rules for the projects for different reports
   switch (reportType) {
+    case 'strategy':
+      filteredProjects = projects.filter((p) =>
+        p.planningStartYear && p.constructionEndYear &&
+        isProjectInPlanningOrConstructionThisYear({
+          planningStart: p.planningStartYear,
+          constructionEnd: p.constructionEndYear
+        })
+      );
+      Object.assign(initialValues, {["projectManager"]: ''})
+      Object.assign(initialValues, {["projectPhase"]: ''})
+      Object.assign(initialValues, {["costPlan"]: ''})
+      Object.assign(initialValues, {["januaryStatus"]: ''})
+      Object.assign(initialValues, {["februaryStatus"]: ''})
+      Object.assign(initialValues, {["marchStatus"]: ''})
+      Object.assign(initialValues, {["aprilStatus"]: ''})
+      Object.assign(initialValues, {["mayStatus"]: ''})
+      Object.assign(initialValues, {["juneStatus"]: ''})
+      Object.assign(initialValues, {["julyStatus"]: ''})
+      Object.assign(initialValues, {["augustStatus"]: ''})
+      Object.assign(initialValues, {["septemberStatus"]: ''})
+      Object.assign(initialValues, {["octoberStatus"]: ''})
+      Object.assign(initialValues, {["novemberStatus"]: ''})
+      Object.assign(initialValues, {["decemberStatus"]: ''})
+      break;
     case 'constructionProgram':
       filteredProjects = projects.filter((p) => 
         p.planningStartYear && p.constructionEndYear &&
@@ -173,8 +209,103 @@ export const getReportRows = (
       filteredProjects = projects;
   };
 
-  const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> => {
+  const getYear = (dateStr: string): number => {
+    const parts = dateStr.split('.');
+    return parseInt(parts[2], 10);
+  }
+
+  const getMonth = (dateStr: string): number => {
+    const parts = dateStr.split('.');
+    return parseInt(parts[1], 10);
+  }
+
+  const getProjectPhase = (project: IProject) => {
+    if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
+      return "none"
+    }
+
+    const currentYear = new Date().getFullYear();
+    const planningStartYear = getYear(project.estPlanningStart);
+    const planningEndYear = getYear(project.estPlanningEnd);
+    const constructionStartYear = getYear(project.estConstructionStart);
+    const constructionEndYear = getYear(project.estConstructionEnd);
+
+    const isPlanning = currentYear === planningStartYear || currentYear === planningEndYear;
+    const isConstruction = currentYear == constructionStartYear || currentYear === constructionEndYear;
+
+    if (isPlanning && isConstruction) {
+      return "s r";
+    }
+    else if (isPlanning) {
+        return "s";
+    }
+    else if (isConstruction) {
+        return "r";
+    }
+    else {
+      return "";
+    }
+  }
+
+  const getProjectPhasePerMonth = (project: IProject, month: number) => {
+    if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
+        return "none"
+    }
+
+    const currentYear = new Date().getFullYear();
+    const planningStartYear = getYear(project.estPlanningStart);
+    const planningEndYear = getYear(project.estPlanningEnd);
+    const constructionStartYear = getYear(project.estConstructionStart);
+    const constructionEndYear = getYear(project.estConstructionEnd);
+
+    const planningStartMonth = getMonth(project.estPlanningStart);
+    const planningEndMonth = getMonth(project.estPlanningEnd);
+    const constructionStartMonth = getMonth(project.estConstructionStart);
+    const constructionEndMonth = getMonth(project.estConstructionEnd);
+
+    const isPlanning = (currentYear === planningStartYear || currentYear === planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
+    const isConstruction = (currentYear === constructionStartYear || currentYear === constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
+
+    if (isPlanning && isConstruction) {
+        return "planningAndConstruction";
+    }
+    else if (isPlanning) {
+        return "planning";
+    }
+    else if (isConstruction) {
+        return "construction";
+    }
+    else {
+        return "none";
+    }
+  }
+
+  const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
     switch (reportType) {
+      case 'strategy':
+        return filteredProjects
+        .filter((p) => p.projectClass === id)
+        .map((p) => ({
+          ...initialValues,
+          name: p.name,
+          id: p.id,
+          projectManager: p.personPlanning?.lastName,
+          projectPhase: getProjectPhase(p),
+          costForecast: keurToMillion(p.costForecast),
+          januaryStatus: getProjectPhasePerMonth(p, 1),
+          februaryStatus: getProjectPhasePerMonth(p,2),
+          marchStatus: getProjectPhasePerMonth(p,3),
+          aprilStatus: getProjectPhasePerMonth(p,4),
+          mayStatus: getProjectPhasePerMonth(p,5),
+          juneStatus: getProjectPhasePerMonth(p,6),
+          julyStatus: getProjectPhasePerMonth(p,7),
+          augustStatus: getProjectPhasePerMonth(p,8),
+          septemberStatus: getProjectPhasePerMonth(p,9),
+          octoberStatus: getProjectPhasePerMonth(p,10),
+          novemberStatus: getProjectPhasePerMonth(p,11),
+          decemberStatus: getProjectPhasePerMonth(p,12),
+          type: 'project',
+        }));
       case 'constructionProgram':
         return filteredProjects
         .filter((p) => p.projectClass === id)
@@ -200,8 +331,19 @@ export const getReportRows = (
   }
 
   // Filter all classes that are included in the projects' parent classes
-  let classesForProjects: Array<IConstructionProgramTableRow> = [];
+  let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
   switch (reportType) {
+    case 'strategy':
+      classesForProjects = allClasses
+        .filter((ac) => filteredProjects.findIndex((p) => p.projectClass === ac.id) !== -1)
+        .map((c) => ({
+          ...initialValues,
+          name: c.name,
+          parent: c.parent,
+          id: c.id,
+          projects: c.relatedTo ? getProjectsForClass(c.relatedTo) : [],
+        }));
+      break;
     case 'constructionProgram':
       classesForProjects = allClasses
         .filter((ac) => filteredProjects.findIndex((p) => p.projectClass === ac.id) !== -1)
@@ -216,8 +358,27 @@ export const getReportRows = (
   }
 
     // Get the classes parents
-    let classParents: Array<IConstructionProgramTableRow> = [];
+    let classParents: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
     switch (reportType) {
+      case 'strategy': {
+        const helperClassGrandParents = allClasses
+        .filter((ac) => ac.parent === null)
+        .map((c) => ({
+          ...initialValues,
+          id: c.id,
+        }));
+
+        classParents = allClasses
+          .filter((ac) => helperClassGrandParents.findIndex((cdp) => cdp.id === ac.parent) !== -1)
+          .map((c) => ({
+            ...initialValues,
+            id: c.id,
+            name: c.name,
+            parent: c.parent,
+            children: classesForProjects.filter((cfp) => cfp.parent === c.id),
+          }));
+        break;
+        }
       case 'constructionProgram':
         classParents = allClasses
           .filter((ac) => classesForProjects.findIndex((cfp) => cfp.parent === ac.id) !== -1)
@@ -235,6 +396,18 @@ export const getReportRows = (
   // Get the parent classes parents
   let classGrandParents: Array<IConstructionProgramTableRow> = [];
   switch (reportType) {
+    case 'strategy': {
+      classGrandParents = allClasses
+      .filter((ac) => ac.parent === null)
+      .map((c) => ({
+        ...initialValues,
+        id: c.id,
+        name: c.name,
+        parent: c.parent,
+        children: classParents.filter((cp) => cp.parent === c.id),
+      }));
+      break;
+    }
     case 'constructionProgram':
       classGrandParents = allClasses
         .filter((ac) => classParents.findIndex((cp) => cp.parent === ac.id) !== -1)

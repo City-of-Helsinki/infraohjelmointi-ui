@@ -75,6 +75,7 @@ export interface IFlattenedBudgetBookSummaryProperties extends IFinancePropertie
 export interface IStrategyTableRow extends ITableRowEssentials {
   projects: Array<IStrategyTableRow>
   children: Array<IStrategyTableRow>
+  type: ReportTableRowType
   projectManager: string;
   projectPhase: string;
   costPlan: string;
