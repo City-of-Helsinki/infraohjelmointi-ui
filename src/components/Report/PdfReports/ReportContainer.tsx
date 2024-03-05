@@ -4,6 +4,7 @@ import DocumentHeader from './DocumentHeader';
 import ReportTable from './ReportTable';
 import { FC, memo } from 'react';
 import { IBasicReportData, ReportType } from '@/interfaces/reportInterfaces';
+import StrategyReportFooter from './StrategyReportFooter';
 
 const styles = StyleSheet.create({
   page: {
@@ -67,6 +68,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
             subtitleOne={documentSubtitle}
           />
           <ReportTable reportType={reportType} data={data} />
+          {reportType === 'strategy' &&
+            <StrategyReportFooter
+              infoText='s = suunnittelu, r = rakentaminen'
+              colorInfoTextOne='Suunnittelu'
+              colorInfoTextTwo='Rakentaminen'/>
+          }
         </View>
       </Page>
     </Document>

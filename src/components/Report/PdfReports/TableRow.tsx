@@ -155,44 +155,58 @@ const strategyReportStyles = StyleSheet.create({
     ...tableRowStyles,
     backgroundColor: '#f2f2f2',
   },
+  classRow: {
+    ...tableRowStyles,
+    backgroundColor: '#f0f0ff'
+  },
   projectCell: {
     ...cellStyles,
     paddingLeft: '21px',
     width: '450px',
   },
-  classRow: {
-    ...tableRowStyles,
-    backgroundColor: '#f0f0ff'
+  classNameCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    fontWeight: 'bold',
+    paddingLeft: '21px',
+    width: '450px',
   },
   projectManagerCell: {
+    ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '200px',
     paddingRight: '15px',
     paddingLeft: '21px'
   },
   projectPhaseCell: {
+    ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '100px',
   },
   budgetCell: {
+    ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '80px',
   },
   monthCell: {
+    ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '30px',
   },
   monthCellGreen: {
+    ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '30px',
     backgroundColor: '#00d7a7'
   },
   monthCellBlack: {
+    ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '30px',
     backgroundColor: '#333333'
   },
   lastCell: {
+    ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '30px',
   },
@@ -220,14 +234,27 @@ const getMonthCellStyle = (monthCell: string | undefined) => {
   }
 }
 
+const getRowStyle = (rowType: string, depth: number) => {
+  switch (rowType) {
+    case 'class':
+      return strategyReportStyles.classRow
+    case 'project':
+      if (depth % 2) {
+        return strategyReportStyles.evenRow
+      } else {
+        return strategyReportStyles.oddRow
+      }
+  }
+}
+
 const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
     let tableRow;
     switch (reportType) {
         case 'strategy': {
             const strategyRow = row as IStrategyTableRow;
             tableRow =
-            <View style={depth % 2 ? strategyReportStyles.evenRow : strategyReportStyles.oddRow} key={strategyRow.id}>
-                <Text style={strategyReportStyles.projectCell}>{strategyRow.name}</Text>
+            <View style={getRowStyle(strategyRow.type, depth)} key={strategyRow.id}>
+                <Text style={strategyRow.type === 'class' ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{strategyRow.name}</Text>
                 <Text style={strategyReportStyles.projectManagerCell}>{strategyRow.projectManager}</Text>
                 <Text style={strategyReportStyles.projectPhaseCell}>{strategyRow.projectPhase}</Text>
                 <Text style={strategyReportStyles.budgetCell}>{strategyRow.costPlan}</Text>
