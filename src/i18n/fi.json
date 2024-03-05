@@ -443,7 +443,12 @@
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma",
-      "documentName": "toimintasuunnitelma"
+      "documentName": "toimintasuunnitelma",
+      "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}}",
+      "subtitle": "Maankäyttö ja kaupunkirakenne",
+      "projectNameTitle": "Hanke",
+      "projectsTitle": "Kohteen",
+      "projectManagerTitle": "projektipäällikkö"
     },
     "constructionProgram": {
       "rowTitle": "Rakentamisohjelma (yli 1 milj hankkeet)",
