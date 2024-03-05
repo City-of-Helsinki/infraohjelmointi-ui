@@ -35,7 +35,9 @@ const getPdfDocument = (
 ) => {
   const pdfDocument = {
     budgetProposal: <EmptyDocument />,
-    strategy: <EmptyDocument />,
+    strategy: (
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'strategy'}/>
+    ),
     constructionProgram: (
       <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'constructionProgram'}/>
     ),
@@ -68,6 +70,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
   const LOADING_PDF_DATA = 'loading-pdf-data';
+  const isConstructedFromForcedToFrame = type === 'strategy';
 
   const downloadPdf = useCallback(async () => {
     try {
@@ -89,9 +92,9 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
             direct: false,
             programmed: false,
             params: 'overMillion=true',
-            forcedToFrame: false,
+            forcedToFrame: isConstructedFromForcedToFrame,
             year,
-          });
+          }, isConstructedFromForcedToFrame);
           if (res.results.length > 0) {
             document = getPdfDocument(type, divisions, classes, res.results);
           }
@@ -113,7 +116,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary'}
+      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'strategy'}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>
