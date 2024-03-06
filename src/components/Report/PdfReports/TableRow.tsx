@@ -161,8 +161,10 @@ const strategyReportStyles = StyleSheet.create({
   },
   projectCell: {
     ...cellStyles,
+    ...constructionProgramCommonStyles,
     paddingLeft: '21px',
     width: '450px',
+    borderLeft: '1px solid #808080',
   },
   classNameCell: {
     ...cellStyles,
@@ -170,6 +172,7 @@ const strategyReportStyles = StyleSheet.create({
     fontWeight: 'bold',
     paddingLeft: '21px',
     width: '450px',
+    borderLeft: '1px solid #808080',
   },
   projectManagerCell: {
     ...constructionProgramCommonStyles,
@@ -254,7 +257,7 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
         case 'strategy': {
             if (flattenedRow) {
               tableRow =
-              <View style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
+              <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
                   <Text style={flattenedRow.type === 'class' ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
                   <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                   <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
