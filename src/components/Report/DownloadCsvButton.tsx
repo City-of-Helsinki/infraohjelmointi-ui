@@ -31,6 +31,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
   const LOADING_CSV_DATA = 'loading-csv-data';
+  const year = new Date().getFullYear();
 
   useEffect(() => {
     if (csvData.length > 0) {
@@ -43,7 +44,6 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
         case 'strategy': {
-          const year = new Date().getFullYear();
           const res = await getForcedToFrameData(year - 1);
 
           const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
@@ -54,7 +54,6 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
           break;
         case 'budgetBookSummary': {
-          const year = new Date().getFullYear();
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
