@@ -70,9 +70,9 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
           <ReportTable reportType={reportType} data={data} />
           {reportType === 'strategy' &&
             <StrategyReportFooter
-              infoText='s = suunnittelu, r = rakentaminen'
-              colorInfoTextOne='Suunnittelu'
-              colorInfoTextTwo='Rakentaminen'/>
+              infoText={t('report.strategy.footerInfoText')}
+              colorInfoTextOne={t('report.strategy.planning')}
+              colorInfoTextTwo={t('report.strategy.constructing')}/>
           }
         </View>
       </Page>
