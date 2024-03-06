@@ -15,9 +15,7 @@ import ReportContainer from './PdfReports/ReportContainer';
 import { useAppDispatch } from '@/hooks/common';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
-import { ILocationHierarchy } from '@/reducers/locationSlice';
-import { IPlanningRow, IPlanningRowSelections } from '@/interfaces/planningInterfaces';
-import { IGroup } from '@/interfaces/groupInterfaces';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -60,9 +58,6 @@ interface IDownloadPdfButtonProps {
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
   forcedToFrameClasses: ICoordinatorClassHierarchy;
-  forcedToFrameLocations: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
-  selections: IPlanningRowSelections;
-  coordinatorGroups: IGroup[];
 }
 
 /**

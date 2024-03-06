@@ -60,9 +60,9 @@ const StrategyTableHeader = () => {
         <Text style={styles.projectCell}>{`\n${t('report.strategy.projectNameTitle')}`}</Text>
         <Text style={styles.projectManagerCell}>{`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`}</Text>
         <Text style={styles.projectPhaseCell}>{`\n${t('projectPhase')}`}</Text>
-        <Text style={styles.budgetCell}>{`\nTA ${new Date().getFullYear()}`}</Text>
-        <Text style={styles.budgetCell}>{`\nTS ${new Date().getFullYear()}`}</Text>
-        <Text style={styles.monthCell}>{`${new Date().getFullYear()}\n01`}</Text>
+        <Text style={styles.budgetCell}>{`\nTA ${new Date().getFullYear() - 1}`}</Text>
+        <Text style={styles.budgetCell}>{`\nTS ${new Date().getFullYear() - 1}`}</Text>
+        <Text style={styles.monthCell}>{`${new Date().getFullYear() - 1}\n01`}</Text>
         <Text style={styles.monthCell}>{`\n02`}</Text>
         <Text style={styles.monthCell}>{`\n03`}</Text>
         <Text style={styles.monthCell}>{`\n04`}</Text>

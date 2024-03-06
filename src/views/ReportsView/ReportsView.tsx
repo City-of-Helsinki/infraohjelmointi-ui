@@ -2,7 +2,7 @@ import { ReportRow } from '@/components/Report';
 import { reports } from '@/interfaces/reportInterfaces';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectBatchedForcedToFrameLocations, selectCoordinationDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
+import { selectBatchedForcedToFrameLocations, selectPlanningDivisions } from '@/reducers/locationSlice';
 import { selectBatchedForcedToFrameClasses, selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import './styles.css';
 import { selectIsPlanningLoading, selectSelections, setStartYear } from '@/reducers/planningSlice';

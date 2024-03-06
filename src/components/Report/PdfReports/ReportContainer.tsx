@@ -27,7 +27,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
   const getDocumentTitle = () => {
     switch (reportType) {
       case 'strategy':
-        return t('report.strategy.title', {startYear: new Date().getFullYear()});
+        return t('report.strategy.title', {startYear: new Date().getFullYear() - 1});
       case 'constructionProgram':
         return t('report.constructionProgram.title');
       case 'budgetBookSummary':

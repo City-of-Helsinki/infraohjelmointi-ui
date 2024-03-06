@@ -7,9 +7,8 @@ import DownloadPdfButton from './DownloadPdfButton';
 import DownloadCsvButton from './DownloadCsvButton';
 import './styles.css';
 import './pdfFonts';
-import { ILocationHierarchy, separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
+import { separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
 import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
-import { IGroup } from '@/interfaces/groupInterfaces';
 import { getCoordinationClasses } from '@/services/classServices';
 import { getCoordinatorGroups } from '@/services/groupServices';
 import { getCoordinatorLocations } from '@/services/locationServices';
@@ -21,12 +20,9 @@ interface IReportRowProps {
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
   forcedToFrameClasses: ICoordinatorClassHierarchy;
-  forcedToFrameLocations: Omit<ILocationHierarchy, 'allLocations' | 'divisions' | 'subDivisions'>;
-  selections: IPlanningRowSelections;
-  coordinatorGroups: IGroup[];
 }
 
-const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFrameClasses, forcedToFrameLocations, selections, coordinatorGroups }) => {
+const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
   const { t } = useTranslation();
 
   const getForcedToFrameData = async (year: number) => {
@@ -76,7 +72,7 @@ const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFram
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} getForcedToFrameData={getForcedToFrameData} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} forcedToFrameLocations={forcedToFrameLocations} selections={selections} coordinatorGroups={coordinatorGroups} />
+      <DownloadPdfButton type={type} getForcedToFrameData={getForcedToFrameData} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
       {/* download csv button */}
       <DownloadCsvButton type={type} getForcedToFrameData={getForcedToFrameData} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
     </div>
