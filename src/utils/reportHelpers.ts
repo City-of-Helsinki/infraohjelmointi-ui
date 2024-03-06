@@ -14,6 +14,7 @@ import { convertToMillions, keurToMillion } from './calculations';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { TFunction } from 'i18next';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { split } from 'lodash';
 
 interface IYearCheck {
   planningStart: number;
@@ -122,6 +123,7 @@ export const convertToStrategyReportRows = (coordinatorRows: IPlanningRow[]): IS
       parent: null,
       children: c.children.length ? convertToStrategyReportRows(c.children) : [],
       projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+      costPlan: c.cells[0].plannedBudget,
       type: 'class' as ReportTableRowType
     }
     forcedToFrameHierarchy.push(convertedClass);
@@ -147,7 +149,7 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
       costPlan: "",
       projectManager: p.personPlanning?.lastName ?? "",
       projectPhase: getProjectPhase(p),
-      costForecast: p.costForecast,
+      costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",
       januaryStatus: getProjectPhasePerMonth(p, 1),
       februaryStatus: getProjectPhasePerMonth(p,2),
       marchStatus: getProjectPhasePerMonth(p,3),

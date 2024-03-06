@@ -187,6 +187,7 @@ const strategyReportStyles = StyleSheet.create({
     ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '80px',
+    textAlign: 'right'
   },
   monthCell: {
     ...constructionProgramCommonStyles,
