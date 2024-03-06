@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IOperationalEnvironmentAnalysisProperties, IStrategyTableRow, IOperationalEnvironmentAnalysisTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IFlattenedOperationalEnvironmentAnalysisProperties, IStrategyTableRow, IOperationalEnvironmentAnalysisTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -166,6 +166,21 @@ const styles = StyleSheet.create({
     borderRight: '1px solid #808080',
     fontWeight: 'medium',
   },
+  crossingPressure: {
+    color: '#0072C6',
+  },
+  frame: {
+    color: '#BD271A',
+  },
+  tae: {
+    backgroundColor: '#EFE3F6',
+  },
+  tse1: {
+    backgroundColor: '#D8E3F9',
+  },
+  tse2: {
+    backgroundColor: '#F2ECE7',
+  },
 
 });
 
@@ -246,7 +261,7 @@ interface ITableRowProps {
 }
 
 interface IRowProps extends ITableRowProps{
-  flattenedRow?: IFlattenedBudgetBookSummaryProperties | IOperationalEnvironmentAnalysisProperties;
+  flattenedRow?: IFlattenedBudgetBookSummaryProperties | IFlattenedOperationalEnvironmentAnalysisProperties;
 }
 
 const getMonthCellStyle = (monthCell: string | undefined) => {
@@ -366,22 +381,62 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
         }
         case Reports.OperationalEnvironmentAnalysis: {
           if (flattenedRow) {
+            const getNameStyle = () => {
+              if (flattenedRow.type === 'taeTseFrame') return [styles.targetColumn, styles.frame];
+              if (flattenedRow.type === 'crossingPressure') return [styles.targetColumn, styles.crossingPressure];
+              return styles.targetColumn;
+            }
+
             tableRow =  
               <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
-                  <Text style={styles.targetColumn}>
-                    {flattenedRow.name}
-                  </Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.costForecast}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.TAE}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.TSE1}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.TSE2}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.initial1}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.initial2}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.initial3}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.initial4}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.initial5}</Text>
-                  <Text style={styles.numberColumns}>{flattenedRow.initial6}</Text>
-                  <Text style={styles.lastNumberColumn}>{flattenedRow.initial7}</Text>
+                <Text style={getNameStyle()}>
+                  {flattenedRow.name}
+                </Text>
+                { flattenedRow.type === 'crossingPressure' &&
+                  <>
+                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpCostForecast}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure, styles.tae]}>{flattenedRow.cpTAE}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure, styles.tse1]}>{flattenedRow.cpTSE1}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure, styles.tse2]}>{flattenedRow.cpTSE2}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial1}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial2}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial3}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial4}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial5}</Text>
+                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial6}</Text>
+                    <Text style={[styles.lastNumberColumn, styles.crossingPressure]}>{flattenedRow.cpInitial7}</Text>
+                  </>
+                }
+                { flattenedRow.type === 'taeTseFrame' &&
+                  <>
+                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.costForecast}</Text>
+                    <Text style={[styles.numberColumns, styles.frame, styles.tae]}>{flattenedRow.TAE}</Text>
+                    <Text style={[styles.numberColumns, styles.frame, styles.tse1]}>{flattenedRow.TSE1}</Text>
+                    <Text style={[styles.numberColumns, styles.frame, styles.tse2]}>{flattenedRow.TSE2}</Text>
+                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial1}</Text>
+                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial2}</Text>
+                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial3}</Text>
+                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial4}</Text>
+                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial5}</Text>
+                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial6}</Text>
+                    <Text style={[styles.lastNumberColumn, styles.frame]}>{flattenedRow.initial7}</Text>
+                  </>
+                }
+                { flattenedRow.type === 'class' &&
+                  <>
+                    <Text style={styles.numberColumns}>{flattenedRow.plannedCostForecast}</Text>
+                    <Text style={[styles.numberColumns, styles.tae]}>{flattenedRow.plannedTAE}</Text>
+                    <Text style={[styles.numberColumns, styles.tse1]}>{flattenedRow.plannedTSE1}</Text>
+                    <Text style={[styles.numberColumns, styles.tse2]}>{flattenedRow.plannedTSE2}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial1}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial2}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial3}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial4}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial5}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial6}</Text>
+                    <Text style={styles.lastNumberColumn}>{flattenedRow.plannedInitial7}</Text>
+                  </>
+                }
               </View>;
           }
           break;
@@ -406,7 +461,7 @@ const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, i
           <>
             {/* Class */}
             { flattenedRows?.map((row, index) => {
-              const typedRow = row as IFlattenedBudgetBookSummaryProperties;
+              const typedRow = row as IFlattenedBudgetBookSummaryProperties | IFlattenedOperationalEnvironmentAnalysisProperties;
                 return <Row key={typedRow.id} flattenedRow={typedRow} depth={depth} index={index} reportType={reportType} />
               })
             }

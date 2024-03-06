@@ -52,7 +52,7 @@ export enum Reports {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location';
+export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame';
 
 export interface IBasicReportData {
   divisions: Array<ILocation>;
@@ -66,6 +66,7 @@ interface ITableRowEssentials {
   name: string;
   parent: string | null;
 }
+
 export interface IOperationalEnvironmentAnalysisFinanceProperties {
   costForecast?: string;
   TAE?: string;
@@ -78,12 +79,37 @@ export interface IOperationalEnvironmentAnalysisFinanceProperties {
   initial5?: string;
   initial6?: string;
   initial7?: string;
+
+  plannedCostForecast?: string;
+  plannedTAE?: string;
+  plannedTSE1?: string;
+  plannedTSE2?: string;
+  plannedInitial1?: string;
+  plannedInitial2?: string;
+  plannedInitial3?: string;
+  plannedInitial4?: string;
+  plannedInitial5?: string;
+  plannedInitial6?: string;
+  plannedInitial7?: string;
+
+  cpCostForecast?: string;
+  cpTAE?: string;
+  cpTSE1?: string;
+  cpTSE2?: string;
+  cpInitial1?: string;
+  cpInitial2?: string;
+  cpInitial3?: string;
+  cpInitial4?: string;
+  cpInitial5?: string;
+  cpInitial6?: string;
+  cpInitial7?: string;
   [key: string]: string | undefined;
 }
 
-export interface IOperationalEnvironmentAnalysisProperties extends IBudgetBookFinanceProperties {
+export interface IFlattenedOperationalEnvironmentAnalysisProperties extends IOperationalEnvironmentAnalysisFinanceProperties {
   id: string;
   name: string;
+  type: ReportTableRowType;
 }
 
 export interface IBudgetBookFinanceProperties {
@@ -157,5 +183,43 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
   projects: Array<IOperationalEnvironmentAnalysisTableRow>;
   type: ReportTableRowType;
 
-  financeProperties: IOperationalEnvironmentAnalysisFinanceProperties;
+  frameBudgets: {
+    costForecast?: string;
+    TAE?: string;
+    TSE1?: string;
+    TSE2?: string;
+    initial1?: string;
+    initial2?: string;
+    initial3?: string;
+    initial4?: string;
+    initial5?: string;
+    initial6?: string;
+    initial7?: string;
+  }
+  plannedBudgets: {
+    plannedCostForecast?: string;
+    plannedTAE?: string;
+    plannedTSE1?: string;
+    plannedTSE2?: string;
+    plannedInitial1?: string;
+    plannedInitial2?: string;
+    plannedInitial3?: string;
+    plannedInitial4?: string;
+    plannedInitial5?: string;
+    plannedInitial6?: string;
+    plannedInitial7?: string;
+  }
+  crossingPressure?: { // ylityspaine
+    cpCostForecast?: string;
+    cpTAE?: string;
+    cpTSE1?: string;
+    cpTSE2?: string;
+    cpInitial1?: string;
+    cpInitial2?: string;
+    cpInitial3?: string;
+    cpInitial4?: string;
+    cpInitial5?: string;
+    cpInitial6?: string;
+    cpInitial7?: string;
+  }
 }

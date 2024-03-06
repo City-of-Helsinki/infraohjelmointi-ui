@@ -35,10 +35,10 @@ const getPdfDocument = (
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis:
-      <ReportContainer data={{divisions: divisions, classes: classes, projects:[]}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
-      strategy: (
-        <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={'strategy'}/>
-      ),
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: []}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
+    strategy: (
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={Reports.Strategy}/>
+    ),
     constructionProgram: (
       <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={Reports.ConstructionProgram}/>
     ),
@@ -96,9 +96,10 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           }
           break;
         }
-        case Reports.OperationalEnvironmentAnalysis:
+        case Reports.OperationalEnvironmentAnalysis: {
           document = getPdfDocument(type, divisions, forcedToFrameClasses, []);
           break;
+        }
         default: {
           const res = await getProjectsWithParams({
             direct: false,
@@ -128,7 +129,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== Reports.ConstructionProgram && type !== Reports.BudgetBookSummary && type !== Reports.OperationalEnvironmentAnalysis && type !== 'strategy'}
+      disabled={type === Reports.FinancialStatement}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>

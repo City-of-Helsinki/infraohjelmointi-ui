@@ -19,7 +19,7 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { TFunction } from 'i18next';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
-import { IClassFinances } from '@/interfaces/classInterfaces';
+import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 
 interface IYearCheck {
   planningStart: number;
@@ -330,20 +330,35 @@ export const getReportRows = (
       filteredProjects = projects;
   };
 
-   const mapOperationalEnvironmentAnalysisProperties = (finances: IClassFinances) => {
-    return {
-      costForecast: finances.year0.plannedBudget,
-      TAE: finances.year1.plannedBudget,
-      TSE1: finances.year2.plannedBudget,
-      TSE2: finances.year3.plannedBudget,
-      initial1: finances.year4.plannedBudget,
-      initial2: finances.year5.plannedBudget,
-      initial3: finances.year6.plannedBudget,
-      initial4: finances.year7.plannedBudget,
-      initial5: finances.year8.plannedBudget,
-      initial6: finances.year9.plannedBudget,
-      initial7: finances.year10.plannedBudget,
-      type: 'class',
+  const mapOperationalEnvironmentAnalysisProperties = (finances: IClassFinances, type: 'frameBudget' | 'plannedBudget') => {
+    if (type === 'frameBudget') {
+      return {
+        costForecast: finances.year0.frameBudget,
+        TAE: finances.year1.frameBudget,
+        TSE1: finances.year2.frameBudget,
+        TSE2: finances.year3.frameBudget,
+        initial1: finances.year4.frameBudget,
+        initial2: finances.year5.frameBudget,
+        initial3: finances.year6.frameBudget,
+        initial4: finances.year7.frameBudget,
+        initial5: finances.year8.frameBudget,
+        initial6: finances.year9.frameBudget,
+        initial7: finances.year10.frameBudget,
+      }
+    } else {
+      return {
+        plannedCostForecast: finances.year0.plannedBudget,
+        plannedTAE: finances.year1.plannedBudget,
+        plannedTSE1: finances.year2.plannedBudget,
+        plannedTSE2: finances.year3.plannedBudget,
+        plannedInitial1: finances.year4.plannedBudget,
+        plannedInitial2: finances.year5.plannedBudget,
+        plannedInitial3: finances.year6.plannedBudget,
+        plannedInitial4: finances.year7.plannedBudget,
+        plannedInitial5: finances.year8.plannedBudget,
+        plannedInitial6: finances.year9.plannedBudget,
+        plannedInitial7: finances.year10.plannedBudget,
+      }
     }
   };
 
@@ -374,7 +389,7 @@ export const getReportRows = (
   }
 
   // Filter all classes that are included in the projects' parent classes
-  let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
+  let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow | IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow> = [];
   switch (reportType) {
     case Reports.ConstructionProgram:
       classesForProjects = allClasses
@@ -386,6 +401,62 @@ export const getReportRows = (
           id: c.id,
           projects: getProjectsForClass(c.id),
         }));
+      break;
+    case Reports.OperationalEnvironmentAnalysis:
+      classesForProjects = allClasses
+        .map((c: IClass) => ({
+          ...initialValues,
+          name: c.name,
+          parent: c.parent,
+          id: c.id,
+          frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "frameBudget"),
+          plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "plannedBudget"),
+          type: 'class',
+        }));
+        for (let i = 0; i < classesForProjects.length; i++) {
+          // Add TAE&TSE raami and Ylityspaine rows under the fourth level 'ta' parts
+          if (/^\d \d\d \d\d \d\d/.test(classesForProjects[i].name)) {
+            const typedClasses = classesForProjects as IOperationalEnvironmentAnalysisTableRow[];
+            typedClasses.splice(i + 1, 0, 
+              {
+                children: [],
+                frameBudgets: typedClasses[i].frameBudgets,
+                plannedBudgets: {},
+                id: `taeTseFrame-${typedClasses[i].id}`,
+                name: "TAE&TSE raami",
+                parent: classesForProjects[i].parent,
+                projects: [],
+                type: "taeTseFrame",
+              },
+              {
+                children: [],
+                frameBudgets: {},
+                plannedBudgets: {},
+                // Calculate crossingPressures ('Ylityspaine')
+                crossingPressure: {
+                  cpCostForecast: String(Number(typedClasses[i].frameBudgets.costForecast)-Number(typedClasses[i].plannedBudgets.plannedCostForecast)),
+                  cpTAE: String(Number(typedClasses[i].frameBudgets.TAE)-Number(typedClasses[i].plannedBudgets.plannedTAE)),
+                  cpTSE1: String(Number(typedClasses[i].frameBudgets.TSE1)-Number(typedClasses[i].plannedBudgets.plannedTSE1)),
+                  cpTSE2: String(Number(typedClasses[i].frameBudgets.TSE2)-Number(typedClasses[i].plannedBudgets.plannedTSE2)),
+                  cpInitial1: String(Number(typedClasses[i].frameBudgets.initial1)-Number(typedClasses[i].plannedBudgets.plannedInitial1)),
+                  cpInitial2: String(Number(typedClasses[i].frameBudgets.initial2)-Number(typedClasses[i].plannedBudgets.plannedInitial2)),
+                  cpInitial3: String(Number(typedClasses[i].frameBudgets.initial3)-Number(typedClasses[i].plannedBudgets.plannedInitial3)),
+                  cpInitial4: String(Number(typedClasses[i].frameBudgets.initial4)-Number(typedClasses[i].plannedBudgets.plannedInitial4)),
+                  cpInitial5: String(Number(typedClasses[i].frameBudgets.initial5)-Number(typedClasses[i].plannedBudgets.plannedInitial5)),
+                  cpInitial6: String(Number(typedClasses[i].frameBudgets.initial6)-Number(typedClasses[i].plannedBudgets.plannedInitial6)),
+                  cpInitial7: String(Number(typedClasses[i].frameBudgets.initial7)-Number(typedClasses[i].plannedBudgets.plannedInitial7))
+                },
+                id: `ylityspaine-${typedClasses[i].id}`,
+                name: "Ylityspaine",
+                parent: typedClasses[i].parent,
+                projects: [],
+                type: "crossingPressure",
+              }
+            );
+            // Increase 'i' by 2 to skip the new objects in the next iteration
+            i += 2;
+          }
+        }
       break;
   }
 
@@ -404,48 +475,28 @@ export const getReportRows = (
             projects: getProjectsForClass(c.id),
           }));
         break;
+      case Reports.OperationalEnvironmentAnalysis: {
+        const helperClassGrandParents = allClasses
+        .filter((ac) => ac.parent === null)
+        .map((c) => ({
+          ...initialValues,
+          id: c.id,
+        }));
+        classParents = allClasses
+          .filter((ac) => helperClassGrandParents.findIndex((cdp) => cdp.id === ac.parent) !== -1)
+          .map((c) => ({
+            ...initialValues,
+            id: c.id,
+            name: c.name,
+            parent: c.parent,
+            children: classesForProjects.filter((cfp) => cfp.parent === c.id),
+            frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "frameBudget"),
+            plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "plannedBudget"),
+            type: 'class',
+          }));
+        break;
+      }
     }
-
-  const addInvestmentPart = () => {
-    const initialInvestmentPart: IBudgetBookSummaryTableRow = {
-      children: [],
-      projects: [],
-      type: 'class',
-      financeProperties: {},
-      name: 'Investointiosa',
-      parent: null,
-      id: 'investmentpart',
-    }
-
-    const typedClassGrandParents = classGrandParents as IBudgetBookSummaryTableRow[];
-
-    /* Loop through the financeProperties of each classGrandparent and create an object (investmentPart) that contains the summed values 
-      e.g. each classGrandparent has a property called budgetEstimation --> here we take the budgetEstimation of every classGrandParent and sum them 
-      together. Same thing is done to the other financeProperties as well */
-    let investmentPart = typedClassGrandParents.reduce((investmentPart, row) => {
-      // Go through the financeProperties of classGrandParents (budgetEstimation, budgetEstimationSuggestion,...initial1, initial2... etc.)
-        for (const property in row.financeProperties) {
-            if (row.financeProperties[property] !== undefined) {
-              /* The financeProperty is calculated as follows: the property of investmentPart + the property from the classGrandParent. When all
-                  the classGrandParents have been looped, each property in the investmentPart has the sum of the properties of the classGrandParents */
-              investmentPart.financeProperties[property] = 
-                String((Number(investmentPart.financeProperties[property]) || 0) + Number(row.financeProperties[property]));
-            }
-        }
-        return investmentPart;
-    }, initialInvestmentPart);
-
-    // convert the numbers into decimals and add investmentPart into classGrandParents
-    classGrandParents = typedClassGrandParents.map((grandparent) => convertBudgetBookSummaryPropertiesToMillions(grandparent, 'grandParents')) as IConstructionProgramTableRow[] | IBudgetBookSummaryTableRow[];
-    investmentPart = convertBudgetBookSummaryPropertiesToMillions(investmentPart, 'grandParents') as IBudgetBookSummaryTableRow;
-    
-      // The investmentPart should only be added to classGrandParents if other grandParents exist, otherwise it will cause duplicate investmentPart rows to the report
-    if (classGrandParents.length) {
-      // The investmentPart is added as the first object among the classGrandParents as it should be the first row in the report
-      classGrandParents.unshift(investmentPart);
-    }
-    return classGrandParents;
-  }
 
   // Get the parent classes parents
   let classGrandParents: Array<IConstructionProgramTableRow | IOperationalEnvironmentAnalysisTableRow> = [];
@@ -462,7 +513,23 @@ export const getReportRows = (
           projects: getProjectsForClass(c.id),
         }));
       break;
+    case Reports.OperationalEnvironmentAnalysis: {
+      classGrandParents = allClasses
+      .filter((ac) => ac.parent === null)
+      .map((c) => ({
+        ...initialValues,
+        id: c.id,
+        name: c.name,
+        parent: c.parent,
+        children: classParents.filter((cp) => cp.parent === c.id),
+        frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "frameBudget"),
+        plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "plannedBudget"),
+        type: 'class',
+      }));
+      break;
+    }
   }
+  
   const classesForProjectsWithNoParents = classesForProjects?.filter((cfp) => cfp.parent === null);
   const classParentsWithNoParents = classParents?.filter((cp) => cp.parent === null);
 
@@ -497,8 +564,8 @@ const processBudgetBookSummaryTableRows = (tableRows: IBudgetBookSummaryTableRow
     }
 
     // Recursive calls for children and projects.
-    processTableRows(tableRow.projects);
-    processTableRows(tableRow.children);
+    processBudgetBookSummaryTableRows(tableRow.projects);
+    processBudgetBookSummaryTableRows(tableRow.children);
   });
   return budgetBookSummaryCsvRows;
 };
@@ -537,24 +604,49 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
 }
 const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
-const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalEnvironmentAnalysisTableRow[]) => {
+const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalEnvironmentAnalysisTableRow[]): IBudgetBookSummaryCsvRow[]  => {
   tableRows.forEach((tableRow) => {
     if (!operationalEnvironmentAnalysisCsvRows.some(row => row.id === tableRow.id)) {
       operationalEnvironmentAnalysisCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,
         type: tableRow.type,
-        costForecast: tableRow.financeProperties.costForecast ?? '0.00',
-        TAE: tableRow.financeProperties.TAE ?? '0.00',
-        TSE1: tableRow.financeProperties.TSE1 ?? '0.00',
-        TSE2: tableRow.financeProperties.TSE2 ?? '0.00',
-        initial1: tableRow.financeProperties.initial1 ?? '0.00',
-        initial2: tableRow.financeProperties.initial2 ?? '0.00',
-        initial3: tableRow.financeProperties.initial3 ?? '0.00',
-        initial4: tableRow.financeProperties.initial4 ?? '0.00',
-        initial5: tableRow.financeProperties.initial5 ?? '0.00',
-        initial6: tableRow.financeProperties.initial6 ?? '0.00',
-        initial7: tableRow.financeProperties.initial7 ?? '0.00',
+
+        costForecast: tableRow.frameBudgets.costForecast ?? '0',
+        TAE: tableRow.frameBudgets.TAE ?? '0',
+        TSE1: tableRow.frameBudgets.TSE1 ?? '0',
+        TSE2: tableRow.frameBudgets.TSE2 ?? '0',
+        initial1: tableRow.frameBudgets.initial1 ?? '0',
+        initial2: tableRow.frameBudgets.initial2 ?? '0',
+        initial3: tableRow.frameBudgets.initial3 ?? '0',
+        initial4: tableRow.frameBudgets.initial4 ?? '0',
+        initial5: tableRow.frameBudgets.initial5 ?? '0',
+        initial6: tableRow.frameBudgets.initial6 ?? '0',
+        initial7: tableRow.frameBudgets.initial7 ?? '0',
+
+        plannedCostForecast: tableRow.plannedBudgets.plannedCostForecast ?? '0',
+        plannedTAE: tableRow.plannedBudgets.plannedTAE ?? '0',
+        plannedTSE1: tableRow.plannedBudgets.plannedTSE1 ?? '0',
+        plannedTSE2: tableRow.plannedBudgets.plannedTSE2 ?? '0',
+        plannedInitial1: tableRow.plannedBudgets.plannedInitial1 ?? '0',
+        plannedInitial2: tableRow.plannedBudgets.plannedInitial2 ?? '0',
+        plannedInitial3: tableRow.plannedBudgets.plannedInitial3 ?? '0',
+        plannedInitial4: tableRow.plannedBudgets.plannedInitial4 ?? '0',
+        plannedInitial5: tableRow.plannedBudgets.plannedInitial5 ?? '0',
+        plannedInitial6: tableRow.plannedBudgets.plannedInitial6 ?? '0',
+        plannedInitial7: tableRow.plannedBudgets.plannedInitial7 ?? '0',
+
+        cpCostForecast: tableRow.crossingPressure?.cpCostForecast ?? '0',
+        cpTAE: tableRow.crossingPressure?.cpTAE ?? '0',
+        cpTSE1: tableRow.crossingPressure?.cpTSE1 ?? '0',
+        cpTSE2: tableRow.crossingPressure?.cpTSE2 ?? '0',
+        cpInitial1: tableRow.crossingPressure?.cpInitial1 ?? '0',
+        cpInitial2: tableRow.crossingPressure?.cpInitial2 ?? '0',
+        cpInitial3: tableRow.crossingPressure?.cpInitial3 ?? '0',
+        cpInitial4: tableRow.crossingPressure?.cpInitial4 ?? '0',
+        cpInitial5: tableRow.crossingPressure?.cpInitial5 ?? '0',
+        cpInitial6: tableRow.crossingPressure?.cpInitial6 ?? '0',
+        cpInitial7: tableRow.crossingPressure?.cpInitial7 ?? '0',
       })
     }
 
@@ -576,13 +668,13 @@ export const flattenOperationalEnvironmentAnalysisTableRows = (
 
 export const flattenBudgetBookSummaryTableRows = (
   tableRows: Array<IBudgetBookSummaryTableRow>,
-): Array<IBudgetBookSummaryCsvRow> =>
-  processTableRows(tableRows).flat(Infinity);
+): Array<IBudgetBookSummaryCsvRow> => processBudgetBookSummaryTableRows(tableRows).flat(Infinity);
 
 export const flattenStrategyTableRows = (
   tableRows: Array<IStrategyTableRow>,
 ): Array<IStrategyTableCsvRow> =>
   processStrategyTableRows(tableRows).flat(Infinity);
+
 
 const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
   a,
