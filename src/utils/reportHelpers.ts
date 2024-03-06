@@ -5,6 +5,7 @@ import {
   IBudgetBookSummaryTableRow,
   IConstructionProgramCsvRow,
   IConstructionProgramTableRow,
+  IStrategyTableCsvRow,
   IStrategyTableRow,
   ReportTableRowType,
   ReportType,
@@ -123,7 +124,7 @@ export const convertToStrategyReportRows = (coordinatorRows: IPlanningRow[]): IS
       parent: null,
       children: c.children.length ? convertToStrategyReportRows(c.children) : [],
       projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
-      costPlan: c.cells[0].plannedBudget,
+      costForecast: c.cells[0].plannedBudget,
       type: 'class' as ReportTableRowType
     }
     forcedToFrameHierarchy.push(convertedClass);
@@ -309,77 +310,6 @@ export const getReportRows = (
       filteredProjects = projects;
   };
 
-  const getYear = (dateStr: string): number => {
-    const parts = dateStr.split('.');
-    return parseInt(parts[2], 10);
-  }
-
-  const getMonth = (dateStr: string): number => {
-    const parts = dateStr.split('.');
-    return parseInt(parts[1], 10);
-  }
-
-  const getProjectPhase = (project: IProject) => {
-    if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
-      return "none"
-    }
-
-    const currentYear = new Date().getFullYear();
-    const planningStartYear = getYear(project.estPlanningStart);
-    const planningEndYear = getYear(project.estPlanningEnd);
-    const constructionStartYear = getYear(project.estConstructionStart);
-    const constructionEndYear = getYear(project.estConstructionEnd);
-
-    const isPlanning = currentYear === planningStartYear || currentYear === planningEndYear;
-    const isConstruction = currentYear == constructionStartYear || currentYear === constructionEndYear;
-
-    if (isPlanning && isConstruction) {
-      return "s r";
-    }
-    else if (isPlanning) {
-        return "s";
-    }
-    else if (isConstruction) {
-        return "r";
-    }
-    else {
-      return "";
-    }
-  }
-
-  const getProjectPhasePerMonth = (project: IProject, month: number) => {
-    if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
-        return "none"
-    }
-
-    const currentYear = new Date().getFullYear();
-    const planningStartYear = getYear(project.estPlanningStart);
-    const planningEndYear = getYear(project.estPlanningEnd);
-    const constructionStartYear = getYear(project.estConstructionStart);
-    const constructionEndYear = getYear(project.estConstructionEnd);
-
-    const planningStartMonth = getMonth(project.estPlanningStart);
-    const planningEndMonth = getMonth(project.estPlanningEnd);
-    const constructionStartMonth = getMonth(project.estConstructionStart);
-    const constructionEndMonth = getMonth(project.estConstructionEnd);
-
-    const isPlanning = (currentYear === planningStartYear || currentYear === planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
-    const isConstruction = (currentYear === constructionStartYear || currentYear === constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
-
-    if (isPlanning && isConstruction) {
-        return "planningAndConstruction";
-    }
-    else if (isPlanning) {
-        return "planning";
-    }
-    else if (isConstruction) {
-        return "construction";
-    }
-    else {
-        return "none";
-    }
-  }
-
   const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
     switch (reportType) {
       case 'constructionProgram':
@@ -495,12 +425,51 @@ const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
   return budgetBookSummaryCsvRows;
 };
 
+const strategyCsvRows: IStrategyTableCsvRow[] = [];
+
+const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
+  tableRows.forEach((tableRow) => {
+    if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
+      strategyCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: tableRow.type,
+        costPlan: "",
+        projectManager: tableRow.projectManager ?? '',
+        projectPhase: tableRow.projectPhase ?? '',
+        costForecast: tableRow.costForecast ?? '',
+        januaryStatus: tableRow.januaryStatus ?? '',
+        februaryStatus: tableRow.februaryStatus ?? "",
+        marchStatus: tableRow.marchStatus ?? "",
+        aprilStatus: tableRow.aprilStatus ?? "",
+        mayStatus: tableRow.mayStatus ?? "",
+        juneStatus: tableRow.juneStatus ?? "",
+        julyStatus: tableRow.julyStatus ?? "",
+        augustStatus: tableRow.augustStatus ?? "",
+        septemberStatus: tableRow.septemberStatus ?? "",
+        octoberStatus: tableRow.octoberStatus ?? "",
+        novemberStatus: tableRow.novemberStatus ?? "",
+        decemberStatus: tableRow.decemberStatus ?? "",
+      })
+    }
+    processStrategyTableRows(tableRow.projects);
+    processStrategyTableRows(tableRow.children);
+  });
+  return strategyCsvRows;
+}
+
 /**
  * Create a flattened version of report table rows, since the react-csv needs a one-dimensional array
  */
 export const flattenBudgetBookSummaryTableRows = (
   tableRows: Array<IBudgetBookSummaryTableRow>,
-): Array<IBudgetBookSummaryCsvRow> => processTableRows(tableRows).flat(Infinity);
+): Array<IBudgetBookSummaryCsvRow> =>
+  processTableRows(tableRows).flat(Infinity);
+
+export const flattenStrategyTableRows = (
+  tableRows: Array<IStrategyTableRow>,
+): Array<IStrategyTableCsvRow> =>
+  processStrategyTableRows(tableRows).flat(Infinity);
 
 const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
   a,
@@ -525,7 +494,7 @@ export const getReportData = async (
   try {
     let projects;
 
-    if (reportType !== 'budgetBookSummary') {
+    if (reportType !== 'budgetBookSummary' && reportType !== 'strategy') {
       const res = await getProjectsWithParams({
         direct: false,
         programmed: false,
@@ -537,18 +506,43 @@ export const getReportData = async (
       projects = res.results;
     }
    
-    if (!projects && reportType !== 'budgetBookSummary') {
+    if (!projects && reportType !== 'budgetBookSummary' && reportType !== 'strategy') {
       return [];
     }
 
     let reportRows;
     if (reportType === 'budgetBookSummary') {
       reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, 'budgetBookSummary') : [];
-    }  else {
+    }  else if (reportType === 'strategy') {
+      reportRows = coordinatorRows ? convertToStrategyReportRows(coordinatorRows) : [];
+    } else {
       reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);
     }
 
     switch (reportType) {
+      case 'strategy' : {
+        //Flatten rows to one dimension
+        const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyTableRow[]);
+        return flattenedRows.map((r) => ({
+          [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
+          [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
+          [`\n${t('projectPhase')}`]: r.projectPhase,
+          [`\nTA ${new Date().getFullYear()}`]: r.costPlan,
+          [`\nTS ${new Date().getFullYear()}`]: r.costForecast,
+          [`${new Date().getFullYear()}\n01`]: r.januaryStatus,
+          [`\n02`]: r.februaryStatus,
+          [`\n03`]: r.marchStatus,
+          [`\n04`]: r.aprilStatus,
+          [`\n05`]: r.mayStatus,
+          [`\n06`]: r.juneStatus,
+          [`\n07`]: r.julyStatus,
+          [`\n08`]: r.augustStatus,
+          [`\n09`]: r.septemberStatus,
+          [`\n10`]: r.octoberStatus,
+          [`\n11`]: r.novemberStatus,
+          [`\n12`]: r.decemberStatus,
+        }))
+      }
       case 'constructionProgram': {
         // Flatten rows into one dimension
         const flattenedRows = flattenConstructionProgramTableRows(reportRows);

@@ -252,28 +252,32 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
     let tableRow;
     switch (reportType) {
         case 'strategy': {
-            const strategyRow = row as IStrategyTableRow;
-            tableRow =
-            <View style={getRowStyle(strategyRow.type, depth)} key={strategyRow.id}>
-                <Text style={strategyRow.type === 'class' ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{strategyRow.name}</Text>
-                <Text style={strategyReportStyles.projectManagerCell}>{strategyRow.projectManager}</Text>
-                <Text style={strategyReportStyles.projectPhaseCell}>{strategyRow.projectPhase}</Text>
-                <Text style={strategyReportStyles.budgetCell}>{strategyRow.costPlan}</Text>
-                <Text style={strategyReportStyles.budgetCell}>{strategyRow.costForecast}</Text>
-                <Text style={getMonthCellStyle(strategyRow.januaryStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.februaryStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.marchStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.aprilStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.mayStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.juneStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.julyStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.augustStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.septemberStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.octoberStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.novemberStatus)}></Text>
-                <Text style={getMonthCellStyle(strategyRow.decemberStatus)}></Text>
-                <Text style={strategyReportStyles.lastCell}></Text>
-            </View>
+            if (flattenedRow) {
+              tableRow =
+              <View style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
+                  <Text style={flattenedRow.type === 'class' ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
+                  <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
+                  <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
+                  <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
+                  <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
+                  <Text style={getMonthCellStyle(flattenedRow.januaryStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.februaryStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.marchStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.aprilStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.mayStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.juneStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.julyStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.augustStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.septemberStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.octoberStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.novemberStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.decemberStatus)}></Text>
+                  <Text style={strategyReportStyles.lastCell}></Text>
+              </View>
+            } else {
+              tableRow = <View></View>;
+            }
+            
             break;
         }
         case 'constructionProgram': {
@@ -350,7 +354,7 @@ Row.displayName = 'Row';
 const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, index }) => {
   return (
       <>
-        { reportType === 'budgetBookSummary' ?
+        { reportType === 'budgetBookSummary' || reportType === 'strategy' ?
           <>
             {/* Class */}
             { flattenedRows?.map((row, index) => {

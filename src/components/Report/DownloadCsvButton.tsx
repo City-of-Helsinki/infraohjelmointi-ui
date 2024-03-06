@@ -42,6 +42,14 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
+        case 'strategy': {
+          const year = new Date().getFullYear();
+          const res = await getForcedToFrameData(year - 1);
+
+          const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+          setCsvData(await getReportData(forcedToFrameClasses, divisions, t, 'strategy', coordinatorRows));
+          break;
+        }
         case 'constructionProgram':
           setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
           break;
@@ -73,7 +81,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           iconLeft={downloadIcon}
           variant="secondary"
           onClick={getCsvData}
-          disabled={(type !== 'constructionProgram' && type !== 'budgetBookSummary')}
+          disabled={(type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'strategy')}
         >
           {t('downloadCsv', { name: t(`report.${type}.documentName`) })}
         </Button>

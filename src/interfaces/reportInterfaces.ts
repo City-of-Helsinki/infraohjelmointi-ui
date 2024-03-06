@@ -30,6 +30,10 @@ export interface IConstructionProgramCsvRow {
   [key: string]: string | undefined;
 }
 
+export interface IStrategyTableCsvRow {
+  [key: string]: string | undefined;
+}
+
 export interface IBudgetBookSummaryCsvRow {
   [key: string]: string | IFinanceProperties | undefined;
 }
