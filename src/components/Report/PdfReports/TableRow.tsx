@@ -136,7 +136,11 @@ const styles = StyleSheet.create({
     borderRight: '1px solid #808080',
     width: '7%',
     fontWeight: 'bold',
-  }
+  },
+  indentedRow: {
+    paddingLeft: '25px',
+    fontWeight: 'medium',
+  },
 });
 interface ITableRowProps {
   row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow /*| another report row type */;
@@ -170,9 +174,15 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
         }
         case 'budgetBookSummary': {
           if (flattenedRow) {
+            const getStyle = () => {
+              const isFourthLevelRow = /^\d \d\d \d\d \d\d/.test(flattenedRow.name);
+                return (flattenedRow.type === 'class' || flattenedRow.type === 'investmentpart')
+                  ? isFourthLevelRow ? [styles.classNameTargetCell, styles.indentedRow] : styles.classNameTargetCell
+                  : isFourthLevelRow ? [styles.nameTargetCell, styles.indentedRow] : styles.nameTargetCell;
+            }
             tableRow =  
               <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
-                  <Text style={(flattenedRow.type === 'class' || flattenedRow.type === 'investmentpart') ? styles.classNameTargetCell : styles.nameTargetCell}>
+                  <Text style={getStyle()}>
                     {flattenedRow.name}
                   </Text>
                   <Text style={styles.unBoldedColumns}>{flattenedRow.usage}</Text>
