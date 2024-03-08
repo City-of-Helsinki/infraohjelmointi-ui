@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReportType } from '@/interfaces/reportInterfaces';
+import { ReportType, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -14,6 +14,8 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import ReportContainer from './PdfReports/ReportContainer';
 import { useAppDispatch } from '@/hooks/common';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -29,6 +31,7 @@ const getPdfDocument = (
   divisions: Array<ILocation>,
   classes: IClassHierarchy,
   projects: Array<IProject>,
+  coordinatorRows?: IPlanningRow[],
 ) => {
   const pdfDocument = {
     budgetProposal: <EmptyDocument />,
@@ -37,7 +40,7 @@ const getPdfDocument = (
       <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'constructionProgram'}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects:[]}} reportType={'budgetBookSummary'}/>
+      <ReportContainer data={{divisions: divisions, classes: classes, projects:[], coordinatorRows}} reportType={'budgetBookSummary'}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -49,6 +52,7 @@ const downloadIcon = <IconDownload />;
 
 interface IDownloadPdfButtonProps {
   type: ReportType;
+  getForcedToFrameData: (year: number) => getForcedToFrameDataType;
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
   forcedToFrameClasses: ICoordinatorClassHierarchy;
@@ -59,7 +63,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, divisions, classes, forcedToFrameClasses }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -72,9 +76,14 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, divisions, class
 
       let document: JSX.Element | undefined = undefined;
       switch(type) {
-        case 'budgetBookSummary':
-          document = getPdfDocument(type, divisions, forcedToFrameClasses, []);
+        case 'budgetBookSummary': {
+          const res = await getForcedToFrameData(year);
+          if (res && res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
+          }
           break;
+        }
         default: {
           const res = await getProjectsWithParams({
             direct: false,

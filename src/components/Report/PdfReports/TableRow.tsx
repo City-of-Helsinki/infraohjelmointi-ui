@@ -137,8 +137,12 @@ const styles = StyleSheet.create({
     width: '7%',
     fontWeight: 'bold',
   },
-  indentedRow: {
+  fourthLevel: {
     paddingLeft: '25px',
+    fontWeight: 'medium',
+  },
+  districtOrCollectiveSubLevel: {
+    paddingLeft: '45px',
     fontWeight: 'medium',
   },
 });
@@ -176,9 +180,20 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
           if (flattenedRow) {
             const getStyle = () => {
               const isFourthLevelRow = /^\d \d\d \d\d \d\d/.test(flattenedRow.name);
-                return (flattenedRow.type === 'class' || flattenedRow.type === 'investmentpart')
-                  ? isFourthLevelRow ? [styles.classNameTargetCell, styles.indentedRow] : styles.classNameTargetCell
-                  : isFourthLevelRow ? [styles.nameTargetCell, styles.indentedRow] : styles.nameTargetCell;
+              const isDistrictOrCollectiveSubLevel = flattenedRow.objectType === 'districtPreview' || flattenedRow.objectType === 'collectiveSubLevel';
+              const extraStyle = isDistrictOrCollectiveSubLevel ? styles.districtOrCollectiveSubLevel : styles.fourthLevel;
+
+              let defaultStyle;
+
+              if (flattenedRow.type === 'class' || flattenedRow.type === 'investmentpart') {
+                  defaultStyle = styles.classNameTargetCell;
+              } else {
+                  defaultStyle = styles.nameTargetCell;
+              }
+        
+              return (isFourthLevelRow || isDistrictOrCollectiveSubLevel)
+                ? [defaultStyle, extraStyle]
+                : defaultStyle;
             }
             tableRow =  
               <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
