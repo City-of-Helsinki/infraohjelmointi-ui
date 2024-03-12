@@ -10,9 +10,9 @@ import {
 } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { convertToMillions, keurToMillion } from './calculations';
-import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { TFunction } from 'i18next';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 
 /**
  * Gets the division name and removes the number infront of it.
@@ -36,12 +36,95 @@ export const getDivision = (divisions?: Array<ILocation>, projectLocation?: stri
  * @param divisions
  * @returns
  */
+
+export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTableRow[]) => {
+  const initialInvestmentPart: IBudgetBookSummaryTableRow = {
+    children: [],
+    projects: [],
+    type: 'class',
+    financeProperties: {},
+    name: 'Investointiosa',
+    parent: null,
+    id: 'investmentpart',
+    objectType: '',
+  }
+
+  /* Loop through the financeProperties of each "classGrandparent" and create an object (investmentPart) that contains the summed values 
+    e.g. each classGrandparent has a property called budgetEstimation --> here we take the budgetEstimation of every classGrandParent and sum them 
+    together and the same thing is done to the other financeProperties as well */
+
+  const investmentPart = forcedToFrameHierarchy.reduce((investmentPart: IBudgetBookSummaryTableRow, row: IBudgetBookSummaryTableRow) => {
+    // Go through the financeProperties (budgetEstimation, budgetEstimationSuggestion,...initial1, initial2... etc.) of classGrandParents
+      for (const property in row.financeProperties) {
+          if (row.financeProperties[property] !== undefined) {
+            const investmentPartProperty = Number(investmentPart.financeProperties[property]?.replace(/\s/g, '')) || 0;
+            const rowProperty = Number(row.financeProperties[property]?.replace(/\s/g, '')) || 0;
+            /* The financeProperty is calculated as follows: the property of investmentPart + the property from the classGrandParent. When all
+                the classGrandParents have been looped, each property in the investmentPart has the sum of the properties of the classGrandParents */
+            investmentPart.financeProperties[property] = String(investmentPartProperty + rowProperty);
+          }
+      }
+      return investmentPart;
+  }, initialInvestmentPart);
+
+    // The investmentPart should only be added to the data if it exists, otherwise it will cause duplicate investmentPart rows to the report
+  if (forcedToFrameHierarchy.length) {
+    // The investmentPart is added as the first object among the "classGrandParents" as it should be the first row in the report
+    const dataWithInvestmentPart = forcedToFrameHierarchy.unshift(investmentPart);
+    return dataWithInvestmentPart;
+  }
+  return [];
+}
+
+const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
+  const properties = [];
+  for (const c of coordinatorRows) {
+    if (c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass' || c.type === 'districtPreview' || c.type === 'collectiveSubLevel') {
+      const convertedClass: IBudgetBookSummaryTableRow = {
+        id: c.id,
+        name: c.name,
+        parent: null,
+        children: c.children.length && c.type !== 'districtPreview' && c.type !== 'collectiveSubLevel'  // children from the lower levels aren't needed
+          ? getBudgetBookSummaryProperties(c.children)
+          : [],
+        projects: [],
+        financeProperties: {
+          usage: '',
+          budgetEstimation: c.cells[0].frameBudget ?? '0.00',
+          budgetEstimationSuggestion: c.cells[1].frameBudget ?? '0.00',
+          budgetPlanSuggestion1: c.cells[2].frameBudget ?? '0.00',
+          budgetPlanSuggestion2: c.cells[3].frameBudget ?? '0.00',
+          initial1: c.cells[4].frameBudget ?? '0.00',
+          initial2: c.cells[5].frameBudget ?? '0.00',
+          initial3: c.cells[6].frameBudget ?? '0.00',
+          initial4: c.cells[7].frameBudget ?? '0.00',
+          initial5: c.cells[8].frameBudget ?? '0.00',
+          initial6: c.cells[9].frameBudget ?? '0.00',
+          initial7: c.cells[10].frameBudget ?? '0.00',
+        },
+        objectType: c.type,
+        type: 'class' as ReportTableRowType
+      }
+      properties.push(convertedClass);
+    }
+  }
+  return properties;
+}
+export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] => {
+  let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
+  if (reportType === 'budgetBookSummary') {
+    forcedToFrameHierarchy = getBudgetBookSummaryProperties(coordinatorRows);
+    getInvestmentPart(forcedToFrameHierarchy);
+  } 
+  return forcedToFrameHierarchy;
+}
+
 export const getReportRows = (
   reportType: ReportType,
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
   projects: Array<IProject>,
-): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow/* | put here another report type and to the switch cases too */> => {
+): Array<IConstructionProgramTableRow> => {
   const { allClasses } = classes;
 
   const initialValues = {
@@ -90,69 +173,6 @@ export const getReportRows = (
       filteredProjects = projects;
   };
 
-  /* This is used to map the properties of classGrandParents when we can't convert
-   the values into millions yet so that the calculations would be exact */
-  const mapBudgetBookSummaryProperties = (finances: IClassFinances) => {
-    return {
-      usage: '',
-      budgetEstimation: finances.year0.frameBudget,
-      budgetEstimationSuggestion: finances.year1.frameBudget,
-      budgetPlanSuggestion1: finances.year2.frameBudget,
-      budgetPlanSuggestion2: finances.year3.frameBudget,
-      initial1: finances.year4.frameBudget,
-      initial2: finances.year5.frameBudget,
-      initial3: finances.year6.frameBudget,
-      initial4: finances.year7.frameBudget,
-      initial5: finances.year8.frameBudget,
-      initial6: finances.year9.frameBudget,
-      initial7: finances.year10.frameBudget,
-      type: 'class',
-    }
-  };
-
-  const convertBudgetBookSummaryPropertiesToMillions = (c: IClass | IBudgetBookSummaryTableRow, level?: string) => {
-    // After doing the calculations for the 'Investointiosa', we convert the values into millions
-    if (level === 'grandParents') {
-      const finances = c as IBudgetBookSummaryTableRow;
-      return {
-        ...c,
-        financeProperties: {
-          usage: '',
-          budgetEstimation: convertToMillions(finances.financeProperties.budgetEstimation),
-          budgetEstimationSuggestion: convertToMillions(finances.financeProperties.budgetEstimationSuggestion),
-          budgetPlanSuggestion1: convertToMillions(finances.financeProperties.budgetPlanSuggestion1),
-          budgetPlanSuggestion2: convertToMillions(finances.financeProperties.budgetPlanSuggestion2),
-          initial1: convertToMillions(finances.financeProperties.initial1),
-          initial2: convertToMillions(finances.financeProperties.initial2),
-          initial3: convertToMillions(finances.financeProperties.initial3),
-          initial4: convertToMillions(finances.financeProperties.initial4),
-          initial5: convertToMillions(finances.financeProperties.initial5),
-          initial6: convertToMillions(finances.financeProperties.initial6),
-          initial7: convertToMillions(finances.financeProperties.initial7),
-          type: 'class',
-        }
-      }
-    } else {
-      // This condition is used in other levels than classes' grandParents
-      const finances = c as IClass;
-      return {
-        usage: '',
-        budgetEstimation: convertToMillions(finances.finances.year0.frameBudget),
-        budgetEstimationSuggestion: convertToMillions(finances.finances.year1.frameBudget),
-        budgetPlanSuggestion1: convertToMillions(finances.finances.year2.frameBudget),
-        budgetPlanSuggestion2: convertToMillions(finances.finances.year3.frameBudget),
-        initial1: convertToMillions(finances.finances.year4.frameBudget),
-        initial2: convertToMillions(finances.finances.year5.frameBudget),
-        initial3: convertToMillions(finances.finances.year6.frameBudget),
-        initial4: convertToMillions(finances.finances.year7.frameBudget),
-        initial5: convertToMillions(finances.finances.year8.frameBudget),
-        initial6: convertToMillions(finances.finances.year9.frameBudget),
-        initial7: convertToMillions(finances.finances.year10.frameBudget),
-        type: 'class',
-      }
-    }
-  };
-
   const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> => {
     switch (reportType) {
       case 'constructionProgram':
@@ -180,7 +200,7 @@ export const getReportRows = (
   }
 
   // Filter all classes that are included in the projects' parent classes
-  let classesForProjects: Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> = [];
+  let classesForProjects: Array<IConstructionProgramTableRow> = [];
   switch (reportType) {
     case 'constructionProgram':
       classesForProjects = allClasses
@@ -193,20 +213,10 @@ export const getReportRows = (
           projects: getProjectsForClass(c.id),
         }));
       break;
-    case 'budgetBookSummary':
-      classesForProjects = allClasses
-        .map((c: IClass) => ({
-          ...initialValues,
-          name: c.name,
-          parent: c.parent,
-          id: c.id,
-          financeProperties: convertBudgetBookSummaryPropertiesToMillions(c),
-        }));
-      break;
   }
 
     // Get the classes parents
-    let classParents: Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> = [];
+    let classParents: Array<IConstructionProgramTableRow> = [];
     switch (reportType) {
       case 'constructionProgram':
         classParents = allClasses
@@ -220,30 +230,10 @@ export const getReportRows = (
             projects: getProjectsForClass(c.id),
           }));
         break;
-      case 'budgetBookSummary': {
-        const helperClassGrandParents = allClasses
-        .filter((ac) => ac.parent === null)
-        .map((c) => ({
-          ...initialValues,
-          id: c.id,
-        }));
-
-        classParents = allClasses
-          .filter((ac) => helperClassGrandParents.findIndex((cdp) => cdp.id === ac.parent) !== -1)
-          .map((c) => ({
-            ...initialValues,
-            id: c.id,
-            name: c.name,
-            parent: c.parent,
-            children: classesForProjects.filter((cfp) => cfp.parent === c.id),
-            financeProperties: convertBudgetBookSummaryPropertiesToMillions(c),
-          }));
-        break;
-      }
     }
 
   // Get the parent classes parents
-  let classGrandParents: Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> = [];
+  let classGrandParents: Array<IConstructionProgramTableRow> = [];
   switch (reportType) {
     case 'constructionProgram':
       classGrandParents = allClasses
@@ -257,64 +247,12 @@ export const getReportRows = (
           projects: getProjectsForClass(c.id),
         }));
       break;
-    case 'budgetBookSummary': {
-      classGrandParents = allClasses
-      .filter((ac) => ac.parent === null)
-      .map((c) => ({
-        ...initialValues,
-        id: c.id,
-        name: c.name,
-        parent: c.parent,
-        children: classParents.filter((cp) => cp.parent === c.id),
-        financeProperties: mapBudgetBookSummaryProperties(c.finances),
-      }));
-
-      const initialInvestmentPart: IBudgetBookSummaryTableRow = {
-          children: [],
-          projects: [],
-          type: 'class',
-          financeProperties: {},
-          name: 'Investointiosa',
-          parent: null,
-          id: 'investmentpart',
-      }
-
-      const typedClassGrandParents = classGrandParents as IBudgetBookSummaryTableRow[];
-
-      /* Loop through the financeProperties of each classGrandparent and create an object (investmentPart) that contains the summed values 
-        e.g. each classGrandparent has a property called budgetEstimation --> here we take the budgetEstimation of every classGrandParent and sum them 
-        together. Same thing is done to the other financeProperties as well */
-      let investmentPart = typedClassGrandParents.reduce((investmentPart, row) => {
-        // Go through the financeProperties of classGrandParents (budgetEstimation, budgetEstimationSuggestion,...initial1, initial2... etc.)
-          for (const property in row.financeProperties) {
-              if (row.financeProperties[property] !== undefined) {
-                /* The financeProperty is calculated as follows: the property of investmentPart + the property from the classGrandParent. When all
-                    the classGrandParents have been looped, each property in the investmentPart has the sum of the properties of the classGrandParents */
-                investmentPart.financeProperties[property] = 
-                  String((Number(investmentPart.financeProperties[property]) || 0) + Number(row.financeProperties[property]));
-              }
-          }
-          return investmentPart;
-      }, initialInvestmentPart);
-      // convert the numbers into decimals and add investmentPart into classGrandParents
-      classGrandParents = typedClassGrandParents.map((grandparent) => convertBudgetBookSummaryPropertiesToMillions(grandparent, 'grandParents')) as IConstructionProgramTableRow[] | IBudgetBookSummaryTableRow[];
-      investmentPart = convertBudgetBookSummaryPropertiesToMillions(investmentPart, 'grandParents') as IBudgetBookSummaryTableRow;
-      
-        // The investmentPart should only be added to classGrandParents if other grandParents exist, otherwise it will cause duplicate investmentPart rows to the report
-      if (classGrandParents.length) {
-        // The investmentPart is added as the first object among the classGrandParents as it should be the first row in the report
-        classGrandParents.unshift(investmentPart);
-      }
-      break;
-    }
   }
   const classesForProjectsWithNoParents = classesForProjects?.filter((cfp) => cfp.parent === null);
   const classParentsWithNoParents = classParents?.filter((cp) => cp.parent === null);
 
   // We return all resulting rows that do not have parents as the first level in the array
-  return reportType === 'budgetBookSummary' 
-    ? [...classGrandParents]
-    : [...classGrandParents, ...classParentsWithNoParents, ...classesForProjectsWithNoParents];
+  return [...classGrandParents, ...classParentsWithNoParents, ...classesForProjectsWithNoParents];
 };
 
 // For CSV reports -->
@@ -327,25 +265,25 @@ const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
         id: tableRow.id,
         name: tableRow.name,
         type: tableRow.type,
-        usage: tableRow.financeProperties.usage ?? '',
-        budgetEstimation: tableRow.financeProperties.budgetEstimation ?? '0.00',
-        budgetEstimationSuggestion: tableRow.financeProperties.budgetEstimationSuggestion ?? '0.00',
-        budgetPlanSuggestion1: tableRow.financeProperties.budgetPlanSuggestion1 ?? '0.00',
-        budgetPlanSuggestion2: tableRow.financeProperties.budgetPlanSuggestion2 ?? '0.00',
-        initial1: tableRow.financeProperties.initial1 ?? '0.00',
-        initial2: tableRow.financeProperties.initial2 ?? '0.00',
-        initial3: tableRow.financeProperties.initial3 ?? '0.00',
-        initial4: tableRow.financeProperties.initial4 ?? '0.00',
-        initial5: tableRow.financeProperties.initial5 ?? '0.00',
-        initial6: tableRow.financeProperties.initial6 ?? '0.00',
-        initial7: tableRow.financeProperties.initial7 ?? '0.00',
+        usage: '',
+        budgetEstimation: convertToMillions(tableRow.financeProperties.budgetEstimation),
+        budgetEstimationSuggestion: convertToMillions(tableRow.financeProperties.budgetEstimationSuggestion),
+        budgetPlanSuggestion1: convertToMillions(tableRow.financeProperties.budgetPlanSuggestion1),
+        budgetPlanSuggestion2: convertToMillions(tableRow.financeProperties.budgetPlanSuggestion2),
+        initial1: convertToMillions(tableRow.financeProperties.initial1),
+        initial2: convertToMillions(tableRow.financeProperties.initial2),
+        initial3: convertToMillions(tableRow.financeProperties.initial3),
+        initial4: convertToMillions(tableRow.financeProperties.initial4),
+        initial5: convertToMillions(tableRow.financeProperties.initial5),
+        initial6: convertToMillions(tableRow.financeProperties.initial6),
+        initial7: convertToMillions(tableRow.financeProperties.initial7),
+        objectType: tableRow.objectType,
       })
     }
 
-      // Recursive calls for children and projects.
-      processTableRows(tableRow.projects);
-      processTableRows(tableRow.children);
-    
+    // Recursive calls for children and projects.
+    processTableRows(tableRow.projects);
+    processTableRows(tableRow.children);
   });
   return budgetBookSummaryCsvRows;
 };
@@ -355,8 +293,7 @@ const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
  */
 export const flattenBudgetBookSummaryTableRows = (
   tableRows: Array<IBudgetBookSummaryTableRow>,
-): Array<IBudgetBookSummaryCsvRow> =>
-  processTableRows(tableRows).flat(Infinity);
+): Array<IBudgetBookSummaryCsvRow> => processTableRows(tableRows).flat(Infinity);
 
 const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
   a,
@@ -374,6 +311,7 @@ export const getReportData = async (
   divisions: Array<ILocation>,
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
+  coordinatorRows?: IPlanningRow[],
 ): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow>> => {
   const year = new Date().getFullYear();
 
@@ -396,10 +334,12 @@ export const getReportData = async (
       return [];
     }
 
-    // Get report rows the same way as for the pdf table
-    const reportRows = reportType === 'budgetBookSummary' 
-    ? getReportRows(reportType, classes, divisions, [])
-    : getReportRows(reportType, classes, divisions, projects as IProject[]);
+    let reportRows;
+    if (reportType === 'budgetBookSummary') {
+      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, 'budgetBookSummary') : [];
+    }  else {
+      reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);
+    }
 
     switch (reportType) {
       case 'constructionProgram': {

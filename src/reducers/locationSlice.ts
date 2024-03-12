@@ -82,7 +82,7 @@ export const getForcedToFrameLocationsThunk = createAsyncThunk(
 const getLocationsForParent = (allLocations: Array<ILocation>, parents: Array<ILocation>) =>
   parent ? allLocations?.filter((al) => parents.findIndex((p) => p.id === al.parent) !== -1) : [];
 
-const separateLocationsIntoHierarchy = (
+export const separateLocationsIntoHierarchy = (
   allLocations: Array<ILocation>,
   forCoordinator: boolean,
 ) => {

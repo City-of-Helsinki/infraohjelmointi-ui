@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { getReportData } from '@/utils/reportHelpers';
@@ -9,13 +9,15 @@ import { CSVDownload } from 'react-csv';
 import './styles.css';
 import { useAppDispatch } from '@/hooks/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
+  getForcedToFrameData: (year: number) => getForcedToFrameDataType;
   divisions: Array<ILocation>;
   classes: IClassHierarchy;
   forcedToFrameClasses: ICoordinatorClassHierarchy;
-}
+  }
 
 const downloadIcon = <IconDownload />;
 
@@ -24,7 +26,7 @@ const downloadIcon = <IconDownload />;
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
+const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrameData, divisions, classes, forcedToFrameClasses }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
@@ -43,9 +45,15 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, class
         case 'constructionProgram':
           setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
           break;
-        case 'budgetBookSummary':
-          setCsvData(await getReportData(forcedToFrameClasses, divisions, t, 'budgetBookSummary'));
+        case 'budgetBookSummary': {
+          const year = new Date().getFullYear();
+          const res = await getForcedToFrameData(year);
+          if (res && res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            setCsvData(await getReportData(forcedToFrameClasses, divisions, t, 'budgetBookSummary', coordinatorRows));
+          }
           break;
+        }
         default:
           // In the MVP stage we only had time to implement the construction program report, the other
           // report cases should come here

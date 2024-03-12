@@ -247,7 +247,7 @@ const buildCoordinatorTableRows = (
   return rows;
 };
 
-const getCoordinationTableRows = (
+export const getCoordinationTableRows = (
   allClasses: ICoordinatorClassHierarchy,
   districts: Array<ILocation>,
   selections: IPlanningRowSelections,

@@ -196,7 +196,7 @@ const roundUpInTensOfThousands = (number: number) => {
 // Specifically for budgetBookSummaryReport
 export const convertToMillions = (value?: string | number) => {
   if (!value) return '0.00';
-  const valueWithCorrectType: number = typeof value === 'string' ? Number(value): value;
+  const valueWithCorrectType: number = typeof value === 'string' ? Number(value.replace(/\s/g, '')): value;
   const rounded = roundUpInTensOfThousands(valueWithCorrectType);
   // convert to millions
   const convertedNumber = rounded / 1000000;

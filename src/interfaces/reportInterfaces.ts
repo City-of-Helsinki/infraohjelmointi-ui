@@ -1,6 +1,22 @@
-import { IClassHierarchy } from "@/reducers/classSlice";
+import { IClassHierarchy, ICoordinatorClassHierarchy } from "@/reducers/classSlice";
 import { ILocation } from "./locationInterfaces";
-import { IProject } from "./projectInterfaces";
+import { IProject, IProjectsResponse } from "./projectInterfaces";
+import { IPlanningRow, IPlanningRowSelections, PlanningRowType } from "./planningInterfaces";
+import { IGroup } from "./groupInterfaces";
+
+export type getForcedToFrameDataType = Promise<{ 
+    res: IProjectsResponse;
+    projects: IProject[];
+    classHierarchy: ICoordinatorClassHierarchy;
+    forcedToFrameDistricts: {
+      districts: ILocation[];
+      year: number;
+      allLocations?: ILocation[];
+      divisions?: ILocation[];
+      subDivisions?: ILocation[];
+    };
+    groupRes: IGroup[];
+    initialSelections: IPlanningRowSelections}>;
 
 export const reports = [
   'budgetProposal',
@@ -26,6 +42,7 @@ export interface IBasicReportData {
   divisions: Array<ILocation>;
   projects: Array<IProject>;
   classes: IClassHierarchy;
+  coordinatorRows?: IPlanningRow[];
 }
 
 interface ITableRowEssentials {
@@ -59,6 +76,7 @@ export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {
   children: Array<IBudgetBookSummaryTableRow>;
   projects: Array<IBudgetBookSummaryTableRow>;
   type: ReportTableRowType;
+  objectType: PlanningRowType | '',
   
   financeProperties: IFinanceProperties;
 }
