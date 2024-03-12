@@ -115,23 +115,6 @@ const isProjectInPlanningOrConstructionPreviousYear = (props: IYearCheck) => {
   }
 }
 
-export const convertToStrategyReportRows = (coordinatorRows: IPlanningRow[]): IStrategyTableRow[] => {
-  const forcedToFrameHierarchy: IStrategyTableRow[] = [];
-  for (const c of coordinatorRows) {
-    const convertedClass = {
-      id: c.id,
-      name: c.name,
-      parent: null,
-      children: c.children.length ? convertToStrategyReportRows(c.children) : [],
-      projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
-      costForecast: c.cells[0].plannedBudget,
-      type: 'class' as ReportTableRowType
-    }
-    forcedToFrameHierarchy.push(convertedClass);
-  }
-  return forcedToFrameHierarchy;
-}
-
 const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
   return projects
     .filter((p) =>
@@ -252,13 +235,30 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   }
   return properties;
 }
-export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] => {
-  let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
+export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] => {
   if (reportType === 'budgetBookSummary') {
+    let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
     forcedToFrameHierarchy = getBudgetBookSummaryProperties(coordinatorRows);
     getInvestmentPart(forcedToFrameHierarchy as IBudgetBookSummaryTableRow[]);
+    return forcedToFrameHierarchy;
   }
-  return forcedToFrameHierarchy;
+  else if (reportType === 'strategy') {
+    const forcedToFrameHierarchy: IStrategyTableRow[] = [];
+    for (const c of coordinatorRows) {
+      const convertedClass = {
+        id: c.id,
+        name: c.name,
+        parent: null,
+        children: c.children.length ? convertToReportRows(c.children, reportType) : [],
+        projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+        costForecast: c.cells[0].plannedBudget,
+        type: 'class' as ReportTableRowType
+      }
+      forcedToFrameHierarchy.push(convertedClass);
+    }
+    return forcedToFrameHierarchy;
+  }
+  return [];
 }
 
 export const getReportRows = (
@@ -513,9 +513,9 @@ export const getReportData = async (
 
     let reportRows;
     if (reportType === 'budgetBookSummary') {
-      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, 'budgetBookSummary') : [];
+      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
     }  else if (reportType === 'strategy') {
-      reportRows = coordinatorRows ? convertToStrategyReportRows(coordinatorRows) : [];
+      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
     } else {
       reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);
     }
