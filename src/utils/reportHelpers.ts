@@ -490,6 +490,7 @@ export const getReportData = async (
   coordinatorRows?: IPlanningRow[],
 ): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow>> => {
   const year = new Date().getFullYear();
+  const previousYear = year - 1;
 
   try {
     let projects;
@@ -527,9 +528,9 @@ export const getReportData = async (
           [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
           [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
           [`\n${t('projectPhase')}`]: r.projectPhase,
-          [`\nTA ${new Date().getFullYear() - 1}`]: r.costPlan,
-          [`\nTS ${new Date().getFullYear() - 1}`]: r.costForecast,
-          [`${new Date().getFullYear() - 1}\n01`]: r.januaryStatus,
+          [`\nTA ${previousYear}`]: r.costPlan,
+          [`\nTS ${previousYear}`]: r.costForecast,
+          [`${previousYear}\n01`]: r.januaryStatus,
           [`\n02`]: r.februaryStatus,
           [`\n03`]: r.marchStatus,
           [`\n04`]: r.aprilStatus,
@@ -553,9 +554,9 @@ export const getReportData = async (
           [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
           [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
           [t('previouslyUsed')]: r.spentBudget,
-          [`TAE ${new Date().getFullYear()}`]: r.budgetProposalCurrentYearPlus0,
-          [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
-          [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
+          [`TAE ${year}`]: r.budgetProposalCurrentYearPlus0,
+          [`TSE ${year + 1}`]: r.budgetProposalCurrentYearPlus1,
+          [`TSE ${year + 2}`]: r.budgetProposalCurrentYearPlus2,
         }));
       }
       case 'budgetBookSummary': {
@@ -564,18 +565,18 @@ export const getReportData = async (
         // Transform them into csv rows
         return flattenedRows.map((r) => ({
           [t('target')]: r.name,
-          [`${t('usage')} ${t('usageSV')} ${new Date().getFullYear() - 1} ${t('millionEuro')}`]: '',
-          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear()} ${t('millionEuro')}`]: r.budgetEstimation,
-          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear() + 1} ${t('millionEuro')}`]: r.budgetEstimationSuggestion,
-          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 2} ${t('millionEuro')}`]: r.budgetPlanSuggestion1,
-          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 3} ${t('millionEuro')}`]: r.budgetPlanSuggestion2,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 4} ${t('millionEuro')}`]: r.initial1,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 5} ${t('millionEuro')}`]: r.initial2,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 6} ${t('millionEuro')}`]: r.initial3,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 7} ${t('millionEuro')}`]: r.initial4,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 8} ${t('millionEuro')}`]: r.initial5,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 9} ${t('millionEuro')}`]: r.initial6,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 10} ${t('millionEuro')}`]: r.initial7,
+          [`${t('usage')} ${t('usageSV')} ${previousYear} ${t('millionEuro')}`]: '',
+          [`${t('TA')} ${t('taSV')} ${year} ${t('millionEuro')}`]: r.budgetEstimation,
+          [`${t('TA')} ${t('taSV')} ${year + 1} ${t('millionEuro')}`]: r.budgetEstimationSuggestion,
+          [`${t('TS')} ${t('tsSV')} ${year + 2} ${t('millionEuro')}`]: r.budgetPlanSuggestion1,
+          [`${t('TS')} ${t('tsSV')} ${year + 3} ${t('millionEuro')}`]: r.budgetPlanSuggestion2,
+          [`${t('initial')} ${t('initialSV')} ${year + 4} ${t('millionEuro')}`]: r.initial1,
+          [`${t('initial')} ${t('initialSV')} ${year + 5} ${t('millionEuro')}`]: r.initial2,
+          [`${t('initial')} ${t('initialSV')} ${year + 6} ${t('millionEuro')}`]: r.initial3,
+          [`${t('initial')} ${t('initialSV')} ${year + 7} ${t('millionEuro')}`]: r.initial4,
+          [`${t('initial')} ${t('initialSV')} ${year + 8} ${t('millionEuro')}`]: r.initial5,
+          [`${t('initial')} ${t('initialSV')} ${year + 9} ${t('millionEuro')}`]: r.initial6,
+          [`${t('initial')} ${t('initialSV')} ${year + 10} ${t('millionEuro')}`]: r.initial7,
         }));
       }
         default:

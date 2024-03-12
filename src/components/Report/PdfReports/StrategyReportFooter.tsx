@@ -48,7 +48,6 @@ interface IStrategyTableFooterProps {
   infoText: string;
   colorInfoTextOne: string;
   colorInfoTextTwo: string;
-  date?: string;
 }
 
 const StrategyTableFooter: FC<IStrategyTableFooterProps> = ({infoText, colorInfoTextOne, colorInfoTextTwo}) => {
