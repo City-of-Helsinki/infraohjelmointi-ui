@@ -239,7 +239,7 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
   if (reportType === 'budgetBookSummary') {
     let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
     forcedToFrameHierarchy = getBudgetBookSummaryProperties(coordinatorRows);
-    getInvestmentPart(forcedToFrameHierarchy as IBudgetBookSummaryTableRow[]);
+    getInvestmentPart(forcedToFrameHierarchy);
     return forcedToFrameHierarchy;
   }
   else if (reportType === 'strategy') {
