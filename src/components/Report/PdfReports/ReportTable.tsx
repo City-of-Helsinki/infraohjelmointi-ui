@@ -1,10 +1,11 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
 import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
-import { convertToReportRows, flattenBudgetBookSummaryTableRows,getReportRows } from '@/utils/reportHelpers';
+import { convertToReportRows, flattenBudgetBookSummaryTableRows, flattenStrategyTableRows, getReportRows } from '@/utils/reportHelpers';
 import TableRow from './TableRow';
 import { IBasicReportData, IBudgetBookSummaryTableRow, ReportType } from '@/interfaces/reportInterfaces';
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
+import StrategyTableHeader from './StrategyTableHeader';
 
 const styles = StyleSheet.create({
   table: {
@@ -28,9 +29,12 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = reportType === 'budgetBookSummary' ? flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]) : [];
+  const strategyReportRows = reportType === 'strategy' ? flattenStrategyTableRows(reportRows) : [];
   
   const getTableHeader = () => {
     switch (reportType) {
+      case 'strategy':
+        return <StrategyTableHeader />;
       case 'constructionProgram':
         return <ConstructionProgramTableHeader />;
       case 'budgetBookSummary':
@@ -42,8 +46,8 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
     <View>
       <View style={styles.table}>
         <View fixed>{tableHeader}</View>
-        { reportType === 'budgetBookSummary' ?
-          <TableRow flattenedRows={flattenedRows} depth={0} reportType={reportType}/>
+        { reportType === 'budgetBookSummary' || reportType === 'strategy' ?
+          <TableRow flattenedRows={reportType === 'budgetBookSummary' ? flattenedRows : strategyReportRows} depth={0} reportType={reportType}/>
         :
         reportRows?.map((r, i) => (
           <TableRow key={r.id ?? i} row={r} index={i} depth={0} reportType={reportType}/>

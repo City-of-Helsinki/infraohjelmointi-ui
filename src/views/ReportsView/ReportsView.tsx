@@ -41,7 +41,7 @@ const ReportsView = () => {
         {t('reports')}
       </h1>
       {reports.map((r) => (
-        <ReportRow key={r} type={r} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses}/>
+        <ReportRow key={r} type={r} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
       ))}
     </div>
   );

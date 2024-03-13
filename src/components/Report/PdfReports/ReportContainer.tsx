@@ -4,6 +4,7 @@ import DocumentHeader from './DocumentHeader';
 import ReportTable from './ReportTable';
 import { FC, memo } from 'react';
 import { IBasicReportData, ReportType } from '@/interfaces/reportInterfaces';
+import StrategyReportFooter from './StrategyReportFooter';
 
 const styles = StyleSheet.create({
   page: {
@@ -25,6 +26,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
 
   const getDocumentTitle = () => {
     switch (reportType) {
+      case 'strategy':
+        return t('report.strategy.title', {startYear: new Date().getFullYear() - 1});
       case 'constructionProgram':
         return t('report.constructionProgram.title');
       case 'budgetBookSummary':
@@ -39,6 +42,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
 
   const getDocumentSubtitle = () => {
     switch (reportType) {
+      case 'strategy':
+        return t('report.strategy.subtitle')
       case 'constructionProgram':
         return t('report.constructionProgram.subtitle', {
             startYear: new Date().getFullYear() + 1,
@@ -63,6 +68,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
             subtitleOne={documentSubtitle}
           />
           <ReportTable reportType={reportType} data={data} />
+          {reportType === 'strategy' &&
+            <StrategyReportFooter
+              infoText={t('report.strategy.footerInfoText')}
+              colorInfoTextOne={t('report.strategy.planning')}
+              colorInfoTextTwo={t('report.strategy.constructing')}/>
+          }
         </View>
       </Page>
     </Document>

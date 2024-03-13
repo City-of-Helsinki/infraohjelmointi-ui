@@ -5,6 +5,8 @@ import {
   IBudgetBookSummaryTableRow,
   IConstructionProgramCsvRow,
   IConstructionProgramTableRow,
+  IStrategyTableCsvRow,
+  IStrategyTableRow,
   ReportTableRowType,
   ReportType,
 } from '@/interfaces/reportInterfaces';
@@ -13,6 +15,12 @@ import { convertToMillions, keurToMillion } from './calculations';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { TFunction } from 'i18next';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { split } from 'lodash';
+
+interface IYearCheck {
+  planningStart: number;
+  constructionEnd: number;
+}
 
 /**
  * Gets the division name and removes the number infront of it.
@@ -24,6 +32,123 @@ export const getDivision = (divisions?: Array<ILocation>, projectLocation?: stri
   }
   return '';
 };
+
+const getYear = (dateStr: string): number => {
+  const parts = dateStr.split('.');
+  return parseInt(parts[2], 10);
+}
+
+const getMonth = (dateStr: string): number => {
+  const parts = dateStr.split('.');
+  return parseInt(parts[1], 10);
+}
+
+const getProjectPhase = (project: IProject) => {
+  if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
+    return ""
+  }
+
+  const previousYear = new Date().getFullYear() - 1;
+  const planningStartYear = getYear(project.estPlanningStart);
+  const planningEndYear = getYear(project.estPlanningEnd);
+  const constructionStartYear = getYear(project.estConstructionStart);
+  const constructionEndYear = getYear(project.estConstructionEnd);
+
+  const isPlanning = previousYear === planningStartYear || previousYear === planningEndYear;
+  const isConstruction = previousYear == constructionStartYear || previousYear === constructionEndYear;
+
+  if (isPlanning && isConstruction) {
+    return "s r";
+  }
+  else if (isPlanning) {
+      return "s";
+  }
+  else if (isConstruction) {
+      return "r";
+  }
+  else {
+    return "";
+  }
+}
+
+const getProjectPhasePerMonth = (project: IProject, month: number) => {
+  if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
+      return ""
+  }
+
+  const previousYear = new Date().getFullYear() - 1;
+  const planningStartYear = getYear(project.estPlanningStart);
+  const planningEndYear = getYear(project.estPlanningEnd);
+  const constructionStartYear = getYear(project.estConstructionStart);
+  const constructionEndYear = getYear(project.estConstructionEnd);
+
+  const planningStartMonth = getMonth(project.estPlanningStart);
+  const planningEndMonth = getMonth(project.estPlanningEnd);
+  const constructionStartMonth = getMonth(project.estConstructionStart);
+  const constructionEndMonth = getMonth(project.estConstructionEnd);
+
+  const isPlanning = (previousYear === planningStartYear || previousYear === planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
+  const isConstruction = (previousYear === constructionStartYear || previousYear === constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
+
+  if (isPlanning && isConstruction) {
+      return "planningAndConstruction";
+  }
+  else if (isPlanning) {
+      return "planning";
+  }
+  else if (isConstruction) {
+      return "construction";
+  }
+  else {
+      return "";
+  }
+}
+
+const isProjectInPlanningOrConstructionPreviousYear = (props: IYearCheck) => {
+  const previousYear = [new Date().getFullYear() - 1];
+  const inPlanningOrConstruction = (previousYear.some(year => year >= props.planningStart && year <= props.constructionEnd));
+
+  if (inPlanningOrConstruction) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
+  return projects
+    .filter((p) =>
+      p.planningStartYear && p.constructionEndYear &&
+      isProjectInPlanningOrConstructionPreviousYear({
+        planningStart: p.planningStartYear,
+        constructionEnd: p.constructionEndYear
+      }))
+    .map((p) => ({
+      name: p.name,
+      id: p.id,
+      parent: p.projectClass ?? null,
+      projects: [],
+      children: [],
+      // costPlan data will come from SAP and we don't have it yet
+      costPlan: "",
+      projectManager: p.personPlanning?.lastName ?? "",
+      projectPhase: getProjectPhase(p),
+      costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",
+      januaryStatus: getProjectPhasePerMonth(p, 1),
+      februaryStatus: getProjectPhasePerMonth(p,2),
+      marchStatus: getProjectPhasePerMonth(p,3),
+      aprilStatus: getProjectPhasePerMonth(p,4),
+      mayStatus: getProjectPhasePerMonth(p,5),
+      juneStatus: getProjectPhasePerMonth(p,6),
+      julyStatus: getProjectPhasePerMonth(p,7),
+      augustStatus: getProjectPhasePerMonth(p,8),
+      septemberStatus: getProjectPhasePerMonth(p,9),
+      octoberStatus: getProjectPhasePerMonth(p,10),
+      novemberStatus: getProjectPhasePerMonth(p,11),
+      decemberStatus: getProjectPhasePerMonth(p,12),
+      type: 'project',
+    }));
+}
 
 /**
  * We build report rows "backwards" by checking each projects parent class and iterating classes
@@ -110,13 +235,30 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   }
   return properties;
 }
-export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] => {
-  let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
+export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] => {
   if (reportType === 'budgetBookSummary') {
+    let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
     forcedToFrameHierarchy = getBudgetBookSummaryProperties(coordinatorRows);
     getInvestmentPart(forcedToFrameHierarchy);
-  } 
-  return forcedToFrameHierarchy;
+    return forcedToFrameHierarchy;
+  }
+  else if (reportType === 'strategy') {
+    const forcedToFrameHierarchy: IStrategyTableRow[] = [];
+    for (const c of coordinatorRows) {
+      const convertedClass = {
+        id: c.id,
+        name: c.name,
+        parent: null,
+        children: c.children.length ? convertToReportRows(c.children, reportType) : [],
+        projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+        costForecast: c.cells[0].plannedBudget,
+        type: 'class' as ReportTableRowType
+      }
+      forcedToFrameHierarchy.push(convertedClass);
+    }
+    return forcedToFrameHierarchy;
+  }
+  return [];
 }
 
 export const getReportRows = (
@@ -124,7 +266,7 @@ export const getReportRows = (
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
   projects: Array<IProject>,
-): Array<IConstructionProgramTableRow> => {
+): Array<IConstructionProgramTableRow | IStrategyTableRow/* | put here another report type and to the switch cases too */> => {
   const { allClasses } = classes;
 
   const initialValues = {
@@ -133,11 +275,6 @@ export const getReportRows = (
     children: [],
     type: 'class' as ReportTableRowType,
   };
-
-  interface IYearCheck {
-    planningStart: number;
-    constructionEnd: number;
-  }
 
   const checkYearRange = (props: IYearCheck ) => {
     const nextYear = new Date().getFullYear() + 1;
@@ -173,7 +310,7 @@ export const getReportRows = (
       filteredProjects = projects;
   };
 
-  const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow> => {
+  const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
     switch (reportType) {
       case 'constructionProgram':
         return filteredProjects
@@ -200,7 +337,7 @@ export const getReportRows = (
   }
 
   // Filter all classes that are included in the projects' parent classes
-  let classesForProjects: Array<IConstructionProgramTableRow> = [];
+  let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
   switch (reportType) {
     case 'constructionProgram':
       classesForProjects = allClasses
@@ -216,7 +353,7 @@ export const getReportRows = (
   }
 
     // Get the classes parents
-    let classParents: Array<IConstructionProgramTableRow> = [];
+    let classParents: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
     switch (reportType) {
       case 'constructionProgram':
         classParents = allClasses
@@ -288,12 +425,51 @@ const processTableRows = (tableRows: IBudgetBookSummaryTableRow[]) => {
   return budgetBookSummaryCsvRows;
 };
 
+const strategyCsvRows: IStrategyTableCsvRow[] = [];
+
+const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
+  tableRows.forEach((tableRow) => {
+    if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
+      strategyCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: tableRow.type,
+        costPlan: "",
+        projectManager: tableRow.projectManager ?? '',
+        projectPhase: tableRow.projectPhase ?? '',
+        costForecast: tableRow.costForecast ?? '',
+        januaryStatus: tableRow.januaryStatus ?? '',
+        februaryStatus: tableRow.februaryStatus ?? "",
+        marchStatus: tableRow.marchStatus ?? "",
+        aprilStatus: tableRow.aprilStatus ?? "",
+        mayStatus: tableRow.mayStatus ?? "",
+        juneStatus: tableRow.juneStatus ?? "",
+        julyStatus: tableRow.julyStatus ?? "",
+        augustStatus: tableRow.augustStatus ?? "",
+        septemberStatus: tableRow.septemberStatus ?? "",
+        octoberStatus: tableRow.octoberStatus ?? "",
+        novemberStatus: tableRow.novemberStatus ?? "",
+        decemberStatus: tableRow.decemberStatus ?? "",
+      })
+    }
+    processStrategyTableRows(tableRow.projects);
+    processStrategyTableRows(tableRow.children);
+  });
+  return strategyCsvRows;
+}
+
 /**
  * Create a flattened version of report table rows, since the react-csv needs a one-dimensional array
  */
 export const flattenBudgetBookSummaryTableRows = (
   tableRows: Array<IBudgetBookSummaryTableRow>,
-): Array<IBudgetBookSummaryCsvRow> => processTableRows(tableRows).flat(Infinity);
+): Array<IBudgetBookSummaryCsvRow> =>
+  processTableRows(tableRows).flat(Infinity);
+
+export const flattenStrategyTableRows = (
+  tableRows: Array<IStrategyTableRow>,
+): Array<IStrategyTableCsvRow> =>
+  processStrategyTableRows(tableRows).flat(Infinity);
 
 const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
   a,
@@ -314,11 +490,12 @@ export const getReportData = async (
   coordinatorRows?: IPlanningRow[],
 ): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow>> => {
   const year = new Date().getFullYear();
+  const previousYear = year - 1;
 
   try {
     let projects;
 
-    if (reportType !== 'budgetBookSummary') {
+    if (reportType !== 'budgetBookSummary' && reportType !== 'strategy') {
       const res = await getProjectsWithParams({
         direct: false,
         programmed: false,
@@ -330,18 +507,43 @@ export const getReportData = async (
       projects = res.results;
     }
    
-    if (!projects && reportType !== 'budgetBookSummary') {
+    if (!projects && reportType !== 'budgetBookSummary' && reportType !== 'strategy') {
       return [];
     }
 
     let reportRows;
     if (reportType === 'budgetBookSummary') {
-      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, 'budgetBookSummary') : [];
-    }  else {
+      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
+    }  else if (reportType === 'strategy') {
+      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
+    } else {
       reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);
     }
 
     switch (reportType) {
+      case 'strategy' : {
+        //Flatten rows to one dimension
+        const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyTableRow[]);
+        return flattenedRows.map((r) => ({
+          [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
+          [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
+          [`\n${t('projectPhase')}`]: r.projectPhase,
+          [`\nTA ${previousYear}`]: r.costPlan,
+          [`\nTS ${previousYear}`]: r.costForecast,
+          [`${previousYear}\n01`]: r.januaryStatus,
+          [`\n02`]: r.februaryStatus,
+          [`\n03`]: r.marchStatus,
+          [`\n04`]: r.aprilStatus,
+          [`\n05`]: r.mayStatus,
+          [`\n06`]: r.juneStatus,
+          [`\n07`]: r.julyStatus,
+          [`\n08`]: r.augustStatus,
+          [`\n09`]: r.septemberStatus,
+          [`\n10`]: r.octoberStatus,
+          [`\n11`]: r.novemberStatus,
+          [`\n12`]: r.decemberStatus,
+        }))
+      }
       case 'constructionProgram': {
         // Flatten rows into one dimension
         const flattenedRows = flattenConstructionProgramTableRows(reportRows);
@@ -352,9 +554,9 @@ export const getReportData = async (
           [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
           [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
           [t('previouslyUsed')]: r.spentBudget,
-          [`TAE ${new Date().getFullYear()}`]: r.budgetProposalCurrentYearPlus0,
-          [`TSE ${new Date().getFullYear() + 1}`]: r.budgetProposalCurrentYearPlus1,
-          [`TSE ${new Date().getFullYear() + 2}`]: r.budgetProposalCurrentYearPlus2,
+          [`TAE ${year}`]: r.budgetProposalCurrentYearPlus0,
+          [`TSE ${year + 1}`]: r.budgetProposalCurrentYearPlus1,
+          [`TSE ${year + 2}`]: r.budgetProposalCurrentYearPlus2,
         }));
       }
       case 'budgetBookSummary': {
@@ -363,18 +565,18 @@ export const getReportData = async (
         // Transform them into csv rows
         return flattenedRows.map((r) => ({
           [t('target')]: r.name,
-          [`${t('usage')} ${t('usageSV')} ${new Date().getFullYear() - 1} ${t('millionEuro')}`]: '',
-          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear()} ${t('millionEuro')}`]: r.budgetEstimation,
-          [`${t('TA')} ${t('taSV')} ${new Date().getFullYear() + 1} ${t('millionEuro')}`]: r.budgetEstimationSuggestion,
-          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 2} ${t('millionEuro')}`]: r.budgetPlanSuggestion1,
-          [`${t('TS')} ${t('tsSV')} ${new Date().getFullYear() + 3} ${t('millionEuro')}`]: r.budgetPlanSuggestion2,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 4} ${t('millionEuro')}`]: r.initial1,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 5} ${t('millionEuro')}`]: r.initial2,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 6} ${t('millionEuro')}`]: r.initial3,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 7} ${t('millionEuro')}`]: r.initial4,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 8} ${t('millionEuro')}`]: r.initial5,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 9} ${t('millionEuro')}`]: r.initial6,
-          [`${t('initial')} ${t('initialSV')} ${new Date().getFullYear() + 10} ${t('millionEuro')}`]: r.initial7,
+          [`${t('usage')} ${t('usageSV')} ${previousYear} ${t('millionEuro')}`]: '',
+          [`${t('TA')} ${t('taSV')} ${year} ${t('millionEuro')}`]: r.budgetEstimation,
+          [`${t('TA')} ${t('taSV')} ${year + 1} ${t('millionEuro')}`]: r.budgetEstimationSuggestion,
+          [`${t('TS')} ${t('tsSV')} ${year + 2} ${t('millionEuro')}`]: r.budgetPlanSuggestion1,
+          [`${t('TS')} ${t('tsSV')} ${year + 3} ${t('millionEuro')}`]: r.budgetPlanSuggestion2,
+          [`${t('initial')} ${t('initialSV')} ${year + 4} ${t('millionEuro')}`]: r.initial1,
+          [`${t('initial')} ${t('initialSV')} ${year + 5} ${t('millionEuro')}`]: r.initial2,
+          [`${t('initial')} ${t('initialSV')} ${year + 6} ${t('millionEuro')}`]: r.initial3,
+          [`${t('initial')} ${t('initialSV')} ${year + 7} ${t('millionEuro')}`]: r.initial4,
+          [`${t('initial')} ${t('initialSV')} ${year + 8} ${t('millionEuro')}`]: r.initial5,
+          [`${t('initial')} ${t('initialSV')} ${year + 9} ${t('millionEuro')}`]: r.initial6,
+          [`${t('initial')} ${t('initialSV')} ${year + 10} ${t('millionEuro')}`]: r.initial7,
         }));
       }
         default:

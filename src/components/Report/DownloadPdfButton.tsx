@@ -14,8 +14,8 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import ReportContainer from './PdfReports/ReportContainer';
 import { useAppDispatch } from '@/hooks/common';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
-import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -35,7 +35,9 @@ const getPdfDocument = (
 ) => {
   const pdfDocument = {
     budgetProposal: <EmptyDocument />,
-    strategy: <EmptyDocument />,
+    strategy: (
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={'strategy'}/>
+    ),
     constructionProgram: (
       <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'constructionProgram'}/>
     ),
@@ -84,6 +86,14 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           }
           break;
         }
+        case 'strategy': {
+          const res = await getForcedToFrameData(year - 1);
+          if (res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
+          }
+          break;
+        }
         default: {
           const res = await getProjectsWithParams({
             direct: false,
@@ -113,7 +123,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary'}
+      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'strategy'}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>

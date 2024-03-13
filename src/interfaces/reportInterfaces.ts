@@ -30,6 +30,10 @@ export interface IConstructionProgramCsvRow {
   [key: string]: string | undefined;
 }
 
+export interface IStrategyTableCsvRow {
+  [key: string]: string | undefined;
+}
+
 export interface IBudgetBookSummaryCsvRow {
   [key: string]: string | IFinanceProperties | undefined;
 }
@@ -70,6 +74,28 @@ export interface IFinanceProperties {
 export interface IFlattenedBudgetBookSummaryProperties extends IFinanceProperties {
   id: string;
   name: string;
+}
+
+export interface IStrategyTableRow extends ITableRowEssentials {
+  projects: Array<IStrategyTableRow>
+  children: Array<IStrategyTableRow>
+  type: ReportTableRowType
+  projectManager?: string;
+  projectPhase?: string;
+  costPlan?: string;
+  costForecast?: string;
+  januaryStatus?: string;
+  februaryStatus?: string;
+  marchStatus?: string;
+  aprilStatus?: string;
+  mayStatus?: string;
+  juneStatus?: string;
+  julyStatus?: string;
+  augustStatus?: string;
+  septemberStatus?: string;
+  octoberStatus?: string;
+  novemberStatus?: string;
+  decemberStatus?: string;
 }
 
 export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {

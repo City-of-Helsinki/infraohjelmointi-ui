@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, ReportType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IStrategyTableRow, ReportType } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -146,8 +146,77 @@ const styles = StyleSheet.create({
     fontWeight: 'medium',
   },
 });
+
+const strategyReportStyles = StyleSheet.create({
+  oddRow: {
+    ...tableRowStyles,
+  },
+  evenRow: {
+    ...tableRowStyles,
+    backgroundColor: '#f2f2f2',
+  },
+  classRow: {
+    ...tableRowStyles,
+    backgroundColor: '#f0f0ff'
+  },
+  projectCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    paddingLeft: '21px',
+    width: '450px',
+    borderLeft: '1px solid #808080',
+  },
+  classNameCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    fontWeight: 'bold',
+    paddingLeft: '21px',
+    width: '450px',
+    borderLeft: '1px solid #808080',
+  },
+  projectManagerCell: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '200px',
+    paddingRight: '15px',
+    paddingLeft: '21px'
+  },
+  projectPhaseCell: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '100px',
+  },
+  budgetCell: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '80px',
+    textAlign: 'right'
+  },
+  monthCell: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '30px',
+  },
+  monthCellGreen: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '30px',
+    backgroundColor: '#00d7a7'
+  },
+  monthCellBlack: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '30px',
+    backgroundColor: '#333333'
+  },
+  lastCell: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '30px',
+  },
+});
 interface ITableRowProps {
-  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow /*| another report row type */;
+  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow /*| another report row type */;
   flattenedRows?: IBudgetBookSummaryCsvRow[];
   depth: number;
   index?: number;
@@ -158,9 +227,62 @@ interface IRowProps extends ITableRowProps{
   flattenedRow?: IFlattenedBudgetBookSummaryProperties;
 }
 
+const getMonthCellStyle = (monthCell: string | undefined) => {
+  switch (monthCell) {
+    case 'planning':
+      return strategyReportStyles.monthCellBlack
+    case 'construction':
+      return strategyReportStyles.monthCellGreen
+    default:
+    return strategyReportStyles.monthCell
+  }
+}
+
+const getRowStyle = (rowType: string, depth: number) => {
+  switch (rowType) {
+    case 'class':
+      return strategyReportStyles.classRow
+    case 'project':
+      if (depth % 2) {
+        return strategyReportStyles.evenRow
+      } else {
+        return strategyReportStyles.oddRow
+      }
+  }
+}
+
 const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
     let tableRow;
     switch (reportType) {
+        case 'strategy': {
+            if (flattenedRow) {
+              tableRow =
+              <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
+                  <Text style={flattenedRow.type === 'class' ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
+                  <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
+                  <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
+                  <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
+                  <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
+                  <Text style={getMonthCellStyle(flattenedRow.januaryStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.februaryStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.marchStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.aprilStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.mayStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.juneStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.julyStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.augustStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.septemberStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.octoberStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.novemberStatus)}></Text>
+                  <Text style={getMonthCellStyle(flattenedRow.decemberStatus)}></Text>
+                  <Text style={strategyReportStyles.lastCell}></Text>
+              </View>
+            } else {
+              tableRow = <View></View>;
+            }
+            
+            break;
+        }
         case 'constructionProgram': {
             const constructionRow = row as IConstructionProgramTableRow;
             tableRow =  
@@ -235,7 +357,7 @@ Row.displayName = 'Row';
 const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, index }) => {
   return (
       <>
-        { reportType === 'budgetBookSummary' ?
+        { reportType === 'budgetBookSummary' || reportType === 'strategy' ?
           <>
             {/* Class */}
             { flattenedRows?.map((row, index) => {
