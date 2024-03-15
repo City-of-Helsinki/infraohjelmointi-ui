@@ -31,6 +31,7 @@ const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFram
       direct: false,
       programmed: false,
       forcedToFrame: true,
+      params: 'overMillion=false',
       year: year,
     }, true);
     const projects = res.results;
