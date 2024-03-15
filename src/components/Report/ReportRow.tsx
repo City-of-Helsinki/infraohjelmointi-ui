@@ -12,8 +12,7 @@ import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
 import { getCoordinationClasses } from '@/services/classServices';
 import { getCoordinatorGroups } from '@/services/groupServices';
 import { getCoordinatorLocations } from '@/services/locationServices';
-/* import { getProjectsWithParams } from '@/services/projectServices'; */
-import { IProjectsResponse } from '@/interfaces/projectInterfaces';
+import { getProjectsWithParams } from '@/services/projectServices';
 
 interface IReportRowProps {
   type: ReportType;
@@ -28,18 +27,13 @@ const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFram
 
   const getForcedToFrameData = async (year: number) => {
     // projects
-    /* const res = await getProjectsWithParams({
+    const res = await getProjectsWithParams({
       direct: false,
       programmed: false,
       forcedToFrame: true,
       year: year,
     }, true);
-    const projects = res.results; */
-    const res: IProjectsResponse = {
-      results: [],
-      count: 0
-    }
-    const projects = res.results
+    const projects = res.results;
 
     // classes
     const classRes = await getCoordinationClasses({
