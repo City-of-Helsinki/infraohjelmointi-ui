@@ -16,10 +16,10 @@ import {
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { convertToMillions, keurToMillion } from './calculations';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { TFunction } from 'i18next';
-import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { TFunction, t } from 'i18next';
+import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
-import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
+import { Categories } from './staticData';
 
 interface IYearCheck {
   planningStart: number;
@@ -45,6 +45,83 @@ const getYear = (dateStr: string): number => {
 const getMonth = (dateStr: string): number => {
   const parts = dateStr.split('.');
   return parseInt(parts[1], 10);
+}
+
+const mapOperationalEnvironmentAnalysisProperties = (finances: IPlanningCell[], type: 'frameBudget' | 'plannedBudget') => {
+  if (type === 'frameBudget') {
+    return {
+      costForecast: finances[0].frameBudget?.replace(/\s/g, ''),
+      TAE: finances[1].frameBudget?.replace(/\s/g, ''),
+      TSE1: finances[2].frameBudget?.replace(/\s/g, ''),
+      TSE2: finances[3].frameBudget?.replace(/\s/g, ''),
+      initial1: finances[4].frameBudget?.replace(/\s/g, ''),
+      initial2: finances[5].frameBudget?.replace(/\s/g, ''),
+      initial3: finances[6].frameBudget?.replace(/\s/g, ''),
+      initial4: finances[7].frameBudget?.replace(/\s/g, ''),
+      initial5: finances[8].frameBudget?.replace(/\s/g, ''),
+      initial6: finances[9].frameBudget?.replace(/\s/g, ''),
+      initial7: finances[10].frameBudget?.replace(/\s/g, ''),
+    }
+  }
+  return {
+    plannedCostForecast: finances[0].plannedBudget?.replace(/\s/g, ''),
+    plannedTAE: finances[1].plannedBudget?.replace(/\s/g, ''),
+    plannedTSE1: finances[2].plannedBudget?.replace(/\s/g, ''),
+    plannedTSE2: finances[3].plannedBudget?.replace(/\s/g, ''),
+    plannedInitial1: finances[4].plannedBudget?.replace(/\s/g, ''),
+    plannedInitial2: finances[5].plannedBudget?.replace(/\s/g, ''),
+    plannedInitial3: finances[6].plannedBudget?.replace(/\s/g, ''),
+    plannedInitial4: finances[7].plannedBudget?.replace(/\s/g, ''),
+    plannedInitial5: finances[8].plannedBudget?.replace(/\s/g, ''),
+    plannedInitial6: finances[9].plannedBudget?.replace(/\s/g, ''),
+    plannedInitial7: finances[10].plannedBudget?.replace(/\s/g, ''),
+  }
+};
+
+const sumFinances = (classItem: IPlanningRow, category: Categories, totals?: any) => {
+  const initialTotals =  {
+    plannedCostForecast: 0,
+    plannedTAE: 0,
+    plannedTSE1: 0,
+    plannedTSE2: 0,
+    plannedInitial1: 0,
+    plannedInitial2: 0,
+    plannedInitial3: 0,
+    plannedInitial4: 0,
+    plannedInitial5: 0,
+    plannedInitial6: 0,
+    plannedInitial7: 0,
+  };
+  totals = totals || initialTotals;
+
+  classItem.projectRows.forEach((obj) => {
+    if (obj.category?.value === category) {
+      totals.plannedCostForecast += Number(obj.finances?.budgetProposalCurrentYearPlus0?.replace(/\s/g, ''));
+      totals.plannedTAE += Number(obj.finances?.budgetProposalCurrentYearPlus1?.replace(/\s/g, ''));
+      totals.plannedTSE1 += Number(obj.finances?.budgetProposalCurrentYearPlus2?.replace(/\s/g, ''));
+      totals.plannedTSE2 += Number(obj.finances?.preliminaryCurrentYearPlus3?.replace(/\s/g, ''));
+      totals.plannedInitial1 += Number(obj.finances?.preliminaryCurrentYearPlus4?.replace(/\s/g, ''));
+      totals.plannedInitial2 += Number(obj.finances?.preliminaryCurrentYearPlus5?.replace(/\s/g, ''));
+      totals.plannedInitial3 += Number(obj.finances?.preliminaryCurrentYearPlus6?.replace(/\s/g, ''));
+      totals.plannedInitial4 += Number(obj.finances?.preliminaryCurrentYearPlus7?.replace(/\s/g, ''));
+      totals.plannedInitial5 += Number(obj.finances?.preliminaryCurrentYearPlus8?.replace(/\s/g, ''));
+      totals.plannedInitial6 += Number(obj.finances?.preliminaryCurrentYearPlus9?.replace(/\s/g, ''));
+      totals.plannedInitial7 += Number(obj.finances?.preliminaryCurrentYearPlus10?.replace(/\s/g, ''));
+    }
+  });
+
+  if (classItem.children) {
+    classItem.children.forEach((child) => {
+      totals = sumFinances(child, category, totals);
+    });
+  }
+
+  return totals;
+}
+
+const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: Categories) => {
+  const sums = sumFinances(classItem, category);
+  return sums
 }
 
 const getProjectPhase = (project: IProject) => {
@@ -253,32 +330,202 @@ const getRowType = (type: string) => {
   }
 }
 
-export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] => {
-  if (reportType === 'budgetBookSummary') {
-    let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
-    forcedToFrameHierarchy = getBudgetBookSummaryProperties(coordinatorRows);
-    getInvestmentPart(forcedToFrameHierarchy);
-    return forcedToFrameHierarchy;
-  }
-  else if (reportType === 'strategy') {
-    const forcedToFrameHierarchy: IStrategyTableRow[] = [];
-    for (const c of coordinatorRows) {
-      const convertedClass = {
-        id: c.id,
-        name: c.name,
-        parent: null,
-        children: c.children.length ? convertToReportRows(c.children, reportType) : [],
-        projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
-        costForecast: c.cells[0].plannedBudget,
-        type: getRowType(c.type) as ReportTableRowType
-      }
-      if (c.type !== 'group') {
-        forcedToFrameHierarchy.push(convertedClass);
-      }
+const getExtraRows = (project: IPlanningRow) => {
+  // Add TAE&TSE frame, CrossingPressure and Category rows under the fourth level "ta" parts to the report
+  const extraRows = [
+    {
+      children: [],
+      frameBudgets: {
+        costForecast: project.cells[0].frameBudget ?? 0,
+        TAE: project.cells[1].frameBudget ?? 0,
+        TSE1: project.cells[2].frameBudget ?? 0,
+        TSE2: project.cells[3].frameBudget ?? 0,
+        initial1: project.cells[4].frameBudget ?? 0,
+        initial2: project.cells[5].frameBudget ?? 0,
+        initial3: project.cells[6].frameBudget ?? 0,
+        initial4: project.cells[7].frameBudget ?? 0,
+        initial5: project.cells[8].frameBudget ?? 0,
+        initial6: project.cells[9].frameBudget ?? 0,
+        initial7: project.cells[10].frameBudget ?? 0,
+      },
+      plannedBudgets: {},
+      id: `taeTseFrame-${project.id}`,
+      name: t('report.operationalEnvironmentAnalysis.taeTseFrame'),
+      projects: [],
+      type: "taeTseFrame",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      crossingPressure: {
+        cpCostForecast: String(Number(project.cells[0].frameBudget?.replace(/\s/g, ''))-Number(project.cells[0].plannedBudget?.replace(/\s/g, ''))),
+        cpTAE: String(Number(project.cells[1].frameBudget?.replace(/\s/g, ''))-Number(project.cells[1].plannedBudget?.replace(/\s/g, ''))),
+        cpTSE1: String(Number(project.cells[2].frameBudget?.replace(/\s/g, ''))-Number(project.cells[2].plannedBudget?.replace(/\s/g, ''))),
+        cpTSE2: String(Number(project.cells[3].frameBudget?.replace(/\s/g, ''))-Number(project.cells[3].plannedBudget?.replace(/\s/g, ''))),
+        cpInitial1: String(Number(project.cells[4].frameBudget?.replace(/\s/g, ''))-Number(project.cells[4].plannedBudget?.replace(/\s/g, ''))),
+        cpInitial2: String(Number(project.cells[5].frameBudget?.replace(/\s/g, ''))-Number(project.cells[5].plannedBudget?.replace(/\s/g, ''))),
+        cpInitial3: String(Number(project.cells[6].frameBudget?.replace(/\s/g, ''))-Number(project.cells[6].plannedBudget?.replace(/\s/g, ''))),
+        cpInitial4: String(Number(project.cells[7].frameBudget?.replace(/\s/g, ''))-Number(project.cells[7].plannedBudget?.replace(/\s/g, ''))),
+        cpInitial5: String(Number(project.cells[8].frameBudget?.replace(/\s/g, ''))-Number(project.cells[8].plannedBudget?.replace(/\s/g, ''))),
+        cpInitial6: String(Number(project.cells[9].frameBudget?.replace(/\s/g, ''))-Number(project.cells[9].plannedBudget?.replace(/\s/g, ''))),
+        cpInitial7: String(Number(project.cells[10].frameBudget?.replace(/\s/g, ''))-Number(project.cells[10].plannedBudget?.replace(/\s/g, '')))
+      },
+      id: `ylityspaine-${project.id}`,
+      name: t('report.operationalEnvironmentAnalysis.crossingPressure'),
+      projects: [],
+      type: "crossingPressure",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K1),
+      id: `category-K1-${project.id}`,
+      name: t('option.K1'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K2),
+      id: `category-K2-${project.id}`,
+      name: t('option.K2'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K3),
+      id: `category-K3-${project.id}`,
+      name: t('option.K3'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K4),
+      id: `category-K4-${project.id}`,
+      name: t('option.K4'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K51),
+      id: `category-K51-${project.id}`,
+      name: t('option.K51'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K52),
+      id: `category-K52-${project.id}`,
+      name: t('option.K52'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K53),
+      id: `category-K53-${project.id}`,
+      name: t('option.K53'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K54),
+      id: `category-K54-${project.id}`,
+      name: t('option.K54'),
+      projects: [],
+      type: "category",
+    },
+    {
+      children: [],
+      frameBudgets: {},
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K55),
+      id: `category-K55-${project.id}`,
+      name: t('option.K55'),
+      projects: [],
+      type: "category",
     }
-    return forcedToFrameHierarchy;
+  ];
+
+  return extraRows;
+}
+
+export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+  switch (reportType) {
+    case Reports.BudgetBookSummary: {
+      let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
+      forcedToFrameHierarchy = getBudgetBookSummaryProperties(coordinatorRows);
+      getInvestmentPart(forcedToFrameHierarchy);
+      return forcedToFrameHierarchy;
+    }
+    case Reports.Strategy: {
+      const forcedToFrameHierarchy: IStrategyTableRow[] = [];
+      for (const c of coordinatorRows) {
+        const convertedClass = {
+          id: c.id,
+          name: c.name,
+          parent: null,
+          children: c.children.length ? convertToReportRows(c.children, reportType) : [],
+          projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+          costForecast: c.cells[0].plannedBudget,
+          type: getRowType(c.type) as ReportTableRowType
+        }
+        if (c.type !== 'group') {
+          forcedToFrameHierarchy.push(convertedClass);
+        }
+      }
+      return forcedToFrameHierarchy;
+    }
+    case Reports.OperationalEnvironmentAnalysis: {
+      const forcedToFrameHierarchy = [];
+      for (const c of coordinatorRows) {
+        const convertedClass = {
+          id: c.id,
+          name: c.name,
+          parent: null,
+          children: c.children.length ? convertToReportRows(c.children, reportType) : [],
+          projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+          frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "frameBudget"),
+          plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "plannedBudget"),
+          costForecast: c.cells[0].plannedBudget,
+          cells: c.cells,
+          type: 'class' as ReportTableRowType
+        }
+        forcedToFrameHierarchy.push(convertedClass);
+        // If the class is on the fourth level, we want to add some extra rows there
+        if (/^\d \d\d \d\d \d\d/.test(c.name)) {
+          const extraRows = getExtraRows(c);
+          extraRows.forEach((row) =>
+            forcedToFrameHierarchy.push(row)
+          );
+        }
+      }
+      return forcedToFrameHierarchy;
+    }
+    default:
+      return [];
   }
-  return [];
 }
 
 export const getReportRows = (
@@ -286,7 +533,7 @@ export const getReportRows = (
   classes: IClassHierarchy,
   divisions: Array<ILocation>,
   projects: Array<IProject>,
-): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow | IOperationalEnvironmentAnalysisTableRow> => {
+): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
   const { allClasses } = classes;
 
   const initialValues = {
@@ -330,38 +577,6 @@ export const getReportRows = (
       filteredProjects = projects;
   };
 
-  const mapOperationalEnvironmentAnalysisProperties = (finances: IClassFinances, type: 'frameBudget' | 'plannedBudget') => {
-    if (type === 'frameBudget') {
-      return {
-        costForecast: finances.year0.frameBudget,
-        TAE: finances.year1.frameBudget,
-        TSE1: finances.year2.frameBudget,
-        TSE2: finances.year3.frameBudget,
-        initial1: finances.year4.frameBudget,
-        initial2: finances.year5.frameBudget,
-        initial3: finances.year6.frameBudget,
-        initial4: finances.year7.frameBudget,
-        initial5: finances.year8.frameBudget,
-        initial6: finances.year9.frameBudget,
-        initial7: finances.year10.frameBudget,
-      }
-    } else {
-      return {
-        plannedCostForecast: finances.year0.plannedBudget,
-        plannedTAE: finances.year1.plannedBudget,
-        plannedTSE1: finances.year2.plannedBudget,
-        plannedTSE2: finances.year3.plannedBudget,
-        plannedInitial1: finances.year4.plannedBudget,
-        plannedInitial2: finances.year5.plannedBudget,
-        plannedInitial3: finances.year6.plannedBudget,
-        plannedInitial4: finances.year7.plannedBudget,
-        plannedInitial5: finances.year8.plannedBudget,
-        plannedInitial6: finances.year9.plannedBudget,
-        plannedInitial7: finances.year10.plannedBudget,
-      }
-    }
-  };
-
   const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
     switch (reportType) {
       case Reports.ConstructionProgram:
@@ -387,9 +602,9 @@ export const getReportRows = (
           return [];
     }
   }
-
+  
   // Filter all classes that are included in the projects' parent classes
-  let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow | IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow> = [];
+  let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow | IBudgetBookSummaryTableRow> = [];
   switch (reportType) {
     case Reports.ConstructionProgram:
       classesForProjects = allClasses
@@ -401,62 +616,6 @@ export const getReportRows = (
           id: c.id,
           projects: getProjectsForClass(c.id),
         }));
-      break;
-    case Reports.OperationalEnvironmentAnalysis:
-      classesForProjects = allClasses
-        .map((c: IClass) => ({
-          ...initialValues,
-          name: c.name,
-          parent: c.parent,
-          id: c.id,
-          frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "frameBudget"),
-          plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "plannedBudget"),
-          type: 'class',
-        }));
-        for (let i = 0; i < classesForProjects.length; i++) {
-          // Add TAE&TSE raami and Ylityspaine rows under the fourth level 'ta' parts
-          if (/^\d \d\d \d\d \d\d/.test(classesForProjects[i].name)) {
-            const typedClasses = classesForProjects as IOperationalEnvironmentAnalysisTableRow[];
-            typedClasses.splice(i + 1, 0, 
-              {
-                children: [],
-                frameBudgets: typedClasses[i].frameBudgets,
-                plannedBudgets: {},
-                id: `taeTseFrame-${typedClasses[i].id}`,
-                name: "TAE&TSE raami",
-                parent: classesForProjects[i].parent,
-                projects: [],
-                type: "taeTseFrame",
-              },
-              {
-                children: [],
-                frameBudgets: {},
-                plannedBudgets: {},
-                // Calculate crossingPressures ('Ylityspaine')
-                crossingPressure: {
-                  cpCostForecast: String(Number(typedClasses[i].frameBudgets.costForecast)-Number(typedClasses[i].plannedBudgets.plannedCostForecast)),
-                  cpTAE: String(Number(typedClasses[i].frameBudgets.TAE)-Number(typedClasses[i].plannedBudgets.plannedTAE)),
-                  cpTSE1: String(Number(typedClasses[i].frameBudgets.TSE1)-Number(typedClasses[i].plannedBudgets.plannedTSE1)),
-                  cpTSE2: String(Number(typedClasses[i].frameBudgets.TSE2)-Number(typedClasses[i].plannedBudgets.plannedTSE2)),
-                  cpInitial1: String(Number(typedClasses[i].frameBudgets.initial1)-Number(typedClasses[i].plannedBudgets.plannedInitial1)),
-                  cpInitial2: String(Number(typedClasses[i].frameBudgets.initial2)-Number(typedClasses[i].plannedBudgets.plannedInitial2)),
-                  cpInitial3: String(Number(typedClasses[i].frameBudgets.initial3)-Number(typedClasses[i].plannedBudgets.plannedInitial3)),
-                  cpInitial4: String(Number(typedClasses[i].frameBudgets.initial4)-Number(typedClasses[i].plannedBudgets.plannedInitial4)),
-                  cpInitial5: String(Number(typedClasses[i].frameBudgets.initial5)-Number(typedClasses[i].plannedBudgets.plannedInitial5)),
-                  cpInitial6: String(Number(typedClasses[i].frameBudgets.initial6)-Number(typedClasses[i].plannedBudgets.plannedInitial6)),
-                  cpInitial7: String(Number(typedClasses[i].frameBudgets.initial7)-Number(typedClasses[i].plannedBudgets.plannedInitial7))
-                },
-                id: `ylityspaine-${typedClasses[i].id}`,
-                name: "Ylityspaine",
-                parent: typedClasses[i].parent,
-                projects: [],
-                type: "crossingPressure",
-              }
-            );
-            // Increase 'i' by 2 to skip the new objects in the next iteration
-            i += 2;
-          }
-        }
       break;
   }
 
@@ -475,31 +634,10 @@ export const getReportRows = (
             projects: getProjectsForClass(c.id),
           }));
         break;
-      case Reports.OperationalEnvironmentAnalysis: {
-        const helperClassGrandParents = allClasses
-        .filter((ac) => ac.parent === null)
-        .map((c) => ({
-          ...initialValues,
-          id: c.id,
-        }));
-        classParents = allClasses
-          .filter((ac) => helperClassGrandParents.findIndex((cdp) => cdp.id === ac.parent) !== -1)
-          .map((c) => ({
-            ...initialValues,
-            id: c.id,
-            name: c.name,
-            parent: c.parent,
-            children: classesForProjects.filter((cfp) => cfp.parent === c.id),
-            frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "frameBudget"),
-            plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "plannedBudget"),
-            type: 'class',
-          }));
-        break;
-      }
     }
 
   // Get the parent classes parents
-  let classGrandParents: Array<IConstructionProgramTableRow | IOperationalEnvironmentAnalysisTableRow> = [];
+  let classGrandParents: Array<IConstructionProgramTableRow> = [];
   switch (reportType) {
     case Reports.ConstructionProgram:
       classGrandParents = allClasses
@@ -513,23 +651,7 @@ export const getReportRows = (
           projects: getProjectsForClass(c.id),
         }));
       break;
-    case Reports.OperationalEnvironmentAnalysis: {
-      classGrandParents = allClasses
-      .filter((ac) => ac.parent === null)
-      .map((c) => ({
-        ...initialValues,
-        id: c.id,
-        name: c.name,
-        parent: c.parent,
-        children: classParents.filter((cp) => cp.parent === c.id),
-        frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "frameBudget"),
-        plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.finances, "plannedBudget"),
-        type: 'class',
-      }));
-      break;
-    }
   }
-  
   const classesForProjectsWithNoParents = classesForProjects?.filter((cfp) => cfp.parent === null);
   const classParentsWithNoParents = classParents?.filter((cp) => cp.parent === null);
 
@@ -544,22 +666,22 @@ const processBudgetBookSummaryTableRows = (tableRows: IBudgetBookSummaryTableRow
   tableRows.forEach((tableRow) => {
     if (!budgetBookSummaryCsvRows.some(row => row.id === tableRow.id)) {
       budgetBookSummaryCsvRows.push({
-        id: tableRow.id,
-        name: tableRow.name,
-        type: tableRow.type,
+        id: tableRow?.id,
+        name: tableRow?.name,
+        type: tableRow?.type,
         usage: '',
-        budgetEstimation: convertToMillions(tableRow.financeProperties.budgetEstimation),
-        budgetEstimationSuggestion: convertToMillions(tableRow.financeProperties.budgetEstimationSuggestion),
-        budgetPlanSuggestion1: convertToMillions(tableRow.financeProperties.budgetPlanSuggestion1),
-        budgetPlanSuggestion2: convertToMillions(tableRow.financeProperties.budgetPlanSuggestion2),
-        initial1: convertToMillions(tableRow.financeProperties.initial1),
-        initial2: convertToMillions(tableRow.financeProperties.initial2),
-        initial3: convertToMillions(tableRow.financeProperties.initial3),
-        initial4: convertToMillions(tableRow.financeProperties.initial4),
-        initial5: convertToMillions(tableRow.financeProperties.initial5),
-        initial6: convertToMillions(tableRow.financeProperties.initial6),
-        initial7: convertToMillions(tableRow.financeProperties.initial7),
-        objectType: tableRow.objectType,
+        budgetEstimation: convertToMillions(tableRow?.financeProperties.budgetEstimation),
+        budgetEstimationSuggestion: convertToMillions(tableRow?.financeProperties.budgetEstimationSuggestion),
+        budgetPlanSuggestion1: convertToMillions(tableRow?.financeProperties.budgetPlanSuggestion1),
+        budgetPlanSuggestion2: convertToMillions(tableRow?.financeProperties.budgetPlanSuggestion2),
+        initial1: convertToMillions(tableRow?.financeProperties.initial1),
+        initial2: convertToMillions(tableRow?.financeProperties.initial2),
+        initial3: convertToMillions(tableRow?.financeProperties.initial3),
+        initial4: convertToMillions(tableRow?.financeProperties.initial4),
+        initial5: convertToMillions(tableRow?.financeProperties.initial5),
+        initial6: convertToMillions(tableRow?.financeProperties.initial6),
+        initial7: convertToMillions(tableRow?.financeProperties.initial7),
+        objectType: tableRow?.objectType,
       })
     }
 
@@ -612,30 +734,31 @@ const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalE
         name: tableRow.name,
         type: tableRow.type,
 
-        costForecast: tableRow.frameBudgets.costForecast ?? '0',
-        TAE: tableRow.frameBudgets.TAE ?? '0',
-        TSE1: tableRow.frameBudgets.TSE1 ?? '0',
-        TSE2: tableRow.frameBudgets.TSE2 ?? '0',
-        initial1: tableRow.frameBudgets.initial1 ?? '0',
-        initial2: tableRow.frameBudgets.initial2 ?? '0',
-        initial3: tableRow.frameBudgets.initial3 ?? '0',
-        initial4: tableRow.frameBudgets.initial4 ?? '0',
-        initial5: tableRow.frameBudgets.initial5 ?? '0',
-        initial6: tableRow.frameBudgets.initial6 ?? '0',
-        initial7: tableRow.frameBudgets.initial7 ?? '0',
+        costForecast: tableRow.frameBudgets?.costForecast ?? '0',
+        TAE: tableRow.frameBudgets?.TAE ?? '0',
+        TSE1: tableRow.frameBudgets?.TSE1 ?? '0',
+        TSE2: tableRow.frameBudgets?.TSE2 ?? '0',
+        initial1: tableRow.frameBudgets?.initial1 ?? '0',
+        initial2: tableRow.frameBudgets?.initial2 ?? '0',
+        initial3: tableRow.frameBudgets?.initial3 ?? '0',
+        initial4: tableRow.frameBudgets?.initial4 ?? '0',
+        initial5: tableRow.frameBudgets?.initial5 ?? '0',
+        initial6: tableRow.frameBudgets?.initial6 ?? '0',
+        initial7: tableRow.frameBudgets?.initial7 ?? '0',
 
-        plannedCostForecast: tableRow.plannedBudgets.plannedCostForecast ?? '0',
-        plannedTAE: tableRow.plannedBudgets.plannedTAE ?? '0',
-        plannedTSE1: tableRow.plannedBudgets.plannedTSE1 ?? '0',
-        plannedTSE2: tableRow.plannedBudgets.plannedTSE2 ?? '0',
-        plannedInitial1: tableRow.plannedBudgets.plannedInitial1 ?? '0',
-        plannedInitial2: tableRow.plannedBudgets.plannedInitial2 ?? '0',
-        plannedInitial3: tableRow.plannedBudgets.plannedInitial3 ?? '0',
-        plannedInitial4: tableRow.plannedBudgets.plannedInitial4 ?? '0',
-        plannedInitial5: tableRow.plannedBudgets.plannedInitial5 ?? '0',
-        plannedInitial6: tableRow.plannedBudgets.plannedInitial6 ?? '0',
-        plannedInitial7: tableRow.plannedBudgets.plannedInitial7 ?? '0',
+        plannedCostForecast: tableRow.plannedBudgets?.plannedCostForecast ?? '0',
+        plannedTAE: tableRow.plannedBudgets?.plannedTAE ?? '0',
+        plannedTSE1: tableRow.plannedBudgets?.plannedTSE1 ?? '0',
+        plannedTSE2: tableRow.plannedBudgets?.plannedTSE2 ?? '0',
+        plannedInitial1: tableRow.plannedBudgets?.plannedInitial1 ?? '0',
+        plannedInitial2: tableRow.plannedBudgets?.plannedInitial2 ?? '0',
+        plannedInitial3: tableRow.plannedBudgets?.plannedInitial3 ?? '0',
+        plannedInitial4: tableRow.plannedBudgets?.plannedInitial4 ?? '0',
+        plannedInitial5: tableRow.plannedBudgets?.plannedInitial5 ?? '0',
+        plannedInitial6: tableRow.plannedBudgets?.plannedInitial6 ?? '0',
+        plannedInitial7: tableRow.plannedBudgets?.plannedInitial7 ?? '0',
 
+        //CrossingPressure
         cpCostForecast: tableRow.crossingPressure?.cpCostForecast ?? '0',
         cpTAE: tableRow.crossingPressure?.cpTAE ?? '0',
         cpTSE1: tableRow.crossingPressure?.cpTSE1 ?? '0',
@@ -647,13 +770,27 @@ const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalE
         cpInitial5: tableRow.crossingPressure?.cpInitial5 ?? '0',
         cpInitial6: tableRow.crossingPressure?.cpInitial6 ?? '0',
         cpInitial7: tableRow.crossingPressure?.cpInitial7 ?? '0',
+
+        //Categories
+        categoryCostForecast: tableRow.plannedBudgetsForCategories?.plannedCostForecast ?? '0',
+        categoryTAE: tableRow.plannedBudgetsForCategories?.plannedTAE ?? '0',
+        categoryTSE1: tableRow.plannedBudgetsForCategories?.plannedTSE1 ?? '0',
+        categoryTSE2: tableRow.plannedBudgetsForCategories?.plannedTSE2 ?? '0',
+        categoryInitial1: tableRow.plannedBudgetsForCategories?.plannedInitial1 ?? '0',
+        categoryInitial2: tableRow.plannedBudgetsForCategories?.plannedInitial2 ?? '0',
+        categoryInitial3: tableRow.plannedBudgetsForCategories?.plannedInitial3 ?? '0',
+        categoryInitial4: tableRow.plannedBudgetsForCategories?.plannedInitial4 ?? '0',
+        categoryInitial5: tableRow.plannedBudgetsForCategories?.plannedInitial5 ?? '0',
+        categoryInitial6: tableRow.plannedBudgetsForCategories?.plannedInitial6 ?? '0',
+        categoryInitial7: tableRow.plannedBudgetsForCategories?.plannedInitial7 ?? '0',
       })
     }
 
-    // Recursive calls for children and projects.
-    processOperationalEnvironmentAnalysisTableRows(tableRow.projects);
-    processOperationalEnvironmentAnalysisTableRows(tableRow.children);
-    
+    // Recursive calls for children and projects. These shouldn't be done in the fourth level anymore
+    if (!/^\d \d\d \d\d \d\d/.test(tableRow.name)) {
+      processOperationalEnvironmentAnalysisTableRows(tableRow.projects);
+      processOperationalEnvironmentAnalysisTableRows(tableRow.children);
+    }
   });
   return operationalEnvironmentAnalysisCsvRows;
 };
@@ -717,9 +854,9 @@ export const getReportData = async (
     }
 
     let reportRows;
-    if (reportType === 'budgetBookSummary') {
+    if (reportType === Reports.BudgetBookSummary) {
       reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
-    }  else if (reportType === 'strategy') {
+    }  else if (reportType === Reports.Strategy) {
       reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
     } else {
       reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);

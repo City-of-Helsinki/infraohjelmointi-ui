@@ -35,7 +35,7 @@ const getPdfDocument = (
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis:
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: []}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
+      <ReportContainer data={{divisions: divisions, classes: classes, projects: [], coordinatorRows}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
     strategy: (
       <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={Reports.Strategy}/>
     ),
@@ -97,7 +97,11 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           break;
         }
         case Reports.OperationalEnvironmentAnalysis: {
-          document = getPdfDocument(type, divisions, forcedToFrameClasses, []);
+          const res = await getForcedToFrameData(year);
+          if (res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
+          }
           break;
         }
         default: {

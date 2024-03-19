@@ -439,7 +439,9 @@
       "title": "Kaupunkiympäristön toimiala - Toimintaympäristöanalyysi {{startYear}} - {{endYear}}",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
-      "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}"
+      "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
+      "crossingPressure": "Ylityspaine",
+      "taeTseFrame": "TAE&TSE raami"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma",

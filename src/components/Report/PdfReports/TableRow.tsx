@@ -437,6 +437,21 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
                     <Text style={styles.lastNumberColumn}>{flattenedRow.plannedInitial7}</Text>
                   </>
                 }
+                { flattenedRow.type === 'category' &&
+                  <>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryCostForecast}</Text>
+                    <Text style={[styles.numberColumns, styles.tae]}>{flattenedRow.categoryTAE}</Text>
+                    <Text style={[styles.numberColumns, styles.tse1]}>{flattenedRow.categoryTSE1}</Text>
+                    <Text style={[styles.numberColumns, styles.tse2]}>{flattenedRow.categoryTSE2}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial1}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial2}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial3}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial4}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial5}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial6}</Text>
+                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial7}</Text>
+                  </>
+                }
               </View>;
           }
           break;

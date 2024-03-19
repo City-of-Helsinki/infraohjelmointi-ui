@@ -52,7 +52,7 @@ export enum Reports {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame';
+export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category';
 
 export interface IBasicReportData {
   divisions: Array<ILocation>;
@@ -103,6 +103,18 @@ export interface IOperationalEnvironmentAnalysisFinanceProperties {
   cpInitial5?: string;
   cpInitial6?: string;
   cpInitial7?: string;
+
+  categoryCostForecast?: string;
+  categoryTAE?: string;
+  categoryTSE1?: string;
+  categoryTSE2?: string;
+  categoryInitial1?: string;
+  categoryInitial2?: string;
+  categoryInitial3?: string;
+  categoryInitial4?: string;
+  categoryInitial5?: string;
+  categoryInitial6?: string;
+  categoryInitial7?: string;
   [key: string]: string | undefined;
 }
 
@@ -178,10 +190,30 @@ export interface IConstructionProgramTableRow extends ITableRowEssentials {
   budgetProposalCurrentYearPlus2?: string;
 }
 
+export interface IPlannedBudgets {
+  plannedCostForecast?: string;
+  plannedTAE?: string;
+  plannedTSE1?: string;
+  plannedTSE2?: string;
+  plannedInitial1?: string;
+  plannedInitial2?: string;
+  plannedInitial3?: string;
+  plannedInitial4?: string;
+  plannedInitial5?: string;
+  plannedInitial6?: string;
+  plannedInitial7?: string;
+}
+
 export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssentials {
   children: Array<IOperationalEnvironmentAnalysisTableRow>;
   projects: Array<IOperationalEnvironmentAnalysisTableRow>;
   type: ReportTableRowType;
+  category?: {
+    id?: string;
+    updatedDate?: string;
+    value?: string;
+  }
+  plannedBudgetsForCategories?: IPlannedBudgets;
 
   frameBudgets: {
     costForecast?: string;
@@ -196,19 +228,8 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
     initial6?: string;
     initial7?: string;
   }
-  plannedBudgets: {
-    plannedCostForecast?: string;
-    plannedTAE?: string;
-    plannedTSE1?: string;
-    plannedTSE2?: string;
-    plannedInitial1?: string;
-    plannedInitial2?: string;
-    plannedInitial3?: string;
-    plannedInitial4?: string;
-    plannedInitial5?: string;
-    plannedInitial6?: string;
-    plannedInitial7?: string;
-  }
+  plannedBudgets: IPlannedBudgets;
+
   crossingPressure?: { // ylityspaine
     cpCostForecast?: string;
     cpTAE?: string;
