@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const previousYear = new Date().getFullYear() - 1;
+const year = new Date().getFullYear();
 
 const StrategyTableHeader = () => {
   const { t } = useTranslation();
@@ -62,9 +62,9 @@ const StrategyTableHeader = () => {
         <Text style={styles.projectCell}>{`\n${t('report.strategy.projectNameTitle')}`}</Text>
         <Text style={styles.projectManagerCell}>{`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`}</Text>
         <Text style={styles.projectPhaseCell}>{`\n${t('projectPhase')}`}</Text>
-        <Text style={styles.budgetCell}>{`\nTA ${previousYear}`}</Text>
-        <Text style={styles.budgetCell}>{`\nTS ${previousYear}`}</Text>
-        <Text style={styles.monthCell}>{`${previousYear}\n01`}</Text>
+        <Text style={styles.budgetCell}>{`\nTA ${year}`}</Text>
+        <Text style={styles.budgetCell}>{`\nTS ${year}`}</Text>
+        <Text style={styles.monthCell}>{`${year}\n01`}</Text>
         <Text style={styles.monthCell}>{`\n02`}</Text>
         <Text style={styles.monthCell}>{`\n03`}</Text>
         <Text style={styles.monthCell}>{`\n04`}</Text>
