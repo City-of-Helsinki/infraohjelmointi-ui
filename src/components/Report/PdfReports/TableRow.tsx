@@ -145,8 +145,9 @@ const styles = StyleSheet.create({
     paddingLeft: '45px',
     fontWeight: 'medium',
   },
+});
 
-  // For operationalEnvironmentAnalysis report:
+const operationalEnvironmentAnalysisStyles = StyleSheet.create({
   targetColumn: {
     ...cellStyles,
     borderLeft: '1px solid #808080',
@@ -181,8 +182,10 @@ const styles = StyleSheet.create({
   tse2: {
     backgroundColor: '#F2ECE7',
   },
-
-});
+  basicRow: {
+    color: '#000000',
+  }
+})
 
 const strategyReportStyles = StyleSheet.create({
   oddRow: {
@@ -382,76 +385,32 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
         case Reports.OperationalEnvironmentAnalysis: {
           if (flattenedRow) {
             const getNameStyle = () => {
-              if (flattenedRow.type === 'taeTseFrame') return [styles.targetColumn, styles.frame];
-              if (flattenedRow.type === 'crossingPressure') return [styles.targetColumn, styles.crossingPressure];
-              return styles.targetColumn;
+              if (flattenedRow.type === 'taeTseFrame') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
+              if (flattenedRow.type === 'crossingPressure') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.crossingPressure];
+              return operationalEnvironmentAnalysisStyles.targetColumn;
             }
-
+            const getColor = () => {
+              if (flattenedRow.type === 'taeTseFrame') return operationalEnvironmentAnalysisStyles.frame;
+              if (flattenedRow.type === 'crossingPressure') return operationalEnvironmentAnalysisStyles.crossingPressure;
+              return operationalEnvironmentAnalysisStyles.basicRow;
+            }
+            const color = getColor();
             tableRow =  
               <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
                 <Text style={getNameStyle()}>
                   {flattenedRow.name}
                 </Text>
-                { flattenedRow.type === 'crossingPressure' &&
-                  <>
-                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpCostForecast}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure, styles.tae]}>{flattenedRow.cpTAE}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure, styles.tse1]}>{flattenedRow.cpTSE1}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure, styles.tse2]}>{flattenedRow.cpTSE2}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial1}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial2}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial3}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial4}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial5}</Text>
-                    <Text style={[styles.numberColumns, styles.crossingPressure]}>{flattenedRow.cpInitial6}</Text>
-                    <Text style={[styles.lastNumberColumn, styles.crossingPressure]}>{flattenedRow.cpInitial7}</Text>
-                  </>
-                }
-                { flattenedRow.type === 'taeTseFrame' &&
-                  <>
-                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.costForecast}</Text>
-                    <Text style={[styles.numberColumns, styles.frame, styles.tae]}>{flattenedRow.TAE}</Text>
-                    <Text style={[styles.numberColumns, styles.frame, styles.tse1]}>{flattenedRow.TSE1}</Text>
-                    <Text style={[styles.numberColumns, styles.frame, styles.tse2]}>{flattenedRow.TSE2}</Text>
-                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial1}</Text>
-                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial2}</Text>
-                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial3}</Text>
-                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial4}</Text>
-                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial5}</Text>
-                    <Text style={[styles.numberColumns, styles.frame]}>{flattenedRow.initial6}</Text>
-                    <Text style={[styles.lastNumberColumn, styles.frame]}>{flattenedRow.initial7}</Text>
-                  </>
-                }
-                { flattenedRow.type === 'class' &&
-                  <>
-                    <Text style={styles.numberColumns}>{flattenedRow.plannedCostForecast}</Text>
-                    <Text style={[styles.numberColumns, styles.tae]}>{flattenedRow.plannedTAE}</Text>
-                    <Text style={[styles.numberColumns, styles.tse1]}>{flattenedRow.plannedTSE1}</Text>
-                    <Text style={[styles.numberColumns, styles.tse2]}>{flattenedRow.plannedTSE2}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial1}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial2}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial3}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial4}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial5}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.plannedInitial6}</Text>
-                    <Text style={styles.lastNumberColumn}>{flattenedRow.plannedInitial7}</Text>
-                  </>
-                }
-                { flattenedRow.type === 'category' &&
-                  <>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryCostForecast}</Text>
-                    <Text style={[styles.numberColumns, styles.tae]}>{flattenedRow.categoryTAE}</Text>
-                    <Text style={[styles.numberColumns, styles.tse1]}>{flattenedRow.categoryTSE1}</Text>
-                    <Text style={[styles.numberColumns, styles.tse2]}>{flattenedRow.categoryTSE2}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial1}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial2}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial3}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial4}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial5}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial6}</Text>
-                    <Text style={styles.numberColumns}>{flattenedRow.categoryInitial7}</Text>
-                  </>
-                }
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.costForecast}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color, operationalEnvironmentAnalysisStyles.tae]}>{flattenedRow.TAE}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color, operationalEnvironmentAnalysisStyles.tse1]}>{flattenedRow.TSE1}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color, operationalEnvironmentAnalysisStyles.tse2]}>{flattenedRow.TSE2}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial1}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial2}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial3}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial4}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial5}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial6}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.lastNumberColumn, color]}>{flattenedRow.initial7}</Text>
               </View>;
           }
           break;

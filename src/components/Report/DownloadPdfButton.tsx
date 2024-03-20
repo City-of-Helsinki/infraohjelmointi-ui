@@ -88,14 +88,6 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           }
           break;
         }
-        case Reports.Strategy: {
-          const res = await getForcedToFrameData(year - 1);
-          if (res.projects.length > 0) {
-            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
-          }
-          break;
-        }
         case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year);
           if (res.projects.length > 0) {

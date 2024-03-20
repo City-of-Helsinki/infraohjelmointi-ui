@@ -79,42 +79,6 @@ export interface IOperationalEnvironmentAnalysisFinanceProperties {
   initial5?: string;
   initial6?: string;
   initial7?: string;
-
-  plannedCostForecast?: string;
-  plannedTAE?: string;
-  plannedTSE1?: string;
-  plannedTSE2?: string;
-  plannedInitial1?: string;
-  plannedInitial2?: string;
-  plannedInitial3?: string;
-  plannedInitial4?: string;
-  plannedInitial5?: string;
-  plannedInitial6?: string;
-  plannedInitial7?: string;
-
-  cpCostForecast?: string;
-  cpTAE?: string;
-  cpTSE1?: string;
-  cpTSE2?: string;
-  cpInitial1?: string;
-  cpInitial2?: string;
-  cpInitial3?: string;
-  cpInitial4?: string;
-  cpInitial5?: string;
-  cpInitial6?: string;
-  cpInitial7?: string;
-
-  categoryCostForecast?: string;
-  categoryTAE?: string;
-  categoryTSE1?: string;
-  categoryTSE2?: string;
-  categoryInitial1?: string;
-  categoryInitial2?: string;
-  categoryInitial3?: string;
-  categoryInitial4?: string;
-  categoryInitial5?: string;
-  categoryInitial6?: string;
-  categoryInitial7?: string;
   [key: string]: string | undefined;
 }
 
@@ -204,6 +168,31 @@ export interface IPlannedBudgets {
   plannedInitial7?: string;
 }
 
+export interface ITotals {
+  plannedCostForecast: number;
+  plannedTAE: number;
+  plannedTSE1: number;
+  plannedTSE2: number;
+  plannedInitial1: number;
+  plannedInitial2: number;
+  plannedInitial3: number;
+  plannedInitial4: number;
+  plannedInitial5: number;
+  plannedInitial6: number;
+  plannedInitial7: number;
+}
+
+export interface ICategoryArray {
+  children: [],
+  frameBudgets: [],
+  plannedBudgets?: IPlannedBudgets,
+  plannedBudgetsForCategories: ITotals,
+  id: string,
+  name: string,
+  projects: [],
+  type: string,
+}
+
 export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssentials {
   children: Array<IOperationalEnvironmentAnalysisTableRow>;
   projects: Array<IOperationalEnvironmentAnalysisTableRow>;
@@ -214,23 +203,10 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
     value?: string;
   }
   plannedBudgetsForCategories?: IPlannedBudgets;
-
-  frameBudgets: {
-    costForecast?: string;
-    TAE?: string;
-    TSE1?: string;
-    TSE2?: string;
-    initial1?: string;
-    initial2?: string;
-    initial3?: string;
-    initial4?: string;
-    initial5?: string;
-    initial6?: string;
-    initial7?: string;
-  }
+  frameBudgets: IOperationalEnvironmentAnalysisFinanceProperties;
   plannedBudgets: IPlannedBudgets;
-
-  crossingPressure?: { // ylityspaine
+  // ylityspaine
+  crossingPressure?: { 
     cpCostForecast?: string;
     cpTAE?: string;
     cpTSE1?: string;

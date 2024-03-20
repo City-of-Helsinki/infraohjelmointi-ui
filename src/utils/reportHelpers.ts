@@ -12,6 +12,8 @@ import {
   ReportTableRowType,
   ReportType,
   Reports,
+  ICategoryArray,
+  ITotals,
 } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy } from '@/reducers/classSlice';
 import { convertToMillions, keurToMillion } from './calculations';
@@ -20,6 +22,7 @@ import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
 import { Categories } from './staticData';
+import { formatNumberToContainSpaces } from './common';
 
 interface IYearCheck {
   planningStart: number;
@@ -50,35 +53,35 @@ const getMonth = (dateStr: string): number => {
 const mapOperationalEnvironmentAnalysisProperties = (finances: IPlanningCell[], type: 'frameBudget' | 'plannedBudget') => {
   if (type === 'frameBudget') {
     return {
-      costForecast: finances[0].frameBudget?.replace(/\s/g, ''),
-      TAE: finances[1].frameBudget?.replace(/\s/g, ''),
-      TSE1: finances[2].frameBudget?.replace(/\s/g, ''),
-      TSE2: finances[3].frameBudget?.replace(/\s/g, ''),
-      initial1: finances[4].frameBudget?.replace(/\s/g, ''),
-      initial2: finances[5].frameBudget?.replace(/\s/g, ''),
-      initial3: finances[6].frameBudget?.replace(/\s/g, ''),
-      initial4: finances[7].frameBudget?.replace(/\s/g, ''),
-      initial5: finances[8].frameBudget?.replace(/\s/g, ''),
-      initial6: finances[9].frameBudget?.replace(/\s/g, ''),
-      initial7: finances[10].frameBudget?.replace(/\s/g, ''),
+      costForecast: finances[0].frameBudget,
+      TAE: finances[1].frameBudget,
+      TSE1: finances[2].frameBudget,
+      TSE2: finances[3].frameBudget,
+      initial1: finances[4].frameBudget,
+      initial2: finances[5].frameBudget,
+      initial3: finances[6].frameBudget,
+      initial4: finances[7].frameBudget,
+      initial5: finances[8].frameBudget,
+      initial6: finances[9].frameBudget,
+      initial7: finances[10].frameBudget,
     }
   }
   return {
-    plannedCostForecast: finances[0].plannedBudget?.replace(/\s/g, ''),
-    plannedTAE: finances[1].plannedBudget?.replace(/\s/g, ''),
-    plannedTSE1: finances[2].plannedBudget?.replace(/\s/g, ''),
-    plannedTSE2: finances[3].plannedBudget?.replace(/\s/g, ''),
-    plannedInitial1: finances[4].plannedBudget?.replace(/\s/g, ''),
-    plannedInitial2: finances[5].plannedBudget?.replace(/\s/g, ''),
-    plannedInitial3: finances[6].plannedBudget?.replace(/\s/g, ''),
-    plannedInitial4: finances[7].plannedBudget?.replace(/\s/g, ''),
-    plannedInitial5: finances[8].plannedBudget?.replace(/\s/g, ''),
-    plannedInitial6: finances[9].plannedBudget?.replace(/\s/g, ''),
-    plannedInitial7: finances[10].plannedBudget?.replace(/\s/g, ''),
+    plannedCostForecast: finances[0].plannedBudget,
+    plannedTAE: finances[1].plannedBudget,
+    plannedTSE1: finances[2].plannedBudget,
+    plannedTSE2: finances[3].plannedBudget,
+    plannedInitial1: finances[4].plannedBudget,
+    plannedInitial2: finances[5].plannedBudget,
+    plannedInitial3: finances[6].plannedBudget,
+    plannedInitial4: finances[7].plannedBudget,
+    plannedInitial5: finances[8].plannedBudget,
+    plannedInitial6: finances[9].plannedBudget,
+    plannedInitial7: finances[10].plannedBudget,
   }
 };
 
-const sumFinances = (classItem: IPlanningRow, category: Categories, totals?: any) => {
+const sumFinances = (classItem: IPlanningRow, category: Categories, totalsParam?: ITotals) => {
   const initialTotals =  {
     plannedCostForecast: 0,
     plannedTAE: 0,
@@ -92,7 +95,7 @@ const sumFinances = (classItem: IPlanningRow, category: Categories, totals?: any
     plannedInitial6: 0,
     plannedInitial7: 0,
   };
-  totals = totals || initialTotals;
+  let totals = totalsParam || initialTotals;
 
   classItem.projectRows.forEach((obj) => {
     if (obj.category?.value === category) {
@@ -121,7 +124,7 @@ const sumFinances = (classItem: IPlanningRow, category: Categories, totals?: any
 
 const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: Categories) => {
   const sums = sumFinances(classItem, category);
-  return sums
+  return sums;
 }
 
 const getProjectPhase = (project: IProject) => {
@@ -331,6 +334,34 @@ const getRowType = (type: string) => {
 }
 
 const getExtraRows = (project: IPlanningRow) => {
+  const categories: ICategoryArray[] = [];
+  // Map category rows
+  Object.keys(Categories).forEach(key => {
+    const categoryKey = key as keyof typeof Categories;
+    categories.push({
+      children: [],
+      frameBudgets: [],
+      plannedBudgets: {},
+      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories[categoryKey]),
+      id: `category-${key}-${project.id}`,
+      name: t(`option.${key}`),
+      projects: [],
+      type: "category",
+    });
+  });
+  // Form initial crossingPressure rows
+  const cpCostForecast = Number(project.cells[0].frameBudget?.replace(/\s/g, ''))-Number(project.cells[0].plannedBudget?.replace(/\s/g, ''));
+  const cpTAE = Number(project.cells[1].frameBudget?.replace(/\s/g, ''))-Number(project.cells[1].plannedBudget?.replace(/\s/g, ''));
+  const cpTSE1 = Number(project.cells[2].frameBudget?.replace(/\s/g, ''))-Number(project.cells[2].plannedBudget?.replace(/\s/g, ''));
+  const cpTSE2 = Number(project.cells[3].frameBudget?.replace(/\s/g, ''))-Number(project.cells[3].plannedBudget?.replace(/\s/g, ''));
+  const cpInitial1 = Number(project.cells[4].frameBudget?.replace(/\s/g, ''))-Number(project.cells[4].plannedBudget?.replace(/\s/g, ''));
+  const cpInitial2 = Number(project.cells[5].frameBudget?.replace(/\s/g, ''))-Number(project.cells[5].plannedBudget?.replace(/\s/g, ''));
+  const cpInitial3 = Number(project.cells[6].frameBudget?.replace(/\s/g, ''))-Number(project.cells[6].plannedBudget?.replace(/\s/g, ''));
+  const cpInitial4 = Number(project.cells[7].frameBudget?.replace(/\s/g, ''))-Number(project.cells[7].plannedBudget?.replace(/\s/g, ''));
+  const cpInitial5 = Number(project.cells[8].frameBudget?.replace(/\s/g, ''))-Number(project.cells[8].plannedBudget?.replace(/\s/g, ''));
+  const cpInitial6 = Number(project.cells[9].frameBudget?.replace(/\s/g, ''))-Number(project.cells[9].plannedBudget?.replace(/\s/g, ''));
+  const cpInitial7 = Number(project.cells[10].frameBudget?.replace(/\s/g, ''))-Number(project.cells[10].plannedBudget?.replace(/\s/g, ''));
+
   // Add TAE&TSE frame, CrossingPressure and Category rows under the fourth level "ta" parts to the report
   const extraRows = [
     {
@@ -360,113 +391,24 @@ const getExtraRows = (project: IPlanningRow) => {
       frameBudgets: {},
       plannedBudgets: {},
       crossingPressure: {
-        cpCostForecast: String(Number(project.cells[0].frameBudget?.replace(/\s/g, ''))-Number(project.cells[0].plannedBudget?.replace(/\s/g, ''))),
-        cpTAE: String(Number(project.cells[1].frameBudget?.replace(/\s/g, ''))-Number(project.cells[1].plannedBudget?.replace(/\s/g, ''))),
-        cpTSE1: String(Number(project.cells[2].frameBudget?.replace(/\s/g, ''))-Number(project.cells[2].plannedBudget?.replace(/\s/g, ''))),
-        cpTSE2: String(Number(project.cells[3].frameBudget?.replace(/\s/g, ''))-Number(project.cells[3].plannedBudget?.replace(/\s/g, ''))),
-        cpInitial1: String(Number(project.cells[4].frameBudget?.replace(/\s/g, ''))-Number(project.cells[4].plannedBudget?.replace(/\s/g, ''))),
-        cpInitial2: String(Number(project.cells[5].frameBudget?.replace(/\s/g, ''))-Number(project.cells[5].plannedBudget?.replace(/\s/g, ''))),
-        cpInitial3: String(Number(project.cells[6].frameBudget?.replace(/\s/g, ''))-Number(project.cells[6].plannedBudget?.replace(/\s/g, ''))),
-        cpInitial4: String(Number(project.cells[7].frameBudget?.replace(/\s/g, ''))-Number(project.cells[7].plannedBudget?.replace(/\s/g, ''))),
-        cpInitial5: String(Number(project.cells[8].frameBudget?.replace(/\s/g, ''))-Number(project.cells[8].plannedBudget?.replace(/\s/g, ''))),
-        cpInitial6: String(Number(project.cells[9].frameBudget?.replace(/\s/g, ''))-Number(project.cells[9].plannedBudget?.replace(/\s/g, ''))),
-        cpInitial7: String(Number(project.cells[10].frameBudget?.replace(/\s/g, ''))-Number(project.cells[10].plannedBudget?.replace(/\s/g, '')))
+        cpCostForecast: formatNumberToContainSpaces(cpCostForecast),
+        cpTAE: formatNumberToContainSpaces(cpTAE),
+        cpTSE1: formatNumberToContainSpaces(cpTSE1),
+        cpTSE2: formatNumberToContainSpaces(cpTSE2),
+        cpInitial1: formatNumberToContainSpaces(cpInitial1),
+        cpInitial2: formatNumberToContainSpaces(cpInitial2),
+        cpInitial3: formatNumberToContainSpaces(cpInitial3),
+        cpInitial4: formatNumberToContainSpaces(cpInitial4),
+        cpInitial5: formatNumberToContainSpaces(cpInitial5),
+        cpInitial6: formatNumberToContainSpaces(cpInitial6),
+        cpInitial7: formatNumberToContainSpaces(cpInitial7),
       },
       id: `ylityspaine-${project.id}`,
       name: t('report.operationalEnvironmentAnalysis.crossingPressure'),
       projects: [],
       type: "crossingPressure",
     },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K1),
-      id: `category-K1-${project.id}`,
-      name: t('option.K1'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K2),
-      id: `category-K2-${project.id}`,
-      name: t('option.K2'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K3),
-      id: `category-K3-${project.id}`,
-      name: t('option.K3'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K4),
-      id: `category-K4-${project.id}`,
-      name: t('option.K4'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K51),
-      id: `category-K51-${project.id}`,
-      name: t('option.K51'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K52),
-      id: `category-K52-${project.id}`,
-      name: t('option.K52'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K53),
-      id: `category-K53-${project.id}`,
-      name: t('option.K53'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K54),
-      id: `category-K54-${project.id}`,
-      name: t('option.K54'),
-      projects: [],
-      type: "category",
-    },
-    {
-      children: [],
-      frameBudgets: {},
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories.K55),
-      id: `category-K55-${project.id}`,
-      name: t('option.K55'),
-      projects: [],
-      type: "category",
-    }
+    ...categories
   ];
 
   return extraRows;
@@ -727,14 +669,52 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
 }
 const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
-const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalEnvironmentAnalysisTableRow[]): IBudgetBookSummaryCsvRow[]  => {
-  tableRows.forEach((tableRow) => {
-    if (!operationalEnvironmentAnalysisCsvRows.some(row => row.id === tableRow.id)) {
-      operationalEnvironmentAnalysisCsvRows.push({
-        id: tableRow.id,
-        name: tableRow.name,
-        type: tableRow.type,
-
+const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
+  switch(tableRow.type) {
+    case 'class':
+      return {
+        costForecast: tableRow.plannedBudgets?.plannedCostForecast ?? '0',
+        TAE: tableRow.plannedBudgets?.plannedTAE ?? '0',
+        TSE1: tableRow.plannedBudgets?.plannedTSE1 ?? '0',
+        TSE2: tableRow.plannedBudgets?.plannedTSE2 ?? '0',
+        initial1: tableRow.plannedBudgets?.plannedInitial1 ?? '0',
+        initial2: tableRow.plannedBudgets?.plannedInitial2 ?? '0',
+        initial3: tableRow.plannedBudgets?.plannedInitial3 ?? '0',
+        initial4: tableRow.plannedBudgets?.plannedInitial4 ?? '0',
+        initial5: tableRow.plannedBudgets?.plannedInitial5 ?? '0',
+        initial6: tableRow.plannedBudgets?.plannedInitial6 ?? '0',
+        initial7: tableRow.plannedBudgets?.plannedInitial7 ?? '0',
+      }
+    case 'category':
+      return {
+        costForecast: tableRow.plannedBudgetsForCategories?.plannedCostForecast ?? '0',
+        TAE: tableRow.plannedBudgetsForCategories?.plannedTAE ?? '0',
+        TSE1: tableRow.plannedBudgetsForCategories?.plannedTSE1 ?? '0',
+        TSE2: tableRow.plannedBudgetsForCategories?.plannedTSE2 ?? '0',
+        initial1: tableRow.plannedBudgetsForCategories?.plannedInitial1 ?? '0',
+        initial2: tableRow.plannedBudgetsForCategories?.plannedInitial2 ?? '0',
+        initial3: tableRow.plannedBudgetsForCategories?.plannedInitial3 ?? '0',
+        initial4: tableRow.plannedBudgetsForCategories?.plannedInitial4 ?? '0',
+        initial5: tableRow.plannedBudgetsForCategories?.plannedInitial5 ?? '0',
+        initial6: tableRow.plannedBudgetsForCategories?.plannedInitial6 ?? '0',
+        initial7: tableRow.plannedBudgetsForCategories?.plannedInitial7 ?? '0',
+      }
+    case 'crossingPressure':
+      return {
+        costForecast: tableRow.crossingPressure?.cpCostForecast ?? '0',
+        TAE: tableRow.crossingPressure?.cpTAE ?? '0',
+        TSE1: tableRow.crossingPressure?.cpTSE1 ?? '0',
+        TSE2: tableRow.crossingPressure?.cpTSE2 ?? '0',
+        initial1: tableRow.crossingPressure?.cpInitial1 ?? '0',
+        initial2: tableRow.crossingPressure?.cpInitial2 ?? '0',
+        initial3: tableRow.crossingPressure?.cpInitial3 ?? '0',
+        initial4: tableRow.crossingPressure?.cpInitial4 ?? '0',
+        initial5: tableRow.crossingPressure?.cpInitial5 ?? '0',
+        initial6: tableRow.crossingPressure?.cpInitial6 ?? '0',
+        initial7: tableRow.crossingPressure?.cpInitial7 ?? '0',
+      }
+    case 'taeTseFrame':
+      return {
         costForecast: tableRow.frameBudgets?.costForecast ?? '0',
         TAE: tableRow.frameBudgets?.TAE ?? '0',
         TSE1: tableRow.frameBudgets?.TSE1 ?? '0',
@@ -746,44 +726,18 @@ const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalE
         initial5: tableRow.frameBudgets?.initial5 ?? '0',
         initial6: tableRow.frameBudgets?.initial6 ?? '0',
         initial7: tableRow.frameBudgets?.initial7 ?? '0',
-
-        plannedCostForecast: tableRow.plannedBudgets?.plannedCostForecast ?? '0',
-        plannedTAE: tableRow.plannedBudgets?.plannedTAE ?? '0',
-        plannedTSE1: tableRow.plannedBudgets?.plannedTSE1 ?? '0',
-        plannedTSE2: tableRow.plannedBudgets?.plannedTSE2 ?? '0',
-        plannedInitial1: tableRow.plannedBudgets?.plannedInitial1 ?? '0',
-        plannedInitial2: tableRow.plannedBudgets?.plannedInitial2 ?? '0',
-        plannedInitial3: tableRow.plannedBudgets?.plannedInitial3 ?? '0',
-        plannedInitial4: tableRow.plannedBudgets?.plannedInitial4 ?? '0',
-        plannedInitial5: tableRow.plannedBudgets?.plannedInitial5 ?? '0',
-        plannedInitial6: tableRow.plannedBudgets?.plannedInitial6 ?? '0',
-        plannedInitial7: tableRow.plannedBudgets?.plannedInitial7 ?? '0',
-
-        //CrossingPressure
-        cpCostForecast: tableRow.crossingPressure?.cpCostForecast ?? '0',
-        cpTAE: tableRow.crossingPressure?.cpTAE ?? '0',
-        cpTSE1: tableRow.crossingPressure?.cpTSE1 ?? '0',
-        cpTSE2: tableRow.crossingPressure?.cpTSE2 ?? '0',
-        cpInitial1: tableRow.crossingPressure?.cpInitial1 ?? '0',
-        cpInitial2: tableRow.crossingPressure?.cpInitial2 ?? '0',
-        cpInitial3: tableRow.crossingPressure?.cpInitial3 ?? '0',
-        cpInitial4: tableRow.crossingPressure?.cpInitial4 ?? '0',
-        cpInitial5: tableRow.crossingPressure?.cpInitial5 ?? '0',
-        cpInitial6: tableRow.crossingPressure?.cpInitial6 ?? '0',
-        cpInitial7: tableRow.crossingPressure?.cpInitial7 ?? '0',
-
-        //Categories
-        categoryCostForecast: tableRow.plannedBudgetsForCategories?.plannedCostForecast ?? '0',
-        categoryTAE: tableRow.plannedBudgetsForCategories?.plannedTAE ?? '0',
-        categoryTSE1: tableRow.plannedBudgetsForCategories?.plannedTSE1 ?? '0',
-        categoryTSE2: tableRow.plannedBudgetsForCategories?.plannedTSE2 ?? '0',
-        categoryInitial1: tableRow.plannedBudgetsForCategories?.plannedInitial1 ?? '0',
-        categoryInitial2: tableRow.plannedBudgetsForCategories?.plannedInitial2 ?? '0',
-        categoryInitial3: tableRow.plannedBudgetsForCategories?.plannedInitial3 ?? '0',
-        categoryInitial4: tableRow.plannedBudgetsForCategories?.plannedInitial4 ?? '0',
-        categoryInitial5: tableRow.plannedBudgetsForCategories?.plannedInitial5 ?? '0',
-        categoryInitial6: tableRow.plannedBudgetsForCategories?.plannedInitial6 ?? '0',
-        categoryInitial7: tableRow.plannedBudgetsForCategories?.plannedInitial7 ?? '0',
+      }
+  }
+}
+const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalEnvironmentAnalysisTableRow[]): IBudgetBookSummaryCsvRow[]  => {
+  tableRows.forEach((tableRow) => {
+    const data = getCorrectData(tableRow);
+    if (!operationalEnvironmentAnalysisCsvRows.some(row => row.id === tableRow.id)) {
+      operationalEnvironmentAnalysisCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: tableRow.type,
+        ...data
       })
     }
 
@@ -923,85 +877,20 @@ export const getReportData = async (
       case Reports.OperationalEnvironmentAnalysis : {
         //Flatten rows to one dimension
         const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
-        return flattenedRows.map((r) => {
-          switch (r.type) {
-            case 'class':
-              return {
-                [`${t('target')}`]: r.name,
-                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.plannedCostForecast,
-                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.plannedTAE,
-                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.plannedTSE1,
-                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.plannedTSE2,
-                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.plannedInitial1,
-                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.plannedInitial2,
-                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.plannedInitial3,
-                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.plannedInitial4,
-                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.plannedInitial5,
-                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.plannedInitial6,
-                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.plannedInitial7,
-              };
-            case 'taeTseFrame':
-              return {
-                [`${t('target')}`]: r.name,
-                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.costForecast,
-                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.TAE,
-                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.TSE1,
-                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.TSE2,
-                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.initial1,
-                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.initial2,
-                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.initial3,
-                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.initial4,
-                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.initial5,
-                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.initial6,
-                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.initial7,
-              };
-            case 'crossingPressure':
-              return {
-                [`${t('target')}`]: r.name,
-                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.cpCostForecast,
-                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.cpTAE,
-                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.cpTSE1,
-                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.cpTSE2,
-                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.cpInitial1,
-                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.cpInitial2,
-                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.cpInitial3,
-                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.cpInitial4,
-                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.cpInitial5,
-                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.cpInitial6,
-                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.cpInitial7,
-              };
-            case 'category':
-              return {
-                [`${t('target')}`]: r.name,
-                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.categoryCostForecast,
-                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.categoryTAE,
-                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.categoryTSE1,
-                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.categoryTSE2,
-                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.categoryInitial1,
-                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.categoryInitial2,
-                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.categoryInitial3,
-                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.categoryInitial4,
-                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.categoryInitial5,
-                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.categoryInitial6,
-                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.categoryInitial7,
-              };
-            default:
-              return {
-                [`${t('target')}`]: '',
-                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: '',
-                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: '',
-                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: '',
-                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: '',
-                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: '',
-                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: '',
-                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: '',
-                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: '',
-                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: '',
-                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: '',
-                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: '',
-              };
-          }
-        });
+        return flattenedRows.map((r) => ({
+          [`${t('target')}`]: r.name,
+          [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.costForecast,
+          [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.TAE,
+          [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.TSE1,
+          [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.TSE2,
+          [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.initial1,
+          [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.initial2,
+          [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.initial3,
+          [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.initial4,
+          [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.initial5,
+          [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.initial6,
+          [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.initial7,
+      }));
       }
       default:
         return [];

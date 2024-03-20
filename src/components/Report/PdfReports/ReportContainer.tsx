@@ -26,9 +26,9 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
 
   const getDocumentTitle = () => {
     switch (reportType) {
-      case 'strategy':
+      case Reports.Strategy:
         return t('report.strategy.title', {startYear: new Date().getFullYear()});
-      case 'constructionProgram':
+      case Reports.ConstructionProgram:
         return t('report.constructionProgram.title');
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title', {
@@ -47,7 +47,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
 
   const getDocumentSubtitleOne = () => {
     switch (reportType) {
-      case 'strategy':
+      case Reports.Strategy:
         return t('report.strategy.subtitle')
       case Reports.ConstructionProgram:
         return t('report.constructionProgram.subtitle', {
@@ -63,11 +63,10 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
     }
   }
   const getDocumentSubtitleTwo = () => {
-    switch (reportType) {
-      case Reports.OperationalEnvironmentAnalysis:
-        return t('report.operationalEnvironmentAnalysis.subtitleTwo');
-      default:
-        return '';
+    if (reportType == Reports.OperationalEnvironmentAnalysis) {
+      return t('report.operationalEnvironmentAnalysis.subtitleTwo');
+    } else {
+      return '';
     }
   }
 
@@ -88,7 +87,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
             date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
           />
           <ReportTable reportType={reportType} data={data} />
-          {reportType === 'strategy' &&
+          {reportType === Reports.Strategy &&
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
               colorInfoTextOne={t('report.strategy.planning')}

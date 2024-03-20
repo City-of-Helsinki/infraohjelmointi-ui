@@ -55,6 +55,12 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
         case Reports.ConstructionProgram:
           setCsvData(await getReportData(classes, divisions, t, Reports.ConstructionProgram));
           break;
+        case Reports.OperationalEnvironmentAnalysis: {
+          const res = await getForcedToFrameData(year);
+          const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+          setCsvData(await getReportData(forcedToFrameClasses, divisions, t, Reports.OperationalEnvironmentAnalysis, coordinatorRows));
+          break;
+        }
         default:
           // In the MVP stage we only had time to implement the construction program report, the other
           // report cases should come here
