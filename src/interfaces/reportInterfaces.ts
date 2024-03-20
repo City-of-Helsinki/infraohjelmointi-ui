@@ -40,7 +40,7 @@ export interface IBudgetBookSummaryCsvRow {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class' | 'project' | 'investmentpart';
+export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location';
 
 export interface IBasicReportData {
   divisions: Array<ILocation>;

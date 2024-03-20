@@ -242,6 +242,8 @@ const getRowStyle = (rowType: string, depth: number) => {
   switch (rowType) {
     case 'class':
       return strategyReportStyles.classRow
+    case 'location':
+      return strategyReportStyles.oddRow
     case 'project':
       if (depth % 2) {
         return strategyReportStyles.evenRow
@@ -258,7 +260,7 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
             if (flattenedRow) {
               tableRow =
               <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
-                  <Text style={flattenedRow.type === 'class' ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
+                  <Text style={['class', 'location'].includes(flattenedRow.type ?? '') ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
                   <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                   <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                   <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
