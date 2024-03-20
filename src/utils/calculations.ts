@@ -193,16 +193,33 @@ const roundUpInTensOfThousands = (number: number) => {
   return Math.round(number / 10000) * 10000;
 }
 
+const checkDecimals = (number: number) => {
+  let numberToString = number.toString();
+
+  // Check if the number has decimals
+  if (number % 1 === 0) {
+    numberToString = numberToString + '.00';
+  }
+
+  const decimalPlaces = numberToString.split('.')[1];
+
+  // Make sure the number has two decimals
+  if (decimalPlaces.length == 1) {
+    return numberToString + '0';
+  } else {
+    return numberToString;
+  }
+}
 // Specifically for budgetBookSummaryReport
 export const convertToMillions = (value?: string | number) => {
   if (!value) return '0.00';
   const valueWithCorrectType: number = typeof value === 'string' ? Number(value.replace(/\s/g, '')): value;
   const rounded = roundUpInTensOfThousands(valueWithCorrectType);
   // convert to millions
-  const convertedNumber = rounded / 1000000;
-  // show the number with two decimals
-  const splitAtDecimal = convertedNumber === 0
-    ? '0'
-    : String(convertedNumber).split('.');
-  return splitAtDecimal === '0' ? '0.00' : `${splitAtDecimal[0]}.${splitAtDecimal[1].substring(0,2)}`;
+  let convertedNumber: number | string = rounded / 1000000;
+
+  // Check if the number has decimals and add them if it doesn't
+  convertedNumber = checkDecimals(convertedNumber);
+
+  return convertedNumber;
 };

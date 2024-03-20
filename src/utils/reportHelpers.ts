@@ -203,34 +203,39 @@ export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTabl
 
 const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   const properties = [];
+  /* We want to show only those lower level items that start with some number or one letter and a space after that. 
+    This rule is meant for the lower level items but every item in the hierarchy in forced to frame view data should match this */
+  const nameCheckPattern = /^(\d+|\w)\s/;
   for (const c of coordinatorRows) {
     if (c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass' || c.type === 'districtPreview' || c.type === 'collectiveSubLevel') {
-      const convertedClass: IBudgetBookSummaryTableRow = {
-        id: c.id,
-        name: c.name,
-        parent: null,
-        children: c.children.length && c.type !== 'districtPreview' && c.type !== 'collectiveSubLevel'  // children from the lower levels aren't needed
-          ? getBudgetBookSummaryProperties(c.children)
-          : [],
-        projects: [],
-        financeProperties: {
-          usage: '',
-          budgetEstimation: c.cells[0].frameBudget ?? '0.00',
-          budgetEstimationSuggestion: c.cells[1].frameBudget ?? '0.00',
-          budgetPlanSuggestion1: c.cells[2].frameBudget ?? '0.00',
-          budgetPlanSuggestion2: c.cells[3].frameBudget ?? '0.00',
-          initial1: c.cells[4].frameBudget ?? '0.00',
-          initial2: c.cells[5].frameBudget ?? '0.00',
-          initial3: c.cells[6].frameBudget ?? '0.00',
-          initial4: c.cells[7].frameBudget ?? '0.00',
-          initial5: c.cells[8].frameBudget ?? '0.00',
-          initial6: c.cells[9].frameBudget ?? '0.00',
-          initial7: c.cells[10].frameBudget ?? '0.00',
-        },
-        objectType: c.type,
-        type: 'class' as ReportTableRowType
+      if (nameCheckPattern.test(c.name)) {
+        const convertedClass: IBudgetBookSummaryTableRow = {
+          id: c.id,
+          name: c.name,
+          parent: null,
+          children: c.children.length && c.type !== 'districtPreview' && c.type !== 'collectiveSubLevel'  // children from the lower levels aren't needed
+            ? getBudgetBookSummaryProperties(c.children)
+            : [],
+          projects: [],
+          financeProperties: {
+            usage: '',
+            budgetEstimation: c.cells[0].frameBudget ?? '0.00',
+            budgetEstimationSuggestion: c.cells[1].frameBudget ?? '0.00',
+            budgetPlanSuggestion1: c.cells[2].frameBudget ?? '0.00',
+            budgetPlanSuggestion2: c.cells[3].frameBudget ?? '0.00',
+            initial1: c.cells[4].frameBudget ?? '0.00',
+            initial2: c.cells[5].frameBudget ?? '0.00',
+            initial3: c.cells[6].frameBudget ?? '0.00',
+            initial4: c.cells[7].frameBudget ?? '0.00',
+            initial5: c.cells[8].frameBudget ?? '0.00',
+            initial6: c.cells[9].frameBudget ?? '0.00',
+            initial7: c.cells[10].frameBudget ?? '0.00',
+          },
+          objectType: c.type,
+          type: 'class' as ReportTableRowType
+        }
+        properties.push(convertedClass);
       }
-      properties.push(convertedClass);
     }
   }
   return properties;
