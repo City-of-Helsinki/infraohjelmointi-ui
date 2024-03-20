@@ -43,21 +43,15 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
-        case 'strategy': {
-          const res = await getForcedToFrameData(year - 1);
-
-          const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-          setCsvData(await getReportData(forcedToFrameClasses, divisions, t, 'strategy', coordinatorRows));
-          break;
-        }
         case 'constructionProgram':
           setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
           break;
-        case 'budgetBookSummary': {
+        case 'budgetBookSummary':
+        case 'strategy': {
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(forcedToFrameClasses, divisions, t, 'budgetBookSummary', coordinatorRows));
+            setCsvData(await getReportData(forcedToFrameClasses, divisions, t, type, coordinatorRows));
           }
           break;
         }

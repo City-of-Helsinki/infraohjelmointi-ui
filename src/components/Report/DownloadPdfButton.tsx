@@ -78,17 +78,10 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
 
       let document: JSX.Element | undefined = undefined;
       switch(type) {
-        case 'budgetBookSummary': {
+        case 'budgetBookSummary':
+        case 'strategy': {
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
-            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
-          }
-          break;
-        }
-        case 'strategy': {
-          const res = await getForcedToFrameData(year - 1);
-          if (res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
             document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
           }
