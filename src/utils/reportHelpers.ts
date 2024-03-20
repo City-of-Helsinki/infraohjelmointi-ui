@@ -346,7 +346,8 @@ const getExtraRows = (project: IPlanningRow) => {
         initial4: project.cells[7].frameBudget ?? 0,
         initial5: project.cells[8].frameBudget ?? 0,
         initial6: project.cells[9].frameBudget ?? 0,
-        initial7: project.cells[10].frameBudget ?? 0,
+        // The framebudget is intentionally the same as in the second to last row
+        initial7: project.cells[9].frameBudget ?? 0,
       },
       plannedBudgets: {},
       id: `taeTseFrame-${project.id}`,
@@ -830,7 +831,7 @@ export const getReportData = async (
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
   coordinatorRows?: IPlanningRow[],
-): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow>> => {
+): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow> | Array<IStrategyTableCsvRow> | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
@@ -854,9 +855,7 @@ export const getReportData = async (
     }
 
     let reportRows;
-    if (reportType === Reports.BudgetBookSummary) {
-      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
-    }  else if (reportType === Reports.Strategy) {
+    if (reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy || reportType === Reports.OperationalEnvironmentAnalysis) {
       reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
     } else {
       reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);
@@ -921,8 +920,91 @@ export const getReportData = async (
           [`${t('initial')} ${t('initialSV')} ${year + 10} ${t('millionEuro')}`]: r.initial7,
         }));
       }
-        default:
-          return [];
+      case Reports.OperationalEnvironmentAnalysis : {
+        //Flatten rows to one dimension
+        const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+        return flattenedRows.map((r) => {
+          switch (r.type) {
+            case 'class':
+              return {
+                [`${t('target')}`]: r.name,
+                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.plannedCostForecast,
+                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.plannedTAE,
+                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.plannedTSE1,
+                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.plannedTSE2,
+                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.plannedInitial1,
+                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.plannedInitial2,
+                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.plannedInitial3,
+                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.plannedInitial4,
+                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.plannedInitial5,
+                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.plannedInitial6,
+                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.plannedInitial7,
+              };
+            case 'taeTseFrame':
+              return {
+                [`${t('target')}`]: r.name,
+                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.costForecast,
+                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.TAE,
+                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.TSE1,
+                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.TSE2,
+                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.initial1,
+                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.initial2,
+                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.initial3,
+                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.initial4,
+                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.initial5,
+                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.initial6,
+                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.initial7,
+              };
+            case 'crossingPressure':
+              return {
+                [`${t('target')}`]: r.name,
+                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.cpCostForecast,
+                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.cpTAE,
+                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.cpTSE1,
+                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.cpTSE2,
+                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.cpInitial1,
+                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.cpInitial2,
+                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.cpInitial3,
+                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.cpInitial4,
+                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.cpInitial5,
+                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.cpInitial6,
+                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.cpInitial7,
+              };
+            case 'category':
+              return {
+                [`${t('target')}`]: r.name,
+                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.categoryCostForecast,
+                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.categoryTAE,
+                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.categoryTSE1,
+                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.categoryTSE2,
+                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.categoryInitial1,
+                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.categoryInitial2,
+                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.categoryInitial3,
+                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.categoryInitial4,
+                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.categoryInitial5,
+                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.categoryInitial6,
+                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.categoryInitial7,
+              };
+            default:
+              return {
+                [`${t('target')}`]: '',
+                [`Kustannus-\nennuste\n${t('thousandEuros')}`]: '',
+                [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: '',
+                [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: '',
+                [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: '',
+                [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: '',
+                [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: '',
+                [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: '',
+                [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: '',
+                [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: '',
+                [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: '',
+                [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: '',
+              };
+          }
+        });
+      }
+      default:
+        return [];
     }
   } catch (e) {
     console.log('Error building csv rows: ', e);

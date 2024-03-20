@@ -74,7 +74,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           iconLeft={downloadIcon}
           variant="secondary"
           onClick={getCsvData}
-          disabled={(type !== Reports.ConstructionProgram && type !== Reports.BudgetBookSummary && type !== 'strategy')}
+          disabled={(type === Reports.FinancialStatement)}
         >
           {t('downloadCsv', { name: t(`report.${type}.documentName`) })}
         </Button>
