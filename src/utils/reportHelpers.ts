@@ -47,15 +47,15 @@ const getProjectPhase = (project: IProject) => {
   if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
     return ""
   }
-
-  const previousYear = new Date().getFullYear() - 1;
+  
+  const year = new Date().getFullYear();
   const planningStartYear = getYear(project.estPlanningStart);
   const planningEndYear = getYear(project.estPlanningEnd);
   const constructionStartYear = getYear(project.estConstructionStart);
   const constructionEndYear = getYear(project.estConstructionEnd);
-
-  const isPlanning = previousYear === planningStartYear || previousYear === planningEndYear;
-  const isConstruction = previousYear == constructionStartYear || previousYear === constructionEndYear;
+  
+  const isPlanning = year >= planningStartYear && year <= planningEndYear;
+  const isConstruction = year >= constructionStartYear && year <= constructionEndYear;
 
   if (isPlanning && isConstruction) {
     return "s r";
@@ -76,7 +76,7 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
       return ""
   }
 
-  const previousYear = new Date().getFullYear() - 1;
+  const year = new Date().getFullYear();
   const planningStartYear = getYear(project.estPlanningStart);
   const planningEndYear = getYear(project.estPlanningEnd);
   const constructionStartYear = getYear(project.estConstructionStart);
@@ -87,8 +87,8 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
   const constructionStartMonth = getMonth(project.estConstructionStart);
   const constructionEndMonth = getMonth(project.estConstructionEnd);
 
-  const isPlanning = (previousYear === planningStartYear || previousYear === planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
-  const isConstruction = (previousYear === constructionStartYear || previousYear === constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
+  const isPlanning = (year >= planningStartYear && year <= planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
+  const isConstruction = (year >= constructionStartYear && year <= constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
 
   if (isPlanning && isConstruction) {
       return "planningAndConstruction";
@@ -104,9 +104,9 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
   }
 }
 
-const isProjectInPlanningOrConstructionPreviousYear = (props: IYearCheck) => {
-  const previousYear = [new Date().getFullYear() - 1];
-  const inPlanningOrConstruction = (previousYear.some(year => year >= props.planningStart && year <= props.constructionEnd));
+const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
+  const year = [new Date().getFullYear()]
+  const inPlanningOrConstruction = (year.some(y => y >= props.planningStart && y <= props.constructionEnd));
 
   if (inPlanningOrConstruction) {
     return true;
@@ -119,7 +119,7 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
   return projects
     .filter((p) =>
       p.planningStartYear && p.constructionEndYear &&
-      isProjectInPlanningOrConstructionPreviousYear({
+      isProjectInPlanningOrConstruction({
         planningStart: p.planningStartYear,
         constructionEnd: p.constructionEndYear
       }))
@@ -254,7 +254,9 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
         costForecast: c.cells[0].plannedBudget,
         type: 'class' as ReportTableRowType
       }
-      forcedToFrameHierarchy.push(convertedClass);
+      if (c.type !== 'group') {
+        forcedToFrameHierarchy.push(convertedClass);
+      }
     }
     return forcedToFrameHierarchy;
   }
