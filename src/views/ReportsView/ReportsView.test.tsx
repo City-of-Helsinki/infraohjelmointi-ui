@@ -30,7 +30,7 @@ describe('ReportsView', () => {
       expect(await findByTestId(`report-title-${r}`)).toHaveTextContent(`report.${r}.rowTitle`);
       expect(await findByTestId(`last-updated-${r}`)).toBeInTheDocument();
       expect(await findByTestId(`download-pdf-${r}`)).toHaveTextContent('downloadPdf');
-      expect(await findByTestId(`download-xlsx-${r}`)).toHaveTextContent('downloadXlsx');
+      expect(await findByTestId(`download-csv-${r}`)).toHaveTextContent('downloadCsv');
     });
   });
 });

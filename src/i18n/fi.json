@@ -443,7 +443,15 @@
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma",
-      "documentName": "toimintasuunnitelma"
+      "documentName": "toimintasuunnitelma",
+      "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}}",
+      "subtitle": "Maankäyttö ja kaupunkirakenne",
+      "projectNameTitle": "Hanke",
+      "projectsTitle": "Kohteen",
+      "projectManagerTitle": "projektipäällikkö",
+      "footerInfoText": "s = suunnittelu, r = rakentaminen",
+      "planning": "Suunnittelu",
+      "constructing": "Rakentaminen"
     },
     "constructionProgram": {
       "rowTitle": "Rakentamisohjelma (yli 1 milj hankkeet)",
@@ -453,7 +461,9 @@
     },
     "budgetBookSummary": {
       "rowTitle": "Talousarviokirjan kooste",
-      "documentName": "talousarviokirjan kooste"
+      "documentName": "talousarviokirjan kooste",
+      "title": "Investointiohjelma vuosiksi {{startYear}}-{{endYear}}",
+      "subtitle": ""
     },
     "financialStatement": {
       "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",
@@ -461,7 +471,7 @@
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
-  "downloadXlsx": "Lataa {{name}} (.xlsx)",
+  "downloadCsv": "Lataa {{name}} (.csv)",
   "reportsTitle": "Raportit",
   "forcedToFrame": "Sovitettu budjetti",
   "implementedAndBound": "Toteutettu ja sidottu",
@@ -511,6 +521,14 @@
   "planningAnd": "Suunnittelun ja",
   "constructionTiming": "rakentamisen ajoitus",
   "previouslyUsed": "Aiemmin käytetty",
+  "usage": "Käyttö",
+  "usageSV": "Använt",
+  "TA": "TA",
+  "taSV": "BDG",
+  "TS": "TS",
+  "tsSV": "EP",
+  "initial": "Alustava",
+  "initialSV": "Preliminär",
   "maintenanceMode": {
     "title": "Huoltotila",
     "description": "Pieni hetki, sivustoa huolletaan parhaillaan"

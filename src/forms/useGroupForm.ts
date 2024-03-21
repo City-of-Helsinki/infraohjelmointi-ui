@@ -131,7 +131,7 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
     if (group) {
       reset(formValues);
     }
-  }, [group, projects]);
+  }, [formValues, group, projects, reset]);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {

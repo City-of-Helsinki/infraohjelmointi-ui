@@ -247,7 +247,7 @@ const buildCoordinatorTableRows = (
   return rows;
 };
 
-const getCoordinationTableRows = (
+export const getCoordinationTableRows = (
   allClasses: ICoordinatorClassHierarchy,
   districts: Array<ILocation>,
   selections: IPlanningRowSelections,
@@ -361,7 +361,7 @@ const useCoordinationRows = () => {
     if (type && id) {
       getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
-  }, [selections, groups, mode, forcedToFrame]);
+  }, [selections, groups, mode, forcedToFrame, startYear, dispatch]);
 
   /**
    * We use coordinator or forced to frame values (classes and locations).
@@ -384,14 +384,7 @@ const useCoordinationRows = () => {
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [
-    batchedCoordinationClasses,
-    batchedCoordinationLocations,
-    groups,
-    projects,
-    selections,
-    mode,
-  ]);
+  }, [startYear, batchedCoordinationClasses, batchedCoordinationLocations, groups, projects, selections, mode, forcedToFrame, batchedForcedToFrameClasses, batchedForcedToFrameLocations.districts, rows, dispatch]);
 };
 
 export default useCoordinationRows;

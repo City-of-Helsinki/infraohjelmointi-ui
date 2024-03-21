@@ -270,7 +270,7 @@ const usePlanningRows = () => {
     if (type && id) {
       getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
-  }, [selections, groups, mode, forcedToFrame]);
+  }, [selections, groups, mode, forcedToFrame, startYear, dispatch]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {
@@ -310,15 +310,7 @@ const usePlanningRows = () => {
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [
-    batchedPlanningClasses,
-    batchedPlanningLocations,
-    groups,
-    projects,
-    selections,
-    mode,
-    forcedToFrame,
-  ]);
+  }, [startYear, batchedPlanningClasses, batchedPlanningLocations, groups, projects, selections, mode, forcedToFrame, startYear, subDivisions, rows, dispatch]);
 };
 
 export default usePlanningRows;

@@ -49,7 +49,7 @@ export interface ITooltipEventData {
   text: string;
 }
 
-interface IFinancePlanningData {
+export interface IFinancePlanningData {
   masterClass: IClass | null;
   class: IClass | null;
   subClass: IClass | null;
@@ -57,7 +57,7 @@ interface IFinancePlanningData {
   group: IGroup | null;
 }
 
-interface IFinanceCoordinationData extends IFinancePlanningData {
+export interface IFinanceCoordinationData extends IFinancePlanningData {
   collectiveSubLevel: IClass | null;
   otherClassification: IClass | null;
   otherClassificationSubLevel: IClass | null;

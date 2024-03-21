@@ -88,7 +88,7 @@ const useClassOptions = (currentClass: string | undefined) => {
     } else if (isUserPlanner(user) || isUserCoordinator(user) || isUserAdmin(user)) {
       return masterClasses;
     } else return [];
-  }, [user, masterClasses]);
+  }, [user, selectedMasterClass?.name, masterClasses]);
 
   return {
     masterClasses: classesToOptions(filteredMasterClasses),

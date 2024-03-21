@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
   header: {
     maxWidth: '100%',
     width: '100%',
+    marginTop: '16px',
     marginBottom: '16px',
     display: 'flex',
     flexDirection: 'row',
@@ -36,7 +37,7 @@ interface IDocumentHeaderProps {
 
 const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, subtitleOne, subtitleTwo, date }) => {
   return (
-    <View style={styles.header}>
+    <View fixed style={styles.header}>
       <View style={styles.textAndLogo}>
         <Image style={styles.logo} src={logo} />
         <View style={styles.text}>
