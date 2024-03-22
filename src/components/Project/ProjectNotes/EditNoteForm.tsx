@@ -2,7 +2,7 @@ import { Button } from 'hds-react/components/Button';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react/components/Dialog';
-import { useAppDispatch } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { INote } from '@/interfaces/noteInterfaces';
 import { Controller } from 'react-hook-form';
 import { TextArea } from 'hds-react/components/Textarea';
@@ -11,24 +11,27 @@ import useProjectNoteForm from '@/forms/useNoteForm';
 import { patchNoteThunk } from '@/reducers/noteSlice';
 import DialogWrapper from '@/components/shared/DialogWrapper';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
+import { selectUser } from '@/reducers/authSlice';
 
 interface IProjectEditNoteFormProps {
   isOpen: boolean;
   note: INote;
+  project: string;
   close: () => void;
 }
 
-const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, note }) => {
+const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, note, project }) => {
   const { Content, ActionButtons } = Dialog;
   const { formMethods } = useProjectNoteForm(note);
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
 
   const { handleSubmit, control } = formMethods;
 
   const onSubmit = useCallback(
     async (form: IProjectNoteForm) => {
-      await dispatch(patchNoteThunk({ content: form.content, id: form.id }));
+      await dispatch(patchNoteThunk({ content: form.content, id: form.id, updatedBy: user?.uuid, project: project }));
       close();
     },
     [close, dispatch],

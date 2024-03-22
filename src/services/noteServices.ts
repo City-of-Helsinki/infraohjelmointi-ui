@@ -40,9 +40,9 @@ export const postNote = async (request: INoteRequest): Promise<INote> => {
   }
 };
 
-export const deleteNote = async (id: string): Promise<INote> => {
+export const deleteNote = async (request: INoteRequest): Promise<INote> => {
   try {
-    const res = await axios.delete(`${REACT_APP_API_URL}/notes/${id}`);
+    const res = await axios.delete(`${REACT_APP_API_URL}/notes/${request.id}/`, {data: request});
     return res.data;
   } catch (e) {
     return Promise.reject(e);
