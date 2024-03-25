@@ -441,7 +441,11 @@
       "subtitleTwo": "LIKE/Toiminnanohjaus",
       "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
       "crossingPressure": "Ylityspaine",
-      "taeTseFrame": "TAE&TSE raami"
+      "taeTseFrame": "TAE&TSE raami",
+      "costForecast": {
+        "cost": "Kustannus-",
+        "forecast": "ennuste"
+      }
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma",

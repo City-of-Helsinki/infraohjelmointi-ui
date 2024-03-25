@@ -52,8 +52,8 @@ const OperationalEnvironmentAnalysisTableHeader = () => {
     <View style={styles.tableHeader}>
         <Text style={styles.targetCell}>{t('target')}</Text>
         <View style={styles.narrowerColumns}>
-            <Text>Kustannus-</Text>
-            <Text>ennuste</Text>
+            <Text>{t('report.operationalEnvironmentAnalysis.costForecast.cost')}</Text>
+            <Text>{t('report.operationalEnvironmentAnalysis.costForecast.forecast')}</Text>
             <Text>{t('thousandEuros')}</Text>
         </View>
         <View style={styles.narrowerColumns}>

@@ -81,7 +81,7 @@ const mapOperationalEnvironmentAnalysisProperties = (finances: IPlanningCell[], 
   }
 };
 
-const sumFinances = (classItem: IPlanningRow, category: Categories, totalsParam?: ITotals) => {
+const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: Categories, totalsParam?: ITotals) => {
   const initialTotals =  {
     plannedCostForecast: 0,
     plannedTAE: 0,
@@ -115,16 +115,11 @@ const sumFinances = (classItem: IPlanningRow, category: Categories, totalsParam?
 
   if (classItem.children) {
     classItem.children.forEach((child) => {
-      totals = sumFinances(child, category, totals);
+      totals = getPlannedBudgetsByCategories(child, category, totals);
     });
   }
 
   return totals;
-}
-
-const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: Categories) => {
-  const sums = sumFinances(classItem, category);
-  return sums;
 }
 
 const getProjectPhase = (project: IProject) => {
