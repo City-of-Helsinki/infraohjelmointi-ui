@@ -11,6 +11,9 @@ export const matchExact = (value: string) => new RegExp(value, 'i');
 
 export const removeDotsFromString = (value: string) => value.replace('.', '');
 
+export const formatNumberToContainSpaces = (number: number) => {
+  return String(new Intl.NumberFormat('de-DE').format(number)).replace(/\./g, ' ');
+}
 export const listItemToOption = (listItem: IListItem | undefined): IOption => ({
   label: listItem?.value ?? '',
   value: listItem?.id ?? '',

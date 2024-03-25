@@ -433,13 +433,19 @@
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
   "report": {
-    "budgetProposal": {
-      "rowTitle": "Talousarvioehdotus",
-      "documentName": "talousarvioehdotus",
-      "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}} - {{endYear}}",
+    "operationalEnvironmentAnalysis": {
+      "rowTitle": "Toimintaympäristöanalyysi",
+      "documentName": "toimintaympäristöanalyysi",
+      "title": "Kaupunkiympäristön toimiala - Toimintaympäristöanalyysi {{startYear}} - {{endYear}}",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
-      "tableTitle": "Talousarvioehdotus {{startYear}} & {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}"
+      "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
+      "crossingPressure": "Ylityspaine",
+      "taeTseFrame": "TAE&TSE raami",
+      "costForecast": {
+        "cost": "Kustannus-",
+        "forecast": "ennuste"
+      }
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma",
@@ -529,6 +535,10 @@
   "tsSV": "EP",
   "initial": "Alustava",
   "initialSV": "Preliminär",
+  "initialInvestmentProgram": "Alustava investointiohjelma {{startYear}}-{{endYear}}",
+  "TAE": "TAE",
+  "TSE": "TSE",
+  "thousandEuros": "1000 €",
   "maintenanceMode": {
     "title": "Huoltotila",
     "description": "Pieni hetki, sivustoa huolletaan parhaillaan"
