@@ -3,6 +3,7 @@ import { ILocation } from "./locationInterfaces";
 import { IProject, IProjectsResponse } from "./projectInterfaces";
 import { IPlanningRow, IPlanningRowSelections, PlanningRowType } from "./planningInterfaces";
 import { IGroup } from "./groupInterfaces";
+import { IListItem } from "./common";
 
 export type getForcedToFrameDataType = Promise<{ 
     res: IProjectsResponse;
@@ -58,6 +59,7 @@ export interface IBasicReportData {
   divisions: Array<ILocation>;
   projects: Array<IProject>;
   classes: IClassHierarchy;
+  categories?: IListItem[];
   coordinatorRows?: IPlanningRow[];
 }
 

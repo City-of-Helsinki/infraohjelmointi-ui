@@ -13,6 +13,8 @@ import { getCoordinationClasses } from '@/services/classServices';
 import { getCoordinatorGroups } from '@/services/groupServices';
 import { getCoordinatorLocations } from '@/services/locationServices';
 import { getProjectsWithParams } from '@/services/projectServices';
+import { useAppSelector } from '@/hooks/common';
+import { selectCategories } from '@/reducers/listsSlice';
 
 interface IReportRowProps {
   type: ReportType;
@@ -24,7 +26,7 @@ interface IReportRowProps {
 
 const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFrameClasses }) => {
   const { t } = useTranslation();
-
+  const categories = useAppSelector(selectCategories);
   const getForcedToFrameData = async (year: number) => {
     // projects
     const res = await getProjectsWithParams({
@@ -72,9 +74,9 @@ const ReportRow: FC<IReportRowProps> = ({ type, divisions, classes, forcedToFram
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} getForcedToFrameData={getForcedToFrameData} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
+      <DownloadPdfButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
       {/* download csv button */}
-      <DownloadCsvButton type={type} getForcedToFrameData={getForcedToFrameData} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
+      <DownloadCsvButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} divisions={divisions} classes={classes} forcedToFrameClasses={forcedToFrameClasses} />
     </div>
   );
 };

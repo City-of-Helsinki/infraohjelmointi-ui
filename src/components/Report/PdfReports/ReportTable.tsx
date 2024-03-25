@@ -33,7 +33,7 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   data
 }) => {
   const reportRows = data.coordinatorRows
-    ? convertToReportRows(data.coordinatorRows, reportType)
+    ? convertToReportRows(data.coordinatorRows, reportType, data.categories)
     : getReportRows(reportType, data.classes, data.divisions, data.projects);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily

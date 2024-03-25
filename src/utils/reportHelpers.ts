@@ -21,8 +21,8 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
-import { Categories } from './staticData';
 import { formatNumberToContainSpaces } from './common';
+import { IListItem } from '@/interfaces/common';
 
 interface IYearCheck {
   planningStart: number;
@@ -81,7 +81,7 @@ const mapOperationalEnvironmentAnalysisProperties = (finances: IPlanningCell[], 
   }
 };
 
-const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: Categories, totalsParam?: ITotals) => {
+const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: string, totalsParam?: ITotals) => {
   const initialTotals =  {
     plannedCostForecast: 0,
     plannedTAE: 0,
@@ -328,22 +328,23 @@ const getRowType = (type: string) => {
   }
 }
 
-const getExtraRows = (project: IPlanningRow) => {
+const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | undefined) => {
   const categories: ICategoryArray[] = [];
-  // Map category rows
-  Object.keys(Categories).forEach(key => {
-    const categoryKey = key as keyof typeof Categories;
-    categories.push({
-      children: [],
-      frameBudgets: [],
-      plannedBudgets: {},
-      plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, Categories[categoryKey]),
-      id: `category-${key}-${project.id}`,
-      name: t(`option.${key}`),
-      projects: [],
-      type: "category",
+  if (categoriesFromSlice) {
+    // Map category rows
+    categoriesFromSlice.forEach(key => {
+      categories.push({
+        children: [],
+        frameBudgets: [],
+        plannedBudgets: {},
+        plannedBudgetsForCategories: getPlannedBudgetsByCategories(project, key.value),
+        id: `category-${key.value.replace(".", "")}-${project.id}`,
+        name: t(`option.${key.value.replace(".", "")}`),
+        projects: [],
+        type: "category",
+      });
     });
-  });
+  }
   // Form initial crossingPressure rows
   const cpCostForecast = Number(project.cells[0].frameBudget?.replace(/\s/g, ''))-Number(project.cells[0].plannedBudget?.replace(/\s/g, ''));
   const cpTAE = Number(project.cells[1].frameBudget?.replace(/\s/g, ''))-Number(project.cells[1].plannedBudget?.replace(/\s/g, ''));
@@ -409,7 +410,7 @@ const getExtraRows = (project: IPlanningRow) => {
   return extraRows;
 }
 
-export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | ''): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
@@ -424,7 +425,7 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
           id: c.id,
           name: c.name,
           parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType) : [],
+          children: c.children.length ? convertToReportRows(c.children, reportType, categories) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
           costForecast: c.cells[0].plannedBudget,
           type: getRowType(c.type) as ReportTableRowType
@@ -442,7 +443,7 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
           id: c.id,
           name: c.name,
           parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType) : [],
+          children: c.children.length ? convertToReportRows(c.children, reportType, categories) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
           frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "frameBudget"),
           plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "plannedBudget"),
@@ -453,7 +454,7 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
         forcedToFrameHierarchy.push(convertedClass);
         // If the class is on the fourth level, we want to add some extra rows there
         if (/^\d \d\d \d\d \d\d/.test(c.name)) {
-          const extraRows = getExtraRows(c);
+          const extraRows = getExtraRows(c, categories);
           extraRows.forEach((row) =>
             forcedToFrameHierarchy.push(row)
           );
@@ -735,7 +736,6 @@ const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalE
         ...data
       })
     }
-
     // Recursive calls for children and projects. These shouldn't be done in the fourth level anymore
     if (!/^\d \d\d \d\d \d\d/.test(tableRow.name)) {
       processOperationalEnvironmentAnalysisTableRows(tableRow.projects);
@@ -779,6 +779,7 @@ export const getReportData = async (
   divisions: Array<ILocation>,
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
+  categories: IListItem[],
   coordinatorRows?: IPlanningRow[],
 ): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow> | Array<IStrategyTableCsvRow> | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
   const year = new Date().getFullYear();
@@ -805,7 +806,7 @@ export const getReportData = async (
 
     let reportRows;
     if (reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy || reportType === Reports.OperationalEnvironmentAnalysis) {
-      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType) : [];
+      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType, categories) : [];
     } else {
       reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);
     }
