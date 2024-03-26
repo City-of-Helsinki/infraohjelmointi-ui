@@ -610,9 +610,9 @@ const processBudgetBookSummaryTableRows = (tableRows: IBudgetBookSummaryTableRow
   tableRows.forEach((tableRow) => {
     if (!budgetBookSummaryCsvRows.some(row => row.id === tableRow.id)) {
       budgetBookSummaryCsvRows.push({
-        id: tableRow?.id,
-        name: tableRow?.name,
-        type: tableRow?.type,
+        id: tableRow.id || 'id',
+        name: tableRow.name,
+        type: tableRow.type,
         usage: '',
         budgetEstimation: convertToMillions(tableRow?.financeProperties.budgetEstimation),
         budgetEstimationSuggestion: convertToMillions(tableRow?.financeProperties.budgetEstimationSuggestion),
