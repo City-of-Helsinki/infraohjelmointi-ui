@@ -188,38 +188,12 @@ export const keurToMillion = (value?: string | null) => {
   return millionValue.toString().replace('.', ',');
 };
 
-const roundUpInTensOfThousands = (number: number) => {
-  // e.g. 2 685 000 should become 2,69 when the number has been converted into millions
-  return Math.round(number / 10000) * 10000;
-}
+const roundUp = (number: number) => (number / 1000).toFixed(2);
 
-const checkDecimals = (number: number) => {
-  let numberToString = number.toString();
-
-  // Check if the number has decimals
-  if (number % 1 === 0) {
-    numberToString = numberToString + '.00';
-  }
-
-  const decimalPlaces = numberToString.split('.')[1];
-
-  // Make sure the number has two decimals
-  if (decimalPlaces.length == 1) {
-    return numberToString + '0';
-  } else {
-    return numberToString;
-  }
-}
 // Specifically for budgetBookSummaryReport
-export const convertToMillions = (value?: string | number) => {
+export const convertToMillions = (value?: string | number): string => {
   if (!value) return '0.00';
   const valueWithCorrectType: number = typeof value === 'string' ? Number(value.replace(/\s/g, '')): value;
-  const rounded = roundUpInTensOfThousands(valueWithCorrectType);
-  // convert to millions
-  let convertedNumber: number | string = rounded / 1000000;
-
-  // Check if the number has decimals and add them if it doesn't
-  convertedNumber = checkDecimals(convertedNumber);
-
-  return convertedNumber;
+  const rounded = roundUp(valueWithCorrectType);
+  return String(rounded);
 };
