@@ -184,6 +184,9 @@ const operationalEnvironmentAnalysisStyles = StyleSheet.create({
   },
   basicRow: {
     color: '#000000',
+  },
+  indentation : {
+    paddingLeft: '15px',
   }
 })
 
@@ -387,17 +390,26 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
             const getNameStyle = () => {
               if (flattenedRow.type === 'taeTseFrame') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
               if (flattenedRow.type === 'crossingPressure') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.crossingPressure];
-              return operationalEnvironmentAnalysisStyles.targetColumn;
+              return [operationalEnvironmentAnalysisStyles.targetColumn];
             }
+            
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            const nameStyle: any = getNameStyle();
+
             const getColor = () => {
               if (flattenedRow.type === 'taeTseFrame') return operationalEnvironmentAnalysisStyles.frame;
               if (flattenedRow.type === 'crossingPressure') return operationalEnvironmentAnalysisStyles.crossingPressure;
               return operationalEnvironmentAnalysisStyles.basicRow;
             }
             const color = getColor();
+
+            const shouldHaveIdentation = flattenedRow.type === 'taeTseFrame' || flattenedRow.type === 'crossingPressure' || flattenedRow.type === 'category';
+
+            if (shouldHaveIdentation) nameStyle.push(operationalEnvironmentAnalysisStyles.indentation);
+
             tableRow =  
               <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
-                <Text style={getNameStyle()}>
+                <Text style={nameStyle}>
                   {flattenedRow.name}
                 </Text>
                 <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.costForecast}</Text>

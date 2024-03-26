@@ -451,7 +451,12 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
           cells: c.cells,
           type: 'class' as ReportTableRowType
         }
-        forcedToFrameHierarchy.push(convertedClass);
+
+        const plannedBudgets = Object.values(convertedClass.plannedBudgets);
+        // TA parts that don't have any planned budgets shouldn't be shown on the report
+        if (plannedBudgets.some((value) => value !== "0")) {
+          forcedToFrameHierarchy.push(convertedClass);
+        }
         // If the class is on the fourth level, we want to add some extra rows there
         if (/^\d \d\d \d\d \d\d/.test(c.name)) {
           const extraRows = getExtraRows(c, categories);
