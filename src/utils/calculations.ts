@@ -192,7 +192,7 @@ const roundUp = (number: number) => (number / 1000).toFixed(2);
 
 // Specifically for budgetBookSummaryReport
 export const convertToMillions = (value?: string | number): string => {
-  if (!value) return '0';
+  if (!value) return '0.00';
   const valueWithCorrectType: number = typeof value === 'string' ? Number(value.replace(/\s/g, '')): value;
   const rounded = roundUp(valueWithCorrectType);
   return String(rounded);
