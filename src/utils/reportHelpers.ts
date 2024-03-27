@@ -460,10 +460,9 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
 
 const getGroupStartYear = (projects: IProject[]) => {
   let earliestPlanningStartYear: number | null = null;
+  const isEarlier = (p: IProject) => {return (!earliestPlanningStartYear && p.planningStartYear) || (p.planningStartYear && earliestPlanningStartYear && p.planningStartYear < earliestPlanningStartYear)};
   for (const p of projects) {
-    if (!earliestPlanningStartYear && p.planningStartYear) {
-      earliestPlanningStartYear = p.planningStartYear
-    } else if (p.planningStartYear && earliestPlanningStartYear && p.planningStartYear < earliestPlanningStartYear) {
+    if (isEarlier(p)) {
       earliestPlanningStartYear = p.planningStartYear
     }
   }
@@ -472,10 +471,9 @@ const getGroupStartYear = (projects: IProject[]) => {
 
 const getGroupEndYear = (projects: IProject[]) => {
   let latestConstructionEndYear: number | null = null;
+  const isLater = (p: IProject) => {return ((!latestConstructionEndYear && p.constructionEndYear) || (p.constructionEndYear && latestConstructionEndYear && p.constructionEndYear > latestConstructionEndYear))};
   for (const p of projects) {
-    if (!latestConstructionEndYear && p.constructionEndYear) {
-      latestConstructionEndYear = p.constructionEndYear
-    } else if (p.constructionEndYear && latestConstructionEndYear && p.constructionEndYear > latestConstructionEndYear) {
+    if (isLater(p)) {
       latestConstructionEndYear = p.constructionEndYear
     }
   }

@@ -26,9 +26,9 @@ export type getPlanningDataType = Promise<{
     planningDistricts: {
       districts: ILocation[];
       year: number;
-      allLocations?: undefined;
-      divisions?: undefined;
-      subDivisions?: undefined;
+      allLocations?: ILocation[];
+      divisions?: ILocation[];
+      subDivisions?: ILocation[];
   } | {
       districts: ILocation[];
       allLocations: ILocation[];
@@ -46,9 +46,9 @@ export type IPlanningData = {
   planningDistricts: {
     districts: ILocation[];
     year: number;
-    allLocations?: undefined;
-    divisions?: undefined;
-    subDivisions?: undefined;
+    allLocations?: ILocation[];
+    divisions?: ILocation[];
+    subDivisions?: ILocation[];
   } | {
     districts: ILocation[];
     allLocations: ILocation[];
