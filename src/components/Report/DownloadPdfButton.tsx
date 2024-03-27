@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReportType, Reports, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
+import { ReportType, Reports, getForcedToFrameDataType, getPlanningDataType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -53,7 +53,7 @@ interface IDownloadPdfButtonProps {
   type: ReportType;
   categories: IListItem[];
   getForcedToFrameData: (year: number) => getForcedToFrameDataType;
-  getPlanningData: (year: number) => any;
+  getPlanningData: (year: number) => getPlanningDataType;
 }
 
 /**
@@ -95,7 +95,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
               districts: res.planningDistricts.districts,
               otherClassifications: res.classHierarchy.otherClassifications,
               otherClassificationSubLevels: [],
-              divisions: res.planningDistricts.divisions,
+              divisions: res.planningDistricts.divisions ?? [],
               groups: res.groupRes
             }, res.projects, res.initialSelections, res.planningDistricts.subDivisions);
             document = getPdfDocument(type, categories, planningRows);

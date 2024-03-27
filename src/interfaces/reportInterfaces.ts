@@ -19,6 +19,26 @@ export type getForcedToFrameDataType = Promise<{
     groupRes: IGroup[];
     initialSelections: IPlanningRowSelections}>;
 
+export type getPlanningDataType = Promise<{
+  res: IProjectsResponse;
+    projects: IProject[];
+    classHierarchy: IClassHierarchy;
+    planningDistricts: {
+      districts: ILocation[];
+      year: number;
+      allLocations?: undefined;
+      divisions?: undefined;
+      subDivisions?: undefined;
+  } | {
+      districts: ILocation[];
+      allLocations: ILocation[];
+      divisions: ILocation[];
+      subDivisions: ILocation[];
+      year: number;
+  };
+    groupRes: IGroup[];
+    initialSelections: IPlanningRowSelections}>;
+
 export const reports = [
   'operationalEnvironmentAnalysis',
   'strategy',
