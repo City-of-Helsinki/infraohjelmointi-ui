@@ -27,6 +27,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
 import './styles.css';
 import _ from 'lodash';
+import { selectUser } from '@/reducers/authSlice';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -58,6 +59,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
   ) => {
     const { Header, Content, ActionButtons } = Dialog;
     const allHashTags = useAppSelector(selectHashTags);
+    const user = useAppSelector(selectUser);
     const { t } = useTranslation();
 
     const [formState, setFormState] = useState<IFormState>({
@@ -172,6 +174,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
               await patchProject({
                 id: projectId,
                 data: { hashTags: hashTagsForSubmit.map((h) => hashTagsObject[h.value].id) },
+                user
               });
             }
             // Hashtags are saved to the form values in the onChange below

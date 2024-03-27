@@ -247,7 +247,7 @@ const ProjectForm = () => {
           }
 
           try {
-            const response = await patchProject({ id: project?.id, data });
+            const response = await patchProject({ id: project?.id, data, user });
             if (response.status === 200) {
               dispatch(setSelectedProject(response.data));
               dispatch(setIsSaving(false));
@@ -270,7 +270,7 @@ const ProjectForm = () => {
         // Post project
         if (projectMode === 'new') {
           try {
-            const response = await postProject({ data });
+            const response = await postProject({ data, user });
             if (response.status === 201) {
               dispatch(setIsSaving(false));
               dispatch(setSelectedProject(response.data));

@@ -40,7 +40,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
           return;
         }
       }
-      patchProject({ data: req, id: project.id }).catch(() =>
+      patchProject({ data: req, id: project.id, user }).catch(() =>
         dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })),
       );
     },

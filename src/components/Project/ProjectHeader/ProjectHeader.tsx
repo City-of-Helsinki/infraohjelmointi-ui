@@ -64,7 +64,7 @@ const ProjectHeader: FC = () => {
 
         if (project?.id) {
           try {
-            const response = await patchProject({ id: project?.id, data });
+            const response = await patchProject({ id: project.id, data: data, user })
             if (response.status === 200) {
               dispatch(setSelectedProject(response.data));
               dispatch(setIsSaving(false));
