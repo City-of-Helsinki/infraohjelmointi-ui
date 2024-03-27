@@ -53,7 +53,7 @@ export enum Reports {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category';
+export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'changePressure' | 'taeFrame' | 'category';
 
 export interface IBasicReportData {
   divisions: Array<ILocation>;
@@ -207,8 +207,8 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
   plannedBudgetsForCategories?: IPlannedBudgets;
   frameBudgets: IOperationalEnvironmentAnalysisFinanceProperties;
   plannedBudgets: IPlannedBudgets;
-  // ylityspaine
-  crossingPressure?: { 
+  // muutospaine
+  changePressure?: { 
     cpCostForecast?: string;
     cpTAE?: string;
     cpTSE1?: string;
