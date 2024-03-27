@@ -59,7 +59,7 @@ const ProjectHeader: FC = () => {
           delete data.favourite;
         }
 
-        projectId && (await patchProject({ id: projectId, data: data }));
+        projectId && (await patchProject({ id: projectId, data: data, user }));
       }
     },
     [project?.favPersons, projectId, user?.uuid, dirtyFields, isDirty],

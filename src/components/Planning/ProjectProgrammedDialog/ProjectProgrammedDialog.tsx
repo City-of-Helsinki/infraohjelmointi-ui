@@ -10,8 +10,9 @@ import { IProjectsPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { useOptions } from '@/hooks/useOptions';
 import { patchProjects } from '@/services/projectServices';
 import { createDateToEndOfYear, createDateToStartOfYear } from '@/utils/dates';
-import { useAppDispatch } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import { selectUser } from '@/reducers/authSlice';
 
 interface ProjectProgrammedDialogProps {
   isVisible: boolean;
@@ -24,6 +25,7 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = memo(
       Array<IProgrammedProjectSuggestions>
     >([]);
     const dispatch = useAppDispatch();
+    const user = useAppSelector(selectUser);
 
     const phase = useOptions('phases').find((phase) => phase.label === 'programming')?.value || '';
 
@@ -41,6 +43,7 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = memo(
               estConstructionStart: createDateToStartOfYear(currentYear + 1),
               estConstructionEnd: createDateToEndOfYear(currentYear + 1),
             },
+            user
           })),
         };
       },

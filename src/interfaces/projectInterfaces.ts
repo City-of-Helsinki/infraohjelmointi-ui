@@ -1,5 +1,6 @@
 import { IListItem } from './common';
 import { IPerson } from './personsInterfaces';
+import { IUser } from './userInterfaces';
 
 export interface IProject {
   id: string;
@@ -160,10 +161,12 @@ export interface IProjectRequest {
 export interface IProjectPatchRequestObject {
   id?: string;
   data: IProjectRequest;
+  user: IUser | null;
 }
 
 export interface IProjectPostRequestObject {
   data: IProjectRequest;
+  user: IUser | null;
 }
 
 export interface IProjectGetRequestObject {

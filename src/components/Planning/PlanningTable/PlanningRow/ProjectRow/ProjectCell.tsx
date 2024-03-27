@@ -109,6 +109,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
       patchProject({
         id,
         data: req,
+        user
       }).catch(() => {
         dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
       }).finally(() => {

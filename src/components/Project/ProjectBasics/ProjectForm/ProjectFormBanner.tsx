@@ -8,6 +8,7 @@ import { deleteProject } from '@/services/projectServices';
 import { useNavigate } from 'react-router';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { loadCoordinationData, loadPlanningData } from '@/App';
+import { selectUser } from '@/reducers/authSlice';
 interface IProjectFormbannerProps {
   onSubmit: () =>
     | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
@@ -18,6 +19,7 @@ interface IProjectFormbannerProps {
 const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) => {
   const dispatch = useAppDispatch();
   const startYear = useAppSelector(selectStartYear);
+  const user = useAppSelector(selectUser);
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
 
     if (confirm !== false && project?.id) {
       try {
-        await deleteProject(project.id);
+        await deleteProject(project.id, user);
         loadCoordinationData(dispatch, startYear);
         loadPlanningData(dispatch, startYear);
         

@@ -13,6 +13,7 @@ import {
   ISearchResults,
 } from '@/interfaces/searchInterfaces';
 import axios from 'axios';
+import { IUser } from '@/interfaces/userInterfaces';
 
 const { REACT_APP_API_URL } = process.env;
 
@@ -25,18 +26,27 @@ export const getProject = async (id: string): Promise<IProject> => {
   }
 };
 
-export const deleteProject = async (id: string): Promise<{ id: string }> => {
+export const deleteProject = async (id: string, user: IUser | null): Promise<{ id: string }> => {
   try {
-    const res = await axios.delete(`${REACT_APP_API_URL}/projects/${id}/`);
+    const request = {
+      user: user?.uuid ?? 'no-uuid-available',
+    }
+    const res = await axios.delete(`${REACT_APP_API_URL}/projects/${id}/`, {data: request});
     return res.data;
   } catch (e) {
     return Promise.reject(e);
   }
 };
 
+
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProjectResponse> => {
   try {
-    const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data);
+    const requestObject = {
+      data: request.data,
+      user: request?.user?.uuid ?? 'no-uuid-available',
+      projectId: request.id,
+    }
+    const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, requestObject);
     return res;
   } catch (e) {
     return Promise.reject(e);
@@ -45,6 +55,10 @@ export const patchProject = async (request: IProjectPatchRequestObject): Promise
 
 export const postProject = async (request: IProjectPostRequestObject): Promise<IProjectResponse> => {
   try {
+   /* const requestData = {
+      data: request.data,
+      user: request.user?.uuid,
+    } */
     const res = await axios.post(`${REACT_APP_API_URL}/projects/`, request.data);
     return res;
   } catch (e) {
