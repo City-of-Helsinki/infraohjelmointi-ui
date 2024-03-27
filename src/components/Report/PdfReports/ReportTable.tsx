@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
 import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
-import { convertToReportRows, flattenBudgetBookSummaryTableRows, flattenStrategyTableRows, flattenOperationalEnvironmentAnalysisTableRows, getReportRows } from '@/utils/reportHelpers';
+import { convertToReportRows, flattenBudgetBookSummaryTableRows, flattenStrategyTableRows, flattenOperationalEnvironmentAnalysisTableRows } from '@/utils/reportHelpers';
 import TableRow from './TableRow';
 import { IBasicReportData, IBudgetBookSummaryTableRow, IOperationalEnvironmentAnalysisTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
@@ -32,9 +32,7 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   reportType,
   data
 }) => {
-  const reportRows = data.coordinatorRows
-    ? convertToReportRows(data.coordinatorRows, reportType, data.categories)
-    : getReportRows(reportType, data.classes, data.divisions, data.projects);
+  const reportRows = convertToReportRows(data.rows, reportType, data.categories);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (reportType === Reports.BudgetBookSummary || reportType === Reports.OperationalEnvironmentAnalysis) ? getFlattenedRows(reportRows as (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow)[], reportType) : [];

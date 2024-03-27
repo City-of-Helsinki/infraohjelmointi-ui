@@ -19,6 +19,47 @@ export type getForcedToFrameDataType = Promise<{
     groupRes: IGroup[];
     initialSelections: IPlanningRowSelections}>;
 
+export type getPlanningDataType = Promise<{
+  res: IProjectsResponse;
+    projects: IProject[];
+    classHierarchy: IClassHierarchy;
+    planningDistricts: {
+      districts: ILocation[];
+      year: number;
+      allLocations?: ILocation[];
+      divisions?: ILocation[];
+      subDivisions?: ILocation[];
+  } | {
+      districts: ILocation[];
+      allLocations: ILocation[];
+      divisions: ILocation[];
+      subDivisions: ILocation[];
+      year: number;
+  };
+    groupRes: IGroup[];
+    initialSelections: IPlanningRowSelections}>;
+
+export type IPlanningData = {
+  res: IProjectsResponse;
+  projects: IProject[];
+  classHierarchy: IClassHierarchy;
+  planningDistricts: {
+    districts: ILocation[];
+    year: number;
+    allLocations?: ILocation[];
+    divisions?: ILocation[];
+    subDivisions?: ILocation[];
+  } | {
+    districts: ILocation[];
+    allLocations: ILocation[];
+    divisions: ILocation[];
+    subDivisions: ILocation[];
+    year: number;
+  };
+  groupRes: IGroup[];
+  initialSelections: IPlanningRowSelections;
+}
+
 export const reports = [
   'operationalEnvironmentAnalysis',
   'strategy',
@@ -56,11 +97,8 @@ export type ReportType = (typeof reports)[number];
 export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'changePressure' | 'taeFrame' | 'category';
 
 export interface IBasicReportData {
-  divisions: Array<ILocation>;
-  projects: Array<IProject>;
-  classes: IClassHierarchy;
-  categories?: IListItem[];
-  coordinatorRows?: IPlanningRow[];
+  categories: IListItem[];
+  rows: IPlanningRow[];
 }
 
 interface ITableRowEssentials {
