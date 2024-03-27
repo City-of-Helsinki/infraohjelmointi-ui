@@ -345,7 +345,7 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
       });
     });
   }
-  // Form initial crossingPressure rows
+  // Form initial changePressure rows
   const cpCostForecast = Number(project.cells[0].frameBudget?.replace(/\s/g, ''))-Number(project.cells[0].plannedBudget?.replace(/\s/g, ''));
   const cpTAE = Number(project.cells[1].frameBudget?.replace(/\s/g, ''))-Number(project.cells[1].plannedBudget?.replace(/\s/g, ''));
   const cpTSE1 = Number(project.cells[2].frameBudget?.replace(/\s/g, ''))-Number(project.cells[2].plannedBudget?.replace(/\s/g, ''));
@@ -358,7 +358,7 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
   const cpInitial6 = Number(project.cells[9].frameBudget?.replace(/\s/g, ''))-Number(project.cells[9].plannedBudget?.replace(/\s/g, ''));
   const cpInitial7 = Number(project.cells[10].frameBudget?.replace(/\s/g, ''))-Number(project.cells[10].plannedBudget?.replace(/\s/g, ''));
 
-  // Add TAE&TSE frame, CrossingPressure and Category rows under the fourth level "ta" parts to the report
+  // Add TAE&TSE frame, changePressure and Category rows under the fourth level "ta" parts to the report
   const extraRows = [
     {
       children: [],
@@ -377,16 +377,16 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
         initial7: project.cells[9].frameBudget ?? 0,
       },
       plannedBudgets: {},
-      id: `taeTseFrame-${project.id}`,
-      name: t('report.operationalEnvironmentAnalysis.taeTseFrame'),
+      id: `taeFrame-${project.id}`,
+      name: t('report.operationalEnvironmentAnalysis.taeFrame'),
       projects: [],
-      type: "taeTseFrame",
+      type: "taeFrame",
     },
     {
       children: [],
       frameBudgets: {},
       plannedBudgets: {},
-      crossingPressure: {
+      changePressure: {
         cpCostForecast: formatNumberToContainSpaces(cpCostForecast),
         cpTAE: formatNumberToContainSpaces(cpTAE),
         cpTSE1: formatNumberToContainSpaces(cpTSE1),
@@ -399,10 +399,10 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
         cpInitial6: formatNumberToContainSpaces(cpInitial6),
         cpInitial7: formatNumberToContainSpaces(cpInitial7),
       },
-      id: `ylityspaine-${project.id}`,
-      name: t('report.operationalEnvironmentAnalysis.crossingPressure'),
+      id: `changePressure-${project.id}`,
+      name: t('report.operationalEnvironmentAnalysis.changePressure'),
       projects: [],
-      type: "crossingPressure",
+      type: "changePressure",
     },
     ...categories
   ];
@@ -701,21 +701,21 @@ const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
         initial6: tableRow.plannedBudgetsForCategories?.plannedInitial6 ?? '0',
         initial7: tableRow.plannedBudgetsForCategories?.plannedInitial7 ?? '0',
       }
-    case 'crossingPressure':
+    case 'changePressure':
       return {
-        costForecast: tableRow.crossingPressure?.cpCostForecast ?? '0',
-        TAE: tableRow.crossingPressure?.cpTAE ?? '0',
-        TSE1: tableRow.crossingPressure?.cpTSE1 ?? '0',
-        TSE2: tableRow.crossingPressure?.cpTSE2 ?? '0',
-        initial1: tableRow.crossingPressure?.cpInitial1 ?? '0',
-        initial2: tableRow.crossingPressure?.cpInitial2 ?? '0',
-        initial3: tableRow.crossingPressure?.cpInitial3 ?? '0',
-        initial4: tableRow.crossingPressure?.cpInitial4 ?? '0',
-        initial5: tableRow.crossingPressure?.cpInitial5 ?? '0',
-        initial6: tableRow.crossingPressure?.cpInitial6 ?? '0',
-        initial7: tableRow.crossingPressure?.cpInitial7 ?? '0',
+        costForecast: tableRow.changePressure?.cpCostForecast ?? '0',
+        TAE: tableRow.changePressure?.cpTAE ?? '0',
+        TSE1: tableRow.changePressure?.cpTSE1 ?? '0',
+        TSE2: tableRow.changePressure?.cpTSE2 ?? '0',
+        initial1: tableRow.changePressure?.cpInitial1 ?? '0',
+        initial2: tableRow.changePressure?.cpInitial2 ?? '0',
+        initial3: tableRow.changePressure?.cpInitial3 ?? '0',
+        initial4: tableRow.changePressure?.cpInitial4 ?? '0',
+        initial5: tableRow.changePressure?.cpInitial5 ?? '0',
+        initial6: tableRow.changePressure?.cpInitial6 ?? '0',
+        initial7: tableRow.changePressure?.cpInitial7 ?? '0',
       }
-    case 'taeTseFrame':
+    case 'taeFrame':
       return {
         costForecast: tableRow.frameBudgets?.costForecast ?? '0',
         TAE: tableRow.frameBudgets?.TAE ?? '0',
