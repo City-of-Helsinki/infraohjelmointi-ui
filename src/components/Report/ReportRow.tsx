@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReportType } from '@/interfaces/reportInterfaces';
+import { IPlanningData, ReportType } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy, ICoordinatorClassHierarchy, separateClassesIntoHierarchy } from '@/reducers/classSlice';
 import DownloadPdfButton from './DownloadPdfButton';
 import DownloadCsvButton from './DownloadCsvButton';
@@ -14,6 +14,7 @@ import { getCoordinatorLocations, getPlanningLocations } from '@/services/locati
 import { getProjectsWithParams } from '@/services/projectServices';
 import { useAppSelector } from '@/hooks/common';
 import { selectCategories } from '@/reducers/listsSlice';
+import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
 
 interface IReportRowProps {
   type: ReportType;
@@ -96,6 +97,21 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     return { res, projects, classHierarchy, planningDistricts, groupRes, initialSelections }
   }
 
+  const getPlanningRows = (res: IPlanningData) => {
+    const planningRows = buildPlanningTableRows({
+      masterClasses: res.classHierarchy.masterClasses,
+      classes: res.classHierarchy.classes,
+      subClasses: res.classHierarchy.subClasses,
+      collectiveSubLevels: [],
+      districts: res.planningDistricts.districts,
+      otherClassifications: res.classHierarchy.otherClassifications,
+      otherClassificationSubLevels: [],
+      divisions: res.planningDistricts.divisions ?? [],
+      groups: res.groupRes
+    }, res.projects, res.initialSelections, res.planningDistricts.subDivisions);
+    return planningRows;
+  }
+
   return (
     <div className="report-row-container" data-testid={`report-row-${type}`}>
       {/* report title */}
@@ -103,9 +119,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} />
+      <DownloadPdfButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} />
       {/* download csv button */}
-      <DownloadCsvButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} />
+      <DownloadCsvButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows}/>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReportType, Reports, getForcedToFrameDataType, getPlanningDataType } from '@/interfaces/reportInterfaces';
+import { IPlanningData, ReportType, Reports, getForcedToFrameDataType, getPlanningDataType } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -13,7 +13,6 @@ import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IListItem } from '@/interfaces/common';
-import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -51,9 +50,10 @@ const downloadIcon = <IconDownload />;
 
 interface IDownloadPdfButtonProps {
   type: ReportType;
-  categories: IListItem[];
   getForcedToFrameData: (year: number) => getForcedToFrameDataType;
   getPlanningData: (year: number) => getPlanningDataType;
+  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
+  categories: IListItem[];
 }
 
 /**
@@ -61,7 +61,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, categories }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, categories }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -87,17 +87,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
         case Reports.ConstructionProgram: {
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
-            const planningRows = buildPlanningTableRows({
-              masterClasses: res.classHierarchy.masterClasses,
-              classes: res.classHierarchy.classes,
-              subClasses: res.classHierarchy.subClasses,
-              collectiveSubLevels: [],
-              districts: res.planningDistricts.districts,
-              otherClassifications: res.classHierarchy.otherClassifications,
-              otherClassificationSubLevels: [],
-              divisions: res.planningDistricts.divisions ?? [],
-              groups: res.groupRes
-            }, res.projects, res.initialSelections, res.planningDistricts.subDivisions);
+            const planningRows = getPlanningRows(res);
             document = getPdfDocument(type, categories, planningRows);
           }
         }

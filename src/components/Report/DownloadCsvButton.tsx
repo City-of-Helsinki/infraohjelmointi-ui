@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType, Reports, getPlanningDataType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType, Reports, getPlanningDataType, IPlanningData } from '@/interfaces/reportInterfaces';
 import { getReportData } from '@/utils/reportHelpers';
 import { CSVDownload } from 'react-csv';
 import './styles.css';
@@ -9,13 +9,14 @@ import { useAppDispatch } from '@/hooks/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IListItem } from '@/interfaces/common';
-import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
-  categories: IListItem[],
+  categories: IListItem[];
   getForcedToFrameData: (year: number) => getForcedToFrameDataType;
   getPlanningData: (year: number) => getPlanningDataType;
+  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   }
 
 const downloadIcon = <IconDownload />;
@@ -25,7 +26,7 @@ const downloadIcon = <IconDownload />;
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getForcedToFrameData, getPlanningData }) => {
+const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getForcedToFrameData, getPlanningData, getPlanningRows }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
@@ -38,7 +39,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getF
     }
   }, [csvData]);
 
-  const getCsvData = useCallback(async () => {
+  const getCsvData = useCallback(async (categories: IListItem[]) => {
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
@@ -55,17 +56,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getF
         case Reports.ConstructionProgram: {
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
-            const planningRows = buildPlanningTableRows({
-              masterClasses: res.classHierarchy.masterClasses,
-              classes: res.classHierarchy.classes,
-              subClasses: res.classHierarchy.subClasses,
-              collectiveSubLevels: [],
-              districts: res.planningDistricts.districts,
-              otherClassifications: res.classHierarchy.otherClassifications,
-              otherClassificationSubLevels: [],
-              divisions: res.planningDistricts.divisions ?? [],
-              groups: res.groupRes
-            }, res.projects, res.initialSelections, res.planningDistricts.subDivisions);
+            const planningRows = getPlanningRows(res);
             setCsvData(await getReportData(t, Reports.ConstructionProgram, categories, planningRows));
           }
           break;
@@ -86,7 +77,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getF
         <Button
           iconLeft={downloadIcon}
           variant="secondary"
-          onClick={() => getCsvData()}
+          onClick={() => getCsvData(categories)}
           disabled={(type === Reports.FinancialStatement)}
         >
           {t('downloadCsv', { name: t(`report.${type}.documentName`) })}
