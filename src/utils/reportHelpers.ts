@@ -537,7 +537,8 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
     case Reports.ConstructionProgram: {
       const planningHierarchy = [];
       for (const c of rows) {
-        if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget) >= 1000) {
+        if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
+          console.log(c.costEstimateBudget)
           const startYear = getGroupStartYear(c.projectRows);
           const endYear = getGroupEndYear(c.projectRows);
           if (startYear && endYear && checkYearRange({
@@ -557,7 +558,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             }
             planningHierarchy.push(convertedGroup);
           }
-        } else {
+        } else if (c.type !== 'group') {
           const convertedClass: IConstructionProgramTableRow = {
             id: c.id,
             name: c.name,
