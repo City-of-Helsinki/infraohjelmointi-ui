@@ -15,9 +15,7 @@ import {
   ICategoryArray,
   ITotals,
 } from '@/interfaces/reportInterfaces';
-import { IClassHierarchy } from '@/reducers/classSlice';
 import { convertToMillions, keurToMillion } from './calculations';
-import { getProjectsWithParams } from '@/services/projectServices';
 import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
@@ -229,17 +227,67 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
     }));
 }
 
-/**
- * We build report rows "backwards" by checking each projects parent class and iterating classes
- * to create a hierarchy of masterClass, class, subClass and projects.
- *
- * Projects can appear under any of these levels.
- *
- * @param projects
- * @param classes
- * @param divisions
- * @returns
- */
+const convertToConstructionReportProjects = (projects: IProject[]): IConstructionProgramTableRow[] => {
+  return projects
+  .filter((p) => 
+    p.planningStartYear && p.constructionEndYear &&
+    checkYearRange({
+      planningStart: p.planningStartYear,
+      constructionEnd: p.constructionEndYear
+    }) &&
+    parseFloat(p.costForecast) >= 1000)
+  .map((p) => ({
+    name: p.name,
+    id: p.id,
+    children: [],
+    projects: [],
+    parent: null,
+    location: p.projectLocation,
+    costForecast: keurToMillion(p.costForecast),
+    startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
+    spentBudget: keurToMillion(p.spentBudget),
+    budgetProposalCurrentYearPlus0:
+      keurToMillion(p.finances.budgetProposalCurrentYearPlus0) ?? '',
+    budgetProposalCurrentYearPlus1:
+      keurToMillion(p.finances.budgetProposalCurrentYearPlus1) ?? '',
+    budgetProposalCurrentYearPlus2:
+      keurToMillion(p.finances.budgetProposalCurrentYearPlus2) ?? '',
+    type: 'project',
+  }));
+}
+
+const convertToGroupValues = (projects: IProject[]) => {
+  let spentBudget = 0;
+  let budgetProposalCurrentYearPlus0 = 0;
+  let budgetProposalCurrentYearPlus1 = 0;
+  let budgetProposalCurrentYearPlus2 = 0;
+
+  for (const p of projects) {
+    spentBudget += parseFloat(p.spentBudget);
+    budgetProposalCurrentYearPlus0 += parseFloat(p.finances.budgetProposalCurrentYearPlus0 ?? '0');
+    budgetProposalCurrentYearPlus1 += parseFloat(p.finances.budgetProposalCurrentYearPlus1 ?? '0');
+    budgetProposalCurrentYearPlus2 += parseFloat(p.finances.budgetProposalCurrentYearPlus2 ?? '0');
+  }
+
+  return {
+    spentBudget: keurToMillion(spentBudget),
+    budgetProposalCurrentYearPlus0: keurToMillion(budgetProposalCurrentYearPlus0),
+    budgetProposalCurrentYearPlus1: keurToMillion(budgetProposalCurrentYearPlus1),
+    budgetProposalCurrentYearPlus2: keurToMillion(budgetProposalCurrentYearPlus2),
+  }
+}
+
+const checkYearRange = (props: IYearCheck ) => {
+  const nextYear = new Date().getFullYear() + 1;
+  const nextThreeYears = [nextYear, nextYear + 1, nextYear + 2];
+  const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
+
+  if (inPlanningOrConstruction) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTableRow[]) => {
   const initialInvestmentPart: IBudgetBookSummaryTableRow = {
@@ -410,17 +458,41 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
   return extraRows;
 }
 
-export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+const getGroupStartYear = (projects: IProject[]) => {
+  let earliestPlanningStartYear: number | null = null;
+  for (const p of projects) {
+    if (!earliestPlanningStartYear && p.planningStartYear) {
+      earliestPlanningStartYear = p.planningStartYear
+    } else if (p.planningStartYear && earliestPlanningStartYear && p.planningStartYear < earliestPlanningStartYear) {
+      earliestPlanningStartYear = p.planningStartYear
+    }
+  }
+  return earliestPlanningStartYear;
+}
+
+const getGroupEndYear = (projects: IProject[]) => {
+  let latestConstructionEndYear: number | null = null;
+  for (const p of projects) {
+    if (!latestConstructionEndYear && p.constructionEndYear) {
+      latestConstructionEndYear = p.constructionEndYear
+    } else if (p.constructionEndYear && latestConstructionEndYear && p.constructionEndYear > latestConstructionEndYear) {
+      latestConstructionEndYear = p.constructionEndYear
+    }
+  }
+  return latestConstructionEndYear;
+}
+
+export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
-      forcedToFrameHierarchy = getBudgetBookSummaryProperties(coordinatorRows);
+      forcedToFrameHierarchy = getBudgetBookSummaryProperties(rows);
       getInvestmentPart(forcedToFrameHierarchy);
       return forcedToFrameHierarchy;
     }
     case Reports.Strategy: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
-      for (const c of coordinatorRows) {
+      for (const c of rows) {
         const convertedClass = {
           id: c.id,
           name: c.name,
@@ -438,7 +510,7 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
     }
     case Reports.OperationalEnvironmentAnalysis: {
       const forcedToFrameHierarchy = [];
-      for (const c of coordinatorRows) {
+      for (const c of rows) {
         const convertedClass = {
           id: c.id,
           name: c.name,
@@ -462,141 +534,47 @@ export const convertToReportRows = (coordinatorRows: IPlanningRow[], reportType:
       }
       return forcedToFrameHierarchy;
     }
+    case Reports.ConstructionProgram: {
+      const planningHierarchy = [];
+      for (const c of rows) {
+        if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget) >= 1000) {
+          const startYear = getGroupStartYear(c.projectRows);
+          const endYear = getGroupEndYear(c.projectRows);
+          if (startYear && endYear && checkYearRange({
+            planningStart: startYear,
+            constructionEnd: endYear
+          })) {
+            const convertedGroup: IConstructionProgramTableRow = {
+              id: c.id,
+              name: c.name,
+              parent: null,
+              children: [],
+              projects: [],
+              costForecast: keurToMillion(c.plannedBudgets),
+              startAndEnd: `${startYear}-${endYear}`,
+              type: 'group' as ReportTableRowType,
+              ...convertToGroupValues(c.projectRows)
+            }
+            planningHierarchy.push(convertedGroup);
+          }
+        } else {
+          const convertedClass: IConstructionProgramTableRow = {
+            id: c.id,
+            name: c.name,
+            parent: null,
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories) : [],
+            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows) : [],
+            type: 'class' as ReportTableRowType,
+          }
+          planningHierarchy.push(convertedClass);
+        }
+      }
+      return planningHierarchy;
+    }
     default:
       return [];
   }
 }
-
-export const getReportRows = (
-  reportType: ReportType,
-  classes: IClassHierarchy,
-  divisions: Array<ILocation>,
-  projects: Array<IProject>,
-): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
-  const { allClasses } = classes;
-
-  const initialValues = {
-    parent: null,
-    projects: [],
-    children: [],
-    type: 'class' as ReportTableRowType,
-  };
-
-  const checkYearRange = (props: IYearCheck ) => {
-    const nextYear = new Date().getFullYear() + 1;
-    const nextThreeYears = [nextYear, nextYear + 1, nextYear + 2];
-    const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
-
-    if (inPlanningOrConstruction) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  let filteredProjects: IProject[];
-
-  // Filtering rules for the projects for different reports
-  switch (reportType) {
-    case Reports.ConstructionProgram:
-      filteredProjects = projects.filter((p) => 
-        p.planningStartYear && p.constructionEndYear &&
-        checkYearRange({
-          planningStart: p.planningStartYear,
-          constructionEnd: p.constructionEndYear}));
-          Object.assign(initialValues, {["location"]: ''})
-          Object.assign(initialValues, {["costForecast"]: ''})
-          Object.assign(initialValues, {["startAndEnd"]: ''})
-          Object.assign(initialValues, {["spentBudget"]: []})
-          Object.assign(initialValues, {["budgetProposalCurrentYearPlus0"]: ''})
-          Object.assign(initialValues, {["budgetProposalCurrentYearPlus1"]: ''})
-          Object.assign(initialValues, {["budgetProposalCurrentYearPlus2"]: ''})
-      break;
-    default:
-      filteredProjects = projects;
-  };
-
-  const getProjectsForClass = (id: string): Array<IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow> => {
-    switch (reportType) {
-      case Reports.ConstructionProgram:
-        return filteredProjects
-        .filter((p) => p.projectClass === id)
-        .map((p) => ({
-          ...initialValues,
-          name: p.name,
-          id: p.id,
-          location: getDivision(divisions, p.projectLocation),
-          costForecast: keurToMillion(p.costForecast),
-          startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
-          spentBudget: keurToMillion(p.spentBudget),
-          budgetProposalCurrentYearPlus0:
-            keurToMillion(p.finances.budgetProposalCurrentYearPlus0) ?? '',
-          budgetProposalCurrentYearPlus1:
-            keurToMillion(p.finances.budgetProposalCurrentYearPlus1) ?? '',
-          budgetProposalCurrentYearPlus2:
-            keurToMillion(p.finances.budgetProposalCurrentYearPlus2) ?? '',
-          type: 'project',
-        }));
-        default:
-          return [];
-    }
-  }
-  
-  // Filter all classes that are included in the projects' parent classes
-  let classesForProjects: Array<IConstructionProgramTableRow | IStrategyTableRow | IBudgetBookSummaryTableRow> = [];
-  switch (reportType) {
-    case Reports.ConstructionProgram:
-      classesForProjects = allClasses
-        .filter((ac) => filteredProjects.findIndex((p) => p.projectClass === ac.id) !== -1)
-        .map((c) => ({
-          ...initialValues,
-          name: c.name,
-          parent: c.parent,
-          id: c.id,
-          projects: getProjectsForClass(c.id),
-        }));
-      break;
-  }
-
-    // Get the classes parents
-    let classParents: Array<IConstructionProgramTableRow | IStrategyTableRow> = [];
-    switch (reportType) {
-      case Reports.ConstructionProgram:
-        classParents = allClasses
-          .filter((ac) => classesForProjects.findIndex((cfp) => cfp.parent === ac.id) !== -1)
-          .map((c) => ({
-            ...initialValues,
-            id: c.id,
-            name: c.name,
-            parent: c.parent,
-            children: classesForProjects.filter((cfp) => cfp.parent === c.id),
-            projects: getProjectsForClass(c.id),
-          }));
-        break;
-    }
-
-  // Get the parent classes parents
-  let classGrandParents: Array<IConstructionProgramTableRow> = [];
-  switch (reportType) {
-    case Reports.ConstructionProgram:
-      classGrandParents = allClasses
-        .filter((ac) => classParents.findIndex((cp) => cp.parent === ac.id) !== -1)
-        .map((c) => ({
-          ...initialValues,
-          id: c.id,
-          name: c.name,
-          parent: c.parent,
-          children: classParents.filter((cp) => cp.parent === c.id),
-          projects: getProjectsForClass(c.id),
-        }));
-      break;
-  }
-  const classesForProjectsWithNoParents = classesForProjects?.filter((cfp) => cfp.parent === null);
-  const classParentsWithNoParents = classParents?.filter((cp) => cp.parent === null);
-
-  // We return all resulting rows that do not have parents as the first level in the array
-  return [...classGrandParents, ...classParentsWithNoParents, ...classesForProjectsWithNoParents];
-};
 
 // For CSV reports -->
 const budgetBookSummaryCsvRows: IBudgetBookSummaryCsvRow[] = [];
@@ -775,42 +753,17 @@ const flattenConstructionProgramTableRows = (
   tableRows.map(flatten).flat(Infinity) as Array<IConstructionProgramTableRow>;
 
 export const getReportData = async (
-  classes: IClassHierarchy,
-  divisions: Array<ILocation>,
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
   categories: IListItem[],
-  coordinatorRows?: IPlanningRow[],
+  rows: IPlanningRow[],
 ): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow> | Array<IStrategyTableCsvRow> | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
+  const reportRows = convertToReportRows(rows, reportType, categories);
+
   try {
-    let projects;
-
-    if (reportType !== Reports.BudgetBookSummary && reportType !== Reports.Strategy) {
-      const res = await getProjectsWithParams({
-        direct: false,
-        programmed: false,
-        params: 'overMillion=true',
-        forcedToFrame: false,
-        year,
-      });
-
-      projects = res.results;
-    }
-   
-    if (!projects && reportType !== Reports.BudgetBookSummary && reportType !== Reports.Strategy) {
-      return [];
-    }
-
-    let reportRows;
-    if (reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy || reportType === Reports.OperationalEnvironmentAnalysis) {
-      reportRows = coordinatorRows ? convertToReportRows(coordinatorRows, reportType, categories) : [];
-    } else {
-      reportRows = getReportRows(reportType, classes, divisions, projects as IProject[]);
-    }
-
     switch (reportType) {
       case Reports.Strategy : {
         //Flatten rows to one dimension
@@ -837,7 +790,7 @@ export const getReportData = async (
       }
       case Reports.ConstructionProgram: {
         // Flatten rows into one dimension
-        const flattenedRows = flattenConstructionProgramTableRows(reportRows);
+        const flattenedRows = flattenConstructionProgramTableRows(reportRows as IConstructionProgramTableRow[]);
         // Transform them into csv rows
         return flattenedRows.map((r: IConstructionProgramTableRow) => ({
           [t('target')]: r.name,

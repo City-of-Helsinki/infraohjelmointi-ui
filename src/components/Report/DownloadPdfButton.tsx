@@ -5,18 +5,15 @@ import { ReportType, Reports, getForcedToFrameDataType } from '@/interfaces/repo
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
-import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
-import { getProjectsWithParams } from '@/services/projectServices';
-import { IProject } from '@/interfaces/projectInterfaces';
 import './pdfFonts';
 import './styles.css';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import ReportContainer from './PdfReports/ReportContainer';
 import { useAppDispatch } from '@/hooks/common';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IListItem } from '@/interfaces/common';
+import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -29,23 +26,20 @@ const EmptyDocument = () => (
 
 const getPdfDocument = (
   type: ReportType,
-  divisions: Array<ILocation>,
-  classes: IClassHierarchy,
-  projects: Array<IProject>,
   categories: IListItem[],
-  coordinatorRows?: IPlanningRow[],
+  rows: IPlanningRow[],
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis:
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: [], coordinatorRows, categories}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
+      <ReportContainer data={{categories, rows}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
     strategy: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={Reports.Strategy}/>
+      <ReportContainer data={{categories, rows}} reportType={Reports.Strategy}/>
     ),
     constructionProgram: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={Reports.ConstructionProgram}/>
+      <ReportContainer data={{categories, rows}} reportType={Reports.ConstructionProgram}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects:[], coordinatorRows}} reportType={Reports.BudgetBookSummary}/>
+      <ReportContainer data={{categories, rows}} reportType={Reports.BudgetBookSummary}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -59,9 +53,7 @@ interface IDownloadPdfButtonProps {
   type: ReportType;
   categories: IListItem[];
   getForcedToFrameData: (year: number) => getForcedToFrameDataType;
-  divisions: Array<ILocation>;
-  classes: IClassHierarchy;
-  forcedToFrameClasses: ICoordinatorClassHierarchy;
+  getPlanningData: (year: number) => any;
 }
 
 /**
@@ -69,7 +61,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, divisions, classes, forcedToFrameClasses, categories }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, categories }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -83,32 +75,30 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
       let document: JSX.Element | undefined = undefined;
       switch(type) {
         case Reports.Strategy:
-        case Reports.BudgetBookSummary: {
+        case Reports.BudgetBookSummary: 
+        case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, categories, coordinatorRows);
+            document = getPdfDocument(type, categories, coordinatorRows);
           }
           break;
         }
-        case Reports.OperationalEnvironmentAnalysis: {
-          const res = await getForcedToFrameData(year);
-          if (res.projects.length > 0) {
-            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, categories, coordinatorRows);
-          }
-          break;
-        }
-        default: {
-          const res = await getProjectsWithParams({
-            direct: false,
-            programmed: false,
-            params: 'overMillion=true',
-            forcedToFrame: false,
-            year,
-          });
-          if (res.results.length > 0) {
-            document = getPdfDocument(type, divisions, classes, res.results, categories);
+        case Reports.ConstructionProgram: {
+          const res = await getPlanningData(year);
+          if (res && res.projects.length > 0) {
+            const planningRows = buildPlanningTableRows({
+              masterClasses: res.classHierarchy.masterClasses,
+              classes: res.classHierarchy.classes,
+              subClasses: res.classHierarchy.subClasses,
+              collectiveSubLevels: [],
+              districts: res.planningDistricts.districts,
+              otherClassifications: res.classHierarchy.otherClassifications,
+              otherClassificationSubLevels: [],
+              divisions: res.planningDistricts.divisions,
+              groups: res.groupRes
+            }, res.projects, res.initialSelections, res.planningDistricts.subDivisions);
+            document = getPdfDocument(type, categories, planningRows);
           }
         }
       }
@@ -122,7 +112,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
     } finally {
       dispatch(clearLoading(LOADING_PDF_DATA));
     }
-  }, [classes, documentName, divisions, type]);
+  }, [documentName, type]);
 
   return (
     <Button

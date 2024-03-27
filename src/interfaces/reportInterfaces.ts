@@ -56,11 +56,8 @@ export type ReportType = (typeof reports)[number];
 export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category';
 
 export interface IBasicReportData {
-  divisions: Array<ILocation>;
-  projects: Array<IProject>;
-  classes: IClassHierarchy;
-  categories?: IListItem[];
-  coordinatorRows?: IPlanningRow[];
+  categories: IListItem[];
+  rows: IPlanningRow[];
 }
 
 interface ITableRowEssentials {

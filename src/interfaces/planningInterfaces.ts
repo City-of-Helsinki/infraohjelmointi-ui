@@ -2,6 +2,7 @@ import { IClass } from './classInterfaces';
 import { IGroup } from './groupInterfaces';
 import { ILocation } from './locationInterfaces';
 import { IProject } from './projectInterfaces';
+import { IBudgetBookFinanceProperties, IOperationalEnvironmentAnalysisFinanceProperties } from './reportInterfaces';
 
 // This types are used to create search params and style the rows differently
 export type PlanningRowType =
@@ -86,6 +87,11 @@ export interface IPlanningRow extends IPlanningSums {
   defaultExpanded: boolean;
   urlSearchParam: { [key: string]: string } | null;
   cells: Array<IPlanningCell>;
+  projects?: [];
+  parent?: string;
+  objectType?: string;
+  financeProperties?: IBudgetBookFinanceProperties;
+  frameBudgets?: IOperationalEnvironmentAnalysisFinanceProperties;
 }
 
 export type PlanningMode = 'planning' | 'coordination';

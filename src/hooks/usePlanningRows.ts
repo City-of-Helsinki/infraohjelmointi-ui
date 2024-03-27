@@ -57,7 +57,7 @@ const sortLocationsByName = (list: Array<ILocation>) =>
  * @param state the current state of the planningRows-hook
  * @returns a list of planning rows for the planning table
  */
-const buildPlanningTableRows = (
+export const buildPlanningTableRows = (
   list: IPlanningRowList,
   projects: Array<IProject>,
   selections: IPlanningRowSelections,
