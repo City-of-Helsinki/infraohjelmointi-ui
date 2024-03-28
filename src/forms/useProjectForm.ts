@@ -16,6 +16,7 @@ import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
+import _ from 'lodash';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -181,7 +182,7 @@ const useProjectForm = () => {
   const [selections, setSelections] = useState({ selectedClass: project?.projectClass, selectedLocation: project?.projectDistrict });
 
   // control,
-  const { reset, watch, setValue } = formMethods;
+  const { reset, watch, setValue, getValues } = formMethods;
 
   const selectedMasterClassName = formValues.masterClass.label;
 
@@ -258,8 +259,19 @@ const useProjectForm = () => {
 
   // Updates form with the selectedProject from redux
   useEffect(() => {
-    // added projectMode check for when a new project creation form is opened, form values get reset too
-    if (project || projectMode === 'new') {
+    const currentState = getValues();
+    const inComingState = formValues;
+    const sameValuesInStates = _.isEqual(currentState, inComingState);
+    const nameExists = formValues.name.trim() !== '' && formValues.name.match(/[a-z]/i);
+     /* 
+      If a project is edited, the if sentence should be accessed only when the current and incoming states are the same and 
+      if a project is created the if sentence should be accessed only if the name exists in both states (because name is a
+      mandatory property). These conditions are necessary because if a user is creating or editing a project and some other
+      user is updating budgets of the projects, the project form will be affected of that (because of the finance-update) and
+      the data in it will be lost (in a new project the whole form will become blank and when editing a project, the edited fields
+      will have the unedited values).
+    */
+    if ((sameValuesInStates && project) || (nameExists && projectMode === 'new')) {
       reset(formValues);
     }
   }, [project, projectMode, classes, subClasses, masterClasses, districts, divisions, subDivisions, reset, formValues]);
