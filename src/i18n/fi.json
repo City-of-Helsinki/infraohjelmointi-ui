@@ -440,8 +440,8 @@
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
       "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
-      "crossingPressure": "Ylityspaine",
-      "taeTseFrame": "TAE&TSE raami",
+      "changePressure": "Muutospaine",
+      "taeFrame": "TA, käytettävissä oleva määräraha",
       "costForecast": {
         "cost": "Kustannus-",
         "forecast": "ennuste"
