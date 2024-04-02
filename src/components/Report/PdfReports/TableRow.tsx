@@ -167,7 +167,7 @@ const operationalEnvironmentAnalysisStyles = StyleSheet.create({
     borderRight: '1px solid #808080',
     fontWeight: 'medium',
   },
-  crossingPressure: {
+  changePressure: {
     color: '#0072C6',
   },
   frame: {
@@ -184,6 +184,9 @@ const operationalEnvironmentAnalysisStyles = StyleSheet.create({
   },
   basicRow: {
     color: '#000000',
+  },
+  indentation : {
+    paddingLeft: '15px',
   }
 })
 
@@ -384,19 +387,28 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
         case Reports.OperationalEnvironmentAnalysis: {
           if (flattenedRow) {
             const getNameStyle = () => {
-              if (flattenedRow.type === 'taeTseFrame') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
-              if (flattenedRow.type === 'crossingPressure') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.crossingPressure];
-              return operationalEnvironmentAnalysisStyles.targetColumn;
+              if (flattenedRow.type === 'taeFrame') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
+              if (flattenedRow.type === 'changePressure') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.changePressure];
+              return [operationalEnvironmentAnalysisStyles.targetColumn];
             }
+            
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            const nameStyle: any = getNameStyle();
+
             const getColor = () => {
-              if (flattenedRow.type === 'taeTseFrame') return operationalEnvironmentAnalysisStyles.frame;
-              if (flattenedRow.type === 'crossingPressure') return operationalEnvironmentAnalysisStyles.crossingPressure;
+              if (flattenedRow.type === 'taeFrame') return operationalEnvironmentAnalysisStyles.frame;
+              if (flattenedRow.type === 'changePressure') return operationalEnvironmentAnalysisStyles.changePressure;
               return operationalEnvironmentAnalysisStyles.basicRow;
             }
             const color = getColor();
+
+            const shouldHaveIdentation = flattenedRow.type === 'taeFrame' || flattenedRow.type === 'changePressure' || flattenedRow.type === 'category';
+
+            if (shouldHaveIdentation) nameStyle.push(operationalEnvironmentAnalysisStyles.indentation);
+
             tableRow =  
               <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
-                <Text style={getNameStyle()}>
+                <Text style={nameStyle}>
                   {flattenedRow.name}
                 </Text>
                 <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.costForecast}</Text>

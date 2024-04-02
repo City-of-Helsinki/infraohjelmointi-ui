@@ -226,8 +226,8 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
   plannedBudgetsForCategories?: IPlannedBudgets;
   frameBudgets: IOperationalEnvironmentAnalysisFinanceProperties;
   plannedBudgets: IPlannedBudgets;
-  // ylityspaine
-  crossingPressure?: { 
+  // muutospaine
+  changePressure?: { 
     cpCostForecast?: string;
     cpTAE?: string;
     cpTSE1?: string;
