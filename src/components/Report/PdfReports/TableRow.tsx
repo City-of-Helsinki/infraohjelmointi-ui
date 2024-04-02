@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IFlattenedOperationalEnvironmentAnalysisProperties, IStrategyTableRow, IOperationalEnvironmentAnalysisTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IFlattenedOperationalEnvironmentAnalysisProperties, IStrategyTableRow, IOperationalEnvironmentAnalysisTableRow, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -256,9 +256,7 @@ const strategyReportStyles = StyleSheet.create({
   },
 });
 interface ITableRowProps {
-  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow | IOperationalEnvironmentAnalysisTableRow;
-  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[];
-  depth: number;
+  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[] | IConstructionProgramTableRow[];
   index?: number;
   reportType: ReportType;
 }
@@ -293,13 +291,13 @@ const getRowStyle = (rowType: string, depth: number) => {
   }
 }
 
-const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
+const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
         case Reports.Strategy: {
             if (flattenedRow) {
               tableRow =
-              <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
+              <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
                   <Text style={['class', 'location'].includes(flattenedRow.type ?? '') ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
                   <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                   <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
@@ -326,19 +324,20 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
             break;
         }
         case Reports.ConstructionProgram: {
-            const constructionRow = row as IConstructionProgramTableRow;
+          if (flattenedRow) {
             tableRow =  
-            <View wrap={false} style={depth % 2 ? styles.evenRow : styles.oddRow} key={constructionRow.id}>
-                <Text style={constructionRow.type === 'class' ? styles.classNameCell : styles.nameCell}>{constructionRow.name}</Text>
-                <Text style={styles.divisionCell}>{constructionRow.location}</Text>
-                <Text style={styles.costForecastCell}>{constructionRow.costForecast}</Text>
-                <Text style={styles.planAndConStartCell}>{constructionRow.startAndEnd}</Text>
-                <Text style={styles.previouslyUsedCell}>{constructionRow.spentBudget}</Text>
-                <Text style={styles.cell}>{constructionRow.budgetProposalCurrentYearPlus1}</Text>
-                <Text style={styles.cell}>{constructionRow.budgetProposalCurrentYearPlus1}</Text>
-                <Text style={styles.lastCell}>{constructionRow.budgetProposalCurrentYearPlus2}</Text>
+            <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
+                <Text style={flattenedRow.type === 'class' ? styles.classNameCell : styles.nameCell}>{flattenedRow.name}</Text>
+                <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
+                <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
+                <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+                <Text style={styles.previouslyUsedCell}>{flattenedRow.spentBudget}</Text>
+                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
+                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
+                <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
             </View>
-            break;
+          }
+          break;
         }
         case Reports.BudgetBookSummary: {
           if (flattenedRow) {
@@ -428,31 +427,14 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
 
 Row.displayName = 'Row';
 
-const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, index }) => {
+const TableRow: FC<ITableRowProps> = ({ flattenedRows, reportType }) => {
   return (
       <>
-        { reportType === Reports.BudgetBookSummary || reportType === Reports.Strategy || reportType === Reports.OperationalEnvironmentAnalysis ?
-          <>
-            {/* Class */}
-            { flattenedRows?.map((row, index) => {
-              const typedRow = row as IFlattenedBudgetBookSummaryProperties | IFlattenedOperationalEnvironmentAnalysisProperties;
-                return <Row key={typedRow.id} flattenedRow={typedRow} depth={depth} index={index} reportType={reportType} />
-              })
-            }
-          </>
-        :
-          <>
-            {/* Class */}
-            <Row row={row} depth={depth} index={index} reportType={reportType} />
-            {/* Projects for class */}
-            {row?.projects?.map((p) => (
-                <Row key={p.id} row={p} depth={depth + 1} reportType={reportType} />
-            ))}
-            {/* Iterate children recursively */}
-            {row?.children?.map((r) => (
-                <TableRow key={r.id} row={r} depth={depth + 1} reportType={reportType}/>
-            ))}
-          </>
+        {/* Class */}
+        { flattenedRows?.map((row, index) => {
+            const typedRow = row as IFlattenedBudgetBookSummaryProperties | IFlattenedOperationalEnvironmentAnalysisProperties;
+            return <Row key={typedRow.id} flattenedRow={typedRow} index={index} reportType={reportType} />
+          })
         }
       </>
   );

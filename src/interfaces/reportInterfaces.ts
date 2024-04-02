@@ -19,26 +19,6 @@ export type getForcedToFrameDataType = Promise<{
     groupRes: IGroup[];
     initialSelections: IPlanningRowSelections}>;
 
-export type getPlanningDataType = Promise<{
-  res: IProjectsResponse;
-    projects: IProject[];
-    classHierarchy: IClassHierarchy;
-    planningDistricts: {
-      districts: ILocation[];
-      year: number;
-      allLocations?: ILocation[];
-      divisions?: ILocation[];
-      subDivisions?: ILocation[];
-  } | {
-      districts: ILocation[];
-      allLocations: ILocation[];
-      divisions: ILocation[];
-      subDivisions: ILocation[];
-      year: number;
-  };
-    groupRes: IGroup[];
-    initialSelections: IPlanningRowSelections}>;
-
 export type IPlanningData = {
   res: IProjectsResponse;
   projects: IProject[];
@@ -94,7 +74,7 @@ export enum Reports {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category';
+export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category' | 'group' | 'districtPreview';
 
 export interface IBasicReportData {
   categories: IListItem[];
@@ -147,6 +127,7 @@ export interface IBudgetBookFinanceProperties {
 export interface IFlattenedBudgetBookSummaryProperties extends IBudgetBookFinanceProperties {
   id: string;
   name: string;
+  type: string;
 }
 
 export interface IStrategyTableRow extends ITableRowEssentials {

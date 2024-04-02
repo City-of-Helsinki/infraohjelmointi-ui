@@ -1,7 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType, Reports, getPlanningDataType, IPlanningData } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType, Reports, IPlanningData } from '@/interfaces/reportInterfaces';
 import { getReportData } from '@/utils/reportHelpers';
 import { CSVDownload } from 'react-csv';
 import './styles.css';
@@ -15,7 +15,7 @@ interface IDownloadCsvButtonProps {
   type: ReportType;
   categories: IListItem[];
   getForcedToFrameData: (year: number) => getForcedToFrameDataType;
-  getPlanningData: (year: number) => getPlanningDataType;
+  getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   }
 

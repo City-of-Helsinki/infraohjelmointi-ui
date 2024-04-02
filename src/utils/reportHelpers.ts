@@ -261,12 +261,16 @@ const convertToGroupValues = (projects: IProject[]) => {
   let budgetProposalCurrentYearPlus0 = 0;
   let budgetProposalCurrentYearPlus1 = 0;
   let budgetProposalCurrentYearPlus2 = 0;
+  const groupLocation: string[] = [];
 
   for (const p of projects) {
     spentBudget += parseFloat(p.spentBudget);
     budgetProposalCurrentYearPlus0 += parseFloat(p.finances.budgetProposalCurrentYearPlus0 ?? '0');
     budgetProposalCurrentYearPlus1 += parseFloat(p.finances.budgetProposalCurrentYearPlus1 ?? '0');
     budgetProposalCurrentYearPlus2 += parseFloat(p.finances.budgetProposalCurrentYearPlus2 ?? '0');
+    if (p.projectLocation && !groupLocation.some(location => location === p.projectLocation)) {
+      groupLocation.push(p.projectLocation)
+    }
   }
 
   return {
@@ -274,6 +278,7 @@ const convertToGroupValues = (projects: IProject[]) => {
     budgetProposalCurrentYearPlus0: keurToMillion(budgetProposalCurrentYearPlus0),
     budgetProposalCurrentYearPlus1: keurToMillion(budgetProposalCurrentYearPlus1),
     budgetProposalCurrentYearPlus2: keurToMillion(budgetProposalCurrentYearPlus2),
+    location: groupLocation.length === 1 ? groupLocation[0] : ""
   }
 }
 
@@ -369,10 +374,12 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
 }
 
 const getRowType = (type: string) => {
-  if (['class', 'subClass', 'masterClass', 'group', 'otherClassification', 'collectiveSubLevel'].includes(type)) {
-    return 'class'
+  if (['class', 'subClass', 'masterClass', 'otherClassification', 'collectiveSubLevel'].includes(type)) {
+    return 'class';
+  } else if (type === 'group') {
+    return 'group';
   } else {
-    return 'location'
+    return 'location';
   }
 }
 
@@ -500,9 +507,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
           costForecast: c.cells[0].plannedBudget,
           type: getRowType(c.type) as ReportTableRowType
         }
-        if (c.type !== 'group') {
-          forcedToFrameHierarchy.push(convertedClass);
-        }
+        forcedToFrameHierarchy.push(convertedClass);
       }
       return forcedToFrameHierarchy;
     }
@@ -536,7 +541,6 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
       const planningHierarchy = [];
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
-          console.log(c.costEstimateBudget)
           const startYear = getGroupStartYear(c.projectRows);
           const endYear = getGroupEndYear(c.projectRows);
           if (startYear && endYear && checkYearRange({
@@ -563,7 +567,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             parent: null,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows) : [],
-            type: 'class' as ReportTableRowType,
+            type: c.type === 'districtPreview' ? 'districtPreview' : 'class' as ReportTableRowType,
           }
           planningHierarchy.push(convertedClass);
         }
@@ -612,7 +616,7 @@ const strategyCsvRows: IStrategyTableCsvRow[] = [];
 
 const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
   tableRows.forEach((tableRow) => {
-    if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
+    if (!strategyCsvRows.some(row => row.id === tableRow.id) && tableRow.type !== 'group') {
       strategyCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,
@@ -722,6 +726,30 @@ const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalE
   return operationalEnvironmentAnalysisCsvRows;
 };
 
+const constructionProgramCsvRows: IConstructionProgramCsvRow[] = [];
+
+const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]) => {
+  tableRows.forEach((tableRow) => {
+    if (tableRow.type !== 'districtPreview' && !constructionProgramCsvRows.some(row => row.id === tableRow.id)) {
+      constructionProgramCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: tableRow.type,
+        location: tableRow.location,
+        costForecast: tableRow.costForecast,
+        startAndEnd: tableRow.startAndEnd,
+        spentBudget: tableRow.spentBudget,
+        budgetProposalCurrentYearPlus0: tableRow.budgetProposalCurrentYearPlus0,
+        budgetProposalCurrentYearPlus1: tableRow.budgetProposalCurrentYearPlus1,
+        budgetProposalCurrentYearPlus2: tableRow.budgetProposalCurrentYearPlus2,
+      });
+    }
+    processConstructionReportRows(tableRow.projects);
+    processConstructionReportRows(tableRow.children);
+  });
+  return constructionProgramCsvRows;
+}
+
 /**
  * Create a flattened version of report table rows, since the react-csv needs a one-dimensional array
  */
@@ -739,17 +767,10 @@ export const flattenStrategyTableRows = (
 ): Array<IStrategyTableCsvRow> =>
   processStrategyTableRows(tableRows).flat(Infinity);
 
-
-const flatten = (a: IConstructionProgramTableRow): Array<IConstructionProgramTableRow> => [
-  a,
-  ...a.projects,
-  ...(a.children.map(flatten) as unknown as Array<IConstructionProgramTableRow>),
-];
-
-const flattenConstructionProgramTableRows = (
+export const flattenConstructionProgramTableRows = (
   tableRows: Array<IConstructionProgramTableRow>,
-): Array<IConstructionProgramTableRow> =>
-  tableRows.map(flatten).flat(Infinity) as Array<IConstructionProgramTableRow>;
+): Array<IConstructionProgramCsvRow> =>
+  processConstructionReportRows(tableRows).flat(Infinity);
 
 export const getReportData = async (
   t: TFunction<'translation', undefined>,
@@ -791,7 +812,7 @@ export const getReportData = async (
         // Flatten rows into one dimension
         const flattenedRows = flattenConstructionProgramTableRows(reportRows as IConstructionProgramTableRow[]);
         // Transform them into csv rows
-        return flattenedRows.map((r: IConstructionProgramTableRow) => ({
+        return flattenedRows.map((r: IConstructionProgramCsvRow) => ({
           [t('target')]: r.name,
           [t('content')]: r.location,
           [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
