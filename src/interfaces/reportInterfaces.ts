@@ -19,6 +19,27 @@ export type getForcedToFrameDataType = Promise<{
     groupRes: IGroup[];
     initialSelections: IPlanningRowSelections}>;
 
+export type IPlanningData = {
+  res: IProjectsResponse;
+  projects: IProject[];
+  classHierarchy: IClassHierarchy;
+  planningDistricts: {
+    districts: ILocation[];
+    year: number;
+    allLocations?: ILocation[];
+    divisions?: ILocation[];
+    subDivisions?: ILocation[];
+  } | {
+    districts: ILocation[];
+    allLocations: ILocation[];
+    divisions: ILocation[];
+    subDivisions: ILocation[];
+    year: number;
+  };
+  groupRes: IGroup[];
+  initialSelections: IPlanningRowSelections;
+}
+
 export const reports = [
   'operationalEnvironmentAnalysis',
   'strategy',
@@ -53,14 +74,11 @@ export enum Reports {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'changePressure' | 'taeFrame' | 'category';
+export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category' | 'group' | 'districtPreview' | 'changePressure' | 'taeFrame';
 
 export interface IBasicReportData {
-  divisions: Array<ILocation>;
-  projects: Array<IProject>;
-  classes: IClassHierarchy;
-  categories?: IListItem[];
-  coordinatorRows?: IPlanningRow[];
+  categories: IListItem[];
+  rows: IPlanningRow[];
 }
 
 interface ITableRowEssentials {
@@ -109,6 +127,7 @@ export interface IBudgetBookFinanceProperties {
 export interface IFlattenedBudgetBookSummaryProperties extends IBudgetBookFinanceProperties {
   id: string;
   name: string;
+  type: string;
 }
 
 export interface IStrategyTableRow extends ITableRowEssentials {
