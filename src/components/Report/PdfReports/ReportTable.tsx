@@ -34,7 +34,7 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   reportType,
   data
 }) => {
-  const reportRows = convertToReportRows(data.rows, reportType, data.categories);
+  const reportRows = convertToReportRows(data.rows, reportType, data.categories, data.divisions);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (reportType === Reports.BudgetBookSummary || reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.ConstructionProgram) ? getFlattenedRows(reportRows as (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow)[], reportType) : [];

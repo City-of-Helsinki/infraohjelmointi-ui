@@ -141,6 +141,17 @@ export const buildPlanningTableRows = (
                   .filter((district) => district.parentClass === filteredSubClass.id)
                   .map((filteredDistrict) => ({
                     ...getRow(filteredDistrict, districtType),
+                    children: [
+                      ...getSortedGroupRows(filteredDistrict.id, districtType),
+                      ...divisions
+                        .filter((division) => division.parent === filteredDistrict.id)
+                        .map((filteredDivision) => ({
+                          ...getRow(filteredDivision, 'division'),
+                          children: [
+                            ...getSortedGroupRows(filteredDivision.id, 'division')
+                          ]
+                        }))
+                    ]
                   })),
                 ...otherClassifications
                 .filter((otherClassifications) => otherClassifications.parent === filteredSubClass.id)
@@ -219,7 +230,6 @@ export const buildPlanningTableRows = (
       return classRows;
     }
   };
-
   return getRows();
 };
 

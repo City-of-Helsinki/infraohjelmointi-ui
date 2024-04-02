@@ -6,7 +6,7 @@ import DownloadPdfButton from './DownloadPdfButton';
 import DownloadCsvButton from './DownloadCsvButton';
 import './styles.css';
 import './pdfFonts';
-import { separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
+import { selectPlanningDivisions, separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
 import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
 import { getCoordinationClasses, getPlanningClasses } from '@/services/classServices';
 import { getCoordinatorGroups, getPlanningGroups } from '@/services/groupServices';
@@ -23,6 +23,7 @@ interface IReportRowProps {
 const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const { t } = useTranslation();
   const categories = useAppSelector(selectCategories);
+  const divisions = useAppSelector(selectPlanningDivisions);
   const getForcedToFrameData = async (year: number) => {
     // projects
     const res = await getProjectsWithParams({
@@ -119,9 +120,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} />
+      <DownloadPdfButton type={type} categories={categories} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} />
       {/* download csv button */}
-      <DownloadCsvButton type={type} categories={categories} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows}/>
+      <DownloadCsvButton type={type} categories={categories} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows}/>
     </div>
   );
 };
