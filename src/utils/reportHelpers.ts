@@ -343,7 +343,7 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
       if (nameCheckPattern.test(c.name)) {
         const convertedClass: IBudgetBookSummaryTableRow = {
           id: c.id,
-          name: c.name,
+          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
           children: c.children.length && c.type !== 'districtPreview' && c.type !== 'collectiveSubLevel'  // children from the lower levels aren't needed
             ? getBudgetBookSummaryProperties(c.children)
@@ -504,7 +504,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
       for (const c of rows) {
         const convertedClass = {
           id: c.id,
-          name: c.name,
+          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
           children: c.children.length ? convertToReportRows(c.children, reportType, categories) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
@@ -520,7 +520,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
       for (const c of rows) {
         const convertedClass = {
           id: c.id,
-          name: c.name,
+          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
           children: c.children.length ? convertToReportRows(c.children, reportType, categories) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
