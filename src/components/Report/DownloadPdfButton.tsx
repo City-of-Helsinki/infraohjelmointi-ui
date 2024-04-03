@@ -13,6 +13,7 @@ import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IListItem } from '@/interfaces/common';
+import { ILocation } from '@/interfaces/locationInterfaces';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -27,18 +28,19 @@ const getPdfDocument = (
   type: ReportType,
   categories: IListItem[],
   rows: IPlanningRow[],
+  divisions: Array<ILocation>,
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis:
-      <ReportContainer data={{categories, rows}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
     strategy: (
-      <ReportContainer data={{categories, rows}} reportType={Reports.Strategy}/>
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.Strategy}/>
     ),
     constructionProgram: (
-      <ReportContainer data={{categories, rows}} reportType={Reports.ConstructionProgram}/>
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.ConstructionProgram}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{categories, rows}} reportType={Reports.BudgetBookSummary}/>
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.BudgetBookSummary}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -54,6 +56,7 @@ interface IDownloadPdfButtonProps {
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   categories: IListItem[];
+  divisions: Array<ILocation>;
 }
 
 /**
@@ -61,7 +64,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, categories }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, categories, divisions }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -80,7 +83,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, categories, coordinatorRows);
+            document = getPdfDocument(type, categories, coordinatorRows, divisions);
           }
           break;
         }
@@ -88,7 +91,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, categories, planningRows);
+            document = getPdfDocument(type, categories, planningRows, divisions);
           }
         }
       }

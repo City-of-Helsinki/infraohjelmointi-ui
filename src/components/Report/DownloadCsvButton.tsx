@@ -10,10 +10,12 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IListItem } from '@/interfaces/common';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
   categories: IListItem[];
+  divisions: Array<ILocation>;
   getForcedToFrameData: (year: number) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
@@ -26,7 +28,7 @@ const downloadIcon = <IconDownload />;
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getForcedToFrameData, getPlanningData, getPlanningRows }) => {
+const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divisions, getForcedToFrameData, getPlanningData, getPlanningRows }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
@@ -49,7 +51,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getF
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(t, type, categories, coordinatorRows));
+            setCsvData(await getReportData(t, type, categories, coordinatorRows, divisions));
           }
           break;
         }
@@ -57,7 +59,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, getF
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            setCsvData(await getReportData(t, Reports.ConstructionProgram, categories, planningRows));
+            setCsvData(await getReportData(t, Reports.ConstructionProgram, categories, planningRows, divisions));
           }
           break;
         }
