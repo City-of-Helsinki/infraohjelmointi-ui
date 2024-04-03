@@ -129,5 +129,6 @@ export const listsSlice = createSlice({
 export const selectProjectDistricts = (state: RootState) => state.lists.projectDistricts;
 export const selectProjectDivisions = (state: RootState) => state.lists.projectDivisions;
 export const selectProjectSubDivisions = (state: RootState) => state.lists.projectSubDivisions;
+export const selectCategories = (state: RootState) => state.lists.categories;
 
 export default listsSlice.reducer;

@@ -1,4 +1,4 @@
-import { IBudgetBookSummaryCsvRow, IBudgetBookSummaryTableRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IStrategyTableRow, ReportType } from '@/interfaces/reportInterfaces';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IFlattenedOperationalEnvironmentAnalysisProperties, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -26,7 +26,7 @@ const constructionProgramCommonStyles = {
   borderRight: '1px solid #808080',
 };
 
-const budgetBookSummaryCommonStyles = {
+const budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles = {
   borderLeft: '1px solid #808080',
   textAlign: 'center' as unknown as 'center',
 };
@@ -104,35 +104,35 @@ const styles = StyleSheet.create({
   // For budgetBookSummary report:
   classNameTargetCell: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     ...budgetBookSummaryNameCellCommonStyles,
     fontWeight: 'bold',
   },
   nameTargetCell: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     ...budgetBookSummaryNameCellCommonStyles
   },
   unBoldedColumns: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     width: '5%',
   },
   narrowerColumns: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     width: '5%',
     fontWeight: 'bold',
   },
   widerColumns: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     width: '7%',
     fontWeight: 'bold',
   },
   lastWiderColumn: {
     ...cellStyles,
-    ...budgetBookSummaryCommonStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
     borderRight: '1px solid #808080',
     width: '7%',
     fontWeight: 'bold',
@@ -146,6 +146,49 @@ const styles = StyleSheet.create({
     fontWeight: 'medium',
   },
 });
+
+const operationalEnvironmentAnalysisStyles = StyleSheet.create({
+  targetColumn: {
+    ...cellStyles,
+    borderLeft: '1px solid #808080',
+    width: '28.5%',
+    fontWeight: 'medium',
+  },
+  numberColumns: {
+    ...cellStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
+    width: '6.5%',
+    fontWeight: 'medium',
+  },
+  lastNumberColumn: {
+    ...cellStyles,
+    ...budgetBookSummaryOperationalEnvironmentAnalysisCommonStyles,
+    width: '6.5%',
+    borderRight: '1px solid #808080',
+    fontWeight: 'medium',
+  },
+  changePressure: {
+    color: '#0072C6',
+  },
+  frame: {
+    color: '#BD271A',
+  },
+  tae: {
+    backgroundColor: '#EFE3F6',
+  },
+  tse1: {
+    backgroundColor: '#D8E3F9',
+  },
+  tse2: {
+    backgroundColor: '#F2ECE7',
+  },
+  basicRow: {
+    color: '#000000',
+  },
+  indentation : {
+    paddingLeft: '15px',
+  }
+})
 
 const strategyReportStyles = StyleSheet.create({
   oddRow: {
@@ -216,15 +259,13 @@ const strategyReportStyles = StyleSheet.create({
   },
 });
 interface ITableRowProps {
-  row?: IConstructionProgramTableRow | IBudgetBookSummaryTableRow | IStrategyTableRow /*| another report row type */;
-  flattenedRows?: IBudgetBookSummaryCsvRow[];
-  depth: number;
+  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[] | IConstructionProgramTableRow[];
   index?: number;
   reportType: ReportType;
 }
 
 interface IRowProps extends ITableRowProps{
-  flattenedRow?: IFlattenedBudgetBookSummaryProperties;
+  flattenedRow?: IFlattenedBudgetBookSummaryProperties | IFlattenedOperationalEnvironmentAnalysisProperties;
 }
 
 const getMonthCellStyle = (monthCell: string | undefined) => {
@@ -253,13 +294,13 @@ const getRowStyle = (rowType: string, depth: number) => {
   }
 }
 
-const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }) => {
+const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
-        case 'strategy': {
+        case Reports.Strategy: {
             if (flattenedRow) {
               tableRow =
-              <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? depth)} key={flattenedRow.id}>
+              <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
                   <Text style={['class', 'location'].includes(flattenedRow.type ?? '') ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
                   <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                   <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
@@ -285,22 +326,23 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
             
             break;
         }
-        case 'constructionProgram': {
-            const constructionRow = row as IConstructionProgramTableRow;
+        case Reports.ConstructionProgram: {
+          if (flattenedRow) {
             tableRow =  
-            <View wrap={false} style={depth % 2 ? styles.evenRow : styles.oddRow} key={constructionRow.id}>
-                <Text style={constructionRow.type === 'class' ? styles.classNameCell : styles.nameCell}>{constructionRow.name}</Text>
-                <Text style={styles.divisionCell}>{constructionRow.location}</Text>
-                <Text style={styles.costForecastCell}>{constructionRow.costForecast}</Text>
-                <Text style={styles.planAndConStartCell}>{constructionRow.startAndEnd}</Text>
-                <Text style={styles.previouslyUsedCell}>{constructionRow.spentBudget}</Text>
-                <Text style={styles.cell}>{constructionRow.budgetProposalCurrentYearPlus1}</Text>
-                <Text style={styles.cell}>{constructionRow.budgetProposalCurrentYearPlus1}</Text>
-                <Text style={styles.lastCell}>{constructionRow.budgetProposalCurrentYearPlus2}</Text>
+            <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
+                <Text style={flattenedRow.type === 'class' ? styles.classNameCell : styles.nameCell}>{flattenedRow.name}</Text>
+                <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
+                <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
+                <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+                <Text style={styles.previouslyUsedCell}>{flattenedRow.spentBudget}</Text>
+                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
+                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
+                <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
             </View>
-            break;
+          }
+          break;
         }
-        case 'budgetBookSummary': {
+        case Reports.BudgetBookSummary: {
           if (flattenedRow) {
             const getStyle = () => {
               const isFourthLevelRow = /^\d \d\d \d\d \d\d/.test(flattenedRow.name);
@@ -340,7 +382,48 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
           } else {
             tableRow = <View></View>;
           }
-          
+          break;
+        }
+        case Reports.OperationalEnvironmentAnalysis: {
+          if (flattenedRow) {
+            const getNameStyle = () => {
+              if (flattenedRow.type === 'taeFrame') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
+              if (flattenedRow.type === 'changePressure') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.changePressure];
+              return [operationalEnvironmentAnalysisStyles.targetColumn];
+            }
+            
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            const nameStyle: any = getNameStyle();
+
+            const getColor = () => {
+              if (flattenedRow.type === 'taeFrame') return operationalEnvironmentAnalysisStyles.frame;
+              if (flattenedRow.type === 'changePressure') return operationalEnvironmentAnalysisStyles.changePressure;
+              return operationalEnvironmentAnalysisStyles.basicRow;
+            }
+            const color = getColor();
+
+            const shouldHaveIdentation = flattenedRow.type === 'taeFrame' || flattenedRow.type === 'changePressure' || flattenedRow.type === 'category';
+
+            if (shouldHaveIdentation) nameStyle.push(operationalEnvironmentAnalysisStyles.indentation);
+
+            tableRow =  
+              <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
+                <Text style={nameStyle}>
+                  {flattenedRow.name}
+                </Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.costForecast}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color, operationalEnvironmentAnalysisStyles.tae]}>{flattenedRow.TAE}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color, operationalEnvironmentAnalysisStyles.tse1]}>{flattenedRow.TSE1}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color, operationalEnvironmentAnalysisStyles.tse2]}>{flattenedRow.TSE2}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial1}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial2}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial3}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial4}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial5}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>{flattenedRow.initial6}</Text>
+                <Text style={[operationalEnvironmentAnalysisStyles.lastNumberColumn, color]}>{flattenedRow.initial7}</Text>
+              </View>;
+          }
           break;
         }
         default:
@@ -356,31 +439,14 @@ const Row: FC<IRowProps> = memo(({ row, flattenedRow, depth, index, reportType }
 
 Row.displayName = 'Row';
 
-const TableRow: FC<ITableRowProps> = ({ row, flattenedRows, depth, reportType, index }) => {
+const TableRow: FC<ITableRowProps> = ({ flattenedRows, reportType }) => {
   return (
       <>
-        { reportType === 'budgetBookSummary' || reportType === 'strategy' ?
-          <>
-            {/* Class */}
-            { flattenedRows?.map((row, index) => {
-              const typedRow = row as IFlattenedBudgetBookSummaryProperties;
-                return <Row key={typedRow.id} flattenedRow={typedRow} depth={depth} index={index} reportType={reportType} />
-              })
-            }
-          </>
-        :
-          <>
-            {/* Class */}
-            <Row row={row} depth={depth} index={index} reportType={reportType} />
-            {/* Projects for class */}
-            {row?.projects?.map((p) => (
-                <Row key={p.id} row={p} depth={depth + 1} reportType={reportType} />
-            ))}
-            {/* Iterate children recursively */}
-            {row?.children?.map((r) => (
-                <TableRow key={r.id} row={r} depth={depth + 1} reportType={reportType}/>
-            ))}
-          </>
+        {/* Class */}
+        { flattenedRows?.map((row, index) => {
+            const typedRow = row as IFlattenedBudgetBookSummaryProperties | IFlattenedOperationalEnvironmentAnalysisProperties;
+            return <Row key={typedRow.id} flattenedRow={typedRow} index={index} reportType={reportType} />
+          })
         }
       </>
   );

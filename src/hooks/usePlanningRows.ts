@@ -57,7 +57,7 @@ const sortLocationsByName = (list: Array<ILocation>) =>
  * @param state the current state of the planningRows-hook
  * @returns a list of planning rows for the planning table
  */
-const buildPlanningTableRows = (
+export const buildPlanningTableRows = (
   list: IPlanningRowList,
   projects: Array<IProject>,
   selections: IPlanningRowSelections,
@@ -141,6 +141,17 @@ const buildPlanningTableRows = (
                   .filter((district) => district.parentClass === filteredSubClass.id)
                   .map((filteredDistrict) => ({
                     ...getRow(filteredDistrict, districtType),
+                    children: [
+                      ...getSortedGroupRows(filteredDistrict.id, districtType),
+                      ...divisions
+                        .filter((division) => division.parent === filteredDistrict.id)
+                        .map((filteredDivision) => ({
+                          ...getRow(filteredDivision, 'division'),
+                          children: [
+                            ...getSortedGroupRows(filteredDivision.id, 'division')
+                          ]
+                        }))
+                    ]
                   })),
                 ...otherClassifications
                 .filter((otherClassifications) => otherClassifications.parent === filteredSubClass.id)
@@ -219,7 +230,6 @@ const buildPlanningTableRows = (
       return classRows;
     }
   };
-
   return getRows();
 };
 

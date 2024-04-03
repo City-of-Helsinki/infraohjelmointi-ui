@@ -96,7 +96,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           <TextAreaField
             {...getFieldProps('description')}
             size="l"
-            rules={validateRequired('description', t)}
+            rules={{...validateMaxLength(1000,t), ...validateRequired('description', t)}}
             formSaved={isSaving}
           />
         </div>

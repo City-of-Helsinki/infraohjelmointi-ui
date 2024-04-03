@@ -1,21 +1,19 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReportType, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
+import { IPlanningData, ReportType, Reports, getForcedToFrameDataType  } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
-import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
-import { getProjectsWithParams } from '@/services/projectServices';
-import { IProject } from '@/interfaces/projectInterfaces';
 import './pdfFonts';
 import './styles.css';
-import { ILocation } from '@/interfaces/locationInterfaces';
 import ReportContainer from './PdfReports/ReportContainer';
 import { useAppDispatch } from '@/hooks/common';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { IListItem } from '@/interfaces/common';
+import { ILocation } from '@/interfaces/locationInterfaces';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -28,21 +26,21 @@ const EmptyDocument = () => (
 
 const getPdfDocument = (
   type: ReportType,
+  categories: IListItem[],
+  rows: IPlanningRow[],
   divisions: Array<ILocation>,
-  classes: IClassHierarchy,
-  projects: Array<IProject>,
-  coordinatorRows?: IPlanningRow[],
 ) => {
   const pdfDocument = {
-    budgetProposal: <EmptyDocument />,
+    operationalEnvironmentAnalysis:
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
     strategy: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects, coordinatorRows: coordinatorRows}} reportType={'strategy'}/>
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.Strategy}/>
     ),
     constructionProgram: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects: projects}} reportType={'constructionProgram'}/>
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.ConstructionProgram}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{divisions: divisions, classes: classes, projects:[], coordinatorRows}} reportType={'budgetBookSummary'}/>
+      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.BudgetBookSummary}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -55,9 +53,10 @@ const downloadIcon = <IconDownload />;
 interface IDownloadPdfButtonProps {
   type: ReportType;
   getForcedToFrameData: (year: number) => getForcedToFrameDataType;
+  getPlanningData: (year: number) => Promise<IPlanningData>;
+  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
+  categories: IListItem[];
   divisions: Array<ILocation>;
-  classes: IClassHierarchy;
-  forcedToFrameClasses: ICoordinatorClassHierarchy;
 }
 
 /**
@@ -65,7 +64,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, divisions, classes, forcedToFrameClasses }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, categories, divisions }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -78,25 +77,21 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
 
       let document: JSX.Element | undefined = undefined;
       switch(type) {
-        case 'budgetBookSummary':
-        case 'strategy': {
+        case Reports.Strategy:
+        case Reports.BudgetBookSummary: 
+        case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, divisions, forcedToFrameClasses, res.res.results, coordinatorRows);
+            document = getPdfDocument(type, categories, coordinatorRows, divisions);
           }
           break;
         }
-        default: {
-          const res = await getProjectsWithParams({
-            direct: false,
-            programmed: false,
-            params: 'overMillion=true',
-            forcedToFrame: false,
-            year,
-          });
-          if (res.results.length > 0) {
-            document = getPdfDocument(type, divisions, classes, res.results);
+        case Reports.ConstructionProgram: {
+          const res = await getPlanningData(year);
+          if (res && res.projects.length > 0) {
+            const planningRows = getPlanningRows(res);
+            document = getPdfDocument(type, categories, planningRows, divisions);
           }
         }
       }
@@ -110,13 +105,13 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
     } finally {
       dispatch(clearLoading(LOADING_PDF_DATA));
     }
-  }, [classes, documentName, divisions, type]);
+  }, [documentName, type]);
 
   return (
     <Button
       iconLeft={downloadIcon}
       onClick={() => downloadPdf()}
-      disabled={type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'strategy'}
+      disabled={type === Reports.FinancialStatement}
     >
       {t('downloadPdf', { name: documentName })}
     </Button>

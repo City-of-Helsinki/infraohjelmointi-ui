@@ -1,22 +1,24 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType } from '@/interfaces/reportInterfaces';
-import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
-import { ILocation } from '@/interfaces/locationInterfaces';
+import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType, Reports, IPlanningData } from '@/interfaces/reportInterfaces';
 import { getReportData } from '@/utils/reportHelpers';
 import { CSVDownload } from 'react-csv';
 import './styles.css';
 import { useAppDispatch } from '@/hooks/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
+import { IListItem } from '@/interfaces/common';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
-  getForcedToFrameData: (year: number) => getForcedToFrameDataType;
+  categories: IListItem[];
   divisions: Array<ILocation>;
-  classes: IClassHierarchy;
-  forcedToFrameClasses: ICoordinatorClassHierarchy;
+  getForcedToFrameData: (year: number) => getForcedToFrameDataType;
+  getPlanningData: (year: number) => Promise<IPlanningData>;
+  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   }
 
 const downloadIcon = <IconDownload />;
@@ -26,7 +28,7 @@ const downloadIcon = <IconDownload />;
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrameData, divisions, classes, forcedToFrameClasses }) => {
+const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divisions, getForcedToFrameData, getPlanningData, getPlanningRows }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
@@ -39,25 +41,29 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
     }
   }, [csvData]);
 
-  const getCsvData = useCallback(async () => {
+  const getCsvData = useCallback(async (categories: IListItem[]) => {
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
-        case 'constructionProgram':
-          setCsvData(await getReportData(classes, divisions, t, 'constructionProgram'));
-          break;
-        case 'budgetBookSummary':
-        case 'strategy': {
+        case Reports.BudgetBookSummary:
+        case Reports.Strategy:
+        case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(forcedToFrameClasses, divisions, t, type, coordinatorRows));
+            setCsvData(await getReportData(t, type, categories, coordinatorRows, divisions));
+          }
+          break;
+        }
+        case Reports.ConstructionProgram: {
+          const res = await getPlanningData(year);
+          if (res && res.projects.length > 0) {
+            const planningRows = getPlanningRows(res);
+            setCsvData(await getReportData(t, Reports.ConstructionProgram, categories, planningRows, divisions));
           }
           break;
         }
         default:
-          // In the MVP stage we only had time to implement the construction program report, the other
-          // report cases should come here
           break;
       }
     } catch (e) {
@@ -73,8 +79,8 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
         <Button
           iconLeft={downloadIcon}
           variant="secondary"
-          onClick={getCsvData}
-          disabled={(type !== 'constructionProgram' && type !== 'budgetBookSummary' && type !== 'strategy')}
+          onClick={() => getCsvData(categories)}
+          disabled={(type === Reports.FinancialStatement)}
         >
           {t('downloadCsv', { name: t(`report.${type}.documentName`) })}
         </Button>
