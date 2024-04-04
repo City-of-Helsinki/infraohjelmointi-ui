@@ -548,9 +548,13 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
         // TA parts that don't have any planned budgets shouldn't be shown on the report
         if (plannedBudgets.some((value) => value !== "0")) {
           forcedToFrameHierarchy.push(convertedClass);
-
-          // If the class is on the fourth level, we want to add some extra rows there
-          if (/^\d \d\d \d\d \d\d/.test(c.name)) {
+          const isClassWithoutChildren = c.children.length === 0 && c.type === 'class';
+          /* 
+            If the class is on the fourth level, we want to add some extra rows there.
+            If the class is on a higher level and it doesn't contain children, it might have projects
+            that aren't under any subClass so we need to take that into account as well (isClassWithoutChildren)
+          */
+          if (c.type === 'subClass' || /^\d \d\d \d\d \d\d/.test(c.name) || isClassWithoutChildren) {
             const extraRows = getExtraRows(c, categories);
             extraRows.forEach((row) =>
               forcedToFrameHierarchy.push(row)
