@@ -536,7 +536,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
           children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions) : [],
-          projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+          projects: [],
           frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "frameBudget"),
           plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "plannedBudget"),
           costForecast: c.cells[0].plannedBudget,
