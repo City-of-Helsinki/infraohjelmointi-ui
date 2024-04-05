@@ -16,7 +16,7 @@ interface IDownloadCsvButtonProps {
   type: ReportType;
   categories: IListItem[];
   divisions: Array<ILocation>;
-  getForcedToFrameData: (year: number) => getForcedToFrameDataType;
+  getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   }
@@ -46,9 +46,16 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divi
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
         case Reports.BudgetBookSummary:
-        case Reports.Strategy:
+        case Reports.Strategy: {
+          const res = await getForcedToFrameData(year, true);
+          if (res && res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            setCsvData(await getReportData(t, type, categories, coordinatorRows, divisions));
+          }
+          break;
+        }
         case Reports.OperationalEnvironmentAnalysis: {
-          const res = await getForcedToFrameData(year);
+          const res = await getForcedToFrameData(year, false);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
             setCsvData(await getReportData(t, type, categories, coordinatorRows, divisions));
