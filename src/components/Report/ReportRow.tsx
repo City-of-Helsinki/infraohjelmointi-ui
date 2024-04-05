@@ -24,26 +24,26 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const { t } = useTranslation();
   const categories = useAppSelector(selectCategories);
   const divisions = useAppSelector(selectPlanningDivisions);
-  const getForcedToFrameData = async (year: number) => {
+  const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
     // projects
     const res = await getProjectsWithParams({
       direct: false,
       programmed: false,
-      forcedToFrame: true,
+      forcedToFrame: forcedToFrame,
       year: year,
     }, true);
     const projects = res.results;
 
     // classes
     const classRes = await getCoordinationClasses({
-      forcedToFrame: true,
+      forcedToFrame: forcedToFrame,
       year: year ,
     });
     const classHierarchy = separateClassesIntoHierarchy(classRes, true) as ICoordinatorClassHierarchy;
 
     // districts
     const locationRes = await getCoordinatorLocations({
-      forcedToFrame: true,
+      forcedToFrame: forcedToFrame,
       year: year,
     });
     const forcedToFrameDistricts = separateLocationsIntoHierarchy(locationRes, true);
