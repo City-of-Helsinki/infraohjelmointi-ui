@@ -545,7 +545,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
         }
 
         const plannedBudgets = Object.values(convertedClass.plannedBudgets);
-        const isSomeLevelofClass = c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass';
+        const isSomeLevelofClass = c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass';
         // TA parts that don't have any planned budgets shouldn't be shown on the report. There shouldn't either be other rows than classes from some of the levels.
         if (isSomeLevelofClass && plannedBudgets.some((value) => value !== "0")) {
           forcedToFrameHierarchy.push(convertedClass);
