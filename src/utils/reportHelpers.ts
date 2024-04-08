@@ -536,7 +536,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
           children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions) : [],
-          projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+          projects: [],
           frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "frameBudget"),
           plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "plannedBudget"),
           costForecast: c.cells[0].plannedBudget,
@@ -545,12 +545,23 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
         }
 
         const plannedBudgets = Object.values(convertedClass.plannedBudgets);
-        // TA parts that don't have any planned budgets shouldn't be shown on the report
-        if (plannedBudgets.some((value) => value !== "0")) {
+        const isSomeLevelofClass = c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass';
+        // TA parts that don't have any planned budgets shouldn't be shown on the report. There shouldn't either be other rows than classes from some of the levels.
+        if (isSomeLevelofClass && plannedBudgets.some((value) => value !== "0")) {
           forcedToFrameHierarchy.push(convertedClass);
 
-          // If the class is on the fourth level, we want to add some extra rows there
-          if (/^\d \d\d \d\d \d\d/.test(c.name)) {
+          const noneOfTheChildrenIsSubClass =
+            c.type === 'class' && c.children.length > 0 && c.children.some((child) => child.type !== 'subClass');
+
+          const isClassWithoutChildren = c.children.length === 0 && c.type === 'class';
+          /* 
+            In general: if the class is on the fourth level, we want to add some extra rows there.
+            isClassWithoutChildren: if the class is on a higher level and it doesn't contain children, it might have projects
+            that aren't under any subClass so we need to take that into account as well
+            noneOfTheChildrenIsSubClass: there might be classes with only a group under them
+          */
+
+          if (c.type === 'subClass' || /^\d \d\d \d\d \d\d/.test(c.name) || isClassWithoutChildren || noneOfTheChildrenIsSubClass) {
             const extraRows = getExtraRows(c, categories);
             extraRows.forEach((row) =>
               forcedToFrameHierarchy.push(row)

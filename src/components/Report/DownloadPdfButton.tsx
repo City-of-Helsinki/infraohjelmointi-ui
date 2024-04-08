@@ -52,7 +52,7 @@ const downloadIcon = <IconDownload />;
 
 interface IDownloadPdfButtonProps {
   type: ReportType;
-  getForcedToFrameData: (year: number) => getForcedToFrameDataType;
+  getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   categories: IListItem[];
@@ -78,9 +78,16 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
       let document: JSX.Element | undefined = undefined;
       switch(type) {
         case Reports.Strategy:
-        case Reports.BudgetBookSummary: 
+        case Reports.BudgetBookSummary: {
+          const res = await getForcedToFrameData(year, true);
+          if (res && res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
+            document = getPdfDocument(type, categories, coordinatorRows, divisions);
+          }
+          break;
+        }
         case Reports.OperationalEnvironmentAnalysis: {
-          const res = await getForcedToFrameData(year);
+          const res = await getForcedToFrameData(year, false);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
             document = getPdfDocument(type, categories, coordinatorRows, divisions);
