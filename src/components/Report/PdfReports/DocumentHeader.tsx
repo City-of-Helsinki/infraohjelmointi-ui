@@ -59,10 +59,10 @@ const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, reportType, subtitleO
         <View>
           <Text style={styles.extraTableHeader}>
             {t('report.operationalEnvironmentAnalysis.tableTitle', {
-              startYear: new Date().getFullYear(),
-              financialPlanStartYear: new Date().getFullYear() + 1,
-              financialPlanEndYear: new Date().getFullYear() + 2,
-              investmentProgramStartYear: new Date().getFullYear() + 3,
+              startYear: new Date().getFullYear() + 1,
+              financialPlanStartYear: new Date().getFullYear() + 2,
+              financialPlanEndYear: new Date().getFullYear() + 3,
+              investmentProgramStartYear: new Date().getFullYear() + 4,
               investmentProgramEndYear: new Date().getFullYear() + 10,
             })}  
           </Text>
