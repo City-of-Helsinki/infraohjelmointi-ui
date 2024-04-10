@@ -4,7 +4,6 @@ import { useOptions } from '@/hooks/useOptions';
 import { Control } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
-import { useTranslation } from 'react-i18next';
 
 interface IProjectLocationSectionProps {
   getFieldProps: (name: string) => {
@@ -24,7 +23,6 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
   locationOptions,
   isInputDisabled,
 }) => {
-  const { t } = useTranslation();
 
   const { districts, divisions, subDivisions } = locationOptions;
 
@@ -38,9 +36,6 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
           <SelectField
             {...getFieldProps('responsibleZone')}
             options={responsibleZones}
-            rules={{
-              required: t('validation.required', { field: 'Alueen vastuujaon mukaan' }) ?? '',
-            }}
             size="full"
             disabled={isInputDisabled}
           />
