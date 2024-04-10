@@ -1,3 +1,4 @@
+import { IListItem } from '@/interfaces/common';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
@@ -40,7 +41,7 @@ export const getConstructionPhaseDetails = async () => {
   }
 };
 
-export const getProjectCategories = async () => {
+export const getProjectCategories = async (): Promise<IListItem[]> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-categories/`);
     return res.data;

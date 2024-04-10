@@ -227,7 +227,7 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
     }));
 }
 
-const convertToConstructionReportProjects = (projects: IProject[], divisions: Array<ILocation>): IConstructionProgramTableRow[] => {
+const convertToConstructionReportProjects = (projects: IProject[], divisions: Array<ILocation> | undefined): IConstructionProgramTableRow[] => {
   return projects
   .filter((p) => 
     p.planningStartYear && p.constructionEndYear &&
@@ -256,7 +256,7 @@ const convertToConstructionReportProjects = (projects: IProject[], divisions: Ar
   }));
 }
 
-const convertToGroupValues = (projects: IProject[], divisions: Array<ILocation>) => {
+const convertToGroupValues = (projects: IProject[], divisions: Array<ILocation> | undefined) => {
   let spentBudget = 0;
   let budgetProposalCurrentYearPlus0 = 0;
   let budgetProposalCurrentYearPlus1 = 0;
@@ -504,7 +504,7 @@ const getGroupEndYear = (projects: IProject[]) => {
   return latestConstructionEndYear;
 }
 
-export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined, divisions: Array<ILocation>): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined, divisions: Array<ILocation> | undefined): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
@@ -809,9 +809,9 @@ export const flattenConstructionProgramTableRows = (
 export const getReportData = async (
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
-  categories: IListItem[],
   rows: IPlanningRow[],
-  divisions: Array<ILocation>,
+  divisions?: Array<ILocation>,
+  categories?: IListItem[],
 ): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow> | Array<IStrategyTableCsvRow> | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
   const year = new Date().getFullYear();
   const previousYear = year - 1;
