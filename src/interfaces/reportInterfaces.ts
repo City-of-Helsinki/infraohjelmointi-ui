@@ -79,7 +79,7 @@ export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'locat
 export interface IBasicReportData {
   categories?: IListItem[];
   rows: IPlanningRow[];
-  divisions: Array<ILocation>;
+  divisions?: Array<ILocation>;
 }
 
 interface ITableRowEssentials {

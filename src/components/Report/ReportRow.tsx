@@ -6,13 +6,12 @@ import DownloadPdfButton from './DownloadPdfButton';
 import DownloadCsvButton from './DownloadCsvButton';
 import './styles.css';
 import './pdfFonts';
-import { selectPlanningDivisions, separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
+import { separateLocationsIntoHierarchy } from '@/reducers/locationSlice';
 import { IPlanningRowSelections } from '@/interfaces/planningInterfaces';
 import { getCoordinationClasses, getPlanningClasses } from '@/services/classServices';
 import { getCoordinatorGroups, getPlanningGroups } from '@/services/groupServices';
 import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { useAppSelector } from '@/hooks/common';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
 import { getProjectCategories } from '@/services/listServices';
 
@@ -22,7 +21,6 @@ interface IReportRowProps {
 
 const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const { t } = useTranslation();
-  const divisions = useAppSelector(selectPlanningDivisions);
 
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
     // projects
@@ -126,9 +124,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories} />
+      <DownloadPdfButton type={type} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories} />
       {/* download csv button */}
-      <DownloadCsvButton type={type} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories}/>
+      <DownloadCsvButton type={type} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories}/>
     </div>
   );
 };

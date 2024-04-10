@@ -1,5 +1,5 @@
 import { Button, IconDownload } from 'hds-react';
-import { FC, memo, useCallback, useEffect, useState } from 'react';
+import { FC, memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IBudgetBookSummaryCsvRow, IConstructionProgramCsvRow, ReportType, getForcedToFrameDataType, Reports, IPlanningData } from '@/interfaces/reportInterfaces';
 import { getReportData } from '@/utils/reportHelpers';
@@ -8,13 +8,10 @@ import './styles.css';
 import { useAppDispatch } from '@/hooks/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
-import { IListItem } from '@/interfaces/common';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
-import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
-  divisions: Array<ILocation>;
   getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
@@ -28,7 +25,7 @@ const downloadIcon = <IconDownload />;
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, getForcedToFrameData, getPlanningData, getPlanningRows, getCategories }) => {
+const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, getCategories }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
@@ -50,7 +47,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, getFo
           const res = await getForcedToFrameData(year, true);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(t, type, coordinatorRows, divisions));
+            setCsvData(await getReportData(t, type, coordinatorRows));
           }
           break;
         }
@@ -59,7 +56,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, getFo
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(t, type, coordinatorRows, divisions, categories));
+            setCsvData(await getReportData(t, type, coordinatorRows, undefined, categories));
           }
           break;
         }
@@ -67,7 +64,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, getFo
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, divisions));
+            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, res.planningDistricts.divisions));
           }
           break;
         }

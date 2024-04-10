@@ -27,20 +27,20 @@ const EmptyDocument = () => (
 const getPdfDocument = (
   type: ReportType,
   rows: IPlanningRow[],
-  divisions: Array<ILocation>,
+  divisions?: Array<ILocation>,
   categories?: IListItem[],
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis:
-      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
+      <ReportContainer data={{categories, rows}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
     strategy: (
-      <ReportContainer data={{rows, divisions}} reportType={Reports.Strategy}/>
+      <ReportContainer data={{rows}} reportType={Reports.Strategy}/>
     ),
     constructionProgram: (
       <ReportContainer data={{rows, divisions}} reportType={Reports.ConstructionProgram}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{rows, divisions}} reportType={Reports.BudgetBookSummary}/>
+      <ReportContainer data={{rows}} reportType={Reports.BudgetBookSummary}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -56,7 +56,6 @@ interface IDownloadPdfButtonProps {
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   getCategories: () => Promise<any>;
-  divisions: Array<ILocation>;
 }
 
 /**
@@ -64,7 +63,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, getCategories, divisions }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, getCategories }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -82,7 +81,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const res = await getForcedToFrameData(year, true);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, coordinatorRows, divisions);
+            document = getPdfDocument(type, coordinatorRows);
           }
           break;
         }
@@ -91,7 +90,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, coordinatorRows, divisions, categories);
+            document = getPdfDocument(type, coordinatorRows, undefined, categories);
           }
           break;
         }
@@ -99,7 +98,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, planningRows, divisions);
+            document = getPdfDocument(type, planningRows, res.planningDistricts.divisions);
           }
         }
       }
