@@ -55,7 +55,7 @@ interface IDownloadPdfButtonProps {
   getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
-  getCategories: () => Promise<any>;
+  getCategories: () => Promise<IListItem[]>;
 }
 
 /**

@@ -9,13 +9,14 @@ import { useAppDispatch } from '@/hooks/common';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import { IListItem } from '@/interfaces/common';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
   getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
-  getCategories: () => Promise<any>;
+  getCategories: () => Promise<IListItem[]>;
   }
 
 const downloadIcon = <IconDownload />;

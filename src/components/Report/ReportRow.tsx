@@ -14,6 +14,7 @@ import { getCoordinatorLocations, getPlanningLocations } from '@/services/locati
 import { getProjectsWithParams } from '@/services/projectServices';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
 import { getProjectCategories } from '@/services/listServices';
+import { IListItem } from '@/interfaces/common';
 
 interface IReportRowProps {
   type: ReportType;
@@ -63,7 +64,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     return { res, projects, classHierarchy, forcedToFrameDistricts, groupRes, initialSelections }
   }
 
-  const getCategories = async () => {
+  const getCategories = async (): Promise<IListItem[]> => {
     const categories = await getProjectCategories();
     return categories;
   }
