@@ -809,9 +809,9 @@ export const flattenConstructionProgramTableRows = (
 export const getReportData = async (
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
-  categories: IListItem[],
   rows: IPlanningRow[],
   divisions: Array<ILocation>,
+  categories?: IListItem[],
 ): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow> | Array<IStrategyTableCsvRow> | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
   const year = new Date().getFullYear();
   const previousYear = year - 1;

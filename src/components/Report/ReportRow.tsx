@@ -13,8 +13,8 @@ import { getCoordinatorGroups, getPlanningGroups } from '@/services/groupService
 import { getCoordinatorLocations, getPlanningLocations } from '@/services/locationServices';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { useAppSelector } from '@/hooks/common';
-import { selectCategories } from '@/reducers/listsSlice';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
+import { getProjectCategories } from '@/services/listServices';
 
 interface IReportRowProps {
   type: ReportType;
@@ -22,8 +22,8 @@ interface IReportRowProps {
 
 const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const { t } = useTranslation();
-  const categories = useAppSelector(selectCategories);
   const divisions = useAppSelector(selectPlanningDivisions);
+
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
     // projects
     const res = await getProjectsWithParams({
@@ -61,7 +61,13 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       selectedSubLevelDistrict: null,
       selectedOtherClassification: null
     }
+
     return { res, projects, classHierarchy, forcedToFrameDistricts, groupRes, initialSelections }
+  }
+
+  const getCategories = async () => {
+    const categories = await getProjectCategories();
+    return categories;
   }
 
   const getPlanningData = async (year: number) => {
@@ -120,9 +126,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
         {t(`report.${type}.rowTitle`)}
       </h3>
       {/* download pdf button */}
-      <DownloadPdfButton type={type} categories={categories} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} />
+      <DownloadPdfButton type={type} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories} />
       {/* download csv button */}
-      <DownloadCsvButton type={type} categories={categories} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows}/>
+      <DownloadCsvButton type={type} divisions={divisions} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories}/>
     </div>
   );
 };

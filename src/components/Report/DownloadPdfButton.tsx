@@ -26,21 +26,21 @@ const EmptyDocument = () => (
 
 const getPdfDocument = (
   type: ReportType,
-  categories: IListItem[],
   rows: IPlanningRow[],
   divisions: Array<ILocation>,
+  categories?: IListItem[],
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis:
       <ReportContainer data={{categories, rows, divisions}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
     strategy: (
-      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.Strategy}/>
+      <ReportContainer data={{rows, divisions}} reportType={Reports.Strategy}/>
     ),
     constructionProgram: (
-      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.ConstructionProgram}/>
+      <ReportContainer data={{rows, divisions}} reportType={Reports.ConstructionProgram}/>
     ),
     budgetBookSummary: (
-      <ReportContainer data={{categories, rows, divisions}} reportType={Reports.BudgetBookSummary}/>
+      <ReportContainer data={{rows, divisions}} reportType={Reports.BudgetBookSummary}/>
     ),
     financialStatement: <EmptyDocument />,
   };
@@ -55,7 +55,7 @@ interface IDownloadPdfButtonProps {
   getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
-  categories: IListItem[];
+  getCategories: () => Promise<any>;
   divisions: Array<ILocation>;
 }
 
@@ -64,7 +64,7 @@ interface IDownloadPdfButtonProps {
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, categories, divisions }) => {
+const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, getCategories, divisions }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
@@ -82,15 +82,16 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const res = await getForcedToFrameData(year, true);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, categories, coordinatorRows, divisions);
+            document = getPdfDocument(type, coordinatorRows, divisions);
           }
           break;
         }
         case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year, false);
-          if (res && res.projects.length > 0) {
+          const categories = await getCategories();
+          if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, categories, coordinatorRows, divisions);
+            document = getPdfDocument(type, coordinatorRows, divisions, categories);
           }
           break;
         }
@@ -98,7 +99,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, categories, planningRows, divisions);
+            document = getPdfDocument(type, planningRows, divisions);
           }
         }
       }

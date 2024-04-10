@@ -14,11 +14,11 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
-  categories: IListItem[];
   divisions: Array<ILocation>;
   getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
+  getCategories: () => Promise<any>;
   }
 
 const downloadIcon = <IconDownload />;
@@ -28,7 +28,7 @@ const downloadIcon = <IconDownload />;
  *
  * The styles are a bit funky since pdf-react doesn't support grid or table.
  */
-const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divisions, getForcedToFrameData, getPlanningData, getPlanningRows }) => {
+const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, divisions, getForcedToFrameData, getPlanningData, getPlanningRows, getCategories }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const [csvData, setCsvData] = useState<Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>>([]);
@@ -41,7 +41,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divi
     }
   }, [csvData]);
 
-  const getCsvData = useCallback(async (categories: IListItem[]) => {
+  const getCsvData = async () => {
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
       switch (type) {
@@ -50,15 +50,16 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divi
           const res = await getForcedToFrameData(year, true);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(t, type, categories, coordinatorRows, divisions));
+            setCsvData(await getReportData(t, type, coordinatorRows, divisions));
           }
           break;
         }
         case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year, false);
-          if (res && res.projects.length > 0) {
+          const categories = await getCategories();
+          if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(t, type, categories, coordinatorRows, divisions));
+            setCsvData(await getReportData(t, type, coordinatorRows, divisions, categories));
           }
           break;
         }
@@ -66,7 +67,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divi
           const res = await getPlanningData(year);
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            setCsvData(await getReportData(t, Reports.ConstructionProgram, categories, planningRows, divisions));
+            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, divisions));
           }
           break;
         }
@@ -78,7 +79,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divi
     } finally {
       dispatch(clearLoading(LOADING_CSV_DATA));
     }
-  }, []);
+  };
 
   return (
     <>
@@ -86,7 +87,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, categories, divi
         <Button
           iconLeft={downloadIcon}
           variant="secondary"
-          onClick={() => getCsvData(categories)}
+          onClick={() => getCsvData()}
           disabled={(type === Reports.FinancialStatement)}
         >
           {t('downloadCsv', { name: t(`report.${type}.documentName`) })}
