@@ -3,20 +3,13 @@ import { reports } from '@/interfaces/reportInterfaces';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import './styles.css';
-import { selectIsPlanningLoading, setStartYear } from '@/reducers/planningSlice';
+import { selectIsPlanningLoading } from '@/reducers/planningSlice';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { useEffect } from 'react';
 
 const ReportsView = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  
-  const year = new Date().getFullYear();
-  useEffect(() => {
-    // Set the timeline to the current year so that the correct year's data is passed to the reports
-    dispatch(setStartYear(year))
-  }, [])
-
   const isPlanningLoading = useAppSelector(selectIsPlanningLoading);
   const LOADING_DATA_ID = 'loading-data';
 

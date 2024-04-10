@@ -77,9 +77,9 @@ export type ReportType = (typeof reports)[number];
 export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category' | 'group' | 'districtPreview' | 'changePressure' | 'taeFrame' | 'division';
 
 export interface IBasicReportData {
-  categories: IListItem[];
+  categories?: IListItem[];
   rows: IPlanningRow[];
-  divisions: Array<ILocation>;
+  divisions?: Array<ILocation>;
 }
 
 interface ITableRowEssentials {
