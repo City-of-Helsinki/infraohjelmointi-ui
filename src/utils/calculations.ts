@@ -40,7 +40,7 @@ export const calculatePlanningRowSums = (
   const budgets = Object.values(rest).reduce(
     (budgets: { sumOfPlannedBudgets: number; sumOfFrameBudgets: number }, finance) => {
       budgets.sumOfPlannedBudgets += finance.plannedBudget;
-      budgets.sumOfFrameBudgets += finance.plannedBudget;
+      budgets.sumOfFrameBudgets += finance.frameBudget;
       return budgets;
     },
     { sumOfPlannedBudgets: 0, sumOfFrameBudgets: 0 },
