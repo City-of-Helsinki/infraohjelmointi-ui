@@ -54,10 +54,11 @@ export const postProject = async (request: IProjectPostRequestObject): Promise<I
 
 export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResults> => {
   try {
-    const res = await axios.get(
-      req.fullPath ||
-        `${REACT_APP_API_URL}/projects/search-results/?${req.params}&limit=${req.limit}&order=${req.order}`,
-    );
+    const endOfFullPath = req.fullPath?.split("/projects")[1];
+    const url = endOfFullPath
+      ? `${REACT_APP_API_URL}/projects${endOfFullPath}`
+      : `${REACT_APP_API_URL}/projects/search-results/?${req.params}&limit=${req.limit}&order=${req.order}`;
+    const res = await axios.get(url);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
