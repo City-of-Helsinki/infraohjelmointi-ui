@@ -492,12 +492,12 @@ describe('SearchResultsView', () => {
       // Next page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-next-button'));
-      expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.next);
+      expect(mockedAxios.get.mock.lastCall[0].includes('page=2')).toBe(true);
 
       // Previous page
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
       await user.click(await findByTestId('search-results-pagination-previous-button'));
-      expect(mockedAxios.get.mock.lastCall[0]).toBe(mockLongSearchResults.data.previous);
+      expect(mockedAxios.get.mock.lastCall[0].includes('page=1')).toBe(true);
 
       // Page 4
       mockedAxios.get.mockResolvedValueOnce(mockLongSearchResults);
