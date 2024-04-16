@@ -17,6 +17,7 @@ import useLocationOptions from '@/hooks/useLocationOptions';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 import _ from 'lodash';
+import { selectProjectUpdate } from '@/reducers/eventsSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -172,7 +173,8 @@ const useProjectFormValues = () => {
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectForm = () => {
-  const { formValues, project, classes, subClasses, masterClasses, districts, divisions, subDivisions } = useProjectFormValues();
+  const projectUpdate = useAppSelector(selectProjectUpdate);
+  const { formValues, project } = useProjectFormValues();
   const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -259,23 +261,16 @@ const useProjectForm = () => {
 
   // Updates form with the selectedProject from redux
   useEffect(() => {
-    const currentState = getValues();
-    const inComingState = formValues;
-    const sameValuesInStates = _.isEqual(currentState, inComingState);
-    const nameExists = formValues.name.trim() !== '' && formValues.name.match(/[a-z]/i);
-     /* 
-      If a project is edited, the if sentence should be accessed only when the current and incoming states are the same and 
-      if a project is created the if sentence should be accessed only if the name exists in both states (because name is a
-      mandatory property). These conditions are necessary because if a user is creating or editing a project and some other
-      user is updating budgets of the projects, the project form will be affected of that (because of the finance-update) and
-      the data in it will be lost (in a new project the whole form will become blank and when editing a project, the edited fields
-      will have the unedited values).
+    const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project.id;
+    /* 
+      Finance-update and project-update cause problems to the project form. If the budgets of some project are updated
+      in the programming view and some user has a project form open, the values of the form will always be updated and for
+      that reason we need to check if the project in projectUpdate is the same as the one that is opened.
     */
-    if ((sameValuesInStates && project) || (nameExists && projectMode === 'new')) {
+    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject)) {
       reset(formValues);
     }
-  }, [project, projectMode, classes, subClasses, masterClasses, districts, divisions, subDivisions, reset, formValues]);
-
+  }, [project, projectUpdate]);
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
 
