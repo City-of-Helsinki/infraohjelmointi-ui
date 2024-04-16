@@ -266,14 +266,17 @@ const useProjectForm = () => {
     const currentState = getValues();
     const inComingState = formValues;
     const sameValuesInStates = _.isEqual(currentState, inComingState);
+    const nameExists = formValues.name.trim() !== '' && formValues.name.match(/[a-z]/i);
     const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project.id;
     /* 
       Finance-update and project-update cause problems to the project form. If the budgets of some project are updated
       in the programming view and some user has a project form open, the values of the form will always be updated and for
       that reason we need to check if the project in projectUpdate is the same as the one that is opened and for the notification
       to work properly it's necessary to check the states also.
+
+      The 'new' mode must be checked also, otherwise the project creation doesn't seem to go through in the UI even though it does.
     */
-    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates)) {
+    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates) || (nameExists && projectMode === 'new')) {
       reset(formValues);
       dispatch(notifyInfo({ title: 'update', message: 'projectUpdated', type: 'toast', duration: 3500 }));
     }
