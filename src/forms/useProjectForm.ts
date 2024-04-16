@@ -1,7 +1,7 @@
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAppSelector } from '../hooks/common';
+import { useAppDispatch, useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
@@ -18,6 +18,7 @@ import { IPerson } from '@/interfaces/personsInterfaces';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 import _ from 'lodash';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
+import { notifyInfo } from '@/reducers/notificationSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -259,16 +260,22 @@ const useProjectForm = () => {
     return () => subscription.unsubscribe();
   }, [watch, setValue]);
 
+  const dispatch = useAppDispatch();
   // Updates form with the selectedProject from redux
   useEffect(() => {
+    const currentState = getValues();
+    const inComingState = formValues;
+    const sameValuesInStates = _.isEqual(currentState, inComingState);
     const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project.id;
     /* 
       Finance-update and project-update cause problems to the project form. If the budgets of some project are updated
       in the programming view and some user has a project form open, the values of the form will always be updated and for
-      that reason we need to check if the project in projectUpdate is the same as the one that is opened.
+      that reason we need to check if the project in projectUpdate is the same as the one that is opened and for the notification
+      to work properly it's necessary to check the states also.
     */
-    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject)) {
+    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates)) {
       reset(formValues);
+      dispatch(notifyInfo({ title: 'update', message: 'projectUpdated', type: 'toast', duration: 3500 }));
     }
   }, [project, projectUpdate]);
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
