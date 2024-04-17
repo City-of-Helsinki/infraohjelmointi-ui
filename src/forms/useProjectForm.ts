@@ -174,6 +174,7 @@ const useProjectFormValues = () => {
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectForm = () => {
+  const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
   const { formValues, project } = useProjectFormValues();
   const projectMode = useAppSelector(selectProjectMode);
@@ -266,7 +267,6 @@ const useProjectForm = () => {
     const currentState = getValues();
     const inComingState = formValues;
     const sameValuesInStates = _.isEqual(currentState, inComingState);
-    const nameExists = formValues.name.trim() !== '' && formValues.name.match(/[a-z]/i);
     const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project.id;
     /* 
       Finance-update and project-update cause problems to the project form. If the budgets of some project are updated
@@ -276,11 +276,13 @@ const useProjectForm = () => {
 
       The 'new' mode must be checked also, otherwise the project creation doesn't seem to go through in the UI even though it does.
     */
-    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates) || (nameExists && projectMode === 'new')) {
+    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates) || (selectedProject !== null && projectMode === 'new')) {
       reset(formValues);
-      dispatch(notifyInfo({ title: 'update', message: 'projectUpdated', type: 'toast', duration: 3500 }));
+      if (projectMode === 'edit') {
+        dispatch(notifyInfo({ title: 'update', message: 'projectUpdated', type: 'toast', duration: 3500 }));
+      }
     }
-  }, [project, projectUpdate]);
+  }, [project, projectUpdate, dispatch, formValues, getValues, projectMode, reset]);
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
 

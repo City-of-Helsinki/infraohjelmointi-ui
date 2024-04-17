@@ -94,6 +94,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
       <div className="form-row">
         <div className="form-col-xl">
           <TextAreaField
+            testId="project-form-description"
             {...getFieldProps('description')}
             size="l"
             rules={{...validateMaxLength(1000,t), ...validateRequired('description', t)}}

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import autosize from 'autosize';
 
 interface ITextAreaFieldProps {
+  testId?: string;
   name: string;
   label: string;
   control: HookFormControlType;
@@ -17,6 +18,7 @@ interface ITextAreaFieldProps {
 }
 
 const TextAreaField: FC<ITextAreaFieldProps> = ({
+  testId,
   name,
   label,
   control,
@@ -57,6 +59,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
+            data-testid={testId}
             ref={textAreaRef}
             onChange={onChange}
             value={value}
