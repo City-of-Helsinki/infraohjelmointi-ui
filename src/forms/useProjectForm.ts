@@ -186,7 +186,7 @@ const useProjectForm = () => {
   const [selections, setSelections] = useState({ selectedClass: project?.projectClass, selectedLocation: project?.projectDistrict });
 
   // control,
-  const { reset, watch, setValue, getValues } = formMethods;
+  const { reset, watch, setValue, getValues, formState } = formMethods;
 
   const selectedMasterClassName = formValues.masterClass.label;
 
@@ -266,9 +266,10 @@ const useProjectForm = () => {
   useEffect(() => {
     const currentState = getValues();
     const inComingState = formValues;
+    const isSubmitting = formState.isSubmitting;
     const sameValuesInStates = _.isEqual(currentState, inComingState);
     const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project.id;
-    /* 
+    /*
       Finance-update and project-update cause problems to the project form. If the budgets of some project are updated
       in the programming view and some user has a project form open, the values of the form will always be updated and for
       that reason we need to check if the project in projectUpdate is the same as the one that is opened and for the notification
@@ -278,11 +279,16 @@ const useProjectForm = () => {
     */
     if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates) || (selectedProject !== null && projectMode === 'new')) {
       reset(formValues);
-      if (projectMode === 'edit') {
+      if (projectMode === 'edit' && !isSubmitting) {
         dispatch(notifyInfo({ title: 'update', message: 'projectUpdated', type: 'toast', duration: 3500 }));
       }
     }
-  }, [project, projectUpdate, dispatch, formValues, getValues, projectMode, reset]);
+    /*
+      Only these dependencies should be here, otherwise when project is in the edit mode and someone is editing the budgets,
+      the if sentence's conditions' states come "one step behind" and for that reason the form values are sometimes
+      emptied when the budgets of some other project are changed.
+    */
+  }, [project, projectUpdate]);
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
 
