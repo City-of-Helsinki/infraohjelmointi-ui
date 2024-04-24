@@ -268,9 +268,11 @@
       "accessDenied": "Pääsy evätty",
       "undefined": "Virhe",
       "noteAddSuccess": "Muistiinpano lisätty",
-      "noteAddError": "Muistiinpanon lisääminen epäonnistui"
+      "noteAddError": "Muistiinpanon lisääminen epäonnistui",
+      "update": "Päivitys"
     },
     "message": {
+      "projectUpdated": "Hankkeen tietoja päivitettiin",
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
       "formSaveError": "Lomakkeen tallennus ei onnistunut.",
       "projectCreatingError": "Uuden hankkeen luominen epäonnistui.",
