@@ -1,7 +1,7 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
-import { dirtyFieldsToRequestObject } from '@/utils/common';
+import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
@@ -65,6 +65,11 @@ const ProjectHeader: FC = () => {
     [project?.favPersons, projectId, user?.uuid, dirtyFields, isDirty],
   );
 
+  const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
+  useEffect(() => {
+    setIconKey(mapIconKey(getValues('phase').label));
+  }, [getValues('phase').label]);
+  
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
       <div className="project-header-container" data-testid="project-header">
@@ -86,7 +91,8 @@ const ProjectHeader: FC = () => {
               name="phase"
               control={control}
               options={phases}
-              iconKey={getValues('phase').label}
+              iconKey={iconKey}
+              shouldUpdateIcon={true}
             />
           </div>
         </div>

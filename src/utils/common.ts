@@ -353,3 +353,55 @@ export const syncUpdatedClassFinancesWithStartYear = (financesFromState: IClassF
 
   return convertedFinances;
 }
+
+export const enum IconKey {
+  Proposal = 'proposal',
+  Design = 'design',
+  Programming = 'programming',
+  DraftInitiation = 'draftInitiation',
+  DraftApproval = 'draftApproval',
+  ConstructionPlan = 'constructionPlan',
+  ConstructionWait = 'constructionWait',
+  Construction = 'construction',
+  WarrantyPeriod = 'warrantyPeriod',
+  Completed = 'completed',
+  Location = 'location',
+  Person = 'person',
+}
+
+export const mapIconKey = (type: string): IconKey => {
+    switch (type) {
+      case 'proposal':
+      case 'Hanke-ehdotus':
+          return IconKey.Proposal;
+      case 'design':
+      case 'Yleissuunnittelu':
+        return IconKey.Design;
+      case 'programming':
+      case 'Ohjelmointi':
+        return IconKey.Programming;
+      case 'draftInitiation':
+      case 'Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos':
+        return IconKey.DraftInitiation;
+      case 'draftApproval':
+      case 'Katu-/puistosuunnitelmaehdotus ja hyväksyminen':
+        return IconKey.DraftApproval;
+      case 'constructionPlan':
+      case 'Rakennussuunnitelma':
+        return IconKey.ConstructionPlan;
+      case 'constructionWait':
+      case 'Odottaa rakentamista':
+        return IconKey.ConstructionWait;
+      case 'construction':
+      case 'Rakentaminen':
+        return IconKey.Construction;
+      case 'warrantyPeriod':
+      case 'Takuuaika':
+        return IconKey.WarrantyPeriod;
+      case 'completed':
+      case 'Valmis / ylläpidossa':
+        return IconKey.Completed;
+      default:
+        return IconKey.Programming;
+  }
+};

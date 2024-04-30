@@ -15,6 +15,7 @@ interface ISelectFieldProps {
   rules?: HookFormRulesType;
   hideLabel?: boolean;
   iconKey?: string;
+  shouldUpdateIcon?: boolean;
   disabled?: boolean;
   clearable?: boolean;
   size?: 'full' | 'lg';
@@ -29,6 +30,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   rules,
   hideLabel,
   iconKey,
+  shouldUpdateIcon,
   disabled,
   clearable,
   size,
@@ -87,14 +89,32 @@ const SelectField: FC<ISelectFieldProps> = ({
     setTranslate(shouldTranslate ?? true);
   }, [shouldTranslate]);
 
-  const icon = useMemo(() => optionIcon[iconKey as keyof typeof optionIcon], []);
+  const [icon, setIcon] = useState(optionIcon[iconKey as keyof typeof optionIcon]);
 
+  const updateIconBasedOnSelection = useCallback((selectedValue: string) => {
+    const selectedOption = options.find(option => option.value === selectedValue);
+    if (selectedOption) {
+      const newIcon = optionIcon[selectedOption.label as keyof typeof optionIcon];
+      setIcon(newIcon);
+    }
+  }, [options, iconKey]);
+  
+  useEffect(() => {
+    setIcon(optionIcon[iconKey as keyof typeof optionIcon]);
+  }, [iconKey]); 
+  
   return (
     <Controller
       name={name}
       control={control as Control<FieldValues>}
       rules={rules}
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
+        const handleChange = (event: { value: string; }) => {
+          onChange(event);
+          if (shouldUpdateIcon && event?.value) {
+            updateIconBasedOnSelection(event.value);
+          }
+        };
         return (
           <div className="input-wrapper" id={name} data-testid={name}>
             {/**
@@ -112,7 +132,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                 id={`select-field-${name}`}
                 className={`custom-select ${iconKey ? 'icon' : ''}`}
                 value={translateValue(value)}
-                onChange={onChange}
+                onChange={handleChange}
                 onBlur={onBlur}
                 label={!hideLabel && label && t(label)}
                 invalid={error ? true : false}
