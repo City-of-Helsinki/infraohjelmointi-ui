@@ -1,9 +1,9 @@
 import { FC, useCallback, useMemo, useState, useEffect } from 'react';
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
+import { selectProjectMode, selectProject, setIsSaving, setSelectedProject } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
@@ -15,14 +15,15 @@ import { useTranslation } from 'react-i18next';
 import { patchProject } from '@/services/projectServices';
 import _ from 'lodash';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
+import { notifyError } from '@/reducers/notificationSlice';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
 }
 
 const ProjectHeader: FC = () => {
+  const dispatch = useAppDispatch();
   const project = useAppSelector(selectProject);
-  const projectId = project?.id;
   const user = useAppSelector(selectUser);
   const groups = useAppSelector(selectPlanningGroups);
   const { t } = useTranslation();
@@ -44,10 +45,12 @@ const ProjectHeader: FC = () => {
   } = formMethods;
 
   const phases = useOptions('phases');
+  const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
 
   const onSubmit: SubmitHandler<IProjectHeaderForm> = useCallback(
     async (form: IProjectHeaderForm) => {
       if (isDirty) {
+        dispatch(setIsSaving(true));
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
         if (_.has(data, 'favourite')) {
@@ -59,13 +62,31 @@ const ProjectHeader: FC = () => {
           delete data.favourite;
         }
 
-        projectId && (await patchProject({ id: projectId, data: data }));
+        if (project?.id) {
+          try {
+            const response = await patchProject({ id: project?.id, data });
+            if (response.status === 200) {
+              dispatch(setSelectedProject(response.data));
+              dispatch(setIsSaving(false));
+            }
+          } catch (error) {
+            console.log('project patch error: ', error);
+            dispatch(setIsSaving(false));
+            dispatch(
+              notifyError({
+                message: 'formSaveError',
+                title: 'saveError',
+                type: 'notification',
+              }),
+            );
+            return;
+          }
+        }
       }
     },
-    [project?.favPersons, projectId, user?.uuid, dirtyFields, isDirty],
+    [project?.favPersons, project?.id, user?.uuid, dirtyFields, isDirty],
   );
 
-  const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
   useEffect(() => {
     setIconKey(mapIconKey(getValues('phase').label));
   }, [getValues('phase').label]);

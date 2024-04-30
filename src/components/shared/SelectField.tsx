@@ -101,8 +101,8 @@ const SelectField: FC<ISelectFieldProps> = ({
   
   useEffect(() => {
     setIcon(optionIcon[iconKey as keyof typeof optionIcon]);
-  }, [iconKey]); 
-  
+  }, [iconKey]);
+
   return (
     <Controller
       name={name}
