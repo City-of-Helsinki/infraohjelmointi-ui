@@ -11,6 +11,8 @@ import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
 import _ from 'lodash';
 import { mapIconKey } from '@/utils/common';
+import { useAppSelector } from '@/hooks/common';
+import { selectProject } from '@/reducers/projectSlice';
 
 interface IProjectStatusSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -291,10 +293,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [getValues, phases, t],
   );
 
+  const projectFormPhase = getValues('phase').label;
+  const projectPhase = useAppSelector(selectProject)?.phase;
   const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
   useEffect(() => {
     setIconKey(mapIconKey(getValues('phase').label));
-  }, [getValues('phase').label]); 
+  }, [getValues, projectFormPhase, projectPhase]); 
 
   return (
     <div className="w-full" id="basics-status-section">
