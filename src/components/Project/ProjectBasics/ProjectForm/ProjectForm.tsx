@@ -73,7 +73,7 @@ const ProjectForm = () => {
     const numberOfYears = startYear - previousStartYear;
     let budgetToMove = 0.00;
     for (let i=0; i<numberOfYears; ++i) {
-      const financeYearName = getFinanceYearName(finances, previousStartYear + i);
+      const financeYearName = getFinanceYearName(finances, Number(previousStartYear) + i);
       const financeValue = finances[financeYearName];
       budgetToMove += parseFloat(financeValue as string);
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
@@ -92,7 +92,7 @@ const ProjectForm = () => {
     const maxIndex = 10 - (endYear - finances.year);
     let budgetToMove = 0.00;
     for (let i=1; i<=numberOfYears && i<=maxIndex; ++i) {
-      const financeYearName = getFinanceYearName(finances, endYear + i);
+      const financeYearName = getFinanceYearName(finances, Number(endYear) + i);
       const financeValue = finances[financeYearName];
       budgetToMove += parseFloat(financeValue as string);
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
