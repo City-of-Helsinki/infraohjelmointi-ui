@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { notifyError } from '@/reducers/notificationSlice';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
+import { useOptions } from '@/hooks/useOptions';
 
 interface IProjectHeadProps {
   project: IProject;
@@ -21,17 +22,33 @@ interface IProjectHeadProps {
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
   const user = useAppSelector(selectUser);
+  const phases = useOptions('phases');
   const dispatch = useAppDispatch();
 
   const projectPhase = project.phase?.value;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
+      const phase = phases.find((p) => p.value === req.phase);
+      // Check if the project has all required info before changing the phase to warrantyPeriod to avoid uneccessary PATCH-call
+      if (phase && phase.label === 'warrantyPeriod') {
+        if (!project.personPlanning || !project.personConstruction || !project.programmed) {
+          dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' }));
+          return;
+        }
+      }
       patchProject({ data: req, id: project.id }).catch(() =>
         dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })),
       );
     },
-    [dispatch, project.id],
+    [
+      dispatch,
+      project.id,
+      project.personPlanning,
+      project.personConstruction,
+      project.programmed,
+      phases,
+    ],
   );
 
   // Open the custom context menu for editing the project phase on click
