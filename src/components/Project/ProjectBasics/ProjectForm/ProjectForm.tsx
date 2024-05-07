@@ -68,12 +68,12 @@ const ProjectForm = () => {
   }
 
   // Function to move budget/budgets to the first year that's within the project schedule
-  const moveBudgetForwards = (finances: IProjectFinances, previousStartYear: number, startYear: number) => {
+  const moveBudgetForwards = (finances: IProjectFinances, previousStartYear: number, startYear: number): IProjectFinances => {
     let financesCopy = finances
     const numberOfYears = startYear - previousStartYear;
     let budgetToMove = 0.00;
     for (let i=0; i<numberOfYears; ++i) {
-      const financeYearName = getFinanceYearName(finances, previousStartYear + i);
+      const financeYearName = getFinanceYearName(finances, Number(previousStartYear) + i);
       const financeValue = finances[financeYearName];
       budgetToMove += parseFloat(financeValue as string);
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
@@ -92,7 +92,7 @@ const ProjectForm = () => {
     const maxIndex = 10 - (endYear - finances.year);
     let budgetToMove = 0.00;
     for (let i=1; i<=numberOfYears && i<=maxIndex; ++i) {
-      const financeYearName = getFinanceYearName(finances, endYear + i);
+      const financeYearName = getFinanceYearName(finances, Number(endYear) + i);
       const financeValue = finances[financeYearName];
       budgetToMove += parseFloat(financeValue as string);
       financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
@@ -104,8 +104,8 @@ const ProjectForm = () => {
     return financesCopy;
   }
 
-  const updatePlanningStartYear = (finances: IProjectFinances, previousStartYear: number | null, startYear: number) => {
-    let updatedFinances;
+  const updatePlanningStartYear = (finances: IProjectFinances, previousStartYear: number | null, startYear: number): IProjectFinances => {
+    let updatedFinances = finances;
     // If new planning start year is bigger than the previous one, budget from years that are not within the schedule of the project
     // need to be moved to the new planning start year
     if(previousStartYear && startYear > previousStartYear) {
@@ -114,8 +114,8 @@ const ProjectForm = () => {
     return updatedFinances;
   }
 
-  const updateEstPlanningEndYear = (finances: IProjectFinances, previousEndYear: number | null, endYear: number | null, startYear: number | null) => {
-    let updatedFinances;
+  const updateEstPlanningEndYear = (finances: IProjectFinances, previousEndYear: number | null, endYear: number | null, startYear: number | null): IProjectFinances => {
+    let updatedFinances = finances;
      // If new planning end year is smaller that the previous one, budget from the years that are not within the schedule need to
     // be moved backwards to the new end year
     if (previousEndYear && endYear && endYear < previousEndYear) {
@@ -133,8 +133,8 @@ const ProjectForm = () => {
     return updatedFinances;
   }
 
-  const updateEstConstructionStartYear = (finances: IProjectFinances, previousStartYear: number | null, startYear: number | null, endYear: number | null) => {
-    let updatedFinances;
+  const updateEstConstructionStartYear = (finances: IProjectFinances, previousStartYear: number | null, startYear: number | null, endYear: number | null): IProjectFinances => {
+    let updatedFinances = finances;
     // If new construction start year is bigger than the previous one, budget from years that are not within the schedule of the project
       // need to be moved to the new construction start year
       if (previousStartYear && startYear && startYear > previousStartYear) {
@@ -153,8 +153,8 @@ const ProjectForm = () => {
       return updatedFinances;
   }
 
-  const updateConstructionEndYear = (finances: IProjectFinances, previousEndYear: number | null, endYear: number) => {
-    let updatedFinances;
+  const updateConstructionEndYear = (finances: IProjectFinances, previousEndYear: number | null, endYear: number): IProjectFinances => {
+    let updatedFinances = finances;
     // If new construction end year is smaller that the previous one, budget from the years that are not within the schedule need to
     // be moved backwards to the new end year
     if (previousEndYear && endYear < previousEndYear) {
@@ -164,34 +164,33 @@ const ProjectForm = () => {
   }
 
   const updateFinances = (data: IProjectRequest, project: IProject) => {
-    let finances = project.finances;
-    let updatedFinances;
+    if (project.finances) {
+      let updatedFinances = project.finances;
 
-    if (data.planningStartYear) {
-      const planningStartYear = project.planningStartYear ?? null;
-      updatedFinances = updatePlanningStartYear(finances, planningStartYear, data.planningStartYear);
-      finances = updatedFinances ?? finances;
-    }
-    if (data.estPlanningEnd) {
-      const previousPlanningEndYear = getYear(project.estPlanningEnd);
-      const planningEndYear = getYear(data.estPlanningEnd);
-      const constructionStartYear = getYear(project.estConstructionStart);
-      updatedFinances = updateEstPlanningEndYear(finances, previousPlanningEndYear, planningEndYear, constructionStartYear);
-      finances = updatedFinances ?? finances;
-    }
-    if (data.estConstructionStart) {
-      const previousConstructionStartYear = getYear(project.estConstructionStart);
-      const constructionStartYear = getYear(data.estConstructionStart);
-      const planningEndYear = getYear(project.estPlanningEnd);
-      updatedFinances = updateEstConstructionStartYear(finances, previousConstructionStartYear, constructionStartYear, planningEndYear);
-      finances = updatedFinances ?? finances;
-    }
-    if (data.constructionEndYear) {
-      const constructionEndYear = project.constructionEndYear;
-      updatedFinances = updateConstructionEndYear(finances, constructionEndYear, data.constructionEndYear);
-    }
+      if (data.planningStartYear) {
+        const planningStartYear = project.planningStartYear ?? null;
+        updatedFinances = updatePlanningStartYear(updatedFinances, planningStartYear, data.planningStartYear);
+      }
+      if (data.estPlanningEnd) {
+        const previousPlanningEndYear = getYear(project.estPlanningEnd);
+        const planningEndYear = getYear(data.estPlanningEnd);
+        const constructionStartYear = getYear(project.estConstructionStart);
+        updatedFinances = updateEstPlanningEndYear(updatedFinances, previousPlanningEndYear, planningEndYear, constructionStartYear);
+      }
+      if (data.estConstructionStart) {
+        const previousConstructionStartYear = getYear(project.estConstructionStart);
+        const constructionStartYear = getYear(data.estConstructionStart);
+        const planningEndYear = getYear(project.estPlanningEnd);
+        updatedFinances = updateEstConstructionStartYear(updatedFinances, previousConstructionStartYear, constructionStartYear, planningEndYear);
+      }
+      if (data.constructionEndYear) {
+        const constructionEndYear = project.constructionEndYear;
+        updatedFinances = updateConstructionEndYear(updatedFinances, constructionEndYear, data.constructionEndYear);
+      }
 
-    data = {...data, "finances": updatedFinances};
+      data = {...data, "finances": updatedFinances};
+    }
+    
     return data;
   }
 

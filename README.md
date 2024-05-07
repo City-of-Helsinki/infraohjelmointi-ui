@@ -6,6 +6,10 @@
     - [Formatting and validation](#formatting-and-validation)
         - [ESLint](#eslint)
         - [Prettier](#prettier)
+    - [Ways of working](#ways-of-working)
+        - [Commits](#commits)
+        - [Hotfixes](#hotfixes)
+        - [Merges](#merges)
     - [State and storage](#state-and-storage)
     - [Routing](#routing)
     - [Testing](#testing)
@@ -47,6 +51,20 @@ If using VS Code, download the [Prettier - Code formatter](https://marketplace.v
   "editor.formatOnSave": true,
 }
 ```
+
+### Ways of working
+##### Commits
+
+To make our commits more informative those should be written in a format of Conventional Commits i.e. a suitable prefix should be added in the beginning
+of every commit e.g. **feat:** built a notification or **refactor**:... etc. The Conventional Commits could be properly configured to the project in the future.
+
+##### Hotfixes
+
+Hotfixes should be done by creating a hotfix branch out of main and then merge that to main and develop to avoid doing any rebases.
+
+##### Merges
+
+The common way of merging branches is using normal merges i.e. not using squash merging unless there is a situation when squashing should be done.
 
 ### State and storage
 

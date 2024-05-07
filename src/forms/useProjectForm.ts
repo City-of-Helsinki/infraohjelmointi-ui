@@ -1,7 +1,7 @@
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAppSelector } from '../hooks/common';
+import { useAppDispatch, useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
@@ -16,6 +16,9 @@ import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
+import _ from 'lodash';
+import { selectProjectUpdate } from '@/reducers/eventsSlice';
+import { notifyInfo } from '@/reducers/notificationSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -171,7 +174,9 @@ const useProjectFormValues = () => {
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
 const useProjectForm = () => {
-  const { formValues, project, classes, subClasses, masterClasses, districts, divisions, subDivisions } = useProjectFormValues();
+  const selectedProject = useAppSelector(selectProject);
+  const projectUpdate = useAppSelector(selectProjectUpdate);
+  const { formValues, project } = useProjectFormValues();
   const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -181,7 +186,7 @@ const useProjectForm = () => {
   const [selections, setSelections] = useState({ selectedClass: project?.projectClass, selectedLocation: project?.projectDistrict });
 
   // control,
-  const { reset, watch, setValue } = formMethods;
+  const { reset, watch, setValue, getValues, formState } = formMethods;
 
   const selectedMasterClassName = formValues.masterClass.label;
 
@@ -256,14 +261,34 @@ const useProjectForm = () => {
     return () => subscription.unsubscribe();
   }, [watch, setValue]);
 
+  const dispatch = useAppDispatch();
   // Updates form with the selectedProject from redux
   useEffect(() => {
-    // added projectMode check for when a new project creation form is opened, form values get reset too
-    if (project || projectMode === 'new') {
-      reset(formValues);
-    }
-  }, [project, projectMode, classes, subClasses, masterClasses, districts, divisions, subDivisions, reset, formValues]);
+    const currentState = getValues();
+    const inComingState = formValues;
+    const isSubmitting = formState.isSubmitting;
+    const sameValuesInStates = _.isEqual(currentState, inComingState);
+    const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project.id;
+    /*
+      Finance-update and project-update cause problems to the project form. If the budgets of some project are updated
+      in the programming view and some user has a project form open, the values of the form will always be updated and for
+      that reason we need to check if the project in projectUpdate is the same as the one that is opened and for the notification
+      to work properly it's necessary to check the states also.
 
+      The 'new' mode must be checked also, otherwise the project creation doesn't seem to go through in the UI even though it does.
+    */
+    if ((projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates) || (selectedProject !== null && projectMode === 'new')) {
+      reset(formValues);
+      if (projectMode === 'edit' && !isSubmitting) {
+        dispatch(notifyInfo({ title: 'update', message: 'projectUpdated', type: 'toast', duration: 3500 }));
+      }
+    }
+    /*
+      Only these dependencies should be here, otherwise when project is in the edit mode and someone is editing the budgets,
+      the if sentence's conditions' states come "one step behind" and for that reason the form values are sometimes
+      emptied when the budgets of some other project are changed.
+    */
+  }, [project, projectUpdate]);
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
 

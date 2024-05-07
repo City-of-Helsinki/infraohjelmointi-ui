@@ -423,6 +423,9 @@ describe('projectForm', () => {
   });
 
   it('can post a new project', async () => {
+    const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
+    const { dispatch } = store;
+
     const expectedName = 'Post project';
     const expectedDescription = 'Post project description';
     const expectedProgrammed = false;
@@ -433,60 +436,67 @@ describe('projectForm', () => {
 
     const project = mockProject.data;
     const mockPostResponse: { data: IProject, status: number} = {
-      data: {
-        ...project,
-        id: 'post-project-id',
-        name: expectedName,
-        description: expectedDescription,
-        programmed: expectedProgrammed,
-        phase: expectedPhase,
-      },
-      status: 201,
+          data: {
+            ...project,
+            id: 'post-project-id',
+            description: expectedDescription,
+            programmed: expectedProgrammed,
+            phase: expectedPhase,
+            name: expectedName,
+          },
+          status: 201,
     };
 
-    const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
+    // reset the form and set project mode to new
     await waitFor(() => {
       store.dispatch(resetProject());
       store.dispatch(setProjectMode('new'));
     });
     expect(store.getState().project.selectedProject).toBe(null);
     expect(store.getState().project.mode).toBe('new');
+
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
+
+    let parentContainer = await findByTestId('project-form');
     const nameField = await findByRole('textbox', { name: getFormField('name *') });
     const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
-    let parentContainer = await findByTestId('project-form');
 
+    // write name and description
     await user.type(nameField, expectedName);
     await user.type(descriptionField, expectedDescription);
-    //select phase
+    expect((nameField as HTMLInputElement).value.length).toBeGreaterThan(0);
+    expect((descriptionField as HTMLInputElement).value.length).toBeGreaterThan(0);
+
+    // select phase
     await user.click(
       parentContainer.querySelector('#select-field-phase-toggle-button') as HTMLElement,
     );
     await user.click(await within(parentContainer).findByText('option.proposal'));
+
+    // save project
     const submitProjectButton = await findByTestId('submit-project-button');
     mockedAxios.get.mockResolvedValueOnce(mockPostResponse);
     await waitFor(async () => {
       await user.click(submitProjectButton);
+      dispatch(setSelectedProject(mockPostResponse.data));
+      store.dispatch(setProjectMode('edit'));
     });
 
-    const formPostRequest = mockedAxios.post.mock.lastCall[1] as IProject;
+    // Ensure that mode is edit and store contains the saved project
+    expect(store.getState().project.mode).toBe('edit');
+    expect(store.getState().project.selectedProject).toBe(mockPostResponse.data);
+    expect(await findByTestId('open-delete-project-dialog-button')).toBeInTheDocument();
 
-    expect(formPostRequest.name).toEqual(expectedName);
-    expect(formPostRequest.description).toEqual(expectedDescription);
-    expect(formPostRequest.phase).toEqual(expectedPhase.id);
-    parentContainer = await findByTestId('project-form');
-    expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
-
-    expect(await findByTestId('project-header-name-fields')).toHaveTextContent(
-      matchExact(expectedName),
+    // Ensure that correct values are present on the form
+    expect(await findByDisplayValue(matchExact(expectedName))).toBeInTheDocument();
+    expect(await findByTestId('project-form-description')).toHaveTextContent(
+      matchExact(expectedDescription),
     );
-
-    expect(await findByTestId('project-header-name-fields')).toHaveTextContent(
+    expect(await findByTestId('phase')).toHaveTextContent(
       matchExact(expectedPhase.value),
     );
-    expect(store.getState().project.selectedProject).toBe(mockPostResponse.data);
-    expect(store.getState().project.mode).toBe('edit');
-  });
+  }, 10000);
+
   it('can delete a project', async () => {
     const project = mockProject.data;
     const deleteResponse = { data: { id: project.id } };

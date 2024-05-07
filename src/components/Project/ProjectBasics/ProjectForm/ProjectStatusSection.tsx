@@ -1,5 +1,5 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useMemo, useState } from 'react';
+import { FC, memo, useMemo, useState, useEffect } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -10,6 +10,9 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
 import _ from 'lodash';
+import { mapIconKey } from '@/utils/common';
+import { useAppSelector } from '@/hooks/common';
+import { selectProject } from '@/reducers/projectSlice';
 
 interface IProjectStatusSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -31,7 +34,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const riskAssessments = useOptions('riskAssessments');
   const constructionPhaseDetails = useOptions('constructionPhaseDetails');
   const currentPhase = getValues('phase').value;
-
   const { t } = useTranslation();
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
@@ -291,6 +293,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [getValues, phases, t],
   );
 
+  const projectFormPhase = getValues('phase').label;
+  const projectPhase = useAppSelector(selectProject)?.phase;
+  const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
+  useEffect(() => {
+    setIconKey(mapIconKey(getValues('phase').label));
+  }, [getValues, projectFormPhase, projectPhase]); 
+
   return (
     <div className="w-full" id="basics-status-section">
       <FormSectionTitle {...getFieldProps('status')} />
@@ -300,7 +309,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             {...getFieldProps('phase')}
             options={phases}
             rules={validatePhase}
-            iconKey={getValues('phase').label}
+            iconKey={iconKey}
+            shouldUpdateIcon={true}
           />
         </div>
         <div className="form-col-xl">
