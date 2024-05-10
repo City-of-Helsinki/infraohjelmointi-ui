@@ -13,6 +13,7 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
+import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 
 interface IProjectHeadProps {
   project: IProject;
@@ -24,15 +25,17 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const user = useAppSelector(selectUser);
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
-
+  const isPhaseValid = useProjectPhaseValidation({
+    getProject: () => project,
+  });
   const projectPhase = project.phase?.value;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
       const phase = phases.find((p) => p.value === req.phase);
-      // Check if the project has all required info before changing the phase to warrantyPeriod to avoid uneccessary PATCH-call
-      if (phase && phase.label === 'warrantyPeriod') {
-        if (!project.personPlanning || !project.personConstruction || !project.programmed) {
+      if (phase) {
+        const isValid = isPhaseValid(phase);
+        if (!isValid) {
           dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' }));
           return;
         }
@@ -41,14 +44,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })),
       );
     },
-    [
-      dispatch,
-      project.id,
-      project.personPlanning,
-      project.personConstruction,
-      project.programmed,
-      phases,
-    ],
+    [dispatch, isPhaseValid, phases, project.id],
   );
 
   // Open the custom context menu for editing the project phase on click

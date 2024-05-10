@@ -5,12 +5,13 @@ import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { IOption } from '@/interfaces/common';
-import { getToday, isBefore, updateYear } from '@/utils/dates';
+import { isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
-import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
+import { validateMaxNumber } from '@/utils/validation';
 import _ from 'lodash';
 import { mapIconKey } from '@/utils/common';
+import { usePhaseValidation } from '@/hooks/usePhaseValidation';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
 
@@ -36,109 +37,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const currentPhase = getValues('phase').value;
   const { t } = useTranslation();
 
-  const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
-
-  const [
-    proposalPhase,
-    designPhase,
-    programmedPhase,
-    draftInitiationPhase,
-    draftApprovalPhase,
-    constructionPlanPhase,
-    constructionWaitPhase,
-    constructionPhase,
-    warrantyPeriodPhase,
-    completedPhase,
-  ] = useMemo(() => phases.map(({ value }) => value), [phases]);
-
-  const validatePhase = useMemo(
-    () => ({
-      required: t('validation.required', { field: t('validation.phase') }) ?? '',
-      validate: {
-        isPhaseValid: (phase: IOption) => {
-          if (phase.value === '') {
-            return t('validation.required', { field: t('validation.phase') }) ?? '';
-          }
-
-          const phaseToSubmit = phase.value;
-          const programmed = getValues('programmed');
-          const fields: Array<string> = [];
-          const fieldsIfEmpty = (fields: Array<string>) => getFieldsIfEmpty(fields, getValues);
-
-          const programmedRequirements = [
-            'planningStartYear',
-            'constructionEndYear',
-            'category',
-            'masterClass',
-            'class',
-          ];
-          const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
-          const generalConstructionRequirements = [ 'estConstructionStart', 'estConstructionEnd', 'personConstruction'];
-          const combinedRequirements = [...programmedRequirements, ...planningRequirements, ...generalConstructionRequirements];
-
-          // Check fields that cannot be empty
-          switch (phaseToSubmit) {
-            case programmedPhase:
-              fields.push(...fieldsIfEmpty([...programmedRequirements]));
-              break;
-            case draftInitiationPhase:
-            case draftApprovalPhase:
-            case constructionPlanPhase:
-            case constructionWaitPhase:
-              fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
-              break;
-            case constructionPhase:
-              fields.push(
-                ...fieldsIfEmpty([
-                ...combinedRequirements,
-                  'constructionPhaseDetail'
-                ]),
-              );
-              break;
-            case warrantyPeriodPhase:
-            case completedPhase:
-              if (isBefore(getToday(), getValues('estConstructionEnd'))) {
-                return t('validation.phaseTooEarly', { value: phase.label });
-              }
-
-              fields.push(
-                ...fieldsIfEmpty([
-                ...combinedRequirements,
-                ]),
-              );
-              break;
-          }
-
-          // Check if programmed has the correct value
-          if (phase.value === proposalPhase || phase.value === designPhase) {
-            if (programmed) {
-              fields.push('programmed');
-            }
-          } else {
-            if (!programmed) {
-              fields.push('programmed');
-            }
-          }
-          setPhaseRequirements(fields);
-
-          return fields.length === 0;
-        },
-      },
-    }),
-    [
-      t,
-      getValues,
-      proposalPhase,
-      designPhase,
-      programmedPhase,
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
-      constructionWaitPhase,
-      constructionPhase,
-      warrantyPeriodPhase,
-      completedPhase,
-    ],
+  const { validatePhase, phaseRequirements } = usePhaseValidation({
+    getValues,
+  });
+  const [proposalPhase, designPhase, constructionPhase] = useMemo(
+    () => phases.map(({ value }) => value),
+    [phases],
   );
 
   const validateConstructionPhaseDetails = useMemo(
@@ -147,24 +51,19 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         isConstructionPhaseDetailsValid: (constructionPhaseDetail: IOption) => {
           const phase = getValues('phase');
           // Required after phase is changed to construction
-          if (
-            (phase.value === constructionPhase) &&
-            constructionPhaseDetail?.value === ''
-          ) {
+          if (phase.value === constructionPhase && constructionPhaseDetail?.value === '') {
             return t('validation.required', { field: t('validation.constructionPhaseDetail') });
           }
           return true;
         },
       },
     }),
-    [completedPhase, constructionPhase, getValues, t, warrantyPeriodPhase],
+    [constructionPhase, getValues, t],
   );
 
   const isConstructionPhaseDetailsDisabled = useMemo(() => {
-    return (
-      currentPhase !== constructionPhase
-    );
-  }, [currentPhase, constructionPhase, warrantyPeriodPhase, completedPhase]);
+    return currentPhase !== constructionPhase;
+  }, [currentPhase, constructionPhase]);
 
   const validateProgrammed = useMemo(
     () => ({
@@ -298,7 +197,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
   useEffect(() => {
     setIconKey(mapIconKey(getValues('phase').label));
-  }, [getValues, projectFormPhase, projectPhase]); 
+  }, [getValues, projectFormPhase, projectPhase]);
 
   return (
     <div className="w-full" id="basics-status-section">
