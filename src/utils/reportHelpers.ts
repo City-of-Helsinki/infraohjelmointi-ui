@@ -15,7 +15,7 @@ import {
   ICategoryArray,
   ITotals,
 } from '@/interfaces/reportInterfaces';
-import { convertToMillions, keurToMillion } from './calculations';
+import { calculateProjectRowSums, convertToMillions, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
@@ -243,7 +243,7 @@ const convertToConstructionReportProjects = (projects: IProject[], divisions: Ar
     projects: [],
     parent: null,
     location: getDivision(divisions, p.projectLocation),
-    costForecast: keurToMillion(p.costForecast),
+    costForecast: keurToMillion(calculateProjectRowSums(p).availableFrameBudget),
     startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
     spentBudget: keurToMillion(p.spentBudget),
     budgetProposalCurrentYearPlus0:
@@ -283,8 +283,8 @@ const convertToGroupValues = (projects: IProject[], divisions: Array<ILocation> 
 }
 
 const checkYearRange = (props: IYearCheck ) => {
-  const nextYear = new Date().getFullYear() + 1;
-  const nextThreeYears = [nextYear, nextYear + 1, nextYear + 2];
+  const startYear = new Date().getFullYear() + 2;
+  const nextThreeYears = [startYear, startYear + 1, startYear + 2];
   const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
 
   if (inPlanningOrConstruction) {

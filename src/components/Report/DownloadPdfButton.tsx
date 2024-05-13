@@ -95,7 +95,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           break;
         }
         case Reports.ConstructionProgram: {
-          const res = await getPlanningData(year);
+          const res = await getPlanningData(year + 1);
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
             document = getPdfDocument(type, planningRows, res.planningDistricts.divisions);
