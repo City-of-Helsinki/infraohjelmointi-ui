@@ -1,12 +1,22 @@
 import { useMemo } from 'react';
-import { getToday, isBefore } from '@/utils/dates';
+import { IProject } from '@/interfaces/projectInterfaces';
 import { useOptions } from './useOptions';
 import { IOption } from '@/interfaces/common';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { getToday, isBefore } from '@/utils/dates';
 
 interface IUseProjectPhaseValidationProps {
   getProject: () => IProject;
 }
+
+const fieldsIfEmpty = (fields: Array<string>, obj: IProject) => {
+  const emptyFields = fields.filter(
+    (field) =>
+      obj[field as keyof IProject] === undefined ||
+      obj[field as keyof IProject] === null ||
+      obj[field as keyof IProject] === '',
+  );
+  return emptyFields;
+};
 
 export const useProjectPhaseValidation = ({
   getProject,
@@ -37,15 +47,6 @@ export const useProjectPhaseValidation = ({
 
         const phaseToSubmit = phase.value;
         const programmed = project.programmed;
-        const fieldsIfEmpty = (fields: Array<string>, obj: IProject) => {
-          const emptyFields = fields.filter(
-            (field) =>
-              obj[field as keyof IProject] === undefined ||
-              obj[field as keyof IProject] === null ||
-              obj[field as keyof IProject] === '',
-          );
-          return emptyFields;
-        };
 
         const programmedRequirements = ['planningStartYear', 'constructionEndYear', 'category'];
         const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
@@ -60,8 +61,7 @@ export const useProjectPhaseValidation = ({
           ...generalConstructionRequirements,
         ];
 
-        let fields: Array<string> = [];
-
+        let fields = [];
         switch (phaseToSubmit) {
           case programmedPhase:
             fields = fieldsIfEmpty([...programmedRequirements], project);
@@ -84,14 +84,10 @@ export const useProjectPhaseValidation = ({
             break;
         }
 
-        if (phase.value === proposalPhase || phase.value === designPhase) {
-          if (programmed) {
-            fields.push('programmed');
-          }
-        } else {
-          if (!programmed) {
-            fields.push('programmed');
-          }
+        if ((phase.value === proposalPhase || phase.value === designPhase) && programmed) {
+          fields.push('programmed');
+        } else if (!(phase.value === proposalPhase || phase.value === designPhase) && !programmed) {
+          fields.push('programmed');
         }
 
         return fields.length === 0;
