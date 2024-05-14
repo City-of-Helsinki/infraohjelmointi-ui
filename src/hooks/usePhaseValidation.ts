@@ -97,15 +97,14 @@ export const usePhaseValidation = ({
               fields.push(...fieldsIfEmpty([...combinedRequirements]));
               break;
           }
-          if ((phase.value === proposalPhase || phase.value === designPhase) && programmed) {
+          // Check if programmed has the correct value
+          if (phase.value === proposalPhase || (phase.value === designPhase && programmed)) {
             fields.push('programmed');
-          } else if (
-            !(phase.value === proposalPhase || phase.value === designPhase) &&
-            !programmed
-          ) {
-            fields.push('programmed');
+          } else {
+            if (!programmed) {
+              fields.push('programmed');
+            }
           }
-
           setPhaseRequirements(fields);
 
           return fields.length === 0;
