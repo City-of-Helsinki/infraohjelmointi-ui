@@ -86,10 +86,8 @@ export const useProjectPhaseValidation = ({
 
         if (phase.value === proposalPhase || (phase.value === designPhase && programmed)) {
           fields.push('programmed');
-        } else {
-          if (!programmed) {
-            fields.push('programmed');
-          }
+        } else if (!programmed) {
+          fields.push('programmed');
         }
 
         return fields.length === 0;

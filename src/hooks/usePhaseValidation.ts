@@ -100,10 +100,8 @@ export const usePhaseValidation = ({
           // Check if programmed has the correct value
           if (phase.value === proposalPhase || (phase.value === designPhase && programmed)) {
             fields.push('programmed');
-          } else {
-            if (!programmed) {
-              fields.push('programmed');
-            }
+          } else if (!programmed) {
+            fields.push('programmed');
           }
           setPhaseRequirements(fields);
 
