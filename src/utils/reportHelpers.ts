@@ -762,9 +762,18 @@ const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalE
 
 const constructionProgramCsvRows: IConstructionProgramCsvRow[] = [];
 
+const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => {
+  return (
+    tableRow.type === 'group' ||
+    tableRow.type === 'project' ||
+    tableRow.projects.length > 0 ||
+    tableRow.children.some(isShownOnTheReport)
+  );
+};
+
 const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]) => {
   tableRows.forEach((tableRow) => {
-    if (tableRow.type !== 'districtPreview' && tableRow.type !== 'division' && !constructionProgramCsvRows.some(row => row.id === tableRow.id)) {
+    if (tableRow.type !== 'districtPreview' && tableRow.type !== 'division' && !constructionProgramCsvRows.some(row => row.id === tableRow.id) && isShownOnTheReport(tableRow)) {
       constructionProgramCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,
