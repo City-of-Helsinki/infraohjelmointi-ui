@@ -83,10 +83,11 @@ export const buildPlanningTableRows = (
     defaultExpanded?: boolean,
     districtsForSubClass?: IClass[],
     subDivisions?: Array<ILocation>,
-  ) => buildPlanningRow({ item, type, projects, expanded: defaultExpanded, districtsForSubClass, subDivisions: subDivisions });
+    parentRowPath?: string
+  ) => buildPlanningRow({ item, type, projects, expanded: defaultExpanded, districtsForSubClass, subDivisions: subDivisions, parentRowPath: parentRowPath });
 
   // Groups can get mapped under subClasses, districts and divisions and sorts them by name
-  const getSortedGroupRows = (id: string, type: PlanningRowType) => {
+  const getSortedGroupRows = (id: string, type: PlanningRowType, parentRowPath: string | undefined) => {
     const filteredGroups = [];
     // Filter all groups under subClassDistrict
     if (type === 'subClassDistrict') {
@@ -113,7 +114,7 @@ export const buildPlanningTableRows = (
     }
 
     return sortByName(filteredGroups).map((group) => ({
-      ...getRow(group as IGroup, 'group', undefined, undefined, subDivisions),
+      ...getRow(group as IGroup, 'group', undefined, undefined, subDivisions, parentRowPath),
     }));
   };
 
@@ -128,27 +129,27 @@ export const buildPlanningTableRows = (
         .map((filteredClass) => ({
           ...getRow(filteredClass, 'class', !!selectedClass),
           children: [
-            ...getSortedGroupRows(filteredClass.id, 'class'),
+            ...getSortedGroupRows(filteredClass.id, 'class', filteredClass.path),
             ...subClasses.filter((subClass) => subClass.parent === filteredClass.id)
             .map((filteredSubClass) => ({
               ...getRow(filteredSubClass, subClassType, !!selectedSubClass),
               // DISTRICTS & GROUPS
               children: [
                 // groups
-                ...getSortedGroupRows(filteredSubClass.id, subClassType),
+                ...getSortedGroupRows(filteredSubClass.id, subClassType, filteredSubClass.path),
                 // districts
                 ...districts
                   .filter((district) => district.parentClass === filteredSubClass.id)
                   .map((filteredDistrict) => ({
                     ...getRow(filteredDistrict, districtType),
                     children: [
-                      ...getSortedGroupRows(filteredDistrict.id, districtType),
+                      ...getSortedGroupRows(filteredDistrict.id, districtType, filteredSubClass.path),
                       ...divisions
                         .filter((division) => division.parent === filteredDistrict.id)
                         .map((filteredDivision) => ({
                           ...getRow(filteredDivision, 'division'),
                           children: [
-                            ...getSortedGroupRows(filteredDivision.id, 'division')
+                            ...getSortedGroupRows(filteredDivision.id, 'division', filteredSubClass.path)
                           ]
                         }))
                     ]
@@ -183,10 +184,10 @@ export const buildPlanningTableRows = (
       // DIVISIONS & GROUPS
       children: [
         // groups
-        ...getSortedGroupRows(subClass.id, subClassType),
+        ...getSortedGroupRows(subClass.id, subClassType, subClass.path),
         // divisions
         ...sortLocationsByName(divisionsForSubClass).map((filteredDivision) => {
-          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
+          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division', subClass.path);
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
             // GROUPS (for division)
@@ -199,18 +200,27 @@ export const buildPlanningTableRows = (
     return subClassDistrictRows;
   });
 
+  const parentClassForDistrict = (district: ILocation) => {
+    return (
+      subClasses.find((subClass) => district.parentClass === subClass.id) ||
+      classes.find((_class) => district.parentClass === _class.id) ||
+      masterClasses.find((masterClass) => district.parentClass === masterClass.id)
+    );
+  };
+
   // Map the selected districts divisions and the groups & projects that belong to those divisions
   const districtRows = districts.map((district) => {
     const divisionsForDistrict = divisions.filter((division) => division.parent === district.id);
+    const parentClassPath = parentClassForDistrict(district)?.path
     return {
       ...getRow(district, districtType, true),
       // DIVISIONS & GROUPS
       children: [
         // groups
-        ...getSortedGroupRows(district.id, districtType),
+        ...getSortedGroupRows(district.id, districtType, parentClassPath),
         // divisions
         ...sortLocationsByName(divisionsForDistrict).map((filteredDivision) => {
-          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division');
+          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division', parentClassPath);
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
             // GROUPS (for division)

@@ -573,6 +573,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
     }
     case Reports.ConstructionProgram: {
       const planningHierarchy = [];
+      const projectsToBeShownMasterClass = (path: string) => path.startsWith('801') || path.startsWith('804') || path.startsWith('808');
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
           const startYear = getGroupStartYear(c.projectRows);
@@ -581,16 +582,17 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             planningStart: startYear,
             constructionEnd: endYear
           })) {
+            const isOnlyHeaderGroup = projectsToBeShownMasterClass(c.path);
             const convertedGroup: IConstructionProgramTableRow = {
               id: c.id,
               name: c.name,
-              parent: null,
+              parent: c.path,
               children: [],
-              projects: [],
-              costForecast: keurToMillion(c.plannedBudgets),
-              startAndEnd: `${startYear}-${endYear}`,
-              type: getConstructionRowType(c.type) as ReportTableRowType,
-              ...convertToGroupValues(c.projectRows, divisions)
+              projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
+              costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.plannedBudgets),
+              startAndEnd: isOnlyHeaderGroup ? undefined : `${startYear}-${endYear}`,
+              type: isOnlyHeaderGroup ? 'class' : 'group',
+              ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, divisions))
             }
             planningHierarchy.push(convertedGroup);
           }
