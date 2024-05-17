@@ -228,6 +228,7 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
 }
 
 const convertToConstructionReportProjects = (projects: IProject[], divisions: Array<ILocation> | undefined): IConstructionProgramTableRow[] => {
+  console.log(projects);
   return projects
   .filter((p) => 
     p.planningStartYear && p.constructionEndYear &&
@@ -243,7 +244,7 @@ const convertToConstructionReportProjects = (projects: IProject[], divisions: Ar
     projects: [],
     parent: null,
     location: getDivision(divisions, p.projectLocation),
-    costForecast: keurToMillion(calculateProjectRowSums(p).availableFrameBudget),
+    costForecast: keurToMillion(p.costForecast),
     startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
     spentBudget: keurToMillion(p.spentBudget),
     budgetProposalCurrentYearPlus0:
@@ -589,7 +590,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               parent: c.path,
               children: [],
               projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
-              costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.plannedBudgets),
+              costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.costEstimateBudget),
               startAndEnd: isOnlyHeaderGroup ? undefined : `${startYear}-${endYear}`,
               type: isOnlyHeaderGroup ? 'class' : 'group',
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, divisions))
