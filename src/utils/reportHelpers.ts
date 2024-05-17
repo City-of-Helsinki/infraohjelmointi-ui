@@ -15,7 +15,7 @@ import {
   ICategoryArray,
   ITotals,
 } from '@/interfaces/reportInterfaces';
-import { calculateProjectRowSums, convertToMillions, keurToMillion } from './calculations';
+import { convertToMillions, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
