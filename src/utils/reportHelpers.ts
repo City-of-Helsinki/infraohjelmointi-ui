@@ -228,7 +228,6 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
 }
 
 const convertToConstructionReportProjects = (projects: IProject[], divisions: Array<ILocation> | undefined): IConstructionProgramTableRow[] => {
-  console.log(projects);
   return projects
   .filter((p) => 
     p.planningStartYear && p.constructionEndYear &&
