@@ -121,6 +121,7 @@ interface IBuildPlanningRowParams {
   siblings?: Array<IClass> | Array<ILocation>;
   parentRow?: IPlanningRow | null;
   subDivisions?: Array<ILocation>;
+  parentRowPath?: string;
 }
 
 /**
@@ -136,6 +137,7 @@ interface IBuildPlanningRowParams {
  */
 export const buildPlanningRow = ({
   item,
+  parentRowPath,
   type,
   projects,
   expanded,
@@ -161,7 +163,7 @@ export const buildPlanningRow = ({
   return {
     type: type,
     name: item.name,
-    path: type !== 'group' ? (item as IClass | ILocation).path : '',
+    path: type !== 'group' ? (item as IClass | ILocation).path : parentRowPath ?? '',
     id: item.id,
     key: item.id,
     urlSearchParam: searchParamOrNull,

@@ -85,7 +85,7 @@ export interface IBasicReportData {
 interface ITableRowEssentials {
   id?: string;
   name: string;
-  parent: string | null;
+  parent: string | null | undefined;
 }
 
 export interface IOperationalEnvironmentAnalysisFinanceProperties {
