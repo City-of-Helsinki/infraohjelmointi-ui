@@ -24,6 +24,16 @@ export const formattedNumberToNumber = (formattedNumber?: string) => {
 };
 
 /**
+ * Round decimal number to number string
+ *
+ * @returns Rounded number as a string
+ */
+export const roundNumberToString = (number: string | number) => {
+  const numberString = String(number).replace(',', '.');
+  return Math.round(Number(numberString)).toString();
+}
+
+/**
  * Calculates the budgets for the current row. Returns nothing for a division and no deviation for groups.
  *
  * @returns
@@ -59,7 +69,7 @@ export const calculatePlanningRowSums = (
   return {
     ...(type !== 'division' && {
       plannedBudgets,
-      costEstimateBudget,
+      costEstimateBudget: roundNumberToString(costEstimateBudget),
       ...(type !== 'group' && {
         deviation: formatNumber(deviationBetweenCostEstimateAndBudget),
       }),
