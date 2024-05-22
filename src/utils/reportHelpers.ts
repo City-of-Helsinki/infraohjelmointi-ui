@@ -21,6 +21,7 @@ import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
+import { useTranslation } from 'react-i18next';
 
 interface IYearCheck {
   planningStart: number;
@@ -504,7 +505,7 @@ const getGroupEndYear = (projects: IProject[]) => {
   return latestConstructionEndYear;
 }
 
-export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined, divisions: Array<ILocation> | undefined): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined, divisions: Array<ILocation> | undefined, t: TFunction<"translation", undefined>): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
@@ -519,7 +520,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions) : [],
+          children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
           costForecast: c.cells[0].plannedBudget,
           type: getRowType(c.type) as ReportTableRowType
@@ -535,7 +536,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions) : [],
+          children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
           projects: [],
           frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "frameBudget"),
           plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "plannedBudget"),
@@ -573,6 +574,24 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
     }
     case Reports.ConstructionProgram: {
       const planningHierarchy = [];
+      const pathsWithExtraRows = [
+        "8 01 Kiinteä omaisuus/Esirakentaminen/Muu esirakentaminen",
+        "8 03 Kadut ja liikenneväylät/Uudisrakentaminen",
+        "8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt",
+        "8 03 Kadut ja liikenneväylät/Muut investoinnit",
+        "8 03 Kadut ja liikenneväylät/Yhteishankkeet väyläviraston kanssa",
+        "8 04 Puistot ja liikunta-alueet",
+        "8 08 Projektialueiden infrarakentaminen/Esirakentaminen",
+        "8 08 Projektialueiden infrarakentaminen/Kadut",
+        "8 08 Projektialueiden infrarakentaminen/Puistot ja liikunta-alueet",
+        "8 09 Kaupunkiuudistus/Malminkartano-Kannelmäki",
+        "8 09 Kaupunkiuudistus/Malmi",
+        "8 09 Kaupunkiuudistus/Mellunkylä",
+        "8 09 Kaupunkiuudistus/Meri-Rastila",
+        "8 10 Suuret liikennehankkeet/Kruunusillat",
+        "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
+        "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet"
+      ]
       const projectsToBeShownMasterClass = (path: string) => path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08');
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
@@ -601,11 +620,22 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             id: c.id,
             name: c.name,
             parent: null,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions) : [],
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
             type: getConstructionRowType(c.type) as ReportTableRowType,
           }
           planningHierarchy.push(convertedClass);
+        }
+        if (pathsWithExtraRows.includes(c.path) && c.type === 'class') {
+          const summaryOfProjectsRow: IConstructionProgramTableRow = {
+            children: [],
+            projects: [],
+            type: 'class',
+            name: t('report.constructionProgram.classSummary'),
+            parent: c.path,
+            costForecast: c.costEstimateBudget
+          }
+          planningHierarchy.push(summaryOfProjectsRow);
         }
       }
       return planningHierarchy;
@@ -769,6 +799,7 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
     tableRow.type === 'group' ||
     tableRow.type === 'project' ||
     tableRow.projects.length > 0 ||
+    tableRow.name === 'Hankkeet yhteensä' ||
     tableRow.children.some(isShownOnTheReport)
   );
 };
@@ -827,7 +858,7 @@ export const getReportData = async (
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
-  const reportRows = convertToReportRows(rows, reportType, categories, divisions);
+  const reportRows = convertToReportRows(rows, reportType, categories, divisions, t);
 
   try {
     switch (reportType) {
