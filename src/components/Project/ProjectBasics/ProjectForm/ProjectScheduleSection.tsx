@@ -20,11 +20,11 @@ interface IProjectScheduleSectionProps {
   isUserProjectManager: boolean;
 }
 
-const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ 
+const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
   getFieldProps,
   getValues,
   getFieldState,
-  isUserProjectManager 
+  isUserProjectManager
 }) => {
   const { t } = useTranslation();
 
@@ -223,11 +223,11 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearToBeSet = date?.split('.')[2];
           const yearInFormYearCell = getValues('constructionEndYear');
 
-          if (yearToBeSet !== yearInFormYearCell) {
-            if (isUserProjectManager) {
-              return t('validation.userIsNotAllowedToModifyConstructionEndYear');
-            }
-            return t('validation.constructionEndYearValidator');
+          if (!getFieldState('constructionEndYear').isDirty && yearToBeSet !== yearInFormYearCell) {
+              if (isUserProjectManager) {
+                return t('validation.userIsNotAllowedToModifyConstructionEndYear');
+              }
+              return t('validation.constructionEndYearValidator');
           }
 
           const phase = getValues('phase').value;
