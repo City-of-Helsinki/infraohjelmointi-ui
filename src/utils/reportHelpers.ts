@@ -573,7 +573,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
     }
     case Reports.ConstructionProgram: {
       const planningHierarchy = [];
-      const projectsToBeShownMasterClass = (path: string) => path.startsWith('801') || path.startsWith('804') || path.startsWith('808');
+      const projectsToBeShownMasterClass = (path: string) => path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08');
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
           const startYear = getGroupStartYear(c.projectRows);
