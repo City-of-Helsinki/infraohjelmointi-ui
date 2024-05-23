@@ -504,23 +504,14 @@ const getGroupEndYear = (projects: IProject[]) => {
   return latestConstructionEndYear;
 }
 
-const projectsToBeShownMasterClass = (path: string) => path.startsWith('801') || path.startsWith('804') || path.startsWith('808');
-
 const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]): number => {
   let sumOfBudgets = 0;
   for (const row of rows) {
     if (row.type === 'group') {
-      if (projectsToBeShownMasterClass(row.parent ?? '')) {
-        for (const project of row.projects) {
-          const projectBudget = parseFloat((project.costForecast ?? '0').replace(/\s/g, ''));
-          sumOfBudgets += projectBudget
-        }
-      } else {
-        sumOfBudgets += parseFloat((row.costForecast ?? '0').replace(/\s/g, ''));
-      }
+      sumOfBudgets += parseFloat((row.costForecast ?? '0').replace(',', '.'));
     } else {
       for (const project of row.projects) {
-        const projectBudget = parseFloat((project.costForecast ?? '0').replace(/\s/g, ''));
+        const projectBudget = parseFloat((project.costForecast ?? '0').replace(',', '.'));
         sumOfBudgets += projectBudget
       }
       sumOfBudgets += getUnderMillionSummary(row.children);
@@ -616,6 +607,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
         "810 Suuret liikennehankkeet/Sörnäistentunneli",
         "810 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet"
       ]
+      const projectsToBeShownMasterClass = (path: string | undefined | null) => path && (path.startsWith('801') || path.startsWith('804') || path.startsWith('808'));
       
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
@@ -643,7 +635,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
           const convertedClass: IConstructionProgramTableRow = {
             id: c.id,
             name: c.name,
-            parent: null,
+            parent: c.path,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
             type: getConstructionRowType(c.type) as ReportTableRowType,
@@ -660,6 +652,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               costForecast: keurToMillion(c.costEstimateBudget)
             }
             planningHierarchy.push(summaryOfProjectsRow);
+            const underMillionSummary = parseFloat(keurToMillion(c.costEstimateBudget).replace(',', '.')) - getUnderMillionSummary(convertedClass.children);
             const underMillionSummaryRow: IConstructionProgramTableRow = {
               id: `${c.id}-under-million-summary`,
               children: [],
@@ -667,7 +660,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               type: 'class',
               name: t('report.constructionProgram.underMillionSummary'),
               parent: c.path,
-              costForecast: keurToMillion(parseFloat((c.costEstimateBudget ?? '0').replace(/\s/g, '')) - getUnderMillionSummary(convertedClass.children))
+              costForecast: underMillionSummary.toString()
             }
             planningHierarchy.push(underMillionSummaryRow);
           }
@@ -834,8 +827,8 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
     tableRow.type === 'group' ||
     tableRow.type === 'project' ||
     tableRow.projects.length > 0 ||
-    tableRow.name === 'Hankkeet yhteensä' ||
-    tableRow.name === 'Muut alle 1 milj. euron investointihankkeet' ||
+    tableRow.name === t('report.constructionProgram.classSummary') ||
+    tableRow.name === t('report.constructionProgram.underMillionSummary') ||
     tableRow.children.some(isShownOnTheReport)
   );
 };
