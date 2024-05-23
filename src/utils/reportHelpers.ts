@@ -652,7 +652,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               costForecast: keurToMillion(c.costEstimateBudget)
             }
             planningHierarchy.push(summaryOfProjectsRow);
-            const underMillionSummary = parseFloat(keurToMillion(c.costEstimateBudget).replace(',', '.')) - getUnderMillionSummary(convertedClass.children);
+            const underMillionSummary = (parseFloat(keurToMillion(c.costEstimateBudget).replace(',', '.')) - getUnderMillionSummary(convertedClass.children)).toFixed(1);
             const underMillionSummaryRow: IConstructionProgramTableRow = {
               id: `${c.id}-under-million-summary`,
               children: [],
