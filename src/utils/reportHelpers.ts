@@ -594,7 +594,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
         "8 03 Kadut ja liikenneväylät/Uudisrakentaminen",
         "8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt",
         "8 03 Kadut ja liikenneväylät/Muut investoinnit",
-        "8 03 Kadut ja liikenneväylät/Yhteishankkeet väyläviraston kanssa",
+        "8 03 Kadut ja liikenneväylät/Yhteishankkeet Väyläviraston kanssa",
         "8 04 Puistot ja liikunta-alueet",
         "8 08 Projektialueiden infrarakentaminen/Esirakentaminen",
         "8 08 Projektialueiden infrarakentaminen/Kadut",
