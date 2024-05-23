@@ -7,6 +7,7 @@ import { IBasicReportData, IBudgetBookSummaryTableRow, IConstructionProgramTable
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
 import StrategyTableHeader from './StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
+import { useTranslation } from 'react-i18next';
 
 const styles = StyleSheet.create({
   table: {
@@ -34,7 +35,8 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   reportType,
   data
 }) => {
-  const reportRows = convertToReportRows(data.rows, reportType, data.categories, data.divisions);
+  const { t } = useTranslation();
+  const reportRows = convertToReportRows(data.rows, reportType, data.categories, data.divisions, t);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (reportType === Reports.BudgetBookSummary || reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.ConstructionProgram) ? getFlattenedRows(reportRows as (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow)[], reportType) : [];
