@@ -41,9 +41,11 @@ const budgetBookSummaryNameCellCommonStyles = {
 const styles = StyleSheet.create({
   oddRow: {
     ...tableRowStyles,
+    minHeight: '15px',
   },
   evenRow: {
     ...tableRowStyles,
+    minHeight: '15px',
     backgroundColor: '#efeff0',
   },
   nameCell: {
