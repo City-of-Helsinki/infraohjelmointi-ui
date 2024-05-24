@@ -335,7 +335,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                 <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
                 <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
                 <Text style={styles.previouslyUsedCell}>{flattenedRow.spentBudget}</Text>
-                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
+                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
                 <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
                 <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
             </View>
