@@ -504,17 +504,26 @@ const getGroupEndYear = (projects: IProject[]) => {
   return latestConstructionEndYear;
 }
 
-const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]): number => {
-  let sumOfBudgets = 0;
+const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
+  const sumOfBudgets = {
+    budgetProposalCurrentYearPlus0: 0,
+    budgetProposalCurrentYearPlus1: 0,
+    budgetProposalCurrentYearPlus2: 0
+  };
   for (const row of rows) {
     if (row.type === 'group') {
-      sumOfBudgets += parseFloat((row.costForecast ?? '0').replace(',', '.'));
+      sumOfBudgets.budgetProposalCurrentYearPlus0 += parseFloat((row.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.'));
+      sumOfBudgets.budgetProposalCurrentYearPlus1 += parseFloat((row.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.'));
+      sumOfBudgets.budgetProposalCurrentYearPlus2 += parseFloat((row.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.'));
     } else {
       for (const project of row.projects) {
-        const projectBudget = parseFloat((project.costForecast ?? '0').replace(',', '.'));
-        sumOfBudgets += projectBudget
+        sumOfBudgets.budgetProposalCurrentYearPlus0 += parseFloat((project.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.'));
+        sumOfBudgets.budgetProposalCurrentYearPlus1 += parseFloat((project.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.'));
+        sumOfBudgets.budgetProposalCurrentYearPlus2 += parseFloat((project.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.'));
       }
-      sumOfBudgets += getUnderMillionSummary(row.children);
+      sumOfBudgets.budgetProposalCurrentYearPlus0 += getUnderMillionSummary(row.children).budgetProposalCurrentYearPlus0;
+      sumOfBudgets.budgetProposalCurrentYearPlus1 += getUnderMillionSummary(row.children).budgetProposalCurrentYearPlus1;
+      sumOfBudgets.budgetProposalCurrentYearPlus2 += getUnderMillionSummary(row.children).budgetProposalCurrentYearPlus2;
     }
   }
   return sumOfBudgets;
@@ -649,10 +658,15 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               type: 'class',
               name: t('report.constructionProgram.classSummary'),
               parent: c.path,
-              costForecast: keurToMillion(c.costEstimateBudget)
+              budgetProposalCurrentYearPlus0: keurToMillion(c.cells[0].displayFrameBudget),
+              budgetProposalCurrentYearPlus1: keurToMillion(c.cells[1].displayFrameBudget),
+              budgetProposalCurrentYearPlus2: keurToMillion(c.cells[2].displayFrameBudget)
             }
-            planningHierarchy.push(summaryOfProjectsRow);
-            const underMillionSummary = (parseFloat(keurToMillion(c.costEstimateBudget).replace(',', '.')) - getUnderMillionSummary(convertedClass.children)).toFixed(1);
+            const underMillionSummary = {
+              budgetProposalCurrentYearPlus0: (parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus0 ?? '0') - getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus0).toFixed(1),
+              budgetProposalCurrentYearPlus1: (parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus1 ?? '0') - getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus1).toFixed(1),
+              budgetProposalCurrentYearPlus2: (parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus2 ?? '0') - getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus2).toFixed(1)
+            }
             const underMillionSummaryRow: IConstructionProgramTableRow = {
               id: `${c.id}-under-million-summary`,
               children: [],
@@ -660,9 +674,12 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               type: 'class',
               name: t('report.constructionProgram.underMillionSummary'),
               parent: c.path,
-              costForecast: underMillionSummary.toString()
+              budgetProposalCurrentYearPlus0: underMillionSummary.budgetProposalCurrentYearPlus0.toString(),
+              budgetProposalCurrentYearPlus1: underMillionSummary.budgetProposalCurrentYearPlus1.toString(),
+              budgetProposalCurrentYearPlus2: underMillionSummary.budgetProposalCurrentYearPlus2.toString(),
             }
             planningHierarchy.push(underMillionSummaryRow);
+            planningHierarchy.push(summaryOfProjectsRow);
           }
         }
       }
