@@ -678,8 +678,17 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               budgetProposalCurrentYearPlus1: underMillionSummary.budgetProposalCurrentYearPlus1.toString(),
               budgetProposalCurrentYearPlus2: underMillionSummary.budgetProposalCurrentYearPlus2.toString(),
             }
+            const emptyRow: IConstructionProgramTableRow = {
+              children: [],
+              projects: [],
+              type: 'class',
+              name: '',
+              parent: undefined,
+              id: `${c.id}-empty-row`
+            }
             planningHierarchy.push(underMillionSummaryRow);
             planningHierarchy.push(summaryOfProjectsRow);
+            planningHierarchy.push(emptyRow);
           }
         }
       }
@@ -846,6 +855,7 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
     tableRow.projects.length > 0 ||
     tableRow.name === t('report.constructionProgram.classSummary') ||
     tableRow.name === t('report.constructionProgram.underMillionSummary') ||
+    tableRow.name === '' ||
     tableRow.children.some(isShownOnTheReport)
   );
 };
