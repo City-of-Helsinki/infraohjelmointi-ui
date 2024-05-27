@@ -31,7 +31,6 @@ import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
-import { isUserOnlyProjectManager } from '@/utils/userRoleHelpers';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -50,7 +49,6 @@ const ProjectForm = () => {
     handleSubmit,
     control,
     getValues,
-    getFieldState,
   } = formMethods;
 
   usePromptConfirmOnNavigate({
@@ -311,7 +309,6 @@ const ProjectForm = () => {
       getFieldProps,
       control,
       getValues,
-      getFieldState,
     }),
     [control, getFieldProps, getValues],
   );
@@ -360,11 +357,6 @@ const ProjectForm = () => {
     [selectedMasterClassName, user],
   );
 
-  const isUserProjectManagerCheck = useMemo(
-    () => isUserOnlyProjectManager(user),
-    [user]
-  );
-
   return (
     <form
       data-testid="project-form"
@@ -375,7 +367,7 @@ const ProjectForm = () => {
       {/* SECTION 2 - STATUS */}
       <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
       {/* SECTION 3 - SCHEDULE */}
-      <ProjectScheduleSection {...formProps} isUserProjectManager={isUserProjectManagerCheck} />
+      <ProjectScheduleSection {...formProps} />
       {/* SECTION 4 - FINANCIALS */}
       <ProjectFinancialSection
         {...formProps}

@@ -1,7 +1,7 @@
 import { FormSectionTitle } from '@/components/shared';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetFieldState, UseFormGetValues } from 'react-hook-form';
+import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'hds-react';
@@ -16,16 +16,9 @@ interface IProjectScheduleSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
-  getFieldState: UseFormGetFieldState<IProjectForm>;
-  isUserProjectManager: boolean;
 }
 
-const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
-  getFieldProps,
-  getValues,
-  getFieldState,
-  isUserProjectManager
-}) => {
+const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ getFieldProps, getValues }) => { 
   const { t } = useTranslation();
 
   const phases = useOptions('phases');
@@ -44,16 +37,6 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     return {
       validate: {
         isEstPlanningStartValid: (date: string | null) => {
-          const yearToBeSet = date?.split('.')[2];
-          const yearInFormYearCell = getValues('planningStartYear');
-
-          if (!getFieldState('planningStartYear').isDirty && yearToBeSet !== yearInFormYearCell) {
-            if (isUserProjectManager) {
-              return t('validation.userIsNotAllowedToModifyPlanningStartYear');
-            }
-            return t('validation.planningStartYearChangingValidator');
-          }
-
           const phase = getValues('phase').value;
 
           if (phasesThatNeedPlanning.includes(phase) && !date) {
@@ -220,16 +203,6 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     return {
       validate: {
         isEstConstructionEndValid: (date: string | null) => {
-          const yearToBeSet = date?.split('.')[2];
-          const yearInFormYearCell = getValues('constructionEndYear');
-
-          if (!getFieldState('constructionEndYear').isDirty && yearToBeSet !== yearInFormYearCell) {
-              if (isUserProjectManager) {
-                return t('validation.userIsNotAllowedToModifyConstructionEndYear');
-              }
-              return t('validation.constructionEndYearValidator');
-          }
-
           const phase = getValues('phase').value;
 
           if (phasesThatNeedConstruction.includes(phase) && !date) {
