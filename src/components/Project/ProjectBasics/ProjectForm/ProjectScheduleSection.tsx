@@ -18,7 +18,7 @@ interface IProjectScheduleSectionProps {
   };
 }
 
-const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ getFieldProps, getValues }) => {
+const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({ getFieldProps, getValues }) => { 
   const { t } = useTranslation();
 
   const phases = useOptions('phases');

@@ -12,6 +12,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { notifyError } from '@/reducers/notificationSlice';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
+import { useOptions } from '@/hooks/useOptions';
+import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 
 interface IProjectHeadProps {
   project: IProject;
@@ -21,17 +23,28 @@ interface IProjectHeadProps {
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
   const user = useAppSelector(selectUser);
+  const phases = useOptions('phases');
   const dispatch = useAppDispatch();
-
+  const isPhaseValid = useProjectPhaseValidation({
+    getProject: () => project,
+  });
   const projectPhase = project.phase?.value;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
+      const phase = phases.find((p) => p.value === req.phase);
+      if (phase) {
+        const isValid = isPhaseValid(phase);
+        if (!isValid) {
+          dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' }));
+          return;
+        }
+      }
       patchProject({ data: req, id: project.id }).catch(() =>
         dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })),
       );
     },
-    [dispatch, project.id],
+    [dispatch, isPhaseValid, phases, project.id],
   );
 
   // Open the custom context menu for editing the project phase on click
