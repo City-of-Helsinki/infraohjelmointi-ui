@@ -396,10 +396,14 @@ const getRowType = (type: string) => {
   }
 }
 
-const getConstructionRowType = (type: string) => {
+const getConstructionRowType = (type: string, name: string) => {
   switch (type) {
-    case 'districtPreview':
-      return 'districtPreview';
+    case 'subClass':
+      if (name.includes('suurpiiri') || name.includes('östersundom')) {
+        return 'subClassDistrict';
+      } else {
+        return 'class'
+      }
     case 'division':
       return 'division';
     case 'group':
@@ -662,7 +666,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             parent: c.path,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
-            type: getConstructionRowType(c.type) as ReportTableRowType,
+            type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
           planningHierarchy.push(convertedClass);
           if (pathsWithExtraRows.includes(c.path)) {
@@ -877,7 +881,7 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
 
 const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]) => {
   tableRows.forEach((tableRow) => {
-    if (tableRow.type !== 'districtPreview' && tableRow.type !== 'division' && !constructionProgramCsvRows.some(row => row.id === tableRow.id) && isShownOnTheReport(tableRow)) {
+    if (tableRow.type !== 'subClassDistrict' && tableRow.type !== 'division' && !constructionProgramCsvRows.some(row => row.id === tableRow.id) && isShownOnTheReport(tableRow)) {
       constructionProgramCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,

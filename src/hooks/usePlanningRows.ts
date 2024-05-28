@@ -109,7 +109,7 @@ export const buildPlanningTableRows = (
       );
     }
     // Filter groups under division or district
-    else if (type === 'division' || type == 'district') {
+    else if (type === 'division' || type == 'district' || type == 'districtPreview') {
       filteredGroups.push(...groups.filter((group) => group.locationRelation === id));
     }
 

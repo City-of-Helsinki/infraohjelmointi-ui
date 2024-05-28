@@ -106,6 +106,7 @@ export const filterProjectsForPlanningRow = (
       return sortByName(getProjectsForGroup()) as Array<IProject>;
     case 'district':
     case 'division':
+    case 'districtPreview':
       return sortByName(getProjectsForLocation()) as Array<IProject>;
   }
   return [];
