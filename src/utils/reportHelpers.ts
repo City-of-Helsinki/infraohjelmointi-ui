@@ -632,7 +632,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
       const projectsToBeShownMasterClass = (path: string | undefined | null) => path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
       
       for (const c of rows) {
-        if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000 ) {
+        if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
           const startYear = getGroupStartYear(c.projectRows);
           const endYear = getGroupEndYear(c.projectRows);
           if (startYear && endYear && checkYearRange({
@@ -706,7 +706,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             planningHierarchy.push(emptyRow);
           }
         }
-      };
+      }
       return planningHierarchy;
     }
     default:
