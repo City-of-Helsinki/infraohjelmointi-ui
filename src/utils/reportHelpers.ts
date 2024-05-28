@@ -1,5 +1,5 @@
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
 import {
   IBudgetBookSummaryCsvRow,
   IBudgetBookSummaryTableRow,
@@ -235,6 +235,7 @@ const convertToConstructionReportProjects = (projects: IProject[], divisions: Ar
       planningStart: p.planningStartYear,
       constructionEnd: p.constructionEndYear
     }) &&
+    checkProjectHasBudgets(p.finances) &&
     parseFloat(p.costForecast) >= 1000)
   .map((p) => ({
     name: p.name,
@@ -292,6 +293,18 @@ const checkYearRange = (props: IYearCheck ) => {
   } else {
     return false;
   }
+}
+
+const checkProjectHasBudgets = (projectFinances: IProjectFinances) => {
+  return parseFloat(projectFinances.budgetProposalCurrentYearPlus0 ?? '0') > 0 ||
+    parseFloat(projectFinances.budgetProposalCurrentYearPlus1 ?? '0') > 0 ||
+    parseFloat(projectFinances.budgetProposalCurrentYearPlus2 ?? '0') > 0;
+}
+
+const checkGroupHasBudgets = (group: IConstructionProgramTableRow) => {
+  return parseFloat(group.budgetProposalCurrentYearPlus0 ?? '0') > 0 ||
+    parseFloat(group.budgetProposalCurrentYearPlus1 ?? '0') > 0 ||
+    parseFloat(group.budgetProposalCurrentYearPlus2 ?? '0') > 0
 }
 
 export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTableRow[]) => {
@@ -638,7 +651,9 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               type: isOnlyHeaderGroup ? 'class' : 'group',
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, divisions))
             }
-            planningHierarchy.push(convertedGroup);
+            if (checkGroupHasBudgets(convertedGroup)) {
+              planningHierarchy.push(convertedGroup);
+            }
           }
         } else if (c.type !== 'group') {
           const convertedClass: IConstructionProgramTableRow = {
