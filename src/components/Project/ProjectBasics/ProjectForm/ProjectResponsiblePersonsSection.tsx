@@ -102,7 +102,6 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             options={responsiblePersons}
             rules={validatePersonPlanning()}
             shouldTranslate={false}
-            disabled={isInputDisabled}
           />
         </div>
         <div className="form-col-md">
@@ -112,7 +111,6 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             options={responsiblePersons}
             rules={validatePersonConstruction()}
             shouldTranslate={false}
-            disabled={isInputDisabled}
           />
         </div>
       </div>
