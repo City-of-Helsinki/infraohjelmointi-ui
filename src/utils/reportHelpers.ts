@@ -296,15 +296,15 @@ const checkYearRange = (props: IYearCheck ) => {
 }
 
 const checkProjectHasBudgets = (projectFinances: IProjectFinances) => {
-  return parseFloat(projectFinances.budgetProposalCurrentYearPlus0 ?? '0') > 0 ||
-    parseFloat(projectFinances.budgetProposalCurrentYearPlus1 ?? '0') > 0 ||
-    parseFloat(projectFinances.budgetProposalCurrentYearPlus2 ?? '0') > 0;
+  return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((projectFinances.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((projectFinances.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0;
 }
 
 const checkGroupHasBudgets = (group: IConstructionProgramTableRow) => {
-  return parseFloat(group.budgetProposalCurrentYearPlus0 ?? '0') > 0 ||
-    parseFloat(group.budgetProposalCurrentYearPlus1 ?? '0') > 0 ||
-    parseFloat(group.budgetProposalCurrentYearPlus2 ?? '0') > 0
+  return parseFloat((group.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((group.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((group.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0
 }
 
 export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTableRow[]) => {
