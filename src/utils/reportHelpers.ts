@@ -1,5 +1,5 @@
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 import {
   IBudgetBookSummaryCsvRow,
   IBudgetBookSummaryTableRow,
