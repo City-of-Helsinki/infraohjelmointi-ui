@@ -1,5 +1,5 @@
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 import {
   IBudgetBookSummaryCsvRow,
   IBudgetBookSummaryTableRow,
@@ -25,6 +25,12 @@ import { IListItem } from '@/interfaces/common';
 interface IYearCheck {
   planningStart: number;
   constructionEnd: number;
+}
+
+interface IBudgetCheck {
+  budgetProposalCurrentYearPlus0: string | undefined | null;
+  budgetProposalCurrentYearPlus1: string | undefined | null;
+  budgetProposalCurrentYearPlus2: string | undefined | null;
 }
 
 /**
@@ -235,7 +241,11 @@ const convertToConstructionReportProjects = (projects: IProject[], divisions: Ar
       planningStart: p.planningStartYear,
       constructionEnd: p.constructionEndYear
     }) &&
-    checkProjectHasBudgets(p.finances) &&
+    checkProjectHasBudgets({
+      budgetProposalCurrentYearPlus0: p.finances.budgetProposalCurrentYearPlus0,
+      budgetProposalCurrentYearPlus1: p.finances.budgetProposalCurrentYearPlus1,
+      budgetProposalCurrentYearPlus2: p.finances.budgetProposalCurrentYearPlus2
+    }) &&
     parseFloat(p.costForecast) >= 1000)
   .map((p) => ({
     name: p.name,
@@ -295,16 +305,16 @@ const checkYearRange = (props: IYearCheck ) => {
   }
 }
 
-const checkProjectHasBudgets = (projectFinances: IProjectFinances) => {
-  return parseFloat(projectFinances.budgetProposalCurrentYearPlus0 ?? '0') > 0 ||
-    parseFloat(projectFinances.budgetProposalCurrentYearPlus1 ?? '0') > 0 ||
-    parseFloat(projectFinances.budgetProposalCurrentYearPlus2 ?? '0') > 0;
+const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
+  return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((projectFinances.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((projectFinances.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0;
 }
 
 const checkGroupHasBudgets = (group: IConstructionProgramTableRow) => {
-  return parseFloat(group.budgetProposalCurrentYearPlus0 ?? '0') > 0 ||
-    parseFloat(group.budgetProposalCurrentYearPlus1 ?? '0') > 0 ||
-    parseFloat(group.budgetProposalCurrentYearPlus2 ?? '0') > 0
+  return parseFloat((group.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((group.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
+    parseFloat((group.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0
 }
 
 export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTableRow[]) => {
@@ -655,8 +665,20 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               type: isOnlyHeaderGroup ? 'class' : 'group',
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, divisions))
             }
-            if (checkGroupHasBudgets(convertedGroup)) {
+            
+            if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup)) {
               planningHierarchy.push(convertedGroup);
+            } else {
+              for (const project of convertedGroup.projects) {
+                if (checkProjectHasBudgets({
+                  budgetProposalCurrentYearPlus0: project.budgetProposalCurrentYearPlus0,
+                  budgetProposalCurrentYearPlus1: project.budgetProposalCurrentYearPlus1,
+                  budgetProposalCurrentYearPlus2: project.budgetProposalCurrentYearPlus2
+                })) {
+                  planningHierarchy.push(convertedGroup);
+                  break;
+                }
+              }
             }
           }
         } else if (c.type !== 'group') {
