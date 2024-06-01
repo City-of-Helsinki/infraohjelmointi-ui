@@ -408,6 +408,8 @@ const getRowType = (type: string) => {
 
 const getConstructionRowType = (type: string, name: string) => {
   switch (type) {
+    case 'masterClass':
+      return 'masterClass';
     case 'subClass':
       if (name.includes('suurpiiri') || name.includes('östersundom')) {
         return 'subClassDistrict';
@@ -690,13 +692,15 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
+
           planningHierarchy.push(convertedClass);
+
           if (pathsWithExtraRows.includes(c.path)) {
             const summaryOfProjectsRow: IConstructionProgramTableRow = {
               id: `${c.id}-class-summary`,
               children: [],
               projects: [],
-              type: 'class',
+              type: 'info',
               name: t('report.constructionProgram.classSummary'),
               parent: c.path,
               budgetProposalCurrentYearPlus0: keurToMillion(c.cells[0].displayFrameBudget),
@@ -712,7 +716,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               id: `${c.id}-under-million-summary`,
               children: [],
               projects: [],
-              type: 'class',
+              type: 'info',
               name: t('report.constructionProgram.underMillionSummary'),
               parent: c.path,
               budgetProposalCurrentYearPlus0: underMillionSummary.budgetProposalCurrentYearPlus0.toString(),
@@ -722,7 +726,7 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             const emptyRow: IConstructionProgramTableRow = {
               children: [],
               projects: [],
-              type: 'class',
+              type: 'empty',
               name: '',
               parent: undefined,
               id: `${c.id}-empty-row`

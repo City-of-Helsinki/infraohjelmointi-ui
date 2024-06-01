@@ -57,6 +57,16 @@ const styles = StyleSheet.create({
     paddingRight: '15px',
     width: '214px',
   },
+  masterClassRow: {
+    ...tableRowStyles,
+    backgroundColor: '#0000a3',
+    color: 'white',
+  },
+  classRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00007a',
+    color: 'white',
+  },
   classNameCell: {
     ...cellStyles,
     ...constructionProgramCommonStyles,
@@ -296,6 +306,19 @@ const getRowStyle = (rowType: string, depth: number) => {
   }
 }
 
+const getConstructionRowStyle = (rowType: string, depth: number) => {
+  // masterClass, class, group, project, info, empty
+  switch (rowType) {
+    case 'masterClass':
+      return styles.masterClassRow;
+    case 'class':
+      return styles.classRow;
+    default:
+      if (depth % 2) return styles.evenRow;
+      return styles.oddRow;
+  }
+}
+
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
@@ -329,10 +352,22 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             break;
         }
         case Reports.ConstructionProgram: {
+          // Blue background for class rows excluding 'suurpiiri' classes. Otherwise white/grey rows
           if (flattenedRow) {
-            tableRow =  
-            <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
-                <Text style={flattenedRow.type === 'class' ? styles.classNameCell : styles.nameCell}>{flattenedRow.name}</Text>
+            tableRow =
+              <View
+                wrap={false}
+                style={
+                  getConstructionRowStyle(
+                    flattenedRow.name.includes("suurpiiri")
+                    ? 'district' : flattenedRow.type ?? '', index ?? 0
+                  )}
+                key={flattenedRow.id}
+              >
+                <Text style={['masterClass', 'class', 'group', 'info', 'empty'].includes(flattenedRow.type)
+                  ? styles.classNameCell
+                  : styles.nameCell}
+                >{flattenedRow.name}</Text>
                 <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
                 <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
                 <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
