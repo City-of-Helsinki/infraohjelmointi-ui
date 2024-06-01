@@ -1,4 +1,12 @@
-import { IBudgetBookSummaryCsvRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IFlattenedOperationalEnvironmentAnalysisProperties, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import {
+  IBudgetBookSummaryCsvRow,
+  IConstructionProgramTableRow,
+  IFlattenedBudgetBookSummaryProperties,
+  IOperationalEnvironmentAnalysisCsvRow,
+  IFlattenedOperationalEnvironmentAnalysisProperties,
+  ReportType,
+  Reports
+} from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -326,7 +334,12 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             if (flattenedRow) {
               tableRow =
               <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
-                  <Text style={['class', 'location'].includes(flattenedRow.type ?? '') ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
+                  <Text style={
+                    ['class', 'location'].includes(flattenedRow.type ?? '')
+                    ? strategyReportStyles.classNameCell
+                    : strategyReportStyles.projectCell}>
+                      {flattenedRow.name}
+                  </Text>
                   <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                   <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                   <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
@@ -376,7 +389,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                 <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
                 <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
                 <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
-            </View>
+              </View>
           }
           break;
         }
@@ -425,8 +438,10 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
         case Reports.OperationalEnvironmentAnalysis: {
           if (flattenedRow) {
             const getNameStyle = () => {
-              if (flattenedRow.type === 'taeFrame') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
-              if (flattenedRow.type === 'changePressure') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.changePressure];
+              if (flattenedRow.type === 'taeFrame')
+                return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
+              if (flattenedRow.type === 'changePressure')
+                return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.changePressure];
               return [operationalEnvironmentAnalysisStyles.targetColumn];
             }
             
@@ -440,7 +455,9 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             }
             const color = getColor();
 
-            const shouldHaveIdentation = flattenedRow.type === 'taeFrame' || flattenedRow.type === 'changePressure' || flattenedRow.type === 'category';
+            const shouldHaveIdentation = flattenedRow.type === 'taeFrame' ||
+              flattenedRow.type === 'changePressure' ||
+              flattenedRow.type === 'category';
 
             if (shouldHaveIdentation) nameStyle.push(operationalEnvironmentAnalysisStyles.indentation);
 

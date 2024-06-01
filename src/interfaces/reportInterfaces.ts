@@ -74,7 +74,21 @@ export enum Reports {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class' | 'project' | 'investmentpart' | 'location' | 'crossingPressure' | 'taeTseFrame' | 'category' | 'group' | 'districtPreview' | 'changePressure' | 'taeFrame' | 'division' | 'subClassDistrict';
+export type ReportTableRowType = 'class'
+  | 'project'
+  | 'investmentpart'
+  | 'location'
+  | 'crossingPressure'
+  | 'taeTseFrame'
+  | 'category'
+  | 'group'
+  | 'districtPreview'
+  | 'changePressure'
+  | 'taeFrame'
+  | 'division'
+  | 'subClassDistrict'
+  | 'empty'
+  | 'info';
 
 export interface IBasicReportData {
   categories?: IListItem[];

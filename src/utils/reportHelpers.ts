@@ -362,7 +362,12 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
     This rule is meant for the lower level items but every item in the hierarchy in forced to frame view data should match this */
   const nameCheckPattern = /^(\d+|\w)\s/;
   for (const c of coordinatorRows) {
-    if (c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass' || c.type === 'districtPreview' || c.type === 'collectiveSubLevel') {
+    if (
+      c.type === 'masterClass' ||
+        c.type === 'class' ||
+        c.type === 'subClass' ||
+        c.type === 'districtPreview' ||
+        c.type === 'collectiveSubLevel') {
       if (nameCheckPattern.test(c.name)) {
         const convertedClass: IBudgetBookSummaryTableRow = {
           id: c.id,
@@ -414,7 +419,7 @@ const getConstructionRowType = (type: string, name: string) => {
       if (name.includes('suurpiiri') || name.includes('östersundom')) {
         return 'subClassDistrict';
       } else {
-        return 'class'
+        return 'class';
       }
     case 'division':
       return 'division';
@@ -510,7 +515,9 @@ const getExtraRows = (project: IPlanningRow, categoriesFromSlice: IListItem[] | 
 const getGroupStartYear = (projects: IProject[]) => {
   let earliestPlanningStartYear: number | null = null;
   const isEarlier = (p: IProject) => {
-    return (!earliestPlanningStartYear && p.planningStartYear) || (p.planningStartYear && earliestPlanningStartYear && p.planningStartYear < earliestPlanningStartYear)
+    return (
+      !earliestPlanningStartYear && p.planningStartYear) ||
+      (p.planningStartYear && earliestPlanningStartYear && p.planningStartYear < earliestPlanningStartYear)
   };
   for (const p of projects) {
     if (isEarlier(p)) {
@@ -558,7 +565,13 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
   return sumOfBudgets;
 }
 
-export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType | '', categories: IListItem[] | undefined, divisions: Array<ILocation> | undefined, t: TFunction<"translation", undefined>): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+export const convertToReportRows = (
+  rows: IPlanningRow[],
+  reportType: ReportType | '',
+  categories: IListItem[] | undefined,
+  divisions: Array<ILocation> | undefined,
+  t: TFunction<"translation", undefined>
+): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
@@ -600,7 +613,8 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
 
         const plannedBudgets = Object.values(convertedClass.plannedBudgets);
         const isSomeLevelofClass = c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass';
-        // TA parts that don't have any planned budgets shouldn't be shown on the report. There shouldn't either be other rows than classes from some of the levels.
+        // TA parts that don't have any planned budgets shouldn't be shown on the report.
+        // There shouldn't either be other rows than classes from some of the levels.
         if (isSomeLevelofClass && plannedBudgets.some((value) => value !== "0")) {
           forcedToFrameHierarchy.push(convertedClass);
 
@@ -645,7 +659,8 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
         "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
         "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet"
       ]
-      const projectsToBeShownMasterClass = (path: string | undefined | null) => path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
+      const projectsToBeShownMasterClass = (path: string | undefined | null) =>
+        path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
       
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
@@ -714,9 +729,15 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
               budgetProposalCurrentYearPlus2: keurToMillion(c.cells[2].displayFrameBudget)
             }
             const underMillionSummary = {
-              budgetProposalCurrentYearPlus0: (parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus0 ?? '0') - getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus0).toFixed(1),
-              budgetProposalCurrentYearPlus1: (parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus1 ?? '0') - getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus1).toFixed(1),
-              budgetProposalCurrentYearPlus2: (parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus2 ?? '0') - getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus2).toFixed(1)
+              budgetProposalCurrentYearPlus0: (
+                parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus0 ?? '0') -
+                getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus0).toFixed(1),
+              budgetProposalCurrentYearPlus1: (
+                parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus1 ?? '0') -
+                getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus1).toFixed(1),
+              budgetProposalCurrentYearPlus2: (
+                parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus2 ?? '0') -
+                getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus2).toFixed(1)
             }
             const underMillionSummaryRow: IConstructionProgramTableRow = {
               id: `${c.id}-under-million-summary`,
@@ -877,7 +898,9 @@ const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
       }
   }
 }
-const processOperationalEnvironmentAnalysisTableRows = (tableRows: IOperationalEnvironmentAnalysisTableRow[]): IBudgetBookSummaryCsvRow[]  => {
+const processOperationalEnvironmentAnalysisTableRows = (
+  tableRows: IOperationalEnvironmentAnalysisTableRow[]
+): IBudgetBookSummaryCsvRow[]  => {
   tableRows.forEach((tableRow) => {
     const data = getCorrectData(tableRow);
     if (!operationalEnvironmentAnalysisCsvRows.some(row => row.id === tableRow.id)) {
@@ -913,7 +936,11 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
 
 const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]) => {
   tableRows.forEach((tableRow) => {
-    if (tableRow.type !== 'subClassDistrict' && tableRow.type !== 'division' && !constructionProgramCsvRows.some(row => row.id === tableRow.id) && isShownOnTheReport(tableRow)) {
+    if (
+      tableRow.type !== 'subClassDistrict' &&
+      tableRow.type !== 'division' &&
+      !constructionProgramCsvRows.some(row => row.id === tableRow.id) && isShownOnTheReport(tableRow)
+    ){
       constructionProgramCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,
@@ -961,7 +988,10 @@ export const getReportData = async (
   rows: IPlanningRow[],
   divisions?: Array<ILocation>,
   categories?: IListItem[],
-): Promise<Array<IConstructionProgramCsvRow> | Array<IBudgetBookSummaryCsvRow> | Array<IStrategyTableCsvRow> | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
+): Promise<Array<IConstructionProgramCsvRow>
+  | Array<IBudgetBookSummaryCsvRow>
+  | Array<IStrategyTableCsvRow>
+  | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
