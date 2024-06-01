@@ -693,6 +693,12 @@ export const convertToReportRows = (rows: IPlanningRow[], reportType: ReportType
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
 
+          // 'Esirakentaminen' is old budget item and it should be hidden on the report.
+          // We rename it as '' that will be used later to skip row if the name is empty.
+          if (c.name === 'Esirakentaminen' && c.path === '8 01 Kiinteä omaisuus/Esirakentaminen'){
+            convertedClass.name = '';
+          }
+
           planningHierarchy.push(convertedClass);
 
           if (pathsWithExtraRows.includes(c.path)) {
