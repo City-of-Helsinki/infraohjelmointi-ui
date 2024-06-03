@@ -36,10 +36,19 @@ interface IBudgetCheck {
 /**
  * Gets the division name and removes the number infront of it.
  */
-export const getDivision = (divisions?: Array<ILocation>, projectLocation?: string) => {
-  const division = divisions?.filter((d) => projectLocation && d.id === projectLocation)[0];
+export const getDivision = (
+  divisions?: Array<IListItem>,
+  projectLocation?: string
+) => {
+  const division: ILocation | IListItem | undefined = divisions &&
+    (divisions as Array<ILocation | IListItem>).filter((d: ILocation | IListItem) => projectLocation && d.id === projectLocation)[0];
+
   if (division) {
-    return division.name.replace(/^\d+\.\s*/, '');
+    if ('name' in division && division.name) {
+      return division.name.replace(/^\d+\.\s*/, '');
+    } else if ('value' in division && division.value) {
+      return division.value.replace(/^\d+\.\s*/, '');
+    }
   }
   return '';
 };
@@ -233,7 +242,9 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
     }));
 }
 
-const convertToConstructionReportProjects = (projects: IProject[], divisions: Array<ILocation> | undefined): IConstructionProgramTableRow[] => {
+const convertToConstructionReportProjects = (projects: IProject[],
+  divisions: Array<IListItem> | undefined
+): IConstructionProgramTableRow[] => {
   return projects
   .filter((p) => 
     p.planningStartYear && p.constructionEndYear &&
@@ -253,7 +264,7 @@ const convertToConstructionReportProjects = (projects: IProject[], divisions: Ar
     children: [],
     projects: [],
     parent: null,
-    location: getDivision(divisions, p.projectLocation),
+    location: getDivision(divisions, p.projectDistrict),
     costForecast: keurToMillion(p.costForecast),
     startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
     spentBudget: keurToMillion(p.spentBudget),
@@ -267,7 +278,10 @@ const convertToConstructionReportProjects = (projects: IProject[], divisions: Ar
   }));
 }
 
-const convertToGroupValues = (projects: IProject[], divisions: Array<ILocation> | undefined) => {
+const convertToGroupValues = (
+  projects: IProject[],
+  divisions: Array<IListItem> | undefined
+) => {
   let spentBudget = 0;
   let budgetProposalCurrentYearPlus0 = 0;
   let budgetProposalCurrentYearPlus1 = 0;
@@ -294,7 +308,7 @@ const convertToGroupValues = (projects: IProject[], divisions: Array<ILocation> 
 }
 
 const checkYearRange = (props: IYearCheck ) => {
-  const startYear = new Date().getFullYear() + 2;
+  const startYear = new Date().getFullYear() + 1;
   const nextThreeYears = [startYear, startYear + 1, startYear + 2];
   const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
 
@@ -569,8 +583,8 @@ export const convertToReportRows = (
   rows: IPlanningRow[],
   reportType: ReportType | '',
   categories: IListItem[] | undefined,
-  divisions: Array<ILocation> | undefined,
-  t: TFunction<"translation", undefined>
+  t: TFunction<"translation", undefined>,
+  divisions?: Array<IListItem> | undefined
 ): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
@@ -586,7 +600,7 @@ export const convertToReportRows = (
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
+          children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
           costForecast: c.cells[0].plannedBudget,
           type: getRowType(c.type) as ReportTableRowType
@@ -602,7 +616,7 @@ export const convertToReportRows = (
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
+          children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
           projects: [],
           frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "frameBudget"),
           plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "plannedBudget"),
@@ -703,7 +717,7 @@ export const convertToReportRows = (
             id: c.id,
             name: c.name,
             parent: c.path,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, divisions, t) : [],
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
@@ -986,7 +1000,7 @@ export const getReportData = async (
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
   rows: IPlanningRow[],
-  divisions?: Array<ILocation>,
+  divisions?: IListItem[],
   categories?: IListItem[],
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
@@ -995,7 +1009,7 @@ export const getReportData = async (
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
-  const reportRows = convertToReportRows(rows, reportType, categories, divisions, t);
+  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions);
 
   try {
     switch (reportType) {

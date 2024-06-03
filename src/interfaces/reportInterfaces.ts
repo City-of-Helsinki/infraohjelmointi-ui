@@ -93,7 +93,7 @@ export type ReportTableRowType = 'class'
 export interface IBasicReportData {
   categories?: IListItem[];
   rows: IPlanningRow[];
-  divisions?: Array<ILocation>;
+  divisions?: Array<IListItem>;
 }
 
 interface ITableRowEssentials {

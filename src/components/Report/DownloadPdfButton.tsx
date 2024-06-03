@@ -13,7 +13,8 @@ import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IListItem } from '@/interfaces/common';
-import { ILocation } from '@/interfaces/locationInterfaces';
+import { getDistricts } from '@/services/listServices';
+import { getProjectDistricts } from '@/reducers/listsSlice';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -27,7 +28,7 @@ const EmptyDocument = () => (
 const getPdfDocument = (
   type: ReportType,
   rows: IPlanningRow[],
-  divisions?: Array<ILocation>,
+  divisions?: Array<IListItem>,
   categories?: IListItem[],
 ) => {
   const pdfDocument = {
@@ -96,9 +97,12 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
         }
         case Reports.ConstructionProgram: {
           const res = await getPlanningData(year + 1);
+          const resDivisions = await getDistricts();
+          const divisions = getProjectDistricts(resDivisions, "division");
+
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, planningRows, res.planningDistricts.divisions);
+            document = getPdfDocument(type, planningRows, divisions);
           }
         }
       }

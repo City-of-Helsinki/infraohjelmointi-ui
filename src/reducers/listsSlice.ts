@@ -73,7 +73,7 @@ const getResponsiblePersons = async () => {
   }
 };
 
-const getProjectDistricts = (districts: IProjectDistrict[], districtLevel: string) => {
+export const getProjectDistricts = (districts: IProjectDistrict[], districtLevel: string) => {
     const filtered = districts.filter(({ level }) => level == districtLevel);
     const mapped = filtered.map(({ id, name, parent }) => ({
       value: name,

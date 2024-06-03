@@ -1,6 +1,6 @@
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { mockClassFinances } from './mockClassFinances';
-import { IListItem, IOption } from '@/interfaces/common';
+import { IListItem } from '@/interfaces/common';
 
 export const mockLocations: { data: Array<ILocation> } = {
   data: [
@@ -81,7 +81,7 @@ export const mockLocations: { data: Array<ILocation> } = {
       path: 'Koillinen/Kluuvi/TestSubDivision',
       forCoordinatorOnly: false,
       parent: 'fb35bbd1-193d-48ed-8fa1-46fcf8912f03',
-      parentClass: null,
+      parentClass: undefined,
       relatedTo: null,
       finances: mockClassFinances,
     },
@@ -176,7 +176,7 @@ export const mockSubDivisions: { data: Array<ILocation> } = {
       path: 'Koillinen/Kluuvi/TestSubDivision',
       forCoordinatorOnly: false,
       parent: 'fb35bbd1-193d-48ed-8fa1-46fcf8912f03',
-      parentClass: null,
+      parentClass: undefined,
       relatedTo: null,
       finances: mockClassFinances,
     },
