@@ -367,7 +367,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
         case Reports.ConstructionProgram: {
           // Blue background for class rows excluding 'suurpiiri' classes. Otherwise white/grey rows
           // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
-          if (flattenedRow && flattenedRow.name !== '') {
+        if (flattenedRow && (flattenedRow.name !== "" || flattenedRow.type === "empty")) {
             tableRow =
               <View
                 wrap={false}
