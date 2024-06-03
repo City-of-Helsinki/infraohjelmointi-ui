@@ -367,29 +367,32 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
         case Reports.ConstructionProgram: {
           // Blue background for class rows excluding 'suurpiiri' classes. Otherwise white/grey rows
           // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
-        if (flattenedRow && (flattenedRow.name !== "" || flattenedRow.type === "empty")) {
-            tableRow =
-              <View
-                wrap={false}
-                style={
-                  getConstructionRowStyle(
-                    flattenedRow.name.includes("suurpiiri")
-                    ? 'district' : flattenedRow.type ?? '', index ?? 0
-                  )}
-                key={flattenedRow.id}
-              >
-                <Text style={['masterClass', 'class', 'group', 'info', 'empty'].includes(flattenedRow.type)
-                  ? styles.classNameCell
-                  : styles.nameCell}
-                >{flattenedRow.name}</Text>
-                <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
-                <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
-                <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
-                <Text style={styles.previouslyUsedCell}>{flattenedRow.spentBudget}</Text>
-                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
-                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
-                <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
-              </View>
+        if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
+          const rowTypeForStyle = () => {
+            if (flattenedRow.name.includes('suurpiiri')){
+              return 'district';
+            }
+            return flattenedRow.type ?? '';
+          }
+
+          tableRow =
+            <View
+              wrap={false}
+              style={ getConstructionRowStyle(rowTypeForStyle(), index ?? 0 )}
+              key={flattenedRow.id}
+            >
+              <Text style={['masterClass', 'class', 'group', 'info', 'empty'].includes(flattenedRow.type)
+                ? styles.classNameCell
+                : styles.nameCell}
+              >{flattenedRow.name}</Text>
+              <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
+              <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
+              <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+              <Text style={styles.previouslyUsedCell}>{flattenedRow.spentBudget}</Text>
+              <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
+              <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
+              <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
+            </View>
           }
           break;
         }
