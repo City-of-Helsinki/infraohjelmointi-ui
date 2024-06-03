@@ -988,13 +988,13 @@ export const getReportData = async (
         // Transform them into csv rows
         return flattenedRows.map((r: IConstructionProgramCsvRow) => ({
           [t('target')]: r.name,
-          [t('content')]: r.location,
+          [t('division')]: r.location,
           [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
           [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
-          [t('previouslyUsed')]: r.spentBudget,
-          [`TAE ${year + 1}`]: r.budgetProposalCurrentYearPlus0,
-          [`TSE ${year + 2}`]: r.budgetProposalCurrentYearPlus1,
-          [`TSE ${year + 3}`]: r.budgetProposalCurrentYearPlus2,
+          [`${t('previouslyUsed')} ${t('millionEuro')}`]: r.spentBudget,
+          [`TA ${year + 1} ${t('millionEuro')}`]: r.budgetProposalCurrentYearPlus0,
+          [`TS ${year + 2} ${t('millionEuro')}`]: r.budgetProposalCurrentYearPlus1,
+          [`TS ${year + 3} ${t('millionEuro')}`]: r.budgetProposalCurrentYearPlus2,
         }));
       }
       case Reports.BudgetBookSummary: {
