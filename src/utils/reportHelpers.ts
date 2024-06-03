@@ -992,9 +992,9 @@ export const getReportData = async (
           [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
           [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
           [t('previouslyUsed')]: r.spentBudget,
-          [`TAE ${year}`]: r.budgetProposalCurrentYearPlus0,
-          [`TSE ${year + 1}`]: r.budgetProposalCurrentYearPlus1,
-          [`TSE ${year + 2}`]: r.budgetProposalCurrentYearPlus2,
+          [`TAE ${year + 1}`]: r.budgetProposalCurrentYearPlus0,
+          [`TSE ${year + 2}`]: r.budgetProposalCurrentYearPlus1,
+          [`TSE ${year + 3}`]: r.budgetProposalCurrentYearPlus2,
         }));
       }
       case Reports.BudgetBookSummary: {
