@@ -1,4 +1,12 @@
-import { IBudgetBookSummaryCsvRow, IConstructionProgramTableRow, IFlattenedBudgetBookSummaryProperties, IOperationalEnvironmentAnalysisCsvRow, IFlattenedOperationalEnvironmentAnalysisProperties, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import {
+  IBudgetBookSummaryCsvRow,
+  IConstructionProgramTableRow,
+  IFlattenedBudgetBookSummaryProperties,
+  IOperationalEnvironmentAnalysisCsvRow,
+  IFlattenedOperationalEnvironmentAnalysisProperties,
+  ReportType,
+  Reports
+} from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -56,6 +64,31 @@ const styles = StyleSheet.create({
     paddingLeft: '21px',
     paddingRight: '15px',
     width: '214px',
+  },
+  masterClassRow: {
+    ...tableRowStyles,
+    backgroundColor: '#0000bf',
+    color: 'white',
+  },
+  classRow: {
+    ...tableRowStyles,
+    backgroundColor: '#0000a3',
+    color: 'white',
+  },
+  subClassRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00007a',
+    color: 'white',
+  },
+  subClassDistrictRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00007a',
+    color: 'white',
+  },
+  districtPreviewRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00005e',
+    color: 'white',
   },
   classNameCell: {
     ...cellStyles,
@@ -296,6 +329,24 @@ const getRowStyle = (rowType: string, depth: number) => {
   }
 }
 
+const getConstructionRowStyle = (rowType: string, depth: number) => {
+  switch (rowType) {
+    case 'masterClass':
+      return styles.masterClassRow;
+    case 'class':
+      return styles.classRow;
+    case 'subClass':
+      return styles.subClassRow;
+    case 'subClassDistrict':
+      return styles.subClassDistrictRow;
+    case 'districtPreview':
+      return styles.districtPreviewRow;
+    default:
+      if (depth % 2) return styles.evenRow;
+      return styles.oddRow;
+  }
+}
+
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
@@ -303,7 +354,12 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             if (flattenedRow) {
               tableRow =
               <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
-                  <Text style={['class', 'location'].includes(flattenedRow.type ?? '') ? strategyReportStyles.classNameCell : strategyReportStyles.projectCell}>{flattenedRow.name}</Text>
+                  <Text style={
+                    ['class', 'location'].includes(flattenedRow.type ?? '')
+                    ? strategyReportStyles.classNameCell
+                    : strategyReportStyles.projectCell}>
+                      {flattenedRow.name}
+                  </Text>
                   <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                   <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                   <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
@@ -329,17 +385,26 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             break;
         }
         case Reports.ConstructionProgram: {
-          if (flattenedRow) {
-            tableRow =  
-            <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
-                <Text style={flattenedRow.type === 'class' ? styles.classNameCell : styles.nameCell}>{flattenedRow.name}</Text>
-                <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
-                <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
-                <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
-                <Text style={styles.previouslyUsedCell}>{flattenedRow.spentBudget}</Text>
-                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
-                <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
-                <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
+          // Programming view (hierarchy) colours for class rows
+          // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
+        if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
+          tableRow =
+            <View
+              wrap={false}
+              style={ getConstructionRowStyle(flattenedRow.type ?? '', index ?? 0 )}
+              key={flattenedRow.id}
+            >
+              <Text style={['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'group', 'info', 'empty'].includes(flattenedRow.type)
+                ? styles.classNameCell
+                : styles.nameCell}
+              >{flattenedRow.name}</Text>
+              <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
+              <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
+              <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+              <Text style={styles.previouslyUsedCell}>{flattenedRow.spentBudget}</Text>
+              <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
+              <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
+              <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
             </View>
           }
           break;
@@ -389,8 +454,10 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
         case Reports.OperationalEnvironmentAnalysis: {
           if (flattenedRow) {
             const getNameStyle = () => {
-              if (flattenedRow.type === 'taeFrame') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
-              if (flattenedRow.type === 'changePressure') return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.changePressure];
+              if (flattenedRow.type === 'taeFrame')
+                return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.frame];
+              if (flattenedRow.type === 'changePressure')
+                return [operationalEnvironmentAnalysisStyles.targetColumn, operationalEnvironmentAnalysisStyles.changePressure];
               return [operationalEnvironmentAnalysisStyles.targetColumn];
             }
             
@@ -404,7 +471,9 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             }
             const color = getColor();
 
-            const shouldHaveIdentation = flattenedRow.type === 'taeFrame' || flattenedRow.type === 'changePressure' || flattenedRow.type === 'category';
+            const shouldHaveIdentation = flattenedRow.type === 'taeFrame' ||
+              flattenedRow.type === 'changePressure' ||
+              flattenedRow.type === 'category';
 
             if (shouldHaveIdentation) nameStyle.push(operationalEnvironmentAnalysisStyles.indentation);
 
