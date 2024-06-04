@@ -394,7 +394,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               style={ getConstructionRowStyle(flattenedRow.type ?? '', index ?? 0 )}
               key={flattenedRow.id}
             >
-              <Text style={['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'group', 'info', 'empty'].includes(flattenedRow.type)
+              <Text style={['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'info'].includes(flattenedRow.type)
                 ? styles.classNameCell
                 : styles.nameCell}
               >{flattenedRow.name}</Text>
