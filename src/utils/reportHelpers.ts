@@ -435,6 +435,8 @@ const getConstructionRowType = (type: string, name: string) => {
       } else {
         return 'class';
       }
+    case 'districtPreview':
+      return 'districtPreview';
     case 'division':
       return 'division';
     case 'group':
@@ -949,6 +951,14 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
 };
 
 const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]) => {
+  const getType = (name: string, type: string) => {
+    const nameLowerCase = name.toLowerCase();
+    if (nameLowerCase.includes("suurpiiri") || nameLowerCase.includes("östersundom")){
+      return type === "districtPreview" ? "subClassDistrict" : type;
+    }
+    return type;
+  }
+
   tableRows.forEach((tableRow) => {
     if (
       tableRow.type !== 'subClassDistrict' &&
@@ -958,7 +968,7 @@ const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]
       constructionProgramCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,
-        type: tableRow.type,
+        type: getType(tableRow.name, tableRow.type),
         location: tableRow.location,
         costForecast: tableRow.costForecast,
         startAndEnd: tableRow.startAndEnd,

@@ -67,12 +67,27 @@ const styles = StyleSheet.create({
   },
   masterClassRow: {
     ...tableRowStyles,
-    backgroundColor: '#0000a3',
+    backgroundColor: '#0000bf',
     color: 'white',
   },
   classRow: {
     ...tableRowStyles,
+    backgroundColor: '#0000a3',
+    color: 'white',
+  },
+  subClassRow: {
+    ...tableRowStyles,
     backgroundColor: '#00007a',
+    color: 'white',
+  },
+  subClassDistrictRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00007a',
+    color: 'white',
+  },
+  districtPreviewRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00005e',
     color: 'white',
   },
   classNameCell: {
@@ -315,12 +330,17 @@ const getRowStyle = (rowType: string, depth: number) => {
 }
 
 const getConstructionRowStyle = (rowType: string, depth: number) => {
-  // masterClass, class, group, project, info, empty
   switch (rowType) {
     case 'masterClass':
       return styles.masterClassRow;
     case 'class':
       return styles.classRow;
+    case 'subClass':
+      return styles.subClassRow;
+    case 'subClassDistrict':
+      return styles.subClassDistrictRow;
+    case 'districtPreview':
+      return styles.districtPreviewRow;
     default:
       if (depth % 2) return styles.evenRow;
       return styles.oddRow;
@@ -365,23 +385,16 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             break;
         }
         case Reports.ConstructionProgram: {
-          // Blue background for class rows excluding 'suurpiiri' classes. Otherwise white/grey rows
+          // Programming view (hierarchy) colours for class rows
           // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
         if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
-          const rowTypeForStyle = () => {
-            if (flattenedRow.name.includes('suurpiiri')){
-              return 'district';
-            }
-            return flattenedRow.type ?? '';
-          }
-
           tableRow =
             <View
               wrap={false}
-              style={ getConstructionRowStyle(rowTypeForStyle(), index ?? 0 )}
+              style={ getConstructionRowStyle(flattenedRow.type ?? '', index ?? 0 )}
               key={flattenedRow.id}
             >
-              <Text style={['masterClass', 'class', 'group', 'info', 'empty'].includes(flattenedRow.type)
+              <Text style={['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'group', 'info', 'empty'].includes(flattenedRow.type)
                 ? styles.classNameCell
                 : styles.nameCell}
               >{flattenedRow.name}</Text>
