@@ -64,7 +64,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           break;
         }
         case Reports.ConstructionProgram: {
-          const res = await getPlanningData(year);
+          const res = await getPlanningData(year + 1);
           const resDivisions = await getDistricts();
           const divisions = getProjectDistricts(resDivisions, "division");
 
