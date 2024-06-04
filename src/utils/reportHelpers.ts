@@ -1,4 +1,3 @@
-import { ILocation } from '@/interfaces/locationInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   IBudgetBookSummaryCsvRow,
@@ -40,15 +39,10 @@ export const getDivision = (
   divisions?: Array<IListItem>,
   projectLocation?: string
 ) => {
-  const division: ILocation | IListItem | undefined = divisions &&
-    (divisions as Array<ILocation | IListItem>).filter((d: ILocation | IListItem) => projectLocation && d.id === projectLocation)[0];
+  const division = divisions?.filter((d) => projectLocation && d.id === projectLocation)[0];
 
   if (division) {
-    if ('name' in division && division.name) {
-      return division.name.replace(/^\d+\.\s*/, '');
-    } else if ('value' in division && division.value) {
-      return division.value.replace(/^\d+\.\s*/, '');
-    }
+    return division.value.replace(/^\d+\.\s*/, '');
   }
   return '';
 };

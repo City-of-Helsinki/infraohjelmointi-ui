@@ -1,7 +1,7 @@
 import { IClass } from './classInterfaces';
 
 export interface ILocation extends IClass {
-  parentClass: string | undefined;
+  parentClass: string | null;
 }
 
 export interface IProjectDistrict {
