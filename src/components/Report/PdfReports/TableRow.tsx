@@ -346,7 +346,14 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
     case 'districtPreview':
       return styles.districtPreviewRow;
     case 'group':
-      return styles.groupRow;
+      if (depth % 2) return {
+        ...styles.groupRow,
+        ...styles.evenRow,
+      }
+      return {
+        ...styles.groupRow,
+        ...styles.oddRow,
+      }
     default:
       if (depth % 2) return styles.evenRow;
       return styles.oddRow;
