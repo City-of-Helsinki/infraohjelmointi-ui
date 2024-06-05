@@ -756,9 +756,9 @@ export const convertToReportRows = (
               type: 'info',
               name: t('report.constructionProgram.underMillionSummary'),
               parent: c.path,
-              budgetProposalCurrentYearPlus0: underMillionSummary.budgetProposalCurrentYearPlus0.toString(),
-              budgetProposalCurrentYearPlus1: underMillionSummary.budgetProposalCurrentYearPlus1.toString(),
-              budgetProposalCurrentYearPlus2: underMillionSummary.budgetProposalCurrentYearPlus2.toString(),
+              budgetProposalCurrentYearPlus0: underMillionSummary.budgetProposalCurrentYearPlus0.toString().replace('.', ','),
+              budgetProposalCurrentYearPlus1: underMillionSummary.budgetProposalCurrentYearPlus1.toString().replace('.', ','),
+              budgetProposalCurrentYearPlus2: underMillionSummary.budgetProposalCurrentYearPlus2.toString().replace('.', ','),
             }
             const emptyRow: IConstructionProgramTableRow = {
               children: [],
