@@ -347,12 +347,12 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
       return styles.districtPreviewRow;
     case 'group':
       if (depth % 2) return {
-        ...styles.groupRow,
         ...styles.evenRow,
+        ...styles.groupRow,
       }
       return {
-        ...styles.groupRow,
         ...styles.oddRow,
+        ...styles.groupRow,
       }
     default:
       if (depth % 2) return styles.evenRow;
