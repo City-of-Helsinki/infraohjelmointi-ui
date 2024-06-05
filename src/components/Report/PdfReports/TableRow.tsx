@@ -90,6 +90,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#00005e',
     color: 'white',
   },
+  groupRow: {
+    ...tableRowStyles,
+    fontWeight: 'bold',
+  },
   classNameCell: {
     ...cellStyles,
     ...constructionProgramCommonStyles,
@@ -341,6 +345,8 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
       return styles.subClassDistrictRow;
     case 'districtPreview':
       return styles.districtPreviewRow;
+    case 'group':
+      return styles.groupRow;
     default:
       if (depth % 2) return styles.evenRow;
       return styles.oddRow;
