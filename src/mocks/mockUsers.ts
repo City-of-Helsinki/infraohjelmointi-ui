@@ -40,6 +40,11 @@ export const mockUser: { data: IUser } = {
         display_name: 'sl_dyn_kymp_sso_io_katselijat',
       },
       {
+        id: '61336d5e-4b74-400f-a1d6-c9f96d3f1d4d',
+        name: 'sg_kymp_sso_io_katselijat_muut' as UserRole,
+        display_name: 'sg_KYMP_sso_IO_Katselijat_Muut'
+      },
+      {
         id: 'test-admin-role',
         name: 'sg_kymp_sso_io_admin' as UserRole,
         display_name: 'sg_KYMP_sso_IO_Admin',

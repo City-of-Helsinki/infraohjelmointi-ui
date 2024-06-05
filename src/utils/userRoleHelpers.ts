@@ -60,7 +60,7 @@ export const isUserOnlyViewer = (user: IUser | null) => {
   if (!user) {
     return false;
   }
-  return user.ad_groups.length === 1 && user.ad_groups.some((ag) => ag.name === UserRole.VIEWER);
+  return user.ad_groups.length === 1 && user.ad_groups.some((ag) => ag.name === UserRole.VIEWER || ag.name === UserRole.VIEWER_OTHERS);
 };
 
 export const isUserOnlyProjectAreaPlanner = (user: IUser | null) => {
