@@ -1,6 +1,6 @@
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { mockClassFinances } from './mockClassFinances';
-import { IListItem, IOption } from '@/interfaces/common';
+import { IListItem } from '@/interfaces/common';
 
 export const mockLocations: { data: Array<ILocation> } = {
   data: [

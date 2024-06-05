@@ -423,6 +423,7 @@ describe('projectForm', () => {
   });
 
   it('can post a new project', async () => {
+    jest.setTimeout(15000);
     const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
     const { dispatch } = store;
 

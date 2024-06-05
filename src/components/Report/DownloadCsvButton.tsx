@@ -10,6 +10,8 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IListItem } from '@/interfaces/common';
+import { getDistricts } from '@/services/listServices';
+import { getProjectDistricts } from '@/reducers/listsSlice';
 
 interface IDownloadCsvButtonProps {
   type: ReportType;
@@ -62,10 +64,13 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           break;
         }
         case Reports.ConstructionProgram: {
-          const res = await getPlanningData(year);
+          const res = await getPlanningData(year + 1);
+          const resDivisions = await getDistricts();
+          const divisions = getProjectDistricts(resDivisions, "division");
+
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, res.planningDistricts.divisions));
+            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, divisions));
           }
           break;
         }
