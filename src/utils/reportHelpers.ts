@@ -689,7 +689,7 @@ export const convertToReportRows = (
               projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
               costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.costEstimateBudget),
               startAndEnd: isOnlyHeaderGroup ? undefined : `${startYear}-${endYear}`,
-              type: isOnlyHeaderGroup ? 'class' : 'group',
+              type: isOnlyHeaderGroup ? 'group' : 'project',
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, divisions))
             }
             
