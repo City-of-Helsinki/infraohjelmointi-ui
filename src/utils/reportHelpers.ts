@@ -557,7 +557,7 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
     budgetProposalCurrentYearPlus2: 0
   };
   for (const row of rows) {
-    if (row.type === 'group') {
+    if (row.type === 'groupWithValues') {
       sumOfBudgets.budgetProposalCurrentYearPlus0 += parseFloat((row.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.'));
       sumOfBudgets.budgetProposalCurrentYearPlus1 += parseFloat((row.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.'));
       sumOfBudgets.budgetProposalCurrentYearPlus2 += parseFloat((row.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.'));
@@ -689,7 +689,7 @@ export const convertToReportRows = (
               projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
               costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.costEstimateBudget),
               startAndEnd: isOnlyHeaderGroup ? undefined : `${startYear}-${endYear}`,
-              type: isOnlyHeaderGroup ? 'group' : 'project',
+              type: isOnlyHeaderGroup ? 'group' : 'groupWithValues',
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, divisions))
             }
             
