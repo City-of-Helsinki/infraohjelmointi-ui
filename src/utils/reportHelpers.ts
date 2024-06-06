@@ -935,6 +935,7 @@ const constructionProgramCsvRows: IConstructionProgramCsvRow[] = [];
 const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => {
   return (
     tableRow.type === 'group' ||
+    tableRow.type === 'groupWithValues' ||
     tableRow.type === 'project' ||
     tableRow.projects.length > 0 ||
     tableRow.name === t('report.constructionProgram.classSummary') ||
