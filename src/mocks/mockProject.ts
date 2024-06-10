@@ -50,7 +50,7 @@ const mockProject: { data: IProject } = {
       title: '',
       phone: '',
     },
-    estPlanningStart: '01.01.2021',
+    estPlanningStart: '01.01.2020',
     estPlanningEnd: '01.04.2025',
     category: {
       id: '8b614fbe-bb41-4d66-9efc-bdba3d0d943a',
@@ -86,7 +86,7 @@ const mockProject: { data: IProject } = {
     otherPersons: '',
     description: 'Mock project description',
     programmed: true,
-    planningStartYear: 2021,
+    planningStartYear: 2020,
     constructionEndYear: 2031,
     projectWorkQuantity: '3000',
     projectCostForecast: '4000',
