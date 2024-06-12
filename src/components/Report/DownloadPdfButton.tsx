@@ -29,6 +29,7 @@ const getPdfDocument = (
   type: ReportType,
   rows: IPlanningRow[],
   divisions?: Array<IListItem>,
+  subDivisions?: Array<IListItem>,
   categories?: IListItem[],
 ) => {
   const pdfDocument = {
@@ -38,7 +39,7 @@ const getPdfDocument = (
       <ReportContainer data={{rows}} reportType={Reports.Strategy}/>
     ),
     constructionProgram: (
-      <ReportContainer data={{rows, divisions}} reportType={Reports.ConstructionProgram}/>
+      <ReportContainer data={{rows, divisions, subDivisions}} reportType={Reports.ConstructionProgram}/>
     ),
     budgetBookSummary: (
       <ReportContainer data={{rows}} reportType={Reports.BudgetBookSummary}/>
@@ -91,7 +92,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, coordinatorRows, undefined, categories);
+            document = getPdfDocument(type, coordinatorRows, undefined, undefined, categories);
           }
           break;
         }
@@ -99,10 +100,11 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const res = await getPlanningData(year + 1);
           const resDivisions = await getDistricts();
           const divisions = getProjectDistricts(resDivisions, "division");
+          const subDivisions = getProjectDistricts(resDivisions, "subDivision");
 
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, planningRows, divisions);
+            document = getPdfDocument(type, planningRows, divisions, subDivisions);
           }
         }
       }

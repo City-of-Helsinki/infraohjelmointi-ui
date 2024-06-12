@@ -92,6 +92,7 @@ export interface IPlanningRow extends IPlanningSums {
   objectType?: string;
   financeProperties?: IBudgetBookFinanceProperties;
   frameBudgets?: IOperationalEnvironmentAnalysisFinanceProperties;
+  location?: string | null;
 }
 
 export type PlanningMode = 'planning' | 'coordination';
