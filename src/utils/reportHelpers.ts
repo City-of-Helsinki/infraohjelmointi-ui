@@ -36,13 +36,19 @@ interface IBudgetCheck {
  * Gets the division name and removes the number infront of it.
  */
 export const getDivision = (
+  projectLocation?: string,
   divisions?: Array<IListItem>,
-  projectLocation?: string
+  subDivisions?: Array<IListItem>
 ) => {
   const division = divisions?.filter((d) => projectLocation && d.id === projectLocation)[0];
-
   if (division) {
     return division.value.replace(/^\d+\.\s*/, '');
+  } else {
+    const subDivision = subDivisions?.filter((d) => projectLocation && d.id === projectLocation)[0];
+    if (subDivision) {
+      const division = divisions?.filter((d) => d.id === subDivision.parent)[0];
+      return division ? division.value.replace(/^\d+\.\s*/, '') : '';
+    }
   }
   return '';
 };
@@ -236,8 +242,10 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
     }));
 }
 
-const convertToConstructionReportProjects = (projects: IProject[],
-  divisions: Array<IListItem> | undefined
+const convertToConstructionReportProjects = (
+  projects: IProject[],
+  divisions: Array<IListItem> | undefined,
+  subDivisions: Array<IListItem> | undefined
 ): IConstructionProgramTableRow[] => {
   return projects
   .filter((p) => 
@@ -258,7 +266,7 @@ const convertToConstructionReportProjects = (projects: IProject[],
     children: [],
     projects: [],
     parent: null,
-    location: getDivision(divisions, p.projectDistrict),
+    location: getDivision(p.projectDistrict, divisions, subDivisions),
     costForecast: keurToMillion(p.costForecast),
     startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
     spentBudget: keurToMillion(p.spentBudget),
@@ -274,22 +282,17 @@ const convertToConstructionReportProjects = (projects: IProject[],
 
 const convertToGroupValues = (
   projects: IProject[],
-  divisions: Array<IListItem> | undefined
 ) => {
   let spentBudget = 0;
   let budgetProposalCurrentYearPlus0 = 0;
   let budgetProposalCurrentYearPlus1 = 0;
   let budgetProposalCurrentYearPlus2 = 0;
-  const groupLocation: string[] = [];
 
   for (const p of projects) {
     spentBudget += parseFloat(p.spentBudget);
     budgetProposalCurrentYearPlus0 += parseFloat(p.finances.budgetProposalCurrentYearPlus0 ?? '0');
     budgetProposalCurrentYearPlus1 += parseFloat(p.finances.budgetProposalCurrentYearPlus1 ?? '0');
     budgetProposalCurrentYearPlus2 += parseFloat(p.finances.budgetProposalCurrentYearPlus2 ?? '0');
-    if (p.projectLocation && !groupLocation.some(location => location === p.projectLocation)) {
-      groupLocation.push(p.projectLocation)
-    }
   }
 
   return {
@@ -297,7 +300,6 @@ const convertToGroupValues = (
     budgetProposalCurrentYearPlus0: keurToMillion(budgetProposalCurrentYearPlus0),
     budgetProposalCurrentYearPlus1: keurToMillion(budgetProposalCurrentYearPlus1),
     budgetProposalCurrentYearPlus2: keurToMillion(budgetProposalCurrentYearPlus2),
-    location: groupLocation.length === 1 ? getDivision(divisions, groupLocation[0]) : ""
   }
 }
 
@@ -580,7 +582,8 @@ export const convertToReportRows = (
   reportType: ReportType | '',
   categories: IListItem[] | undefined,
   t: TFunction<"translation", undefined>,
-  divisions?: Array<IListItem> | undefined
+  divisions?: Array<IListItem> | undefined,
+  subDivisions?: Array<IListItem> | undefined
 ): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
@@ -686,11 +689,12 @@ export const convertToReportRows = (
               name: c.name,
               parent: c.path,
               children: [],
-              projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
+              projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
               costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.costEstimateBudget),
               startAndEnd: isOnlyHeaderGroup ? undefined : `${startYear}-${endYear}`,
               type: isOnlyHeaderGroup ? 'group' : 'groupWithValues',
-              ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, divisions))
+              location: c.location ? getDivision(c.location, divisions, subDivisions) : '',
+              ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows)),
             }
             
             if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup)) {
@@ -713,8 +717,8 @@ export const convertToReportRows = (
             id: c.id,
             name: c.name,
             parent: c.path,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions) : [],
-            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions) : [],
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions) : [],
+            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
 
@@ -1006,6 +1010,7 @@ export const getReportData = async (
   reportType: ReportType,
   rows: IPlanningRow[],
   divisions?: IListItem[],
+  subDivisions?: IListItem[],
   categories?: IListItem[],
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
@@ -1014,7 +1019,7 @@ export const getReportData = async (
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
-  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions);
+  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions);
 
   try {
     switch (reportType) {

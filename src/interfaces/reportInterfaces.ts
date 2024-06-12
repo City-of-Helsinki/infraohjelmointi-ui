@@ -95,6 +95,7 @@ export interface IBasicReportData {
   categories?: IListItem[];
   rows: IPlanningRow[];
   divisions?: Array<IListItem>;
+  subDivisions?: Array<IListItem>;
 }
 
 interface ITableRowEssentials {

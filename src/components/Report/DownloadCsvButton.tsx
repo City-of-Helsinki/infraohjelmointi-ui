@@ -67,10 +67,11 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           const res = await getPlanningData(year + 1);
           const resDivisions = await getDistricts();
           const divisions = getProjectDistricts(resDivisions, "division");
+          const subDivisions = getProjectDistricts(resDivisions, "subDivision");
 
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, divisions));
+            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, divisions, subDivisions));
           }
           break;
         }

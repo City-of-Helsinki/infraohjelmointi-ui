@@ -52,7 +52,7 @@ const ReportTable: FC<IConstructionProgramTableProps> = ({
   data
 }) => {
   const { t } = useTranslation();
-  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions);
+  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions, data.subDivisions);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (

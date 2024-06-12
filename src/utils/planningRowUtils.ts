@@ -172,6 +172,7 @@ export const buildPlanningRow = ({
     children: [],
     projectRows,
     cells: calculatePlanningCells(item.finances, type),
+    location: type === 'group' ? (item as IGroup).location : '',
     ...calculatePlanningRowSums(item.finances, type),
   };
 };
