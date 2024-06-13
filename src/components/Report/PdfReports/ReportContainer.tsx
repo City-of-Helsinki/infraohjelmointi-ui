@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 interface IPdfReportContainerProps {
   reportType: ReportType;
   data: IBasicReportData;
-  projectsInWarrantyPhase?: IProject[] | undefined,
+  projectsInWarrantyPhase?: IProject[],
 }
 
 const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase }) => {

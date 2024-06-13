@@ -615,8 +615,8 @@ export const convertToReportRows = (
       const forcedToFrameHierarchy = [];
 
       const sumBudgets = (number1?: string, number2?: string | null): string => {
-        const formattedNumber1 = Number(number1?.replace(/\s/g, '') || '0');
-        const formattedNumber2 = Number(number2?.replace(/\s/g, '') || '0');
+        const formattedNumber1 = Number(number1?.replace(/\s/g, '') ?? '0');
+        const formattedNumber2 = Number(number2?.replace(/\s/g, '') ?? '0');
         const sum = formattedNumber1 + formattedNumber2;
         return formatNumberToContainSpaces(sum);
       }
