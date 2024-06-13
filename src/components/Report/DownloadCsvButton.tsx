@@ -59,7 +59,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(t, type, coordinatorRows, undefined, categories, res.projectsInWarrantyPhase));
+            setCsvData(await getReportData(t, type, coordinatorRows, undefined, undefined, categories, res.projectsInWarrantyPhase));
           }
           break;
         }
