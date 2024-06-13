@@ -15,6 +15,7 @@ import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
+import { IProject } from '@/interfaces/projectInterfaces';
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -31,10 +32,11 @@ const getPdfDocument = (
   divisions?: Array<IListItem>,
   subDivisions?: Array<IListItem>,
   categories?: IListItem[],
+  projectsInWarrantyPhase?: IProject[],
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis:
-      <ReportContainer data={{categories, rows}} reportType={Reports.OperationalEnvironmentAnalysis}/>,
+      <ReportContainer data={{categories, rows}} reportType={Reports.OperationalEnvironmentAnalysis} projectsInWarrantyPhase={projectsInWarrantyPhase} />,
     strategy: (
       <ReportContainer data={{rows}} reportType={Reports.Strategy}/>
     ),
@@ -92,7 +94,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            document = getPdfDocument(type, coordinatorRows, undefined, undefined, categories);
+            document = getPdfDocument(type, coordinatorRows, undefined, undefined, categories, res.projectsInWarrantyPhase);
           }
           break;
         }

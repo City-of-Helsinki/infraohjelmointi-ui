@@ -1,4 +1,4 @@
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectFinances } from '@/interfaces/projectInterfaces';
 import {
   IBudgetBookSummaryCsvRow,
   IBudgetBookSummaryTableRow,
@@ -13,6 +13,8 @@ import {
   Reports,
   ICategoryArray,
   ITotals,
+  IPlannedBudgets,
+  IChild,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -583,7 +585,8 @@ export const convertToReportRows = (
   categories: IListItem[] | undefined,
   t: TFunction<"translation", undefined>,
   divisions?: Array<IListItem> | undefined,
-  subDivisions?: Array<IListItem> | undefined
+  subDivisions?: Array<IListItem> | undefined,
+  projectsInWarrantyPhase?: Array<IProject>,
 ): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
@@ -610,12 +613,20 @@ export const convertToReportRows = (
     }
     case Reports.OperationalEnvironmentAnalysis: {
       const forcedToFrameHierarchy = [];
+
+      const sumBudgets = (number1?: string, number2?: string | null): string => {
+        const formattedNumber1 = Number(number1?.replace(/\s/g, '') || '0');
+        const formattedNumber2 = Number(number2?.replace(/\s/g, '') || '0');
+        const sum = formattedNumber1 + formattedNumber2;
+        return formatNumberToContainSpaces(sum);
+      }
+
       for (const c of rows) {
         const convertedClass = {
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
           parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
+          children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, projectsInWarrantyPhase) : [],
           projects: [],
           frameBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "frameBudget"),
           plannedBudgets: mapOperationalEnvironmentAnalysisProperties(c.cells, "plannedBudget"),
@@ -623,14 +634,30 @@ export const convertToReportRows = (
           cells: c.cells,
           type: 'class' as ReportTableRowType
         }
+        /* Because the projects in the warranty phase are not calculated to the sums in the views of the tool we need to add them manually.
+           There is more logic related to this further in this file where addProjectBudgetToSpecifiedLevel function is used */
+        const foundProjects = projectsInWarrantyPhase?.filter((p) => p.projectClass == convertedClass.id);
+        foundProjects?.forEach((p) => {
+          // If there were projects in the warranty phase, we add those budgets to the subClass level here e.g. 8 01 03 01 etc.
+          convertedClass.plannedBudgets.plannedCostForecast = sumBudgets(convertedClass.plannedBudgets.plannedCostForecast, p.finances.budgetProposalCurrentYearPlus0);
+          convertedClass.plannedBudgets.plannedTAE = sumBudgets(convertedClass.plannedBudgets.plannedTAE, p.finances.budgetProposalCurrentYearPlus1);
+          convertedClass.plannedBudgets.plannedTSE1 = sumBudgets(convertedClass.plannedBudgets.plannedTSE1, p.finances.budgetProposalCurrentYearPlus2);
+          convertedClass.plannedBudgets.plannedTSE2 = sumBudgets(convertedClass.plannedBudgets.plannedTSE2, p.finances.preliminaryCurrentYearPlus3);
+          convertedClass.plannedBudgets.plannedInitial1 = sumBudgets(convertedClass.plannedBudgets.plannedInitial1, p.finances.preliminaryCurrentYearPlus4);
+          convertedClass.plannedBudgets.plannedInitial2 = sumBudgets(convertedClass.plannedBudgets.plannedInitial2, p.finances.preliminaryCurrentYearPlus5);
+          convertedClass.plannedBudgets.plannedInitial3 = sumBudgets(convertedClass.plannedBudgets.plannedInitial3, p.finances.preliminaryCurrentYearPlus6);
+          convertedClass.plannedBudgets.plannedInitial4 = sumBudgets(convertedClass.plannedBudgets.plannedInitial4, p.finances.preliminaryCurrentYearPlus7);
+          convertedClass.plannedBudgets.plannedInitial5 = sumBudgets(convertedClass.plannedBudgets.plannedInitial5, p.finances.preliminaryCurrentYearPlus8);
+          convertedClass.plannedBudgets.plannedInitial6 = sumBudgets(convertedClass.plannedBudgets.plannedInitial6, p.finances.preliminaryCurrentYearPlus9);
+          convertedClass.plannedBudgets.plannedInitial7 = sumBudgets(convertedClass.plannedBudgets.plannedInitial7, p.finances.preliminaryCurrentYearPlus10);
+        })
 
         const plannedBudgets = Object.values(convertedClass.plannedBudgets);
         const isSomeLevelofClass = c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass';
-        // TA parts that don't have any planned budgets shouldn't be shown on the report.
-        // There shouldn't either be other rows than classes from some of the levels.
+        /* TA parts that don't have any planned budgets shouldn't be shown on the report.
+           There shouldn't either be other rows than classes from some of the levels. */
         if (isSomeLevelofClass && plannedBudgets.some((value) => value !== "0")) {
           forcedToFrameHierarchy.push(convertedClass);
-
           const noneOfTheChildrenIsSubClass =
             c.type === 'class' && c.children.length > 0 && c.children.some((child) => child.type !== 'subClass');
 
@@ -647,6 +674,49 @@ export const convertToReportRows = (
             extraRows.forEach((row) =>
               forcedToFrameHierarchy.push(row)
             );
+          }
+        }
+      }
+
+      const addProjectBudgetToSpecifiedLevel = (level: IPlannedBudgets, projectInWarrantyPhase: IProjectFinances) => {
+        level.plannedCostForecast = sumBudgets(level.plannedCostForecast, projectInWarrantyPhase.budgetProposalCurrentYearPlus0);
+        level.plannedTAE = sumBudgets(level.plannedTAE, projectInWarrantyPhase.budgetProposalCurrentYearPlus1);
+        level.plannedTSE1 = sumBudgets(level.plannedTSE1, projectInWarrantyPhase.budgetProposalCurrentYearPlus2);
+        level.plannedTSE2 = sumBudgets(level.plannedTSE2, projectInWarrantyPhase.preliminaryCurrentYearPlus3);
+        level.plannedInitial1 = sumBudgets(level.plannedInitial1, projectInWarrantyPhase.preliminaryCurrentYearPlus4);
+        level.plannedInitial2 = sumBudgets(level.plannedInitial2, projectInWarrantyPhase.preliminaryCurrentYearPlus5);
+        level.plannedInitial3 = sumBudgets(level.plannedInitial3, projectInWarrantyPhase.preliminaryCurrentYearPlus6);
+        level.plannedInitial4 = sumBudgets(level.plannedInitial4, projectInWarrantyPhase.preliminaryCurrentYearPlus7);
+        level.plannedInitial5 = sumBudgets(level.plannedInitial5, projectInWarrantyPhase.preliminaryCurrentYearPlus8);
+        level.plannedInitial6 = sumBudgets(level.plannedInitial6, projectInWarrantyPhase.preliminaryCurrentYearPlus9);
+        level.plannedInitial7 = sumBudgets(level.plannedInitial7, projectInWarrantyPhase.preliminaryCurrentYearPlus10);
+      }
+
+      // this function is called recursively --> we need to check that we have the version with main level classes e.g. 8 01 KIINTEÄ OMAISUUS etc.
+      const has801 = forcedToFrameHierarchy.some(item => item.name === "8 01 KIINTEÄ OMAISUUS");
+      const has803 = forcedToFrameHierarchy.some(item => item.name === "8 03 KADUT JA LIIKENNEVÄYLÄT");
+      if (has801 && has803) {
+        for (const mainClass of forcedToFrameHierarchy) {
+          // loop through the children of each main class to check if they contain projects in the warranty phase
+          for (const child of mainClass.children) {
+            /* in addition to projects, children of the mainClass also include objects of categories,
+              changePressure and taeFrame that need to be filtered out here to get the projects only */
+            if (!child?.id?.includes("category") && !child?.id?.includes("changePressure") && !child?.id?.includes("taeFrame")) {
+              const foundProjectsInWarrantyPhase = projectsInWarrantyPhase?.filter((p) => p.projectClass == child.id);
+              foundProjectsInWarrantyPhase?.forEach((p) => {
+                addProjectBudgetToSpecifiedLevel(mainClass.plannedBudgets, p.finances);
+              });
+              
+              // loop through also the children of children. This is the last level in which we can find matching ids
+              for (const child1 of child.children) {
+                const foundProjects = projectsInWarrantyPhase?.filter((p) => p.projectClass == child1.id);
+                const typedChild = child as IChild;
+                foundProjects?.forEach((p) => {
+                  addProjectBudgetToSpecifiedLevel(mainClass.plannedBudgets, p.finances);
+                  addProjectBudgetToSpecifiedLevel(typedChild?.plannedBudgets, p.finances)
+                });
+              }
+            }
           }
         }
       }

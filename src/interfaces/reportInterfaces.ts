@@ -1,13 +1,14 @@
 import { IClassHierarchy, ICoordinatorClassHierarchy } from "@/reducers/classSlice";
 import { ILocation } from "./locationInterfaces";
 import { IProject, IProjectsResponse } from "./projectInterfaces";
-import { IPlanningRow, IPlanningRowSelections, PlanningRowType } from "./planningInterfaces";
+import { IPlanningCell, IPlanningRow, IPlanningRowSelections, PlanningRowType } from "./planningInterfaces";
 import { IGroup } from "./groupInterfaces";
 import { IListItem } from "./common";
 
 export type getForcedToFrameDataType = Promise<{ 
     res: IProjectsResponse;
     projects: IProject[];
+    projectsInWarrantyPhase?: IProject[];
     classHierarchy: ICoordinatorClassHierarchy;
     forcedToFrameDistricts: {
       districts: ILocation[];
@@ -103,7 +104,18 @@ interface ITableRowEssentials {
   name: string;
   parent: string | null | undefined;
 }
-
+export interface IChild {
+  cells: IPlanningCell[];
+  children?: IOperationalEnvironmentAnalysisTableRow[];
+  projects?: IOperationalEnvironmentAnalysisTableRow[];
+  type: ReportTableRowType;
+  parent?: string | null;
+  name: string;
+  id: string;
+  costforecast?: string;
+  frameBudgets: IOperationalEnvironmentAnalysisFinanceProperties;
+  plannedBudgets: IPlannedBudgets;
+}
 export interface IOperationalEnvironmentAnalysisFinanceProperties {
   costForecast?: string;
   TAE?: string;

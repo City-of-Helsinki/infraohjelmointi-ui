@@ -5,6 +5,7 @@ import ReportTable from './ReportTable';
 import { FC, memo } from 'react';
 import StrategyReportFooter from './StrategyReportFooter';
 import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 const styles = StyleSheet.create({
   page: {
@@ -19,9 +20,10 @@ const styles = StyleSheet.create({
 interface IPdfReportContainerProps {
   reportType: ReportType;
   data: IBasicReportData;
+  projectsInWarrantyPhase?: IProject[] | undefined,
 }
 
-const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => {
+const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase }) => {
   const { t } = useTranslation();
 
   const getDocumentTitle = () => {
@@ -86,7 +88,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data }) => 
             reportType={reportType}
             date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
           />
-          <ReportTable reportType={reportType} data={data} />
+          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} />
           {reportType === Reports.Strategy &&
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
