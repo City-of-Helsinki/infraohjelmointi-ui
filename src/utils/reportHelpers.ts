@@ -1082,6 +1082,7 @@ export const getReportData = async (
   divisions?: IListItem[],
   subDivisions?: IListItem[],
   categories?: IListItem[],
+  projectsInWarrantyPhase?: IProject[],
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
   | Array<IStrategyTableCsvRow>
@@ -1089,7 +1090,7 @@ export const getReportData = async (
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
-  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions);
+  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions, projectsInWarrantyPhase);
 
   try {
     switch (reportType) {
