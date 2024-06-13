@@ -485,7 +485,7 @@ describe('projectForm', () => {
 
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    let parentContainer = await findByTestId('project-form');
+    const parentContainer = await findByTestId('project-form');
     const nameField = await findByRole('textbox', { name: getFormField('name *') });
     const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
 
