@@ -141,7 +141,23 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [t, isUserOnlyProjectManager, getValues, proposalPhase, designPhase, getPhaseIndexByPhaseId, currentPhase, programmedPhase, draftInitiationPhase, draftApprovalPhase, constructionPlanPhase, constructionWaitPhase, constructionPhase, warrantyPeriodPhase, completedPhase],
+    [
+      t,
+      isUserOnlyProjectManager,
+      getValues, 
+      proposalPhase,
+      designPhase,
+      currentPhase,
+      phasesWithIndexes,
+      programmedPhase,
+      draftInitiationPhase,
+      draftApprovalPhase,
+      constructionPlanPhase,
+      constructionWaitPhase,
+      constructionPhase,
+      warrantyPeriodPhase,
+      completedPhase
+    ],
   );
 
   const validateConstructionPhaseDetails = useMemo(
