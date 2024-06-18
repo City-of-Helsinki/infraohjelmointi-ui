@@ -4,7 +4,7 @@ import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
-import { IOption } from '@/interfaces/common';
+import { IListItem, IOption } from '@/interfaces/common';
 import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
@@ -13,6 +13,7 @@ import _ from 'lodash';
 import { mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
+import { selectProjectPhases } from '@/reducers/listsSlice';
 
 interface IProjectStatusSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -22,14 +23,22 @@ interface IProjectStatusSectionProps {
     control: Control<IProjectForm>;
   };
   isInputDisabled: boolean;
+  isUserOnlyProjectManager: boolean;
+}
+
+const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: IListItem[]) => {
+  const phase = phasesWithIndexes.find(({id}) => id === phaseId);
+  return phase?.index;
 }
 
 const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   getFieldProps,
   getValues,
   isInputDisabled,
+  isUserOnlyProjectManager
 }) => {
   const phases = useOptions('phases');
+  const phasesWithIndexes = useAppSelector(selectProjectPhases);
   const categories = useOptions('categories');
   const riskAssessments = useOptions('riskAssessments');
   const constructionPhaseDetails = useOptions('constructionPhaseDetails');
@@ -58,6 +67,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         isPhaseValid: (phase: IOption) => {
           if (phase.value === '') {
             return t('validation.required', { field: t('validation.phase') }) ?? '';
+          }
+
+          if (isUserOnlyProjectManager) {
+            const previousPhaseIndex = getPhaseIndexByPhaseId(currentPhase, phasesWithIndexes);
+            const newPhaseIndex = getPhaseIndexByPhaseId(phase.value, phasesWithIndexes);
+            if (newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex)) {
+              return t('validation.userNotAllowedToChangePhaseBackwards');
+            }
           }
 
           const phaseToSubmit = phase.value;
@@ -124,20 +141,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [
-      t,
-      getValues,
-      proposalPhase,
-      designPhase,
-      programmedPhase,
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
-      constructionWaitPhase,
-      constructionPhase,
-      warrantyPeriodPhase,
-      completedPhase,
-    ],
+    [t, isUserOnlyProjectManager, getValues, proposalPhase, designPhase, getPhaseIndexByPhaseId, currentPhase, programmedPhase, draftInitiationPhase, draftApprovalPhase, constructionPlanPhase, constructionWaitPhase, constructionPhase, warrantyPeriodPhase, completedPhase],
   );
 
   const validateConstructionPhaseDetails = useMemo(

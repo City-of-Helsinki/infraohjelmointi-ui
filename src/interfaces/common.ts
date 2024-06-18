@@ -44,6 +44,7 @@ export interface IListItem {
   id: string;
   value: string;
   parent?: string;
+  index?: number;
 }
 
 export type ListType =
