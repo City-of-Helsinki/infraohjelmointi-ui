@@ -1,5 +1,5 @@
 import { IError } from '@/interfaces/common';
-import { IUser, UserRole } from '@/interfaces/userInterfaces';
+import { IUser, /* UserRole */ } from '@/interfaces/userInterfaces';
 import { getUser } from '@/services/userServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
