@@ -72,7 +72,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           if (isUserOnlyProjectManager) {
             const previousPhaseIndex = getPhaseIndexByPhaseId(currentPhase, phasesWithIndexes);
             const newPhaseIndex = getPhaseIndexByPhaseId(phase.value, phasesWithIndexes);
-            if (newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex)) {
+            const newPhaseIsBeforeCurrent = newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex)
+            if (newPhaseIsBeforeCurrent) {
               return t('validation.userNotAllowedToChangePhaseBackwards');
             }
           }
