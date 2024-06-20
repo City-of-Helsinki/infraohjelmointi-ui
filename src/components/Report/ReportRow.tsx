@@ -33,6 +33,11 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     }, true);
     const projects = res.results.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'completed');
 
+    /* needed for the operational environment analysis report. The budgets of the projects that are in the warranty phase
+       need to be added to the sums there separately and because of that we check here which projects are in this phase
+       and do the calculations then in the reportsHelper.tsx */
+    const projectsInWarrantyPhase = res.results.filter((p) => p.phase.value === 'warrantyPeriod');
+    
     // classes
     const classRes = await getCoordinationClasses({
       forcedToFrame: forcedToFrame,
@@ -61,7 +66,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       selectedOtherClassification: null
     }
 
-    return { res, projects, classHierarchy, forcedToFrameDistricts, groupRes, initialSelections }
+    return { res, projects, projectsInWarrantyPhase, classHierarchy, forcedToFrameDistricts, groupRes, initialSelections }
   }
 
   const getCategories = async (): Promise<IListItem[]> => {

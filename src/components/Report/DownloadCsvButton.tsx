@@ -59,7 +59,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
-            setCsvData(await getReportData(t, type, coordinatorRows, undefined, categories));
+            setCsvData(await getReportData(t, type, coordinatorRows, undefined, undefined, categories, res.projectsInWarrantyPhase));
           }
           break;
         }
@@ -67,10 +67,11 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({ type, getForcedToFrame
           const res = await getPlanningData(year + 1);
           const resDivisions = await getDistricts();
           const divisions = getProjectDistricts(resDivisions, "division");
+          const subDivisions = getProjectDistricts(resDivisions, "subDivision");
 
           if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
-            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, divisions));
+            setCsvData(await getReportData(t, Reports.ConstructionProgram, planningRows, divisions, subDivisions));
           }
           break;
         }

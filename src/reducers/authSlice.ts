@@ -1,5 +1,5 @@
 import { IError } from '@/interfaces/common';
-import { IUser } from '@/interfaces/userInterfaces';
+import { IUser, /* UserRole */ } from '@/interfaces/userInterfaces';
 import { getUser } from '@/services/userServices';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -67,6 +67,11 @@ export const authSlice = createSlice({
         //     name: 'sl_dyn_kymp_sso_io_katselijat' as UserRole,
         //     display_name: 'sl_dyn_kymp_sso_io_katselijat',
         //   },
+        //    {
+        //      id: '61336d5e-4b74-400f-a1d6-c9f96d3f1d4d',
+        //      name: 'sg_kymp_sso_io_katselijat_muut' as UserRole,
+        //      display_name: 'sg_KYMP_sso_IO_Katselijat_Muut',
+        //    }
         // ],
       };
 

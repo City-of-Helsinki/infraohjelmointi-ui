@@ -352,7 +352,7 @@ describe('projectForm', () => {
     expect(await findByText(matchExact(expectedValue.value))).toBeInTheDocument();
   });
 
-  it('can patch a DateField', async () => {
+  it('can patch a DateField when year doesnt differ from planningStartYear', async () => {
     const { user, findByRole, findByDisplayValue, findByTestId } = await render();
     const expectedValue = '13.12.2020';
     const project = mockProject.data;
@@ -376,6 +376,33 @@ describe('projectForm', () => {
     expect(await findByDisplayValue(matchExact(expectedValue))).toBeInTheDocument();
   });
 
+  it('can not patch a DateField when year of date differs from planningStartYear', async () => {
+    const { user, findByRole, findByTestId } = await render();
+    const expectedValue = '13.12.2021';
+    const project = mockProject.data;
+    const responseProject: {data: IProject } = {
+      data: { ...project, estPlanningStart: expectedValue },
+    };
+
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+    const formSubmitButton = await findByTestId('submit-project-button');
+    const estPlanningStart = await findByRole('textbox', {
+      name: getFormField('estPlanningStart'),
+    });
+    const planningStartYear = await findByRole('spinbutton', {
+      name: getFormField('planningStartYear')});
+
+    await user.clear(estPlanningStart);
+    await user.type(estPlanningStart, expectedValue);
+    await user.click(formSubmitButton);
+
+    const yearToBeSet = expectedValue.split('.')[2];
+
+    expect(planningStartYear).not.toEqual(yearToBeSet);
+    expect(mockedAxios.patch.mock.lastCall).toBeUndefined;
+  });
+  
   it('can patch a TextField', async () => {
     const expectedValue = 'New description';
     const project = mockProject.data;
@@ -458,7 +485,7 @@ describe('projectForm', () => {
 
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    let parentContainer = await findByTestId('project-form');
+    const parentContainer = await findByTestId('project-form');
     const nameField = await findByRole('textbox', { name: getFormField('name *') });
     const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
 
