@@ -373,9 +373,9 @@ const ProjectForm = () => {
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} projectMode={projectMode} />
       {/* SECTION 2 - STATUS */}
-      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} />
+      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} isUserOnlyProjectManager={isUserProjectManagerCheck} />
       {/* SECTION 3 - SCHEDULE */}
-      <ProjectScheduleSection {...formProps} isUserProjectManager={isUserProjectManagerCheck} />
+      <ProjectScheduleSection {...formProps} isUserOnlyProjectManager={isUserProjectManagerCheck} />
       {/* SECTION 4 - FINANCIALS */}
       <ProjectFinancialSection
         {...formProps}
