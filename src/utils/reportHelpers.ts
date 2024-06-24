@@ -740,7 +740,8 @@ export const convertToReportRows = (
         "8 09 Kaupunkiuudistus/Meri-Rastila",
         "8 10 Suuret liikennehankkeet/Kruunusillat",
         "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
-        "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet"
+        "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
+        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila"
       ]
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
         path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
