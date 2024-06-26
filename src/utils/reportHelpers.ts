@@ -802,6 +802,29 @@ export const convertToReportRows = (
           planningHierarchy.push(convertedClass);
 
           if (pathsWithExtraRows.includes(c.path)) {
+            if (convertedClass.type === 'class'){
+              // Check if one of class' childs has project.
+              // If any childs does not have projects, we don't show summary and empty rows.
+              const isNotEmptyClass = (inputClass: IConstructionProgramTableRow) => {
+                if (inputClass.projects.length) {
+                  return true;
+                }
+
+                if (inputClass.children.length){
+                  for (const child of inputClass.children) {
+                    if (isNotEmptyClass(child)) {
+                      return true;
+                    }
+                  }
+                }
+                return false;
+              }
+
+              if (!isNotEmptyClass(convertedClass)) {
+                continue;
+              }
+            }
+
             const summaryOfProjectsRow: IConstructionProgramTableRow = {
               id: `${c.id}-class-summary`,
               children: [],
