@@ -82,7 +82,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       forcedToFrame: false,
       year: year,
     });
-    const projects = res.results.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'completed');
+    const projects = res.results.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'warrantyPeriod' && p.phase.value !== 'completed');
 
     // classes
     const classRes = await getPlanningClasses(year);
