@@ -129,6 +129,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       <h3 className="report-title" data-testid={`report-title-${type}`}>
         {t(`report.${type}.rowTitle`)}
       </h3>
+      {type === 'constructionProgram' &&
+        <p>{t(`report.warrantyPeriodPhaseNotIncluded`)}</p>
+      }
       {/* download pdf button */}
       <DownloadPdfButton type={type} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories} />
       {/* download csv button */}

@@ -440,6 +440,7 @@
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
   "report": {
+    "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Toimintaympäristöanalyysi",
       "documentName": "toimintaympäristöanalyysi",
