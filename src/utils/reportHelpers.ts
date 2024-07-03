@@ -1158,7 +1158,7 @@ export const getReportData = async (
         const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
         return flattenedRows.map((r) => ({
           [`${t('target')}`]: r.name,
-          [`Kustannus-\nennuste\n${t('thousandEuros')}`]: r.costForecast,
+          [`Ennuste\n${new Date().getFullYear()}\n${t('thousandEuros')}`]: r.costForecast,
           [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.TAE,
           [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.TSE1,
           [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.TSE2,
