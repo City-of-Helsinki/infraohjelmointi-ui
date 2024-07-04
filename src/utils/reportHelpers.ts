@@ -60,9 +60,21 @@ const getYear = (dateStr: string): number => {
   return parseInt(parts[2], 10);
 }
 
-const getMonth = (dateStr: string): number => {
-  const parts = dateStr.split('.');
-  return parseInt(parts[1], 10);
+const getMonth = (startDateStr: string, endDateStr?: string): number => {
+  const startParts = startDateStr.split('.');
+  const endParts = endDateStr ? endDateStr.split('.') : [];
+
+  if (endParts.length){
+    if (startParts[2] < endParts[2]){
+      // If end year is bigger, we return Dec.
+      // E.g. start 1.1.2024 and end 2.1.2026 should return 12.
+      return 12;
+    }
+
+    return parseInt(endParts[1], 10);
+  }
+
+  return parseInt(startParts[1], 10);
 }
 
 const mapOperationalEnvironmentAnalysisProperties = (finances: IPlanningCell[], type: 'frameBudget' | 'plannedBudget') => {
@@ -177,9 +189,9 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
   const constructionEndYear = getYear(project.estConstructionEnd);
 
   const planningStartMonth = getMonth(project.estPlanningStart);
-  const planningEndMonth = getMonth(project.estPlanningEnd);
+  const planningEndMonth = getMonth(project.estPlanningStart, project.estPlanningEnd);
   const constructionStartMonth = getMonth(project.estConstructionStart);
-  const constructionEndMonth = getMonth(project.estConstructionEnd);
+  const constructionEndMonth = getMonth(project.estConstructionStart, project.estConstructionEnd);
 
   const isPlanning = (year >= planningStartYear && year <= planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
   const isConstruction = (year >= constructionStartYear && year <= constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
