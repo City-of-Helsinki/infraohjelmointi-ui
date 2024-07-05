@@ -425,13 +425,14 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   return properties;
 }
 
-const getRowType = (type: string) => {
-  if (['class', 'subClass', 'masterClass', 'otherClassification', 'collectiveSubLevel'].includes(type)) {
-    return 'class';
-  } else if (type === 'group') {
-    return 'group';
-  } else {
-    return 'location';
+const getStrategyRowType = (type: string) => {
+  switch (type) {
+    case 'class':
+    case 'otherClassification':
+    case 'collectiveSubLevel':
+      return 'class';
+    default:
+      return type;
   }
 }
 
@@ -617,7 +618,7 @@ export const convertToReportRows = (
           children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
           costForecast: c.cells[0].plannedBudget,
-          type: getRowType(c.type) as ReportTableRowType
+          type: getStrategyRowType(c.type) as ReportTableRowType
         }
         forcedToFrameHierarchy.push(convertedClass);
       }
