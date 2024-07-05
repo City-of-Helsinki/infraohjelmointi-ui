@@ -262,6 +262,10 @@ const strategyReportStyles = StyleSheet.create({
     backgroundColor: '#00005e',
     color: 'white',
   },
+  groupRow: {
+    ...tableRowStyles,
+    backgroundColor: '#e8f3fc',
+  },
   projectCell: {
     ...cellStyles,
     ...constructionProgramCommonStyles,
@@ -351,6 +355,8 @@ const getStrategyRowStyle = (rowType: string, depth: number) => {
         return strategyReportStyles.subClassDistrictRow;
       case 'districtPreview':
         return strategyReportStyles.districtPreviewRow;
+      case 'group':
+        return strategyReportStyles.groupRow;
     default:
       if (depth % 2) return strategyReportStyles.evenRow;
       return strategyReportStyles.oddRow;
@@ -392,7 +398,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               tableRow =
                 <View wrap={false} style={getStrategyRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
                     <Text style={
-                      ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview'].includes(flattenedRow.type ?? '')
+                      ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'group'].includes(flattenedRow.type ?? '')
                       ? strategyReportStyles.classNameCell
                       : strategyReportStyles.projectCell}>
                         {flattenedRow.name}

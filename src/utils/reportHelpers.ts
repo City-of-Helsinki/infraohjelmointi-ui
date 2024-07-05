@@ -906,7 +906,7 @@ const strategyCsvRows: IStrategyTableCsvRow[] = [];
 
 const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
   tableRows.forEach((tableRow) => {
-    if (!strategyCsvRows.some(row => row.id === tableRow.id) && tableRow.type !== 'group') {
+    if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
       strategyCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,
