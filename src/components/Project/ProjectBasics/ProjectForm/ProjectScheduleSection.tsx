@@ -17,14 +17,14 @@ interface IProjectScheduleSectionProps {
     control: Control<IProjectForm>;
   };
   getFieldState: UseFormGetFieldState<IProjectForm>;
-  isUserProjectManager: boolean;
+  isUserOnlyProjectManager: boolean;
 }
 
 const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
   getFieldProps,
   getValues,
   getFieldState,
-  isUserProjectManager
+  isUserOnlyProjectManager
 }) => {
   const { t } = useTranslation();
 
@@ -48,7 +48,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearInFormYearCell = getValues('planningStartYear');
 
           if (!getFieldState('planningStartYear').isDirty && yearToBeSet !== yearInFormYearCell) {
-            if (isUserProjectManager) {
+            if (isUserOnlyProjectManager) {
               return t('validation.userIsNotAllowedToModifyPlanningStartYear');
             }
             return t('validation.planningStartYearChangingValidator');
@@ -224,7 +224,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearInFormYearCell = getValues('constructionEndYear');
 
           if (!getFieldState('constructionEndYear').isDirty && yearToBeSet !== yearInFormYearCell) {
-            if (isUserProjectManager) {
+            if (isUserOnlyProjectManager) {
               return t('validation.userIsNotAllowedToModifyConstructionEndYear');
             }
             return t('validation.constructionEndYearValidator');
