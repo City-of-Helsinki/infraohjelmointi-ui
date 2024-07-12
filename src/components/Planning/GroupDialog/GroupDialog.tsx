@@ -189,7 +189,7 @@ const DialogContainer: FC<IDialogProps> = memo(
       (d: IOption, fieldName: string) =>
         Object.keys(d).includes('value') && d.value !== ''
           ? true
-          : t('validation.required', { value: fieldName }) || '',
+          : t('validation.required', { field: fieldName }) || '',
       [t],
     );
 
@@ -249,7 +249,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                         <TextField
                           {...formProps('name')}
                           rules={{
-                            required: t('validation.required', { value: 'Ryhmän nimi' }) ?? '',
+                            required: t('validation.required', { field: 'Ryhmän nimi' }) ?? '',
                           }}
                         />
                         <SelectField
@@ -257,7 +257,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           disabled={editMode}
                           {...formProps('masterClass')}
                           rules={{
-                            required: t('validation.required', { value: 'Pääluokka' }) ?? '',
+                            required: t('validation.required', { field: 'Pääluokka' }) ?? '',
                             validate: {
                               isPopulated: (mc: IOption) => customValidation(mc, 'Pääluokka'),
                             },
@@ -269,7 +269,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           disabled={editMode}
                           {...formProps('class')}
                           rules={{
-                            required: t('validation.required', { value: 'Luokka' }) ?? '',
+                            required: t('validation.required', { field: 'Luokka' }) ?? '',
                             validate: {
                               isPopulated: (c: IOption) => customValidation(c, 'Luokka'),
                             },
@@ -282,7 +282,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           {...formProps('subClass')}
                           options={classOptions.subClasses}
                           rules={{
-                            required: classOptions.subClasses.length > 0 ? t('validation.required', { value: 'Alaluokka' }) ?? '' : '',
+                            required: classOptions.subClasses.length > 0 ? t('validation.required', { field: 'Alaluokka' }) ?? '' : '',
                             validate: {
                               isPopulated: (c: IOption) => classOptions.subClasses.length > 0 ? customValidation(c, 'Alaluokka') ?? '' : true,
                             },
@@ -295,7 +295,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                           <SelectField
                             {...formProps('district')}
                             rules={{
-                              required: (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring))) ? t('validation.required', { value: 'Suurpiiri' }) ?? '' : '',
+                              required: (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring))) ? t('validation.required', { field: 'Suurpiiri' }) ?? '' : '',
                               validate: {
                                 isValidDistrict: (d: IOption) => districtValidation(d, subClassField.label),
                               },
@@ -332,9 +332,6 @@ const DialogContainer: FC<IDialogProps> = memo(
                   <GroupProjectSearch
                     getValues={getValues}
                     control={control}
-                    showAdvanceFields={showAdvanceFields}
-                    divisions={hierarchyDivisionsAsIoptions(districtField.label, subClassField.value, classField.value, hierarchyDistricts, hierarchyDivisions)}
-                    subClasses={classOptions.subClasses}
                   />
                 </div>
               </div>

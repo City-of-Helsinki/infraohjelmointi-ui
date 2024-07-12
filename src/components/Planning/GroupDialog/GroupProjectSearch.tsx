@@ -1,110 +1,102 @@
-import { IOption } from '@/interfaces/common';
+import { IListItem, IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { arrayHasValue, getLocationRelationId, listItemToOption } from '@/utils/common';
+import { listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
-import { FC, memo, useCallback, useRef, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control, Controller, UseFormGetValues } from 'react-hook-form';
 import { IGroupForm } from '@/interfaces/formInterfaces';
-import { IProjectSearchRequest } from '@/interfaces/searchInterfaces';
 import { useAppSelector } from '@/hooks/common';
-import { selectForcedToFrame } from '@/reducers/planningSlice';
-import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
+import { selectForcedToFrame, selectStartYear } from '@/reducers/planningSlice';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 
 interface IProjectSearchProps {
   getValues: UseFormGetValues<IGroupForm>;
   control: Control<IGroupForm>;
-  showAdvanceFields: boolean;
-  divisions: IOption[];
-  subClasses: IOption[];
 }
 
+const getProjectsUnderClassOrSubClass = async (groupSubClass: string, groupClass: string, forcedToFrame: boolean, year: number) => {
+  const res = await getProjectsWithParams({
+    params: (groupSubClass ? `subClass=${groupSubClass}`: `class=${groupClass}`) + "&inGroup=false",
+    direct: false,
+    programmed: true,
+    forcedToFrame: forcedToFrame,
+    year: year,
+  }, false)
+  return res.results;
+}
 
 const GroupProjectSearch: FC<IProjectSearchProps> = ({
   getValues,
   control,
-  showAdvanceFields,
-  divisions,
-  subClasses
 }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
-  const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
-
-  const buildQueryParamString = useCallback(
-    (projectName: string): IProjectSearchRequest => {
-      const searchParams = [];
-
-      const year = new Date().getFullYear();
-      const lowestLocationId = getLocationRelationId(getValues(), hierarchyDistricts, hierarchyDivisions);
-
-      if (subClasses.length > 0){
-        searchParams.push(`subClass=${getValues('subClass').value}`);
-      }
-      else {
-        searchParams.push(`class=${getValues('class').value}`);
-      }
-
-      if (lowestLocationId) {
-        if (getValues("division").value) {
-          searchParams.push(`division=${lowestLocationId}`);
-        } else if (getValues('district').value) {
-          searchParams.push(`district=${lowestLocationId}`);
-        }
-      }
-      searchParams.push(`projectName=${projectName}`);
-      searchParams.push('inGroup=false');
-      searchParams.push('programmed=true');
-
-      return { params: searchParams.join('&'), direct: !showAdvanceFields, forcedToFrame, year };
-    },
-    [getValues, showAdvanceFields, forcedToFrame, subClasses],
-  );
-
+  const projectSubDivisions = useAppSelector(selectProjectSubDivisions);
+  const projectDivisions = useAppSelector(selectProjectDivisions);
+  const year = useAppSelector(selectStartYear);
   const { t } = useTranslation();
   const [searchWord, setSearchWord] = useState('');
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
+  const [allProjectsUnderSelectedClass, setAllProjectsUnderSelectedClass] = useState<IProject[]>([]);
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
 
-  const getSuggestions = useCallback(
-    async (inputValue: string) => {
-      if (
-          (subClasses.length > 0 && !getValues('subClass').value) ||
-          !getValues('class').value
-      ) {
-        return Promise.resolve([]);
-      }
+  const getSuggestions = useCallback(async() => {
+    return searchedProjects;
+  }, [searchedProjects]);
 
-      try {
-        const queryParams = buildQueryParamString(inputValue);
-        const res = await getProjectsWithParams(queryParams);
+  const getLocationParent = (locationList: IListItem[], locationId: string | undefined) => {
+    return locationList.find((location) => location.id === locationId)?.parent;
+  }
 
-        const projectsIdList = getValues('projectsForSubmit').map((p) => p.value);
+  useEffect( () => {
+    const setProjectsForSearch = async () => {
+      const groupClass = getValues('class.value');
+      const groupSubClass = getValues('subClass.value');
+      const projects = getProjectsUnderClassOrSubClass(groupSubClass, groupClass, forcedToFrame, year);
+      setAllProjectsUnderSelectedClass(await projects)
+    }
+    setProjectsForSearch();
+    }, [getValues('class.value'), getValues('subClass.value')]
+  );
 
-        const resultList = res.results?.filter(
-          (project) => !arrayHasValue(projectsIdList, project.id),
-        );
-
-        const searchProjectsItemList: Array<IOption> | [] = resultList
-          ? resultList.map((project) => ({
-              ...listItemToOption({ id: project.id, value: project.name }),
-            }))
-          : [];
-
-        if (searchProjectsItemList.length > 0) {
-          setSearchedProjects(searchProjectsItemList);
+  useEffect(() => {
+      const lowerCaseSearchWord = searchWord.toLowerCase();
+      const groupSubDivision = getValues('subDivision.value');
+      const groupDivision = getValues('division.value');
+      const groupDistrict = getValues('district.value');
+      const groupSubClass = getValues('subClass.value');
+      const groupClass = getValues('class.value');
+  
+      const projectSearchResult = allProjectsUnderSelectedClass.filter((project) => {
+        const projectNameMatches = project.name.toLowerCase().startsWith(lowerCaseSearchWord);
+        const noGroup = !project.projectGroup || project.projectGroup === '';
+        const classMatches = (project.projectClass === groupSubClass || project.projectClass === groupClass);
+        const districtMatches = 
+          project.projectDistrict === groupDistrict ||
+          getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
+          getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, project.projectDistrict)) === groupDivision;
+        const divisionMatches = project.projectDistrict === groupDivision || getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
+        const subDivisionMatches = project.projectDistrict === groupSubDivision;
+  
+        if (groupSubDivision) return subDivisionMatches && projectNameMatches && noGroup && classMatches;
+        else if (groupDivision) return divisionMatches && projectNameMatches && noGroup && classMatches;
+        else if (groupDistrict) return districtMatches && projectNameMatches && noGroup && classMatches;
+        else if (groupSubClass || groupClass) {
+          return classMatches && projectNameMatches && noGroup;
         }
-
-        return searchProjectsItemList;
-      } catch (e) {
-        console.log('Error getting project suggestions: ', e);
-        return [];
-      }
+        return false;
+      });
+  
+      const searchProjectsItemList = projectSearchResult.map((project) => ({
+        ...listItemToOption({ id: project.id, value: project.name }),
+      }));
+      setSearchedProjects(searchProjectsItemList);
     },
-    [getValues, showAdvanceFields, buildQueryParamString, divisions],
+    [allProjectsUnderSelectedClass, getValues, projectDivisions, projectSubDivisions, searchWord],
   );
 
   const handleSubmit = useCallback(
