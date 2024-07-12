@@ -18,7 +18,7 @@ import { selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 import { selectPlanningDistricts, selectPlanningDivisions } from '@/reducers/locationSlice';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { getLocationRelationId, locationItemsToOptions } from '@/utils/common';
+import { getLocationRelationId } from '@/utils/common';
 
 interface IDialogProps {
   handleClose: () => void;
@@ -50,16 +50,6 @@ const buildRequestPayload = (
   }
   return data;
 };
-
-const hierarchyDivisionsAsIoptions = (districtName: string, subClassId: string, classId: string, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
-  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === subClassId || classId);
-  const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(districtName));
-  if (relatedDistrict) {
-    const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
-    return locationItemsToOptions(relatedDivisions);
-  }
-  return [];
-}
 
 const DialogContainer: FC<IDialogProps> = memo(
   ({ isOpen, handleClose, editMode, projects, id }) => {
