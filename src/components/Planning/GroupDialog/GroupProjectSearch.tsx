@@ -18,7 +18,8 @@ interface IProjectSearchProps {
 }
 
 const getProjectsUnderClassOrSubClass = async (groupSubClass: string, groupClass: string, forcedToFrame: boolean, year: number) => {
-  const classParam = groupSubClass ? `subClass=${groupSubClass}`: groupClass ? `class=${groupClass}` : ''
+  const groupClassParam = groupClass ? `class=${groupClass}` : '';
+  const classParam = groupSubClass ? `subClass=${groupSubClass}`: groupClassParam;
   const res = await getProjectsWithParams({
     params: classParam + "&inGroup=false",
     direct: false,
