@@ -793,15 +793,20 @@ export const convertToReportRows = (
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
 
-          // 'Esirakentaminen' is old budget item and it should be hidden on the report.
-          // We rename it as '' that will be used later to skip row if the name is empty.
-          if (c.name === 'Esirakentaminen' && c.path === '8 01 Kiinteä omaisuus/Esirakentaminen'){
-            convertedClass.name = '';
-          }
-
           planningHierarchy.push(convertedClass);
 
-          if (pathsWithExtraRows.includes(c.path)) {
+          const isNotAnEmptyClass = (rows: IConstructionProgramTableRow[]): boolean => {
+            for (const row of rows) {
+              if (row.costForecast || row.projects.length) {
+                return true;
+              } else if (row.children.length) {
+                return isNotAnEmptyClass(row.children)
+              }
+            }
+            return false;
+          }
+
+          if (pathsWithExtraRows.includes(c.path) && isNotAnEmptyClass([convertedClass])) {
             const summaryOfProjectsRow: IConstructionProgramTableRow = {
               id: `${c.id}-class-summary`,
               children: [],
@@ -816,13 +821,13 @@ export const convertToReportRows = (
             const underMillionSummary = {
               budgetProposalCurrentYearPlus0: (
                 parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus0 ?? '0') -
-                getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus0).toFixed(1),
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus0).toFixed(1),
               budgetProposalCurrentYearPlus1: (
                 parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus1 ?? '0') -
-                getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus1).toFixed(1),
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus1).toFixed(1),
               budgetProposalCurrentYearPlus2: (
                 parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus2 ?? '0') -
-                getUnderMillionSummary(convertedClass.children).budgetProposalCurrentYearPlus2).toFixed(1)
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus2).toFixed(1)
             }
             const underMillionSummaryRow: IConstructionProgramTableRow = {
               id: `${c.id}-under-million-summary`,
@@ -1009,14 +1014,19 @@ const constructionProgramCsvRows: IConstructionProgramCsvRow[] = [];
 
 const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => {
   return (
-    tableRow.type === 'group' ||
+    (tableRow.type === 'group' ||
     tableRow.type === 'groupWithValues' ||
     tableRow.type === 'project' ||
     tableRow.projects.length > 0 ||
     tableRow.name === t('report.constructionProgram.classSummary') ||
     tableRow.name === t('report.constructionProgram.underMillionSummary') ||
     tableRow.name === '' ||
-    tableRow.children.some(isShownOnTheReport)
+    tableRow.children.some(isShownOnTheReport))
+    // temporary solution to remove Esirakentaminen from the report
+    // will later possibly be removed from the database, but currently
+    //'Esirakentaminen' is old budget item that the tool stilll needs to show
+    // but it should be hidden on the report.
+    && tableRow.name !== "Esirakentaminen"
   );
 };
 
