@@ -19,7 +19,7 @@ interface IProjectSearchProps {
 
 const getProjectsUnderClassOrSubClass = async (groupSubClass: string, groupClass: string, forcedToFrame: boolean, year: number) => {
   const res = await getProjectsWithParams({
-    params: (groupSubClass ? `subClass=${groupSubClass}`: `class=${groupClass}`) + "&inGroup=false",
+    params: (groupSubClass ? `subClass=${groupSubClass}`: groupClass ? `class=${groupClass}` : '') + "&inGroup=false",
     direct: false,
     programmed: true,
     forcedToFrame: forcedToFrame,
@@ -73,7 +73,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   
       const projectSearchResult = allProjectsUnderSelectedClass.filter((project) => {
         const projectNameMatches = project.name.toLowerCase().startsWith(lowerCaseSearchWord);
-        const noGroup = !project.projectGroup || project.projectGroup === '';
         const classMatches = (project.projectClass === groupSubClass || project.projectClass === groupClass);
         const districtMatches = 
           project.projectDistrict === groupDistrict ||
@@ -82,11 +81,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
         const divisionMatches = project.projectDistrict === groupDivision || getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
         const subDivisionMatches = project.projectDistrict === groupSubDivision;
   
-        if (groupSubDivision) return subDivisionMatches && projectNameMatches && noGroup && classMatches;
-        else if (groupDivision) return divisionMatches && projectNameMatches && noGroup && classMatches;
-        else if (groupDistrict) return districtMatches && projectNameMatches && noGroup && classMatches;
+        if (groupSubDivision) return subDivisionMatches && projectNameMatches && classMatches;
+        else if (groupDivision) return divisionMatches && projectNameMatches && classMatches;
+        else if (groupDistrict) return districtMatches && projectNameMatches && classMatches;
         else if (groupSubClass || groupClass) {
-          return classMatches && projectNameMatches && noGroup;
+          return classMatches && projectNameMatches;
         }
         return false;
       });
