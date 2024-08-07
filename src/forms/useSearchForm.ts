@@ -65,14 +65,12 @@ const useSearchForm = () => {
    * Listens to form changes and checks if form has any added values and sets submitDisabled
    */
   useEffect(() => {
-    const subscription = watch((form, { name }) => {
-      setMultiListOption(name as string, form[name as keyof ISearchForm] as unknown as IOption);
-      if (!isDirty) {
-        setSubmitDisabled(_.isEqual(form, initialSearchForm));
-      }
+    const subscription = watch((form) => {
+      const formHasChanged = !_.isEqual(form, initialSearchForm);
+      setSubmitDisabled(!formHasChanged);
     });
     return () => subscription.unsubscribe();
-  }, [watch, storeFormValues]);
+  }, [watch]);
 
   // Set the form and the multi-selections to match the values in redux storeFormValues
   useEffect(() => {
