@@ -56,13 +56,6 @@ const getSearchTerms = (
         break;
       case 'programmedYearMin':
       case 'programmedYearMax':
-        value.value &&
-          searchTerms.push({
-            value: translate(`searchTag.${key}`, { label: value.label }),
-            type: key,
-            id: value.value,
-          });
-        break;
       case 'phase':
       case 'personPlanning':
       case 'category':
