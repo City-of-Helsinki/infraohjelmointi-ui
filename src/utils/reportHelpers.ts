@@ -235,11 +235,10 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
       parent: p.projectClass ?? null,
       projects: [],
       children: [],
-      // costPlan data will come from SAP and we don't have it yet
-      costPlan: "",
+      costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
+      costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
       projectManager: p.personPlanning?.lastName ?? "",
       projectPhase: getProjectPhase(p),
-      costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",
       januaryStatus: getProjectPhasePerMonth(p, 1),
       februaryStatus: getProjectPhasePerMonth(p,2),
       marchStatus: getProjectPhasePerMonth(p,3),
@@ -592,6 +591,18 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
   return sumOfBudgets;
 }
 
+/**
+ * Shows cost estimated budget (TA, "raamiluku") on
+ * Strategy report for high level classes only.
+ */
+const costEstimateBudgetHandler = (type: string, budget: string) => {
+  if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)){
+    return budget;
+  }
+
+  return "";
+}
+
 export const convertToReportRows = (
   rows: IPlanningRow[],
   reportType: ReportType | '',
@@ -611,6 +622,7 @@ export const convertToReportRows = (
     case Reports.Strategy: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
+        const costEstimateBudget = c.costEstimateBudget ? costEstimateBudgetHandler(c.type, c.costEstimateBudget) : "";
         const convertedClass = {
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
@@ -618,6 +630,7 @@ export const convertToReportRows = (
           children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
           costForecast: c.cells[0].plannedBudget,
+          costPlan: costEstimateBudget,
           type: getStrategyRowType(c.type) as ReportTableRowType
         }
         forcedToFrameHierarchy.push(convertedClass);
@@ -911,10 +924,10 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
         id: tableRow.id,
         name: tableRow.name,
         type: tableRow.type,
-        costPlan: "",
+        costPlan: tableRow.costPlan,                    // TA value
+        costForecast: tableRow.costForecast ?? '',      // TS value
         projectManager: tableRow.projectManager ?? '',
         projectPhase: tableRow.projectPhase ?? '',
-        costForecast: tableRow.costForecast ?? '',
         januaryStatus: tableRow.januaryStatus ?? '',
         februaryStatus: tableRow.februaryStatus ?? "",
         marchStatus: tableRow.marchStatus ?? "",
