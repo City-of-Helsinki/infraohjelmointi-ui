@@ -60,9 +60,21 @@ const getYear = (dateStr: string): number => {
   return parseInt(parts[2], 10);
 }
 
-const getMonth = (dateStr: string): number => {
-  const parts = dateStr.split('.');
-  return parseInt(parts[1], 10);
+const getMonth = (startDateStr: string, endDateStr?: string): number => {
+  const startParts = startDateStr.split('.');
+  const endParts = endDateStr ? endDateStr.split('.') : [];
+
+  if (endParts.length){
+    if (startParts[2] < endParts[2]){
+      // If end year is bigger, we return Dec.
+      // E.g. start 1.1.2024 and end 2.1.2026 should return 12.
+      return 12;
+    }
+
+    return parseInt(endParts[1], 10);
+  }
+
+  return parseInt(startParts[1], 10);
 }
 
 const mapOperationalEnvironmentAnalysisProperties = (finances: IPlanningCell[], type: 'frameBudget' | 'plannedBudget') => {
@@ -177,9 +189,9 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
   const constructionEndYear = getYear(project.estConstructionEnd);
 
   const planningStartMonth = getMonth(project.estPlanningStart);
-  const planningEndMonth = getMonth(project.estPlanningEnd);
+  const planningEndMonth = getMonth(project.estPlanningStart, project.estPlanningEnd);
   const constructionStartMonth = getMonth(project.estConstructionStart);
-  const constructionEndMonth = getMonth(project.estConstructionEnd);
+  const constructionEndMonth = getMonth(project.estConstructionStart, project.estConstructionEnd);
 
   const isPlanning = (year >= planningStartYear && year <= planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
   const isConstruction = (year >= constructionStartYear && year <= constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
@@ -223,11 +235,10 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
       parent: p.projectClass ?? null,
       projects: [],
       children: [],
-      // costPlan data will come from SAP and we don't have it yet
-      costPlan: "",
+      costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
+      costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
       projectManager: p.personPlanning?.lastName ?? "",
       projectPhase: getProjectPhase(p),
-      costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",
       januaryStatus: getProjectPhasePerMonth(p, 1),
       februaryStatus: getProjectPhasePerMonth(p,2),
       marchStatus: getProjectPhasePerMonth(p,3),
@@ -413,13 +424,14 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   return properties;
 }
 
-const getRowType = (type: string) => {
-  if (['class', 'subClass', 'masterClass', 'otherClassification', 'collectiveSubLevel'].includes(type)) {
-    return 'class';
-  } else if (type === 'group') {
-    return 'group';
-  } else {
-    return 'location';
+const getStrategyRowType = (type: string) => {
+  switch (type) {
+    case 'class':
+    case 'otherClassification':
+    case 'collectiveSubLevel':
+      return 'class';
+    default:
+      return type;
   }
 }
 
@@ -579,6 +591,18 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
   return sumOfBudgets;
 }
 
+/**
+ * Shows cost estimated budget (TA, "raamiluku") on
+ * Strategy report for high level classes only.
+ */
+const costEstimateBudgetHandler = (type: string, budget: string) => {
+  if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)){
+    return budget;
+  }
+
+  return "";
+}
+
 export const convertToReportRows = (
   rows: IPlanningRow[],
   reportType: ReportType | '',
@@ -598,6 +622,7 @@ export const convertToReportRows = (
     case Reports.Strategy: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
+        const costEstimateBudget = c.costEstimateBudget ? costEstimateBudgetHandler(c.type, c.costEstimateBudget) : "";
         const convertedClass = {
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
@@ -605,7 +630,8 @@ export const convertToReportRows = (
           children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
           projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
           costForecast: c.cells[0].plannedBudget,
-          type: getRowType(c.type) as ReportTableRowType
+          costPlan: costEstimateBudget,
+          type: getStrategyRowType(c.type) as ReportTableRowType
         }
         forcedToFrameHierarchy.push(convertedClass);
       }
@@ -898,15 +924,15 @@ const strategyCsvRows: IStrategyTableCsvRow[] = [];
 
 const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
   tableRows.forEach((tableRow) => {
-    if (!strategyCsvRows.some(row => row.id === tableRow.id) && tableRow.type !== 'group') {
+    if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
       strategyCsvRows.push({
         id: tableRow.id,
         name: tableRow.name,
         type: tableRow.type,
-        costPlan: "",
+        costPlan: tableRow.costPlan,                    // TA value
+        costForecast: tableRow.costForecast ?? '',      // TS value
         projectManager: tableRow.projectManager ?? '',
         projectPhase: tableRow.projectPhase ?? '',
-        costForecast: tableRow.costForecast ?? '',
         januaryStatus: tableRow.januaryStatus ?? '',
         februaryStatus: tableRow.februaryStatus ?? "",
         marchStatus: tableRow.marchStatus ?? "",
