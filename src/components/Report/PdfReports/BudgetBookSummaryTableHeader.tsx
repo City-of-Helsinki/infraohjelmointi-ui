@@ -38,37 +38,31 @@ const BudgetBookSummaryTableHeader = () => {
         <Text style={styles.targetCell}>{t('target')}</Text>
         <View style={styles.narrowerColumns}>
             <Text>{t('usage')}</Text>
-            <Text>{t('usageSV')}</Text>
             <Text>{new Date().getFullYear() - 1}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TA')}</Text>
-            <Text>{t('taSV')}</Text>
             <Text>{new Date().getFullYear() }</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TA')}</Text>
-            <Text>{t('taSV')}</Text>
             <Text>{new Date().getFullYear() + 1}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TS')}</Text>
-            <Text>{t('tsSV')}</Text>
             <Text>{new Date().getFullYear() + 2 }</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TS')}</Text>
-            <Text>{t('tsSV')}</Text>
             <Text>{new Date().getFullYear() + 3}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
         <View style={styles.widerColumns}>
             <Text>{t('initial')}</Text>
-            <Text>{t('initialSV')}</Text>
             <Text>{new Date().getFullYear() + 4}</Text>
             <Text>{t('millionEuro')}</Text>
         </View>
@@ -76,7 +70,6 @@ const BudgetBookSummaryTableHeader = () => {
             return (
                 <View key={year} style={styles.widerColumns}>
                     <Text>{t('initial')}</Text>
-                    <Text>{t('initialSV')}</Text>
                     <Text>{new Date().getFullYear() + year}</Text>
                     <Text>{t('millionEuro')}</Text>
                 </View>
