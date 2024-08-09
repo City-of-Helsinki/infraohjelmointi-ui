@@ -456,10 +456,10 @@
       }
     },
     "strategy": {
-      "rowTitle": "Toimintasuunnitelma",
+      "rowTitle": "Toimintasuunnitelma (sovitettu budjetti)",
       "documentName": "toimintasuunnitelma",
-      "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}}",
-      "subtitle": "Maankäyttö ja kaupunkirakenne",
+      "title": "Helsingin kaupunki",
+      "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
       "projectNameTitle": "Hanke",
       "projectsTitle": "Kohteen",
       "projectManagerTitle": "projektipäällikkö",
