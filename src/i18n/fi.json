@@ -456,7 +456,7 @@
       }
     },
     "strategy": {
-      "rowTitle": "Toimintasuunnitelma",
+      "rowTitle": "Toimintasuunnitelma (sovitettu budjetti)",
       "documentName": "toimintasuunnitelma",
       "title": "Kaupunkiympäristön toimiala - Investointiohjelma {{startYear}}",
       "subtitle": "Maankäyttö ja kaupunkirakenne",
