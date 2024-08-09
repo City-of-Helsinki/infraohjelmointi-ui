@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const ConstructionProgramTableHeader = () => {
+const BudgetBookSummaryTableHeader = () => {
   const { t } = useTranslation();
   // This is used for looping the inital budgets for 5-10 years from now on
   const currentPlusYears = [5, 6, 7, 8, 9, 10];
@@ -86,4 +86,4 @@ const ConstructionProgramTableHeader = () => {
   );
 };
 
-export default memo(ConstructionProgramTableHeader);
+export default memo(BudgetBookSummaryTableHeader);
