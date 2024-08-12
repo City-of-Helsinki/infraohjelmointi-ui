@@ -450,10 +450,7 @@
       "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
       "changePressure": "Muutospaine",
       "taeFrame": "TA, käytettävissä oleva määräraha",
-      "costForecast": {
-        "cost": "Kustannus-",
-        "forecast": "ennuste"
-      }
+      "costForecastShortened": "Ennuste"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (sovitettu budjetti)",
