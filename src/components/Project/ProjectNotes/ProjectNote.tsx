@@ -92,8 +92,8 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
       {/* history (sorted by updated) */}
       {openModifiedInfo &&
         sortedHistory()?.map((h) => <ProjectNoteHistoryRow key={h.history_id} history={h} />)}
-      <DeleteNoteForm isOpen={openDeleteDialog} close={handleOpenDeleteDialog} noteId={note.id} project={note.project} />
-      <EditNoteForm isOpen={openEditDialog} close={handleOpenEditDialog} note={note} project={note.project} />
+      <DeleteNoteForm isOpen={openDeleteDialog} close={handleOpenDeleteDialog} noteId={note.id} />
+      <EditNoteForm isOpen={openEditDialog} close={handleOpenEditDialog} note={note} />
     </div>
   );
 };

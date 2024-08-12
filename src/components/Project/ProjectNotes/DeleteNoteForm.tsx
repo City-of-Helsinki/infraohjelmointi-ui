@@ -2,29 +2,25 @@ import { Button } from 'hds-react/components/Button';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react/components/Dialog';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
+import { useAppDispatch } from '@/hooks/common';
 import { deleteNoteThunk } from '@/reducers/noteSlice';
 import { useTranslation } from 'react-i18next';
 import DialogWrapper from '@/components/shared/DialogWrapper';
-import { selectUser } from '@/reducers/authSlice';
 
 interface IProjectDeleteNoteFormProps {
   isOpen: boolean;
   noteId: string;
-  project: string;
   close: () => void;
 }
 
-const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close, noteId, project }) => {
+const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close, noteId }) => {
   const { Content, ActionButtons } = Dialog;
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const user = useAppSelector(selectUser);
 
   const handleDeleteNote = useCallback(async () => {
     try {
-      const noteData = {id: noteId, updatedBy: user?.uuid, project: project};
-      await dispatch(deleteNoteThunk(noteData));
+      await dispatch(deleteNoteThunk(noteId));
       close();
     } catch (e) {
       console.log('Error deleting note: ', e);

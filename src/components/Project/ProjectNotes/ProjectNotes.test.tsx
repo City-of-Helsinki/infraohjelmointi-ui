@@ -201,11 +201,7 @@ describe('ProjectNotes', () => {
     const { store } = await render();
 
     mockedAxios.delete.mockRejectedValueOnce(mockError);
-    await store.dispatch(deleteNoteThunk({
-      id: 'test-id',
-      updatedBy: 'test-person-id',
-      project: 'project-id'
-    }));
+    await store.dispatch(deleteNoteThunk(''));
 
     const storeError = store.getState().note.error as IError;
     expect(storeError.message).toBe(mockError.message);

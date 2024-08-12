@@ -39,9 +39,9 @@ export const postNoteThunk = createAsyncThunk(
   },
 );
 
-export const deleteNoteThunk = createAsyncThunk('note/delete', async (request: INoteRequest, thunkAPI) => {
+export const deleteNoteThunk = createAsyncThunk('note/delete', async (id: string, thunkAPI) => {
   try {
-    const note = await deleteNote(request);
+    const note = await deleteNote(id);
 
     thunkAPI.dispatch(
       notifySuccess({
