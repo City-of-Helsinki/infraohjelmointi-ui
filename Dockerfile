@@ -1,36 +1,36 @@
 # ===============================================
-FROM alpine:3.20.0
-# ===============================================
+# Use an official Node.js runtime as a parent image
+FROM node:16
+
+# Set the working directory in the container
 WORKDIR /app
-# Copy all files
+
+# Copy all files to the container
 COPY . .
 
+# Install nginx and other necessary packages
+RUN apt-get update && apt-get install -y \
+  nano nginx bash && \
+  rm -rf /var/lib/apt/lists/* && \
+  chown -R 1001:0 /var/lib/nginx /var/log/nginx /run && \
+  chmod -R ug+rwX /var/lib/nginx /var/log/nginx /run
+
+# Set the Yarn version
 ENV YARN_VERSION 1.22.19
 
-# Changing ownership and user rights to support following use-cases:
-# 1) running container on OpenShift, whose default security model
-#    is to run the container under random UID, but GID=0
-# 2) for working root-less container with UID=1001, which does not have
-#    to have GID=0
-# 3) for default use-case, that is running container directly on operating system,
-#    with default UID and GID (1001:0)
-# Supported combinations of UID:GID are thus following:
-# UID=1001 && GID=0
-# UID=<any>&& GID=0
-# UID=1001 && GID=<any>
-RUN apk add --update nano nginx nodejs yarn bash && \
-  rm -rf /var/cache/apk/* && \
-  chown -R 1001:0 /var/lib/nginx /var/log/nginx /run && \
-  chmod -R ug+rwX /var/lib/nginx /var/log/nginx /run && \
-  yarn policies set-version $YARN_VERSION && \
-  # Install dependencies
-  yarn install && yarn build && \
+# Install dependencies with Yarn
+RUN yarn set version $YARN_VERSION && \
+  yarn install && \
+  yarn build && \
   cp -r /app/build /usr/share/nginx/html && \
   # Copy nginx config
   cp /app/nginx.conf /etc/nginx/nginx.conf
 
-
+# Expose the port nginx is reachable on
 EXPOSE 4000
-# start nginx service
+
+# Define the running user
 USER 1001
+
+# Specify the entrypoint script to start nginx
 ENTRYPOINT ["./docker-entrypoint.sh"]
