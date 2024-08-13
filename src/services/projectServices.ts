@@ -3,6 +3,7 @@ import {
   IProject,
   IProjectPatchRequestObject,
   IProjectPostRequestObject,
+  IProjectRequest,
   IProjectResponse,
   IProjectsPatchRequestObject,
   IProjectsResponse,
@@ -41,11 +42,39 @@ export const deleteProject = async (id: string, user: IUser | null): Promise<{ i
 
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProjectResponse> => {
   try {
+    // for getting only those properties that have changed values
+    const filterUndefinedValues = (obj: IProjectRequest) =>
+      Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== undefined));
     const requestObject = {
-      data: request.data,
-      user: request?.user?.uuid ?? 'no-uuid-available',
-      projectId: request.id,
-    }
+      requestData: request.data,
+      valuesForLogging: filterUndefinedValues({
+        user: request?.user?.uuid ?? 'no-uuid-available',
+        dateTime: new Date().toISOString(),
+        operation: 'update',
+        projectId: request.id,
+        type: 'project',
+        endpoint: `${REACT_APP_API_URL}/projects/${request.id}/`,
+       /* newValues: {
+          category: request.data.category,
+          projectClass: request.data.projectClass,
+          name: request.data.name,
+          phase: request.data.phase,
+          constructionPhaseDetail: request.data.constructionPhaseDetail,
+          planningStartYear: request.data.planningStartYear,
+          constructionEndYear: request.data.constructionEndYear,
+          estPlanningStart: request.data.estPlanningStart,
+          estPlanningEnd: request.data.estPlanningEnd,
+          estConstructionStart: request.data.estConstructionStart,
+          estConstructionEnd: request.data.estConstructionEnd,
+        },
+        oldValues: {
+          // here could be the old values
+        }
+        */
+      }),
+    };
+    
+    console.log("requestObject: ", requestObject)
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, requestObject);
     return res;
   } catch (e) {
