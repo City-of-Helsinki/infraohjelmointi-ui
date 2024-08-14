@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     fontSize: '8px',
     fontWeight: 500,
     color: 'white',
+    borderBottom: '1px solid #808080',
   },
   tableHeaderRow: {
     flexDirection: 'row',

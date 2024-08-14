@@ -237,9 +237,34 @@ const strategyReportStyles = StyleSheet.create({
     ...tableRowStyles,
     backgroundColor: '#f2f2f2',
   },
+  masterClassRow: {
+    ...tableRowStyles,
+    backgroundColor: '#0000bf',
+    color: 'white',
+  },
   classRow: {
     ...tableRowStyles,
-    backgroundColor: '#f0f0ff'
+    backgroundColor: '#0000a3',
+    color: 'white',
+  },
+  subClassRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00007a',
+    color: 'white',
+  },
+  subClassDistrictRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00007a',
+    color: 'white',
+  },
+  districtPreviewRow: {
+    ...tableRowStyles,
+    backgroundColor: '#00005e',
+    color: 'white',
+  },
+  groupRow: {
+    ...tableRowStyles,
+    backgroundColor: '#e8f3fc',
   },
   projectCell: {
     ...cellStyles,
@@ -318,18 +343,23 @@ const getMonthCellStyle = (monthCell: string | undefined) => {
   }
 }
 
-const getRowStyle = (rowType: string, depth: number) => {
+const getStrategyRowStyle = (rowType: string, depth: number) => {
   switch (rowType) {
-    case 'class':
-      return strategyReportStyles.classRow
-    case 'location':
-      return strategyReportStyles.oddRow
-    case 'project':
-      if (depth % 2) {
-        return strategyReportStyles.evenRow
-      } else {
-        return strategyReportStyles.oddRow
-      }
+      case 'masterClass':
+        return strategyReportStyles.masterClassRow;
+      case 'class':
+        return strategyReportStyles.classRow;
+      case 'subClass':
+        return strategyReportStyles.subClassRow;
+      case 'subClassDistrict':
+        return strategyReportStyles.subClassDistrictRow;
+      case 'districtPreview':
+        return strategyReportStyles.districtPreviewRow;
+      case 'group':
+        return strategyReportStyles.groupRow;
+    default:
+      if (depth % 2) return strategyReportStyles.evenRow;
+      return strategyReportStyles.oddRow;
   }
 }
 
@@ -366,31 +396,31 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
         case Reports.Strategy: {
             if (flattenedRow) {
               tableRow =
-              <View wrap={false} style={getRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
-                  <Text style={
-                    ['class', 'location'].includes(flattenedRow.type ?? '')
-                    ? strategyReportStyles.classNameCell
-                    : strategyReportStyles.projectCell}>
-                      {flattenedRow.name}
-                  </Text>
-                  <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
-                  <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
-                  <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
-                  <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                  <Text style={getMonthCellStyle(flattenedRow.januaryStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.februaryStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.marchStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.aprilStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.mayStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.juneStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.julyStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.augustStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.septemberStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.octoberStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.novemberStatus)}></Text>
-                  <Text style={getMonthCellStyle(flattenedRow.decemberStatus)}></Text>
-                  <Text style={strategyReportStyles.lastCell}></Text>
-              </View>
+                <View wrap={false} style={getStrategyRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
+                    <Text style={
+                      ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'group'].includes(flattenedRow.type ?? '')
+                      ? strategyReportStyles.classNameCell
+                      : strategyReportStyles.projectCell}>
+                        {flattenedRow.name}
+                    </Text>
+                    <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
+                    <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
+                    <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
+                    <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
+                    <Text style={getMonthCellStyle(flattenedRow.januaryStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.februaryStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.marchStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.aprilStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.mayStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.juneStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.julyStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.augustStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.septemberStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.octoberStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.novemberStatus)}></Text>
+                    <Text style={getMonthCellStyle(flattenedRow.decemberStatus)}></Text>
+                    <Text style={strategyReportStyles.lastCell}></Text>
+                </View>
             } else {
               tableRow = <View></View>;
             }
