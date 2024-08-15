@@ -379,6 +379,15 @@ export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTabl
   return [];
 }
 
+const classOrChildrenHasBudgets = (cells: IPlanningCell[]) => {
+  for (let i = 0; i <= 10; i++) {
+    if (cells[i].frameBudget != '0' || cells[i].isFrameBudgetOverlap) {
+      return true;
+    }
+  }
+  return false;
+}
+
 const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   const properties = [];
   /* We want to show only those lower level items that start with some number or one letter and a space after that. 
@@ -387,11 +396,12 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   for (const c of coordinatorRows) {
     if (
       c.type === 'masterClass' ||
-        c.type === 'class' ||
-        c.type === 'subClass' ||
-        c.type === 'districtPreview' ||
-        c.type === 'collectiveSubLevel') {
-      if (nameCheckPattern.test(c.name)) {
+      c.type === 'class' ||
+      c.type === 'subClass' ||
+      c.type === 'districtPreview' ||
+      c.type === 'collectiveSubLevel'
+    ) {
+      if (nameCheckPattern.test(c.name) && classOrChildrenHasBudgets(c.cells)) {
         const convertedClass: IBudgetBookSummaryTableRow = {
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
