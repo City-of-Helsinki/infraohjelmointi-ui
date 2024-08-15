@@ -13,10 +13,10 @@ const styles = StyleSheet.create({
   }
 });
 
-const StrategyTableFooter = () => {
+const DefaultReportFooter = () => {
   return (
     <View fixed style={styles.footer}/>
   );
 };
 
-export default memo(StrategyTableFooter);
+export default memo(DefaultReportFooter);
