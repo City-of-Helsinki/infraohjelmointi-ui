@@ -42,9 +42,11 @@ export const deleteProject = async (id: string, user: IUser | null): Promise<{ i
 
 export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProjectResponse> => {
   try {
+    console.log("project: ", request.project)
     // for getting only those properties that have changed values
     const filterUndefinedValues = (obj: IProjectRequest) =>
       Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== undefined));
+
     const requestObject = {
       requestData: request.data,
       valuesForLogging: filterUndefinedValues({
@@ -68,9 +70,18 @@ export const patchProject = async (request: IProjectPatchRequestObject): Promise
           estConstructionEnd: request.data.estConstructionEnd,
         },
         oldValues: {
-          // here could be the old values
-        }
-        */
+          category: request.project?.category,
+          projectClass: request.project?.projectClass,
+          name: request.project?.name,
+          phase: request.project?.phase,
+          constructionPhaseDetail: request.project?.constructionPhaseDetail,
+          planningStartYear: request.project?.planningStartYear,
+          constructionEndYear: request.project?.constructionEndYear,
+          estPlanningStart: request.project?.estPlanningStart,
+          estPlanningEnd: request.project?.estPlanningEnd,
+          estConstructionStart: request.project?.estConstructionStart,
+          estConstructionEnd: request.project?.estConstructionEnd,
+        }*/
       }),
     };
     
