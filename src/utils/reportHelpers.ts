@@ -634,7 +634,7 @@ export const convertToReportRows = (
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
         const costEstimateBudget = c.costEstimateBudget ? costEstimateBudgetHandler(c.type, c.costEstimateBudget) : "";
-        if ((c.cells[0].frameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
+        if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
           const convertedClass = {
             id: c.id,
             name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
