@@ -224,6 +224,7 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
 const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
   return projects
     .filter((p) =>
+      //p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
       p.planningStartYear && p.constructionEndYear &&
       isProjectInPlanningOrConstruction({
         planningStart: p.planningStartYear,
@@ -633,17 +634,19 @@ export const convertToReportRows = (
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
         const costEstimateBudget = c.costEstimateBudget ? costEstimateBudgetHandler(c.type, c.costEstimateBudget) : "";
-        const convertedClass = {
-          id: c.id,
-          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
-          parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
-          projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
-          costForecast: c.cells[0].plannedBudget,
-          costPlan: costEstimateBudget,
-          type: getStrategyRowType(c.type) as ReportTableRowType
+        if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
+          const convertedClass = {
+            id: c.id,
+            name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+            parent: null,
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
+            projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+            costForecast: c.cells[0].plannedBudget,
+            costPlan: costEstimateBudget,
+            type: getStrategyRowType(c.type) as ReportTableRowType
+          }
+          forcedToFrameHierarchy.push(convertedClass);
         }
-        forcedToFrameHierarchy.push(convertedClass);
       }
       return forcedToFrameHierarchy;
     }
