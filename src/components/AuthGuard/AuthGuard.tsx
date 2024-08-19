@@ -132,8 +132,8 @@ const AuthGuard: FC = () => {
     }
 
     // Redirect to planning view if a viewer is trying to access anything but the planning view
-    if (!pathname.includes(PAGES.PLANNING) && isUserOnlyViewer(user)) {
-      return navigate(PAGES.PLANNING);
+    if ((!pathname.includes(PAGES.PLANNING) && !pathname.includes(PAGES.PROJECT_BASICS)) && isUserOnlyViewer(user)) {
+      return navigate(-1);
     }
 
     // Redirect project managers away from new project form
