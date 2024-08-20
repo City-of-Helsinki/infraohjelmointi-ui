@@ -255,6 +255,7 @@ interface IProjectHashTagsProps {
   control: HookFormControlType;
   project: IProject | null;
   projectMode: "edit" | "new";
+  readOnly?: boolean;
 }
 
 interface IProjectHashTagsState {
@@ -262,7 +263,7 @@ interface IProjectHashTagsState {
   projectHashTags: IListItem[];
 }
 
-const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, project, projectMode }) => {
+const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, project, projectMode, readOnly }) => {
   const { t } = useTranslation();
   const allHashTags = useAppSelector(selectHashTags);
   const [state, setState] = useState<IProjectHashTagsState>({
@@ -320,10 +321,11 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({ name, label, control, proj
       <FormFieldLabel
         dataTestId="open-hash-tag-dialog-button"
         text={t(`projectForm.${name}`)}
-        onClick={toggleOpenDialog}
+        onClick={!readOnly ? toggleOpenDialog : undefined}
+        disabled={readOnly}
       />
       {/* Displayed on form (Project hashtags) */}
-      <HashTagsContainer tags={projectHashTags} />
+      <HashTagsContainer tags={projectHashTags} readOnly={readOnly}/>
     </div>
   );
 };

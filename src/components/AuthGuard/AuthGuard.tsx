@@ -131,7 +131,7 @@ const AuthGuard: FC = () => {
       return navigate(-1);
     }
 
-    // Redirect to planning view if a viewer is trying to access anything but the planning view
+    // Redirect to planning view if a viewer is trying to access anything but the planning view or a project card
     if ((!pathname.includes(PAGES.PLANNING) && !pathname.includes(PAGES.PROJECT_BASICS)) && isUserOnlyViewer(user)) {
       return navigate(-1);
     }

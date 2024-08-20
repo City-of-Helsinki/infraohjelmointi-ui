@@ -31,7 +31,7 @@ import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
-import { isUserOnlyProjectManager } from '@/utils/userRoleHelpers';
+import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -42,6 +42,8 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
   const sapCosts = useAppSelector(getProjectSapCosts);
+
+  const isOnlyViewer = isUserOnlyViewer(user);
 
   const [newProjectId, setNewProjectId] = useState('');
 
@@ -393,7 +395,9 @@ const ProjectForm = () => {
       {/* SECTION 7 - PROJECT PROGRAM */}
       <ProjectProgramSection {...formProps} />
       {/* BANNER */}
-      <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
+      {!isOnlyViewer &&
+        <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
+      }
     </form>
   );
 };

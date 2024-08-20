@@ -6,6 +6,7 @@ import { Select as HDSSelect } from 'hds-react/components/Select';
 import { IconCrossCircle } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
+import TextField from './TextField';
 
 interface ISelectFieldProps {
   name: string;
@@ -20,6 +21,7 @@ interface ISelectFieldProps {
   clearable?: boolean;
   size?: 'full' | 'lg';
   shouldTranslate?: boolean;
+  readOnly?: boolean;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -35,6 +37,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   clearable,
   size,
   shouldTranslate,
+  readOnly
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -128,23 +131,34 @@ const SelectField: FC<ISelectFieldProps> = ({
               }`}
               ref={selectContainerRef}
             >
-              <HDSSelect
-                id={`select-field-${name}`}
-                className={`custom-select ${iconKey ? 'icon' : ''}`}
-                value={translateValue(value)}
-                onChange={handleChange}
-                onBlur={onBlur}
-                label={!hideLabel && label && t(label)}
-                invalid={error ? true : false}
-                error={error?.message}
-                options={translatedOptions ?? []}
-                required={required}
-                disabled={disabled}
-                style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-                placeholder={t('choose') ?? ''}
-                icon={icon}
-              />
-              {((clearable === undefined && value.value) || (clearable && value.value)) &&
+              {readOnly ?
+                <TextField
+                  name={''}
+                  label={label ?? ""}
+                  control={control}
+                  readOnly={true}
+                  readOnlyValue={translateValue(value).label}
+                />
+              :
+                <HDSSelect
+                  id={`select-field-${name}`}
+                  className={`custom-select ${iconKey ? 'icon' : ''}`}
+                  value={translateValue(value)}
+                  onChange={handleChange}
+                  onBlur={onBlur}
+                  label={!hideLabel && label && t(label)}
+                  invalid={error ? true : false}
+                  error={error?.message}
+                  options={translatedOptions ?? []}
+                  required={required}
+                  disabled={disabled}
+                  style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
+                  placeholder={t('choose') ?? ''}
+                  icon={icon}
+                />
+              }
+              {((clearable === undefined && value.value) || (clearable && value.value)) && 
+                !readOnly &&
                 !disabled &&
                 !required && (
                   <button

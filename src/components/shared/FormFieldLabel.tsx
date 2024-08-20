@@ -2,6 +2,7 @@ import { Button } from 'hds-react';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, MouseEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
+import Icon from './Icon';
 
 interface IFormFieldLabel {
   text: string;
