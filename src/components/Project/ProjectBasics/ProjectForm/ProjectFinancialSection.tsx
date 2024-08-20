@@ -30,12 +30,14 @@ interface IProjectFinancialSectionProps {
     subClasses: IOption[];
   };
   isInputDisabled: boolean;
+  isUserOnlyViewer: boolean
 }
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getFieldProps,
   control,
   classOptions,
   isInputDisabled,
+  isUserOnlyViewer
 }) => {
   const { t } = useTranslation();
 
@@ -58,6 +60,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             size="full"
             shouldTranslate={false}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -68,6 +71,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             options={classes}
             shouldTranslate={false}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-md">
@@ -76,6 +80,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             options={subClasses}
             shouldTranslate={false}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -86,16 +91,22 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             tooltip="keur"
             hideLabel={true}
             rules={validateMaxLength(10, t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-lg">
-          <SelectField {...getFieldProps('projectQualityLevel')} options={projectQualityLevels} />
+          <SelectField
+            {...getFieldProps('projectQualityLevel')}
+            options={projectQualityLevels}
+            readOnly={isUserOnlyViewer}
+          />
         </div>
         <div className="form-col-sm">
           <NumberField
             {...getFieldProps('projectWorkQuantity')}
             tooltip="m2"
             rules={validateMaxLength(10, t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -106,16 +117,22 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             tooltip="keur"
             hideLabel={true}
             rules={validateMaxLength(10, t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-lg">
-          <SelectField {...getFieldProps('planningPhase')} options={planningPhases} />
+          <SelectField
+            {...getFieldProps('planningPhase')}
+            options={planningPhases}
+            readOnly={isUserOnlyViewer}
+          />
         </div>
         <div className="form-col-sm">
           <NumberField
             {...getFieldProps('planningWorkQuantity')}
             tooltip="m2"
             rules={validateMaxLength(10, t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -126,22 +143,29 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             tooltip="keur"
             hideLabel={true}
             rules={validateMaxLength(10, t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-lg">
-          <SelectField {...getFieldProps('constructionPhase')} options={constructionPhases} />
+          <SelectField
+            {...getFieldProps('constructionPhase')}
+            options={constructionPhases}
+            readOnly={isUserOnlyViewer}
+          />
         </div>
         <div className="form-col-sm">
           <NumberField
             {...getFieldProps('constructionWorkQuantity')}
             tooltip="m2"
             rules={validateMaxLength(10, t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
       <ListField
         {...getFieldProps('realizedCostLabel')}
         disabled={isInputDisabled}
+        readOnly={isUserOnlyViewer}
         fields={[
           { ...getFieldProps('costForecast'), rules: validateMaxLength(15, t) },
           {
@@ -163,7 +187,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         cancelEdit={isSaving}
       />
 
-      <OverrunRightField control={control} cancelEdit={isSaving} />
+      <OverrunRightField control={control} cancelEdit={isSaving} readOnly={isUserOnlyViewer}/>
       <ListField
         {...getFieldProps('preliminaryBudgetDivision')}
         readOnly={true}

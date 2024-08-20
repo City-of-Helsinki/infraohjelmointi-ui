@@ -79,7 +79,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         <div className="project-name-container">
           <Link
             to={`/project/${project.id}/basics`}
-            className={`project-name-button ${isUserOnlyViewer(user) ? 'pointer-events-none' : ''}`}
+            className={`project-name-button`}
             data-testid={`navigate-${project.id}`}
           >
             {project.name}

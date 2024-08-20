@@ -373,9 +373,19 @@ const ProjectForm = () => {
       className="project-form"
     >
       {/* SECTION 1 - BASIC INFO */}
-      <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} projectMode={projectMode} />
+      <ProjectInfoSection
+        {...formProps} project={project}
+        isInputDisabled={isInputDisabled}
+        projectMode={projectMode}
+        isUserOnlyViewer={isOnlyViewer}
+      />
       {/* SECTION 2 - STATUS */}
-      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} isUserOnlyProjectManager={isUserProjectManagerCheck} />
+      <ProjectStatusSection 
+        {...formProps}
+        isInputDisabled={isInputDisabled}
+        isUserOnlyProjectManager={isUserProjectManagerCheck}
+        isUserOnlyViewer={isOnlyViewer}
+      />
       {/* SECTION 3 - SCHEDULE */}
       <ProjectScheduleSection {...formProps} isUserOnlyProjectManager={isUserProjectManagerCheck} isUserOnlyViewer={isOnlyViewer}/>
       {/* SECTION 4 - FINANCIALS */}
@@ -383,6 +393,7 @@ const ProjectForm = () => {
         {...formProps}
         classOptions={classOptions}
         isInputDisabled={isInputDisabled}
+        isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
       <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
