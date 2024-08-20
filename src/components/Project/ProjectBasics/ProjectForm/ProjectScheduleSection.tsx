@@ -18,13 +18,15 @@ interface IProjectScheduleSectionProps {
   };
   getFieldState: UseFormGetFieldState<IProjectForm>;
   isUserOnlyProjectManager: boolean;
+  isUserOnlyViewer: boolean;
 }
 
 const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
   getFieldProps,
   getValues,
   getFieldState,
-  isUserOnlyProjectManager
+  isUserOnlyProjectManager,
+  isUserOnlyViewer
 }) => {
   const { t } = useTranslation();
 
@@ -254,26 +256,26 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
       <Fieldset heading={t('projectForm.planning')} className="w-full" id="planning">
         <div className="form-row">
           <div className="form-col-md">
-            <DateField {...getFieldProps('estPlanningStart')} rules={validateEstPlanningStart()} />
+            <DateField {...getFieldProps('estPlanningStart')} rules={validateEstPlanningStart()} readOnly={isUserOnlyViewer}/>
           </div>
           <div className="form-col-md">
-            <DateField {...getFieldProps('estPlanningEnd')} rules={validateEstPlanningEnd()} />
-          </div>
-        </div>
-        <div className="form-row">
-          <div className="form-col-md">
-            <DateField {...getFieldProps('presenceStart')} rules={validatePresenceStart()} />
-          </div>
-          <div className="form-col-md">
-            <DateField {...getFieldProps('presenceEnd')} rules={validatePresenceEnd()} />
+            <DateField {...getFieldProps('estPlanningEnd')} rules={validateEstPlanningEnd()} readOnly={isUserOnlyViewer}/>
           </div>
         </div>
         <div className="form-row">
           <div className="form-col-md">
-            <DateField {...getFieldProps('visibilityStart')} rules={validateVisibilityStart()} />
+            <DateField {...getFieldProps('presenceStart')} rules={validatePresenceStart()} readOnly={isUserOnlyViewer}/>
           </div>
           <div className="form-col-md">
-            <DateField {...getFieldProps('visibilityEnd')} rules={validateVisibilityEnd()} />
+            <DateField {...getFieldProps('presenceEnd')} rules={validatePresenceEnd()} readOnly={isUserOnlyViewer}/>
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-col-md">
+            <DateField {...getFieldProps('visibilityStart')} rules={validateVisibilityStart()} readOnly={isUserOnlyViewer}/>
+          </div>
+          <div className="form-col-md">
+            <DateField {...getFieldProps('visibilityEnd')} rules={validateVisibilityEnd()} readOnly={isUserOnlyViewer}/>
           </div>
         </div>
       </Fieldset>
@@ -282,12 +284,14 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           <div className="form-col-md">
             <DateField
               {...getFieldProps('estConstructionStart')}
+              readOnly={isUserOnlyViewer}
               rules={validateEstConstructionStart()}
             />
           </div>
           <div className="form-col-md">
             <DateField
               {...getFieldProps('estConstructionEnd')}
+              readOnly={isUserOnlyViewer}
               rules={validateEstConstructionEnd()}
             />
           </div>

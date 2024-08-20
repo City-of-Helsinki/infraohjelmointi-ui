@@ -40,6 +40,7 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
               invalid={error ? true : false}
               errorText={error?.message}
               maxDate={datePlus10Years}
+              disableDatePicker={readOnly}
             />
           </div>
         );
