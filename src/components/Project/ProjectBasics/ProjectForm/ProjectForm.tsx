@@ -396,7 +396,7 @@ const ProjectForm = () => {
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
-      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
+      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} isUserOnlyViewer={isOnlyViewer}/>
       {/* SECTION 6 - LOCATION */}
       <ProjectLocationSection
         {...formProps}
