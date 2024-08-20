@@ -402,9 +402,10 @@ const ProjectForm = () => {
         {...formProps}
         locationOptions={locationOptions}
         isInputDisabled={isInputDisabled}
+        isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection {...formProps} />
+      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer}/>
       {/* BANNER */}
       {!isOnlyViewer &&
         <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
