@@ -603,12 +603,13 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
 }
 
 /**
- * Shows cost estimated budget (TA, "raamiluku") on
+ * Shows current year cost estimated budget (TA, "raamiluku") on
  * Strategy report for high level classes only.
  */
-const costEstimateBudgetHandler = (type: string, budget: string) => {
-  if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)){
-    return budget;
+const frameBudgetHandler = (type: string, budgets: IPlanningCell[]) => {
+  if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)) {
+    const budget = budgets.find(obj => obj.year === new Date().getFullYear());
+    return budget ? budget.displayFrameBudget : "";
   }
 
   return "";
@@ -633,7 +634,7 @@ export const convertToReportRows = (
     case Reports.Strategy: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
-        const costEstimateBudget = c.costEstimateBudget ? costEstimateBudgetHandler(c.type, c.costEstimateBudget) : "";
+        const frameBudget = frameBudgetHandler(c.type, c.cells);
         if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
           const convertedClass = {
             id: c.id,
@@ -642,7 +643,7 @@ export const convertToReportRows = (
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
             projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
             costForecast: c.cells[0].plannedBudget,
-            costPlan: costEstimateBudget,
+            costPlan: frameBudget,
             type: getStrategyRowType(c.type) as ReportTableRowType
           }
           forcedToFrameHierarchy.push(convertedClass);
