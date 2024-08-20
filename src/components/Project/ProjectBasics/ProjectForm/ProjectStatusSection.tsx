@@ -14,6 +14,8 @@ import { mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 interface IProjectStatusSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -44,6 +46,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const constructionPhaseDetails = useOptions('constructionPhaseDetails');
   const currentPhase = getValues('phase').value;
   const { t } = useTranslation();
+  const user = useAppSelector(selectUser);
+  const isOnlyViewer = isUserOnlyViewer(user);
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
 
@@ -326,6 +330,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             rules={validatePhase}
             iconKey={iconKey}
             shouldUpdateIcon={true}
+            readOnly={isOnlyViewer}
           />
         </div>
         <div className="form-col-xl">
@@ -334,6 +339,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             options={constructionPhaseDetails}
             rules={validateConstructionPhaseDetails}
             disabled={isConstructionPhaseDetailsDisabled}
+            readOnly={isOnlyViewer}
           />
         </div>
       </div>
@@ -351,6 +357,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           {...getFieldProps('programmed')}
           rules={validateProgrammed}
           disabled={isInputDisabled}
+          readOnly={isOnlyViewer}
         />
       </div>
       <div className="form-row">
@@ -359,6 +366,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             {...getFieldProps('planningStartYear')}
             rules={validatePlanningStartYear}
             disabled={isInputDisabled}
+            readOnly={isOnlyViewer}
           />
         </div>
       </div>
@@ -368,14 +376,15 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             {...getFieldProps('constructionEndYear')}
             rules={validateConstructionEndYear}
             disabled={isInputDisabled}
+            readOnly={isOnlyViewer}
           />
         </div>
       </div>
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('louhi')} />
+        <RadioCheckboxField {...getFieldProps('louhi')} readOnly={isOnlyViewer}/>
       </div>
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('gravel')} />
+        <RadioCheckboxField {...getFieldProps('gravel')} readOnly={isOnlyViewer}/>
       </div>
       <div className="form-row">
         <div className="form-col-xl">
@@ -384,11 +393,16 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             options={categories}
             rules={validateCategory}
             disabled={isInputDisabled}
+            readOnly={isOnlyViewer}
           />
         </div>
       </div>
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('effectHousing')} disabled={isInputDisabled} />
+        <RadioCheckboxField 
+          {...getFieldProps('effectHousing')}
+          disabled={isInputDisabled}
+          readOnly={isOnlyViewer}
+        />
       </div>
       <div className="form-row">
         <div className="form-col-xl">
@@ -396,6 +410,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             {...getFieldProps('riskAssessment')}
             options={riskAssessments}
             disabled={isInputDisabled}
+            readOnly={isOnlyViewer}
           />
         </div>
       </div>
