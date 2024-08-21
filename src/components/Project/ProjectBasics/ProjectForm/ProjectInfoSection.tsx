@@ -1,4 +1,4 @@
-import { FormFieldLabel, FormSectionTitle, NumberField, SelectField, TextField } from '@/components/shared';
+import { FormSectionTitle, NumberField, SelectField, TextField } from '@/components/shared';
 import TextAreaField from '@/components/shared/TextAreaField';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { FC, memo } from 'react';
