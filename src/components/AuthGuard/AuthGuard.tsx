@@ -32,6 +32,7 @@ const AuthGuard: FC = () => {
     PROJECT_NEW: 'project/new',
     PROJECT_BASICS: 'basics',
     PROJECT_NOTES: 'notes',
+    SEARCH_RESULTS: 'search-results',
   }
 
   const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
@@ -131,8 +132,13 @@ const AuthGuard: FC = () => {
       return navigate(-1);
     }
 
-    // Redirect to planning view if a viewer is trying to access anything but the planning view or a project card
-    if ((!pathname.includes(PAGES.PLANNING) && !pathname.includes(PAGES.PROJECT_BASICS)) && isUserOnlyViewer(user)) {
+    // Redirect to planning view if a viewer is trying to access anything but the planning view, search results or a project card
+    if (
+      (!pathname.includes(PAGES.PLANNING) &&
+      !pathname.includes(PAGES.PROJECT_BASICS) &&
+      !pathname.includes(PAGES.SEARCH_RESULTS)) &&
+      isUserOnlyViewer(user)
+    ) {
       return navigate(-1);
     }
 
