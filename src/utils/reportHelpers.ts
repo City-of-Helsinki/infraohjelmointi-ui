@@ -828,6 +828,7 @@ export const convertToReportRows = (
             id: c.id,
             name: c.name,
             parent: c.path,
+            path: c.path,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
@@ -1062,11 +1063,11 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
     tableRow.name === t('report.constructionProgram.underMillionSummary') ||
     tableRow.name === '' ||
     tableRow.children.some(isShownOnTheReport))
-    // temporary solution to remove Esirakentaminen from the report
+    // temporary solution to remove 8 0 Kiinteä omaisuus/Esirakentaminen from the report
     // will later possibly be removed from the database, but currently
-    //'Esirakentaminen' is old budget item that the tool stilll needs to show
+    //'8 0 Kiinteä omaisuus/Esirakentaminen' is old budget item that the tool stilll needs to show
     // but it should be hidden on the report.
-    && tableRow.name !== "Esirakentaminen"
+    && tableRow.path !== "8 0 Kiinteä omaisuus/Esirakentaminen"
   );
 };
 
