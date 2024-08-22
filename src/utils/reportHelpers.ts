@@ -1066,7 +1066,7 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
     // will later possibly be removed from the database, but currently
     //'8 0 Kiinteä omaisuus/Esirakentaminen' is old budget item that the tool stilll needs to show
     // but it should be hidden on the report.
-    && tableRow.path !== "8 0 Kiinteä omaisuus/Esirakentaminen"
+    && tableRow.path !== "8 01 Kiinteä omaisuus/Esirakentaminen"
   );
 };
 
