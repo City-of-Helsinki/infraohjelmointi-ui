@@ -1062,7 +1062,8 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
     tableRow.name === t('report.constructionProgram.classSummary') ||
     tableRow.name === t('report.constructionProgram.underMillionSummary') ||
     tableRow.name === '' ||
-    tableRow.children.some(isShownOnTheReport))
+    tableRow.children.some(isShownOnTheReport) ||
+    tableRow.name === '8 01 Kiinteä omaisuus')
     // temporary solution to remove 8 0 Kiinteä omaisuus/Esirakentaminen from the report
     // will later possibly be removed from the database, but currently
     //'8 0 Kiinteä omaisuus/Esirakentaminen' is old budget item that the tool stilll needs to show
