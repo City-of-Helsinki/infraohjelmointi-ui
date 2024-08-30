@@ -182,7 +182,7 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
       return ""
   }
 
-  const year = new Date().getFullYear();
+  const year = new Date().getFullYear() + 1;
   const planningStartYear = getYear(project.estPlanningStart);
   const planningEndYear = getYear(project.estPlanningEnd);
   const constructionStartYear = getYear(project.estConstructionStart);
