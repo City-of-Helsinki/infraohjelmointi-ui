@@ -21,41 +21,59 @@ USER root
 
 # Import Yarn GPG key and add the repository
 RUN rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
-    curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
+    curl --proto "=https" --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
     microdnf install -y yum && \
-    microdnf module enable -y nodejs:18 && \
-    yum install -y nano nginx yarn && \
+    # microdnf module enable -y nodejs && \
+    yum install -y nano nginx nodejs yarn && \
     yum clean all && \
     rm -rf /var/cache/yum && \
     mkdir -p /.cache/yarn /.npm /.yarn
-
+    
 # Change ownership and permissions
 RUN chown -R 1001:0 /.cache/yarn /.npm /run /usr/share/nginx/html /var/lib/nginx /var/log/nginx /.yarn && \
     chmod -R ug+rwX /.cache/yarn /.npm /run /usr/share/nginx/html /var/lib/nginx /var/log/nginx /.yarn
 
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy nginx file and change file owner and permissions
+COPY --chown=1001:0 nginx.conf /etc/nginx/nginx.conf
+RUN chown -R 1001:0 /etc/nginx/nginx.conf && \
+    chmod -R ug+rwX /etc/nginx/nginx.conf
 
 # Use default user '1001' to install packages and copy files
 USER 1001
 
 WORKDIR /app
 
-COPY --chown=1001:0 package.json yarn.lock .
+COPY --chown=1001:0 --chmod=755 yarn.lock .
+COPY --chown=1001:0 --chmod=755 package.json .
 
-RUN yarn install && \
+RUN yarn install --frozen-lockfile && \
     npx update-browserslist-db@latest
 
 RUN yarn policies set-version $YARN_VERSION
 
-COPY --chown=1001:0 . .
+COPY --chown=1001:0 --chmod=755 ./public ./public
+COPY --chown=1001:0 --chmod=755 ./src ./src
+COPY --chown=1001:0 --chmod=755 ./craco.config.js .
+COPY --chown=1001:0 --chmod=755 ./docker-entrypoint.sh .
+COPY --chown=1001:0 --chmod=755 ./sonar-project.properties .
+COPY --chown=1001:0 --chmod=755 ./tsconfig* .
+COPY --chown=1001:0 --chmod=755 ./.eslintrc.json .
+COPY --chown=1001:0 --chmod=755 ./.env.development .
+COPY --chown=1001:0 --chmod=755 ./.env.production .
 
 # Build application
-RUN yarn build && \
-    cp -r /app/build /usr/share/nginx/html
+RUN yarn build
 
-# Change ownership and permissions
-RUN chown -R 1001:0 /run /usr/share/nginx/html /var/lib/nginx /var/log/nginx && \
-    chmod -R ug+rwX /run /usr/share/nginx/html /var/lib/nginx /var/log/nginx
+# Change ownership and permissions so the files can be replaced with app's files
+USER root
+RUN rm -rf /usr/share/nginx/html/* && \
+    chown -R 1001:0 /run /usr/share/nginx/html /var/lib/nginx /var/log/nginx && \
+    chmod -R ug+rwX /run /usr/share/nginx/html /var/lib/nginx /var/log/nginx 
+
+# We make sure we will entry with the user 1001
+USER 1001
+
+RUN cp -r /app/build/* /usr/share/nginx/html/
 
 EXPOSE 4000
 
