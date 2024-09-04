@@ -20,7 +20,18 @@ export const downloadCSV = (
 export const arrayToCSV = (
   dataArray: (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[],
 ) => {
-  const headers = Object.keys(dataArray[0]).join(',');
-  const rows = dataArray.map((row) => Object.values(row).join(','));
+  const headers = Object.keys(dataArray[0])
+    .map((field) => `"${field}"`) // Wrap every field in quotes for consistency
+    .join(',');
+  const rows = dataArray.map((row) =>
+    Object.values(row)
+      .map(
+        (value) =>
+          typeof value === 'string' && value.includes('\n')
+            ? `"${value.replace(/"/g, '""')}"` // Handle multiline values by wrapping them in quotes and escaping existing quotes
+            : `"${value}"`, // Wrap every field in quotes for consistency
+      )
+      .join(','),
+  );
   return [headers, ...rows].join('\n');
 };
