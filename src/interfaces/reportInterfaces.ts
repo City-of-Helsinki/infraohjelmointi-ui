@@ -195,6 +195,7 @@ export interface IConstructionProgramTableRow extends ITableRowEssentials {
   projects: Array<IConstructionProgramTableRow>;
   type: ReportTableRowType;
 
+  path?: string;
   costForecast?: string;
   location?: string;
   startAndEnd?: string;

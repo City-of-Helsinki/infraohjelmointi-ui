@@ -1,11 +1,12 @@
 import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
-import DocumentHeader from './DocumentHeader';
-import ReportTable from './ReportTable';
 import { FC, memo } from 'react';
-import StrategyReportFooter from './StrategyReportFooter';
 import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
+import DocumentHeader from './DocumentHeader';
+import ReportTable from './ReportTable';
+import StrategyReportFooter from './StrategyReportFooter';
+import DefaultReportFooter from './DefaultReportFooter';
 
 const styles = StyleSheet.create({
   page: {
@@ -33,10 +34,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       case Reports.ConstructionProgram:
         return t('report.constructionProgram.title');
       case Reports.BudgetBookSummary:
-        return t('report.budgetBookSummary.title', {
-          startYear: new Date().getFullYear() + 1,
-          endYear: new Date().getFullYear() + 10,
-        });
+        return t('report.budgetBookSummary.title');
       case Reports.OperationalEnvironmentAnalysis:
         return t('report.operationalEnvironmentAnalysis.title', {
           startYear: new Date().getFullYear() + 1,
@@ -59,7 +57,10 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             endYear: new Date().getFullYear() + 3,
           });
       case Reports.BudgetBookSummary:
-        return t('report.budgetBookSummary.subtitle');
+        return t('report.budgetBookSummary.subtitle', {
+          startYear: new Date().getFullYear() + 1,
+          endYear: new Date().getFullYear() + 10,
+        });
       case Reports.OperationalEnvironmentAnalysis:
         return t('report.operationalEnvironmentAnalysis.subtitleOne');
       default:
@@ -91,11 +92,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
           />
           <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} />
-          {reportType === Reports.Strategy &&
+          {reportType === Reports.Strategy ?
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
               colorInfoTextOne={t('report.strategy.planning')}
-              colorInfoTextTwo={t('report.strategy.constructing')}/>
+              colorInfoTextTwo={t('report.strategy.constructing')}
+            /> : <DefaultReportFooter/>
           }
         </View>
       </Page>

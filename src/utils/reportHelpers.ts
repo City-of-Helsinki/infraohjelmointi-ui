@@ -224,6 +224,7 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
 const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
   return projects
     .filter((p) =>
+      //p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
       p.planningStartYear && p.constructionEndYear &&
       isProjectInPlanningOrConstruction({
         planningStart: p.planningStartYear,
@@ -379,6 +380,15 @@ export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTabl
   return [];
 }
 
+const classOrChildrenHasBudgets = (cells: IPlanningCell[]) => {
+  for (let i = 0; i <= 10; i++) {
+    if (cells[i].frameBudget != '0' || cells[i].isFrameBudgetOverlap) {
+      return true;
+    }
+  }
+  return false;
+}
+
 const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   const properties = [];
   /* We want to show only those lower level items that start with some number or one letter and a space after that. 
@@ -387,11 +397,12 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   for (const c of coordinatorRows) {
     if (
       c.type === 'masterClass' ||
-        c.type === 'class' ||
-        c.type === 'subClass' ||
-        c.type === 'districtPreview' ||
-        c.type === 'collectiveSubLevel') {
-      if (nameCheckPattern.test(c.name)) {
+      c.type === 'class' ||
+      c.type === 'subClass' ||
+      c.type === 'districtPreview' ||
+      c.type === 'collectiveSubLevel'
+    ) {
+      if (nameCheckPattern.test(c.name) && classOrChildrenHasBudgets(c.cells)) {
         const convertedClass: IBudgetBookSummaryTableRow = {
           id: c.id,
           name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
@@ -592,12 +603,13 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
 }
 
 /**
- * Shows cost estimated budget (TA, "raamiluku") on
+ * Shows current year cost estimated budget (TA, "raamiluku") on
  * Strategy report for high level classes only.
  */
-const costEstimateBudgetHandler = (type: string, budget: string) => {
-  if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)){
-    return budget;
+const frameBudgetHandler = (type: string, budgets: IPlanningCell[]) => {
+  if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)) {
+    const budget = budgets.find(obj => obj.year === new Date().getFullYear());
+    return budget ? budget.displayFrameBudget : "";
   }
 
   return "";
@@ -622,18 +634,20 @@ export const convertToReportRows = (
     case Reports.Strategy: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
-        const costEstimateBudget = c.costEstimateBudget ? costEstimateBudgetHandler(c.type, c.costEstimateBudget) : "";
-        const convertedClass = {
-          id: c.id,
-          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
-          parent: null,
-          children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
-          projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
-          costForecast: c.cells[0].plannedBudget,
-          costPlan: costEstimateBudget,
-          type: getStrategyRowType(c.type) as ReportTableRowType
+        const frameBudget = frameBudgetHandler(c.type, c.cells);
+        if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
+          const convertedClass = {
+            id: c.id,
+            name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+            parent: null,
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
+            projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+            costForecast: c.cells[0].plannedBudget,
+            costPlan: frameBudget,
+            type: getStrategyRowType(c.type) as ReportTableRowType
+          }
+          forcedToFrameHierarchy.push(convertedClass);
         }
-        forcedToFrameHierarchy.push(convertedClass);
       }
       return forcedToFrameHierarchy;
     }
@@ -814,6 +828,7 @@ export const convertToReportRows = (
             id: c.id,
             name: c.name,
             parent: c.path,
+            path: c.path,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
@@ -1047,12 +1062,13 @@ const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => 
     tableRow.name === t('report.constructionProgram.classSummary') ||
     tableRow.name === t('report.constructionProgram.underMillionSummary') ||
     tableRow.name === '' ||
-    tableRow.children.some(isShownOnTheReport))
-    // temporary solution to remove Esirakentaminen from the report
+    tableRow.children.some(isShownOnTheReport) ||
+    tableRow.name === '8 01 Kiinteä omaisuus')
+    // temporary solution to remove 8 0 Kiinteä omaisuus/Esirakentaminen from the report
     // will later possibly be removed from the database, but currently
-    //'Esirakentaminen' is old budget item that the tool stilll needs to show
+    //'8 0 Kiinteä omaisuus/Esirakentaminen' is old budget item that the tool stilll needs to show
     // but it should be hidden on the report.
-    && tableRow.name !== "Esirakentaminen"
+    && tableRow.path !== "8 01 Kiinteä omaisuus/Esirakentaminen"
   );
 };
 

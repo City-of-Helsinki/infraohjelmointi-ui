@@ -475,8 +475,8 @@
     "budgetBookSummary": {
       "rowTitle": "Talousarviokirjan kooste",
       "documentName": "talousarviokirjan kooste",
-      "title": "Investointiohjelma vuosiksi {{startYear}}-{{endYear}}",
-      "subtitle": ""
+      "title": "Helsingin kaupunki",
+      "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma vuosiksi {{startYear}}-{{endYear}}"
     },
     "financialStatement": {
       "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",

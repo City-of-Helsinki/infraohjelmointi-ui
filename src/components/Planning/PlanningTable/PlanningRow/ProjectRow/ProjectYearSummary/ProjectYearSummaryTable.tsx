@@ -10,7 +10,12 @@ interface IProjectYearSummaryTableProps {
   sapCosts: Record<string, IProjectSapCost>;
 }
 
-const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, id, sapProject, sapCosts }) => {
+const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
+  cellType,
+  id,
+  sapProject,
+  sapCosts,
+}) => {
   const costs = useMemo(() => {
     const projectCosts = sapCosts[id];
 
@@ -22,6 +27,15 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
     };
   }, [cellType, id]);
   // All the values in the table are retrieved from SAP and mocked as 0 for now
+
+  // Format the numbers to be displayed in the table, e.g. 1 000000 and rounded to closest 1 000
+  const formatSapNumbers = (number: number) => {
+    // Convert to kiloeuros and round to the nearest thousand
+    const kiloeuros = Math.round(number / 1000);
+    return new Intl.NumberFormat('fr-FR', {
+      maximumFractionDigits: 0,
+    }).format(kiloeuros);
+  };
   return (
     <td
       className={`monthly-summary-cell project ${cellType}`}
@@ -53,14 +67,20 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                   <IconScrollContent size="xs" />
                 </td>
                 <td>
-                  <span className="text-sm font-light">{costs.projectTaskCosts.toFixed(0)}</span>
-                </td>
-                <td>
-                  <span className="text-sm font-light">{costs.projectTaskCommitments.toFixed(0)}</span>
+                  <span className="text-sm font-light">
+                    {formatSapNumbers(costs.projectTaskCosts)}
+                  </span>
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.projectTaskCosts + costs.projectTaskCommitments).toFixed(0)}
+                    {formatSapNumbers(costs.projectTaskCommitments)}
+                  </span>
+                </td>
+                <td>
+                  <span className="text-sm font-light">
+                    {formatSapNumbers(
+                      Number(costs.projectTaskCosts + costs.projectTaskCommitments),
+                    )}
                   </span>
                 </td>
               </tr>
@@ -71,14 +91,20 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                   <IconHammers size="xs" />
                 </td>
                 <td>
-                  <span className="text-sm font-light">{costs.productionTaskCosts.toFixed(0)}</span>
-                </td>
-                <td>
-                  <span className="text-sm font-light">{costs.productionTaskCommitments.toFixed(0)}</span>
+                  <span className="text-sm font-light">
+                    {formatSapNumbers(costs.productionTaskCosts)}
+                  </span>
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.productionTaskCosts + costs.productionTaskCommitments).toFixed(0)}
+                    {formatSapNumbers(costs.productionTaskCommitments)}
+                  </span>
+                </td>
+                <td>
+                  <span className="text-sm font-light">
+                    {formatSapNumbers(
+                      Number(costs.productionTaskCosts + costs.productionTaskCommitments),
+                    )}
                   </span>
                 </td>
               </tr>
@@ -90,22 +116,26 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({ cellType, 
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.projectTaskCosts + costs.productionTaskCosts).toFixed(0)}
+                    {formatSapNumbers(Number(costs.projectTaskCosts + costs.productionTaskCosts))}
                   </span>
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(costs.projectTaskCommitments + costs.productionTaskCommitments).toFixed(0)}
+                    {formatSapNumbers(
+                      Number(costs.projectTaskCommitments + costs.productionTaskCommitments),
+                    )}
                   </span>
                 </td>
                 <td>
                   <span className="text-sm font-light">
-                    {Number(
-                      costs.projectTaskCosts +
-                        costs.productionTaskCosts +
-                        costs.projectTaskCommitments +
-                        costs.productionTaskCommitments,
-                    ).toFixed(0)}
+                    {formatSapNumbers(
+                      Number(
+                        costs.projectTaskCosts +
+                          costs.productionTaskCosts +
+                          costs.projectTaskCommitments +
+                          costs.productionTaskCommitments,
+                      ),
+                    )}
                   </span>
                 </td>
               </tr>
