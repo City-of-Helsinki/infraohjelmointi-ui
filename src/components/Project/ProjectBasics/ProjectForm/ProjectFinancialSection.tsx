@@ -30,12 +30,14 @@ interface IProjectFinancialSectionProps {
     subClasses: IOption[];
   };
   isInputDisabled: boolean;
+  isUserOnlyViewer: boolean
 }
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getFieldProps,
   control,
   classOptions,
   isInputDisabled,
+  isUserOnlyViewer
 }) => {
   const { t } = useTranslation();
 
@@ -47,101 +49,80 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const projectQualityLevels = useOptions('projectQualityLevels');
   const planningPhases = useOptions('planningPhases');
 
+  const renderSelectField = (name: string, options: IOption[], size: "full" | "lg" | undefined, shouldTranslate: boolean) => (
+    <SelectField
+      {...getFieldProps(name)}
+      options={options}
+      size={size}
+      shouldTranslate={shouldTranslate}
+      disabled={isInputDisabled}
+      readOnly={isUserOnlyViewer}
+    />
+  );
+
+  const renderNumberField = (name: string, tooltip: string, hideLabel: boolean) => (
+    <NumberField
+      {...getFieldProps(name)}
+      tooltip={tooltip}
+      hideLabel={hideLabel}
+      rules={validateMaxLength(10, t)}
+      readOnly={isUserOnlyViewer}
+    />
+  );
+
   return (
     <div className="w-full" id="basics-financials-section">
       <FormSectionTitle {...getFieldProps('financial')} />
       <div className="form-row">
         <div className="form-col-xxl">
-          <SelectField
-            {...getFieldProps('masterClass')}
-            options={masterClasses}
-            size="full"
-            shouldTranslate={false}
-            disabled={isInputDisabled}
-          />
+          {renderSelectField('masterClass', masterClasses, "full", false)}
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <SelectField
-            {...getFieldProps('class')}
-            options={classes}
-            shouldTranslate={false}
-            disabled={isInputDisabled}
-          />
+          {renderSelectField('class', classes, undefined, false)}
         </div>
         <div className="form-col-md">
-          <SelectField
-            {...getFieldProps('subClass')}
-            options={subClasses}
-            shouldTranslate={false}
-            disabled={isInputDisabled}
-          />
+          {renderSelectField('subClass', subClasses, undefined, false)}
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-sm">
-          <NumberField
-            {...getFieldProps('projectCostForecast')}
-            tooltip="keur"
-            hideLabel={true}
-            rules={validateMaxLength(10, t)}
-          />
+          {renderNumberField('projectCostForecast', "keur", true)}
         </div>
         <div className="form-col-lg">
-          <SelectField {...getFieldProps('projectQualityLevel')} options={projectQualityLevels} />
+          {renderSelectField('projectQualityLevel', projectQualityLevels, undefined, true)}
         </div>
         <div className="form-col-sm">
-          <NumberField
-            {...getFieldProps('projectWorkQuantity')}
-            tooltip="m2"
-            rules={validateMaxLength(10, t)}
-          />
+          {renderNumberField('projectWorkQuantity', "m2", false)}
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-sm">
-          <NumberField
-            {...getFieldProps('planningCostForecast')}
-            tooltip="keur"
-            hideLabel={true}
-            rules={validateMaxLength(10, t)}
-          />
+          {renderNumberField('planningCostForecast', "keur", true)}
         </div>
         <div className="form-col-lg">
-          <SelectField {...getFieldProps('planningPhase')} options={planningPhases} />
+          {renderSelectField('planningPhase', planningPhases, undefined, true)}
         </div>
         <div className="form-col-sm">
-          <NumberField
-            {...getFieldProps('planningWorkQuantity')}
-            tooltip="m2"
-            rules={validateMaxLength(10, t)}
-          />
+          {renderNumberField('planningWorkQuantity', "m2", false)}
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-sm">
-          <NumberField
-            {...getFieldProps('constructionCostForecast')}
-            tooltip="keur"
-            hideLabel={true}
-            rules={validateMaxLength(10, t)}
-          />
+          {renderNumberField('constructionCostForecast', "keur", true)}
         </div>
         <div className="form-col-lg">
-          <SelectField {...getFieldProps('constructionPhase')} options={constructionPhases} />
+          {renderSelectField('constructionPhase', constructionPhases, undefined, true)}
         </div>
         <div className="form-col-sm">
-          <NumberField
-            {...getFieldProps('constructionWorkQuantity')}
-            tooltip="m2"
-            rules={validateMaxLength(10, t)}
-          />
+          {renderNumberField('constructionWorkQuantity', "m2", false)}
         </div>
       </div>
       <ListField
         {...getFieldProps('realizedCostLabel')}
         disabled={isInputDisabled}
+        readOnly={isUserOnlyViewer}
         fields={[
           { ...getFieldProps('costForecast'), rules: validateMaxLength(15, t) },
           {
@@ -163,7 +144,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         cancelEdit={isSaving}
       />
 
-      <OverrunRightField control={control} cancelEdit={isSaving} />
+      <OverrunRightField control={control} cancelEdit={isSaving} readOnly={isUserOnlyViewer}/>
       <ListField
         {...getFieldProps('preliminaryBudgetDivision')}
         readOnly={true}

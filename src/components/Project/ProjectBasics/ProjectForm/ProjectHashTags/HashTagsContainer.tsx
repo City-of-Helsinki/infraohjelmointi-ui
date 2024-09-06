@@ -9,6 +9,7 @@ interface IHashTagsProps {
   onClick?: (tag: string) => void;
   onDelete?: (tag: string) => void;
   id?: string;
+  readOnly?: boolean;
 }
 
 const getAriaLabel = (
@@ -22,7 +23,7 @@ const getAriaLabel = (
   return translate(deleteTag ?? addTag ?? '');
 };
 
-const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) => {
+const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id, readOnly }) => {
   const { t } = useTranslation();
 
   const handleOnClick = useCallback(
@@ -44,7 +45,7 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id }) 
   );
 
   const handlers = {
-    onClick: handleOnClick,
+    onClick: readOnly ? undefined : handleOnClick,
     onDelete: onDelete ? handleOnDelete : undefined,
   };
 

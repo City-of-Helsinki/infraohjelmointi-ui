@@ -10,14 +10,15 @@ interface IProjectProgramSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
+  isUserOnlyViewer: boolean;
 }
-const ProjectProgramSection: FC<IProjectProgramSectionProps> = ({ getFieldProps }) => {
+const ProjectProgramSection: FC<IProjectProgramSectionProps> = ({ getFieldProps, isUserOnlyViewer }) => {
   return (
     <div className="w-full" id="basics-location-section">
       <FormSectionTitle {...getFieldProps('projectProgramTitle')} />
       <div className="form-row">
         <div className="form-col-xxl">
-          <TextAreaField {...getFieldProps('projectProgram')} />
+          <TextAreaField {...getFieldProps('projectProgram')} readOnly={isUserOnlyViewer}/>
         </div>
       </div>
     </div>

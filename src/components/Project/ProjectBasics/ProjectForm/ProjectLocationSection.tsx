@@ -17,11 +17,13 @@ interface IProjectLocationSectionProps {
     subDivisions: IOption[];
   };
   isInputDisabled: boolean;
+  isUserOnlyViewer: boolean;
 }
 const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
   getFieldProps,
   locationOptions,
   isInputDisabled,
+  isUserOnlyViewer
 }) => {
 
   const { districts, divisions, subDivisions } = locationOptions;
@@ -38,6 +40,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             options={responsibleZones}
             size="full"
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -50,6 +53,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             size="full"
             shouldTranslate={false}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -61,6 +65,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             options={divisions}
             shouldTranslate={false}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-md">
@@ -70,20 +75,21 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             options={subDivisions}
             shouldTranslate={false}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <TextField {...getFieldProps('masterPlanAreaNumber')} />
+          <TextField {...getFieldProps('masterPlanAreaNumber')} readOnly={isUserOnlyViewer}/>
         </div>
         <div className="form-col-md">
-          <TextField {...getFieldProps('trafficPlanNumber')} />
+          <TextField {...getFieldProps('trafficPlanNumber')} readOnly={isUserOnlyViewer}/>
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <TextField {...getFieldProps('bridgeNumber')} />
+          <TextField {...getFieldProps('bridgeNumber')} readOnly={isUserOnlyViewer}/>
         </div>
       </div>
     </div>

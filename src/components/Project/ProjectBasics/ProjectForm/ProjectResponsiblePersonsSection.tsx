@@ -14,11 +14,13 @@ interface IProjectResponsiblePersonsSectionProps {
     control: Control<IProjectForm>;
   };
   isInputDisabled: boolean;
+  isUserOnlyViewer: boolean;
 }
 const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProps> = ({
   getFieldProps,
   getValues,
   isInputDisabled,
+  isUserOnlyViewer
 }) => {
   const { t } = useTranslation();
 
@@ -102,6 +104,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             options={responsiblePersons}
             rules={validatePersonPlanning()}
             shouldTranslate={false}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-md">
@@ -111,6 +114,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             options={responsiblePersons}
             rules={validatePersonConstruction()}
             shouldTranslate={false}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -124,10 +128,11 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             options={[]}
             shouldTranslate={false}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-md">
-          <TextField {...getFieldProps('otherPersons')} />
+          <TextField {...getFieldProps('otherPersons')} readOnly={isUserOnlyViewer}/>
         </div>
       </div>
     </div>

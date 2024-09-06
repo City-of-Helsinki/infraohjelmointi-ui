@@ -8,6 +8,8 @@ import './styles.css';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 import { useTranslation } from 'react-i18next';
+import { selectUser } from '@/reducers/authSlice';
+import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 interface IProjectNameFormProps {
   control: HookFormControlType;
@@ -17,6 +19,8 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const projectMode = useAppSelector(selectProjectMode);
+  const user = useAppSelector(selectUser);
+  const isOnlyViewer = isUserOnlyViewer(user);
   const handleSetEditing = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
@@ -71,13 +75,15 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
           }
         />
       </div>
-      <IconButton
-        onClick={handleSetEditing}
-        icon={IconPenLine}
-        disabled={projectMode === 'new'}
-        color="white"
-        label="edit-project-name"
-      />
+      { !isOnlyViewer &&
+        <IconButton
+          onClick={handleSetEditing}
+          icon={IconPenLine}
+          disabled={projectMode === 'new'}
+          color="white"
+          label="edit-project-name"
+        />
+      }
     </div>
   );
 };
