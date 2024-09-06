@@ -49,7 +49,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
     switch (reportType) {
       case Reports.Strategy:
         return t('report.strategy.subtitle', {
-          startYear: new Date().getFullYear()
+          startYear: new Date().getFullYear() + 1
         });
       case Reports.ConstructionProgram:
         return t('report.constructionProgram.subtitle', {
