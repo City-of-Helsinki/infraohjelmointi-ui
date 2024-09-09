@@ -1,36 +1,48 @@
 # ===============================================
-FROM alpine:3.20.0
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.4
 # ===============================================
 WORKDIR /app
-# Copy all files
-COPY . .
 
-ENV YARN_VERSION 1.22.19
+# Set environment variables
+ENV YARN_VERSION=1.22.19
+ENV NODE_VERSION=18.x
 
-# Changing ownership and user rights to support following use-cases:
-# 1) running container on OpenShift, whose default security model
-#    is to run the container under random UID, but GID=0
-# 2) for working root-less container with UID=1001, which does not have
-#    to have GID=0
-# 3) for default use-case, that is running container directly on operating system,
-#    with default UID and GID (1001:0)
-# Supported combinations of UID:GID are thus following:
-# UID=1001 && GID=0
-# UID=<any>&& GID=0
-# UID=1001 && GID=<any>
-RUN apk add --update nano nginx nodejs yarn bash && \
-  rm -rf /var/cache/apk/* && \
+# Install necessary packages, Node.js, Yarn, and change ownership and user rights
+RUN microdnf update -y && \
+  microdnf install -y \
+  tar \
+  gzip \
+  bash \
+  nano && \
+  microdnf clean all && \
+  microdnf install -y nginx && \
+  microdnf clean all && \
   chown -R 1001:0 /var/lib/nginx /var/log/nginx /run && \
-  chmod -R ug+rwX /var/lib/nginx /var/log/nginx /run && \
-  yarn policies set-version $YARN_VERSION && \
-  # Install dependencies
-  yarn install && yarn build && \
-  cp -r /app/build /usr/share/nginx/html && \
-  # Copy nginx config
+  chmod -R ug+rwX /var/lib/nginx /var/log/nginx /run
+
+# Add the NodeSource setup script and install Node.js
+ADD https://rpm.nodesource.com/setup_18.x /tmp/setup_18.x
+RUN bash /tmp/setup_18.x && rm /tmp/setup_18.x && \
+  microdnf install -y nodejs && \
+  microdnf clean all
+
+# Add the Yarn installation script and install Yarn
+ADD https://yarnpkg.com/install.sh /tmp/install-yarn.sh
+RUN bash /tmp/install-yarn.sh --version "$YARN_VERSION" && \
+  ln -s /root/.yarn/bin/yarn /usr/local/bin/yarn && \
+  rm /tmp/install-yarn.sh
+
+# Install node dependencies and build the project
+COPY . .
+RUN yarn install --ignore-scripts && yarn build && \
+  cp -r /app/build/* /usr/share/nginx/html/ && \
   cp /app/nginx.conf /etc/nginx/nginx.conf
 
-
+# Expose port 4000
 EXPOSE 4000
-# start nginx service
+
+# Run the container as the non-root user
 USER 1001
+
+# Start nginx service
 ENTRYPOINT ["./docker-entrypoint.sh"]
