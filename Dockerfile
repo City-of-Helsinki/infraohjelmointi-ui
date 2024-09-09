@@ -7,30 +7,34 @@ WORKDIR /app
 ENV YARN_VERSION=1.22.19
 ENV NODE_VERSION=18.x
 
-# Install necessary packages using curl-minimal
+# Install necessary packages, Node.js, Yarn, and change ownership and user rights
 RUN microdnf update -y && \
   microdnf install -y \
   tar \
   gzip \
   bash \
-  && curl -sL https://rpm.nodesource.com/setup_18.x | bash - && \
-  microdnf install -y \
-  nodejs \
-  nginx \
-  nano \
-  && microdnf clean all
-
-# Install Yarn manually
-RUN curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version $YARN_VERSION && \
-  ln -s /root/.yarn/bin/yarn /usr/local/bin/yarn
-
-# Changing ownership and user rights to support following use-cases:
-RUN chown -R 1001:0 /var/lib/nginx /var/log/nginx /run && \
+  nano && \
+  microdnf clean all && \
+  microdnf install -y nginx && \
+  microdnf clean all && \
+  chown -R 1001:0 /var/lib/nginx /var/log/nginx /run && \
   chmod -R ug+rwX /var/lib/nginx /var/log/nginx /run
+
+# Add the NodeSource setup script and install Node.js
+ADD https://rpm.nodesource.com/setup_18.x /tmp/setup_18.x
+RUN bash /tmp/setup_18.x && rm /tmp/setup_18.x && \
+  microdnf install -y nodejs && \
+  microdnf clean all
+
+# Add the Yarn installation script and install Yarn
+ADD https://yarnpkg.com/install.sh /tmp/install-yarn.sh
+RUN bash /tmp/install-yarn.sh --version "$YARN_VERSION" && \
+  ln -s /root/.yarn/bin/yarn /usr/local/bin/yarn && \
+  rm /tmp/install-yarn.sh
 
 # Install node dependencies and build the project
 COPY . .
-RUN yarn install && yarn build && \
+RUN yarn install --ignore-scripts && yarn build && \
   cp -r /app/build/* /usr/share/nginx/html/ && \
   cp /app/nginx.conf /etc/nginx/nginx.conf
 
