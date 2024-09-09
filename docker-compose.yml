@@ -7,7 +7,7 @@ services:
       context: ./
       dockerfile: ./Dockerfile
     environment:
-      DEV_SERVER: 'false'
+      DEV_SERVER: 'true'
     volumes:
       - .:/app:cached
     ports:
