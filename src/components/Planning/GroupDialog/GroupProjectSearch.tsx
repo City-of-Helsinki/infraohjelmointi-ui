@@ -72,6 +72,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       const groupDistrict = getValues('district.value');
       const groupSubClass = getValues('subClass.value');
       const groupClass = getValues('class.value');
+      const projectsForSubmitIds = getValues('projectsForSubmit').map(project => project.value);
   
       const projectSearchResult = allProjectsUnderSelectedClass.filter((project) => {
         const projectNameMatches = project.name.toLowerCase().startsWith(lowerCaseSearchWord);
@@ -82,12 +83,13 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
           getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, project.projectDistrict)) === groupDivision;
         const divisionMatches = project.projectDistrict === groupDivision || getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
         const subDivisionMatches = project.projectDistrict === groupSubDivision;
+        const projectNotSelectedAlready = !projectsForSubmitIds.includes(project.id);
   
-        if (groupSubDivision) return subDivisionMatches && projectNameMatches && classMatches;
-        else if (groupDivision) return divisionMatches && projectNameMatches && classMatches;
-        else if (groupDistrict) return districtMatches && projectNameMatches && classMatches;
+        if (groupSubDivision) return subDivisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
+        else if (groupDivision) return divisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
+        else if (groupDistrict) return districtMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
         else if (groupSubClass || groupClass) {
-          return classMatches && projectNameMatches;
+          return classMatches && projectNameMatches && projectNotSelectedAlready;
         }
         return false;
       });
