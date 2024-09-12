@@ -15,8 +15,9 @@ import {
 } from '@/reducers/classSlice';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
-import { listItemToOption } from '@/utils/common';
+import { getLocationParent, listItemToOption } from '@/utils/common';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
+import { selectProjects } from '@/reducers/planningSlice';
 interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
@@ -105,6 +106,10 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
 const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const { formValues, group } = useGroupValues(projects, id);
 
+  const allProjects = useAppSelector(selectProjects);
+  const projectSubDivisions = useAppSelector(selectProjectSubDivisions);
+  const projectDivisions = useAppSelector(selectProjectDivisions);
+
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: group?.classRelation ?? '',
     selectedLocation: group?.location ?? '',
@@ -165,7 +170,35 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
           if (name === 'district' || name === 'division') {
             setValue('subDivision', { label: '', value: '' });
           }
-          setValue('projectsForSubmit', []);
+          if (projects) {
+            const projectsWithSameLocationDataAsGroup: IOption[] = [];
+            projects.forEach((project) => {
+              const projectData = allProjects.find(({ id }) => id == project.value);
+              if (name === 'subDivision') {
+                if ((value.subDivision?.value && projectData?.projectDistrict === value.subDivision?.value) ||
+                  (!value.subDivision?.value && (getLocationParent(projectSubDivisions, projectData?.projectDistrict) === value.division?.value ||
+                  projectData?.projectDistrict === value.division?.value))
+                ) {
+                  projectsWithSameLocationDataAsGroup.push(project);
+                }
+              }
+              else if (name === 'division') {
+                if ((value.division?.value && (projectData?.projectDistrict === value.division?.value) ||
+                  getLocationParent(projectSubDivisions, projectData?.projectDistrict) === value.division?.value) ||
+                  (!value.division?.value && (getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectData?.projectDistrict)) === value.district?.value ||
+                  getLocationParent(projectDivisions, projectData?.projectDistrict) === value.district?.value))) {
+                projectsWithSameLocationDataAsGroup.push(project);
+                }
+              }
+              else if (value.district?.value && (projectData?.projectDistrict === value.district?.value ||
+                getLocationParent(projectDivisions, projectData?.projectDistrict) === value.district?.value ||
+                getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectData?.projectDistrict)) === value.district?.value)
+              ) {
+                projectsWithSameLocationDataAsGroup.push(project);
+              }
+            });
+            setValue('projectsForSubmit', projectsWithSameLocationDataAsGroup)
+          }
           break;
         default:
       }
