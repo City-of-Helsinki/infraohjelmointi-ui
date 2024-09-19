@@ -35,7 +35,8 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control, cancelEd
             <div className="mb-3">
               <FormFieldLabel
                 text={t('overrunRightValue', { value: field.value })}
-                onClick={handleSetEditing}
+                onClick={!readOnly ? handleSetEditing : undefined}
+                disabled={readOnly}
               />
             </div>
             {editing && (

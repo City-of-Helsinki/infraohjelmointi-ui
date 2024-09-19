@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const year = new Date().getFullYear();
+const year = new Date().getFullYear() + 1;
 
 const StrategyTableHeader = () => {
   const { t } = useTranslation();

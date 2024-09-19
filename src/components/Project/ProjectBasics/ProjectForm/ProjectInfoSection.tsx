@@ -3,7 +3,7 @@ import TextAreaField from '@/components/shared/TextAreaField';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { FC, memo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control } from 'react-hook-form';
+import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
@@ -19,15 +19,19 @@ interface IProjectInfoSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
+  getValues: UseFormGetValues<IProjectForm>;
   isInputDisabled: boolean;
   projectMode: "edit" | "new";
+  isUserOnlyViewer: boolean;
 }
 
 const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   project,
   getFieldProps,
+  getValues,
   control,
   isInputDisabled,
+  isUserOnlyViewer
 }) => {
   const areas = useOptions('areas');
   const types = useOptions('types');
@@ -52,6 +56,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             options={types}
             disabled={isInputDisabled}
             rules={{ required: t('validation.required', { field: t('validation.phase') }) ?? '' }}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-xl">
@@ -59,6 +64,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('hkrId')}
             rules={validateMaxLength(5, t)}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -68,6 +74,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('entityName')}
             rules={validateMaxLength(30, t)}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-xl">
@@ -76,12 +83,13 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             control={control}
             rules={validateMaxLength(15, t)}
             disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('area')} options={areas} />
+          <SelectField {...getFieldProps('area')} options={areas} readOnly={isUserOnlyViewer} />
         </div>
         <div className="form-col-xl">
           <TextField
@@ -99,6 +107,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             size="l"
             rules={{...validateMaxLength(1000,t), ...validateRequired('description', t)}}
             formSaved={isSaving}
+            readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
@@ -109,6 +118,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           control={control}
           project={project}
           projectMode={projectMode}
+          readOnly={isUserOnlyViewer}
         />
       </div>
     </div>

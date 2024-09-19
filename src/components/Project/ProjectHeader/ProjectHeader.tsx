@@ -16,6 +16,7 @@ import { patchProject } from '@/services/projectServices';
 import _ from 'lodash';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { notifyError } from '@/reducers/notificationSlice';
+import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -29,6 +30,7 @@ const ProjectHeader: FC = () => {
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
   const { formMethods } = useProjectHeaderForm();
+  const isOnlyViewer = isUserOnlyViewer(user);
 
   const projectGroupName = useMemo(() => {
     if (!project?.projectGroup) {
@@ -108,7 +110,7 @@ const ProjectHeader: FC = () => {
           >
             <ProjectNameFields control={control} />
             <SelectField
-              disabled={projectMode === 'new'}
+              disabled={projectMode === 'new' || isOnlyViewer}
               name="phase"
               control={control}
               options={phases}
@@ -120,9 +122,14 @@ const ProjectHeader: FC = () => {
         <div className="mr-3 flex-1" data-testid="project-header-right">
           <div className="flex h-full flex-col">
             <div className="mr-auto text-right">
-              <div className="mb-8" data-testid="project-favourite">
-                <ProjectFavouriteField control={control} />
-              </div>
+              {/*The viewers can't access any other views than planning view and the project card
+              so by default they also can't access the place where the favourite projects would
+              be. Also, the whole feature is not yet implemented.*/}
+              {!isOnlyViewer && 
+                <div className="mb-8" data-testid="project-favourite">
+                  <ProjectFavouriteField control={control} />
+                </div>
+              }
               <p className="text-white">{t('inGroup')}</p>
               <p className="text-l font-bold text-white">{projectGroupName}</p>
             </div>

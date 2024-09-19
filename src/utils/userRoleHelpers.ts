@@ -1,4 +1,4 @@
-import { IUser, UserRole } from '@/interfaces/userInterfaces';
+import { IAdGroup, IUser, UserRole } from '@/interfaces/userInterfaces';
 
 export const isUserAdmin = (user: IUser | null) => {
   if (!user) {
@@ -56,11 +56,16 @@ export const isUserProjectManager = (user: IUser | null) => {
   );
 };
 
+const adGroupIsViewer = (adGroup: IAdGroup) => adGroup.name === UserRole.VIEWER || adGroup.name === UserRole.VIEWER_OTHERS;
+
 export const isUserOnlyViewer = (user: IUser | null) => {
   if (!user) {
     return false;
   }
-  return user.ad_groups.length === 1 && user.ad_groups.some((ag) => ag.name === UserRole.VIEWER || ag.name === UserRole.VIEWER_OTHERS);
+  return (
+    (user.ad_groups.length === 1 && adGroupIsViewer(user.ad_groups[0])) ||
+    (user.ad_groups.length === 2 && (adGroupIsViewer(user.ad_groups[0]) && adGroupIsViewer(user.ad_groups[1])))
+  );
 };
 
 export const isUserOnlyProjectAreaPlanner = (user: IUser | null) => {

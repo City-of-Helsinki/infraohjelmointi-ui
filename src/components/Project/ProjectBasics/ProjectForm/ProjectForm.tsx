@@ -31,7 +31,7 @@ import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
-import { isUserOnlyProjectManager } from '@/utils/userRoleHelpers';
+import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -42,6 +42,8 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
   const sapCosts = useAppSelector(getProjectSapCosts);
+
+  const isOnlyViewer = isUserOnlyViewer(user);
 
   const [newProjectId, setNewProjectId] = useState('');
 
@@ -371,29 +373,43 @@ const ProjectForm = () => {
       className="project-form"
     >
       {/* SECTION 1 - BASIC INFO */}
-      <ProjectInfoSection {...formProps} project={project} isInputDisabled={isInputDisabled} projectMode={projectMode} />
+      <ProjectInfoSection
+        {...formProps} project={project}
+        isInputDisabled={isInputDisabled}
+        projectMode={projectMode}
+        isUserOnlyViewer={isOnlyViewer}
+      />
       {/* SECTION 2 - STATUS */}
-      <ProjectStatusSection {...formProps} isInputDisabled={isInputDisabled} isUserOnlyProjectManager={isUserProjectManagerCheck} />
+      <ProjectStatusSection 
+        {...formProps}
+        isInputDisabled={isInputDisabled}
+        isUserOnlyProjectManager={isUserProjectManagerCheck}
+        isUserOnlyViewer={isOnlyViewer}
+      />
       {/* SECTION 3 - SCHEDULE */}
-      <ProjectScheduleSection {...formProps} isUserOnlyProjectManager={isUserProjectManagerCheck} />
+      <ProjectScheduleSection {...formProps} isUserOnlyProjectManager={isUserProjectManagerCheck} isUserOnlyViewer={isOnlyViewer}/>
       {/* SECTION 4 - FINANCIALS */}
       <ProjectFinancialSection
         {...formProps}
         classOptions={classOptions}
         isInputDisabled={isInputDisabled}
+        isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
-      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} />
+      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} isUserOnlyViewer={isOnlyViewer}/>
       {/* SECTION 6 - LOCATION */}
       <ProjectLocationSection
         {...formProps}
         locationOptions={locationOptions}
         isInputDisabled={isInputDisabled}
+        isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection {...formProps} />
+      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer}/>
       {/* BANNER */}
-      <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
+      {!isOnlyViewer &&
+        <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
+      }
     </form>
   );
 };

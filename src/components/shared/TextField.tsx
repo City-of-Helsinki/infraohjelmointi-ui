@@ -13,6 +13,7 @@ interface ITextFieldProps {
   hideLabel?: boolean;
   tooltip?: string;
   disabled?: boolean;
+  readOnlyValue?: string;
 }
 
 const TextField: FC<ITextFieldProps> = ({
@@ -24,6 +25,7 @@ const TextField: FC<ITextFieldProps> = ({
   hideLabel,
   tooltip,
   disabled,
+  readOnlyValue,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
@@ -37,7 +39,7 @@ const TextField: FC<ITextFieldProps> = ({
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextInput
             className="input-l"
-            value={value}
+            value={readOnlyValue ?? value}
             onChange={onChange}
             label={t(label)}
             hideLabel={hideLabel}
