@@ -18,6 +18,7 @@ import { IListItem, IOption } from '@/interfaces/common';
 import { getLocationParent, listItemToOption } from '@/utils/common';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 import { selectProjects } from '@/reducers/planningSlice';
+import { IProject } from '@/interfaces/projectInterfaces';
 interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
@@ -90,6 +91,8 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
     };
   };
 
+  
+
   const formValues: IGroupForm = useMemo(
     () => ({
       name: group?.name || '',
@@ -119,6 +122,45 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const classOptions = useClassOptions(selectedClass);
   const locationOptions = useLocationOptions(selectedLocation);
 
+  const lowestSelectedLocationLevel = (divisionValue: string | undefined, subDivisionValue: string | undefined): 'subDivision' | 'division' | 'district' => {
+    let lowestSelectedLocationLevel: 'subDivision' | 'division' | 'district';
+    if (subDivisionValue) {
+      lowestSelectedLocationLevel = 'subDivision';
+    } else if (divisionValue) {
+      lowestSelectedLocationLevel = 'division';
+    } else {
+      lowestSelectedLocationLevel = 'district';
+    }
+    return lowestSelectedLocationLevel;
+  }
+
+  const filterProjectsForSubmit = (projects: IOption[] | undefined, groupLocationLevel: string, groupLocationId: string | undefined) => {
+    const filteredProjects = projects?.filter((project) => {
+      const projecLocationId = allProjects.find(({ id }) => id == project.value)?.projectDistrict;
+      return projectAndGroupLocationMatches(groupLocationLevel, groupLocationId, projecLocationId);
+    });
+    return filteredProjects;
+  }
+
+  const projectAndGroupLocationMatches = (
+    groupLocationLevel: string,
+    groupLocationId?: string,
+    projectLocationId?: string,
+  ) => {
+    const projectDirectlyUnderGroupLocation = projectLocationId === groupLocationId;
+    const divisionLevelMatchesGroupDistrict = getLocationParent(projectDivisions, projectLocationId) === groupLocationId;
+    const subDivisionLevelMatchesGroupDivision = getLocationParent(projectSubDivisions, projectLocationId) === groupLocationId;
+    const subDivisionLevelMatchesGroupDistrict = getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectLocationId)) === groupLocationId;
+    switch (groupLocationLevel) {
+      case 'district':
+        return projectDirectlyUnderGroupLocation || divisionLevelMatchesGroupDistrict || subDivisionLevelMatchesGroupDistrict;
+      case 'division':
+        return projectDirectlyUnderGroupLocation || subDivisionLevelMatchesGroupDivision;
+      case 'subDivision':
+        return projectDirectlyUnderGroupLocation;
+    }
+  }
+
   const formMethods = useForm<IGroupForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onSubmit',
@@ -140,6 +182,7 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
+      const lowestLocationForGroup = lowestSelectedLocationLevel(value.division?.value, value.subDivision?.value);
       switch (name) {
         case 'masterClass':
         case 'class':
@@ -166,39 +209,12 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
           }
           if (name === 'district') {
             setValue('division', { label: '', value: '' });
-          }
-          if (name === 'district' || name === 'division') {
             setValue('subDivision', { label: '', value: '' });
           }
-          if (projects) {
-            const projectsWithSameLocationDataAsGroup: IOption[] = [];
-            projects.forEach((project) => {
-              const projectData = allProjects.find(({ id }) => id == project.value);
-              if (name === 'subDivision') {
-                if ((value.subDivision?.value && projectData?.projectDistrict === value.subDivision?.value) ||
-                  (!value.subDivision?.value && (getLocationParent(projectSubDivisions, projectData?.projectDistrict) === value.division?.value ||
-                  projectData?.projectDistrict === value.division?.value))
-                ) {
-                  projectsWithSameLocationDataAsGroup.push(project);
-                }
-              }
-              else if (name === 'division') {
-                if ((value.division?.value && (projectData?.projectDistrict === value.division?.value) ||
-                  getLocationParent(projectSubDivisions, projectData?.projectDistrict) === value.division?.value) ||
-                  (!value.division?.value && (getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectData?.projectDistrict)) === value.district?.value ||
-                  getLocationParent(projectDivisions, projectData?.projectDistrict) === value.district?.value))) {
-                projectsWithSameLocationDataAsGroup.push(project);
-                }
-              }
-              else if (value.district?.value && (projectData?.projectDistrict === value.district?.value ||
-                getLocationParent(projectDivisions, projectData?.projectDistrict) === value.district?.value ||
-                getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectData?.projectDistrict)) === value.district?.value)
-              ) {
-                projectsWithSameLocationDataAsGroup.push(project);
-              }
-            });
-            setValue('projectsForSubmit', projectsWithSameLocationDataAsGroup)
+          if (name === 'division') {
+            setValue('subDivision', { label: '', value: '' });
           }
+          setValue('projectsForSubmit', filterProjectsForSubmit(projects, lowestLocationForGroup, value[lowestLocationForGroup]?.value) ?? [])
           break;
         default:
       }
