@@ -1,4 +1,4 @@
-import { IListItem, IOption } from '@/interfaces/common';
+import { IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
 import { getLocationParent, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';

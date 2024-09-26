@@ -18,7 +18,6 @@ import { IListItem, IOption } from '@/interfaces/common';
 import { getLocationParent, listItemToOption } from '@/utils/common';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 import { selectProjects } from '@/reducers/planningSlice';
-import { IProject } from '@/interfaces/projectInterfaces';
 interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
@@ -90,8 +89,6 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
       subDivision: listItemToOption(selectedSubDivision),
     };
   };
-
-  
 
   const formValues: IGroupForm = useMemo(
     () => ({
