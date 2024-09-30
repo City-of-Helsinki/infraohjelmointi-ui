@@ -83,7 +83,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
         case Reports.Strategy:
         case Reports.BudgetBookSummary: {
           // For Strategy report, we will fetch next year data
-          const res = type === Reports.Strategy ? await getForcedToFrameData(year + 1, true) : await getForcedToFrameData(year, true);
+          const res = type === Reports.Strategy ? await getForcedToFrameData(year + 1, false) : await getForcedToFrameData(year, true);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
             document = getPdfDocument(type, coordinatorRows);
