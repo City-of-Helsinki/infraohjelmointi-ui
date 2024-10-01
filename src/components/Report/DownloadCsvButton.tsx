@@ -1,7 +1,12 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Reports, IDownloadCsvButtonProps } from '@/interfaces/reportInterfaces';
+import {
+  Reports,
+  IDownloadCsvButtonProps,
+  IConstructionProgramCsvRow,
+  IBudgetBookSummaryCsvRow,
+} from '@/interfaces/reportInterfaces';
 import './styles.css';
 
 import { useCsvData } from '@/hooks/useCsvData';
@@ -26,11 +31,23 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
     getCategories,
   });
 
+  const cleanData = (data: (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[]) => {
+    return data.map((row) => {
+      return Object.keys(row).reduce((acc, key) => {
+        const typedKey = key as keyof (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
+
+        acc[typedKey] = row[typedKey] === undefined ? '' : row[typedKey];
+        return acc;
+      }, {} as IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
+    });
+  };
+
   const handleDownloadClick = async () => {
     try {
-      const data = await getCsvData();
+      let data = await getCsvData();
 
       if (data && data.length > 0) {
+        data = cleanData(data) as (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[];
         const documentName = t(`report.${type}.documentName`);
         downloadCSV(data, `${documentName}_${year}.csv`);
       } else {
