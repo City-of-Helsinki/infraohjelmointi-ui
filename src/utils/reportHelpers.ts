@@ -211,7 +211,7 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
 }
 
 const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
-  const year = [new Date().getFullYear()]
+  const year = [new Date().getFullYear() + 1]
   const inPlanningOrConstruction = (year.some(y => y >= props.planningStart && y <= props.constructionEnd));
 
   if (inPlanningOrConstruction) {
@@ -224,7 +224,7 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
 const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
   return projects
     .filter((p) =>
-      //p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
+      p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
       p.planningStartYear && p.constructionEndYear &&
       isProjectInPlanningOrConstruction({
         planningStart: p.planningStartYear,
@@ -646,7 +646,9 @@ export const convertToReportRows = (
             costPlan: frameBudget,
             type: getStrategyRowType(c.type) as ReportTableRowType
           }
-          forcedToFrameHierarchy.push(convertedClass);
+          if (convertedClass.type !== 'group' || convertedClass.projects.length) {
+            forcedToFrameHierarchy.push(convertedClass);
+          }
         }
       }
       return forcedToFrameHierarchy;
