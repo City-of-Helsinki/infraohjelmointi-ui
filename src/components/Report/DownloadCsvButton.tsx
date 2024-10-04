@@ -36,7 +36,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
       return Object.keys(row).reduce((acc, key) => {
         const typedKey = key as keyof (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
 
-        acc[typedKey] = row[typedKey] === undefined ? '' : row[typedKey];
+        acc[typedKey] = row[typedKey] ?? '';
         return acc;
       }, {} as IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
     });
@@ -47,7 +47,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
       let data = await getCsvData();
 
       if (data && data.length > 0) {
-        data = cleanData(data) as (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[];
+        data = cleanData(data);
         const documentName = t(`report.${type}.documentName`);
         downloadCSV(data, `${documentName}_${year}.csv`);
       } else {
