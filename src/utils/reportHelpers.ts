@@ -178,56 +178,10 @@ const getProjectPhase = (project: IProject) => {
 }
 
 const getProjectPhasePerMonth = (project: IProject, month: number) => {
-  let isPlanning = false;
-  let isConstruction = false;
   const monthStartDate = new Date(2025, month - 1, 1);
   const monthEndDate = new Date(2025, month, 0);
-
-  if (project.estPlanningStart) {
-    const planningStartAsDate = new Date(project.estPlanningStart);
-    if (planningStartAsDate < monthStartDate) {
-      if (project.estPlanningEnd) {
-        const planningEndAsDate = new Date(project.estPlanningEnd);
-        if (planningEndAsDate >= monthStartDate) {
-          isPlanning = true;
-        }
-      } else {
-        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
-        if (monthStartDate >= yearFromPlanningStart) {
-          isPlanning = true;
-        }
-      }
-    } else if (planningStartAsDate >= monthStartDate && planningStartAsDate <= monthEndDate) {
-      isPlanning = true;
-    }
-  // project is in planning phase for 1 year by default if no specific dates are set
-  } else if (project.planningStartYear && project.planningStartYear === new Date().getFullYear() +1) {
-    isPlanning = true;
-  }
-
-  if (project.estConstructionEnd) {
-    const constructionEndAsDate = new Date(project.estConstructionEnd);
-    if (constructionEndAsDate > monthEndDate) {
-      if (project.estConstructionStart) {
-        const constructionStartAsDate = new Date(project.estConstructionStart);
-        if (constructionStartAsDate <= monthEndDate) {
-          isConstruction = true;
-        }
-      } else if (project.estPlanningStart) {
-        // project is in planning phase for 1 year by default if no specific dates are set
-        const planningStartAsDate = new Date(project.estPlanningStart);
-        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
-        if (monthEndDate < yearFromPlanningStart) {
-          isConstruction = true;
-        }
-      }
-    } else if (constructionEndAsDate >= monthStartDate && constructionEndAsDate <= monthEndDate) {
-      isConstruction = true;
-    }
-  // project is in planning phase for 1 year by default if no specific dates are set
-  } else if (project.planningStartYear && project.planningStartYear < new Date().getFullYear() + 1) {
-    isConstruction = true;
-  }
+  const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, project.planningStartYear);
+  const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, project.planningStartYear);
 
   if (isPlanning && isConstruction) {
       return "planningAndConstruction";
@@ -241,6 +195,74 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
   else {
       return "";
   }
+}
+
+const projectIsInPlanningPhase = (
+  planningStartDate: string | null,
+  monthStartDate: Date,
+  planningEndDate: string | null,
+  monthEndDate: Date,
+  planningStartYear: number | null
+): boolean => {
+  // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
+  if (planningStartDate) {
+    const planningStartAsDate = new Date(planningStartDate);
+    if (planningStartAsDate < monthStartDate) {
+      if (planningEndDate) {
+        const planningEndAsDate = new Date(planningEndDate);
+        if (planningEndAsDate >= monthStartDate) {
+          return true;
+        }
+      } else {
+        // project is in planning phase for 1 year by default if no specific end date is set
+        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
+        if (monthStartDate >= yearFromPlanningStart) {
+          return true;
+        }
+      }
+    } else if (planningStartAsDate >= monthStartDate && planningStartAsDate <= monthEndDate) {
+      return true;
+    }
+  // project is in planning phase for 1 year by default if no specific dates are set
+  } else if (planningStartYear && planningStartYear === new Date().getFullYear() +1) {
+    return true;
+  }
+  return false;
+}
+
+const projectIsInConstructionPhase = (
+  constructionStartDate: string | null,
+  monthStartDate: Date,
+  constructionEndDate: string | null,
+  monthEndDate: Date,
+  planningStartDate: string | null,
+  planningStartYear: number | null
+): boolean => {
+  // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
+  if (constructionEndDate) {
+    const constructionEndAsDate = new Date(constructionEndDate);
+    if (constructionEndAsDate > monthEndDate) {
+      if (constructionStartDate) {
+        const constructionStartAsDate = new Date(constructionStartDate);
+        if (constructionStartAsDate <= monthEndDate) {
+          return true;
+        }
+      } else if (planningStartDate) {
+        // project is in planning phase for 1 year by default if no specific dates are set
+        const planningStartAsDate = new Date(planningStartDate);
+        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
+        if (monthEndDate < yearFromPlanningStart) {
+          return true;
+        }
+      }
+    } else if (constructionEndAsDate >= monthStartDate && constructionEndAsDate <= monthEndDate) {
+      return true;
+    }
+  // project is in planning phase for 1 year by default if no specific dates are set
+  } else if (planningStartYear && planningStartYear < new Date().getFullYear() + 1) {
+    return true;
+  }
+  return false;
 }
 
 const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
