@@ -178,23 +178,56 @@ const getProjectPhase = (project: IProject) => {
 }
 
 const getProjectPhasePerMonth = (project: IProject, month: number) => {
-  if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
-      return ""
+  let isPlanning = false;
+  let isConstruction = false;
+  const monthStartDate = new Date(2025, month - 1, 1);
+  const monthEndDate = new Date(2025, month, 0);
+
+  if (project.estPlanningStart) {
+    const planningStartAsDate = new Date(project.estPlanningStart);
+    if (planningStartAsDate < monthStartDate) {
+      if (project.estPlanningEnd) {
+        const planningEndAsDate = new Date(project.estPlanningEnd);
+        if (planningEndAsDate >= monthStartDate) {
+          isPlanning = true;
+        }
+      } else {
+        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
+        if (monthStartDate >= yearFromPlanningStart) {
+          isPlanning = true;
+        }
+      }
+    } else if (planningStartAsDate >= monthStartDate && planningStartAsDate <= monthEndDate) {
+      isPlanning = true;
+    }
+  // project is in planning phase for 1 year by default if no specific dates are set
+  } else if (project.planningStartYear && project.planningStartYear === new Date().getFullYear() +1) {
+    isPlanning = true;
   }
 
-  const year = new Date().getFullYear() + 1;
-  const planningStartYear = getYear(project.estPlanningStart);
-  const planningEndYear = getYear(project.estPlanningEnd);
-  const constructionStartYear = getYear(project.estConstructionStart);
-  const constructionEndYear = getYear(project.estConstructionEnd);
-
-  const planningStartMonth = getMonth(project.estPlanningStart);
-  const planningEndMonth = getMonth(project.estPlanningStart, project.estPlanningEnd);
-  const constructionStartMonth = getMonth(project.estConstructionStart);
-  const constructionEndMonth = getMonth(project.estConstructionStart, project.estConstructionEnd);
-
-  const isPlanning = (year >= planningStartYear && year <= planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
-  const isConstruction = (year >= constructionStartYear && year <= constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
+  if (project.estConstructionEnd) {
+    const constructionEndAsDate = new Date(project.estConstructionEnd);
+    if (constructionEndAsDate > monthEndDate) {
+      if (project.estConstructionStart) {
+        const constructionStartAsDate = new Date(project.estConstructionStart);
+        if (constructionStartAsDate <= monthEndDate) {
+          isConstruction = true;
+        }
+      } else if (project.estPlanningStart) {
+        // project is in planning phase for 1 year by default if no specific dates are set
+        const planningStartAsDate = new Date(project.estPlanningStart);
+        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
+        if (monthEndDate < yearFromPlanningStart) {
+          isConstruction = true;
+        }
+      }
+    } else if (constructionEndAsDate >= monthStartDate && constructionEndAsDate <= monthEndDate) {
+      isConstruction = true;
+    }
+  // project is in planning phase for 1 year by default if no specific dates are set
+  } else if (project.planningStartYear && project.planningStartYear < new Date().getFullYear() + 1) {
+    isConstruction = true;
+  }
 
   if (isPlanning && isConstruction) {
       return "planningAndConstruction";
