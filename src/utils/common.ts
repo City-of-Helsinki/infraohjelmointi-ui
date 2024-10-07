@@ -354,6 +354,10 @@ export const syncUpdatedClassFinancesWithStartYear = (financesFromState: IClassF
   return convertedFinances;
 }
 
+export const getLocationParent = (locationList: IListItem[], locationId: string | undefined) => {
+  return locationList.find((location) => location.id === locationId)?.parent;
+}
+
 export const enum IconKey {
   Proposal = 'proposal',
   Design = 'design',

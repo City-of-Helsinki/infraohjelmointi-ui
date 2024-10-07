@@ -1,6 +1,6 @@
-import { IListItem, IOption } from '@/interfaces/common';
+import { IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { listItemToOption } from '@/utils/common';
+import { getLocationParent, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -49,10 +49,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   const getSuggestions = useCallback(async() => {
     return searchedProjects;
   }, [searchedProjects]);
-
-  const getLocationParent = (locationList: IListItem[], locationId: string | undefined) => {
-    return locationList.find((location) => location.id === locationId)?.parent;
-  }
 
   useEffect( () => {
     const setProjectsForSearch = async () => {
