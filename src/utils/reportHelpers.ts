@@ -22,6 +22,7 @@ import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
+import moment from 'moment';
 
 interface IYearCheck {
   planningStart: number;
@@ -180,8 +181,9 @@ const getProjectPhase = (project: IProject) => {
 const getProjectPhasePerMonth = (project: IProject, month: number) => {
   const monthStartDate = new Date(2025, month - 1, 1);
   const monthEndDate = new Date(2025, month, 0);
-  const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, project.planningStartYear);
-  const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, project.planningStartYear);
+  const dateFormat = "DD.MM.YYYY";
+  const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, project.planningStartYear, dateFormat);
+  const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
 
   if (isPlanning && isConstruction) {
       return "planningAndConstruction";
@@ -202,14 +204,15 @@ const projectIsInPlanningPhase = (
   monthStartDate: Date,
   planningEndDate: string | null,
   monthEndDate: Date,
-  planningStartYear: number | null
+  planningStartYear: number | null,
+  dateFormat: string
 ): boolean => {
   // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
   if (planningStartDate) {
-    const planningStartAsDate = new Date(planningStartDate);
+    const planningStartAsDate = moment(planningStartDate, dateFormat).toDate();
     if (planningStartAsDate < monthStartDate) {
       if (planningEndDate) {
-        const planningEndAsDate = new Date(planningEndDate);
+        const planningEndAsDate = moment(planningEndDate, dateFormat).toDate();
         if (planningEndAsDate >= monthStartDate) {
           return true;
         }
@@ -236,20 +239,21 @@ const projectIsInConstructionPhase = (
   constructionEndDate: string | null,
   monthEndDate: Date,
   planningStartDate: string | null,
-  planningStartYear: number | null
+  planningStartYear: number | null,
+  dateFormat: string
 ): boolean => {
   // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
   if (constructionEndDate) {
-    const constructionEndAsDate = new Date(constructionEndDate);
+    const constructionEndAsDate = moment(constructionEndDate, dateFormat).toDate();
     if (constructionEndAsDate > monthEndDate) {
       if (constructionStartDate) {
-        const constructionStartAsDate = new Date(constructionStartDate);
+        const constructionStartAsDate = moment(constructionStartDate, dateFormat).toDate();
         if (constructionStartAsDate <= monthEndDate) {
           return true;
         }
       } else if (planningStartDate) {
         // project is in planning phase for 1 year by default if no specific dates are set
-        const planningStartAsDate = new Date(planningStartDate);
+        const planningStartAsDate = moment(planningStartDate, dateFormat).toDate();
         const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
         if (monthEndDate < yearFromPlanningStart) {
           return true;
