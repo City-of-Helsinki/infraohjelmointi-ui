@@ -353,7 +353,7 @@ const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
         }
       }
     default:
-      strategyReportStyles.monthCell
+      return strategyReportStyles.monthCell
   }
 }
 
