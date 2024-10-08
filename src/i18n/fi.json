@@ -453,7 +453,7 @@
       "costForecastShortened": "Ennuste"
     },
     "strategy": {
-      "rowTitle": "Toimintasuunnitelma (sovitettu budjetti)",
+      "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
       "documentName": "toimintasuunnitelma",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
