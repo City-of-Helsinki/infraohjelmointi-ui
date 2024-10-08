@@ -7,7 +7,7 @@ import {
   ReportType,
   Reports
 } from '@/interfaces/reportInterfaces';
-import { View, StyleSheet, Text, Svg, Defs, RadialGradient, Stop } from '@react-pdf/renderer';
+import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
 const cellStyles = {
