@@ -7,7 +7,7 @@ import {
   ReportType,
   Reports
 } from '@/interfaces/reportInterfaces';
-import { View, StyleSheet, Text } from '@react-pdf/renderer';
+import { View, StyleSheet, Text, Svg, Defs, RadialGradient, Stop } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
 const cellStyles = {
@@ -332,14 +332,28 @@ interface IRowProps extends ITableRowProps{
   flattenedRow?: IFlattenedBudgetBookSummaryProperties | IFlattenedOperationalEnvironmentAnalysisProperties;
 }
 
-const getMonthCellStyle = (monthCell: string | undefined) => {
+const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
   switch (monthCell) {
     case 'planning':
-      return strategyReportStyles.monthCellBlack
-    case 'construction':
       return strategyReportStyles.monthCellGreen
+    case 'construction':
+     return strategyReportStyles.monthCellBlack
+    case 'planningAndConstruction':
+      if (side === 'left') {
+        return {
+          ...strategyReportStyles.monthCellGreen,
+          borderRight: '0px',
+          width: "15px"
+        }
+      } else {
+        return {
+          ...strategyReportStyles.monthCellBlack,
+          borderLeft: '0px',
+          width: "15px"
+        }
+      }
     default:
-    return strategyReportStyles.monthCell
+      strategyReportStyles.monthCell
   }
 }
 
@@ -407,19 +421,67 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                     <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                     <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
                     <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                    <Text style={getMonthCellStyle(flattenedRow.januaryStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.februaryStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.marchStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.aprilStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.mayStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.juneStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.julyStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.augustStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.septemberStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.octoberStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.novemberStatus)}></Text>
-                    <Text style={getMonthCellStyle(flattenedRow.decemberStatus)}></Text>
-                    <Text style={strategyReportStyles.lastCell}></Text>
+                    {flattenedRow.januaryStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></View>
+                    }
+                    {flattenedRow.februaryStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.februaryStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.februaryStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.februaryStatus, 'left')}></View>
+                    }
+                    {flattenedRow.marchStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.marchStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.marchStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.marchStatus, 'left')}></View>
+                    }
+                    {flattenedRow.aprilStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.aprilStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.aprilStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.aprilStatus, 'left')}></View>
+                    }
+                    {flattenedRow.mayStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.mayStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.mayStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.mayStatus, 'left')}></View>
+                    }
+                    {flattenedRow.juneStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.juneStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.juneStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.juneStatus, 'left')}></View>
+                    }
+                    {flattenedRow.julyStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.julyStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.julyStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.julyStatus, 'left')}></View>
+                    }
+                    {flattenedRow.augustStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.augustStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.augustStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.augustStatus, 'left')}></View>
+                    }
+                    {flattenedRow.septemberStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.septemberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.septemberStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.septemberStatus, 'left')}></View>
+                    }
+                    {flattenedRow.octoberStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.octoberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.octoberStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.octoberStatus, 'left')}></View>
+                    }
+                    {flattenedRow.novemberStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.novemberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.novemberStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.novemberStatus, 'left')}></View>
+                    }
+                    {flattenedRow.decemberStatus === "planningAndConstruction" ?
+                      <><Text style={getMonthCellStyle(flattenedRow.decemberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.decemberStatus, 'right')}></Text></>
+                      :
+                      <View style={getMonthCellStyle(flattenedRow.decemberStatus, 'left')}></View>
+                    }
+                    <View style={strategyReportStyles.lastCell}></View>
                 </View>
             } else {
               tableRow = <View></View>;
