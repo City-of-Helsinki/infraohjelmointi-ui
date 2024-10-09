@@ -32,6 +32,7 @@ import { t } from 'i18next';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { selectPlanningGroups } from '@/reducers/groupSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -213,6 +214,7 @@ const ProjectForm = () => {
   const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
   const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
   const hierarchySubDivisions = useAppSelector(selectPlanningSubDivisions);
+  const groups = useAppSelector(selectPlanningGroups);
 
   const CREATE_NEW_PROJECT = 'create-new-project';
 
@@ -232,10 +234,11 @@ const ProjectForm = () => {
             data = updateFinances(data, project);
           }
 
-          /* If project belongs to some group and then class is changed, the project will disappear as 
-             the group that it belongs to and the project exist under different subclasses */
           if (data?.projectClass && project.projectGroup) {
-              data = {...data, "projectGroup": null} 
+              const projectGroup = groups.find(({id}) => id === project.projectGroup);
+              if (project.projectClass !== projectGroup?.classRelation) {
+                data = {...data, "projectGroup": null} 
+              }
           }
 
           /* If project is under a district and user changes the class, the district has to be removed or the
