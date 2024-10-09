@@ -22,6 +22,7 @@ import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
+import moment from 'moment';
 
 interface IYearCheck {
   planningStart: number;
@@ -178,23 +179,11 @@ const getProjectPhase = (project: IProject) => {
 }
 
 const getProjectPhasePerMonth = (project: IProject, month: number) => {
-  if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
-      return ""
-  }
-
-  const year = new Date().getFullYear() + 1;
-  const planningStartYear = getYear(project.estPlanningStart);
-  const planningEndYear = getYear(project.estPlanningEnd);
-  const constructionStartYear = getYear(project.estConstructionStart);
-  const constructionEndYear = getYear(project.estConstructionEnd);
-
-  const planningStartMonth = getMonth(project.estPlanningStart);
-  const planningEndMonth = getMonth(project.estPlanningStart, project.estPlanningEnd);
-  const constructionStartMonth = getMonth(project.estConstructionStart);
-  const constructionEndMonth = getMonth(project.estConstructionStart, project.estConstructionEnd);
-
-  const isPlanning = (year >= planningStartYear && year <= planningEndYear) && (month >= planningStartMonth && month <= planningEndMonth);
-  const isConstruction = (year >= constructionStartYear && year <= constructionEndYear) && (month >= constructionStartMonth && month <= constructionEndMonth);
+  const monthStartDate = new Date(2025, month - 1, 1);
+  const monthEndDate = new Date(2025, month, 0);
+  const dateFormat = "DD.MM.YYYY";
+  const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, project.planningStartYear, dateFormat);
+  const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
 
   if (isPlanning && isConstruction) {
       return "planningAndConstruction";
@@ -210,8 +199,78 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
   }
 }
 
+const projectIsInPlanningPhase = (
+  planningStartDate: string | null,
+  monthStartDate: Date,
+  planningEndDate: string | null,
+  monthEndDate: Date,
+  planningStartYear: number | null,
+  dateFormat: string
+): boolean => {
+  // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
+  if (planningStartDate) {
+    const planningStartAsDate = moment(planningStartDate, dateFormat).toDate();
+    if (planningStartAsDate < monthStartDate) {
+      if (planningEndDate) {
+        const planningEndAsDate = moment(planningEndDate, dateFormat).toDate();
+        if (planningEndAsDate >= monthStartDate) {
+          return true;
+        }
+      } else {
+        // project is in planning phase for 1 year by default if no specific end date is set
+        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
+        if (monthStartDate >= yearFromPlanningStart) {
+          return true;
+        }
+      }
+    } else if (planningStartAsDate >= monthStartDate && planningStartAsDate <= monthEndDate) {
+      return true;
+    }
+  // project is in planning phase for 1 year by default if no specific dates are set
+  } else if (planningStartYear && planningStartYear === new Date().getFullYear() +1) {
+    return true;
+  }
+  return false;
+}
+
+const projectIsInConstructionPhase = (
+  constructionStartDate: string | null,
+  monthStartDate: Date,
+  constructionEndDate: string | null,
+  monthEndDate: Date,
+  planningStartDate: string | null,
+  planningStartYear: number | null,
+  dateFormat: string
+): boolean => {
+  // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
+  if (constructionEndDate) {
+    const constructionEndAsDate = moment(constructionEndDate, dateFormat).toDate();
+    if (constructionEndAsDate > monthEndDate) {
+      if (constructionStartDate) {
+        const constructionStartAsDate = moment(constructionStartDate, dateFormat).toDate();
+        if (constructionStartAsDate <= monthEndDate) {
+          return true;
+        }
+      } else if (planningStartDate) {
+        // project is in planning phase for 1 year by default if no specific dates are set
+        const planningStartAsDate = moment(planningStartDate, dateFormat).toDate();
+        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
+        if (monthEndDate < yearFromPlanningStart) {
+          return true;
+        }
+      }
+    } else if (constructionEndAsDate >= monthStartDate && constructionEndAsDate <= monthEndDate) {
+      return true;
+    }
+  // project is in planning phase for 1 year by default if no specific dates are set
+  } else if (planningStartYear && planningStartYear < new Date().getFullYear() + 1) {
+    return true;
+  }
+  return false;
+}
+
 const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
-  const year = [new Date().getFullYear()]
+  const year = [new Date().getFullYear() + 1]
   const inPlanningOrConstruction = (year.some(y => y >= props.planningStart && y <= props.constructionEnd));
 
   if (inPlanningOrConstruction) {
@@ -224,7 +283,7 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
 const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
   return projects
     .filter((p) =>
-      //p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
+      p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
       p.planningStartYear && p.constructionEndYear &&
       isProjectInPlanningOrConstruction({
         planningStart: p.planningStartYear,
@@ -646,7 +705,9 @@ export const convertToReportRows = (
             costPlan: frameBudget,
             type: getStrategyRowType(c.type) as ReportTableRowType
           }
-          forcedToFrameHierarchy.push(convertedClass);
+          if (convertedClass.type !== 'group' || convertedClass.projects.length) {
+            forcedToFrameHierarchy.push(convertedClass);
+          }
         }
       }
       return forcedToFrameHierarchy;
