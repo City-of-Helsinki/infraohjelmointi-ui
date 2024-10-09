@@ -61,23 +61,6 @@ const getYear = (dateStr: string): number => {
   return parseInt(parts[2], 10);
 }
 
-const getMonth = (startDateStr: string, endDateStr?: string): number => {
-  const startParts = startDateStr.split('.');
-  const endParts = endDateStr ? endDateStr.split('.') : [];
-
-  if (endParts.length){
-    if (startParts[2] < endParts[2]){
-      // If end year is bigger, we return Dec.
-      // E.g. start 1.1.2024 and end 2.1.2026 should return 12.
-      return 12;
-    }
-
-    return parseInt(endParts[1], 10);
-  }
-
-  return parseInt(startParts[1], 10);
-}
-
 const mapOperationalEnvironmentAnalysisProperties = (finances: IPlanningCell[], type: 'frameBudget' | 'plannedBudget') => {
   if (type === 'frameBudget') {
     return {
@@ -151,18 +134,11 @@ const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: string
 }
 
 const getProjectPhase = (project: IProject) => {
-  if (!project.estPlanningStart || !project.estPlanningEnd || !project.estConstructionStart || !project.estConstructionEnd) {
-    return ""
-  }
-  
-  const year = new Date().getFullYear();
-  const planningStartYear = getYear(project.estPlanningStart);
-  const planningEndYear = getYear(project.estPlanningEnd);
-  const constructionStartYear = getYear(project.estConstructionStart);
-  const constructionEndYear = getYear(project.estConstructionEnd);
-  
-  const isPlanning = year >= planningStartYear && year <= planningEndYear;
-  const isConstruction = year >= constructionStartYear && year <= constructionEndYear;
+  const yearStartDate = new Date(new Date().getFullYear() + 1, 0, 1);
+  const yearEndDate = new Date(new Date().getFullYear() + 1, 11, 0);
+  const dateFormat = "DD.MM.YYYY";
+  const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, yearStartDate, project.estPlanningEnd, yearEndDate, project.planningStartYear, dateFormat);
+  const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
 
   if (isPlanning && isConstruction) {
     return "s r";
@@ -186,44 +162,44 @@ const getProjectPhasePerMonth = (project: IProject, month: number) => {
   const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
 
   if (isPlanning && isConstruction) {
-      return "planningAndConstruction";
+    return "planningAndConstruction";
   }
   else if (isPlanning) {
-      return "planning";
+    return "planning";
   }
   else if (isConstruction) {
-      return "construction";
+    return "construction";
   }
   else {
-      return "";
+    return "";
   }
 }
 
 const projectIsInPlanningPhase = (
   planningStartDate: string | null,
-  monthStartDate: Date,
+  startDate: Date,
   planningEndDate: string | null,
-  monthEndDate: Date,
+  endDate: Date,
   planningStartYear: number | null,
   dateFormat: string
 ): boolean => {
   // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
   if (planningStartDate) {
     const planningStartAsDate = moment(planningStartDate, dateFormat).toDate();
-    if (planningStartAsDate < monthStartDate) {
+    if (planningStartAsDate < startDate) {
       if (planningEndDate) {
         const planningEndAsDate = moment(planningEndDate, dateFormat).toDate();
-        if (planningEndAsDate >= monthStartDate) {
+        if (planningEndAsDate >= startDate) {
           return true;
         }
       } else {
         // project is in planning phase for 1 year by default if no specific end date is set
         const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
-        if (monthStartDate >= yearFromPlanningStart) {
+        if (startDate >= yearFromPlanningStart) {
           return true;
         }
       }
-    } else if (planningStartAsDate >= monthStartDate && planningStartAsDate <= monthEndDate) {
+    } else if (planningStartAsDate >= startDate && planningStartAsDate <= endDate) {
       return true;
     }
   // project is in planning phase for 1 year by default if no specific dates are set
