@@ -155,8 +155,8 @@ const getProjectPhase = (project: IProject) => {
 }
 
 const getProjectPhasePerMonth = (project: IProject, month: number) => {
-  const monthStartDate = new Date(2025, month - 1, 1);
-  const monthEndDate = new Date(2025, month, 0);
+  const monthStartDate = new Date(new Date().getFullYear() + 1, month - 1, 1);
+  const monthEndDate = new Date(new Date().getFullYear() + 1, month, 0);
   const dateFormat = "DD.MM.YYYY";
   const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, project.planningStartYear, dateFormat);
   const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
