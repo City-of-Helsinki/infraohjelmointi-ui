@@ -335,19 +335,19 @@ interface IRowProps extends ITableRowProps{
 const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
   switch (monthCell) {
     case 'planning':
-      return strategyReportStyles.monthCellGreen
+      return strategyReportStyles.monthCellBlack
     case 'construction':
-     return strategyReportStyles.monthCellBlack
+     return strategyReportStyles.monthCellGreen
     case 'planningAndConstruction':
       if (side === 'left') {
         return {
-          ...strategyReportStyles.monthCellGreen,
+          ...strategyReportStyles.monthCellBlack,
           borderRight: '0px',
           width: "15px"
         }
       } else {
         return {
-          ...strategyReportStyles.monthCellBlack,
+          ...strategyReportStyles.monthCellGreen,
           borderLeft: '0px',
           width: "15px"
         }
