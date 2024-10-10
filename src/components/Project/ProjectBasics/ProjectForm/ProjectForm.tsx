@@ -26,12 +26,17 @@ import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { getYear } from '@/utils/dates';
-import { selectPlanningDistricts, selectPlanningDivisions, selectPlanningSubDivisions } from '@/reducers/locationSlice';
+import {
+  selectPlanningDistricts,
+  selectPlanningDivisions,
+  selectPlanningSubDivisions,
+} from '@/reducers/locationSlice';
 import usePromptConfirmOnNavigate from '@/hooks/usePromptConfirmOnNavigate';
 import { t } from 'i18next';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 
 const ProjectForm = () => {
@@ -65,63 +70,79 @@ const ProjectForm = () => {
   const getFinanceYearName = (finances: IProjectFinances, year: number) => {
     const index = year - finances.year;
     if (index < 3) {
-      return "budgetProposalCurrentYearPlus" + index as keyof IProjectFinances;
+      return ('budgetProposalCurrentYearPlus' + index) as keyof IProjectFinances;
+    } else {
+      return ('preliminaryCurrentYearPlus' + index) as keyof IProjectFinances;
     }
-    else {
-      return "preliminaryCurrentYearPlus" + index as keyof IProjectFinances;
-    }
-  }
+  };
 
   // Function to move budget/budgets to the first year that's within the project schedule
-  const moveBudgetForwards = (finances: IProjectFinances, previousStartYear: number, startYear: number): IProjectFinances => {
-    let financesCopy = finances
+  const moveBudgetForwards = (
+    finances: IProjectFinances,
+    previousStartYear: number,
+    startYear: number,
+  ): IProjectFinances => {
+    let financesCopy = finances;
     const numberOfYears = startYear - previousStartYear;
-    let budgetToMove = 0.00;
-    for (let i=0; i<numberOfYears; ++i) {
+    let budgetToMove = 0.0;
+    for (let i = 0; i < numberOfYears; ++i) {
       const financeYearName = getFinanceYearName(finances, Number(previousStartYear) + i);
       const financeValue = finances[financeYearName];
       budgetToMove += parseFloat(financeValue as string);
-      financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
+      financesCopy = { ...financesCopy, [financeYearName]: '0.00' };
     }
     const startYearName = getFinanceYearName(finances, startYear);
-    const newBudget = (parseFloat(finances[startYearName] as string) || 0.00) + budgetToMove || 0.00;
+    const newBudget = (parseFloat(finances[startYearName] as string) || 0.0) + budgetToMove || 0.0;
 
-    financesCopy = { ...financesCopy, [startYearName]: newBudget.toFixed(2)}
+    financesCopy = { ...financesCopy, [startYearName]: newBudget.toFixed(2) };
     return financesCopy;
-  }
+  };
 
   // Function to move budget/budgets to the last year that's within the project schedule
-  const moveBudgetBackwards = (finances: IProjectFinances, previousEndYear: number, endYear: number) => {
+  const moveBudgetBackwards = (
+    finances: IProjectFinances,
+    previousEndYear: number,
+    endYear: number,
+  ) => {
     let financesCopy = finances;
     const numberOfYears = previousEndYear - endYear;
     const maxIndex = 10 - (endYear - finances.year);
-    let budgetToMove = 0.00;
-    for (let i=1; i<=numberOfYears && i<=maxIndex; ++i) {
+    let budgetToMove = 0.0;
+    for (let i = 1; i <= numberOfYears && i <= maxIndex; ++i) {
       const financeYearName = getFinanceYearName(finances, Number(endYear) + i);
       const financeValue = finances[financeYearName];
       budgetToMove += parseFloat(financeValue as string);
-      financesCopy = { ...financesCopy, [financeYearName]: "0.00"};
+      financesCopy = { ...financesCopy, [financeYearName]: '0.00' };
     }
     const endYearName = getFinanceYearName(finances, endYear);
-    const newBudget = (parseFloat(finances[endYearName] as string) || 0.00) + budgetToMove || 0.00;
+    const newBudget = (parseFloat(finances[endYearName] as string) || 0.0) + budgetToMove || 0.0;
 
-    financesCopy =  { ...financesCopy, [endYearName]: newBudget.toFixed(2)}
+    financesCopy = { ...financesCopy, [endYearName]: newBudget.toFixed(2) };
     return financesCopy;
-  }
+  };
 
-  const updatePlanningStartYear = (finances: IProjectFinances, previousStartYear: number | null, startYear: number): IProjectFinances => {
+  const updatePlanningStartYear = (
+    finances: IProjectFinances,
+    previousStartYear: number | null,
+    startYear: number,
+  ): IProjectFinances => {
     let updatedFinances = finances;
     // If new planning start year is bigger than the previous one, budget from years that are not within the schedule of the project
     // need to be moved to the new planning start year
-    if(previousStartYear && startYear > previousStartYear) {
+    if (previousStartYear && startYear > previousStartYear) {
       updatedFinances = moveBudgetForwards(finances, previousStartYear, startYear);
     }
     return updatedFinances;
-  }
+  };
 
-  const updateEstPlanningEndYear = (finances: IProjectFinances, previousEndYear: number | null, endYear: number | null, startYear: number | null): IProjectFinances => {
+  const updateEstPlanningEndYear = (
+    finances: IProjectFinances,
+    previousEndYear: number | null,
+    endYear: number | null,
+    startYear: number | null,
+  ): IProjectFinances => {
     let updatedFinances = finances;
-     // If new planning end year is smaller that the previous one, budget from the years that are not within the schedule need to
+    // If new planning end year is smaller that the previous one, budget from the years that are not within the schedule need to
     // be moved backwards to the new end year
     if (previousEndYear && endYear && endYear < previousEndYear) {
       // If there was an overlap between planning end year and construction start year, budget shouldn't be moved from that year
@@ -136,29 +157,37 @@ const ProjectForm = () => {
       }
     }
     return updatedFinances;
-  }
+  };
 
-  const updateEstConstructionStartYear = (finances: IProjectFinances, previousStartYear: number | null, startYear: number | null, endYear: number | null): IProjectFinances => {
+  const updateEstConstructionStartYear = (
+    finances: IProjectFinances,
+    previousStartYear: number | null,
+    startYear: number | null,
+    endYear: number | null,
+  ): IProjectFinances => {
     let updatedFinances = finances;
     // If new construction start year is bigger than the previous one, budget from years that are not within the schedule of the project
-      // need to be moved to the new construction start year
-      if (previousStartYear && startYear && startYear > previousStartYear) {
-        // If there was an overlap between planning end year and construction start year, budget shouldn't be moved from that year
-        // but still needs to be moved from all the years that are not within the schedule anymore
-        const yearIsOverlap = endYear == previousStartYear;
-        const isMoreThanOneYearDifference = startYear - previousStartYear > 1;
+    // need to be moved to the new construction start year
+    if (previousStartYear && startYear && startYear > previousStartYear) {
+      // If there was an overlap between planning end year and construction start year, budget shouldn't be moved from that year
+      // but still needs to be moved from all the years that are not within the schedule anymore
+      const yearIsOverlap = endYear == previousStartYear;
+      const isMoreThanOneYearDifference = startYear - previousStartYear > 1;
 
-        if (yearIsOverlap && isMoreThanOneYearDifference) {
-          updatedFinances = moveBudgetForwards(finances, previousStartYear + 1, startYear);
-        } else if (!yearIsOverlap) {
-          updatedFinances = moveBudgetForwards(finances, previousStartYear, startYear);
-        }
-
+      if (yearIsOverlap && isMoreThanOneYearDifference) {
+        updatedFinances = moveBudgetForwards(finances, previousStartYear + 1, startYear);
+      } else if (!yearIsOverlap) {
+        updatedFinances = moveBudgetForwards(finances, previousStartYear, startYear);
       }
-      return updatedFinances;
-  }
+    }
+    return updatedFinances;
+  };
 
-  const updateConstructionEndYear = (finances: IProjectFinances, previousEndYear: number | null, endYear: number): IProjectFinances => {
+  const updateConstructionEndYear = (
+    finances: IProjectFinances,
+    previousEndYear: number | null,
+    endYear: number,
+  ): IProjectFinances => {
     let updatedFinances = finances;
     // If new construction end year is smaller that the previous one, budget from the years that are not within the schedule need to
     // be moved backwards to the new end year
@@ -166,7 +195,7 @@ const ProjectForm = () => {
       updatedFinances = moveBudgetBackwards(finances, previousEndYear, endYear);
     }
     return updatedFinances;
-  }
+  };
 
   const updateFinances = (data: IProjectRequest, project: IProject) => {
     if (project.finances) {
@@ -174,30 +203,48 @@ const ProjectForm = () => {
 
       if (data.planningStartYear) {
         const planningStartYear = project.planningStartYear ?? null;
-        updatedFinances = updatePlanningStartYear(updatedFinances, planningStartYear, data.planningStartYear);
+        updatedFinances = updatePlanningStartYear(
+          updatedFinances,
+          planningStartYear,
+          data.planningStartYear,
+        );
       }
       if (data.estPlanningEnd) {
         const previousPlanningEndYear = getYear(project.estPlanningEnd);
         const planningEndYear = getYear(data.estPlanningEnd);
         const constructionStartYear = getYear(project.estConstructionStart);
-        updatedFinances = updateEstPlanningEndYear(updatedFinances, previousPlanningEndYear, planningEndYear, constructionStartYear);
+        updatedFinances = updateEstPlanningEndYear(
+          updatedFinances,
+          previousPlanningEndYear,
+          planningEndYear,
+          constructionStartYear,
+        );
       }
       if (data.estConstructionStart) {
         const previousConstructionStartYear = getYear(project.estConstructionStart);
         const constructionStartYear = getYear(data.estConstructionStart);
         const planningEndYear = getYear(project.estPlanningEnd);
-        updatedFinances = updateEstConstructionStartYear(updatedFinances, previousConstructionStartYear, constructionStartYear, planningEndYear);
+        updatedFinances = updateEstConstructionStartYear(
+          updatedFinances,
+          previousConstructionStartYear,
+          constructionStartYear,
+          planningEndYear,
+        );
       }
       if (data.constructionEndYear) {
         const constructionEndYear = project.constructionEndYear;
-        updatedFinances = updateConstructionEndYear(updatedFinances, constructionEndYear, data.constructionEndYear);
+        updatedFinances = updateConstructionEndYear(
+          updatedFinances,
+          constructionEndYear,
+          data.constructionEndYear,
+        );
       }
 
-      data = {...data, "finances": updatedFinances};
+      data = { ...data, finances: updatedFinances };
     }
-    
+
     return data;
-  }
+  };
 
   // useEffect which triggers when form fields are reset by setting selectedProject after successful POST request
   useEffect(() => {
@@ -224,17 +271,22 @@ const ProjectForm = () => {
 
       if (isDirty) {
         dispatch(setIsSaving(true));
-        let data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms, hierarchyDistricts, hierarchyDivisions, hierarchySubDivisions);
+        let data: IProjectRequest = dirtyFieldsToRequestObject(
+          dirtyFields,
+          form as IAppForms,
+          hierarchyDistricts,
+          hierarchyDivisions,
+          hierarchySubDivisions,
+        );
 
         // Patch project
         if (project?.id && projectMode === 'edit') {
-          // If any of these is modified there's a chance that some finance years might be out of schedule, so budgets from those years need
-          // to be moved to years that are within schedule
-          if (data.planningStartYear || data.estPlanningEnd || data.estConstructionStart || data.constructionEndYear) {
+          if (data.planningStartYear || data.constructionEndYear) {
             data = updateFinances(data, project);
           }
 
           if (data?.projectClass && project.projectGroup) {
+
               const projectGroup = groups.find(({id}) => id === project.projectGroup);
               if (project.projectClass !== projectGroup?.classRelation) {
                 data = {...data, "projectGroup": null} 
@@ -244,11 +296,11 @@ const ProjectForm = () => {
           /* If project is under a district and user changes the class, the district has to be removed or the
              project will remain under that district in the new class, which isn't intended behavior */
           if (data?.projectClass && project.projectLocation) {
-            data = {...data, "projectLocation": null} 
+            data = { ...data, projectLocation: null };
           }
           // The projectDistrict should also be deleted in order to not show it on the project form when class is changed
           if (data?.projectClass && project.projectDistrict) {
-            data = {...data, "projectDistrict": null}
+            data = { ...data, projectDistrict: null };
           }
 
           try {
@@ -257,10 +309,20 @@ const ProjectForm = () => {
               dispatch(setSelectedProject(response.data));
               dispatch(setIsSaving(false));
             }
-
-          } catch (error) {
+          } catch (error: unknown) {
             console.log('project patch error: ', error);
-            dispatch(setIsSaving(false));
+            if ((error as AxiosError).status === 403) {
+              dispatch(
+                notifyError({
+                  message: 'accessError',
+                  title: 'saveError',
+                  type: 'notification',
+                }),
+              );
+              dispatch(clearLoading(CREATE_NEW_PROJECT));
+              dispatch(setIsSaving(false));
+              return;
+            }
             dispatch(
               notifyError({
                 message: 'formSaveError',
@@ -268,6 +330,8 @@ const ProjectForm = () => {
                 type: 'notification',
               }),
             );
+            dispatch(setIsSaving(false));
+            dispatch(clearLoading(CREATE_NEW_PROJECT));
             return;
           }
         }
@@ -283,6 +347,18 @@ const ProjectForm = () => {
             }
           } catch (error) {
             console.log('project post error: ', error);
+            if ((error as AxiosError).status === 403) {
+              dispatch(
+                notifyError({
+                  message: 'accessError',
+                  title: 'saveError',
+                  type: 'notification',
+                }),
+              );
+              dispatch(clearLoading(CREATE_NEW_PROJECT));
+              dispatch(setIsSaving(false));
+              return;
+            }
             dispatch(setIsSaving(false));
             dispatch(
               notifyError({
@@ -294,9 +370,21 @@ const ProjectForm = () => {
           }
         }
       }
+      dispatch(setIsSaving(false));
       dispatch(clearLoading(CREATE_NEW_PROJECT));
     },
-    [isDirty, project?.id, dirtyFields, dispatch, projectMode, navigate],
+    [
+      dispatch,
+      isDirty,
+      dirtyFields,
+      hierarchyDistricts,
+      hierarchyDivisions,
+      hierarchySubDivisions,
+      project,
+      projectMode,
+      user,
+      updateFinances,
+    ],
   );
 
   const getFieldProps = useCallback(
@@ -318,7 +406,7 @@ const ProjectForm = () => {
       getValues,
       getFieldState,
     }),
-    [control, getFieldProps, getValues],
+    [control, getFieldProps, getFieldState, getValues],
   );
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -365,32 +453,31 @@ const ProjectForm = () => {
     [selectedMasterClassName, user],
   );
 
-  const isUserProjectManagerCheck = useMemo(
-    () => isUserOnlyProjectManager(user),
-    [user]
-  );
+  const isUserProjectManagerCheck = useMemo(() => isUserOnlyProjectManager(user), [user]);
 
   return (
-    <form
-      data-testid="project-form"
-      className="project-form"
-    >
+    <form data-testid="project-form" className="project-form">
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection
-        {...formProps} project={project}
+        {...formProps}
+        project={project}
         isInputDisabled={isInputDisabled}
         projectMode={projectMode}
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 2 - STATUS */}
-      <ProjectStatusSection 
+      <ProjectStatusSection
         {...formProps}
         isInputDisabled={isInputDisabled}
         isUserOnlyProjectManager={isUserProjectManagerCheck}
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 3 - SCHEDULE */}
-      <ProjectScheduleSection {...formProps} isUserOnlyProjectManager={isUserProjectManagerCheck} isUserOnlyViewer={isOnlyViewer}/>
+      <ProjectScheduleSection
+        {...formProps}
+        isUserOnlyProjectManager={isUserProjectManagerCheck}
+        isUserOnlyViewer={isOnlyViewer}
+      />
       {/* SECTION 4 - FINANCIALS */}
       <ProjectFinancialSection
         {...formProps}
@@ -399,7 +486,11 @@ const ProjectForm = () => {
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 5 - RESPONSIBLE PERSONS */}
-      <ProjectResponsiblePersonsSection {...formProps} isInputDisabled={isInputDisabled} isUserOnlyViewer={isOnlyViewer}/>
+      <ProjectResponsiblePersonsSection
+        {...formProps}
+        isInputDisabled={isInputDisabled}
+        isUserOnlyViewer={isOnlyViewer}
+      />
       {/* SECTION 6 - LOCATION */}
       <ProjectLocationSection
         {...formProps}
@@ -408,11 +499,9 @@ const ProjectForm = () => {
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer}/>
+      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
       {/* BANNER */}
-      {!isOnlyViewer &&
-        <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />
-      }
+      {!isOnlyViewer && <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />}
     </form>
   );
 };
