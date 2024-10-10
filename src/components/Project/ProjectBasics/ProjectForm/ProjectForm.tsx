@@ -283,6 +283,22 @@ const ProjectForm = () => {
             data = updateFinances(data, project);
           }
 
+          /* If project belongs to some group and then class is changed, the project will disappear as 
+             the group that it belongs to and the project exist under different subclasses */
+          if (data?.projectClass && project.projectGroup) {
+            data = { ...data, projectGroup: null };
+          }
+
+          /* If project is under a district and user changes the class, the district has to be removed or the
+             project will remain under that district in the new class, which isn't intended behavior */
+          if (data?.projectClass && project.projectLocation) {
+            data = { ...data, projectLocation: null };
+          }
+          // The projectDistrict should also be deleted in order to not show it on the project form when class is changed
+          if (data?.projectClass && project.projectDistrict) {
+            data = { ...data, projectDistrict: null };
+          }
+
           try {
             const response = await patchProject({ id: project?.id, data });
             if (response.status === 200) {
