@@ -65,6 +65,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
       const lowerCaseSearchWord = searchWord.toLowerCase();
       const groupSubDivision = getValues('subDivision.value');
       const groupDivision = getValues('division.value');
+      const groupDivisionName = getValues('division.label');
       const groupDistrict = getValues('district.value');
       const groupSubClass = getValues('subClass.value');
       const groupClass = getValues('class.value');
@@ -77,7 +78,10 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
           project.projectDistrict === groupDistrict ||
           getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
           getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, project.projectDistrict)) === groupDivision;
-        const divisionMatches = project.projectDistrict === groupDivision || getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
+        const divisionMatches = 
+          project.projectDistrict === groupDivision ||
+          getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
+          (groupDivisionName === "Eri kaupunginosia" && districtMatches);
         const subDivisionMatches = project.projectDistrict === groupSubDivision;
         const projectNotSelectedAlready = !projectsForSubmitIds.includes(project.id);
   
