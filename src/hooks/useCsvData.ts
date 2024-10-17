@@ -37,7 +37,8 @@ export const useCsvData = ({
       switch (type) {
         case Reports.BudgetBookSummary:
         case Reports.Strategy: {
-          const res = await getForcedToFrameData(year, true);
+          // For Strategy report, we will fetch next year data
+          const res = type === Reports.Strategy ? await getForcedToFrameData(year + 1, false) : await getForcedToFrameData(year, true);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(
               res.classHierarchy,

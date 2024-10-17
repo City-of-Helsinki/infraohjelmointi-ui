@@ -643,7 +643,7 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
  */
 const frameBudgetHandler = (type: string, budgets: IPlanningCell[]) => {
   if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)) {
-    const budget = budgets.find(obj => obj.year === new Date().getFullYear());
+    const budget = budgets.find(obj => obj.year === new Date().getFullYear() + 1);
     return budget ? budget.displayFrameBudget : "";
   }
 
@@ -1191,9 +1191,9 @@ export const getReportData = async (
           [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
           [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
           [`\n${t('projectPhase')}`]: r.projectPhase,
-          [`\nTA ${year}`]: r.costPlan,
-          [`\nTS ${year}`]: r.costForecast,
-          [`${year}\n01`]: r.januaryStatus,
+          [`\nTA ${year + 1}`]: r.costPlan,
+          [`\nTS ${year + 1}`]: r.costForecast,
+          [`${year + 1}\n01`]: r.januaryStatus,
           [`\n02`]: r.februaryStatus,
           [`\n03`]: r.marchStatus,
           [`\n04`]: r.aprilStatus,
