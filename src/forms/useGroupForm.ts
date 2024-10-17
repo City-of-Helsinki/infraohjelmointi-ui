@@ -131,10 +131,10 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
     return lowestSelectedLocationLevel;
   }
 
-  const filterProjectsForSubmit = (projects: IOption[] | undefined, groupLocationLevel: string, groupLocationId: string | undefined, groupLocationName: string | undefined) => {
+  const filterProjectsForSubmit = (projects: IOption[] | undefined, groupLocationLevel: string, groupLocationId: string | undefined, groupLocationName: string | undefined, groupDistrictName: string | undefined) => {
     const filteredProjects = projects?.filter((project) => {
       const projecLocationId = allProjects.find(({ id }) => id == project.value)?.projectDistrict;
-      return projectAndGroupLocationMatches(groupLocationLevel, groupLocationId, groupLocationName, projecLocationId);
+      return projectAndGroupLocationMatches(groupLocationLevel, groupLocationId, groupLocationName, projecLocationId, groupDistrictName);
     });
     return filteredProjects;
   }
@@ -144,6 +144,7 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
     groupLocationId?: string,
     groupLocationName?: string,
     projectLocationId?: string,
+    groupDistrictName?: string
   ) => {
     const projectDirectlyUnderGroupLocation = projectLocationId === groupLocationId;
     const divisionLevelMatchesGroupDistrict = 
@@ -152,11 +153,13 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
     const subDivisionLevelMatchesGroupDivision = getLocationParent(projectSubDivisions, projectLocationId) === groupLocationId;
     const subDivisionLevelMatchesGroupDistrict = getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectLocationId)) === groupLocationId;
 
-    const districtMatches = projectDirectlyUnderGroupLocation || divisionLevelMatchesGroupDistrict || subDivisionLevelMatchesGroupDistrict;
+    const multipleDistrictsSelectedMatches = (projectLocationId && groupDistrictName === "Eri suurpiirejä");
+    const districtMatches = projectDirectlyUnderGroupLocation || divisionLevelMatchesGroupDistrict || subDivisionLevelMatchesGroupDistrict || multipleDistrictsSelectedMatches;
+    
 
     switch (groupLocationLevel) {
       case 'district':
-        return projectDirectlyUnderGroupLocation || divisionLevelMatchesGroupDistrict || subDivisionLevelMatchesGroupDistrict;
+        return districtMatches;
       case 'division':
         return projectDirectlyUnderGroupLocation || subDivisionLevelMatchesGroupDivision || (groupLocationName === "Eri kaupunginosia" && districtMatches);
       case 'subDivision':
@@ -217,7 +220,16 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
           if (name === 'division') {
             setValue('subDivision', { label: '', value: '' });
           }
-          setValue('projectsForSubmit', filterProjectsForSubmit(projects, lowestLocationForGroup, value[lowestLocationForGroup]?.value, value[lowestLocationForGroup]?.label) ?? [])
+          setValue(
+            'projectsForSubmit',
+            filterProjectsForSubmit(
+              projects,
+              lowestLocationForGroup,
+              value[lowestLocationForGroup]?.value,
+              value[lowestLocationForGroup]?.label,
+              value.district?.label
+            ) ?? []
+          )
           break;
         default:
       }
