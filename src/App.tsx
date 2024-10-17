@@ -45,6 +45,7 @@ import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
 import { AppDispatch } from './store';
+import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForcedToFrame';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -158,6 +159,7 @@ const App: FC = () => {
               <Route path="/admin" element={<AdminView />}>
                 <Route path="functions" element={<AdminFunctions />} />
                 <Route path="hashtags" element={<AdminHashtags />} />
+                <Route path="forcedtoframestate" element={<AdminForcedToFrame />} />
               </Route>
               <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="/auth/helsinki/return" element={<></>}></Route>

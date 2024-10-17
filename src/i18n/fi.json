@@ -512,6 +512,11 @@
       "name": "Tilinpäätös",
       "description": "Päätä edellinen vuosi ja lukitse tilinpäätös.",
       "button": "Lukitse tilinpäätös tästä"
+    },
+    "forcedtoframestate": {
+      "name": "Sovitettu budjetti -näkymän hallinta",
+      "description": "Sulje tai avaa sovitettu budjetti. Lataa tiedot koordinointinäkymästä sovitettu budjetti -näkymään.",
+      "button": "Hallitse sovitettu budjetti -näkymää"
     }
   },
   "projectCount": "Projektien määrä",
