@@ -516,7 +516,9 @@
     "forcedtoframestate": {
       "name": "Sovitettu budjetti -näkymän hallinta",
       "description": "Sulje tai avaa sovitettu budjetti. Lataa tiedot koordinointinäkymästä sovitettu budjetti -näkymään.",
-      "button": "Hallitse sovitettu budjetti -näkymää"
+      "button": "Hallitse sovitettu budjetti -näkymää",
+      "viewState": "Sovitettu budjetti -näkymän tila",
+      "moveData": "Tietojen siirto sovitettu budjetti -näkymään"
     }
   },
   "projectCount": "Projektien määrä",

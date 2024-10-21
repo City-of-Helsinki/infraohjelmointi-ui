@@ -46,6 +46,7 @@ import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
 import { AppDispatch } from './store';
 import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForcedToFrame';
+import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -104,7 +105,8 @@ const App: FC = () => {
     try {
       await dispatch(getListsThunk());
       await dispatch(getHashTagsThunk());
-      await dispatch(getCoordinatorNotesThunk())
+      await dispatch(getCoordinatorNotesThunk());
+      await dispatch(getAppStateValuesThunk());
     } catch (e) {
       console.log('Error getting app data: ', e);
       dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
