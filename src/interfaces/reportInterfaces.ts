@@ -1,45 +1,53 @@
-import { IClassHierarchy, ICoordinatorClassHierarchy } from "@/reducers/classSlice";
-import { ILocation } from "./locationInterfaces";
-import { IProject, IProjectsResponse } from "./projectInterfaces";
-import { IPlanningCell, IPlanningRow, IPlanningRowSelections, PlanningRowType } from "./planningInterfaces";
-import { IGroup } from "./groupInterfaces";
-import { IListItem } from "./common";
+import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
+import { ILocation } from './locationInterfaces';
+import { IProject, IProjectsResponse } from './projectInterfaces';
+import {
+  IPlanningCell,
+  IPlanningRow,
+  IPlanningRowSelections,
+  PlanningRowType,
+} from './planningInterfaces';
+import { IGroup } from './groupInterfaces';
+import { IListItem } from './common';
 
-export type getForcedToFrameDataType = Promise<{ 
-    res: IProjectsResponse;
-    projects: IProject[];
-    projectsInWarrantyPhase?: IProject[];
-    classHierarchy: ICoordinatorClassHierarchy;
-    forcedToFrameDistricts: {
-      districts: ILocation[];
-      year: number;
-      allLocations?: ILocation[];
-      divisions?: ILocation[];
-      subDivisions?: ILocation[];
-    };
-    groupRes: IGroup[];
-    initialSelections: IPlanningRowSelections}>;
-
-export type IPlanningData = {
+export type getForcedToFrameDataType = Promise<{
   res: IProjectsResponse;
   projects: IProject[];
-  classHierarchy: IClassHierarchy;
-  planningDistricts: {
+  projectsInWarrantyPhase?: IProject[];
+  classHierarchy: ICoordinatorClassHierarchy;
+  forcedToFrameDistricts: {
     districts: ILocation[];
     year: number;
     allLocations?: ILocation[];
     divisions?: ILocation[];
     subDivisions?: ILocation[];
-  } | {
-    districts: ILocation[];
-    allLocations: ILocation[];
-    divisions: ILocation[];
-    subDivisions: ILocation[];
-    year: number;
   };
   groupRes: IGroup[];
   initialSelections: IPlanningRowSelections;
-}
+}>;
+
+export type IPlanningData = {
+  res: IProjectsResponse;
+  projects: IProject[];
+  classHierarchy: IClassHierarchy;
+  planningDistricts:
+    | {
+        districts: ILocation[];
+        year: number;
+        allLocations?: ILocation[];
+        divisions?: ILocation[];
+        subDivisions?: ILocation[];
+      }
+    | {
+        districts: ILocation[];
+        allLocations: ILocation[];
+        divisions: ILocation[];
+        subDivisions: ILocation[];
+        year: number;
+      };
+  groupRes: IGroup[];
+  initialSelections: IPlanningRowSelections;
+};
 
 export const reports = [
   'operationalEnvironmentAnalysis',
@@ -75,7 +83,8 @@ export enum Reports {
 
 export type ReportType = (typeof reports)[number];
 
-export type ReportTableRowType = 'class'
+export type ReportTableRowType =
+  | 'class'
   | 'project'
   | 'investmentpart'
   | 'location'
@@ -131,14 +140,15 @@ export interface IOperationalEnvironmentAnalysisFinanceProperties {
   [key: string]: string | undefined;
 }
 
-export interface IFlattenedOperationalEnvironmentAnalysisProperties extends IOperationalEnvironmentAnalysisFinanceProperties {
+export interface IFlattenedOperationalEnvironmentAnalysisProperties
+  extends IOperationalEnvironmentAnalysisFinanceProperties {
   id: string;
   name: string;
   type: ReportTableRowType;
 }
 
 export interface IBudgetBookFinanceProperties {
-  usage?: string; 
+  usage?: string;
   budgetEstimation?: string; //first TA column means talousarvio
   budgetEstimationSuggestion?: string; //second TA column means talousarvioehdotus
   budgetPlanSuggestion1?: string; // TS = taloussunnitelmaehdotus
@@ -160,9 +170,9 @@ export interface IFlattenedBudgetBookSummaryProperties extends IBudgetBookFinanc
 }
 
 export interface IStrategyTableRow extends ITableRowEssentials {
-  projects: Array<IStrategyTableRow>
-  children: Array<IStrategyTableRow>
-  type: ReportTableRowType
+  projects: Array<IStrategyTableRow>;
+  children: Array<IStrategyTableRow>;
+  type: ReportTableRowType;
   projectManager?: string;
   projectPhase?: string;
   costPlan?: string;
@@ -185,8 +195,8 @@ export interface IBudgetBookSummaryTableRow extends ITableRowEssentials {
   children: Array<IBudgetBookSummaryTableRow>;
   projects: Array<IBudgetBookSummaryTableRow>;
   type: ReportTableRowType;
-  objectType: PlanningRowType | '',
-  
+  objectType: PlanningRowType | '';
+
   financeProperties: IBudgetBookFinanceProperties;
 }
 
@@ -234,14 +244,14 @@ export interface ITotals {
 }
 
 export interface ICategoryArray {
-  children: [],
-  frameBudgets: [],
-  plannedBudgets?: IPlannedBudgets,
-  plannedBudgetsForCategories: ITotals,
-  id: string,
-  name: string,
-  projects: [],
-  type: string,
+  children: [];
+  frameBudgets: [];
+  plannedBudgets?: IPlannedBudgets;
+  plannedBudgetsForCategories: ITotals;
+  id: string;
+  name: string;
+  projects: [];
+  type: string;
 }
 
 export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssentials {
@@ -252,12 +262,12 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
     id?: string;
     updatedDate?: string;
     value?: string;
-  }
+  };
   plannedBudgetsForCategories?: IPlannedBudgets;
   frameBudgets: IOperationalEnvironmentAnalysisFinanceProperties;
   plannedBudgets: IPlannedBudgets;
   // muutospaine
-  changePressure?: { 
+  changePressure?: {
     cpCostForecast?: string;
     cpTAE?: string;
     cpTSE1?: string;
@@ -269,5 +279,13 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
     cpInitial5?: string;
     cpInitial6?: string;
     cpInitial7?: string;
-  }
+  };
+}
+
+export interface IDownloadCsvButtonProps {
+  type: ReportType;
+  getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
+  getPlanningData: (year: number) => Promise<IPlanningData>;
+  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
+  getCategories: () => Promise<IListItem[]>;
 }
