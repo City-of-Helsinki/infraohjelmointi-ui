@@ -64,9 +64,13 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   useEffect(() => {
       const lowerCaseSearchWord = searchWord.toLowerCase();
       const groupSubDivision = getValues('subDivision.value');
-      const groupDivision = getValues('division.value');
       const groupDivisionName = getValues('division.label');
-      const groupDistrict = getValues('district.value');
+      // If selected groupDivision is Eri kaupunginosia (= Different divisions) it means that there is no specific division selected
+      // and the search should work as if there's no division selected
+      const groupDivision = groupDivisionName === "Eri kaupunginosia" ? undefined : getValues('division.value');
+      const groupDistrictName = getValues('district.label');
+      // If selected groupDistrict is Eri suurpiirejä (= Different districts) it's the same as if there was no groupDivision selected
+      const groupDistrict = groupDistrictName === "Eri suurpiirejä" ? undefined : getValues('district.value');
       const groupSubClass = getValues('subClass.value');
       const groupClass = getValues('class.value');
       const projectsForSubmitIds = getValues('projectsForSubmit').map(project => project.value);
@@ -80,8 +84,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
           getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, project.projectDistrict)) === groupDivision;
         const divisionMatches = 
           project.projectDistrict === groupDivision ||
-          getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
-          (groupDivisionName === "Eri kaupunginosia" && districtMatches);
+          getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
         const subDivisionMatches = project.projectDistrict === groupSubDivision;
         const projectNotSelectedAlready = !projectsForSubmitIds.includes(project.id);
   
