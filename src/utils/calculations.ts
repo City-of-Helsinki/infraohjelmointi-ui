@@ -7,8 +7,9 @@ import {
 } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 
-// Formats a number to include thousand sepparators
-export const formatNumber = (number: number | undefined) => number?.toLocaleString('fi-FI') ?? '0';
+// Formats a number to include thousand sepparators and rounds it to a whole number
+export const formatNumber = (number: number | undefined) =>
+  Math.round(number ?? 0).toLocaleString('fi-FI');
 
 // Turns a formatted number string to a number
 export const formattedNumberToNumber = (formattedNumber?: string) => {
@@ -16,7 +17,7 @@ export const formattedNumberToNumber = (formattedNumber?: string) => {
     return 0;
   }
   // The character U+2212 is compared intentional here, since the number is formatted with toLocaleString('fi-FI')
-  if (['−','-'].includes(formattedNumber.trim()[0])) {
+  if (['−', '-'].includes(formattedNumber.trim()[0])) {
     return -parseInt(formattedNumber.trim().replace(/\D/g, ''));
   } else {
     return parseInt(formattedNumber.trim().replace(/\D/g, ''));
@@ -182,7 +183,7 @@ export const calcPercentage = (value: number, total: number) => Math.round((valu
 export const keurToMillion = (value?: string | null | number) => {
   if (!value) return '0,0';
 
-  const valueAsNumber = typeof(value) !== "number" ? parseFloat(value.replace(/\s/g, '')) : value;
+  const valueAsNumber = typeof value !== 'number' ? parseFloat(value.replace(/\s/g, '')) : value;
   const millionValue = (valueAsNumber / 1000).toFixed(1);
 
   return millionValue.toString().replace('.', ',');
@@ -193,7 +194,8 @@ const roundUp = (number: number) => (number / 1000).toFixed(2);
 // Specifically for budgetBookSummaryReport
 export const convertToMillions = (value?: string | number): string => {
   if (!value) return '0.00';
-  const valueWithCorrectType: number = typeof value === 'string' ? Number(value.replace(/\s/g, '')): value;
+  const valueWithCorrectType: number =
+    typeof value === 'string' ? Number(value.replace(/\s/g, '')) : value;
   const rounded = roundUp(valueWithCorrectType);
   return String(rounded);
 };
