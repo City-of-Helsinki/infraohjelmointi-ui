@@ -107,6 +107,7 @@
     "isBefore": "Aika on oltava ennen kuin {{value}}",
     "isAfter": "Aika on oltava myöhemmin kuin {{value}}",
     "maxLength": "Maksimipituus on {{value}} merkkiä",
+    "wholeNumber": "Anna kokonaisluku",
     "minValue": "Arvon on oltava vähintään {{value}}",
     "maxValue": "Arvon on oltava enintään {{value}}",
     "requiredFor": "'{{requiredField}}' on pakollinen kun '{{field}}' on '{{value}}'",
