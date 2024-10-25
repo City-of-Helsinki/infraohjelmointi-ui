@@ -14,6 +14,12 @@ export const validateMaxLength = (
   maxLength: { value: value, message: t('validation.maxLength', { value: value }) },
 });
 
+export const validateInteger = (t: TFunction<'translation', undefined, 'translation'>) => ({
+  validate: {
+    isInteger: (value: string | number) =>
+      Number.isInteger(Number(value)) ? true : t('validation.wholeNumber'),
+  },
+});
 export const validateRequired = (
   field: string,
   t: TFunction<'translation', undefined, 'translation'>,

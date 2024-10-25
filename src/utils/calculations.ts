@@ -7,9 +7,8 @@ import {
 } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 
-// Formats a number to include thousand sepparators and rounds it to a whole number
-export const formatNumber = (number: number | undefined) =>
-  Math.round(number ?? 0).toLocaleString('fi-FI');
+// Formats a number to include thousand sepparators
+export const formatNumber = (number: number | undefined) => number?.toLocaleString('fi-FI') ?? '0';
 
 // Turns a formatted number string to a number
 export const formattedNumberToNumber = (formattedNumber?: string) => {
