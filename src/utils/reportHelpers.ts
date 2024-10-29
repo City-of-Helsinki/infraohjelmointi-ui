@@ -273,7 +273,7 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
       children: [],
       costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
       costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
-      projectManager: p.personPlanning?.lastName ?? "",
+      projectManager: p.personPlanning?.lastName ?? "Odottaa nimeämistä",
       projectPhase: getProjectPhase(p),
       januaryStatus: getProjectPhasePerMonth(p, 1),
       februaryStatus: getProjectPhasePerMonth(p,2),
