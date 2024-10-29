@@ -267,6 +267,11 @@ const strategyReportStyles = StyleSheet.create({
     backgroundColor: '#00005e',
     color: 'white',
   },
+  otherClassification: {
+    ...tableRowStyles,
+    backgroundColor: '#00005e',
+    color: 'white',
+  },
   districtPreviewRow: {
     ...tableRowStyles,
     backgroundColor: '#00005e',
@@ -381,6 +386,8 @@ const getStrategyRowStyle = (rowType: string, depth: number) => {
       return strategyReportStyles.subLevelDistrict;
     case 'collectiveSubLevel':
       return strategyReportStyles.collectiveSubLevel;
+    case 'otherClassification':
+      return strategyReportStyles.otherClassification;
     case 'districtPreview':
       return strategyReportStyles.districtPreviewRow;
     case 'group':
@@ -422,7 +429,18 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
         case Reports.Strategy: {
-          const classNameTypes = ['masterClass', 'class', 'subClass', 'subClassDistrict', 'subLevelDistrict', 'collectiveSubLevel', 'districtPreview', 'group']
+          const classNameTypes = [
+            'masterClass',
+            'class',
+            'subClass',
+            'subClassDistrict',
+            'subLevelDistrict',
+            'collectiveSubLevel',
+            'otherClassification',
+            'districtPreview',
+            'group'
+          ]
+
           if (flattenedRow) {
               tableRow =
                 <View wrap={false} style={getStrategyRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>

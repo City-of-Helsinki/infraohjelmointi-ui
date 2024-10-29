@@ -96,6 +96,7 @@ export type ReportTableRowType =
   | 'districtPreview'
   | 'subLevelDistrict'
   | 'collectiveSubLevel'
+  | 'otherClassification'
   | 'changePressure'
   | 'taeFrame'
   | 'division'

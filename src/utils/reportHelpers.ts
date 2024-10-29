@@ -470,16 +470,6 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   return properties;
 }
 
-const getStrategyRowType = (type: string) => {
-  switch (type) {
-    case 'class':
-    case 'otherClassification':
-      return 'class';
-    default:
-      return type;
-  }
-}
-
 const getConstructionRowType = (type: string, name: string) => {
   switch (type) {
     case 'masterClass':
@@ -678,7 +668,7 @@ export const convertToReportRows = (
             projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
             costForecast: c.cells[0].plannedBudget,
             costPlan: frameBudget,
-            type: getStrategyRowType(c.type) as ReportTableRowType
+            type: c.type as ReportTableRowType
           }
           if (convertedClass.type !== 'group' || convertedClass.projects.length) {
             forcedToFrameHierarchy.push(convertedClass);
