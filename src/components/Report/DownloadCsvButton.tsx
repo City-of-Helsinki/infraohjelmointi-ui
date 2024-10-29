@@ -49,7 +49,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
       if (data && data.length > 0) {
         data = cleanData(data);
         const documentName = t(`report.${type}.documentName`);
-        downloadCSV(data, `${documentName}_${year}.csv`);
+        downloadCSV(data, `${documentName}_${type === 'strategy' ? year + 1 : year}.csv`);
       } else {
         console.warn('No data available for CSV download.');
       }
