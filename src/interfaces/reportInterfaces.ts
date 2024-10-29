@@ -94,6 +94,8 @@ export type ReportTableRowType =
   | 'group'
   | 'groupWithValues'
   | 'districtPreview'
+  | 'subLevelDistrict'
+  | 'collectiveSubLevel'
   | 'changePressure'
   | 'taeFrame'
   | 'division'

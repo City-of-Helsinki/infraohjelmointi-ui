@@ -474,7 +474,6 @@ const getStrategyRowType = (type: string) => {
   switch (type) {
     case 'class':
     case 'otherClassification':
-    case 'collectiveSubLevel':
       return 'class';
     default:
       return type;

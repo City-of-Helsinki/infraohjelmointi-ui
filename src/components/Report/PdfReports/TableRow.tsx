@@ -257,6 +257,16 @@ const strategyReportStyles = StyleSheet.create({
     backgroundColor: '#00007a',
     color: 'white',
   },
+  subLevelDistrict: {
+    ...tableRowStyles,
+    backgroundColor: '#00005e',
+    color: 'white',
+  },
+  collectiveSubLevel: {
+    ...tableRowStyles,
+    backgroundColor: '#00005e',
+    color: 'white',
+  },
   districtPreviewRow: {
     ...tableRowStyles,
     backgroundColor: '#00005e',
@@ -359,18 +369,22 @@ const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
 
 const getStrategyRowStyle = (rowType: string, depth: number) => {
   switch (rowType) {
-      case 'masterClass':
-        return strategyReportStyles.masterClassRow;
-      case 'class':
-        return strategyReportStyles.classRow;
-      case 'subClass':
-        return strategyReportStyles.subClassRow;
-      case 'subClassDistrict':
-        return strategyReportStyles.subClassDistrictRow;
-      case 'districtPreview':
-        return strategyReportStyles.districtPreviewRow;
-      case 'group':
-        return strategyReportStyles.groupRow;
+    case 'masterClass':
+      return strategyReportStyles.masterClassRow;
+    case 'class':
+      return strategyReportStyles.classRow;
+    case 'subClass':
+      return strategyReportStyles.subClassRow;
+    case 'subClassDistrict':
+      return strategyReportStyles.subClassDistrictRow;
+    case 'subLevelDistrict':
+      return strategyReportStyles.subLevelDistrict;
+    case 'collectiveSubLevel':
+      return strategyReportStyles.collectiveSubLevel;
+    case 'districtPreview':
+      return strategyReportStyles.districtPreviewRow;
+    case 'group':
+      return strategyReportStyles.groupRow;
     default:
       if (depth % 2) return strategyReportStyles.evenRow;
       return strategyReportStyles.oddRow;
@@ -408,11 +422,12 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
         case Reports.Strategy: {
-            if (flattenedRow) {
+          const classNameTypes = ['masterClass', 'class', 'subClass', 'subClassDistrict', 'subLevelDistrict', 'collectiveSubLevel', 'districtPreview', 'group']
+          if (flattenedRow) {
               tableRow =
                 <View wrap={false} style={getStrategyRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
                     <Text style={
-                      ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'group'].includes(flattenedRow.type ?? '')
+                      classNameTypes.includes(flattenedRow.type ?? '')
                       ? strategyReportStyles.classNameCell
                       : strategyReportStyles.projectCell}>
                         {flattenedRow.name}
