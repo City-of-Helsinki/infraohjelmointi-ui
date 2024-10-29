@@ -1,6 +1,6 @@
-import { IListItem, IOption } from '@/interfaces/common';
+import { IOption } from '@/interfaces/common';
 import { getProjectsWithParams } from '@/services/projectServices';
-import { listItemToOption } from '@/utils/common';
+import { getLocationParent, listItemToOption } from '@/utils/common';
 import { Tag } from 'hds-react/components/Tag';
 import { SearchInput } from 'hds-react/components/SearchInput';
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -50,10 +50,6 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     return searchedProjects;
   }, [searchedProjects]);
 
-  const getLocationParent = (locationList: IListItem[], locationId: string | undefined) => {
-    return locationList.find((location) => location.id === locationId)?.parent;
-  }
-
   useEffect( () => {
     const setProjectsForSearch = async () => {
       const groupClass = getValues('class.value');
@@ -68,8 +64,13 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   useEffect(() => {
       const lowerCaseSearchWord = searchWord.toLowerCase();
       const groupSubDivision = getValues('subDivision.value');
-      const groupDivision = getValues('division.value');
-      const groupDistrict = getValues('district.value');
+      const groupDivisionName = getValues('division.label');
+      // If selected groupDivision is Eri kaupunginosia (= Different divisions) it means that there is no specific division selected
+      // and the search should work as if there's no division selected
+      const groupDivision = groupDivisionName === "Eri kaupunginosia" ? undefined : getValues('division.value');
+      const groupDistrictName = getValues('district.label');
+      // If selected groupDistrict is Eri suurpiirejä (= Different districts) it's the same as if there was no groupDivision selected
+      const groupDistrict = groupDistrictName === "Eri suurpiirejä" ? undefined : getValues('district.value');
       const groupSubClass = getValues('subClass.value');
       const groupClass = getValues('class.value');
       const projectsForSubmitIds = getValues('projectsForSubmit').map(project => project.value);
@@ -81,7 +82,9 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
           project.projectDistrict === groupDistrict ||
           getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
           getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, project.projectDistrict)) === groupDivision;
-        const divisionMatches = project.projectDistrict === groupDivision || getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
+        const divisionMatches = 
+          project.projectDistrict === groupDivision ||
+          getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
         const subDivisionMatches = project.projectDistrict === groupSubDivision;
         const projectNotSelectedAlready = !projectsForSubmitIds.includes(project.id);
   

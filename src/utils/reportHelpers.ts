@@ -273,7 +273,7 @@ const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
       children: [],
       costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
       costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
-      projectManager: p.personPlanning?.lastName ?? "",
+      projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
       projectPhase: getProjectPhase(p),
       januaryStatus: getProjectPhasePerMonth(p, 1),
       februaryStatus: getProjectPhasePerMonth(p,2),
@@ -468,17 +468,6 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
     }
   }
   return properties;
-}
-
-const getStrategyRowType = (type: string) => {
-  switch (type) {
-    case 'class':
-    case 'otherClassification':
-    case 'collectiveSubLevel':
-      return 'class';
-    default:
-      return type;
-  }
 }
 
 const getConstructionRowType = (type: string, name: string) => {
@@ -679,7 +668,7 @@ export const convertToReportRows = (
             projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
             costForecast: c.cells[0].plannedBudget,
             costPlan: frameBudget,
-            type: getStrategyRowType(c.type) as ReportTableRowType
+            type: c.type as ReportTableRowType
           }
           if (convertedClass.type !== 'group' || convertedClass.projects.length) {
             forcedToFrameHierarchy.push(convertedClass);

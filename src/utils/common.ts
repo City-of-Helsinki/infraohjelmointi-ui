@@ -13,7 +13,7 @@ export const removeDotsFromString = (value: string) => value.replace('.', '');
 
 export const formatNumberToContainSpaces = (number: number) => {
   return String(new Intl.NumberFormat('de-DE').format(number)).replace(/\./g, ' ');
-}
+};
 export const listItemToOption = (listItem: IListItem | undefined): IOption => ({
   label: listItem?.value ?? '',
   value: listItem?.id ?? '',
@@ -26,10 +26,10 @@ export const listItemsToOption = (listItems: Array<IListItem>): Array<IOption> =
   }));
 
 export const locationItemsToOptions = (locationList: ILocation[]): IOption[] =>
-locationList.map((locationItem) => ({
-  label: locationItem?.name ?? '',
-  value: locationItem?.id ?? '',
-}));
+  locationList.map((locationItem) => ({
+    label: locationItem?.name ?? '',
+    value: locationItem?.id ?? '',
+  }));
 
 export const booleanToString = (
   boolVal: boolean | undefined,
@@ -57,81 +57,47 @@ export const getOptionId = (option: IOption) => option.value || null;
 
 export const isOption = (obj: object) => _.has(obj, 'label') && _.has(obj, 'value');
 
-/**
- * Make sure the projects planning dates are in sync with the planningStartYear
- */
-const syncPlanningDates = (request: IProjectRequest, form: IAppForms) => {
-  const requestCopy = { ...request };
-
-  if (form.estPlanningStart) {
-    if (_.has(requestCopy, 'estPlanningStart')) {
-      request.planningStartYear = getYear(form.estPlanningStart);
-    }
-
-    if (
-      _.has(requestCopy, 'planningStartYear') &&
-      form.planningStartYear &&
-      parseInt(form.planningStartYear)
-    ) {
-      request.estPlanningStart = updateYear(
-        parseInt(form.planningStartYear),
-        form.estPlanningStart,
-      );
-    }
-  }
-};
-
-/**
- * Make sure the projects construction dates are in sync with the constructionEndYear
- */
-const syncConstructionDates = (request: IProjectRequest, form: IAppForms) => {
-  const requestCopy = { ...request };
-
-  if (form.estConstructionEnd) {
-    if (_.has(requestCopy, 'estConstructionEnd')) {
-      request.constructionEndYear = getYear(form.estConstructionEnd);
-    }
-    if (
-      _.has(requestCopy, 'constructionEndYear') &&
-      form.constructionEndYear &&
-      parseInt(form.constructionEndYear)
-    ) {
-      request.estConstructionEnd = updateYear(
-        parseInt(form.constructionEndYear),
-        form.estConstructionEnd,
-      );
-    }
-  }
-};
-
 const getLocation = (list: ILocation[], locationName: string) => {
   const location = list.find(({ name }) => name.includes(locationName));
   return location;
-}
+};
 
-const getLocationList = (list: ILocation[] | undefined, parentClassId?: string, projectClass?: string) => {
+const getLocationList = (
+  list: ILocation[] | undefined,
+  parentClassId?: string,
+  projectClass?: string,
+) => {
   let locationList: ILocation[] = [];
   // projectClass is given as a parameter when we want to get a list of districts filtered by project's subclass or class
   // The list of distrcits is always filtered by parentClass, which is the projects class or subclass the project belongs to
   if (projectClass && list) {
     locationList = list.filter(({ parentClass }) => parentClass === projectClass);
-  } 
+  }
   // parentClassId is given as a parameter when we want to get a list of divisions or sub divisions filtered based on the
   // district or division id as divisions or sub divisions parent id
   else if (parentClassId && list) {
     locationList = list.filter(({ parent }) => parent === parentClassId);
   }
   return locationList;
-}
+};
 
-const canGetNextLevel = (currentLevelId: string | undefined, previousLevelLocation: ILocation | undefined, nextLevelLocationList: ILocation[] | undefined): boolean => {
+const canGetNextLevel = (
+  currentLevelId: string | undefined,
+  previousLevelLocation: ILocation | undefined,
+  nextLevelLocationList: ILocation[] | undefined,
+): boolean => {
   if (currentLevelId && previousLevelLocation && nextLevelLocationList) {
     return true;
   }
   return false;
-}
+};
 
-const getLowestLocationId = (hierarchyDistricts: ILocation[] | undefined, hierarchyDivisions: ILocation[] | undefined, hierarchySubDivisions: ILocation[] | undefined, form: IAppForms) => {
+const getLowestLocationId = (
+  hierarchyDistricts: ILocation[] | undefined,
+  hierarchyDivisions: ILocation[] | undefined,
+  hierarchySubDivisions: ILocation[] | undefined,
+  form: IAppForms,
+) => {
   let lowestLocationId: string | undefined;
   if (hierarchyDistricts) {
     const districts = getLocationList(hierarchyDistricts, undefined, form.subClass.value);
@@ -149,7 +115,7 @@ const getLowestLocationId = (hierarchyDistricts: ILocation[] | undefined, hierar
     }
   }
   return lowestLocationId;
-}
+};
 
 const parseValue = (value: FormValueType) => {
   switch (true) {
@@ -174,7 +140,7 @@ const getKey = (key: string) => {
 
 const compareKeyToValues = (key: string, values: string[]): boolean => {
   return values.includes(key);
-}
+};
 
 /**
  *
@@ -182,66 +148,85 @@ const compareKeyToValues = (key: string, values: string[]): boolean => {
  * @param form form object
  * @returns data object that can be used for a patch request
  */
-export const dirtyFieldsToRequestObject = (dirtyFields: object, form: IAppForms, hierarchyDistricts?: ILocation[], hierarchyDivisions?: ILocation[], hierarchySubDivisions?: ILocation[]) => {
+export const dirtyFieldsToRequestObject = (
+  dirtyFields: object,
+  form: IAppForms,
+  hierarchyDistricts?: ILocation[],
+  hierarchyDivisions?: ILocation[],
+  hierarchySubDivisions?: ILocation[],
+) => {
   const request: IProjectRequest = {};
 
   for (const key in dirtyFields) {
-
     const parsedValue = parseValue(form[key as keyof IAppForms]);
     const convertedKey = getKey(key);
     const assignValueToKey = (key: string, value: any) => {
       if (value !== undefined) {
         request[key as keyof IAppForms] = value;
       }
-    }
+    };
 
     if (compareKeyToValues(key, ['district', 'division', 'subDivision']) && parsedValue) {
-      _.assign(request, { 'projectLocation': getLowestLocationId(hierarchyDistricts, hierarchyDivisions, hierarchySubDivisions, form)});
+      _.assign(request, {
+        projectLocation: getLowestLocationId(
+          hierarchyDistricts,
+          hierarchyDivisions,
+          hierarchySubDivisions,
+          form,
+        ),
+      });
     }
 
     // if subDivision or division is removed, we need to set projectDistrict to be the new lowest
     // selected location class (e.g. if subDivision is removed, new lowest selected would be division)
     switch (true) {
-      case !parsedValue && compareKeyToValues(key, ["subDivision"]):
-        assignValueToKey(convertedKey, parseValue(form["division" as keyof IAppForms]));
+      case !parsedValue && compareKeyToValues(key, ['subDivision']):
+        assignValueToKey(convertedKey, parseValue(form['division' as keyof IAppForms]));
         break;
-      case !parsedValue && compareKeyToValues(key, ["division"]):
-        assignValueToKey(convertedKey, parseValue(form["district" as keyof IAppForms]));
+      case !parsedValue && compareKeyToValues(key, ['division']):
+        assignValueToKey(convertedKey, parseValue(form['district' as keyof IAppForms]));
         break;
       default:
         assignValueToKey(convertedKey, parsedValue);
-        
-        if (compareKeyToValues(key, ["district"]) && hierarchyDistricts) {
-          const subClass = parseValue(form["subClass" as keyof IAppForms]);
-          const projectClass = parseValue(form["class" as keyof IAppForms]);
+
+        if (compareKeyToValues(key, ['district']) && hierarchyDistricts) {
+          const subClass = parseValue(form['subClass' as keyof IAppForms]);
+          const projectClass = parseValue(form['class' as keyof IAppForms]);
           assignValueToKey('projectClass', subClass ?? projectClass);
         }
     }
   }
 
-  syncPlanningDates(request, form);
-  syncConstructionDates(request, form);
-
   return request;
 };
 
-export const getLocationRelationId = (form: IGroupForm, hierarchyDistricts: ILocation[], hierarchyDivisions: ILocation[]) => {
-  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) => parentClass === form.subClass.value ? true : parentClass === form.class.value);
+export const getLocationRelationId = (
+  form: IGroupForm,
+  hierarchyDistricts: ILocation[],
+  hierarchyDivisions: ILocation[],
+) => {
+  const relatedDistricts = hierarchyDistricts.filter(({ parentClass }) =>
+    parentClass === form.subClass.value ? true : parentClass === form.class.value,
+  );
   if (form.district.label) {
     const relatedDistrict = relatedDistricts.find(({ name }) => name.includes(form.district.label));
     if (form.division.label && relatedDistrict) {
-      const relatedDivisions = hierarchyDivisions.filter(({ parent }) => parent === relatedDistrict.id);
-      const relatedDivision = relatedDivisions.find(({ name }) => name.includes(form.division.label));
+      const relatedDivisions = hierarchyDivisions.filter(
+        ({ parent }) => parent === relatedDistrict.id,
+      );
+      const relatedDivision = relatedDivisions.find(({ name }) =>
+        name.includes(form.division.label),
+      );
       if (relatedDivision) {
         return relatedDivision.id;
       }
       return relatedDistrict.id;
     } else if (relatedDistrict) {
-      return relatedDistrict.id
+      return relatedDistrict.id;
     }
   }
   return '';
-}
+};
 
 export const setProgrammedYears = () => {
   const currentYear = new Date().getFullYear();
@@ -287,72 +272,93 @@ export const removeHoveredClassFromMonth = (month: string) => {
   }
 };
 
-const isWithinYearRange = (yearIndex: number) => (yearIndex >= 0 && yearIndex <=10);
+const isWithinYearRange = (yearIndex: number) => yearIndex >= 0 && yearIndex <= 10;
 
 /**
  * This function is used to set the finance data from a project-update event to correct years to state. It's needed
  * because the startYear of the finance data from the update event is different than what the user has selected
  * when another user has modified project budgets after moving the timeline and triggers the update event. The function
  * loops through 10 finance years, cause currently the backend returns 10 years of finance data at a time.
- * 
+ *
  * @param financesFromState finance data that already exists in the state and that needs to be modified
  * @param financesFromUpdateEvent finance data from the update event that is used to update the data in state
  * @param startYear the start year of the timeline that the user has selected
  * @returns an IProjectFinances object with the updated finance data
  */
-export const syncUpdatedProjectFinancesWithStartYear = (financesFromState: IProjectFinances, financesFromUpdateEvent: IProjectFinances, startYear: number) => {
+export const syncUpdatedProjectFinancesWithStartYear = (
+  financesFromState: IProjectFinances,
+  financesFromUpdateEvent: IProjectFinances,
+  startYear: number,
+) => {
   let convertedFinances: IProjectFinances = {
     ...financesFromState,
-    year: startYear
-  }
+    year: startYear,
+  };
 
   const yearDifference = financesFromUpdateEvent.year - startYear;
-  const convertToFinanceKey = (yearIndex: number) => yearIndex <= 3 ? ("budgetProposalCurrentYearPlus" + yearIndex) as keyof IProjectFinances : ("preliminaryCurrentYearPlus" + yearIndex) as keyof IProjectFinances;
+  const convertToFinanceKey = (yearIndex: number) =>
+    yearIndex <= 3
+      ? (('budgetProposalCurrentYearPlus' + yearIndex) as keyof IProjectFinances)
+      : (('preliminaryCurrentYearPlus' + yearIndex) as keyof IProjectFinances);
 
   for (let financeYearIndex = 0; financeYearIndex <= 10; financeYearIndex++) {
     const adjustedFinanceYearIndex = financeYearIndex + yearDifference;
     if (isWithinYearRange(adjustedFinanceYearIndex)) {
       const sourceFinanceYearKey = convertToFinanceKey(financeYearIndex);
       const destinationFinanceYearKey = convertToFinanceKey(adjustedFinanceYearIndex);
-      convertedFinances = { ...convertedFinances, [destinationFinanceYearKey]: financesFromUpdateEvent[sourceFinanceYearKey] };
+      convertedFinances = {
+        ...convertedFinances,
+        [destinationFinanceYearKey]: financesFromUpdateEvent[sourceFinanceYearKey],
+      };
     }
   }
   return convertedFinances;
-}
+};
 
 /**
  * This function is used to set the finance data from a finance-update event to correct years to state. It's needed
  * because the startYear of the finance data from the update event is different than what the user has selected
  * when another user has modified project or class or group budgets after moving the timeline and triggers the update event.
  * The function loops through 10 finance years, cause currently the backend returns 10 years of finance data at a time.
- * 
+ *
  * @param financesFromState finance data that already exists in the state and that needs to be modified
  * @param financesFromUpdateEvent finance data from the update event that is used to update the data in state
  * @param startYear the start year of the timeline that the user has selected
  * @returns an IClassFinances object with the updated finance data
  */
-export const syncUpdatedClassFinancesWithStartYear = (financesFromState: IClassFinances, financesFromUpdateEvent: IClassFinances, startYear: number) => {
+export const syncUpdatedClassFinancesWithStartYear = (
+  financesFromState: IClassFinances,
+  financesFromUpdateEvent: IClassFinances,
+  startYear: number,
+) => {
   let convertedFinances: IClassFinances = {
     ...financesFromState,
     year: startYear,
     budgetOverrunAmount: financesFromUpdateEvent.budgetOverrunAmount,
-    projectBudgets: financesFromUpdateEvent.projectBudgets
-  }
+    projectBudgets: financesFromUpdateEvent.projectBudgets,
+  };
 
   const yearDifference = startYear - financesFromState.year;
-  const convertToFinanceKey = (yearIndex: number) => ("year" + yearIndex) as keyof IClassFinances;
+  const convertToFinanceKey = (yearIndex: number) => ('year' + yearIndex) as keyof IClassFinances;
 
   for (let financeYearIndex = 0; financeYearIndex <= 10; financeYearIndex++) {
     const adjustedFinanceYearIndex = financeYearIndex + yearDifference;
     if (isWithinYearRange(adjustedFinanceYearIndex)) {
       const sourceFinanceYearKey = convertToFinanceKey(financeYearIndex);
       const destinationFinanceYearKey = convertToFinanceKey(adjustedFinanceYearIndex);
-      convertedFinances = { ...convertedFinances, [destinationFinanceYearKey]: financesFromUpdateEvent[sourceFinanceYearKey] };
+      convertedFinances = {
+        ...convertedFinances,
+        [destinationFinanceYearKey]: financesFromUpdateEvent[sourceFinanceYearKey],
+      };
     }
   }
 
   return convertedFinances;
-}
+};
+
+export const getLocationParent = (locationList: IListItem[], locationId: string | undefined) => {
+  return locationList.find((location) => location.id === locationId)?.parent;
+};
 
 export const enum IconKey {
   Proposal = 'proposal',
@@ -370,38 +376,38 @@ export const enum IconKey {
 }
 
 export const mapIconKey = (type: string): IconKey => {
-    switch (type) {
-      case 'proposal':
-      case 'Hanke-ehdotus':
-          return IconKey.Proposal;
-      case 'design':
-      case 'Yleissuunnittelu':
-        return IconKey.Design;
-      case 'programming':
-      case 'Ohjelmointi':
-        return IconKey.Programming;
-      case 'draftInitiation':
-      case 'Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos':
-        return IconKey.DraftInitiation;
-      case 'draftApproval':
-      case 'Katu-/puistosuunnitelmaehdotus ja hyväksyminen':
-        return IconKey.DraftApproval;
-      case 'constructionPlan':
-      case 'Rakennussuunnitelma':
-        return IconKey.ConstructionPlan;
-      case 'constructionWait':
-      case 'Odottaa rakentamista':
-        return IconKey.ConstructionWait;
-      case 'construction':
-      case 'Rakentaminen':
-        return IconKey.Construction;
-      case 'warrantyPeriod':
-      case 'Takuuaika':
-        return IconKey.WarrantyPeriod;
-      case 'completed':
-      case 'Valmis / ylläpidossa':
-        return IconKey.Completed;
-      default:
-        return IconKey.Programming;
+  switch (type) {
+    case 'proposal':
+    case 'Hanke-ehdotus':
+      return IconKey.Proposal;
+    case 'design':
+    case 'Yleissuunnittelu':
+      return IconKey.Design;
+    case 'programming':
+    case 'Ohjelmointi':
+      return IconKey.Programming;
+    case 'draftInitiation':
+    case 'Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos':
+      return IconKey.DraftInitiation;
+    case 'draftApproval':
+    case 'Katu-/puistosuunnitelmaehdotus ja hyväksyminen':
+      return IconKey.DraftApproval;
+    case 'constructionPlan':
+    case 'Rakennussuunnitelma':
+      return IconKey.ConstructionPlan;
+    case 'constructionWait':
+    case 'Odottaa rakentamista':
+      return IconKey.ConstructionWait;
+    case 'construction':
+    case 'Rakentaminen':
+      return IconKey.Construction;
+    case 'warrantyPeriod':
+    case 'Takuuaika':
+      return IconKey.WarrantyPeriod;
+    case 'completed':
+    case 'Valmis / ylläpidossa':
+      return IconKey.Completed;
+    default:
+      return IconKey.Programming;
   }
 };

@@ -15,8 +15,9 @@ import {
 } from '@/reducers/classSlice';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
-import { listItemToOption } from '@/utils/common';
+import { getLocationParent, listItemToOption } from '@/utils/common';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
+import { selectProjects } from '@/reducers/planningSlice';
 interface ISelectionState {
   selectedClass: string | undefined;
   selectedLocation: string | undefined;
@@ -105,6 +106,10 @@ const useGroupValues = (projects?: IOption[], id?: string | null) => {
 const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const { formValues, group } = useGroupValues(projects, id);
 
+  const allProjects = useAppSelector(selectProjects);
+  const projectSubDivisions = useAppSelector(selectProjectSubDivisions);
+  const projectDivisions = useAppSelector(selectProjectDivisions);
+
   const [selections, setSelections] = useState<ISelectionState>({
     selectedClass: group?.classRelation ?? '',
     selectedLocation: group?.location ?? '',
@@ -113,6 +118,54 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
   const { selectedClass, selectedLocation } = selections;
   const classOptions = useClassOptions(selectedClass);
   const locationOptions = useLocationOptions(selectedLocation);
+
+  const lowestSelectedLocationLevel = (divisionValue: string | undefined, subDivisionValue: string | undefined): 'subDivision' | 'division' | 'district' => {
+    let lowestSelectedLocationLevel: 'subDivision' | 'division' | 'district';
+    if (subDivisionValue) {
+      lowestSelectedLocationLevel = 'subDivision';
+    } else if (divisionValue) {
+      lowestSelectedLocationLevel = 'division';
+    } else {
+      lowestSelectedLocationLevel = 'district';
+    }
+    return lowestSelectedLocationLevel;
+  }
+
+  const filterProjectsForSubmit = (projects: IOption[] | undefined, groupLocationLevel: string, groupLocationId: string | undefined, groupLocationName: string | undefined, groupDistrictName: string | undefined) => {
+    const filteredProjects = projects?.filter((project) => {
+      const projecLocationId = allProjects.find(({ id }) => id == project.value)?.projectDistrict;
+      return projectAndGroupLocationMatches(groupLocationLevel, groupLocationId, groupLocationName, projecLocationId, groupDistrictName);
+    });
+    return filteredProjects;
+  }
+
+  const projectAndGroupLocationMatches = (
+    groupLocationLevel: string,
+    groupLocationId?: string,
+    groupLocationName?: string,
+    projectLocationId?: string,
+    groupDistrictName?: string
+  ) => {
+    const projectDirectlyUnderGroupLocation = projectLocationId === groupLocationId;
+    const divisionLevelMatchesGroupDistrict = 
+      getLocationParent(projectDivisions, projectLocationId) === groupLocationId ||
+      (groupLocationName === "Eri kaupunginosia" && getLocationParent(projectDivisions, projectLocationId) === getLocationParent(projectDivisions, groupLocationId));
+    const subDivisionLevelMatchesGroupDivision = getLocationParent(projectSubDivisions, projectLocationId) === groupLocationId;
+    const subDivisionLevelMatchesGroupDistrict = getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, projectLocationId)) === groupLocationId;
+
+    const multipleDistrictsSelectedMatches = (projectLocationId && groupDistrictName === "Eri suurpiirejä");
+    const districtMatches = projectDirectlyUnderGroupLocation || divisionLevelMatchesGroupDistrict || subDivisionLevelMatchesGroupDistrict || multipleDistrictsSelectedMatches;
+    
+
+    switch (groupLocationLevel) {
+      case 'district':
+        return districtMatches;
+      case 'division':
+        return projectDirectlyUnderGroupLocation || subDivisionLevelMatchesGroupDivision || (groupLocationName === "Eri kaupunginosia" && districtMatches);
+      case 'subDivision':
+        return projectDirectlyUnderGroupLocation;
+    }
+  }
 
   const formMethods = useForm<IGroupForm>({
     defaultValues: useMemo(() => formValues, [formValues]),
@@ -135,6 +188,7 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
+      const lowestLocationForGroup = lowestSelectedLocationLevel(value.division?.value, value.subDivision?.value);
       switch (name) {
         case 'masterClass':
         case 'class':
@@ -161,11 +215,21 @@ const useGroupForm = (projects?: IOption[], id?: string | null) => {
           }
           if (name === 'district') {
             setValue('division', { label: '', value: '' });
-          }
-          if (name === 'district' || name === 'division') {
             setValue('subDivision', { label: '', value: '' });
           }
-          setValue('projectsForSubmit', []);
+          if (name === 'division') {
+            setValue('subDivision', { label: '', value: '' });
+          }
+          setValue(
+            'projectsForSubmit',
+            filterProjectsForSubmit(
+              projects,
+              lowestLocationForGroup,
+              value[lowestLocationForGroup]?.value,
+              value[lowestLocationForGroup]?.label,
+              value.district?.label
+            ) ?? []
+          )
           break;
         default:
       }
