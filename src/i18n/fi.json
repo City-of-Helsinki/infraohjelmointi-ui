@@ -463,7 +463,8 @@
       "projectManagerTitle": "projektipäällikkö",
       "footerInfoText": "s = suunnittelu, r = rakentaminen",
       "planning": "Suunnittelu",
-      "constructing": "Rakentaminen"
+      "constructing": "Rakentaminen",
+      "projectManagerMissing": "Odottaa nimeämistä"
     },
     "constructionProgram": {
       "rowTitle": "Rakentamisohjelma (yli 1 milj hankkeet)",
