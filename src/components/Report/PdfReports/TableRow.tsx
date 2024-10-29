@@ -403,6 +403,8 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
     case 'masterClass':
       return styles.masterClassRow;
     case 'class':
+    case 'otherClassification':
+    case 'collectiveSubLevel':
       return styles.classRow;
     case 'subClass':
       return styles.subClassRow;
@@ -526,13 +528,24 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
           // Programming view (hierarchy) colours for class rows
           // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
         if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
+          const classNameTypes = [
+            'masterClass',
+            'class',
+            'subClass',
+            'subClassDistrict',
+            'collectiveSubLevel',
+            'otherClassification',
+            'districtPreview',
+            'info'
+          ]
+
           tableRow =
             <View
               wrap={false}
               style={ getConstructionRowStyle(flattenedRow.type ?? '', index ?? 0 )}
               key={flattenedRow.id}
             >
-              <Text style={['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'info'].includes(flattenedRow.type)
+              <Text style={classNameTypes.includes(flattenedRow.type)
                 ? styles.classNameCell
                 : styles.nameCell}
               >{flattenedRow.name}</Text>
@@ -556,7 +569,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
 
               let defaultStyle;
 
-              if (flattenedRow.type === 'class' || flattenedRow.type === 'investmentpart') {
+              if (['class', 'otherClassification', 'collectiveSubLevel'].includes(flattenedRow.type) || flattenedRow.type === 'investmentpart') {
                   defaultStyle = styles.classNameTargetCell;
               } else {
                   defaultStyle = styles.nameTargetCell;
