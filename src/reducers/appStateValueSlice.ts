@@ -47,7 +47,6 @@ const getForcedToFrameState = (appStateValues: Array<any>): IForcedToFrameState 
 export const getAppStateValuesThunk = createAsyncThunk("appStateValues/get", async (_, thunkAPI) => {
     try {
         const appStateValues = await getAllAppStateValues();
-        console.log(appStateValues)
         return {
             forcedToFrameState: getForcedToFrameState(appStateValues),
             coordinationDataMoved: appStateValues

@@ -15,7 +15,7 @@ export const postOrPatchAppStateValue = async (request: {name: string, value: bo
     try {
         // if value already exists we modify the existing one
         if (request.id) {
-            const res = await axios.patch(`${REACT_APP_API_URL}/app-state-value/`, request);
+            const res = await axios.patch(`${REACT_APP_API_URL}/app-state-value/${request.id}/`, request);
             return res.data;
         // post a new value if there's no existing value
         } else {

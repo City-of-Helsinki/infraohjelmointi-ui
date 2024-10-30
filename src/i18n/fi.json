@@ -518,7 +518,13 @@
       "description": "Sulje tai avaa sovitettu budjetti. Lataa tiedot koordinointinäkymästä sovitettu budjetti -näkymään.",
       "button": "Hallitse sovitettu budjetti -näkymää",
       "viewState": "Sovitettu budjetti -näkymän tila",
-      "moveData": "Tietojen siirto sovitettu budjetti -näkymään"
+      "moveData": "Tietojen siirto sovitettu budjetti -näkymään",
+      "lastModified": "Tilaa viimeksi muokattu",
+      "changeStatus": "Vaihda tilan status",
+      "dataLastUpdated": "Tiedot viimeksi siirretty",
+      "updateData": "Siirrä tiedot",
+      "open": "Auki",
+      "locked": "Lukittu"
     }
   },
   "projectCount": "Projektien määrä",
