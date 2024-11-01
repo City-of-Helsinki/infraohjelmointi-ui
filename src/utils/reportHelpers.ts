@@ -635,7 +635,7 @@ const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string
 
   if (!allowedTypes.includes(type)) return ""
   
-  if (type === 'collectiveSubLevel' && !path.startsWith('803')) return ""
+  if (type === 'collectiveSubLevel' && !path.startsWith('8 03')) return ""
 
   const budget = budgets.find(obj => obj.year === new Date().getFullYear() + 1);
   return budget ? budget.displayFrameBudget : "";
