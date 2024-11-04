@@ -630,13 +630,15 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
  * Shows current year cost estimated budget (TA, "raamiluku") on
  * Strategy report for high level classes only.
  */
-const frameBudgetHandler = (type: string, budgets: IPlanningCell[]) => {
-  if (['masterClass', 'class', 'subClass', 'subClassDistrict'].includes(type)) {
-    const budget = budgets.find(obj => obj.year === new Date().getFullYear() + 1);
-    return budget ? budget.displayFrameBudget : "";
-  }
+const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string) => {
+  const allowedTypes = ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'collectiveSubLevel']
 
-  return "";
+  if (!allowedTypes.includes(type)) return ""
+  
+  if (type === 'collectiveSubLevel' && !path.startsWith('8 03')) return ""
+
+  const budget = budgets.find(obj => obj.year === new Date().getFullYear() + 1);
+  return budget ? budget.displayFrameBudget : "";
 }
 
 export const convertToReportRows = (
@@ -658,7 +660,7 @@ export const convertToReportRows = (
     case Reports.Strategy: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
-        const frameBudget = frameBudgetHandler(c.type, c.cells);
+        const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
         if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
           const convertedClass = {
             id: c.id,
