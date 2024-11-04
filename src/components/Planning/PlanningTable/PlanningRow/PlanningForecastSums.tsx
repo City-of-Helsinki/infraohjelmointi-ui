@@ -87,6 +87,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
             budgetChange: parsedValue,
           },
         },
+        forcedToFrame: forcedToFrame
       },
     };
     patchCoordinationClass(request);

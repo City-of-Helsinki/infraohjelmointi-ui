@@ -112,6 +112,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
             frameBudget: valueToPatch,
           },
         },
+        forcedToFrame: forcedToFrame
       },
     };
 
