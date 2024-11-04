@@ -1,7 +1,16 @@
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
-import { IForcedToFrameState, selectForcedToFrameState, setForcedToFrameState } from "@/reducers/appStateValueSlice";
-import { setIsSaving } from "@/reducers/projectSlice";
+import {
+    IForcedToFrameDataUpdated,
+    IForcedToFrameState,
+    selectForcedToFrameDataUpdtaed,
+    selectForcedToFrameState,
+    setForcedToFrameState,
+    setForcedToFrameValuesUpdated
+} from "@/reducers/appStateValueSlice";
+import { clearLoading, setLoading } from "@/reducers/loaderSlice";
+import { notifyError, notifySuccess } from "@/reducers/notificationSlice";
 import { postOrPatchAppStateValue } from "@/services/appStateValueServices";
+import { patchForcedToFrameProjects } from "@/services/projectServices";
 import { Button, Fieldset, ToggleButton } from "hds-react";
 import moment from "moment";
 import { memo } from "react";
@@ -11,24 +20,62 @@ const AdminForcedToFrame = () => {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const forcedToFrameState = useAppSelector(selectForcedToFrameState);
+    const forcedToFrameDataUpdated = useAppSelector(selectForcedToFrameDataUpdtaed);
     const forcedToFrameUpdatedDate = moment(new Date(forcedToFrameState.lastModified)).format('D.M.YYYY HH:mm:ss');
+    const forcedToFrameDataUpdatedDate = moment(new Date(forcedToFrameDataUpdated.lastModified)).format('D.M.YYYY HH:mm:ss');
 
     const handleForcedToFrameStatusChange = async () => {
-        setIsSaving(true);
-        const request = {
-            name: "forcedToFrameStatus",
-            value: !forcedToFrameState.isOpen,
-            id: forcedToFrameState.id !== "" ? forcedToFrameState.id : undefined
+        dispatch(setLoading({ text: 'Change forced to frame status', id: "change-forced-to-frame-status" }));
+        try {
+            const request = {
+                name: "forcedToFrameStatus",
+                value: !forcedToFrameState.isOpen,
+                id: forcedToFrameState.id !== "" ? forcedToFrameState.id : undefined
+            }
+            const response = await postOrPatchAppStateValue(request);
+            const newValues: IForcedToFrameState = {
+                ...forcedToFrameState,
+                id: response.id,
+                isOpen: response.value,
+                lastModified: response.updatedDate
+            };
+            dispatch(setForcedToFrameState(newValues));
+        } catch (e) {
+            dispatch(notifyError({ message: 'forcedToFrameStatusUpdateError', type: 'notification', title: 'undefined' }));
         }
-        const response = await postOrPatchAppStateValue(request);
-        const newValues: IForcedToFrameState = {
-            ...forcedToFrameState,
-            id: response.id,
-            isOpen: response.value,
-            lastModified: response.updatedDate
-        };
-        dispatch(setForcedToFrameState(newValues));
-        setIsSaving(false);
+        dispatch(clearLoading("change-forced-to-frame-status"));
+    }
+
+    const handleForcedToFrameDataUpdate = async () => {
+        dispatch(setLoading({ text: 'Update all forced to frame data', id: "update-forced-to-frame-data" }));
+        try {
+            const res = await patchForcedToFrameProjects();
+            const newValues: IForcedToFrameDataUpdated = {
+                ...forcedToFrameState,
+                id: res.id,
+                hasBeenMoved: res.value,
+                lastModified: res.updatedDate
+            };
+            dispatch(setForcedToFrameValuesUpdated(newValues));
+            dispatch(
+                notifySuccess({
+                message: 'forcedToFrameUpdated',
+                title: 'updateSuccessful',
+                type: 'toast',
+                duration: 5000,
+                }),
+            );
+        } catch (e) {
+            dispatch(
+                notifyError({
+                    message: 'forcedToFrameDataUpdateError',
+                    title: 'patchError',
+                    type: 'toast',
+                    duration: 5000,
+                }),
+            );
+        }
+        dispatch(clearLoading("update-forced-to-frame-data"));
     }
     
     return (
@@ -50,9 +97,9 @@ const AdminForcedToFrame = () => {
             <Fieldset border heading={t(`adminFunctions.forcedtoframestate.moveData`) ?? ''} style={{ display: "flex", flexDirection: "row", gap: "60px", marginTop: "30px"}}>
                 <div>
                     <p style={{fontWeight: "bold"}}>{t(`adminFunctions.forcedtoframestate.dataLastUpdated`)}</p>
-                    <p>18.10.2024 klo. 11:01</p>
+                    <p>{forcedToFrameDataUpdatedDate}</p>
                 </div>
-                <Button style={{height: "50%", marginTop: "14px"}}>{t(`adminFunctions.forcedtoframestate.updateData`)}</Button>
+                <Button style={{height: "50%", marginTop: "14px"}} onClick={handleForcedToFrameDataUpdate}>{t(`adminFunctions.forcedtoframestate.updateData`)}</Button>
             </Fieldset>
         </div>
     );

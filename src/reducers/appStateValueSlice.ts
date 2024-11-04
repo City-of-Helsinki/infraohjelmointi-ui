@@ -8,14 +8,16 @@ export interface IForcedToFrameState {
     isOpen: boolean,
     lastModified: string
 }
+
+export interface IForcedToFrameDataUpdated {
+    id: string,
+    hasBeenMoved: boolean,
+    lastModified: string
+}
  
 export interface IAppStateValues {
     forcedToFrameState: IForcedToFrameState
-    coordinationDataMoved: {
-        id: string,
-        hasBeenMoved: boolean,
-        lastModified: string
-    }
+    forcedToFrameDataUpdated: IForcedToFrameDataUpdated
 }
 
 const initialState: IAppStateValues = {
@@ -24,7 +26,7 @@ const initialState: IAppStateValues = {
         isOpen: false,
         lastModified: "",
     },
-    coordinationDataMoved: {
+    forcedToFrameDataUpdated: {
         id: "",
         hasBeenMoved: false,
         lastModified: ""
@@ -44,12 +46,25 @@ const getForcedToFrameState = (appStateValues: Array<any>): IForcedToFrameState 
     return initialState.forcedToFrameState;
 }
 
+const getForcedToFrameDataUpdated = (appStateValues: Array<any>): IForcedToFrameDataUpdated => {
+    for (const value of appStateValues) {
+        if (value.name === "forcedToFrameDataUpdated") {
+            return {
+                id: value.id,
+                hasBeenMoved: value.value,
+                lastModified: value.updatedDate
+            }
+        }
+    }
+    return initialState.forcedToFrameDataUpdated;
+}
+
 export const getAppStateValuesThunk = createAsyncThunk("appStateValues/get", async (_, thunkAPI) => {
     try {
         const appStateValues = await getAllAppStateValues();
         return {
             forcedToFrameState: getForcedToFrameState(appStateValues),
-            coordinationDataMoved: appStateValues
+            forcedToFrameDataUpdated: getForcedToFrameDataUpdated(appStateValues),
         }
     } catch (err) {
         return thunkAPI.rejectWithValue(err);
@@ -63,6 +78,9 @@ export const appStateValueSlice = createSlice({
         setForcedToFrameState(state, action: PayloadAction<IForcedToFrameState>) {
             return { ...state, forcedToFrameState: action.payload };
           },
+        setForcedToFrameValuesUpdated(state, action: PayloadAction<IForcedToFrameDataUpdated>) {
+            return { ...state, forcedToFrameDataUpdated: action.payload};
+        },
     },
     extraReducers: (builder) => {
         // GET all app state values
@@ -79,10 +97,11 @@ export const appStateValueSlice = createSlice({
 });
 
 export const selectForcedToFrameState = (state: RootState) => state.appStateValues.forcedToFrameState;
-export const selectCoordinationDataMoved = (state: RootState) => state.appStateValues.coordinationDataMoved;
+export const selectForcedToFrameDataUpdtaed = (state: RootState) => state.appStateValues.forcedToFrameDataUpdated;
 
 export const {
     setForcedToFrameState,
+    setForcedToFrameValuesUpdated,
 } = appStateValueSlice.actions;
 
 export default appStateValueSlice.reducer;

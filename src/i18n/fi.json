@@ -274,7 +274,8 @@
       "undefined": "Virhe",
       "noteAddSuccess": "Muistiinpano lisätty",
       "noteAddError": "Muistiinpanon lisääminen epäonnistui",
-      "update": "Päivitys"
+      "update": "Päivitys",
+      "updateSuccessful": "Tietojen siirto onnistui"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -300,7 +301,10 @@
       "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
       "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen.",
       "Network Error": "Verkkovirhe",
-      "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa."
+      "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa.",
+      "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu budjetti -näkymään.",
+      "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu budjetti -näkymään tapahtui virhe.",
+      "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe."
     }
   },
   "searchOrder": {
