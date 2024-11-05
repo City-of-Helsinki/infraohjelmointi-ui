@@ -66,14 +66,7 @@ const AdminForcedToFrame = () => {
                 }),
             );
         } catch (e) {
-            dispatch(
-                notifyError({
-                    message: 'forcedToFrameDataUpdateError',
-                    title: 'patchError',
-                    type: 'toast',
-                    duration: 5000,
-                }),
-            );
+            dispatch(notifyError({ message: 'forcedToFrameDataUpdateError', type: 'notification', title: 'patchError' }));
         }
         dispatch(clearLoading("update-forced-to-frame-data"));
     }
