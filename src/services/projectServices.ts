@@ -76,6 +76,15 @@ export const patchProjects = async (
   }
 };
 
+export const patchForcedToFrameProjects = async (): Promise<any> => {
+  try {
+    const res = await axios.patch(`${REACT_APP_API_URL}/projects/bulk-update/forced-to-frame/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}
+
 export const getProjectsWithParams = async (
   req: IProjectSearchRequest,
   isCoordinator?: boolean,

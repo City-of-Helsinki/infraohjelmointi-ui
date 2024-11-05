@@ -65,7 +65,7 @@ describe('AdminView', () => {
 
     adminFunctions.forEach((af) => {
       expect(getByTestId(`admin-card-${af}`)).toBeInTheDocument();
-      if (af === 'hashtags') {
+      if (af === 'hashtags' || af === 'forcedtoframestate') {
         expect(getByTestId(`admin-card-button-${af}`)).not.toBeDisabled();
       } else {
         expect(getByTestId(`admin-card-button-${af}`)).toBeDisabled();

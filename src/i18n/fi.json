@@ -275,7 +275,8 @@
       "undefined": "Virhe",
       "noteAddSuccess": "Muistiinpano lisätty",
       "noteAddError": "Muistiinpanon lisääminen epäonnistui",
-      "update": "Päivitys"
+      "update": "Päivitys",
+      "updateSuccessful": "Tietojen siirto onnistui"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -301,7 +302,10 @@
       "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
       "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen.",
       "Network Error": "Verkkovirhe",
-      "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa."
+      "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa.",
+      "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu budjetti -näkymään.",
+      "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu budjetti -näkymään tapahtui virhe.",
+      "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe."
     }
   },
   "searchOrder": {
@@ -514,6 +518,19 @@
       "name": "Tilinpäätös",
       "description": "Päätä edellinen vuosi ja lukitse tilinpäätös.",
       "button": "Lukitse tilinpäätös tästä"
+    },
+    "forcedtoframestate": {
+      "name": "Sovitettu budjetti -näkymän hallinta",
+      "description": "Sulje tai avaa sovitettu budjetti. Lataa tiedot koordinointinäkymästä sovitettu budjetti -näkymään.",
+      "button": "Hallitse sovitettu budjetti -näkymää",
+      "viewState": "Sovitettu budjetti -näkymän tila",
+      "moveData": "Tietojen siirto sovitettu budjetti -näkymään",
+      "lastModified": "Tilaa viimeksi muokattu",
+      "changeStatus": "Vaihda tilan status",
+      "dataLastUpdated": "Tiedot viimeksi siirretty",
+      "updateData": "Siirrä tiedot",
+      "open": "Auki",
+      "locked": "Lukittu"
     }
   },
   "projectCount": "Projektien määrä",
