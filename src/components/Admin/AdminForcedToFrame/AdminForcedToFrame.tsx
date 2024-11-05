@@ -1,4 +1,5 @@
 import { useAppDispatch, useAppSelector } from "@/hooks/common";
+import useConfirmDialog from "@/hooks/useConfirmDialog";
 import {
     IForcedToFrameDataUpdated,
     IForcedToFrameState,
@@ -23,6 +24,7 @@ const AdminForcedToFrame = () => {
     const forcedToFrameDataUpdated = useAppSelector(selectForcedToFrameDataUpdtaed);
     const forcedToFrameUpdatedDate = moment(new Date(forcedToFrameState.lastModified)).format('D.M.YYYY HH:mm:ss');
     const forcedToFrameDataUpdatedDate = moment(new Date(forcedToFrameDataUpdated.lastModified)).format('D.M.YYYY HH:mm:ss');
+    const { isConfirmed } = useConfirmDialog();
 
     const handleForcedToFrameStatusChange = async () => {
         dispatch(setLoading({ text: 'Change forced to frame status', id: "change-forced-to-frame-status" }));
@@ -47,28 +49,37 @@ const AdminForcedToFrame = () => {
     }
 
     const handleForcedToFrameDataUpdate = async () => {
-        dispatch(setLoading({ text: 'Update all forced to frame data', id: "update-forced-to-frame-data" }));
-        try {
-            const res = await patchForcedToFrameProjects();
-            const newValues: IForcedToFrameDataUpdated = {
-                ...forcedToFrameState,
-                id: res.id,
-                hasBeenMoved: res.value,
-                lastModified: res.updatedDate
-            };
-            dispatch(setForcedToFrameValuesUpdated(newValues));
-            dispatch(
-                notifySuccess({
-                message: 'forcedToFrameUpdated',
-                title: 'updateSuccessful',
-                type: 'toast',
-                duration: 5000,
-                }),
-            );
-        } catch (e) {
-            dispatch(notifyError({ message: 'forcedToFrameDataUpdateError', type: 'notification', title: 'patchError' }));
+        const confirm = await isConfirmed({
+            dialogType: 'confirm',
+            confirmButtonText: 'adminFunctions.forcedtoframestate.updateData',
+            title: t(`adminFunctions.forcedtoframestate.confirmDataUpdateTitle`),
+            description: t(`adminFunctions.forcedtoframestate.confirmDataUpdateDescription`),
+          });
+        if (confirm !== false) {
+            dispatch(setLoading({ text: 'Update all forced to frame data', id: "update-forced-to-frame-data" }));
+            try {
+                const res = await patchForcedToFrameProjects();
+                const newValues: IForcedToFrameDataUpdated = {
+                    ...forcedToFrameState,
+                    id: res.id,
+                    hasBeenMoved: res.value,
+                    lastModified: res.updatedDate
+                };
+                dispatch(setForcedToFrameValuesUpdated(newValues));
+                dispatch(
+                    notifySuccess({
+                    message: 'forcedToFrameUpdated',
+                    title: 'updateSuccessful',
+                    type: 'toast',
+                    duration: 5000,
+                    }),
+                );
+            } catch (e) {
+                dispatch(notifyError({ message: 'forcedToFrameDataUpdateError', type: 'notification', title: 'patchError' }));
+            }
+            dispatch(clearLoading("update-forced-to-frame-data"));
         }
-        dispatch(clearLoading("update-forced-to-frame-data"));
+        
     }
     
     return (
