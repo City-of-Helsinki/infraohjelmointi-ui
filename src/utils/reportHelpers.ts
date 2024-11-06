@@ -154,12 +154,24 @@ const getProjectPhase = (project: IProject) => {
   }
 }
 
-const getProjectPhasePerMonth = (project: IProject, month: number) => {
+const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProject, month: number) => {
   const monthStartDate = new Date(new Date().getFullYear() + 1, month - 1, 1);
   const monthEndDate = new Date(new Date().getFullYear() + 1, month, 0);
   const dateFormat = "DD.MM.YYYY";
-  const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, project.planningStartYear, dateFormat);
-  const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
+
+  const planningStartYear = () => {
+    if (type === Reports.Strategy) return project.planningStartYear;
+
+    return project.frameEstPlanningStart ? getYear(project.frameEstPlanningStart) : project.planningStartYear;
+  }
+
+  const isPlanning = type === Reports.Strategy ?
+    projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, planningStartYear(), dateFormat) :
+    projectIsInPlanningPhase(project.frameEstPlanningStart, monthStartDate, project.frameEstPlanningEnd, monthEndDate, planningStartYear(), dateFormat);
+
+  const isConstruction = type === Reports.Strategy ?
+    projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, planningStartYear(), dateFormat) :
+    projectIsInConstructionPhase(project.frameEstConstructionStart, monthStartDate, project.frameEstConstructionEnd, monthEndDate, project.frameEstPlanningStart, planningStartYear(), dateFormat);
 
   if (isPlanning && isConstruction) {
     return "planningAndConstruction";
@@ -288,28 +300,28 @@ const convertToStrategyReportProjects = (type: ReportType, projects: IProject[])
   }
 
   return filteredProjects().map((p) => ({
-      name: p.name,
-      id: p.id,
-      parent: p.projectClass ?? null,
-      projects: [],
-      children: [],
-      costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
-      costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
-      projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
-      projectPhase: getProjectPhase(p),
-      januaryStatus: getProjectPhasePerMonth(p, 1),
-      februaryStatus: getProjectPhasePerMonth(p,2),
-      marchStatus: getProjectPhasePerMonth(p,3),
-      aprilStatus: getProjectPhasePerMonth(p,4),
-      mayStatus: getProjectPhasePerMonth(p,5),
-      juneStatus: getProjectPhasePerMonth(p,6),
-      julyStatus: getProjectPhasePerMonth(p,7),
-      augustStatus: getProjectPhasePerMonth(p,8),
-      septemberStatus: getProjectPhasePerMonth(p,9),
-      octoberStatus: getProjectPhasePerMonth(p,10),
-      novemberStatus: getProjectPhasePerMonth(p,11),
-      decemberStatus: getProjectPhasePerMonth(p,12),
-      type: 'project',
+    name: p.name,
+    id: p.id,
+    parent: p.projectClass ?? null,
+    projects: [],
+    children: [],
+    costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
+    costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
+    projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
+    projectPhase: getProjectPhase(p),
+    januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
+    februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
+    marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
+    aprilStatus: getStrategyReportProjectPhasePerMonth(type, p, 4),
+    mayStatus: getStrategyReportProjectPhasePerMonth(type, p, 5),
+    juneStatus: getStrategyReportProjectPhasePerMonth(type, p, 6),
+    julyStatus: getStrategyReportProjectPhasePerMonth(type, p, 7),
+    augustStatus: getStrategyReportProjectPhasePerMonth(type, p, 8),
+    septemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 9),
+    octoberStatus: getStrategyReportProjectPhasePerMonth(type, p, 10),
+    novemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 11),
+    decemberStatus: getStrategyReportProjectPhasePerMonth(type, p ,12),
+    type: 'project',
     }));
 }
 
