@@ -9,10 +9,18 @@ import {
   IDownloadCsvButtonProps,
   IConstructionProgramCsvRow,
   IBudgetBookSummaryCsvRow,
+  ReportType,
 } from '@/interfaces/reportInterfaces';
 import { getCoordinationTableRows } from './useCoordinationRows';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
+
+const getData = async (getForcedToFrameData: IDownloadCsvButtonProps["getForcedToFrameData"], type: ReportType, year: number) => {
+  // Function is used on Reports Strategy, StrategyAgreedBudget, and BudgetBookSummary
+  if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
+  if (type === Reports.StrategyAgreedBudget) return await getForcedToFrameData(year + 1, true);
+  else return await getForcedToFrameData(year, true);
+}
 
 export const useCsvData = ({
   type,
@@ -36,9 +44,10 @@ export const useCsvData = ({
 
       switch (type) {
         case Reports.BudgetBookSummary:
-        case Reports.Strategy: {
+        case Reports.Strategy:
+        case Reports.StrategyAgreedBudget: {
           // For Strategy report, we will fetch next year data
-          const res = type === Reports.Strategy ? await getForcedToFrameData(year + 1, false) : await getForcedToFrameData(year, true);
+          const res = await getData(getForcedToFrameData, type, year)
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(
               res.classHierarchy,
