@@ -40,6 +40,9 @@ const getPdfDocument = (
     strategy: (
       <ReportContainer data={{rows}} reportType={Reports.Strategy}/>
     ),
+    strategyAgreedBudget: (
+      <ReportContainer data={{rows}} reportType={Reports.StrategyAgreedBudget}/>
+    ),
     constructionProgram: (
       <ReportContainer data={{rows, divisions, subDivisions}} reportType={Reports.ConstructionProgram}/>
     ),
@@ -62,6 +65,13 @@ interface IDownloadPdfButtonProps {
   getCategories: () => Promise<IListItem[]>;
 }
 
+const getData = async (getForcedToFrameData: IDownloadPdfButtonProps["getForcedToFrameData"], type: ReportType, year: number) => {
+  // Function is used on Reports Strategy, StrategyAgreedBudget, and BudgetBookSummary
+  if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
+  if (type === Reports.StrategyAgreedBudget) return await getForcedToFrameData(year + 1, true);
+  else return await getForcedToFrameData(year, true);
+}
+
 /**
  * We're using pdf-react to create pdf's.
  *
@@ -81,9 +91,11 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
       let document: JSX.Element | undefined = undefined;
       switch(type) {
         case Reports.Strategy:
+        case Reports.StrategyAgreedBudget:
         case Reports.BudgetBookSummary: {
           // For Strategy report, we will fetch next year data
-          const res = type === Reports.Strategy ? await getForcedToFrameData(year + 1, false) : await getForcedToFrameData(year, true);
+          const res = await getData(getForcedToFrameData, type, year);
+
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
             document = getPdfDocument(type, coordinatorRows);
@@ -93,6 +105,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
         case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year, false);
           const categories = await getCategories();
+
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(res.classHierarchy, res.forcedToFrameDistricts.districts, res.initialSelections, res.projects, res.groupRes);
             document = getPdfDocument(type, coordinatorRows, undefined, undefined, categories, res.projectsInWarrantyPhase);

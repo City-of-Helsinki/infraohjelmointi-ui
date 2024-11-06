@@ -67,18 +67,20 @@ const ReportTable: FC<IReportTableProps> = ({
         , reportType
   ) : [];
 
-  const strategyReportRows = reportType === Reports.Strategy ? flattenStrategyTableRows(reportRows) : [];
+  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyAgreedBudget ?
+    flattenStrategyTableRows(reportRows) : [];
 
   const getTableHeader = () => {
     switch (reportType) {
+      case Reports.OperationalEnvironmentAnalysis:
+        return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
+      case Reports.StrategyAgreedBudget:
         return <StrategyTableHeader />;
       case Reports.ConstructionProgram:
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:
         return <BudgetBookSummaryTableHeader />;
-      case Reports.OperationalEnvironmentAnalysis:
-        return <OperationalEnvironmentAnalysisTableHeader />
     }
   }
 
@@ -87,7 +89,10 @@ const ReportTable: FC<IReportTableProps> = ({
     <View>
       <View style={styles.table}>
         <View fixed>{tableHeader}</View>
-        <TableRow flattenedRows={reportType === Reports.Strategy ? strategyReportRows : flattenedRows} reportType={reportType}/>
+        <TableRow reportType={reportType} flattenedRows={
+          reportType === Reports.Strategy || reportType === Reports.StrategyAgreedBudget ?
+            strategyReportRows : flattenedRows
+        }/>
       </View>
     </View>
   );

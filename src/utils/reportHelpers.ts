@@ -256,16 +256,38 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
   }
 }
 
-const convertToReportProjects = (projects: IProject[]): IStrategyTableRow[] => {
-  return projects
-    .filter((p) =>
-      p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
-      p.planningStartYear && p.constructionEndYear &&
-      isProjectInPlanningOrConstruction({
-        planningStart: p.planningStartYear,
-        constructionEnd: p.constructionEndYear
-      }))
-    .map((p) => ({
+const convertToStrategyReportProjects = (type: ReportType, projects: IProject[]): IStrategyTableRow[] => {
+  const filteredProjects = (): IProject[] => {
+    if (type === Reports.Strategy){
+      return projects
+        .filter((p) =>
+          p.finances.budgetProposalCurrentYearPlus0 != "0.00" &&
+          p.planningStartYear && p.constructionEndYear &&
+          isProjectInPlanningOrConstruction({
+            planningStart: p.planningStartYear,
+            constructionEnd: p.constructionEndYear
+          })
+        )
+    }
+
+    return projects
+      .filter((p) => {
+        const hasBudget = p.finances.budgetProposalCurrentYearPlus0 !== "0.00";
+        const planningStart = p.frameEstPlanningStart ? getYear(p.frameEstPlanningStart) : p.planningStartYear;
+        const constructionEnd = p.frameEstConstructionEnd ? getYear(p.frameEstConstructionEnd) : p.constructionEndYear;
+
+        if (hasBudget && typeof planningStart === 'number' && typeof constructionEnd === 'number') {
+          return isProjectInPlanningOrConstruction({
+            planningStart,
+            constructionEnd,
+          });
+        }
+
+        return false;
+      });
+  }
+
+  return filteredProjects().map((p) => ({
       name: p.name,
       id: p.id,
       parent: p.projectClass ?? null,
@@ -657,7 +679,8 @@ export const convertToReportRows = (
       getInvestmentPart(forcedToFrameHierarchy);
       return forcedToFrameHierarchy;
     }
-    case Reports.Strategy: {
+    case Reports.Strategy:
+    case Reports.StrategyAgreedBudget: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
         const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
@@ -667,7 +690,7 @@ export const convertToReportRows = (
             name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
             parent: null,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
-            projects: c.projectRows.length ? convertToReportProjects(c.projectRows) : [],
+            projects: c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [],
             costForecast: c.cells[0].plannedBudget,
             costPlan: frameBudget,
             type: c.type as ReportTableRowType
@@ -1175,7 +1198,8 @@ export const getReportData = async (
 
   try {
     switch (reportType) {
-      case Reports.Strategy : {
+      case Reports.Strategy:
+      case Reports.StrategyAgreedBudget: {
         //Flatten rows to one dimension
         const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyTableRow[]);
         return flattenedRows.map((r) => ({
