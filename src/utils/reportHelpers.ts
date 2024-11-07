@@ -692,7 +692,7 @@ export const convertToReportRows = (
       return forcedToFrameHierarchy;
     }
     case Reports.Strategy:
-    case Reports.StrategyAgreedBudget: {
+    case Reports.StrategyForcedToFrame: {
       const forcedToFrameHierarchy: IStrategyTableRow[] = [];
       for (const c of rows) {
         const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
@@ -1211,7 +1211,7 @@ export const getReportData = async (
   try {
     switch (reportType) {
       case Reports.Strategy:
-      case Reports.StrategyAgreedBudget: {
+      case Reports.StrategyForcedToFrame: {
         //Flatten rows to one dimension
         const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyTableRow[]);
         return flattenedRows.map((r) => ({

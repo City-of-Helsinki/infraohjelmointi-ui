@@ -54,7 +54,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
         data = cleanData(data);
         const documentName = t(`report.${type}.documentName`);
         downloadCSV(
-          data, `${documentName} ${['strategy','strategyAgreedBudget'].includes(type) ?
+          data, `${documentName} ${['strategy','strategyForcedToFrame'].includes(type) ?
           year + 1 : year}.csv`
         );
       } else {

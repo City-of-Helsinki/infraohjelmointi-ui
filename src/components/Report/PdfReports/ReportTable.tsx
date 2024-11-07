@@ -67,7 +67,7 @@ const ReportTable: FC<IReportTableProps> = ({
         , reportType
   ) : [];
 
-  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyAgreedBudget ?
+  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
     flattenStrategyTableRows(reportRows) : [];
 
   const getTableHeader = () => {
@@ -75,7 +75,7 @@ const ReportTable: FC<IReportTableProps> = ({
       case Reports.OperationalEnvironmentAnalysis:
         return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
-      case Reports.StrategyAgreedBudget:
+      case Reports.StrategyForcedToFrame:
         return <StrategyTableHeader />;
       case Reports.ConstructionProgram:
         return <ConstructionProgramTableHeader />;
@@ -90,7 +90,7 @@ const ReportTable: FC<IReportTableProps> = ({
       <View style={styles.table}>
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
-          reportType === Reports.Strategy || reportType === Reports.StrategyAgreedBudget ?
+          reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
             strategyReportRows : flattenedRows
         }/>
       </View>
