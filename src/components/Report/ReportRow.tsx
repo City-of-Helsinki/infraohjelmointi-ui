@@ -53,7 +53,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
     const forcedToFrameDistricts = separateLocationsIntoHierarchy(locationRes, true);
 
     // groups
-    const groupRes = await getCoordinatorGroups(year);
+    const groupRes = await getCoordinatorGroups(year, forcedToFrame);
 
     // selections
     const initialSelections: IPlanningRowSelections = {

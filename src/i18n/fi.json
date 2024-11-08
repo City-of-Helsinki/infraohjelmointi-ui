@@ -459,7 +459,20 @@
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
-      "documentName": "toimintasuunnitelma",
+      "documentName": "toimintasuunnitelma - koordinointinäkymä",
+      "title": "Helsingin kaupunki",
+      "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
+      "projectNameTitle": "Hanke",
+      "projectsTitle": "Kohteen",
+      "projectManagerTitle": "projektipäällikkö",
+      "footerInfoText": "s = suunnittelu, r = rakentaminen",
+      "planning": "Suunnittelu",
+      "constructing": "Rakentaminen",
+      "projectManagerMissing": "Odottaa nimeämistä"
+    },
+    "strategyForcedToFrame": {
+      "rowTitle": "Toimintasuunnitelma (Sovitettu budjetti)",
+      "documentName": "toimintasuunnitelma - sovitettu budjetti",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
       "projectNameTitle": "Hanke",

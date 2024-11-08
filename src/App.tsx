@@ -24,7 +24,7 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getCoordinationGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
+import { getCoordinationGroupsThunk, getForcedToFrameGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
 import { getSapCostsThunk } from './reducers/sapCostSlice';
@@ -70,6 +70,7 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
     await dispatch(getCoordinationGroupsThunk(year));
     await dispatch(getCoordinationClassesThunk(year));
     await dispatch(getCoordinationLocationsThunk(year));
+    await dispatch(getForcedToFrameGroupsThunk(year));
     await dispatch(getForcedToFrameClassesThunk(year));
     await dispatch(getForcedToFrameLocationsThunk(year));
   } catch (e) {
