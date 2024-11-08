@@ -470,7 +470,7 @@
       "constructing": "Rakentaminen",
       "projectManagerMissing": "Odottaa nimeämistä"
     },
-    "strategyAgreedBudget": {
+    "strategyForcedToFrame": {
       "rowTitle": "Toimintasuunnitelma (Sovitettu budjetti)",
       "documentName": "toimintasuunnitelma - sovitettu budjetti",
       "title": "Helsingin kaupunki",

@@ -40,8 +40,8 @@ const getPdfDocument = (
     strategy: (
       <ReportContainer data={{rows}} reportType={Reports.Strategy}/>
     ),
-    strategyAgreedBudget: (
-      <ReportContainer data={{rows}} reportType={Reports.StrategyAgreedBudget}/>
+    strategyForcedToFrame: (
+      <ReportContainer data={{rows}} reportType={Reports.StrategyForcedToFrame}/>
     ),
     constructionProgram: (
       <ReportContainer data={{rows, divisions, subDivisions}} reportType={Reports.ConstructionProgram}/>
@@ -66,9 +66,9 @@ interface IDownloadPdfButtonProps {
 }
 
 const getData = async (getForcedToFrameData: IDownloadPdfButtonProps["getForcedToFrameData"], type: ReportType, year: number) => {
-  // Function is used on Reports Strategy, StrategyAgreedBudget, and BudgetBookSummary
+  // Function is used on Reports Strategy, strategyForcedToFrame, and BudgetBookSummary
   if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
-  if (type === Reports.StrategyAgreedBudget) return await getForcedToFrameData(year + 1, true);
+  if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
   else return await getForcedToFrameData(year, true);
 }
 
@@ -91,7 +91,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
       let document: JSX.Element | undefined = undefined;
       switch(type) {
         case Reports.Strategy:
-        case Reports.StrategyAgreedBudget:
+        case Reports.StrategyForcedToFrame:
         case Reports.BudgetBookSummary: {
           // For Strategy report, we will fetch next year data
           const res = await getData(getForcedToFrameData, type, year);

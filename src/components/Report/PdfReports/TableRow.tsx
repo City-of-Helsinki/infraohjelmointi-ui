@@ -431,7 +431,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
         case Reports.Strategy:
-        case Reports.StrategyAgreedBudget: {
+        case Reports.StrategyForcedToFrame: {
           const classNameTypes = [
             'masterClass',
             'class',
