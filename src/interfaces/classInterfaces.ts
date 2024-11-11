@@ -49,5 +49,6 @@ export interface IClassPatchRequest {
       year9?: IClassBudgets;
       year10?: IClassBudgets;
     };
+    forcedToFrame: boolean;
   };
 }

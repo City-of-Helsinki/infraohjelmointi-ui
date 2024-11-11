@@ -35,8 +35,12 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
     return data.map((row) => {
       return Object.keys(row).reduce((acc, key) => {
         const typedKey = key as keyof (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
-
-        acc[typedKey] = row[typedKey] ?? '';
+        if (key === "\nTS 2025" || key === "\nTA 2025") {
+          const value = (row[typedKey] ?? '') as string;
+          acc[typedKey] = value ? value.replace(/\s/g, '') : '';
+        } else {
+          acc[typedKey] = row[typedKey] ?? '';
+        }
         return acc;
       }, {} as IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
     });
@@ -49,7 +53,10 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
       if (data && data.length > 0) {
         data = cleanData(data);
         const documentName = t(`report.${type}.documentName`);
-        downloadCSV(data, `${documentName}_${type === 'strategy' ? year + 1 : year}.csv`);
+        downloadCSV(
+          data, `${documentName} ${['strategy','strategyForcedToFrame'].includes(type) ?
+          year + 1 : year}.csv`
+        );
       } else {
         console.warn('No data available for CSV download.');
       }

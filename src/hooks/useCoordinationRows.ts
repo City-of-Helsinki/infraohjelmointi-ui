@@ -15,7 +15,7 @@ import {
   IPlanningRowSelections,
   PlanningRowType,
 } from '@/interfaces/planningInterfaces';
-import { selectCoordinationGroups } from '@/reducers/groupSlice';
+import { selectCoordinationGroups, selectForcedToFrameGroups } from '@/reducers/groupSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   selectForcedToFrame,
@@ -320,7 +320,8 @@ export const getCoordinationTableRows = (
  */
 const useCoordinationRows = () => {
   const dispatch = useAppDispatch();
-  const groups = useAppSelector(selectCoordinationGroups);
+  const coordinationGroups = useAppSelector(selectCoordinationGroups);
+  const forcedToFrameGroups = useAppSelector(selectForcedToFrameGroups);
   const rows = useAppSelector(selectPlanningRows);
   const projects = useAppSelector(selectProjects);
   const startYear = useAppSelector(selectStartYear);
@@ -361,7 +362,7 @@ const useCoordinationRows = () => {
     if (type && id) {
       getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
-  }, [selections, groups, mode, forcedToFrame, startYear, dispatch]);
+  }, [selections, coordinationGroups, mode, forcedToFrame, startYear, dispatch]);
 
   /**
    * We use coordinator or forced to frame values (classes and locations).
@@ -378,13 +379,15 @@ const useCoordinationRows = () => {
       ? batchedForcedToFrameLocations.districts
       : batchedCoordinationLocations.districts;
 
+    const groups = forcedToFrame ? forcedToFrameGroups : coordinationGroups;
+
     const nextRows = getCoordinationTableRows(allClasses, districts, selections, projects, groups);
 
     // Re-build planning rows if the existing rows are not equal
     if (!_.isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [startYear, batchedCoordinationClasses, batchedCoordinationLocations, groups, projects, selections, mode, forcedToFrame, batchedForcedToFrameClasses, batchedForcedToFrameLocations.districts, rows, dispatch]);
+  }, [startYear, batchedCoordinationClasses, batchedCoordinationLocations, coordinationGroups, projects, selections, mode, forcedToFrame, batchedForcedToFrameClasses, batchedForcedToFrameLocations.districts, rows, dispatch]);
 };
 
 export default useCoordinationRows;

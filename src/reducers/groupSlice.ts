@@ -16,19 +16,31 @@ interface IGroupUpdatePayload {
 interface IGroupsState {
   planning: { groups: Array<IGroup>; year: number };
   coordination: { groups: Array<IGroup>; year: number };
+  forcedToFrame: { groups: Array<IGroup>; year: number};
   error: unknown;
 }
 
 const initialState: IGroupsState = {
   planning: { groups: [], year: new Date().getFullYear() },
   coordination: { groups: [], year: new Date().getFullYear() },
+  forcedToFrame: { groups: [], year: new Date().getFullYear() },
   error: null,
 };
 export const getCoordinationGroupsThunk = createAsyncThunk(
   'group/getAllCoordinator',
   async (year: number, thunkAPI) => {
     try {
-      return await getCoordinatorGroups(year);
+      return await getCoordinatorGroups(year, false);
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+export const getForcedToFrameGroupsThunk = createAsyncThunk(
+  'group/getAllForcedToFrame',
+  async (year: number, thunkAPI) => {
+    try {
+      return await getCoordinatorGroups(year, true);
     } catch (e) {
       return thunkAPI.rejectWithValue(e);
     }
@@ -91,7 +103,7 @@ export const groupSlice = createSlice({
     builder.addCase(postGroupThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
-    // GROUP GET ALL
+    // GROUP GET ALL PLANNING GROUPS
     builder.addCase(
       getPlanningGroupsThunk.fulfilled,
       (state, action: PayloadAction<Array<IGroup>>) => {
@@ -137,10 +149,27 @@ export const groupSlice = createSlice({
         return { ...state, error: action.payload };
       },
     );
+    // GET ALL FORCED TO FRAME
+    builder.addCase(
+      getForcedToFrameGroupsThunk.fulfilled,
+      (state, action: PayloadAction<Array<IGroup>>) => {
+        return {
+          ...state,
+          forcedToFrame: { year: action.payload[0]?.finances?.year, groups: action.payload },
+        };
+      },
+    );
+    builder.addCase(
+      getForcedToFrameGroupsThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
   },
 });
 
 export const { updateGroup } = groupSlice.actions;
+export const selectForcedToFrameGroups = (state: RootState) => state.group.forcedToFrame.groups;
 export const selectCoordinationGroups = (state: RootState) => state.group.coordination.groups;
 export const selectPlanningGroups = (state: RootState) => state.group.planning.groups;
 export default groupSlice.reducer;

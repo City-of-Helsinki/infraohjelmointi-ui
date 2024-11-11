@@ -430,7 +430,8 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
-        case Reports.Strategy: {
+        case Reports.Strategy:
+        case Reports.StrategyForcedToFrame: {
           const classNameTypes = [
             'masterClass',
             'class',

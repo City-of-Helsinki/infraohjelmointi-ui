@@ -24,7 +24,7 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getCoordinationGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
+import { getCoordinationGroupsThunk, getForcedToFrameGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
 import { getSapCostsThunk } from './reducers/sapCostSlice';
@@ -45,6 +45,8 @@ import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
 import { AppDispatch } from './store';
+import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForcedToFrame';
+import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -68,6 +70,7 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
     await dispatch(getCoordinationGroupsThunk(year));
     await dispatch(getCoordinationClassesThunk(year));
     await dispatch(getCoordinationLocationsThunk(year));
+    await dispatch(getForcedToFrameGroupsThunk(year));
     await dispatch(getForcedToFrameClassesThunk(year));
     await dispatch(getForcedToFrameLocationsThunk(year));
   } catch (e) {
@@ -103,7 +106,8 @@ const App: FC = () => {
     try {
       await dispatch(getListsThunk());
       await dispatch(getHashTagsThunk());
-      await dispatch(getCoordinatorNotesThunk())
+      await dispatch(getCoordinatorNotesThunk());
+      await dispatch(getAppStateValuesThunk());
     } catch (e) {
       console.log('Error getting app data: ', e);
       dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
@@ -158,6 +162,7 @@ const App: FC = () => {
               <Route path="/admin" element={<AdminView />}>
                 <Route path="functions" element={<AdminFunctions />} />
                 <Route path="hashtags" element={<AdminHashtags />} />
+                <Route path="forcedtoframestate" element={<AdminForcedToFrame />} />
               </Route>
               <Route path="/access-denied" element={<AccessDeniedView />} />
               <Route path="/auth/helsinki/return" element={<></>}></Route>

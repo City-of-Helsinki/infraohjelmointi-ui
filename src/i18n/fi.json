@@ -275,7 +275,8 @@
       "undefined": "Virhe",
       "noteAddSuccess": "Muistiinpano lisätty",
       "noteAddError": "Muistiinpanon lisääminen epäonnistui",
-      "update": "Päivitys"
+      "update": "Päivitys",
+      "updateSuccessful": "Tietojen siirto onnistui"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -301,7 +302,10 @@
       "financeChangeError": "Haluamasi muutos budjettiin vaatii lisää tietoja hankekorttiin. Tee muutos hankekortilla.",
       "frameBudgetError": "Raamibudjetti ei voi olla negatiivinen.",
       "Network Error": "Verkkovirhe",
-      "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa."
+      "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa.",
+      "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu budjetti -näkymään.",
+      "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu budjetti -näkymään tapahtui virhe.",
+      "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe."
     }
   },
   "searchOrder": {
@@ -455,7 +459,20 @@
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
-      "documentName": "toimintasuunnitelma",
+      "documentName": "toimintasuunnitelma - koordinointinäkymä",
+      "title": "Helsingin kaupunki",
+      "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
+      "projectNameTitle": "Hanke",
+      "projectsTitle": "Kohteen",
+      "projectManagerTitle": "projektipäällikkö",
+      "footerInfoText": "s = suunnittelu, r = rakentaminen",
+      "planning": "Suunnittelu",
+      "constructing": "Rakentaminen",
+      "projectManagerMissing": "Odottaa nimeämistä"
+    },
+    "strategyForcedToFrame": {
+      "rowTitle": "Toimintasuunnitelma (Sovitettu budjetti)",
+      "documentName": "toimintasuunnitelma - sovitettu budjetti",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma {{startYear}}",
       "projectNameTitle": "Hanke",
@@ -514,6 +531,21 @@
       "name": "Tilinpäätös",
       "description": "Päätä edellinen vuosi ja lukitse tilinpäätös.",
       "button": "Lukitse tilinpäätös tästä"
+    },
+    "forcedtoframestate": {
+      "name": "Sovitettu budjetti -näkymän hallinta",
+      "description": "Sulje tai avaa sovitettu budjetti. Lataa tiedot koordinointinäkymästä sovitettu budjetti -näkymään.",
+      "button": "Hallitse sovitettu budjetti -näkymää",
+      "viewState": "Sovitettu budjetti -näkymän tila",
+      "moveData": "Tietojen siirto sovitettu budjetti -näkymään",
+      "lastModified": "Tilaa viimeksi muokattu",
+      "changeStatus": "Vaihda tilan status",
+      "dataLastUpdated": "Tiedot viimeksi siirretty",
+      "updateData": "Siirrä tiedot",
+      "open": "Auki",
+      "locked": "Lukittu",
+      "confirmDataUpdateTitle": "Oletko varma että haluat siirtää kaikki tiedot?",
+      "confirmDataUpdateDescription": "Olet siirtämässä kaikki koordinointinäkymän budjetti- ja aikataulutiedot Sovitettu budjetti -näkymään. Tietojen siirtoa ei voi myöhemmin peruuttaa."
     }
   },
   "projectCount": "Projektien määrä",

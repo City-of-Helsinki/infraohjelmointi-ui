@@ -11,7 +11,7 @@ import {
   ICoordinatorClassHierarchy,
   selectBatchedForcedToFrameClasses,
 } from '@/reducers/classSlice';
-import { selectCoordinationGroups, selectPlanningGroups, updateGroup } from '@/reducers/groupSlice';
+import { selectCoordinationGroups, selectForcedToFrameGroups, selectPlanningGroups, updateGroup } from '@/reducers/groupSlice';
 import { ILocationHierarchy, selectBatchedCoordinationLocations, selectBatchedForcedToFrameLocations, selectBatchedPlanningLocations, updateDistrict } from '@/reducers/locationSlice';
 import {
   addFinanceUpdateEventListener,
@@ -164,6 +164,7 @@ const useUpdateEvents = () => {
   const forcedToFrameLocationDataFromState = useAppSelector(selectBatchedForcedToFrameLocations);
   const plannigGroupsDataFromState = useAppSelector(selectPlanningGroups);
   const coordinationGroupDataFromState = useAppSelector(selectCoordinationGroups);
+  const forcedToFrameGroupDataFromState = useAppSelector(selectForcedToFrameGroups);
 
   const startYear = useAppSelector(selectStartYear);
 
@@ -229,7 +230,7 @@ const useUpdateEvents = () => {
       if (forcedToFrame) {
         forcedToFrame = {...forcedToFrame, ...syncClassFinances(forcedToFrameClassDataFromState, forcedToFrame, startYear)};
         forcedToFrame = {...forcedToFrame, ...syncLocationFinances(forcedToFrameLocationDataFromState, forcedToFrame, startYear)};
-        forcedToFrame = {...forcedToFrame, ...syncGroupFinances(coordinationGroupDataFromState, forcedToFrame, startYear)};
+        forcedToFrame = {...forcedToFrame, ...syncGroupFinances(forcedToFrameGroupDataFromState, forcedToFrame, startYear)};
         forcedToFrame = syncCoordinationFinances(forcedToFrameClassDataFromState, forcedToFrame, startYear);
         const type = 'forcedToFrame';
         Promise.all([
