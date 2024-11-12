@@ -1,5 +1,6 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo } from 'react';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
   Reports,
@@ -30,6 +31,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
     getPlanningRows,
     getCategories,
   });
+  const navigate = useNavigate();
 
   const cleanData = (data: (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[]) => {
     return data.map((row) => {
@@ -62,6 +64,11 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
       }
     } catch (error) {
       console.error('Error during CSV download:', error);
+    } finally {
+      // Workaround: Reload the page after downloading Strategy report
+      // If the Strategy report with ForcedToFrame data is downloaded after coord. data
+      // without refreshing the page, the report is fetched from cache and will show incorrect data.
+      if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) navigate(0);
     }
   };
 
