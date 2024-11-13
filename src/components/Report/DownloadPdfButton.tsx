@@ -1,6 +1,7 @@
 import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { IPlanningData, ReportType, Reports, getForcedToFrameDataType  } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
@@ -16,6 +17,7 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
+
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
  * still haven't been implemented.
@@ -79,8 +81,9 @@ const getData = async (getForcedToFrameData: IDownloadPdfButtonProps["getForcedT
  */
 const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrameData, getPlanningData, getPlanningRows, getCategories }) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { t } = useTranslation();
-  const documentName = useMemo(() => t(`report.${type}.documentName`), [type]);
+  const documentName = useMemo(() => t(`report.${type}.documentName`), [t, type]);
   const LOADING_PDF_DATA = 'loading-pdf-data';
 
   const downloadPdf = useCallback(async () => {
@@ -133,6 +136,11 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({ type, getForcedToFrame
       console.log(`Error getting projects for ${documentName}: `, e);
     } finally {
       dispatch(clearLoading(LOADING_PDF_DATA));
+
+      // Workaround: Reload the page after downloading Strategy report
+      // If the Strategy report with ForcedToFrame data is downloaded after coord. data
+      // without refreshing the page, the report is fetched from cache and will show incorrect data.
+      if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) navigate(0);
     }
   }, [documentName, type]);
 
