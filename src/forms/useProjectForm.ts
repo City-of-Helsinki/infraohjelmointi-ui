@@ -19,6 +19,7 @@ import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisio
 import _ from 'lodash';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
+import { selectIsLoading } from '@/reducers/loaderSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -182,6 +183,7 @@ const useProjectForm = () => {
     defaultValues: useMemo(() => formValues, [formValues]),
     mode: 'onBlur',
   });
+  const isLoading = useAppSelector(selectIsLoading);
 
   const [selections, setSelections] = useState({ selectedClass: project?.projectClass, selectedLocation: project?.projectDistrict });
 
@@ -289,6 +291,13 @@ const useProjectForm = () => {
       emptied when the budgets of some other project are changed.
     */
   }, [project, projectUpdate]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      reset(formValues);
+    }
+  }, [formValues, isLoading, reset]);
+
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
 

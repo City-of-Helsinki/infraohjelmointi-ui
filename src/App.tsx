@@ -52,6 +52,7 @@ const LOADING_APP_ID = 'loading-app-data';
 
 export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
   dispatch(setIsPlanningLoading(true));
+  dispatch(setLoading({ text: 'Loading app data', id: "planning" }));
   try {
     await dispatch(getPlanningGroupsThunk(year));
     await dispatch(getPlanningClassesThunk(year));
@@ -61,11 +62,13 @@ export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
     dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
   } finally {
     dispatch(setIsPlanningLoading(false));
+    dispatch(clearLoading("planning"));
   }
 };
 
 export const loadCoordinationData = async (dispatch: AppDispatch, year: number) => {
   dispatch(setIsPlanningLoading(true));
+  dispatch(setLoading({ text: 'Loading app data', id: "coordination" }));
   try {
     await dispatch(getCoordinationGroupsThunk(year));
     await dispatch(getCoordinationClassesThunk(year));
@@ -78,6 +81,7 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
     dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
   } finally {
     dispatch(setIsPlanningLoading(false));
+    dispatch(clearLoading("coordination"));
   }
 }
 
@@ -92,35 +96,35 @@ const App: FC = () => {
 
   useUpdateEvents();
 
-  const initializeStates = async () => {
-    // Set moments locale to finnish for the app
-    moment().locale('fi');
-
-    // When maintenance mode is on, don't fetch data
-    if (MAINTENANCE_MODE) {
-      setAppDataReady(true);
-      return;
-    }
-
-    dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
-    try {
-      await dispatch(getListsThunk());
-      await dispatch(getHashTagsThunk());
-      await dispatch(getCoordinatorNotesThunk());
-      await dispatch(getAppStateValuesThunk());
-    } catch (e) {
-      console.log('Error getting app data: ', e);
-      dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
-    } finally {
-      setAppDataReady(true);
-      dispatch(clearLoading(LOADING_APP_ID));
-    }
-  };
-
   // Initialize states that are used everywhere in the app
   useEffect(() => {
+    const initializeStates = async () => {
+      // Set moments locale to finnish for the app
+      moment().locale('fi');
+  
+      // When maintenance mode is on, don't fetch data
+      if (MAINTENANCE_MODE) {
+        setAppDataReady(true);
+        return;
+      }
+  
+      dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
+      try {
+        setAppDataReady(false);
+        await dispatch(getListsThunk());
+        await dispatch(getHashTagsThunk());
+        await dispatch(getCoordinatorNotesThunk());
+        await dispatch(getAppStateValuesThunk());
+      } catch (e) {
+        console.log('Error getting app data: ', e);
+        dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
+      } finally {
+        dispatch(clearLoading(LOADING_APP_ID));
+        setAppDataReady(true)
+      }
+    };
     initializeStates().catch(Promise.reject);
-  }, [user]);
+  }, [MAINTENANCE_MODE, dispatch, user]);
 
   // Changing the startYear in the planning view will trigger a re-fetch of all the planning data
   useEffect(() => {
@@ -130,6 +134,7 @@ const App: FC = () => {
     }
 
     if (startYear) {
+      setAppDataReady(false)
       loadPlanningData(dispatch, startYear);
       // viewers can access only planning view & planning data, so coordination data is not fetched if user has viewer role only
       if (!isUserOnlyViewer(user)) {
@@ -137,7 +142,7 @@ const App: FC = () => {
       }
       dispatch(getSapCostsThunk(startYear));
     }
-  }, [user, startYear]);
+  }, [user, startYear, MAINTENANCE_MODE, dispatch]);
 
   return (
     <div>
