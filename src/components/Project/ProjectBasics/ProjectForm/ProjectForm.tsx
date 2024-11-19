@@ -288,7 +288,7 @@ const ProjectForm = () => {
           if (data?.projectClass && project.projectGroup) {
 
               const projectGroup = groups.find(({id}) => id === project.projectGroup);
-              if (project.projectClass !== projectGroup?.classRelation) {
+              if (data.projectClass !== projectGroup?.classRelation) {
                 data = {...data, "projectGroup": null} 
               }
           }
