@@ -123,14 +123,8 @@ export const planningSlice = createSlice({
     setPlanningRows(state, action: PayloadAction<Array<IPlanningRow>>) {
       return { ...state, rows: action.payload };
     },
-    setProjects(state, action: PayloadAction<{mode?: string, projects: Array<IProject>}>) {
-      // In case the mode is switched while fetching projects, we don't want to set
-      // different view projects on another view (['planning' | 'coordination']).
-      if (!action.payload.mode || action.payload.mode === state.mode){
-        return { ...state, projects: action.payload.projects };
-      }
-
-      return state;
+    setProjects(state, action: PayloadAction<Array<IProject>>) {
+      return { ...state, projects: action.payload };
     },
     setGroupsExpanded(state, action: PayloadAction<boolean>) {
       return { ...state, groupsExpanded: action.payload };
