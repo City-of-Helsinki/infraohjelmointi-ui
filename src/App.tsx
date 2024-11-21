@@ -134,7 +134,6 @@ const App: FC = () => {
     }
 
     if (startYear) {
-      setAppDataReady(false)
       loadPlanningData(dispatch, startYear);
       // viewers can access only planning view & planning data, so coordination data is not fetched if user has viewer role only
       if (!isUserOnlyViewer(user)) {
