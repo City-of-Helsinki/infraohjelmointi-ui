@@ -281,7 +281,7 @@ const usePlanningRows = () => {
       try {
         const year = startYear ?? new Date().getFullYear();
         const projects = await fetchProjectsByRelation(type as PlanningRowType, id, false, year);
-        dispatch(setProjects({mode, projects}));
+        dispatch(setProjects(projects));
       } catch (e) {
         console.log('Error fetching projects for planning selections: ', e);
       }

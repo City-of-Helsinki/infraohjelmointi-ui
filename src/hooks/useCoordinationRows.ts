@@ -353,7 +353,7 @@ const useCoordinationRows = () => {
           year,
           true,
         );
-        dispatch(setProjects({mode, projects}));
+        dispatch(setProjects(projects));
       } catch (e) {
         console.log('Error fetching projects for coordination selections: ', e);
       }
