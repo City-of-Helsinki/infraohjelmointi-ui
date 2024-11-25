@@ -257,7 +257,7 @@ const useUpdateEvents = () => {
         return p.id === projectUpdate.id ? projectUpdate : p
       });
       Promise.all([
-        dispatch(setProjects(updatedProjects))
+        dispatch(setProjects({projects: updatedProjects}))
       ]).catch((e) => console.log('Error updating project data: ', e));
     }
   }, [financeUpdate, projectUpdateEventData]);
