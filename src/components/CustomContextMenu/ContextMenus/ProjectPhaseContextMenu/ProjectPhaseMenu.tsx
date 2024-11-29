@@ -43,7 +43,9 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
           <p className="title">{title}</p>
           <p className="description">{t('currentStatus')}</p>
         </div>
-        <IconCross className="close-icon" onClick={onCloseMenu} />
+        <button className="close-icon" onClick={onCloseMenu}>
+          <IconCross />
+        </button>
       </div>
       <ul className="phase-menu-list">
         {phases.map(({ value, label }) => (

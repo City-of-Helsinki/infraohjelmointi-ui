@@ -49,7 +49,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
 
   // Open the custom context menu for editing the project phase on click
   const handleOpenPhaseMenu = useCallback(
-    (e: ReactMouseEvent<SVGElement>) => {
+    (e: ReactMouseEvent<HTMLButtonElement>) => {
       dispatchContextMenuEvent(e, {
         menuType: ContextMenuType.EDIT_PROJECT_PHASE,
         phaseMenuProps: {
@@ -67,12 +67,13 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
       <div className="project-head-cell-container">
         {/* Dots & Document */}
         <div className="project-left-icons-container">
-          <IconMenuDots
-            size="xs"
+          <button
             className={isUserOnlyViewer(user) ? 'pointer-events-none' : 'cursor-pointer'}
             data-testid={`edit-phase-${project.id}`}
-            onMouseDown={handleOpenPhaseMenu}
-          />
+            onClick={handleOpenPhaseMenu}
+          >
+            <IconMenuDots size="xs" />
+          </button>
           {projectPhase && optionIcon[projectPhase as keyof typeof optionIcon]}
         </div>
         {/* Project name */}

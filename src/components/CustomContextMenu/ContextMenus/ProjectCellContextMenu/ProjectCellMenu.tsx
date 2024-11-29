@@ -68,11 +68,13 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
             {title}
           </p>
         </div>
-        <IconCross
-          className="close-icon"
+        <button
           onClick={onCloseMenu}
-          data-testid="close-project-cell-menu"
-        />
+          className="close-icon"
+          data-testid="close-project-cell-pappdiin"
+        >
+          <IconCross />
+        </button>
       </div>
       <div className="project-cell-menu-content">
         <p className="ml-1 font-bold" data-testid={'cell-year'}>

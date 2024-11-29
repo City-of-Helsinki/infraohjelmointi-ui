@@ -1,7 +1,7 @@
 import { FC, useCallback } from 'react';
-import { Navigation } from 'hds-react/components/Navigation';
+import { Header, Logo, logoFi } from 'hds-react/components';
 import { useTranslation } from 'react-i18next';
-import { IconAngleLeft, IconBell, IconSearch } from 'hds-react/icons';
+import { IconAngleLeft, IconSearch, IconSignin } from 'hds-react/icons';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { toggleSearch } from '@/reducers/searchSlice';
 import { Button } from 'hds-react/components/Button';
@@ -16,13 +16,19 @@ const TopBar: FC = () => {
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
-  const { Dropdown, Actions, User } = Navigation;
+  const { SkipLink, ActionBar, ActionBarItem, ActionBarSubItem, ActionBarButton, LoginButton } =
+    Header;
+  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
-  const handleOpenSearch = useCallback(() => dispatch(toggleSearch()), [dispatch]);
+  const handleOpenSearch = useCallback(() => {
+    if (MAINTENANCE_MODE || !user || user?.ad_groups.length === 0) {
+      return; // Do nothing if disabled
+    }
+    console.log(user, MAINTENANCE_MODE);
+    dispatch(toggleSearch());
+  }, [dispatch, MAINTENANCE_MODE, user]);
 
   const navigateBack = useCallback(() => navigate(-1), [navigate]);
-
-  const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   return (
     <div data-testid="top-bar" className="top-bar-container">
@@ -41,35 +47,43 @@ const TopBar: FC = () => {
       </div>
       {/* Navigation */}
       <div className="navigation-container">
-        <Navigation
-          title={t('topBarTitle')}
-          menuToggleAriaLabel="menu"
-          skipTo="#content"
-          skipToContentLabel={t('nav.skipToContent')}
-        >
-          <Actions>
-            {/* search */}
-            <Button
-              variant="supplementary"
-              iconLeft={<IconSearch />}
-              disabled={MAINTENANCE_MODE || !user || user?.ad_groups.length === 0}
+        <Header>
+          <SkipLink skipTo="#content" label={t('nav.skipToContent')} />
+          <ActionBar
+            title={t('topBarTitle')}
+            frontPageLabel="Helsinki Infratyökalu"
+            titleAriaLabel="Helsingin kaupunki"
+            titleHref="https://hel.fi"
+            logoAriaLabel="Service logo"
+            logoHref="https://hel.fi"
+            logo={<Logo src={logoFi} alt="Helsingin kaupunki" />}
+            menuButtonAriaLabel="menu"
+            menuButtonLabel="Valikko"
+            onMenuClick={(e) => e.stopPropagation()}
+          >
+            <ActionBarItem
+              label={String(t('nav.search'))}
+              icon={<IconSearch />}
+              id="action-bar-search"
               onClick={handleOpenSearch}
-              data-testid="search-projects"
               className="search-button"
-            >
-              {t('nav.search')}
-            </Button>
-            {/* user */}
-            <User
-              label={t('nav.login')}
-              // temporary uuid here until we get the user's name from helsinki-profiili
-              userName={`${user?.first_name} ${user?.last_name}`}
-              authenticated={!!user}
+              data-testid="search-projects"
             />
-            {/* notifications */}
-            <Dropdown label={t('nav.notifications')} icon={<IconBell />} />
-          </Actions>
-        </Navigation>
+            {!user ? (
+              <ActionBarButton label={String(t('nav.login'))} icon={<IconSignin />} />
+            ) : (
+              <ActionBarItem
+                id="action-bar-user"
+                label={`${user?.first_name} ${user?.last_name}`}
+                avatar={`${user?.first_name?.[0]?.toUpperCase()}
+            ${user?.last_name?.[0]?.toUpperCase()}`}
+                fixedRightPosition
+              >
+                <ActionBarSubItem label={String(t('nav.notifications'))} />
+              </ActionBarItem>
+            )}
+          </ActionBar>
+        </Header>
       </div>
     </div>
   );
