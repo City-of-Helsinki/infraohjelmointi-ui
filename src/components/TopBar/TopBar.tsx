@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { IconAngleLeft, IconSearch, IconSignin } from 'hds-react/icons';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { toggleSearch } from '@/reducers/searchSlice';
-import { Button } from 'hds-react/components/Button';
 import { selectUser } from '@/reducers/authSlice';
 import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
@@ -16,15 +15,13 @@ const TopBar: FC = () => {
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
-  const { SkipLink, ActionBar, ActionBarItem, ActionBarSubItem, ActionBarButton, LoginButton } =
-    Header;
+  const { SkipLink, ActionBar, ActionBarItem, ActionBarSubItem, ActionBarButton } = Header;
   const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
   const handleOpenSearch = useCallback(() => {
     if (MAINTENANCE_MODE || !user || user?.ad_groups.length === 0) {
       return; // Do nothing if disabled
     }
-    console.log(user, MAINTENANCE_MODE);
     dispatch(toggleSearch());
   }, [dispatch, MAINTENANCE_MODE, user]);
 
@@ -58,7 +55,7 @@ const TopBar: FC = () => {
             logoHref="https://hel.fi"
             logo={<Logo src={logoFi} alt="Helsingin kaupunki" />}
             menuButtonAriaLabel="menu"
-            menuButtonLabel="Valikko"
+            menuButtonLabel={String(t('nav.menu'))}
             onMenuClick={(e) => e.stopPropagation()}
           >
             <ActionBarItem
