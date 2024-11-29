@@ -63,7 +63,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
 
   // Open the custom context menu for editing groups
   const handleGroupRowMenu = useCallback(
-    (e: ReactMouseEvent<SVGAElement>) => {
+    (e: ReactMouseEvent<HTMLButtonElement>) => {
       dispatchContextMenuEvent(e, {
         menuType: ContextMenuType.EDIT_GROUP_ROW,
         groupRowMenuProps: { groupName: name, onShowGroupDeleteDialog, onShowGroupEditDialog },
@@ -138,11 +138,9 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
                   />
                 </>
               )}
-              <IconMenuDots
-                size="s"
-                onClick={type === 'group' ? handleGroupRowMenu : undefined}
-                data-testid={`show-more-icon-${id}`}
-              />
+              <button onClick={handleGroupRowMenu} data-testid={`show-more-icon-${id}`}>
+                <IconMenuDots size="s" />
+              </button>
             </div>
           )}
           <div className="planning-title-container">

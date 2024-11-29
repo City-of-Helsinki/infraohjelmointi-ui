@@ -32,11 +32,9 @@ const GroupRowContextMenu: FC<GroupRowMenuProps> = ({
             {groupName} <IconCopy />
           </p>
         </div>
-        <IconCross
-          className="close-icon"
-          onClick={onCloseMenu}
-          data-testid="close-project-cell-menu"
-        />
+        <button className="close-icon" onClick={onCloseMenu} data-testid="close-project-cell-menu">
+          <IconCross />
+        </button>
       </div>
       <div className="project-cell-menu-footer">
         <Button
