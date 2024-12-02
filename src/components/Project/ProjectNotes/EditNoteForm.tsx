@@ -1,4 +1,4 @@
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react/components/Dialog';
@@ -62,7 +62,7 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
           <Button type="submit" data-testid="edit-note-save">
             {t('save')}
           </Button>
-          <Button onClick={close} variant="secondary">
+          <Button onClick={close} variant={ButtonVariant.Secondary}>
             {t('cancel')}
           </Button>
         </ActionButtons>

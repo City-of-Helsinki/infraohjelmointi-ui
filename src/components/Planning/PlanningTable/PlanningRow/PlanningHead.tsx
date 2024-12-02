@@ -1,4 +1,4 @@
-import { IconAngleDown, IconAngleUp, IconMenuDots } from 'hds-react/icons';
+import { IconAngleDown, IconAngleUp, IconMenuDots, IconSize } from 'hds-react/icons';
 import { FC, memo, useCallback, useMemo, MouseEvent as ReactMouseEvent, useState } from 'react';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IOption } from '@/interfaces/common';
@@ -139,7 +139,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
                 </>
               )}
               <button onClick={handleGroupRowMenu} data-testid={`show-more-icon-${id}`}>
-                <IconMenuDots size="s" />
+                <IconMenuDots size={IconSize.Small} />
               </button>
             </div>
           )}

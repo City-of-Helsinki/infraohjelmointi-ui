@@ -1,4 +1,4 @@
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { IconAngleLeft } from 'hds-react/icons';
@@ -59,7 +59,7 @@ const PlanningInfoPanel = () => {
     });
   }, [selections, search, navigate, mode]);
 
-  const iconLeft = useMemo(() => <IconAngleLeft />, []);
+  const iconStart = useMemo(() => <IconAngleLeft />, []);
 
   return (
     <div className="planning-info-panel-container">
@@ -77,8 +77,8 @@ const PlanningInfoPanel = () => {
                 <Button
                   data-testid="previous-button"
                   onClick={navigateBack}
-                  variant="supplementary"
-                  iconLeft={iconLeft}
+                  variant={ButtonVariant.Supplementary}
+                  iconStart={iconStart}
                 >
                   {t('previous')}
                 </Button>

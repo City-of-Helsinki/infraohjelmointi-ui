@@ -1,5 +1,5 @@
 import { IOption } from '@/interfaces/common';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,16 +109,16 @@ const ProjectCellMenu: FC<IProjectCellMenuProps> = ({
       </div>
       <div className="project-cell-menu-footer">
         <Button
-          variant="supplementary"
-          iconLeft={undefined}
+          variant={ButtonVariant.Supplementary}
+          iconStart={undefined}
           onClick={handleRemoveYear}
           data-testid="remove-year-button"
         >
           {t('removeYearFromTimeline')}
         </Button>
         <Button
-          variant="supplementary"
-          iconLeft={undefined}
+          variant={ButtonVariant.Supplementary}
+          iconStart={undefined}
           onClick={handleEditTimeline}
           data-testid="edit-year-button"
         >

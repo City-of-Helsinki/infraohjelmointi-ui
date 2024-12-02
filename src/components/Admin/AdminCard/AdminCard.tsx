@@ -1,7 +1,7 @@
 import { FC, memo, useCallback, useMemo } from 'react';
 import { AdminFunctionType } from '@/interfaces/adminInterfaces';
 import { useTranslation } from 'react-i18next';
-import { Button, Card } from 'hds-react';
+import { Button, ButtonPresetTheme, ButtonVariant, Card } from 'hds-react';
 import { useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
@@ -44,8 +44,8 @@ const AdminCard: FC<IAdminCardProps> = ({ type }) => {
         data-testid={`admin-card-${type}`}
       >
         <Button
-          variant="secondary"
-          theme="black"
+          variant={ButtonVariant.Secondary}
+          theme={ButtonPresetTheme.Black}
           role="link"
           onClick={navigateToAdminFunction}
           disabled={buttonDisabled}

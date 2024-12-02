@@ -1,4 +1,4 @@
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonSize } from 'hds-react/components/Button';
 import { IconArrowLeft } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -15,8 +15,8 @@ const ErrorView = () => {
           <p className="text-xl">{t('error.pageNotFound')}</p>
         </div>
         <Button
-          iconLeft={<IconArrowLeft />}
-          size="small"
+          iconStart={<IconArrowLeft />}
+          size={ButtonSize.Small}
           onClick={() => navigate('/planning')}
           data-testid="return-to-frontpage-btn"
         >

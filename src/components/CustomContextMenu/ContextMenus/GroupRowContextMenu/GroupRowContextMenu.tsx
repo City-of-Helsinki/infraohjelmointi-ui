@@ -1,4 +1,4 @@
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { IconCross, IconCopy } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { GroupRowMenuDetails } from '@/interfaces/eventInterfaces';
@@ -38,17 +38,17 @@ const GroupRowContextMenu: FC<GroupRowMenuProps> = ({
       </div>
       <div className="project-cell-menu-footer">
         <Button
-          variant="supplementary"
+          variant={ButtonVariant.Supplementary}
           onClick={handleEditGroupDialogOpen}
-          iconLeft={undefined}
+          iconStart={undefined}
           data-testid="open-group-edit-dialog"
         >
           {t(`editGroup`)}
         </Button>
         <Button
-          variant="supplementary"
+          variant={ButtonVariant.Supplementary}
           onClick={handleDeleteDialogOpen}
-          iconLeft={undefined}
+          iconStart={undefined}
           data-testid="open-delete-group-dialog"
         >
           {t(`deleteGroup`)}

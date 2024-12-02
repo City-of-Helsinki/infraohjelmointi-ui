@@ -6,7 +6,7 @@ import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
-import { IconMenuDots } from 'hds-react/icons';
+import { IconMenuDots, IconSize } from 'hds-react/icons';
 import optionIcon from '@/utils/optionIcon';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { notifyError } from '@/reducers/notificationSlice';
@@ -72,7 +72,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
             data-testid={`edit-phase-${project.id}`}
             onClick={handleOpenPhaseMenu}
           >
-            <IconMenuDots size="xs" />
+            <IconMenuDots size={IconSize.ExtraSmall} />
           </button>
           {projectPhase && optionIcon[projectPhase as keyof typeof optionIcon]}
         </div>
