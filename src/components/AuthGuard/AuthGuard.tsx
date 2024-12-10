@@ -222,7 +222,9 @@ const AuthGuard: FC = () => {
       // Other redirects
       handlePageRedirects(pathname);
 
-      return navigate(PAGES.PLANNING);
+      if (pathname == "/") {
+        navigate(PAGES.PLANNING);
+      }
     }
   }, [location, navigate, user, isAuthenticated, authError]);
 
