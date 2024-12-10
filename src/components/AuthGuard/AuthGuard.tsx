@@ -221,6 +221,10 @@ const AuthGuard: FC = () => {
       handleUserRoles(pathname, user, navigate, initialPath);
       // Other redirects
       handlePageRedirects(pathname);
+
+      if (pathname == "/") {
+        navigate(PAGES.PLANNING);
+      }
     }
   }, [location, navigate, user, isAuthenticated, authError]);
 
