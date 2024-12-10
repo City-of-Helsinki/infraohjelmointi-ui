@@ -1,6 +1,6 @@
 import { IconMap, IconPlusCircle, IconShare } from 'hds-react/icons';
 import { Toolbar } from '../../shared';
-import { Button } from 'hds-react';
+import { Button, ButtonVariant } from 'hds-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,17 +13,17 @@ const ProjectToolbar = () => {
       left={
         <>
           <Button
-            variant="supplementary"
+            variant={ButtonVariant.Supplementary}
             className="toolbar-button"
-            iconLeft={circleIcon}
+            iconStart={circleIcon}
             disabled={true}
           >
             {t('new')}
           </Button>
           <Button
-            variant="supplementary"
+            variant={ButtonVariant.Supplementary}
             className="toolbar-button"
-            iconLeft={shareIcon}
+            iconStart={shareIcon}
             disabled={true}
           >
             {t('shareProject')}

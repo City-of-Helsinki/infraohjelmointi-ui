@@ -6,7 +6,7 @@ import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
-import { IconMenuDots } from 'hds-react/icons';
+import { IconMenuDots, IconSize } from 'hds-react/icons';
 import optionIcon from '@/utils/optionIcon';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { notifyError } from '@/reducers/notificationSlice';
@@ -49,7 +49,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
 
   // Open the custom context menu for editing the project phase on click
   const handleOpenPhaseMenu = useCallback(
-    (e: ReactMouseEvent<SVGElement>) => {
+    (e: ReactMouseEvent<HTMLButtonElement>) => {
       dispatchContextMenuEvent(e, {
         menuType: ContextMenuType.EDIT_PROJECT_PHASE,
         phaseMenuProps: {
@@ -67,12 +67,13 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
       <div className="project-head-cell-container">
         {/* Dots & Document */}
         <div className="project-left-icons-container">
-          <IconMenuDots
-            size="xs"
+          <button
             className={isUserOnlyViewer(user) ? 'pointer-events-none' : 'cursor-pointer'}
             data-testid={`edit-phase-${project.id}`}
-            onMouseDown={handleOpenPhaseMenu}
-          />
+            onClick={handleOpenPhaseMenu}
+          >
+            <IconMenuDots size={IconSize.ExtraSmall} />
+          </button>
           {projectPhase && optionIcon[projectPhase as keyof typeof optionIcon]}
         </div>
         {/* Project name */}

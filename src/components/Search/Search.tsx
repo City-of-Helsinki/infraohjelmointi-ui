@@ -1,6 +1,6 @@
 import useSearchForm from '@/forms/useSearchForm';
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useCallback } from 'react';
 import { FormFieldLabel, SelectField } from '../shared';
@@ -137,7 +137,7 @@ const Search = () => {
         >
           {t('search')}
         </Button>
-        <Button onClick={handleClose} variant="secondary" data-testid="cancel-search">
+        <Button onClick={handleClose} variant={ButtonVariant.Secondary} data-testid="cancel-search">
           {t('cancel')}
         </Button>
       </Dialog.ActionButtons>

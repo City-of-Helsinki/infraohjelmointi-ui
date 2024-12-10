@@ -1,5 +1,5 @@
 import { useState, MouseEvent, FC, useCallback, memo } from 'react';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/Loader';
@@ -125,7 +125,11 @@ const ProjectProgrammedDialog: FC<ProjectProgrammedDialogProps> = memo(
               >
                 {t('projectProgrammedForm.addProjects')}
               </Button>
-              <Button onClick={handleDialogClose} variant="secondary" data-testid="cancel-search">
+              <Button
+                onClick={handleDialogClose}
+                variant={ButtonVariant.Secondary}
+                data-testid="cancel-search"
+              >
                 {t('cancel')}
               </Button>
             </ActionButtons>

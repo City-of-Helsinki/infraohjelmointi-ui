@@ -30,7 +30,8 @@
     "documents": "Dokumentit",
     "pwFolderLink": "Avaa dokumentit ProjectWisessa",
     "planning": "Ohjelmointi",
-    "coordination": "Koordinointi"
+    "coordination": "Koordinointi",
+    "menu": "Valikko"
   },
   "option": {
     "underConstruction": "Rakenteilla",

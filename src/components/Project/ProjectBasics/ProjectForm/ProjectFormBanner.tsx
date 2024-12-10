@@ -1,4 +1,4 @@
-import { Button, IconTrash } from 'hds-react';
+import { Button, ButtonVariant, IconTrash } from 'hds-react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { BaseSyntheticEvent, FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
         await deleteProject(project.id);
         loadCoordinationData(dispatch, startYear);
         loadPlanningData(dispatch, startYear);
-        
+
         // navigate back to history or if no history, go to planning view
         if (window.history.state && window.history.state.idx > 0) {
           navigate(-1);
@@ -62,8 +62,8 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
             <Button
               data-testid={'open-delete-project-dialog-button'}
               disabled={false}
-              iconLeft={<IconTrash />}
-              variant="supplementary"
+              iconStart={<IconTrash />}
+              variant={ButtonVariant.Supplementary}
               onClick={handleProjectDelete}
             >
               {t(`deleteProject`)}

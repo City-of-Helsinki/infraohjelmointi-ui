@@ -1,4 +1,4 @@
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonPresetTheme, ButtonVariant } from 'hds-react/components/Button';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react/components/Dialog';
@@ -39,12 +39,12 @@ const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close,
         <p>{t('deleteNoteInfo')}</p>
       </Content>
       <ActionButtons>
-        <Button onClick={close} theme="black" variant="secondary">
+        <Button onClick={close} theme={ButtonPresetTheme.Black} variant={ButtonVariant.Secondary}>
           {t('cancel')}
         </Button>
         <Button
-          variant="danger"
-          iconLeft={<IconTrash aria-hidden="true" />}
+          variant={ButtonVariant.Danger}
+          iconStart={<IconTrash aria-hidden="true" />}
           onClick={handleDeleteNote}
         >
           {t('deleteNote')}

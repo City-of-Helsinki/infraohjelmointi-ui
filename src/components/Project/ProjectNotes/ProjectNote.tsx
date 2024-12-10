@@ -1,6 +1,6 @@
 import { FormFieldLabel } from '@/components/shared';
 import { StatusLabel } from 'hds-react/components/StatusLabel';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonSize, ButtonVariant } from 'hds-react/components/Button';
 import { IconAngleDown, IconAngleUp, IconPenLine, IconTrash } from 'hds-react/icons';
 import { INote } from '@/interfaces/noteInterfaces';
 import { FC, memo, useCallback, useState } from 'react';
@@ -61,9 +61,9 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
         <div>
           {hasHistory && (
             <Button
-              size="small"
-              variant="supplementary"
-              iconRight={openModifiedInfo ? <IconAngleUp /> : <IconAngleDown />}
+              size={ButtonSize.Small}
+              variant={ButtonVariant.Supplementary}
+              iconEnd={openModifiedInfo ? <IconAngleUp /> : <IconAngleDown />}
               onClick={handleOpenModifiedInfo}
             >
               {t('editHistory')}
@@ -72,17 +72,17 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
         </div>
         <div>
           <Button
-            size="small"
-            variant="supplementary"
-            iconLeft={<IconTrash />}
+            size={ButtonSize.Small}
+            variant={ButtonVariant.Supplementary}
+            iconStart={<IconTrash />}
             onClick={handleOpenDeleteDialog}
           >
             {t('delete')}
           </Button>
           <Button
-            size="small"
-            variant="supplementary"
-            iconLeft={<IconPenLine />}
+            size={ButtonSize.Small}
+            variant={ButtonVariant.Supplementary}
+            iconStart={<IconPenLine />}
             onClick={handleOpenEditDialog}
           >
             {t('edit')}

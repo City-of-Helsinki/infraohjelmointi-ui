@@ -86,7 +86,7 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
     <div className="custom-pagination pb-4 pt-16" data-testid="search-results-pagination-container">
       {pageCount > 1 && (
         <Pagination
-          dataTestId="search-results-pagination"
+          data-testid="search-results-pagination"
           language="fi"
           onChange={handleGetSearchResults}
           pageCount={pageCount}

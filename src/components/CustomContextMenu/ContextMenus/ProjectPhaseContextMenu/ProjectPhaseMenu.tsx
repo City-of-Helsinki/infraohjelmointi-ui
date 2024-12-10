@@ -1,4 +1,4 @@
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonSize } from 'hds-react/components/Button';
 import { IconCheck, IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +43,9 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
           <p className="title">{title}</p>
           <p className="description">{t('currentStatus')}</p>
         </div>
-        <IconCross className="close-icon" onClick={onCloseMenu} />
+        <button className="close-icon" onClick={onCloseMenu}>
+          <IconCross />
+        </button>
       </div>
       <ul className="phase-menu-list">
         {phases.map(({ value, label }) => (
@@ -66,7 +68,7 @@ const ProjectPhaseMenu: FC<IProjectPhaseMenuProps> = ({
         ))}
       </ul>
       <div className="phase-menu-footer">
-        <Button size="small" onClick={onSubmit} data-testid="patch-project-phase">
+        <Button size={ButtonSize.Small} onClick={onSubmit} data-testid="patch-project-phase">
           {t('save')}
         </Button>
       </div>

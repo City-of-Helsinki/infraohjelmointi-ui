@@ -2,6 +2,7 @@ import { FontWeightType, IconSizeType, TextColorType } from '@/interfaces/common
 import { CSSProperties, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
+import { IconSize } from 'hds-react';
 
 interface IIconProps {
   icon: FC<{ size?: IconSizeType; color?: string; style?: CSSProperties }>;
@@ -14,7 +15,7 @@ interface IIconProps {
 const Icon: FC<IIconProps> = ({ size, text, icon, color, fontWeight }) => {
   const { t } = useTranslation();
   const FCIcon = icon;
-  const iconSize = size === 'xs' ? '1rem' : '1.5rem';
+  const iconSize = size === IconSize.ExtraSmall ? '1rem' : '1.5rem';
   return (
     <div className="flex items-center">
       <FCIcon

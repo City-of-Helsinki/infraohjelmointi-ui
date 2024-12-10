@@ -5,7 +5,7 @@ import { selectStartYear, setStartYear } from '@/reducers/planningSlice';
 import './styles.css';
 
 const iconRight = <IconAngleLeft className="left-year-button-icon" />;
-const iconLeft = <IconAngleRight className="right-year-button-icon" />;
+const iconStart = <IconAngleRight className="right-year-button-icon" />;
 const currentYear = new Date().getFullYear();
 
 const YearSelector = () => {
@@ -51,7 +51,7 @@ const YearSelector = () => {
               aria-label="Next year"
               onClick={() => dispatch(setStartYear(startYear + 1))}
             >
-              {iconLeft}
+              {iconStart}
             </button>
           </div>
         </div>

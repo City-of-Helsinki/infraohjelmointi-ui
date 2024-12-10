@@ -13,7 +13,7 @@ import {
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { GroupDialog } from '../GroupDialog';
 import { ProjectProgrammedDialog } from '../ProjectProgrammedDialog';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
@@ -180,9 +180,9 @@ const PlanningToolbar = () => {
           <div className="planning-toolbar-left">
             {/* Manage */}
             <Button
-              variant="supplementary"
+              variant={ButtonVariant.Supplementary}
               className="toolbar-button"
-              iconLeft={slidersIcon}
+              iconStart={slidersIcon}
               disabled={true}
             >
               {t('manage')}
@@ -190,9 +190,9 @@ const PlanningToolbar = () => {
             {/* Expand groups */}
             <Button
               onClick={toggleGroupsExpanded}
-              variant="supplementary"
+              variant={ButtonVariant.Supplementary}
               className="expand-groups-button toolbar-button"
-              iconLeft={groupsExpandIcon}
+              iconStart={groupsExpandIcon}
               disabled={mode === 'coordination'}
               data-testid="expand-groups-button"
             >
@@ -200,18 +200,18 @@ const PlanningToolbar = () => {
             </Button>
             {/* Organize */}
             <Button
-              variant="supplementary"
+              variant={ButtonVariant.Supplementary}
               className="toolbar-button"
-              iconLeft={dragIcon}
+              iconStart={dragIcon}
               disabled={true}
             >
               {t('organize')}
             </Button>
             {/* New item */}
             <Button
-              variant="supplementary"
+              variant={ButtonVariant.Supplementary}
               className="toolbar-button"
-              iconLeft={plusIcon}
+              iconStart={plusIcon}
               data-testid="new-item-button"
               onMouseDown={handleNewItemMenu}
               disabled={isNewItemButtonDisabled}
@@ -220,18 +220,18 @@ const PlanningToolbar = () => {
             </Button>
             {/* Save version */}
             <Button
-              variant="supplementary"
+              variant={ButtonVariant.Supplementary}
               className="toolbar-button"
-              iconLeft={downloadIcon}
+              iconStart={downloadIcon}
               disabled={true}
             >
               {t('saveVersion')}
             </Button>
             {/* Share version */}
             <Button
-              variant="supplementary"
+              variant={ButtonVariant.Supplementary}
               className="toolbar-button"
-              iconLeft={shareIcon}
+              iconStart={shareIcon}
               disabled={true}
             >
               {t('shareVersion')}

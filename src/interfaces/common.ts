@@ -1,3 +1,4 @@
+import { IconSize } from 'hds-react';
 import { ReactNode } from 'react';
 
 interface IDjangoError {
@@ -75,7 +76,12 @@ type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';
 export type TextColorType = 'black' | 'white';
 export type FontWeightType = 'bold' | 'light' | 'medium';
-export type IconSizeType = 'xl' | 'l' | 'm' | 's' | 'xs';
+export type IconSizeType =
+  | IconSize.ExtraLarge
+  | IconSize.Large
+  | IconSize.Medium
+  | IconSize.Small
+  | IconSize.ExtraSmall;
 
 export interface IFreeSearchResults {
   hashtags: Array<IListItem>;

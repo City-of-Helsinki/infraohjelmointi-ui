@@ -8,14 +8,13 @@ interface IAdminHashtagsPaginationProps {
 }
 
 const pageHref = () => '#';
-
 const AdminHashtagsPagination: FC<IAdminHashtagsPaginationProps> = ({
   pageCount,
   page,
   onPageChange,
 }) => {
   return (
-    <div className="custom-pagination mt-16">
+    <div className="custom-pagination mt-16" data-testid="hds-pagination">
       <Pagination
         language="fi"
         onChange={onPageChange}

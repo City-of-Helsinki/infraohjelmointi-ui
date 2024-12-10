@@ -94,7 +94,7 @@ we give the container a 3rem margin left
 }
 
 .toolbar-button {
-  @apply max-h-[3.25rem] whitespace-nowrap !p-0 !text-sm !font-normal !text-black;
+  @apply whitespace-nowrap py-2 !text-sm !font-normal leading-normal !text-black;
 }
 
 .toolbar-button[disabled] {

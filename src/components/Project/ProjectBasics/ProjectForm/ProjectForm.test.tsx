@@ -99,7 +99,7 @@ const render = async () =>
             projects: mockSapCostsProject.data,
             groups: {},
             error: null,
-          }
+          },
         },
       },
     ),
@@ -136,7 +136,9 @@ describe('projectForm', () => {
 
     const project = mockProject.data;
     const sapCost = mockSapCostsProject.data;
-    const sapCostsSum = Number(sapCost[project.id].project_task_commitments) + Number(sapCost[project.id].production_task_costs);
+    const sapCostsSum =
+      Number(sapCost[project.id].project_task_commitments) +
+      Number(sapCost[project.id].production_task_costs);
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
@@ -161,9 +163,17 @@ describe('projectForm', () => {
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);
     expectRadioBoolean('effectHousing-0', false);
-    expect(await findByText(Number(project?.costForecast).toFixed(0) + ' keur'|| '')).toBeInTheDocument();
-    expect(await findByText(Number(sapCost[project.id]?.project_task_commitments).toFixed(0) + ' €' || '')).toBeInTheDocument();
-    expect(await findByText(Number(sapCost[project.id]?.project_task_costs).toFixed(0) + ' €' || '')).toBeInTheDocument();
+    expect(
+      await findByText(Number(project?.costForecast).toFixed(0) + ' keur' || ''),
+    ).toBeInTheDocument();
+    expect(
+      await findByText(
+        Number(sapCost[project.id]?.project_task_commitments).toFixed(0) + ' €' || '',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      await findByText(Number(sapCost[project.id]?.project_task_costs).toFixed(0) + ' €' || ''),
+    ).toBeInTheDocument();
     expect(await findByText(sapCostsSum.toFixed(0) + ' €' || '')).toBeInTheDocument();
     expect(await findByText('overrunRightValue' || '')).toBeInTheDocument();
     expect(await findByText(`${project?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();
@@ -380,7 +390,7 @@ describe('projectForm', () => {
     const { user, findByRole, findByTestId } = await render();
     const expectedValue = '13.12.2021';
     const project = mockProject.data;
-    const responseProject: {data: IProject } = {
+    const responseProject: { data: IProject } = {
       data: { ...project, estPlanningStart: expectedValue },
     };
 
@@ -391,7 +401,8 @@ describe('projectForm', () => {
       name: getFormField('estPlanningStart'),
     });
     const planningStartYear = await findByRole('spinbutton', {
-      name: getFormField('planningStartYear')});
+      name: getFormField('planningStartYear'),
+    });
 
     await user.clear(estPlanningStart);
     await user.type(estPlanningStart, expectedValue);
@@ -402,7 +413,7 @@ describe('projectForm', () => {
     expect(planningStartYear).not.toEqual(yearToBeSet);
     expect(mockedAxios.patch.mock.lastCall).toBeUndefined;
   });
-  
+
   it('can patch a TextField', async () => {
     const expectedValue = 'New description';
     const project = mockProject.data;
@@ -450,7 +461,6 @@ describe('projectForm', () => {
   });
 
   it('can post a new project', async () => {
-    jest.setTimeout(15000);
     const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
     const { dispatch } = store;
 
@@ -463,16 +473,16 @@ describe('projectForm', () => {
     };
 
     const project = mockProject.data;
-    const mockPostResponse: { data: IProject, status: number} = {
-          data: {
-            ...project,
-            id: 'post-project-id',
-            description: expectedDescription,
-            programmed: expectedProgrammed,
-            phase: expectedPhase,
-            name: expectedName,
-          },
-          status: 201,
+    const mockPostResponse: { data: IProject; status: number } = {
+      data: {
+        ...project,
+        id: 'post-project-id',
+        description: expectedDescription,
+        programmed: expectedProgrammed,
+        phase: expectedPhase,
+        name: expectedName,
+      },
+      status: 201,
     };
 
     // reset the form and set project mode to new
@@ -520,10 +530,8 @@ describe('projectForm', () => {
     expect(await findByTestId('project-form-description')).toHaveTextContent(
       matchExact(expectedDescription),
     );
-    expect(await findByTestId('phase')).toHaveTextContent(
-      matchExact(expectedPhase.value),
-    );
-  }, 10000);
+    expect(await findByTestId('phase')).toHaveTextContent(matchExact(expectedPhase.value));
+  }, 15000);
 
   it('can delete a project', async () => {
     const project = mockProject.data;

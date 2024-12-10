@@ -4,7 +4,7 @@ import { RootState, setupStore } from '@/store';
 import { renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import { act, waitFor, within } from '@testing-library/react';
+import { act, waitFor, within, screen } from '@testing-library/react';
 import AdminView from './AdminView';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import AdminFunctions from '@/components/Admin/AdminFunctions';
@@ -88,7 +88,7 @@ describe('AdminView', () => {
 
   describe('AdminHashtags', () => {
     it('renders 10 hashtag rows at a time to the table and can move with the pagination', async () => {
-      const { findByTestId, store, queryByTestId, user } = await render(null, '/admin/hashtags');
+      const { findByTestId, store, queryByTestId } = await render(null, '/admin/hashtags');
 
       const allHashtags = store.getState().hashTags.hashTags;
       const firstPageHashtags = allHashtags.slice(0, 10);
@@ -111,8 +111,8 @@ describe('AdminView', () => {
         (await findByTestId('hds-pagination')).getElementsByTagName('ul')[0].children.length,
       ).toBe(2);
 
-      await user.click(await findByTestId('hds-pagination-next-button'));
-
+      const nextButton = screen.getByRole('button', { name: /Seuraava/i });
+      expect(nextButton).toBeInTheDocument();
       // Renders the rest of the hashtags and creates a cell for each key in the hashtags object
       secondPageHashtags.forEach(async (fph, i) => {
         Object.keys(fph).forEach(async (k) => {

@@ -1,6 +1,6 @@
 import SearchTerms from './SearchTerms';
 import './styles.css';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonSize, ButtonVariant } from 'hds-react/components/Button';
 import { IconSliders } from 'hds-react/icons';
 import { useAppDispatch } from '@/hooks/common';
 import { memo, useCallback, useMemo } from 'react';
@@ -22,11 +22,11 @@ const SearchResultsHeader = () => {
         <SearchTerms />
         <div className="search-filter-container">
           <Button
-            variant="secondary"
-            size="small"
+            variant={ButtonVariant.Secondary}
+            size={ButtonSize.Small}
             className="h-12 w-40"
             data-testid="filterSearchBtn"
-            iconLeft={iconSliders}
+            iconStart={iconSliders}
             onClick={handleOpenSearch}
           >
             {t('filterSearch')}

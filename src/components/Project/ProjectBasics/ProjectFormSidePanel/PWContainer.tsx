@@ -1,6 +1,6 @@
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'hds-react/components/Link';
+import { Link, LinkSize } from 'hds-react/components/Link';
 
 interface IPWContainerProps {
   pwFolderLink?: string | null;
@@ -28,7 +28,7 @@ const PWContainer: FC<IPWContainerProps> = ({ pwFolderLink }) => {
               <div>
                 <Link
                   href={pwFolderLink}
-                  size="S"
+                  size={LinkSize.Small}
                   id="pw-folder-link"
                   className="pw-folder-link"
                   data-testid="pw-folder-link"

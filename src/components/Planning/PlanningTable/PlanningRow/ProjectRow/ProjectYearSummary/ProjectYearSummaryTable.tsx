@@ -1,6 +1,6 @@
 import { CellType } from '@/interfaces/projectInterfaces';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
-import { IconHammers, IconScrollContent } from 'hds-react/icons';
+import { IconHammers, IconScrollContent, IconSize } from 'hds-react/icons';
 import { FC, memo, useMemo } from 'react';
 
 interface IProjectYearSummaryTableProps {
@@ -64,7 +64,7 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
               <tr>
                 <td className="w-10 text-right">
                   {/* planning icon */}
-                  <IconScrollContent size="xs" />
+                  <IconScrollContent size={IconSize.ExtraSmall} />
                 </td>
                 <td>
                   <span className="text-sm font-light">
@@ -88,7 +88,7 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
                 {/* construction values from SAP */}
                 <td className="w-10 text-right">
                   {/* construction icon */}
-                  <IconHammers size="xs" />
+                  <IconHammers size={IconSize.ExtraSmall} />
                 </td>
                 <td>
                   <span className="text-sm font-light">
