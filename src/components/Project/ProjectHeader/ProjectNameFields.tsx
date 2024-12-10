@@ -75,7 +75,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
           }
         />
       </div>
-      { !isOnlyViewer &&
+      {!isOnlyViewer && (
         <IconButton
           onClick={handleSetEditing}
           icon={IconPenLine}
@@ -83,7 +83,7 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
           color="white"
           label="edit-project-name"
         />
-      }
+      )}
     </div>
   );
 };

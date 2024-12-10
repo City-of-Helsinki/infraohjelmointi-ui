@@ -15,7 +15,7 @@ interface IHashTagsProps {
 const getAriaLabel = (
   tag: string,
   translate: TFunction<'translation', undefined>,
-  onDelete?: (e: MouseEvent<HTMLButtonElement>) => void,
+  onDelete?: (e: MouseEvent<HTMLDivElement>) => void,
   onClick?: (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => void,
 ) => {
   const deleteTag = onDelete && `removeHashTag ${tag}`;
@@ -36,9 +36,10 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id, re
   );
 
   const handleOnDelete = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+    (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
       if (onDelete) {
-        onDelete((e.currentTarget as HTMLButtonElement).parentElement?.parentElement?.id ?? '');
+        const tagId = (e.currentTarget as HTMLDivElement).id;
+        onDelete(tagId);
       }
     },
     [onDelete],
@@ -51,7 +52,8 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id, re
 
   return (
     <div className="hashtags-container">
-      {tags && tags.map((tag) => 
+      {tags &&
+        tags.map((tag) => (
           <div
             key={tag.id}
             className="hashtags-wrapper"
@@ -63,7 +65,7 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id, re
               {tag.value}
             </Tag>
           </div>
-      )}
+        ))}
     </div>
   );
 };

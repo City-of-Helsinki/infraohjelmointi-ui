@@ -17,23 +17,28 @@ interface IProjectSearchProps {
   control: Control<IGroupForm>;
 }
 
-const getProjectsUnderClassOrSubClass = async (groupSubClass: string, groupClass: string, forcedToFrame: boolean, year: number) => {
+const getProjectsUnderClassOrSubClass = async (
+  groupSubClass: string,
+  groupClass: string,
+  forcedToFrame: boolean,
+  year: number,
+) => {
   const groupClassParam = groupClass ? `class=${groupClass}` : '';
-  const classParam = groupSubClass ? `subClass=${groupSubClass}`: groupClassParam;
-  const res = await getProjectsWithParams({
-    params: classParam + "&inGroup=false",
-    direct: false,
-    programmed: true,
-    forcedToFrame: forcedToFrame,
-    year: year,
-  }, false)
+  const classParam = groupSubClass ? `subClass=${groupSubClass}` : groupClassParam;
+  const res = await getProjectsWithParams(
+    {
+      params: classParam + '&inGroup=false',
+      direct: false,
+      programmed: true,
+      forcedToFrame: forcedToFrame,
+      year: year,
+    },
+    false,
+  );
   return res.results;
-}
+};
 
-const GroupProjectSearch: FC<IProjectSearchProps> = ({
-  getValues,
-  control,
-}) => {
+const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => {
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const scrollRef = useRef<HTMLDivElement>(null);
   const projectSubDivisions = useAppSelector(selectProjectSubDivisions);
@@ -42,68 +47,83 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
   const { t } = useTranslation();
   const [searchWord, setSearchWord] = useState('');
   const [searchedProjects, setSearchedProjects] = useState<Array<IOption>>([]);
-  const [allProjectsUnderSelectedClass, setAllProjectsUnderSelectedClass] = useState<IProject[]>([]);
+  const [allProjectsUnderSelectedClass, setAllProjectsUnderSelectedClass] = useState<IProject[]>(
+    [],
+  );
 
   const handleValueChange = useCallback((value: string) => setSearchWord(value), []);
 
-  const getSuggestions = useCallback(async() => {
+  const getSuggestions = useCallback(async () => {
     return searchedProjects;
   }, [searchedProjects]);
 
-  useEffect( () => {
+  useEffect(() => {
     const setProjectsForSearch = async () => {
       const groupClass = getValues('class.value');
       const groupSubClass = getValues('subClass.value');
-      const projects = getProjectsUnderClassOrSubClass(groupSubClass, groupClass, forcedToFrame, year);
-      setAllProjectsUnderSelectedClass(await projects)
-    }
+      const projects = getProjectsUnderClassOrSubClass(
+        groupSubClass,
+        groupClass,
+        forcedToFrame,
+        year,
+      );
+      setAllProjectsUnderSelectedClass(await projects);
+    };
     setProjectsForSearch();
-    }, [getValues('class.value'), getValues('subClass.value')]
-  );
+  }, [getValues('class.value'), getValues('subClass.value')]);
 
   useEffect(() => {
-      const lowerCaseSearchWord = searchWord.toLowerCase();
-      const groupSubDivision = getValues('subDivision.value');
-      const groupDivisionName = getValues('division.label');
-      // If selected groupDivision is Eri kaupunginosia (= Different divisions) it means that there is no specific division selected
-      // and the search should work as if there's no division selected
-      const groupDivision = groupDivisionName === "Eri kaupunginosia" ? undefined : getValues('division.value');
-      const groupDistrictName = getValues('district.label');
-      // If selected groupDistrict is Eri suurpiirejä (= Different districts) it's the same as if there was no groupDivision selected
-      const groupDistrict = groupDistrictName === "Eri suurpiirejä" ? undefined : getValues('district.value');
-      const groupSubClass = getValues('subClass.value');
-      const groupClass = getValues('class.value');
-      const projectsForSubmitIds = getValues('projectsForSubmit').map(project => project.value);
-  
-      const projectSearchResult = allProjectsUnderSelectedClass.filter((project) => {
-        const projectNameMatches = project.name.toLowerCase().startsWith(lowerCaseSearchWord);
-        const classMatches = (project.projectClass === groupSubClass || project.projectClass === groupClass);
-        const districtMatches = 
-          project.projectDistrict === groupDistrict ||
-          getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
-          getLocationParent(projectDivisions, getLocationParent(projectSubDivisions, project.projectDistrict)) === groupDivision;
-        const divisionMatches = 
-          project.projectDistrict === groupDivision ||
-          getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
-        const subDivisionMatches = project.projectDistrict === groupSubDivision;
-        const projectNotSelectedAlready = !projectsForSubmitIds.includes(project.id);
-  
-        if (groupSubDivision) return subDivisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
-        else if (groupDivision) return divisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
-        else if (groupDistrict) return districtMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
-        else if (groupSubClass || groupClass) {
-          return classMatches && projectNameMatches && projectNotSelectedAlready;
-        }
-        return false;
-      });
-  
-      const searchProjectsItemList = projectSearchResult.map((project) => ({
-        ...listItemToOption({ id: project.id, value: project.name }),
-      }));
-      setSearchedProjects(searchProjectsItemList);
-    },
-    [allProjectsUnderSelectedClass, getValues, projectDivisions, projectSubDivisions, searchWord],
-  );
+    const lowerCaseSearchWord = searchWord.toLowerCase();
+    const groupSubDivision = getValues('subDivision.value');
+    const groupDivisionName = getValues('division.label');
+    // If selected groupDivision is Eri kaupunginosia (= Different divisions) it means that there is no specific division selected
+    // and the search should work as if there's no division selected
+    const groupDivision =
+      groupDivisionName === 'Eri kaupunginosia' ? undefined : getValues('division.value');
+    const groupDistrictName = getValues('district.label');
+    // If selected groupDistrict is Eri suurpiirejä (= Different districts) it's the same as if there was no groupDivision selected
+    const groupDistrict =
+      groupDistrictName === 'Eri suurpiirejä' ? undefined : getValues('district.value');
+    const groupSubClass = getValues('subClass.value');
+    const groupClass = getValues('class.value');
+    const projectsForSubmitIds = getValues('projectsForSubmit').map((project) => project.value);
+
+    const projectSearchResult = allProjectsUnderSelectedClass.filter((project) => {
+      const projectNameMatches = project.name.toLowerCase().startsWith(lowerCaseSearchWord);
+      const classMatches =
+        project.projectClass === groupSubClass || project.projectClass === groupClass;
+      const districtMatches =
+        project.projectDistrict === groupDistrict ||
+        getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
+        getLocationParent(
+          projectDivisions,
+          getLocationParent(projectSubDivisions, project.projectDistrict),
+        ) === groupDivision;
+      const divisionMatches =
+        project.projectDistrict === groupDivision ||
+        getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;
+      const subDivisionMatches = project.projectDistrict === groupSubDivision;
+      const projectNotSelectedAlready = !projectsForSubmitIds.includes(project.id);
+
+      if (groupSubDivision)
+        return (
+          subDivisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready
+        );
+      else if (groupDivision)
+        return divisionMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
+      else if (groupDistrict)
+        return districtMatches && projectNameMatches && classMatches && projectNotSelectedAlready;
+      else if (groupSubClass || groupClass) {
+        return classMatches && projectNameMatches && projectNotSelectedAlready;
+      }
+      return false;
+    });
+
+    const searchProjectsItemList = projectSearchResult.map((project) => ({
+      ...listItemToOption({ id: project.id, value: project.name }),
+    }));
+    setSearchedProjects(searchProjectsItemList);
+  }, [allProjectsUnderSelectedClass, getValues, projectDivisions, projectSubDivisions, searchWord]);
 
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
@@ -116,19 +136,18 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
     },
     [searchedProjects, getValues],
   );
-
   const handleDelete = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
+    (e: React.MouseEvent<HTMLDivElement>, onChange: (...event: unknown[]) => void) => {
       onChange(
         getValues('projectsForSubmit').filter(
           (p) =>
-            p.label !==
-            ((e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string),
+            p.label !== ((e.currentTarget as HTMLDivElement)?.parentElement?.innerText as string),
         ),
       );
     },
     [getValues],
   );
+
   return (
     <div className="dialog-section " data-testid="search-project-field-section">
       <Controller
@@ -158,8 +177,10 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({
                   data-testid={'project-selections'}
                 >
                   <Tag
-                    deleteButtonAriaLabel={`delete-project-${s.value}`}
-                    onDelete={(e) => handleDelete(e, onChange)}
+                    aria-label={`delete-project-${s.value}`}
+                    onDelete={(e) => {
+                      handleDelete(e as React.MouseEvent<HTMLDivElement>, onChange);
+                    }}
                   >
                     {s.label}
                   </Tag>

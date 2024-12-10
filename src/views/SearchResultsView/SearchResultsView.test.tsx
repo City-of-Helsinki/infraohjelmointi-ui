@@ -109,10 +109,7 @@ const render = async (customState?: object) =>
       {
         preloadedState: {
           ...store.getState(),
-          ...customState,
-          auth: { ...store.getState().auth, user: mockUser.data },
-        } ?? {
-          ...store.getState(),
+          ...(customState ?? {}),
           auth: { ...store.getState().auth, user: mockUser.data },
         },
       },
@@ -162,7 +159,7 @@ describe('SearchResultsView', () => {
 
       expect((await findAllByTestId('search-term')).length).toBe(4);
 
-      const emptyAllBtn = container.querySelector('#empty-all-btn-delete-button') as Element;
+      const emptyAllBtn = container.querySelector('#empty-all-btn') as Element;
 
       expect(emptyAllBtn).toBeInTheDocument();
 
@@ -170,7 +167,7 @@ describe('SearchResultsView', () => {
 
       expect(store.getState().search.submittedForm).toStrictEqual(initialSearchForm);
       expect(queryAllByTestId('search-term').length).toBe(0);
-      expect(container.querySelector('#empty-all-btn-delete-button')).toBeNull();
+      expect(container.querySelector('#empty-all-btn')).toBeNull();
     });
 
     it('renders all terms and sends a new GET request if a term is removed', async () => {
@@ -195,7 +192,7 @@ describe('SearchResultsView', () => {
       ).toBeInTheDocument();
 
       const removeFirstTermButton = container.querySelector(
-        `#search-term-${mockHashTags.data.hashTags[1].id}-delete-button`,
+        `#search-term-${mockHashTags.data.hashTags[1].id}`,
       ) as Element;
 
       expect(removeFirstTermButton).toBeInTheDocument();
