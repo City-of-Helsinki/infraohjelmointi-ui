@@ -52,20 +52,19 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id, re
 
   return (
     <div className="hashtags-container">
-      {tags &&
-        tags.map((tag) => (
-          <div
-            key={tag.id}
-            className="hashtags-wrapper"
-            aria-label={getAriaLabel(tag.value, t, handleOnDelete, handleOnClick)}
-            data-testid={id}
-            id={tag.value}
-          >
-            <Tag {...handlers} id={tag.id}>
-              {tag.value}
-            </Tag>
-          </div>
-        ))}
+      {tags?.map((tag) => (
+        <div
+          key={tag.id}
+          className="hashtags-wrapper"
+          aria-label={getAriaLabel(tag.value, t, handleOnDelete, handleOnClick)}
+          data-testid={id}
+          id={tag.value}
+        >
+          <Tag {...handlers} id={tag.id}>
+            {tag.value}
+          </Tag>
+        </div>
+      ))}
     </div>
   );
 };
