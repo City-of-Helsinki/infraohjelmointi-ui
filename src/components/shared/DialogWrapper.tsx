@@ -27,7 +27,7 @@ const DialogWrapper: FC<IDialogWrapperProps> = ({
     variant={variant || 'primary'}
     className={size === 'l' ? 'big-dialog' : ''}
   >
-    <Dialog.Header id={`${name}-dialog-header`} title={title} iconLeft={icon} />
+    <Dialog.Header id={`${name}-dialog-header`} title={title} iconStart={icon} />
     {children}
   </Dialog>
 );

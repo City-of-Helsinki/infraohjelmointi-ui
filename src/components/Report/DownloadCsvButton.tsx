@@ -1,4 +1,4 @@
-import { Button, IconDownload } from 'hds-react';
+import { Button, ButtonVariant, IconDownload } from 'hds-react';
 import { FC, memo } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
     return data.map((row) => {
       return Object.keys(row).reduce((acc, key) => {
         const typedKey = key as keyof (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
-        if (key === "\nTS 2025" || key === "\nTA 2025") {
+        if (key === '\nTS 2025' || key === '\nTA 2025') {
           const value = (row[typedKey] ?? '') as string;
           acc[typedKey] = value ? value.replace(/\s/g, '') : '';
         } else {
@@ -56,8 +56,10 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
         data = cleanData(data);
         const documentName = t(`report.${type}.documentName`);
         downloadCSV(
-          data, `${documentName} ${['strategy','strategyForcedToFrame'].includes(type) ?
-          year + 1 : year}.csv`
+          data,
+          `${documentName} ${
+            ['strategy', 'strategyForcedToFrame'].includes(type) ? year + 1 : year
+          }.csv`,
         );
       } else {
         console.warn('No data available for CSV download.');
@@ -75,8 +77,8 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
   return (
     <div className="report-download-csv-button" data-testid={`download-csv-${type}`}>
       <Button
-        iconLeft={downloadIcon}
-        variant="secondary"
+        iconStart={downloadIcon}
+        variant={ButtonVariant.Secondary}
         onClick={handleDownloadClick}
         disabled={type === Reports.FinancialStatement}
       >

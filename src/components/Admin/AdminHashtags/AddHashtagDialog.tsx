@@ -3,7 +3,7 @@ import { IError } from '@/interfaces/common';
 import { postHashTagThunk, selectHashTags } from '@/reducers/hashTagsSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { getErrorText } from '@/utils/validation';
-import { Button, Dialog, TextInput } from 'hds-react';
+import { Button, ButtonVariant, Dialog, TextInput } from 'hds-react';
 import { ChangeEvent, FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -84,7 +84,7 @@ const AddHashtagDialog: FC<IAddhashtagDialogProps> = ({ isOpen, onToggleAddHasht
           <Button onClick={onAddHashtag} data-testid="submit-hashtag-button">
             {t('save')}
           </Button>
-          <Button onClick={onToggleAddHashtagDialog} variant="secondary">
+          <Button onClick={onToggleAddHashtagDialog} variant={ButtonVariant.Secondary}>
             {t('cancel')}
           </Button>
         </ActionButtons>

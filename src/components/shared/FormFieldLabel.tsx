@@ -1,4 +1,4 @@
-import { Button } from 'hds-react';
+import { Button, ButtonVariant } from 'hds-react';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, MouseEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,8 +22,8 @@ const FormFieldLabel: FC<IFormFieldLabel> = ({ text, onClick, disabled, dataTest
         <label className="pen-and-label-text">{t(text)}</label>
       ) : (
         <Button
-          iconRight={<IconPenLine />}
-          variant="supplementary"
+          iconEnd={<IconPenLine />}
+          variant={ButtonVariant.Supplementary}
           className="pen-and-label-button"
           onClick={onClick}
           disabled={disabled}

@@ -139,11 +139,14 @@ const FreeSearchForm = ({
    * Get the <span>-elements value and use the value to remove the key from the form value
    */
   const onSelectionDelete = useCallback(
-    (e: MouseEvent<HTMLButtonElement>, onChange: (...event: unknown[]) => void) => {
+    (
+      e: MouseEvent<HTMLDivElement | HTMLButtonElement>,
+      onChange: (...event: unknown[]) => void,
+    ) => {
       const formValue = getValues('freeSearchParams') as FreeSearchFormObject;
-      // Copy everything except the chosen value to a new object, since react-hook-forms freezes the object
+
       const {
-        [(e.currentTarget as HTMLButtonElement)?.parentElement?.innerText as string]: _,
+        [(e.currentTarget as HTMLElement)?.parentElement?.innerText as string]: _,
         ...nextChange
       } = formValue;
 
@@ -186,7 +189,12 @@ const FreeSearchForm = ({
             />
             <div className="search-selections">
               {Object.keys(value || {}).map((s) => (
-                <Tag key={s} onDelete={(e) => onSelectionDelete(e, onChange)}>
+                <Tag
+                  key={s}
+                  onDelete={(e) => {
+                    onSelectionDelete(e as React.MouseEvent<HTMLDivElement>, onChange);
+                  }}
+                >
                   {s}
                 </Tag>
               ))}

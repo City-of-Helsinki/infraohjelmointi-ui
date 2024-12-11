@@ -1,5 +1,5 @@
 import useConfirmDialog from '@/hooks/useConfirmDialog';
-import { Dialog, Button, IconQuestionCircle } from 'hds-react';
+import { Dialog, Button, IconQuestionCircle, ButtonVariant, ButtonPresetTheme } from 'hds-react';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
@@ -21,7 +21,7 @@ const ConfirmDialog = () => {
     useConfirmDialog();
 
   const confirmButtonVariant = useMemo(
-    () => (dialogType === 'delete' ? 'danger' : 'primary'),
+    () => (dialogType === 'delete' ? ButtonVariant.Danger : ButtonVariant.Primary),
     [dialogType],
   );
   const confirmButtonIcon = useMemo(
@@ -41,7 +41,7 @@ const ConfirmDialog = () => {
       <Dialog.Header
         id={titleId}
         title={title}
-        iconLeft={
+        iconStart={
           dialogType === 'delete' ? (
             <IconAlertCircle aria-hidden="true" />
           ) : (
@@ -57,8 +57,8 @@ const ConfirmDialog = () => {
       <Dialog.ActionButtons>
         <Button
           onClick={cancel as (value: unknown) => void}
-          variant="secondary"
-          theme={dialogType === 'delete' ? 'black' : 'default'}
+          variant={ButtonVariant.Secondary}
+          theme={dialogType === 'delete' ? ButtonPresetTheme.Black : ButtonPresetTheme.Coat}
         >
           {t('cancel')}
         </Button>
@@ -66,7 +66,7 @@ const ConfirmDialog = () => {
           data-testid={'confirm-dialog-button'}
           onClick={proceed as (value: unknown) => void}
           variant={confirmButtonVariant}
-          iconLeft={confirmButtonIcon}
+          iconStart={confirmButtonIcon}
         >
           {t(confirmButtonText || 'proceed')}
         </Button>
