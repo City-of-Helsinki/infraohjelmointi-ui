@@ -28,6 +28,7 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
+import { getGroupSapCurrentYear } from '@/reducers/sapCurrentYearSlice';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -55,6 +56,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const groupSapCosts = useAppSelector(getGroupSapCosts);
+  const groupSapCurrentYear = useAppSelector(getGroupSapCurrentYear);
 
   const { value, onChange, setInputValue } = useNumberInput(displayFrameBudget);
   const UPDATE_CELL_DATA = 'update-cell-data';
