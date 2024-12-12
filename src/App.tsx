@@ -47,6 +47,7 @@ import MaintenanceView from './views/Maintenance';
 import { AppDispatch } from './store';
 import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForcedToFrame';
 import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
+import { getSapCurrentYearThunk } from './reducers/sapCurrentYearSlice';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -140,6 +141,7 @@ const App: FC = () => {
         loadCoordinationData(dispatch, startYear);
       }
       dispatch(getSapCostsThunk(startYear));
+      dispatch(getSapCurrentYearThunk(startYear));
     }
   }, [user, startYear, MAINTENANCE_MODE, dispatch]);
 

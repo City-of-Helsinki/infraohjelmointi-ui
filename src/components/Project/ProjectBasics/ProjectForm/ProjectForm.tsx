@@ -38,6 +38,7 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
+import { getProjectSapCurrentYear } from '@/reducers/sapCurrentYearSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -48,6 +49,7 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
   const sapCosts = useAppSelector(getProjectSapCosts);
+  const sapCurrentYear = useAppSelector(getProjectSapCurrentYear);
 
   const isOnlyViewer = isUserOnlyViewer(user);
 
@@ -394,6 +396,7 @@ const ProjectForm = () => {
         label: `projectForm.${name}`,
         control: control,
         sapCosts: project ? sapCosts[project?.id] : null,
+        sapCurrentYear: project ? sapCurrentYear[project?.id] : null,
       };
     },
     [control],
