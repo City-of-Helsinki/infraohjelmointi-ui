@@ -14,6 +14,7 @@ import eventsReducer from './reducers/eventsSlice';
 import planningReducer from './reducers/planningSlice';
 import sapCostReducer from './reducers/sapCostSlice';
 import appStateValuesReducer from './reducers/appStateValueSlice';
+import sapCurrentYearReducer from './reducers/sapCurrentYearSlice';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
@@ -32,6 +33,7 @@ export const storeItems = {
   planning: planningReducer,
   sapCosts: sapCostReducer,
   appStateValues: appStateValuesReducer,
+  sapCurrentYear: sapCurrentYearReducer
 };
 
 const rootReducer = combineReducers(storeItems);
