@@ -45,6 +45,7 @@ interface IProjectCellProps {
   projectFinances: IProjectFinances | null;
   sapProject: string | undefined;
   sapCosts: Record<string, IProjectSapCost>;
+  sapCurrentYear: Record<string, IProjectSapCost>;
 }
 
 interface IProjectCellState {
@@ -52,7 +53,7 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject, sapCosts }) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject, sapCurrentYear }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -280,7 +281,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
           ))}
       </td>
       {selectedYearClass && (
-        <ProjectYearSummary cellType={cellTypeClass} {...cell} sapProject={sapProject} sapCosts={sapCosts} />
+        <ProjectYearSummary cellType={cellTypeClass} {...cell} sapProject={sapProject} sapCurrentYear={sapCurrentYear} />
       )}
     </>
   );
