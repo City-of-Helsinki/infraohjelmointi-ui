@@ -12,9 +12,10 @@ interface IProjectRowProps {
   isSearched?: boolean;
   parentId: string;
   sapCosts: Record<string, IProjectSapCost>;
+  sapCurrentYear: Record<string, IProjectSapCost>;
 }
 
-const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCosts }) => {
+const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCosts, sapCurrentYear }) => {
   const projectRowRef = useRef<HTMLTableRowElement>(null);
   const { cells, sums, projectFinances } = useProjectRow(project, sapCosts[project.id]);
 
@@ -44,6 +45,7 @@ const ProjectRow: FC<IProjectRowProps> = ({ project, isSearched, parentId, sapCo
           projectFinances={projectFinances}
           sapProject={project.sapProject}
           sapCosts={sapCosts}
+          sapCurrentYear={sapCurrentYear}
         />
       ))}
     </tr>

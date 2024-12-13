@@ -33,6 +33,7 @@ export interface IProject {
   constructionPhase?: IListItem;
   constructionWorkQuantity?: string;
   budget?: string;
+  sapCurrentYear?: string;
   realizedCost?: string;
   comittedCost?: string;
   spentCost?: string;
