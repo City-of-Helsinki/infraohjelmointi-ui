@@ -4,6 +4,7 @@ import { FC, memo, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
+import { Tooltip } from 'hds-react';
 
 interface IListFieldProps {
   name: string;
@@ -60,6 +61,29 @@ const ListField: FC<IListFieldProps> = ({
     return Number(sapValue).toFixed(0);
   };
 
+  const showTooltip = (field: IForm) => {
+    if (field.name === 'realizedCostCurrentYear' || field.name === 'realizedCost' || field.name === 'comittedCost' || field.name === 'spentCost') {
+        return true; 
+    }
+  }
+
+  const renderTooltip = (field: IForm) => {
+    let tooltipLabel = '';
+    if (field.name === 'realizedCostCurrentYear') {
+      tooltipLabel = t('projectForm.realizedCostCurrentYearTooltipLabel')
+    }
+    else if (field.name === 'realizedCost') {
+      tooltipLabel = t('projectForm.realizedCostTooltipLabel')
+    }
+    else if (field.name === 'comittedCost') {
+      tooltipLabel = t('projectForm.comittedCostTooltipLabel')
+    }
+    else if (field.name === 'spentCost') {
+      tooltipLabel = t('projectForm.spentCostTooltipLabel')
+    }
+    return <Tooltip placement="top-start" className="list-field-tool-tip" >{tooltipLabel}</Tooltip>
+  }
+
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setEditing((currentState) => !currentState);
@@ -89,9 +113,13 @@ const ListField: FC<IListFieldProps> = ({
             control={f.control as Control<FieldValues>}
             render={({ field, fieldState: { error } }) => (
               <div className="list-field-container" key={f.label}>
-                <label className="list-field-label">{t(f.label)}</label>
+                <label className="list-field-label">{t(f.label)}{showTooltip(f) ? renderTooltip(f) : null}</label>
+                
                 {!editing || f.readOnly ? (
-                  <span>{f.isSapProject ? `${getSapCostValue(f)} €` : `${Number(field.value).toFixed(0)} keur`}</span>
+                  <div className="list-field-values">
+                    <span>{f.isSapProject ? `${getSapCostValue(f)}` : `${Number(field.value).toFixed(0)}`}</span>
+                    <span>{f.isSapProject ? '€' : 'keur'}</span>
+                  </div>
                 ) : (
                   <>
                     <NumberInput
