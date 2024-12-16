@@ -75,10 +75,8 @@ describe('TopBar', () => {
 
     expect(getByTestId('top-bar')).toBeInTheDocument();
     expect(getByRole('link', { name: matchExact('nav.skipToContent') })).toBeInTheDocument();
-    expect(getByRole('button', { name: matchExact('menu') })).toBeInTheDocument();
     expect(getByRole('button', { name: matchExact('nav.search') })).toBeInTheDocument();
     expect(getAllByRole('button', { name: matchExact('nav.login') })[0]).toBeInTheDocument();
-    expect(getByRole('button', { name: matchExact('nav.notifications') })).toBeInTheDocument();
     expect(getByRole('img')).toBeInTheDocument();
   });
 

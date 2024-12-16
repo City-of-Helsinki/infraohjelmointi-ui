@@ -1,5 +1,5 @@
 import { FC, memo, useCallback } from 'react';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonPresetTheme, ButtonVariant } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
@@ -43,19 +43,23 @@ const DeleteGroupDialog: FC<DeleteGroupDialogProps> = memo(
             <Header
               id={'delete-group-dialog-header'}
               title={t(`deleteGroupDialog.title`, { name: groupName })}
-              iconLeft={<IconAlertCircle aria-hidden="true" />}
+              iconStart={<IconAlertCircle aria-hidden="true" />}
             />
             <Content>
               <p className="text-body">{t(`deleteGroupDialog.description`)}</p>
             </Content>
             <ActionButtons>
-              <Button onClick={onCloseDeleteGroupDialog} theme="black" variant="secondary">
+              <Button
+                onClick={onCloseDeleteGroupDialog}
+                theme={ButtonPresetTheme.Black}
+                variant={ButtonVariant.Secondary}
+              >
                 {t(`cancel`)}
               </Button>
               <Button
                 data-testid={`delete-group-${id}`}
-                variant="danger"
-                iconLeft={<IconTrash aria-hidden="true" />}
+                variant={ButtonVariant.Danger}
+                iconStart={<IconTrash aria-hidden="true" />}
                 onClick={handleDeleteGroup}
               >
                 {t(`deleteGroup`)}

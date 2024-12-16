@@ -1,4 +1,4 @@
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { INewItemMenuDetails } from '@/interfaces/eventInterfaces';
@@ -40,16 +40,14 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
             Uusi
           </p>
         </div>
-        <IconCross
-          className="close-icon"
-          onClick={onCloseMenu}
-          data-testid="close-project-cell-menu"
-        />
+        <button className="close-icon" onClick={onCloseMenu} data-testid="close-project-cell-menu">
+          <IconCross />
+        </button>
       </div>
       <div className="project-cell-menu-footer">
         <Button
-          variant="supplementary"
-          iconLeft={undefined}
+          variant={ButtonVariant.Supplementary}
+          iconStart={undefined}
           onClick={onOpenProjectProgrammedDialog}
           disabled={selections.selectedClass?.id || selections.selectedSubClass?.id ? false : true}
           data-testid="open-project-programmed-dialog"
@@ -57,16 +55,16 @@ const NewItemMenu: FC<INewItemMenuProps> = ({
           {t(`projectProgrammedForm.addProjectsToProgramming`)}
         </Button>
         <Button
-          variant="supplementary"
-          iconLeft={undefined}
+          variant={ButtonVariant.Supplementary}
+          iconStart={undefined}
           onClick={onOpenGroupDialog}
           data-testid="open-summing-group-dialog"
         >
           {t(`createSummingGroups`)}
         </Button>
         <Button
-          variant="supplementary"
-          iconLeft={undefined}
+          variant={ButtonVariant.Supplementary}
+          iconStart={undefined}
           onClick={openNewProjectForm}
           data-testid="edit-year-button"
         >

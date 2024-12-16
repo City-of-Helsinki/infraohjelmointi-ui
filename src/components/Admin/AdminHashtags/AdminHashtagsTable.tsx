@@ -1,6 +1,7 @@
 import { dateStringToMoment } from '@/utils/dates';
 import {
   Button,
+  ButtonVariant,
   IconCheckCircle,
   IconCheckCircleFill,
   IconCrossCircle,
@@ -74,10 +75,10 @@ const getArchiveButton = (
     <div className="archived-button-container">
       <Button
         type="button"
-        variant="supplementary"
+        variant={ButtonVariant.Supplementary}
         className="archived-button"
         data-testid={`archive-hashtag-${id}`}
-        iconLeft={archived ? <IconCheckCircle /> : <IconCrossCircle />}
+        iconStart={archived ? <IconCheckCircle /> : <IconCrossCircle />}
         onClick={() => archiveHashtag(archived, id, dispatch)}
       >
         {archived ? translate('restore') : translate('archive')}

@@ -1,5 +1,5 @@
 import { ISearchResultListItem } from '@/interfaces/searchInterfaces';
-import { IconAngleRight, IconScrollGroup } from 'hds-react/icons';
+import { IconAngleRight, IconScrollGroup, IconSize } from 'hds-react/icons';
 import { FC, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -17,7 +17,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
   programmed,
 }) => {
   const { t } = useTranslation();
-  const iconGroup = useMemo(() => <IconScrollGroup size="xs" />, []);
+  const iconGroup = useMemo(() => <IconScrollGroup size={IconSize.ExtraSmall} />, []);
 
   return (
     <Link to={link} className="color-black no-underline">
@@ -50,7 +50,7 @@ const SearchResultsCard: FC<ISearchResultListItem> = ({
           {breadCrumbs?.map((b, i) => (
             <div key={b}>
               <span>{b}</span>
-              {breadCrumbs.length > i + 1 && <IconAngleRight size="xs" />}
+              {breadCrumbs.length > i + 1 && <IconAngleRight size={IconSize.ExtraSmall} />}
             </div>
           ))}
         </div>
