@@ -105,6 +105,11 @@ const render = async () =>
             groups: {},
             error: null,
           },
+          sapCurrentYear: {
+            projects: mockCurrentYearSapCostsProject.data,
+            groups: {},
+            error: null,
+          },
         },
       },
     ),
