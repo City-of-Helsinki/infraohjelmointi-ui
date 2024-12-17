@@ -28,27 +28,21 @@ const ListField: FC<IListFieldProps> = ({
 
   function getSapCostValue(field: IForm):string {
     let sapValue = 0;
-    // Toteuma kuluva vuosi = project_task_cost + production_task_cost kuluvalta vuodelta
     if (field.name === 'realizedCostCurrentYear') {
         const projectTaskCosts = Number(field.sapCurrentYear?.project_task_costs) || 0;
         const productionTaskCosts = Number(field.sapCurrentYear?.production_task_costs) || 0;
         sapValue = projectTaskCosts + productionTaskCosts;
     }
-    // Toteuma yhteensä = project_task_cost + production_task_cost haettuna 
-    // projektin suunnittelun aloitusvuodesta kuluvan vuoden loppuun asti
     else if (field.name === 'realizedCost') {
       const projectTaskCosts = Number(field.sapCosts?.project_task_costs) || 0;
       const productionTaskCosts = Number(field.sapCosts?.production_task_costs) || 0;
       sapValue = projectTaskCosts + productionTaskCosts;
     }
-    // Sitoumukset yhteensä = project_task_commitments + production_task_commitments 
-    // haettuna projektin suunnittelun aloitusvuodesta kuluvan vuoden loppuun asti 
     else if (field.name === 'comittedCost') {
       const project_task_commitments = Number(field.sapCosts?.project_task_commitments) || 0;
       const production_task_commitments = Number(field.sapCosts?.production_task_commitments) || 0;
       sapValue = project_task_commitments + production_task_commitments;
     }
-    // Käytetty (Toteuma yhteensä + kaikki sitoumukset yhteensä) -> tarvii infotekstin
     else if (field.name === 'spentCost') {
       const projectTaskCosts = Number(field.sapCosts?.project_task_costs) || 0;
       const productionTaskCosts = Number(field.sapCosts?.production_task_costs) || 0;
