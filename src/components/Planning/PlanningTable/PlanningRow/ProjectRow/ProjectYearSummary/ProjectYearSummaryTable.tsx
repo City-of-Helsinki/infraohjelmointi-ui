@@ -113,9 +113,9 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
                 </td>
               </tr>
               <tr>
-                {/* construction values from SAP */}
+                {/* summary row for SAP values */}
                 <td className="w-10 text-right">
-                  {/* construction icon */}
+                  {/* summary text */}
                   <span className="text-sm">yht.</span>
                 </td>
                 <td>
