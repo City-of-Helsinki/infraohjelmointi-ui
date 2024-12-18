@@ -10,7 +10,6 @@ import { useAppSelector } from '@/hooks/common';
 import { selectGroupsExpanded } from '@/reducers/planningSlice';
 import './styles.css';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
-import { sapCurrentYearSlice } from '@/reducers/sapCurrentYearSlice';
 
 interface IPlanningRowState {
   expanded: boolean;

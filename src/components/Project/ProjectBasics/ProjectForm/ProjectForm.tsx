@@ -24,7 +24,7 @@ import _ from 'lodash';
 import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
-import { getProjectSapCosts } from '@/reducers/sapCostSlice';
+import { getProjectSapCosts, getProjectSapCurrentYear } from '@/reducers/sapCostSlice';
 import { getYear } from '@/utils/dates';
 import {
   selectPlanningDistricts,
@@ -38,7 +38,6 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
-import { getProjectSapCurrentYear } from '@/reducers/sapCurrentYearSlice';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();

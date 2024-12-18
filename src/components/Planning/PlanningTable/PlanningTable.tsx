@@ -7,8 +7,7 @@ import { useAppSelector } from '@/hooks/common';
 import { selectPlanningMode, selectPlanningRows } from '@/reducers/planningSlice';
 import './styles.css';
 import { HoverTooltip } from './PlanningRow/HoverTooltip';
-import { getProjectSapCosts } from '@/reducers/sapCostSlice';
-import { getProjectSapCurrentYear } from '@/reducers/sapCurrentYearSlice';
+import { getProjectSapCosts, getProjectSapCurrentYear } from '@/reducers/sapCostSlice';
 
 const PlanningTable = () => {
   const rows = useAppSelector(selectPlanningRows);

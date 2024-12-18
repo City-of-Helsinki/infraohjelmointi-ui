@@ -22,13 +22,12 @@ import { patchCoordinationLocation } from '@/services/locationServices';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { formattedNumberToNumber } from '@/utils/calculations';
-import { getGroupSapCosts } from '@/reducers/sapCostSlice';
+import { getGroupSapCosts, getGroupSapCurrentYear } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
-import { getGroupSapCurrentYear } from '@/reducers/sapCurrentYearSlice';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;

@@ -11,3 +11,13 @@ export const getSapCosts = async (year: number): Promise<Array<ISapCost>> => {
     return Promise.reject(e);
   }
 };
+
+export const getSapCurrentYear = async (year: number): Promise<Array<ISapCost>> => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/sap-current-year-costs/${year}`);
+    console.log(res);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
