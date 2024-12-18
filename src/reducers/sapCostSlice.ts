@@ -119,7 +119,7 @@ export const sapCostsSlice = createSlice({
 
 export const getGroupSapCosts = (state: RootState) => state.sapCosts.groups;
 export const getProjectSapCosts = (state: RootState) => state.sapCosts.projects;
-export const getGroupSapCurrentYear = (state: RootState) => state.sapCurrentYear.currentSapGroups;
-export const getProjectSapCurrentYear = (state: RootState) => state.sapCurrentYear.currentSap;
+export const getGroupSapCurrentYear = (state: RootState) => state.sapCosts.currentSapGroups;
+export const getProjectSapCurrentYear = (state: RootState) => state.sapCosts.currentSap;
 
 export default sapCostsSlice.reducer;

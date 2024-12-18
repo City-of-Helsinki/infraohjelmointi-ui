@@ -32,7 +32,6 @@ export const storeItems = {
   planning: planningReducer,
   sapCosts: sapCostReducer,
   appStateValues: appStateValuesReducer,
-  sapCurrentYear: sapCostReducer
 };
 
 const rootReducer = combineReducers(storeItems);
