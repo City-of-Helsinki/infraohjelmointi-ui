@@ -54,7 +54,6 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const selectedYear = useAppSelector(selectSelectedYear);
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
-  const groupSapCosts = useAppSelector(getGroupSapCosts);
   const groupSapCurrentYear = useAppSelector(getGroupSapCurrentYear);
 
   const { value, onChange, setInputValue } = useNumberInput(displayFrameBudget);
@@ -198,7 +197,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
       {/* There will be data generated here (at least for the first year) in future tasks */}
       {year === selectedYear && (
         <>
-          {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCosts} />}
+          {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCurrentYear} />}
           {moment.months().map((m) => (
             pathname.includes('coordination') && m === 'tammikuu' ?
             <Fragment key={id}>

@@ -8,7 +8,6 @@ interface IProjectYearSummaryTableProps {
   cellType: CellType;
   id: string;
   sapProject: string | undefined;
-  sapCosts: Record<string, IProjectSapCost>;
   sapCurrentYear: Record<string, IProjectSapCost>;
 }
 

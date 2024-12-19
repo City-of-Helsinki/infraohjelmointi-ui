@@ -23,7 +23,7 @@ const ProjectYearSummary: FC<IProjectYearSummaryProps> = (props) => {
   return (
     <>
       {/* Year summary (only visible for the first year in the table) */}
-      {showYearSummaryTable && <ProjectYearSummaryTable {...props} sapCosts={sapCurrentYear} />}
+      {showYearSummaryTable && <ProjectYearSummaryTable {...props} sapCurrentYear={sapCurrentYear} />}
       {/* Monthly graph */}
       {monthlyDataList.map((c) => (
         <MonthlyGraphCell key={c.month} {...c} month={c.month} {...props} />
