@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { ProgressCircle, SelectField } from '@/components/shared';
 import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { selectProjectMode, selectProject, setIsSaving, setSelectedProject } from '@/reducers/projectSlice';
+import { selectProject, setIsSaving, setSelectedProject } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
@@ -28,7 +28,6 @@ const ProjectHeader: FC = () => {
   const user = useAppSelector(selectUser);
   const groups = useAppSelector(selectPlanningGroups);
   const { t } = useTranslation();
-  const projectMode = useAppSelector(selectProjectMode);
   const { formMethods } = useProjectHeaderForm();
   const isOnlyViewer = isUserOnlyViewer(user);
 
@@ -86,13 +85,13 @@ const ProjectHeader: FC = () => {
         }
       }
     },
-    [project?.favPersons, project?.id, user?.uuid, dirtyFields, isDirty],
+    [isDirty, dispatch, dirtyFields, project?.id, project?.favPersons, user?.uuid],
   );
 
   useEffect(() => {
     setIconKey(mapIconKey(getValues('phase').label));
   }, [getValues('phase').label]);
-  
+
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
       <div className="project-header-container" data-testid="project-header">
@@ -110,7 +109,7 @@ const ProjectHeader: FC = () => {
           >
             <ProjectNameFields control={control} />
             <SelectField
-              disabled={projectMode === 'new' || isOnlyViewer}
+              disabled={true}
               name="phase"
               control={control}
               options={phases}
@@ -125,11 +124,11 @@ const ProjectHeader: FC = () => {
               {/*The viewers can't access any other views than planning view and the project card
               so by default they also can't access the place where the favourite projects would
               be. Also, the whole feature is not yet implemented.*/}
-              {!isOnlyViewer && 
+              {!isOnlyViewer && (
                 <div className="mb-8" data-testid="project-favourite">
                   <ProjectFavouriteField control={control} />
                 </div>
-              }
+              )}
               <p className="text-white">{t('inGroup')}</p>
               <p className="text-l font-bold text-white">{projectGroupName}</p>
             </div>
