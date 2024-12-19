@@ -22,7 +22,7 @@ import { patchCoordinationLocation } from '@/services/locationServices';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { formattedNumberToNumber } from '@/utils/calculations';
-import { getGroupSapCosts, getGroupSapCurrentYear } from '@/reducers/sapCostSlice';
+import { getGroupSapCurrentYear } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
