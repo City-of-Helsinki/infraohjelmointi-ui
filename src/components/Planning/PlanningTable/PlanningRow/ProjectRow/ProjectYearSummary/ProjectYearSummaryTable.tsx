@@ -2,22 +2,26 @@ import { CellType } from '@/interfaces/projectInterfaces';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 import { IconHammers, IconScrollContent, IconSize } from 'hds-react/icons';
 import { FC, memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface IProjectYearSummaryTableProps {
   cellType: CellType;
   id: string;
   sapProject: string | undefined;
-  sapCosts: Record<string, IProjectSapCost>;
+  sapCurrentYear: Record<string, IProjectSapCost>;
 }
 
 const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
   cellType,
   id,
   sapProject,
-  sapCosts,
+  sapCurrentYear
 }) => {
+  const { t } = useTranslation();
+
   const costs = useMemo(() => {
-    const projectCosts = sapCosts[id];
+    //For planning view use sap values from the current year
+    const projectCosts = sapCurrentYear[id];
 
     return {
       projectTaskCosts: Number(projectCosts?.project_task_costs || 0),
@@ -26,7 +30,6 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
       productionTaskCommitments: Number(projectCosts?.production_task_commitments || 0),
     };
   }, [cellType, id]);
-  // All the values in the table are retrieved from SAP and mocked as 0 for now
 
   // Format the numbers to be displayed in the table, e.g. 1 000000 and rounded to closest 1 000
   const formatSapNumbers = (number: number) => {
@@ -49,13 +52,13 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
               <tr>
                 <th></th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">Toteut.</span>
+                  <span className="ml-2 text-sm font-medium text-black-60">{t('monthlySummaryTable.currentYearSapCosts')}</span>
                 </th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">Sidot.</span>
+                  <span className="ml-2 text-sm font-medium text-black-60">{t('monthlySummaryTable.currentYearSapCommitments')}</span>
                 </th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">Käytet.</span>
+                  <span className="ml-2 text-sm font-medium text-black-60">{t('monthlySummaryTable.totalValues')}</span>
                 </th>
               </tr>
             </thead>
@@ -109,10 +112,10 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
                 </td>
               </tr>
               <tr>
-                {/* construction values from SAP */}
+                {/* summary row for SAP values */}
                 <td className="w-10 text-right">
-                  {/* construction icon */}
-                  <span className="text-sm">yht.</span>
+                  {/* summary text */}
+                  <span className="text-sm">{t('monthlySummaryTable.totalValues')}</span>
                 </td>
                 <td>
                   <span className="text-sm font-light">

@@ -194,9 +194,14 @@
     "overrunRight": "Ylitysoikeus",
     "costForecast": "Budjetti",
     "realizedCostLabel": "Toteumatiedot",
-    "realizedCost": "Toteuma",
-    "comittedCost": "Sitoumukset",
+    "realizedCostCurrentYear": "Toteuma kuluva vuosi",
+    "realizedCostCurrentYearTooltipLabel": "Kuluvan vuoden toteuma",
+    "realizedCost": "Toteuma yhteensä",
+    "realizedCostTooltipLabel": "Toteuma yhteensä hankkeen suunnittelun aloitusvuodesta kuluvan vuoden loppuun",
+    "comittedCost": "Sitoumukset yhteensä",
+    "comittedCostTooltipLabel": "Sitoumukset yhteensä hankkeen suunnittelun aloitusvuodesta kuluvan vuoden loppuun",
     "spentCost": "Käytetty",
+    "spentCostTooltipLabel": "Toteuma yhteensä + kaikki sitoumukset yhteensä kuluvan vuoden loppuun",
     "budgetOverrunYear": "Ylitysoikeus vuosi",
     "budgetOverrunAmount": "Ylitysoikeuden määrä",
     "preliminaryBudgetDivision": "Kustannusarvion alustava jakautuminen",
@@ -584,5 +589,10 @@
   "maintenanceMode": {
     "title": "Huoltotila",
     "description": "Pieni hetki, sivustoa huolletaan parhaillaan"
+  },
+  "monthlySummaryTable": {
+    "currentYearSapCosts": "Toteum.",
+    "currentYearSapCommitments": "Sitoum.",
+    "totalValues": "Yht."
   }
 }
