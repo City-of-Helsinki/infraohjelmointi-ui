@@ -97,9 +97,9 @@ const render = async () =>
           },
           sapCosts: {
             projects: mockAllSapCostsProject.data,
-            currentSap: mockCurrentYearSapCostsProject.data,
+            currentYearSapProjects: mockCurrentYearSapCostsProject.data,
             groups: {},
-            currentSapGroups: {},
+            currentYearSapGroups: {},
             error: null,
           }
         },

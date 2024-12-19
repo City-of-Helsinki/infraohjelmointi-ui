@@ -593,6 +593,6 @@
   "monthlySummaryTable": {
     "currentYearSapCosts": "Toteum.",
     "currentYearSapCommitments": "Sitoum.",
-    "currentYearTotalSapValues": "Yht."
+    "totalValues": "Yht."
   }
 }

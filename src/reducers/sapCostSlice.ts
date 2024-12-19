@@ -6,17 +6,17 @@ import _ from 'lodash';
 
 interface ISapCostsState {
   projects: Record<string, IProjectSapCost>;
-  currentSap: Record<string, IProjectSapCost>;
+  currentYearSapProjects: Record<string, IProjectSapCost>;
   groups: Record<string, IGroupSapCost>;
-  currentSapGroups: Record<string, IGroupSapCost>;
+  currentYearSapGroups: Record<string, IGroupSapCost>;
   error: unknown;
 }
 
 const initialState: ISapCostsState = {
   projects: {},
-  currentSap: {},
+  currentYearSapProjects: {},
   groups: {},
-  currentSapGroups: {},
+  currentYearSapGroups: {},
   error: null,
 };
 
@@ -85,7 +85,7 @@ export const sapCostsSlice = createSlice({
     builder.addCase(getSapCurrentYearThunk.fulfilled, (state, action: PayloadAction<Array<ISapCost>>) => {
       return {
         ...state,
-        currentSap: _.keyBy(
+        currentYearSapProjects: _.keyBy(
           action.payload
             .filter((sapCost) => sapCost.project_id != null)
             .map((sapCost) => ({
@@ -98,7 +98,7 @@ export const sapCostsSlice = createSlice({
             })),
           'id',
         ),
-        currentSapGroups: _.keyBy(
+        currentYearSapGroups: _.keyBy(
           action.payload
             .filter((sapCost) => sapCost.project_id == null)
             .map((sapCost) => ({
@@ -119,7 +119,7 @@ export const sapCostsSlice = createSlice({
 
 export const getGroupSapCosts = (state: RootState) => state.sapCosts.groups;
 export const getProjectSapCosts = (state: RootState) => state.sapCosts.projects;
-export const getGroupSapCurrentYear = (state: RootState) => state.sapCosts.currentSapGroups;
-export const getProjectSapCurrentYear = (state: RootState) => state.sapCosts.currentSap;
+export const getGroupSapCurrentYear = (state: RootState) => state.sapCosts.currentYearSapGroups;
+export const getProjectSapCurrentYear = (state: RootState) => state.sapCosts.currentYearSapProjects;
 
 export default sapCostsSlice.reducer;
