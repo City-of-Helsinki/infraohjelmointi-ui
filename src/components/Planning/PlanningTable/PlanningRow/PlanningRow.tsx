@@ -16,8 +16,8 @@ interface IPlanningRowState {
   searchedProjectId: string;
 }
 
-const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost> }> = (props) => {
-  const { defaultExpanded, projectRows, cells, id, type, sapCosts, children } = props;
+const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>, sapCurrentYear: Record<string, IProjectSapCost> }> = (props) => {
+  const { defaultExpanded, projectRows, cells, id, type, sapCosts, children, sapCurrentYear } = props;
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
 
@@ -134,11 +134,12 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
               isSearched={p.id === searchedProjectId}
               parentId={id}
               sapCosts={sapCosts}
+              sapCurrentYear={sapCurrentYear}
             />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} sapCosts={sapCosts} />
+            <PlanningRow {...c} sapCosts={sapCosts} sapCurrentYear={sapCurrentYear}/>
           ))}
         </>
       )}

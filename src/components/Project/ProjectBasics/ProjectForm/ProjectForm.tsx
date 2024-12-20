@@ -24,7 +24,7 @@ import _ from 'lodash';
 import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
-import { getProjectSapCosts } from '@/reducers/sapCostSlice';
+import { getProjectSapCosts, getProjectSapCurrentYear } from '@/reducers/sapCostSlice';
 import { getYear } from '@/utils/dates';
 import {
   selectPlanningDistricts,
@@ -48,6 +48,7 @@ const ProjectForm = () => {
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
   const sapCosts = useAppSelector(getProjectSapCosts);
+  const sapCurrentYear = useAppSelector(getProjectSapCurrentYear);
 
   const isOnlyViewer = isUserOnlyViewer(user);
 
@@ -394,6 +395,7 @@ const ProjectForm = () => {
         label: `projectForm.${name}`,
         control: control,
         sapCosts: project ? sapCosts[project?.id] : null,
+        sapCurrentYear: project ? sapCurrentYear[project?.id] : null,
       };
     },
     [control],
