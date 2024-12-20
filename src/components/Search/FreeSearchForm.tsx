@@ -146,7 +146,7 @@ const FreeSearchForm = ({
       const formValue = getValues('freeSearchParams') as FreeSearchFormObject;
 
       const {
-        [(e.currentTarget as HTMLElement)?.parentElement?.innerText as string]: _,
+        [e.currentTarget?.innerText]: _,
         ...nextChange
       } = formValue;
 
