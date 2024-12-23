@@ -22,6 +22,7 @@ import StrategyTableHeader from './StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
 import { useTranslation } from 'react-i18next';
 import { IProject } from '@/interfaces/projectInterfaces';
+import ForecastReportTableHeader from './ForecastReportTableHeader';
 
 const styles = StyleSheet.create({
   table: {
@@ -77,6 +78,8 @@ const ReportTable: FC<IReportTableProps> = ({
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return <StrategyTableHeader />;
+      case Reports.ForecastReport:
+        return <ForecastReportTableHeader />;
       case Reports.ConstructionProgram:
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:

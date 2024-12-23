@@ -53,6 +53,7 @@ const getPdfDocument = (
     strategyForcedToFrame: (
       <ReportContainer data={{ rows }} reportType={Reports.StrategyForcedToFrame} />
     ),
+    forecastReport: <ReportContainer data={{ rows }} reportType={Reports.ForecastReport} />,
     constructionProgram: (
       <ReportContainer
         data={{ rows, divisions, subDivisions }}
@@ -114,6 +115,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       switch (type) {
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame:
+        case Reports.ForecastReport:
         case Reports.BudgetBookSummary: {
           // For Strategy report, we will fetch next year data
           const res = await getData(getForcedToFrameData, type, year);

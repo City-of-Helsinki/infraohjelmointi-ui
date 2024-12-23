@@ -506,6 +506,14 @@
     "financialStatement": {
       "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",
       "documentName": "tilinpäätös"
+    },
+    "forecastReport": {
+      "rowTitle": "Ennusteraportti",
+      "documentName": "ennusteraportti",
+      "title": "Helsingin kaupunki",
+      "projectNameTitle": "Hanke",
+      "projectsTitle": "Kohteen",
+      "projectManagerTitle": "projektipäällikkö"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",

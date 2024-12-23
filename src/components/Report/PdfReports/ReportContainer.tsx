@@ -34,6 +34,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
         return t('report.strategy.title');
       case Reports.ConstructionProgram:
         return t('report.constructionProgram.title');
+      case Reports.ForecastReport:
+        return t('report.forecastReport.title');
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title');
       case Reports.OperationalEnvironmentAnalysis:

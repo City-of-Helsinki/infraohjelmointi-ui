@@ -53,6 +53,7 @@ export const reports = [
   'operationalEnvironmentAnalysis',
   'strategy',
   'strategyForcedToFrame',
+  'forecastReport',
   'constructionProgram',
   'budgetBookSummary',
   'financialStatement',
@@ -79,6 +80,7 @@ export enum Reports {
   Strategy = 'strategy',
   StrategyForcedToFrame = 'strategyForcedToFrame',
   ConstructionProgram = 'constructionProgram',
+  ForecastReport = 'forecastReport',
   BudgetBookSummary = 'budgetBookSummary',
   FinancialStatement = 'financialStatement',
 }
