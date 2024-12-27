@@ -67,6 +67,10 @@ export interface IStrategyTableCsvRow {
   [key: string]: string | undefined;
 }
 
+export interface IForecastTableCsvRow {
+  [key: string]: string | undefined;
+}
+
 export interface IBudgetBookSummaryCsvRow {
   [key: string]: string | IBudgetBookFinanceProperties | undefined;
 }
@@ -184,6 +188,30 @@ export interface IStrategyTableRow extends ITableRowEssentials {
   projectPhase?: string;
   costPlan?: string;
   costForecast?: string;
+  januaryStatus?: string;
+  februaryStatus?: string;
+  marchStatus?: string;
+  aprilStatus?: string;
+  mayStatus?: string;
+  juneStatus?: string;
+  julyStatus?: string;
+  augustStatus?: string;
+  septemberStatus?: string;
+  octoberStatus?: string;
+  novemberStatus?: string;
+  decemberStatus?: string;
+}
+
+export interface IForecastTableRow extends ITableRowEssentials {
+  projects: Array<IStrategyTableRow>;
+  children: Array<IStrategyTableRow>;
+  type: ReportTableRowType;
+  projectManager?: string;
+  projectPhase?: string;
+  costPlan?: string;
+  costForecast?: string;
+  newValue?: string; //TODO
+  newValue2?: string;
   januaryStatus?: string;
   februaryStatus?: string;
   marchStatus?: string;

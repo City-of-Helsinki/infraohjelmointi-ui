@@ -29,13 +29,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
 
   const getDocumentTitle = () => {
     switch (reportType) {
+      case Reports.ForecastReport:
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.title');
       case Reports.ConstructionProgram:
         return t('report.constructionProgram.title');
-      case Reports.ForecastReport:
-        return t('report.forecastReport.title');
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title');
       case Reports.OperationalEnvironmentAnalysis:
@@ -50,6 +49,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
 
   const getDocumentSubtitleOne = () => {
     switch (reportType) {
+      case Reports.ForecastReport:
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {
@@ -96,7 +96,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
           />
           <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} />
-          {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
+          {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport?
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
               colorInfoTextOne={t('report.strategy.planning')}

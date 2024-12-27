@@ -15,6 +15,8 @@ import {
   ITotals,
   IPlannedBudgets,
   IChild,
+  IForecastTableRow,
+  IForecastTableCsvRow,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -668,7 +670,7 @@ const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string
   const allowedTypes = ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'collectiveSubLevel']
 
   if (!allowedTypes.includes(type)) return ""
-  
+
   if (type === 'collectiveSubLevel' && !path.startsWith('8 03')) return ""
 
   const budget = budgets.find(obj => obj.year === new Date().getFullYear() + 1);
@@ -689,6 +691,30 @@ export const convertToReportRows = (
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
       forcedToFrameHierarchy = getBudgetBookSummaryProperties(rows);
       getInvestmentPart(forcedToFrameHierarchy);
+      return forcedToFrameHierarchy;
+    }
+    case Reports.ForecastReport: {
+      const forcedToFrameHierarchy: IForecastTableRow[] = [];
+      for (const c of rows) {
+        const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
+        if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
+          const convertedClass = {
+            id: c.id,
+            name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+            parent: null,
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
+            projects: c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [],
+            costForecast: c.cells[0].plannedBudget,
+            costPlan: frameBudget,
+            newValue: '',
+            newValue2: '',
+            type: c.type as ReportTableRowType
+          }
+          if (convertedClass.type !== 'group' || convertedClass.projects.length) {
+            forcedToFrameHierarchy.push(convertedClass);
+          }
+        }
+      }
       return forcedToFrameHierarchy;
     }
     case Reports.Strategy:
@@ -809,7 +835,7 @@ export const convertToReportRows = (
               foundProjectsInWarrantyPhase?.forEach((p) => {
                 addProjectBudgetToSpecifiedLevel(mainClass.plannedBudgets, p.finances);
               });
-              
+
               // loop through also the children of children. This is the last level in which we can find matching ids
               for (const child1 of child.children) {
                 const foundProjects = projectsInWarrantyPhase?.filter((p) => p.projectClass == child1.id);
@@ -848,7 +874,7 @@ export const convertToReportRows = (
       ]
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
         path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
-      
+
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
           const startYear = getGroupStartYear(c.projectRows);
@@ -870,7 +896,7 @@ export const convertToReportRows = (
               location: c.location ? getDivision(c.location, divisions, subDivisions) : '',
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows)),
             }
-            
+
             if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup)) {
               planningHierarchy.push(convertedGroup);
             } else {
@@ -1029,7 +1055,43 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
     processStrategyTableRows(tableRow.children);
   });
   return strategyCsvRows;
-}
+};
+
+const forecastCsvRows: IForecastTableCsvRow[] = [];
+
+const processForecastTableRows = (tableRows: IStrategyTableRow[]) => {
+  tableRows.forEach((tableRow) => {
+    if (!forecastCsvRows.some(row => row.id === tableRow.id)) {
+      forecastCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: tableRow.type,
+        costPlan: tableRow.costPlan,                    // TA value
+        costForecast: tableRow.costForecast ?? '',      // TS value
+        newValue: "kökkö2",
+        newValue2: "kökkö3",
+        projectManager: tableRow.projectManager ?? '',
+        projectPhase: tableRow.projectPhase ?? '',
+        januaryStatus: tableRow.januaryStatus ?? '',
+        februaryStatus: tableRow.februaryStatus ?? "",
+        marchStatus: tableRow.marchStatus ?? "",
+        aprilStatus: tableRow.aprilStatus ?? "",
+        mayStatus: tableRow.mayStatus ?? "",
+        juneStatus: tableRow.juneStatus ?? "",
+        julyStatus: tableRow.julyStatus ?? "",
+        augustStatus: tableRow.augustStatus ?? "",
+        septemberStatus: tableRow.septemberStatus ?? "",
+        octoberStatus: tableRow.octoberStatus ?? "",
+        novemberStatus: tableRow.novemberStatus ?? "",
+        decemberStatus: tableRow.decemberStatus ?? "",
+      })
+    }
+    processForecastTableRows(tableRow.projects);
+    processForecastTableRows(tableRow.children);
+  });
+  return forecastCsvRows;
+};
+
 const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
 const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
@@ -1186,6 +1248,11 @@ export const flattenStrategyTableRows = (
 ): Array<IStrategyTableCsvRow> =>
   processStrategyTableRows(tableRows).flat(Infinity);
 
+export const flattenForecastTableRows = (
+  tableRows: Array<IForecastTableRow>,
+): Array<IForecastTableCsvRow> =>
+  processForecastTableRows(tableRows).flat(Infinity);
+
 export const flattenConstructionProgramTableRows = (
   tableRows: Array<IConstructionProgramTableRow>,
 ): Array<IConstructionProgramCsvRow> =>
@@ -1210,6 +1277,31 @@ export const getReportData = async (
 
   try {
     switch (reportType) {
+      case Reports.ForecastReport: {
+        //Flatten rows to one dimension
+        const flattenedRows = flattenForecastTableRows(reportRows as IStrategyTableRow[]);
+        return flattenedRows.map((r) => ({
+          [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
+          [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
+          [`\n${t('projectPhase')}`]: r.projectPhase,
+          [`\nTA ${year + 1}`]: r.costPlan,
+          [`\nTS ${year + 1}`]: r.costForecast,
+          [`\nEnnuste ${year + 1}`]: "test1",
+          [`\nPoikkeama`]: "test2", //TODO
+          [`${year + 1}\n01`]: r.januaryStatus,
+          [`\n02`]: r.februaryStatus,
+          [`\n03`]: r.marchStatus,
+          [`\n04`]: r.aprilStatus,
+          [`\n05`]: r.mayStatus,
+          [`\n06`]: r.juneStatus,
+          [`\n07`]: r.julyStatus,
+          [`\n08`]: r.augustStatus,
+          [`\n09`]: r.septemberStatus,
+          [`\n10`]: r.octoberStatus,
+          [`\n11`]: r.novemberStatus,
+          [`\n12`]: r.decemberStatus,
+        }))
+      }
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame: {
         //Flatten rows to one dimension

@@ -22,7 +22,6 @@ import StrategyTableHeader from './StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
 import { useTranslation } from 'react-i18next';
 import { IProject } from '@/interfaces/projectInterfaces';
-import ForecastReportTableHeader from './ForecastReportTableHeader';
 
 const styles = StyleSheet.create({
   table: {
@@ -68,7 +67,7 @@ const ReportTable: FC<IReportTableProps> = ({
         , reportType
   ) : [];
 
-  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
+  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType === Reports.ForecastReport ?
     flattenStrategyTableRows(reportRows) : [];
 
   const getTableHeader = () => {
@@ -77,9 +76,9 @@ const ReportTable: FC<IReportTableProps> = ({
         return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
-        return <StrategyTableHeader />;
+        return <StrategyTableHeader isForecastReport={false}/>;
       case Reports.ForecastReport:
-        return <ForecastReportTableHeader />;
+        return <StrategyTableHeader isForecastReport={true} />;
       case Reports.ConstructionProgram:
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:
@@ -93,7 +92,7 @@ const ReportTable: FC<IReportTableProps> = ({
       <View style={styles.table}>
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
-          reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
+          reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
             strategyReportRows : flattenedRows
         }/>
       </View>

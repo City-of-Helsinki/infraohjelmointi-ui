@@ -19,6 +19,7 @@ const getData = async (getForcedToFrameData: IDownloadCsvButtonProps["getForcedT
   // Function is used on Reports Strategy, StrategyForcedToFrame, and BudgetBookSummary
   if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
   if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
+  if (type === Reports.ForecastReport) return await getForcedToFrameData(year + 1, true);
   else return await getForcedToFrameData(year, true);
 }
 
@@ -44,6 +45,7 @@ export const useCsvData = ({
 
       switch (type) {
         case Reports.BudgetBookSummary:
+        case Reports.ForecastReport:
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame: {
           // For Strategy report, we will fetch next year data

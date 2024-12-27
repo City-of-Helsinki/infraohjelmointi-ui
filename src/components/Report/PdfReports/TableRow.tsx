@@ -430,6 +430,7 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
+        case Reports.ForecastReport:
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame: {
           const classNameTypes = [
@@ -457,6 +458,15 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                     <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                     <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
                     <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
+                    {
+                      reportType === Reports.ForecastReport ? 
+                      <>
+                        <Text style={strategyReportStyles.budgetCell}>{'testiiii'}</Text>
+                        <Text style={strategyReportStyles.budgetCell}>{'testi2'}</Text>
+                      </>
+                      : null // TODO
+                    }
+                    
                     {flattenedRow.januaryStatus === "planningAndConstruction" ?
                       <><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'right')}></Text></>
                       :
