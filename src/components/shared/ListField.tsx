@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import FormFieldLabel from './FormFieldLabel';
 import { Tooltip } from 'hds-react';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
-import { formatNumber } from '@/utils/calculations';
+import { formatNumberToContainSpaces } from '@/utils/common';
 
 interface IListFieldProps {
   name: string;
@@ -32,7 +32,7 @@ const ListField: FC<IListFieldProps> = ({
     return costs ? (Number(costs[costType1 as keyof IProjectSapCost]) || 0) + (Number(costs[costType2 as keyof IProjectSapCost]) || 0) : 0;
   }
 
-  function getSapCostValue(field: IForm):number {
+  function getSapCostValue(field: IForm): string {
     let sapValue = 0;
 
     switch (field.name) {
@@ -55,7 +55,7 @@ const ListField: FC<IListFieldProps> = ({
       default:
         break;
     }
-    return sapValue;
+    return formatNumberToContainSpaces(Number((sapValue).toFixed(0)));
   };
 
   const showTooltip = (field: IForm) => {
@@ -108,7 +108,7 @@ const ListField: FC<IListFieldProps> = ({
                 
                 {!editing || f.readOnly ? (
                   <div className="list-field-values">
-                    <span>{f.isSapProject ? `${formatNumber(getSapCostValue(f))}` : `${formatNumber(field.value)}`}</span>
+                    <span>{f.isSapProject ? `${getSapCostValue(f)}` : `${formatNumberToContainSpaces(Number((field.value).toFixed(0)))}`}</span>
                     <span>{f.isSapProject ? '€' : 'keur'}</span>
                   </div>
                 ) : (
