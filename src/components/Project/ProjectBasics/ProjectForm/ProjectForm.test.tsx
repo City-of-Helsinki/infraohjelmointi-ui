@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
-import { arrayHasValue, matchExact } from '@/utils/common';
+import { arrayHasValue, formatNumberToContainSpaces, matchExact } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
@@ -164,25 +164,26 @@ describe('projectForm', () => {
     expectRadioBoolean('gravel-0', false);
     expectRadioBoolean('effectHousing-0', false);
 
-    expect(await findByText(`${Number(project?.costForecast).toFixed(0)}`)).toBeInTheDocument();
+    const costForecastValue = Number(project?.costForecast).toFixed(0);
+    expect(await findByText(`${formatNumberToContainSpaces(Number(costForecastValue))}`)).toBeInTheDocument();
 
     const sapCurrentYearprojectTaskCosts = Number(sapCostCurrentYear[project.id]?.project_task_costs).toFixed(0);
     const sapCurrentYearProductionTaskCosts = Number(sapCostCurrentYear[project.id]?.production_task_costs).toFixed(0);
-    const SapCostsCurrentYearValue = Number(sapCurrentYearprojectTaskCosts) + Number(sapCurrentYearProductionTaskCosts);
-    expect(await findByText(`${SapCostsCurrentYearValue}`)).toBeInTheDocument();
+    const sapCostsCurrentYearValue = Number(sapCurrentYearprojectTaskCosts) + Number(sapCurrentYearProductionTaskCosts);
+    expect(await findByText(`${formatNumberToContainSpaces(sapCostsCurrentYearValue)}`)).toBeInTheDocument();
 
     const sapAllProjectTaskCosts = Number(sapCostAll[project.id]?.project_task_costs).toFixed(0);
     const sapAllProductionTaskCosts = Number(sapCostAll[project.id]?.production_task_costs).toFixed(0);
-    const SapCostsAllValue = Number(sapAllProjectTaskCosts) + Number(sapAllProductionTaskCosts);
-    expect(await findByText(`${SapCostsAllValue}`)).toBeInTheDocument();
+    const sapCostsAllValue = Number(sapAllProjectTaskCosts) + Number(sapAllProductionTaskCosts);
+    expect(await findByText(`${formatNumberToContainSpaces(sapCostsAllValue)}`)).toBeInTheDocument();
 
     const sapAllProjectTaskCommitments = Number(sapCostAll[project.id]?.project_task_commitments).toFixed(0);
     const sapAllProductionTaskCommitments = Number(sapCostAll[project.id]?.production_task_commitments).toFixed(0);
-    const SapCommitmentsAllValue = Number(sapAllProjectTaskCommitments) + Number(sapAllProductionTaskCommitments);
-    expect(await findByText(`${SapCommitmentsAllValue}`)).toBeInTheDocument();
+    const sapCommitmentsAllValue = Number(sapAllProjectTaskCommitments) + Number(sapAllProductionTaskCommitments);
+    expect(await findByText(`${formatNumberToContainSpaces(sapCommitmentsAllValue)}`)).toBeInTheDocument();
 
-    const SapAllSpentValue = SapCostsAllValue + SapCommitmentsAllValue;
-    expect(await findByText(`${SapAllSpentValue}`)).toBeInTheDocument();
+    const SapAllSpentValue = sapCostsAllValue + sapCommitmentsAllValue;
+    expect(await findByText(`${formatNumberToContainSpaces(SapAllSpentValue)}`)).toBeInTheDocument();
 
     expect(await findByText('overrunRightValue' || '')).toBeInTheDocument();
     expect(await findByText(`${project?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();

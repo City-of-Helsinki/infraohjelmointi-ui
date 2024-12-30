@@ -86,6 +86,10 @@ const ListField: FC<IListFieldProps> = ({
     }
   }, [cancelEdit]);
 
+  const formatFieldValue = (fieldValue: string) => {
+    return formatNumberToContainSpaces(Number(Number(fieldValue).toFixed(0)))
+  }
+
   return (
     <div className="input-wrapper" id={name} data-testid={name}>
       <div className="flex flex-col">
@@ -108,7 +112,7 @@ const ListField: FC<IListFieldProps> = ({
                 
                 {!editing || f.readOnly ? (
                   <div className="list-field-values">
-                    <span>{f.isSapProject ? `${getSapCostValue(f)}` : `${formatNumberToContainSpaces(Number((field.value).toFixed(0)))}`}</span>
+                    <span>{f.isSapProject ? `${getSapCostValue(f)}` : `${formatFieldValue(field.value)}`}</span>
                     <span>{f.isSapProject ? '€' : 'keur'}</span>
                   </div>
                 ) : (
