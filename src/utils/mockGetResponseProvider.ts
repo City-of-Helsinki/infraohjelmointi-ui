@@ -106,6 +106,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockSapCosts);
       case url.toLocaleLowerCase().includes(`/coordinator-notes/`):
         return Promise.resolve(mockCoordinatorNotes);
+      case url.toLocaleLowerCase().includes(`/sap-current-year-costs/${year}/`):
+        return Promise.resolve(mockSapCosts);
       default:
         console.log('not found!: ', url);
 
