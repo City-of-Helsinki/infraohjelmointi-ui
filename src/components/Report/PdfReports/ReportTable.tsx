@@ -6,7 +6,8 @@ import {
   flattenBudgetBookSummaryTableRows,
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
-  flattenConstructionProgramTableRows
+  flattenConstructionProgramTableRows,
+  flattenForecastTableRows
 } from '@/utils/reportHelpers';
 import TableRow from './TableRow';
 import {
@@ -68,7 +69,16 @@ const ReportTable: FC<IReportTableProps> = ({
   ) : [];
 
   const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType === Reports.ForecastReport ?
-    flattenStrategyTableRows(reportRows) : [];
+    flattenStrategyTableRows(reportRows) : flattenForecastTableRows(reportRows);
+
+  // const strategyReportRows = (reportType: ReportType) => {
+  //   if (reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame) {
+  //     return flattenStrategyTableRows(reportRows);
+  //   } else if (reportType === Reports.ForecastReport) {
+  //     return flattenForecastTableRows(reportRows);
+  //   }
+  //   else return [];
+  // }
 
   const getTableHeader = () => {
     switch (reportType) {

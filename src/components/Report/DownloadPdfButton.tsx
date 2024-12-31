@@ -81,10 +81,15 @@ const getData = async (
   getForcedToFrameData: IDownloadPdfButtonProps['getForcedToFrameData'],
   type: ReportType,
   year: number,
+  coordinatorData?: boolean,
 ) => {
-  // Function is used on Reports Strategy, strategyForcedToFrame, and BudgetBookSummary
+  // Function is used on Reports Strategy, strategyForcedToFrame, ForecastReport and BudgetBookSummary
   if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
   if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
+  if (type === Reports.ForecastReport) {
+    if (coordinatorData) return await getForcedToFrameData(year + 1, false);
+    else return await getForcedToFrameData(year + 1, true);
+  } 
   else return await getForcedToFrameData(year, true);
 };
 
@@ -115,7 +120,6 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       switch (type) {
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame:
-        case Reports.ForecastReport:
         case Reports.BudgetBookSummary: {
           // For Strategy report, we will fetch next year data
           const res = await getData(getForcedToFrameData, type, year);
@@ -127,6 +131,28 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
               res.initialSelections,
               res.projects,
               res.groupRes,
+            );
+            document = getPdfDocument(type, coordinatorRows);
+          }
+          break;
+        }
+        case Reports.ForecastReport: {
+          // For ForecastReport report, we will fetch both coordinator and forceToFrame data
+          // true = coordinatorData, false = forcedToFrameData
+
+          // tässä nyt haettu data jo kahteen kertaan. Jatko: toteuta se, miten dataa vertaillaan.
+          // pohjana on coordinator data, ja sovitetusta datasta otetaan luvut oikeille kohdille. 
+
+          const resCoordinator = await getData(getForcedToFrameData, type, year, true);
+          const resForcedToFrame = await getData(getForcedToFrameData, type, year, false);
+
+          if (resCoordinator && resCoordinator.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(
+              resCoordinator.classHierarchy,
+              resCoordinator.forcedToFrameDistricts.districts,
+              resCoordinator.initialSelections,
+              resCoordinator.projects,
+              resCoordinator.groupRes,
             );
             document = getPdfDocument(type, coordinatorRows);
           }

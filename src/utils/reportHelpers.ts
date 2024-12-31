@@ -1059,7 +1059,7 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
 
 const forecastCsvRows: IForecastTableCsvRow[] = [];
 
-const processForecastTableRows = (tableRows: IStrategyTableRow[]) => {
+const processForecastTableRows = (tableRows: IForecastTableRow[]) => {
   tableRows.forEach((tableRow) => {
     if (!forecastCsvRows.some(row => row.id === tableRow.id)) {
       forecastCsvRows.push({
@@ -1279,7 +1279,7 @@ export const getReportData = async (
     switch (reportType) {
       case Reports.ForecastReport: {
         //Flatten rows to one dimension
-        const flattenedRows = flattenForecastTableRows(reportRows as IStrategyTableRow[]);
+        const flattenedRows = flattenForecastTableRows(reportRows as IForecastTableRow[]);
         return flattenedRows.map((r) => ({
           [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
           [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
