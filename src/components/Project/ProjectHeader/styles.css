@@ -14,3 +14,16 @@
 .project-header-phase-select-container .empty-select-field-button {
   @apply top-4;
 }
+
+.project-header-icon {
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.project-header-phase {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  color: white;
+}

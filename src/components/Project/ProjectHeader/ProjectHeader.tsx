@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { ProgressCircle, SelectField } from '@/components/shared';
+import { ProgressCircle } from '@/components/shared';
 import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
 import { IProjectRequest } from '@/interfaces/projectInterfaces';
 import { selectProject, setIsSaving, setSelectedProject } from '@/reducers/projectSlice';
@@ -10,13 +10,12 @@ import ProjectNameFields from './ProjectNameFields';
 import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import ProjectFavouriteField from './ProjectFavouriteField';
 import { selectUser } from '@/reducers/authSlice';
-import { useOptions } from '@/hooks/useOptions';
 import { useTranslation } from 'react-i18next';
 import { patchProject } from '@/services/projectServices';
-import _ from 'lodash';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import optionIcon from '@/utils/optionIcon';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -32,10 +31,9 @@ const ProjectHeader: FC = () => {
   const isOnlyViewer = isUserOnlyViewer(user);
 
   const projectGroupName = useMemo(() => {
-    if (!project?.projectGroup) {
-      return '';
-    }
-    return groups.find((g) => g.id === project.projectGroup)?.name;
+    return project?.projectGroup
+      ? groups.find((g) => g.id === project.projectGroup)?.name ?? ''
+      : '';
   }, [groups, project?.projectGroup]);
 
   const {
@@ -45,16 +43,15 @@ const ProjectHeader: FC = () => {
     getValues,
   } = formMethods;
 
-  const phases = useOptions('phases');
   const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
-
+  const [icon, setIcon] = useState(optionIcon[iconKey as keyof typeof optionIcon]);
   const onSubmit: SubmitHandler<IProjectHeaderForm> = useCallback(
     async (form: IProjectHeaderForm) => {
       if (isDirty) {
         dispatch(setIsSaving(true));
         const data: IProjectRequest = dirtyFieldsToRequestObject(dirtyFields, form as IAppForms);
 
-        if (_.has(data, 'favourite')) {
+        if ('favourite' in data) {
           // Set favourite persons as a set to include user ID and filter it away if the user de-selected it as a favourite
           data.favPersons = Array.from(
             new Set<string>([...(project?.favPersons ?? []), user?.uuid ?? '']),
@@ -89,8 +86,11 @@ const ProjectHeader: FC = () => {
   );
 
   useEffect(() => {
-    setIconKey(mapIconKey(getValues('phase').label));
-  }, [getValues('phase').label]);
+    const phaseLabel = getValues('phase').label;
+    const newIconKey = mapIconKey(phaseLabel);
+    setIconKey(newIconKey);
+    setIcon(optionIcon[newIconKey as keyof typeof optionIcon]);
+  }, [getValues]);
 
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
@@ -108,14 +108,10 @@ const ProjectHeader: FC = () => {
             data-testid="project-header-name-fields"
           >
             <ProjectNameFields control={control} />
-            <SelectField
-              disabled={true}
-              name="phase"
-              control={control}
-              options={phases}
-              iconKey={iconKey}
-              shouldUpdateIcon={true}
-            />
+            <div className="project-header-phase">
+              <div className="project-header-icon">{icon}</div>
+              <div>{t(`option.${getValues('phase').label}`)}</div>
+            </div>
           </div>
         </div>
         <div className="mr-3 flex-1" data-testid="project-header-right">
