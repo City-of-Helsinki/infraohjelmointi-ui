@@ -39,6 +39,7 @@ const ProjectHeader: FC = () => {
   const {
     formState: { dirtyFields, isDirty },
     control,
+    watch,
     handleSubmit,
     getValues,
   } = formMethods;
@@ -85,12 +86,13 @@ const ProjectHeader: FC = () => {
     [isDirty, dispatch, dirtyFields, project?.id, project?.favPersons, user?.uuid],
   );
 
+  const phase = watch('phase');
+
   useEffect(() => {
-    const phaseLabel = getValues('phase').label;
-    const newIconKey = mapIconKey(phaseLabel);
+    const newIconKey = mapIconKey(phase?.label);
     setIconKey(newIconKey);
     setIcon(optionIcon[newIconKey as keyof typeof optionIcon]);
-  }, [getValues]);
+  }, [phase]);
 
   return (
     <form onBlur={handleSubmit(onSubmit) as SubmitHandler<FieldValues>}>
