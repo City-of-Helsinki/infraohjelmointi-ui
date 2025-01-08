@@ -27,7 +27,7 @@ import { CustomContextMenu } from './components/CustomContextMenu';
 import { getCoordinationGroupsThunk, getForcedToFrameGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
-import { getSapCostsThunk } from './reducers/sapCostSlice';
+import { getSapCostsThunk,getSapCurrentYearThunk } from './reducers/sapCostSlice';
 import moment from 'moment';
 import 'moment/locale/fi';
 import ScrollHandler from './components/shared/ScrollHandler';
@@ -140,6 +140,7 @@ const App: FC = () => {
         loadCoordinationData(dispatch, startYear);
       }
       dispatch(getSapCostsThunk(startYear));
+      dispatch(getSapCurrentYearThunk(startYear));
     }
   }, [user, startYear, MAINTENANCE_MODE, dispatch]);
 
