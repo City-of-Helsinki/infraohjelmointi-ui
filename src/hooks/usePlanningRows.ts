@@ -65,10 +65,7 @@ export const buildPlanningTableRows = (
   subDivisions?: Array<ILocation>
 ) => {
   const { masterClasses, classes, subClasses, districts, divisions, otherClassifications, groups } = list;
-
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
-
-
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
 
