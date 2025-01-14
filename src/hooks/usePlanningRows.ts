@@ -2,6 +2,7 @@ import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
 import { selectBatchedPlanningLocations, selectPlanningSubDivisions } from '@/reducers/locationSlice';
 import { useEffect } from 'react';
+import { useLocation } from 'react-router';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
   IPlanningRow,
@@ -265,6 +266,7 @@ const usePlanningRows = () => {
   const batchedPlanningClasses = useAppSelector(selectBatchedPlanningClasses);
   const batchedPlanningLocations = useAppSelector(selectBatchedPlanningLocations);
   const subDivisions = useAppSelector(selectPlanningSubDivisions);
+  const location = useLocation();
 
   const mode = useAppSelector(selectPlanningMode);
 
@@ -287,10 +289,14 @@ const usePlanningRows = () => {
       }
     };
 
-    if (type && id) {
+    // Prevent fetching projects if selected class/district is different what is shown on the page
+    const queryParams = new URLSearchParams(location.search);
+    const openedViewId = queryParams.get(type as string);
+
+    if (type && id && openedViewId === id) {
       getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
-  }, [selections, groups, mode, forcedToFrame, startYear, dispatch]);
+  }, [selections, groups, mode, forcedToFrame, startYear, dispatch, location.search]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
   useEffect(() => {
