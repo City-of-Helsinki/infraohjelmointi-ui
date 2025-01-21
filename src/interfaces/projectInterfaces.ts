@@ -185,6 +185,7 @@ export enum ProjectType {
   Omastadi = 'omaStadi',
   ProjectArea = 'projectArea',
   Park = 'park',
+  PreConstruction = 'preConstruction',
 }
 
 // These will be used in order to render the icons for project header phase field
