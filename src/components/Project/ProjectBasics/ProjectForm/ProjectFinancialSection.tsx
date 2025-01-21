@@ -23,6 +23,7 @@ interface IProjectFinancialSectionProps {
     label: string;
     control: Control<IProjectForm>;
     sapCosts: IProjectSapCost | null;
+    sapCurrentYear: IProjectSapCost | null;
   };
   classOptions: {
     masterClasses: IOption[];
@@ -125,6 +126,11 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
               ...validateMaxLength(15, t),
               ...validateInteger(t),
             },
+          },
+          {
+            ...getFieldProps('realizedCostCurrentYear'),
+            readOnly: true,
+            isSapProject: true,
           },
           {
             ...getFieldProps('realizedCost'),

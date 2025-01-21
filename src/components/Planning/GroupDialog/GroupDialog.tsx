@@ -1,5 +1,5 @@
 import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
-import { Button } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react/components/Button';
 import { Dialog } from 'hds-react/components/Dialog';
 import { useTranslation } from 'react-i18next';
 import { TextField, SelectField } from '@/components/shared';
@@ -80,8 +80,11 @@ const DialogContainer: FC<IDialogProps> = memo(
       return (
         !nameField ||
         !masterClassField.value ||
-        !classField.value || 
-        (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring)) && !districtField.value)
+        !classField.value ||
+        (['suurpiiri', 'östersundom'].some((subClassSubstring) =>
+          subClassField.label.includes(subClassSubstring),
+        ) &&
+          !districtField.value)
       );
     }, [
       districtField.value,
@@ -91,7 +94,7 @@ const DialogContainer: FC<IDialogProps> = memo(
       subClassField.value,
       locationOptions,
       masterClassField.value,
-      classField.value
+      classField.value,
     ]);
 
     const dispatch = useAppDispatch();
@@ -103,9 +106,10 @@ const DialogContainer: FC<IDialogProps> = memo(
           masterClass: form.masterClass.value,
           class: form.class.value,
           subClass: form.subClass.value,
-          ...(form.district.value && !form.division.value && {
-            district: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions)
-          }),
+          ...(form.district.value &&
+            !form.division.value && {
+              district: getLocationRelationId(form, hierarchyDistricts, hierarchyDivisions),
+            }),
         };
 
         navigate({
@@ -127,7 +131,12 @@ const DialogContainer: FC<IDialogProps> = memo(
         if (editMode && id) {
           try {
             const group = await patchGroup(
-              buildRequestPayload(form, id, hierarchyDistricts, hierarchyDivisions) as IGroupPatchRequestObject,
+              buildRequestPayload(
+                form,
+                id,
+                hierarchyDistricts,
+                hierarchyDivisions,
+              ) as IGroupPatchRequestObject,
             );
             dispatch(updateGroup({ data: group, type: 'planning' }));
             handleDialogClose();
@@ -136,7 +145,16 @@ const DialogContainer: FC<IDialogProps> = memo(
           }
         } else {
           try {
-            await dispatch(postGroupThunk(buildRequestPayload(form, null, hierarchyDistricts, hierarchyDivisions) as IGroupRequest));
+            await dispatch(
+              postGroupThunk(
+                buildRequestPayload(
+                  form,
+                  null,
+                  hierarchyDistricts,
+                  hierarchyDivisions,
+                ) as IGroupRequest,
+              ),
+            );
             handleDialogClose();
             navigateToGroupLocation(form);
           } catch (e) {
@@ -185,7 +203,9 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const districtValidation = useCallback(
       (d: IOption, subClass: string) =>
-        ((["suurpiiri", "östersundom"].some(subClassSubstring => subClass.includes(subClassSubstring))) && !subClass.includes(d.label))
+        ['suurpiiri', 'östersundom'].some((subClassSubstring) =>
+          subClass.includes(subClassSubstring),
+        ) && !subClass.includes(d.label)
           ? t('validation.incorrectLocation', { field: 'suurpiiri' }) || ''
           : true,
       [t],
@@ -272,9 +292,15 @@ const DialogContainer: FC<IDialogProps> = memo(
                           {...formProps('subClass')}
                           options={classOptions.subClasses}
                           rules={{
-                            required: classOptions.subClasses.length > 0 ? t('validation.required', { field: 'Alaluokka' }) ?? '' : '',
+                            required:
+                              classOptions.subClasses.length > 0
+                                ? t('validation.required', { field: 'Alaluokka' }) ?? ''
+                                : '',
                             validate: {
-                              isPopulated: (c: IOption) => classOptions.subClasses.length > 0 ? customValidation(c, 'Alaluokka') ?? '' : true,
+                              isPopulated: (c: IOption) =>
+                                classOptions.subClasses.length > 0
+                                  ? customValidation(c, 'Alaluokka') ?? ''
+                                  : true,
                             },
                           }}
                         />
@@ -285,9 +311,14 @@ const DialogContainer: FC<IDialogProps> = memo(
                           <SelectField
                             {...formProps('district')}
                             rules={{
-                              required: (["suurpiiri", "östersundom"].some(subClassSubstring => subClassField.label.includes(subClassSubstring))) ? t('validation.required', { field: 'Suurpiiri' }) ?? '' : '',
+                              required: ['suurpiiri', 'östersundom'].some((subClassSubstring) =>
+                                subClassField.label.includes(subClassSubstring),
+                              )
+                                ? t('validation.required', { field: 'Suurpiiri' }) ?? ''
+                                : '',
                               validate: {
-                                isValidDistrict: (d: IOption) => districtValidation(d, subClassField.label),
+                                isValidDistrict: (d: IOption) =>
+                                  districtValidation(d, subClassField.label),
                               },
                             }}
                             options={locationOptions.districts}
@@ -307,10 +338,9 @@ const DialogContainer: FC<IDialogProps> = memo(
                       {/* Divider to click */}
                       <div className="advance-fields-button">
                         <button onClick={toggleAdvanceFields}>
-                          {!showAdvanceFields ?
-                            (t(`groupForm.openAdvanceFilters`)
-                            ) : (
-                              (t(`groupForm.closeAdvanceFilters`)))}
+                          {!showAdvanceFields
+                            ? t(`groupForm.openAdvanceFilters`)
+                            : t(`groupForm.closeAdvanceFilters`)}
                         </button>
                         {advanceFieldIcons}
                       </div>
@@ -319,10 +349,7 @@ const DialogContainer: FC<IDialogProps> = memo(
                 </div>
 
                 <div>
-                  <GroupProjectSearch
-                    getValues={getValues}
-                    control={control}
-                  />
+                  <GroupProjectSearch getValues={getValues} control={control} />
                 </div>
               </div>
             </Content>
@@ -335,7 +362,11 @@ const DialogContainer: FC<IDialogProps> = memo(
               >
                 {editMode ? t('save') : t('groupForm.createGroup')}
               </Button>
-              <Button onClick={handleDialogClose} variant="secondary" data-testid="cancel-search">
+              <Button
+                onClick={handleDialogClose}
+                variant={ButtonVariant.Secondary}
+                data-testid="cancel-search"
+              >
                 {t('cancel')}
               </Button>
             </ActionButtons>

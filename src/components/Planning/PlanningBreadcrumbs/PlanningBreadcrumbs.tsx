@@ -8,7 +8,9 @@ import './styles.css';
 
 const Breadcrumb = memo(({ value, path, id }: { value: string; path: string; id: string }) => (
   <>
-    <IconAngleRight data-testid="breadcrumb-arrow" />
+    <button data-testid="breadcrumb-arrow">
+      <IconAngleRight />
+    </button>
     <li className="breadcrumb">
       <Link data-testid={`${id}-breadcrumb`} to={path}>
         {value}

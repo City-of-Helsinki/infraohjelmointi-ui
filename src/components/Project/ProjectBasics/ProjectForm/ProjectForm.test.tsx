@@ -2,7 +2,7 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
-import { arrayHasValue, matchExact } from '@/utils/common';
+import { arrayHasValue, formatNumberToContainSpaces, matchExact } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockConstructionPhaseDetails,
@@ -32,7 +32,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogContext';
 import { mockUser } from '@/mocks/mockUsers';
 import { IPerson } from '@/interfaces/personsInterfaces';
-import { mockSapCostsProject } from '@/mocks/mockSapCosts';
+import { mockAllSapCostsProject, mockCurrentYearSapCostsProject } from '@/mocks/mockSapCosts';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -96,8 +96,10 @@ const render = async () =>
             error: {},
           },
           sapCosts: {
-            projects: mockSapCostsProject.data,
+            projects: mockAllSapCostsProject.data,
+            currentYearSapProjects: mockCurrentYearSapCostsProject.data,
             groups: {},
+            currentYearSapGroups: {},
             error: null,
           }
         },
@@ -135,8 +137,8 @@ describe('projectForm', () => {
     const { findByDisplayValue, findByText, findByTestId } = await render();
 
     const project = mockProject.data;
-    const sapCost = mockSapCostsProject.data;
-    const sapCostsSum = Number(sapCost[project.id].project_task_commitments) + Number(sapCost[project.id].production_task_costs);
+    const sapCostAll = mockAllSapCostsProject.data;
+    const sapCostCurrentYear = mockCurrentYearSapCostsProject.data;
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
@@ -161,10 +163,28 @@ describe('projectForm', () => {
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);
     expectRadioBoolean('effectHousing-0', false);
-    expect(await findByText(Number(project?.costForecast).toFixed(0) + ' keur'|| '')).toBeInTheDocument();
-    expect(await findByText(Number(sapCost[project.id]?.project_task_commitments).toFixed(0) + ' €' || '')).toBeInTheDocument();
-    expect(await findByText(Number(sapCost[project.id]?.project_task_costs).toFixed(0) + ' €' || '')).toBeInTheDocument();
-    expect(await findByText(sapCostsSum.toFixed(0) + ' €' || '')).toBeInTheDocument();
+
+    const costForecastValue = Number(project?.costForecast).toFixed(0);
+    expect(await findByText(`${formatNumberToContainSpaces(Number(costForecastValue))}`)).toBeInTheDocument();
+
+    const sapCurrentYearprojectTaskCosts = Number(sapCostCurrentYear[project.id]?.project_task_costs).toFixed(0);
+    const sapCurrentYearProductionTaskCosts = Number(sapCostCurrentYear[project.id]?.production_task_costs).toFixed(0);
+    const sapCostsCurrentYearValue = Number(sapCurrentYearprojectTaskCosts) + Number(sapCurrentYearProductionTaskCosts);
+    expect(await findByText(`${formatNumberToContainSpaces(sapCostsCurrentYearValue)}`)).toBeInTheDocument();
+
+    const sapAllProjectTaskCosts = Number(sapCostAll[project.id]?.project_task_costs).toFixed(0);
+    const sapAllProductionTaskCosts = Number(sapCostAll[project.id]?.production_task_costs).toFixed(0);
+    const sapCostsAllValue = Number(sapAllProjectTaskCosts) + Number(sapAllProductionTaskCosts);
+    expect(await findByText(`${formatNumberToContainSpaces(sapCostsAllValue)}`)).toBeInTheDocument();
+
+    const sapAllProjectTaskCommitments = Number(sapCostAll[project.id]?.project_task_commitments).toFixed(0);
+    const sapAllProductionTaskCommitments = Number(sapCostAll[project.id]?.production_task_commitments).toFixed(0);
+    const sapCommitmentsAllValue = Number(sapAllProjectTaskCommitments) + Number(sapAllProductionTaskCommitments);
+    expect(await findByText(`${formatNumberToContainSpaces(sapCommitmentsAllValue)}`)).toBeInTheDocument();
+
+    const SapAllSpentValue = sapCostsAllValue + sapCommitmentsAllValue;
+    expect(await findByText(`${formatNumberToContainSpaces(SapAllSpentValue)}`)).toBeInTheDocument();
+
     expect(await findByText('overrunRightValue' || '')).toBeInTheDocument();
     expect(await findByText(`${project?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();
     expectDisplayValue(project?.description);
@@ -380,7 +400,7 @@ describe('projectForm', () => {
     const { user, findByRole, findByTestId } = await render();
     const expectedValue = '13.12.2021';
     const project = mockProject.data;
-    const responseProject: {data: IProject } = {
+    const responseProject: { data: IProject } = {
       data: { ...project, estPlanningStart: expectedValue },
     };
 
@@ -391,7 +411,8 @@ describe('projectForm', () => {
       name: getFormField('estPlanningStart'),
     });
     const planningStartYear = await findByRole('spinbutton', {
-      name: getFormField('planningStartYear')});
+      name: getFormField('planningStartYear'),
+    });
 
     await user.clear(estPlanningStart);
     await user.type(estPlanningStart, expectedValue);
@@ -402,7 +423,7 @@ describe('projectForm', () => {
     expect(planningStartYear).not.toEqual(yearToBeSet);
     expect(mockedAxios.patch.mock.lastCall).toBeUndefined;
   });
-  
+
   it('can patch a TextField', async () => {
     const expectedValue = 'New description';
     const project = mockProject.data;
@@ -450,7 +471,6 @@ describe('projectForm', () => {
   });
 
   it('can post a new project', async () => {
-    jest.setTimeout(15000);
     const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
     const { dispatch } = store;
 
@@ -463,16 +483,16 @@ describe('projectForm', () => {
     };
 
     const project = mockProject.data;
-    const mockPostResponse: { data: IProject, status: number} = {
-          data: {
-            ...project,
-            id: 'post-project-id',
-            description: expectedDescription,
-            programmed: expectedProgrammed,
-            phase: expectedPhase,
-            name: expectedName,
-          },
-          status: 201,
+    const mockPostResponse: { data: IProject; status: number } = {
+      data: {
+        ...project,
+        id: 'post-project-id',
+        description: expectedDescription,
+        programmed: expectedProgrammed,
+        phase: expectedPhase,
+        name: expectedName,
+      },
+      status: 201,
     };
 
     // reset the form and set project mode to new
@@ -520,10 +540,8 @@ describe('projectForm', () => {
     expect(await findByTestId('project-form-description')).toHaveTextContent(
       matchExact(expectedDescription),
     );
-    expect(await findByTestId('phase')).toHaveTextContent(
-      matchExact(expectedPhase.value),
-    );
-  }, 10000);
+    expect(await findByTestId('phase')).toHaveTextContent(matchExact(expectedPhase.value));
+  }, 15000);
 
   it('can delete a project', async () => {
     const project = mockProject.data;

@@ -33,6 +33,7 @@ export interface IForm {
   placeholder?: string;
   sapCosts?: IProjectSapCost | null;
   isSapProject?: boolean;
+  sapCurrentYear?: IProjectSapCost | null;
 }
 
 export interface IProjectHeaderForm {

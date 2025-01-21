@@ -1,4 +1,4 @@
-import { IconAngleRight, IconCrossCircle } from 'hds-react/icons';
+import { IconAngleRight, IconCrossCircle, IconSize } from 'hds-react/icons';
 import { FC, memo } from 'react';
 
 import './styles.css';
@@ -29,7 +29,7 @@ const SelectedProjectCard: FC<ISelectedProjectCardProps> = ({
         {breadCrumbs?.map((b, i) => (
           <div key={b}>
             <span>{b}</span>
-            {breadCrumbs.length > i + 1 && <IconAngleRight size="xs" />}
+            {breadCrumbs.length > i + 1 && <IconAngleRight size={IconSize.ExtraSmall} />}
           </div>
         ))}
       </div>

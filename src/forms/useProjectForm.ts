@@ -145,6 +145,7 @@ const useProjectFormValues = () => {
       constructionPhase: listItemToOption(project?.constructionPhase),
       constructionWorkQuantity: value(project?.constructionWorkQuantity),
       costForecast: value(project?.costForecast),
+      sapCurrentYear: value(project?.sapCurrentYear),
       realizedCost: value(project?.realizedCost),
       comittedCost: value(project?.comittedCost),
       spentCost: value(project?.spentCost),
