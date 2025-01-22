@@ -111,7 +111,8 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
 
     const onHashTagDelete = useCallback((value: string) => {
       setFormState((current) => {
-        const hashTagsForSubmit = current.hashTagsForSubmit.filter((hv) => hv.value !== value);
+        const hashTagsForSubmit = current.hashTagsForSubmit.filter((hv) => hv.id !== value);
+
         if (projectMode === 'new') {
           setHashTagsState((current) => ({
             ...current,

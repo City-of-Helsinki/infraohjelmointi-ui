@@ -30,6 +30,10 @@ export const mockProjectTypes: { data: Array<IListItem> } = {
       id: '720bddee-9a45-40cd-83f6-89fc44dfd8f6',
       value: 'park',
     },
+    {
+      id: '7e60a0b0-4801-4cb2-8178-69d876515d96',
+      value: 'preConstruction',
+    },
   ],
 };
 
