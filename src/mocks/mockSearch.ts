@@ -47,6 +47,7 @@ export const mockSearchResults: { data: ISearchResults } = {
         id: 'planning-project-1',
         type: 'projects',
         programmed: true,
+        group: '',
         hashTags: [
           {
             id: 'hashtag-1',
@@ -71,6 +72,7 @@ export const mockSearchResults: { data: ISearchResults } = {
         phase: null,
         path: '',
         programmed: false,
+        group: '',
       },
       {
         name: 'Koillinen',
@@ -80,6 +82,7 @@ export const mockSearchResults: { data: ISearchResults } = {
         phase: null,
         path: 'masterClass=7b69a4ae-5950-4175-a142-66dc9c6306a4&class=c6294258-41b1-4ad6-afdf-0b10849ca000&subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8',
         programmed: null,
+        group: '',
       },
     ],
   },
@@ -99,6 +102,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -108,6 +112,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -117,6 +122,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -126,6 +132,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -135,6 +142,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -144,6 +152,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -153,6 +162,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -162,6 +172,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -171,6 +182,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
       {
@@ -180,6 +192,7 @@ export const mockLongSearchResults: { data: ISearchResults } = {
         hashTags: [],
         phase: null,
         programmed: true,
+        group: '',
         path: '7b69a4ae-5950-4175-a142-66dc9c6306a4/c6294258-41b1-4ad6-afdf-0b10849ca000/55c6accb-80a4-4cb8-ad5b-8f605459e537',
       },
     ],

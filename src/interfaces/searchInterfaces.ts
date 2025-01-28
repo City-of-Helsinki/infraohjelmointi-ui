@@ -11,6 +11,7 @@ export interface ISearchResultPayloadItem {
   hashTags: Array<IListItem>;
   phase: IListItem | null;
   programmed: boolean | null;
+  group: string;
 }
 
 export interface IProgrammedProjectSuggestions {

@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { useAppSelector } from './common';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { selectPlanningDistricts } from '@/reducers/locationSlice';
+import { selectPlanningGroups } from '@/reducers/groupSlice';
+import { IGroup } from '@/interfaces/groupInterfaces';
 
 const buildBreadCrumbs = (
   path: string,
@@ -35,17 +37,25 @@ const buildLink = (r: ISearchResultPayloadItem) => {
   return `/planning/?${r.path}`;
 };
 
+function extractUUIDs(input: string): string[] {
+  const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+  const matches = input.match(uuidRegex);
+
+  return matches || [];
+}
+
 const buildSearchResultsList = (
   searchResults: Array<ISearchResultPayloadItem>,
   classes: Array<IClass>,
   districts: Array<ILocation>,
+  groups: Array<IGroup>,
 ): Array<ISearchResultListItem> => {
   const parsedResults = searchResults.map((r) => {
     return {
       ...r,
       phase: r.phase?.value ?? null,
       breadCrumbs: buildBreadCrumbs(r.path, classes, districts),
-      link: buildLink(r),
+      link: buildLink(r), //, groupClassId
     };
   });
 
@@ -61,12 +71,13 @@ const buildSearchResultsList = (
 const useSearchResultsList = () => {
   const classes = useAppSelector(selectAllPlanningClasses);
   const districts = useAppSelector(selectPlanningDistricts);
+  const groups = useAppSelector(selectPlanningGroups);
   const { results, next, previous, count } = useAppSelector(selectSearchResults);
   const [searchResultsList, setSearchResultsList] = useState<Array<ISearchResultListItem>>([]);
 
   useEffect(() => {
     if (results) {
-      setSearchResultsList(buildSearchResultsList(results, classes, districts));
+      setSearchResultsList(buildSearchResultsList(results, classes, districts, groups));
     }
   }, [classes, results]);
 
