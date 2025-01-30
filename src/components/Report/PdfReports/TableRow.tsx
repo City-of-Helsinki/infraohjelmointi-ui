@@ -8,6 +8,7 @@ import {
   Reports,
   IForecastTableRow
 } from '@/interfaces/reportInterfaces';
+import { formattedNumberToNumber } from '@/utils/calculations';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -338,6 +339,15 @@ const strategyReportStyles = StyleSheet.create({
     width: '30px',
   },
 });
+
+const forecastReportStyles = StyleSheet.create({
+  forecastDeviationCostOver: {
+    ...strategyReportStyles.budgetCell,
+    backgroundColor: '#BD2719',
+    color: '#ffffff',
+  },
+});
+
 interface ITableRowProps {
   flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[] | IConstructionProgramTableRow[] | IForecastTableRow[];
   index?: number;
@@ -428,6 +438,15 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
   }
 }
 
+const getForecastDeviationStyle = (deviationValueString: string) => {
+  const dValue = formattedNumberToNumber(deviationValueString);
+  const THRESHOLD = 200000;
+  if (dValue > THRESHOLD || dValue < -THRESHOLD ) {
+    return forecastReportStyles.forecastDeviationCostOver;
+  }
+  return strategyReportStyles.budgetCell;
+}
+
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
@@ -469,7 +488,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                       <>
                         <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForcedToFrameBudget}</Text>
                         <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecastDeviation}</Text>
+                        <Text style={getForecastDeviationStyle(flattenedRow.costForecastDeviation ?? "0")}>{flattenedRow.costForecastDeviation}</Text>
                       </>
                     }
                     
