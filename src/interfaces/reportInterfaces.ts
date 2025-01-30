@@ -188,6 +188,8 @@ export interface IStrategyTableRow extends ITableRowEssentials {
   projectPhase?: string;
   costPlan?: string;
   costForecast?: string;
+  costForcedToFrameBudget?: string;
+  costForecastDeviation?: string;
   januaryStatus?: string;
   februaryStatus?: string;
   marchStatus?: string;
@@ -210,8 +212,8 @@ export interface IForecastTableRow extends ITableRowEssentials {
   projectPhase?: string;
   costPlan?: string;
   costForecast?: string;
-  newValue?: string; //TODO
-  newValue2?: string;
+  costForcedToFrameBudget?: string;
+  costForecastDeviation?: string;
   januaryStatus?: string;
   februaryStatus?: string;
   marchStatus?: string;

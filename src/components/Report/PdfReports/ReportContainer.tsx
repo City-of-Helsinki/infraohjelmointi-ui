@@ -2,6 +2,7 @@ import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
 import { FC, memo } from 'react';
 import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import DocumentHeader from './DocumentHeader';
 import ReportTable from './ReportTable';
@@ -22,9 +23,10 @@ interface IPdfReportContainerProps {
   reportType: ReportType;
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[],
+  forcedToFrameRows?: IPlanningRow[],
 }
 
-const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase }) => {
+const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows }) => {
   const { t } = useTranslation();
 
   const getDocumentTitle = () => {
@@ -95,7 +97,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             reportType={reportType}
             date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
           />
-          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} />
+          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} hierarchyInForcedToFrame={forcedToFrameRows}/>
           {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport?
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}

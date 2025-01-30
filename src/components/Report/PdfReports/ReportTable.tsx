@@ -1,5 +1,6 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
+import { useTranslation } from 'react-i18next';
 import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
 import {
   convertToReportRows,
@@ -9,7 +10,6 @@ import {
   flattenConstructionProgramTableRows,
   flattenForecastTableRows
 } from '@/utils/reportHelpers';
-import TableRow from './TableRow';
 import {
   IBasicReportData,
   IBudgetBookSummaryTableRow,
@@ -18,11 +18,12 @@ import {
   ReportType,
   Reports
 } from '@/interfaces/reportInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
 import StrategyTableHeader from './StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
-import { useTranslation } from 'react-i18next';
-import { IProject } from '@/interfaces/projectInterfaces';
+import TableRow from './TableRow';
 
 const styles = StyleSheet.create({
   table: {
@@ -35,6 +36,7 @@ interface IReportTableProps {
   reportType: ReportType;
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[];
+  hierarchyInForcedToFrame?: IPlanningRow[];
 }
 
 const getFlattenedRows = (
@@ -53,10 +55,11 @@ const getFlattenedRows = (
 const ReportTable: FC<IReportTableProps> = ({
   reportType,
   data,
-  projectsInWarrantyPhase
+  projectsInWarrantyPhase,
+  hierarchyInForcedToFrame
 }) => {
   const { t } = useTranslation();
-  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions, data.subDivisions, projectsInWarrantyPhase);
+  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions, data.subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (
@@ -68,17 +71,9 @@ const ReportTable: FC<IReportTableProps> = ({
         , reportType
   ) : [];
 
-  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType === Reports.ForecastReport ?
-    flattenStrategyTableRows(reportRows) : flattenForecastTableRows(reportRows);
-
-  // const strategyReportRows = (reportType: ReportType) => {
-  //   if (reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame) {
-  //     return flattenStrategyTableRows(reportRows);
-  //   } else if (reportType === Reports.ForecastReport) {
-  //     return flattenForecastTableRows(reportRows);
-  //   }
-  //   else return [];
-  // }
+  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
+    flattenStrategyTableRows(reportRows) : reportType === Reports.ForecastReport ?
+    flattenForecastTableRows(reportRows) : [];
 
   const getTableHeader = () => {
     switch (reportType) {

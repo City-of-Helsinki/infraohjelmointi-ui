@@ -40,6 +40,7 @@ const getPdfDocument = (
   subDivisions?: Array<IListItem>,
   categories?: IListItem[],
   projectsInWarrantyPhase?: IProject[],
+  forcedToFrameRows?: IPlanningRow[],
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis: (
@@ -53,7 +54,7 @@ const getPdfDocument = (
     strategyForcedToFrame: (
       <ReportContainer data={{ rows }} reportType={Reports.StrategyForcedToFrame} />
     ),
-    forecastReport: <ReportContainer data={{ rows }} reportType={Reports.ForecastReport} />,
+    forecastReport: <ReportContainer data={{ rows }} reportType={Reports.ForecastReport} forcedToFrameRows={forcedToFrameRows}/>,
     constructionProgram: (
       <ReportContainer
         data={{ rows, divisions, subDivisions }}
@@ -140,9 +141,6 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           // For ForecastReport report, we will fetch both coordinator and forceToFrame data
           // true = coordinatorData, false = forcedToFrameData
 
-          // tässä nyt haettu data jo kahteen kertaan. Jatko: toteuta se, miten dataa vertaillaan.
-          // pohjana on coordinator data, ja sovitetusta datasta otetaan luvut oikeille kohdille. 
-
           const resCoordinator = await getData(getForcedToFrameData, type, year, true);
           const resForcedToFrame = await getData(getForcedToFrameData, type, year, false);
 
@@ -154,7 +152,16 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
               resCoordinator.projects,
               resCoordinator.groupRes,
             );
-            document = getPdfDocument(type, coordinatorRows);
+
+            const forcedToFrameRows = getCoordinationTableRows(
+              resForcedToFrame.classHierarchy,
+              resForcedToFrame.forcedToFrameDistricts.districts,
+              resForcedToFrame.initialSelections,
+              resForcedToFrame.projects,
+              resForcedToFrame.groupRes
+            )
+
+            document = getPdfDocument(type, coordinatorRows, undefined, undefined, undefined, undefined, forcedToFrameRows);
           }
           break;
         }
@@ -206,7 +213,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame || type === Reports.ForecastReport) navigate(0);
+      //if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame || type === Reports.ForecastReport) navigate(0);
     }
   }, [documentName, type]);
 

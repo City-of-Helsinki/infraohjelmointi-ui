@@ -18,7 +18,7 @@ import {
   IForecastTableRow,
   IForecastTableCsvRow,
 } from '@/interfaces/reportInterfaces';
-import { convertToMillions, keurToMillion } from './calculations';
+import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
@@ -270,7 +270,7 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
   }
 }
 
-const convertToStrategyReportProjects = (type: ReportType, projects: IProject[]): IStrategyTableRow[] => {
+const convertToStrategyReportProjects = (type: ReportType, projects: IProject[], forcedToFrameProjects?: IProject[]): IStrategyTableRow[] => {
   const filteredProjects = (): IProject[] => {
     if (type === Reports.Strategy){
       return projects
@@ -301,30 +301,39 @@ const convertToStrategyReportProjects = (type: ReportType, projects: IProject[])
       });
   }
 
-  return filteredProjects().map((p) => ({
-    name: p.name,
-    id: p.id,
-    parent: p.projectClass ?? null,
-    projects: [],
-    children: [],
-    costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
-    costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
-    projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
-    projectPhase: getProjectPhase(p),
-    januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
-    februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
-    marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
-    aprilStatus: getStrategyReportProjectPhasePerMonth(type, p, 4),
-    mayStatus: getStrategyReportProjectPhasePerMonth(type, p, 5),
-    juneStatus: getStrategyReportProjectPhasePerMonth(type, p, 6),
-    julyStatus: getStrategyReportProjectPhasePerMonth(type, p, 7),
-    augustStatus: getStrategyReportProjectPhasePerMonth(type, p, 8),
-    septemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 9),
-    octoberStatus: getStrategyReportProjectPhasePerMonth(type, p, 10),
-    novemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 11),
-    decemberStatus: getStrategyReportProjectPhasePerMonth(type, p ,12),
-    type: 'project',
-    }));
+  return filteredProjects().map((p) => {
+    const costForecast = split(p.finances.budgetProposalCurrentYearPlus0, ".")[0]
+    const forcedToFrameData = forcedToFrameProjects?.filter((fp) => fp.id === p.id)[0];
+    const costForcedToFrameBudget = split(forcedToFrameData?.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "";
+    const costForecastDeviation = calculateCostForecastDeviation(costForecast, costForcedToFrameBudget);
+
+    return {
+      name: p.name,
+      id: p.id,
+      parent: p.projectClass ?? null,
+      projects: [],
+      children: [],
+      costPlan: "",                                       // TA value "raamiluku". Will not be shown for projects.
+      costForecast: costForecast ?? "",                   // TS value
+      costForcedToFrameBudget: costForcedToFrameBudget,   // Ennuste
+      costForecastDeviation: costForecastDeviation,       // Poikkeama
+      projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
+      projectPhase: getProjectPhase(p),
+      januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
+      februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
+      marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
+      aprilStatus: getStrategyReportProjectPhasePerMonth(type, p, 4),
+      mayStatus: getStrategyReportProjectPhasePerMonth(type, p, 5),
+      juneStatus: getStrategyReportProjectPhasePerMonth(type, p, 6),
+      julyStatus: getStrategyReportProjectPhasePerMonth(type, p, 7),
+      augustStatus: getStrategyReportProjectPhasePerMonth(type, p, 8),
+      septemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 9),
+      octoberStatus: getStrategyReportProjectPhasePerMonth(type, p, 10),
+      novemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 11),
+      decemberStatus: getStrategyReportProjectPhasePerMonth(type, p ,12),
+      type: 'project',
+    }
+  });
 }
 
 const convertToConstructionReportProjects = (
@@ -677,6 +686,12 @@ const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string
   return budget ? budget.displayFrameBudget : "";
 }
 
+export const calculateCostForecastDeviation = (plannedBudget: string | undefined, costForecast: string | undefined) => {
+  const plannedBudgetValue = plannedBudget ? formattedNumberToNumber(plannedBudget) : 0;
+  const costForecastValue = costForecast ? formattedNumberToNumber(costForecast) : 0;
+  return formatNumber(plannedBudgetValue - costForecastValue);
+}
+
 export const convertToReportRows = (
   rows: IPlanningRow[],
   reportType: ReportType | '',
@@ -685,6 +700,7 @@ export const convertToReportRows = (
   divisions?: Array<IListItem> | undefined,
   subDivisions?: Array<IListItem> | undefined,
   projectsInWarrantyPhase?: Array<IProject>,
+  hierarchyInForcedToFrame?: IPlanningRow[],
 ): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
@@ -695,19 +711,25 @@ export const convertToReportRows = (
     }
     case Reports.ForecastReport: {
       const forcedToFrameHierarchy: IForecastTableRow[] = [];
+
       for (const c of rows) {
+        const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
+        const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
+        const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
+        const forcedToFrameBudget = forcedToFrameClass?.cells[0].plannedBudget ?? "0";
         const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
+
         if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
           const convertedClass = {
             id: c.id,
             name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
             parent: null,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
-            projects: c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [],
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, undefined, forcedToFrameChildren) : [],
+            projects: c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows, forcedToFrameClass?.projectRows) : [],
             costForecast: c.cells[0].plannedBudget,
+            costForcedToFrameBudget: forcedToFrameBudget ? forcedToFrameBudget : "0",                             // Ennuste 2026
+            costForecastDeviation: calculateCostForecastDeviation(forcedToFrameBudget, c.cells[0].plannedBudget), // Poikkeama
             costPlan: frameBudget,
-            newValue: '',
-            newValue2: '',
             type: c.type as ReportTableRowType
           }
           if (convertedClass.type !== 'group' || convertedClass.projects.length) {
@@ -1068,8 +1090,8 @@ const processForecastTableRows = (tableRows: IForecastTableRow[]) => {
         type: tableRow.type,
         costPlan: tableRow.costPlan,                    // TA value
         costForecast: tableRow.costForecast ?? '',      // TS value
-        newValue: "kökkö2",
-        newValue2: "kökkö3",
+        costForcedToFrameBudget: tableRow.costForcedToFrameBudget ?? '',  // Ennuste
+        costForecastDeviation: tableRow.costForecastDeviation ?? '',      // Poikkeama
         projectManager: tableRow.projectManager ?? '',
         projectPhase: tableRow.projectPhase ?? '',
         januaryStatus: tableRow.januaryStatus ?? '',
@@ -1286,8 +1308,8 @@ export const getReportData = async (
           [`\n${t('projectPhase')}`]: r.projectPhase,
           [`\nTA ${year + 1}`]: r.costPlan,
           [`\nTS ${year + 1}`]: r.costForecast,
-          [`\nEnnuste ${year + 1}`]: "test1",
-          [`\nPoikkeama`]: "test2", //TODO
+          [`\nEnnuste ${year + 1}`]: r.costForcedToFrameBudget,
+          [`\nPoikkeama`]: r.costForecastDeviation,
           [`${year + 1}\n01`]: r.januaryStatus,
           [`\n02`]: r.februaryStatus,
           [`\n03`]: r.marchStatus,

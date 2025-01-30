@@ -5,7 +5,8 @@ import {
   IOperationalEnvironmentAnalysisCsvRow,
   IFlattenedOperationalEnvironmentAnalysisProperties,
   ReportType,
-  Reports
+  Reports,
+  IForecastTableRow
 } from '@/interfaces/reportInterfaces';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
@@ -338,7 +339,7 @@ const strategyReportStyles = StyleSheet.create({
   },
 });
 interface ITableRowProps {
-  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[] | IConstructionProgramTableRow[];
+  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[] | IConstructionProgramTableRow[] | IForecastTableRow[];
   index?: number;
   reportType: ReportType;
 }
@@ -457,14 +458,19 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                     <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                     <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                     <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
-                    <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
                     {
-                      reportType === Reports.ForecastReport ? 
+                      reportType !== Reports.ForecastReport &&
                       <>
-                        <Text style={strategyReportStyles.budgetCell}>{'testiiii'}</Text>
-                        <Text style={strategyReportStyles.budgetCell}>{'testi2'}</Text>
+                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
                       </>
-                      : null // TODO
+                    }
+                    {
+                      reportType === Reports.ForecastReport &&
+                      <>
+                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForcedToFrameBudget}</Text>
+                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
+                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecastDeviation}</Text>
+                      </>
                     }
                     
                     {flattenedRow.januaryStatus === "planningAndConstruction" ?
