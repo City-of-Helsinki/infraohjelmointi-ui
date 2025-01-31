@@ -8,7 +8,7 @@ const useDoubleClick = (
   useEffect(() => {
     if (ref.current) {
       const clickRef = ref.current;
-      const latency = 200;
+      const latency = 500;
       let clickCount = 0;
       const handleClick = () => {
         clickCount += 1;
