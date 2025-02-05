@@ -36,7 +36,12 @@ const buildSearchParams = (form: ISearchForm) => {
         for (const [_, v] of Object.entries(value as FreeSearchFormObject)) {
           const paramType = typeToParam[v.type];
           const paramValue = v.type === 'hashtags' ? v.value : v.label;
-          searchParams.push(`${paramType}=${paramValue}`);
+          if (paramType === "hashtag") {
+            searchParams.push(`${paramType}=${paramValue}`);
+          } else {
+            searchParams.push(`projectName=${paramValue}`);
+            searchParams.push(`group=${paramValue}`);
+          }
         }
         break;
       default:
