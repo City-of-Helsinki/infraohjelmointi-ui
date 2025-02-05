@@ -1,8 +1,13 @@
-import { FreeSearchFormObject, IOption } from '@/interfaces/common';
+import { FreeSearchFormItem, FreeSearchFormObject, IOption } from '@/interfaces/common';
 import { ISearchForm } from '@/interfaces/formInterfaces';
 
 // Build a search parameter with all the choices from the search form
 const buildSearchParams = (form: ISearchForm) => {
+  const typeToParam: {[key in FreeSearchFormItem['type']]?: string} = {
+    projects: 'projectName',
+    groups: 'group',
+    hashtags: 'hashtag'
+  };
   const searchParams = [];
   for (const [key, value] of Object.entries(form)) {
     switch (key) {
@@ -29,8 +34,9 @@ const buildSearchParams = (form: ISearchForm) => {
         break;
       case 'freeSearchParams':
         for (const [_, v] of Object.entries(value as FreeSearchFormObject)) {
-          const paramType = v.type.substring(0, v.type.length - 1);
-          searchParams.push(`${paramType}=${v.value}`);
+          const paramType = typeToParam[v.type];
+          const paramValue = v.type === 'hashtags' ? v.value : v.label;
+          searchParams.push(`${paramType}=${paramValue}`);
         }
         break;
       default:
