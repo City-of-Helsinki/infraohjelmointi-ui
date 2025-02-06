@@ -439,11 +439,12 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
 }
 
 const getForecastDeviationStyle = (deviationValueString: string) => {
+  const THRESHOLD = 200;
   const dValue = formattedNumberToNumber(deviationValueString);
-  const THRESHOLD = 200000;
-  if (dValue > THRESHOLD || dValue < -THRESHOLD ) {
+  if (dValue >= THRESHOLD || dValue <= -THRESHOLD ) {
     return forecastReportStyles.forecastDeviationCostOver;
   }
+
   return strategyReportStyles.budgetCell;
 }
 
