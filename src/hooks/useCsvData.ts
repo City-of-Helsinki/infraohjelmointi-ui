@@ -15,11 +15,19 @@ import { getCoordinationTableRows } from './useCoordinationRows';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 
-const getData = async (getForcedToFrameData: IDownloadCsvButtonProps["getForcedToFrameData"], type: ReportType, year: number) => {
-  // Function is used on Reports Strategy, StrategyForcedToFrame, and BudgetBookSummary
+const getData = async (
+  getForcedToFrameData: IDownloadCsvButtonProps["getForcedToFrameData"],
+  type: ReportType,
+  year: number,
+  coordinatorData?: boolean,
+) => {
+  // Function is used on Reports Strategy, StrategyForcedToFrame, ForecastReport and BudgetBookSummary
   if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
   if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
-  if (type === Reports.ForecastReport) return await getForcedToFrameData(year + 1, true);
+  if (type === Reports.ForecastReport) {
+    if (coordinatorData) return await getForcedToFrameData(year + 1, false);
+    else return await getForcedToFrameData(year + 1, true);
+  }
   else return await getForcedToFrameData(year, true);
 }
 
@@ -45,11 +53,10 @@ export const useCsvData = ({
 
       switch (type) {
         case Reports.BudgetBookSummary:
-        case Reports.ForecastReport:
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame: {
           // For Strategy report, we will fetch next year data
-          const res = await getData(getForcedToFrameData, type, year)
+          const res = await getData(getForcedToFrameData, type, year);
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(
               res.classHierarchy,
@@ -59,6 +66,33 @@ export const useCsvData = ({
               res.groupRes,
             );
             data = await getReportData(t, type, coordinatorRows);
+          }
+          break;
+        }
+        case Reports.ForecastReport: {
+          // For ForecastReport report, we will fetch both coordinator and forceToFrame data
+          // true = coordinatorData, false = forcedToFrameData
+          const resCoordinator = await getData(getForcedToFrameData, type, year, true);
+          const resForcedToFrame = await getData(getForcedToFrameData, type, year, false);
+
+          if (resCoordinator && resCoordinator.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(
+              resCoordinator.classHierarchy,
+              resCoordinator.forcedToFrameDistricts.districts,
+              resCoordinator.initialSelections,
+              resCoordinator.projects,
+              resCoordinator.groupRes,
+            );
+
+            const forcedToFrameRows = getCoordinationTableRows(
+              resForcedToFrame.classHierarchy,
+              resForcedToFrame.forcedToFrameDistricts.districts,
+              resForcedToFrame.initialSelections,
+              resForcedToFrame.projects,
+              resForcedToFrame.groupRes,
+            );
+
+            data = await getReportData(t, type, coordinatorRows, undefined, undefined, undefined, undefined, forcedToFrameRows);
           }
           break;
         }

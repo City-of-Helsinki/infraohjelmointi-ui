@@ -17,6 +17,7 @@ import {
   IChild,
   IForecastTableRow,
   IForecastTableCsvRow,
+  IPlanningData,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -1288,6 +1289,7 @@ export const getReportData = async (
   subDivisions?: IListItem[],
   categories?: IListItem[],
   projectsInWarrantyPhase?: IProject[],
+  hierarchyInForcedToFrame?: IPlanningRow[],
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
   | Array<IStrategyTableCsvRow>
@@ -1295,7 +1297,7 @@ export const getReportData = async (
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
-  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions, projectsInWarrantyPhase);
+  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame);
 
   try {
     switch (reportType) {
