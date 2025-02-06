@@ -305,7 +305,7 @@ const convertToStrategyReportProjects = (type: ReportType, projects: IProject[],
     const costForecast = split(p.finances.budgetProposalCurrentYearPlus0, ".")[0]
     const forcedToFrameData = forcedToFrameProjects?.filter((fp) => fp.id === p.id)[0];
     const costForcedToFrameBudget = split(forcedToFrameData?.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "";
-    const costForecastDeviation = calculateCostForecastDeviation(costForecast, costForcedToFrameBudget);
+    const costForecastDeviation = calculateCostForecastDeviation(costForcedToFrameBudget, costForecast);
 
     return {
       name: p.name,
