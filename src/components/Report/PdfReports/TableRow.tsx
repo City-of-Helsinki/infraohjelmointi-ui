@@ -438,9 +438,13 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
   }
 }
 
-const getForecastDeviationStyle = (deviationValueString: string) => {
+const getForecastDeviationStyle = (type: string, deviationValueString: string) => {
+  if (type !== "project") return strategyReportStyles.budgetCell;
+
+  // If the value is over the threshold, the background for the project cell is red.
   const THRESHOLD = 200;
   const dValue = formattedNumberToNumber(deviationValueString);
+
   if (dValue >= THRESHOLD || dValue <= -THRESHOLD ) {
     return forecastReportStyles.forecastDeviationCostOver;
   }
@@ -489,7 +493,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                       <>
                         <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForcedToFrameBudget}</Text>
                         <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                        <Text style={getForecastDeviationStyle(flattenedRow.costForecastDeviation ?? "0")}>{flattenedRow.costForecastDeviation}</Text>
+                        <Text style={getForecastDeviationStyle(flattenedRow.type, flattenedRow.costForecastDeviation ?? "0")}>{flattenedRow.costForecastDeviation}</Text>
                       </>
                     }
                     
