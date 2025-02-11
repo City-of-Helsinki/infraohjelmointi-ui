@@ -1049,32 +1049,54 @@ const processBudgetBookSummaryTableRows = (tableRows: IBudgetBookSummaryTableRow
   return budgetBookSummaryCsvRows;
 };
 
+const strategyAndForecastRowObject =(reportName: string, row: IStrategyAndForecastTableRow) => {
+  const commonObject = {
+    id: row.id,
+    name: row.name,
+    type: row.type,
+    costPlan: row.costPlan,                   // TA value
+    costForecast: row.costForecast ?? '',     // TS value
+    projectManager: row.projectManager ?? '',
+    projectPhase: row.projectPhase ?? '',
+    januaryStatus: row.januaryStatus ?? '',
+    februaryStatus: row.februaryStatus ?? "",
+    marchStatus: row.marchStatus ?? "",
+    aprilStatus: row.aprilStatus ?? "",
+    mayStatus: row.mayStatus ?? "",
+    juneStatus: row.juneStatus ?? "",
+    julyStatus: row.julyStatus ?? "",
+    augustStatus: row.augustStatus ?? "",
+    septemberStatus: row.septemberStatus ?? "",
+    octoberStatus: row.octoberStatus ?? "",
+    novemberStatus: row.novemberStatus ?? "",
+    decemberStatus: row.decemberStatus ?? "",
+  }
+
+  switch (reportName) {
+    case 'strategy': {
+      return commonObject;
+    }
+    case 'forecast': {
+      return {
+        ...commonObject,
+        costForcedToFrameBudget: row.costForcedToFrameBudget ?? '', // Ennuste
+        costForecastDeviation: row.costForecastDeviation ?? '',     // Poikkeama
+      }
+    }
+    default: {
+      return {}
+    }
+  }
+}
+
 const strategyCsvRows: IStrategyTableCsvRow[] = [];
+const forecastCsvRows: IForecastTableCsvRow[] = [];
 
 const processStrategyTableRows = (tableRows: IStrategyAndForecastTableRow[]) => {
   tableRows.forEach((tableRow) => {
     if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
-      strategyCsvRows.push({
-        id: tableRow.id,
-        name: tableRow.name,
-        type: tableRow.type,
-        costPlan: tableRow.costPlan,                    // TA value
-        costForecast: tableRow.costForecast ?? '',      // TS value
-        projectManager: tableRow.projectManager ?? '',
-        projectPhase: tableRow.projectPhase ?? '',
-        januaryStatus: tableRow.januaryStatus ?? '',
-        februaryStatus: tableRow.februaryStatus ?? "",
-        marchStatus: tableRow.marchStatus ?? "",
-        aprilStatus: tableRow.aprilStatus ?? "",
-        mayStatus: tableRow.mayStatus ?? "",
-        juneStatus: tableRow.juneStatus ?? "",
-        julyStatus: tableRow.julyStatus ?? "",
-        augustStatus: tableRow.augustStatus ?? "",
-        septemberStatus: tableRow.septemberStatus ?? "",
-        octoberStatus: tableRow.octoberStatus ?? "",
-        novemberStatus: tableRow.novemberStatus ?? "",
-        decemberStatus: tableRow.decemberStatus ?? "",
-      })
+      const rowObject = strategyAndForecastRowObject("strategy", tableRow);
+      strategyCsvRows.push(rowObject);
     }
     processStrategyTableRows(tableRow.projects);
     processStrategyTableRows(tableRow.children);
@@ -1082,34 +1104,11 @@ const processStrategyTableRows = (tableRows: IStrategyAndForecastTableRow[]) => 
   return strategyCsvRows;
 };
 
-const forecastCsvRows: IForecastTableCsvRow[] = [];
-
 const processForecastTableRows = (tableRows: IStrategyAndForecastTableRow[]) => {
   tableRows.forEach((tableRow) => {
     if (!forecastCsvRows.some(row => row.id === tableRow.id)) {
-      forecastCsvRows.push({
-        id: tableRow.id,
-        name: tableRow.name,
-        type: tableRow.type,
-        costPlan: tableRow.costPlan,                    // TA value
-        costForecast: tableRow.costForecast ?? '',      // TS value
-        costForcedToFrameBudget: tableRow.costForcedToFrameBudget ?? '',  // Ennuste
-        costForecastDeviation: tableRow.costForecastDeviation ?? '',      // Poikkeama
-        projectManager: tableRow.projectManager ?? '',
-        projectPhase: tableRow.projectPhase ?? '',
-        januaryStatus: tableRow.januaryStatus ?? '',
-        februaryStatus: tableRow.februaryStatus ?? "",
-        marchStatus: tableRow.marchStatus ?? "",
-        aprilStatus: tableRow.aprilStatus ?? "",
-        mayStatus: tableRow.mayStatus ?? "",
-        juneStatus: tableRow.juneStatus ?? "",
-        julyStatus: tableRow.julyStatus ?? "",
-        augustStatus: tableRow.augustStatus ?? "",
-        septemberStatus: tableRow.septemberStatus ?? "",
-        octoberStatus: tableRow.octoberStatus ?? "",
-        novemberStatus: tableRow.novemberStatus ?? "",
-        decemberStatus: tableRow.decemberStatus ?? "",
-      })
+      const rowObject = strategyAndForecastRowObject("forecast", tableRow);
+      forecastCsvRows.push(rowObject);
     }
     processForecastTableRows(tableRow.projects);
     processForecastTableRows(tableRow.children);
@@ -1303,6 +1302,8 @@ export const getReportData = async (
 
   try {
     switch (reportType) {
+      case Reports.Strategy:
+      case Reports.StrategyForcedToFrame:
       case Reports.ForecastReport: {
         //Flatten rows to one dimension
         const flattenedRows = flattenForecastTableRows(reportRows as IStrategyAndForecastTableRow[]);
@@ -1312,8 +1313,10 @@ export const getReportData = async (
           [`\n${t('projectPhase')}`]: r.projectPhase,
           [`\nTA ${year + 1}`]: r.costPlan,
           [`\nTS ${year + 1}`]: r.costForecast,
-          [`\nEnnuste ${year + 1}`]: r.costForcedToFrameBudget,
-          [`\nPoikkeama`]: r.costForecastDeviation,
+          ...(reportType === Reports.ForecastReport && {
+            [`\nEnnuste ${year + 1}`]: r.costForcedToFrameBudget,
+            [`\nPoikkeama`]: r.costForecastDeviation,
+          }),
           [`${year + 1}\n01`]: r.januaryStatus,
           [`\n02`]: r.februaryStatus,
           [`\n03`]: r.marchStatus,
@@ -1326,31 +1329,7 @@ export const getReportData = async (
           [`\n10`]: r.octoberStatus,
           [`\n11`]: r.novemberStatus,
           [`\n12`]: r.decemberStatus,
-        }))
-      }
-      case Reports.Strategy:
-      case Reports.StrategyForcedToFrame: {
-        //Flatten rows to one dimension
-        const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyAndForecastTableRow[]);
-        return flattenedRows.map((r) => ({
-          [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
-          [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
-          [`\n${t('projectPhase')}`]: r.projectPhase,
-          [`\nTA ${year + 1}`]: r.costPlan,
-          [`\nTS ${year + 1}`]: r.costForecast,
-          [`${year + 1}\n01`]: r.januaryStatus,
-          [`\n02`]: r.februaryStatus,
-          [`\n03`]: r.marchStatus,
-          [`\n04`]: r.aprilStatus,
-          [`\n05`]: r.mayStatus,
-          [`\n06`]: r.juneStatus,
-          [`\n07`]: r.julyStatus,
-          [`\n08`]: r.augustStatus,
-          [`\n09`]: r.septemberStatus,
-          [`\n10`]: r.octoberStatus,
-          [`\n11`]: r.novemberStatus,
-          [`\n12`]: r.decemberStatus,
-        }))
+        }));
       }
       case Reports.ConstructionProgram: {
         // Flatten rows into one dimension
