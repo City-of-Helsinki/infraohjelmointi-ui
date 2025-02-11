@@ -2,12 +2,7 @@ import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import {
-  IPlanningData,
-  ReportType,
-  Reports,
-  getForcedToFrameDataType,
-} from '@/interfaces/reportInterfaces';
+import { IDownloadPdfButtonProps, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -22,6 +17,7 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports } from './common';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -70,30 +66,6 @@ const getPdfDocument = (
 
 const downloadIcon = <IconDownload />;
 
-interface IDownloadPdfButtonProps {
-  type: ReportType;
-  getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
-  getPlanningData: (year: number) => Promise<IPlanningData>;
-  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
-  getCategories: () => Promise<IListItem[]>;
-}
-
-const getData = async (
-  getForcedToFrameData: IDownloadPdfButtonProps['getForcedToFrameData'],
-  type: ReportType,
-  year: number,
-  coordinatorData?: boolean,
-) => {
-  // Function is used on Reports Strategy, strategyForcedToFrame, ForecastReport and BudgetBookSummary
-  if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
-  if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
-  if (type === Reports.ForecastReport) {
-    if (coordinatorData) return await getForcedToFrameData(year + 1, false);
-    else return await getForcedToFrameData(year + 1, true);
-  } 
-  else return await getForcedToFrameData(year, true);
-};
-
 /**
  * We're using pdf-react to create pdf's.
  *
@@ -123,7 +95,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
         case Reports.StrategyForcedToFrame:
         case Reports.BudgetBookSummary: {
           // For Strategy report, we will fetch next year data
-          const res = await getData(getForcedToFrameData, type, year);
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);
 
           if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(
@@ -140,28 +112,12 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
         case Reports.ForecastReport: {
           // For ForecastReport report, we will fetch both coordinator and forceToFrame data
           // true = coordinatorData, false = forcedToFrameData
-
-          const resCoordinator = await getData(getForcedToFrameData, type, year, true);
-          const resForcedToFrame = await getData(getForcedToFrameData, type, year, false);
+          const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
+          const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
 
           if (resCoordinator && resCoordinator.projects.length > 0) {
-            const coordinatorRows = getCoordinationTableRows(
-              resCoordinator.classHierarchy,
-              resCoordinator.forcedToFrameDistricts.districts,
-              resCoordinator.initialSelections,
-              resCoordinator.projects,
-              resCoordinator.groupRes,
-            );
-
-            const forcedToFrameRows = getCoordinationTableRows(
-              resForcedToFrame.classHierarchy,
-              resForcedToFrame.forcedToFrameDistricts.districts,
-              resForcedToFrame.initialSelections,
-              resForcedToFrame.projects,
-              resForcedToFrame.groupRes
-            )
-
-            document = getPdfDocument(type, coordinatorRows, undefined, undefined, undefined, undefined, forcedToFrameRows);
+            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
+            document = getPdfDocument(type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
           }
           break;
         }

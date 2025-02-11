@@ -5,7 +5,7 @@ import {
   IConstructionProgramCsvRow,
   IConstructionProgramTableRow,
   IStrategyTableCsvRow,
-  IStrategyTableRow,
+  IStrategyAndForecastTableRow,
   IOperationalEnvironmentAnalysisCsvRow,
   IOperationalEnvironmentAnalysisTableRow,
   ReportTableRowType,
@@ -15,9 +15,7 @@ import {
   ITotals,
   IPlannedBudgets,
   IChild,
-  IForecastTableRow,
   IForecastTableCsvRow,
-  IPlanningData,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -271,7 +269,11 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
   }
 }
 
-const convertToStrategyReportProjects = (type: ReportType, projects: IProject[], forcedToFrameProjects?: IProject[]): IStrategyTableRow[] => {
+const convertToStrategyReportProjects = (
+  type: ReportType,
+  projects: IProject[],
+  forcedToFrameProjects?: IProject[]
+): IStrategyAndForecastTableRow[] | IStrategyAndForecastTableRow[] => {
   const filteredProjects = (): IProject[] => {
     if (type === Reports.Strategy){
       return projects
@@ -702,7 +704,7 @@ export const convertToReportRows = (
   subDivisions?: Array<IListItem> | undefined,
   projectsInWarrantyPhase?: Array<IProject>,
   hierarchyInForcedToFrame?: IPlanningRow[],
-): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+): IBudgetBookSummaryTableRow[] | IStrategyAndForecastTableRow[] | IOperationalEnvironmentAnalysisTableRow[] | IStrategyAndForecastTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
@@ -711,7 +713,7 @@ export const convertToReportRows = (
       return forcedToFrameHierarchy;
     }
     case Reports.ForecastReport: {
-      const forcedToFrameHierarchy: IForecastTableRow[] = [];
+      const forcedToFrameHierarchy: IStrategyAndForecastTableRow[] = [];
 
       for (const c of rows) {
         const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
@@ -742,7 +744,7 @@ export const convertToReportRows = (
     }
     case Reports.Strategy:
     case Reports.StrategyForcedToFrame: {
-      const forcedToFrameHierarchy: IStrategyTableRow[] = [];
+      const forcedToFrameHierarchy: IStrategyAndForecastTableRow[] = [];
       for (const c of rows) {
         const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
         if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
@@ -1049,7 +1051,7 @@ const processBudgetBookSummaryTableRows = (tableRows: IBudgetBookSummaryTableRow
 
 const strategyCsvRows: IStrategyTableCsvRow[] = [];
 
-const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
+const processStrategyTableRows = (tableRows: IStrategyAndForecastTableRow[]) => {
   tableRows.forEach((tableRow) => {
     if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
       strategyCsvRows.push({
@@ -1082,7 +1084,7 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
 
 const forecastCsvRows: IForecastTableCsvRow[] = [];
 
-const processForecastTableRows = (tableRows: IForecastTableRow[]) => {
+const processForecastTableRows = (tableRows: IStrategyAndForecastTableRow[]) => {
   tableRows.forEach((tableRow) => {
     if (!forecastCsvRows.some(row => row.id === tableRow.id)) {
       forecastCsvRows.push({
@@ -1267,12 +1269,12 @@ export const flattenBudgetBookSummaryTableRows = (
 ): Array<IBudgetBookSummaryCsvRow> => processBudgetBookSummaryTableRows(tableRows).flat(Infinity);
 
 export const flattenStrategyTableRows = (
-  tableRows: Array<IStrategyTableRow>,
+  tableRows: Array<IStrategyAndForecastTableRow>,
 ): Array<IStrategyTableCsvRow> =>
   processStrategyTableRows(tableRows).flat(Infinity);
 
 export const flattenForecastTableRows = (
-  tableRows: Array<IForecastTableRow>,
+  tableRows: Array<IStrategyAndForecastTableRow>,
 ): Array<IForecastTableCsvRow> =>
   processForecastTableRows(tableRows).flat(Infinity);
 
@@ -1303,7 +1305,7 @@ export const getReportData = async (
     switch (reportType) {
       case Reports.ForecastReport: {
         //Flatten rows to one dimension
-        const flattenedRows = flattenForecastTableRows(reportRows as IForecastTableRow[]);
+        const flattenedRows = flattenForecastTableRows(reportRows as IStrategyAndForecastTableRow[]);
         return flattenedRows.map((r) => ({
           [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
           [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
@@ -1329,7 +1331,7 @@ export const getReportData = async (
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame: {
         //Flatten rows to one dimension
-        const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyTableRow[]);
+        const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyAndForecastTableRow[]);
         return flattenedRows.map((r) => ({
           [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
           [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,

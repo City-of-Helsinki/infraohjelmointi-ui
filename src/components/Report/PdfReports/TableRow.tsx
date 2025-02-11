@@ -6,7 +6,7 @@ import {
   IFlattenedOperationalEnvironmentAnalysisProperties,
   ReportType,
   Reports,
-  IForecastTableRow
+  IStrategyAndForecastTableRow
 } from '@/interfaces/reportInterfaces';
 import { formattedNumberToNumber } from '@/utils/calculations';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
@@ -349,7 +349,10 @@ const forecastReportStyles = StyleSheet.create({
 });
 
 interface ITableRowProps {
-  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[] | IConstructionProgramTableRow[] | IForecastTableRow[];
+  flattenedRows?: IBudgetBookSummaryCsvRow[]
+    | IOperationalEnvironmentAnalysisCsvRow[]
+    | IConstructionProgramTableRow[]
+    | IStrategyAndForecastTableRow[];
   index?: number;
   reportType: ReportType;
 }

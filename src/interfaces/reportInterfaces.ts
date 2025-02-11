@@ -10,7 +10,7 @@ import {
 import { IGroup } from './groupInterfaces';
 import { IListItem } from './common';
 
-export type getForcedToFrameDataType = Promise<{
+export type IGetForcedToFrameData = {
   res: IProjectsResponse;
   projects: IProject[];
   projectsInWarrantyPhase?: IProject[];
@@ -24,7 +24,9 @@ export type getForcedToFrameDataType = Promise<{
   };
   groupRes: IGroup[];
   initialSelections: IPlanningRowSelections;
-}>;
+};
+
+export type IGetForcedToFrameDataPromise = Promise<IGetForcedToFrameData>;
 
 export type IPlanningData = {
   res: IProjectsResponse;
@@ -180,33 +182,9 @@ export interface IFlattenedBudgetBookSummaryProperties extends IBudgetBookFinanc
   type: string;
 }
 
-export interface IStrategyTableRow extends ITableRowEssentials {
-  projects: Array<IStrategyTableRow>;
-  children: Array<IStrategyTableRow>;
-  type: ReportTableRowType;
-  projectManager?: string;
-  projectPhase?: string;
-  costPlan?: string;
-  costForecast?: string;
-  costForcedToFrameBudget?: string;
-  costForecastDeviation?: string;
-  januaryStatus?: string;
-  februaryStatus?: string;
-  marchStatus?: string;
-  aprilStatus?: string;
-  mayStatus?: string;
-  juneStatus?: string;
-  julyStatus?: string;
-  augustStatus?: string;
-  septemberStatus?: string;
-  octoberStatus?: string;
-  novemberStatus?: string;
-  decemberStatus?: string;
-}
-
-export interface IForecastTableRow extends ITableRowEssentials {
-  projects: Array<IStrategyTableRow>;
-  children: Array<IStrategyTableRow>;
+export interface IStrategyAndForecastTableRow extends ITableRowEssentials {
+  projects: Array<IStrategyAndForecastTableRow>;
+  children: Array<IStrategyAndForecastTableRow>;
   type: ReportTableRowType;
   projectManager?: string;
   projectPhase?: string;
@@ -321,7 +299,15 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
 
 export interface IDownloadCsvButtonProps {
   type: ReportType;
-  getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
+  getForcedToFrameData: (year: number, forcedToFrame: boolean) => IGetForcedToFrameDataPromise;
+  getPlanningData: (year: number) => Promise<IPlanningData>;
+  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
+  getCategories: () => Promise<IListItem[]>;
+}
+
+export interface IDownloadPdfButtonProps {
+  type: ReportType;
+  getForcedToFrameData: (year: number, forcedToFrame: boolean) => IGetForcedToFrameDataPromise;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   getCategories: () => Promise<IListItem[]>;
