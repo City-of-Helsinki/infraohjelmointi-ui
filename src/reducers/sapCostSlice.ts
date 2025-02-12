@@ -56,6 +56,7 @@ export const sapCostsSlice = createSlice({
             .filter((sapCost) => sapCost.project_id != null)
             .map((sapCost) => ({
               id: sapCost.project_id,
+              year: sapCost.year,
               sap_id: sapCost.id,
               project_task_costs: sapCost.project_task_costs,
               project_task_commitments: sapCost.project_task_commitments,
@@ -90,6 +91,7 @@ export const sapCostsSlice = createSlice({
             .filter((sapCost) => sapCost.project_id != null)
             .map((sapCost) => ({
               id: sapCost.project_id,
+              year: sapCost.year,
               sap_id: sapCost.id,
               project_task_costs: sapCost.project_task_costs,
               project_task_commitments: sapCost.project_task_commitments,
