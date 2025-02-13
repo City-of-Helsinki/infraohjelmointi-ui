@@ -38,7 +38,6 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
-import { getSapCurrentYear } from '@/services/sapCostsServices';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -63,7 +62,6 @@ const ProjectForm = () => {
           production_task_costs: value.production_task_costs,
           production_task_commitments: value.production_task_commitments,
         }));
-  
       return filteredSapValues.length > 0 ? filteredSapValues[0] : null;
     }
     return null;

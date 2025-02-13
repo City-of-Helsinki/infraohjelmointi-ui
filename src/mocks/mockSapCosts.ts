@@ -31,3 +31,17 @@ export const mockCurrentYearSapCostsProject: { data: Record<string, IProjectSapC
     }
   }
 };
+
+export const mockSapCostforProjectCard: ISapCost = {
+  id: 'mock-sap-cost-id',
+  year: 2025,
+  sap_id: 'mock-sap-id',
+  project_task_costs: 1000,
+  project_task_commitments: 500,
+  production_task_costs: 2000,
+  production_task_commitments: 1000,
+  group_combined_commitments: 1500,
+  group_combined_costs: 2500,
+  project_id: 'mock-project-id',
+  project_group_id: 'test-group-1',
+};
