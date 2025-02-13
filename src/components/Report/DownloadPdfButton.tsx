@@ -17,7 +17,7 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports, hasProjects as viewHasProjects } from './common';
+import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports, viewHasProjects } from './common';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -115,7 +115,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
           const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
 
-          if (resCoordinator && resCoordinator.projects.length > 0) {
+          if (viewHasProjects(resCoordinator)) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
             document = getPdfDocument(type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
           }
@@ -169,7 +169,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame || type === Reports.ForecastReport) navigate(0);
+      if ([Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(type as Reports)) navigate(0);
     }
   }, [documentName, type]);
 

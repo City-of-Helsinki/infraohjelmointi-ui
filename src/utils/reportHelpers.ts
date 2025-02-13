@@ -273,7 +273,7 @@ const convertToStrategyReportProjects = (
   type: ReportType,
   projects: IProject[],
   forcedToFrameProjects?: IProject[]
-): IStrategyAndForecastTableRow[] | IStrategyAndForecastTableRow[] => {
+): IStrategyAndForecastTableRow[] => {
   const filteredProjects = (): IProject[] => {
     if (type === Reports.Strategy){
       return projects
@@ -749,7 +749,7 @@ export const convertToReportRows = (
   subDivisions?: Array<IListItem> | undefined,
   projectsInWarrantyPhase?: Array<IProject>,
   hierarchyInForcedToFrame?: IPlanningRow[],
-): IBudgetBookSummaryTableRow[] | IStrategyAndForecastTableRow[] | IOperationalEnvironmentAnalysisTableRow[] | IStrategyAndForecastTableRow[] => {
+): IBudgetBookSummaryTableRow[] | IOperationalEnvironmentAnalysisTableRow[] | IStrategyAndForecastTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];

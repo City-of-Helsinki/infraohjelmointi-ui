@@ -59,4 +59,4 @@ export const getCoordinatorAndForcedToFrameRows = async (
  * @param res Selected view's data
  * @returns boolean
  */
-export const hasProjects = (res: IGetForcedToFrameData | IPlanningData ) => { return res && res.projects.length > 0 }
+export const viewHasProjects = (res: IGetForcedToFrameData | IPlanningData ) => { return res && res.projects.length > 0 }

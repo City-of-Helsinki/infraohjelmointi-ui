@@ -39,8 +39,10 @@ interface IReportTableProps {
   hierarchyInForcedToFrame?: IPlanningRow[];
 }
 
+type IReportFlattenedRows = IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow;
+
 const getFlattenedRows = (
-  reportRows: (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow)[],
+  reportRows: IReportFlattenedRows[],
   reportType: ReportType
 ) => {
   if (reportType === Reports.BudgetBookSummary) {
@@ -50,6 +52,15 @@ const getFlattenedRows = (
   } else {
     return flattenConstructionProgramTableRows(reportRows);
   }
+}
+
+const getStrategyReportRows = (type: ReportType, rows: IReportFlattenedRows[]) => {
+  if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) {
+    return flattenStrategyTableRows(rows);
+  } else if (type === Reports.ForecastReport) {
+    return flattenForecastTableRows(rows);
+  }
+  return [];
 }
 
 const ReportTable: FC<IReportTableProps> = ({
@@ -66,14 +77,9 @@ const ReportTable: FC<IReportTableProps> = ({
     reportType === Reports.BudgetBookSummary ||
     reportType === Reports.OperationalEnvironmentAnalysis ||
     reportType === Reports.ConstructionProgram)
-      ? getFlattenedRows(
-        reportRows as (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow)[]
-        , reportType
-  ) : [];
+      ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
 
-  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
-    flattenStrategyTableRows(reportRows) : reportType === Reports.ForecastReport ?
-    flattenForecastTableRows(reportRows) : [];
+  const strategyReportRows = getStrategyReportRows(reportType, reportRows);
 
   const getTableHeader = () => {
     switch (reportType) {

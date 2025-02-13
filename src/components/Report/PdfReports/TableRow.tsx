@@ -486,10 +486,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                     <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                     <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
                     {
-                      reportType !== Reports.ForecastReport &&
-                      <>
-                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                      </>
+                      reportType !== Reports.ForecastReport && <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
                     }
                     {
                       reportType === Reports.ForecastReport &&
