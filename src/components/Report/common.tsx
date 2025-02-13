@@ -1,5 +1,5 @@
 import { getCoordinationTableRows } from "@/hooks/useCoordinationRows";
-import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData } from "@/interfaces/reportInterfaces";
+import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData } from "@/interfaces/reportInterfaces";
 
 export const getForcedToFrameDataForReports = async (
     getForcedToFrameData: IDownloadCsvButtonProps['getForcedToFrameData'] | IDownloadPdfButtonProps['getForcedToFrameData'],
@@ -39,3 +39,10 @@ export const getCoordinatorAndForcedToFrameRows = async (
 
     return { coordinatorRows, forcedToFrameRows };
 };
+
+/**
+ * Check if the view (Planning, Coordinator, Forced to Frame) projects.
+ * @param res Selected view's data
+ * @returns boolean
+ */
+export const hasProjects = (res: IGetForcedToFrameData | IPlanningData ) => { return res && res.projects.length > 0 }

@@ -2,7 +2,7 @@ import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { IDownloadPdfButtonProps, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IDownloadPdfButtonProps, IGetForcedToFrameData, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -17,7 +17,7 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports } from './common';
+import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports, hasProjects as viewHasProjects } from './common';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -97,7 +97,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           // For Strategy report, we will fetch next year data
           const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);
 
-          if (res && res.projects.length > 0) {
+          if (viewHasProjects(res)) {
             const coordinatorRows = getCoordinationTableRows(
               res.classHierarchy,
               res.forcedToFrameDistricts.districts,
@@ -125,7 +125,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           const res = await getForcedToFrameData(year, false);
           const categories = await getCategories();
 
-          if (res && res.projects.length > 0 && categories) {
+          if (viewHasProjects(res) && categories) {
             const coordinatorRows = getCoordinationTableRows(
               res.classHierarchy,
               res.forcedToFrameDistricts.districts,
@@ -150,7 +150,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           const divisions = getProjectDistricts(resDivisions, 'division');
           const subDivisions = getProjectDistricts(resDivisions, 'subDivision');
 
-          if (res && res.projects.length > 0) {
+          if (viewHasProjects(res)) {
             const planningRows = getPlanningRows(res);
             document = getPdfDocument(type, planningRows, divisions, subDivisions);
           }

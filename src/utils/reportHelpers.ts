@@ -19,7 +19,7 @@ import {
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
-import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
+import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
@@ -488,7 +488,7 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
       if (nameCheckPattern.test(c.name) && classOrChildrenHasBudgets(c.cells)) {
         const convertedClass: IBudgetBookSummaryTableRow = {
           id: c.id,
-          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+          name: formatNameBasedOnType(c),
           parent: null,
           children: c.children.length && c.type !== 'districtPreview' && c.type !== 'collectiveSubLevel'  // children from the lower levels aren't needed
             ? getBudgetBookSummaryProperties(c.children)
@@ -695,6 +695,51 @@ export const calculateCostForecastDeviation = (plannedBudget: string | undefined
   return formatNumber(plannedBudgetValue - costForecastValue);
 }
 
+/**
+ * Check row has either frame budget or budget overlap, or it has planned budget
+ * @param c A row object
+ * @returns boolean
+ */
+const hasBudgetData = (c: IPlanningRow): boolean => {
+  return (c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0';
+}
+
+/**
+ * Format object name based the type of the row
+ * @param row A row object
+ * @returns string
+ */
+const formatNameBasedOnType = (row: IPlanningRow): string => {
+  switch (row.type) {
+    case 'masterClass': {
+      return row.name.toUpperCase()
+    }
+    default: {
+      return row.name;
+    }
+  }
+}
+
+/**
+ * Check if the type is not "group" and has projects
+ * @param type Type of the row
+ * @param projects Array of projects
+ * @returns boolean
+ */
+const isNotGroupOrRowHasProjects = (type: PlanningRowType, projects: IStrategyAndForecastTableRow[]) => {
+  return type !== 'group' || projects.length;
+}
+
+/**
+ * Check if the value is included in the list of string values
+ * @param value String that is looked for
+ * @param listTypes List of strings
+ * @returns boolean
+ */
+function isOneOfTheListItems(value: string, listTypes: string[]) {
+  return listTypes.includes(value)
+}
+
 export const convertToReportRows = (
   rows: IPlanningRow[],
   reportType: ReportType | '',
@@ -716,26 +761,29 @@ export const convertToReportRows = (
       const forcedToFrameHierarchy: IStrategyAndForecastTableRow[] = [];
 
       for (const c of rows) {
-        const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
-        const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
-        const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
-        const forcedToFrameBudget = forcedToFrameClass?.cells[0].plannedBudget ?? "0";
-        const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
+        if (hasBudgetData(c)) {
+          const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
+          const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
+          const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
+          const forcedToFrameBudget = forcedToFrameClass?.cells[0].plannedBudget ?? "0";
+          const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
+          const rowProjects = c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows, forcedToFrameClass?.projectRows) : [];
 
-        if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
-          const convertedClass = {
-            id: c.id,
-            name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
-            parent: null,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, undefined, forcedToFrameChildren) : [],
-            projects: c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows, forcedToFrameClass?.projectRows) : [],
-            costForecast: c.cells[0].plannedBudget,
-            costForcedToFrameBudget: forcedToFrameBudget ? forcedToFrameBudget : "0",                             // Ennuste 2026
-            costForecastDeviation: calculateCostForecastDeviation(forcedToFrameBudget, c.cells[0].plannedBudget), // Poikkeama
-            costPlan: frameBudget,
-            type: c.type as ReportTableRowType
-          }
-          if (convertedClass.type !== 'group' || convertedClass.projects.length) {
+          if (isNotGroupOrRowHasProjects(c.type, rowProjects)) {
+            const rowChildren = c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, undefined, forcedToFrameChildren) : [];
+            const convertedClass = {
+              id: c.id,
+              name: formatNameBasedOnType(c),
+              parent: null,
+              children: rowChildren,
+              projects: rowProjects,
+              costForecast: c.cells[0].plannedBudget,
+              costForcedToFrameBudget: forcedToFrameBudget,                                                         // Ennuste 2026
+              costForecastDeviation: calculateCostForecastDeviation(forcedToFrameBudget, c.cells[0].plannedBudget), // Poikkeama
+              costPlan: frameBudget,
+              type: c.type as ReportTableRowType
+            }
+
             forcedToFrameHierarchy.push(convertedClass);
           }
         }
@@ -745,22 +793,25 @@ export const convertToReportRows = (
     case Reports.Strategy:
     case Reports.StrategyForcedToFrame: {
       const forcedToFrameHierarchy: IStrategyAndForecastTableRow[] = [];
+
       for (const c of rows) {
         const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
-        if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
+        const rowProjects = c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [];
+
+        if (hasBudgetData(c) && (isNotGroupOrRowHasProjects(c.type, rowProjects))) {
+          const rowChildren = c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [];
           const convertedClass = {
             id: c.id,
-            name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+            name: formatNameBasedOnType(c),
             parent: null,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
-            projects: c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [],
+            children: rowChildren,
+            projects: rowProjects,
             costForecast: c.cells[0].plannedBudget,
             costPlan: frameBudget,
             type: c.type as ReportTableRowType
           }
-          if (convertedClass.type !== 'group' || convertedClass.projects.length) {
-            forcedToFrameHierarchy.push(convertedClass);
-          }
+
+          forcedToFrameHierarchy.push(convertedClass);
         }
       }
       return forcedToFrameHierarchy;
@@ -778,7 +829,7 @@ export const convertToReportRows = (
       for (const c of rows) {
         const convertedClass = {
           id: c.id,
-          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+          name: formatNameBasedOnType(c),
           parent: null,
           children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, projectsInWarrantyPhase) : [],
           projects: [],
@@ -807,15 +858,17 @@ export const convertToReportRows = (
         })
 
         const plannedBudgets = Object.values(convertedClass.plannedBudgets);
-        const isSomeLevelofClass = c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass';
+        const isSomeLevelofClass = isOneOfTheListItems(c.type, ['masterClass', 'class', 'subClass']);
         /* TA parts that don't have any planned budgets shouldn't be shown on the report.
            There shouldn't either be other rows than classes from some of the levels. */
         if (isSomeLevelofClass && plannedBudgets.some((value) => value !== "0")) {
           forcedToFrameHierarchy.push(convertedClass);
-          const noneOfTheChildrenIsSubClass =
-            c.type === 'class' && c.children.length > 0 && c.children.some((child) => child.type !== 'subClass');
+          const typeIsClass = c.type === 'class';
 
-          const isClassWithoutChildren = c.children.length === 0 && c.type === 'class';
+          const noneOfTheChildrenIsSubClass =
+            typeIsClass && c.children.length > 0 && c.children.some((child) => child.type !== 'subClass');
+
+          const isClassWithoutChildren = c.children.length === 0 && typeIsClass;
           /* 
             In general: if the class is on the fourth level, we want to add some extra rows there.
             isClassWithoutChildren: if the class is on a higher level and it doesn't contain children, it might have projects
@@ -1204,15 +1257,12 @@ const constructionProgramCsvRows: IConstructionProgramCsvRow[] = [];
 
 const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => {
   return (
-    (tableRow.type === 'group' ||
-    tableRow.type === 'groupWithValues' ||
-    tableRow.type === 'project' ||
-    tableRow.projects.length > 0 ||
-    tableRow.name === t('report.constructionProgram.classSummary') ||
-    tableRow.name === t('report.constructionProgram.underMillionSummary') ||
-    tableRow.name === '' ||
-    tableRow.children.some(isShownOnTheReport) ||
-    tableRow.name === '8 01 Kiinteä omaisuus')
+    (
+      tableRow.projects.length > 0 ||
+      tableRow.children.some(isShownOnTheReport) ||
+      isOneOfTheListItems(tableRow.type, ['group', 'groupWithValues', 'project']) ||
+      isOneOfTheListItems(tableRow.name, [t('report.constructionProgram.classSummary'), t('report.constructionProgram.underMillionSummary'), '8 01 Kiinteä omaisuus', ''])
+    )
     // temporary solution to remove 8 0 Kiinteä omaisuus/Esirakentaminen from the report
     // will later possibly be removed from the database, but currently
     //'8 0 Kiinteä omaisuus/Esirakentaminen' is old budget item that the tool stilll needs to show
