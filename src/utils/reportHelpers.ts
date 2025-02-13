@@ -710,14 +710,10 @@ const hasBudgetData = (c: IPlanningRow): boolean => {
  * @returns string
  */
 const formatNameBasedOnType = (row: IPlanningRow): string => {
-  switch (row.type) {
-    case 'masterClass': {
-      return row.name.toUpperCase()
-    }
-    default: {
-      return row.name;
-    }
+  if (row.type === 'masterClass'){
+    return row.name.toUpperCase()
   }
+  return row.name;
 }
 
 /**
