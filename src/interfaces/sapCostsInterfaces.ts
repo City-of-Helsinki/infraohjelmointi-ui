@@ -1,6 +1,5 @@
 export interface IProjectSapCost {
   id: string;
-  year: number;
   sap_id: string;
   project_task_costs: number;
   project_task_commitments: number;
