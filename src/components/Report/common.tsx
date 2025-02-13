@@ -1,6 +1,14 @@
 import { getCoordinationTableRows } from "@/hooks/useCoordinationRows";
 import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData } from "@/interfaces/reportInterfaces";
 
+/**
+ * Get Forced to Frame view data for reports.
+ * @param getForcedToFrameData Function for data fetch
+ * @param type String Report type
+ * @param year Which year's data will be fetched
+ * @param coordinatorData Is data fetched from coordinator view
+ * @returns Promise
+ */
 export const getForcedToFrameDataForReports = async (
     getForcedToFrameData: IDownloadCsvButtonProps['getForcedToFrameData'] | IDownloadPdfButtonProps['getForcedToFrameData'],
     type: ReportType,
@@ -17,6 +25,12 @@ export const getForcedToFrameDataForReports = async (
     else return await getForcedToFrameData(year, true);
 };
 
+/**
+ * Fetch Coordinator and Forced to Frame rows for reports
+ * @param resCoordinator Coordinator view data
+ * @param resForcedToFrame Forced to Frame view data
+ * @returns Object
+ */
 export const getCoordinatorAndForcedToFrameRows = async (
     resCoordinator: IGetForcedToFrameData,
     resForcedToFrame: IGetForcedToFrameData
