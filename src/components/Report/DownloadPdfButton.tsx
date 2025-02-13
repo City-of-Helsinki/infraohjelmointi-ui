@@ -2,7 +2,7 @@ import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { IDownloadPdfButtonProps, IGetForcedToFrameData, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IDownloadPdfButtonProps, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
