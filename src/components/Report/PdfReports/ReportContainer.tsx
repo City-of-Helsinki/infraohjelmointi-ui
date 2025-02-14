@@ -2,6 +2,7 @@ import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
 import { FC, memo } from 'react';
 import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import DocumentHeader from './DocumentHeader';
 import ReportTable from './ReportTable';
@@ -22,13 +23,15 @@ interface IPdfReportContainerProps {
   reportType: ReportType;
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[],
+  forcedToFrameRows?: IPlanningRow[],
 }
 
-const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase }) => {
+const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows }) => {
   const { t } = useTranslation();
 
   const getDocumentTitle = () => {
     switch (reportType) {
+      case Reports.ForecastReport:
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.title');
@@ -48,6 +51,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
 
   const getDocumentSubtitleOne = () => {
     switch (reportType) {
+      case Reports.ForecastReport:
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {
@@ -93,8 +97,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             reportType={reportType}
             date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
           />
-          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} />
-          {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
+          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} hierarchyInForcedToFrame={forcedToFrameRows}/>
+          {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport?
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
               colorInfoTextOne={t('report.strategy.planning')}

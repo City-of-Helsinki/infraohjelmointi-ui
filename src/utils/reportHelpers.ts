@@ -5,7 +5,7 @@ import {
   IConstructionProgramCsvRow,
   IConstructionProgramTableRow,
   IStrategyTableCsvRow,
-  IStrategyTableRow,
+  IStrategyAndForecastTableRow,
   IOperationalEnvironmentAnalysisCsvRow,
   IOperationalEnvironmentAnalysisTableRow,
   ReportTableRowType,
@@ -15,10 +15,11 @@ import {
   ITotals,
   IPlannedBudgets,
   IChild,
+  IForecastTableCsvRow,
 } from '@/interfaces/reportInterfaces';
-import { convertToMillions, keurToMillion } from './calculations';
+import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
-import { IPlanningCell, IPlanningRow } from '@/interfaces/planningInterfaces';
+import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
@@ -268,7 +269,11 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
   }
 }
 
-const convertToStrategyReportProjects = (type: ReportType, projects: IProject[]): IStrategyTableRow[] => {
+const convertToStrategyReportProjects = (
+  type: ReportType,
+  projects: IProject[],
+  forcedToFrameProjects?: IProject[]
+): IStrategyAndForecastTableRow[] => {
   const filteredProjects = (): IProject[] => {
     if (type === Reports.Strategy){
       return projects
@@ -299,30 +304,39 @@ const convertToStrategyReportProjects = (type: ReportType, projects: IProject[])
       });
   }
 
-  return filteredProjects().map((p) => ({
-    name: p.name,
-    id: p.id,
-    parent: p.projectClass ?? null,
-    projects: [],
-    children: [],
-    costPlan: "",                                                                   // TA value "raamiluku". Will not be shown for projects.
-    costForecast: split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "",   // TS value
-    projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
-    projectPhase: getProjectPhase(p),
-    januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
-    februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
-    marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
-    aprilStatus: getStrategyReportProjectPhasePerMonth(type, p, 4),
-    mayStatus: getStrategyReportProjectPhasePerMonth(type, p, 5),
-    juneStatus: getStrategyReportProjectPhasePerMonth(type, p, 6),
-    julyStatus: getStrategyReportProjectPhasePerMonth(type, p, 7),
-    augustStatus: getStrategyReportProjectPhasePerMonth(type, p, 8),
-    septemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 9),
-    octoberStatus: getStrategyReportProjectPhasePerMonth(type, p, 10),
-    novemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 11),
-    decemberStatus: getStrategyReportProjectPhasePerMonth(type, p ,12),
-    type: 'project',
-    }));
+  return filteredProjects().map((p) => {
+    const costForecast = split(p.finances.budgetProposalCurrentYearPlus0, ".")[0]
+    const forcedToFrameData = forcedToFrameProjects?.filter((fp) => fp.id === p.id)[0];
+    const costForcedToFrameBudget = split(forcedToFrameData?.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "";
+    const costForecastDeviation = calculateCostForecastDeviation(costForcedToFrameBudget, costForecast);
+
+    return {
+      name: p.name,
+      id: p.id,
+      parent: p.projectClass ?? null,
+      projects: [],
+      children: [],
+      costPlan: "",                                       // TA value "raamiluku". Will not be shown for projects.
+      costForecast: costForecast ?? "",                   // TS value
+      costForcedToFrameBudget: costForcedToFrameBudget,   // Ennuste
+      costForecastDeviation: costForecastDeviation,       // Poikkeama
+      projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
+      projectPhase: getProjectPhase(p),
+      januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
+      februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
+      marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
+      aprilStatus: getStrategyReportProjectPhasePerMonth(type, p, 4),
+      mayStatus: getStrategyReportProjectPhasePerMonth(type, p, 5),
+      juneStatus: getStrategyReportProjectPhasePerMonth(type, p, 6),
+      julyStatus: getStrategyReportProjectPhasePerMonth(type, p, 7),
+      augustStatus: getStrategyReportProjectPhasePerMonth(type, p, 8),
+      septemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 9),
+      octoberStatus: getStrategyReportProjectPhasePerMonth(type, p, 10),
+      novemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 11),
+      decemberStatus: getStrategyReportProjectPhasePerMonth(type, p ,12),
+      type: 'project',
+    }
+  });
 }
 
 const convertToConstructionReportProjects = (
@@ -474,7 +488,7 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
       if (nameCheckPattern.test(c.name) && classOrChildrenHasBudgets(c.cells)) {
         const convertedClass: IBudgetBookSummaryTableRow = {
           id: c.id,
-          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+          name: formatNameBasedOnType(c),
           parent: null,
           children: c.children.length && c.type !== 'districtPreview' && c.type !== 'collectiveSubLevel'  // children from the lower levels aren't needed
             ? getBudgetBookSummaryProperties(c.children)
@@ -668,11 +682,58 @@ const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string
   const allowedTypes = ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'collectiveSubLevel']
 
   if (!allowedTypes.includes(type)) return ""
-  
+
   if (type === 'collectiveSubLevel' && !path.startsWith('8 03')) return ""
 
   const budget = budgets.find(obj => obj.year === new Date().getFullYear() + 1);
   return budget ? budget.displayFrameBudget : "";
+}
+
+export const calculateCostForecastDeviation = (plannedBudget: string | undefined, costForecast: string | undefined) => {
+  const costForecastValue = costForecast ? formattedNumberToNumber(costForecast) : 0;
+  const plannedBudgetValue = plannedBudget ? formattedNumberToNumber(plannedBudget) : 0;
+  return formatNumber(costForecastValue - plannedBudgetValue);
+}
+
+/**
+ * Check row has either frame budget or budget overlap, or it has planned budget
+ * @param c A row object
+ * @returns boolean
+ */
+const hasBudgetData = (c: IPlanningRow): boolean => {
+  return (c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0';
+}
+
+/**
+ * Format object name based the type of the row
+ * @param row A row object
+ * @returns string
+ */
+const formatNameBasedOnType = (row: IPlanningRow): string => {
+  if (row.type === 'masterClass'){
+    return row.name.toUpperCase()
+  }
+  return row.name;
+}
+
+/**
+ * Check if the type is not "group" and has projects
+ * @param type Type of the row
+ * @param projects Array of projects
+ * @returns boolean
+ */
+const isNotGroupOrRowHasProjects = (type: PlanningRowType, projects: IStrategyAndForecastTableRow[]) => {
+  return type !== 'group' || projects.length;
+}
+
+/**
+ * Check if the value is included in the list of string values
+ * @param value String that is looked for
+ * @param listTypes List of strings
+ * @returns boolean
+ */
+function isOneOfTheListItems(value: string, listTypes: string[]) {
+  return listTypes.includes(value)
 }
 
 export const convertToReportRows = (
@@ -683,7 +744,8 @@ export const convertToReportRows = (
   divisions?: Array<IListItem> | undefined,
   subDivisions?: Array<IListItem> | undefined,
   projectsInWarrantyPhase?: Array<IProject>,
-): IBudgetBookSummaryTableRow[] | IStrategyTableRow[] | IOperationalEnvironmentAnalysisTableRow[] => {
+  hierarchyInForcedToFrame?: IPlanningRow[],
+): IBudgetBookSummaryTableRow[] | IOperationalEnvironmentAnalysisTableRow[] | IStrategyAndForecastTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
       let forcedToFrameHierarchy: IBudgetBookSummaryTableRow[] = [];
@@ -691,25 +753,61 @@ export const convertToReportRows = (
       getInvestmentPart(forcedToFrameHierarchy);
       return forcedToFrameHierarchy;
     }
+    case Reports.ForecastReport: {
+      const forcedToFrameHierarchy: IStrategyAndForecastTableRow[] = [];
+
+      for (const c of rows) {
+        if (hasBudgetData(c)) {
+          const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
+          const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
+          const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
+          const forcedToFrameBudget = forcedToFrameClass?.cells[0].plannedBudget ?? "0";
+          const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
+          const rowProjects = c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows, forcedToFrameClass?.projectRows) : [];
+
+          if (isNotGroupOrRowHasProjects(c.type, rowProjects)) {
+            const rowChildren = c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, undefined, forcedToFrameChildren) : [];
+            const convertedClass = {
+              id: c.id,
+              name: formatNameBasedOnType(c),
+              parent: null,
+              children: rowChildren,
+              projects: rowProjects,
+              costForecast: c.cells[0].plannedBudget,
+              costForcedToFrameBudget: forcedToFrameBudget,                                                         // Ennuste 2026
+              costForecastDeviation: calculateCostForecastDeviation(forcedToFrameBudget, c.cells[0].plannedBudget), // Poikkeama
+              costPlan: frameBudget,
+              type: c.type as ReportTableRowType
+            }
+
+            forcedToFrameHierarchy.push(convertedClass);
+          }
+        }
+      }
+      return forcedToFrameHierarchy;
+    }
     case Reports.Strategy:
     case Reports.StrategyForcedToFrame: {
-      const forcedToFrameHierarchy: IStrategyTableRow[] = [];
+      const forcedToFrameHierarchy: IStrategyAndForecastTableRow[] = [];
+
       for (const c of rows) {
         const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
-        if ((c.cells[0].displayFrameBudget != '0' || c.cells[0].isFrameBudgetOverlap) || c.cells[0].plannedBudget != '0') {
+        const rowProjects = c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [];
+
+        if (hasBudgetData(c) && (isNotGroupOrRowHasProjects(c.type, rowProjects))) {
+          const rowChildren = c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [];
           const convertedClass = {
             id: c.id,
-            name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+            name: formatNameBasedOnType(c),
             parent: null,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [],
-            projects: c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [],
+            children: rowChildren,
+            projects: rowProjects,
             costForecast: c.cells[0].plannedBudget,
             costPlan: frameBudget,
             type: c.type as ReportTableRowType
           }
-          if (convertedClass.type !== 'group' || convertedClass.projects.length) {
-            forcedToFrameHierarchy.push(convertedClass);
-          }
+
+          forcedToFrameHierarchy.push(convertedClass);
         }
       }
       return forcedToFrameHierarchy;
@@ -727,7 +825,7 @@ export const convertToReportRows = (
       for (const c of rows) {
         const convertedClass = {
           id: c.id,
-          name: c.type === 'masterClass' ? c.name.toUpperCase() : c.name,
+          name: formatNameBasedOnType(c),
           parent: null,
           children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, projectsInWarrantyPhase) : [],
           projects: [],
@@ -756,15 +854,17 @@ export const convertToReportRows = (
         })
 
         const plannedBudgets = Object.values(convertedClass.plannedBudgets);
-        const isSomeLevelofClass = c.type === 'masterClass' || c.type === 'class' || c.type === 'subClass';
+        const isSomeLevelofClass = isOneOfTheListItems(c.type, ['masterClass', 'class', 'subClass']);
         /* TA parts that don't have any planned budgets shouldn't be shown on the report.
            There shouldn't either be other rows than classes from some of the levels. */
         if (isSomeLevelofClass && plannedBudgets.some((value) => value !== "0")) {
           forcedToFrameHierarchy.push(convertedClass);
-          const noneOfTheChildrenIsSubClass =
-            c.type === 'class' && c.children.length > 0 && c.children.some((child) => child.type !== 'subClass');
+          const typeIsClass = c.type === 'class';
 
-          const isClassWithoutChildren = c.children.length === 0 && c.type === 'class';
+          const noneOfTheChildrenIsSubClass =
+            typeIsClass && c.children.length > 0 && c.children.some((child) => child.type !== 'subClass');
+
+          const isClassWithoutChildren = c.children.length === 0 && typeIsClass;
           /* 
             In general: if the class is on the fourth level, we want to add some extra rows there.
             isClassWithoutChildren: if the class is on a higher level and it doesn't contain children, it might have projects
@@ -809,7 +909,7 @@ export const convertToReportRows = (
               foundProjectsInWarrantyPhase?.forEach((p) => {
                 addProjectBudgetToSpecifiedLevel(mainClass.plannedBudgets, p.finances);
               });
-              
+
               // loop through also the children of children. This is the last level in which we can find matching ids
               for (const child1 of child.children) {
                 const foundProjects = projectsInWarrantyPhase?.filter((p) => p.projectClass == child1.id);
@@ -848,7 +948,7 @@ export const convertToReportRows = (
       ]
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
         path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
-      
+
       for (const c of rows) {
         if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
           const startYear = getGroupStartYear(c.projectRows);
@@ -870,7 +970,7 @@ export const convertToReportRows = (
               location: c.location ? getDivision(c.location, divisions, subDivisions) : '',
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows)),
             }
-            
+
             if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup)) {
               planningHierarchy.push(convertedGroup);
             } else {
@@ -998,38 +1098,73 @@ const processBudgetBookSummaryTableRows = (tableRows: IBudgetBookSummaryTableRow
   return budgetBookSummaryCsvRows;
 };
 
-const strategyCsvRows: IStrategyTableCsvRow[] = [];
+const strategyAndForecastRowObject =(reportName: string, row: IStrategyAndForecastTableRow) => {
+  const commonObject = {
+    id: row.id,
+    name: row.name,
+    type: row.type,
+    costPlan: row.costPlan,                   // TA value
+    costForecast: row.costForecast ?? '',     // TS value
+    projectManager: row.projectManager ?? '',
+    projectPhase: row.projectPhase ?? '',
+    januaryStatus: row.januaryStatus ?? '',
+    februaryStatus: row.februaryStatus ?? "",
+    marchStatus: row.marchStatus ?? "",
+    aprilStatus: row.aprilStatus ?? "",
+    mayStatus: row.mayStatus ?? "",
+    juneStatus: row.juneStatus ?? "",
+    julyStatus: row.julyStatus ?? "",
+    augustStatus: row.augustStatus ?? "",
+    septemberStatus: row.septemberStatus ?? "",
+    octoberStatus: row.octoberStatus ?? "",
+    novemberStatus: row.novemberStatus ?? "",
+    decemberStatus: row.decemberStatus ?? "",
+  }
 
-const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
+  switch (reportName) {
+    case 'strategy': {
+      return commonObject;
+    }
+    case 'forecast': {
+      return {
+        ...commonObject,
+        costForcedToFrameBudget: row.costForcedToFrameBudget ?? '', // Ennuste
+        costForecastDeviation: row.costForecastDeviation ?? '',     // Poikkeama
+      }
+    }
+    default: {
+      return {}
+    }
+  }
+}
+
+const strategyCsvRows: IStrategyTableCsvRow[] = [];
+const forecastCsvRows: IForecastTableCsvRow[] = [];
+
+const processStrategyTableRows = (tableRows: IStrategyAndForecastTableRow[]) => {
   tableRows.forEach((tableRow) => {
     if (!strategyCsvRows.some(row => row.id === tableRow.id)) {
-      strategyCsvRows.push({
-        id: tableRow.id,
-        name: tableRow.name,
-        type: tableRow.type,
-        costPlan: tableRow.costPlan,                    // TA value
-        costForecast: tableRow.costForecast ?? '',      // TS value
-        projectManager: tableRow.projectManager ?? '',
-        projectPhase: tableRow.projectPhase ?? '',
-        januaryStatus: tableRow.januaryStatus ?? '',
-        februaryStatus: tableRow.februaryStatus ?? "",
-        marchStatus: tableRow.marchStatus ?? "",
-        aprilStatus: tableRow.aprilStatus ?? "",
-        mayStatus: tableRow.mayStatus ?? "",
-        juneStatus: tableRow.juneStatus ?? "",
-        julyStatus: tableRow.julyStatus ?? "",
-        augustStatus: tableRow.augustStatus ?? "",
-        septemberStatus: tableRow.septemberStatus ?? "",
-        octoberStatus: tableRow.octoberStatus ?? "",
-        novemberStatus: tableRow.novemberStatus ?? "",
-        decemberStatus: tableRow.decemberStatus ?? "",
-      })
+      const rowObject = strategyAndForecastRowObject("strategy", tableRow);
+      strategyCsvRows.push(rowObject);
     }
     processStrategyTableRows(tableRow.projects);
     processStrategyTableRows(tableRow.children);
   });
   return strategyCsvRows;
-}
+};
+
+const processForecastTableRows = (tableRows: IStrategyAndForecastTableRow[]) => {
+  tableRows.forEach((tableRow) => {
+    if (!forecastCsvRows.some(row => row.id === tableRow.id)) {
+      const rowObject = strategyAndForecastRowObject("forecast", tableRow);
+      forecastCsvRows.push(rowObject);
+    }
+    processForecastTableRows(tableRow.projects);
+    processForecastTableRows(tableRow.children);
+  });
+  return forecastCsvRows;
+};
+
 const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
 const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
@@ -1118,15 +1253,12 @@ const constructionProgramCsvRows: IConstructionProgramCsvRow[] = [];
 
 const isShownOnTheReport = (tableRow: IConstructionProgramTableRow): boolean => {
   return (
-    (tableRow.type === 'group' ||
-    tableRow.type === 'groupWithValues' ||
-    tableRow.type === 'project' ||
-    tableRow.projects.length > 0 ||
-    tableRow.name === t('report.constructionProgram.classSummary') ||
-    tableRow.name === t('report.constructionProgram.underMillionSummary') ||
-    tableRow.name === '' ||
-    tableRow.children.some(isShownOnTheReport) ||
-    tableRow.name === '8 01 Kiinteä omaisuus')
+    (
+      tableRow.projects.length > 0 ||
+      tableRow.children.some(isShownOnTheReport) ||
+      isOneOfTheListItems(tableRow.type, ['group', 'groupWithValues', 'project']) ||
+      isOneOfTheListItems(tableRow.name, [t('report.constructionProgram.classSummary'), t('report.constructionProgram.underMillionSummary'), '8 01 Kiinteä omaisuus', ''])
+    )
     // temporary solution to remove 8 0 Kiinteä omaisuus/Esirakentaminen from the report
     // will later possibly be removed from the database, but currently
     //'8 0 Kiinteä omaisuus/Esirakentaminen' is old budget item that the tool stilll needs to show
@@ -1182,9 +1314,14 @@ export const flattenBudgetBookSummaryTableRows = (
 ): Array<IBudgetBookSummaryCsvRow> => processBudgetBookSummaryTableRows(tableRows).flat(Infinity);
 
 export const flattenStrategyTableRows = (
-  tableRows: Array<IStrategyTableRow>,
+  tableRows: Array<IStrategyAndForecastTableRow>,
 ): Array<IStrategyTableCsvRow> =>
   processStrategyTableRows(tableRows).flat(Infinity);
+
+export const flattenForecastTableRows = (
+  tableRows: Array<IStrategyAndForecastTableRow>,
+): Array<IForecastTableCsvRow> =>
+  processForecastTableRows(tableRows).flat(Infinity);
 
 export const flattenConstructionProgramTableRows = (
   tableRows: Array<IConstructionProgramTableRow>,
@@ -1199,6 +1336,7 @@ export const getReportData = async (
   subDivisions?: IListItem[],
   categories?: IListItem[],
   projectsInWarrantyPhase?: IProject[],
+  hierarchyInForcedToFrame?: IPlanningRow[],
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
   | Array<IStrategyTableCsvRow>
@@ -1206,20 +1344,25 @@ export const getReportData = async (
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
-  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions, projectsInWarrantyPhase);
+  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame);
 
   try {
     switch (reportType) {
       case Reports.Strategy:
-      case Reports.StrategyForcedToFrame: {
+      case Reports.StrategyForcedToFrame:
+      case Reports.ForecastReport: {
         //Flatten rows to one dimension
-        const flattenedRows = flattenStrategyTableRows(reportRows as IStrategyTableRow[]);
+        const flattenedRows = flattenForecastTableRows(reportRows as IStrategyAndForecastTableRow[]);
         return flattenedRows.map((r) => ({
           [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
           [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
           [`\n${t('projectPhase')}`]: r.projectPhase,
           [`\nTA ${year + 1}`]: r.costPlan,
           [`\nTS ${year + 1}`]: r.costForecast,
+          ...(reportType === Reports.ForecastReport && {
+            [`\nEnnuste ${year + 1}`]: r.costForcedToFrameBudget,
+            [`\nPoikkeama`]: r.costForecastDeviation,
+          }),
           [`${year + 1}\n01`]: r.januaryStatus,
           [`\n02`]: r.februaryStatus,
           [`\n03`]: r.marchStatus,
@@ -1232,7 +1375,7 @@ export const getReportData = async (
           [`\n10`]: r.octoberStatus,
           [`\n11`]: r.novemberStatus,
           [`\n12`]: r.decemberStatus,
-        }))
+        }));
       }
       case Reports.ConstructionProgram: {
         // Flatten rows into one dimension

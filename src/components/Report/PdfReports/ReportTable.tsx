@@ -1,14 +1,15 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
+import { useTranslation } from 'react-i18next';
 import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
 import {
   convertToReportRows,
   flattenBudgetBookSummaryTableRows,
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
-  flattenConstructionProgramTableRows
+  flattenConstructionProgramTableRows,
+  flattenForecastTableRows
 } from '@/utils/reportHelpers';
-import TableRow from './TableRow';
 import {
   IBasicReportData,
   IBudgetBookSummaryTableRow,
@@ -17,11 +18,12 @@ import {
   ReportType,
   Reports
 } from '@/interfaces/reportInterfaces';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
 import StrategyTableHeader from './StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
-import { useTranslation } from 'react-i18next';
-import { IProject } from '@/interfaces/projectInterfaces';
+import TableRow from './TableRow';
 
 const styles = StyleSheet.create({
   table: {
@@ -34,10 +36,13 @@ interface IReportTableProps {
   reportType: ReportType;
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[];
+  hierarchyInForcedToFrame?: IPlanningRow[];
 }
 
+type IReportFlattenedRows = IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow;
+
 const getFlattenedRows = (
-  reportRows: (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow)[],
+  reportRows: IReportFlattenedRows[],
   reportType: ReportType
 ) => {
   if (reportType === Reports.BudgetBookSummary) {
@@ -49,26 +54,32 @@ const getFlattenedRows = (
   }
 }
 
+const getStrategyReportRows = (type: ReportType, rows: IReportFlattenedRows[]) => {
+  if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) {
+    return flattenStrategyTableRows(rows);
+  } else if (type === Reports.ForecastReport) {
+    return flattenForecastTableRows(rows);
+  }
+  return [];
+}
+
 const ReportTable: FC<IReportTableProps> = ({
   reportType,
   data,
-  projectsInWarrantyPhase
+  projectsInWarrantyPhase,
+  hierarchyInForcedToFrame
 }) => {
   const { t } = useTranslation();
-  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions, data.subDivisions, projectsInWarrantyPhase);
+  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions, data.subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame);
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (
     reportType === Reports.BudgetBookSummary ||
     reportType === Reports.OperationalEnvironmentAnalysis ||
     reportType === Reports.ConstructionProgram)
-      ? getFlattenedRows(
-        reportRows as (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow)[]
-        , reportType
-  ) : [];
+      ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
 
-  const strategyReportRows = reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
-    flattenStrategyTableRows(reportRows) : [];
+  const strategyReportRows = getStrategyReportRows(reportType, reportRows);
 
   const getTableHeader = () => {
     switch (reportType) {
@@ -76,7 +87,9 @@ const ReportTable: FC<IReportTableProps> = ({
         return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
-        return <StrategyTableHeader />;
+        return <StrategyTableHeader isForecastReport={false}/>;
+      case Reports.ForecastReport:
+        return <StrategyTableHeader isForecastReport={true} />;
       case Reports.ConstructionProgram:
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:
@@ -90,7 +103,7 @@ const ReportTable: FC<IReportTableProps> = ({
       <View style={styles.table}>
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
-          reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
+          reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
             strategyReportRows : flattenedRows
         }/>
       </View>
