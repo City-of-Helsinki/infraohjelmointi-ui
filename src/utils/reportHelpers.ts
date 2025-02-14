@@ -690,9 +690,9 @@ const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string
 }
 
 export const calculateCostForecastDeviation = (plannedBudget: string | undefined, costForecast: string | undefined) => {
-  const plannedBudgetValue = plannedBudget ? formattedNumberToNumber(plannedBudget) : 0;
   const costForecastValue = costForecast ? formattedNumberToNumber(costForecast) : 0;
-  return formatNumber(plannedBudgetValue - costForecastValue);
+  const plannedBudgetValue = plannedBudget ? formattedNumberToNumber(plannedBudget) : 0;
+  return formatNumber(costForecastValue - plannedBudgetValue);
 }
 
 /**
