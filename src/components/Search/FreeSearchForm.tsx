@@ -162,8 +162,6 @@ const FreeSearchForm = ({
   const handleSetSearchWord = useCallback(
     (value: string) =>
       setSearchState((current) => {
-        // TODO: here user must be notified if selected value is duplicate
-        // TODO: searchWordDuplicates contains duplicates
         return { ...current, searchWord: value };
       }),
     [],
