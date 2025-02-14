@@ -1,4 +1,5 @@
 import { IProject } from '@/interfaces/projectInterfaces';
+import { mockSapCostforProjectCard } from './mockSapCosts';
 
 const mockProject: { data: IProject } = {
   data: {
@@ -141,6 +142,7 @@ const mockProject: { data: IProject } = {
     frameEstPlanningEnd: '01.04.2025',
     frameEstConstructionStart: '10.04.2025',
     frameEstConstructionEnd: '10.04.2031',
+    currentYearsSapValues: [mockSapCostforProjectCard]
   },
 };
 
