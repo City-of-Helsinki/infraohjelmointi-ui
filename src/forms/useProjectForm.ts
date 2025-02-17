@@ -294,7 +294,7 @@ const useProjectForm = () => {
   }, [project, projectUpdate]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && projectMode === "edit") {
       reset(formValues);
     }
   }, [formValues, isLoading, reset]);
