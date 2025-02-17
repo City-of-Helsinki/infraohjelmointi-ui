@@ -13,10 +13,10 @@ import CheckboxField from '../shared/CheckboxField';
 import { Fieldset } from 'hds-react/components/Fieldset';
 import { useOptions } from '@/hooks/useOptions';
 import {
+  clearSearchState,
   getSearchResultsThunk,
   selectOpen,
   setLastSearchParams,
-  setSearchForm,
   setSubmittedSearchForm,
   toggleSearch,
 } from '@/reducers/searchSlice';
@@ -62,8 +62,8 @@ const Search = () => {
 
   const handleClose = useCallback(() => {
     dispatch(toggleSearch());
-    dispatch(setSearchForm(getValues()));
-  }, [dispatch, getValues]);
+    dispatch(clearSearchState());
+  }, [dispatch]);
 
   const formProps = useCallback(
     (name: string) => {
