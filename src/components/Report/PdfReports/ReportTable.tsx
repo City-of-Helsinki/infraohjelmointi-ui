@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
-import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
+import ConstructionProgramTableHeader from './reportHeaders/ConstructionProgramTableHeader';
 import {
   convertToReportRows,
   flattenBudgetBookSummaryTableRows,
@@ -20,9 +20,9 @@ import {
 } from '@/interfaces/reportInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
-import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
-import StrategyTableHeader from './StrategyTableHeader';
-import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
+import BudgetBookSummaryTableHeader from './reportHeaders/BudgetBookSummaryTableHeader';
+import StrategyTableHeader from './reportHeaders/StrategyTableHeader';
+import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
 import TableRow from './TableRow';
 
 const styles = StyleSheet.create({

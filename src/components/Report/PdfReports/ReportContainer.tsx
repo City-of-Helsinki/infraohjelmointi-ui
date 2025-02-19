@@ -4,7 +4,7 @@ import { FC, memo } from 'react';
 import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
-import DocumentHeader from './DocumentHeader';
+import DocumentHeader from './reportHeaders/DocumentHeader';
 import ReportTable from './ReportTable';
 import StrategyReportFooter from './StrategyReportFooter';
 import DefaultReportFooter from './DefaultReportFooter';
