@@ -1,6 +1,7 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
-import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
+import { useTranslation } from 'react-i18next';
+import ConstructionProgramTableHeader from './reportHeaders/ConstructionProgramTableHeader';
 import {
   convertToReportRows,
   flattenBudgetBookSummaryTableRows,
@@ -8,7 +9,6 @@ import {
   flattenOperationalEnvironmentAnalysisTableRows,
   flattenConstructionProgramTableRows
 } from '@/utils/reportHelpers';
-import TableRow from './TableRow';
 import {
   IBasicReportData,
   IBudgetBookSummaryTableRow,
@@ -17,11 +17,12 @@ import {
   ReportType,
   Reports
 } from '@/interfaces/reportInterfaces';
-import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
-import StrategyTableHeader from './StrategyTableHeader';
-import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
-import { useTranslation } from 'react-i18next';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { IPlanningRow } from '@/interfaces/planningInterfaces';
+import BudgetBookSummaryTableHeader from './reportHeaders/BudgetBookSummaryTableHeader';
+import StrategyTableHeader from './reportHeaders/StrategyTableHeader';
+import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
+import TableRow from './TableRow';
 
 const styles = StyleSheet.create({
   table: {
