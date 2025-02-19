@@ -454,7 +454,7 @@
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti",
-      "documentName": "Kategorisointiraportti",
+      "documentName": "kategorisointiraportti",
       "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}}",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
