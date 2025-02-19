@@ -6,8 +6,8 @@ import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import DocumentHeader from './reportHeaders/DocumentHeader';
 import ReportTable from './ReportTable';
-import StrategyReportFooter from './StrategyReportFooter';
-import DefaultReportFooter from './DefaultReportFooter';
+import StrategyReportFooter from './reportFooters/StrategyReportFooter';
+import DefaultReportFooter from './reportFooters/DefaultReportFooter';
 
 const styles = StyleSheet.create({
   page: {
