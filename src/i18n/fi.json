@@ -455,9 +455,9 @@
   "report": {
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
-      "rowTitle": "Toimintaympäristöanalyysi",
-      "documentName": "toimintaympäristöanalyysi",
-      "title": "Kaupunkiympäristön toimiala - Toimintaympäristöanalyysi {{startYear}} - {{endYear}}",
+      "rowTitle": "Kategorisointiraportti",
+      "documentName": "Kategorisointiraportti",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}}",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
       "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
