@@ -55,13 +55,15 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     options: IOption[],
     size: 'full' | 'lg' | undefined,
     shouldTranslate: boolean,
+    shouldNotBeDisabled?: boolean,
   ) => (
+
     <SelectField
       {...getFieldProps(name)}
       options={options}
       size={size}
       shouldTranslate={shouldTranslate}
-      disabled={isInputDisabled}
+      disabled={shouldNotBeDisabled ? false : isInputDisabled}
       readOnly={isUserOnlyViewer}
     />
   );
@@ -93,14 +95,14 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       <div className="form-row">
         <div className="form-col-sm">{renderNumberField('projectCostForecast', 'keur', true)}</div>
         <div className="form-col-lg">
-          {renderSelectField('projectQualityLevel', projectQualityLevels, undefined, true)}
+          {renderSelectField('projectQualityLevel', projectQualityLevels, undefined, true, true)}
         </div>
         <div className="form-col-sm">{renderNumberField('projectWorkQuantity', 'm2', false)}</div>
       </div>
       <div className="form-row">
         <div className="form-col-sm">{renderNumberField('planningCostForecast', 'keur', true)}</div>
         <div className="form-col-lg">
-          {renderSelectField('planningPhase', planningPhases, undefined, true)}
+          {renderSelectField('planningPhase', planningPhases, undefined, true, true)}
         </div>
         <div className="form-col-sm">{renderNumberField('planningWorkQuantity', 'm2', false)}</div>
       </div>
@@ -109,7 +111,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           {renderNumberField('constructionCostForecast', 'keur', true)}
         </div>
         <div className="form-col-lg">
-          {renderSelectField('constructionPhase', constructionPhases, undefined, true)}
+          {renderSelectField('constructionPhase', constructionPhases, undefined, true, true)}
         </div>
         <div className="form-col-sm">
           {renderNumberField('constructionWorkQuantity', 'm2', false)}
@@ -151,7 +153,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         cancelEdit={isSaving}
       />
 
-      <OverrunRightField control={control} cancelEdit={isSaving} readOnly={isUserOnlyViewer} />
+      <OverrunRightField control={control} cancelEdit={isSaving} readOnly={isUserOnlyViewer} isInputDisabled={isInputDisabled}/>
       <ListField
         {...getFieldProps('preliminaryBudgetDivision')}
         readOnly={true}
