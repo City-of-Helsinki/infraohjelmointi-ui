@@ -463,7 +463,10 @@
       "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
       "changePressure": "Muutospaine",
       "taeFrame": "TA, käytettävissä oleva määräraha",
-      "costForecastShortened": "Ennuste"
+      "costForecastShortened": "Ennuste",
+      "code": "Koodi",
+      "codeDescription": "Luokka kuvaajaan",
+      "millionEuro": "Miljoonaa euroa"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
