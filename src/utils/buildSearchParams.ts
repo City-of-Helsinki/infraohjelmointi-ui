@@ -9,10 +9,12 @@ const buildSearchParams = (form: ISearchForm) => {
       case 'masterClass':
       case 'class':
       case 'subClass':
+        value.forEach((v: IOption) => searchParams.push(`${key}=${v.value}`));
+        break;
       case 'district':
       case 'division':
       case 'subDivision':
-        value.forEach((v: IOption) => searchParams.push(`${key}=${v.value}`));
+        value.forEach((v: IOption) => searchParams.push(`project${key}=${v.value}`));
         break;
       case 'programmedYes':
         value && searchParams.push('programmed=true');
