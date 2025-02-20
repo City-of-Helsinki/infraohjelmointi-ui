@@ -1,13 +1,8 @@
 import { IOption } from '@/interfaces/common';
-import {
-  selectPlanningDistricts,
-  selectPlanningDivisions,
-  selectPlanningSubDivisions,
-} from '@/reducers/locationSlice';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import _ from 'lodash';
-import { classesToOptions, listItemsToOption } from '@/utils/common';
+import { listItemsToOption } from '@/utils/common';
 import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 
 /**
