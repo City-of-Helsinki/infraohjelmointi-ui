@@ -37,7 +37,6 @@ const useSearchForm = () => {
     multiListsState.masterClass,
     multiListsState.class,
     multiListsState.subClass,
-    multiListsState.otherClassification,
   );
 
   const {
