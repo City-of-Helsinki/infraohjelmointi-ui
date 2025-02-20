@@ -1,13 +1,9 @@
 import { IOption } from '@/interfaces/common';
-import {
-  selectPlanningDistricts,
-  selectPlanningDivisions,
-  selectPlanningSubDivisions,
-} from '@/reducers/locationSlice';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import _ from 'lodash';
-import { classesToOptions } from '@/utils/common';
+import { listItemsToOption } from '@/utils/common';
+import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 
 /**
  * Populates the district, division and subDivision lists. Filters the available options of the lists
@@ -22,9 +18,9 @@ const useMultiLocationOptions = (
   divisions: Array<IOption>,
   subDivisions: Array<IOption>,
 ) => {
-  const allDistricts = useAppSelector(selectPlanningDistricts);
-  const allDivisions = useAppSelector(selectPlanningDivisions);
-  const allSubDivisions = useAppSelector(selectPlanningSubDivisions);
+  const allDistricts = useAppSelector(selectProjectDistricts);
+  const allDivisions = useAppSelector(selectProjectDivisions);
+  const allSubDivisions = useAppSelector(selectProjectSubDivisions);
 
   const selectedDivisionParent = useMemo(
     () =>
@@ -83,9 +79,9 @@ const useMultiLocationOptions = (
   }, [allDistricts, divisions, getNextDivisions, selectedDivisionParent, subDivisions]);
 
   return {
-    districts: classesToOptions(getNextDistricts()),
-    divisions: classesToOptions(getNextDivisions()),
-    subDivisions: classesToOptions(getNextSubDivisions()),
+    districts: listItemsToOption(getNextDistricts()),
+    divisions: listItemsToOption(getNextDivisions()),
+    subDivisions: listItemsToOption(getNextSubDivisions()),
   };
 };
 
