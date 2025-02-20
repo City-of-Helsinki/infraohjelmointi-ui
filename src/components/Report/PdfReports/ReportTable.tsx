@@ -23,6 +23,7 @@ import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import BudgetBookSummaryTableHeader from './reportHeaders/BudgetBookSummaryTableHeader';
 import StrategyTableHeader from './reportHeaders/StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
+import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
 
 const styles = StyleSheet.create({
@@ -101,6 +102,10 @@ const ReportTable: FC<IReportTableProps> = ({
   return (
     <View>
       <View style={styles.table}>
+        {
+          reportType === Reports.OperationalEnvironmentAnalysis &&
+            <OperationalEnvironmentCategorySummary flattenedRows={flattenedRows} />
+        }
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
           reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
