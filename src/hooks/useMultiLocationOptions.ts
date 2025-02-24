@@ -88,7 +88,7 @@ const useMultiLocationOptions = (
       const isDuplicate = locationNameCounts[l.value] > 1;
       if (isDuplicate) {
         const parentLoaction = allParentLocations.find((parentClass) => parentClass.id === l.parent);
-        const newName = `${l.value} (${parentLoaction?.value || ''})`;
+        const newName = `${l.value} (${parentLoaction?.value ?? ''})`;
         return { ...l, value: newName };
       }
       return l;

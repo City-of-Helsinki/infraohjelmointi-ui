@@ -93,7 +93,7 @@ const useMultiClassOptions = (
       const isDuplicate = classNameCounts[c.name] > 1;
       if (isDuplicate) {
         const parentClass = allParentClasses.find((parentClass) => parentClass.id === c.parent);
-        const newName = `${c.name} (${parentClass?.name || ''})`;
+        const newName = `${c.name} (${parentClass?.name ?? ''})`;
         return { ...c, name: newName };
       }
       return c;
