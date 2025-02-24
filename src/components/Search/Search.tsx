@@ -37,7 +37,7 @@ const Search = () => {
   const phases = useOptions('phases');
   const programmedYearMin = useOptions('programmedYears');
   const programmedYearMax = useOptions('programmedYears');
-  const personPlanning = useOptions('responsiblePersons');
+  const responsiblePersons = useOptions('responsiblePersons');
   const categories = useOptions('categories');
   const { masterClasses, classes, subClasses } = classOptions;
   const { districts, divisions, subDivisions } = locationOptions;
@@ -110,6 +110,7 @@ const Search = () => {
               options={programmedYearMin}
               shouldTranslate={false}
             />
+            
             <SelectField
               {...formProps('programmedYearMax')}
               options={programmedYearMax}
@@ -119,7 +120,13 @@ const Search = () => {
             <SelectField
               {...formProps('personPlanning')}
               iconKey="person"
-              options={personPlanning}
+              options={responsiblePersons}
+              shouldTranslate={false}
+            />
+            <SelectField
+              {...formProps('personConstruction')}
+              iconKey="person"
+              options={responsiblePersons}
               shouldTranslate={false}
             />
             <MultiSelectField {...formProps('district')} options={districts} />

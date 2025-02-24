@@ -58,6 +58,7 @@ const getSearchTerms = (
       case 'programmedYearMax':
       case 'phase':
       case 'personPlanning':
+      case 'personConstruction':
       case 'category':
         value.value && searchTerms.push({ value: value.label, type: key, id: value.value });
         break;
@@ -113,6 +114,7 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
     case 'programmedYearMax':
     case 'phase':
     case 'personPlanning':
+    case 'personConstruction':
     case 'category':
       (form[type] as string | boolean | IOption) = initialSearchForm[type];
       break;

@@ -31,6 +31,7 @@ const buildSearchParams = (form: ISearchForm) => {
       case 'programmedYearMax':
       case 'phase':
       case 'personPlanning':
+      case 'personConstruction':
       case 'category':
         value.value && searchParams.push(`${key}=${value.value}`);
         break;

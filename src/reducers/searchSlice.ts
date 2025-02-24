@@ -36,6 +36,7 @@ export const initialSearchForm = {
   programmedYes: false,
   programmedNo: false,
   personPlanning: { value: '', label: '' },
+  personConstruction: { value: '', label: '' },
   programmedYearMin: { value: '', label: '' },
   programmedYearMax: { value: '', label: '' },
   phase: { value: '', label: '' },

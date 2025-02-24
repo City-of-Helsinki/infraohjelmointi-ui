@@ -233,6 +233,7 @@
     "subClass": "Alaluokka",
     "category": "Kategoria",
     "personPlanning": "Vastuuhenkilö",
+    "personConstruction":"Rakennuttamisen vastuuhenkilö",
     "filter": "Rajaa projekteja",
     "programmed": "Ohjelmoitu",
     "programmedYes": "Kyllä",

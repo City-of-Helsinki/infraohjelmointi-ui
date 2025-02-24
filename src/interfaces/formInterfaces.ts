@@ -90,6 +90,7 @@ export interface ISearchForm {
   programmedYes: boolean;
   programmedNo: boolean;
   personPlanning: IOption;
+  personConstruction: IOption;
   programmedYearMin: IOption;
   programmedYearMax: IOption;
   phase: IOption;
