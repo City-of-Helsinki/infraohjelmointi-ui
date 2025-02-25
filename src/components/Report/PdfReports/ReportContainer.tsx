@@ -29,6 +29,9 @@ interface IPdfReportContainerProps {
 const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows }) => {
   const { t } = useTranslation();
 
+  const date = new Date();
+  const currentDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+
   const getDocumentTitle = () => {
     switch (reportType) {
       case Reports.ForecastReport:
@@ -77,18 +80,21 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
     }
   }
   const getDocumentSubtitleTwo = () => {
-    if (reportType == Reports.OperationalEnvironmentAnalysis) {
+    if (reportType == Reports.OperationalEnvironmentAnalysis)
       return t('report.operationalEnvironmentAnalysis.subtitleTwo');
-    } else {
-      return '';
-    }
+
+    if (reportType === Reports.ForecastReport)
+      return t('report.forecastReport.subtitleTwo', {
+        currentDate: currentDate,
+      });
+
+    return '';
   }
 
   const documentTitle = getDocumentTitle();
   const documentSubtitleOne = getDocumentSubtitleOne();
   const documentSubtitleTwo = getDocumentSubtitleTwo();
-  const date = new Date();
-  const currentDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+
   return (
     <Document title={documentTitle}>
       <Page orientation={reportType !== Reports.ConstructionProgram ? "landscape" : "portrait" } size="A3" style={styles.page}>
