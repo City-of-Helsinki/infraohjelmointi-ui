@@ -22,6 +22,7 @@ import {
 } from '@/reducers/searchSlice';
 import buildSearchParams from '@/utils/buildSearchParams';
 import './styles.css';
+import HkrIdSearch from './HkrIdSearch';
 
 const Search = () => {
   const { t } = useTranslation();
@@ -105,6 +106,7 @@ const Search = () => {
               <CheckboxField {...formProps('programmedYes')} />
               <CheckboxField {...formProps('programmedNo')} />
             </Fieldset>
+            <HkrIdSearch control={control} getValues={getValues} />
             <SelectField
               {...formProps('programmedYearMin')}
               options={programmedYearMin}

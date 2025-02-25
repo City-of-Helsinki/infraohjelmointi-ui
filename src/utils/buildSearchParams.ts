@@ -47,6 +47,11 @@ const buildSearchParams = (form: ISearchForm) => {
           }
         }
         break;
+      case 'hkrIds':
+        for (const hkrId of value) {
+          searchParams.push(`hkrId=${hkrId}`)
+        }
+        break;
       default:
         break;
     }

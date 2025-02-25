@@ -35,6 +35,7 @@ export const initialSearchForm = {
   subClass: [],
   programmedYes: false,
   programmedNo: false,
+  hkrIds: [],
   personPlanning: { value: '', label: '' },
   personConstruction: { value: '', label: '' },
   programmedYearMin: { value: '', label: '' },
