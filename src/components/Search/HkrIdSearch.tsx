@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { arrayHasValue } from '@/utils/common';
 import { HookFormControlType, ISearchForm } from '@/interfaces/formInterfaces';
 import { Control, Controller, FieldValues, UseFormGetValues } from 'react-hook-form';
-import _ from 'lodash';
 import './styles.css';
 
 
