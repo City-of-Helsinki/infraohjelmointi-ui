@@ -58,7 +58,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
         downloadCSV(
           data,
           `${documentName} ${
-            ['strategy', 'strategyForcedToFrame', 'forecastReport'].includes(type) ? year + 1 : year
+            ['strategy', 'strategyForcedToFrame'].includes(type) ? year + 1 : year
           }.csv`,
         );
       } else {
