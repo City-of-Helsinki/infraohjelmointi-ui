@@ -52,6 +52,9 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
   const getDocumentSubtitleOne = () => {
     switch (reportType) {
       case Reports.ForecastReport:
+        return t('report.strategy.subtitle', {
+          startYear: new Date().getFullYear()
+        });
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {

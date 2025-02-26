@@ -774,7 +774,7 @@ export const convertToReportRows = (
               children: rowChildren,
               projects: rowProjects,
               costForecast: c.cells[0].plannedBudget,
-              costForcedToFrameBudget: forcedToFrameBudget,                                                         // Ennuste 2026
+              costForcedToFrameBudget: forcedToFrameBudget,                                                         // Ennuste
               costForecastDeviation: calculateCostForecastDeviation(forcedToFrameBudget, c.cells[0].plannedBudget), // Poikkeama
               costPlan: frameBudget,
               type: c.type as ReportTableRowType
