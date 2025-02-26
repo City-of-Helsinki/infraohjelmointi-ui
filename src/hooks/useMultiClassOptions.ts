@@ -8,6 +8,7 @@ import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import _ from 'lodash';
 import { classesToOptions } from '@/utils/common';
+import { IClass } from '@/interfaces/classInterfaces';
 
 /**
  * Populates the masterClass, class and subClass lists. Filters the available options of the lists
@@ -82,10 +83,28 @@ const useMultiClassOptions = (
     }
   }, [allMasterClasses, classes, getNextClasses, selectedClassParents, subClasses]);
 
+  const renameDublicateClassNames = (classes: IClass[], allParentClasses: IClass[]) => {
+    const classNameCounts = classes.reduce((acc: {[key: string]: number}, c) => {
+      acc[c.name] = (acc[c.name] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const renamedClasses = classes.map((c) => {
+      const isDuplicate = classNameCounts[c.name] > 1;
+      if (isDuplicate) {
+        const parentClass = allParentClasses.find((parentClass) => parentClass.id === c.parent);
+        const newName = `${c.name} (${parentClass?.name ?? ''})`;
+        return { ...c, name: newName };
+      }
+      return c;
+    });
+    return renamedClasses;
+  }
+
   return {
     masterClasses: classesToOptions(getNextMasterClasses()),
-    classes: classesToOptions(getNextClasses()),
-    subClasses: classesToOptions(getNextSubClasses()),
+    classes: classesToOptions(renameDublicateClassNames(getNextClasses(), allMasterClasses)),
+    subClasses: classesToOptions(renameDublicateClassNames(getNextSubClasses(), allClasses)),
   };
 };
 
