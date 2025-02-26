@@ -30,7 +30,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
   const { t } = useTranslation();
 
   const date = new Date();
-  const currentDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+  const currentYear = date.getFullYear();
+  const currentDate = `${date.getDate()}.${date.getMonth() + 1}.${currentYear}`;
 
   const getDocumentTitle = () => {
     switch (reportType) {
@@ -44,8 +45,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
         return t('report.budgetBookSummary.title');
       case Reports.OperationalEnvironmentAnalysis:
         return t('report.operationalEnvironmentAnalysis.title', {
-          startYear: new Date().getFullYear() + 1,
-          endYear: new Date().getFullYear() + 10,
+          startYear: currentYear + 1,
+          endYear: currentYear + 10,
         });
       default:
         return '';
@@ -56,22 +57,22 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
     switch (reportType) {
       case Reports.ForecastReport:
         return t('report.strategy.subtitle', {
-          startYear: new Date().getFullYear()
+          startYear: currentYear
         });
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {
-          startYear: new Date().getFullYear() + 1
+          startYear: currentYear + 1
         });
       case Reports.ConstructionProgram:
         return t('report.constructionProgram.subtitle', {
-            startYear: new Date().getFullYear() + 1,
-            endYear: new Date().getFullYear() + 3,
+            startYear: currentYear + 1,
+            endYear: currentYear + 3,
           });
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.subtitle', {
-          startYear: new Date().getFullYear() + 1,
-          endYear: new Date().getFullYear() + 10,
+          startYear: currentYear + 1,
+          endYear: currentYear + 10,
         });
       case Reports.OperationalEnvironmentAnalysis:
         return t('report.operationalEnvironmentAnalysis.subtitleOne');
