@@ -27,10 +27,14 @@ const HkrIdSearch = ({
 
   const { searchWord } = searchState;
 
+  const validateHkrId = (id: string) => {
+    return id && id.length < 6;
+  }
+
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
       const formValue = getValues('hkrIds');
-      if (!arrayHasValue(formValue, value)) {
+      if (!arrayHasValue(formValue, value) && validateHkrId(value)) {
         const nextChange = [...formValue, value]
         onChange(nextChange);
         setSearchState((current) => {
