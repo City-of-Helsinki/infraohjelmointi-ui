@@ -67,6 +67,8 @@ const mockProject: { data: IProject } = {
     },
     estConstructionStart: '10.04.2025',
     estConstructionEnd: '10.04.2031',
+    warrantyPhaseStart: '11.04.2031',
+    warrantyPhaseEnd: '14.04.2032',
     presenceStart: '01.02.2021',
     presenceEnd: '01.01.2023',
     visibilityStart: '02.01.2023',

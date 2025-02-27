@@ -20,6 +20,8 @@ export interface IProject {
   estPlanningEnd: string | null;
   estConstructionStart: string | null;
   estConstructionEnd: string | null;
+  warrantyPhaseStart: string | null;
+  warrantyPhaseEnd: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;
@@ -292,7 +294,11 @@ export type CellType =
   | 'constructionStart'
   | 'constructionEnd'
   | 'construction'
+  | 'warrantyPhaseStart'
+  | 'warrantyPhaseEnd'
+  | 'warrantyPhase'
   | 'overlap'
+  | 'constructionAndWarrantyOverlap'
   | 'none';
 
 export type ProjectCellGrowDirection = 'left' | 'right';
@@ -308,6 +314,8 @@ export interface ITimelineDates {
   planningEnd: null | string;
   constructionStart: null | string;
   constructionEnd: null | string;
+  warrantyPhaseStart: null | string;
+  warrantyPhaseEnd: null | string;
 }
 
 export interface IProjectEstDates {

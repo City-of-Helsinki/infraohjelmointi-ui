@@ -71,6 +71,8 @@ export interface IProjectForm {
   visibilityEnd: string;
   estConstructionStart: string;
   estConstructionEnd: string;
+  warrantyPhaseStart: string;
+  warrantyPhaseEnd: string;
   personConstruction: IOption;
   personPlanning: IOption;
   name: string;

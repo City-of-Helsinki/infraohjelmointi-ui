@@ -54,6 +54,11 @@
   @apply bg-white;
 }
 
+.project-cell.warrantyPhase {
+  box-shadow: inset 0 -4px 0 var(--color-black-20);
+  @apply bg-white;
+}
+
 .construction,
 .planning,
 .overlap,

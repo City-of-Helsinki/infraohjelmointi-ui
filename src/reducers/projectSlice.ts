@@ -25,6 +25,7 @@ export const getProjectThunk = createAsyncThunk('project/getOne', async (id: str
   thunkAPI.dispatch(resetProject());
   try {
     const project = await getProject(id);
+    console.log(project)
     return project;
   } catch (e) {
     return thunkAPI.rejectWithValue(e);

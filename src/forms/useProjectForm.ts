@@ -119,6 +119,8 @@ const useProjectFormValues = () => {
       estPlanningEnd: value(project?.estPlanningEnd),
       estConstructionStart: value(project?.estConstructionStart),
       estConstructionEnd: value(project?.estConstructionEnd),
+      warrantyPhaseStart: value(project?.warrantyPhaseStart),
+      warrantyPhaseEnd: value(project?.warrantyPhaseEnd),
       presenceStart: value(project?.presenceStart),
       presenceEnd: value(project?.presenceEnd),
       visibilityStart: value(project?.visibilityStart),
