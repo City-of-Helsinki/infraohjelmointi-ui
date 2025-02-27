@@ -448,7 +448,7 @@ const getForecastDeviationStyle = (type: string, deviationValueString: string) =
   const THRESHOLD = 200;
   const dValue = formattedNumberToNumber(deviationValueString);
 
-  if (dValue >= THRESHOLD) {
+  if (Math.abs(dValue) >= THRESHOLD) {
     return forecastReportStyles.forecastDeviationCostOver;
   }
 
