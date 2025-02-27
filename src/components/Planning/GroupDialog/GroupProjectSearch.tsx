@@ -181,6 +181,7 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
                     onDelete={(e) => {
                       handleDelete(e as React.MouseEvent<HTMLDivElement>, onChange);
                     }}
+                    placeholder={""}
                   >
                     {s.label}
                   </Tag>

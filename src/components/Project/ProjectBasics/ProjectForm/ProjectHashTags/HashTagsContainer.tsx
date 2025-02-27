@@ -60,7 +60,7 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id, re
           data-testid={id}
           id={tag.value}
         >
-          <Tag {...handlers} id={tag.id}>
+          <Tag {...handlers} id={tag.id} placeholder={""}>
             {tag.value}
           </Tag>
         </div>

@@ -2,7 +2,7 @@ import { IOption } from '@/interfaces/common';
 import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { Select as HDSSelect } from 'hds-react/components/Select';
+import { Select as HDSSelect, Option, SelectData } from 'hds-react/components/Select';
 import { IconCrossCircle } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
@@ -112,10 +112,10 @@ const SelectField: FC<ISelectFieldProps> = ({
       control={control as Control<FieldValues>}
       rules={rules}
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
-        const handleChange = (event: { value: string; }) => {
-          onChange(event);
-          if (shouldUpdateIcon && event?.value) {
-            updateIconBasedOnSelection(event.value);
+        const handleChange = (selectedOptions: Option[], clickedOption: Option) => {
+          onChange(clickedOption);
+          if (shouldUpdateIcon && clickedOption) {
+            updateIconBasedOnSelection(clickedOption.value);
           }
         };
         return (
@@ -143,17 +143,19 @@ const SelectField: FC<ISelectFieldProps> = ({
                 <HDSSelect
                   id={`select-field-${name}`}
                   className={`custom-select ${iconKey ? 'icon' : ''}`}
-                  value={translateValue(value)}
+                  texts={{ 
+                    label: `${!hideLabel && label && t(label)}`,
+                    placeholder: t('choose') ?? '',
+                    error: error?.message
+                  }}
+                  value={translateValue(value).value}
                   onChange={handleChange}
                   onBlur={onBlur}
-                  label={!hideLabel && label && t(label)}
                   invalid={error ? true : false}
-                  error={error?.message}
                   options={translatedOptions ?? []}
                   required={required}
                   disabled={disabled}
                   style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-                  placeholder={t('choose') ?? ''}
                   icon={icon}
                 />
               }

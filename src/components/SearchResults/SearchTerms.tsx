@@ -18,6 +18,7 @@ const SearchTerms = () => {
             id={`search-term-${t.id}`}
             onDelete={() => deleteTerm(t)}
             data-testid="search-term"
+            placeholder={""}
           >
             {t.value}
           </Tag>
@@ -31,6 +32,7 @@ const SearchTerms = () => {
             id="empty-all-btn"
             className="h-4 whitespace-nowrap !bg-transparent"
             onDelete={deleteAllTerms}
+            placeholder={""}
           >
             {t('emptyTerms')}
           </Tag>

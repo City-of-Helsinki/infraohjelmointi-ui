@@ -192,6 +192,7 @@ const FreeSearchForm = ({
                   onDelete={(e) => {
                     onSelectionDelete(e as React.MouseEvent<HTMLDivElement>, onChange);
                   }}
+                  placeholder={""}
                 >
                   {s}
                 </Tag>
