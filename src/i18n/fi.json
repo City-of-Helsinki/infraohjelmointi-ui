@@ -233,6 +233,8 @@
     "subClass": "Alaluokka",
     "category": "Kategoria",
     "personPlanning": "Vastuuhenkilö",
+    "hkrIdSearch": "PW Hanketunnus",
+    "personConstruction":"Rakennuttamisen vastuuhenkilö",
     "filter": "Rajaa projekteja",
     "programmed": "Ohjelmoitu",
     "programmedYes": "Kyllä",

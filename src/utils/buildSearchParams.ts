@@ -31,6 +31,7 @@ const buildSearchParams = (form: ISearchForm) => {
       case 'programmedYearMax':
       case 'phase':
       case 'personPlanning':
+      case 'personConstruction':
       case 'category':
         value.value && searchParams.push(`${key}=${value.value}`);
         break;
@@ -44,6 +45,11 @@ const buildSearchParams = (form: ISearchForm) => {
             searchParams.push(`projectName=${paramValue}`);
             searchParams.push(`group=${paramValue}`);
           }
+        }
+        break;
+      case 'hkrIds':
+        for (const hkrId of value) {
+          searchParams.push(`hkrId=${hkrId}`)
         }
         break;
       default:
