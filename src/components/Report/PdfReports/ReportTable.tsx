@@ -7,7 +7,9 @@ import {
   flattenBudgetBookSummaryTableRows,
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
-  flattenConstructionProgramTableRows
+  flattenConstructionProgramTableRows,
+  operationalEnvironmentAnalysisTableRows,
+  processOperationalEnvironmentAnalysisTableRows
 } from '@/utils/reportHelpers';
 import {
   IBasicReportData,
@@ -86,13 +88,17 @@ const ReportTable: FC<IReportTableProps> = ({
     }
   }
 
+  const buildSummaryRows = () => {
+    return operationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[])
+  }
+
   const tableHeader = getTableHeader();
+
   return (
     <View>
       <View style={styles.table}>
         {
-          reportType === Reports.OperationalEnvironmentAnalysis &&
-            <OperationalEnvironmentCategorySummary flattenedRows={flattenedRows} />
+          reportType === Reports.OperationalEnvironmentAnalysis && <OperationalEnvironmentCategorySummary rows={buildSummaryRows()} />
         }
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={

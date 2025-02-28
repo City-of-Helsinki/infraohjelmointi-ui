@@ -287,6 +287,34 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
   };
 }
 
+export interface IOperationalEnvironmentAnalysisSummaryCategoryRowData {
+    costForecast: string;
+    TAE: string;
+    TSE1: string;
+    TSE2: string;
+    initial1: string;
+    initial2: string;
+    initial3: string;
+    initial4: string;
+    initial5: string;
+    initial6: string;
+    initial7: string;
+}
+
+export interface IOperationalEnvironmentAnalysisSummaryCategoryRow {
+  id: string | undefined;
+  name: string;
+  type: string;
+  data: IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+}
+
+export interface IOperationalEnvironmentAnalysisSummaryRow {
+  id: string | undefined;
+  name: string;
+  type: string;
+  categories: IOperationalEnvironmentAnalysisSummaryCategoryRow[];
+}
+
 export interface IDownloadCsvButtonProps {
   type: ReportType;
   getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;

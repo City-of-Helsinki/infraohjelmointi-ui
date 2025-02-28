@@ -15,6 +15,9 @@ import {
   ITotals,
   IPlannedBudgets,
   IChild,
+  IOperationalEnvironmentAnalysisSummaryCategoryRow,
+  IOperationalEnvironmentAnalysisSummaryRow,
+  IOperationalEnvironmentAnalysisSummaryCategoryRowData,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -1032,7 +1035,7 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
 }
 const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
-const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
+const getOperationalEnvironmentAnalysisData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
   switch(tableRow.type) {
     case 'class':
       return {
@@ -1092,11 +1095,45 @@ const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
       }
   }
 }
-const processOperationalEnvironmentAnalysisTableRows = (
+
+const getOperationalEnvironmentAnalysisSummaryData = (tableRows: IOperationalEnvironmentAnalysisTableRow[]) => {
+  const categories: IOperationalEnvironmentAnalysisSummaryCategoryRow[] = [];
+
+  tableRows.forEach((row) => {
+    if (row.type === "class") {
+      const data = getOperationalEnvironmentAnalysisSummaryData(row.children);
+      categories.push(...data);
+    }
+    if (row.type === "category") {
+      categories.push({
+        id: row.id,
+        name: row.name,
+        type: row.type,
+        data: {
+          costForecast: row.plannedBudgetsForCategories?.plannedCostForecast ?? '0',
+          TAE: row.plannedBudgetsForCategories?.plannedTAE ?? '0',
+          TSE1: row.plannedBudgetsForCategories?.plannedTSE1 ?? '0',
+          TSE2: row.plannedBudgetsForCategories?.plannedTSE2 ?? '0',
+          initial1: row.plannedBudgetsForCategories?.plannedInitial1 ?? '0',
+          initial2: row.plannedBudgetsForCategories?.plannedInitial2 ?? '0',
+          initial3: row.plannedBudgetsForCategories?.plannedInitial3 ?? '0',
+          initial4: row.plannedBudgetsForCategories?.plannedInitial4 ?? '0',
+          initial5: row.plannedBudgetsForCategories?.plannedInitial5 ?? '0',
+          initial6: row.plannedBudgetsForCategories?.plannedInitial6 ?? '0',
+          initial7: row.plannedBudgetsForCategories?.plannedInitial7 ?? '0',
+        }
+      });
+    }
+  });
+
+  return categories;
+}
+
+export const processOperationalEnvironmentAnalysisTableRows = (
   tableRows: IOperationalEnvironmentAnalysisTableRow[]
 ): IBudgetBookSummaryCsvRow[]  => {
   tableRows.forEach((tableRow) => {
-    const data = getCorrectData(tableRow);
+    const data = getOperationalEnvironmentAnalysisData(tableRow);
     if (!operationalEnvironmentAnalysisCsvRows.some(row => row.id === tableRow.id)) {
       operationalEnvironmentAnalysisCsvRows.push({
         id: tableRow.id,
@@ -1190,6 +1227,88 @@ export const flattenConstructionProgramTableRows = (
   tableRows: Array<IConstructionProgramTableRow>,
 ): Array<IConstructionProgramCsvRow> =>
   processConstructionReportRows(tableRows).flat(Infinity);
+
+/**
+ * Create report table rows without flattening
+ */
+
+const summaryClasses: IOperationalEnvironmentAnalysisSummaryRow[] = [];
+const summarySubClasses: IOperationalEnvironmentAnalysisSummaryCategoryRow[] = [];
+let data: IOperationalEnvironmentAnalysisSummaryCategoryRow[] = [];
+
+export const operationalEnvironmentAnalysisTableRows = (
+  tableRows: IOperationalEnvironmentAnalysisTableRow[],
+): IOperationalEnvironmentAnalysisSummaryRow[] => {
+
+  const getTopMostClassCategoryData = (
+    tableRows: IOperationalEnvironmentAnalysisTableRow[]
+  ) => {
+    tableRows.forEach((row) => {
+      data = getOperationalEnvironmentAnalysisSummaryData(row.children);
+      summarySubClasses.push(...data);
+    })
+    return summarySubClasses;
+  }
+
+  const cleanSummaryData = (masterClasses: IOperationalEnvironmentAnalysisSummaryRow[]) => {
+    const cleanSummaryData: IOperationalEnvironmentAnalysisSummaryRow[] = []
+
+    masterClasses.forEach(masterClass => {
+      const cleanClassData: { [key: string]: IOperationalEnvironmentAnalysisSummaryCategoryRow } = {}
+
+      masterClass.categories.forEach(category => {
+        const name = category.name;
+
+        if (!cleanClassData[name]) {
+          cleanClassData[name] = { ...category, id: `${masterClass.id}-${category.name}-sum` }
+        } else {
+          Object.keys(category.data).forEach(key => {
+            cleanClassData[name].data[key as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData] = (
+              cleanClassData[name].data[key as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData] || 0
+            ) + category.data[key as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData];
+          })
+        }
+      });
+
+      const clean = {
+        id: masterClass.id,
+        name: masterClass.name,
+        type: masterClass.type,
+        categories: Object.values(cleanClassData),
+      }
+
+
+      cleanSummaryData.push(clean)
+    });
+
+    return cleanSummaryData;
+  }
+
+  tableRows.forEach((row) => {
+    if (row.type === "class") {
+      data = getOperationalEnvironmentAnalysisSummaryData(row.children);
+      let classData: any = {};
+
+      if (!data.length) {
+        summarySubClasses.length = 0;
+        data = getTopMostClassCategoryData(row.children)
+      }
+
+      if (!summaryClasses.some(summaryClass => summaryClass.id === row.id)) {
+        classData = {
+          id: row.id,
+          name: row.name,
+          type: row.type,
+          categories: data as IOperationalEnvironmentAnalysisSummaryCategoryRow[],
+        };
+
+        summaryClasses.push(classData);
+      }
+    }
+  });
+
+  return cleanSummaryData(summaryClasses);
+};
 
 export const getReportData = async (
   t: TFunction<'translation', undefined>,
