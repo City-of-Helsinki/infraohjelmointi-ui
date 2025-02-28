@@ -1,16 +1,16 @@
 import { View, StyleSheet, Text } from "@react-pdf/renderer";
-import { IOperationalEnvironmentAnalysisCsvRow } from "@/interfaces/reportInterfaces";
+import { IFlattenedOperationalEnvironmentAnalysisProperties, IOperationalEnvironmentAnalysisCsvRow, IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryRow } from "@/interfaces/reportInterfaces";
 import { FC, memo } from "react";
 import { t } from "i18next";
 
 const categorySummaryView = {
-  width: "50%",
+  width: "100%",
   paddingBottom: "10px",
 }
 
 const tableCell = {
   alignItems: 'center' as unknown as 'center',
-  width: "10%",
+  width: '6.5%',
 }
 
 const styles = StyleSheet.create({
@@ -32,31 +32,26 @@ const styles = StyleSheet.create({
   },
   tableDescriptionCell: {
     ...tableCell,
-    width: `${10*7}%`
+    width: '28.5%',
   },
   euroValuesView: {
-    width: `${10*2}%`,
+    width: "65%",
   },
   euroValueCells: {
     ...tableCell,
     width: "100%",
   },
   tableEuroValueCell: {
-    width: "10%"
+    width: '6.5%',
   }
 });
 
 interface ICategorySummaryProps {
-  flattenedRows: IOperationalEnvironmentAnalysisCsvRow[],
+  rows: IOperationalEnvironmentAnalysisSummaryRow[],
 }
 
-interface ISummary {
-  rows: [{
-    code: string,
-    description: string,
-    euroYear0: string,
-    euroYear1: string,
-  }]
+interface ICategorySummaryRowProps {
+  category: IOperationalEnvironmentAnalysisSummaryCategoryRow,
 }
 
 const CategorySummaryHeader = () => {
@@ -71,38 +66,67 @@ const CategorySummaryHeader = () => {
   )
 }
 
-const CategorySummaryRows: FC<ISummary> = ({rows}) => {
+const CategorySummaryRow: FC<ICategorySummaryRowProps> = ({category}) => {
+  const categoryName = t(`projectData.category.${category.name.replace(/\./g,"")}`);
+
   return (
-    <>
-      { rows?.map((row, index) => {
-        return (
-          <View style={styles.tableRow} key={index}>
-            <Text style={styles.tableFirstCell}>{row.code}</Text>
-            <Text style={styles.tableDescriptionCell}>{row.description}</Text>
-            <Text style={styles.tableEuroValueCell}>{row.euroYear0}</Text>
-            <Text style={styles.tableEuroValueCell}>{row.euroYear1}</Text>
-          </View>
-        )
-      })}
-    </>
+    <View style={styles.tableRow}>
+      <Text style={styles.tableFirstCell}>{category.name}</Text>
+      <Text style={styles.tableDescriptionCell}>{categoryName}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.costForecast}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.TAE}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.TSE1}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.TSE2}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.initial1}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.initial2}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.initial3}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.initial4}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.initial5}</Text>
+      <Text style={styles.tableEuroValueCell}>{category.data.initial6}</Text>
+    </View>
   )
 }
 
-const OperationalEnvironmentCategorySummary: FC<ICategorySummaryProps> = ({
-  flattenedRows
-}) => {
+const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
+  const currentYear = new Date().getFullYear();
 
-  const exampleObject = {
-    code: "K1",
-    description: "Class xyz",
-    euroYear0: "100",
-    euroYear1: "200",
-  }
+  const tableRows = rows?.map((classRow) => {
+    return (
+      <>
+        <View style={styles.tableRow} key={classRow.id}>
+          <Text style={styles.tableFirstCell}>{""}</Text>
+          <Text style={styles.tableDescriptionCell}>{classRow.name}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 1}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 2}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 3}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 4}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 5}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 6}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 7}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 8}</Text>
+          <Text style={styles.tableEuroValueCell}>{currentYear + 9}</Text>
+        </View>
+        { classRow.categories.map((category) => {
+            return <CategorySummaryRow category={category} key={category.id}/>
+          })
+        }
+      </>
+    )
+  })
 
+  return (
+    <>
+      {tableRows}
+    </>
+  );
+}
+
+const OperationalEnvironmentCategorySummary: FC<ICategorySummaryProps> = ({rows}) => {
   return (
     <View style={categorySummaryView}>
       <CategorySummaryHeader />
-      <CategorySummaryRows rows={[exampleObject]}/>
+      <CategorySummaryClasses rows={rows}/>
     </View>
   )
 };

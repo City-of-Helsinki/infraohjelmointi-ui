@@ -605,5 +605,19 @@
     "currentYearSapCosts": "Toteum.",
     "currentYearSapCommitments": "Sitoum.",
     "totalValues": "Yht."
+  },
+  "projectData": {
+    "category": {
+      "K1": "1. Sopimusvelvoitteet",
+      "K2": "2. Turvallisuus, terveellisyys ja toimintavarmuus",
+      "K3": "3. Lakisääteisten palveluiden kasvu",
+      "K4": "4. Omaisuuden hallinta",
+      "K5": "5. Kaupungin kasvu ja muut strategiset tavoitteet",
+      "K51": "5.1 Asuntotuotannon edellytysinvestointi",
+      "K52": "5.2 Alueiden valmiiksi saattaminen",
+      "K53": "5.3 Vetovoimaan liittyvät erillishankkeet",
+      "K54": "5.4 Toimitilahankkeet",
+      "K55": "5.5 Muut"
+    }
   }
 }
