@@ -464,7 +464,8 @@
       "costForecastShortened": "Ennuste",
       "code": "Koodi",
       "codeDescription": "Luokka kuvaajaan",
-      "millionEuro": "Miljoonaa euroa"
+      "millionEuro": "Miljoonaa euroa",
+      "total": "Yhteensä"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",

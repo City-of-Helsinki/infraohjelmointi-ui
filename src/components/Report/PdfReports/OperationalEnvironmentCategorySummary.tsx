@@ -1,5 +1,9 @@
 import { View, StyleSheet, Text } from "@react-pdf/renderer";
-import { IFlattenedOperationalEnvironmentAnalysisProperties, IOperationalEnvironmentAnalysisCsvRow, IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryRow } from "@/interfaces/reportInterfaces";
+import {
+  IOperationalEnvironmentAnalysisSummaryCategoryRow,
+  IOperationalEnvironmentAnalysisSummaryCategoryRowData,
+  IOperationalEnvironmentAnalysisSummaryRow
+} from "@/interfaces/reportInterfaces";
 import { FC, memo } from "react";
 import { t } from "i18next";
 
@@ -43,6 +47,9 @@ const styles = StyleSheet.create({
   },
   tableEuroValueCell: {
     width: '6.5%',
+  },
+  tableSumCell: {
+    fontWeight: "bold",
   }
 });
 
@@ -52,6 +59,10 @@ interface ICategorySummaryProps {
 
 interface ICategorySummaryRowProps {
   category: IOperationalEnvironmentAnalysisSummaryCategoryRow,
+}
+
+interface ICategorySummarySumRowProps {
+  categories: IOperationalEnvironmentAnalysisSummaryCategoryRow[],
 }
 
 const CategorySummaryHeader = () => {
@@ -64,6 +75,40 @@ const CategorySummaryHeader = () => {
       </View>
     </View>
   )
+}
+
+const CategorySummarySumRow: FC<ICategorySummarySumRowProps> = ({categories}) => {
+  const sums: { [key: string]: string} = {}
+
+  categories.forEach(category => {
+    Object.keys(category.data).forEach(keyString => {
+      const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+      if (!sums[key]) {
+        sums[key] = category.data[key];
+      } else {
+        sums[key] = ( sums[key] || 0 ) + category.data[key];
+      }
+    });
+  });
+
+  return (
+    <View style={styles.tableRow}>
+      <Text style={styles.tableFirstCell}>{""}</Text>
+      <Text style={[styles.tableDescriptionCell, styles.tableSumCell]}>{t('report.operationalEnvironmentAnalysis.total')}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.costForecast}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.TAE}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.TSE1}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.TSE2}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.initial1}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.initial2}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.initial3}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.initial4}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.initial5}</Text>
+      <Text style={styles.tableEuroValueCell}>{sums.initial6}</Text>
+    </View>
+
+    //TODO: Calculate difference that is shown on the example report
+  );
 }
 
 const CategorySummaryRow: FC<ICategorySummaryRowProps> = ({category}) => {
@@ -110,6 +155,12 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
         { classRow.categories.map((category) => {
             return <CategorySummaryRow category={category} key={category.id}/>
           })
+        }
+        {
+          <CategorySummarySumRow categories={classRow.categories}/>
+        }
+        {
+          //TODO: Calculate difference that is shown on the example report (here or in <CategorySummarySumRow>)
         }
       </>
     )
