@@ -13,7 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
-import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import { clearIsProjectCardLoading, clearLoading, setIsProjectCardLoading, setLoading } from '@/reducers/loaderSlice';
 import { selectUser } from '@/reducers/authSlice';
 import _ from 'lodash';
 
@@ -50,6 +50,7 @@ const ProjectView = () => {
   useEffect(() => {
     const getProjectById = async (id: string) => {
       dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
+      dispatch(setIsProjectCardLoading());
 
       try {
         const res = await dispatch(getProjectThunk(id));
@@ -61,6 +62,7 @@ const ProjectView = () => {
         console.log('Error getting project by id: ', e);
       } finally {
         dispatch(clearLoading(LOADING_PROJECT));
+        dispatch(clearIsProjectCardLoading());
       }
     };
 

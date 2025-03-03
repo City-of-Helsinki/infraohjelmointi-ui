@@ -138,7 +138,7 @@ describe('projectForm', () => {
 
     const project = mockProject.data;
     const sapCostAll = mockAllSapCostsProject.data;
-    const sapCostCurrentYear = mockCurrentYearSapCostsProject.data;
+    const sapCostCurrentYear = project.currentYearsSapValues ? project.currentYearsSapValues[0] : null;
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
@@ -167,8 +167,8 @@ describe('projectForm', () => {
     const costForecastValue = Number(project?.costForecast).toFixed(0);
     expect(await findByText(`${formatNumberToContainSpaces(Number(costForecastValue))}`)).toBeInTheDocument();
 
-    const sapCurrentYearprojectTaskCosts = Number(sapCostCurrentYear[project.id]?.project_task_costs).toFixed(0);
-    const sapCurrentYearProductionTaskCosts = Number(sapCostCurrentYear[project.id]?.production_task_costs).toFixed(0);
+    const sapCurrentYearprojectTaskCosts = Number(sapCostCurrentYear?.project_task_costs).toFixed(0);
+    const sapCurrentYearProductionTaskCosts = Number(sapCostCurrentYear?.production_task_costs).toFixed(0);
     const sapCostsCurrentYearValue = Number(sapCurrentYearprojectTaskCosts) + Number(sapCurrentYearProductionTaskCosts);
     expect(await findByText(`${formatNumberToContainSpaces(sapCostsCurrentYearValue)}`)).toBeInTheDocument();
 

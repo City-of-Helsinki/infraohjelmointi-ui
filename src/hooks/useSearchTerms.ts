@@ -58,6 +58,7 @@ const getSearchTerms = (
       case 'programmedYearMax':
       case 'phase':
       case 'personPlanning':
+      case 'personConstruction':
       case 'category':
         value.value && searchTerms.push({ value: value.label, type: key, id: value.value });
         break;
@@ -72,6 +73,11 @@ const getSearchTerms = (
             default:
               break;
           }
+        }
+        break;
+      case 'hkrIds':
+        for (const hkrId of value) {
+          searchTerms.push({ value: hkrId, type: key, id: hkrId})
         }
         break;
       default:
@@ -96,8 +102,6 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
     return next;
   };
 
-  // Could this be refactored? Since the type has to be cast in an if-statement, it would still end up
-  // being almost as long
   switch (type) {
     case 'masterClass':
     case 'class':
@@ -113,11 +117,15 @@ const deleteSearchFormValue = (searchForm: ISearchForm, term: ISearchTerm): ISea
     case 'programmedYearMax':
     case 'phase':
     case 'personPlanning':
+    case 'personConstruction':
     case 'category':
       (form[type] as string | boolean | IOption) = initialSearchForm[type];
       break;
     case 'freeSearchParams':
       form[type] = removeFreeSearchParam(value, form[type] as FreeSearchFormObject);
+      break;
+    case 'hkrIds':
+      form[type] = searchForm[type].filter((v) => v !== value);
       break;
   }
   return form;
