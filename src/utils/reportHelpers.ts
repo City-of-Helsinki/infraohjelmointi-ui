@@ -1262,10 +1262,9 @@ export const operationalEnvironmentAnalysisTableRows = (
         if (!cleanClassData[name]) {
           cleanClassData[name] = { ...category, id: `${masterClass.id}-${category.name}-sum` }
         } else {
-          Object.keys(category.data).forEach(key => {
-            cleanClassData[name].data[key as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData] = (
-              cleanClassData[name].data[key as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData] || 0
-            ) + category.data[key as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData];
+          Object.keys(category.data).forEach(keyString => {
+            const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+            cleanClassData[name].data[key] = ( cleanClassData[name].data[key] || 0 ) + category.data[key];
           })
         }
       });
