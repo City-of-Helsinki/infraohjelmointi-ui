@@ -8,13 +8,11 @@ interface ILoaderItem {
 
 interface ILoadingState {
   isLoading: boolean;
-  isProjectCardLoading: boolean;
   loaders: Array<ILoaderItem>;
 }
 
 const initialState: ILoadingState = {
   isLoading: false,
-  isProjectCardLoading: false,
   loaders: [],
 };
 
@@ -32,12 +30,6 @@ export const loaderSlice = createSlice({
       currentLoaders.push(action.payload);
       return { ...state, loaders: currentLoaders, isLoading: currentLoaders.length > 0 };
     },
-    setIsProjectCardLoading(state) {
-      return { ...state, isLoading: true };
-    },
-    clearIsProjectCardLoading(state) {
-      return { ...state, isLoading: false };
-    },
     clearLoading(state, action: PayloadAction<string>) {
       const nextLoaders = state.loaders.filter((s) => s.id !== action.payload);
       return { ...state, loaders: nextLoaders, isLoading: nextLoaders.length > 0 };
@@ -46,7 +38,6 @@ export const loaderSlice = createSlice({
 });
 
 export const selectIsLoading = (state: RootState) => state.loader.isLoading;
-export const selectIsProjectCardLoading = (state: RootState) => state.loader.isProjectCardLoading
 
-export const { setLoading, clearLoading, setIsProjectCardLoading, clearIsProjectCardLoading } = loaderSlice.actions;
+export const { setLoading, clearLoading } = loaderSlice.actions;
 export default loaderSlice.reducer;

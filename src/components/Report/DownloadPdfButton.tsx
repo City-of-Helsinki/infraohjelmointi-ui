@@ -2,7 +2,12 @@ import { Button, IconDownload } from 'hds-react';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { IDownloadPdfButtonProps, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import {
+  IPlanningData,
+  ReportType,
+  Reports,
+  getForcedToFrameDataType,
+} from '@/interfaces/reportInterfaces';
 import { pdf } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import { Page, Document } from '@react-pdf/renderer';
@@ -17,7 +22,6 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports, viewHasProjects } from './common';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -36,7 +40,6 @@ const getPdfDocument = (
   subDivisions?: Array<IListItem>,
   categories?: IListItem[],
   projectsInWarrantyPhase?: IProject[],
-  forcedToFrameRows?: IPlanningRow[],
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis: (
@@ -50,7 +53,6 @@ const getPdfDocument = (
     strategyForcedToFrame: (
       <ReportContainer data={{ rows }} reportType={Reports.StrategyForcedToFrame} />
     ),
-    forecastReport: <ReportContainer data={{ rows }} reportType={Reports.ForecastReport} forcedToFrameRows={forcedToFrameRows}/>,
     constructionProgram: (
       <ReportContainer
         data={{ rows, divisions, subDivisions }}
@@ -65,6 +67,25 @@ const getPdfDocument = (
 };
 
 const downloadIcon = <IconDownload />;
+
+interface IDownloadPdfButtonProps {
+  type: ReportType;
+  getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
+  getPlanningData: (year: number) => Promise<IPlanningData>;
+  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
+  getCategories: () => Promise<IListItem[]>;
+}
+
+const getData = async (
+  getForcedToFrameData: IDownloadPdfButtonProps['getForcedToFrameData'],
+  type: ReportType,
+  year: number,
+) => {
+  // Function is used on Reports Strategy, strategyForcedToFrame, and BudgetBookSummary
+  if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
+  if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
+  else return await getForcedToFrameData(year, true);
+};
 
 /**
  * We're using pdf-react to create pdf's.
@@ -95,9 +116,9 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
         case Reports.StrategyForcedToFrame:
         case Reports.BudgetBookSummary: {
           // For Strategy report, we will fetch next year data
-          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);
+          const res = await getData(getForcedToFrameData, type, year);
 
-          if (viewHasProjects(res)) {
+          if (res && res.projects.length > 0) {
             const coordinatorRows = getCoordinationTableRows(
               res.classHierarchy,
               res.forcedToFrameDistricts.districts,
@@ -109,23 +130,11 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           }
           break;
         }
-        case Reports.ForecastReport: {
-          // For ForecastReport report, we will fetch both coordinator and forceToFrame data
-          // true = coordinatorData, false = forcedToFrameData
-          const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
-          const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
-
-          if (viewHasProjects(resCoordinator)) {
-            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            document = getPdfDocument(type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
-          }
-          break;
-        }
         case Reports.OperationalEnvironmentAnalysis: {
           const res = await getForcedToFrameData(year, false);
           const categories = await getCategories();
 
-          if (viewHasProjects(res) && categories) {
+          if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(
               res.classHierarchy,
               res.forcedToFrameDistricts.districts,
@@ -150,7 +159,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           const divisions = getProjectDistricts(resDivisions, 'division');
           const subDivisions = getProjectDistricts(resDivisions, 'subDivision');
 
-          if (viewHasProjects(res)) {
+          if (res && res.projects.length > 0) {
             const planningRows = getPlanningRows(res);
             document = getPdfDocument(type, planningRows, divisions, subDivisions);
           }
@@ -169,7 +178,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if ([Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(type as Reports)) navigate(0);
+      if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) navigate(0);
     }
   }, [documentName, type]);
 

@@ -233,8 +233,6 @@
     "subClass": "Alaluokka",
     "category": "Kategoria",
     "personPlanning": "Vastuuhenkilö",
-    "hkrIdSearch": "PW Hanketunnus",
-    "personConstruction":"Rakennuttamisen vastuuhenkilö",
     "filter": "Rajaa projekteja",
     "programmed": "Ohjelmoitu",
     "programmedYes": "Kyllä",
@@ -508,15 +506,6 @@
     "financialStatement": {
       "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",
       "documentName": "tilinpäätös"
-    },
-    "forecastReport": {
-      "rowTitle": "Ennusteraportti",
-      "documentName": "ennusteraportti",
-      "title": "Helsingin kaupunki",
-      "subtitleTwo": "Ennusteraportti {{currentDate}}",
-      "projectNameTitle": "Hanke",
-      "projectsTitle": "Kohteen",
-      "projectManagerTitle": "projektipäällikkö"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
