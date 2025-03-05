@@ -22,7 +22,6 @@ import {
 } from '@/reducers/searchSlice';
 import buildSearchParams from '@/utils/buildSearchParams';
 import './styles.css';
-import HkrIdSearch from './HkrIdSearch';
 
 const Search = () => {
   const { t } = useTranslation();
@@ -38,7 +37,7 @@ const Search = () => {
   const phases = useOptions('phases');
   const programmedYearMin = useOptions('programmedYears');
   const programmedYearMax = useOptions('programmedYears');
-  const responsiblePersons = useOptions('responsiblePersons');
+  const personPlanning = useOptions('responsiblePersons');
   const categories = useOptions('categories');
   const { masterClasses, classes, subClasses } = classOptions;
   const { districts, divisions, subDivisions } = locationOptions;
@@ -106,13 +105,11 @@ const Search = () => {
               <CheckboxField {...formProps('programmedYes')} />
               <CheckboxField {...formProps('programmedNo')} />
             </Fieldset>
-            <HkrIdSearch control={control} getValues={getValues} />
             <SelectField
               {...formProps('programmedYearMin')}
               options={programmedYearMin}
               shouldTranslate={false}
             />
-            
             <SelectField
               {...formProps('programmedYearMax')}
               options={programmedYearMax}
@@ -122,13 +119,7 @@ const Search = () => {
             <SelectField
               {...formProps('personPlanning')}
               iconKey="person"
-              options={responsiblePersons}
-              shouldTranslate={false}
-            />
-            <SelectField
-              {...formProps('personConstruction')}
-              iconKey="person"
-              options={responsiblePersons}
+              options={personPlanning}
               shouldTranslate={false}
             />
             <MultiSelectField {...formProps('district')} options={districts} />

@@ -5,10 +5,8 @@ import {
   IOperationalEnvironmentAnalysisCsvRow,
   IFlattenedOperationalEnvironmentAnalysisProperties,
   ReportType,
-  Reports,
-  IStrategyAndForecastTableRow
+  Reports
 } from '@/interfaces/reportInterfaces';
-import { formattedNumberToNumber } from '@/utils/calculations';
 import { View, StyleSheet, Text } from '@react-pdf/renderer';
 import { FC, memo } from 'react';
 
@@ -339,20 +337,8 @@ const strategyReportStyles = StyleSheet.create({
     width: '30px',
   },
 });
-
-const forecastReportStyles = StyleSheet.create({
-  forecastDeviationCostOver: {
-    ...strategyReportStyles.budgetCell,
-    backgroundColor: '#BD2719',
-    color: '#ffffff',
-  },
-});
-
 interface ITableRowProps {
-  flattenedRows?: IBudgetBookSummaryCsvRow[]
-    | IOperationalEnvironmentAnalysisCsvRow[]
-    | IConstructionProgramTableRow[]
-    | IStrategyAndForecastTableRow[];
+  flattenedRows?: IBudgetBookSummaryCsvRow[] | IOperationalEnvironmentAnalysisCsvRow[] | IConstructionProgramTableRow[];
   index?: number;
   reportType: ReportType;
 }
@@ -441,24 +427,9 @@ const getConstructionRowStyle = (rowType: string, depth: number) => {
   }
 }
 
-const getForecastDeviationStyle = (type: string, deviationValueString: string) => {
-  if (type !== "project") return strategyReportStyles.budgetCell;
-
-  // If the value is over the threshold, the background for the project cell is red.
-  const THRESHOLD = 200;
-  const dValue = formattedNumberToNumber(deviationValueString);
-
-  if (Math.abs(dValue) >= THRESHOLD) {
-    return forecastReportStyles.forecastDeviationCostOver;
-  }
-
-  return strategyReportStyles.budgetCell;
-}
-
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
-        case Reports.ForecastReport:
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame: {
           const classNameTypes = [
@@ -485,18 +456,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                     <Text style={strategyReportStyles.projectManagerCell}>{flattenedRow.projectManager}</Text>
                     <Text style={strategyReportStyles.projectPhaseCell}>{flattenedRow.projectPhase}</Text>
                     <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
-                    {
-                      reportType !== Reports.ForecastReport && <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                    }
-                    {
-                      reportType === Reports.ForecastReport &&
-                      <>
-                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForcedToFrameBudget}</Text>
-                        <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                        <Text style={getForecastDeviationStyle(flattenedRow.type, flattenedRow.costForecastDeviation ?? "0")}>{flattenedRow.costForecastDeviation}</Text>
-                      </>
-                    }
-                    
+                    <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
                     {flattenedRow.januaryStatus === "planningAndConstruction" ?
                       <><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'right')}></Text></>
                       :
