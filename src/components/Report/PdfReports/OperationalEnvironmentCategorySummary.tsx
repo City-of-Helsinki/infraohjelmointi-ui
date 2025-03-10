@@ -39,6 +39,9 @@ const styles = StyleSheet.create({
     ...tableCell,
     width: '28.5%',
   },
+  tableDescriptionCellK5: {
+    paddingLeft: "5px",
+  },
   euroValuesView: {
     width: "65%",
   },
@@ -115,10 +118,12 @@ const CategorySummarySumRow: FC<ICategorySummarySumRowProps> = ({categories}) =>
 const CategorySummaryRow: FC<ICategorySummaryRowProps> = ({category}) => {
   const categoryName = t(`projectData.category.${category.name.replace(/\./g,"")}`);
 
+  const categoryNameStyles = category.name.includes("K5") ? [styles.tableDescriptionCell, styles.tableDescriptionCellK5] : [styles.tableDescriptionCell]
+
   return (
     <View style={styles.tableRow}>
       <Text style={styles.tableFirstCell}>{category.name}</Text>
-      <Text style={styles.tableDescriptionCell}>{categoryName}</Text>
+      <Text style={categoryNameStyles}>{categoryName}</Text>
       <Text style={styles.tableEuroValueCell}>{category.data.costForecast}</Text>
       <Text style={styles.tableEuroValueCell}>{category.data.TAE}</Text>
       <Text style={styles.tableEuroValueCell}>{category.data.TSE1}</Text>
