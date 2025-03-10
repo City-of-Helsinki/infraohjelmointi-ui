@@ -1,11 +1,12 @@
+import { FC, memo } from "react";
+import { JSX } from "react/jsx-runtime";
 import { View, StyleSheet, Text } from "@react-pdf/renderer";
+import { t } from "i18next";
 import {
   IOperationalEnvironmentAnalysisSummaryCategoryRow,
   IOperationalEnvironmentAnalysisSummaryCategoryRowData,
   IOperationalEnvironmentAnalysisSummaryRow
 } from "@/interfaces/reportInterfaces";
-import { FC, memo } from "react";
-import { t } from "i18next";
 
 const categorySummaryView = {
   width: "100%",
@@ -136,6 +137,21 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
   const currentYear = new Date().getFullYear();
 
   const tableRows = rows?.map((classRow) => {
+    console.log(classRow.name);
+    const categoryFiveTotal = {
+      costForecast: 0,
+      TAE: 0,
+      TSE1: 0,
+      TSE2: 0,
+      initial1: 0,
+      initial2: 0,
+      initial3: 0,
+      initial4: 0,
+      initial5: 0,
+      initial6: 0,
+    };
+
+    const tableRowsK5: JSX.Element[] = []
     return (
       <>
         <View style={styles.tableRow} key={classRow.id}>
@@ -152,12 +168,51 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
           <Text style={styles.tableEuroValueCell}>{currentYear + 8}</Text>
           <Text style={styles.tableEuroValueCell}>{currentYear + 9}</Text>
         </View>
-        { classRow.categories.map((category) => {
-            return <CategorySummaryRow category={category} key={category.id}/>
+        {
+          classRow.categories.map((category) => {
+            if (category.name.includes("K5")) {
+              console.log(category.name);
+              console.log(categoryFiveTotal.costForecast, "+", category.data.costForecast);
+              categoryFiveTotal.costForecast += Number(category.data.costForecast);
+              categoryFiveTotal.TAE += Number(category.data.TAE);
+              categoryFiveTotal.TSE1 += Number(category.data.TSE1);
+              categoryFiveTotal.TSE2 += Number(category.data.TSE2);
+              categoryFiveTotal.initial1 += Number(category.data.initial1);
+              categoryFiveTotal.initial2 += Number(category.data.initial2);
+              categoryFiveTotal.initial3 += Number(category.data.initial3);
+              categoryFiveTotal.initial4 += Number(category.data.initial4);
+              categoryFiveTotal.initial5 += Number(category.data.initial5);
+              categoryFiveTotal.initial6 += Number(category.data.initial6);
+
+              tableRowsK5.push(<CategorySummaryRow category={category} key={category.id} />)
+            } else {
+              return <CategorySummaryRow category={category} key={category.id} />
+            }
           })
         }
         {
-          <CategorySummarySumRow categories={classRow.categories}/>
+
+          // K5 parent row
+          <>
+            <View style={styles.tableRow}>
+              <Text style={styles.tableFirstCell}>{"K5"}</Text>
+              <Text style={styles.tableDescriptionCell}>{t("projectData.category.K5")}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.costForecast}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.TAE}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.TSE1}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.TSE2}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial1}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial2}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial3}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial4}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial5}</Text>
+              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial6}</Text>
+            </View>
+
+            {tableRowsK5}
+
+            <CategorySummarySumRow categories={classRow.categories}/>
+          </>
         }
         {
           //TODO: Calculate difference that is shown on the example report (here or in <CategorySummarySumRow>)
