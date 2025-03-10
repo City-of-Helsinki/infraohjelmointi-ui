@@ -1276,7 +1276,6 @@ export const operationalEnvironmentAnalysisTableRows = (
         categories: Object.values(cleanClassData),
       }
 
-
       cleanSummaryData.push(clean)
     });
 
