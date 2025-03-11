@@ -48,6 +48,11 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
           startYear: currentYear + 1,
           endYear: currentYear + 10,
         });
+      case Reports.OperationalEnvironmentAnalysisForcedToFrame:
+        return t('report.operationalEnvironmentAnalysisForcedToFrame.title', {
+          startYear: currentYear + 1,
+          endYear: currentYear + 10,
+        });
       default:
         return '';
     }
@@ -81,8 +86,9 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
     }
   }
   const getDocumentSubtitleTwo = () => {
-    if (reportType == Reports.OperationalEnvironmentAnalysis)
+    if (reportType == Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
       return t('report.operationalEnvironmentAnalysis.subtitleTwo');
+    }
 
     if (reportType === Reports.ForecastReport)
       return t('report.forecastReport.subtitleTwo', {
@@ -105,7 +111,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             subtitleOne={documentSubtitleOne}
             subtitleTwo={documentSubtitleTwo}
             reportType={reportType}
-            date={reportType === Reports.OperationalEnvironmentAnalysis ? currentDate : ''}
+            date={(reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) ? currentDate : ''}
           />
           <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} hierarchyInForcedToFrame={forcedToFrameRows}/>
           {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport?

@@ -455,8 +455,23 @@
   "report": {
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
-      "rowTitle": "Kategorisointiraportti",
-      "documentName": "kategorisointiraportti",
+      "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
+      "documentName": "kategorisointiraportti - koordinointinäkymä",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}}",
+      "subtitleOne": "Maankäyttö ja kaupunkirakenne",
+      "subtitleTwo": "LIKE/Toiminnanohjaus",
+      "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
+      "changePressure": "Muutospaine",
+      "taeFrame": "TA, käytettävissä oleva määräraha",
+      "costForecastShortened": "Ennuste",
+      "code": "Koodi",
+      "codeDescription": "Luokka kuvaajaan",
+      "millionEuro": "Miljoonaa euroa",
+      "total": "Yhteensä"
+    },
+    "operationalEnvironmentAnalysisForcedToFrame": {
+      "rowTitle": "Kategorisointiraportti (Sovitettu budjetti)",
+      "documentName": "kategorisointiraportti - sovitettu budjetti",
       "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}}",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
