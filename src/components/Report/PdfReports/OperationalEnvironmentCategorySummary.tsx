@@ -259,9 +259,6 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
             <CategorySummarySumRow categories={classRow.categories}/>
           </>
         }
-        {
-          //TODO: Calculate difference that is shown on the example report (here or in <CategorySummarySumRow>)
-        }
       </>
     )
   })
