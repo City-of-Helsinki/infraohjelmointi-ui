@@ -457,7 +457,7 @@
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
       "documentName": "kategorisointiraportti - koordinointinäkymä",
-      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}}",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Koordinointinäkymä)",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
       "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
@@ -471,7 +471,8 @@
     },
     "operationalEnvironmentAnalysisForcedToFrame": {
       "rowTitle": "Kategorisointiraportti (Sovitettu budjetti)",
-      "documentName": "kategorisointiraportti - sovitettu budjetti"
+      "documentName": "kategorisointiraportti - sovitettu budjetti",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Sovitettu budjetti)"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
