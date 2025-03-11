@@ -15,7 +15,10 @@ export const getForcedToFrameDataForReports = async (
     year: number,
     coordinatorData?: boolean,
 ) => {
-    // Function is used on Reports Strategy, strategyForcedToFrame, ForecastReport and BudgetBookSummary
+    // Function is used on Reports Strategy, strategyForcedToFrame, ForecastReport, BudgetBookSummary
+    // OperationalEnvironmentAnalysis and OperationalEnvironmentAnalysisForcedToFrame
+    if (type === Reports.OperationalEnvironmentAnalysis) return await getForcedToFrameData(year, false)
+    if (type === Reports.OperationalEnvironmentAnalysisForcedToFrame) return await getForcedToFrameData(year, true)
     if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
     if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
     if (type === Reports.ForecastReport) {

@@ -55,7 +55,7 @@ const DocumentHeader: FC<IDocumentHeaderProps> = ({ title, reportType, subtitleO
         </View>
         <Text>{date}</Text>
       </View>
-      { reportType === Reports.OperationalEnvironmentAnalysis &&
+      { (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) &&
         <View>
           <Text style={styles.extraTableHeader}>
             {t('report.operationalEnvironmentAnalysis.tableTitle', {

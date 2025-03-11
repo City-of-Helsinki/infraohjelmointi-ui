@@ -64,7 +64,8 @@ export const useCsvData = ({
           }
           break;
         }
-        case Reports.OperationalEnvironmentAnalysis: {
+        case Reports.OperationalEnvironmentAnalysis:
+        case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
           const res = await getForcedToFrameData(year, false);
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
