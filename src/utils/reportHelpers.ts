@@ -717,7 +717,8 @@ export const convertToReportRows = (
       }
       return forcedToFrameHierarchy;
     }
-    case Reports.OperationalEnvironmentAnalysis: {
+    case Reports.OperationalEnvironmentAnalysis:
+    case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
       const forcedToFrameHierarchy = [];
 
       const sumBudgets = (number1?: string, number2?: string | null): string => {
@@ -1386,7 +1387,8 @@ export const getReportData = async (
           [`${t('initial')} ${t('initialSV')} ${year + 10} ${t('millionEuro')}`]: r.initial7,
         }));
       }
-      case Reports.OperationalEnvironmentAnalysis : {
+      case Reports.OperationalEnvironmentAnalysis :
+      case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
         //Flatten rows to one dimension
         const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
         return flattenedRows.map((r) => ({

@@ -83,6 +83,29 @@ export const useCsvData = ({
           }
           break;
         }
+        case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
+          const res = await getForcedToFrameData(year, true);
+          const categories = await getCategories();
+          if (res && res.projects.length > 0 && categories) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+            data = await getReportData(
+              t,
+              type,
+              coordinatorRows,
+              undefined,
+              undefined,
+              categories,
+              res.projectsInWarrantyPhase,
+            );
+          }
+          break;
+        }
         case Reports.ConstructionProgram: {
           const res = await getPlanningData(year + 1);
           const resDivisions = await getDistricts();

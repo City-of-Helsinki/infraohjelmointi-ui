@@ -49,6 +49,13 @@ const getPdfDocument = (
         projectsInWarrantyPhase={projectsInWarrantyPhase}
       />
     ),
+    operationalEnvironmentAnalysisForcedToFrame: (
+      <ReportContainer
+        data={{ categories, rows }}
+        reportType={Reports.OperationalEnvironmentAnalysisForcedToFrame}
+        projectsInWarrantyPhase={projectsInWarrantyPhase}
+    />
+    ),
     strategy: <ReportContainer data={{ rows }} reportType={Reports.Strategy} />,
     strategyForcedToFrame: (
       <ReportContainer data={{ rows }} reportType={Reports.StrategyForcedToFrame} />
@@ -153,6 +160,29 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           }
           break;
         }
+        case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
+          const res = await getForcedToFrameData(year, true);
+          const categories = await getCategories();
+
+          if (res && res.projects.length > 0 && categories) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+            document = getPdfDocument(
+              type,
+              coordinatorRows,
+              undefined,
+              undefined,
+              categories,
+              res.projectsInWarrantyPhase,
+            );
+          }
+          break;
+        }
         case Reports.ConstructionProgram: {
           const res = await getPlanningData(year + 1);
           const resDivisions = await getDistricts();
@@ -178,7 +208,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) navigate(0);
+      if ([Reports.Strategy, Reports.StrategyForcedToFrame, Reports.OperationalEnvironmentAnalysis, Reports.OperationalEnvironmentAnalysisForcedToFrame].includes(type as Reports)) navigate(0);
     }
   }, [documentName, type]);
 

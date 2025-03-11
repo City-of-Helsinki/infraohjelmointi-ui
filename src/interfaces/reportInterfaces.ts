@@ -51,6 +51,7 @@ export type IPlanningData = {
 
 export const reports = [
   'operationalEnvironmentAnalysis',
+  'operationalEnvironmentAnalysisForcedToFrame',
   'strategy',
   'strategyForcedToFrame',
   'constructionProgram',
@@ -76,6 +77,7 @@ export interface IOperationalEnvironmentAnalysisCsvRow {
 
 export enum Reports {
   OperationalEnvironmentAnalysis = 'operationalEnvironmentAnalysis',
+  OperationalEnvironmentAnalysisForcedToFrame = 'operationalEnvironmentAnalysisForcedToFrame',
   Strategy = 'strategy',
   StrategyForcedToFrame = 'strategyForcedToFrame',
   ConstructionProgram = 'constructionProgram',

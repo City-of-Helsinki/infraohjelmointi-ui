@@ -45,7 +45,7 @@ const getFlattenedRows = (
 ) => {
   if (reportType === Reports.BudgetBookSummary) {
     return flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
-  } else if (reportType === Reports.OperationalEnvironmentAnalysis) {
+  } else if (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
     return flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
   } else {
     return flattenConstructionProgramTableRows(reportRows);
@@ -64,6 +64,7 @@ const ReportTable: FC<IReportTableProps> = ({
   const flattenedRows = (
     reportType === Reports.BudgetBookSummary ||
     reportType === Reports.OperationalEnvironmentAnalysis ||
+    reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame ||
     reportType === Reports.ConstructionProgram)
       ? getFlattenedRows(
         reportRows as (IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow)[]
@@ -76,6 +77,7 @@ const ReportTable: FC<IReportTableProps> = ({
   const getTableHeader = () => {
     switch (reportType) {
       case Reports.OperationalEnvironmentAnalysis:
+      case Reports.OperationalEnvironmentAnalysisForcedToFrame:
         return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
@@ -97,7 +99,7 @@ const ReportTable: FC<IReportTableProps> = ({
     <View>
       <View style={styles.table}>
         {
-          reportType === Reports.OperationalEnvironmentAnalysis && <OperationalEnvironmentCategorySummary rows={buildSummaryRows()} />
+          (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) && <OperationalEnvironmentCategorySummary rows={buildSummaryRows()} />
         }
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
