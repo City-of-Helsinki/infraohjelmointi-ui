@@ -44,12 +44,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title');
       case Reports.OperationalEnvironmentAnalysis:
-        return t('report.operationalEnvironmentAnalysis.title', {
-          startYear: currentYear + 1,
-          endYear: currentYear + 10,
-        });
       case Reports.OperationalEnvironmentAnalysisForcedToFrame:
-        return t('report.operationalEnvironmentAnalysisForcedToFrame.title', {
+        return t('report.operationalEnvironmentAnalysis.title', {
           startYear: currentYear + 1,
           endYear: currentYear + 10,
         });
@@ -80,6 +76,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
           endYear: currentYear + 10,
         });
       case Reports.OperationalEnvironmentAnalysis:
+      case Reports.OperationalEnvironmentAnalysisForcedToFrame:
         return t('report.operationalEnvironmentAnalysis.subtitleOne');
       default:
         return '';

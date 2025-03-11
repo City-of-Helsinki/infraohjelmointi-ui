@@ -471,18 +471,7 @@
     },
     "operationalEnvironmentAnalysisForcedToFrame": {
       "rowTitle": "Kategorisointiraportti (Sovitettu budjetti)",
-      "documentName": "kategorisointiraportti - sovitettu budjetti",
-      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}}",
-      "subtitleOne": "Maankäyttö ja kaupunkirakenne",
-      "subtitleTwo": "LIKE/Toiminnanohjaus",
-      "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
-      "changePressure": "Muutospaine",
-      "taeFrame": "TA, käytettävissä oleva määräraha",
-      "costForecastShortened": "Ennuste",
-      "code": "Koodi",
-      "codeDescription": "Luokka kuvaajaan",
-      "millionEuro": "Miljoonaa euroa",
-      "total": "Yhteensä"
+      "documentName": "kategorisointiraportti - sovitettu budjetti"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
