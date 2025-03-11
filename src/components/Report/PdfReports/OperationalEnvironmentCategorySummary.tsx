@@ -11,36 +11,67 @@ import {
 const categorySummaryView = {
   width: "100%",
   paddingBottom: "10px",
-}
+};
 
 const tableCell = {
   alignItems: 'center' as unknown as 'center',
   width: '6.5%',
-}
+  paddingTop: '4px',
+  paddingBottom: '4px',
+  paddingLeft: '6px',
+  borderRight: '1px solid #808080',
+  fontWeight: 'medium' as unknown as 'medium'
+};
 
-const styles = StyleSheet.create({
-  tableHeader: {
+const tableRowStyles = {
+  fontSize: '8px',
+  fontWeight: 'normal' as unknown as 'normal',
+  flexDirection: 'row' as unknown as 'row',
+};
+
+const tableStyles = StyleSheet.create({
+  header: {
+    ...tableRowStyles,
     paddingTop: '4px',
     paddingBottom: '4px',
     backgroundColor: '#0000bf',
-    fontSize: '8px',
-    fontWeight: 500,
     color: 'white',
-    flexDirection: 'row',
+    fontWeight: 500,
   },
-  tableRow: {
-    flexDirection: 'row',
+  classRow: {
+    ...tableRowStyles,
+    backgroundColor: '#0000bf',
+    color: 'white',
   },
-  tableFirstCell: {
+  row: {
+    ...tableRowStyles,
+    fontWeight: 'normal',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottom: '1px solid #808080',
+  },
+  firstHeaderCell: {
     ...tableCell,
     paddingLeft: "8px",
+    borderLeft: 0,
+    borderRight: 0,
   },
-  tableDescriptionCell: {
+  headerCell: {
+    border: 0,
+  },
+  firstCell: {
+    ...tableCell,
+    paddingLeft: "8px",
+    height: '100%',
+    borderLeft: '1px solid #808080',
+  },
+  descriptionCell: {
     ...tableCell,
     width: '28.5%',
   },
-  tableDescriptionCellK5: {
-    paddingLeft: "5px",
+  cellK5: {
+    paddingLeft: "15px",
+    color: '#555',
   },
   euroValuesView: {
     width: "65%",
@@ -49,10 +80,11 @@ const styles = StyleSheet.create({
     ...tableCell,
     width: "100%",
   },
-  tableEuroValueCell: {
+  euroValueCell: {
+    ...tableCell,
     width: '6.5%',
   },
-  tableSumCell: {
+  sumCell: {
     fontWeight: "bold",
   }
 });
@@ -71,15 +103,21 @@ interface ICategorySummarySumRowProps {
 
 const CategorySummaryHeader = () => {
   return (
-    <View style={styles.tableHeader}>
-      <Text style={styles.tableFirstCell}>{t('report.operationalEnvironmentAnalysis.code')}</Text>
-      <Text style={styles.tableDescriptionCell}>{t('report.operationalEnvironmentAnalysis.codeDescription')}</Text>
-      <View style={styles.euroValuesView}>
-        <Text style={styles.euroValueCells}>{t('report.operationalEnvironmentAnalysis.millionEuro')}</Text>
+    <View style={tableStyles.header}>
+      <Text style={[tableStyles.firstCell, tableStyles.headerCell]}>
+        {t('report.operationalEnvironmentAnalysis.code')}
+      </Text>
+      <Text style={[tableStyles.descriptionCell, tableStyles.headerCell]}>
+        {t('report.operationalEnvironmentAnalysis.codeDescription')}
+      </Text>
+      <View style={[tableStyles.euroValuesView, tableStyles.headerCell]}>
+        <Text style={[tableStyles.euroValueCells, tableStyles.headerCell]}>
+          {t('report.operationalEnvironmentAnalysis.millionEuro')}
+        </Text>
       </View>
     </View>
   )
-}
+};
 
 const CategorySummarySumRow: FC<ICategorySummarySumRowProps> = ({categories}) => {
   const sums: { [key: string]: string} = {}
@@ -96,53 +134,56 @@ const CategorySummarySumRow: FC<ICategorySummarySumRowProps> = ({categories}) =>
   });
 
   return (
-    <View style={styles.tableRow}>
-      <Text style={styles.tableFirstCell}>{""}</Text>
-      <Text style={[styles.tableDescriptionCell, styles.tableSumCell]}>{t('report.operationalEnvironmentAnalysis.total')}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.costForecast}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.TAE}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.TSE1}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.TSE2}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.initial1}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.initial2}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.initial3}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.initial4}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.initial5}</Text>
-      <Text style={styles.tableEuroValueCell}>{sums.initial6}</Text>
+    <View style={tableStyles.row}>
+      <Text style={tableStyles.firstCell}>{""}</Text>
+      <Text style={[tableStyles.descriptionCell, tableStyles.sumCell]}>{t('report.operationalEnvironmentAnalysis.total')}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.costForecast}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.TAE}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.TSE1}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.TSE2}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.initial1}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.initial2}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.initial3}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.initial4}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.initial5}</Text>
+      <Text style={tableStyles.euroValueCell}>{sums.initial6}</Text>
     </View>
 
     //TODO: Calculate difference that is shown on the example report
   );
-}
+};
 
 const CategorySummaryRow: FC<ICategorySummaryRowProps> = ({category}) => {
   const categoryName = t(`projectData.category.${category.name.replace(/\./g,"")}`);
 
-  const categoryNameStyles = category.name.includes("K5") ? [styles.tableDescriptionCell, styles.tableDescriptionCellK5] : [styles.tableDescriptionCell]
+  const categoryCodeStyles = category.name.includes("K5") ?
+    [tableStyles.firstCell, tableStyles.cellK5] : tableStyles.firstCell;
+
+  const categoryNameStyles = category.name.includes("K5") ?
+    [tableStyles.descriptionCell, tableStyles.cellK5] : tableStyles.descriptionCell;
 
   return (
-    <View style={styles.tableRow}>
-      <Text style={styles.tableFirstCell}>{category.name}</Text>
+    <View style={tableStyles.row}>
+      <Text style={categoryCodeStyles}>{category.name}</Text>
       <Text style={categoryNameStyles}>{categoryName}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.costForecast}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.TAE}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.TSE1}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.TSE2}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.initial1}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.initial2}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.initial3}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.initial4}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.initial5}</Text>
-      <Text style={styles.tableEuroValueCell}>{category.data.initial6}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.costForecast}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.TAE}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.TSE1}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.TSE2}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.initial1}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.initial2}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.initial3}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.initial4}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.initial5}</Text>
+      <Text style={tableStyles.euroValueCell}>{category.data.initial6}</Text>
     </View>
   )
-}
+};
 
 const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
   const currentYear = new Date().getFullYear();
 
   const tableRows = rows?.map((classRow) => {
-    console.log(classRow.name);
     const categoryFiveTotal = {
       costForecast: 0,
       TAE: 0,
@@ -156,22 +197,22 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
       initial6: 0,
     };
 
-    const tableRowsK5: JSX.Element[] = []
+    const tableRowsK5: JSX.Element[] = [];
     return (
       <>
-        <View style={styles.tableRow} key={classRow.id}>
-          <Text style={styles.tableFirstCell}>{""}</Text>
-          <Text style={styles.tableDescriptionCell}>{classRow.name}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 1}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 2}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 3}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 4}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 5}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 6}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 7}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 8}</Text>
-          <Text style={styles.tableEuroValueCell}>{currentYear + 9}</Text>
+        <View style={tableStyles.classRow} key={classRow.id}>
+          <Text style={tableStyles.firstCell}>{""}</Text>
+          <Text style={tableStyles.descriptionCell}>{classRow.name}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 1}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 2}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 3}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 4}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 5}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 6}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 7}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 8}</Text>
+          <Text style={tableStyles.euroValueCell}>{currentYear + 9}</Text>
         </View>
         {
           classRow.categories.map((category) => {
@@ -196,22 +237,21 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
           })
         }
         {
-
           // K5 parent row
           <>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableFirstCell}>{"K5"}</Text>
-              <Text style={styles.tableDescriptionCell}>{t("projectData.category.K5")}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.costForecast}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.TAE}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.TSE1}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.TSE2}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial1}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial2}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial3}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial4}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial5}</Text>
-              <Text style={styles.tableEuroValueCell}>{categoryFiveTotal.initial6}</Text>
+            <View style={tableStyles.row}>
+              <Text style={tableStyles.firstCell}>{"K5"}</Text>
+              <Text style={tableStyles.descriptionCell}>{t("projectData.category.K5")}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.costForecast}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.TAE}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.TSE1}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.TSE2}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.initial1}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.initial2}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.initial3}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.initial4}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.initial5}</Text>
+              <Text style={tableStyles.euroValueCell}>{categoryFiveTotal.initial6}</Text>
             </View>
 
             {tableRowsK5}
@@ -231,7 +271,7 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
       {tableRows}
     </>
   );
-}
+};
 
 const OperationalEnvironmentCategorySummary: FC<ICategorySummaryProps> = ({rows}) => {
   return (
@@ -242,4 +282,4 @@ const OperationalEnvironmentCategorySummary: FC<ICategorySummaryProps> = ({rows}
   )
 };
 
-export default memo(OperationalEnvironmentCategorySummary)
+export default memo(OperationalEnvironmentCategorySummary);
