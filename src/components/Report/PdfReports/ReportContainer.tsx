@@ -40,8 +40,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title');
       case Reports.OperationalEnvironmentAnalysis:
-      case Reports.OperationalEnvironmentAnalysisForcedToFrame:
         return t('report.operationalEnvironmentAnalysis.title', {
+          startYear: new Date().getFullYear() + 1,
+          endYear: new Date().getFullYear() + 10,
+        })
+      case Reports.OperationalEnvironmentAnalysisForcedToFrame:
+        return t('report.operationalEnvironmentAnalysisForcedToFrame.title', {
           startYear: new Date().getFullYear() + 1,
           endYear: new Date().getFullYear() + 10,
         })
