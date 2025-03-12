@@ -27,7 +27,6 @@ import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
 import moment from 'moment';
-import { buildOperationalEnvironmentAnalysisRows } from '@/components/Report/common';
 
 interface IYearCheck {
   planningStart: number;
@@ -1394,7 +1393,7 @@ export const getReportData = async (
       case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
         //Flatten rows to one dimension
         const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
-        const summaryData = buildOperationalEnvironmentAnalysisRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+        const summaryData = operationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
 
         const summaryRows = generateSummaryRows(summaryData);
 
@@ -1544,9 +1543,36 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
       initial6: categoryFiveTotal.initial6,
     }
 
-    // TODO: sum row per each class
+    // Sum row after each class rows
+    const sums: { [key: string]: string} = {};
 
-    tableRows.push(cRow, ...categoryRows, parentRowK5, ...categoryRowsK5);
+    classRow.categories.forEach(category => {
+      Object.keys(category.data).forEach(keyString => {
+        const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+        if (!sums[key]) {
+          sums[key] = category.data[key];
+        } else {
+          sums[key] = ( sums[key] || 0 ) + category.data[key];
+        }
+      });
+    });
+
+    const classSumRow = {
+      name: "",
+      description: t('report.operationalEnvironmentAnalysis.total'),
+      costForecast: sums.costForecast,
+      TAE: sums.TAE,
+      TSE1: sums.TSE1,
+      TSE2: sums.TSE2,
+      initial1: sums.initial1,
+      initial2: sums.initial2,
+      initial3: sums.initial3,
+      initial4: sums.initial4,
+      initial5: sums.initial5,
+      initial6: sums.initial6,
+    }
+
+    tableRows.push(cRow, ...categoryRows, parentRowK5, ...categoryRowsK5, classSumRow);
   });
 
   return tableRows;
