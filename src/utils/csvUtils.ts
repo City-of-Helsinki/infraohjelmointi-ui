@@ -1,10 +1,13 @@
 import {
   IBudgetBookSummaryCsvRow,
   IConstructionProgramCsvRow,
+  IOperationalEnvironmentAnalysisSummaryCsvRow,
 } from '@/interfaces/reportInterfaces';
 
 export const downloadCSV = (
-  dataArray: (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[],
+  dataArray: (
+    IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow
+  )[],
   filename = 'report.csv',
 ) => {
   const csvString = arrayToCSV(dataArray);
@@ -18,7 +21,8 @@ export const downloadCSV = (
 };
 
 export const arrayToCSV = (
-  dataArray: (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[],
+  dataArray: (IConstructionProgramCsvRow | IConstructionProgramCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow
+  )[],
 ) => {
   const headers = Object.keys(dataArray[0])
     .map((field) => `"${field}"`) // Wrap every field in quotes for consistency

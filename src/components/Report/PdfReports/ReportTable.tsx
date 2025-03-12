@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
-import ConstructionProgramTableHeader from './ConstructionProgramTableHeader';
+import ConstructionProgramTableHeader from './reportHeaders/ConstructionProgramTableHeader';
 import {
   convertToReportRows,
   flattenBudgetBookSummaryTableRows,
@@ -20,10 +20,12 @@ import {
 } from '@/interfaces/reportInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
-import BudgetBookSummaryTableHeader from './BudgetBookSummaryTableHeader';
-import StrategyTableHeader from './StrategyTableHeader';
-import OperationalEnvironmentAnalysisTableHeader from './OperationalEnvironmentAnalysisTableHeader';
+import BudgetBookSummaryTableHeader from './reportHeaders/BudgetBookSummaryTableHeader';
+import StrategyTableHeader from './reportHeaders/StrategyTableHeader';
+import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
+import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
+import { buildOperationalEnvironmentAnalysisRows } from '../common';
 
 const styles = StyleSheet.create({
   table: {
@@ -47,7 +49,7 @@ const getFlattenedRows = (
 ) => {
   if (reportType === Reports.BudgetBookSummary) {
     return flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
-  } else if (reportType === Reports.OperationalEnvironmentAnalysis) {
+  } else if (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
     return flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
   } else {
     return flattenConstructionProgramTableRows(reportRows);
@@ -76,6 +78,7 @@ const ReportTable: FC<IReportTableProps> = ({
   const flattenedRows = (
     reportType === Reports.BudgetBookSummary ||
     reportType === Reports.OperationalEnvironmentAnalysis ||
+    reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame ||
     reportType === Reports.ConstructionProgram)
       ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
 
@@ -84,6 +87,7 @@ const ReportTable: FC<IReportTableProps> = ({
   const getTableHeader = () => {
     switch (reportType) {
       case Reports.OperationalEnvironmentAnalysis:
+      case Reports.OperationalEnvironmentAnalysisForcedToFrame:
         return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
@@ -98,9 +102,14 @@ const ReportTable: FC<IReportTableProps> = ({
   }
 
   const tableHeader = getTableHeader();
+
   return (
     <View>
       <View style={styles.table}>
+        {
+          (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) &&
+            <OperationalEnvironmentCategorySummary rows={buildOperationalEnvironmentAnalysisRows(reportRows as IOperationalEnvironmentAnalysisTableRow[])} />
+        }
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
           reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
