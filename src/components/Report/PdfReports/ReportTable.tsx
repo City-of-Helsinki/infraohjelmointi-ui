@@ -26,6 +26,7 @@ import StrategyTableHeader from './reportHeaders/StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
 import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
+import { buildOperationalEnvironmentAnalysisRows } from '../common';
 
 const styles = StyleSheet.create({
   table: {
@@ -101,17 +102,14 @@ const ReportTable: FC<IReportTableProps> = ({
     }
   }
 
-  const buildSummaryRows = () => {
-    return operationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[])
-  }
-
   const tableHeader = getTableHeader();
 
   return (
     <View>
       <View style={styles.table}>
         {
-          (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) && <OperationalEnvironmentCategorySummary rows={buildSummaryRows()} />
+          (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) &&
+            <OperationalEnvironmentCategorySummary rows={buildOperationalEnvironmentAnalysisRows(reportRows as IOperationalEnvironmentAnalysisTableRow[])} />
         }
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={

@@ -1,5 +1,6 @@
 import { getCoordinationTableRows } from "@/hooks/useCoordinationRows";
-import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData } from "@/interfaces/reportInterfaces";
+import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData, IOperationalEnvironmentAnalysisTableRow } from "@/interfaces/reportInterfaces";
+import { operationalEnvironmentAnalysisTableRows } from "@/utils/reportHelpers";
 
 /**
  * Get Forced to Frame view data for reports.
@@ -63,3 +64,7 @@ export const getCoordinatorAndForcedToFrameRows = async (
  * @returns boolean
  */
 export const viewHasProjects = (res: IGetForcedToFrameData | IPlanningData ) => { return res && res.projects.length > 0 }
+
+export const buildOperationalEnvironmentAnalysisRows = (reportRows: IOperationalEnvironmentAnalysisTableRow[]) => {
+    return operationalEnvironmentAnalysisTableRows(reportRows)
+}
