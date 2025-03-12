@@ -9,7 +9,8 @@ import {
   IDownloadCsvButtonProps,
   IConstructionProgramCsvRow,
   IBudgetBookSummaryCsvRow,
-  ReportType,
+  IOperationalEnvironmentAnalysisSummaryCsvRow,
+  ReportType
 } from '@/interfaces/reportInterfaces';
 import { getCoordinationTableRows } from './useCoordinationRows';
 import { getDistricts } from '@/services/listServices';
@@ -32,7 +33,7 @@ export const useCsvData = ({
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const [csvData, setCsvData] = useState<
-    Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow>
+    Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow>
   >([]);
   const LOADING_CSV_DATA = 'loading-csv-data';
   const year = new Date().getFullYear();
@@ -40,7 +41,7 @@ export const useCsvData = ({
   const getCsvData = async () => {
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
-      let data: Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow> = [];
+      let data: Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow> = [];
 
       switch (type) {
         case Reports.BudgetBookSummary:

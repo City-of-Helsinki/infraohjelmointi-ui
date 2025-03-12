@@ -465,7 +465,8 @@
       "code": "Koodi",
       "codeDescription": "Luokka kuvaajaan",
       "millionEuro": "Miljoonaa euroa",
-      "total": "Yhteensä"
+      "total": "Yhteensä",
+      "name": "Nimi"
     },
     "operationalEnvironmentAnalysisForcedToFrame": {
       "rowTitle": "Kategorisointiraportti (Sovitettu budjetti)",

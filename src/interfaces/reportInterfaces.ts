@@ -75,6 +75,10 @@ export interface IOperationalEnvironmentAnalysisCsvRow {
   [key: string]: string | IOperationalEnvironmentAnalysisFinanceProperties | undefined;
 }
 
+export interface IOperationalEnvironmentAnalysisSummaryCsvRow {
+  [key: string]: string | IOperationalEnvironmentAnalysisFinanceProperties | undefined | number;
+}
+
 export enum Reports {
   OperationalEnvironmentAnalysis = 'operationalEnvironmentAnalysis',
   OperationalEnvironmentAnalysisForcedToFrame = 'operationalEnvironmentAnalysisForcedToFrame',
