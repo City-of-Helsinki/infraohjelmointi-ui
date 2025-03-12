@@ -1572,6 +1572,23 @@ export const getReportData = async (
           initial6: "",
         }]
 
+        // When adding another, different sized table to the same file,
+        // we need to add the header row
+        const analysisHeaderRow = {
+          [`${t('target')}`]: `${t('target')}`,
+          [`Ennuste ${year} ${t('thousandEuros')}`]: `Ennuste ${year} ${t('thousandEuros')}`,
+          [`${t('TAE')} ${year + 1} ${t('thousandEuros')}`]: `${t('TAE')} ${year + 1} ${t('thousandEuros')}`,
+          [`${t('TSE')} ${year + 2} ${t('thousandEuros')}`]: `${t('TSE')} ${year + 2} ${t('thousandEuros')}`,
+          [`${t('TSE')} ${year + 3} ${t('thousandEuros')}`]: `${t('TSE')} ${year + 3} ${t('thousandEuros')}`,
+          [`${year + 4} ${t('thousandEuros')}`]: `${year + 4} ${t('thousandEuros')}`,
+          [`${year + 5} ${t('thousandEuros')}`]: `${year + 5} ${t('thousandEuros')}`,
+          [`${year + 6} ${t('thousandEuros')}`]: `${year + 6} ${t('thousandEuros')}`,
+          [`${year + 7} ${t('thousandEuros')}`]: `${year + 7} ${t('thousandEuros')}`,
+          [`${year + 8} ${t('thousandEuros')}`]: `${year + 8} ${t('thousandEuros')}`,
+          [`${year + 9} ${t('thousandEuros')}`]: `${year + 9} ${t('thousandEuros')}`,
+          [`${year + 10} ${t('thousandEuros')}`]: `${year + 10} ${t('thousandEuros')}`,
+        }
+
         const analysisTableRows = flattenedRows.map((r) => ({
           [`${t('target')}`]: r.name,
           [`Ennuste ${year} ${t('thousandEuros')}`]: r.costForecast,
@@ -1587,7 +1604,7 @@ export const getReportData = async (
           [`${year + 10} ${t('thousandEuros')}`]: r.initial7,
       }));
 
-      return [...summaryTableRows, ...emptyRow, ...analysisTableRows];
+      return [...summaryTableRows, ...emptyRow, analysisHeaderRow, ...analysisTableRows];
       }
       default:
         return [];
