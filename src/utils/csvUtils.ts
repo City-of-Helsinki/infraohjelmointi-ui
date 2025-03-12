@@ -6,11 +6,7 @@ import {
 
 export const downloadCSV = (
   dataArray: (
-    IConstructionProgramCsvRow
-    | IBudgetBookSummaryCsvRow
-    | IConstructionProgramCsvRow
-    | IBudgetBookSummaryCsvRow
-    | IOperationalEnvironmentAnalysisSummaryCsvRow
+    IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow
   )[],
   filename = 'report.csv',
 ) => {
@@ -25,12 +21,7 @@ export const downloadCSV = (
 };
 
 export const arrayToCSV = (
-  dataArray: (
-    IConstructionProgramCsvRow
-    | IBudgetBookSummaryCsvRow
-    | IConstructionProgramCsvRow
-    | IBudgetBookSummaryCsvRow
-    | IOperationalEnvironmentAnalysisSummaryCsvRow
+  dataArray: (IConstructionProgramCsvRow | IConstructionProgramCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow
   )[],
 ) => {
   const headers = Object.keys(dataArray[0])
