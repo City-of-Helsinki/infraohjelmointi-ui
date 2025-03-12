@@ -4,6 +4,7 @@ import { View, StyleSheet, Text } from "@react-pdf/renderer";
 import { t } from "i18next";
 import { IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryRow} from "@/interfaces/reportInterfaces";
 import { calculateOperationalEnvironmentAnalysisCategorySums } from "../common";
+import { updateCategoryFiveTotals } from "@/utils/reportHelpers";
 
 const categorySummaryView = {
   width: "100%",
@@ -184,6 +185,7 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
     };
 
     const tableRowsK5: JSX.Element[] = [];
+
     return (
       <>
         <View style={tableStyles.classRow} key={classRow.id}>
@@ -203,16 +205,7 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
         {
           classRow.categories.map((category) => {
             if (category.name.includes("K5")) {
-              categoryFiveTotal.costForecast += Number(category.data.costForecast);
-              categoryFiveTotal.TAE += Number(category.data.TAE);
-              categoryFiveTotal.TSE1 += Number(category.data.TSE1);
-              categoryFiveTotal.TSE2 += Number(category.data.TSE2);
-              categoryFiveTotal.initial1 += Number(category.data.initial1);
-              categoryFiveTotal.initial2 += Number(category.data.initial2);
-              categoryFiveTotal.initial3 += Number(category.data.initial3);
-              categoryFiveTotal.initial4 += Number(category.data.initial4);
-              categoryFiveTotal.initial5 += Number(category.data.initial5);
-              categoryFiveTotal.initial6 += Number(category.data.initial6);
+              updateCategoryFiveTotals(categoryFiveTotal, category);
 
               tableRowsK5.push(<CategorySummaryRow category={category} key={category.id} />)
             } else {
