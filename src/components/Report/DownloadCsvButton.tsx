@@ -70,7 +70,13 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame || type === Reports.ForecastReport) navigate(0);
+      if ([
+        Reports.Strategy,
+        Reports.StrategyForcedToFrame,
+        Reports.ForecastReport,
+        Reports.OperationalEnvironmentAnalysis,
+        Reports.OperationalEnvironmentAnalysisForcedToFrame
+      ].includes(type as Reports)) navigate(0);
     }
   };
 
