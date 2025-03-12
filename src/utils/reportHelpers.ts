@@ -1471,6 +1471,19 @@ export const getReportData = async (
   }
 };
 
+export const updateCategoryFiveTotals = (categoryFiveTotal: { costForecast: number; TAE: number; TSE1: number; TSE2: number; initial1: number; initial2: number; initial3: number; initial4: number; initial5: number; initial6: number; }, category: IOperationalEnvironmentAnalysisSummaryCategoryRow) => {
+  categoryFiveTotal.costForecast += Number(category.data.costForecast);
+    categoryFiveTotal.TAE += Number(category.data.TAE);
+    categoryFiveTotal.TSE1 += Number(category.data.TSE1);
+    categoryFiveTotal.TSE2 += Number(category.data.TSE2);
+    categoryFiveTotal.initial1 += Number(category.data.initial1);
+    categoryFiveTotal.initial2 += Number(category.data.initial2);
+    categoryFiveTotal.initial3 += Number(category.data.initial3);
+    categoryFiveTotal.initial4 += Number(category.data.initial4);
+    categoryFiveTotal.initial5 += Number(category.data.initial5);
+    categoryFiveTotal.initial6 += Number(category.data.initial6);
+}
+
 const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummaryRow[]) => {
   const currentYear = new Date().getFullYear();
 
@@ -1527,16 +1540,7 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
       };
 
       if (category.name.includes("K5")) {
-        categoryFiveTotal.costForecast += Number(category.data.costForecast);
-        categoryFiveTotal.TAE += Number(category.data.TAE);
-        categoryFiveTotal.TSE1 += Number(category.data.TSE1);
-        categoryFiveTotal.TSE2 += Number(category.data.TSE2);
-        categoryFiveTotal.initial1 += Number(category.data.initial1);
-        categoryFiveTotal.initial2 += Number(category.data.initial2);
-        categoryFiveTotal.initial3 += Number(category.data.initial3);
-        categoryFiveTotal.initial4 += Number(category.data.initial4);
-        categoryFiveTotal.initial5 += Number(category.data.initial5);
-        categoryFiveTotal.initial6 += Number(category.data.initial6);
+        updateCategoryFiveTotals(categoryFiveTotal, category);
 
         categoryRowsK5.push(tempRow);
       } else {
