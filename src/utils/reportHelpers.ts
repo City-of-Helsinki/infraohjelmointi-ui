@@ -1601,9 +1601,11 @@ export const getReportData = async (
 const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummaryRow[]) => {
   const currentYear = new Date().getFullYear();
 
-  const tableRows = summaryData.map((classRow) => {
-    // TODO: categoryFiveTotal
-    // tableRowK5 = JSX.Element[] = [];
+  const tableRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
+
+  summaryData.map((classRow) => {
+    const categoryRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
+    const categoryRowsK5: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
 
     const cRow = {
       name: classRow.name,
@@ -1620,7 +1622,33 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
       initial6: currentYear + 9,
     }
 
-    return cRow;
+    classRow.categories.map((category) => {
+      const categoryName = t(`projectData.category.${category.name.replace(/\./g,"")}`);
+
+      const tempRow = {
+        name: category.name,
+        description: categoryName,
+        costForecast: category.data.costForecast,
+        TAE: category.data.TAE,
+        TSE1: category.data.TSE1,
+        TSE2: category.data.TSE2,
+        initial1: category.data.initial1,
+        initial2: category.data.initial2,
+        initial3: category.data.initial3,
+        initial4: category.data.initial4,
+        initial5: category.data.initial5,
+        initial6: category.data.initial6,
+      };
+
+      if (category.name.includes("K5")) {
+        categoryRowsK5.push(tempRow);
+      } else {
+        categoryRows.push(tempRow);
+      }
+    });
+
+    // TODO: sum row per each class
+    tableRows.push(cRow, ...categoryRows, ...categoryRowsK5);
   });
 
   return tableRows;
