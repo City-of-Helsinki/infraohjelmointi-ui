@@ -1299,7 +1299,7 @@ export const operationalEnvironmentAnalysisTableRows = (
           id: row.id,
           name: row.name,
           type: row.type,
-          categories: data as IOperationalEnvironmentAnalysisSummaryCategoryRow[],
+          categories: data,
         };
 
         summaryClasses.push(classData);
@@ -1476,7 +1476,7 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
 
   const tableRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
 
-  summaryData.map((classRow) => {
+  summaryData.forEach((classRow) => {
     const categoryFiveTotal = {
       costForecast: 0,
       TAE: 0,
@@ -1508,7 +1508,7 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
       initial6: currentYear + 9,
     }
 
-    classRow.categories.map((category) => {
+    classRow.categories.forEach((category) => {
       const categoryName = t(`projectData.category.${category.name.replace(/\./g,"")}`);
 
       const tempRow = {
