@@ -217,8 +217,6 @@ const CategorySummaryClasses: FC<ICategorySummaryProps> = ({rows}) => {
         {
           classRow.categories.map((category) => {
             if (category.name.includes("K5")) {
-              console.log(category.name);
-              console.log(categoryFiveTotal.costForecast, "+", category.data.costForecast);
               categoryFiveTotal.costForecast += Number(category.data.costForecast);
               categoryFiveTotal.TAE += Number(category.data.TAE);
               categoryFiveTotal.TSE1 += Number(category.data.TSE1);

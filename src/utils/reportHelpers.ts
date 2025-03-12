@@ -19,6 +19,7 @@ import {
   IOperationalEnvironmentAnalysisSummaryCategoryRow,
   IOperationalEnvironmentAnalysisSummaryRow,
   IOperationalEnvironmentAnalysisSummaryCategoryRowData,
+  IOperationalEnvironmentAnalysisSummaryCsvRow,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -27,6 +28,7 @@ import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
 import moment from 'moment';
+import { buildOperationalEnvironmentAnalysisRows } from '@/components/Report/common';
 
 interface IYearCheck {
   planningStart: number;
@@ -1458,7 +1460,8 @@ export const getReportData = async (
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
   | Array<IStrategyTableCsvRow>
-  | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
+  | Array<IOperationalEnvironmentAnalysisCsvRow>
+  | Array<IOperationalEnvironmentAnalysisSummaryCsvRow>> => {
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
@@ -1534,20 +1537,57 @@ export const getReportData = async (
       case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
         //Flatten rows to one dimension
         const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
-        return flattenedRows.map((r) => ({
+        const summaryData = buildOperationalEnvironmentAnalysisRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+
+        const summaryRows = generateSummaryRows(summaryData);
+
+        //TODO: Tähän väliin luodaan koontirivit
+        const summaryTableRows = summaryRows.map((r) => ({
+          [t('report.operationalEnvironmentAnalysis.code')]: r.name,
+          [t('report.operationalEnvironmentAnalysis.codeDescription')]: r.description,
+          [`${year} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.costForecast,
+          [`${year + 1} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TAE,
+          [`${year + 2} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TSE1,
+          [`${year + 3} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TSE2,
+          [`${year + 4} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial1,
+          [`${year + 5} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial2,
+          [`${year + 6} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial3,
+          [`${year + 7} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial4,
+          [`${year + 8} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial5,
+          [`${year + 9} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial6,
+        }))
+
+        const emptyRow = [{
+          name: "",
+          description: "",
+          costForecast: "",
+          TAE: "",
+          TSE1: "",
+          TSE2: "",
+          initial1: "",
+          initial2: "",
+          initial3: "",
+          initial4: "",
+          initial5: "",
+          initial6: "",
+        }]
+
+        const analysisTableRows = flattenedRows.map((r) => ({
           [`${t('target')}`]: r.name,
-          [`Ennuste\n${new Date().getFullYear()}\n${t('thousandEuros')}`]: r.costForecast,
-          [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.TAE,
-          [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.TSE1,
-          [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.TSE2,
-          [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.initial1,
-          [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.initial2,
-          [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.initial3,
-          [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.initial4,
-          [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.initial5,
-          [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.initial6,
-          [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.initial7,
+          [`Ennuste ${year} ${t('thousandEuros')}`]: r.costForecast,
+          [`${t('TAE')} ${year + 1} ${t('thousandEuros')}`]: r.TAE,
+          [`${t('TSE')} ${year + 2} ${t('thousandEuros')}`]: r.TSE1,
+          [`${t('TSE')} ${year + 3} ${t('thousandEuros')}`]: r.TSE2,
+          [`${year + 4} ${t('thousandEuros')}`]: r.initial1,
+          [`${year + 5} ${t('thousandEuros')}`]: r.initial2,
+          [`${year + 6} ${t('thousandEuros')}`]: r.initial3,
+          [`${year + 7} ${t('thousandEuros')}`]: r.initial4,
+          [`${year + 8} ${t('thousandEuros')}`]: r.initial5,
+          [`${year + 9} ${t('thousandEuros')}`]: r.initial6,
+          [`${year + 10} ${t('thousandEuros')}`]: r.initial7,
       }));
+
+      return [...summaryTableRows, ...emptyRow, ...analysisTableRows];
       }
       default:
         return [];
@@ -1557,3 +1597,31 @@ export const getReportData = async (
     return [];
   }
 };
+
+const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummaryRow[]) => {
+  const currentYear = new Date().getFullYear();
+
+  const tableRows = summaryData.map((classRow) => {
+    // TODO: categoryFiveTotal
+    // tableRowK5 = JSX.Element[] = [];
+
+    const cRow = {
+      name: classRow.name,
+      description: "",
+      costForecast: currentYear,
+      TAE: currentYear + 1,
+      TSE1: currentYear + 2,
+      TSE2: currentYear + 3,
+      initial1: currentYear + 4,
+      initial2: currentYear + 5,
+      initial3: currentYear + 6,
+      initial4: currentYear + 7,
+      initial5: currentYear + 8,
+      initial6: currentYear + 9,
+    }
+
+    return cRow;
+  });
+
+  return tableRows;
+}

@@ -7,6 +7,7 @@ import {
   IDownloadCsvButtonProps,
   IConstructionProgramCsvRow,
   IBudgetBookSummaryCsvRow,
+  IOperationalEnvironmentAnalysisSummaryCsvRow,
 } from '@/interfaces/reportInterfaces';
 import './styles.css';
 
@@ -33,10 +34,14 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
   });
   const navigate = useNavigate();
 
-  const cleanData = (data: (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow)[]) => {
+  const cleanData = (data: (
+    IConstructionProgramCsvRow
+    | IBudgetBookSummaryCsvRow
+    | IOperationalEnvironmentAnalysisSummaryCsvRow
+  )[]) => {
     return data.map((row) => {
       return Object.keys(row).reduce((acc, key) => {
-        const typedKey = key as keyof (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
+        const typedKey = key as keyof (IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow);
         if (key === '\nTS 2025' || key === '\nTA 2025') {
           const value = (row[typedKey] ?? '') as string;
           acc[typedKey] = value ? value.replace(/\s/g, '') : '';
@@ -44,7 +49,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
           acc[typedKey] = row[typedKey] ?? '';
         }
         return acc;
-      }, {} as IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow);
+      }, {} as IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow);
     });
   };
 
