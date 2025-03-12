@@ -66,7 +66,7 @@ export const useCsvData = ({
         }
         case Reports.OperationalEnvironmentAnalysis:
         case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
-          const res = await getForcedToFrameData(year, false);
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(
