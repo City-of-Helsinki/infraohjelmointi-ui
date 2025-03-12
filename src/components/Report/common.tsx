@@ -1,5 +1,5 @@
 import { getCoordinationTableRows } from "@/hooks/useCoordinationRows";
-import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData, IOperationalEnvironmentAnalysisTableRow } from "@/interfaces/reportInterfaces";
+import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData, IOperationalEnvironmentAnalysisTableRow, IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryCategoryRowData } from "@/interfaces/reportInterfaces";
 import { operationalEnvironmentAnalysisTableRows } from "@/utils/reportHelpers";
 
 /**
@@ -67,4 +67,21 @@ export const viewHasProjects = (res: IGetForcedToFrameData | IPlanningData ) => 
 
 export const buildOperationalEnvironmentAnalysisRows = (reportRows: IOperationalEnvironmentAnalysisTableRow[]) => {
     return operationalEnvironmentAnalysisTableRows(reportRows)
+}
+
+export const calculateOperationalEnvironmentAnalysisCategorySums = (categories: IOperationalEnvironmentAnalysisSummaryCategoryRow[]) => {
+    const sums: { [key: string]: string } = {};
+
+    categories.forEach(category => {
+        Object.keys(category.data).forEach(keyString => {
+            const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+            if (!sums[key]) {
+                sums[key] = category.data[key];
+            } else {
+                sums[key] = (sums[key] || 0) + category.data[key];
+            }
+        });
+    });
+
+    return sums;
 }

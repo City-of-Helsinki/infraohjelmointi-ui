@@ -7,6 +7,7 @@ import {
   IOperationalEnvironmentAnalysisSummaryCategoryRowData,
   IOperationalEnvironmentAnalysisSummaryRow
 } from "@/interfaces/reportInterfaces";
+import { calculateOperationalEnvironmentAnalysisCategorySums } from "../common";
 
 const categorySummaryView = {
   width: "100%",
@@ -120,18 +121,7 @@ const CategorySummaryHeader = () => {
 };
 
 const CategorySummarySumRow: FC<ICategorySummarySumRowProps> = ({categories}) => {
-  const sums: { [key: string]: string} = {}
-
-  categories.forEach(category => {
-    Object.keys(category.data).forEach(keyString => {
-      const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
-      if (!sums[key]) {
-        sums[key] = category.data[key];
-      } else {
-        sums[key] = ( sums[key] || 0 ) + category.data[key];
-      }
-    });
-  });
+  const sums = calculateOperationalEnvironmentAnalysisCategorySums(categories);
 
   return (
     <View style={tableStyles.row}>
