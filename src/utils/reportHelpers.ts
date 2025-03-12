@@ -1461,6 +1461,19 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
   const tableRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
 
   summaryData.map((classRow) => {
+    const categoryFiveTotal = {
+      costForecast: 0,
+      TAE: 0,
+      TSE1: 0,
+      TSE2: 0,
+      initial1: 0,
+      initial2: 0,
+      initial3: 0,
+      initial4: 0,
+      initial5: 0,
+      initial6: 0,
+    };
+
     const categoryRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
     const categoryRowsK5: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
 
@@ -1498,14 +1511,42 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
       };
 
       if (category.name.includes("K5")) {
+        categoryFiveTotal.costForecast += Number(category.data.costForecast);
+        categoryFiveTotal.TAE += Number(category.data.TAE);
+        categoryFiveTotal.TSE1 += Number(category.data.TSE1);
+        categoryFiveTotal.TSE2 += Number(category.data.TSE2);
+        categoryFiveTotal.initial1 += Number(category.data.initial1);
+        categoryFiveTotal.initial2 += Number(category.data.initial2);
+        categoryFiveTotal.initial3 += Number(category.data.initial3);
+        categoryFiveTotal.initial4 += Number(category.data.initial4);
+        categoryFiveTotal.initial5 += Number(category.data.initial5);
+        categoryFiveTotal.initial6 += Number(category.data.initial6);
+
         categoryRowsK5.push(tempRow);
       } else {
         categoryRows.push(tempRow);
       }
     });
 
+    // K5 parent row
+    const parentRowK5 = {
+      name: "K5",
+      description: t('projectData.category.K5'),
+      costForecast: categoryFiveTotal.costForecast,
+      TAE: categoryFiveTotal.TAE,
+      TSE1: categoryFiveTotal.TSE1,
+      TSE2: categoryFiveTotal.TSE2,
+      initial1: categoryFiveTotal.initial1,
+      initial2: categoryFiveTotal.initial2,
+      initial3: categoryFiveTotal.initial3,
+      initial4: categoryFiveTotal.initial4,
+      initial5: categoryFiveTotal.initial5,
+      initial6: categoryFiveTotal.initial6,
+    }
+
     // TODO: sum row per each class
-    tableRows.push(cRow, ...categoryRows, ...categoryRowsK5);
+
+    tableRows.push(cRow, ...categoryRows, parentRowK5, ...categoryRowsK5);
   });
 
   return tableRows;
