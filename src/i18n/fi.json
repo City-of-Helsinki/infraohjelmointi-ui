@@ -453,15 +453,25 @@
   "report": {
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
-      "rowTitle": "Toimintaympäristöanalyysi",
-      "documentName": "toimintaympäristöanalyysi",
-      "title": "Kaupunkiympäristön toimiala - Toimintaympäristöanalyysi {{startYear}} - {{endYear}}",
+      "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
+      "documentName": "kategorisointiraportti - koordinointinäkymä",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Koordinointinäkymä)",
       "subtitleOne": "Maankäyttö ja kaupunkirakenne",
       "subtitleTwo": "LIKE/Toiminnanohjaus",
       "tableTitle": "Talousarvioehdotus {{startYear}} & taloussuunnitelmaehdotus {{financialPlanStartYear}}-{{financialPlanEndYear}} & alustava investointiohjelma {{investmentProgramStartYear}}-{{investmentProgramEndYear}}",
       "changePressure": "Muutospaine",
       "taeFrame": "TA, käytettävissä oleva määräraha",
-      "costForecastShortened": "Ennuste"
+      "costForecastShortened": "Ennuste",
+      "code": "Koodi",
+      "codeDescription": "Luokka kuvaajaan",
+      "millionEuro": "Miljoonaa euroa",
+      "total": "Yhteensä",
+      "name": "Nimi"
+    },
+    "operationalEnvironmentAnalysisForcedToFrame": {
+      "rowTitle": "Kategorisointiraportti (Sovitettu budjetti)",
+      "documentName": "kategorisointiraportti - sovitettu budjetti",
+      "title": "Kaupunkiympäristön toimiala - Kategorisointiraportti {{startYear}} - {{endYear}} (Sovitettu budjetti)"
     },
     "strategy": {
       "rowTitle": "Toimintasuunnitelma (Koordinointinäkymä)",
@@ -594,5 +604,19 @@
     "currentYearSapCosts": "Toteum.",
     "currentYearSapCommitments": "Sitoum.",
     "totalValues": "Yht."
+  },
+  "projectData": {
+    "category": {
+      "K1": "1. Sopimusvelvoitteet",
+      "K2": "2. Turvallisuus, terveellisyys ja toimintavarmuus",
+      "K3": "3. Lakisääteisten palveluiden kasvu",
+      "K4": "4. Omaisuuden hallinta",
+      "K5": "5. Kaupungin kasvu ja muut strategiset tavoitteet",
+      "K51": "5.1 Asuntotuotannon edellytysinvestointi",
+      "K52": "5.2 Alueiden valmiiksi saattaminen",
+      "K53": "5.3 Vetovoimaan liittyvät erillishankkeet",
+      "K54": "5.4 Toimitilahankkeet",
+      "K55": "5.5 Muut"
+    }
   }
 }

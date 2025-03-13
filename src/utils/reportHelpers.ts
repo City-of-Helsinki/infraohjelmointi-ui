@@ -15,6 +15,10 @@ import {
   ITotals,
   IPlannedBudgets,
   IChild,
+  IOperationalEnvironmentAnalysisSummaryCategoryRow,
+  IOperationalEnvironmentAnalysisSummaryRow,
+  IOperationalEnvironmentAnalysisSummaryCategoryRowData,
+  IOperationalEnvironmentAnalysisSummaryCsvRow,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -714,7 +718,8 @@ export const convertToReportRows = (
       }
       return forcedToFrameHierarchy;
     }
-    case Reports.OperationalEnvironmentAnalysis: {
+    case Reports.OperationalEnvironmentAnalysis:
+    case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
       const forcedToFrameHierarchy = [];
 
       const sumBudgets = (number1?: string, number2?: string | null): string => {
@@ -1032,7 +1037,7 @@ const processStrategyTableRows = (tableRows: IStrategyTableRow[]) => {
 }
 const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
 
-const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
+const getOperationalEnvironmentAnalysisData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
   switch(tableRow.type) {
     case 'class':
       return {
@@ -1092,11 +1097,45 @@ const getCorrectData = (tableRow: IOperationalEnvironmentAnalysisTableRow) => {
       }
   }
 }
-const processOperationalEnvironmentAnalysisTableRows = (
+
+const getOperationalEnvironmentAnalysisSummaryData = (tableRows: IOperationalEnvironmentAnalysisTableRow[]) => {
+  const categories: IOperationalEnvironmentAnalysisSummaryCategoryRow[] = [];
+
+  tableRows.forEach((row) => {
+    if (row.type === "class") {
+      const data = getOperationalEnvironmentAnalysisSummaryData(row.children);
+      categories.push(...data);
+    }
+    if (row.type === "category") {
+      categories.push({
+        id: row.id,
+        name: row.name,
+        type: row.type,
+        data: {
+          costForecast: row.plannedBudgetsForCategories?.plannedCostForecast ?? '0',
+          TAE: row.plannedBudgetsForCategories?.plannedTAE ?? '0',
+          TSE1: row.plannedBudgetsForCategories?.plannedTSE1 ?? '0',
+          TSE2: row.plannedBudgetsForCategories?.plannedTSE2 ?? '0',
+          initial1: row.plannedBudgetsForCategories?.plannedInitial1 ?? '0',
+          initial2: row.plannedBudgetsForCategories?.plannedInitial2 ?? '0',
+          initial3: row.plannedBudgetsForCategories?.plannedInitial3 ?? '0',
+          initial4: row.plannedBudgetsForCategories?.plannedInitial4 ?? '0',
+          initial5: row.plannedBudgetsForCategories?.plannedInitial5 ?? '0',
+          initial6: row.plannedBudgetsForCategories?.plannedInitial6 ?? '0',
+          initial7: row.plannedBudgetsForCategories?.plannedInitial7 ?? '0',
+        }
+      });
+    }
+  });
+
+  return categories;
+}
+
+export const processOperationalEnvironmentAnalysisTableRows = (
   tableRows: IOperationalEnvironmentAnalysisTableRow[]
 ): IBudgetBookSummaryCsvRow[]  => {
   tableRows.forEach((tableRow) => {
-    const data = getCorrectData(tableRow);
+    const data = getOperationalEnvironmentAnalysisData(tableRow);
     if (!operationalEnvironmentAnalysisCsvRows.some(row => row.id === tableRow.id)) {
       operationalEnvironmentAnalysisCsvRows.push({
         id: tableRow.id,
@@ -1191,6 +1230,86 @@ export const flattenConstructionProgramTableRows = (
 ): Array<IConstructionProgramCsvRow> =>
   processConstructionReportRows(tableRows).flat(Infinity);
 
+/**
+ * Create report table rows without flattening
+ */
+
+const summaryClasses: IOperationalEnvironmentAnalysisSummaryRow[] = [];
+const summarySubClasses: IOperationalEnvironmentAnalysisSummaryCategoryRow[] = [];
+let data: IOperationalEnvironmentAnalysisSummaryCategoryRow[] = [];
+
+export const operationalEnvironmentAnalysisTableRows = (
+  tableRows: IOperationalEnvironmentAnalysisTableRow[],
+): IOperationalEnvironmentAnalysisSummaryRow[] => {
+
+  const getTopMostClassCategoryData = (
+    tableRows: IOperationalEnvironmentAnalysisTableRow[]
+  ) => {
+    tableRows.forEach((row) => {
+      data = getOperationalEnvironmentAnalysisSummaryData(row.children);
+      summarySubClasses.push(...data);
+    })
+    return summarySubClasses;
+  }
+
+  const cleanSummaryData = (masterClasses: IOperationalEnvironmentAnalysisSummaryRow[]) => {
+    const cleanSummaryData: IOperationalEnvironmentAnalysisSummaryRow[] = []
+
+    masterClasses.forEach(masterClass => {
+      const cleanClassData: { [key: string]: IOperationalEnvironmentAnalysisSummaryCategoryRow } = {}
+
+      masterClass.categories.forEach(category => {
+        const name = category.name;
+
+        if (!cleanClassData[name]) {
+          cleanClassData[name] = { ...category, id: `${masterClass.id}-${category.name}-sum` }
+        } else {
+          Object.keys(category.data).forEach(keyString => {
+            const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+            cleanClassData[name].data[key] = ( cleanClassData[name].data[key] || 0 ) + category.data[key];
+          })
+        }
+      });
+
+      const clean = {
+        id: masterClass.id,
+        name: masterClass.name,
+        type: masterClass.type,
+        categories: Object.values(cleanClassData),
+      }
+
+      cleanSummaryData.push(clean)
+    });
+
+    return cleanSummaryData;
+  }
+
+  tableRows.forEach((row) => {
+    if (row.type === "class") {
+      data = getOperationalEnvironmentAnalysisSummaryData(row.children);
+      let classData: any = {};
+
+      if (!data.length) {
+        summarySubClasses.length = 0;
+        data = getTopMostClassCategoryData(row.children)
+      }
+
+      if (!summaryClasses.some(summaryClass => summaryClass.id === row.id)) {
+        classData = {
+          id: row.id,
+          name: row.name,
+          type: row.type,
+          categories: data,
+        };
+
+        summaryClasses.push(classData);
+      }
+    }
+  });
+
+  return cleanSummaryData(summaryClasses);
+};
+
 export const getReportData = async (
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
@@ -1202,7 +1321,8 @@ export const getReportData = async (
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
   | Array<IStrategyTableCsvRow>
-  | Array<IOperationalEnvironmentAnalysisCsvRow>> => {
+  | Array<IOperationalEnvironmentAnalysisCsvRow>
+  | Array<IOperationalEnvironmentAnalysisSummaryCsvRow>> => {
   const year = new Date().getFullYear();
   const previousYear = year - 1;
 
@@ -1269,23 +1389,78 @@ export const getReportData = async (
           [`${t('initial')} ${t('initialSV')} ${year + 10} ${t('millionEuro')}`]: r.initial7,
         }));
       }
-      case Reports.OperationalEnvironmentAnalysis : {
+      case Reports.OperationalEnvironmentAnalysis :
+      case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
         //Flatten rows to one dimension
         const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
-        return flattenedRows.map((r) => ({
+        const summaryData = operationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+
+        const summaryRows = generateSummaryRows(summaryData);
+
+        //TODO: Tähän väliin luodaan koontirivit
+        const summaryTableRows = summaryRows.map((r) => ({
+          [t('report.operationalEnvironmentAnalysis.code')]: r.name,
+          [t('report.operationalEnvironmentAnalysis.codeDescription')]: r.description,
+          [`${year} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.costForecast,
+          [`${year + 1} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TAE,
+          [`${year + 2} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TSE1,
+          [`${year + 3} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TSE2,
+          [`${year + 4} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial1,
+          [`${year + 5} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial2,
+          [`${year + 6} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial3,
+          [`${year + 7} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial4,
+          [`${year + 8} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial5,
+          [`${year + 9} ${ t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial6,
+        }))
+
+        const emptyRow = [{
+          name: "",
+          description: "",
+          costForecast: "",
+          TAE: "",
+          TSE1: "",
+          TSE2: "",
+          initial1: "",
+          initial2: "",
+          initial3: "",
+          initial4: "",
+          initial5: "",
+          initial6: "",
+        }]
+
+        // When adding another, different sized table to the same file,
+        // we need to add the header row
+        const analysisHeaderRow = {
+          [`${t('target')}`]: `${t('target')}`,
+          [`Ennuste ${year} ${t('thousandEuros')}`]: `Ennuste ${year} ${t('thousandEuros')}`,
+          [`${t('TAE')} ${year + 1} ${t('thousandEuros')}`]: `${t('TAE')} ${year + 1} ${t('thousandEuros')}`,
+          [`${t('TSE')} ${year + 2} ${t('thousandEuros')}`]: `${t('TSE')} ${year + 2} ${t('thousandEuros')}`,
+          [`${t('TSE')} ${year + 3} ${t('thousandEuros')}`]: `${t('TSE')} ${year + 3} ${t('thousandEuros')}`,
+          [`${year + 4} ${t('thousandEuros')}`]: `${year + 4} ${t('thousandEuros')}`,
+          [`${year + 5} ${t('thousandEuros')}`]: `${year + 5} ${t('thousandEuros')}`,
+          [`${year + 6} ${t('thousandEuros')}`]: `${year + 6} ${t('thousandEuros')}`,
+          [`${year + 7} ${t('thousandEuros')}`]: `${year + 7} ${t('thousandEuros')}`,
+          [`${year + 8} ${t('thousandEuros')}`]: `${year + 8} ${t('thousandEuros')}`,
+          [`${year + 9} ${t('thousandEuros')}`]: `${year + 9} ${t('thousandEuros')}`,
+          [`${year + 10} ${t('thousandEuros')}`]: `${year + 10} ${t('thousandEuros')}`,
+        }
+
+        const analysisTableRows = flattenedRows.map((r) => ({
           [`${t('target')}`]: r.name,
-          [`Ennuste\n${new Date().getFullYear()}\n${t('thousandEuros')}`]: r.costForecast,
-          [`${t('TAE')}\n${new Date().getFullYear() + 1}\n${t('thousandEuros')}`]: r.TAE,
-          [`${t('TSE')}\n${new Date().getFullYear() + 2}\n${t('thousandEuros')}`]: r.TSE1,
-          [`${t('TSE')}\n${new Date().getFullYear() + 3}\n${t('thousandEuros')}`]: r.TSE2,
-          [`${new Date().getFullYear() + 4}\n${t('thousandEuros')}`]: r.initial1,
-          [`${new Date().getFullYear() + 5}\n${t('thousandEuros')}`]: r.initial2,
-          [`${new Date().getFullYear() + 6}\n${t('thousandEuros')}`]: r.initial3,
-          [`${new Date().getFullYear() + 7}\n${t('thousandEuros')}`]: r.initial4,
-          [`${new Date().getFullYear() + 8}\n${t('thousandEuros')}`]: r.initial5,
-          [`${new Date().getFullYear() + 9}\n${t('thousandEuros')}`]: r.initial6,
-          [`${new Date().getFullYear() + 10}\n${t('thousandEuros')}`]: r.initial7,
+          [`Ennuste ${year} ${t('thousandEuros')}`]: r.costForecast,
+          [`${t('TAE')} ${year + 1} ${t('thousandEuros')}`]: r.TAE,
+          [`${t('TSE')} ${year + 2} ${t('thousandEuros')}`]: r.TSE1,
+          [`${t('TSE')} ${year + 3} ${t('thousandEuros')}`]: r.TSE2,
+          [`${year + 4} ${t('thousandEuros')}`]: r.initial1,
+          [`${year + 5} ${t('thousandEuros')}`]: r.initial2,
+          [`${year + 6} ${t('thousandEuros')}`]: r.initial3,
+          [`${year + 7} ${t('thousandEuros')}`]: r.initial4,
+          [`${year + 8} ${t('thousandEuros')}`]: r.initial5,
+          [`${year + 9} ${t('thousandEuros')}`]: r.initial6,
+          [`${year + 10} ${t('thousandEuros')}`]: r.initial7,
       }));
+
+      return [...summaryTableRows, ...emptyRow, analysisHeaderRow, ...analysisTableRows];
       }
       default:
         return [];
@@ -1295,3 +1470,131 @@ export const getReportData = async (
     return [];
   }
 };
+
+export const updateCategoryFiveTotals = (categoryFiveTotal: { costForecast: number; TAE: number; TSE1: number; TSE2: number; initial1: number; initial2: number; initial3: number; initial4: number; initial5: number; initial6: number; }, category: IOperationalEnvironmentAnalysisSummaryCategoryRow) => {
+  categoryFiveTotal.costForecast += Number(category.data.costForecast);
+    categoryFiveTotal.TAE += Number(category.data.TAE);
+    categoryFiveTotal.TSE1 += Number(category.data.TSE1);
+    categoryFiveTotal.TSE2 += Number(category.data.TSE2);
+    categoryFiveTotal.initial1 += Number(category.data.initial1);
+    categoryFiveTotal.initial2 += Number(category.data.initial2);
+    categoryFiveTotal.initial3 += Number(category.data.initial3);
+    categoryFiveTotal.initial4 += Number(category.data.initial4);
+    categoryFiveTotal.initial5 += Number(category.data.initial5);
+    categoryFiveTotal.initial6 += Number(category.data.initial6);
+}
+
+const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummaryRow[]) => {
+  const currentYear = new Date().getFullYear();
+
+  const tableRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
+
+  summaryData.forEach((classRow) => {
+    const categoryFiveTotal = {
+      costForecast: 0,
+      TAE: 0,
+      TSE1: 0,
+      TSE2: 0,
+      initial1: 0,
+      initial2: 0,
+      initial3: 0,
+      initial4: 0,
+      initial5: 0,
+      initial6: 0,
+    };
+
+    const categoryRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
+    const categoryRowsK5: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
+
+    const cRow = {
+      name: classRow.name,
+      description: "",
+      costForecast: currentYear,
+      TAE: currentYear + 1,
+      TSE1: currentYear + 2,
+      TSE2: currentYear + 3,
+      initial1: currentYear + 4,
+      initial2: currentYear + 5,
+      initial3: currentYear + 6,
+      initial4: currentYear + 7,
+      initial5: currentYear + 8,
+      initial6: currentYear + 9,
+    }
+
+    classRow.categories.forEach((category) => {
+      const categoryName = t(`projectData.category.${category.name.replace(/\./g,"")}`);
+
+      const tempRow = {
+        name: category.name,
+        description: categoryName,
+        costForecast: category.data.costForecast,
+        TAE: category.data.TAE,
+        TSE1: category.data.TSE1,
+        TSE2: category.data.TSE2,
+        initial1: category.data.initial1,
+        initial2: category.data.initial2,
+        initial3: category.data.initial3,
+        initial4: category.data.initial4,
+        initial5: category.data.initial5,
+        initial6: category.data.initial6,
+      };
+
+      if (category.name.includes("K5")) {
+        updateCategoryFiveTotals(categoryFiveTotal, category);
+
+        categoryRowsK5.push(tempRow);
+      } else {
+        categoryRows.push(tempRow);
+      }
+    });
+
+    // K5 parent row
+    const parentRowK5 = {
+      name: "K5",
+      description: t('projectData.category.K5'),
+      costForecast: categoryFiveTotal.costForecast,
+      TAE: categoryFiveTotal.TAE,
+      TSE1: categoryFiveTotal.TSE1,
+      TSE2: categoryFiveTotal.TSE2,
+      initial1: categoryFiveTotal.initial1,
+      initial2: categoryFiveTotal.initial2,
+      initial3: categoryFiveTotal.initial3,
+      initial4: categoryFiveTotal.initial4,
+      initial5: categoryFiveTotal.initial5,
+      initial6: categoryFiveTotal.initial6,
+    }
+
+    // Sum row after each class rows
+    const sums: { [key: string]: string} = {};
+
+    classRow.categories.forEach(category => {
+      Object.keys(category.data).forEach(keyString => {
+        const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+        if (!sums[key]) {
+          sums[key] = category.data[key];
+        } else {
+          sums[key] = ( sums[key] || 0 ) + category.data[key];
+        }
+      });
+    });
+
+    const classSumRow = {
+      name: "",
+      description: t('report.operationalEnvironmentAnalysis.total'),
+      costForecast: sums.costForecast,
+      TAE: sums.TAE,
+      TSE1: sums.TSE1,
+      TSE2: sums.TSE2,
+      initial1: sums.initial1,
+      initial2: sums.initial2,
+      initial3: sums.initial3,
+      initial4: sums.initial4,
+      initial5: sums.initial5,
+      initial6: sums.initial6,
+    }
+
+    tableRows.push(cRow, ...categoryRows, parentRowK5, ...categoryRowsK5, classSumRow);
+  });
+
+  return tableRows;
+}

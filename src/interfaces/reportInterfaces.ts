@@ -51,6 +51,7 @@ export type IPlanningData = {
 
 export const reports = [
   'operationalEnvironmentAnalysis',
+  'operationalEnvironmentAnalysisForcedToFrame',
   'strategy',
   'strategyForcedToFrame',
   'constructionProgram',
@@ -74,8 +75,13 @@ export interface IOperationalEnvironmentAnalysisCsvRow {
   [key: string]: string | IOperationalEnvironmentAnalysisFinanceProperties | undefined;
 }
 
+export interface IOperationalEnvironmentAnalysisSummaryCsvRow {
+  [key: string]: string | IOperationalEnvironmentAnalysisFinanceProperties | undefined | number;
+}
+
 export enum Reports {
   OperationalEnvironmentAnalysis = 'operationalEnvironmentAnalysis',
+  OperationalEnvironmentAnalysisForcedToFrame = 'operationalEnvironmentAnalysisForcedToFrame',
   Strategy = 'strategy',
   StrategyForcedToFrame = 'strategyForcedToFrame',
   ConstructionProgram = 'constructionProgram',
@@ -285,6 +291,34 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
     cpInitial6?: string;
     cpInitial7?: string;
   };
+}
+
+export interface IOperationalEnvironmentAnalysisSummaryCategoryRowData {
+    costForecast: string;
+    TAE: string;
+    TSE1: string;
+    TSE2: string;
+    initial1: string;
+    initial2: string;
+    initial3: string;
+    initial4: string;
+    initial5: string;
+    initial6: string;
+    initial7: string;
+}
+
+export interface IOperationalEnvironmentAnalysisSummaryCategoryRow {
+  id: string | undefined;
+  name: string;
+  type: string;
+  data: IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+}
+
+export interface IOperationalEnvironmentAnalysisSummaryRow {
+  id: string | undefined;
+  name: string;
+  type: string;
+  categories: IOperationalEnvironmentAnalysisSummaryCategoryRow[];
 }
 
 export interface IDownloadCsvButtonProps {

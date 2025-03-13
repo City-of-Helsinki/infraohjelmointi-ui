@@ -603,7 +603,8 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
           }
           break;
         }
-        case Reports.OperationalEnvironmentAnalysis: {
+        case Reports.OperationalEnvironmentAnalysis:
+        case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
           if (flattenedRow) {
             const getNameStyle = () => {
               if (flattenedRow.type === 'taeFrame')
