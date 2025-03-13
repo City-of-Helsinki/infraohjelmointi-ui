@@ -139,7 +139,7 @@ const AuthGuard: FC = () => {
       !pathname.includes(PAGES.SEARCH_RESULTS)) &&
       isUserOnlyViewer(user)
     ) {
-      return navigate(-1);
+      return navigate(PAGES.PLANNING);
     }
 
     // Redirect project managers away from new project form
