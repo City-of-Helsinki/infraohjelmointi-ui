@@ -99,9 +99,12 @@ export const getProjectsWithParams = async (
     ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`
     : `${REACT_APP_API_URL}/projects/?${allParams}`;
 
+  const nextPageUrl = isCoordinator
+    ? `${REACT_APP_API_URL}/projects/coordinator/${fullPath?.split("/projects/coordinator/")[1]}`
+    : `${REACT_APP_API_URL}/projects/${fullPath?.split("/projects/")[1]}`;
 
   try {
-    const res = await axios.get(fullPath ? fullPath : url);
+    const res = await axios.get(fullPath ? nextPageUrl : url);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
