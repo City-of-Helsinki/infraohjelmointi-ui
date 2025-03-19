@@ -10,8 +10,9 @@ interface IOverrunRightField {
   control: HookFormControlType;
   readOnly?: boolean;
   cancelEdit?: boolean;
+  isInputDisabled: boolean;
 }
-const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control, cancelEdit }) => {
+const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control, cancelEdit, isInputDisabled }) => {
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
 
@@ -36,7 +37,7 @@ const OverrunRightField: FC<IOverrunRightField> = ({ readOnly, control, cancelEd
               <FormFieldLabel
                 text={t('overrunRightValue', { value: field.value })}
                 onClick={!readOnly ? handleSetEditing : undefined}
-                disabled={readOnly}
+                disabled={isInputDisabled}
               />
             </div>
             {editing && (
