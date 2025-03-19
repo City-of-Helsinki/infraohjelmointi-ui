@@ -32,11 +32,11 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       forcedToFrame: forcedToFrame,
       year: year,
     }, true);
-    const resultArray = res.results;
+    let resultArray = res.results;
     let nextResultsPath = res.next;
     while (nextResultsPath != null) {
       const nextResults = await getProjectsWithParams({fullPath: nextResultsPath})
-      resultArray.concat(nextResults.results);
+      resultArray = resultArray.concat(nextResults.results);
       nextResultsPath = nextResults.next;
     }
     const projects = resultArray.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'completed');
