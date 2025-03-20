@@ -26,7 +26,7 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
     // projects
     const res = await getProjectsWithParams({
-      params: "limit=100",
+      params: "limit=1000",
       direct: false,
       programmed: false,
       forcedToFrame: forcedToFrame,
