@@ -44,3 +44,11 @@
 .free-search div div div button {
   @apply z-10;
 }
+
+.hkr-id-search .hkr-id-search-selections {
+  @apply my-2 flex flex-wrap gap-2;
+}
+
+.hkr-id-search div div div button {
+  @apply z-10;
+}

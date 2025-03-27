@@ -89,7 +89,9 @@ export interface ISearchForm {
   subClass: Array<IOption>;
   programmedYes: boolean;
   programmedNo: boolean;
+  hkrIds: Array<string>
   personPlanning: IOption;
+  personConstruction: IOption;
   programmedYearMin: IOption;
   programmedYearMax: IOption;
   phase: IOption;
