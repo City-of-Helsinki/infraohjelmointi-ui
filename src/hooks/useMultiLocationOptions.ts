@@ -1,13 +1,9 @@
-import { IOption } from '@/interfaces/common';
-import {
-  selectPlanningDistricts,
-  selectPlanningDivisions,
-  selectPlanningSubDivisions,
-} from '@/reducers/locationSlice';
+import { IListItem, IOption } from '@/interfaces/common';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from './common';
 import _ from 'lodash';
-import { classesToOptions } from '@/utils/common';
+import { listItemsToOption } from '@/utils/common';
+import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisions } from '@/reducers/listsSlice';
 
 /**
  * Populates the district, division and subDivision lists. Filters the available options of the lists
@@ -22,9 +18,9 @@ const useMultiLocationOptions = (
   divisions: Array<IOption>,
   subDivisions: Array<IOption>,
 ) => {
-  const allDistricts = useAppSelector(selectPlanningDistricts);
-  const allDivisions = useAppSelector(selectPlanningDivisions);
-  const allSubDivisions = useAppSelector(selectPlanningSubDivisions);
+  const allDistricts = useAppSelector(selectProjectDistricts);
+  const allDivisions = useAppSelector(selectProjectDivisions);
+  const allSubDivisions = useAppSelector(selectProjectSubDivisions);
 
   const selectedDivisionParent = useMemo(
     () =>
@@ -82,11 +78,36 @@ const useMultiLocationOptions = (
     }
   }, [allDistricts, divisions, getNextDivisions, selectedDivisionParent, subDivisions]);
 
-  return {
-    districts: classesToOptions(getNextDistricts()),
-    divisions: classesToOptions(getNextDivisions()),
-    subDivisions: classesToOptions(getNextSubDivisions()),
+  const renameDublicateLocationNames = (locations: IListItem[], allParentLocations: IListItem[]) => {
+    const locationNameCounts = locations.reduce((acc: {[key: string]: number}, location) => {
+      acc[location.value] = (acc[location.value] || 0) + 1;
+      return acc;
+    }, {});
+
+    const renamedLocations = locations.map((l) => {
+      const isDuplicate = locationNameCounts[l.value] > 1;
+      if (isDuplicate) {
+        const parentLoaction = allParentLocations.find((parentClass) => parentClass.id === l.parent);
+        const newName = `${l.value} (${parentLoaction?.value ?? ''})`;
+        return { ...l, value: newName };
+      }
+      return l;
+    });
+    return renamedLocations;
   };
+
+  const getRenamedLocations = () => {
+    const distrcits = getNextDistricts();
+    const renamedDivisions = renameDublicateLocationNames(getNextDivisions(), distrcits);
+    const renamedSubDivisions = renameDublicateLocationNames(getNextSubDivisions(), renamedDivisions);
+    return {
+      districts: listItemsToOption(distrcits),
+      divisions: listItemsToOption(renamedDivisions),
+      subDivisions: listItemsToOption(renamedSubDivisions)
+    }
+  }
+
+  return getRenamedLocations();
 };
 
 export default useMultiLocationOptions;

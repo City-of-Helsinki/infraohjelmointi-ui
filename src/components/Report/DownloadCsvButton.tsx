@@ -77,7 +77,8 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
         Reports.Strategy,
         Reports.StrategyForcedToFrame,
         Reports.OperationalEnvironmentAnalysis,
-        Reports.OperationalEnvironmentAnalysisForcedToFrame
+        Reports.OperationalEnvironmentAnalysisForcedToFrame,
+        Reports.ForecastReport
       ].includes(type as Reports)) navigate(0);
     }
   };
