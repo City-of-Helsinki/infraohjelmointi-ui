@@ -302,7 +302,7 @@ const convertToStrategyReportProjects = (
           return isProjectInPlanningOrConstruction({
             planningStart,
             constructionEnd,
-          }, 0);
+          }, type === Reports.ForecastReport ? 0 : 1);
         }
 
         return false;
