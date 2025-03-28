@@ -160,8 +160,9 @@ const getProjectPhase = (project: IProject) => {
 }
 
 const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProject, month: number) => {
-  const monthStartDate = new Date(new Date().getFullYear() + 1, month - 1, 1);
-  const monthEndDate = new Date(new Date().getFullYear() + 1, month, 0);
+  const yearsForward = type == Reports.ForecastReport ? 0 : 1;
+  const monthStartDate = new Date(new Date().getFullYear() + yearsForward, month - 1, 1);
+  const monthEndDate = new Date(new Date().getFullYear() + yearsForward, month, 0);
   const dateFormat = "DD.MM.YYYY";
 
   const planningStartYear = () => {
@@ -262,8 +263,8 @@ const projectIsInConstructionPhase = (
   return false;
 }
 
-const isProjectInPlanningOrConstruction = (props: IYearCheck) => {
-  const year = [new Date().getFullYear() + 1]
+const isProjectInPlanningOrConstruction = (props: IYearCheck, yearsForward: number) => {
+  const year = [new Date().getFullYear() + yearsForward]
   const inPlanningOrConstruction = (year.some(y => y >= props.planningStart && y <= props.constructionEnd));
 
   if (inPlanningOrConstruction) {
@@ -287,7 +288,7 @@ const convertToStrategyReportProjects = (
           isProjectInPlanningOrConstruction({
             planningStart: p.planningStartYear,
             constructionEnd: p.constructionEndYear
-          })
+          }, 1)
         )
     }
 
@@ -301,7 +302,7 @@ const convertToStrategyReportProjects = (
           return isProjectInPlanningOrConstruction({
             planningStart,
             constructionEnd,
-          });
+          }, 0);
         }
 
         return false;
