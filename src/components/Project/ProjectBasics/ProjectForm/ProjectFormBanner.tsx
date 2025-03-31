@@ -13,9 +13,10 @@ interface IProjectFormbannerProps {
     | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
     | undefined;
   isDirty: boolean;
+  isInputDisabled: boolean;
 }
 
-const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) => {
+const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty, isInputDisabled }) => {
   const dispatch = useAppDispatch();
   const startYear = useAppSelector(selectStartYear);
   const { t } = useTranslation();
@@ -61,7 +62,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty }) =
             {/** Add logic for disabling button later based on user type */}
             <Button
               data-testid={'open-delete-project-dialog-button'}
-              disabled={false}
+              disabled={isInputDisabled}
               iconStart={<IconTrash />}
               variant={ButtonVariant.Supplementary}
               onClick={handleProjectDelete}
