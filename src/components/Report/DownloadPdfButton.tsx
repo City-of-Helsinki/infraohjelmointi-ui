@@ -152,29 +152,6 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           }
           break;
         }
-        case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
-          const res = await getForcedToFrameData(year, true);
-          const categories = await getCategories();
-
-          if (viewHasProjects(res) && categories) {
-            const coordinatorRows = getCoordinationTableRows(
-              res.classHierarchy,
-              res.forcedToFrameDistricts.districts,
-              res.initialSelections,
-              res.projects,
-              res.groupRes,
-            );
-            document = getPdfDocument(
-              type,
-              coordinatorRows,
-              undefined,
-              undefined,
-              categories,
-              res.projectsInWarrantyPhase,
-            );
-          }
-          break;
-        }
         case Reports.ConstructionProgram: {
           const res = await getPlanningData(year + 1);
           const resDivisions = await getDistricts();
