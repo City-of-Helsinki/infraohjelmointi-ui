@@ -82,7 +82,6 @@ export interface IPlanningRow extends IPlanningSums {
   path: string;
   children: Array<IPlanningRow>;
   projectRows: Array<IProject>;
-  projectForcedToFrameRows?: Array<IProject>;
   id: string;
   key: string;
   defaultExpanded: boolean;
