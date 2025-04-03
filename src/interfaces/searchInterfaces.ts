@@ -51,11 +51,10 @@ export interface ISearchRequest {
 
 export interface IProjectSearchRequest
   extends Omit<ISearchRequest, 'fullPath' | 'limit' | 'order'> {
-  direct?: boolean;
+  direct: boolean;
   programmed?: boolean;
-  forcedToFrame?: boolean;
-  year?: number;
-  fullPath?: string;
+  forcedToFrame: boolean;
+  year: number;
 }
 
 export type SearchLimit = '10' | '20' | '30';

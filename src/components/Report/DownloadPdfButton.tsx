@@ -128,9 +128,31 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           }
           break;
         }
-        case Reports.OperationalEnvironmentAnalysis:
+        case Reports.OperationalEnvironmentAnalysis: {
+          const res = await getForcedToFrameData(year, false);
+          const categories = await getCategories();
+
+          if (viewHasProjects(res) && categories) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+            document = getPdfDocument(
+              type,
+              coordinatorRows,
+              undefined,
+              undefined,
+              categories,
+              res.projectsInWarrantyPhase,
+            );
+          }
+          break;
+        }
         case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
-          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);
+          const res = await getForcedToFrameData(year, true);
           const categories = await getCategories();
 
           if (viewHasProjects(res) && categories) {
@@ -177,7 +199,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if ([Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport, Reports.OperationalEnvironmentAnalysis, Reports.OperationalEnvironmentAnalysisForcedToFrame].includes(type as Reports)) navigate(0);
+      if ([Reports.Strategy, Reports.StrategyForcedToFrame, Reports.OperationalEnvironmentAnalysis, Reports.OperationalEnvironmentAnalysisForcedToFrame, Reports.ForecastReport].includes(type as Reports)) navigate(0);
     }
   }, [documentName, type]);
 

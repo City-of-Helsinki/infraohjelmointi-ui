@@ -89,7 +89,7 @@ export const getProjectsWithParams = async (
   req: IProjectSearchRequest,
   isCoordinator?: boolean,
 ): Promise<IProjectsResponse> => {
-  const { params, direct, programmed, forcedToFrame, year, fullPath } = req;
+  const { params, direct, programmed, forcedToFrame, year } = req;
 
   const allParams = `${params}&year=${year}&forcedToFrame=${forcedToFrame}&direct=${direct}${
     programmed ? '&programmed=true' : ''
@@ -99,12 +99,9 @@ export const getProjectsWithParams = async (
     ? `${REACT_APP_API_URL}/projects/coordinator/?${allParams}`
     : `${REACT_APP_API_URL}/projects/?${allParams}`;
 
-  const nextPageUrl = isCoordinator
-    ? `${REACT_APP_API_URL}/projects/coordinator/${fullPath?.split("/projects/coordinator/")[1]}`
-    : `${REACT_APP_API_URL}/projects/${fullPath?.split("/projects/")[1]}`;
 
   try {
-    const res = await axios.get(fullPath ? nextPageUrl : url);
+    const res = await axios.get(url);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

@@ -1,6 +1,5 @@
 import { getCoordinationTableRows } from "@/hooks/useCoordinationRows";
-import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData, IOperationalEnvironmentAnalysisTableRow, IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryCategoryRowData } from "@/interfaces/reportInterfaces";
-import { operationalEnvironmentAnalysisTableRows } from "@/utils/reportHelpers";
+import { IDownloadCsvButtonProps, IDownloadPdfButtonProps, Reports, ReportType, IGetForcedToFrameData, IPlanningData } from "@/interfaces/reportInterfaces";
 
 /**
  * Get Forced to Frame view data for reports.
@@ -16,10 +15,7 @@ export const getForcedToFrameDataForReports = async (
     year: number,
     coordinatorData?: boolean,
 ) => {
-    // Function is used on Reports Strategy, strategyForcedToFrame, ForecastReport, BudgetBookSummary
-    // OperationalEnvironmentAnalysis and OperationalEnvironmentAnalysisForcedToFrame
-    if (type === Reports.OperationalEnvironmentAnalysis) return await getForcedToFrameData(year, false)
-    if (type === Reports.OperationalEnvironmentAnalysisForcedToFrame) return await getForcedToFrameData(year, true)
+    // Function is used on Reports Strategy, strategyForcedToFrame, ForecastReport and BudgetBookSummary
     if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
     if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
     if (type === Reports.ForecastReport) {
@@ -64,24 +60,3 @@ export const getCoordinatorAndForcedToFrameRows = async (
  * @returns boolean
  */
 export const viewHasProjects = (res: IGetForcedToFrameData | IPlanningData ) => { return res && res.projects.length > 0 }
-
-export const buildOperationalEnvironmentAnalysisRows = (reportRows: IOperationalEnvironmentAnalysisTableRow[]) => {
-    return operationalEnvironmentAnalysisTableRows(reportRows)
-}
-
-export const calculateOperationalEnvironmentAnalysisCategorySums = (categories: IOperationalEnvironmentAnalysisSummaryCategoryRow[]) => {
-    const sums: { [key: string]: string } = {};
-
-    categories.forEach(category => {
-        Object.keys(category.data).forEach(keyString => {
-            const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
-            if (!sums[key]) {
-                sums[key] = category.data[key];
-            } else {
-                sums[key] = (sums[key] || 0) + category.data[key];
-            }
-        });
-    });
-
-    return sums;
-}
