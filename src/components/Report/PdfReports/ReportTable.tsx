@@ -8,7 +8,8 @@ import {
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
   flattenConstructionProgramTableRows,
-  flattenForecastTableRows
+  flattenForecastTableRows,
+  operationalEnvironmentAnalysisTableRows
 } from '@/utils/reportHelpers';
 import {
   IBasicReportData,

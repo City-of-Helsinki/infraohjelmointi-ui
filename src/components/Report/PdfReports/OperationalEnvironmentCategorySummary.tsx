@@ -2,7 +2,7 @@ import { FC, memo } from "react";
 import { JSX } from "react/jsx-runtime";
 import { View, StyleSheet, Text } from "@react-pdf/renderer";
 import { t } from "i18next";
-import { IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryRow} from "@/interfaces/reportInterfaces";
+import { IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryRow } from "@/interfaces/reportInterfaces";
 import { calculateOperationalEnvironmentAnalysisCategorySums } from "../common";
 import { updateCategoryFiveTotals } from "@/utils/reportHelpers";
 
