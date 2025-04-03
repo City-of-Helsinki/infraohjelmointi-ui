@@ -19,6 +19,7 @@ import {
   IOperationalEnvironmentAnalysisSummaryCategoryRow,
   IOperationalEnvironmentAnalysisSummaryRow,
   IOperationalEnvironmentAnalysisSummaryCsvRow,
+  IOperationalEnvironmentAnalysisSummaryCategoryRowData,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
