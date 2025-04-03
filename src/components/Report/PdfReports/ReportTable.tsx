@@ -8,7 +8,8 @@ import {
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
   flattenConstructionProgramTableRows,
-  flattenForecastTableRows
+  flattenForecastTableRows,
+  operationalEnvironmentAnalysisTableRows
 } from '@/utils/reportHelpers';
 import {
   IBasicReportData,
@@ -25,7 +26,6 @@ import StrategyTableHeader from './reportHeaders/StrategyTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
 import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
-import { buildOperationalEnvironmentAnalysisRows } from '../common';
 
 const styles = StyleSheet.create({
   table: {
@@ -108,7 +108,7 @@ const ReportTable: FC<IReportTableProps> = ({
       <View style={styles.table}>
         {
           (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) &&
-            <OperationalEnvironmentCategorySummary rows={buildOperationalEnvironmentAnalysisRows(reportRows as IOperationalEnvironmentAnalysisTableRow[])} />
+            <OperationalEnvironmentCategorySummary rows={operationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[])} />
         }
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
