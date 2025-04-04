@@ -246,7 +246,6 @@ export interface IProjectArea {
 export interface IProjectsResponse {
   results: Array<IProject>;
   count: number;
-  next?: string | null;
 }
 
 export interface IProjectResponse {
