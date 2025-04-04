@@ -1,14 +1,15 @@
 import { ISearchForm } from '@/interfaces/formInterfaces';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAppSelector } from '../hooks/common';
-import { initialSearchForm, selectSearchForm } from '@/reducers/searchSlice';
+import { useAppDispatch, useAppSelector } from '../hooks/common';
+import { initialSearchForm, selectSearchForm, setSearchForm } from '@/reducers/searchSlice';
 import useMultiClassOptions from '@/hooks/useMultiClassOptions';
 import useMultiLocationOptions from '@/hooks/useMultiLocationOptions';
 import _ from 'lodash';
 import { IOption } from '@/interfaces/common';
 
 const useSearchForm = () => {
+  const dispatch = useAppDispatch();
   const storeFormValues = useAppSelector(selectSearchForm);
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const formMethods = useForm<ISearchForm>({
@@ -36,13 +37,12 @@ const useSearchForm = () => {
     multiListsState.masterClass,
     multiListsState.class,
     multiListsState.subClass,
-    multiListsState.otherClassification,
   );
 
   const {
     reset,
     watch,
-    formState: { isDirty },
+    getValues,
   } = formMethods;
 
   const setMultiListOption = useCallback((key: string, value: IOption) => {
@@ -71,6 +71,14 @@ const useSearchForm = () => {
     });
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Set form values to the store when the user chnages any values on the form
+  useEffect(() => {
+    const subscription = watch(() => {
+      dispatch(setSearchForm(getValues()))
+    });
+    return () => subscription.unsubscribe();
+  }, [dispatch, getValues, watch])
 
   // Set the form and the multi-selections to match the values in redux storeFormValues
   useEffect(() => {
