@@ -2,7 +2,6 @@ import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
 import { FC, memo } from 'react';
 import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
-import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import DocumentHeader from './reportHeaders/DocumentHeader';
 import ReportTable from './ReportTable';
@@ -23,10 +22,9 @@ interface IPdfReportContainerProps {
   reportType: ReportType;
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[],
-  forcedToFrameRows?: IPlanningRow[],
 }
 
-const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows }) => {
+const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase }) => {
   const { t } = useTranslation();
 
   const date = new Date();
@@ -35,7 +33,6 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
 
   const getDocumentTitle = () => {
     switch (reportType) {
-      case Reports.ForecastReport:
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.title');
@@ -60,24 +57,20 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
 
   const getDocumentSubtitleOne = () => {
     switch (reportType) {
-      case Reports.ForecastReport:
-        return t('report.strategy.subtitle', {
-          startYear: currentYear
-        });
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {
-          startYear: currentYear + 1
+          startYear: new Date().getFullYear() + 1
         });
       case Reports.ConstructionProgram:
         return t('report.constructionProgram.subtitle', {
-            startYear: currentYear + 1,
-            endYear: currentYear + 3,
+            startYear: new Date().getFullYear() + 1,
+            endYear: new Date().getFullYear() + 3,
           });
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.subtitle', {
-          startYear: currentYear + 1,
-          endYear: currentYear + 10,
+          startYear: new Date().getFullYear() + 1,
+          endYear: new Date().getFullYear() + 10,
         });
       case Reports.OperationalEnvironmentAnalysis:
       case Reports.OperationalEnvironmentAnalysisForcedToFrame:
@@ -91,18 +84,12 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       return t('report.operationalEnvironmentAnalysis.subtitleTwo');
     }
 
-    if (reportType === Reports.ForecastReport)
-      return t('report.forecastReport.subtitleTwo', {
-        currentDate: currentDate,
-      });
-
     return '';
   }
 
   const documentTitle = getDocumentTitle();
   const documentSubtitleOne = getDocumentSubtitleOne();
   const documentSubtitleTwo = getDocumentSubtitleTwo();
-
   return (
     <Document title={documentTitle}>
       <Page orientation={reportType !== Reports.ConstructionProgram ? "landscape" : "portrait" } size="A3" style={styles.page}>
@@ -114,8 +101,8 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             reportType={reportType}
             date={(reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) ? currentDate : ''}
           />
-          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} hierarchyInForcedToFrame={forcedToFrameRows}/>
-          {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport?
+          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} />
+          {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame ?
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
               colorInfoTextOne={t('report.strategy.planning')}

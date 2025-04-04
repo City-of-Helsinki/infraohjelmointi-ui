@@ -1,6 +1,5 @@
 import { IListItem } from './common';
 import { IPerson } from './personsInterfaces';
-import { ISapCost } from './sapCostsInterfaces';
 
 export interface IProject {
   id: string;
@@ -88,7 +87,6 @@ export interface IProject {
   frameEstPlanningEnd: string | null;
   frameEstConstructionStart: string | null;
   frameEstConstructionEnd: string | null;
-  currentYearsSapValues?: Array<ISapCost> | null;
 }
 
 export interface IProjectRequest {

@@ -93,7 +93,6 @@ const App: FC = () => {
   const startYear = useAppSelector(selectStartYear);
 
   const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
-  const yearNow: number = new Date().getFullYear();
 
   useUpdateEvents();
 
@@ -140,7 +139,7 @@ const App: FC = () => {
       if (!isUserOnlyViewer(user)) {
         loadCoordinationData(dispatch, startYear);
       }
-      dispatch(getSapCostsThunk(yearNow));
+      dispatch(getSapCostsThunk(startYear));
       dispatch(getSapCurrentYearThunk(startYear));
     }
   }, [user, startYear, MAINTENANCE_MODE, dispatch]);

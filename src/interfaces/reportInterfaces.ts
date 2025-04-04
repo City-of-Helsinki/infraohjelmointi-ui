@@ -10,7 +10,7 @@ import {
 import { IGroup } from './groupInterfaces';
 import { IListItem } from './common';
 
-export type IGetForcedToFrameData = {
+export type getForcedToFrameDataType = Promise<{
   res: IProjectsResponse;
   projects: IProject[];
   projectsInWarrantyPhase?: IProject[];
@@ -24,9 +24,7 @@ export type IGetForcedToFrameData = {
   };
   groupRes: IGroup[];
   initialSelections: IPlanningRowSelections;
-};
-
-export type IGetForcedToFrameDataPromise = Promise<IGetForcedToFrameData>;
+}>;
 
 export type IPlanningData = {
   res: IProjectsResponse;
@@ -56,7 +54,6 @@ export const reports = [
   'operationalEnvironmentAnalysisForcedToFrame',
   'strategy',
   'strategyForcedToFrame',
-  'forecastReport',
   'constructionProgram',
   'budgetBookSummary',
   'financialStatement',
@@ -67,10 +64,6 @@ export interface IConstructionProgramCsvRow {
 }
 
 export interface IStrategyTableCsvRow {
-  [key: string]: string | undefined;
-}
-
-export interface IForecastTableCsvRow {
   [key: string]: string | undefined;
 }
 
@@ -92,7 +85,6 @@ export enum Reports {
   Strategy = 'strategy',
   StrategyForcedToFrame = 'strategyForcedToFrame',
   ConstructionProgram = 'constructionProgram',
-  ForecastReport = 'forecastReport',
   BudgetBookSummary = 'budgetBookSummary',
   FinancialStatement = 'financialStatement',
 }
@@ -188,16 +180,14 @@ export interface IFlattenedBudgetBookSummaryProperties extends IBudgetBookFinanc
   type: string;
 }
 
-export interface IStrategyAndForecastTableRow extends ITableRowEssentials {
-  projects: Array<IStrategyAndForecastTableRow>;
-  children: Array<IStrategyAndForecastTableRow>;
+export interface IStrategyTableRow extends ITableRowEssentials {
+  projects: Array<IStrategyTableRow>;
+  children: Array<IStrategyTableRow>;
   type: ReportTableRowType;
   projectManager?: string;
   projectPhase?: string;
   costPlan?: string;
   costForecast?: string;
-  costForcedToFrameBudget?: string;
-  costForecastDeviation?: string;
   januaryStatus?: string;
   februaryStatus?: string;
   marchStatus?: string;
@@ -333,15 +323,7 @@ export interface IOperationalEnvironmentAnalysisSummaryRow {
 
 export interface IDownloadCsvButtonProps {
   type: ReportType;
-  getForcedToFrameData: (year: number, forcedToFrame: boolean) => IGetForcedToFrameDataPromise;
-  getPlanningData: (year: number) => Promise<IPlanningData>;
-  getPlanningRows: (res: IPlanningData) => IPlanningRow[];
-  getCategories: () => Promise<IListItem[]>;
-}
-
-export interface IDownloadPdfButtonProps {
-  type: ReportType;
-  getForcedToFrameData: (year: number, forcedToFrame: boolean) => IGetForcedToFrameDataPromise;
+  getForcedToFrameData: (year: number, forcedToFrame: boolean) => getForcedToFrameDataType;
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   getCategories: () => Promise<IListItem[]>;

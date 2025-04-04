@@ -52,14 +52,10 @@ const styles = StyleSheet.create({
   },
 });
 
-interface StrategyTableHeaderProps {
-  isForecastReport: boolean;
-}
+const year = new Date().getFullYear() + 1;
 
-const StrategyTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => {
+const StrategyTableHeader = () => {
   const { t } = useTranslation();
-  const year = isForecastReport ? new Date().getFullYear() : new Date().getFullYear() + 1;
-
   return (
     <View style={styles.tableHeader}>
       {/* Row 2 */}
@@ -69,13 +65,6 @@ const StrategyTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => 
         <Text style={styles.projectPhaseCell}>{`\n${t('projectPhase')}`}</Text>
         <Text style={styles.budgetCell}>{`\nTA ${year}`}</Text>
         <Text style={styles.budgetCell}>{`\nTS ${year}`}</Text>
-        {
-          isForecastReport ?
-            <>
-              <Text style={styles.budgetCell}>{`\nEnnuste ${year}`}</Text>
-              <Text style={styles.budgetCell}>{`\nPoikkeama`}</Text>
-            </> : null
-        }
         <Text style={styles.monthCell}>{`${year}\n01`}</Text>
         <Text style={styles.monthCell}>{`\n02`}</Text>
         <Text style={styles.monthCell}>{`\n03`}</Text>
