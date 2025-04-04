@@ -18,8 +18,8 @@ import {
   IForecastTableCsvRow,
   IOperationalEnvironmentAnalysisSummaryCategoryRow,
   IOperationalEnvironmentAnalysisSummaryRow,
-  IOperationalEnvironmentAnalysisSummaryCsvRow,
   IOperationalEnvironmentAnalysisSummaryCategoryRowData,
+  IOperationalEnvironmentAnalysisSummaryCsvRow,
 } from '@/interfaces/reportInterfaces';
 import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
 import { TFunction, t } from 'i18next';
@@ -28,7 +28,6 @@ import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
 import moment from 'moment';
-import { buildOperationalEnvironmentAnalysisRows, calculateOperationalEnvironmentAnalysisCategorySums } from '@/components/Report/common';
 
 interface IYearCheck {
   planningStart: number;
@@ -1538,7 +1537,8 @@ export const getReportData = async (
       case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
         //Flatten rows to one dimension
         const flattenedRows = flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
-        const summaryData = buildOperationalEnvironmentAnalysisRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+        const summaryData = operationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+
         const summaryRows = generateSummaryRows(summaryData);
 
         //TODO: Tähän väliin luodaan koontirivit
@@ -1709,7 +1709,18 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
     }
 
     // Sum row after each class rows
-    const sums = calculateOperationalEnvironmentAnalysisCategorySums(classRow.categories);
+    const sums: { [key: string]: string} = {};
+
+    classRow.categories.forEach(category => {
+      Object.keys(category.data).forEach(keyString => {
+        const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
+        if (!sums[key]) {
+          sums[key] = category.data[key];
+        } else {
+          sums[key] = ( sums[key] || 0 ) + category.data[key];
+        }
+      });
+    });
 
     const classSumRow = {
       name: "",

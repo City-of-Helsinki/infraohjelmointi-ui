@@ -26,20 +26,12 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
     // projects
     const res = await getProjectsWithParams({
-      params: "limit=1000",
       direct: false,
       programmed: false,
       forcedToFrame: forcedToFrame,
       year: year,
     }, true);
-    let resultArray = res.results;
-    let nextResultsPath = res.next;
-    while (nextResultsPath != null) {
-      const nextResults = await getProjectsWithParams({fullPath: nextResultsPath})
-      resultArray = resultArray.concat(nextResults.results);
-      nextResultsPath = nextResults.next;
-    }
-    const projects = resultArray.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'completed');
+    const projects = res.results.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'completed');
 
     /* needed for the operational environment analysis report. The budgets of the projects that are in the warranty phase
        need to be added to the sums there separately and because of that we check here which projects are in this phase
