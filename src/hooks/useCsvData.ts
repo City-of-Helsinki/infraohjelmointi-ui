@@ -65,31 +65,9 @@ export const useCsvData = ({
           }
           break;
         }
-        case Reports.OperationalEnvironmentAnalysis: {
-          const res = await getForcedToFrameData(year, false);
-          const categories = await getCategories();
-          if (res && res.projects.length > 0 && categories) {
-            const coordinatorRows = getCoordinationTableRows(
-              res.classHierarchy,
-              res.forcedToFrameDistricts.districts,
-              res.initialSelections,
-              res.projects,
-              res.groupRes,
-            );
-            data = await getReportData(
-              t,
-              type,
-              coordinatorRows,
-              undefined,
-              undefined,
-              categories,
-              res.projectsInWarrantyPhase,
-            );
-          }
-          break;
-        }
+        case Reports.OperationalEnvironmentAnalysis:
         case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
-          const res = await getForcedToFrameData(year, true);
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);
           const categories = await getCategories();
           if (res && res.projects.length > 0 && categories) {
             const coordinatorRows = getCoordinationTableRows(

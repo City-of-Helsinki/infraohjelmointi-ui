@@ -2,11 +2,8 @@ import { FC, memo } from "react";
 import { JSX } from "react/jsx-runtime";
 import { View, StyleSheet, Text } from "@react-pdf/renderer";
 import { t } from "i18next";
-import {
-  IOperationalEnvironmentAnalysisSummaryCategoryRow,
-  IOperationalEnvironmentAnalysisSummaryCategoryRowData,
-  IOperationalEnvironmentAnalysisSummaryRow
-} from "@/interfaces/reportInterfaces";
+import { IOperationalEnvironmentAnalysisSummaryCategoryRow, IOperationalEnvironmentAnalysisSummaryRow } from "@/interfaces/reportInterfaces";
+import { calculateOperationalEnvironmentAnalysisCategorySums } from "../common";
 import { updateCategoryFiveTotals } from "@/utils/reportHelpers";
 
 const categorySummaryView = {
@@ -121,18 +118,7 @@ const CategorySummaryHeader = () => {
 };
 
 const CategorySummarySumRow: FC<ICategorySummarySumRowProps> = ({categories}) => {
-  const sums: { [key: string]: string} = {}
-
-  categories.forEach(category => {
-    Object.keys(category.data).forEach(keyString => {
-      const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
-      if (!sums[key]) {
-        sums[key] = category.data[key];
-      } else {
-        sums[key] = ( sums[key] || 0 ) + category.data[key];
-      }
-    });
-  });
+  const sums = calculateOperationalEnvironmentAnalysisCategorySums(categories);
 
   return (
     <View style={tableStyles.row}>
