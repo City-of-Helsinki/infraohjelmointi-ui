@@ -55,7 +55,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     options: IOption[],
     size: 'full' | 'lg' | undefined,
     shouldTranslate: boolean,
-    shouldNotBeDisabled?: boolean,
+    userIsProjectManager?: boolean,
   ) => (
 
     <SelectField
@@ -63,7 +63,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       options={options}
       size={size}
       shouldTranslate={shouldTranslate}
-      disabled={shouldNotBeDisabled ? false : isInputDisabled}
+      disabled={userIsProjectManager ? false : isInputDisabled}
       readOnly={isUserOnlyViewer}
     />
   );
