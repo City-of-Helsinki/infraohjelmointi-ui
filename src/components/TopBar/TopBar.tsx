@@ -50,9 +50,9 @@ const TopBar: FC = () => {
             title={t('topBarTitle')}
             frontPageLabel="Helsinki Infratyökalu"
             titleAriaLabel="Helsingin kaupunki"
-            titleHref="https://infraohjelmointi.hel.fi"
+            titleHref="/"
             logoAriaLabel="Service logo"
-            logoHref="https://infraohjelmointi.hel.fi"
+            logoHref="/"
             logo={<Logo src={logoFi} alt="Helsingin kaupunki" />}
             menuButtonAriaLabel="menu"
             menuButtonLabel={String(t('nav.menu'))}
