@@ -98,7 +98,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             'estConstructionEnd',
             'personConstruction',
           ];
-          const warrantyPhaseRequirements = ['warrantyPhaseStart', 'warrantyPhaseEnd'];
+          const warrantyPhaseRequirements = ['estWarrantyPhaseStart', 'estWarrantyPhaseEnd'];
           const combinedRequirements = [
             ...programmedRequirements,
             ...planningRequirements,

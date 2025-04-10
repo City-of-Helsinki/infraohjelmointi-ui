@@ -149,7 +149,7 @@ const getTimelineDates = (
  */
 const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
   const getMonthData = (year: number, month: number, type: CellType) => {
-    const { planningStart, planningEnd, constructionStart, constructionEnd, warrantyPhaseStart, warrantyPhaseEnd } = timelineDates;
+    const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
 
     const daysInMonth = getDaysInMonthForYear(year, month);
 
@@ -165,8 +165,8 @@ const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<
       end = constructionEnd;
     }
     else {
-      start = warrantyPhaseStart;
-      end = warrantyPhaseEnd;
+      start = estWarrantyPhaseStart;
+      end = estWarrantyPhaseEnd;
     }
 
     const startDatesMonth = getMonthFromDate(start);
@@ -238,11 +238,11 @@ const getCellType = (
   value: string | IProjectSapCost,
   timelineDates: ITimelineDates,
 ): CellType => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd, warrantyPhaseStart, warrantyPhaseEnd } = timelineDates;
+  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
 
   const isPlanning = isInYearRange(cellYear, planningStart, planningEnd);
   const isConstruction = isInYearRange(cellYear, constructionStart, constructionEnd);
-  const isWarrantyPhase = isInYearRange(cellYear, warrantyPhaseStart, warrantyPhaseEnd);
+  const isWarrantyPhase = isInYearRange(cellYear, estWarrantyPhaseStart, estWarrantyPhaseEnd);
   const isCellYear = (date?: string | null) => isSameYear(date, cellYear);
 
   const setPlanningType = () => {
@@ -276,10 +276,10 @@ const getCellType = (
     if (value === null) {
       return 'none';
     }
-    if (isCellYear(warrantyPhaseEnd)) {
+    if (isCellYear(estWarrantyPhaseEnd)) {
       return 'warrantyPhaseEnd'
     }
-    if (isCellYear(warrantyPhaseStart)) {
+    if (isCellYear(estWarrantyPhaseStart)) {
       return 'warrantyPhaseStart'
     }
     return 'warrantyPhase'
@@ -402,9 +402,9 @@ const getIsStartOfTimeline = (cellYear: number, timelineDates: ITimelineDates) =
 };
 
 const getIsEndOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
-  const { planningEnd, constructionEnd, warrantyPhaseEnd } = timelineDates;
-  if (warrantyPhaseEnd) {
-    return isSameYear(warrantyPhaseEnd, cellYear);
+  const { planningEnd, constructionEnd, estWarrantyPhaseEnd } = timelineDates;
+  if (estWarrantyPhaseEnd) {
+    return isSameYear(estWarrantyPhaseEnd, cellYear);
   }
   if (constructionEnd) {
     return isSameYear(constructionEnd, cellYear);
@@ -413,11 +413,11 @@ const getIsEndOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => 
 };
 
 const getIsLastOfType = (cellYear: number, timelineDates: ITimelineDates) => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd, warrantyPhaseStart, warrantyPhaseEnd } = timelineDates;
+  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
   return (
     (isSameYear(planningStart, cellYear) && isSameYear(planningEnd, cellYear)) ||
     (isSameYear(constructionStart, cellYear) && isSameYear(constructionEnd, cellYear)) ||
-    (isSameYear(warrantyPhaseStart, cellYear) && isSameYear(warrantyPhaseEnd, cellYear))
+    (isSameYear(estWarrantyPhaseStart, cellYear) && isSameYear(estWarrantyPhaseEnd, cellYear))
   );
 };
 
@@ -428,7 +428,7 @@ const getAffectsDates = (
   isEndOfTimeline: boolean,
   isLastOfType: boolean,
 ) => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd, warrantyPhaseStart, warrantyPhaseEnd } = timelineDates;
+  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
   if ((type === 'planningStart' && planningStart) || (type === 'planningEnd' && planningEnd)) {
     return true;
   }
@@ -439,8 +439,8 @@ const getAffectsDates = (
     return true;
   }
   if (
-    (type === 'warrantyPhaseStart' && warrantyPhaseStart) ||
-    (type === 'warrantyPhaseEnd' && warrantyPhaseEnd)
+    (type === 'warrantyPhaseStart' && estWarrantyPhaseStart) ||
+    (type === 'warrantyPhaseEnd' && estWarrantyPhaseEnd)
   ) {
     return true;
   }
@@ -457,8 +457,8 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
     estConstructionStart,
     estPlanningEnd,
     estPlanningStart,
-    warrantyPhaseStart,
-    warrantyPhaseEnd,
+    estWarrantyPhaseStart,
+    estWarrantyPhaseEnd,
     frameEstConstructionEnd,
     frameEstConstructionStart,
     frameEstPlanningEnd,
@@ -470,14 +470,14 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
     estPlanningEnd: forcedToFrame ? frameEstPlanningEnd : estPlanningEnd,
     estConstructionStart: forcedToFrame ? frameEstConstructionStart : estConstructionStart,
     estConstructionEnd: forcedToFrame ? frameEstConstructionEnd : estConstructionEnd,
-    warrantyPhaseStart: warrantyPhaseStart,
-    warrantyPhaseEnd: warrantyPhaseEnd
+    estWarrantyPhaseStart: estWarrantyPhaseStart,
+    estWarrantyPhaseEnd: estWarrantyPhaseEnd
   };
 
   const timelineDates = {
     ...getTimelineDates(project, datesToUse),
-    warrantyPhaseStart,
-    warrantyPhaseEnd
+    estWarrantyPhaseStart,
+    estWarrantyPhaseEnd
   }
 
   // Create cells

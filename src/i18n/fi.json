@@ -144,8 +144,8 @@
     "class": "Luokka",
     "masterClass": "Pääluokka",
     "district": "Suurpiiri",
-    "warrantyPhaseEnd": "Takuuaika päättyy",
-    "warrantyPhaseStart": "Takuaika alkaa"
+    "estWarrantyPhaseEnd": "Takuuaika päättyy",
+    "estWarrantyPhaseStart": "Takuaika alkaa"
   },
   "projectForm": {
     "name": "Hankkeen nimi",
@@ -227,8 +227,8 @@
       "description": "Hankkeen poistaminen on pysyvää eikä sitä voida enää palauttaa."
     },
     "warrantyPhase": "Takuuaika",
-    "warrantyPhaseStart": "Alkaa",
-    "warrantyPhaseEnd": "Päättyy"
+    "estWarrantyPhaseStart": "Alkaa",
+    "estWarrantyPhaseEnd": "Päättyy"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",

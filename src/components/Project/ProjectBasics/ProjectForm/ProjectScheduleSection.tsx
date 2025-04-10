@@ -258,7 +258,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const phase = getValues('phase').label;
 
           if (phase === 'warrantyPeriod' && !date) {
-            return t('validation.required', { field: t('validation.warrantyPhaseStart') });
+            return t('validation.required', { field: t('validation.estWarrantyPhaseStart') });
           }
 
           const afterConstructionEnd = validateAfter(date, 'estConstructionEnd', getValues, t);
@@ -267,7 +267,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
             return afterConstructionEnd;
           }
 
-          const beforeWarrantyEnd = validateBefore(date, 'warrantyPhaseEnd', getValues, t);
+          const beforeWarrantyEnd = validateBefore(date, 'estWarrantyPhaseEnd', getValues, t);
 
           if (beforeWarrantyEnd !== true) {
             return beforeWarrantyEnd
@@ -287,7 +287,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const phase = getValues('phase').value;
 
           if (phase === 'warrantyPeriod' && !date) {
-            return t('validation.required', { field: t('validation.warrantyPhaseEnd') });
+            return t('validation.required', { field: t('validation.estWarrantyPhaseEnd') });
           }
 
           const afterWarrantyPhaseStart = validateAfter(date, 'estWarrantyPhaseStart', getValues, t);
@@ -353,14 +353,14 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         <div className="form-row">
           <div className="form-col-md">
             <DateField
-              {...getFieldProps('warrantyPhaseStart')}
+              {...getFieldProps('estWarrantyPhaseStart')}
               readOnly={isUserOnlyViewer}
               rules={validateWarrantyPhaseStart()}
             />
           </div>
           <div className="form-col-md">
             <DateField
-              {...getFieldProps('warrantyPhaseEnd')}
+              {...getFieldProps('estWarrantyPhaseEnd')}
               readOnly={isUserOnlyViewer}
               rules={validateWarrantyPhaseEnd()}
             />

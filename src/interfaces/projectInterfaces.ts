@@ -20,8 +20,8 @@ export interface IProject {
   estPlanningEnd: string | null;
   estConstructionStart: string | null;
   estConstructionEnd: string | null;
-  warrantyPhaseStart: string | null;
-  warrantyPhaseEnd: string | null;
+  estWarrantyPhaseStart: string | null;
+  estWarrantyPhaseEnd: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;
@@ -307,6 +307,7 @@ export interface IMonthlyData {
   month: string;
   planning: { isStart: boolean; percent: string };
   construction: { isStart: boolean; percent: string };
+  warrantyPhase: { isStart: boolean; percent: string };
 }
 
 export interface ITimelineDates {
@@ -314,8 +315,8 @@ export interface ITimelineDates {
   planningEnd: null | string;
   constructionStart: null | string;
   constructionEnd: null | string;
-  warrantyPhaseStart: null | string;
-  warrantyPhaseEnd: null | string;
+  estWarrantyPhaseStart: null | string;
+  estWarrantyPhaseEnd: null | string;
 }
 
 export interface IProjectEstDates {
