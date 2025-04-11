@@ -111,6 +111,8 @@ export interface IProjectRequest {
   estPlanningEnd?: string | null;
   estConstructionStart?: string | null;
   estConstructionEnd?: string | null;
+  estWarrantyPhaseStart?: string | null;
+  estWarrantyPhaseEnd?: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;
