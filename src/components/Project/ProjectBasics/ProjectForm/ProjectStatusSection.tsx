@@ -134,15 +134,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               break;
           }
 
+          const isProposalOrDesignPhase = phase.value === proposalPhase || phase.value === designPhase;
+
           // Check if programmed has the correct value
-          if (phase.value === proposalPhase || phase.value === designPhase) {
-            if (programmed) {
-              fields.push('programmed');
-            }
-          } else {
-            if (!programmed) {
-              fields.push('programmed');
-            }
+          if (isProposalOrDesignPhase && programmed) {
+            fields.push('programmed');
+          } else if (!programmed) {
+            fields.push('programmed');
           }
           setPhaseRequirements(fields);
 

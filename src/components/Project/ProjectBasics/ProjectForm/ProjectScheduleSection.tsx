@@ -8,7 +8,6 @@ import { Fieldset } from 'hds-react';
 import DateField from '@/components/shared/DateField';
 import { validateAfter, validateBefore } from '@/utils/validation';
 import _ from 'lodash';
-import { getToday, isBefore } from '@/utils/dates';
 
 interface IProjectScheduleSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
