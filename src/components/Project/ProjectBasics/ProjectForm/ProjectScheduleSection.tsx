@@ -49,7 +49,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearToBeSet = date?.split('.')[2];
           const yearInFormYearCell = getValues('planningStartYear');
 
-          if (!getFieldState('planningStartYear').isDirty && yearToBeSet !== yearInFormYearCell) {
+          if (!getFieldState('planningStartYear').isDirty && yearToBeSet !== yearInFormYearCell && yearToBeSet) {
             if (isUserOnlyProjectManager) {
               return t('validation.userIsNotAllowedToModifyPlanningStartYear');
             }
@@ -225,7 +225,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearToBeSet = date?.split('.')[2];
           const yearInFormYearCell = getValues('constructionEndYear');
 
-          if (!getFieldState('constructionEndYear').isDirty && yearToBeSet !== yearInFormYearCell) {
+          if (!getFieldState('constructionEndYear').isDirty && yearToBeSet !== yearInFormYearCell && yearToBeSet) {
             if (isUserOnlyProjectManager) {
               return t('validation.userIsNotAllowedToModifyConstructionEndYear');
             }
@@ -249,6 +249,57 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
       },
     };
   }, [getValues, phasesThatNeedConstruction, t]);
+
+  const validateWarrantyPhaseStart = useCallback(() => {
+    return {
+      validate: {
+        isWarrantyPeriodStartValid: (date: string | null) => {
+          const phase = getValues('phase').label;
+
+          if (phase === 'warrantyPeriod' && !date) {
+            return t('validation.required', { field: t('validation.estWarrantyPhaseStart') });
+          }
+
+          const afterConstructionEnd = validateAfter(date, 'estConstructionEnd', getValues, t);
+
+          if (afterConstructionEnd !== true) {
+            return afterConstructionEnd;
+          }
+
+          const beforeWarrantyEnd = validateBefore(date, 'estWarrantyPhaseEnd', getValues, t);
+
+          if (beforeWarrantyEnd !== true) {
+            return beforeWarrantyEnd
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, t]);
+
+  const validateWarrantyPhaseEnd = useCallback(() => {
+    return {
+      validate: {
+        isWarrantyPhaseValid: (date: string | null) => {
+
+          const phase = getValues('phase').value;
+
+          if (phase === 'warrantyPeriod' && !date) {
+            return t('validation.required', { field: t('validation.estWarrantyPhaseEnd') });
+          }
+
+          const afterWarrantyPhaseStart = validateAfter(date, 'estWarrantyPhaseStart', getValues, t);
+
+          if (afterWarrantyPhaseStart !== true) {
+            return afterWarrantyPhaseStart;
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, t]);
 
   return (
     <div className="w-full" id="basics-schedule-section">
@@ -293,6 +344,24 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
               {...getFieldProps('estConstructionEnd')}
               readOnly={isUserOnlyViewer}
               rules={validateEstConstructionEnd()}
+            />
+          </div>
+        </div>
+      </Fieldset>
+      <Fieldset heading={t('projectForm.warrantyPhase')} className="w-full" id="warranty">
+        <div className="form-row">
+          <div className="form-col-md">
+            <DateField
+              {...getFieldProps('estWarrantyPhaseStart')}
+              readOnly={isUserOnlyViewer}
+              rules={validateWarrantyPhaseStart()}
+            />
+          </div>
+          <div className="form-col-md">
+            <DateField
+              {...getFieldProps('estWarrantyPhaseEnd')}
+              readOnly={isUserOnlyViewer}
+              rules={validateWarrantyPhaseEnd()}
             />
           </div>
         </div>

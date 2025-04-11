@@ -196,10 +196,14 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
 
   // Convert any cell type to 'planning' / 'construction' / 'overlap' / 'none'
   const cellTypeClass = useMemo(() => {
-    if (type.includes('planning')) {
+    if (type === "constructionAndWarrantyOverlap") {
+      return "constructionAndWarrantyOverlap";
+    } else if (type.includes('planning')) {
       return 'planning';
     } else if (type.includes('construction')) {
       return 'construction';
+    } else if (type.includes('warrantyPhase')) {
+      return 'warrantyPhase';
     } else {
       return type;
     }

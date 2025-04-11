@@ -149,12 +149,25 @@ const getTimelineDates = (
  */
 const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<IMonthlyData> => {
   const getMonthData = (year: number, month: number, type: CellType) => {
-    const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+    const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
 
     const daysInMonth = getDaysInMonthForYear(year, month);
 
-    const start = type === 'planning' ? planningStart : constructionStart;
-    const end = type === 'planning' ? planningEnd : constructionEnd;
+    let start;
+    let end;
+
+    if (type === 'planning') {
+      start = planningStart;
+      end = planningEnd;
+    }
+    else if (type === 'construction') {
+      start = constructionStart;
+      end = constructionEnd;
+    }
+    else {
+      start = estWarrantyPhaseStart;
+      end = estWarrantyPhaseEnd;
+    }
 
     const startDatesMonth = getMonthFromDate(start);
     const startDatesDay = getDayFromDate(start);
@@ -212,6 +225,7 @@ const getMonthlyDataList = (year: number, timelineDates: ITimelineDates): Array<
     month: m,
     planning: getMonthData(year, i + 1, 'planning'),
     construction: getMonthData(year, i + 1, 'construction'),
+    warrantyPhase: getMonthData(year, i + 1, 'warrantyPhase'),
   }));
 };
 
@@ -224,10 +238,11 @@ const getCellType = (
   value: string | IProjectSapCost,
   timelineDates: ITimelineDates,
 ): CellType => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
 
   const isPlanning = isInYearRange(cellYear, planningStart, planningEnd);
   const isConstruction = isInYearRange(cellYear, constructionStart, constructionEnd);
+  const isWarrantyPhase = isInYearRange(cellYear, estWarrantyPhaseStart, estWarrantyPhaseEnd);
   const isCellYear = (date?: string | null) => isSameYear(date, cellYear);
 
   const setPlanningType = () => {
@@ -257,13 +272,30 @@ const getCellType = (
     return 'construction';
   };
 
+  const setWarrantyPhaseType = () => {
+    if (value === null) {
+      return 'none';
+    }
+    if (isCellYear(estWarrantyPhaseEnd)) {
+      return 'warrantyPhaseEnd'
+    }
+    if (isCellYear(estWarrantyPhaseStart)) {
+      return 'warrantyPhaseStart'
+    }
+    return 'warrantyPhase'
+  }
+
   switch (true) {
     case isPlanning && isConstruction:
       return 'overlap';
+    case isConstruction && isWarrantyPhase:
+      return 'constructionAndWarrantyOverlap';
     case isPlanning:
       return setPlanningType();
     case isConstruction:
       return setConstructionType();
+    case isWarrantyPhase:
+      return setWarrantyPhaseType();
     default:
       return 'none';
   }
@@ -370,17 +402,22 @@ const getIsStartOfTimeline = (cellYear: number, timelineDates: ITimelineDates) =
 };
 
 const getIsEndOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
-  const { planningEnd, constructionEnd } = timelineDates;
-  return constructionEnd
-    ? isSameYear(constructionEnd, cellYear)
-    : isSameYear(planningEnd, cellYear);
+  const { planningEnd, constructionEnd, estWarrantyPhaseEnd } = timelineDates;
+  if (estWarrantyPhaseEnd) {
+    return isSameYear(estWarrantyPhaseEnd, cellYear);
+  }
+  if (constructionEnd) {
+    return isSameYear(constructionEnd, cellYear);
+  }
+  return isSameYear(planningEnd, cellYear);
 };
 
 const getIsLastOfType = (cellYear: number, timelineDates: ITimelineDates) => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
   return (
     (isSameYear(planningStart, cellYear) && isSameYear(planningEnd, cellYear)) ||
-    (isSameYear(constructionStart, cellYear) && isSameYear(constructionEnd, cellYear))
+    (isSameYear(constructionStart, cellYear) && isSameYear(constructionEnd, cellYear)) ||
+    (isSameYear(estWarrantyPhaseStart, cellYear) && isSameYear(estWarrantyPhaseEnd, cellYear))
   );
 };
 
@@ -391,13 +428,19 @@ const getAffectsDates = (
   isEndOfTimeline: boolean,
   isLastOfType: boolean,
 ) => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
   if ((type === 'planningStart' && planningStart) || (type === 'planningEnd' && planningEnd)) {
     return true;
   }
   if (
     (type === 'constructionStart' && constructionStart) ||
     (type === 'constructionEnd' && constructionEnd)
+  ) {
+    return true;
+  }
+  if (
+    (type === 'warrantyPhaseStart' && estWarrantyPhaseStart) ||
+    (type === 'warrantyPhaseEnd' && estWarrantyPhaseEnd)
   ) {
     return true;
   }
@@ -414,6 +457,8 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
     estConstructionStart,
     estPlanningEnd,
     estPlanningStart,
+    estWarrantyPhaseStart,
+    estWarrantyPhaseEnd,
     frameEstConstructionEnd,
     frameEstConstructionStart,
     frameEstPlanningEnd,
@@ -425,9 +470,15 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
     estPlanningEnd: forcedToFrame ? frameEstPlanningEnd : estPlanningEnd,
     estConstructionStart: forcedToFrame ? frameEstConstructionStart : estConstructionStart,
     estConstructionEnd: forcedToFrame ? frameEstConstructionEnd : estConstructionEnd,
+    estWarrantyPhaseStart: estWarrantyPhaseStart,
+    estWarrantyPhaseEnd: estWarrantyPhaseEnd
   };
 
-  const timelineDates = getTimelineDates(project, datesToUse);
+  const timelineDates = {
+    ...getTimelineDates(project, datesToUse),
+    estWarrantyPhaseStart,
+    estWarrantyPhaseEnd
+  }
 
   // Create cells
   const cells: Array<IProjectCell> = Object.entries(finances).map(([key, value], i) => {

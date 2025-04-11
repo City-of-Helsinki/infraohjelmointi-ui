@@ -20,6 +20,8 @@ export interface IProject {
   estPlanningEnd: string | null;
   estConstructionStart: string | null;
   estConstructionEnd: string | null;
+  estWarrantyPhaseStart: string | null;
+  estWarrantyPhaseEnd: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;
@@ -109,6 +111,8 @@ export interface IProjectRequest {
   estPlanningEnd?: string | null;
   estConstructionStart?: string | null;
   estConstructionEnd?: string | null;
+  estWarrantyPhaseStart?: string | null;
+  estWarrantyPhaseEnd?: string | null;
   presenceStart?: string;
   presenceEnd?: string;
   visibilityStart?: string;
@@ -292,7 +296,11 @@ export type CellType =
   | 'constructionStart'
   | 'constructionEnd'
   | 'construction'
+  | 'warrantyPhaseStart'
+  | 'warrantyPhaseEnd'
+  | 'warrantyPhase'
   | 'overlap'
+  | 'constructionAndWarrantyOverlap'
   | 'none';
 
 export type ProjectCellGrowDirection = 'left' | 'right';
@@ -301,6 +309,7 @@ export interface IMonthlyData {
   month: string;
   planning: { isStart: boolean; percent: string };
   construction: { isStart: boolean; percent: string };
+  warrantyPhase: { isStart: boolean; percent: string };
 }
 
 export interface ITimelineDates {
@@ -308,6 +317,8 @@ export interface ITimelineDates {
   planningEnd: null | string;
   constructionStart: null | string;
   constructionEnd: null | string;
+  estWarrantyPhaseStart: null | string;
+  estWarrantyPhaseEnd: null | string;
 }
 
 export interface IProjectEstDates {
