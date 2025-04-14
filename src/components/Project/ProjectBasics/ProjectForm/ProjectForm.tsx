@@ -66,7 +66,7 @@ const ProjectForm = () => {
     }
     return null;
   }, [project?.currentYearsSapValues]);
- 
+
   const isOnlyViewer = isUserOnlyViewer(user);
 
   const [newProjectId, setNewProjectId] = useState('');
@@ -305,10 +305,10 @@ const ProjectForm = () => {
 
           if (data?.projectClass && project.projectGroup) {
 
-              const projectGroup = groups.find(({id}) => id === project.projectGroup);
-              if (data.projectClass !== projectGroup?.classRelation) {
-                data = {...data, "projectGroup": null} 
-              }
+            const projectGroup = groups.find(({ id }) => id === project.projectGroup);
+            if (data.projectClass !== projectGroup?.classRelation) {
+              data = { ...data, "projectGroup": null }
+            }
           }
 
           /* If project is under a district and user changes the class, the district has to be removed or the
@@ -520,7 +520,11 @@ const ProjectForm = () => {
       {/* SECTION 7 - PROJECT PROGRAM */}
       <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
       {/* BANNER */}
-      {!isOnlyViewer && <ProjectFormBanner onSubmit={submitCallback} isDirty={isDirty} />}
+      {!isOnlyViewer &&
+        <ProjectFormBanner
+          onSubmit={submitCallback}
+          isDirty={isDirty}
+          isInputDisabled={isInputDisabled} />}
     </form>
   );
 };
