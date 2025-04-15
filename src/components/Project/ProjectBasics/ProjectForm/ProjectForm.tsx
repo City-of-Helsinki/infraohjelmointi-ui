@@ -322,7 +322,6 @@ const ProjectForm = () => {
           }
 
           try {
-            console.log(data)
             const response = await patchProject({ id: project?.id, data });
             if (response.status === 200) {
               dispatch(setSelectedProject(response.data));
