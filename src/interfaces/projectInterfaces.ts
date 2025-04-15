@@ -90,6 +90,8 @@ export interface IProject {
   frameEstPlanningEnd: string | null;
   frameEstConstructionStart: string | null;
   frameEstConstructionEnd: string | null;
+  frameEstWarrantyPhaseStart: string | null;
+  frameEstWarrantyPhaseEnd: string | null;
   currentYearsSapValues?: Array<ISapCost> | null;
 }
 
@@ -317,8 +319,8 @@ export interface ITimelineDates {
   planningEnd: null | string;
   constructionStart: null | string;
   constructionEnd: null | string;
-  estWarrantyPhaseStart: null | string;
-  estWarrantyPhaseEnd: null | string;
+  estWarrantyPhaseStart: null | string | undefined;
+  estWarrantyPhaseEnd: null | string | undefined;
 }
 
 export interface IProjectEstDates {
