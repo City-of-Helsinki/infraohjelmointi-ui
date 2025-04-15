@@ -6,6 +6,7 @@ import HoverTooltip from '../../HoverTooltip/HoverTooltip';
 interface IMonthlyGraphCellProps {
   planning: { isStart: boolean; percent: string };
   construction: { isStart: boolean; percent: string };
+  warrantyPhase: { isStart: boolean; percent: string };
   cellType: CellType;
   month: string;
   id: string;
@@ -15,12 +16,13 @@ interface IMonthlyGraphCellProps {
 const MonthlyGraphCell: FC<IMonthlyGraphCellProps> = ({
   planning,
   construction,
+  warrantyPhase,
   cellType,
   month,
   id,
   timelineDates,
 }) => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd } = timelineDates;
+  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
   const isPercentZero = (percent: string) => percent.startsWith('0');
 
   return (
@@ -31,7 +33,8 @@ const MonthlyGraphCell: FC<IMonthlyGraphCellProps> = ({
       onMouseLeave={() => removeHoveredClassFromMonth(month)}
     >
       {/*
-       * planning.isStart is used here because Firefox doesn't support the :has()-selector by default.
+       * planning.isStart, construction.isStart and warrantyPhase.isStart is used here because 
+       * Firefox doesn't support the :has()-selector by default.
        * The :has()-selector logic is already implemented in the styles file for this component,
        * so the isStart logic can be safely removed when Firefox enables the :has()-selector.
        */}
@@ -49,11 +52,6 @@ const MonthlyGraphCell: FC<IMonthlyGraphCellProps> = ({
           data-testid={`monthly-planning-bar-${id}-${month}`}
         />
       </div>
-      {/*
-       * construction.isStart is used here because Firefox doesn't support the :has()-selector by default.
-       * The :has()-selector logic is already implemented in the styles file for this component,
-       * so the isStart logic can be safely removed when Firefox enables the :has()-selector.
-       */}
       <div
         className={`monthly-construction-bar-container ${
           isPercentZero(construction.percent) ? 'empty' : ''
@@ -66,6 +64,20 @@ const MonthlyGraphCell: FC<IMonthlyGraphCellProps> = ({
           className="monthly-construction-bar"
           style={{ width: construction.percent }}
           data-testid={`monthly-construction-bar-${id}-${month}`}
+        />
+      </div>
+      <div
+        className={`monthly-warrantyPhase-bar-container ${
+          isPercentZero(warrantyPhase.percent) ? 'empty' : ''
+        } ${warrantyPhase.isStart ? '!justify-end' : ''}`}
+      >
+        {!isPercentZero(warrantyPhase.percent) && (
+          <HoverTooltip text={`${estWarrantyPhaseStart} - ${estWarrantyPhaseEnd}`} id={id} />
+        )}
+        <div
+          className="monthly-warrantyPhase-bar"
+          style={{ width: warrantyPhase.percent }}
+          data-testid={`monthly-warrantyPhase-bar-${id}-${month}`}
         />
       </div>
     </td>

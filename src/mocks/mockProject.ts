@@ -67,6 +67,8 @@ const mockProject: { data: IProject } = {
     },
     estConstructionStart: '10.04.2025',
     estConstructionEnd: '10.04.2031',
+    estWarrantyPhaseStart: '11.04.2031',
+    estWarrantyPhaseEnd: '14.04.2032',
     presenceStart: '01.02.2021',
     presenceEnd: '01.01.2023',
     visibilityStart: '02.01.2023',
@@ -142,6 +144,8 @@ const mockProject: { data: IProject } = {
     frameEstPlanningEnd: '01.04.2025',
     frameEstConstructionStart: '10.04.2025',
     frameEstConstructionEnd: '10.04.2031',
+    frameEstWarrantyPhaseStart: '11.04.2031',
+    frameEstWarrantyPhaseEnd: '14.04.2032',
     currentYearsSapValues: [mockSapCostforProjectCard]
   },
 };

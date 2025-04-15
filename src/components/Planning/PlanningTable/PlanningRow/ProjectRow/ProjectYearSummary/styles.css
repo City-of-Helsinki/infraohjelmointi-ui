@@ -24,7 +24,9 @@
   @apply hidden border-none;
 }
 
-.monthly-planning-bar-container {
+.monthly-planning-bar-container,
+.monthly-construction-bar-container,
+.monthly-warrantyPhase-bar-container {
   @apply relative flex w-full justify-start;
 }
 
@@ -32,19 +34,15 @@
 td:has(.monthly-planning-bar-container.empty)
   + td:has(.monthly-planning-bar-container:not(.empty))
   .monthly-planning-bar-container,
-.monthly-cell.project:nth-child(4) .monthly-planning-bar-container {
-  justify-content: flex-end;
-}
-
-.monthly-construction-bar-container {
-  @apply relative flex w-full justify-start;
-}
-
-/* :has works with all selectors except for firefox 02.06.2023, for some reason the .monthly-cell.project element starts at nth-child(4) */
+.monthly-cell.project:nth-child(4) .monthly-planning-bar-container,
 td:has(.monthly-construction-bar-container.empty)
   + td:has(.monthly-construction-bar-container)
   .monthly-construction-bar-container,
-.monthly-cell.project:nth-child(4) .monthly-construction-bar-container {
+.monthly-cell.project:nth-child(4) .monthly-construction-bar-container,
+td:has(.monthly-warrantyPhase-bar-container.empty)
+  + td:has(.monthly-warrantyPhase-bar-container)
+  .monthly-warrantyPhase-bar-container,
+.monthly-cell.project:nth-child(4) .monthly-warrantyPhase-bar-container {
   justify-content: flex-end;
 }
 
@@ -54,4 +52,8 @@ td:has(.monthly-construction-bar-container.empty)
 
 .monthly-construction-bar {
   @apply h-3 bg-copper;
+}
+
+.monthly-warrantyPhase-bar {
+  @apply mb-3 h-3 -translate-y-[3px] bg-[var(--color-black-20)];
 }

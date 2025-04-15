@@ -143,7 +143,9 @@
     "subClass": "Alaluokka",
     "class": "Luokka",
     "masterClass": "Pääluokka",
-    "district": "Suurpiiri"
+    "district": "Suurpiiri",
+    "estWarrantyPhaseEnd": "Takuuaika päättyy",
+    "estWarrantyPhaseStart": "Takuaika alkaa"
   },
   "projectForm": {
     "name": "Hankkeen nimi",
@@ -223,7 +225,10 @@
     "deleteDialog": {
       "title": "Oletko varma että haluat poistaa tämän hankkeen?",
       "description": "Hankkeen poistaminen on pysyvää eikä sitä voida enää palauttaa."
-    }
+    },
+    "warrantyPhase": "Takuuaika",
+    "estWarrantyPhaseStart": "Alkaa",
+    "estWarrantyPhaseEnd": "Päättyy"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",

@@ -36,7 +36,9 @@
 .monthly-planning-bar-container:hover .tooltip-container,
 .monthly-planning-bar-container:hover .tooltip-arrow-container,
 .monthly-construction-bar-container:hover .tooltip-container,
-.monthly-construction-bar-container:hover .tooltip-arrow-container {
+.monthly-construction-bar-container:hover .tooltip-arrow-container,
+.monthly-warrantyPhase-bar-container:hover .tooltip-container,
+.monthly-warrantyPhase-bar-container:hover .tooltip-arrow-container {
   @apply block;
 }
 
@@ -50,5 +52,9 @@
   inset: auto auto 1rem -4.1rem;
 }
 .monthly-planning-bar-container:hover .tooltip-container {
+  inset: auto auto 2rem -4.1rem;
+}
+
+.monthly-warrantyPhase-bar-container:hover .tooltip-container {
   inset: auto auto 2rem -4.1rem;
 }
