@@ -19,7 +19,6 @@ const { REACT_APP_API_URL } = process.env;
 export const getProject = async (id: string): Promise<IProject> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/projects/${id}/`);
-    console.log(res.data)
     return res.data;
   } catch (e) {
     return Promise.reject(e);
