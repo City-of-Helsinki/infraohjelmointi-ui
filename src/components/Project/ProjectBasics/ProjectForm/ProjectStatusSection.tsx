@@ -98,7 +98,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             'estConstructionEnd',
             'personConstruction',
           ];
-          const warrantyPhaseRequirements = ['estWarrantyPhaseStart', 'estWarrantyPhaseEnd'];
           const combinedRequirements = [
             ...programmedRequirements,
             ...planningRequirements,
@@ -120,7 +119,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               fields.push(...fieldsIfEmpty([...combinedRequirements, 'constructionPhaseDetail']));
               break;
             case warrantyPeriodPhase:
-              fields.push(...fieldsIfEmpty([...warrantyPhaseRequirements]));
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
                 return t('validation.phaseTooEarly', { value: phase.label });
               }
