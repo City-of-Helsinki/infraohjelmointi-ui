@@ -56,7 +56,7 @@ interface StrategyTableHeaderProps {
   isForecastReport: boolean;
 }
 
-const StrategyTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => {
+const StrategyAndForecastTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => {
   const { t } = useTranslation();
   const year = isForecastReport ? new Date().getFullYear() : new Date().getFullYear() + 1;
 
@@ -94,4 +94,4 @@ const StrategyTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => 
   );
 };
 
-export default memo(StrategyTableHeader);
+export default memo(StrategyAndForecastTableHeader);

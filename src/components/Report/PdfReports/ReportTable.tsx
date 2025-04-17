@@ -21,7 +21,7 @@ import {
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import BudgetBookSummaryTableHeader from './reportHeaders/BudgetBookSummaryTableHeader';
-import StrategyTableHeader from './reportHeaders/StrategyTableHeader';
+import StrategyAndForecastTableHeader from './reportHeaders/StrategyAndForecastTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
 import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
@@ -91,9 +91,9 @@ const ReportTable: FC<IReportTableProps> = ({
         return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
-        return <StrategyTableHeader isForecastReport={false}/>;
+        return <StrategyAndForecastTableHeader isForecastReport={false}/>;
       case Reports.ForecastReport:
-        return <StrategyTableHeader isForecastReport={true} />;
+        return <StrategyAndForecastTableHeader isForecastReport={true} />;
       case Reports.ConstructionProgram:
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:
