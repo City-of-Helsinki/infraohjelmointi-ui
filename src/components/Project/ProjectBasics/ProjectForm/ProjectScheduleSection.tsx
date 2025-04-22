@@ -254,11 +254,6 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     return {
       validate: {
         isWarrantyPeriodStartValid: (date: string | null) => {
-          const phase = getValues('phase').label;
-
-          if (phase === 'warrantyPeriod' && !date) {
-            return t('validation.required', { field: t('validation.estWarrantyPhaseStart') });
-          }
 
           const afterConstructionEnd = validateAfter(date, 'estConstructionEnd', getValues, t);
 
