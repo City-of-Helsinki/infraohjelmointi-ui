@@ -62,7 +62,6 @@ const ProjectView = () => {
         console.log('Error getting project by id: ', e);
       } finally {
         dispatch(clearLoading(LOADING_PROJECT));
-        dispatch(clearIsProjectCardLoading());
       }
     };
 
@@ -82,6 +81,7 @@ const ProjectView = () => {
         dispatch(resetProject());
       }
     }
+    dispatch(clearIsProjectCardLoading());
   }, [projectId, projectMode, user]);
 
   return (

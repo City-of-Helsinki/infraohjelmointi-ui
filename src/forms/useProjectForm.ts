@@ -19,7 +19,7 @@ import { selectProjectDistricts, selectProjectDivisions, selectProjectSubDivisio
 import _ from 'lodash';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
-import { selectIsProjectCardLoading } from '@/reducers/loaderSlice';
+import { selectIsLoading, selectIsProjectCardLoading } from '@/reducers/loaderSlice';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -187,6 +187,7 @@ const useProjectForm = () => {
     mode: 'onBlur',
   });
   const isProjectCardLoading = useAppSelector(selectIsProjectCardLoading);
+  const isLoading = useAppSelector(selectIsLoading);
 
   const [selections, setSelections] = useState({ selectedClass: project?.projectClass, selectedLocation: project?.projectDistrict });
 
@@ -296,10 +297,11 @@ const useProjectForm = () => {
   }, [project, projectUpdate]);
 
   useEffect(() => {
-    if (!isProjectCardLoading) {
+    console.log(formValues)
+    if (!isProjectCardLoading && !isLoading) {
       reset(formValues);
     }
-  }, [isProjectCardLoading]);
+  }, [isProjectCardLoading, isLoading]);
 
   return { formMethods, classOptions, locationOptions, selectedMasterClassName };
 };
