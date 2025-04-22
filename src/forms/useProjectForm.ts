@@ -297,7 +297,6 @@ const useProjectForm = () => {
   }, [project, projectUpdate]);
 
   useEffect(() => {
-    console.log(formValues)
     if (!isProjectCardLoading && !isLoading) {
       reset(formValues);
     }
