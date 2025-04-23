@@ -72,7 +72,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
         <div className="form-col-xl">
           <TextField
             {...getFieldProps('entityName')}
-            rules={validateMaxLength(30, t)}
+            rules={validateMaxLength(80, t)}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
           />
