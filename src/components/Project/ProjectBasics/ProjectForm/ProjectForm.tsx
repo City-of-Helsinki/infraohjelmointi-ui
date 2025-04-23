@@ -487,6 +487,7 @@ const ProjectForm = () => {
       {/* SECTION 2 - STATUS */}
       <ProjectStatusSection
         {...formProps}
+        constructionEndYear={project?.constructionEndYear}
         isInputDisabled={isInputDisabled}
         isUserOnlyProjectManager={isUserProjectManagerCheck}
         isUserOnlyViewer={isOnlyViewer}
