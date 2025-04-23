@@ -226,9 +226,6 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearInFormYearCell = getValues('constructionEndYear');
 
           if (!getFieldState('constructionEndYear').isDirty && yearToBeSet !== yearInFormYearCell && yearToBeSet) {
-            if (isUserOnlyProjectManager) {
-              return t('validation.userIsNotAllowedToModifyConstructionEndYear');
-            }
             return t('validation.constructionEndYearValidator');
           }
 

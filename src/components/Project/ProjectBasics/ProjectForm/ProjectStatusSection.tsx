@@ -1,5 +1,5 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useMemo, useState, useEffect } from 'react';
+import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -22,6 +22,7 @@ interface IProjectStatusSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
+  constructionEndYear: number | null | undefined;
   isInputDisabled: boolean;
   isUserOnlyProjectManager: boolean;
   isUserOnlyViewer: boolean;
@@ -35,6 +36,7 @@ const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: 
 const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   getFieldProps,
   getValues,
+  constructionEndYear,
   isInputDisabled,
   isUserOnlyProjectManager,
   isUserOnlyViewer
@@ -249,13 +251,17 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [getValues, t],
   );
 
-  const validateConstructionEndYear = useMemo(
+  const validateConstructionEndYear = useCallback(
     () => ({
       ...validateMaxNumber(3000, t),
       validate: {
         isConstructionEndYearValid: (date: string | null) => {
           if (!date) {
             return true;
+          }
+
+          if (isUserOnlyProjectManager && constructionEndYear && constructionEndYear > parseInt(date)) {
+            return t('validation.userNotAllowedToChangeYearBackwards');
           }
 
           const planStart = getValues('planningStartYear');
@@ -289,7 +295,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [getValues, t],
+    [t, constructionEndYear, isUserOnlyProjectManager, getValues],
   );
 
   const validateCategory = useMemo(
@@ -375,8 +381,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         <div className="form-col-md">
           <NumberField
             {...getFieldProps('constructionEndYear')}
-            rules={validateConstructionEndYear}
-            disabled={isInputDisabled}
+            rules={validateConstructionEndYear()}
+            disabled={isUserOnlyProjectManager ? false : isInputDisabled}
             readOnly={isUserOnlyViewer}
           />
         </div>

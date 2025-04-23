@@ -117,6 +117,7 @@
     "userIsNotAllowedToModifyPlanningStartYear": "Et voi muuttaa tämän kentän vuotta, vain päivää ja kuukautta. Muuttaaksesi Suunnittelun aloitusvuosi -kenttää ota yhteys alueen ohjelmoijaan.",
     "userIsNotAllowedToModifyConstructionEndYear": "Et voi muuttaa tämän kentän vuotta, vain päivää ja kuukautta. Muuttaaksesi Rakentamisen valmistumisvuosi -kenttää ota yhteys alueen ohjelmoijaan.",
     "userNotAllowedToChangePhaseBackwards": "Projektipäällikkönä voit muuttaa vaihetta vain eteenpäin",
+    "userNotAllowedToChangeYearBackwards": "Projektipäällikkönä voit muuttaa rakentamisen päättymisvuotta vain eteenpäin.",
     "estPlanningStart": "Suunnittelu alkaa",
     "estPlanningEnd": "Suunnittelu päättyy",
     "estConstructionStart": "Rakentaminen alkaa",
