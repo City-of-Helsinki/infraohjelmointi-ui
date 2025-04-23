@@ -119,9 +119,17 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               fields.push(...fieldsIfEmpty([...combinedRequirements, 'constructionPhaseDetail']));
               break;
             case warrantyPeriodPhase:
+              if (isBefore(getToday(), getValues('estConstructionEnd'))) {
+                return t('validation.phaseTooEarly', { value: phase.label });
+              }
+              fields.push(...fieldsIfEmpty([...combinedRequirements]));
+              break;
             case completedPhase:
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
                 return t('validation.phaseTooEarly', { value: phase.label });
+              }
+              if (getValues('estWarrantyPhaseEnd') && isBefore(getToday(), getValues('estWarrantyPhaseEnd'))) {
+                return t('validation.completedPhaseTooEarly');
               }
               fields.push(...fieldsIfEmpty([...combinedRequirements]));
               break;

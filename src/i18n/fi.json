@@ -133,6 +133,7 @@
     "programmed": "Ohjelmoitu",
     "description": "Hankkeen kuvaus",
     "phaseTooEarly": "Hankkeen vaihe ei voi olla {{value}} jos nykyinen päivä on ennen rakentamisen päättymispäivää",
+    "completedPhaseTooEarly": "Hankkeen vaihe ei voi olla Valmis / ylläpidossa jos nykyinen päivä on ennen takuuajan päättymispäivää",
     "category": "Kategoria",
     "presenceStart": "Esilläolo alkaa",
     "presenceEnd": "Esilläolo päättyy",
