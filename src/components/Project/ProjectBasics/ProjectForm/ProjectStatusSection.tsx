@@ -88,6 +88,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const programmedRequirements = [
             'planningStartYear',
             'constructionEndYear',
+            'estPlanningStart',
+            'estConstructionEnd',
             'category',
             'masterClass',
             'class',
