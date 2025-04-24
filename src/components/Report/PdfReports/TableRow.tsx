@@ -372,12 +372,16 @@ const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
         return {
           ...strategyReportStyles.monthCellBlack,
           borderRight: '0px',
+          paddingLeft: '0px',
+          paddingRight: '0px',
           width: "15px"
         }
       } else {
         return {
           ...strategyReportStyles.monthCellGreen,
           borderLeft: '0px',
+          paddingLeft: '0px',
+          paddingRight: '0px',
           width: "15px"
         }
       }
