@@ -155,22 +155,25 @@ const getProjectPhase = (type: ReportType , project: IProject) => {
 }
 
 const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProject, month: number) => {
-  const yearsForward = type == Reports.ForecastReport ? 0 : 1;
-  const monthStartDate = new Date(new Date().getFullYear() + yearsForward, month - 1, 1);
-  const monthEndDate = new Date(new Date().getFullYear() + yearsForward, month, 0);
+  const isForecastReport = type === Reports.ForecastReport;
+  const yearsForward = isForecastReport ? 0 : 1;
+  const currentYearPlusYearsForward = new Date().getFullYear() + yearsForward;
+  const monthStartDate = new Date(currentYearPlusYearsForward, month - 1, 1);
+  const monthEndDate = new Date(currentYearPlusYearsForward, month, 0);
+  const isForecastOrStrategyReport = [Reports.Strategy, Reports.ForecastReport].includes(type as Reports)
   const dateFormat = "DD.MM.YYYY";
 
   const planningStartYear = () => {
-    if (type === Reports.Strategy) return project.planningStartYear;
+    if (isForecastOrStrategyReport) return project.planningStartYear;
 
     return project.frameEstPlanningStart ? getYear(project.frameEstPlanningStart) : project.planningStartYear;
   }
 
-  const isPlanning = type === Reports.Strategy ?
+  const isPlanning = isForecastOrStrategyReport ?
     projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, planningStartYear(), dateFormat) :
     projectIsInPlanningPhase(project.frameEstPlanningStart, monthStartDate, project.frameEstPlanningEnd, monthEndDate, planningStartYear(), dateFormat);
 
-  const isConstruction = type === Reports.Strategy ?
+  const isConstruction = isForecastOrStrategyReport ?
     projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, planningStartYear(), dateFormat) :
     projectIsInConstructionPhase(project.frameEstConstructionStart, monthStartDate, project.frameEstConstructionEnd, monthEndDate, project.frameEstPlanningStart, planningStartYear(), dateFormat);
 
