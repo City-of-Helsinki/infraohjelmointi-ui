@@ -272,7 +272,7 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck, yearsForward: numb
   }
 }
 
-const convertToStrategyReportProjects = (
+const convertToStrategyAndForecastReportProjects = (
   type: ReportType,
   projects: IProject[],
   forcedToFrameProjects?: IProject[]
@@ -766,7 +766,7 @@ export const convertToReportRows = (
           const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
           const forcedToFrameBudget = forcedToFrameClass?.cells[0].plannedBudget ?? "0";
           const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
-          const rowProjects = c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows, forcedToFrameClass?.projectRows) : [];
+          const rowProjects = c.projectRows.length ? convertToStrategyAndForecastReportProjects(reportType, c.projectRows, forcedToFrameClass?.projectRows) : [];
 
           if (isNotGroupOrRowHasProjects(c.type, rowProjects)) {
             const rowChildren = c.children.length ? convertToReportRows(c.children, reportType, categories, t, undefined, undefined, undefined, forcedToFrameChildren) : [];
@@ -795,7 +795,7 @@ export const convertToReportRows = (
 
       for (const c of rows) {
         const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
-        const rowProjects = c.projectRows.length ? convertToStrategyReportProjects(reportType, c.projectRows) : [];
+        const rowProjects = c.projectRows.length ? convertToStrategyAndForecastReportProjects(reportType, c.projectRows) : [];
 
         if (hasBudgetData(c) && (isNotGroupOrRowHasProjects(c.type, rowProjects))) {
           const rowChildren = c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [];

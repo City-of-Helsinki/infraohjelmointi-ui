@@ -56,7 +56,7 @@ const getFlattenedRows = (
   }
 }
 
-const getStrategyReportRows = (type: ReportType, rows: IReportFlattenedRows[]) => {
+const getStrategyAndForecastReportRows = (type: ReportType, rows: IReportFlattenedRows[]) => {
   if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) {
     return flattenStrategyTableRows(rows);
   } else if (type === Reports.ForecastReport) {
@@ -82,7 +82,7 @@ const ReportTable: FC<IReportTableProps> = ({
     reportType === Reports.ConstructionProgram)
       ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
 
-  const strategyReportRows = getStrategyReportRows(reportType, reportRows);
+  const strategyAndForecastReportRows = getStrategyAndForecastReportRows(reportType, reportRows);
 
   const getTableHeader = () => {
     switch (reportType) {
@@ -113,7 +113,7 @@ const ReportTable: FC<IReportTableProps> = ({
         <View fixed>{tableHeader}</View>
         <TableRow reportType={reportType} flattenedRows={
           reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
-            strategyReportRows : flattenedRows
+            strategyAndForecastReportRows : flattenedRows
         }/>
       </View>
     </View>

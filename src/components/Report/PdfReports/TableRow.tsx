@@ -390,7 +390,7 @@ const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
   }
 }
 
-const getStrategyRowStyle = (rowType: string, depth: number) => {
+const getStrategyAndForecastRowStyle = (rowType: string, depth: number) => {
   switch (rowType) {
     case 'masterClass':
       return strategyReportStyles.masterClassRow;
@@ -479,7 +479,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
 
           if (flattenedRow) {
               tableRow =
-                <View wrap={false} style={getStrategyRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
+                <View wrap={false} style={getStrategyAndForecastRowStyle(flattenedRow.type ?? '', index ?? 0)} key={flattenedRow.id}>
                     <Text style={
                       classNameTypes.includes(flattenedRow.type ?? '')
                       ? strategyReportStyles.classNameCell
