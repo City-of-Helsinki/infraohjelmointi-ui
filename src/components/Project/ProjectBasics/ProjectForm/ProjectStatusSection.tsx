@@ -288,14 +288,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             getValues('estConstructionEnd'),
           );
 
-          const isEstConstructionEndBeforeEstConstructionStart = !isBefore(
-            getValues('estConstructionStart'),
+          const isEstConstructionEndBeforeEstConstructionStart = isBefore(
             estConstructionEndToUpdate,
+            getValues('estConstructionStart'),
           );
 
           // We also patch the estConstructionEnd value, so we need to check if the date would appear after estConstructionStart
           if (isEstConstructionEndBeforeEstConstructionStart) {
-            return t('validation.isBefore', {
+            return t('validation.isAfter', {
               value: t('validation.estConstructionStart'),
             });
           }
