@@ -139,25 +139,19 @@ const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: string
   return totals;
 }
 
-const getProjectPhase = (project: IProject) => {
+const getProjectPhase = (type: ReportType , project: IProject) => {
   const yearStartDate = new Date(new Date().getFullYear() + 1, 0, 1);
   const yearEndDate = new Date(new Date().getFullYear() + 1, 11, 0);
   const dateFormat = "DD.MM.YYYY";
   const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, yearStartDate, project.estPlanningEnd, yearEndDate, project.planningStartYear, dateFormat);
   const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
+  const isForecastReport = type === Reports.ForecastReport;
 
-  if (isPlanning && isConstruction) {
-    return "s r";
-  }
-  else if (isPlanning) {
-      return "s";
-  }
-  else if (isConstruction) {
-      return "r";
-  }
-  else {
-    return "";
-  }
+  if (isForecastReport) return t(`option.${project.phase.value}`);
+  if (isPlanning && isConstruction) return "s r";
+  if (isPlanning) return "s";
+  if (isConstruction) return "r";
+  return "";
 }
 
 const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProject, month: number) => {
@@ -327,7 +321,7 @@ const convertToStrategyReportProjects = (
       costForcedToFrameBudget: costForcedToFrameBudget,   // Ennuste
       costForecastDeviation: costForecastDeviation,       // Poikkeama
       projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
-      projectPhase: getProjectPhase(p),
+      projectPhase: getProjectPhase(type, p),
       januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
       februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
       marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
