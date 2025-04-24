@@ -51,6 +51,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
 
+  const checkPhaseIsBeforeCurrent = (previousPhaseIndex: number | undefined, newPhaseIndex: number | undefined) => {
+    return newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex);
+  }
+
+  const checkTodayIsBeforeWarrantyPhaseEnd = () => {
+    return getValues('estWarrantyPhaseEnd') && isBefore(getToday(), getValues('estWarrantyPhaseEnd'))
+  }
+
   const [
     proposalPhase,
     designPhase,
@@ -76,8 +84,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           if (isUserOnlyProjectManager) {
             const previousPhaseIndex = getPhaseIndexByPhaseId(currentPhase, phasesWithIndexes);
             const newPhaseIndex = getPhaseIndexByPhaseId(phase.value, phasesWithIndexes);
-            const newPhaseIsBeforeCurrent = newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex)
-            if (newPhaseIsBeforeCurrent) {
+            if (checkPhaseIsBeforeCurrent(previousPhaseIndex, newPhaseIndex)) {
               return t('validation.userNotAllowedToChangePhaseBackwards');
             }
           }
@@ -130,7 +137,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
                 return t('validation.phaseTooEarly', { value: phase.label });
               }
-              if (getValues('estWarrantyPhaseEnd') && isBefore(getToday(), getValues('estWarrantyPhaseEnd'))) {
+              if (checkTodayIsBeforeWarrantyPhaseEnd()) {
                 return t('validation.completedPhaseTooEarly');
               }
               fields.push(...fieldsIfEmpty([...combinedRequirements]));
