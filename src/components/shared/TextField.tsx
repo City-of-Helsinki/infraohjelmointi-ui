@@ -51,7 +51,6 @@ const TextField: FC<ITextFieldProps> = ({
             helperText={tooltip}
             style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
             disabled={disabled}
-            size={1000}
           />
         </div>
       )}
