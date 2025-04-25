@@ -314,3 +314,20 @@ export const mockResponsiblePersons: { data: Array<IListItem> } = {
     },
   ],
 };
+
+export const mockBudgetOverrunReasons: {data: Array<IListItem> } = {
+  data: [
+    {
+      id: '14cb7de8-233c-415f-9b46-235d3d7989d5',
+      value: 'permitProcessingDelay'
+    },
+    {
+      id: 'f777fed1-e6b3-4222-a42c-e67fbb6d5277',
+      value: 'complaintsDelay'
+    },
+    {
+      id: 'dc33a8e5-40fb-4660-884c-38f0423fb898',
+      value: 'otherReason'
+    },
+  ]
+}
