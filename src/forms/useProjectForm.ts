@@ -162,6 +162,8 @@ const useProjectFormValues = () => {
       personConstruction: personToOption(project?.personConstruction),
       personProgramming: personToOption(project?.personProgramming),
       otherPersons: value(project?.otherPersons),
+      budgetOverrunReason: listItemToOption(project?.budgetOverrunReason),
+      otherBudgetOverrunReason: value(project?.otherBudgetOverrunReason)
     }),
 
     [project, classes, subClasses, masterClasses, districts, divisions, subDivisions ],

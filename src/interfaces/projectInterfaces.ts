@@ -93,6 +93,8 @@ export interface IProject {
   frameEstWarrantyPhaseStart: string | null;
   frameEstWarrantyPhaseEnd: string | null;
   currentYearsSapValues?: Array<ISapCost> | null;
+  budgetOverrunReason?: IListItem;
+  otherBudgetOverrunReason?: string;
 }
 
 export interface IProjectRequest {
@@ -164,6 +166,8 @@ export interface IProjectRequest {
   frameEstPlanningEnd?: string | null;
   frameEstConstructionStart?: string | null;
   frameEstConstructionEnd?: string | null;
+  budgetOverrunReason?: string;
+  otherBudgetOverrunReason?: string;
 }
 
 export interface IProjectPatchRequestObject {

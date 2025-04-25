@@ -82,6 +82,8 @@ export interface IProjectForm {
   district: IOption;
   division: IOption;
   subDivision: IOption;
+  budgetOverrunReason: IOption;
+  otherBudgetOverrunReason: string;
 }
 
 export interface ISearchForm {

@@ -14,6 +14,7 @@ interface ITextFieldProps {
   tooltip?: string;
   disabled?: boolean;
   readOnlyValue?: string;
+  size?: string;
 }
 
 const TextField: FC<ITextFieldProps> = ({
@@ -51,6 +52,7 @@ const TextField: FC<ITextFieldProps> = ({
             helperText={tooltip}
             style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
             disabled={disabled}
+            size={1000}
           />
         </div>
       )}
