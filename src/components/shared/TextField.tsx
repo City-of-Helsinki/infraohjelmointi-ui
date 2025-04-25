@@ -14,7 +14,6 @@ interface ITextFieldProps {
   tooltip?: string;
   disabled?: boolean;
   readOnlyValue?: string;
-  size?: string;
 }
 
 const TextField: FC<ITextFieldProps> = ({
