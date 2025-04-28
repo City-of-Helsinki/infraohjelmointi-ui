@@ -226,8 +226,11 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             return true;
           }
 
-          const conEnd = getValues('constructionEndYear');
-          const isAfterConstructionEnd = conEnd && parseInt(date) > parseInt(conEnd);
+          const estPlanningStartValue = getValues('estPlanningStart');
+          const estPlanningEndValue = getValues('estPlanningEnd');
+          const constructionEndYearValue = getValues('constructionEndYear');
+
+          const isAfterConstructionEnd = constructionEndYearValue && parseInt(date) > parseInt(constructionEndYearValue);
 
           // If the date is after construction end year
           if (isAfterConstructionEnd) {
@@ -236,14 +239,20 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             });
           }
 
+          if (!estPlanningStartValue){
+            return t('validation.required', {
+              field: t('validation.estPlanningStart'),
+            });
+          }
+
           const estPlanningStartToUpdate = updateYear(
             parseInt(date),
-            getValues('estPlanningStart'),
+            estPlanningStartValue,
           );
 
           const isEstPlanningStartAfterEstPlanningEnd = !isBefore(
             estPlanningStartToUpdate,
-            getValues('estPlanningEnd'),
+            estPlanningEndValue,
           );
 
           // We also patch the estPlanningStart value, so we need to check if the date would appear after estPlanningEnd
@@ -269,12 +278,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             return true;
           }
 
+          const estConstructionStartValue = getValues('estConstructionStart');
+          const estConstructionEndValue = getValues('estConstructionEnd');
+          const planningStartYearValue = getValues('planningStartYear');
+          const isBeforePlanningStart = planningStartYearValue && parseInt(date) < parseInt(planningStartYearValue);
+
           if (isUserOnlyProjectManager && constructionEndYear && constructionEndYear > parseInt(date)) {
             return t('validation.userNotAllowedToChangeYearBackwards');
           }
-
-          const planStart = getValues('planningStartYear');
-          const isBeforePlanningStart = planStart && parseInt(date) < parseInt(planStart);
 
           // If the date is before planning start year
           if (isBeforePlanningStart) {
@@ -283,14 +294,23 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             });
           }
 
+          if (!estConstructionEndValue){
+            return t('validation.required', {
+              field: t('validation.estConstructionEnd'),
+            });
+          }
+
           const estConstructionEndToUpdate = updateYear(
             parseInt(date),
-            getValues('estConstructionEnd'),
+            estConstructionEndValue,
           );
+
+          // Est construction start is not required for phases until construction phase
+          if (!estConstructionStartValue) return true;
 
           const isEstConstructionEndBeforeEstConstructionStart = isBefore(
             estConstructionEndToUpdate,
-            getValues('estConstructionStart'),
+            estConstructionStartValue,
           );
 
           // We also patch the estConstructionEnd value, so we need to check if the date would appear after estConstructionStart
