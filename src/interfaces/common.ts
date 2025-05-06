@@ -70,7 +70,8 @@ export type ListType =
   | 'programmedYears'
   | 'projectDistricts'
   | 'projectSubDistricts'
-  | 'projectSubSubDistricts';
+  | 'projectSubSubDistricts'
+  | 'budgetOverrunReasons';
 
 type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

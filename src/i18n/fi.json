@@ -100,7 +100,19 @@
     "north": "Pohjoinen",
     "cityRenewal": "Kaupunkiuudistus",
     "bigTrafficProjects": "Suuret liikennehankkeet",
-    "spesialtyStructures": "Taitorakenne"
+    "spesialtyStructures": "Taitorakenne",
+    "consultancyPlanningDelay": "Konsulttisuunnittelun viivästyminen",
+    "permitProcessingDelay": "Lupakäsittelyiden viivästyminen",
+    "complaintsDelay": "Valituksista aiheutunut viivästyminen",
+    "personnelResourcesDelay": "Henkilöstöresursseista johtuva viivästyminen",
+    "budgetDeficitDelay": "Määrärahavajeesta johtuva myöhäistäminen",
+    "earlierSchedule": "Aikataulun aikaistus",
+    "totalCostsClarification": "Kokonaiskustannusten tarkentuminen",
+    "projectCoordinationScheduleChange": "Hankkeiden yhteensovituksesta johtuva aikataulumuutos",
+    "weatherConditionsChange": "Sääolosuhteista johtuva muutos",
+    "contractorScheduleChange": "Urakan toteuttajasta johtuva aikataulumuutos",
+    "cityPlanScheduleChange": "Asemakaavan aikataulumuutokset",
+    "otherReason": "Muu syy"
   },
   "validation": {
     "required": "Täytä {{field}}",
@@ -230,7 +242,9 @@
     },
     "warrantyPhase": "Takuuaika",
     "estWarrantyPhaseStart": "Alkaa",
-    "estWarrantyPhaseEnd": "Päättyy"
+    "estWarrantyPhaseEnd": "Päättyy",
+    "budgetOverrunReason": "Budjettipoikkeaman selitys",
+    "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
