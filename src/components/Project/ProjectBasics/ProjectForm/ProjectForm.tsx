@@ -25,7 +25,7 @@ import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
-import { getYear } from '@/utils/dates';
+import { getYear, isSameYear, updateYear } from '@/utils/dates';
 import {
   selectPlanningDistricts,
   selectPlanningDivisions,
@@ -264,6 +264,24 @@ const ProjectForm = () => {
     return data;
   };
 
+  const updateDateBasedOnYear = (data: IProjectRequest, project: IProject) => {
+    if (data.planningStartYear) {
+      const estPlanningStart = data.estPlanningStart ?? project.estPlanningStart;
+      const isSamePlanningStartYear = isSameYear(estPlanningStart, data.planningStartYear);
+      if (!isSamePlanningStartYear) {
+        data.estPlanningStart = updateYear(data.planningStartYear, estPlanningStart)
+      }
+    }
+    if (data.constructionEndYear) {
+      const estConstructionEnd = data.estConstructionEnd ?? project.estConstructionEnd;
+      const isSameConstructionEndYear = isSameYear(estConstructionEnd, data.constructionEndYear);
+      if (!isSameConstructionEndYear) {
+        data.estConstructionEnd = updateYear(data.constructionEndYear, estConstructionEnd)
+      }
+    }
+    return data;
+  }
+
   // useEffect which triggers when form fields are reset by setting selectedProject after successful POST request
   useEffect(() => {
     if (projectMode !== 'new') {
@@ -301,6 +319,7 @@ const ProjectForm = () => {
         if (project?.id && projectMode === 'edit') {
           if (data.planningStartYear || data.constructionEndYear) {
             data = updateFinances(data, project);
+            data = updateDateBasedOnYear(data, project);
           }
 
           if (data?.projectClass && project.projectGroup) {
@@ -487,6 +506,7 @@ const ProjectForm = () => {
       {/* SECTION 2 - STATUS */}
       <ProjectStatusSection
         {...formProps}
+        constructionEndYear={project?.constructionEndYear}
         isInputDisabled={isInputDisabled}
         isUserOnlyProjectManager={isUserProjectManagerCheck}
         isUserOnlyViewer={isOnlyViewer}

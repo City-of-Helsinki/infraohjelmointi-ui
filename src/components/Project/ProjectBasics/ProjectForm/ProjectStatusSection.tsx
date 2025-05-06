@@ -1,5 +1,5 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useMemo, useState, useEffect } from 'react';
+import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -22,6 +22,7 @@ interface IProjectStatusSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
+  constructionEndYear: number | null | undefined;
   isInputDisabled: boolean;
   isUserOnlyProjectManager: boolean;
   isUserOnlyViewer: boolean;
@@ -35,6 +36,7 @@ const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: 
 const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   getFieldProps,
   getValues,
+  constructionEndYear,
   isInputDisabled,
   isUserOnlyProjectManager,
   isUserOnlyViewer
@@ -48,6 +50,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const { t } = useTranslation();
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
+
+  const checkPhaseIsBeforeCurrent = (previousPhaseIndex: number | undefined, newPhaseIndex: number | undefined) => {
+    return newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex);
+  }
+
+  const checkTodayIsBeforeWarrantyPhaseEnd = () => {
+    return getValues('estWarrantyPhaseEnd') && isBefore(getToday(), getValues('estWarrantyPhaseEnd'))
+  }
 
   const [
     proposalPhase,
@@ -74,8 +84,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           if (isUserOnlyProjectManager) {
             const previousPhaseIndex = getPhaseIndexByPhaseId(currentPhase, phasesWithIndexes);
             const newPhaseIndex = getPhaseIndexByPhaseId(phase.value, phasesWithIndexes);
-            const newPhaseIsBeforeCurrent = newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex)
-            if (newPhaseIsBeforeCurrent) {
+            if (checkPhaseIsBeforeCurrent(previousPhaseIndex, newPhaseIndex)) {
               return t('validation.userNotAllowedToChangePhaseBackwards');
             }
           }
@@ -88,6 +97,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const programmedRequirements = [
             'planningStartYear',
             'constructionEndYear',
+            'estPlanningStart',
+            'estConstructionEnd',
             'category',
             'masterClass',
             'class',
@@ -119,24 +130,27 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               fields.push(...fieldsIfEmpty([...combinedRequirements, 'constructionPhaseDetail']));
               break;
             case warrantyPeriodPhase:
+              if (isBefore(getToday(), getValues('estConstructionEnd'))) {
+                return t('validation.phaseTooEarly', { value: phase.label });
+              }
+              fields.push(...fieldsIfEmpty([...combinedRequirements]));
+              break;
             case completedPhase:
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
                 return t('validation.phaseTooEarly', { value: phase.label });
               }
-
+              if (checkTodayIsBeforeWarrantyPhaseEnd()) {
+                return t('validation.completedPhaseTooEarly');
+              }
               fields.push(...fieldsIfEmpty([...combinedRequirements]));
               break;
           }
 
+          const isProposalOrDesignPhase = phase.value === proposalPhase || phase.value === designPhase;
+
           // Check if programmed has the correct value
-          if (phase.value === proposalPhase || phase.value === designPhase) {
-            if (programmed) {
-              fields.push('programmed');
-            }
-          } else {
-            if (!programmed) {
-              fields.push('programmed');
-            }
+          if ((isProposalOrDesignPhase && programmed) || !isProposalOrDesignPhase && !programmed) {
+            fields.push('programmed');
           }
           setPhaseRequirements(fields);
 
@@ -212,8 +226,11 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             return true;
           }
 
-          const conEnd = getValues('constructionEndYear');
-          const isAfterConstructionEnd = conEnd && parseInt(date) > parseInt(conEnd);
+          const estPlanningStartValue = getValues('estPlanningStart');
+          const estPlanningEndValue = getValues('estPlanningEnd');
+          const constructionEndYearValue = getValues('constructionEndYear');
+
+          const isAfterConstructionEnd = constructionEndYearValue && parseInt(date) > parseInt(constructionEndYearValue);
 
           // If the date is after construction end year
           if (isAfterConstructionEnd) {
@@ -222,14 +239,20 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             });
           }
 
+          if (!estPlanningStartValue){
+            return t('validation.required', {
+              field: t('validation.estPlanningStart'),
+            });
+          }
+
           const estPlanningStartToUpdate = updateYear(
             parseInt(date),
-            getValues('estPlanningStart'),
+            estPlanningStartValue,
           );
 
           const isEstPlanningStartAfterEstPlanningEnd = !isBefore(
             estPlanningStartToUpdate,
-            getValues('estPlanningEnd'),
+            estPlanningEndValue,
           );
 
           // We also patch the estPlanningStart value, so we need to check if the date would appear after estPlanningEnd
@@ -246,7 +269,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [getValues, t],
   );
 
-  const validateConstructionEndYear = useMemo(
+  const validateConstructionEndYear = useCallback(
     () => ({
       ...validateMaxNumber(3000, t),
       validate: {
@@ -255,8 +278,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             return true;
           }
 
-          const planStart = getValues('planningStartYear');
-          const isBeforePlanningStart = planStart && parseInt(date) < parseInt(planStart);
+          const estConstructionStartValue = getValues('estConstructionStart');
+          const estConstructionEndValue = getValues('estConstructionEnd');
+          const planningStartYearValue = getValues('planningStartYear');
+          const isBeforePlanningStart = planningStartYearValue && parseInt(date) < parseInt(planningStartYearValue);
+
+          if (isUserOnlyProjectManager && constructionEndYear && constructionEndYear > parseInt(date)) {
+            return t('validation.userNotAllowedToChangeYearBackwards');
+          }
 
           // If the date is before planning start year
           if (isBeforePlanningStart) {
@@ -265,19 +294,28 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             });
           }
 
+          if (!estConstructionEndValue){
+            return t('validation.required', {
+              field: t('validation.estConstructionEnd'),
+            });
+          }
+
           const estConstructionEndToUpdate = updateYear(
             parseInt(date),
-            getValues('estConstructionEnd'),
+            estConstructionEndValue,
           );
 
-          const isEstConstructionEndBeforeEstConstructionStart = !isBefore(
-            getValues('estConstructionStart'),
+          // Est construction start is not required for phases until construction phase
+          if (!estConstructionStartValue) return true;
+
+          const isEstConstructionEndBeforeEstConstructionStart = isBefore(
             estConstructionEndToUpdate,
+            estConstructionStartValue,
           );
 
           // We also patch the estConstructionEnd value, so we need to check if the date would appear after estConstructionStart
           if (isEstConstructionEndBeforeEstConstructionStart) {
-            return t('validation.isBefore', {
+            return t('validation.isAfter', {
               value: t('validation.estConstructionStart'),
             });
           }
@@ -286,7 +324,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [getValues, t],
+    [t, constructionEndYear, isUserOnlyProjectManager, getValues],
   );
 
   const validateCategory = useMemo(
@@ -372,8 +410,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         <div className="form-col-md">
           <NumberField
             {...getFieldProps('constructionEndYear')}
-            rules={validateConstructionEndYear}
-            disabled={isInputDisabled}
+            rules={validateConstructionEndYear()}
+            disabled={isUserOnlyProjectManager ? false : isInputDisabled}
             readOnly={isUserOnlyViewer}
           />
         </div>
