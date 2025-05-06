@@ -474,6 +474,11 @@
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
   "report": {
+    "shared": {
+      "ta": "TA",
+      "ts": "TS",
+      "kiloEuro": "k€"
+    },
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
@@ -547,7 +552,9 @@
       "subtitleTwo": "Ennusteraportti {{currentDate}}",
       "projectNameTitle": "Hanke",
       "projectsTitle": "Kohteen",
-      "projectManagerTitle": "projektipäällikkö"
+      "projectManagerTitle": "projektipäällikkö",
+      "forecastValue": "Ennuste",
+      "differenceValue": "Poikkeama"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
