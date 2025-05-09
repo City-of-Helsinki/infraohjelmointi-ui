@@ -8,7 +8,8 @@ import {
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
   flattenConstructionProgramTableRows,
-  flattenForecastTableRows
+  flattenForecastTableRows,
+  flattenConstructionProgramForecastTableRows
 } from '@/utils/reportHelpers';
 import {
   IBasicReportData,
@@ -26,6 +27,7 @@ import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/Operation
 import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
 import { buildOperationalEnvironmentAnalysisRows } from '../common';
+import ConstructionProgramForecastTableHeader from './reportHeaders/ConstructionProgramForecastTableHeader';
 
 const styles = StyleSheet.create({
   table: {
@@ -51,6 +53,9 @@ const getFlattenedRows = (
     return flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
   } else if (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
     return flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+  } else if (reportType === Reports.ConstructionProgramForecast) {
+    console.log("täällä")
+    return flattenConstructionProgramForecastTableRows(reportRows);
   } else {
     return flattenConstructionProgramTableRows(reportRows);
   }
@@ -79,7 +84,8 @@ const ReportTable: FC<IReportTableProps> = ({
     reportType === Reports.BudgetBookSummary ||
     reportType === Reports.OperationalEnvironmentAnalysis ||
     reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame ||
-    reportType === Reports.ConstructionProgram)
+    reportType === Reports.ConstructionProgram ||
+    reportType === Reports.ConstructionProgramForecast )
       ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
 
   const strategyAndForecastReportRows = getStrategyAndForecastReportRows(reportType, reportRows);
@@ -98,6 +104,8 @@ const ReportTable: FC<IReportTableProps> = ({
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:
         return <BudgetBookSummaryTableHeader />;
+      case Reports.ConstructionProgramForecast:
+        return <ConstructionProgramForecastTableHeader />;
     }
   }
 

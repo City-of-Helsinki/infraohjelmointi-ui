@@ -141,6 +141,31 @@ const styles = StyleSheet.create({
     paddingRight: '21px',
     width: '72px',
   },
+  budgetOverunReasonCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    paddingRight: '21px',
+    width: '280px',
+  },
+  constructionForecastNameCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    borderLeft: '1px solid #808080',
+    borderRight: 0,
+    paddingLeft: '21px',
+    paddingRight: '15px',
+    width: '280px',
+  },
+  constructionForecastClassNameCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    borderLeft: '1px solid #808080',
+    borderRight: 0,
+    paddingLeft: '21px',
+    paddingRight: '15px',
+    width: '280px',
+    fontWeight: 'bold',
+  },
 
   // For budgetBookSummary report:
   classNameTargetCell: {
@@ -601,6 +626,46 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
               <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
               <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
+            </View>
+          }
+          break;
+        }
+        case Reports.ConstructionProgramForecast: {
+          // Programming view (hierarchy) colours for class rows
+          // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
+        if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
+          const classNameTypes = [
+            'masterClass',
+            'class',
+            'subClass',
+            'subClassDistrict',
+            'collectiveSubLevel',
+            'otherClassification',
+            'districtPreview',
+            'info'
+          ]
+
+          tableRow =
+            <View
+              wrap={false}
+              style={ getConstructionRowStyle(flattenedRow.type ?? '', index ?? 0 )}
+              key={flattenedRow.id}
+            >
+              <Text style={classNameTypes.includes(flattenedRow.type)
+                ? styles.constructionForecastClassNameCell
+                : styles.constructionForecastNameCell}
+              >{flattenedRow.name}</Text>
+              <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
+              <Text style={styles.cell}>{flattenedRow.costForecast}</Text>
+              <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+              <Text style={styles.cell}>{}</Text>
+              <Text style={styles.cell}>{flattenedRow.spentBudget}</Text>
+              <Text style={styles.cell}>{}</Text>
+              <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
+              <Text style={styles.cell}>{}</Text>
+              <Text style={styles.cell}>{}</Text>
+              <Text style={styles.cell}>{}</Text>
+              <Text style={styles.budgetOverunReasonCell}>{}</Text>
             </View>
           }
           break;

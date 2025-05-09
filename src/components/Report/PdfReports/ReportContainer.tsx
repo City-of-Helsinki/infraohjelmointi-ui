@@ -40,6 +40,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.title');
       case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForecast:
         return t('report.constructionProgram.title');
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title');
@@ -64,6 +65,10 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
         return t('report.strategy.subtitle', {
           startYear: currentYear
         });
+      case Reports.ConstructionProgramForecast:
+        return t('report.constructionProgramForecast.subTitle', {
+          year: currentYear
+        });
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {
@@ -86,12 +91,13 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
         return '';
     }
   }
+  
   const getDocumentSubtitleTwo = () => {
     if (reportType == Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
       return t('report.operationalEnvironmentAnalysis.subtitleTwo');
     }
 
-    if (reportType === Reports.ForecastReport)
+    if (reportType === Reports.ForecastReport || reportType === Reports.ConstructionProgramForecast)
       return t('report.forecastReport.subtitleTwo', {
         currentDate: currentDate,
       });

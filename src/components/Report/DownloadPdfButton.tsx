@@ -58,6 +58,7 @@ const getPdfDocument = (
       <ReportContainer data={{ rows }} reportType={Reports.StrategyForcedToFrame} />
     ),
     forecastReport: <ReportContainer data={{ rows }} reportType={Reports.ForecastReport} forcedToFrameRows={forcedToFrameRows}/>,
+    constructionProgramForecast: <ReportContainer data={{ rows }} reportType={Reports.ConstructionProgramForecast} forcedToFrameRows={forcedToFrameRows}/>,
     constructionProgram: (
       <ReportContainer
         data={{ rows, divisions, subDivisions }}
@@ -116,18 +117,20 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
           }
           break;
         }
-        case Reports.ForecastReport: {
-          // For ForecastReport report, we will fetch both coordinator and forceToFrame data
-          // true = coordinatorData, false = forcedToFrameData
-          const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
-          const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
+        case Reports.ForecastReport:
+        case Reports.ConstructionProgramForecast:
+          {
+            // For ForecastReport report, we will fetch both coordinator and forceToFrame data
+            // true = coordinatorData, false = forcedToFrameData
+            const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
+            const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
 
-          if (viewHasProjects(resCoordinator)) {
-            const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            document = getPdfDocument(type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
+            if (viewHasProjects(resCoordinator)) {
+              const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
+              document = getPdfDocument(type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
+            }
+            break;
           }
-          break;
-        }
         case Reports.OperationalEnvironmentAnalysis:
         case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
           const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);

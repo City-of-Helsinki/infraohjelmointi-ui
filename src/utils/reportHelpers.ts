@@ -929,7 +929,8 @@ export const convertToReportRows = (
       }
       return forcedToFrameHierarchy;
     }
-    case Reports.ConstructionProgram: {
+    case Reports.ConstructionProgram:
+    case Reports.ConstructionProgramForecast: {
       const planningHierarchy = [];
       const pathsWithExtraRows = [
         "8 01 Kiinteä omaisuus/Esirakentaminen/Muu esirakentaminen",
@@ -1000,6 +1001,7 @@ export const convertToReportRows = (
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
+          console.log(convertedClass.projects)
 
           planningHierarchy.push(convertedClass);
 
@@ -1339,6 +1341,38 @@ const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]
   return constructionProgramCsvRows;
 }
 
+const processConstructionForecastReportRows = (tableRows: IConstructionProgramTableRow[]) => {
+  const getType = (name: string, type: string) => {
+    const nameLowerCase = name.toLowerCase();
+    if (nameLowerCase.includes("suurpiiri") || nameLowerCase.includes("östersundom")){
+      return type === "districtPreview" ? "subClassDistrict" : type;
+    }
+    return type;
+  }
+
+  tableRows.forEach((tableRow) => {
+    if (
+      tableRow.type !== 'subClassDistrict' &&
+      tableRow.type !== 'division' &&
+      !constructionProgramCsvRows.some(row => row.id === tableRow.id) && isShownOnTheReport(tableRow)
+    ){
+      constructionProgramCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: getType(tableRow.name, tableRow.type),
+        location: tableRow.location,
+        costForecast: tableRow.costForecast,
+        startAndEnd: tableRow.startAndEnd,
+        spentBudget: tableRow.spentBudget,
+        budgetProposalCurrentYearPlus0: tableRow.budgetProposalCurrentYearPlus0,
+      });
+    }
+    processConstructionReportRows(tableRow.projects);
+    processConstructionReportRows(tableRow.children);
+  });
+  return constructionProgramCsvRows;
+}
+
 /**
  * Create a flattened version of report table rows, since the react-csv needs a one-dimensional array
  */
@@ -1365,6 +1399,11 @@ export const flattenConstructionProgramTableRows = (
   tableRows: Array<IConstructionProgramTableRow>,
 ): Array<IConstructionProgramCsvRow> =>
   processConstructionReportRows(tableRows).flat(Infinity);
+
+export const flattenConstructionProgramForecastTableRows = (
+  tableRows: Array<IConstructionProgramTableRow>,
+): Array<IConstructionProgramCsvRow> =>
+  processConstructionForecastReportRows(tableRows).flat(Infinity);
 
 /**
  * Create report table rows without flattening

@@ -555,6 +555,22 @@
       "projectManagerTitle": "projektipäällikkö",
       "forecastValue": "Ennuste",
       "differenceValue": "Poikkeama"
+    },
+    "constructionProgramForecast": {
+      "rowTitle": "Rakentamisohjelman ennusteraportti",
+      "documentName": "rakentamisohjelman ennuste",
+      "subTitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma vuodelle {{year}}",
+      "projectTitle": "Kohde",
+      "locationTitle": "Sijainti",
+      "budgetTitle": "Kokonaiskustannukset milj. €",
+      "scheduleTitle": "Suunnittelun ja rakentamisen ajoitus",
+      "isProjectOnScheduleTitle": "Onko hanke aikataulussa Kyllä/Ei",
+      "commitmentsBeforeYearTitle": "Toteuma ennen",
+      "commitmentsYearTitle": "Toteuma",
+      "forecast1Title": "Ennuste 1",
+      "differenceTitle": "Poikkeama EVTA",
+      "differencePercentTitle": "Poikkeama EVTA{{year}} -%",
+      "differenceReasonTitle": "Budjettipoikkeaman syy"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
