@@ -1001,7 +1001,6 @@ export const convertToReportRows = (
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
           }
-          console.log(convertedClass.projects)
 
           planningHierarchy.push(convertedClass);
 

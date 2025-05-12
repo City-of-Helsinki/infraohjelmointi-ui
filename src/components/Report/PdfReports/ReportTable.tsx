@@ -54,7 +54,6 @@ const getFlattenedRows = (
   } else if (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
     return flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
   } else if (reportType === Reports.ConstructionProgramForecast) {
-    console.log("täällä")
     return flattenConstructionProgramForecastTableRows(reportRows);
   } else {
     return flattenConstructionProgramTableRows(reportRows);

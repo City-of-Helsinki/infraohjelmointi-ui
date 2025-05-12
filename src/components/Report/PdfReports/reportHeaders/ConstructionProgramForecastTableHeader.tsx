@@ -26,22 +26,22 @@ const styles = StyleSheet.create({
     projectCell: {
         ...cellStyles,
         paddingLeft: '21px',
-        width: '450px',
+        width: '300px',
     },
     projectLocationCell: {
         ...cellStyles,
-        width: '200px',
+        width: '113px',
         paddingRight: '15px',
         paddingLeft: '21px'
     },
     projectPhaseCell: {
         ...cellStyles,
-        width: '100px',
+        width: '60px',
     },
     budgetCell: {
         ...cellStyles,
         paddingRight: '3px',
-        width: '80px',
+        width: '55px',
     },
 })
 
@@ -56,7 +56,7 @@ const ConstructionProgramForecastTableHeader = () => {
                 <Text style={styles.projectLocationCell}>{`${t('report.constructionProgramForecast.locationTitle')}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.budgetTitle')}`}</Text>
                 <Text style={styles.projectPhaseCell}>{`${t('report.constructionProgramForecast.scheduleTitle')}`}</Text>
-                <Text style={styles.projectPhaseCell}>{`${t('report.constructionProgramForecast.isProjectOnScheduleTitle')}`}</Text>
+                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.isProjectOnScheduleTitle')}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.commitmentsBeforeYearTitle')} ${year}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.commitmentsYearTitle')} ${year}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.shared.ta')} ${year}`}</Text>

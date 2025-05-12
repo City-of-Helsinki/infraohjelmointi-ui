@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     borderRight: 0,
     paddingLeft: '21px',
     paddingRight: '15px',
-    width: '280px',
+    width: '300px',
   },
   constructionForecastClassNameCell: {
     ...cellStyles,
@@ -163,8 +163,18 @@ const styles = StyleSheet.create({
     borderRight: 0,
     paddingLeft: '21px',
     paddingRight: '15px',
-    width: '280px',
+    width: '300px',
     fontWeight: 'bold',
+  },
+  constructionForecastCell: {
+    ...cellStyles,
+    borderRight: '1px solid #808080',
+    width: "55px",
+  },
+  constructionForecastPlanAndConStartCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    width: '60px',
   },
 
   // For budgetBookSummary report:
@@ -656,15 +666,15 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                 : styles.constructionForecastNameCell}
               >{flattenedRow.name}</Text>
               <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
-              <Text style={styles.cell}>{flattenedRow.costForecast}</Text>
-              <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
-              <Text style={styles.cell}>{}</Text>
-              <Text style={styles.cell}>{flattenedRow.spentBudget}</Text>
-              <Text style={styles.cell}>{}</Text>
-              <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
-              <Text style={styles.cell}>{}</Text>
-              <Text style={styles.cell}>{}</Text>
-              <Text style={styles.cell}>{}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecast}</Text>
+              <Text style={styles.constructionForecastPlanAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+              <Text style={styles.constructionForecastCell}>{}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.spentBudget}</Text>
+              <Text style={styles.constructionForecastCell}>{}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
+              <Text style={styles.constructionForecastCell}>{}</Text>
+              <Text style={styles.constructionForecastCell}>{}</Text>
+              <Text style={styles.constructionForecastCell}>{}</Text>
               <Text style={styles.budgetOverunReasonCell}>{}</Text>
             </View>
           }
