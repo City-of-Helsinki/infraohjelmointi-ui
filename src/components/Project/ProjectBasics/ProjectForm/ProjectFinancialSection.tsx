@@ -2,7 +2,6 @@ import {
   FormSectionTitle,
   ListField,
   NumberField,
-  OverrunRightField,
   SelectField,
 } from '@/components/shared';
 import { FC, memo, useMemo } from 'react';
@@ -38,7 +37,6 @@ interface IProjectFinancialSectionProps {
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getValues,
   getFieldProps,
-  control,
   classOptions,
   isInputDisabled,
   isUserOnlyViewer,
@@ -211,13 +209,6 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           />
         </div>
       </div>
-
-      <OverrunRightField control={control} cancelEdit={isSaving} readOnly={isUserOnlyViewer} isInputDisabled={isInputDisabled}/>
-      <ListField
-        {...getFieldProps('preliminaryBudgetDivision')}
-        readOnly={true}
-        cancelEdit={isSaving}
-      />
     </div>
   );
 };
