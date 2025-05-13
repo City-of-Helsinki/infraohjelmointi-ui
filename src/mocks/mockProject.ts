@@ -127,8 +127,6 @@ const mockProject: { data: IProject } = {
     perfAmount: '300.00',
     unitCost: '400.00',
     costForecast: '500.00',
-    budgetOverrunYear: '2053',
-    budgetOverrunAmount: '468.00',
     neighborhood: 'Kamppi',
     tiedCurrYear: '800.00',
     riskAssess: '50',

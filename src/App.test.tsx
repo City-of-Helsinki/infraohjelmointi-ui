@@ -30,6 +30,7 @@ import {
   mockSubDivisions,
 } from './mocks/mockLocations';
 import {
+  mockBudgetOverrunReasons,
   mockConstructionPhaseDetails,
   mockConstructionPhases,
   mockPlanningPhases,
@@ -99,6 +100,7 @@ describe('App', () => {
       expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);
       expect(lists.planningPhases).toStrictEqual(mockPlanningPhases.data);
       expect(lists.responsibleZones).toStrictEqual(mockResponsibleZones.data);
+      expect(lists.budgetOverrunReasons).toStrictEqual(mockBudgetOverrunReasons.data);
       expect(hashTags.hashTags).toStrictEqual(sortByHashtagName(mockHashTags.data.hashTags));
       expect(hashTags.popularHashTags).toStrictEqual(mockHashTags.data.popularHashTags);
       // Planning classes

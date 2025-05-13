@@ -538,7 +538,10 @@ const ProjectForm = () => {
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
+      <ProjectProgramSection 
+        {...formProps}
+        isUserOnlyViewer={isOnlyViewer}
+      />
       {/* BANNER */}
       {!isOnlyViewer &&
         <ProjectFormBanner

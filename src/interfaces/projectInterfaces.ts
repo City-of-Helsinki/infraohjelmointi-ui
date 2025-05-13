@@ -40,8 +40,6 @@ export interface IProject {
   realizedCost?: string;
   comittedCost?: string;
   spentCost?: string;
-  budgetOverrunYear?: string;
-  budgetOverrunAmount?: string;
   perfAmount: string;
   unitCost: string;
   costForecast: string;
@@ -93,6 +91,8 @@ export interface IProject {
   frameEstWarrantyPhaseStart: string | null;
   frameEstWarrantyPhaseEnd: string | null;
   currentYearsSapValues?: Array<ISapCost> | null;
+  budgetOverrunReason?: IListItem;
+  otherBudgetOverrunReason?: string;
 }
 
 export interface IProjectRequest {
@@ -137,8 +137,6 @@ export interface IProjectRequest {
   realizedCost?: string;
   comittedCost?: string;
   spentCost?: string;
-  budgetOverrunYear?: string;
-  budgetOverrunAmount?: string;
   category?: string | null;
   effectHousing?: boolean;
   riskAssessment?: string | null;
@@ -164,6 +162,8 @@ export interface IProjectRequest {
   frameEstPlanningEnd?: string | null;
   frameEstConstructionStart?: string | null;
   frameEstConstructionEnd?: string | null;
+  budgetOverrunReason?: string;
+  otherBudgetOverrunReason?: string;
 }
 
 export interface IProjectPatchRequestObject {

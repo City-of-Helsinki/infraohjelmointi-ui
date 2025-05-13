@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
   },
   budgetCell: {
     ...cellStyles,
+    paddingRight: '3px',
     width: '80px',
   },
   monthCell: {
@@ -56,7 +57,7 @@ interface StrategyTableHeaderProps {
   isForecastReport: boolean;
 }
 
-const StrategyTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => {
+const StrategyAndForecastTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => {
   const { t } = useTranslation();
   const year = isForecastReport ? new Date().getFullYear() : new Date().getFullYear() + 1;
 
@@ -67,13 +68,13 @@ const StrategyTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => 
         <Text style={styles.projectCell}>{`\n${t('report.strategy.projectNameTitle')}`}</Text>
         <Text style={styles.projectManagerCell}>{`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`}</Text>
         <Text style={styles.projectPhaseCell}>{`\n${t('projectPhase')}`}</Text>
-        <Text style={styles.budgetCell}>{`\nTA ${year}`}</Text>
-        <Text style={styles.budgetCell}>{`\nTS ${year}`}</Text>
+        <Text style={styles.budgetCell}>{`${t('report.shared.ta')} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
+        <Text style={styles.budgetCell}>{`${t('report.shared.ts')} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
         {
           isForecastReport ?
             <>
-              <Text style={styles.budgetCell}>{`\nEnnuste ${year}`}</Text>
-              <Text style={styles.budgetCell}>{`\nPoikkeama`}</Text>
+              <Text style={styles.budgetCell}>{`${t('report.forecastReport.forecastValue')} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
+              <Text style={styles.budgetCell}>{`${t('report.forecastReport.differenceValue')}\n${t('report.shared.kiloEuro')}`}</Text>
             </> : null
         }
         <Text style={styles.monthCell}>{`${year}\n01`}</Text>
@@ -94,4 +95,4 @@ const StrategyTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => 
   );
 };
 
-export default memo(StrategyTableHeader);
+export default memo(StrategyAndForecastTableHeader);
