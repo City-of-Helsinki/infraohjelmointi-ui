@@ -112,3 +112,12 @@ export const getDistricts = async (): Promise<Array<IProjectDistrict>> => {
     return Promise.reject(e);
   }
 }
+
+export const getBudgetOverrunReasons = async () => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/budget-overrun-reasons/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};

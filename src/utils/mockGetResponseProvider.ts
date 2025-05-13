@@ -3,6 +3,7 @@ import { mockCoordinatorNotes } from '@/mocks/mockCoordinatorNotes';
 import { mockGroups } from '@/mocks/mockGroups';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import {
+  mockBudgetOverrunReasons,
   mockConstructionPhaseDetails,
   mockConstructionPhases,
   mockPlanningPhases,
@@ -108,6 +109,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockCoordinatorNotes);
       case url.toLocaleLowerCase().includes(`/sap-current-year-costs/${year}/`):
         return Promise.resolve(mockSapCosts);
+      case url.toLocaleLowerCase().includes('/budget-overrun-reasons/'):
+        return Promise.resolve(mockBudgetOverrunReasons);
       default:
         console.log('not found!: ', url);
 

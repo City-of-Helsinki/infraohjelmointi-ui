@@ -151,8 +151,6 @@ const useProjectFormValues = () => {
       realizedCost: value(project?.realizedCost),
       comittedCost: value(project?.comittedCost),
       spentCost: value(project?.spentCost),
-      budgetOverrunYear: value(project?.budgetOverrunYear),
-      budgetOverrunAmount: value(project?.budgetOverrunAmount),
       responsibleZone: listItemToOption(project?.responsibleZone),
       masterPlanAreaNumber: value(project?.masterPlanAreaNumber),
       trafficPlanNumber: value(project?.trafficPlanNumber),
@@ -162,6 +160,8 @@ const useProjectFormValues = () => {
       personConstruction: personToOption(project?.personConstruction),
       personProgramming: personToOption(project?.personProgramming),
       otherPersons: value(project?.otherPersons),
+      budgetOverrunReason: listItemToOption(project?.budgetOverrunReason),
+      otherBudgetOverrunReason: value(project?.otherBudgetOverrunReason)
     }),
 
     [project, classes, subClasses, masterClasses, districts, divisions, subDivisions ],

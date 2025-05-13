@@ -100,7 +100,19 @@
     "north": "Pohjoinen",
     "cityRenewal": "Kaupunkiuudistus",
     "bigTrafficProjects": "Suuret liikennehankkeet",
-    "spesialtyStructures": "Taitorakenne"
+    "spesialtyStructures": "Taitorakenne",
+    "consultancyPlanningDelay": "Konsulttisuunnittelun viivästyminen",
+    "permitProcessingDelay": "Lupakäsittelyiden viivästyminen",
+    "complaintsDelay": "Valituksista aiheutunut viivästyminen",
+    "personnelResourcesDelay": "Henkilöstöresursseista johtuva viivästyminen",
+    "budgetDeficitDelay": "Määrärahavajeesta johtuva myöhäistäminen",
+    "earlierSchedule": "Aikataulun aikaistus",
+    "totalCostsClarification": "Kokonaiskustannusten tarkentuminen",
+    "projectCoordinationScheduleChange": "Hankkeiden yhteensovituksesta johtuva aikataulumuutos",
+    "weatherConditionsChange": "Sääolosuhteista johtuva muutos",
+    "contractorScheduleChange": "Urakan toteuttajasta johtuva aikataulumuutos",
+    "cityPlanScheduleChange": "Asemakaavan aikataulumuutokset",
+    "otherReason": "Muu syy"
   },
   "validation": {
     "required": "Täytä {{field}}",
@@ -195,7 +207,6 @@
     "planningWorkQuantity": "Suoritemäärä",
     "constructionPhase": "Rakentamisen kustannusarvio",
     "constructionWorkQuantity": "Suoritemäärä",
-    "overrunRight": "Ylitysoikeus",
     "costForecast": "Budjetti",
     "realizedCostLabel": "Toteumatiedot",
     "realizedCostCurrentYear": "Toteuma kuluva vuosi",
@@ -206,9 +217,6 @@
     "comittedCostTooltipLabel": "Sitoumukset yhteensä hankkeen suunnittelun aloitusvuodesta kuluvan vuoden loppuun",
     "spentCost": "Käytetty",
     "spentCostTooltipLabel": "Toteuma yhteensä + kaikki sitoumukset yhteensä kuluvan vuoden loppuun",
-    "budgetOverrunYear": "Ylitysoikeus vuosi",
-    "budgetOverrunAmount": "Ylitysoikeuden määrä",
-    "preliminaryBudgetDivision": "Kustannusarvion alustava jakautuminen",
     "responsibleZone": "Alueen vastuujaon mukaan",
     "district": "Suurpiiri",
     "division": "Kaupunginosa",
@@ -230,7 +238,9 @@
     },
     "warrantyPhase": "Takuuaika",
     "estWarrantyPhaseStart": "Alkaa",
-    "estWarrantyPhaseEnd": "Päättyy"
+    "estWarrantyPhaseEnd": "Päättyy",
+    "budgetOverrunReason": "Budjettipoikkeaman selitys",
+    "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -387,9 +397,6 @@
   "saving": "Tallennetaan",
   "address": "Osoite",
   "name": "nimi",
-  "overrunRightValue": "Ylitysoikeus {{value}}",
-  "budgetOverrunYear": "Ylitysoikeus vuosi",
-  "budgetOverrunAmount": "Ylitysoikeuden määrä",
   "writeNote": "Kirjoita muistiinpano",
   "modified": "Muokattu",
   "editHistory": "Muokkaushistoria",
@@ -460,6 +467,11 @@
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
   "report": {
+    "shared": {
+      "ta": "TA",
+      "ts": "TS",
+      "kiloEuro": "k€"
+    },
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
@@ -533,7 +545,9 @@
       "subtitleTwo": "Ennusteraportti {{currentDate}}",
       "projectNameTitle": "Hanke",
       "projectsTitle": "Kohteen",
-      "projectManagerTitle": "projektipäällikkö"
+      "projectManagerTitle": "projektipäällikkö",
+      "forecastValue": "Ennuste",
+      "differenceValue": "Poikkeama"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
