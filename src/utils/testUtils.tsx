@@ -2,7 +2,6 @@ import React from 'react';
 import { render, RenderResult, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { setupStore } from '../store';
-import type { PreloadedState } from '@reduxjs/toolkit';
 import type { RenderHookResult, RenderOptions } from '@testing-library/react';
 import type { AppStore, RootState } from '../store';
 import userEvent from '@testing-library/user-event';
@@ -29,7 +28,7 @@ const oidcConfig = {
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store.
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
-  preloadedState?: PreloadedState<RootState>;
+  preloadedState?: Partial<RootState>;
   store?: AppStore;
 }
 
