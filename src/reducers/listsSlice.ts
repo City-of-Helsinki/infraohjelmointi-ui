@@ -13,6 +13,7 @@ import {
   getResponsibleZones,
   getPersons,
   getDistricts,
+  getBudgetOverrunReasons,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -34,6 +35,7 @@ export interface IListState {
   projectDistricts: Array<IListItem>;
   projectDivisions: Array<IListItem>;
   projectSubDivisions: Array<IListItem>;
+  budgetOverrunReasons: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -52,6 +54,7 @@ const initialState: IListState = {
   projectDistricts: [],
   projectDivisions: [],
   projectSubDivisions: [],
+  budgetOverrunReasons: [],
   programmedYears: setProgrammedYears(),
   error: null,
 };
@@ -101,7 +104,8 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       programmedYears: setProgrammedYears(),
       projectDistricts: getProjectDistricts(districts, "district"),
       projectDivisions: getProjectDistricts(districts, "division"),
-      projectSubDivisions: getProjectDistricts(districts, "subDivision")
+      projectSubDivisions: getProjectDistricts(districts, "subDivision"),
+      budgetOverrunReasons: await getBudgetOverrunReasons(),
     };
   } catch (err) {
     return thunkAPI.rejectWithValue(err);
@@ -131,5 +135,6 @@ export const selectProjectDivisions = (state: RootState) => state.lists.projectD
 export const selectProjectSubDivisions = (state: RootState) => state.lists.projectSubDivisions;
 export const selectCategories = (state: RootState) => state.lists.categories;
 export const selectProjectPhases = (state: RootState) => state.lists.phases;
+export const selectBudgetOverrunReasons = (state: RootState) => state.lists.budgetOverrunReasons;
 
 export default listsSlice.reducer;

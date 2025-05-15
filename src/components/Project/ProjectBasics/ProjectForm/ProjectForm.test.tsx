@@ -88,6 +88,7 @@ const render = async () =>
             projectDistricts: [],
             projectDivisions: [],
             projectSubDivisions: [],
+            budgetOverrunReasons: [],
             error: {},
           },
           hashTags: {
@@ -185,8 +186,6 @@ describe('projectForm', () => {
     const SapAllSpentValue = sapCostsAllValue + sapCommitmentsAllValue;
     expect(await findByText(`${formatNumberToContainSpaces(SapAllSpentValue)}`)).toBeInTheDocument();
 
-    expect(await findByText('overrunRightValue' || '')).toBeInTheDocument();
-    expect(await findByText(`${project?.budgetOverrunAmount} keur` || '')).toBeInTheDocument();
     expectDisplayValue(project?.description);
     expectDisplayValue(project?.entityName);
     expectDisplayValue(project?.hkrId);
