@@ -24,7 +24,7 @@ import {
 import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion, sumCosts } from './calculations';
 import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
-import { before, split } from 'lodash';
+import { split } from 'lodash';
 import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
 import moment from 'moment';
