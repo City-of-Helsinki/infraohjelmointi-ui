@@ -28,6 +28,7 @@ import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCateg
 import TableRow from './TableRow';
 import { buildOperationalEnvironmentAnalysisRows } from '../common';
 import ConstructionProgramForecastTableHeader from './reportHeaders/ConstructionProgramForecastTableHeader';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 const styles = StyleSheet.create({
   table: {
@@ -41,13 +42,15 @@ interface IReportTableProps {
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[];
   hierarchyInForcedToFrame?: IPlanningRow[];
+  sapCosts?: Record<string, IProjectSapCost>;
+  currentYearSapValues?: Record<string, IProjectSapCost>;
 }
 
 type IReportFlattenedRows = IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow;
 
 const getFlattenedRows = (
   reportRows: IReportFlattenedRows[],
-  reportType: ReportType
+  reportType: ReportType,
 ) => {
   if (reportType === Reports.BudgetBookSummary) {
     return flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
@@ -73,10 +76,23 @@ const ReportTable: FC<IReportTableProps> = ({
   reportType,
   data,
   projectsInWarrantyPhase,
-  hierarchyInForcedToFrame
+  hierarchyInForcedToFrame,
+  sapCosts,
+  currentYearSapValues,
 }) => {
   const { t } = useTranslation();
-  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions, data.subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame);
+  const reportRows = convertToReportRows(
+    data.rows,
+    reportType,
+    data.categories,
+    t,
+    data.divisions,
+    data.subDivisions,
+    projectsInWarrantyPhase,
+    hierarchyInForcedToFrame,
+    sapCosts,
+    currentYearSapValues
+  );
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (
@@ -86,6 +102,7 @@ const ReportTable: FC<IReportTableProps> = ({
     reportType === Reports.ConstructionProgram ||
     reportType === Reports.ConstructionProgramForecast )
       ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
+
 
   const strategyAndForecastReportRows = getStrategyAndForecastReportRows(reportType, reportRows);
 

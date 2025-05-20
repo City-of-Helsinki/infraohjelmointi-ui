@@ -668,14 +668,14 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
               <Text style={styles.constructionForecastCell}>{flattenedRow.costForecast}</Text>
               <Text style={styles.constructionForecastPlanAndConStartCell}>{flattenedRow.startAndEnd}</Text>
-              <Text style={styles.constructionForecastCell}>{}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.spentBudget}</Text>
-              <Text style={styles.constructionForecastCell}>{}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.isProjectOnSchedule}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.currentYearSapCost}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.beforeCurrentYearSapCosts}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForcedToFrameBudget}</Text>
               <Text style={styles.constructionForecastCell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
-              <Text style={styles.constructionForecastCell}>{}</Text>
-              <Text style={styles.constructionForecastCell}>{}</Text>
-              <Text style={styles.constructionForecastCell}>{}</Text>
-              <Text style={styles.budgetOverunReasonCell}>{}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviation}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviationPercent}</Text>
+              <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
             </View>
           }
           break;

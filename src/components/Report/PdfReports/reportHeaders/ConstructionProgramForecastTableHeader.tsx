@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
         ...cellStyles,
         width: '113px',
         paddingRight: '15px',
-        paddingLeft: '21px'
+        paddingLeft: '6px'
     },
     projectPhaseCell: {
         ...cellStyles,
@@ -40,8 +40,15 @@ const styles = StyleSheet.create({
     },
     budgetCell: {
         ...cellStyles,
-        paddingRight: '3px',
+        paddingLeft: '6px',
+        paddingRight: '6px',
         width: '55px',
+    },
+    budgetOverrunReasonCell: {
+        ...cellStyles,
+        paddingRight: '21px',
+        paddingLeft: '6px',
+        width: '280px',
     },
 })
 
@@ -63,7 +70,7 @@ const ConstructionProgramForecastTableHeader = () => {
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.forecast1Title')}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.differenceTitle')}${year}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.differencePercentTitle', {year: year})}`}</Text>
-                <Text style={styles.projectCell}>{`\n${t('report.constructionProgramForecast.differenceReasonTitle')}`}</Text>
+                <Text style={styles.budgetOverrunReasonCell}>{`\n${t('report.constructionProgramForecast.differenceReasonTitle')}`}</Text>
             </View>
         </View>
     )

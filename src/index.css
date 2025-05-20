@@ -7,7 +7,7 @@
 @tailwind utilities;
 
 :root {
-  --infra-font-default: HelsinkiGrotesk, Arial, sans-serif;
+  --infra-font-default: HelsinkiGrotesk Arial, sans-serif;
   --planning-cell-width: 5.5rem;
   --app-min-height: calc(100vh - calc(var(--spacing-5-xl) + 0.0625rem));
 }

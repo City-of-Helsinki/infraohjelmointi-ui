@@ -570,7 +570,7 @@
       "forecast1Title": "Ennuste 1",
       "differenceTitle": "Poikkeama EVTA",
       "differencePercentTitle": "Poikkeama EVTA{{year}} -%",
-      "differenceReasonTitle": "Budjettipoikkeaman syy"
+      "differenceReasonTitle": "Keskeisimmät poikkeamat verrattuna TA:s ja niiden syyt"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",

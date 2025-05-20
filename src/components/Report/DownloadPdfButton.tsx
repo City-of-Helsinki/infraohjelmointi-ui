@@ -9,7 +9,7 @@ import { Page, Document } from '@react-pdf/renderer';
 import './pdfFonts';
 import './styles.css';
 import ReportContainer from './PdfReports/ReportContainer';
-import { useAppDispatch } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { setLoading, clearLoading } from '@/reducers/loaderSlice';
 import { getCoordinationTableRows } from '@/hooks/useCoordinationRows';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
@@ -18,6 +18,8 @@ import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports, viewHasProjects } from './common';
+import { getProjectSapCosts, getProjectSapCurrentYear } from '@/reducers/sapCostSlice';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 /**
  * EmptyDocument is here as a placeholder to not cause an error when rendering rows for documents that
@@ -37,6 +39,8 @@ const getPdfDocument = (
   categories?: IListItem[],
   projectsInWarrantyPhase?: IProject[],
   forcedToFrameRows?: IPlanningRow[],
+  sapCosts?: Record<string, IProjectSapCost>,
+  currentYearSapValues?: Record<string, IProjectSapCost>,
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis: (
@@ -63,6 +67,8 @@ const getPdfDocument = (
         data={{ rows, divisions, subDivisions }}
         reportType={Reports.ConstructionProgramForecast}
         forcedToFrameRows={forcedToFrameRows}
+        sapCosts={sapCosts}
+        currentYearSapValues={currentYearSapValues}
       />
     ),
     constructionProgram: (
@@ -95,6 +101,8 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const projetSapCosts = useAppSelector(getProjectSapCosts);
+  const projectCurrentYearSapValues = useAppSelector(getProjectSapCurrentYear);
   const documentName = useMemo(() => t(`report.${type}.documentName`), [t, type]);
   const LOADING_PDF_DATA = 'loading-pdf-data';
 
@@ -146,7 +154,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
 
           if (viewHasProjects(resCoordinator)) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            document = getPdfDocument(type, rows.coordinatorRows, divisions, subDivisions, undefined, undefined, rows.forcedToFrameRows);
+            document = getPdfDocument(type, rows.coordinatorRows, divisions, subDivisions, undefined, undefined, rows.forcedToFrameRows, projetSapCosts, projectCurrentYearSapValues);
           }
           break;
         }

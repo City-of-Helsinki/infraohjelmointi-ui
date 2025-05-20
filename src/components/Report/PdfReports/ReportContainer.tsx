@@ -8,6 +8,7 @@ import DocumentHeader from './reportHeaders/DocumentHeader';
 import ReportTable from './ReportTable';
 import StrategyReportFooter from './reportFooters/StrategyReportFooter';
 import DefaultReportFooter from './reportFooters/DefaultReportFooter';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 const styles = StyleSheet.create({
   page: {
@@ -24,9 +25,11 @@ interface IPdfReportContainerProps {
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[],
   forcedToFrameRows?: IPlanningRow[],
+  sapCosts?: Record<string, IProjectSapCost>,
+  currentYearSapValues?: Record<string, IProjectSapCost>,
 }
 
-const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows }) => {
+const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows, sapCosts, currentYearSapValues }) => {
   const { t } = useTranslation();
 
   const date = new Date();
@@ -120,7 +123,14 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             reportType={reportType}
             date={(reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) ? currentDate : ''}
           />
-          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} hierarchyInForcedToFrame={forcedToFrameRows}/>
+          <ReportTable 
+            reportType={reportType}
+            data={data}
+            projectsInWarrantyPhase={projectsInWarrantyPhase}
+            hierarchyInForcedToFrame={forcedToFrameRows}
+            sapCosts={sapCosts}
+            currentYearSapValues={currentYearSapValues}
+          />
           {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
