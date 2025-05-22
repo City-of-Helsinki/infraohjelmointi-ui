@@ -275,18 +275,18 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck, yearsForward: numb
 
 const getIsProjectOnSchedule = (budgetOverrunReason: string | undefined): string => {
   if (!budgetOverrunReason || budgetOverrunReason === "earlierSchedule" || budgetOverrunReason === 'totalCostsClarification') {
-    return "Kyllä";
+    return t("option.true");
   }
-  return "Ei";
+  return t("option.false");
 }
 
 const getIsGroupOnSchedule = (projects: IProject[]): string => {
   for (const p of projects) {
     if (p.budgetOverrunReason && !["earlierSchedule", 'totalCostsClarification'].includes(p.budgetOverrunReason.value)) {
-      return "Ei";
+      return t("option.false");
     }
   }
-  return "Kyllä";
+  return t("option.true");
 }
 
 const getBudgetOverrunReason = (budgetOverrunReason: string | undefined, otherReason: string | undefined): string => {
