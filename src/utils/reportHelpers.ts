@@ -587,7 +587,13 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   return properties;
 }
 
-const getConstructionRowType = (type: string, name: string) => {
+const getConstructionRowType = (type: string, name: string, reportType: string) => {
+  const isConstructionProgramForecastReport = reportType === Reports.ConstructionProgramForecast;
+
+  if (isConstructionProgramForecastReport){
+    return type;
+  }
+
   switch (type) {
     case 'masterClass':
       return 'masterClass';
@@ -1088,7 +1094,7 @@ export const convertToReportRows = (
             path: c.path,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions, undefined, forcedToFrameChildren, sapCosts, currentYearSapValues) : [],
             projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
-            type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
+            type: getConstructionRowType(c.type, c.name.toLowerCase(), reportType) as ReportTableRowType,
           }
 
           planningHierarchy.push(convertedClass);

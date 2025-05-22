@@ -658,7 +658,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
           tableRow =
             <View
               wrap={false}
-              style={ getConstructionRowStyle(flattenedRow.type ?? '', index ?? 0 )}
+              style={getStrategyAndForecastRowStyle(flattenedRow.type ?? '', index ?? 0 )}
               key={flattenedRow.id}
             >
               <Text style={classNameTypes.includes(flattenedRow.type)
