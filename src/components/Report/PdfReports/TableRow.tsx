@@ -141,6 +141,41 @@ const styles = StyleSheet.create({
     paddingRight: '21px',
     width: '72px',
   },
+  budgetOverunReasonCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    paddingRight: '21px',
+    width: '280px',
+  },
+  constructionForecastNameCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    borderLeft: '1px solid #808080',
+    borderRight: 0,
+    paddingLeft: '21px',
+    paddingRight: '15px',
+    width: '300px',
+  },
+  constructionForecastClassNameCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    borderLeft: '1px solid #808080',
+    borderRight: 0,
+    paddingLeft: '21px',
+    paddingRight: '15px',
+    width: '300px',
+    fontWeight: 'bold',
+  },
+  constructionForecastCell: {
+    ...cellStyles,
+    borderRight: '1px solid #808080',
+    width: "55px",
+  },
+  constructionForecastPlanAndConStartCell: {
+    ...cellStyles,
+    ...constructionProgramCommonStyles,
+    width: '60px',
+  },
 
   // For budgetBookSummary report:
   classNameTargetCell: {
@@ -256,7 +291,7 @@ const strategyReportStyles = StyleSheet.create({
   },
   subClassDistrictRow: {
     ...tableRowStyles,
-    backgroundColor: '#00007a',
+    backgroundColor: '#00005e',
     color: 'white',
   },
   subLevelDistrict: {
@@ -601,6 +636,47 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
               <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
               <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
+            </View>
+          }
+          break;
+        }
+        case Reports.ConstructionProgramForecast: {
+          // Programming view (hierarchy) colours for class rows
+          // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
+        if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
+          const classNameTypes = [
+            'masterClass',
+            'class',
+            'subClass',
+            'subClassDistrict',
+            'collectiveSubLevel',
+            'subLevelDistrict',
+            'otherClassification',
+            'districtPreview',
+            'info'
+          ]
+
+          tableRow =
+            <View
+              wrap={false}
+              style={getStrategyAndForecastRowStyle(flattenedRow.type ?? '', index ?? 0 )}
+              key={flattenedRow.id}
+            >
+              <Text style={classNameTypes.includes(flattenedRow.type)
+                ? styles.constructionForecastClassNameCell
+                : styles.constructionForecastNameCell}
+              >{flattenedRow.name}</Text>
+              <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecast}</Text>
+              <Text style={styles.constructionForecastPlanAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.isProjectOnSchedule}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.beforeCurrentYearSapCosts}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.currentYearSapCost}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForcedToFrameBudget}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviation}</Text>
+              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviationPercent}</Text>
+              <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
             </View>
           }
           break;

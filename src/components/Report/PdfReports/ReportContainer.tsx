@@ -8,6 +8,7 @@ import DocumentHeader from './reportHeaders/DocumentHeader';
 import ReportTable from './ReportTable';
 import StrategyReportFooter from './reportFooters/StrategyReportFooter';
 import DefaultReportFooter from './reportFooters/DefaultReportFooter';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 const styles = StyleSheet.create({
   page: {
@@ -24,9 +25,11 @@ interface IPdfReportContainerProps {
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[],
   forcedToFrameRows?: IPlanningRow[],
+  sapCosts?: Record<string, IProjectSapCost>,
+  currentYearSapValues?: Record<string, IProjectSapCost>,
 }
 
-const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows }) => {
+const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows, sapCosts, currentYearSapValues }) => {
   const { t } = useTranslation();
 
   const date = new Date();
@@ -40,6 +43,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.title');
       case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForecast:
         return t('report.constructionProgram.title');
       case Reports.BudgetBookSummary:
         return t('report.budgetBookSummary.title');
@@ -64,6 +68,10 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
         return t('report.strategy.subtitle', {
           startYear: currentYear
         });
+      case Reports.ConstructionProgramForecast:
+        return t('report.constructionProgramForecast.subTitle', {
+          year: currentYear
+        });
       case Reports.Strategy:
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {
@@ -86,12 +94,13 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
         return '';
     }
   }
+  
   const getDocumentSubtitleTwo = () => {
     if (reportType == Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
       return t('report.operationalEnvironmentAnalysis.subtitleTwo');
     }
 
-    if (reportType === Reports.ForecastReport)
+    if (reportType === Reports.ForecastReport || reportType === Reports.ConstructionProgramForecast)
       return t('report.forecastReport.subtitleTwo', {
         currentDate: currentDate,
       });
@@ -114,7 +123,14 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             reportType={reportType}
             date={(reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) ? currentDate : ''}
           />
-          <ReportTable reportType={reportType} data={data} projectsInWarrantyPhase={projectsInWarrantyPhase} hierarchyInForcedToFrame={forcedToFrameRows}/>
+          <ReportTable 
+            reportType={reportType}
+            data={data}
+            projectsInWarrantyPhase={projectsInWarrantyPhase}
+            hierarchyInForcedToFrame={forcedToFrameRows}
+            sapCosts={sapCosts}
+            currentYearSapValues={currentYearSapValues}
+          />
           {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
             <StrategyReportFooter
               infoText={t('report.strategy.footerInfoText')}
