@@ -1666,6 +1666,23 @@ export const getReportData = async (
           [`TS ${year + 3} ${t('millionEuro')}`]: r.budgetProposalCurrentYearPlus2,
         }));
       }
+      case Reports.ConstructionProgramForecast: {
+        const flattenedRows = flattenConstructionProgramForecastTableRows(reportRows as IConstructionProgramTableRow[]);
+        return flattenedRows.map((r: IConstructionProgramCsvRow) => ({
+          [t('report.constructionProgramForecast.projectTitle')]: r.name,
+          [t('report.constructionProgramForecast.locationTitle')]: r.location,
+          [t('report.constructionProgramForecast.budgetTitle')]: r.costForecast,
+          [t('report.constructionProgramForecast.scheduleTitle')]: r.startAndEnd,
+          [t('report.constructionProgramForecast.isProjectOnScheduleTitle')]: r.isProjectOnSchedule,
+          [`${t('report.constructionProgramForecast.commitmentsBeforeYearTitle')} ${year}`]: r.beforeCurrentYearSapCosts,
+          [`${t('report.constructionProgramForecast.commitmentsYearTitle')} ${year}`]: r.currentYearSapCost,
+          [`${t('report.shared.ta')} ${year}`]: r.costForcedToFrameBudget,
+          [t('report.constructionProgramForecast.forecast1Title')]: r.budgetProposalCurrentYearPlus0,
+          [`${t('report.constructionProgramForecast.differenceTitle')} ${year}`]: r.costForecastDeviation,
+          [t('report.constructionProgramForecast.differencePercentTitle', {year: year})]: r.costForecastDeviationPercent,
+          [t('report.constructionProgramForecast.differenceReasonTitle')]: r.budgetOverrunReason,
+        }));
+      }
       case Reports.BudgetBookSummary: {
         // Flatten rows into one dimension
         const flattenedRows = flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
