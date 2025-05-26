@@ -34,12 +34,14 @@ import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 interface IYearCheck {
   planningStart: number;
   constructionEnd: number;
+  type?: ReportType;
 }
 
 interface IBudgetCheck {
   budgetProposalCurrentYearPlus0: string | undefined | null;
   budgetProposalCurrentYearPlus1: string | undefined | null;
   budgetProposalCurrentYearPlus2: string | undefined | null;
+  type: ReportType;
 }
 
 /**
@@ -375,6 +377,7 @@ const convertToConstructionReportProjects = (
   projects: IProject[],
   divisions: Array<IListItem> | undefined,
   subDivisions: Array<IListItem> | undefined,
+  type: ReportType,
   forcedToFrameProjects?: Array<IProject>,
   sapCosts?: Record<string, IProjectSapCost>,
   currentYearSapValues?: Record<string, IProjectSapCost>,
@@ -384,12 +387,14 @@ const convertToConstructionReportProjects = (
     p.planningStartYear && p.constructionEndYear &&
     checkYearRange({
       planningStart: p.planningStartYear,
-      constructionEnd: p.constructionEndYear
+      constructionEnd: p.constructionEndYear,
+      type: type,
     }) &&
     checkProjectHasBudgets({
       budgetProposalCurrentYearPlus0: p.finances.budgetProposalCurrentYearPlus0,
       budgetProposalCurrentYearPlus1: p.finances.budgetProposalCurrentYearPlus1,
-      budgetProposalCurrentYearPlus2: p.finances.budgetProposalCurrentYearPlus2
+      budgetProposalCurrentYearPlus2: p.finances.budgetProposalCurrentYearPlus2,
+      type: type,
     }) &&
     parseFloat(p.costForecast) >= 1000);
 
@@ -469,22 +474,30 @@ const convertToGroupValues = (
   }
 }
 
-const checkYearRange = (props: IYearCheck ) => {
-  const startYear = new Date().getFullYear() + 1;
+const checkYearRange = (props: IYearCheck) => {
+  const currentYear = new Date().getFullYear();
+  const startYear = currentYear + 1;
   const nextThreeYears = [startYear, startYear + 1, startYear + 2];
   const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
+  const inPlanningOrConstructionThisYear = (currentYear >= props.planningStart && currentYear <= props.constructionEnd)
 
-  if (inPlanningOrConstruction) {
+  if (inPlanningOrConstruction && props.type === Reports.ConstructionProgram) {
     return true;
-  } else {
+  } else if (inPlanningOrConstructionThisYear && props.type === Reports.ConstructionProgramForecast){
+    return true;
+  }  else {
     return false;
   }
 }
 
 const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
-  return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+  if (projectFinances.type === Reports.ConstructionProgram) {
+    return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
     parseFloat((projectFinances.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
     parseFloat((projectFinances.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0;
+  } else {
+    return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0
+  }
 }
 
 const checkGroupHasBudgets = (group: IConstructionProgramTableRow) => {
@@ -1047,7 +1060,8 @@ export const convertToReportRows = (
           const endYear = getGroupEndYear(c.projectRows);
           if (startYear && endYear && checkYearRange({
             planningStart: startYear,
-            constructionEnd: endYear
+            constructionEnd: endYear,
+            type: reportType,
           })) {
             const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
             const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
@@ -1059,7 +1073,7 @@ export const convertToReportRows = (
               name: c.name,
               parent: c.path,
               children: [],
-              projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
+              projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, reportType, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
               costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.costEstimateBudget),
               startAndEnd: isOnlyHeaderGroup ? undefined : `${startYear}-${endYear}`,
               type: isOnlyHeaderGroup ? 'group' : 'groupWithValues',
@@ -1075,7 +1089,8 @@ export const convertToReportRows = (
                 if (checkProjectHasBudgets({
                   budgetProposalCurrentYearPlus0: project.budgetProposalCurrentYearPlus0,
                   budgetProposalCurrentYearPlus1: project.budgetProposalCurrentYearPlus1,
-                  budgetProposalCurrentYearPlus2: project.budgetProposalCurrentYearPlus2
+                  budgetProposalCurrentYearPlus2: project.budgetProposalCurrentYearPlus2,
+                  type: reportType,
                 })) {
                   planningHierarchy.push(convertedGroup);
                   break;
@@ -1093,7 +1108,7 @@ export const convertToReportRows = (
             parent: c.path,
             path: c.path,
             children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions, undefined, forcedToFrameChildren, sapCosts, currentYearSapValues) : [],
-            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
+            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, reportType, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
             type: getConstructionRowType(c.type, c.name.toLowerCase(), reportType) as ReportTableRowType,
           }
 
