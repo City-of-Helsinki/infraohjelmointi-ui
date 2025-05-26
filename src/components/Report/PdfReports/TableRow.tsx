@@ -291,7 +291,7 @@ const strategyReportStyles = StyleSheet.create({
   },
   subClassDistrictRow: {
     ...tableRowStyles,
-    backgroundColor: '#00007a',
+    backgroundColor: '#00005e',
     color: 'white',
   },
   subLevelDistrict: {
@@ -650,6 +650,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
             'subClass',
             'subClassDistrict',
             'collectiveSubLevel',
+            'subLevelDistrict',
             'otherClassification',
             'districtPreview',
             'info'
