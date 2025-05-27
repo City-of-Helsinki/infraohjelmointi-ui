@@ -21,7 +21,7 @@ import {
   IOperationalEnvironmentAnalysisSummaryCsvRow,
   IOperationalEnvironmentAnalysisSummaryCategoryRowData,
 } from '@/interfaces/reportInterfaces';
-import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion } from './calculations';
+import { convertToMillions, formatNumber, formattedNumberToNumber, keurToMillion, sumCosts } from './calculations';
 import { TFunction, t } from 'i18next';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import { split } from 'lodash';
@@ -29,16 +29,19 @@ import { formatNumberToContainSpaces } from './common';
 import { IListItem } from '@/interfaces/common';
 import moment from 'moment';
 import { buildOperationalEnvironmentAnalysisRows, calculateOperationalEnvironmentAnalysisCategorySums } from '@/components/Report/common';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 interface IYearCheck {
   planningStart: number;
   constructionEnd: number;
+  type?: ReportType;
 }
 
 interface IBudgetCheck {
   budgetProposalCurrentYearPlus0: string | undefined | null;
   budgetProposalCurrentYearPlus1: string | undefined | null;
   budgetProposalCurrentYearPlus2: string | undefined | null;
+  type: ReportType;
 }
 
 /**
@@ -272,6 +275,34 @@ const isProjectInPlanningOrConstruction = (props: IYearCheck, yearsForward: numb
   }
 }
 
+const getIsProjectOnSchedule = (budgetOverrunReason: string | undefined): string => {
+  if (!budgetOverrunReason || budgetOverrunReason === "earlierSchedule" || budgetOverrunReason === 'totalCostsClarification') {
+    return t("option.true");
+  }
+  return t("option.false");
+}
+
+const getIsGroupOnSchedule = (projects: IProject[]): string => {
+  for (const p of projects) {
+    if (p.budgetOverrunReason && !["earlierSchedule", 'totalCostsClarification'].includes(p.budgetOverrunReason.value)) {
+      return t("option.false");
+    }
+  }
+  return t("option.true");
+}
+
+const getBudgetOverrunReason = (budgetOverrunReason: string | undefined, otherReason: string | undefined): string => {
+  if (budgetOverrunReason) {
+    if (budgetOverrunReason === 'otherReason') {
+      return otherReason ?? '';
+    }
+    else {
+      return t(`option.${budgetOverrunReason}`);
+    }
+  }
+  return '';
+}
+
 const convertToStrategyAndForecastReportProjects = (
   type: ReportType,
   projects: IProject[],
@@ -345,80 +376,128 @@ const convertToStrategyAndForecastReportProjects = (
 const convertToConstructionReportProjects = (
   projects: IProject[],
   divisions: Array<IListItem> | undefined,
-  subDivisions: Array<IListItem> | undefined
+  subDivisions: Array<IListItem> | undefined,
+  type: ReportType,
+  forcedToFrameProjects?: Array<IProject>,
+  sapCosts?: Record<string, IProjectSapCost>,
+  currentYearSapValues?: Record<string, IProjectSapCost>,
 ): IConstructionProgramTableRow[] => {
-  return projects
+  const filteredProjects = projects
   .filter((p) => 
     p.planningStartYear && p.constructionEndYear &&
     checkYearRange({
       planningStart: p.planningStartYear,
-      constructionEnd: p.constructionEndYear
+      constructionEnd: p.constructionEndYear,
+      type: type,
     }) &&
     checkProjectHasBudgets({
       budgetProposalCurrentYearPlus0: p.finances.budgetProposalCurrentYearPlus0,
       budgetProposalCurrentYearPlus1: p.finances.budgetProposalCurrentYearPlus1,
-      budgetProposalCurrentYearPlus2: p.finances.budgetProposalCurrentYearPlus2
+      budgetProposalCurrentYearPlus2: p.finances.budgetProposalCurrentYearPlus2,
+      type: type,
     }) &&
-    parseFloat(p.costForecast) >= 1000)
-  .map((p) => ({
-    name: p.name,
-    id: p.id,
-    children: [],
-    projects: [],
-    parent: null,
-    location: getDivision(p.projectDistrict, divisions, subDivisions),
-    costForecast: keurToMillion(p.costForecast),
-    startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
-    spentBudget: keurToMillion(p.spentBudget),
-    budgetProposalCurrentYearPlus0:
-      keurToMillion(p.finances.budgetProposalCurrentYearPlus0) ?? '',
-    budgetProposalCurrentYearPlus1:
-      keurToMillion(p.finances.budgetProposalCurrentYearPlus1) ?? '',
-    budgetProposalCurrentYearPlus2:
-      keurToMillion(p.finances.budgetProposalCurrentYearPlus2) ?? '',
-    type: 'project',
-  }));
+    parseFloat(p.costForecast) >= 1000);
+
+  return filteredProjects.map((p) => {
+    const forcedToFrameData = forcedToFrameProjects?.filter((fp) => fp.id === p.id)[0];
+    const costForcedToFrameBudget = split(forcedToFrameData?.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "";
+    const costForecastDeviation = calculateCostForecastDeviation(costForcedToFrameBudget, split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? undefined);
+    const costForecastDeviationPercent = calculateCostForecastDeviationPercent(split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? undefined, costForcedToFrameBudget);
+    const currentYearSapCost = currentYearSapValues ? sumCosts(currentYearSapValues[p.id], 'project_task_costs', 'production_task_costs') : 0;
+    const beforeCurrentYearSapCosts = sapCosts ? sumCosts(sapCosts[p.id], 'project_task_costs', 'production_task_costs') - currentYearSapCost : 0;
+
+    return {
+      name: p.name,
+      id: p.id,
+      children: [],
+      projects: [],
+      parent: null,
+      location: getDivision(p.projectDistrict, divisions, subDivisions),
+      costForecast: keurToMillion(p.costForecast),
+      startAndEnd: `${p.planningStartYear}-${p.constructionEndYear}`,
+      spentBudget: keurToMillion(p.spentBudget),
+      budgetProposalCurrentYearPlus0:
+        keurToMillion(p.finances.budgetProposalCurrentYearPlus0) ?? '',
+      budgetProposalCurrentYearPlus1:
+        keurToMillion(p.finances.budgetProposalCurrentYearPlus1) ?? '',
+      budgetProposalCurrentYearPlus2:
+        keurToMillion(p.finances.budgetProposalCurrentYearPlus2) ?? '',
+      isProjectOnSchedule: getIsProjectOnSchedule(p.budgetOverrunReason?.value),
+      budgetOverrunReason: getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason),
+      costForcedToFrameBudget: keurToMillion(costForcedToFrameBudget),   // Ennuste
+      costForecastDeviation: keurToMillion(costForecastDeviation),       // Poikkeama
+      costForecastDeviationPercent: costForecastDeviationPercent + "%",
+      currentYearSapCost: keurToMillion(currentYearSapCost / 1000),
+      beforeCurrentYearSapCosts: keurToMillion(beforeCurrentYearSapCosts / 1000),
+      type: 'project',
+    }
+  });
 }
 
 const convertToGroupValues = (
   projects: IProject[],
+  forcedToFramBudget: string | undefined,
+  sapCosts?: Record<string, IProjectSapCost>,
+  currentYearSapValues?: Record<string, IProjectSapCost>,
 ) => {
   let spentBudget = 0;
   let budgetProposalCurrentYearPlus0 = 0;
   let budgetProposalCurrentYearPlus1 = 0;
   let budgetProposalCurrentYearPlus2 = 0;
+  let currentYearSapCost = 0;
+  let beforeCurrentYearSapCosts = 0;
+  let budgetOverrunReasons = ""
 
   for (const p of projects) {
     spentBudget += parseFloat(p.spentBudget);
     budgetProposalCurrentYearPlus0 += parseFloat(p.finances.budgetProposalCurrentYearPlus0 ?? '0');
     budgetProposalCurrentYearPlus1 += parseFloat(p.finances.budgetProposalCurrentYearPlus1 ?? '0');
     budgetProposalCurrentYearPlus2 += parseFloat(p.finances.budgetProposalCurrentYearPlus2 ?? '0');
+    currentYearSapCost += currentYearSapValues ? sumCosts(currentYearSapValues[p.id], 'project_task_costs', 'production_task_costs') : 0;
+    beforeCurrentYearSapCosts += sapCosts ? sumCosts(sapCosts[p.id], 'project_task_costs', 'production_task_costs') - currentYearSapCost : 0;
+    budgetOverrunReasons += p.budgetOverrunReason ? `${budgetOverrunReasons != "" ? "\n" : ""}${p.name}: ${getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason)}` : budgetOverrunReasons
   }
+
+  const costForecastDeviationPercent = calculateCostForecastDeviationPercent(budgetProposalCurrentYearPlus0.toString() ?? undefined, forcedToFramBudget);
 
   return {
     spentBudget: keurToMillion(spentBudget),
     budgetProposalCurrentYearPlus0: keurToMillion(budgetProposalCurrentYearPlus0),
     budgetProposalCurrentYearPlus1: keurToMillion(budgetProposalCurrentYearPlus1),
     budgetProposalCurrentYearPlus2: keurToMillion(budgetProposalCurrentYearPlus2),
+    costForecastDeviation: keurToMillion(calculateCostForecastDeviation(forcedToFramBudget, budgetProposalCurrentYearPlus0.toString())),
+    isProjectOnSchedule: getIsGroupOnSchedule(projects),
+    costForecastDeviationPercent: costForecastDeviationPercent + "%",
+    currentYearSapCost: keurToMillion(currentYearSapCost / 1000),
+    beforeCurrentYearSapCosts: keurToMillion(beforeCurrentYearSapCosts / 1000),
+    budgetOverrunReason: budgetOverrunReasons,
   }
 }
 
-const checkYearRange = (props: IYearCheck ) => {
-  const startYear = new Date().getFullYear() + 1;
+const checkYearRange = (props: IYearCheck) => {
+  const currentYear = new Date().getFullYear();
+  const startYear = currentYear + 1;
   const nextThreeYears = [startYear, startYear + 1, startYear + 2];
   const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
+  const inPlanningOrConstructionThisYear = (currentYear >= props.planningStart && currentYear <= props.constructionEnd)
 
-  if (inPlanningOrConstruction) {
+  if (inPlanningOrConstruction && props.type === Reports.ConstructionProgram) {
     return true;
-  } else {
+  } else if (inPlanningOrConstructionThisYear && props.type === Reports.ConstructionProgramForecast){
+    return true;
+  }  else {
     return false;
   }
 }
 
 const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
-  return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+  if (projectFinances.type === Reports.ConstructionProgram) {
+    return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
     parseFloat((projectFinances.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
     parseFloat((projectFinances.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0;
+  } else {
+    return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0
+  }
 }
 
 const checkGroupHasBudgets = (group: IConstructionProgramTableRow) => {
@@ -521,7 +600,13 @@ const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   return properties;
 }
 
-const getConstructionRowType = (type: string, name: string) => {
+const getConstructionRowType = (type: string, name: string, reportType: string) => {
+  const isConstructionProgramForecastReport = reportType === Reports.ConstructionProgramForecast;
+
+  if (isConstructionProgramForecastReport){
+    return type;
+  }
+
   switch (type) {
     case 'masterClass':
       return 'masterClass';
@@ -698,6 +783,19 @@ export const calculateCostForecastDeviation = (plannedBudget: string | undefined
   return formatNumber(costForecastValue - plannedBudgetValue);
 }
 
+export const calculateCostForecastDeviationPercent = (plannedBudget: string | undefined, costForecast: string | undefined) => {
+  const costForecastValue = costForecast ? formattedNumberToNumber(costForecast) : 0;
+  const plannedBudgetValue = plannedBudget ? formattedNumberToNumber(plannedBudget) : 0;
+  
+  const deviation = plannedBudgetValue - costForecastValue;
+  if (deviation != 0.0) {
+    return Math.round((deviation / Math.abs(costForecastValue)) * 100);
+  }
+  else {
+    return 0;
+  }
+}
+
 /**
  * Check row has either frame budget or budget overlap, or it has planned budget
  * @param c A row object
@@ -748,6 +846,8 @@ export const convertToReportRows = (
   subDivisions?: Array<IListItem> | undefined,
   projectsInWarrantyPhase?: Array<IProject>,
   hierarchyInForcedToFrame?: IPlanningRow[],
+  sapCosts?: Record<string, IProjectSapCost>,
+  currentYearSapValues?: Record<string, IProjectSapCost>,
 ): IBudgetBookSummaryTableRow[] | IOperationalEnvironmentAnalysisTableRow[] | IStrategyAndForecastTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
@@ -929,7 +1029,8 @@ export const convertToReportRows = (
       }
       return forcedToFrameHierarchy;
     }
-    case Reports.ConstructionProgram: {
+    case Reports.ConstructionProgram:
+    case Reports.ConstructionProgramForecast: {
       const planningHierarchy = [];
       const pathsWithExtraRows = [
         "8 01 Kiinteä omaisuus/Esirakentaminen/Muu esirakentaminen",
@@ -959,20 +1060,26 @@ export const convertToReportRows = (
           const endYear = getGroupEndYear(c.projectRows);
           if (startYear && endYear && checkYearRange({
             planningStart: startYear,
-            constructionEnd: endYear
+            constructionEnd: endYear,
+            type: reportType,
           })) {
+            const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
+            const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
+            const forcedToFramBudget = forcedToFrameClass?.cells[0].plannedBudget;
+            
             const isOnlyHeaderGroup = projectsToBeShownMasterClass(c.path);
             const convertedGroup: IConstructionProgramTableRow = {
               id: c.id,
               name: c.name,
               parent: c.path,
               children: [],
-              projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
+              projects: isOnlyHeaderGroup ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, reportType, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
               costForecast: isOnlyHeaderGroup ? undefined : keurToMillion(c.costEstimateBudget),
               startAndEnd: isOnlyHeaderGroup ? undefined : `${startYear}-${endYear}`,
               type: isOnlyHeaderGroup ? 'group' : 'groupWithValues',
               location: c.location ? getDivision(c.location, divisions, subDivisions) : '',
-              ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows)),
+              costForcedToFrameBudget: isOnlyHeaderGroup ? undefined : keurToMillion(forcedToFramBudget),
+              ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, forcedToFramBudget)),
             }
 
             if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup)) {
@@ -982,7 +1089,8 @@ export const convertToReportRows = (
                 if (checkProjectHasBudgets({
                   budgetProposalCurrentYearPlus0: project.budgetProposalCurrentYearPlus0,
                   budgetProposalCurrentYearPlus1: project.budgetProposalCurrentYearPlus1,
-                  budgetProposalCurrentYearPlus2: project.budgetProposalCurrentYearPlus2
+                  budgetProposalCurrentYearPlus2: project.budgetProposalCurrentYearPlus2,
+                  type: reportType,
                 })) {
                   planningHierarchy.push(convertedGroup);
                   break;
@@ -991,14 +1099,17 @@ export const convertToReportRows = (
             }
           }
         } else if (c.type !== 'group') {
+          const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
+          const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
+          const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
           const convertedClass: IConstructionProgramTableRow = {
             id: c.id,
             name: c.name,
             parent: c.path,
             path: c.path,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions) : [],
-            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions) : [],
-            type: getConstructionRowType(c.type, c.name.toLowerCase()) as ReportTableRowType,
+            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions, undefined, forcedToFrameChildren, sapCosts, currentYearSapValues) : [],
+            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, reportType, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
+            type: getConstructionRowType(c.type, c.name.toLowerCase(), reportType) as ReportTableRowType,
           }
 
           planningHierarchy.push(convertedClass);
@@ -1339,6 +1450,45 @@ const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]
   return constructionProgramCsvRows;
 }
 
+const processConstructionForecastReportRows = (tableRows: IConstructionProgramTableRow[]) => {
+  const getType = (name: string, type: string) => {
+    const nameLowerCase = name.toLowerCase();
+    if (nameLowerCase.includes("suurpiiri") || nameLowerCase.includes("östersundom")){
+      return type === "districtPreview" ? "subClassDistrict" : type;
+    }
+    return type;
+  }
+
+  tableRows.forEach((tableRow) => {
+    if (
+      tableRow.type !== 'subClassDistrict' &&
+      tableRow.type !== 'division' &&
+      !constructionProgramCsvRows.some(row => row.id === tableRow.id) && isShownOnTheReport(tableRow)
+    ){
+      constructionProgramCsvRows.push({
+        id: tableRow.id,
+        name: tableRow.name,
+        type: getType(tableRow.name, tableRow.type),
+        location: tableRow.location,
+        costForecast: tableRow.costForecast,
+        startAndEnd: tableRow.startAndEnd,
+        spentBudget: tableRow.spentBudget,
+        budgetProposalCurrentYearPlus0: tableRow.budgetProposalCurrentYearPlus0,
+        isProjectOnSchedule: tableRow.isProjectOnSchedule,
+        budgetOverrunReason: tableRow.budgetOverrunReason,
+        costForcedToFrameBudget: tableRow.costForcedToFrameBudget,
+        costForecastDeviation: tableRow.costForecastDeviation,
+        costForecastDeviationPercent: tableRow.costForecastDeviationPercent,
+        currentYearSapCost: tableRow.currentYearSapCost,
+        beforeCurrentYearSapCosts: tableRow.beforeCurrentYearSapCosts,
+      });
+    }
+    processConstructionForecastReportRows(tableRow.projects);
+    processConstructionForecastReportRows(tableRow.children);
+  });
+  return constructionProgramCsvRows;
+}
+
 /**
  * Create a flattened version of report table rows, since the react-csv needs a one-dimensional array
  */
@@ -1365,6 +1515,11 @@ export const flattenConstructionProgramTableRows = (
   tableRows: Array<IConstructionProgramTableRow>,
 ): Array<IConstructionProgramCsvRow> =>
   processConstructionReportRows(tableRows).flat(Infinity);
+
+export const flattenConstructionProgramForecastTableRows = (
+  tableRows: Array<IConstructionProgramTableRow>,
+): Array<IConstructionProgramCsvRow> =>
+  processConstructionForecastReportRows(tableRows).flat(Infinity);
 
 /**
  * Create report table rows without flattening
@@ -1509,6 +1664,23 @@ export const getReportData = async (
           [`TA ${year + 1} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus0,
           [`TS ${year + 2} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus1,
           [`TS ${year + 3} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus2,
+        }));
+      }
+      case Reports.ConstructionProgramForecast: {
+        const flattenedRows = flattenConstructionProgramForecastTableRows(reportRows as IConstructionProgramTableRow[]);
+        return flattenedRows.map((r: IConstructionProgramCsvRow) => ({
+          [t('report.constructionProgramForecast.projectTitle')]: r.name,
+          [t('report.constructionProgramForecast.locationTitle')]: r.location,
+          [t('report.constructionProgramForecast.budgetTitle')]: r.costForecast,
+          [t('report.constructionProgramForecast.scheduleTitle')]: r.startAndEnd,
+          [t('report.constructionProgramForecast.isProjectOnScheduleTitle')]: r.isProjectOnSchedule,
+          [`${t('report.constructionProgramForecast.commitmentsBeforeYearTitle')} ${year}`]: r.beforeCurrentYearSapCosts,
+          [`${t('report.constructionProgramForecast.commitmentsYearTitle')} ${year}`]: r.currentYearSapCost,
+          [`${t('report.shared.ta')} ${year}`]: r.costForcedToFrameBudget,
+          [t('report.constructionProgramForecast.forecast1Title')]: r.budgetProposalCurrentYearPlus0,
+          [`${t('report.constructionProgramForecast.differenceTitle')} ${year}`]: r.costForecastDeviation,
+          [t('report.constructionProgramForecast.differencePercentTitle', {year: year})]: r.costForecastDeviationPercent,
+          [t('report.constructionProgramForecast.differenceReasonTitle')]: r.budgetOverrunReason,
         }));
       }
       case Reports.BudgetBookSummary: {

@@ -63,7 +63,6 @@ const StrategyAndForecastTableHeader = ({ isForecastReport }: StrategyTableHeade
 
   return (
     <View style={styles.tableHeader}>
-      {/* Row 2 */}
       <View style={styles.tableHeaderRow}>
         <Text style={styles.projectCell}>{`\n${t('report.strategy.projectNameTitle')}`}</Text>
         <Text style={styles.projectManagerCell}>{`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`}</Text>

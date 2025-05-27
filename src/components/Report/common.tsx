@@ -22,7 +22,7 @@ export const getForcedToFrameDataForReports = async (
     if (type === Reports.OperationalEnvironmentAnalysisForcedToFrame) return await getForcedToFrameData(year, true)
     if (type === Reports.Strategy) return await getForcedToFrameData(year + 1, false);
     if (type === Reports.StrategyForcedToFrame) return await getForcedToFrameData(year + 1, true);
-    if (type === Reports.ForecastReport) {
+    if (type === Reports.ForecastReport || type === Reports.ConstructionProgramForecast) {
         if (coordinatorData) return await getForcedToFrameData(year, false);
         else return await getForcedToFrameData(year, true);
     }
