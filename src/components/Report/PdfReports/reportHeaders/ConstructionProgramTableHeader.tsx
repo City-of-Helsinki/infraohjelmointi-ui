@@ -78,12 +78,12 @@ const ConstructionProgramTableHeader = () => {
       {/* Row 2 */}
       <View style={styles.tableHeaderRow}>
         <Text style={styles.firstCellsWrapper} />
-        <Text style={styles.costForecastCell}>{t('millionEuro')}</Text>
+        <Text style={styles.costForecastCell}>{t('report.shared.millionEuro')}</Text>
         <Text style={styles.planAndConStartCell}>{t('constructionTiming')}</Text>
-        <Text style={styles.previouslyUsedCell}>{t('millionEuro')}</Text>
-        <Text style={styles.cell}>{t('millionEuro')}</Text>
-        <Text style={styles.cell}>{t('millionEuro')}</Text>
-        <Text style={styles.lastCell}>{t('millionEuro')}</Text>
+        <Text style={styles.previouslyUsedCell}>{t('report.shared.millionEuro')}</Text>
+        <Text style={styles.cell}>{t('report.shared.millionEuro')}</Text>
+        <Text style={styles.cell}>{t('report.shared.millionEuro')}</Text>
+        <Text style={styles.lastCell}>{t('report.shared.millionEuro')}</Text>
       </View>
     </View>
   );

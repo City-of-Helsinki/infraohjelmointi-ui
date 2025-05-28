@@ -470,7 +470,8 @@
     "shared": {
       "ta": "TA",
       "ts": "TS",
-      "kiloEuro": "k€"
+      "kiloEuro": "k€",
+      "millionEuro": "milj. €"
     },
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
@@ -515,7 +516,6 @@
       "projectNameTitle": "Hanke",
       "projectsTitle": "Kohteen",
       "projectManagerTitle": "projektipäällikkö",
-      "footerInfoText": "s = suunnittelu, r = rakentaminen",
       "planning": "Suunnittelu",
       "constructing": "Rakentaminen",
       "projectManagerMissing": "Odottaa nimeämistä"
@@ -628,7 +628,6 @@
   "content": "Sisältö",
   "division": "Kaupunginosa",
   "costForecast": "Kustannusennuste",
-  "millionEuro": "milj. €",
   "planningAnd": "Suunnittelun ja",
   "constructionTiming": "rakentamisen ajoitus",
   "previouslyUsed": "Aiemmin käytetty",

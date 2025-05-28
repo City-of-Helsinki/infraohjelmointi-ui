@@ -131,12 +131,13 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             sapCosts={sapCosts}
             currentYearSapValues={currentYearSapValues}
           />
-          {reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
-            <StrategyReportFooter
-              infoText={t('report.strategy.footerInfoText')}
-              colorInfoTextOne={t('report.strategy.planning')}
-              colorInfoTextTwo={t('report.strategy.constructing')}
-            /> : <DefaultReportFooter/>
+          {
+            [Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(reportType as Reports) ?
+              <StrategyReportFooter
+                infoText={(reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame) ? t('report.strategy.footerInfoText') : ""}
+                colorInfoTextOne={t('report.strategy.planning')}
+                colorInfoTextTwo={t('report.strategy.constructing')}
+              /> : <DefaultReportFooter />
           }
         </View>
       </Page>
