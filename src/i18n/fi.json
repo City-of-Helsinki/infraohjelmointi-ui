@@ -642,7 +642,6 @@
   "initialInvestmentProgram": "Alustava investointiohjelma {{startYear}}-{{endYear}}",
   "TAE": "TAE",
   "TSE": "TSE",
-  "thousandEuros": "1000 €",
   "maintenanceMode": {
     "title": "Huoltotila",
     "description": "Pieni hetki, sivustoa huolletaan parhaillaan"
