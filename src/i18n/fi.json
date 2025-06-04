@@ -470,7 +470,7 @@
     "shared": {
       "ta": "TA",
       "ts": "TS",
-      "kiloEuro": "k€",
+      "kiloEuro": "1000€",
       "millionEuro": "milj. €"
     },
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
@@ -642,7 +642,6 @@
   "initialInvestmentProgram": "Alustava investointiohjelma {{startYear}}-{{endYear}}",
   "TAE": "TAE",
   "TSE": "TSE",
-  "thousandEuros": "1000 €",
   "maintenanceMode": {
     "title": "Huoltotila",
     "description": "Pieni hetki, sivustoa huolletaan parhaillaan"
