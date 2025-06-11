@@ -26,5 +26,6 @@ export enum UserRole {
   PLANNER = 'sg_kymp_sso_io_ohjelmoijat',
   VIEWER = 'sl_dyn_kymp_sso_io_katselijat',
   VIEWER_OTHERS = 'sg_kymp_sso_io_katselijat_muut',
+  VIEWER_OUTSIDE_ORGANIZATION = 'az_kymp_asgd_u_infraohjelmointi_ulkopuoliset',
   ADMIN = 'sg_kymp_sso_io_admin',
 }
