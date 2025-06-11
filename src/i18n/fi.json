@@ -477,7 +477,8 @@
     "shared": {
       "ta": "TA",
       "ts": "TS",
-      "kiloEuro": "k€"
+      "kiloEuro": "k€",
+      "millionEuro": "milj. €"
     },
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
@@ -567,9 +568,9 @@
       "isProjectOnScheduleTitle": "Onko hanke aikataulussa Kyllä/Ei",
       "commitmentsBeforeYearTitle": "Toteuma ennen",
       "commitmentsYearTitle": "Toteuma",
-      "forecast1Title": "Ennuste 1",
-      "differenceTitle": "Poikkeama EVTA",
-      "differencePercentTitle": "Poikkeama EVTA{{year}} -%",
+      "forecast1Title": "Ennuste",
+      "differenceTitle": "Poikkeama TA",
+      "differencePercentTitle": "Poikkeama TA{{year}} -%",
       "differenceReasonTitle": "Keskeisimmät poikkeamat verrattuna TA:s ja niiden syyt"
     }
   },

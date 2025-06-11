@@ -64,11 +64,11 @@ const ConstructionProgramForecastTableHeader = () => {
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.budgetTitle')}`}</Text>
                 <Text style={styles.projectPhaseCell}>{`${t('report.constructionProgramForecast.scheduleTitle')}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.isProjectOnScheduleTitle')}`}</Text>
-                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.commitmentsBeforeYearTitle')} ${year}`}</Text>
-                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.commitmentsYearTitle')} ${year}`}</Text>
-                <Text style={styles.budgetCell}>{`${t('report.shared.ta')} ${year}`}</Text>
-                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.forecast1Title')}`}</Text>
-                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.differenceTitle')}${year}`}</Text>
+                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.commitmentsBeforeYearTitle')} ${year} ${t('report.shared.millionEuro')}`}</Text>
+                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.commitmentsYearTitle')} ${year} ${t('report.shared.millionEuro')}`}</Text>
+                <Text style={styles.budgetCell}>{`${t('report.shared.ta')} ${year} ${t('report.shared.millionEuro')}`}</Text>
+                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.forecast1Title')} ${t('report.shared.millionEuro')}`}</Text>
+                <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.differenceTitle')}${year} ${t('report.shared.millionEuro')}`}</Text>
                 <Text style={styles.budgetCell}>{`${t('report.constructionProgramForecast.differencePercentTitle', {year: year})}`}</Text>
                 <Text style={styles.budgetOverrunReasonCell}>{`\n${t('report.constructionProgramForecast.differenceReasonTitle')}`}</Text>
             </View>
