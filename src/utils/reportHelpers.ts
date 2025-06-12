@@ -457,7 +457,8 @@ const convertToGroupValues = (
     budgetProposalCurrentYearPlus2 += parseFloat(p.finances.budgetProposalCurrentYearPlus2 ?? '0');
     currentYearSapCost += currentYearSapValues ? sumCosts(currentYearSapValues[p.id], 'project_task_costs', 'production_task_costs') : 0;
     beforeCurrentYearSapCosts += sapCosts ? sumCosts(sapCosts[p.id], 'project_task_costs', 'production_task_costs') - currentYearSapCost : 0;
-    budgetOverrunReasons += p.budgetOverrunReason ? `${budgetOverrunReasons != "" ? "\n" : ""}${p.name}: ${getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason)}` : budgetOverrunReasons
+    budgetOverrunReasons = p.budgetOverrunReason ? budgetOverrunReasons + `${budgetOverrunReasons != "" ? "\n" : ""}${p.name}: ${getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason)}` : budgetOverrunReasons
+    console.log(budgetOverrunReasons);
   }
 
   const costForecastDeviationPercent = calculateCostForecastDeviationPercent(budgetProposalCurrentYearPlus0.toString() ?? undefined, forcedToFramBudget);
