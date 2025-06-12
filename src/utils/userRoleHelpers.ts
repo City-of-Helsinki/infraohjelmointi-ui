@@ -56,16 +56,14 @@ export const isUserProjectManager = (user: IUser | null) => {
   );
 };
 
-const adGroupIsViewer = (adGroup: IAdGroup) => adGroup.name === UserRole.VIEWER || adGroup.name === UserRole.VIEWER_OTHERS;
+const adGroupIsViewer = (adGroup: IAdGroup) => adGroup.name === UserRole.VIEWER || adGroup.name === UserRole.VIEWER_OTHERS || adGroup.name === UserRole.VIEWER_OUTSIDE_ORGANIZATION;
 
-export const isUserOnlyViewer = (user: IUser | null) => {
+export const isUserOnlyViewer = (user: IUser | null): boolean => {
   if (!user) {
     return false;
   }
-  return (
-    (user.ad_groups.length === 1 && adGroupIsViewer(user.ad_groups[0])) ||
-    (user.ad_groups.length === 2 && (adGroupIsViewer(user.ad_groups[0]) && adGroupIsViewer(user.ad_groups[1])))
-  );
+
+  return user.ad_groups.every(adGroupIsViewer);
 };
 
 export const isUserOnlyProjectAreaPlanner = (user: IUser | null) => {
