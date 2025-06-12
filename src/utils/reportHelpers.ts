@@ -41,6 +41,7 @@ interface IBudgetCheck {
   budgetProposalCurrentYearPlus0: string | undefined | null;
   budgetProposalCurrentYearPlus1: string | undefined | null;
   budgetProposalCurrentYearPlus2: string | undefined | null;
+  forcedToFrameProject: IProjectFinances | undefined;
   type: ReportType;
 }
 
@@ -394,12 +395,13 @@ const convertToConstructionReportProjects = (
       budgetProposalCurrentYearPlus0: p.finances.budgetProposalCurrentYearPlus0,
       budgetProposalCurrentYearPlus1: p.finances.budgetProposalCurrentYearPlus1,
       budgetProposalCurrentYearPlus2: p.finances.budgetProposalCurrentYearPlus2,
+      forcedToFrameProject: forcedToFrameProjects?.find((fp) => fp.id === p.id)?.finances,
       type: type,
     }) &&
     parseFloat(p.costForecast) >= 1000);
 
   return filteredProjects.map((p) => {
-    const forcedToFrameData = forcedToFrameProjects?.filter((fp) => fp.id === p.id)[0];
+    const forcedToFrameData = forcedToFrameProjects?.find((fp) => fp.id === p.id);
     const costForcedToFrameBudget = split(forcedToFrameData?.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? "";
     const costForecastDeviation = calculateCostForecastDeviation(costForcedToFrameBudget, split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? undefined);
     const costForecastDeviationPercent = calculateCostForecastDeviationPercent(split(p.finances.budgetProposalCurrentYearPlus0, ".")[0] ?? undefined, costForcedToFrameBudget);
@@ -495,15 +497,19 @@ const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
     return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
     parseFloat((projectFinances.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
     parseFloat((projectFinances.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0;
-  } else {
-    return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0
   }
+  return parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+  parseFloat((projectFinances.forcedToFrameProject?.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.'));
 }
 
-const checkGroupHasBudgets = (group: IConstructionProgramTableRow) => {
-  return parseFloat((group.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+const checkGroupHasBudgets = (group: IConstructionProgramTableRow, reportType: ReportType) => {
+  if (reportType === Reports.ConstructionProgram) {
+    return parseFloat((group.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
     parseFloat((group.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
-    parseFloat((group.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0
+    parseFloat((group.budgetProposalCurrentYearPlus2 ?? '0').replace(',', '.')) > 0;
+  }
+  return parseFloat((group.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
+  parseFloat((group.costForcedToFrameBudget ?? '0').replace(',', '.')) > 0;
 }
 
 export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTableRow[]) => {
@@ -1055,16 +1061,19 @@ export const convertToReportRows = (
         path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
 
       for (const c of rows) {
-        if (c.type === 'group' && c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) {
+        if (c.type === 'group') {
           const startYear = getGroupStartYear(c.projectRows);
           const endYear = getGroupEndYear(c.projectRows);
+          const forcedToFrameData = hierarchyInForcedToFrame?.find((hc) => hc.id === c.id);
           if (startYear && endYear && checkYearRange({
             planningStart: startYear,
             constructionEnd: endYear,
             type: reportType,
-          })) {
-            const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
-            const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
+          }) && (
+            (c.costEstimateBudget && parseFloat(c.costEstimateBudget.replace(/\s/g, '')) >= 1000) ||
+            (forcedToFrameData?.costEstimateBudget && parseFloat(forcedToFrameData.costEstimateBudget.replace(/\s/g, '')) >= 1000)
+          )) {
+            const forcedToFrameClass = forcedToFrameData ? forcedToFrameData : null;
             const forcedToFramBudget = forcedToFrameClass?.cells[0].plannedBudget;
             
             const isOnlyHeaderGroup = projectsToBeShownMasterClass(c.path);
@@ -1082,7 +1091,7 @@ export const convertToReportRows = (
               ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, forcedToFramBudget)),
             }
 
-            if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup)) {
+            if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup, reportType)) {
               planningHierarchy.push(convertedGroup);
             } else {
               for (const project of convertedGroup.projects) {
@@ -1090,6 +1099,7 @@ export const convertToReportRows = (
                   budgetProposalCurrentYearPlus0: project.budgetProposalCurrentYearPlus0,
                   budgetProposalCurrentYearPlus1: project.budgetProposalCurrentYearPlus1,
                   budgetProposalCurrentYearPlus2: project.budgetProposalCurrentYearPlus2,
+                  forcedToFrameProject: forcedToFrameClass?.projectRows.find((fp) => fp.id === project.id)?.finances,
                   type: reportType,
                 })) {
                   planningHierarchy.push(convertedGroup);
@@ -1098,7 +1108,7 @@ export const convertToReportRows = (
               }
             }
           }
-        } else if (c.type !== 'group') {
+        } else {
           const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
           const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
           const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
