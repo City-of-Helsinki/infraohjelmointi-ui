@@ -357,6 +357,7 @@ const convertToStrategyAndForecastReportProjects = (
       costForecastDeviation: costForecastDeviation,       // Poikkeama
       projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
       projectPhase: getProjectPhase(type, p),
+      budgetOverrunReason: getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason),
       januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
       februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
       marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
@@ -1239,6 +1240,7 @@ const strategyAndForecastRowObject =(reportName: string, row: IStrategyAndForeca
     costForecast: row.costForecast ?? '',     // TS value
     projectManager: row.projectManager ?? '',
     projectPhase: row.projectPhase ?? '',
+    budgetOverrunReason: row.budgetOverrunReason ?? '',
     januaryStatus: row.januaryStatus ?? '',
     februaryStatus: row.februaryStatus ?? "",
     marchStatus: row.marchStatus ?? "",
@@ -1653,6 +1655,7 @@ export const getReportData = async (
           ...(reportType === Reports.ForecastReport && {
             [`\nEnnuste ${year + 1}`]: r.costForcedToFrameBudget,
             [`\nPoikkeama`]: r.costForecastDeviation,
+            [t('report.constructionProgramForecast.differenceReasonTitle')]: r.budgetOverrunReason,
           }),
           [`${year + 1}\n01`]: r.januaryStatus,
           [`\n02`]: r.februaryStatus,

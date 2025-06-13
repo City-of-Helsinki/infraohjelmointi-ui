@@ -570,6 +570,9 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
                 <Text style={getForecastDeviationStyle(flattenedRow.type, flattenedRow.costForecastDeviation ?? "0")}>{flattenedRow.costForecastDeviation}</Text>
               </>
             }
+            {
+              reportType === Reports.ForecastReport && <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
+            }
 
             {flattenedRow.januaryStatus === "planningAndConstruction" ?
               <><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'right')}></Text></>
