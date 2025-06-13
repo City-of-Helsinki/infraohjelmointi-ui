@@ -87,6 +87,7 @@ const ProjectHeader: FC = () => {
   );
 
   const phase = watch('phase');
+  const projectHeaderPhaseString = getValues('phase')?.label ? t(`option.${(getValues('phase')).label}`) : "";
 
   useEffect(() => {
     const newIconKey = mapIconKey(phase?.label);
@@ -110,10 +111,12 @@ const ProjectHeader: FC = () => {
             data-testid="project-header-name-fields"
           >
             <ProjectNameFields control={control} />
-            <div className="project-header-phase">
-              <div className="project-header-icon">{icon}</div>
-              <div>{t(`option.${getValues('phase').label}`)}</div>
-            </div>
+            { projectHeaderPhaseString &&
+              <div className="project-header-phase">
+                  <div className="project-header-icon">{icon}</div>
+                  <div>{projectHeaderPhaseString}</div>
+              </div>
+            }
           </div>
         </div>
         <div className="mr-3 flex-1" data-testid="project-header-right">

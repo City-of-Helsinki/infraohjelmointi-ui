@@ -470,7 +470,8 @@
     "shared": {
       "ta": "TA",
       "ts": "TS",
-      "kiloEuro": "k€"
+      "kiloEuro": "1000€",
+      "millionEuro": "milj. €"
     },
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
     "operationalEnvironmentAnalysis": {
@@ -515,7 +516,6 @@
       "projectNameTitle": "Hanke",
       "projectsTitle": "Kohteen",
       "projectManagerTitle": "projektipäällikkö",
-      "footerInfoText": "s = suunnittelu, r = rakentaminen",
       "planning": "Suunnittelu",
       "constructing": "Rakentaminen",
       "projectManagerMissing": "Odottaa nimeämistä"
@@ -548,6 +548,22 @@
       "projectManagerTitle": "projektipäällikkö",
       "forecastValue": "Ennuste",
       "differenceValue": "Poikkeama"
+    },
+    "constructionProgramForecast": {
+      "rowTitle": "Rakentamisohjelman ennusteraportti",
+      "documentName": "rakentamisohjelman ennuste",
+      "subTitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma vuodelle {{year}}",
+      "projectTitle": "Kohde",
+      "locationTitle": "Sijainti",
+      "budgetTitle": "Kokonaiskustannukset milj. €",
+      "scheduleTitle": "Suunnittelun ja rakentamisen ajoitus",
+      "isProjectOnScheduleTitle": "Onko hanke aikataulussa Kyllä/Ei",
+      "commitmentsBeforeYearTitle": "Toteuma ennen",
+      "commitmentsYearTitle": "Toteuma",
+      "forecast1Title": "Ennuste",
+      "differenceTitle": "Poikkeama TA",
+      "differencePercentTitle": "Poikkeama TA{{year}} -%",
+      "differenceReasonTitle": "Keskeisimmät poikkeamat verrattuna talousarvioon ja niiden syyt"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
@@ -612,7 +628,6 @@
   "content": "Sisältö",
   "division": "Kaupunginosa",
   "costForecast": "Kustannusennuste",
-  "millionEuro": "milj. €",
   "planningAnd": "Suunnittelun ja",
   "constructionTiming": "rakentamisen ajoitus",
   "previouslyUsed": "Aiemmin käytetty",
@@ -627,7 +642,6 @@
   "initialInvestmentProgram": "Alustava investointiohjelma {{startYear}}-{{endYear}}",
   "TAE": "TAE",
   "TSE": "TSE",
-  "thousandEuros": "1000 €",
   "maintenanceMode": {
     "title": "Huoltotila",
     "description": "Pieni hetki, sivustoa huolletaan parhaillaan"

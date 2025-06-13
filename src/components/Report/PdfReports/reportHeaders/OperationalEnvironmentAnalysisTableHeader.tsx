@@ -54,22 +54,22 @@ const OperationalEnvironmentAnalysisTableHeader = () => {
         <View style={styles.narrowerColumns}>
             <Text>{t('report.operationalEnvironmentAnalysis.costForecastShortened')}</Text>
             <Text>{new Date().getFullYear()}</Text>
-            <Text>{t('thousandEuros')}</Text>
+            <Text>{t('report.shared.kiloEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TAE')}</Text>
             <Text>{new Date().getFullYear() + 1}</Text>
-            <Text>{t('thousandEuros')}</Text>
+            <Text>{t('report.shared.kiloEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TSE')}</Text>
             <Text>{new Date().getFullYear() + 2}</Text>
-            <Text>{t('thousandEuros')}</Text>
+            <Text>{t('report.shared.kiloEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TSE')}</Text>
             <Text>{new Date().getFullYear() + 3}</Text>
-            <Text>{t('thousandEuros')}</Text>
+            <Text>{t('report.shared.kiloEuro')}</Text>
         </View>
         <View style={styles.yearContainer}>
           <Text>
@@ -83,7 +83,7 @@ const OperationalEnvironmentAnalysisTableHeader = () => {
                 return (
                   <View key={year} style={styles.yearColumn}>
                     <Text>{new Date().getFullYear() + year}</Text>
-                    <Text>{t('thousandEuros')}</Text>
+                    <Text>{t('report.shared.kiloEuro')}</Text>
                   </View>
                 );
             })}

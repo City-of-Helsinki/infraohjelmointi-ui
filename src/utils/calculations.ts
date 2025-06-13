@@ -6,6 +6,8 @@ import {
   PlanningRowType,
 } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { split } from 'lodash';
 
 // Formats a number to include thousand sepparators
 export const formatNumber = (number: number | undefined) => number?.toLocaleString('fi-FI') ?? '0';
@@ -182,7 +184,7 @@ export const calcPercentage = (value: number, total: number) => Math.round((valu
 export const keurToMillion = (value?: string | null | number) => {
   if (!value) return '0,0';
 
-  const valueAsNumber = typeof value !== 'number' ? parseFloat(value.replace(/\s/g, '')) : value;
+  const valueAsNumber = typeof value !== 'number' ? formattedNumberToNumber(split(value, ".")[0]) : value;
   const millionValue = (valueAsNumber / 1000).toFixed(1);
 
   return millionValue.toString().replace('.', ',');
@@ -198,3 +200,7 @@ export const convertToMillions = (value?: string | number): string => {
   const rounded = roundUp(valueWithCorrectType);
   return String(rounded);
 };
+
+export const sumCosts = (costs: IProjectSapCost | undefined | null, costType1: string, costType2: string): number => {
+  return costs ? (Number(costs[costType1 as keyof IProjectSapCost]) || 0) + (Number(costs[costType2 as keyof IProjectSapCost]) || 0) : 0;
+}

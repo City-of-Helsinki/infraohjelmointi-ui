@@ -51,6 +51,12 @@ const styles = StyleSheet.create({
     ...cellStyles,
     width: '30px',
   },
+  budgetOverrunReasonCell: {
+    ...cellStyles,
+    paddingRight: '21px',
+    paddingLeft: '6px',
+    width: '280px',
+  },
 });
 
 interface StrategyTableHeaderProps {
@@ -63,7 +69,6 @@ const StrategyAndForecastTableHeader = ({ isForecastReport }: StrategyTableHeade
 
   return (
     <View style={styles.tableHeader}>
-      {/* Row 2 */}
       <View style={styles.tableHeaderRow}>
         <Text style={styles.projectCell}>{`\n${t('report.strategy.projectNameTitle')}`}</Text>
         <Text style={styles.projectManagerCell}>{`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`}</Text>
@@ -76,6 +81,9 @@ const StrategyAndForecastTableHeader = ({ isForecastReport }: StrategyTableHeade
               <Text style={styles.budgetCell}>{`${t('report.forecastReport.forecastValue')} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
               <Text style={styles.budgetCell}>{`${t('report.forecastReport.differenceValue')}\n${t('report.shared.kiloEuro')}`}</Text>
             </> : null
+        }
+        {
+          isForecastReport && <Text style={styles.budgetOverrunReasonCell}>{`\n${t('report.constructionProgramForecast.differenceReasonTitle')}`}</Text>
         }
         <Text style={styles.monthCell}>{`${year}\n01`}</Text>
         <Text style={styles.monthCell}>{`\n02`}</Text>

@@ -57,6 +57,7 @@ export const reports = [
   'strategy',
   'strategyForcedToFrame',
   'forecastReport',
+  'constructionProgramForecast',
   'constructionProgram',
   'budgetBookSummary',
   'financialStatement',
@@ -92,6 +93,7 @@ export enum Reports {
   Strategy = 'strategy',
   StrategyForcedToFrame = 'strategyForcedToFrame',
   ConstructionProgram = 'constructionProgram',
+  ConstructionProgramForecast = 'constructionProgramForecast',
   ForecastReport = 'forecastReport',
   BudgetBookSummary = 'budgetBookSummary',
   FinancialStatement = 'financialStatement',
@@ -198,6 +200,7 @@ export interface IStrategyAndForecastTableRow extends ITableRowEssentials {
   costForecast?: string;
   costForcedToFrameBudget?: string;
   costForecastDeviation?: string;
+  budgetOverrunReason?: string;
   januaryStatus?: string;
   februaryStatus?: string;
   marchStatus?: string;
@@ -234,6 +237,13 @@ export interface IConstructionProgramTableRow extends ITableRowEssentials {
   budgetProposalCurrentYearPlus0?: string;
   budgetProposalCurrentYearPlus1?: string;
   budgetProposalCurrentYearPlus2?: string;
+  isProjectOnSchedule?: string;
+  budgetOverrunReason?: string;
+  costForcedToFrameBudget?: string;
+  costForecastDeviation?: string;
+  costForecastDeviationPercent?: string;
+  currentYearSapCost?: string;
+  beforeCurrentYearSapCosts?: string;
 }
 
 export interface IPlannedBudgets {

@@ -8,7 +8,8 @@ import {
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
   flattenConstructionProgramTableRows,
-  flattenForecastTableRows
+  flattenForecastTableRows,
+  flattenConstructionProgramForecastTableRows
 } from '@/utils/reportHelpers';
 import {
   IBasicReportData,
@@ -26,6 +27,8 @@ import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/Operation
 import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
 import { buildOperationalEnvironmentAnalysisRows } from '../common';
+import ConstructionProgramForecastTableHeader from './reportHeaders/ConstructionProgramForecastTableHeader';
+import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 const styles = StyleSheet.create({
   table: {
@@ -39,18 +42,22 @@ interface IReportTableProps {
   data: IBasicReportData;
   projectsInWarrantyPhase?: IProject[];
   hierarchyInForcedToFrame?: IPlanningRow[];
+  sapCosts?: Record<string, IProjectSapCost>;
+  currentYearSapValues?: Record<string, IProjectSapCost>;
 }
 
 type IReportFlattenedRows = IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow;
 
 const getFlattenedRows = (
   reportRows: IReportFlattenedRows[],
-  reportType: ReportType
+  reportType: ReportType,
 ) => {
   if (reportType === Reports.BudgetBookSummary) {
     return flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
   } else if (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
     return flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+  } else if (reportType === Reports.ConstructionProgramForecast) {
+    return flattenConstructionProgramForecastTableRows(reportRows);
   } else {
     return flattenConstructionProgramTableRows(reportRows);
   }
@@ -69,18 +76,33 @@ const ReportTable: FC<IReportTableProps> = ({
   reportType,
   data,
   projectsInWarrantyPhase,
-  hierarchyInForcedToFrame
+  hierarchyInForcedToFrame,
+  sapCosts,
+  currentYearSapValues,
 }) => {
   const { t } = useTranslation();
-  const reportRows = convertToReportRows(data.rows, reportType, data.categories, t, data.divisions, data.subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame);
+  const reportRows = convertToReportRows(
+    data.rows,
+    reportType,
+    data.categories,
+    t,
+    data.divisions,
+    data.subDivisions,
+    projectsInWarrantyPhase,
+    hierarchyInForcedToFrame,
+    sapCosts,
+    currentYearSapValues
+  );
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
   const flattenedRows = (
     reportType === Reports.BudgetBookSummary ||
     reportType === Reports.OperationalEnvironmentAnalysis ||
     reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame ||
-    reportType === Reports.ConstructionProgram)
+    reportType === Reports.ConstructionProgram ||
+    reportType === Reports.ConstructionProgramForecast )
       ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
+
 
   const strategyAndForecastReportRows = getStrategyAndForecastReportRows(reportType, reportRows);
 
@@ -98,6 +120,8 @@ const ReportTable: FC<IReportTableProps> = ({
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:
         return <BudgetBookSummaryTableHeader />;
+      case Reports.ConstructionProgramForecast:
+        return <ConstructionProgramForecastTableHeader />;
     }
   }
 

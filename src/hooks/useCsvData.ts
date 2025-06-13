@@ -53,6 +53,7 @@ export const useCsvData = ({
           }
           break;
         }
+        case Reports.ConstructionProgramForecast:
         case Reports.ForecastReport: {
           // For ForecastReport report, we will fetch both coordinator and forceToFrame data
           // true = coordinatorData, false = forcedToFrameData
