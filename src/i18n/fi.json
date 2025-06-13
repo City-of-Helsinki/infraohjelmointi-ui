@@ -563,7 +563,7 @@
       "forecast1Title": "Ennuste",
       "differenceTitle": "Poikkeama TA",
       "differencePercentTitle": "Poikkeama TA{{year}} -%",
-      "differenceReasonTitle": "Keskeisimmät poikkeamat verrattuna TA:s ja niiden syyt"
+      "differenceReasonTitle": "Keskeisimmät poikkeamat verrattuna talousarvioon ja niiden syyt"
     }
   },
   "downloadPdf": "Lataa {{name}} (.pdf)",
