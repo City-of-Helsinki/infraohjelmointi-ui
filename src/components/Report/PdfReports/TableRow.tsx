@@ -347,8 +347,8 @@ const strategyReportStyles = StyleSheet.create({
     borderLeft: '1px solid #808080',
   },
   classNameCell: {
-    ...cellStyles,
     ...constructionProgramCommonStyles,
+    ...cellStyles,
     fontWeight: 'bold',
     paddingLeft: '21px',
     width: '450px',
@@ -377,17 +377,23 @@ const strategyReportStyles = StyleSheet.create({
     ...cellStyles,
     width: '30px',
   },
+  monthCellBlack: {
+    ...constructionProgramCommonStyles,
+    ...cellStyles,
+    width: '30px',
+    backgroundColor: '#333333'
+  },
   monthCellGreen: {
     ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '30px',
     backgroundColor: '#00d7a7'
   },
-  monthCellBlack: {
+  monthCellGrey: {
     ...constructionProgramCommonStyles,
     ...cellStyles,
     width: '30px',
-    backgroundColor: '#333333'
+    backgroundColor: "#cccccc"
   },
   lastCell: {
     ...constructionProgramCommonStyles,
@@ -418,31 +424,47 @@ interface IRowProps extends ITableRowProps {
 }
 
 const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
+  const dividedCellStyles = {
+    paddingLeft: '0px',
+    paddingRight: '0px',
+    width: "15px"
+  }
+
   switch (monthCell) {
     case 'planning':
-      return strategyReportStyles.monthCellBlack
+      return strategyReportStyles.monthCellBlack;
     case 'construction':
-      return strategyReportStyles.monthCellGreen
+      return strategyReportStyles.monthCellGreen;
+    case 'warranty':
+      return strategyReportStyles.monthCellGrey;
     case 'planningAndConstruction':
       if (side === 'left') {
         return {
           ...strategyReportStyles.monthCellBlack,
+          ...dividedCellStyles,
           borderRight: '0px',
-          paddingLeft: '0px',
-          paddingRight: '0px',
-          width: "15px"
-        }
-      } else {
+        };
+      }
+      return {
+        ...strategyReportStyles.monthCellGreen,
+        ...dividedCellStyles,
+        borderLeft: '0px',
+      };
+    case 'constructionAndWarranty':
+      if (side === 'left') {
         return {
           ...strategyReportStyles.monthCellGreen,
-          borderLeft: '0px',
-          paddingLeft: '0px',
-          paddingRight: '0px',
-          width: "15px"
-        }
+          ...dividedCellStyles,
+          borderRight: '0px',
+        };
       }
+      return {
+        ...strategyReportStyles.monthCellGrey,
+        ...dividedCellStyles,
+        borderLeft: '0px',
+      };
     default:
-      return strategyReportStyles.monthCell
+      return strategyReportStyles.monthCell;
   }
 }
 
@@ -574,7 +596,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               reportType === Reports.ForecastReport && <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
             }
 
-            {flattenedRow.januaryStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.januaryStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></View>
