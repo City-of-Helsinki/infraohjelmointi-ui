@@ -357,6 +357,7 @@ const convertToStrategyAndForecastReportProjects = (
       costForecastDeviation: costForecastDeviation,       // Poikkeama
       projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
       projectPhase: getProjectPhase(type, p),
+      budgetOverrunReason: getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason),
       januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
       februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
       marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
@@ -1047,6 +1048,7 @@ export const convertToReportRows = (
       const planningHierarchy = [];
       const pathsWithExtraRows = [
         "8 01 Kiinteä omaisuus/Esirakentaminen/Muu esirakentaminen",
+        "8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset",
         "8 03 Kadut ja liikenneväylät/Uudisrakentaminen",
         "8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt",
         "8 03 Kadut ja liikenneväylät/Muut investoinnit",
@@ -1064,8 +1066,15 @@ export const convertToReportRows = (
         "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
         "8 10 Suuret liikennehankkeet/Kalasatama-Pasila"
       ]
+      const pathsWithOnlySummaryRow = [
+        "8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset",
+        "8 10 Suuret liikennehankkeet/Kruunusillat",
+        "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
+        "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
+        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila"
+      ]
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
-        path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
+        path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08') || path.startsWith("8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Siltojen peruskorjaukset"));
 
       for (const c of rows) {
         if (c.type === 'group') {
@@ -1116,9 +1125,9 @@ export const convertToReportRows = (
             }
           }
         } else {
-          const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
-          const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
-          const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
+          const forcedToFrameData = hierarchyInForcedToFrame?.find((hc) => hc.id === c.id);
+          const forcedToFrameClass = forcedToFrameData ? forcedToFrameData : null;
+          const forcedToFrameChildren = forcedToFrameData && forcedToFrameData.children ? forcedToFrameData.children : [];
           const convertedClass: IConstructionProgramTableRow = {
             id: c.id,
             name: c.name,
@@ -1184,7 +1193,9 @@ export const convertToReportRows = (
               parent: undefined,
               id: `${c.id}-empty-row`
             }
-            planningHierarchy.push(underMillionSummaryRow);
+            if (!pathsWithOnlySummaryRow.includes(c.path)) {
+              planningHierarchy.push(underMillionSummaryRow);
+            }
             planningHierarchy.push(summaryOfProjectsRow);
             planningHierarchy.push(emptyRow);
           }
