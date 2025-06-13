@@ -722,18 +722,17 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
           const isFourthLevelRow = /^\d \d\d \d\d \d\d/.test(flattenedRow.name);
           const isDistrictOrCollectiveSubLevel = flattenedRow.objectType === 'districtPreview' || flattenedRow.objectType === 'collectiveSubLevel';
           const extraStyle = isDistrictOrCollectiveSubLevel ? styles.districtOrCollectiveSubLevel : styles.fourthLevel;
+          let defaultStyle;
 
-      let defaultStyle;
+          if (['class', 'otherClassification', 'collectiveSubLevel'].includes(flattenedRow.type) || flattenedRow.type === 'investmentpart') {
+            defaultStyle = styles.classNameTargetCell;
+          } else {
+            defaultStyle = styles.nameTargetCell;
+          }
 
-      if (['class', 'otherClassification', 'collectiveSubLevel'].includes(flattenedRow.type) || flattenedRow.type === 'investmentpart') {
-        defaultStyle = styles.classNameTargetCell;
-      } else {
-        defaultStyle = styles.nameTargetCell;
-      }
-
-      return (isFourthLevelRow || isDistrictOrCollectiveSubLevel)
-        ? [defaultStyle, extraStyle]
-        : defaultStyle;
+          return (isFourthLevelRow || isDistrictOrCollectiveSubLevel)
+            ? [defaultStyle, extraStyle]
+            : defaultStyle;
         }
         tableRow =
           <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={flattenedRow.id}>
