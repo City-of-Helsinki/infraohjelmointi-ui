@@ -262,7 +262,7 @@ const projectIsInConstructionOrWarrantyPhase = (
           return true;
         }
       } else if (previousPhaseStartDate) {
-        // project is in planning phase for 1 year by default if no specific dates are set
+        // project is in previous phase for 1 year by default if no specific dates are set
         const previousPhaseStartAsDate = moment(previousPhaseStartDate, dateFormat).toDate();
         const yearFromPreviousPhaseStart = new Date(previousPhaseStartAsDate.setFullYear(previousPhaseStartAsDate.getFullYear() + 1));
 
@@ -273,8 +273,8 @@ const projectIsInConstructionOrWarrantyPhase = (
     } else if (phaseEndAsDate >= monthStartDate && phaseEndAsDate <= monthEndDate) {
       return true;
     }
-  // project is in planning phase for 1 year by default if no specific dates are set
-  } else if (phaseType === "construction" && previousPhaseStartYear && previousPhaseStartYear < new Date().getFullYear() + 1) {
+  // project is in previous phase for 1 year by default if no specific dates are set
+  } else if (phaseType !== "warranty" && previousPhaseStartYear && previousPhaseStartYear < new Date().getFullYear() + 1) {
     return true;
   }
   return false;
