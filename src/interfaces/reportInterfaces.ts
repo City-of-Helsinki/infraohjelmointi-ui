@@ -200,6 +200,7 @@ export interface IStrategyAndForecastTableRow extends ITableRowEssentials {
   costForecast?: string;
   costForcedToFrameBudget?: string;
   costForecastDeviation?: string;
+  budgetOverrunReason?: string;
   januaryStatus?: string;
   februaryStatus?: string;
   marchStatus?: string;

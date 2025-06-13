@@ -114,7 +114,11 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
 
   return (
     <Document title={documentTitle}>
-      <Page orientation={reportType !== Reports.ConstructionProgram ? "landscape" : "portrait" } size="A3" style={styles.page}>
+      <Page 
+        orientation={reportType !== Reports.ConstructionProgram ? "landscape" : "portrait" }
+        size={reportType !== Reports.ForecastReport ? "A3" : "A2"}
+        style={styles.page}
+      >
         <View style={styles.document}>
           <DocumentHeader
             title={documentTitle}
