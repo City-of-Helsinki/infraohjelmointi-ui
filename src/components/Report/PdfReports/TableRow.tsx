@@ -171,6 +171,27 @@ const styles = StyleSheet.create({
     borderRight: '1px solid #808080',
     width: "55px",
   },
+  constructionForecastCellRed: {
+    ...cellStyles,
+    borderRight: '1px solid #808080',
+    width: "55px",
+    backgroundColor: '#BD2719',
+    color: '#ffffff',
+  },
+  constructionForecastCellYellow: {
+    ...cellStyles,
+    borderRight: '1px solid #808080',
+    width: "55px",
+    backgroundColor: '#FFDA0A',
+    color: '#ffffff',
+  },
+  constructionForecastCellGreen: {
+    ...cellStyles,
+    borderRight: '1px solid #808080',
+    width: "55px",
+    backgroundColor: '#007A64',
+    color: '#ffffff',
+  },
   constructionForecastPlanAndConStartCell: {
     ...cellStyles,
     ...constructionProgramCommonStyles,
@@ -494,6 +515,20 @@ const getForecastDeviationStyle = (type: string, deviationValueString: string) =
   return strategyReportStyles.budgetCell;
 }
 
+const getConstructionProgramForecastDeviationStyle = (deviationValueString: string | undefined) => {
+  if (!deviationValueString) {
+    return styles.constructionForecastCell;
+  }
+  const THRESHOLD = 10;
+  const deviationValue = parseFloat(deviationValueString.replace("%", ""));
+  if (deviationValue <= 0.0) {
+    return styles.constructionForecastCellGreen;
+  } else if (deviationValue <= THRESHOLD) {
+    return styles.constructionForecastCellYellow;
+  }
+  return styles.constructionForecastCellRed;
+}
+
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
     let tableRow;
     switch (reportType) {
@@ -675,7 +710,7 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               <Text style={styles.constructionForecastCell}>{flattenedRow.costForcedToFrameBudget}</Text>
               <Text style={styles.constructionForecastCell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
               <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviation}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviationPercent}</Text>
+              <Text style={getConstructionProgramForecastDeviationStyle(flattenedRow.costForecastDeviationPercent)}>{flattenedRow.costForecastDeviationPercent}</Text>
               <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
             </View>
           }
