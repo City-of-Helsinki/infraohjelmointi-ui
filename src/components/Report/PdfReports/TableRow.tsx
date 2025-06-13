@@ -691,31 +691,31 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
           'info'
         ]
 
-          tableRow =
-            <View
-              wrap={false}
-              style={getStrategyAndForecastRowStyle(flattenedRow.type ?? '', index ?? 0 )}
-              key={flattenedRow.id}
-            >
-              <Text style={classNameTypes.includes(flattenedRow.type)
-                ? styles.constructionForecastClassNameCell
-                : styles.constructionForecastNameCell}
-              >{flattenedRow.name}</Text>
-              <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecast}</Text>
-              <Text style={styles.constructionForecastPlanAndConStartCell}>{flattenedRow.startAndEnd}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.isProjectOnSchedule}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.beforeCurrentYearSapCosts}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.currentYearSapCost}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.costForcedToFrameBudget}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
-              <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviation}</Text>
-              <Text style={getConstructionProgramForecastDeviationStyle(flattenedRow.costForecastDeviationPercent)}>{flattenedRow.costForecastDeviationPercent}</Text>
-              <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
-            </View>
-          }
-          break;
-        }
+        tableRow =
+          <View
+            wrap={false}
+            style={getStrategyAndForecastRowStyle(flattenedRow.type ?? '', index ?? 0 )}
+            key={flattenedRow.id}
+          >
+            <Text style={classNameTypes.includes(flattenedRow.type)
+              ? styles.constructionForecastClassNameCell
+              : styles.constructionForecastNameCell}
+            >{flattenedRow.name}</Text>
+            <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
+            <Text style={styles.constructionForecastCell}>{flattenedRow.costForecast}</Text>
+            <Text style={styles.constructionForecastPlanAndConStartCell}>{flattenedRow.startAndEnd}</Text>
+            <Text style={styles.constructionForecastCell}>{flattenedRow.isProjectOnSchedule}</Text>
+            <Text style={styles.constructionForecastCell}>{flattenedRow.beforeCurrentYearSapCosts}</Text>
+            <Text style={styles.constructionForecastCell}>{flattenedRow.currentYearSapCost}</Text>
+            <Text style={styles.constructionForecastCell}>{flattenedRow.costForcedToFrameBudget}</Text>
+            <Text style={styles.constructionForecastCell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
+            <Text style={styles.constructionForecastCell}>{flattenedRow.costForecastDeviation}</Text>
+            <Text style={getConstructionProgramForecastDeviationStyle(flattenedRow.costForecastDeviationPercent)}>{flattenedRow.costForecastDeviationPercent}</Text>
+            <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
+          </View>
+      }
+      break;
+    }
         case Reports.BudgetBookSummary: {
           if (flattenedRow) {
             const getStyle = () => {
