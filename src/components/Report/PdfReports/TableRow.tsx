@@ -601,57 +601,57 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
               :
               <View style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></View>
             }
-            {flattenedRow.februaryStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.februaryStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.februaryStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.februaryStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.februaryStatus, 'left')}></View>
             }
-            {flattenedRow.marchStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.marchStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.marchStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.marchStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.marchStatus, 'left')}></View>
             }
-            {flattenedRow.aprilStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.aprilStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.aprilStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.aprilStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.aprilStatus, 'left')}></View>
             }
-            {flattenedRow.mayStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.mayStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.mayStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.mayStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.mayStatus, 'left')}></View>
             }
-            {flattenedRow.juneStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.juneStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.juneStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.juneStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.juneStatus, 'left')}></View>
             }
-            {flattenedRow.julyStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.julyStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.julyStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.julyStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.julyStatus, 'left')}></View>
             }
-            {flattenedRow.augustStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.augustStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.augustStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.augustStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.augustStatus, 'left')}></View>
             }
-            {flattenedRow.septemberStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.septemberStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.septemberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.septemberStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.septemberStatus, 'left')}></View>
             }
-            {flattenedRow.octoberStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.octoberStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.octoberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.octoberStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.octoberStatus, 'left')}></View>
             }
-            {flattenedRow.novemberStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.novemberStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.novemberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.novemberStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.novemberStatus, 'left')}></View>
             }
-            {flattenedRow.decemberStatus === "planningAndConstruction" ?
+            {["planningAndConstruction", "constructionAndWarranty"].includes(flattenedRow.decemberStatus ?? "") ?
               <><Text style={getMonthCellStyle(flattenedRow.decemberStatus, 'left')}></Text><Text style={getMonthCellStyle(flattenedRow.decemberStatus, 'right')}></Text></>
               :
               <View style={getMonthCellStyle(flattenedRow.decemberStatus, 'left')}></View>

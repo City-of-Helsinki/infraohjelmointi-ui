@@ -145,14 +145,22 @@ const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: string
 
 const getProjectPhase = (type: ReportType , project: IProject) => {
   const isForecastReport = type === Reports.ForecastReport;
+  const isStrategyReport = type === Reports.Strategy;
+
   if (isForecastReport) return t(`option.${project.phase.value}`);
 
   const yearStartDate = new Date(new Date().getFullYear() + 1, 0, 1);
   const yearEndDate = new Date(new Date().getFullYear() + 1, 11, 0);
   const dateFormat = "DD.MM.YYYY";
-  const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, yearStartDate, project.estPlanningEnd, yearEndDate, project.planningStartYear, dateFormat);
-  const isConstruction = projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat, "construction");
-  const isWarranty = projectIsInConstructionOrWarrantyPhase(project.estWarrantyPhaseStart, yearStartDate, project.estWarrantyPhaseEnd, yearEndDate, project.estConstructionStart, project.planningStartYear, dateFormat, "warranty");
+  const isPlanning = isStrategyReport ?
+    projectIsInPlanningPhase(project.estPlanningStart, yearStartDate, project.estPlanningEnd, yearEndDate, project.planningStartYear, dateFormat) :
+    projectIsInPlanningPhase(project.frameEstPlanningStart, yearStartDate, project.frameEstPlanningEnd, yearEndDate, getYear(project.frameEstPlanningStart ?? ""), dateFormat);
+  const isConstruction = isStrategyReport ?
+    projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat, "construction") :
+    projectIsInConstructionOrWarrantyPhase(project.frameEstConstructionStart, yearStartDate, project.frameEstConstructionEnd, yearEndDate, project.frameEstPlanningStart, getYear(project.frameEstPlanningStart ?? ""), dateFormat, "construction");
+  const isWarranty = isStrategyReport ?
+    projectIsInConstructionOrWarrantyPhase(project.estWarrantyPhaseStart, yearStartDate, project.estWarrantyPhaseEnd, yearEndDate, project.estConstructionStart, project.planningStartYear, dateFormat, "warranty") :
+    projectIsInConstructionOrWarrantyPhase(project.frameEstWarrantyPhaseStart, yearStartDate, project.frameEstWarrantyPhaseEnd, yearEndDate, project.frameEstConstructionStart, getYear(project.frameEstConstructionStart ?? ""), dateFormat, "warranty");
 
   if (isPlanning && isConstruction) return "s r";
   if (isConstruction && isWarranty) return "r t";
@@ -337,7 +345,7 @@ const convertToStrategyAndForecastReportProjects = (
           p.planningStartYear && p.constructionEndYear &&
           isProjectInPlanningOrConstruction({
             planningStart: p.planningStartYear,
-            constructionEnd: p.constructionEndYear
+            constructionEnd: p.estWarrantyPhaseEnd ? getYear(p.estWarrantyPhaseEnd) : p.constructionEndYear
           }, 1)
         )
     }
@@ -346,7 +354,8 @@ const convertToStrategyAndForecastReportProjects = (
       .filter((p) => {
         const hasBudget = p.finances.budgetProposalCurrentYearPlus0 !== "0.00";
         const planningStart = p.frameEstPlanningStart ? getYear(p.frameEstPlanningStart) : p.planningStartYear;
-        const constructionEnd = p.frameEstConstructionEnd ? getYear(p.frameEstConstructionEnd) : p.constructionEndYear;
+        const constructionEnd = p.frameEstWarrantyPhaseEnd ? getYear(p.frameEstWarrantyPhaseEnd) :
+          p.frameEstConstructionEnd ? getYear(p.frameEstConstructionEnd) : p.constructionEndYear;
 
         if (hasBudget && typeof planningStart === 'number' && typeof constructionEnd === 'number') {
           return isProjectInPlanningOrConstruction({
