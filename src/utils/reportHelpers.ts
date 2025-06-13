@@ -458,7 +458,6 @@ const convertToGroupValues = (
     currentYearSapCost += currentYearSapValues ? sumCosts(currentYearSapValues[p.id], 'project_task_costs', 'production_task_costs') : 0;
     beforeCurrentYearSapCosts += sapCosts ? sumCosts(sapCosts[p.id], 'project_task_costs', 'production_task_costs') - currentYearSapCost : 0;
     budgetOverrunReasons = p.budgetOverrunReason ? budgetOverrunReasons + `${budgetOverrunReasons != "" ? "\n" : ""}${p.name}: ${getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason)}` : budgetOverrunReasons
-    console.log(budgetOverrunReasons);
   }
 
   const costForecastDeviationPercent = calculateCostForecastDeviationPercent(budgetProposalCurrentYearPlus0.toString() ?? undefined, forcedToFramBudget);
@@ -792,7 +791,14 @@ export const calculateCostForecastDeviation = (plannedBudget: string | undefined
 
 export const calculateCostForecastDeviationPercent = (plannedBudget: string | undefined, costForecast: string | undefined) => {
   const costForecastValue = costForecast ? formattedNumberToNumber(costForecast) : 0;
+  if (costForecastValue === 0) {
+    return 100;
+  }
   const plannedBudgetValue = plannedBudget ? formattedNumberToNumber(plannedBudget) : 0;
+  if (plannedBudgetValue === 0) {
+    return -100;
+  }
+  
   
   const deviation = plannedBudgetValue - costForecastValue;
   if (deviation != 0.0) {
