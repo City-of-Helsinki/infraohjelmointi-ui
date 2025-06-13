@@ -1084,14 +1084,16 @@ export const convertToReportRows = (
         "8 10 Suuret liikennehankkeet/Kruunusillat",
         "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
         "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
-        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila"
+        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila",
+        "8 10 Suuret liikennehankkeet/Länsiratikat"
       ]
       const pathsWithOnlySummaryRow = [
         "8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset",
         "8 10 Suuret liikennehankkeet/Kruunusillat",
         "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
         "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
-        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila"
+        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila",
+        "8 10 Suuret liikennehankkeet/Länsiratikat"
       ]
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
         path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08') || path.startsWith("8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Siltojen peruskorjaukset"));
