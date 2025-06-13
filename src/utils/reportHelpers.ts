@@ -147,7 +147,7 @@ const getProjectPhase = (type: ReportType , project: IProject) => {
   const yearEndDate = new Date(new Date().getFullYear() + 1, 11, 0);
   const dateFormat = "DD.MM.YYYY";
   const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, yearStartDate, project.estPlanningEnd, yearEndDate, project.planningStartYear, dateFormat);
-  const isConstruction = projectIsInConstructionPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
+  const isConstruction = projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
   const isForecastReport = type === Reports.ForecastReport;
 
   if (isForecastReport) return t(`option.${project.phase.value}`);
@@ -163,13 +163,21 @@ const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProje
   const currentYearPlusYearsForward = new Date().getFullYear() + yearsForward;
   const monthStartDate = new Date(currentYearPlusYearsForward, month - 1, 1);
   const monthEndDate = new Date(currentYearPlusYearsForward, month, 0);
-  const isForecastOrStrategyReport = [Reports.Strategy, Reports.ForecastReport].includes(type as Reports)
+  const isForecastOrStrategyReport = [Reports.Strategy, Reports.ForecastReport].includes(type as Reports);
   const dateFormat = "DD.MM.YYYY";
 
   const planningStartYear = () => {
     if (isForecastOrStrategyReport) return project.planningStartYear;
-
     return project.frameEstPlanningStart ? getYear(project.frameEstPlanningStart) : project.planningStartYear;
+  }
+
+  const constructionStartYear = () => {
+    const estConstructionStart = project.estConstructionStart;
+    const estConstructionStartYear = estConstructionStart ? getYear(estConstructionStart) : null;
+    
+    if (isForecastOrStrategyReport) return estConstructionStart ? estConstructionStartYear : null;
+    return project.frameEstConstructionStart ? 
+      getYear(project.frameEstConstructionStart) : estConstructionStartYear ? estConstructionStartYear : null;
   }
 
   const isPlanning = isForecastOrStrategyReport ?
@@ -177,19 +185,24 @@ const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProje
     projectIsInPlanningPhase(project.frameEstPlanningStart, monthStartDate, project.frameEstPlanningEnd, monthEndDate, planningStartYear(), dateFormat);
 
   const isConstruction = isForecastOrStrategyReport ?
-    projectIsInConstructionPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, planningStartYear(), dateFormat) :
-    projectIsInConstructionPhase(project.frameEstConstructionStart, monthStartDate, project.frameEstConstructionEnd, monthEndDate, project.frameEstPlanningStart, planningStartYear(), dateFormat);
+    projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, planningStartYear(), dateFormat, "construction") :
+    projectIsInConstructionOrWarrantyPhase(project.frameEstConstructionStart, monthStartDate, project.frameEstConstructionEnd, monthEndDate, project.frameEstPlanningStart, planningStartYear(), dateFormat, "construction");
+
+  const isWarranty = isForecastOrStrategyReport ?
+    projectIsInConstructionOrWarrantyPhase(project.estWarrantyPhaseStart, monthStartDate, project.estWarrantyPhaseEnd, monthEndDate, project.estConstructionStart, constructionStartYear(), dateFormat, "warranty") :
+    projectIsInConstructionOrWarrantyPhase(project.frameEstWarrantyPhaseStart, monthStartDate, project.frameEstWarrantyPhaseEnd, monthEndDate, project.frameEstConstructionStart, constructionStartYear(), dateFormat, "warranty");
 
   if (isPlanning && isConstruction) {
     return "planningAndConstruction";
-  }
-  else if (isPlanning) {
+  } else if (isConstruction && isWarranty) {
+    return "constructionAndWarranty";
+  } else if (isPlanning) {
     return "planning";
-  }
-  else if (isConstruction) {
+  } else if (isConstruction) {
     return "construction";
-  }
-  else {
+  } else if (isWarranty) {
+    return "warranty";
+  } else {
     return "";
   }
 }
@@ -228,37 +241,40 @@ const projectIsInPlanningPhase = (
   return false;
 }
 
-const projectIsInConstructionPhase = (
-  constructionStartDate: string | null,
+const projectIsInConstructionOrWarrantyPhase = (
+  phaseStartDate: string | null,
   monthStartDate: Date,
-  constructionEndDate: string | null,
+  phaseEndDate: string | null,
   monthEndDate: Date,
-  planningStartDate: string | null,
-  planningStartYear: number | null,
-  dateFormat: string
+  previousPhaseStartDate: string | null,
+  previousPhaseStartYear: number | null,
+  dateFormat: string,
+  phaseType?: string
 ): boolean => {
   // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
-  if (constructionEndDate) {
-    const constructionEndAsDate = moment(constructionEndDate, dateFormat).toDate();
-    if (constructionEndAsDate > monthEndDate) {
-      if (constructionStartDate) {
-        const constructionStartAsDate = moment(constructionStartDate, dateFormat).toDate();
-        if (constructionStartAsDate <= monthEndDate) {
+  if (phaseEndDate) {
+    const phaseEndAsDate = moment(phaseEndDate, dateFormat).toDate();
+    if (phaseEndAsDate > monthEndDate) {
+      if (phaseStartDate) {
+        const phaseStartAsDate = moment(phaseStartDate, dateFormat).toDate();
+
+        if (phaseStartAsDate <= monthEndDate) {
           return true;
         }
-      } else if (planningStartDate) {
+      } else if (previousPhaseStartDate) {
         // project is in planning phase for 1 year by default if no specific dates are set
-        const planningStartAsDate = moment(planningStartDate, dateFormat).toDate();
-        const yearFromPlanningStart = new Date(planningStartAsDate.setFullYear(planningStartAsDate.getFullYear() + 1))
-        if (monthEndDate < yearFromPlanningStart) {
+        const previousPhaseStartAsDate = moment(previousPhaseStartDate, dateFormat).toDate();
+        const yearFromPreviousPhaseStart = new Date(previousPhaseStartAsDate.setFullYear(previousPhaseStartAsDate.getFullYear() + 1));
+
+        if (monthEndDate < yearFromPreviousPhaseStart) {
           return true;
         }
       }
-    } else if (constructionEndAsDate >= monthStartDate && constructionEndAsDate <= monthEndDate) {
+    } else if (phaseEndAsDate >= monthStartDate && phaseEndAsDate <= monthEndDate) {
       return true;
     }
   // project is in planning phase for 1 year by default if no specific dates are set
-  } else if (planningStartYear && planningStartYear < new Date().getFullYear() + 1) {
+  } else if (phaseType === "construction" && previousPhaseStartYear && previousPhaseStartYear < new Date().getFullYear() + 1) {
     return true;
   }
   return false;
