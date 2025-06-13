@@ -541,7 +541,6 @@ const ProjectForm = () => {
       <ProjectProgramSection 
         {...formProps}
         isUserOnlyViewer={isOnlyViewer}
-        isInputDisabled={isInputDisabled}
       />
       {/* BANNER */}
       {!isOnlyViewer &&

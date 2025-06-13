@@ -40,8 +40,6 @@ export interface IProject {
   realizedCost?: string;
   comittedCost?: string;
   spentCost?: string;
-  budgetOverrunYear?: string;
-  budgetOverrunAmount?: string;
   perfAmount: string;
   unitCost: string;
   costForecast: string;
@@ -139,8 +137,6 @@ export interface IProjectRequest {
   realizedCost?: string;
   comittedCost?: string;
   spentCost?: string;
-  budgetOverrunYear?: string;
-  budgetOverrunAmount?: string;
   category?: string | null;
   effectHousing?: boolean;
   riskAssessment?: string | null;

@@ -151,8 +151,6 @@ const useProjectFormValues = () => {
       realizedCost: value(project?.realizedCost),
       comittedCost: value(project?.comittedCost),
       spentCost: value(project?.spentCost),
-      budgetOverrunYear: value(project?.budgetOverrunYear),
-      budgetOverrunAmount: value(project?.budgetOverrunAmount),
       responsibleZone: listItemToOption(project?.responsibleZone),
       masterPlanAreaNumber: value(project?.masterPlanAreaNumber),
       trafficPlanNumber: value(project?.trafficPlanNumber),

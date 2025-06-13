@@ -1,4 +1,4 @@
-import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import projectReducer from '@/reducers/projectSlice';
 import authReducer from '@/reducers/authSlice';
 import notificationReducer from '@/reducers/notificationSlice';
@@ -36,7 +36,7 @@ export const storeItems = {
 
 const rootReducer = combineReducers(storeItems);
 
-export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
+export const setupStore = (preloadedState?: Partial<RootState>) => {
   return configureStore({
     reducer: rootReducer,
     preloadedState,

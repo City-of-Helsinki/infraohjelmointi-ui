@@ -39,39 +39,39 @@ const BudgetBookSummaryTableHeader = () => {
         <View style={styles.narrowerColumns}>
             <Text>{t('usage')}</Text>
             <Text>{new Date().getFullYear() - 1}</Text>
-            <Text>{t('millionEuro')}</Text>
+            <Text>{t('report.shared.millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TA')}</Text>
             <Text>{new Date().getFullYear() }</Text>
-            <Text>{t('millionEuro')}</Text>
+            <Text>{t('report.shared.millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TA')}</Text>
             <Text>{new Date().getFullYear() + 1}</Text>
-            <Text>{t('millionEuro')}</Text>
+            <Text>{t('report.shared.millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TS')}</Text>
             <Text>{new Date().getFullYear() + 2 }</Text>
-            <Text>{t('millionEuro')}</Text>
+            <Text>{t('report.shared.millionEuro')}</Text>
         </View>
         <View style={styles.narrowerColumns}>
             <Text>{t('TS')}</Text>
             <Text>{new Date().getFullYear() + 3}</Text>
-            <Text>{t('millionEuro')}</Text>
+            <Text>{t('report.shared.millionEuro')}</Text>
         </View>
         <View style={styles.widerColumns}>
             <Text>{t('initial')}</Text>
             <Text>{new Date().getFullYear() + 4}</Text>
-            <Text>{t('millionEuro')}</Text>
+            <Text>{t('report.shared.millionEuro')}</Text>
         </View>
         {currentPlusYears.map((year) => {
             return (
                 <View key={year} style={styles.widerColumns}>
                     <Text>{t('initial')}</Text>
                     <Text>{new Date().getFullYear() + year}</Text>
-                    <Text>{t('millionEuro')}</Text>
+                    <Text>{t('report.shared.millionEuro')}</Text>
                 </View>
             );
         })}

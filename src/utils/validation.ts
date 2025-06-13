@@ -9,12 +9,12 @@ import { IUser } from '@/interfaces/userInterfaces';
 
 export const validateMaxLength = (
   value: number,
-  t: TFunction<'translation', undefined, 'translation'>,
+  t: TFunction<'translation'>,
 ) => ({
   maxLength: { value: value, message: t('validation.maxLength', { value: value }) },
 });
 
-export const validateInteger = (t: TFunction<'translation', undefined, 'translation'>) => ({
+export const validateInteger = (t: TFunction<'translation'>) => ({
   validate: {
     isInteger: (value: string | number) =>
       Number.isInteger(Number(value)) ? true : t('validation.wholeNumber'),
@@ -22,14 +22,14 @@ export const validateInteger = (t: TFunction<'translation', undefined, 'translat
 });
 export const validateRequired = (
   field: string,
-  t: TFunction<'translation', undefined, 'translation'>,
+  t: TFunction<'translation'>,
 ) => ({
   required: t('validation.required', { field: t(`validation.${field}`) }) ?? '',
 });
 
 export const validateMaxNumber = (
   max: number,
-  t: TFunction<'translation', undefined, 'translation'>,
+  t: TFunction<'translation'>,
 ) => ({
   min: {
     value: 0,
@@ -45,7 +45,7 @@ export const validateBefore = (
   startDate: string | null,
   endDateField: string,
   getValues: UseFormGetValues<IProjectForm>,
-  t: TFunction<'translation', undefined, 'translation'>,
+  t: TFunction<'translation'>,
 ) => {
   if (!isBefore(startDate, getValues(endDateField as keyof IProjectForm) as string)) {
     return t('validation.isBefore', {
@@ -59,7 +59,7 @@ export const validateAfter = (
   endDate: string | null,
   startDateField: string,
   getValues: UseFormGetValues<IProjectForm>,
-  t: TFunction<'translation', undefined, 'translation'>,
+  t: TFunction<'translation'>,
 ) => {
   if (!isBefore(getValues(startDateField as keyof IProjectForm) as string, endDate)) {
     return t('validation.isAfter', {

@@ -71,7 +71,12 @@ export const authSlice = createSlice({
         //      id: '61336d5e-4b74-400f-a1d6-c9f96d3f1d4d',
         //      name: 'sg_kymp_sso_io_katselijat_muut' as UserRole,
         //      display_name: 'sg_KYMP_sso_IO_Katselijat_Muut',
-        //    }
+        //    },
+        //    {
+        //      id: '952da398-75b3-404a-b274-c8f351d7f5a7',
+        //      name: 'az_kymp_asgd_u_infraohjelmointi_ulkopuoliset' as UserRole,
+        //      display_name: 'az_KYMP_asgd_u_infraohjelmointi_ulkopuoliset',
+        //    },
         // ],
       };
 
