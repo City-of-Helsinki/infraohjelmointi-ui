@@ -1655,6 +1655,7 @@ export const getReportData = async (
           ...(reportType === Reports.ForecastReport && {
             [`\nEnnuste ${year + 1}`]: r.costForcedToFrameBudget,
             [`\nPoikkeama`]: r.costForecastDeviation,
+            [t('report.constructionProgramForecast.differenceReasonTitle')]: r.budgetOverrunReason,
           }),
           [`${year + 1}\n01`]: r.januaryStatus,
           [`\n02`]: r.februaryStatus,
