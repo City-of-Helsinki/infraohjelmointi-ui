@@ -143,17 +143,21 @@ const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: string
 }
 
 const getProjectPhase = (type: ReportType , project: IProject) => {
+  const isForecastReport = type === Reports.ForecastReport;
+  if (isForecastReport) return t(`option.${project.phase.value}`);
+
   const yearStartDate = new Date(new Date().getFullYear() + 1, 0, 1);
   const yearEndDate = new Date(new Date().getFullYear() + 1, 11, 0);
   const dateFormat = "DD.MM.YYYY";
   const isPlanning = projectIsInPlanningPhase(project.estPlanningStart, yearStartDate, project.estPlanningEnd, yearEndDate, project.planningStartYear, dateFormat);
-  const isConstruction = projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat);
-  const isForecastReport = type === Reports.ForecastReport;
+  const isConstruction = projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, yearStartDate, project.estConstructionEnd, yearEndDate, project.estPlanningStart, project.planningStartYear, dateFormat, "construction");
+  const isWarranty = projectIsInConstructionOrWarrantyPhase(project.estWarrantyPhaseStart, yearStartDate, project.estWarrantyPhaseEnd, yearEndDate, project.estConstructionStart, project.planningStartYear, dateFormat, "warranty");
 
-  if (isForecastReport) return t(`option.${project.phase.value}`);
   if (isPlanning && isConstruction) return "s r";
+  if (isConstruction && isWarranty) return "r t";
   if (isPlanning) return "s";
   if (isConstruction) return "r";
+  if (isWarranty) return "t";
   return "";
 }
 
