@@ -1675,12 +1675,12 @@ export const getReportData = async (
         return flattenedRows.map((r: IConstructionProgramCsvRow) => ({
           [t('target')]: r.name,
           [t('division')]: r.location,
-          [`${t('costForecast')} ${t('millionEuro')}`]: r.costForecast,
+          [`${t('costForecast')} ${t('report.shared.millionEuro')}`]: r.costForecast,
           [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
-          [`${t('previouslyUsed')} ${t('millionEuro')}`]: r.spentBudget,
-          [`TA ${year + 1} ${t('millionEuro')}`]: r.budgetProposalCurrentYearPlus0,
-          [`TS ${year + 2} ${t('millionEuro')}`]: r.budgetProposalCurrentYearPlus1,
-          [`TS ${year + 3} ${t('millionEuro')}`]: r.budgetProposalCurrentYearPlus2,
+          [`${t('previouslyUsed')} ${t('report.shared.millionEuro')}`]: r.spentBudget,
+          [`TA ${year + 1} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus0,
+          [`TS ${year + 2} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus1,
+          [`TS ${year + 3} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus2,
         }));
       }
       case Reports.ConstructionProgramForecast: {
@@ -1706,18 +1706,18 @@ export const getReportData = async (
         // Transform them into csv rows
         return flattenedRows.map((r) => ({
           [t('target')]: r.name,
-          [`${t('usage')} ${t('usageSV')} ${previousYear} ${t('millionEuro')}`]: '',
-          [`${t('TA')} ${t('taSV')} ${year} ${t('millionEuro')}`]: r.budgetEstimation,
-          [`${t('TA')} ${t('taSV')} ${year + 1} ${t('millionEuro')}`]: r.budgetEstimationSuggestion,
-          [`${t('TS')} ${t('tsSV')} ${year + 2} ${t('millionEuro')}`]: r.budgetPlanSuggestion1,
-          [`${t('TS')} ${t('tsSV')} ${year + 3} ${t('millionEuro')}`]: r.budgetPlanSuggestion2,
-          [`${t('initial')} ${t('initialSV')} ${year + 4} ${t('millionEuro')}`]: r.initial1,
-          [`${t('initial')} ${t('initialSV')} ${year + 5} ${t('millionEuro')}`]: r.initial2,
-          [`${t('initial')} ${t('initialSV')} ${year + 6} ${t('millionEuro')}`]: r.initial3,
-          [`${t('initial')} ${t('initialSV')} ${year + 7} ${t('millionEuro')}`]: r.initial4,
-          [`${t('initial')} ${t('initialSV')} ${year + 8} ${t('millionEuro')}`]: r.initial5,
-          [`${t('initial')} ${t('initialSV')} ${year + 9} ${t('millionEuro')}`]: r.initial6,
-          [`${t('initial')} ${t('initialSV')} ${year + 10} ${t('millionEuro')}`]: r.initial7,
+          [`${t('usage')} ${t('usageSV')} ${previousYear} ${t('report.shared.millionEuro')}`]: '',
+          [`${t('TA')} ${t('taSV')} ${year} ${t('report.shared.millionEuro')}`]: r.budgetEstimation,
+          [`${t('TA')} ${t('taSV')} ${year + 1} ${t('report.shared.millionEuro')}`]: r.budgetEstimationSuggestion,
+          [`${t('TS')} ${t('tsSV')} ${year + 2} ${t('report.shared.millionEuro')}`]: r.budgetPlanSuggestion1,
+          [`${t('TS')} ${t('tsSV')} ${year + 3} ${t('report.shared.millionEuro')}`]: r.budgetPlanSuggestion2,
+          [`${t('initial')} ${t('initialSV')} ${year + 4} ${t('report.shared.millionEuro')}`]: r.initial1,
+          [`${t('initial')} ${t('initialSV')} ${year + 5} ${t('report.shared.millionEuro')}`]: r.initial2,
+          [`${t('initial')} ${t('initialSV')} ${year + 6} ${t('report.shared.millionEuro')}`]: r.initial3,
+          [`${t('initial')} ${t('initialSV')} ${year + 7} ${t('report.shared.millionEuro')}`]: r.initial4,
+          [`${t('initial')} ${t('initialSV')} ${year + 8} ${t('report.shared.millionEuro')}`]: r.initial5,
+          [`${t('initial')} ${t('initialSV')} ${year + 9} ${t('report.shared.millionEuro')}`]: r.initial6,
+          [`${t('initial')} ${t('initialSV')} ${year + 10} ${t('report.shared.millionEuro')}`]: r.initial7,
         }));
       }
       case Reports.OperationalEnvironmentAnalysis :
@@ -1762,32 +1762,32 @@ export const getReportData = async (
         // we need to add the header row
         const analysisHeaderRow = {
           [`${t('target')}`]: `${t('target')}`,
-          [`Ennuste ${year} ${t('thousandEuros')}`]: `Ennuste ${year} ${t('thousandEuros')}`,
-          [`${t('TAE')} ${year + 1} ${t('thousandEuros')}`]: `${t('TAE')} ${year + 1} ${t('thousandEuros')}`,
-          [`${t('TSE')} ${year + 2} ${t('thousandEuros')}`]: `${t('TSE')} ${year + 2} ${t('thousandEuros')}`,
-          [`${t('TSE')} ${year + 3} ${t('thousandEuros')}`]: `${t('TSE')} ${year + 3} ${t('thousandEuros')}`,
-          [`${year + 4} ${t('thousandEuros')}`]: `${year + 4} ${t('thousandEuros')}`,
-          [`${year + 5} ${t('thousandEuros')}`]: `${year + 5} ${t('thousandEuros')}`,
-          [`${year + 6} ${t('thousandEuros')}`]: `${year + 6} ${t('thousandEuros')}`,
-          [`${year + 7} ${t('thousandEuros')}`]: `${year + 7} ${t('thousandEuros')}`,
-          [`${year + 8} ${t('thousandEuros')}`]: `${year + 8} ${t('thousandEuros')}`,
-          [`${year + 9} ${t('thousandEuros')}`]: `${year + 9} ${t('thousandEuros')}`,
-          [`${year + 10} ${t('thousandEuros')}`]: `${year + 10} ${t('thousandEuros')}`,
+          [`Ennuste ${year} ${t('report.shared.kiloEuro')}`]: `Ennuste ${year} ${t('report.shared.kiloEuro')}`,
+          [`${t('TAE')} ${year + 1} ${t('report.shared.kiloEuro')}`]: `${t('TAE')} ${year + 1} ${t('report.shared.kiloEuro')}`,
+          [`${t('TSE')} ${year + 2} ${t('report.shared.kiloEuro')}`]: `${t('TSE')} ${year + 2} ${t('report.shared.kiloEuro')}`,
+          [`${t('TSE')} ${year + 3} ${t('report.shared.kiloEuro')}`]: `${t('TSE')} ${year + 3} ${t('report.shared.kiloEuro')}`,
+          [`${year + 4} ${t('report.shared.kiloEuro')}`]: `${year + 4} ${t('report.shared.kiloEuro')}`,
+          [`${year + 5} ${t('report.shared.kiloEuro')}`]: `${year + 5} ${t('report.shared.kiloEuro')}`,
+          [`${year + 6} ${t('report.shared.kiloEuro')}`]: `${year + 6} ${t('report.shared.kiloEuro')}`,
+          [`${year + 7} ${t('report.shared.kiloEuro')}`]: `${year + 7} ${t('report.shared.kiloEuro')}`,
+          [`${year + 8} ${t('report.shared.kiloEuro')}`]: `${year + 8} ${t('report.shared.kiloEuro')}`,
+          [`${year + 9} ${t('report.shared.kiloEuro')}`]: `${year + 9} ${t('report.shared.kiloEuro')}`,
+          [`${year + 10} ${t('report.shared.kiloEuro')}`]: `${year + 10} ${t('report.shared.kiloEuro')}`,
         }
 
         const analysisTableRows = flattenedRows.map((r) => ({
           [`${t('target')}`]: r.name,
-          [`Ennuste ${year} ${t('thousandEuros')}`]: r.costForecast,
-          [`${t('TAE')} ${year + 1} ${t('thousandEuros')}`]: r.TAE,
-          [`${t('TSE')} ${year + 2} ${t('thousandEuros')}`]: r.TSE1,
-          [`${t('TSE')} ${year + 3} ${t('thousandEuros')}`]: r.TSE2,
-          [`${year + 4} ${t('thousandEuros')}`]: r.initial1,
-          [`${year + 5} ${t('thousandEuros')}`]: r.initial2,
-          [`${year + 6} ${t('thousandEuros')}`]: r.initial3,
-          [`${year + 7} ${t('thousandEuros')}`]: r.initial4,
-          [`${year + 8} ${t('thousandEuros')}`]: r.initial5,
-          [`${year + 9} ${t('thousandEuros')}`]: r.initial6,
-          [`${year + 10} ${t('thousandEuros')}`]: r.initial7,
+          [`Ennuste ${year} ${t('report.shared.kiloEuro')}`]: r.costForecast,
+          [`${t('TAE')} ${year + 1} ${t('report.shared.kiloEuro')}`]: r.TAE,
+          [`${t('TSE')} ${year + 2} ${t('report.shared.kiloEuro')}`]: r.TSE1,
+          [`${t('TSE')} ${year + 3} ${t('report.shared.kiloEuro')}`]: r.TSE2,
+          [`${year + 4} ${t('report.shared.kiloEuro')}`]: r.initial1,
+          [`${year + 5} ${t('report.shared.kiloEuro')}`]: r.initial2,
+          [`${year + 6} ${t('report.shared.kiloEuro')}`]: r.initial3,
+          [`${year + 7} ${t('report.shared.kiloEuro')}`]: r.initial4,
+          [`${year + 8} ${t('report.shared.kiloEuro')}`]: r.initial5,
+          [`${year + 9} ${t('report.shared.kiloEuro')}`]: r.initial6,
+          [`${year + 10} ${t('report.shared.kiloEuro')}`]: r.initial7,
       }));
 
       return [...summaryTableRows, ...emptyRow, analysisHeaderRow, ...analysisTableRows];

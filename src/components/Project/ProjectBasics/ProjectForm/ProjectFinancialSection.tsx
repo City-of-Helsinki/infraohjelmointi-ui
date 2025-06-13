@@ -2,12 +2,11 @@ import {
   FormSectionTitle,
   ListField,
   NumberField,
-  OverrunRightField,
   SelectField,
 } from '@/components/shared';
-import { FC, memo } from 'react';
+import { FC, memo, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control } from 'react-hook-form';
+import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { validateInteger, validateMaxLength } from '@/utils/validation';
@@ -15,9 +14,11 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/common';
 import { selectIsProjectSaving } from '@/reducers/projectSlice';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import TextAreaField from '@/components/shared/TextAreaField';
 
 interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
+  getValues: UseFormGetValues<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -34,8 +35,8 @@ interface IProjectFinancialSectionProps {
   isUserOnlyViewer: boolean;
 }
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
+  getValues,
   getFieldProps,
-  control,
   classOptions,
   isInputDisabled,
   isUserOnlyViewer,
@@ -49,6 +50,41 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const constructionPhases = useOptions('constructionPhases');
   const projectQualityLevels = useOptions('projectQualityLevels');
   const planningPhases = useOptions('planningPhases');
+  const budgetOverrunReasons = useOptions('budgetOverrunReasons');
+
+  const validateBudgetOverrunReason = useMemo(
+    () => ({
+      validate: {
+        isBudgetOverrunReasonValid: (budgetOverrunReason: IOption) => {
+          const mappedBudgetOverrunReason = budgetOverrunReasons.find(item => item.value === budgetOverrunReason.value);
+          const otherReason = getValues('otherBudgetOverrunReason');
+
+          if (mappedBudgetOverrunReason?.label == 'otherReason' && otherReason == '') {
+            return t('validation.required', { field: t('projectForm.otherBudgetOverrunReason') });
+          }
+          return true;
+        },
+      },
+    }),
+    [budgetOverrunReasons, getValues],
+  );
+
+  const validateOtherReasonField = useMemo(
+    () => ({
+      validate: {
+        isOtherReasonFieldValid: (otherReasonField: string) => {
+          const budgetOverrunReason = budgetOverrunReasons.find(item => item.value === getValues('budgetOverrunReason').value);
+          const isBudgetOverrunReasonOtherReason = budgetOverrunReason?.label == 'otherReason'
+
+          if (isBudgetOverrunReasonOtherReason && otherReasonField == '') {
+            return t('validation.required', { field: t('projectForm.otherBudgetOverrunReason') });
+          }
+          return true;
+        },
+      },
+    }),
+    [budgetOverrunReasons, getValues],
+  );
 
   const renderSelectField = (
     name: string,
@@ -152,13 +188,27 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         ]}
         cancelEdit={isSaving}
       />
-
-      <OverrunRightField control={control} cancelEdit={isSaving} readOnly={isUserOnlyViewer} isInputDisabled={isInputDisabled}/>
-      <ListField
-        {...getFieldProps('preliminaryBudgetDivision')}
-        readOnly={true}
-        cancelEdit={isSaving}
-      />
+      <div className="form-row">
+        <div className="form-col-xxl">
+          <SelectField
+              {...getFieldProps('budgetOverrunReason')}
+              options={budgetOverrunReasons}
+              rules={validateBudgetOverrunReason}
+              size='full'
+              disabled={isInputDisabled}
+              readOnly={isUserOnlyViewer}
+            />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-col-xxl">
+          <TextAreaField
+            {...getFieldProps('otherBudgetOverrunReason')}
+            rules={{ ...validateMaxLength(200, t), ...validateOtherReasonField }}
+            readOnly={isUserOnlyViewer}
+          />
+        </div>
+      </div>
     </div>
   );
 };
