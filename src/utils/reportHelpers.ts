@@ -1048,6 +1048,7 @@ export const convertToReportRows = (
       const planningHierarchy = [];
       const pathsWithExtraRows = [
         "8 01 Kiinteä omaisuus/Esirakentaminen/Muu esirakentaminen",
+        "8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset",
         "8 03 Kadut ja liikenneväylät/Uudisrakentaminen",
         "8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt",
         "8 03 Kadut ja liikenneväylät/Muut investoinnit",
@@ -1065,8 +1066,15 @@ export const convertToReportRows = (
         "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
         "8 10 Suuret liikennehankkeet/Kalasatama-Pasila"
       ]
+      const pathsWithOnlySummaryRow = [
+        "8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset",
+        "8 10 Suuret liikennehankkeet/Kruunusillat",
+        "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
+        "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
+        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila"
+      ]
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
-        path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08'));
+        path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08') || path.startsWith("8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Siltojen peruskorjaukset"));
 
       for (const c of rows) {
         if (c.type === 'group') {
@@ -1117,9 +1125,9 @@ export const convertToReportRows = (
             }
           }
         } else {
-          const forcedToFrameData = hierarchyInForcedToFrame?.filter((hc) => hc.id === c.id);
-          const forcedToFrameClass = forcedToFrameData ? forcedToFrameData[0] : null;
-          const forcedToFrameChildren = forcedToFrameData ? forcedToFrameData[0].children : [];
+          const forcedToFrameData = hierarchyInForcedToFrame?.find((hc) => hc.id === c.id);
+          const forcedToFrameClass = forcedToFrameData ? forcedToFrameData : null;
+          const forcedToFrameChildren = forcedToFrameData && forcedToFrameData.children ? forcedToFrameData.children : [];
           const convertedClass: IConstructionProgramTableRow = {
             id: c.id,
             name: c.name,
@@ -1185,7 +1193,9 @@ export const convertToReportRows = (
               parent: undefined,
               id: `${c.id}-empty-row`
             }
-            planningHierarchy.push(underMillionSummaryRow);
+            if (!pathsWithOnlySummaryRow.includes(c.path)) {
+              planningHierarchy.push(underMillionSummaryRow);
+            }
             planningHierarchy.push(summaryOfProjectsRow);
             planningHierarchy.push(emptyRow);
           }
@@ -1457,7 +1467,7 @@ const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]
         location: tableRow.location,
         costForecast: tableRow.costForecast,
         startAndEnd: tableRow.startAndEnd,
-        spentBudget: tableRow.spentBudget,
+        spentBudget: tableRow.beforeCurrentYearSapCosts,
         budgetProposalCurrentYearPlus0: tableRow.budgetProposalCurrentYearPlus0,
         budgetProposalCurrentYearPlus1: tableRow.budgetProposalCurrentYearPlus1,
         budgetProposalCurrentYearPlus2: tableRow.budgetProposalCurrentYearPlus2,
@@ -1680,7 +1690,7 @@ export const getReportData = async (
           [t('division')]: r.location,
           [`${t('costForecast')} ${t('report.shared.millionEuro')}`]: r.costForecast,
           [`${t('planningAnd')} ${t('constructionTiming')}`]: r.startAndEnd,
-          [`${t('previouslyUsed')} ${t('report.shared.millionEuro')}`]: r.spentBudget,
+          [`${t('previouslyUsed')} ${t('report.shared.millionEuro')}`]: r.beforeCurrentYearSapCosts,
           [`TA ${year + 1} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus0,
           [`TS ${year + 2} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus1,
           [`TS ${year + 3} ${t('report.shared.millionEuro')}`]: r.budgetProposalCurrentYearPlus2,
