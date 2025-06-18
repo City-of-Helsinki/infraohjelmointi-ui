@@ -21,6 +21,8 @@ export const useCsvData = ({
   getPlanningData,
   getPlanningRows,
   getCategories,
+  sapCosts,
+  currentYearSapValues,
 }: IDownloadCsvButtonProps) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -62,7 +64,7 @@ export const useCsvData = ({
 
           if (resCoordinator && resCoordinator.projects.length > 0) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            data = await getReportData(t, type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
+            data = await getReportData(t, type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows, sapCosts, currentYearSapValues);
           }
           break;
         }
@@ -104,6 +106,11 @@ export const useCsvData = ({
               planningRows,
               divisions,
               subDivisions,
+              undefined,
+              undefined,
+              undefined,
+              sapCosts,
+              currentYearSapValues
             );
           }
           break;
