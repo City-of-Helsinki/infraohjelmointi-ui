@@ -74,6 +74,8 @@ const getPdfDocument = (
     constructionProgram: (
       <ReportContainer
         data={{ rows, divisions, subDivisions }}
+        sapCosts={sapCosts}
+        currentYearSapValues={currentYearSapValues}
         reportType={Reports.ConstructionProgram}
       />
     ),
@@ -190,7 +192,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
 
           if (viewHasProjects(res)) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, planningRows, divisions, subDivisions);
+            document = getPdfDocument(type, planningRows, divisions, subDivisions, undefined, undefined, undefined, projetSapCosts, projectCurrentYearSapValues);
           }
         }
       }
