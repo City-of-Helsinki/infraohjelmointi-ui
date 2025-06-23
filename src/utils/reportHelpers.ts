@@ -1126,7 +1126,7 @@ export const convertToReportRows = (
               type: isOnlyHeaderGroup ? 'group' : 'groupWithValues',
               location: c.location ? getDivision(c.location, divisions, subDivisions) : '',
               costForcedToFrameBudget: isOnlyHeaderGroup ? undefined : keurToMillion(forcedToFramBudget),
-              ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, forcedToFramBudget)),
+              ...(isOnlyHeaderGroup ? {} : convertToGroupValues(c.projectRows, forcedToFramBudget, sapCosts, currentYearSapValues)),
             }
 
             if (!isOnlyHeaderGroup && checkGroupHasBudgets(convertedGroup, reportType)) {
@@ -1490,6 +1490,7 @@ const processConstructionReportRows = (tableRows: IConstructionProgramTableRow[]
         costForecast: tableRow.costForecast,
         startAndEnd: tableRow.startAndEnd,
         spentBudget: tableRow.beforeCurrentYearSapCosts,
+        beforeCurrentYearSapCosts: tableRow.beforeCurrentYearSapCosts,
         budgetProposalCurrentYearPlus0: tableRow.budgetProposalCurrentYearPlus0,
         budgetProposalCurrentYearPlus1: tableRow.budgetProposalCurrentYearPlus1,
         budgetProposalCurrentYearPlus2: tableRow.budgetProposalCurrentYearPlus2,

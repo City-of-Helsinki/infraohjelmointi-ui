@@ -103,7 +103,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const projetSapCosts = useAppSelector(getProjectSapCosts);
+  const projectSapCosts = useAppSelector(getProjectSapCosts);
   const projectCurrentYearSapValues = useAppSelector(getProjectSapCurrentYear);
   const documentName = useMemo(() => t(`report.${type}.documentName`), [t, type]);
   const LOADING_PDF_DATA = 'loading-pdf-data';
@@ -156,7 +156,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
 
           if (viewHasProjects(resCoordinator)) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            document = getPdfDocument(type, rows.coordinatorRows, divisions, subDivisions, undefined, undefined, rows.forcedToFrameRows, projetSapCosts, projectCurrentYearSapValues);
+            document = getPdfDocument(type, rows.coordinatorRows, divisions, subDivisions, undefined, undefined, rows.forcedToFrameRows, projectSapCosts, projectCurrentYearSapValues);
           }
           break;
         }
@@ -192,7 +192,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
 
           if (viewHasProjects(res)) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, planningRows, divisions, subDivisions, undefined, undefined, undefined, projetSapCosts, projectCurrentYearSapValues);
+            document = getPdfDocument(type, planningRows, divisions, subDivisions, undefined, undefined, undefined, projectSapCosts, projectCurrentYearSapValues);
           }
         }
       }
