@@ -1662,6 +1662,40 @@ export const operationalEnvironmentAnalysisTableRows = (
   return cleanSummaryData(summaryClasses);
 };
 
+function generateStrategyAndForecastCsvRows(
+  reportRows: IStrategyAndForecastTableRow[],
+  reportType: ReportType,
+  reportYear: number,
+) {
+  //Flatten rows to one dimension
+  const flattenedRows = flattenForecastTableRows(reportRows as IStrategyAndForecastTableRow[]);
+  return flattenedRows.map((r) => ({
+    [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
+    [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]:
+      r.projectManager,
+    [`\n${t('projectPhase')}`]: r.projectPhase,
+    [`\nTA ${reportYear}`]: r.costPlan,
+    [`\nTS ${reportYear}`]: r.costForecast,
+    ...(reportType === Reports.ForecastReport && {
+      [`\nEnnuste ${reportYear}`]: r.costForcedToFrameBudget,
+      [`\nPoikkeama`]: r.costForecastDeviation,
+      [t('report.constructionProgramForecast.differenceReasonTitle')]: r.budgetOverrunReason,
+    }),
+    [`${reportYear}\n01`]: r.januaryStatus,
+    [`\n02`]: r.februaryStatus,
+    [`\n03`]: r.marchStatus,
+    [`\n04`]: r.aprilStatus,
+    [`\n05`]: r.mayStatus,
+    [`\n06`]: r.juneStatus,
+    [`\n07`]: r.julyStatus,
+    [`\n08`]: r.augustStatus,
+    [`\n09`]: r.septemberStatus,
+    [`\n10`]: r.octoberStatus,
+    [`\n11`]: r.novemberStatus,
+    [`\n12`]: r.decemberStatus,
+  }));
+}
+
 export const getReportData = async (
   t: TFunction<'translation', undefined>,
   reportType: ReportType,
@@ -1673,12 +1707,12 @@ export const getReportData = async (
   hierarchyInForcedToFrame?: IPlanningRow[],
   sapCosts?: Record<string, IProjectSapCost>,
   currentYearSapValues?: Record<string, IProjectSapCost>,
+  year: number = new Date().getFullYear()
 ): Promise<Array<IConstructionProgramCsvRow>
   | Array<IBudgetBookSummaryCsvRow>
   | Array<IStrategyTableCsvRow>
   | Array<IOperationalEnvironmentAnalysisCsvRow>
   | Array<IOperationalEnvironmentAnalysisSummaryCsvRow>> => {
-  const year = new Date().getFullYear();
   const previousYear = year - 1;
 
   const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame, sapCosts, currentYearSapValues);
@@ -1686,34 +1720,10 @@ export const getReportData = async (
   try {
     switch (reportType) {
       case Reports.Strategy:
+        return generateStrategyAndForecastCsvRows(reportRows, reportType, year);
       case Reports.StrategyForcedToFrame:
       case Reports.ForecastReport: {
-        //Flatten rows to one dimension
-        const flattenedRows = flattenForecastTableRows(reportRows as IStrategyAndForecastTableRow[]);
-        return flattenedRows.map((r) => ({
-          [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
-          [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]: r.projectManager,
-          [`\n${t('projectPhase')}`]: r.projectPhase,
-          [`\nTA ${year + 1}`]: r.costPlan,
-          [`\nTS ${year + 1}`]: r.costForecast,
-          ...(reportType === Reports.ForecastReport && {
-            [`\nEnnuste ${year + 1}`]: r.costForcedToFrameBudget,
-            [`\nPoikkeama`]: r.costForecastDeviation,
-            [t('report.constructionProgramForecast.differenceReasonTitle')]: r.budgetOverrunReason,
-          }),
-          [`${year + 1}\n01`]: r.januaryStatus,
-          [`\n02`]: r.februaryStatus,
-          [`\n03`]: r.marchStatus,
-          [`\n04`]: r.aprilStatus,
-          [`\n05`]: r.mayStatus,
-          [`\n06`]: r.juneStatus,
-          [`\n07`]: r.julyStatus,
-          [`\n08`]: r.augustStatus,
-          [`\n09`]: r.septemberStatus,
-          [`\n10`]: r.octoberStatus,
-          [`\n11`]: r.novemberStatus,
-          [`\n12`]: r.decemberStatus,
-        }));
+        return generateStrategyAndForecastCsvRows(reportRows, reportType, year + 1);
       }
       case Reports.ConstructionProgram: {
         // Flatten rows into one dimension

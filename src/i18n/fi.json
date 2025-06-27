@@ -474,6 +474,7 @@
       "millionEuro": "milj. €"
     },
     "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
+    "yearLabel": "Vuosi",
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
       "documentName": "kategorisointiraportti - koordinointinäkymä",

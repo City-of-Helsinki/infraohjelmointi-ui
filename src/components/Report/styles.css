@@ -17,3 +17,7 @@
 .report-download-csv-button {
   @apply mt-4;
 }
+
+.report-year-select {
+  @apply mb-2 w-48;
+}

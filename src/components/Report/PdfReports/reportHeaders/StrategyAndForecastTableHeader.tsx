@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
 
 interface StrategyTableHeaderProps {
   isForecastReport: boolean;
+  year?: number;
 }
 
-const StrategyAndForecastTableHeader = ({ isForecastReport }: StrategyTableHeaderProps) => {
+const StrategyAndForecastTableHeader = ({ isForecastReport, year = new Date().getFullYear() }: StrategyTableHeaderProps) => {
   const { t } = useTranslation();
-  const year = isForecastReport ? new Date().getFullYear() : new Date().getFullYear() + 1;
 
   return (
     <View style={styles.tableHeader}>
