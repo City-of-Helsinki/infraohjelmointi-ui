@@ -143,14 +143,14 @@ const getPlannedBudgetsByCategories = (classItem: IPlanningRow, category: string
   return totals;
 }
 
-const getProjectPhase = (type: ReportType , project: IProject) => {
+const getProjectPhase = (type: ReportType , project: IProject, year = new Date().getFullYear() + 1) => {
   const isForecastReport = type === Reports.ForecastReport;
   const isStrategyReport = type === Reports.Strategy;
 
   if (isForecastReport) return t(`option.${project.phase.value}`);
 
-  const yearStartDate = new Date(new Date().getFullYear() + 1, 0, 1);
-  const yearEndDate = new Date(new Date().getFullYear() + 1, 11, 0);
+  const yearStartDate = new Date(year, 0, 1);
+  const yearEndDate = new Date(year, 11, 0);
   const dateFormat = "DD.MM.YYYY";
   const isPlanning = isStrategyReport ?
     projectIsInPlanningPhase(project.estPlanningStart, yearStartDate, project.estPlanningEnd, yearEndDate, project.planningStartYear, dateFormat) :
@@ -170,13 +170,12 @@ const getProjectPhase = (type: ReportType , project: IProject) => {
   return "";
 }
 
-const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProject, month: number) => {
-  const isForecastReport = type === Reports.ForecastReport;
-  const yearsForward = isForecastReport ? 0 : 1;
-  const currentYearPlusYearsForward = new Date().getFullYear() + yearsForward;
+const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProject, month: number, year = new Date().getFullYear()) => {
+  const isForecastOrStrategyReport = [Reports.Strategy, Reports.ForecastReport].includes(type as Reports);
+  const yearsForward = isForecastOrStrategyReport ? 0 : 1;
+  const currentYearPlusYearsForward = year + yearsForward;
   const monthStartDate = new Date(currentYearPlusYearsForward, month - 1, 1);
   const monthEndDate = new Date(currentYearPlusYearsForward, month, 0);
-  const isForecastOrStrategyReport = [Reports.Strategy, Reports.ForecastReport].includes(type as Reports);
   const dateFormat = "DD.MM.YYYY";
 
   const planningStartYear = () => {
@@ -194,15 +193,15 @@ const getStrategyReportProjectPhasePerMonth = (type: ReportType, project: IProje
   }
 
   const isPlanning = isForecastOrStrategyReport ?
-    projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, planningStartYear(), dateFormat) :
+    projectIsInPlanningPhase(project.estPlanningStart, monthStartDate, project.estPlanningEnd, monthEndDate, planningStartYear(), dateFormat, year) :
     projectIsInPlanningPhase(project.frameEstPlanningStart, monthStartDate, project.frameEstPlanningEnd, monthEndDate, planningStartYear(), dateFormat);
 
   const isConstruction = isForecastOrStrategyReport ?
-    projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, planningStartYear(), dateFormat, "construction") :
+    projectIsInConstructionOrWarrantyPhase(project.estConstructionStart, monthStartDate, project.estConstructionEnd, monthEndDate, project.estPlanningStart, planningStartYear(), dateFormat, "construction", year) :
     projectIsInConstructionOrWarrantyPhase(project.frameEstConstructionStart, monthStartDate, project.frameEstConstructionEnd, monthEndDate, project.frameEstPlanningStart, planningStartYear(), dateFormat, "construction");
 
   const isWarranty = isForecastOrStrategyReport ?
-    projectIsInConstructionOrWarrantyPhase(project.estWarrantyPhaseStart, monthStartDate, project.estWarrantyPhaseEnd, monthEndDate, project.estConstructionStart, constructionStartYear(), dateFormat, "warranty") :
+    projectIsInConstructionOrWarrantyPhase(project.estWarrantyPhaseStart, monthStartDate, project.estWarrantyPhaseEnd, monthEndDate, project.estConstructionStart, constructionStartYear(), dateFormat, "warranty", year) :
     projectIsInConstructionOrWarrantyPhase(project.frameEstWarrantyPhaseStart, monthStartDate, project.frameEstWarrantyPhaseEnd, monthEndDate, project.frameEstConstructionStart, constructionStartYear(), dateFormat, "warranty");
 
   if (isPlanning && isConstruction) {
@@ -226,7 +225,8 @@ const projectIsInPlanningPhase = (
   planningEndDate: string | null,
   endDate: Date,
   planningStartYear: number | null,
-  dateFormat: string
+  dateFormat: string,
+  year = new Date().getFullYear() + 1,
 ): boolean => {
   // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
   if (planningStartDate) {
@@ -248,7 +248,7 @@ const projectIsInPlanningPhase = (
       return true;
     }
   // project is in planning phase for 1 year by default if no specific dates are set
-  } else if (planningStartYear && planningStartYear === new Date().getFullYear() +1) {
+  } else if (planningStartYear && planningStartYear === year) {
     return true;
   }
   return false;
@@ -262,7 +262,8 @@ const projectIsInConstructionOrWarrantyPhase = (
   previousPhaseStartDate: string | null,
   previousPhaseStartYear: number | null,
   dateFormat: string,
-  phaseType?: string
+  phaseType?: string,
+  year = new Date().getFullYear() + 1,
 ): boolean => {
   // If projectcard has dates, we use them. Otherwise we use the years from projectcard.
   if (phaseEndDate) {
@@ -287,14 +288,14 @@ const projectIsInConstructionOrWarrantyPhase = (
       return true;
     }
   // project is in previous phase for 1 year by default if no specific dates are set
-  } else if (phaseType !== "warranty" && previousPhaseStartYear && previousPhaseStartYear < new Date().getFullYear() + 1) {
+  } else if (phaseType !== "warranty" && previousPhaseStartYear && previousPhaseStartYear < year) {
     return true;
   }
   return false;
 }
 
-const isProjectInPlanningOrConstruction = (props: IYearCheck, yearsForward: number) => {
-  const year = [new Date().getFullYear() + yearsForward]
+const isProjectInPlanningOrConstruction = (props: IYearCheck, yearsForward: number, selectedYear = new Date().getFullYear()) => {
+  const year = [selectedYear + yearsForward]
   const inPlanningOrConstruction = (year.some(y => y >= props.planningStart && y <= props.constructionEnd));
 
   if (inPlanningOrConstruction) {
@@ -335,7 +336,8 @@ const getBudgetOverrunReason = (budgetOverrunReason: string | undefined, otherRe
 const convertToStrategyAndForecastReportProjects = (
   type: ReportType,
   projects: IProject[],
-  forcedToFrameProjects?: IProject[]
+  forcedToFrameProjects?: IProject[],
+  year = new Date().getFullYear(),
 ): IStrategyAndForecastTableRow[] => {
   const filteredProjects = (): IProject[] => {
     if (type === Reports.Strategy){
@@ -346,7 +348,7 @@ const convertToStrategyAndForecastReportProjects = (
           isProjectInPlanningOrConstruction({
             planningStart: p.planningStartYear,
             constructionEnd: p.estWarrantyPhaseEnd ? getYear(p.estWarrantyPhaseEnd) : p.constructionEndYear
-          }, 1)
+          }, 0, year)
         )
     }
 
@@ -385,20 +387,20 @@ const convertToStrategyAndForecastReportProjects = (
       costForcedToFrameBudget: costForcedToFrameBudget,   // Ennuste
       costForecastDeviation: costForecastDeviation,       // Poikkeama
       projectManager: p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
-      projectPhase: getProjectPhase(type, p),
+      projectPhase: getProjectPhase(type, p, year),
       budgetOverrunReason: getBudgetOverrunReason(p.budgetOverrunReason?.value, p.otherBudgetOverrunReason),
-      januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1),
-      februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2),
-      marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3),
-      aprilStatus: getStrategyReportProjectPhasePerMonth(type, p, 4),
-      mayStatus: getStrategyReportProjectPhasePerMonth(type, p, 5),
-      juneStatus: getStrategyReportProjectPhasePerMonth(type, p, 6),
-      julyStatus: getStrategyReportProjectPhasePerMonth(type, p, 7),
-      augustStatus: getStrategyReportProjectPhasePerMonth(type, p, 8),
-      septemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 9),
-      octoberStatus: getStrategyReportProjectPhasePerMonth(type, p, 10),
-      novemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 11),
-      decemberStatus: getStrategyReportProjectPhasePerMonth(type, p ,12),
+      januaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 1, year),
+      februaryStatus: getStrategyReportProjectPhasePerMonth(type, p, 2, year),
+      marchStatus: getStrategyReportProjectPhasePerMonth(type, p, 3, year),
+      aprilStatus: getStrategyReportProjectPhasePerMonth(type, p, 4, year),
+      mayStatus: getStrategyReportProjectPhasePerMonth(type, p, 5, year),
+      juneStatus: getStrategyReportProjectPhasePerMonth(type, p, 6, year),
+      julyStatus: getStrategyReportProjectPhasePerMonth(type, p, 7, year),
+      augustStatus: getStrategyReportProjectPhasePerMonth(type, p, 8, year),
+      septemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 9, year),
+      octoberStatus: getStrategyReportProjectPhasePerMonth(type, p, 10, year),
+      novemberStatus: getStrategyReportProjectPhasePerMonth(type, p, 11, year),
+      decemberStatus: getStrategyReportProjectPhasePerMonth(type, p ,12, year),
       type: 'project',
     }
   });
@@ -802,14 +804,14 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
  * Shows current year cost estimated budget (TA, "raamiluku") on
  * Strategy report for high level classes only.
  */
-const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string) => {
+const frameBudgetHandler = (type: string, budgets: IPlanningCell[], path: string, year = new Date().getFullYear() + 1) => {
   const allowedTypes = ['masterClass', 'class', 'subClass', 'subClassDistrict', 'districtPreview', 'collectiveSubLevel']
 
   if (!allowedTypes.includes(type)) return ""
 
   if (type === 'collectiveSubLevel' && !path.startsWith('8 03')) return ""
 
-  const budget = budgets.find(obj => obj.year === new Date().getFullYear() + 1);
+  const budget = budgets.find(obj => obj.year === year);
   return budget ? budget.displayFrameBudget : "";
 }
 
@@ -891,6 +893,7 @@ export const convertToReportRows = (
   hierarchyInForcedToFrame?: IPlanningRow[],
   sapCosts?: Record<string, IProjectSapCost>,
   currentYearSapValues?: Record<string, IProjectSapCost>,
+  year?: number
 ): IBudgetBookSummaryTableRow[] | IOperationalEnvironmentAnalysisTableRow[] | IStrategyAndForecastTableRow[] => {
   switch (reportType) {
     case Reports.BudgetBookSummary: {
@@ -937,11 +940,27 @@ export const convertToReportRows = (
       const forcedToFrameHierarchy: IStrategyAndForecastTableRow[] = [];
 
       for (const c of rows) {
-        const frameBudget = frameBudgetHandler(c.type, c.cells, c.path);
-        const rowProjects = c.projectRows.length ? convertToStrategyAndForecastReportProjects(reportType, c.projectRows) : [];
+        const frameBudget = frameBudgetHandler(c.type, c.cells, c.path, year);
+        const rowProjects = c.projectRows.length
+          ? convertToStrategyAndForecastReportProjects(reportType, c.projectRows, undefined, year)
+          : [];
 
         if (hasBudgetData(c) && (isNotGroupOrRowHasProjects(c.type, rowProjects))) {
-          const rowChildren = c.children.length ? convertToReportRows(c.children, reportType, categories, t) : [];
+          const rowChildren = c.children.length
+            ? convertToReportRows(
+                c.children,
+                reportType,
+                categories,
+                t,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                year,
+              )
+            : [];
           const convertedClass = {
             id: c.id,
             name: formatNameBasedOnType(c),
@@ -1715,7 +1734,19 @@ export const getReportData = async (
   | Array<IOperationalEnvironmentAnalysisSummaryCsvRow>> => {
   const previousYear = year - 1;
 
-  const reportRows = convertToReportRows(rows, reportType, categories, t, divisions, subDivisions, projectsInWarrantyPhase, hierarchyInForcedToFrame, sapCosts, currentYearSapValues);
+  const reportRows = convertToReportRows(
+    rows,
+    reportType,
+    categories,
+    t,
+    divisions,
+    subDivisions,
+    projectsInWarrantyPhase,
+    hierarchyInForcedToFrame,
+    sapCosts,
+    currentYearSapValues,
+    year,
+  );
 
   try {
     switch (reportType) {

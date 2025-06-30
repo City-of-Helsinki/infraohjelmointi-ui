@@ -93,7 +93,8 @@ const ReportTable: FC<IReportTableProps> = ({
     projectsInWarrantyPhase,
     hierarchyInForcedToFrame,
     sapCosts,
-    currentYearSapValues
+    currentYearSapValues,
+    year,
   );
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
