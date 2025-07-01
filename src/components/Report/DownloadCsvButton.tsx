@@ -24,15 +24,16 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
   getPlanningData,
   getPlanningRows,
   getCategories,
+  year = new Date().getFullYear(),
 }) => {
   const { t } = useTranslation();
-  const year = new Date().getFullYear();
   const { getCsvData } = useCsvData({
     type,
     getForcedToFrameData,
     getPlanningData,
     getPlanningRows,
     getCategories,
+    year,
   });
   const navigate = useNavigate();
 
@@ -61,7 +62,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
         downloadCSV(
           data,
           `${documentName} ${
-            ['strategy', 'strategyForcedToFrame'].includes(type) ? year + 1 : year
+            ['strategyForcedToFrame'].includes(type) ? year + 1 : year
           }.csv`,
         );
       } else {

@@ -6,8 +6,10 @@
 import '@testing-library/jest-dom';
 import { mockEventSource } from './mocks/mockEventSource';
 import { TextEncoder, TextDecoder } from 'util';
+import { mockResizeObserver } from './mocks/mockResizeObserver';
 
 mockEventSource();
+mockResizeObserver();
 
 process.env.REACT_APP_API_URL = 'localhost:4000';
 process.env.REACT_APP_AUTHORITY = 'test-authority-url';

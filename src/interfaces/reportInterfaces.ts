@@ -350,6 +350,7 @@ export interface IDownloadCsvButtonProps {
   getCategories: () => Promise<IListItem[]>;
   sapCosts?: Record<string, IProjectSapCost>;
   currentYearSapValues?: Record<string, IProjectSapCost>;
+  year?: number;
 }
 
 export interface IDownloadPdfButtonProps {
@@ -358,4 +359,5 @@ export interface IDownloadPdfButtonProps {
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   getCategories: () => Promise<IListItem[]>;
+  year?: number;
 }

@@ -27,9 +27,10 @@ interface IPdfReportContainerProps {
   forcedToFrameRows?: IPlanningRow[],
   sapCosts?: Record<string, IProjectSapCost>,
   currentYearSapValues?: Record<string, IProjectSapCost>,
+  year?: number;
 }
 
-const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows, sapCosts, currentYearSapValues }) => {
+const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, projectsInWarrantyPhase, forcedToFrameRows, sapCosts, currentYearSapValues, year = new Date().getFullYear() }) => {
   const { t } = useTranslation();
 
   const date = new Date();
@@ -73,6 +74,9 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
           year: currentYear
         });
       case Reports.Strategy:
+        return t('report.strategy.subtitle', {
+          startYear: year,
+        });
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.subtitle', {
           startYear: currentYear + 1
@@ -134,6 +138,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             hierarchyInForcedToFrame={forcedToFrameRows}
             sapCosts={sapCosts}
             currentYearSapValues={currentYearSapValues}
+            year={year}
           />
           {
             [Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(reportType as Reports) ?

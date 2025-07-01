@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IPlanningData, ReportType } from '@/interfaces/reportInterfaces';
+import { IPlanningData, Reports, ReportType } from '@/interfaces/reportInterfaces';
 import { IClassHierarchy, ICoordinatorClassHierarchy, separateClassesIntoHierarchy } from '@/reducers/classSlice';
 import DownloadPdfButton from './DownloadPdfButton';
 import DownloadCsvButton from './DownloadCsvButton';
@@ -15,6 +15,8 @@ import { getProjectsWithParams } from '@/services/projectServices';
 import { buildPlanningTableRows } from '@/hooks/usePlanningRows';
 import { getProjectCategories } from '@/services/listServices';
 import { IListItem } from '@/interfaces/common';
+import { Option } from 'hds-react';
+import ReportYearSelect from './ReportYearSelect/ReportYearSelect';
 
 interface IReportRowProps {
   type: ReportType;
@@ -22,6 +24,13 @@ interface IReportRowProps {
 
 const ReportRow: FC<IReportRowProps> = ({ type }) => {
   const { t } = useTranslation();
+  const isStrategyReport = type === Reports.Strategy;
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear + 1);
+
+  const handleYearChange = (_: Option[], clickedOption: Option) => {
+    setSelectedYear(parseInt(clickedOption.value, 10));
+  };
 
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
     // projects
@@ -137,13 +146,33 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       <h3 className="report-title" data-testid={`report-title-${type}`}>
         {t(`report.${type}.rowTitle`)}
       </h3>
-      {type === 'constructionProgram' &&
-        <p>{t(`report.warrantyPeriodPhaseNotIncluded`)}</p>
-      }
+      {type === 'constructionProgram' && <p>{t(`report.warrantyPeriodPhaseNotIncluded`)}</p>}
+      {/* year selection dropdown for Strategy report */}
+      {isStrategyReport && (
+        <ReportYearSelect
+          className="report-year-select"
+          value={selectedYear.toString()}
+          onChange={handleYearChange}
+        />
+      )}
       {/* download pdf button */}
-      <DownloadPdfButton type={type} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories} />
+      <DownloadPdfButton
+        type={type}
+        getForcedToFrameData={getForcedToFrameData}
+        getPlanningData={getPlanningData}
+        getPlanningRows={getPlanningRows}
+        getCategories={getCategories}
+        year={isStrategyReport ? selectedYear : undefined}
+      />
       {/* download csv button */}
-      <DownloadCsvButton type={type} getForcedToFrameData={getForcedToFrameData} getPlanningData={getPlanningData} getPlanningRows={getPlanningRows} getCategories={getCategories}/>
+      <DownloadCsvButton
+        type={type}
+        getForcedToFrameData={getForcedToFrameData}
+        getPlanningData={getPlanningData}
+        getPlanningRows={getPlanningRows}
+        getCategories={getCategories}
+        year={isStrategyReport ? selectedYear : undefined}
+      />
     </div>
   );
 };

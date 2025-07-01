@@ -23,6 +23,7 @@ export const useCsvData = ({
   getCategories,
   sapCosts,
   currentYearSapValues,
+  year = new Date().getFullYear(),
 }: IDownloadCsvButtonProps) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -30,7 +31,6 @@ export const useCsvData = ({
     Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow>
   >([]);
   const LOADING_CSV_DATA = 'loading-csv-data';
-  const year = new Date().getFullYear();
 
   const getCsvData = async () => {
     try {
@@ -51,7 +51,7 @@ export const useCsvData = ({
               res.projects,
               res.groupRes,
             );
-            data = await getReportData(t, type, coordinatorRows);
+            data = await getReportData(t, type, coordinatorRows, undefined, undefined, undefined, undefined, undefined, undefined, undefined, year);
           }
           break;
         }

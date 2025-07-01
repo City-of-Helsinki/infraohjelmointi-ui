@@ -44,6 +44,7 @@ interface IReportTableProps {
   hierarchyInForcedToFrame?: IPlanningRow[];
   sapCosts?: Record<string, IProjectSapCost>;
   currentYearSapValues?: Record<string, IProjectSapCost>;
+  year?: number;
 }
 
 type IReportFlattenedRows = IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow;
@@ -79,6 +80,7 @@ const ReportTable: FC<IReportTableProps> = ({
   hierarchyInForcedToFrame,
   sapCosts,
   currentYearSapValues,
+  year = new Date().getFullYear(),
 }) => {
   const { t } = useTranslation();
   const reportRows = convertToReportRows(
@@ -91,7 +93,8 @@ const ReportTable: FC<IReportTableProps> = ({
     projectsInWarrantyPhase,
     hierarchyInForcedToFrame,
     sapCosts,
-    currentYearSapValues
+    currentYearSapValues,
+    year,
   );
 
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
@@ -112,8 +115,9 @@ const ReportTable: FC<IReportTableProps> = ({
       case Reports.OperationalEnvironmentAnalysisForcedToFrame:
         return <OperationalEnvironmentAnalysisTableHeader />
       case Reports.Strategy:
+        return <StrategyAndForecastTableHeader isForecastReport={false} year={year} />;
       case Reports.StrategyForcedToFrame:
-        return <StrategyAndForecastTableHeader isForecastReport={false}/>;
+        return <StrategyAndForecastTableHeader isForecastReport={false} year={year + 1} />;
       case Reports.ForecastReport:
         return <StrategyAndForecastTableHeader isForecastReport={true} />;
       case Reports.ConstructionProgram:
