@@ -119,6 +119,7 @@
     "incorrectLocation": "Valittu {{field}} ei voi kuulua valitun alaluokan alle.",
     "isBefore": "Aika on oltava ennen kuin {{value}}",
     "isAfter": "Aika on oltava myöhemmin kuin {{value}}",
+    "isSameOrAfter": "Aika on oltava sama tai myöhemmin kuin {{value}}",
     "maxLength": "Maksimipituus on {{value}} merkkiä",
     "wholeNumber": "Anna kokonaisluku",
     "minValue": "Arvon on oltava vähintään {{value}}",

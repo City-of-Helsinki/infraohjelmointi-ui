@@ -6,7 +6,7 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'hds-react';
 import DateField from '@/components/shared/DateField';
-import { validateAfter, validateBefore } from '@/utils/validation';
+import { validateAfter, validateBefore, validateSameOrAfter } from '@/utils/validation';
 import _ from 'lodash';
 
 interface IProjectScheduleSectionProps {
@@ -26,7 +26,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
   getValues,
   getFieldState,
   isUserOnlyProjectManager,
-  isUserOnlyViewer
+  isUserOnlyViewer,
 }) => {
   const { t } = useTranslation();
 
@@ -49,7 +49,11 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearToBeSet = date?.split('.')[2];
           const yearInFormYearCell = getValues('planningStartYear');
 
-          if (!getFieldState('planningStartYear').isDirty && yearToBeSet !== yearInFormYearCell && yearToBeSet) {
+          if (
+            !getFieldState('planningStartYear').isDirty &&
+            yearToBeSet !== yearInFormYearCell &&
+            yearToBeSet
+          ) {
             if (isUserOnlyProjectManager) {
               return t('validation.userIsNotAllowedToModifyPlanningStartYear');
             }
@@ -72,7 +76,7 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         },
       },
     };
-  }, [getValues, phasesThatNeedPlanning, t]);
+  }, [getValues, phasesThatNeedPlanning, t, getFieldState, isUserOnlyProjectManager]);
 
   const validateEstPlanningEnd = useCallback(() => {
     return {
@@ -225,7 +229,11 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
           const yearToBeSet = date?.split('.')[2];
           const yearInFormYearCell = getValues('constructionEndYear');
 
-          if (!getFieldState('constructionEndYear').isDirty && yearToBeSet !== yearInFormYearCell && yearToBeSet) {
+          if (
+            !getFieldState('constructionEndYear').isDirty &&
+            yearToBeSet !== yearInFormYearCell &&
+            yearToBeSet
+          ) {
             return t('validation.constructionEndYearValidator');
           }
 
@@ -245,23 +253,27 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
         },
       },
     };
-  }, [getValues, phasesThatNeedConstruction, t]);
+  }, [getValues, phasesThatNeedConstruction, t, getFieldState]);
 
   const validateWarrantyPhaseStart = useCallback(() => {
     return {
       validate: {
         isWarrantyPeriodStartValid: (date: string | null) => {
+          const sameOrAfterConstructionEnd = validateSameOrAfter(
+            date,
+            'estConstructionEnd',
+            getValues,
+            t,
+          );
 
-          const afterConstructionEnd = validateAfter(date, 'estConstructionEnd', getValues, t);
-
-          if (afterConstructionEnd !== true) {
-            return afterConstructionEnd;
+          if (sameOrAfterConstructionEnd !== true) {
+            return sameOrAfterConstructionEnd;
           }
 
           const beforeWarrantyEnd = validateBefore(date, 'estWarrantyPhaseEnd', getValues, t);
 
           if (beforeWarrantyEnd !== true) {
-            return beforeWarrantyEnd
+            return beforeWarrantyEnd;
           }
 
           return true;
@@ -274,14 +286,18 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     return {
       validate: {
         isWarrantyPhaseValid: (date: string | null) => {
-
           const phase = getValues('phase').value;
 
           if (phase === 'warrantyPeriod' && !date) {
             return t('validation.required', { field: t('validation.estWarrantyPhaseEnd') });
           }
 
-          const afterWarrantyPhaseStart = validateAfter(date, 'estWarrantyPhaseStart', getValues, t);
+          const afterWarrantyPhaseStart = validateAfter(
+            date,
+            'estWarrantyPhaseStart',
+            getValues,
+            t,
+          );
 
           if (afterWarrantyPhaseStart !== true) {
             return afterWarrantyPhaseStart;
@@ -299,26 +315,50 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
       <Fieldset heading={t('projectForm.planning')} className="w-full" id="planning">
         <div className="form-row">
           <div className="form-col-md">
-            <DateField {...getFieldProps('estPlanningStart')} rules={validateEstPlanningStart()} readOnly={isUserOnlyViewer}/>
+            <DateField
+              {...getFieldProps('estPlanningStart')}
+              rules={validateEstPlanningStart()}
+              readOnly={isUserOnlyViewer}
+            />
           </div>
           <div className="form-col-md">
-            <DateField {...getFieldProps('estPlanningEnd')} rules={validateEstPlanningEnd()} readOnly={isUserOnlyViewer}/>
+            <DateField
+              {...getFieldProps('estPlanningEnd')}
+              rules={validateEstPlanningEnd()}
+              readOnly={isUserOnlyViewer}
+            />
           </div>
         </div>
         <div className="form-row">
           <div className="form-col-md">
-            <DateField {...getFieldProps('presenceStart')} rules={validatePresenceStart()} readOnly={isUserOnlyViewer}/>
+            <DateField
+              {...getFieldProps('presenceStart')}
+              rules={validatePresenceStart()}
+              readOnly={isUserOnlyViewer}
+            />
           </div>
           <div className="form-col-md">
-            <DateField {...getFieldProps('presenceEnd')} rules={validatePresenceEnd()} readOnly={isUserOnlyViewer}/>
+            <DateField
+              {...getFieldProps('presenceEnd')}
+              rules={validatePresenceEnd()}
+              readOnly={isUserOnlyViewer}
+            />
           </div>
         </div>
         <div className="form-row">
           <div className="form-col-md">
-            <DateField {...getFieldProps('visibilityStart')} rules={validateVisibilityStart()} readOnly={isUserOnlyViewer}/>
+            <DateField
+              {...getFieldProps('visibilityStart')}
+              rules={validateVisibilityStart()}
+              readOnly={isUserOnlyViewer}
+            />
           </div>
           <div className="form-col-md">
-            <DateField {...getFieldProps('visibilityEnd')} rules={validateVisibilityEnd()} readOnly={isUserOnlyViewer}/>
+            <DateField
+              {...getFieldProps('visibilityEnd')}
+              rules={validateVisibilityEnd()}
+              readOnly={isUserOnlyViewer}
+            />
           </div>
         </div>
       </Fieldset>
