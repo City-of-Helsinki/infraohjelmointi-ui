@@ -27,6 +27,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const responsiblePersons = useOptions('responsiblePersons');
   const phases = useOptions('phases');
 
+  const programmingPhase = phases[2]?.value ?? "";
   const draftInitiationPhase = phases[3]?.value ?? "";
   const draftApprovalPhase = phases[4]?.value ?? "";
   const constructionPlanPhase = phases[5]?.value ?? "";
@@ -61,6 +62,11 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
     [completedPhase, constructionPhase, warrantyPeriodPhase],
   );
 
+  const phasesThatNeedProgramming = useMemo(
+    () => [programmingPhase, warrantyPeriodPhase, completedPhase],
+    [completedPhase, programmingPhase, warrantyPeriodPhase],
+  );
+
   const validatePersonPlanning = useCallback(() => {
     return {
       validate: {
@@ -92,6 +98,22 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
       },
     };
   }, [getValues, phasesThatNeedConstruction, t]);
+
+  const validatePersonProgramming = useCallback(() => {
+    return {
+      validate: {
+        isResponsiblePersonValid: (personProgramming: IOption) => {
+          const phase = getValues('phase').value;
+
+          if (phasesThatNeedProgramming.includes(phase) && personProgramming.value === '') {
+            return t('validation.required', { field: t('validation.personProgramming') });
+          }
+
+          return true;
+        },
+      },
+    };
+  }, [getValues, phasesThatNeedProgramming, t]);
 
   return (
     <div className="w-full" id="basics-responsible-persons-section">
@@ -125,7 +147,8 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             iconKey="person"
             // Options is empty for now because this is not implemented yet, and we
             // don't get this list from ProjectWise
-            options={[]}
+            options={responsiblePersons}
+            rules={validatePersonProgramming()}
             shouldTranslate={false}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}

@@ -145,6 +145,7 @@
     "planningStartYear": "Suunnittelun aloitusvuosi",
     "constructionEndYear": "Rakentamisen valmistumisvuosi",
     "personConstruction": "Rakennuttamisen vastuuhenkilö",
+    "personProgramming": "Ohjelmoija",
     "constructionPhaseDetail": "Rakentamisvaiheen tarkenne",
     "phase": "Hankkeen vaihe",
     "fieldsRequired": "Seuraavat kentät ovat pakollisia:",
