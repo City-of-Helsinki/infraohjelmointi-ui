@@ -481,7 +481,7 @@
       "kiloEuro": "1000€",
       "millionEuro": "milj. €"
     },
-    "warrantyPeriodPhaseNotIncluded": "Huomaa ettei takuuajalla olevat hankkeet tule mukaan tälle raportille.",
+    "warrantyPeriodPhaseNotIncluded": "HUOM! Takuuaikaiset hankkeet eivät tulostu raportille.",
     "yearLabel": "Vuosi",
     "operationalEnvironmentAnalysis": {
       "rowTitle": "Kategorisointiraportti (Koordinointinäkymä)",
@@ -530,7 +530,7 @@
       "projectManagerMissing": "Odottaa nimeämistä"
     },
     "constructionProgram": {
-      "rowTitle": "Rakentamisohjelma (yli 1 milj hankkeet)",
+      "rowTitle": "Rakentamisohjelma (yli 1 milj. euron hankkeet)",
       "documentName": "rakentamisohjelma",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)",
@@ -544,7 +544,7 @@
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen investointiohjelma vuosiksi {{startYear}}-{{endYear}}"
     },
     "financialStatement": {
-      "rowTitle": "Tilinpäätös (yli 1 milj hankkeet)",
+      "rowTitle": "Tilinpäätös (yli 1 milj. euron hankkeet)",
       "documentName": "tilinpäätös"
     },
     "forecastReport": {
@@ -566,12 +566,12 @@
       "locationTitle": "Sijainti",
       "budgetTitle": "Kokonaiskustannukset milj. €",
       "scheduleTitle": "Suunnittelun ja rakentamisen ajoitus",
-      "isProjectOnScheduleTitle": "Onko hanke aikataulussa Kyllä/Ei",
+      "isProjectOnScheduleTitle": "Onko hanke aikataulussa\nKyllä/Ei",
       "commitmentsBeforeYearTitle": "Toteuma ennen",
       "commitmentsYearTitle": "Toteuma",
       "forecast1Title": "Ennuste",
       "differenceTitle": "Poikkeama TA",
-      "differencePercentTitle": "Poikkeama TA{{year}} -%",
+      "differencePercentTitle": "Poikkeama TA{{year}}\n-%",
       "differenceReasonTitle": "Keskeisimmät poikkeamat verrattuna talousarvioon ja niiden syyt"
     }
   },
