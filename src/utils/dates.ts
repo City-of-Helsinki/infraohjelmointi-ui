@@ -148,3 +148,15 @@ export const isBefore = (start?: string | null, end?: string | null) => {
   }
   return true;
 };
+
+/**
+ * Returns true if the given start date is the same or before the end date
+ */
+export const isSameOrBefore = (start?: string | null, end?: string | null) => {
+  if (start && end) {
+    const startMoment = momentFromHDSDate(start);
+    const endMoment = momentFromHDSDate(end);
+    return moment(startMoment).isSameOrBefore(endMoment);
+  }
+  return true;
+};
