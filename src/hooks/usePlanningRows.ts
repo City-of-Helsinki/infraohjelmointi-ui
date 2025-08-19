@@ -23,7 +23,7 @@ import {
   setPlanningRows,
   setProjects,
 } from '@/reducers/planningSlice';
-import _ from 'lodash';
+import { isEqual, cloneDeep } from 'lodash';
 import {
   buildPlanningRow,
   fetchProjectsByRelation,
@@ -31,7 +31,7 @@ import {
   getTypeAndIdForLowestExpandedRow,
   sortByName,
 } from '@/utils/planningRowUtils';
-import { IClass } from '@/interfaces/classInterfaces';
+import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -46,6 +46,38 @@ const sortLocationsByName = (list: Array<ILocation>) =>
   [...list].sort(
     (a, b) => parseNumberFromLocationName(a.name) - parseNumberFromLocationName(b.name),
   );
+
+/**
+ * Merges subclass finances with district frame budget data.
+ * 
+ * This function takes a subclass and its associated district location, then creates
+ * a merged finances object where the frame budget values from the district are
+ * applied to each year in the subclass finances while preserving all other
+ * financial data from the subclass.
+ * 
+ * @param subClass - The class object containing financial data to be merged
+ * @param districtForSubClass - Optional district location object containing frame budget data
+ * @returns A new IClassFinances object with merged financial data, or the original
+ *          subclass finances if no district is provided
+ */
+function mergeSubClassFinancesWithDistrictFrameBudget(subClass: IClass, districtForSubClass?: ILocation): IClassFinances {
+  if (!districtForSubClass) {
+    return subClass.finances;
+  }
+
+  const { budgetOverrunAmount, projectBudgets, year, ...rest } = subClass.finances;
+
+  const mergedFinances: IClassFinances = cloneDeep(subClass.finances);
+  
+  for (const yearKey of Object.keys(rest) as Array<keyof typeof rest>) {
+    mergedFinances[yearKey] = {
+      ...subClass.finances[yearKey],
+      frameBudget: districtForSubClass.finances[yearKey].frameBudget,
+    };
+  }
+  
+  return mergedFinances;
+}
 
 /**
  * Builds a hierarchy-list of IPlanningTableRows, that will either include
@@ -128,38 +160,63 @@ export const buildPlanningTableRows = (
           ...getRow(filteredClass, 'class', !!selectedClass),
           children: [
             ...getSortedGroupRows(filteredClass.id, 'class', filteredClass.path),
-            ...subClasses.filter((subClass) => subClass.parent === filteredClass.id)
-            .map((filteredSubClass) => ({
-              ...getRow(filteredSubClass, subClassType, !!selectedSubClass),
-              // DISTRICTS & GROUPS
-              children: [
-                // groups
-                ...getSortedGroupRows(filteredSubClass.id, subClassType, filteredSubClass.path),
-                // districts
-                ...districts
-                  .filter((district) => district.parentClass === filteredSubClass.id)
-                  .map((filteredDistrict) => ({
-                    ...getRow(filteredDistrict, districtType),
-                    children: [
-                      ...getSortedGroupRows(filteredDistrict.id, districtType, filteredSubClass.path),
-                      ...divisions
-                        .filter((division) => division.parent === filteredDistrict.id)
-                        .map((filteredDivision) => ({
-                          ...getRow(filteredDivision, 'division'),
-                          children: [
-                            ...getSortedGroupRows(filteredDivision.id, 'division', filteredSubClass.path)
-                          ]
-                        }))
-                    ]
-                  })),
-                ...otherClassifications
-                .filter((otherClassifications) => otherClassifications.parent === filteredSubClass.id)
-                .map((filteredOthers) => ({
-                  ...getRow(filteredOthers, 'otherClassification'),
-                }))
-              ],
-            })),
-          ]
+            ...subClasses
+              .filter((subClass) => subClass.parent === filteredClass.id)
+              .map((filteredSubClass) => {
+                const districtForSubClass = districts.find(
+                  (district) => district.parentClass === filteredSubClass.id,
+                );
+                return {
+                  ...filteredSubClass,
+                  /* districts' (suurpiiri) framebudget is not available on a subClass level,
+                     so it is merged with the subClass finances here */
+                  finances: mergeSubClassFinancesWithDistrictFrameBudget(
+                    filteredSubClass,
+                    districtForSubClass,
+                  ),
+                };
+              })
+              .map((filteredSubClass) => ({
+                ...getRow(filteredSubClass, subClassType, !!selectedSubClass),
+                // DISTRICTS & GROUPS
+                children: [
+                  // groups
+                  ...getSortedGroupRows(filteredSubClass.id, subClassType, filteredSubClass.path),
+                  // districts
+                  ...districts
+                    .filter((district) => district.parentClass === filteredSubClass.id)
+                    .map((filteredDistrict) => ({
+                      ...getRow(filteredDistrict, districtType),
+                      children: [
+                        ...getSortedGroupRows(
+                          filteredDistrict.id,
+                          districtType,
+                          filteredSubClass.path,
+                        ),
+                        ...divisions
+                          .filter((division) => division.parent === filteredDistrict.id)
+                          .map((filteredDivision) => ({
+                            ...getRow(filteredDivision, 'division'),
+                            children: [
+                              ...getSortedGroupRows(
+                                filteredDivision.id,
+                                'division',
+                                filteredSubClass.path,
+                              ),
+                            ],
+                          })),
+                      ],
+                    })),
+                  ...otherClassifications
+                    .filter(
+                      (otherClassifications) => otherClassifications.parent === filteredSubClass.id,
+                    )
+                    .map((filteredOthers) => ({
+                      ...getRow(filteredOthers, 'otherClassification'),
+                    })),
+                ],
+              })),
+          ],
         })),
     };
   });
@@ -170,22 +227,33 @@ export const buildPlanningTableRows = (
       : [];
 
     const districtForSubClass = /suurpiiri|östersundom/.test(subClass.name.toLocaleLowerCase())
-    ? districts.find((district) => district.parentClass === subClass.id) as IClass
-    : undefined;
+      ? districts.find((district) => district.parentClass === subClass.id)
+      : undefined;
+
+    const finances = mergeSubClassFinancesWithDistrictFrameBudget(subClass, districtForSubClass);
 
     const districtsForSubClass = districts.filter(
       (d) => d.parentClass === subClass.id && !d.parent,
     );
 
     const subClassDistrictRows = {
-      ...getRow({ ...subClass, ...(districtForSubClass ? {finances: districtForSubClass.finances} : {})}, subClassType, !!selectedSubClass, districtsForSubClass),
+      ...getRow(
+        { ...subClass, finances },
+        subClassType,
+        !!selectedSubClass,
+        districtsForSubClass,
+      ),
       // DIVISIONS & GROUPS
       children: [
         // groups
         ...getSortedGroupRows(subClass.id, subClassType, subClass.path),
         // divisions
         ...sortLocationsByName(divisionsForSubClass).map((filteredDivision) => {
-          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division', subClass.path);
+          const groupsForDivision = getSortedGroupRows(
+            filteredDivision.id,
+            'division',
+            subClass.path,
+          );
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
             // GROUPS (for division)
@@ -330,7 +398,7 @@ const usePlanningRows = () => {
     const nextRows = buildPlanningTableRows(list, projects, selections, subDivisions);
 
     // Re-build planning rows if the existing rows are not equal
-    if (!_.isEqual(nextRows, rows)) {
+    if (!isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
   }, [startYear, batchedPlanningClasses, batchedPlanningLocations, groups, projects, selections, mode, forcedToFrame, startYear, subDivisions, rows, dispatch]);

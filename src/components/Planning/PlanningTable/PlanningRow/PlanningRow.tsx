@@ -16,8 +16,14 @@ interface IPlanningRowState {
   searchedProjectId: string;
 }
 
-const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>, sapCurrentYear: Record<string, IProjectSapCost> }> = (props) => {
-  const { defaultExpanded, projectRows, cells, id, type, sapCosts, children, sapCurrentYear } = props;
+const PlanningRow: FC<
+  IPlanningRow & {
+    sapCosts: Record<string, IProjectSapCost>;
+    sapCurrentYear: Record<string, IProjectSapCost>;
+  }
+> = (props) => {
+  const { defaultExpanded, projectRows, cells, id, type, sapCosts, sapCurrentYear } =
+    props;
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
 
@@ -39,7 +45,6 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
   useEffect(() => {
     setPlanningRowState((current) => ({ ...current, expanded: defaultExpanded || false }));
   }, [defaultExpanded]);
-
 
   useEffect(() => {
     if (type === 'group') {
@@ -98,16 +103,13 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
     }
   }, [searchedProjectId]);
 
-/* districts' (suurpiiri) framebudget is not available on a subClass level in 'cells' even though it probably should, however 
-  the data can be found one level lower from the childrens' 'cells'. The problem with the data might happen because the districts
-  that are on the subclass level, are marked as projectGroup now and they probably should be projectClass instead. TODO: investigate
-  the possible problem with projectGroup/projectClass */
-  const cellDataWithFrameBudget = children[0]?.cells;
-  const cellData = props.name.includes("suurpiiri") && cellDataWithFrameBudget && !search.includes("subClass") ? cellDataWithFrameBudget : cells;
-
   /* Rows that type is districtPreview should only exist on a subClass level. If user chose a district as a subClass and then chose 
      the same district as project's location a bit lower on the project form, the district were rendered twice in the planning view */
-  if (!search.includes('subClass') && props.name.includes('suurpiiri') && props.type === 'districtPreview') {
+  if (
+    !search.includes('subClass') &&
+    props.name.includes('suurpiiri') &&
+    props.type === 'districtPreview'
+  ) {
     return <></>;
   }
 
@@ -120,7 +122,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
           {...props}
           projectRows={projectRows}
         />
-        {cellData.map((c: IPlanningCell) => (
+        {cells.map((c: IPlanningCell) => (
           <PlanningCell {...props} cell={c} key={c.key} />
         ))}
       </tr>
@@ -139,7 +141,7 @@ const PlanningRow: FC<IPlanningRow & { sapCosts: Record<string, IProjectSapCost>
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} sapCosts={sapCosts} sapCurrentYear={sapCurrentYear}/>
+            <PlanningRow {...c} sapCosts={sapCosts} sapCurrentYear={sapCurrentYear} />
           ))}
         </>
       )}
