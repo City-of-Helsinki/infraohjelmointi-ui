@@ -3,14 +3,11 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import { UseFormGetValues } from 'react-hook-form';
 import _ from 'lodash';
-import { isBefore } from './dates';
+import { isBefore, isSameOrBefore } from './dates';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyProjectManager } from './userRoleHelpers';
 import { IUser } from '@/interfaces/userInterfaces';
 
-export const validateMaxLength = (
-  value: number,
-  t: TFunction<'translation'>,
-) => ({
+export const validateMaxLength = (value: number, t: TFunction<'translation'>) => ({
   maxLength: { value: value, message: t('validation.maxLength', { value: value }) },
 });
 
@@ -20,17 +17,11 @@ export const validateInteger = (t: TFunction<'translation'>) => ({
       Number.isInteger(Number(value)) ? true : t('validation.wholeNumber'),
   },
 });
-export const validateRequired = (
-  field: string,
-  t: TFunction<'translation'>,
-) => ({
+export const validateRequired = (field: string, t: TFunction<'translation'>) => ({
   required: t('validation.required', { field: t(`validation.${field}`) }) ?? '',
 });
 
-export const validateMaxNumber = (
-  max: number,
-  t: TFunction<'translation'>,
-) => ({
+export const validateMaxNumber = (max: number, t: TFunction<'translation'>) => ({
   min: {
     value: 0,
     message: t('validation.minValue', { value: '0' }),
@@ -63,6 +54,20 @@ export const validateAfter = (
 ) => {
   if (!isBefore(getValues(startDateField as keyof IProjectForm) as string, endDate)) {
     return t('validation.isAfter', {
+      value: t(`validation.${startDateField}`),
+    });
+  }
+  return true;
+};
+
+export const validateSameOrAfter = (
+  endDate: string | null,
+  startDateField: string,
+  getValues: UseFormGetValues<IProjectForm>,
+  t: TFunction<'translation'>,
+) => {
+  if (!isSameOrBefore(getValues(startDateField as keyof IProjectForm) as string, endDate)) {
+    return t('validation.isSameOrAfter', {
       value: t(`validation.${startDateField}`),
     });
   }

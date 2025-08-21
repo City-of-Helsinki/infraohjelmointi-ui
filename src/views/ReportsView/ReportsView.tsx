@@ -19,7 +19,7 @@ const ReportsView = () => {
     } else {
       dispatch(clearLoading(LOADING_DATA_ID));
     }
-  }, [isPlanningLoading]);
+  }, [isPlanningLoading, dispatch]);
 
   return (
     <div className="reports-view" data-testid="reports-view">

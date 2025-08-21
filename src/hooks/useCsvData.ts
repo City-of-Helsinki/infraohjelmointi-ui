@@ -21,6 +21,9 @@ export const useCsvData = ({
   getPlanningData,
   getPlanningRows,
   getCategories,
+  sapCosts,
+  currentYearSapValues,
+  year = new Date().getFullYear(),
 }: IDownloadCsvButtonProps) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -28,7 +31,6 @@ export const useCsvData = ({
     Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow>
   >([]);
   const LOADING_CSV_DATA = 'loading-csv-data';
-  const year = new Date().getFullYear();
 
   const getCsvData = async () => {
     try {
@@ -49,7 +51,7 @@ export const useCsvData = ({
               res.projects,
               res.groupRes,
             );
-            data = await getReportData(t, type, coordinatorRows);
+            data = await getReportData(t, type, coordinatorRows, undefined, undefined, undefined, undefined, undefined, undefined, undefined, year);
           }
           break;
         }
@@ -62,7 +64,7 @@ export const useCsvData = ({
 
           if (resCoordinator && resCoordinator.projects.length > 0) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            data = await getReportData(t, type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
+            data = await getReportData(t, type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows, sapCosts, currentYearSapValues);
           }
           break;
         }
@@ -104,6 +106,11 @@ export const useCsvData = ({
               planningRows,
               divisions,
               subDivisions,
+              undefined,
+              undefined,
+              undefined,
+              sapCosts,
+              currentYearSapValues
             );
           }
           break;

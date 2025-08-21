@@ -169,8 +169,8 @@ const PlanningToolbar = () => {
     [forcedToFrame, mode, user],
   );
   const isForcedToFrameModeButtonDisabled = useMemo(
-    () => forcedToFrame || mode === 'coordination' || isUserOnlyViewer(user),
-    [forcedToFrame, mode, user],
+    () => forcedToFrame || isUserOnlyViewer(user),
+    [forcedToFrame, user],
   );
 
   return (

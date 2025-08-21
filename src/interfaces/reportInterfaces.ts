@@ -9,6 +9,7 @@ import {
 } from './planningInterfaces';
 import { IGroup } from './groupInterfaces';
 import { IListItem } from './common';
+import { IProjectSapCost } from './sapCostsInterfaces';
 
 export type IGetForcedToFrameData = {
   res: IProjectsResponse;
@@ -347,6 +348,9 @@ export interface IDownloadCsvButtonProps {
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   getCategories: () => Promise<IListItem[]>;
+  sapCosts?: Record<string, IProjectSapCost>;
+  currentYearSapValues?: Record<string, IProjectSapCost>;
+  year?: number;
 }
 
 export interface IDownloadPdfButtonProps {
@@ -355,4 +359,5 @@ export interface IDownloadPdfButtonProps {
   getPlanningData: (year: number) => Promise<IPlanningData>;
   getPlanningRows: (res: IPlanningData) => IPlanningRow[];
   getCategories: () => Promise<IListItem[]>;
+  year?: number;
 }

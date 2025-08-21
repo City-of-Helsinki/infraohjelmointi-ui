@@ -41,6 +41,7 @@ const getPdfDocument = (
   forcedToFrameRows?: IPlanningRow[],
   sapCosts?: Record<string, IProjectSapCost>,
   currentYearSapValues?: Record<string, IProjectSapCost>,
+  year?: number,
 ) => {
   const pdfDocument = {
     operationalEnvironmentAnalysis: (
@@ -57,7 +58,7 @@ const getPdfDocument = (
         projectsInWarrantyPhase={projectsInWarrantyPhase}
     />
     ),
-    strategy: <ReportContainer data={{ rows }} reportType={Reports.Strategy} />,
+    strategy: <ReportContainer data={{ rows }} reportType={Reports.Strategy} year={year} />,
     strategyForcedToFrame: (
       <ReportContainer data={{ rows }} reportType={Reports.StrategyForcedToFrame} />
     ),
@@ -74,6 +75,8 @@ const getPdfDocument = (
     constructionProgram: (
       <ReportContainer
         data={{ rows, divisions, subDivisions }}
+        sapCosts={sapCosts}
+        currentYearSapValues={currentYearSapValues}
         reportType={Reports.ConstructionProgram}
       />
     ),
@@ -97,18 +100,18 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
   getPlanningData,
   getPlanningRows,
   getCategories,
+  year = new Date().getFullYear(),
 }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const projetSapCosts = useAppSelector(getProjectSapCosts);
+  const projectSapCosts = useAppSelector(getProjectSapCosts);
   const projectCurrentYearSapValues = useAppSelector(getProjectSapCurrentYear);
   const documentName = useMemo(() => t(`report.${type}.documentName`), [t, type]);
   const LOADING_PDF_DATA = 'loading-pdf-data';
 
   const downloadPdf = useCallback(async () => {
     try {
-      const year = new Date().getFullYear();
       dispatch(setLoading({ text: 'Loading pdf data', id: LOADING_PDF_DATA }));
 
       let document: JSX.Element | undefined = undefined;
@@ -116,7 +119,8 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
         case Reports.Strategy:
         case Reports.StrategyForcedToFrame:
         case Reports.BudgetBookSummary: {
-          // For Strategy report, we will fetch next year data
+          // For Strategy report, we will fetch data from the year user selected
+          // For StrategyForcedToFrame report, we will fetch next year data
           const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year);
 
           if (viewHasProjects(res)) {
@@ -127,7 +131,18 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
               res.projects,
               res.groupRes,
             );
-            document = getPdfDocument(type, coordinatorRows);
+            document = getPdfDocument(
+              type,
+              coordinatorRows,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              year,
+            );
           }
           break;
         }
@@ -154,7 +169,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
 
           if (viewHasProjects(resCoordinator)) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            document = getPdfDocument(type, rows.coordinatorRows, divisions, subDivisions, undefined, undefined, rows.forcedToFrameRows, projetSapCosts, projectCurrentYearSapValues);
+            document = getPdfDocument(type, rows.coordinatorRows, divisions, subDivisions, undefined, undefined, rows.forcedToFrameRows, projectSapCosts, projectCurrentYearSapValues);
           }
           break;
         }
@@ -190,7 +205,7 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
 
           if (viewHasProjects(res)) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, planningRows, divisions, subDivisions);
+            document = getPdfDocument(type, planningRows, divisions, subDivisions, undefined, undefined, undefined, projectSapCosts, projectCurrentYearSapValues);
           }
         }
       }
@@ -209,7 +224,19 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
       if ([Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport, Reports.OperationalEnvironmentAnalysis, Reports.OperationalEnvironmentAnalysisForcedToFrame].includes(type as Reports)) navigate(0);
     }
-  }, [documentName, type]);
+  }, [
+    dispatch,
+    documentName,
+    getCategories,
+    getForcedToFrameData,
+    getPlanningData,
+    getPlanningRows,
+    navigate,
+    projectCurrentYearSapValues,
+    projectSapCosts,
+    type,
+    year,
+  ]);
 
   return (
     <Button
