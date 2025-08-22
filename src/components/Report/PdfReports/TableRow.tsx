@@ -664,7 +664,8 @@ const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
 
       break;
     }
-    case Reports.ConstructionProgram: {
+    case Reports.ConstructionProgram:
+    case Reports.ConstructionProgramForcedToFrame: {
       // Programming view (hierarchy) colours for class rows
       // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
       if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {

@@ -115,6 +115,35 @@ export const useCsvData = ({
           }
           break;
         }
+        case Reports.ConstructionProgramForcedToFrame: {
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year + 1);
+          const resDivisions = await getDistricts();
+          const divisions = getProjectDistricts(resDivisions, 'division');
+          const subDivisions = getProjectDistricts(resDivisions, 'subDivision');
+
+          if (res && res.projects.length > 0) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+            data = await getReportData(
+              t,
+              type,
+              coordinatorRows,
+              divisions,
+              subDivisions,
+              undefined,
+              undefined,
+              undefined,
+              sapCosts,
+              currentYearSapValues,
+            );
+          }
+          break;
+        }
         default:
           break;
       }

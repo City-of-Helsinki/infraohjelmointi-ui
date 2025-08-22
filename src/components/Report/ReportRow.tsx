@@ -146,7 +146,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       <h3 className="report-title" data-testid={`report-title-${type}`}>
         {t(`report.${type}.rowTitle`)}
       </h3>
-      {type === 'constructionProgram' && <p>{t(`report.warrantyPeriodPhaseNotIncluded`)}</p>}
+      {(type === 'constructionProgram' || type === 'constructionProgramForcedToFrame') && (
+        <p>{t(`report.warrantyPeriodPhaseNotIncluded`)}</p>
+      )}
       {/* year selection dropdown for Strategy report */}
       {isStrategyReport && (
         <ReportYearSelect

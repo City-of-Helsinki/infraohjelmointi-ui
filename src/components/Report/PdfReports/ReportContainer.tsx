@@ -44,6 +44,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.title');
       case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForcedToFrame:
       case Reports.ConstructionProgramForecast:
         return t('report.constructionProgram.title');
       case Reports.BudgetBookSummary:
@@ -82,6 +83,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
           startYear: currentYear + 1
         });
       case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForcedToFrame:
         return t('report.constructionProgram.subtitle', {
             startYear: currentYear + 1,
             endYear: currentYear + 3,
@@ -115,11 +117,16 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
   const documentTitle = getDocumentTitle();
   const documentSubtitleOne = getDocumentSubtitleOne();
   const documentSubtitleTwo = getDocumentSubtitleTwo();
+  const documentOrientation =
+    reportType === Reports.ConstructionProgram ||
+    reportType === Reports.ConstructionProgramForcedToFrame
+      ? 'portrait'
+      : 'landscape';
 
   return (
     <Document title={documentTitle}>
-      <Page 
-        orientation={reportType !== Reports.ConstructionProgram ? "landscape" : "portrait" }
+      <Page
+        orientation={documentOrientation}
         size={reportType !== Reports.ForecastReport ? "A3" : "A2"}
         style={styles.page}
       >

@@ -537,6 +537,14 @@
       "classSummary": "Hankkeet yhteensä",
       "underMillionSummary": "Muut alle 1 milj. euron investointihankkeet"
     },
+    "constructionProgramForcedToFrame": {
+      "rowTitle": "Rakentamisohjelma (Sovitettu budjetti, yli 1 milj hankkeet)",
+      "documentName": "rakentamisohjelma - sovitettu budjetti",
+      "title": "Helsingin kaupunki",
+      "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)",
+      "classSummary": "Hankkeet yhteensä",
+      "underMillionSummary": "Muut alle 1 milj. euron investointihankkeet"
+    },
     "budgetBookSummary": {
       "rowTitle": "Talousarviokirjan kooste",
       "documentName": "talousarviokirjan kooste",

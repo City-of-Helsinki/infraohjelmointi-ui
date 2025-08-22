@@ -80,6 +80,14 @@ const getPdfDocument = (
         reportType={Reports.ConstructionProgram}
       />
     ),
+    constructionProgramForcedToFrame: (
+      <ReportContainer
+        data={{ rows, divisions, subDivisions }}
+        sapCosts={sapCosts}
+        currentYearSapValues={currentYearSapValues}
+        reportType={Reports.ConstructionProgramForcedToFrame}
+      />
+    ),
     budgetBookSummary: <ReportContainer data={{ rows }} reportType={Reports.BudgetBookSummary} />,
     financialStatement: <EmptyDocument />,
   };
@@ -207,6 +215,35 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
             const planningRows = getPlanningRows(res);
             document = getPdfDocument(type, planningRows, divisions, subDivisions, undefined, undefined, undefined, projectSapCosts, projectCurrentYearSapValues);
           }
+          break;
+        }
+        case Reports.ConstructionProgramForcedToFrame: {
+          const res = await getForcedToFrameDataForReports(getForcedToFrameData, type, year + 1);
+          const resDivisions = await getDistricts();
+          const divisions = getProjectDistricts(resDivisions, 'division');
+          const subDivisions = getProjectDistricts(resDivisions, 'subDivision');
+
+          if (viewHasProjects(res)) {
+            const coordinatorRows = getCoordinationTableRows(
+              res.classHierarchy,
+              res.forcedToFrameDistricts.districts,
+              res.initialSelections,
+              res.projects,
+              res.groupRes,
+            );
+            document = getPdfDocument(
+              type,
+              coordinatorRows,
+              divisions,
+              subDivisions,
+              undefined,
+              undefined,
+              undefined,
+              projectSapCosts,
+              projectCurrentYearSapValues,
+            );
+          }
+          break;
         }
       }
 
