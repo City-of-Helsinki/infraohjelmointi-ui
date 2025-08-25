@@ -60,6 +60,7 @@ export const reports = [
   'forecastReport',
   'constructionProgramForecast',
   'constructionProgram',
+  'constructionProgramForcedToFrame',
   'budgetBookSummary',
   'financialStatement',
 ] as const;
@@ -94,6 +95,7 @@ export enum Reports {
   Strategy = 'strategy',
   StrategyForcedToFrame = 'strategyForcedToFrame',
   ConstructionProgram = 'constructionProgram',
+  ConstructionProgramForcedToFrame = 'constructionProgramForcedToFrame',
   ConstructionProgramForecast = 'constructionProgramForecast',
   ForecastReport = 'forecastReport',
   BudgetBookSummary = 'budgetBookSummary',

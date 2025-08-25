@@ -103,7 +103,8 @@ const ReportTable: FC<IReportTableProps> = ({
     reportType === Reports.OperationalEnvironmentAnalysis ||
     reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame ||
     reportType === Reports.ConstructionProgram ||
-    reportType === Reports.ConstructionProgramForecast )
+    reportType === Reports.ConstructionProgramForecast ||
+    reportType === Reports.ConstructionProgramForcedToFrame)
       ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
 
 
@@ -121,6 +122,7 @@ const ReportTable: FC<IReportTableProps> = ({
       case Reports.ForecastReport:
         return <StrategyAndForecastTableHeader isForecastReport={true} />;
       case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForcedToFrame:
         return <ConstructionProgramTableHeader />;
       case Reports.BudgetBookSummary:
         return <BudgetBookSummaryTableHeader />;

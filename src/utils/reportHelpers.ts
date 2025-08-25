@@ -515,11 +515,18 @@ const checkYearRange = (props: IYearCheck) => {
   const inPlanningOrConstruction = (nextThreeYears.some(year => year >= props.planningStart && year <= props.constructionEnd));
   const inPlanningOrConstructionThisYear = (currentYear >= props.planningStart && currentYear <= props.constructionEnd)
 
-  if (inPlanningOrConstruction && props.type === Reports.ConstructionProgram) {
+  if (
+    inPlanningOrConstruction &&
+    (props.type === Reports.ConstructionProgram ||
+      props.type === Reports.ConstructionProgramForcedToFrame)
+  ) {
     return true;
-  } else if (inPlanningOrConstructionThisYear && props.type === Reports.ConstructionProgramForecast){
+  } else if (
+    inPlanningOrConstructionThisYear &&
+    props.type === Reports.ConstructionProgramForecast
+  ) {
     return true;
-  }  else {
+  } else {
     return false;
   }
 }
@@ -1092,39 +1099,31 @@ export const convertToReportRows = (
       return forcedToFrameHierarchy;
     }
     case Reports.ConstructionProgram:
+    case Reports.ConstructionProgramForcedToFrame:
     case Reports.ConstructionProgramForecast: {
       const planningHierarchy = [];
-      const pathsWithExtraRows = [
-        "8 01 Kiinteä omaisuus/Esirakentaminen/Muu esirakentaminen",
-        "8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset",
-        "8 03 Kadut ja liikenneväylät/Uudisrakentaminen",
-        "8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt",
-        "8 03 Kadut ja liikenneväylät/Muut investoinnit",
-        "8 03 Kadut ja liikenneväylät/Yhteishankkeet Väyläviraston kanssa",
-        "8 04 Puistot ja liikunta-alueet",
-        "8 08 Projektialueiden infrarakentaminen/Esirakentaminen",
-        "8 08 Projektialueiden infrarakentaminen/Kadut",
-        "8 08 Projektialueiden infrarakentaminen/Puistot ja liikunta-alueet",
-        "8 09 Kaupunkiuudistus/Malminkartano-Kannelmäki",
-        "8 09 Kaupunkiuudistus/Malmi",
-        "8 09 Kaupunkiuudistus/Mellunkylä",
-        "8 09 Kaupunkiuudistus/Meri-Rastila",
-        "8 10 Suuret liikennehankkeet/Kruunusillat",
-        "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
-        "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
-        "8 10 Suuret liikennehankkeet/Kalasatama-Pasila",
-        "8 10 Suuret liikennehankkeet/Länsiratikat"
-      ]
       const pathsWithOnlySummaryRow = [
         "8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset",
         "8 10 Suuret liikennehankkeet/Kruunusillat",
         "8 10 Suuret liikennehankkeet/Sörnäistentunneli",
         "8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet",
         "8 10 Suuret liikennehankkeet/Kalasatama-Pasila",
-        "8 10 Suuret liikennehankkeet/Länsiratikat"
+        "8 10 Suuret liikennehankkeet/Länsiratikat",
+        "8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 01 Kruunusillat",
+        "8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 02 Kalasatama-Pasila",
+        "8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 03 Sörnäistentunneli",
+        "8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 04 Länsi-Helsingin raitiotiet",
       ]
+
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
-        path && (path.startsWith('8 01') || path.startsWith('8 04') || path.startsWith('8 08') || path.startsWith("8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Siltojen peruskorjaukset"));
+        path &&
+        (path.startsWith('8 01') ||
+          path.startsWith('8 04') ||
+          path.startsWith('8 08') ||
+          path.startsWith(
+            '8 03 Kadut ja liikenneväylät/Perusparantaminen ja liikennejärjestelyt/Siltojen peruskorjaukset',
+          ));
+
 
       for (const c of rows) {
         if (c.type === 'group') {
@@ -1177,16 +1176,44 @@ export const convertToReportRows = (
         } else {
           const forcedToFrameData = hierarchyInForcedToFrame?.find((hc) => hc.id === c.id);
           const forcedToFrameClass = forcedToFrameData ? forcedToFrameData : null;
-          const forcedToFrameChildren = forcedToFrameData && forcedToFrameData.children ? forcedToFrameData.children : [];
+          const forcedToFrameChildren =
+            forcedToFrameData && forcedToFrameData.children ? forcedToFrameData.children : [];
           const convertedClass: IConstructionProgramTableRow = {
             id: c.id,
             name: c.name,
             parent: c.path,
             path: c.path,
-            children: c.children.length ? convertToReportRows(c.children, reportType, categories, t, divisions, subDivisions, undefined, forcedToFrameChildren, sapCosts, currentYearSapValues) : [],
-            projects: c.projectRows.length ? convertToConstructionReportProjects(c.projectRows, divisions, subDivisions, reportType, forcedToFrameClass?.projectRows, sapCosts, currentYearSapValues) : [],
-            type: getConstructionRowType(c.type, c.name.toLowerCase(), reportType) as ReportTableRowType,
-          }
+            children: c.children.length
+              ? convertToReportRows(
+                  c.children,
+                  reportType,
+                  categories,
+                  t,
+                  divisions,
+                  subDivisions,
+                  undefined,
+                  forcedToFrameChildren,
+                  sapCosts,
+                  currentYearSapValues,
+                )
+              : [],
+            projects: c.projectRows.length
+              ? convertToConstructionReportProjects(
+                  c.projectRows,
+                  divisions,
+                  subDivisions,
+                  reportType,
+                  forcedToFrameClass?.projectRows,
+                  sapCosts,
+                  currentYearSapValues,
+                )
+              : [],
+            type: getConstructionRowType(
+              c.type,
+              c.name.toLowerCase(),
+              reportType,
+            ) as ReportTableRowType,
+          };
 
           planningHierarchy.push(convertedClass);
 
@@ -1195,13 +1222,31 @@ export const convertToReportRows = (
               if (row.costForecast || row.projects.length) {
                 return true;
               } else if (row.children.length) {
-                return isNotAnEmptyClass(row.children)
+                return isNotAnEmptyClass(row.children);
               }
             }
             return false;
-          }
+          };
 
-          if (pathsWithExtraRows.includes(c.path) && isNotAnEmptyClass([convertedClass])) {
+          /**
+           * Determines if a summary row should be added based on specific criteria.
+           *
+           * A summary row is added if:
+           * - It's a masterClass type thats path starts with '8 04', OR
+           * - It's a class type thats path does NOT start with '8 04'
+           */
+          const isSummaryRow = (c: IPlanningRow): boolean => {
+            return (
+              (c.type === 'masterClass' && c.path.startsWith('8 04')) ||
+              (c.type === 'class' && !c.path.startsWith('8 04'))
+            );
+          };
+
+          if (
+            isSummaryRow(c) &&
+            isNotAnEmptyClass([convertedClass]) &&
+            reportType !== Reports.ConstructionProgramForecast
+          ) {
             const summaryOfProjectsRow: IConstructionProgramTableRow = {
               id: `${c.id}-class-summary`,
               children: [],
@@ -1211,19 +1256,22 @@ export const convertToReportRows = (
               parent: c.path,
               budgetProposalCurrentYearPlus0: keurToMillion(c.cells[0].displayFrameBudget),
               budgetProposalCurrentYearPlus1: keurToMillion(c.cells[1].displayFrameBudget),
-              budgetProposalCurrentYearPlus2: keurToMillion(c.cells[2].displayFrameBudget)
-            }
+              budgetProposalCurrentYearPlus2: keurToMillion(c.cells[2].displayFrameBudget),
+            };
             const underMillionSummary = {
               budgetProposalCurrentYearPlus0: (
                 parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus0 ?? '0') -
-                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus0).toFixed(1),
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus0
+              ).toFixed(1),
               budgetProposalCurrentYearPlus1: (
                 parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus1 ?? '0') -
-                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus1).toFixed(1),
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus1
+              ).toFixed(1),
               budgetProposalCurrentYearPlus2: (
                 parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus2 ?? '0') -
-                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus2).toFixed(1)
-            }
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus2
+              ).toFixed(1),
+            };
             const underMillionSummaryRow: IConstructionProgramTableRow = {
               id: `${c.id}-under-million-summary`,
               children: [],
@@ -1231,18 +1279,24 @@ export const convertToReportRows = (
               type: 'info',
               name: t('report.constructionProgram.underMillionSummary'),
               parent: c.path,
-              budgetProposalCurrentYearPlus0: underMillionSummary.budgetProposalCurrentYearPlus0.toString().replace('.', ','),
-              budgetProposalCurrentYearPlus1: underMillionSummary.budgetProposalCurrentYearPlus1.toString().replace('.', ','),
-              budgetProposalCurrentYearPlus2: underMillionSummary.budgetProposalCurrentYearPlus2.toString().replace('.', ','),
-            }
+              budgetProposalCurrentYearPlus0: underMillionSummary.budgetProposalCurrentYearPlus0
+                .toString()
+                .replace('.', ','),
+              budgetProposalCurrentYearPlus1: underMillionSummary.budgetProposalCurrentYearPlus1
+                .toString()
+                .replace('.', ','),
+              budgetProposalCurrentYearPlus2: underMillionSummary.budgetProposalCurrentYearPlus2
+                .toString()
+                .replace('.', ','),
+            };
             const emptyRow: IConstructionProgramTableRow = {
               children: [],
               projects: [],
               type: 'empty',
               name: '',
               parent: undefined,
-              id: `${c.id}-empty-row`
-            }
+              id: `${c.id}-empty-row`,
+            };
             if (!pathsWithOnlySummaryRow.includes(c.path)) {
               planningHierarchy.push(underMillionSummaryRow);
             }
@@ -1756,7 +1810,8 @@ export const getReportData = async (
       case Reports.ForecastReport: {
         return generateStrategyAndForecastCsvRows(reportRows, reportType, year + 1);
       }
-      case Reports.ConstructionProgram: {
+      case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForcedToFrame: {
         // Flatten rows into one dimension
         const flattenedRows = flattenConstructionProgramTableRows(reportRows as IConstructionProgramTableRow[]);
         // Transform them into csv rows
