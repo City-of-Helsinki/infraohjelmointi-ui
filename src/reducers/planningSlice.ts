@@ -7,12 +7,15 @@ import {
   PlanningMode,
 } from '@/interfaces/planningInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectPatchRequestObject } from '@/interfaces/projectInterfaces';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getCoordinatorNotes, postCoordinatorNoteToProject } from '@/services/noteServices';
-import { IError } from '@/interfaces/common';
+import { IError, INotification } from '@/interfaces/common';
 import { ICoordinatorNote } from '@/interfaces/noteInterfaces';
+import { patchProject } from '@/services/projectServices';
+import { clearLoading, setLoading } from './loaderSlice';
+import { notifyError } from './notificationSlice';
 
 interface ICoordinatorNotesModalOpen {
   isOpen: boolean;
@@ -36,6 +39,15 @@ interface IPlanningState {
   coordinatorNotes: ICoordinatorNote[];
 }
 
+interface IProjectUpdateParams {
+  /** Request object containing the project data to update */
+  request: IProjectPatchRequestObject;
+  /** Optional error notification to display in case of failure */
+  errorNotification?: INotification;
+}
+
+const UPDATE_PROJECT = 'update-project';
+
 export const getCoordinatorNotesThunk = createAsyncThunk(
   'coordinatorNotes/getByProject',
   async (_, thunkAPI) => {
@@ -51,6 +63,24 @@ export const postCoordinatorNoteToProjectThunk = createAsyncThunk(
     return await postCoordinatorNoteToProject(request)
       .then((res) => res)
       .catch((err: IError) => thunkAPI.rejectWithValue(err));
+  },
+);
+
+export const updateProject = createAsyncThunk(
+  'projects/update',
+  async (params: IProjectUpdateParams, thunkAPI) => {
+    thunkAPI.dispatch(setLoading({ text: 'Update project data', id: UPDATE_PROJECT }));
+    return await patchProject(params.request)
+      .then((res) => res.data)
+      .catch((error) => {
+        if (params.errorNotification) {
+          thunkAPI.dispatch(notifyError(params.errorNotification));
+        }
+        return thunkAPI.rejectWithValue(error);
+      })
+      .finally(() => {
+        thunkAPI.dispatch(clearLoading(UPDATE_PROJECT));
+      });
   },
 );
 
@@ -173,6 +203,17 @@ export const planningSlice = createSlice({
         return { ...state, coordinatorNotesError: action.payload };
       },
     );
+    builder.addCase(updateProject.fulfilled, (state, action: PayloadAction<IProject>) => {
+      const updatedProject = action.payload;
+      const projectIndex = state.projects.findIndex((project) => project.id === updatedProject.id);
+      const originalProject = state.projects[projectIndex];
+      if (projectIndex !== -1) {
+        state.projects[projectIndex] = {
+          ...originalProject,
+          ...updatedProject,
+        };
+      }
+    });
   }
 });
 

@@ -297,7 +297,7 @@
       "sendSuccess": "Lähetys onnistui",
       "patchSuccess": "Muokkaus onnistui",
       "deleteSuccess": "Poisto onnistui",
-      "projectNotFound": "Hanketta ei löytnyt",
+      "projectNotFound": "Hanketta ei löytynyt",
       "hashtagPatchSuccess": "Tunniste päivitetty",
       "patchError": "Päivitys epäonnistui",
       "saveError": "Tallennus epäonnistui",
