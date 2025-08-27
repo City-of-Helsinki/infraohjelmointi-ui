@@ -4,7 +4,6 @@ import {
   IProjectRequest,
   ProjectCellGrowDirection,
 } from '@/interfaces/projectInterfaces';
-import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import {
   ChangeEvent,
@@ -25,6 +24,7 @@ import {
   selectForcedToFrame,
   selectSelectedYear,
   selectSelections,
+  updateProject,
 } from '@/reducers/planningSlice';
 import {
   getCellTypeUpdateRequestData,
@@ -34,11 +34,9 @@ import {
   addActiveClassToProjectRow,
   convertToForcedToFrameProjectRequest,
 } from './projectCellUtils';
-import { notifyError } from '@/reducers/notificationSlice';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
-import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 interface IProjectCellProps {
   cell: IProjectCell;
@@ -96,25 +94,19 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
 
   const updateCell = useCallback(
     (req: IProjectRequest) => {
-      dispatch(
-        setLoading({
-          text: 'Update data',
-          id: UPDATE_CELL_DATA,
-        }),
-      );
-
       if (forcedToFrame) {
         convertToForcedToFrameProjectRequest(req);
       }
 
-      patchProject({
-        id,
-        data: req,
-      }).catch(() => {
-        dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
-      }).finally(() => {
-        dispatch(clearLoading(UPDATE_CELL_DATA));;
-      });
+      dispatch(
+        updateProject({
+          request: {
+            id,
+            data: req,
+          },
+          errorNotification: { message: 'financeChangeError', title: 'patchError' },
+        }),
+      );
     },
     [forcedToFrame, id, dispatch],
   );

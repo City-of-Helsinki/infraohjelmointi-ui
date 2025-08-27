@@ -407,24 +407,20 @@ const getCellGrowDirections = (
 
 const getIsStartOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
   const { planningStart, constructionStart, estWarrantyPhaseStart } = timelineDates;
-  if (estWarrantyPhaseStart) {
-    return isSameYear(estWarrantyPhaseStart, cellYear);
-  }
-  if (constructionStart) {
-    return isSameYear(constructionStart, cellYear);
-  }
-  return isSameYear(planningStart, cellYear);
+  return (
+    isSameYear(estWarrantyPhaseStart, cellYear) ||
+    isSameYear(constructionStart, cellYear) ||
+    isSameYear(planningStart, cellYear)
+  );
 };
 
 const getIsEndOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
   const { planningEnd, constructionEnd, estWarrantyPhaseEnd } = timelineDates;
-  if (estWarrantyPhaseEnd) {
-    return isSameYear(estWarrantyPhaseEnd, cellYear);
-  }
-  if (constructionEnd) {
-    return isSameYear(constructionEnd, cellYear);
-  }
-  return isSameYear(planningEnd, cellYear);
+  return (
+    isSameYear(estWarrantyPhaseEnd, cellYear) ||
+    isSameYear(constructionEnd, cellYear) ||
+    isSameYear(planningEnd, cellYear)
+  );
 };
 
 const getIsLastOfType = (cellYear: number, timelineDates: ITimelineDates) => {
