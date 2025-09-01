@@ -37,7 +37,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   clearable,
   size,
   shouldTranslate,
-  readOnly
+  readOnly,
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -70,14 +70,18 @@ const SelectField: FC<ISelectFieldProps> = ({
   const translatedOptions = useMemo(
     () =>
       translate
-        ? options.map(({ value, label }) => ({ value, label: t(`option.${label.replace(".", "")}`) }))
+        ? options.map(({ value, label }) => ({
+            value,
+            label: t(`option.${label.replace('.', '')}`),
+          }))
         : options,
     [options, t, translate],
   );
 
   const translateValue = useCallback(
-    (option: IOption) => {
-      if (option?.label !== '' && !option?.label?.includes('option') && translate) {
+    (option?: IOption) => {
+      if (!option) return { value: '', label: '' };
+      if (option.label !== '' && !option.label?.includes('option') && translate) {
         const translatedLabel = t(`option.${option.label}`);
         if (!translatedLabel.includes('option.')) {
           return { value: option.value, label: translatedLabel };
@@ -94,14 +98,17 @@ const SelectField: FC<ISelectFieldProps> = ({
 
   const [icon, setIcon] = useState(optionIcon[iconKey as keyof typeof optionIcon]);
 
-  const updateIconBasedOnSelection = useCallback((selectedValue: string) => {
-    const selectedOption = options.find(option => option.value === selectedValue);
-    if (selectedOption) {
-      const newIcon = optionIcon[selectedOption.label as keyof typeof optionIcon];
-      setIcon(newIcon);
-    }
-  }, [options, iconKey]);
-  
+  const updateIconBasedOnSelection = useCallback(
+    (selectedValue: string) => {
+      const selectedOption = options.find((option) => option.value === selectedValue);
+      if (selectedOption) {
+        const newIcon = optionIcon[selectedOption.label as keyof typeof optionIcon];
+        setIcon(newIcon);
+      }
+    },
+    [options, iconKey],
+  );
+
   useEffect(() => {
     setIcon(optionIcon[iconKey as keyof typeof optionIcon]);
   }, [iconKey]);
@@ -112,7 +119,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       control={control as Control<FieldValues>}
       rules={rules}
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
-        const handleChange = (event: { value: string; }) => {
+        const handleChange = (event: { value: string }) => {
           onChange(event);
           if (shouldUpdateIcon && event?.value) {
             updateIconBasedOnSelection(event.value);
@@ -131,15 +138,15 @@ const SelectField: FC<ISelectFieldProps> = ({
               }`}
               ref={selectContainerRef}
             >
-              {readOnly ?
+              {readOnly ? (
                 <TextField
                   name={''}
-                  label={label ?? ""}
+                  label={label ?? ''}
                   control={control}
                   readOnly={true}
                   readOnlyValue={translateValue(value).label}
                 />
-              :
+              ) : (
                 <HDSSelect
                   id={`select-field-${name}`}
                   className={`custom-select ${iconKey ? 'icon' : ''}`}
@@ -156,8 +163,8 @@ const SelectField: FC<ISelectFieldProps> = ({
                   placeholder={t('choose') ?? ''}
                   icon={icon}
                 />
-              }
-              {((clearable === undefined && value.value) || (clearable && value.value)) && 
+              )}
+              {((clearable === undefined && value?.value) || (clearable && value?.value)) &&
                 !readOnly &&
                 !disabled &&
                 !required && (

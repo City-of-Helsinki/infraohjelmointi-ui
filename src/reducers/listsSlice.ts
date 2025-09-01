@@ -1,4 +1,5 @@
 import { IError, IListItem } from '@/interfaces/common';
+import { IClass } from '@/interfaces/classInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import {
   getConstructionPhases,
@@ -36,6 +37,7 @@ export interface IListState {
   projectDivisions: Array<IListItem>;
   projectSubDivisions: Array<IListItem>;
   budgetOverrunReasons: Array<IListItem>;
+  projectClasses: Array<IClass>;
   error: IError | null | unknown;
 }
 
@@ -56,20 +58,23 @@ const initialState: IListState = {
   projectSubDivisions: [],
   budgetOverrunReasons: [],
   programmedYears: setProgrammedYears(),
+  projectClasses: [],
   error: null,
 };
 
 // Sorting the list of responsible persons by value which has the person name with lastname first
 export const sortOptions = (persons: Array<IListItem>) =>
-  [...persons].sort((a, b) => a.value < b.value ? -1 : (a.value > b.value ? 1 : 0));
+  [...persons].sort((a, b) => (a.value < b.value ? -1 : a.value > b.value ? 1 : 0));
 
 const getResponsiblePersons = async () => {
   try {
     const persons = await getPersons();
-    return sortOptions(persons.map(({ firstName, lastName, id }) => ({
-      value: `${lastName} ${firstName}`,
-      id,
-    })));
+    return sortOptions(
+      persons.map(({ firstName, lastName, id }) => ({
+        value: `${lastName} ${firstName}`,
+        id,
+      })),
+    );
   } catch (e) {
     console.log('Error getting responsible persons: ', e);
     return [];
@@ -77,40 +82,44 @@ const getResponsiblePersons = async () => {
 };
 
 export const getProjectDistricts = (districts: IProjectDistrict[], districtLevel: string) => {
-    const filtered = districts.filter(({ level }) => level == districtLevel);
-    const mapped = filtered.map(({ id, name, parent }) => ({
-      value: name,
-      id,
-      ... (parent && {parent: parent})
-    }))
-    return sortOptions(mapped);
-}
+  const filtered = districts.filter(({ level }) => level == districtLevel);
+  const mapped = filtered.map(({ id, name, parent }) => ({
+    value: name,
+    id,
+    ...(parent && { parent: parent }),
+  }));
+  return sortOptions(mapped);
+};
 
-export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) => {
-  try {
-    const districts = await getDistricts();
-    return {
-      types: await getProjectTypes(),
-      phases: await getProjectPhases(),
-      areas: await getProjectAreas(),
-      constructionPhaseDetails: await getConstructionPhaseDetails(),
-      categories: await getProjectCategories(),
-      riskAssessments: await getProjectRisks(),
-      projectQualityLevels: await getProjectQualityLevels(),
-      planningPhases: await getPlanningPhases(),
-      constructionPhases: await getConstructionPhases(),
-      responsibleZones: await getResponsibleZones(),
-      responsiblePersons: await getResponsiblePersons(),
-      programmedYears: setProgrammedYears(),
-      projectDistricts: getProjectDistricts(districts, "district"),
-      projectDivisions: getProjectDistricts(districts, "division"),
-      projectSubDivisions: getProjectDistricts(districts, "subDivision"),
-      budgetOverrunReasons: await getBudgetOverrunReasons(),
-    };
-  } catch (err) {
-    return thunkAPI.rejectWithValue(err);
-  }
-});
+export const getListsThunk = createAsyncThunk<Omit<IListState, 'error'>>(
+  'lists/get',
+  async (_, thunkAPI) => {
+    try {
+      const districts = await getDistricts();
+      return {
+        types: await getProjectTypes(),
+        phases: await getProjectPhases(),
+        areas: await getProjectAreas(),
+        constructionPhaseDetails: await getConstructionPhaseDetails(),
+        categories: await getProjectCategories(),
+        riskAssessments: await getProjectRisks(),
+        projectQualityLevels: await getProjectQualityLevels(),
+        planningPhases: await getPlanningPhases(),
+        constructionPhases: await getConstructionPhases(),
+        responsibleZones: await getResponsibleZones(),
+        responsiblePersons: await getResponsiblePersons(),
+        programmedYears: setProgrammedYears(),
+        projectDistricts: getProjectDistricts(districts, 'district'),
+        projectDivisions: getProjectDistricts(districts, 'division'),
+        projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
+        budgetOverrunReasons: await getBudgetOverrunReasons(),
+        projectClasses: [], // TODO: Add service to fetch project classes
+      };
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err);
+    }
+  },
+);
 
 export const listsSlice = createSlice({
   name: 'lists',

@@ -443,8 +443,9 @@ const ProjectForm = () => {
       control,
       getValues,
       getFieldState,
+      setProgrammer: formMethods.setValue,
     }),
-    [control, getFieldProps, getFieldState, getValues],
+    [control, getFieldProps, getFieldState, getValues, formMethods.setValue],
   );
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);

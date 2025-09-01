@@ -76,6 +76,7 @@ const render = async () =>
             areas: mockProjectAreas.data,
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,
+            projectClasses: [],
             constructionPhaseDetails: mockConstructionPhaseDetails.data,
             categories: mockProjectCategories.data,
             riskAssessments: mockProjectRisks.data,

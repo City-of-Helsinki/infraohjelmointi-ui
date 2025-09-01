@@ -1,10 +1,12 @@
 import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues } from 'react-hook-form';
+import { useProgrammerOptions } from '@/hooks/useProgrammerOptions';
+import { Control, UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
+import { useProjectClassOptions } from '@/hooks/useProjectClassOptions';
 
 interface IProjectResponsiblePersonsSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -13,28 +15,59 @@ interface IProjectResponsiblePersonsSectionProps {
     label: string;
     control: Control<IProjectForm>;
   };
+  setProgrammer: UseFormSetValue<IProjectForm>;
   isInputDisabled: boolean;
   isUserOnlyViewer: boolean;
 }
 const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProps> = ({
   getFieldProps,
   getValues,
+  setProgrammer,
   isInputDisabled,
-  isUserOnlyViewer
+  isUserOnlyViewer,
 }) => {
   const { t } = useTranslation();
 
   const responsiblePersons = useOptions('responsiblePersons');
+  const projectClasses = useProjectClassOptions();
+  const [lastSelectedClass, setLastSelectedClass] = useState<string>('');
+
+  // Get the current class value, considering the hierarchy
+  const getCurrentClass = useCallback(() => {
+    return (
+      getValues('subClass')?.value || getValues('class')?.value || getValues('masterClass')?.value
+    );
+  }, [getValues]);
+
+  // Watch for project class changes and set default programmer
+  useEffect(() => {
+    const currentClass = getCurrentClass();
+    const currentProgrammer = getValues('personProgramming')?.value;
+
+    // Only update if class changed and no programmer is selected
+    if (currentClass && currentClass !== lastSelectedClass && !currentProgrammer) {
+      const selectedClass = projectClasses.find((c) => c.value === currentClass);
+      if (selectedClass?.defaultProgrammer) {
+        setProgrammer('personProgramming', {
+          value: selectedClass.defaultProgrammer.id,
+          label:
+            `${selectedClass.defaultProgrammer.firstName} ${selectedClass.defaultProgrammer.lastName}`.trim(),
+        });
+      }
+      setLastSelectedClass(currentClass);
+    }
+  }, [getCurrentClass, getValues, lastSelectedClass, projectClasses, setProgrammer]);
+  const programmers = useProgrammerOptions();
   const phases = useOptions('phases');
 
-  const programmingPhase = phases[2]?.value ?? "";
-  const draftInitiationPhase = phases[3]?.value ?? "";
-  const draftApprovalPhase = phases[4]?.value ?? "";
-  const constructionPlanPhase = phases[5]?.value ?? "";
-  const constructionWaitPhase = phases[6]?.value ?? "";
-  const constructionPhase = phases[7]?.value ?? "";
-  const warrantyPeriodPhase = phases[8]?.value ?? "";
-  const completedPhase = phases[9]?.value ?? "";
+  const programmingPhase = phases[2]?.value ?? '';
+  const draftInitiationPhase = phases[3]?.value ?? '';
+  const draftApprovalPhase = phases[4]?.value ?? '';
+  const constructionPlanPhase = phases[5]?.value ?? '';
+  const constructionWaitPhase = phases[6]?.value ?? '';
+  const constructionPhase = phases[7]?.value ?? '';
+  const warrantyPeriodPhase = phases[8]?.value ?? '';
+  const completedPhase = phases[9]?.value ?? '';
 
   const phasesThatNeedResponsiblePerson = useMemo(
     () => [
@@ -145,9 +178,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
           <SelectField
             {...getFieldProps('personProgramming')}
             iconKey="person"
-            // Options is empty for now because this is not implemented yet, and we
-            // don't get this list from ProjectWise
-            options={responsiblePersons}
+            options={programmers}
             rules={validatePersonProgramming()}
             shouldTranslate={false}
             disabled={isInputDisabled}
@@ -155,7 +186,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
           />
         </div>
         <div className="form-col-md">
-          <TextField {...getFieldProps('otherPersons')} readOnly={isUserOnlyViewer}/>
+          <TextField {...getFieldProps('otherPersons')} readOnly={isUserOnlyViewer} />
         </div>
       </div>
     </div>

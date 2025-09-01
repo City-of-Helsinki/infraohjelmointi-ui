@@ -75,6 +75,7 @@ export interface IProjectForm {
   estWarrantyPhaseEnd: string;
   personConstruction: IOption;
   personPlanning: IOption;
+  personProgramming: IOption;
   name: string;
   masterClass: IOption;
   class: IOption;

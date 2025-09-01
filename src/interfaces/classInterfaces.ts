@@ -30,6 +30,11 @@ export interface IClass {
   relatedTo: string | null;
   parent: string | null;
   finances: IClassFinances;
+  defaultProgrammer?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
 export interface IClassPatchRequest {
