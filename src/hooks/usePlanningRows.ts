@@ -61,7 +61,8 @@ const sortLocationsByName = (list: Array<ILocation>) =>
  *          subclass finances if no district is provided
  */
 function mergeSubClassFinancesWithDistrictFrameBudget(subClass: IClass, districtForSubClass?: ILocation): IClassFinances {
-  if (!districtForSubClass) {
+  // Return original subclass finances if no matching district is found
+  if (!districtForSubClass || subClass.name !== districtForSubClass.name) {
     return subClass.finances;
   }
 
