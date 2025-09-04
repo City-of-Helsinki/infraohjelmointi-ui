@@ -1102,6 +1102,19 @@ export const convertToReportRows = (
     case Reports.ConstructionProgramForcedToFrame:
     case Reports.ConstructionProgramForecast: {
       const planningHierarchy = [];
+      const pathsWithOnlySummaryRow = [
+        '8 01 Kiinteä omaisuus/Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset',
+        '8 10 Suuret liikennehankkeet/Kruunusillat',
+        '8 10 Suuret liikennehankkeet/Sörnäistentunneli',
+        '8 10 Suuret liikennehankkeet/Länsi-Helsingin raitiotiet',
+        '8 10 Suuret liikennehankkeet/Kalasatama-Pasila',
+        '8 10 Suuret liikennehankkeet/Länsiratikat',
+        '8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 01 Kruunusillat',
+        '8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 02 Kalasatama-Pasila',
+        '8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 03 Sörnäistentunneli',
+        '8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 04 Länsi-Helsingin raitiotiet',
+        '8 10 Suuret liikennehankkeet, Kylkn käytettäväksi/8 10 04 Länsiratikat',
+      ];
 
       const projectsToBeShownMasterClass = (path: string | undefined | null) =>
         path &&
@@ -1246,6 +1259,37 @@ export const convertToReportRows = (
               budgetProposalCurrentYearPlus1: keurToMillion(c.cells[1].displayFrameBudget),
               budgetProposalCurrentYearPlus2: keurToMillion(c.cells[2].displayFrameBudget),
             };
+            const underMillionSummary = {
+              budgetProposalCurrentYearPlus0: (
+                parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus0 ?? '0') -
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus0
+              ).toFixed(1),
+              budgetProposalCurrentYearPlus1: (
+                parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus1 ?? '0') -
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus1
+              ).toFixed(1),
+              budgetProposalCurrentYearPlus2: (
+                parseFloat(summaryOfProjectsRow.budgetProposalCurrentYearPlus2 ?? '0') -
+                getUnderMillionSummary([convertedClass]).budgetProposalCurrentYearPlus2
+              ).toFixed(1),
+            };
+            const underMillionSummaryRow: IConstructionProgramTableRow = {
+              id: `${c.id}-under-million-summary`,
+              children: [],
+              projects: [],
+              type: 'info',
+              name: t('report.constructionProgram.underMillionSummary'),
+              parent: c.path,
+              budgetProposalCurrentYearPlus0: underMillionSummary.budgetProposalCurrentYearPlus0
+                .toString()
+                .replace('.', ','),
+              budgetProposalCurrentYearPlus1: underMillionSummary.budgetProposalCurrentYearPlus1
+                .toString()
+                .replace('.', ','),
+              budgetProposalCurrentYearPlus2: underMillionSummary.budgetProposalCurrentYearPlus2
+                .toString()
+                .replace('.', ','),
+            };
             const emptyRow: IConstructionProgramTableRow = {
               children: [],
               projects: [],
@@ -1254,6 +1298,9 @@ export const convertToReportRows = (
               parent: undefined,
               id: `${c.id}-empty-row`,
             };
+            if (!pathsWithOnlySummaryRow.includes(c.path)) {
+              planningHierarchy.push(underMillionSummaryRow);
+            }
             planningHierarchy.push(summaryOfProjectsRow);
             planningHierarchy.push(emptyRow);
           }
