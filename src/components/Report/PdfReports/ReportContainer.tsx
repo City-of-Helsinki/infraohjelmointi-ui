@@ -127,7 +127,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
     <Document title={documentTitle}>
       <Page
         orientation={documentOrientation}
-        size={reportType !== Reports.ForecastReport ? "A3" : "A2"}
+        size={reportType !== Reports.ForecastReport ? 'A3' : 'A2'}
         style={styles.page}
       >
         <View style={styles.document}>
@@ -136,9 +136,14 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             subtitleOne={documentSubtitleOne}
             subtitleTwo={documentSubtitleTwo}
             reportType={reportType}
-            date={(reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) ? currentDate : ''}
+            date={
+              reportType === Reports.OperationalEnvironmentAnalysis ||
+              reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame
+                ? currentDate
+                : ''
+            }
           />
-          <ReportTable 
+          <ReportTable
             reportType={reportType}
             data={data}
             projectsInWarrantyPhase={projectsInWarrantyPhase}
@@ -147,14 +152,22 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             currentYearSapValues={currentYearSapValues}
             year={year}
           />
-          {
-            [Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(reportType as Reports) ?
-              <StrategyReportFooter
-                infoText={(reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame) ? t('report.strategy.footerInfoText') : ""}
-                colorInfoTextOne={t('report.strategy.planning')}
-                colorInfoTextTwo={t('report.strategy.constructing')}
-              /> : <DefaultReportFooter />
-          }
+          {[Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(
+            reportType as Reports,
+          ) ? (
+            <StrategyReportFooter
+              infoText={
+                reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame
+                  ? t('report.strategy.footerInfoText')
+                  : ''
+              }
+              colorInfoTextOne={t('report.strategy.planning')}
+              colorInfoTextTwo={t('report.strategy.constructing')}
+              colorInfoTextThree={t('report.strategy.warrantyPeriod')}
+            />
+          ) : (
+            <DefaultReportFooter />
+          )}
         </View>
       </Page>
     </Document>
