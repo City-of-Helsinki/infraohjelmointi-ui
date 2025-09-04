@@ -111,12 +111,32 @@ export const getDistricts = async (): Promise<Array<IProjectDistrict>> => {
   } catch (e) {
     return Promise.reject(e);
   }
-}
+};
 
 export const getBudgetOverrunReasons = async () => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/budget-overrun-reasons/`);
     return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const getProgrammers = async (): Promise<Array<IListItem>> => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-programmers/`);
+    return res.data
+      .filter(
+        (programmer: { id: string; firstName: string; lastName: string }) =>
+          // Filter out empty names and "Ei Valintaa" programmer
+          programmer.firstName?.trim() &&
+          programmer.lastName?.trim() &&
+          !(programmer.firstName === 'Ei' && programmer.lastName === 'Valintaa'),
+      )
+      .map((programmer: { id: string; firstName: string; lastName: string }) => ({
+        id: programmer.id,
+        value: `${programmer.firstName} ${programmer.lastName}`.trim(),
+      }));
   } catch (e) {
     return Promise.reject(e);
   }

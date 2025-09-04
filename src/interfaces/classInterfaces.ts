@@ -22,6 +22,12 @@ export interface IClassFinances {
   year10: IClassBudgets;
 }
 
+export interface IProgrammer {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface IClass {
   id: string;
   name: string;
@@ -30,6 +36,13 @@ export interface IClass {
   relatedTo: string | null;
   parent: string | null;
   finances: IClassFinances;
+  defaultProgrammer?: IProgrammer;
+}
+
+export interface IProjectClassOption {
+  value: string;
+  label: string;
+  defaultProgrammer?: IProgrammer;
 }
 
 export interface IClassPatchRequest {

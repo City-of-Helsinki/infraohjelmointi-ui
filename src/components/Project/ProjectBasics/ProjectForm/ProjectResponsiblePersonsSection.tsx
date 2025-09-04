@@ -26,6 +26,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
 
   const responsiblePersons = useOptions('responsiblePersons');
   const phases = useOptions('phases');
+  const programmers = useOptions('programmers');
 
   const draftInitiationPhase = phases[3]?.value ?? "";
   const draftApprovalPhase = phases[4]?.value ?? "";
@@ -123,9 +124,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
           <SelectField
             {...getFieldProps('personProgramming')}
             iconKey="person"
-            // Options is empty for now because this is not implemented yet, and we
-            // don't get this list from ProjectWise
-            options={[]}
+            options={programmers}
             shouldTranslate={false}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}

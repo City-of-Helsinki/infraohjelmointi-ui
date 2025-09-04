@@ -75,6 +75,7 @@ export interface IProjectForm {
   estWarrantyPhaseEnd: string;
   personConstruction: IOption;
   personPlanning: IOption;
+  personProgramming: IOption | null;
   name: string;
   masterClass: IOption;
   class: IOption;
@@ -148,4 +149,4 @@ export type HookFormRulesType = Omit<
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
 
-export type FormValueType = string | boolean | IOption | string[] | undefined;
+export type FormValueType = string | boolean | IOption | string[] | null | undefined;

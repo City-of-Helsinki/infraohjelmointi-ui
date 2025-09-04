@@ -16,6 +16,7 @@ import {
   mockProjectTypes,
   mockResponsiblePersons,
   mockResponsibleZones,
+  mockProgrammers,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
@@ -89,6 +90,8 @@ const render = async () =>
             projectDivisions: [],
             projectSubDivisions: [],
             budgetOverrunReasons: [],
+            programmers: mockProgrammers.data,
+            projectClasses: [],
             error: {},
           },
           hashTags: {

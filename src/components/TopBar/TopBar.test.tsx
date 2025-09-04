@@ -56,6 +56,8 @@ const render = async (customRoute?: string) =>
             projectDivisions: [],
             projectSubDivisions: [],
             budgetOverrunReasons: [],
+            programmers: [],
+            projectClasses: [],
             error: {},
           },
         },
