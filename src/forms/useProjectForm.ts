@@ -1,12 +1,11 @@
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAppDispatch, useAppSelector } from '../hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
-import { IClass, IProgrammer } from '@/interfaces/classInterfaces';
-import { getDefaultProgrammerForClasses as getDefaultProgrammerForClassesUtil } from '@/utils/programmerUtils';
+import { IClass } from '@/interfaces/classInterfaces';
 import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
 import {
   selectPlanningClasses,
@@ -25,6 +24,7 @@ import _ from 'lodash';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
 import { selectIsLoading, selectIsProjectCardLoading } from '@/reducers/loaderSlice';
+import { useLocationBasedProgrammer } from '@/hooks/useLocationBasedProgrammer';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -237,23 +237,31 @@ const useProjectForm = () => {
 
   const locationOptions = useLocationOptions(selections?.selectedLocation);
 
-  // Get project classes from the existing class slice (which already has the data)
-  const masterClasses = useAppSelector(selectAllPlanningClasses);
-  const classes = useAppSelector(selectPlanningClasses);
-  const subClasses = useAppSelector(selectPlanningSubClasses);
+  // Get class-based programmer logic
+  const { getDefaultProgrammerFromClassHierarchy } = useLocationBasedProgrammer();
 
-  // Get the default programmer for a given class hierarchy
-  const getDefaultProgrammerForClasses = useCallback(
-    (masterClassId: string, classId: string, subClassId: string): IProgrammer | null => {
-      // Find the relevant classes
-      const masterClass = masterClasses.find((c) => c.id === masterClassId);
-      const class_ = classes.find((c) => c.id === classId);
-      const subClass = subClasses.find((c) => c.id === subClassId);
+  // Set the default programmer based on class hierarchy
+  const setDefaultProgrammerForClassHierarchy = useCallback(
+    (masterClassId?: string, classId?: string, subClassId?: string) => {
+      const defaultProgrammer = getDefaultProgrammerFromClassHierarchy(
+        masterClassId,
+        classId,
+        subClassId,
+      );
 
-      // Use the utility function to determine the default programmer
-      return getDefaultProgrammerForClassesUtil(masterClass, class_, subClass);
+      if (defaultProgrammer) {
+        // Convert the programmer to an option format
+        const programmerOption = {
+          value: defaultProgrammer.id,
+          label: defaultProgrammer.value,
+        };
+        setValue('personProgramming', programmerOption);
+      } else {
+        // No default programmer found, leave field empty
+        setValue('personProgramming', null);
+      }
     },
-    [masterClasses, classes, subClasses],
+    [getDefaultProgrammerFromClassHierarchy, setValue],
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected
@@ -280,21 +288,10 @@ const useProjectForm = () => {
       const classId = currentForm.class?.value || '';
       const subClassId = currentForm.subClass?.value || '';
 
-      const defaultProgrammer = getDefaultProgrammerForClasses(masterClassId, classId, subClassId);
-
-      if (defaultProgrammer && 'id' in defaultProgrammer) {
-        // Convert the programmer to an option format
-        const programmerOption = {
-          value: defaultProgrammer.id,
-          label: `${defaultProgrammer.firstName} ${defaultProgrammer.lastName}`.trim(),
-        };
-        setValue('personProgramming', programmerOption);
-      } else {
-        // No default programmer found, set to null
-        setValue('personProgramming', null);
-      }
+      // Set default programmer based on class hierarchy
+      setDefaultProgrammerForClassHierarchy(masterClassId, classId, subClassId);
     },
-    [setValue, getValues, getDefaultProgrammerForClasses],
+    [setValue, getValues, setDefaultProgrammerForClassHierarchy],
   );
 
   const setLocationSubClass = useCallback(
@@ -334,9 +331,16 @@ const useProjectForm = () => {
           ...current,
           selectedLocation: optionValue,
         }));
+
+        // Set default programmer based on current class hierarchy
+        const currentForm = getValues();
+        const masterClassId = currentForm.masterClass?.value || '';
+        const classId = currentForm.class?.value || '';
+        const subClassId = currentForm.subClass?.value || '';
+        setDefaultProgrammerForClassHierarchy(masterClassId, classId, subClassId);
       }
     },
-    [setValue, formValues, setLocationSubClass],
+    [setValue, formValues, setLocationSubClass, getValues, setDefaultProgrammerForClassHierarchy],
   );
 
   // Listen to changes in the form value and set selected class or location if those properties are changed
@@ -417,7 +421,6 @@ const useProjectForm = () => {
     classOptions,
     locationOptions,
     selectedMasterClassName,
-    getDefaultProgrammerForClasses,
   };
 };
 
