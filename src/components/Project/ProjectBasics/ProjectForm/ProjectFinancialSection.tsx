@@ -1,12 +1,7 @@
-import {
-  FormSectionTitle,
-  ListField,
-  NumberField,
-  SelectField,
-} from '@/components/shared';
-import { FC, memo, useMemo } from 'react';
+import { FormSectionTitle, ListField, NumberField, SelectField } from '@/components/shared';
+import { FC, memo, useEffect, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues } from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { validateInteger, validateMaxLength } from '@/utils/validation';
@@ -15,10 +10,13 @@ import { useAppSelector } from '@/hooks/common';
 import { selectIsProjectSaving } from '@/reducers/projectSlice';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 import TextAreaField from '@/components/shared/TextAreaField';
+import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 
 interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
+  watch: UseFormWatch<IProjectForm>;
+  setValue: UseFormSetValue<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -37,6 +35,8 @@ interface IProjectFinancialSectionProps {
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getValues,
   getFieldProps,
+  watch,
+  setValue,
   classOptions,
   isInputDisabled,
   isUserOnlyViewer,
@@ -52,11 +52,18 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const planningPhases = useOptions('planningPhases');
   const budgetOverrunReasons = useOptions('budgetOverrunReasons');
 
+  const selectedBudgetOverrunReason = watch('budgetOverrunReason');
+  const isOtherBudgetOverrunReasonSelected =
+    selectedBudgetOverrunReason.value ===
+    budgetOverrunReasons.find((item) => item.label === 'otherReason')?.value;
+
   const validateBudgetOverrunReason = useMemo(
     () => ({
       validate: {
         isBudgetOverrunReasonValid: (budgetOverrunReason: IOption) => {
-          const mappedBudgetOverrunReason = budgetOverrunReasons.find(item => item.value === budgetOverrunReason.value);
+          const mappedBudgetOverrunReason = budgetOverrunReasons.find(
+            (item) => item.value === budgetOverrunReason.value,
+          );
           const otherReason = getValues('otherBudgetOverrunReason');
 
           if (mappedBudgetOverrunReason?.label == 'otherReason' && otherReason == '') {
@@ -66,15 +73,17 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         },
       },
     }),
-    [budgetOverrunReasons, getValues],
+    [budgetOverrunReasons, getValues, t],
   );
 
   const validateOtherReasonField = useMemo(
     () => ({
       validate: {
         isOtherReasonFieldValid: (otherReasonField: string) => {
-          const budgetOverrunReason = budgetOverrunReasons.find(item => item.value === getValues('budgetOverrunReason').value);
-          const isBudgetOverrunReasonOtherReason = budgetOverrunReason?.label == 'otherReason'
+          const budgetOverrunReason = budgetOverrunReasons.find(
+            (item) => item.value === getValues('budgetOverrunReason').value,
+          );
+          const isBudgetOverrunReasonOtherReason = budgetOverrunReason?.label == 'otherReason';
 
           if (isBudgetOverrunReasonOtherReason && otherReasonField == '') {
             return t('validation.required', { field: t('projectForm.otherBudgetOverrunReason') });
@@ -83,8 +92,19 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
         },
       },
     }),
-    [budgetOverrunReasons, getValues],
+    [budgetOverrunReasons, getValues, t],
   );
+
+  useEffect(() => {
+    if (!isOtherBudgetOverrunReasonSelected) {
+      // Clear the "other reason" text field and reset "on schedule" when "other reason" is not selected
+      setValue('otherBudgetOverrunReason', '', { shouldValidate: true, shouldDirty: true });
+      setValue('onSchedule', null, { shouldDirty: true });
+    } else {
+      // Set "on schedule" to true by default when "other reason" is selected
+      setValue('onSchedule', true, { shouldDirty: true });
+    }
+  }, [isOtherBudgetOverrunReasonSelected, setValue]);
 
   const renderSelectField = (
     name: string,
@@ -93,7 +113,6 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     shouldTranslate: boolean,
     userIsProjectManager?: boolean,
   ) => (
-
     <SelectField
       {...getFieldProps(name)}
       options={options}
@@ -191,14 +210,19 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       <div className="form-row">
         <div className="form-col-xxl">
           <SelectField
-              {...getFieldProps('budgetOverrunReason')}
-              options={budgetOverrunReasons}
-              rules={validateBudgetOverrunReason}
-              size='full'
-              disabled={isInputDisabled}
-              readOnly={isUserOnlyViewer}
-            />
+            {...getFieldProps('budgetOverrunReason')}
+            options={budgetOverrunReasons}
+            rules={validateBudgetOverrunReason}
+            size="full"
+            disabled={isInputDisabled}
+            readOnly={isUserOnlyViewer}
+          />
         </div>
+        {isOtherBudgetOverrunReasonSelected && (
+          <div className="form-col-md">
+            <RadioCheckboxField {...getFieldProps('onSchedule')} />
+          </div>
+        )}
       </div>
       <div className="form-row">
         <div className="form-col-xxl">
@@ -206,6 +230,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             {...getFieldProps('otherBudgetOverrunReason')}
             rules={{ ...validateMaxLength(200, t), ...validateOtherReasonField }}
             readOnly={isUserOnlyViewer}
+            disabled={!isOtherBudgetOverrunReasonSelected}
           />
         </div>
       </div>

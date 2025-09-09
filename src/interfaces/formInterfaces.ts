@@ -85,6 +85,7 @@ export interface IProjectForm {
   subDivision: IOption;
   budgetOverrunReason: IOption;
   otherBudgetOverrunReason: string;
+  onSchedule?: boolean | null;
 }
 
 export interface ISearchForm {
@@ -94,7 +95,7 @@ export interface ISearchForm {
   subClass: Array<IOption>;
   programmedYes: boolean;
   programmedNo: boolean;
-  hkrIds: Array<string>
+  hkrIds: Array<string>;
   personPlanning: IOption;
   personConstruction: IOption;
   programmedYearMin: IOption;

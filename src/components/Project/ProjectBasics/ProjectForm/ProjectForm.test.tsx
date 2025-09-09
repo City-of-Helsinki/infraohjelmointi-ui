@@ -5,6 +5,7 @@ import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { arrayHasValue, formatNumberToContainSpaces, matchExact } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
+  mockBudgetOverrunReasons,
   mockConstructionPhaseDetails,
   mockConstructionPhases,
   mockPlanningPhases,
@@ -20,7 +21,7 @@ import {
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
-import { waitFor, act, within } from '@testing-library/react';
+import { waitFor, act, within, screen, fireEvent } from '@testing-library/react';
 import { Route } from 'react-router';
 import { resetProject, setProjectMode, setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
@@ -89,7 +90,7 @@ const render = async () =>
             projectDistricts: [],
             projectDivisions: [],
             projectSubDivisions: [],
-            budgetOverrunReasons: [],
+            budgetOverrunReasons: mockBudgetOverrunReasons.data,
             programmers: mockProgrammers.data,
             projectClasses: [],
             error: {},
@@ -105,7 +106,7 @@ const render = async () =>
             groups: {},
             currentYearSapGroups: {},
             error: null,
-          }
+          },
         },
       },
     ),
@@ -142,7 +143,9 @@ describe('projectForm', () => {
 
     const project = mockProject.data;
     const sapCostAll = mockAllSapCostsProject.data;
-    const sapCostCurrentYear = project.currentYearsSapValues ? project.currentYearsSapValues[0] : null;
+    const sapCostCurrentYear = project.currentYearsSapValues
+      ? project.currentYearsSapValues[0]
+      : null;
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
@@ -169,25 +172,47 @@ describe('projectForm', () => {
     expectRadioBoolean('effectHousing-0', false);
 
     const costForecastValue = Number(project?.costForecast).toFixed(0);
-    expect(await findByText(`${formatNumberToContainSpaces(Number(costForecastValue))}`)).toBeInTheDocument();
+    expect(
+      await findByText(`${formatNumberToContainSpaces(Number(costForecastValue))}`),
+    ).toBeInTheDocument();
 
-    const sapCurrentYearprojectTaskCosts = Number(sapCostCurrentYear?.project_task_costs).toFixed(0);
-    const sapCurrentYearProductionTaskCosts = Number(sapCostCurrentYear?.production_task_costs).toFixed(0);
-    const sapCostsCurrentYearValue = Number(sapCurrentYearprojectTaskCosts) + Number(sapCurrentYearProductionTaskCosts);
-    expect(await findByText(`${formatNumberToContainSpaces(sapCostsCurrentYearValue)}`)).toBeInTheDocument();
+    const sapCurrentYearprojectTaskCosts = Number(sapCostCurrentYear?.project_task_costs).toFixed(
+      0,
+    );
+    const sapCurrentYearProductionTaskCosts = Number(
+      sapCostCurrentYear?.production_task_costs,
+    ).toFixed(0);
+    const sapCostsCurrentYearValue =
+      Number(sapCurrentYearprojectTaskCosts) + Number(sapCurrentYearProductionTaskCosts);
+    expect(
+      await findByText(`${formatNumberToContainSpaces(sapCostsCurrentYearValue)}`),
+    ).toBeInTheDocument();
 
     const sapAllProjectTaskCosts = Number(sapCostAll[project.id]?.project_task_costs).toFixed(0);
-    const sapAllProductionTaskCosts = Number(sapCostAll[project.id]?.production_task_costs).toFixed(0);
+    const sapAllProductionTaskCosts = Number(sapCostAll[project.id]?.production_task_costs).toFixed(
+      0,
+    );
     const sapCostsAllValue = Number(sapAllProjectTaskCosts) + Number(sapAllProductionTaskCosts);
-    expect(await findByText(`${formatNumberToContainSpaces(sapCostsAllValue)}`)).toBeInTheDocument();
+    expect(
+      await findByText(`${formatNumberToContainSpaces(sapCostsAllValue)}`),
+    ).toBeInTheDocument();
 
-    const sapAllProjectTaskCommitments = Number(sapCostAll[project.id]?.project_task_commitments).toFixed(0);
-    const sapAllProductionTaskCommitments = Number(sapCostAll[project.id]?.production_task_commitments).toFixed(0);
-    const sapCommitmentsAllValue = Number(sapAllProjectTaskCommitments) + Number(sapAllProductionTaskCommitments);
-    expect(await findByText(`${formatNumberToContainSpaces(sapCommitmentsAllValue)}`)).toBeInTheDocument();
+    const sapAllProjectTaskCommitments = Number(
+      sapCostAll[project.id]?.project_task_commitments,
+    ).toFixed(0);
+    const sapAllProductionTaskCommitments = Number(
+      sapCostAll[project.id]?.production_task_commitments,
+    ).toFixed(0);
+    const sapCommitmentsAllValue =
+      Number(sapAllProjectTaskCommitments) + Number(sapAllProductionTaskCommitments);
+    expect(
+      await findByText(`${formatNumberToContainSpaces(sapCommitmentsAllValue)}`),
+    ).toBeInTheDocument();
 
     const SapAllSpentValue = sapCostsAllValue + sapCommitmentsAllValue;
-    expect(await findByText(`${formatNumberToContainSpaces(SapAllSpentValue)}`)).toBeInTheDocument();
+    expect(
+      await findByText(`${formatNumberToContainSpaces(SapAllSpentValue)}`),
+    ).toBeInTheDocument();
 
     expectDisplayValue(project?.description);
     expectDisplayValue(project?.entityName);
@@ -560,5 +585,64 @@ describe('projectForm', () => {
     await user.click(deleteProjectButton);
 
     expect(mockedAxios.delete).toHaveBeenCalledWith('localhost:4000/projects/mock-project-id/');
+  });
+
+  describe('budget overrun reason selection', () => {
+    it('selecting budget overrun reason to otherReason enables otherBudgetOverrunReason field', async () => {
+      const { user } = await render();
+
+      const otherBudgetOverrunReasonField = await screen.findByRole('textbox', {
+        name: getFormField('otherBudgetOverrunReason'),
+      });
+
+      expect(otherBudgetOverrunReasonField).toBeDisabled();
+
+      await user.click(
+        await screen.findByRole('button', {
+          name: getFormField('budgetOverrunReason'),
+        }),
+      );
+      await user.click(await screen.findByText('option.otherReason'));
+
+      expect(otherBudgetOverrunReasonField).toBeEnabled();
+    });
+
+    it('selecting budget overrun reason other than otherReason disables and clears otherBudgetOverrunReason field', async () => {
+      const { user } = await render();
+
+      const otherBudgetOverrunReasonField = await screen.findByRole('textbox', {
+        name: getFormField('otherBudgetOverrunReason'),
+      });
+      const budgetOverrunReasonSelect = await screen.findByRole('button', {
+        name: getFormField('budgetOverrunReason'),
+      });
+
+      await user.click(budgetOverrunReasonSelect);
+      await user.click(await screen.findByText('option.otherReason'));
+
+      fireEvent.change(otherBudgetOverrunReasonField, { target: { value: 'Some reason' } });
+      expect(otherBudgetOverrunReasonField).toHaveValue('Some reason');
+
+      await user.click(budgetOverrunReasonSelect);
+      await user.click(await screen.findByText('option.earlierSchedule'));
+
+      expect(otherBudgetOverrunReasonField).toBeDisabled();
+      expect(otherBudgetOverrunReasonField).toHaveValue('');
+    });
+
+    it('shows onSchedule field when otherReason is selected', async () => {
+      const { user } = await render();
+
+      expect(screen.queryByText(getFormField('onSchedule'))).not.toBeInTheDocument();
+
+      await user.click(
+        await screen.findByRole('button', {
+          name: getFormField('budgetOverrunReason'),
+        }),
+      );
+      await user.click(await screen.findByText('option.otherReason'));
+
+      expect(screen.queryByText(getFormField('onSchedule'))).toBeInTheDocument();
+    });
   });
 });
