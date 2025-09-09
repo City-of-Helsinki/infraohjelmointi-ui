@@ -71,7 +71,8 @@ export type ListType =
   | 'projectDistricts'
   | 'projectSubDistricts'
   | 'projectSubSubDistricts'
-  | 'budgetOverrunReasons';
+  | 'budgetOverrunReasons'
+  | 'programmers';
 
 type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';
