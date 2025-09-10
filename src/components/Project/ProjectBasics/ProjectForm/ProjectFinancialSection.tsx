@@ -101,10 +101,12 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       setValue('otherBudgetOverrunReason', '', { shouldValidate: true, shouldDirty: true });
       setValue('onSchedule', null, { shouldDirty: true });
     } else {
-      // Set "on schedule" to true by default when "other reason" is selected
-      setValue('onSchedule', true, { shouldDirty: true });
+      if (getValues('onSchedule') === null) {
+        // Set "on schedule" to true by default when "other reason" is selected
+        setValue('onSchedule', true, { shouldDirty: true });
+      }
     }
-  }, [isOtherBudgetOverrunReasonSelected, setValue]);
+  }, [isOtherBudgetOverrunReasonSelected, setValue, getValues]);
 
   const renderSelectField = (
     name: string,

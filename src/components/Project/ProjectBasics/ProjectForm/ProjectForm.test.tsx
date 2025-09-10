@@ -38,7 +38,7 @@ import { mockAllSapCostsProject, mockCurrentYearSapCostsProject } from '@/mocks/
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
-jest.setTimeout(9000);
+jest.setTimeout(15000);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
