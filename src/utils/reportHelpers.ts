@@ -287,9 +287,7 @@ const getStrategyReportProjectPhasePerMonth = (
     if (isForecastOrStrategyReport) return estConstructionStart ? estConstructionStartYear : null;
     return project.frameEstConstructionStart
       ? getYear(project.frameEstConstructionStart)
-      : estConstructionStartYear
-      ? estConstructionStartYear
-      : null;
+      : estConstructionStartYear;
   };
 
   const isPlanning = isForecastOrStrategyReport
@@ -546,11 +544,14 @@ const convertToStrategyAndForecastReportProjects = (
       const planningStart = p.frameEstPlanningStart
         ? getYear(p.frameEstPlanningStart)
         : p.planningStartYear;
-      const constructionEnd = p.frameEstWarrantyPhaseEnd
-        ? getYear(p.frameEstWarrantyPhaseEnd)
-        : p.frameEstConstructionEnd
-        ? getYear(p.frameEstConstructionEnd)
-        : p.constructionEndYear;
+      let constructionEnd: number | null = null;
+      if (p.frameEstWarrantyPhaseEnd) {
+        constructionEnd = getYear(p.frameEstWarrantyPhaseEnd);
+      } else if (p.frameEstConstructionEnd) {
+        constructionEnd = getYear(p.frameEstConstructionEnd);
+      } else {
+        constructionEnd = p.constructionEndYear;
+      }
 
       if (hasBudget && typeof planningStart === 'number' && typeof constructionEnd === 'number') {
         return isProjectInPlanningOrConstruction(
@@ -586,8 +587,7 @@ const convertToStrategyAndForecastReportProjects = (
       costForecast: costForecast ?? '', // TS value
       costForcedToFrameBudget: costForcedToFrameBudget, // Ennuste
       costForecastDeviation: costForecastDeviation, // Poikkeama
-      projectManager:
-        p.personPlanning?.lastName ?? (t('report.strategy.projectManagerMissing') as string),
+      projectManager: p.personPlanning?.lastName ?? t('report.strategy.projectManagerMissing'),
       projectPhase: getProjectPhase(type, p, year),
       budgetOverrunReason: getBudgetOverrunReason(
         p.budgetOverrunReason?.value,
@@ -713,13 +713,14 @@ const convertToGroupValues = (
     beforeCurrentYearSapCosts += sapCosts
       ? sumCosts(sapCosts[p.id], 'project_task_costs', 'production_task_costs') - currentYearSapCost
       : 0;
-    budgetOverrunReasons = p.budgetOverrunReason
-      ? budgetOverrunReasons +
-        `${budgetOverrunReasons != '' ? '\n' : ''}${p.name}: ${getBudgetOverrunReason(
-          p.budgetOverrunReason?.value,
-          p.otherBudgetOverrunReason,
-        )}`
-      : budgetOverrunReasons;
+    if (p.budgetOverrunReason) {
+      const separator = budgetOverrunReasons !== '' ? '\n' : '';
+      const reason = getBudgetOverrunReason(
+        p.budgetOverrunReason?.value,
+        p.otherBudgetOverrunReason,
+      );
+      budgetOverrunReasons += `${separator}${p.name}: ${reason}`;
+    }
   }
 
   const costForecastDeviationPercent = calculateCostForecastDeviationPercent(
