@@ -406,16 +406,44 @@ const useProjectForm = () => {
     prevValues,
   ]);
 
-  // Reset form values when loading states change
+  // Reset form values when loading states change - with comprehensive safeguards
   useEffect(() => {
     if (!isProjectCardLoading && !isLoading) {
-      // Only reset if values have actually changed
-      if (!_.isEqual(prevValues, formValues)) {
+      // Only reset if ALL conditions are met:
+      // 1. Values have actually changed
+      // 2. Form is not dirty (no user changes)
+      // 3. Not currently submitting
+      // 4. We have legitimate new data to populate (not empty formValues)
+      // This prevents resetting user-entered data on page refresh or during user interaction
+      
+      const formIsDirty = formState.isDirty;
+      const hasLegitimateData = Object.values(formValues).some(value => {
+        if (typeof value === 'string') return value.length > 0;
+        if (typeof value === 'object' && value !== null) {
+          return 'value' in value ? String(value.value).length > 0 : false;
+        }
+        return value !== null && value !== undefined;
+      });
+      
+      if (
+        !_.isEqual(prevValues, formValues) &&
+        !formIsDirty &&
+        !formState.isSubmitting &&
+        hasLegitimateData
+      ) {
         setPrevValues(formValues);
         reset(formValues);
       }
     }
-  }, [isProjectCardLoading, isLoading, formValues, reset, prevValues]);
+  }, [
+    isProjectCardLoading,
+    isLoading,
+    formValues,
+    reset,
+    prevValues,
+    formState.isDirty,
+    formState.isSubmitting,
+  ]);
 
   return {
     formMethods,
