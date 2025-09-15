@@ -248,7 +248,8 @@
     "estWarrantyPhaseStart": "Alkaa",
     "estWarrantyPhaseEnd": "Päättyy",
     "budgetOverrunReason": "Budjettipoikkeaman selitys",
-    "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle"
+    "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle",
+    "onSchedule": "Onko hanke aikataulussa"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -575,7 +576,7 @@
       "locationTitle": "Sijainti",
       "budgetTitle": "Kokonaiskustannukset milj. €",
       "scheduleTitle": "Suunnittelun ja rakentamisen ajoitus",
-      "isProjectOnScheduleTitle": "Onko hanke aikataulussa\nKyllä/Ei",
+      "isProjectOnScheduleTitle": "$t(projectForm.onSchedule)\nKyllä/Ei",
       "commitmentsBeforeYearTitle": "Toteuma ennen",
       "commitmentsYearTitle": "Toteuma",
       "forecast1Title": "Ennuste",
