@@ -257,9 +257,6 @@ const useProjectForm = () => {
           label: defaultProgrammer.value,
         };
         setValue('personProgramming', programmerOption);
-      } else {
-        // No default programmer found, leave field empty
-        setValue('personProgramming', null);
       }
     },
     [getDefaultProgrammerFromClassHierarchy, setValue],
@@ -415,16 +412,17 @@ const useProjectForm = () => {
       // 3. Not currently submitting
       // 4. We have legitimate new data to populate (not empty formValues)
       // This prevents resetting user-entered data on page refresh or during user interaction
-      
+
       const formIsDirty = formState.isDirty;
-      const hasLegitimateData = Object.values(formValues).some(value => {
+      const hasLegitimateData = Object.values(formValues).some((value) => {
         if (typeof value === 'string') return value.length > 0;
         if (typeof value === 'object' && value !== null) {
-          return 'value' in value ? String(value.value).length > 0 : false;
+          // For dropdown objects (IOption), check if they have a valid value
+          return 'value' in value && value.value && String(value.value).length > 0;
         }
         return value !== null && value !== undefined;
       });
-      
+
       if (
         !_.isEqual(prevValues, formValues) &&
         !formIsDirty &&
