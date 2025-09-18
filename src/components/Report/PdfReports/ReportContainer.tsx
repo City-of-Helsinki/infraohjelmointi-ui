@@ -44,6 +44,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
       case Reports.StrategyForcedToFrame:
         return t('report.strategy.title');
       case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForcedToFrame:
       case Reports.ConstructionProgramForecast:
         return t('report.constructionProgram.title');
       case Reports.BudgetBookSummary:
@@ -82,6 +83,7 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
           startYear: currentYear + 1
         });
       case Reports.ConstructionProgram:
+      case Reports.ConstructionProgramForcedToFrame:
         return t('report.constructionProgram.subtitle', {
             startYear: currentYear + 1,
             endYear: currentYear + 3,
@@ -115,12 +117,17 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
   const documentTitle = getDocumentTitle();
   const documentSubtitleOne = getDocumentSubtitleOne();
   const documentSubtitleTwo = getDocumentSubtitleTwo();
+  const documentOrientation =
+    reportType === Reports.ConstructionProgram ||
+    reportType === Reports.ConstructionProgramForcedToFrame
+      ? 'portrait'
+      : 'landscape';
 
   return (
     <Document title={documentTitle}>
-      <Page 
-        orientation={reportType !== Reports.ConstructionProgram ? "landscape" : "portrait" }
-        size={reportType !== Reports.ForecastReport ? "A3" : "A2"}
+      <Page
+        orientation={documentOrientation}
+        size={reportType !== Reports.ForecastReport ? 'A3' : 'A2'}
         style={styles.page}
       >
         <View style={styles.document}>
@@ -129,9 +136,14 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             subtitleOne={documentSubtitleOne}
             subtitleTwo={documentSubtitleTwo}
             reportType={reportType}
-            date={(reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) ? currentDate : ''}
+            date={
+              reportType === Reports.OperationalEnvironmentAnalysis ||
+              reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame
+                ? currentDate
+                : ''
+            }
           />
-          <ReportTable 
+          <ReportTable
             reportType={reportType}
             data={data}
             projectsInWarrantyPhase={projectsInWarrantyPhase}
@@ -140,14 +152,22 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({ reportType, data, proje
             currentYearSapValues={currentYearSapValues}
             year={year}
           />
-          {
-            [Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(reportType as Reports) ?
-              <StrategyReportFooter
-                infoText={(reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame) ? t('report.strategy.footerInfoText') : ""}
-                colorInfoTextOne={t('report.strategy.planning')}
-                colorInfoTextTwo={t('report.strategy.constructing')}
-              /> : <DefaultReportFooter />
-          }
+          {[Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(
+            reportType as Reports,
+          ) ? (
+            <StrategyReportFooter
+              infoText={
+                reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame
+                  ? t('report.strategy.footerInfoText')
+                  : ''
+              }
+              colorInfoTextOne={t('report.strategy.planning')}
+              colorInfoTextTwo={t('report.strategy.constructing')}
+              colorInfoTextThree={t('report.strategy.warrantyPeriod')}
+            />
+          ) : (
+            <DefaultReportFooter />
+          )}
         </View>
       </Page>
     </Document>

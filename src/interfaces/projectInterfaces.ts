@@ -93,10 +93,19 @@ export interface IProject {
   currentYearsSapValues?: Array<ISapCost> | null;
   budgetOverrunReason?: IListItem;
   otherBudgetOverrunReason?: string;
+  onSchedule?: boolean;
 }
 
 export interface IProjectRequest {
-  [key: string]: string | null | Array<string> | [] | boolean | IProjectFinancesRequestObject | number | undefined,
+  [key: string]:
+    | string
+    | null
+    | Array<string>
+    | []
+    | boolean
+    | IProjectFinancesRequestObject
+    | number
+    | undefined;
   type?: string | null;
   description?: string;
   entityName?: string | null;
@@ -164,6 +173,7 @@ export interface IProjectRequest {
   frameEstConstructionEnd?: string | null;
   budgetOverrunReason?: string;
   otherBudgetOverrunReason?: string;
+  onSchedule?: boolean | null;
 }
 
 export interface IProjectPatchRequestObject {

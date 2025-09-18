@@ -2,7 +2,6 @@ import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IAppForms, FormValueType, IGroupForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
-import { getYear, updateYear } from './dates';
 import _ from 'lodash';
 import { IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -19,11 +18,11 @@ export const listItemToOption = (listItem: IListItem | undefined): IOption => ({
   value: listItem?.id ?? '',
 });
 
-export const listItemsToOption = (listItems: Array<IListItem>): Array<IOption> =>
-  listItems.map((listItem) => ({
+export const listItemsToOption = (listItems: Array<IListItem> | undefined): Array<IOption> =>
+  listItems?.map((listItem) => ({
     label: listItem?.value ?? '',
     value: listItem?.id ?? '',
-  }));
+  })) ?? [];
 
 export const locationItemsToOptions = (locationList: ILocation[]): IOption[] =>
   locationList.map((locationItem) => ({
@@ -160,9 +159,20 @@ export const dirtyFieldsToRequestObject = (
   for (const key in dirtyFields) {
     const parsedValue = parseValue(form[key as keyof IAppForms]);
     const convertedKey = getKey(key);
-    const assignValueToKey = (key: string, value: any) => {
+    const assignValueToKey = (key: string, value: FormValueType) => {
       if (value !== undefined) {
-        request[key as keyof IAppForms] = value;
+        // Convert null to undefined since IProjectRequest doesn't accept null
+        const convertedValue = value === null ? undefined : value;
+        if (convertedValue !== undefined) {
+          // Convert IOption to string if needed
+          const finalValue =
+            typeof convertedValue === 'object' && 'value' in convertedValue
+              ? convertedValue.value
+              : convertedValue;
+
+          // Cast to the expected type
+          request[key] = finalValue as string | boolean | string[] | undefined;
+        }
       }
     };
 

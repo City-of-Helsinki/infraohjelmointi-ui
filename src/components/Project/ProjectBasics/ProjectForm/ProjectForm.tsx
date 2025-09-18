@@ -77,6 +77,8 @@ const ProjectForm = () => {
     control,
     getValues,
     getFieldState,
+    watch,
+    setValue,
   } = formMethods;
 
   usePromptConfirmOnNavigate({
@@ -269,18 +271,18 @@ const ProjectForm = () => {
       const estPlanningStart = data.estPlanningStart ?? project.estPlanningStart;
       const isSamePlanningStartYear = isSameYear(estPlanningStart, data.planningStartYear);
       if (!isSamePlanningStartYear) {
-        data.estPlanningStart = updateYear(data.planningStartYear, estPlanningStart)
+        data.estPlanningStart = updateYear(data.planningStartYear, estPlanningStart);
       }
     }
     if (data.constructionEndYear) {
       const estConstructionEnd = data.estConstructionEnd ?? project.estConstructionEnd;
       const isSameConstructionEndYear = isSameYear(estConstructionEnd, data.constructionEndYear);
       if (!isSameConstructionEndYear) {
-        data.estConstructionEnd = updateYear(data.constructionEndYear, estConstructionEnd)
+        data.estConstructionEnd = updateYear(data.constructionEndYear, estConstructionEnd);
       }
     }
     return data;
-  }
+  };
 
   // useEffect which triggers when form fields are reset by setting selectedProject after successful POST request
   useEffect(() => {
@@ -292,7 +294,7 @@ const ProjectForm = () => {
       navigate(`/project/${newProjectId}/basics`);
       setNewProjectId('');
     }
-  }, [isDirty, newProjectId]);
+  }, [isDirty, newProjectId, navigate, projectMode]);
 
   const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
   const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
@@ -323,10 +325,9 @@ const ProjectForm = () => {
           }
 
           if (data?.projectClass && project.projectGroup) {
-
             const projectGroup = groups.find(({ id }) => id === project.projectGroup);
             if (data.projectClass !== projectGroup?.classRelation) {
-              data = { ...data, "projectGroup": null }
+              data = { ...data, projectGroup: null };
             }
           }
 
@@ -434,7 +435,7 @@ const ProjectForm = () => {
         sapCurrentYear: project ? currentYearSapValues : null,
       };
     },
-    [control],
+    [control, project, sapCosts, currentYearSapValues],
   );
 
   const formProps = useMemo(
@@ -443,8 +444,10 @@ const ProjectForm = () => {
       control,
       getValues,
       getFieldState,
+      watch,
+      setValue,
     }),
-    [control, getFieldProps, getFieldState, getValues],
+    [control, getFieldProps, getFieldState, getValues, watch, setValue],
   );
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -538,16 +541,15 @@ const ProjectForm = () => {
         isUserOnlyViewer={isOnlyViewer}
       />
       {/* SECTION 7 - PROJECT PROGRAM */}
-      <ProjectProgramSection 
-        {...formProps}
-        isUserOnlyViewer={isOnlyViewer}
-      />
+      <ProjectProgramSection {...formProps} isUserOnlyViewer={isOnlyViewer} />
       {/* BANNER */}
-      {!isOnlyViewer &&
+      {!isOnlyViewer && (
         <ProjectFormBanner
           onSubmit={submitCallback}
           isDirty={isDirty}
-          isInputDisabled={isInputDisabled} />}
+          isInputDisabled={isInputDisabled}
+        />
+      )}
     </form>
   );
 };

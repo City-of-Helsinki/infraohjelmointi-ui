@@ -15,6 +15,7 @@ interface ITextAreaFieldProps {
   hideLabel?: boolean;
   size?: 'l' | 'xl';
   formSaved?: boolean;
+  disabled?: boolean;
 }
 
 const TextAreaField: FC<ITextAreaFieldProps> = ({
@@ -27,6 +28,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
   hideLabel,
   size,
   formSaved,
+  disabled,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
@@ -72,6 +74,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
             invalid={error ? true : false}
             errorText={error?.message}
             style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
+            disabled={disabled}
           />
         </div>
       )}

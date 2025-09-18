@@ -75,6 +75,7 @@ export interface IProjectForm {
   estWarrantyPhaseEnd: string;
   personConstruction: IOption;
   personPlanning: IOption;
+  personProgramming: IOption | null;
   name: string;
   masterClass: IOption;
   class: IOption;
@@ -84,6 +85,7 @@ export interface IProjectForm {
   subDivision: IOption;
   budgetOverrunReason: IOption;
   otherBudgetOverrunReason: string;
+  onSchedule?: boolean | null;
 }
 
 export interface ISearchForm {
@@ -93,7 +95,7 @@ export interface ISearchForm {
   subClass: Array<IOption>;
   programmedYes: boolean;
   programmedNo: boolean;
-  hkrIds: Array<string>
+  hkrIds: Array<string>;
   personPlanning: IOption;
   personConstruction: IOption;
   programmedYearMin: IOption;
@@ -148,4 +150,4 @@ export type HookFormRulesType = Omit<
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
 
-export type FormValueType = string | boolean | IOption | string[] | undefined;
+export type FormValueType = string | boolean | IOption | string[] | null | undefined;

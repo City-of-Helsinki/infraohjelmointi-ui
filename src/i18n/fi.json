@@ -248,7 +248,8 @@
     "estWarrantyPhaseStart": "Alkaa",
     "estWarrantyPhaseEnd": "Päättyy",
     "budgetOverrunReason": "Budjettipoikkeaman selitys",
-    "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle"
+    "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle",
+    "onSchedule": "Onko hanke aikataulussa"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -297,7 +298,7 @@
       "sendSuccess": "Lähetys onnistui",
       "patchSuccess": "Muokkaus onnistui",
       "deleteSuccess": "Poisto onnistui",
-      "projectNotFound": "Hanketta ei löytnyt",
+      "projectNotFound": "Hanketta ei löytynyt",
       "hashtagPatchSuccess": "Tunniste päivitetty",
       "patchError": "Päivitys epäonnistui",
       "saveError": "Tallennus epäonnistui",
@@ -515,6 +516,7 @@
       "footerInfoText": "s = suunnittelu, r = rakentaminen",
       "planning": "Suunnittelu",
       "constructing": "Rakentaminen",
+      "warrantyPeriod": "$t(option.warrantyPeriod)",
       "projectManagerMissing": "Odottaa nimeämistä"
     },
     "strategyForcedToFrame": {
@@ -532,6 +534,14 @@
     "constructionProgram": {
       "rowTitle": "Rakentamisohjelma (yli 1 milj. euron hankkeet)",
       "documentName": "rakentamisohjelma",
+      "title": "Helsingin kaupunki",
+      "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)",
+      "classSummary": "Hankkeet yhteensä",
+      "underMillionSummary": "Muut alle 1 milj. euron investointihankkeet"
+    },
+    "constructionProgramForcedToFrame": {
+      "rowTitle": "Rakentamisohjelma (Sovitettu budjetti, yli 1 milj hankkeet)",
+      "documentName": "rakentamisohjelma - sovitettu budjetti",
       "title": "Helsingin kaupunki",
       "subtitle": "Yleisten alueiden ja tonttien rakentamiskelpoiseksi saattamisen rakentamisohjelma vuosiksi {{startYear}}-{{endYear}} (Vähintään 1,0 milj. euron hankkeet)",
       "classSummary": "Hankkeet yhteensä",
@@ -566,7 +576,7 @@
       "locationTitle": "Sijainti",
       "budgetTitle": "Kokonaiskustannukset milj. €",
       "scheduleTitle": "Suunnittelun ja rakentamisen ajoitus",
-      "isProjectOnScheduleTitle": "Onko hanke aikataulussa\nKyllä/Ei",
+      "isProjectOnScheduleTitle": "$t(projectForm.onSchedule)\nKyllä/Ei",
       "commitmentsBeforeYearTitle": "Toteuma ennen",
       "commitmentsYearTitle": "Toteuma",
       "forecast1Title": "Ennuste",

@@ -15,7 +15,13 @@ import {
   mockProjectTypes,
   mockResponsibleZones,
 } from '@/mocks/mockLists';
-import { mockCoordinatorLocations, mockDistrictOptions, mockDivisionOptions, mockLocations, mockSubDivisionOptions } from '@/mocks/mockLocations';
+import {
+  mockCoordinatorLocations,
+  mockDistrictOptions,
+  mockDivisionOptions,
+  mockLocations,
+  mockSubDivisionOptions,
+} from '@/mocks/mockLocations';
 import mockNotes from '@/mocks/mockNotes';
 import mockPersons from '@/mocks/mockPersons';
 import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
@@ -28,6 +34,22 @@ jest.mock('axios');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const { REACT_APP_API_URL } = process.env;
+
+const mockProgrammers = {
+  data: [
+    { id: 'programmer-1', firstName: 'John', lastName: 'Doe' },
+    { id: 'programmer-2', firstName: 'Jane', lastName: 'Smith' },
+    { id: 'empty-programmer', firstName: 'Ei', lastName: 'Valintaa' },
+  ],
+};
+
+const mockAppStateValue = {
+  data: {
+    id: 'app-state-1',
+    key: 'test-key',
+    value: 'test-value',
+  },
+};
 
 /**
  * This function checks the URL that axios is trying to GET data from and provides the correct
@@ -111,6 +133,12 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockSapCosts);
       case url.toLocaleLowerCase().includes('/budget-overrun-reasons/'):
         return Promise.resolve(mockBudgetOverrunReasons);
+      case url === '/project-programmers/':
+        return Promise.resolve(mockProgrammers);
+      case url === '/app-state-value/':
+        return Promise.resolve(mockAppStateValue);
+      case url.includes('/project-groups/coordinator/?year=2025&forcedToFrame=true'):
+        return Promise.resolve(mockGroups);
       default:
         console.log('not found!: ', url);
 

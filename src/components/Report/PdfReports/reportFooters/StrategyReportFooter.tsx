@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   text: {
     display: 'flex',
     flexDirection: 'column',
-    fontSize: '9px'
+    fontSize: '9px',
   },
   infoBoxes: {
     marginLeft: '670px',
@@ -28,29 +28,41 @@ const styles = StyleSheet.create({
   blackInfoBox: {
     width: '16px',
     height: '12px',
-    backgroundColor: '#333333'
+    backgroundColor: '#333333',
   },
   greenInfoBox: {
     marginTop: '2px',
     width: '16px',
     height: '12px',
-    backgroundColor: '#00d7a7'
+    backgroundColor: '#00d7a7',
+  },
+  greyInfoBox: {
+    marginTop: '2px',
+    width: '16px',
+    height: '12px',
+    backgroundColor: '#cccccc',
   },
   infoText: {
     marginTop: '2px',
     fontSize: '9px',
     justifyContent: 'center',
-    marginLeft: '2px'
-  }
+    marginLeft: '2px',
+  },
 });
 
 interface IStrategyTableFooterProps {
   infoText: string;
   colorInfoTextOne: string;
   colorInfoTextTwo: string;
+  colorInfoTextThree: string;
 }
 
-const StrategyTableFooter: FC<IStrategyTableFooterProps> = ({infoText, colorInfoTextOne, colorInfoTextTwo}) => {
+const StrategyTableFooter: FC<IStrategyTableFooterProps> = ({
+  infoText,
+  colorInfoTextOne,
+  colorInfoTextTwo,
+  colorInfoTextThree,
+}) => {
   return (
     <View fixed style={styles.footer}>
       <View style={styles.textAndLogo}>
@@ -58,12 +70,14 @@ const StrategyTableFooter: FC<IStrategyTableFooterProps> = ({infoText, colorInfo
           <Text>{infoText}</Text>
         </View>
         <View style={styles.infoBoxes}>
-            <Text style={styles.blackInfoBox}></Text>
-            <Text style={styles.greenInfoBox}></Text>
+          <Text style={styles.blackInfoBox}></Text>
+          <Text style={styles.greenInfoBox}></Text>
+          <Text style={styles.greyInfoBox}></Text>
         </View>
         <View>
-            <Text style={styles.infoText}>{colorInfoTextOne}</Text>
-            <Text style={styles.infoText}>{colorInfoTextTwo}</Text>
+          <Text style={styles.infoText}>{colorInfoTextOne}</Text>
+          <Text style={styles.infoText}>{colorInfoTextTwo}</Text>
+          <Text style={styles.infoText}>{colorInfoTextThree}</Text>
         </View>
       </View>
     </View>
