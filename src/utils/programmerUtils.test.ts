@@ -1,4 +1,4 @@
-import { getDefaultProgrammerForClasses } from './programmerUtils';
+import { getDefaultProgrammerForClasses, programmerToListItem } from './programmerUtils';
 import { getDefaultProgrammerForLocation } from './locationProgrammerUtils';
 import { IClass, IProgrammer, IClassFinances } from '@/interfaces/classInterfaces';
 import { IListItem } from '@/interfaces/common';
@@ -286,13 +286,15 @@ describe('programmerUtils', () => {
       expect(result?.value).toBe('John Smith');
     });
 
-    it('should return null when programmer not found in list', () => {
+    it('should create direct mapping when programmer not found in list', () => {
       const unknownProgrammer = { id: 'unknown.id', firstName: 'Unknown', lastName: 'Person' };
       const masterClass = createLocationTestClass('master-1', 'Master Class 1', unknownProgrammer);
 
       const result = getDefaultProgrammerForLocation(masterClass, null, null, mockProgrammerList);
 
-      expect(result).toBeNull();
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('unknown.id');
+      expect(result?.value).toBe('Unknown Person');
     });
 
     it('should handle programmer with only first name', () => {
@@ -335,6 +337,168 @@ describe('programmerUtils', () => {
 
       expect(result).toBeDefined();
       expect(result?.value).toBe('Wilson');
+    });
+  });
+
+  describe('programmerToListItem', () => {
+    it('should convert a valid programmer object to IListItem', () => {
+      const programmer = {
+        id: 'test-id',
+        firstName: 'John',
+        lastName: 'Doe',
+      };
+
+      const result = programmerToListItem(programmer);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('test-id');
+      expect(result?.value).toBe('John Doe');
+    });
+
+    it('should handle programmer with empty last name', () => {
+      const programmer = {
+        id: 'test-id',
+        firstName: 'John',
+        lastName: '',
+      };
+
+      const result = programmerToListItem(programmer);
+
+      expect(result).toBeDefined();
+      expect(result?.value).toBe('John');
+    });
+
+    it('should handle programmer with empty first name', () => {
+      const programmer = {
+        id: 'test-id',
+        firstName: '',
+        lastName: 'Doe',
+      };
+
+      const result = programmerToListItem(programmer);
+
+      expect(result).toBeDefined();
+      expect(result?.value).toBe('Doe');
+    });
+
+    it('should return null for programmer without id', () => {
+      const programmer = {
+        firstName: 'John',
+        lastName: 'Doe',
+      } as any;
+
+      const result = programmerToListItem(programmer);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null for programmer without firstName and lastName', () => {
+      const programmer = {
+        id: 'test-id',
+      } as any;
+
+      const result = programmerToListItem(programmer);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null for null input', () => {
+      const result = programmerToListItem(null);
+      expect(result).toBeNull();
+    });
+
+    it('should return null for undefined input', () => {
+      const result = programmerToListItem(undefined);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getDefaultProgrammerForLocation - Fallback Logic', () => {
+    const mockProgrammerList: IListItem[] = [{ id: 'existing.id', value: 'Existing Programmer' }];
+
+    const createLocationTestClass = (
+      id: string,
+      name: string,
+      defaultProgrammer?: IProgrammer,
+    ): IClass => ({
+      id,
+      name,
+      path: `/${id}`,
+      forCoordinatorOnly: false,
+      relatedTo: null,
+      parent: null,
+      finances: mockFinances,
+      defaultProgrammer,
+    });
+
+    it('should create direct mapping when programmer not found in Redux list', () => {
+      const programmerNotInList = {
+        id: 'new.programmer.id',
+        firstName: 'New',
+        lastName: 'Programmer',
+      };
+      const masterClass = createLocationTestClass(
+        'master-1',
+        'Master Class 1',
+        programmerNotInList,
+      );
+
+      const result = getDefaultProgrammerForLocation(masterClass, null, null, mockProgrammerList);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('new.programmer.id');
+      expect(result?.value).toBe('New Programmer');
+    });
+
+    it('should prefer Redux match over direct mapping when both are available', () => {
+      const programmerInList = {
+        id: 'existing.id',
+        firstName: 'Different',
+        lastName: 'Name',
+      };
+      const masterClass = createLocationTestClass('master-1', 'Master Class 1', programmerInList);
+
+      const result = getDefaultProgrammerForLocation(masterClass, null, null, mockProgrammerList);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('existing.id');
+      expect(result?.value).toBe('Existing Programmer'); // Should use Redux data, not direct mapping
+    });
+
+    it('should handle incomplete programmer data gracefully', () => {
+      const incompleteProgrammer = {
+        id: 'incomplete.id',
+        firstName: '', // Empty firstName
+        lastName: 'LastOnly',
+      };
+      const masterClass = createLocationTestClass(
+        'master-1',
+        'Master Class 1',
+        incompleteProgrammer,
+      );
+
+      const result = getDefaultProgrammerForLocation(masterClass, null, null, mockProgrammerList);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('incomplete.id');
+      expect(result?.value).toBe('LastOnly');
+    });
+
+    it('should handle programmer with no names but valid id', () => {
+      const programmerWithoutNames = {
+        id: 'no.names.id',
+        firstName: '',
+        lastName: '',
+      };
+      const masterClass = createLocationTestClass(
+        'master-1',
+        'Master Class 1',
+        programmerWithoutNames,
+      );
+
+      const result = getDefaultProgrammerForLocation(masterClass, null, null, mockProgrammerList);
+
+      expect(result).toBeNull(); // Should fail gracefully
     });
   });
 });
