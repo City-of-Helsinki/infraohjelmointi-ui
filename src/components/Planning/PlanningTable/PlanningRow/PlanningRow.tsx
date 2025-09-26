@@ -22,8 +22,7 @@ const PlanningRow: FC<
     sapCurrentYear: Record<string, IProjectSapCost>;
   }
 > = (props) => {
-  const { defaultExpanded, projectRows, cells, id, type, sapCosts, sapCurrentYear } =
-    props;
+  const { defaultExpanded, projectRows, cells, id, type, sapCosts, sapCurrentYear } = props;
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
 
@@ -47,10 +46,11 @@ const PlanningRow: FC<
   }, [defaultExpanded]);
 
   useEffect(() => {
-    if (type === 'group') {
+    if (type === 'group' && !searchedProjectId) {
+      // Only apply global groupsExpanded if not in search mode
       setPlanningRowState((current) => ({ ...current, expanded: groupsExpanded }));
     }
-  }, [type, groupsExpanded]);
+  }, [type, groupsExpanded, searchedProjectId]);
 
   const resetSearchedProjectId = useCallback(() => {
     setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
