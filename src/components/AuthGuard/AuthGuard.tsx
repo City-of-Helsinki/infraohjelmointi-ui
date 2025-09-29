@@ -6,8 +6,23 @@ import { getUserThunk, selectAuthError, selectUser } from '@/reducers/authSlice'
 import { NavigateFunction, useLocation, useNavigate } from 'react-router';
 import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { IUser } from '@/interfaces/userInterfaces';
+import useConfirmDialog from '@/hooks/useConfirmDialog';
+import { useTranslation } from 'react-i18next';
 
 const INITIAL_PATH = 'initialPath';
+
+const PAGES = {
+  ACCESS_DENIED: 'access-denied',
+  ADMIN: 'admin',
+  AUTH_HELSINKI_RETURN: 'auth/helsinki/return',
+  MAINTENANCE_MODE: 'maintenance',
+  PLANNING: 'planning',
+  PROJECT: 'project',
+  PROJECT_NEW: 'project/new',
+  PROJECT_BASICS: 'basics',
+  PROJECT_NOTES: 'notes',
+  SEARCH_RESULTS: 'search-results',
+};
 
 /**
  * Component to handle authentication stuff
@@ -21,19 +36,9 @@ const AuthGuard: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, activeNavigator, isLoading, user: oidcUser } = auth;
-
-  const PAGES = {
-    ACCESS_DENIED: 'access-denied',
-    ADMIN: 'admin',
-    AUTH_HELSINKI_RETURN: 'auth/helsinki/return',
-    MAINTENANCE_MODE: 'maintenance',
-    PLANNING: 'planning',
-    PROJECT: 'project',
-    PROJECT_NEW: 'project/new',
-    PROJECT_BASICS: 'basics',
-    PROJECT_NOTES: 'notes',
-    SEARCH_RESULTS: 'search-results',
-  }
+  const [isTokenExpired, setIsTokenExpired] = useState(false);
+  const { isConfirmed } = useConfirmDialog();
+  const { t } = useTranslation();
 
   const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
@@ -41,7 +46,6 @@ const AuthGuard: FC = () => {
   useEffect(() => {
     if (oidcUser?.access_token) {
       const getApiTokenAndUser = async () => {
-
         // Get API token
         try {
           await getApiToken();
@@ -80,7 +84,7 @@ const AuthGuard: FC = () => {
 
       getApiTokenAndUser();
     }
-  }, [oidcUser, user, auth.isLoading]);
+  }, [oidcUser, user, auth.isLoading, dispatch, navigate]);
 
   // Check if user exists and sign in
   useEffect(() => {
@@ -95,110 +99,130 @@ const AuthGuard: FC = () => {
     }
   }, [isAuthenticated, activeNavigator, isLoading, hasTriedSignin, location, auth]);
 
-  /**
-   * Access denied view handler
-   */
-  const redirectToAccessDenied = (pathname: string, authError: unknown, navigate: NavigateFunction) => {
-    // To break possible loop, we don't redirect user
-    if (pathname.includes(PAGES.ACCESS_DENIED)) {
-      return;
-    }
-
-    // Redirect to /access-denied if user is not authorizated
-    if (authError) {
-      return navigate(PAGES.ACCESS_DENIED);
-    }
-  }
-
-  /**
-   * Authenticated User Handler
-   */
-  const handleAuthenticatedUser = (pathname: string, user: IUser | null, navigate: NavigateFunction, initialPath: string | null) => {
-    // Redirect user to the initial path or on planning view if authenticated
-    if (pathname.includes(PAGES.AUTH_HELSINKI_RETURN) && user) {
-      if (initialPath) {
-        return;
-      }
-      return navigate(PAGES.PLANNING);
-    }
-  }
-
-  /**
-   * User Roles Handler
-   */
-  const handleUserRoles = (pathname: string, user: IUser | null, navigate: NavigateFunction, initialPath: string | null) => {
-    // Redirect to previous url if a non admin tries to access the admin view
-    if (pathname.includes(PAGES.ADMIN) && !isUserAdmin(user)) {
-      return navigate(-1);
-    }
-
-    // Redirect to planning view if a viewer is trying to access anything but the planning view, search results or a project card
-    if (
-      (!pathname.includes(PAGES.PLANNING) &&
-      !pathname.includes(PAGES.PROJECT_BASICS) &&
-      !pathname.includes(PAGES.SEARCH_RESULTS)) &&
-      isUserOnlyViewer(user)
-    ) {
-      return navigate(PAGES.PLANNING);
-    }
-
-    // Redirect project managers away from new project form
-    if (pathname.includes(PAGES.PROJECT_NEW) && isUserOnlyProjectManager(user)) {
-      return navigate(-1);
-    }
-
-    // Redirect users without roles to /access-denied
-    if (!pathname.includes(PAGES.ACCESS_DENIED) && user && user.ad_groups.length === 0) {
-      return navigate(PAGES.ACCESS_DENIED);
-    }
-
-    // Redirect users with roles to planning view if they accidentally opens 'access-denied' page
-    if (pathname.includes(PAGES.ACCESS_DENIED) && user && user.ad_groups.length > 0) {
-      // Before login user tried to access a specific page
-      // Because of this don't redirect to /planning view
-      if (initialPath) {
-        return;
-      }
-      return navigate(PAGES.PLANNING);
-    }
-  }
-
-  /**
-   * Other Page Redirecting Handler
-   */
-  const handlePageRedirects = (pathname: string) => {
-    // Redirect user to full project view if /basics or /notes is missing
-    const pathIsInvalid = !pathname.includes(PAGES.PROJECT_BASICS) && !pathname.includes(PAGES.PROJECT_NOTES) && !pathname.includes(PAGES.PROJECT_NEW);
-    if (pathname.includes(PAGES.PROJECT) && pathIsInvalid) {
-      return navigate(`${pathname.replace(/\/$/, "")}/${PAGES.PROJECT_BASICS}`);
-    }
-  }
-
-  /**
-   * Maintenance Mode Handler
-   */
-  const handleMaintenanceModeRedirects = (pathname: string) => {
-    if (MAINTENANCE_MODE) {
-      if (pathname.includes(PAGES.ACCESS_DENIED) || pathname.includes(PAGES.AUTH_HELSINKI_RETURN)) {
-        return;
-      }
-
-      if (!pathname.includes(PAGES.MAINTENANCE_MODE)) {
-        return navigate(PAGES.MAINTENANCE_MODE);
-      }
-      return;
-    }
-
-    // Redirect from maintenance page if not set true
-    if (pathname.includes(PAGES.MAINTENANCE_MODE)) {
-      return navigate(PAGES.PLANNING);
-    }
-  }
-
   // Redirect user from forbidden paths
   // If user can log in (isAuthenticated) but does not have access rights (!user),
   // always redirect them to /access-denied
   useEffect(() => {
+    /**
+     * Access denied view handler
+     */
+    const redirectToAccessDenied = (
+      pathname: string,
+      authError: unknown,
+      navigate: NavigateFunction,
+    ) => {
+      // To break possible loop, we don't redirect user
+      if (pathname.includes(PAGES.ACCESS_DENIED)) {
+        return;
+      }
+
+      // Redirect to /access-denied if user is not authorizated
+      if (authError) {
+        return navigate(PAGES.ACCESS_DENIED);
+      }
+    };
+
+    /**
+     * Authenticated User Handler
+     */
+    const handleAuthenticatedUser = (
+      pathname: string,
+      user: IUser | null,
+      navigate: NavigateFunction,
+      initialPath: string | null,
+    ) => {
+      // Redirect user to the initial path or on planning view if authenticated
+      if (pathname.includes(PAGES.AUTH_HELSINKI_RETURN) && user) {
+        if (initialPath) {
+          return;
+        }
+        return navigate(PAGES.PLANNING);
+      }
+    };
+
+    /**
+     * User Roles Handler
+     */
+    const handleUserRoles = (
+      pathname: string,
+      user: IUser | null,
+      navigate: NavigateFunction,
+      initialPath: string | null,
+    ) => {
+      // Redirect to previous url if a non admin tries to access the admin view
+      if (pathname.includes(PAGES.ADMIN) && !isUserAdmin(user)) {
+        return navigate(-1);
+      }
+
+      // Redirect to planning view if a viewer is trying to access anything but the planning view, search results or a project card
+      if (
+        !pathname.includes(PAGES.PLANNING) &&
+        !pathname.includes(PAGES.PROJECT_BASICS) &&
+        !pathname.includes(PAGES.SEARCH_RESULTS) &&
+        isUserOnlyViewer(user)
+      ) {
+        return navigate(PAGES.PLANNING);
+      }
+
+      // Redirect project managers away from new project form
+      if (pathname.includes(PAGES.PROJECT_NEW) && isUserOnlyProjectManager(user)) {
+        return navigate(-1);
+      }
+
+      // Redirect users without roles to /access-denied
+      if (!pathname.includes(PAGES.ACCESS_DENIED) && user && user.ad_groups.length === 0) {
+        return navigate(PAGES.ACCESS_DENIED);
+      }
+
+      // Redirect users with roles to planning view if they accidentally opens 'access-denied' page
+      if (pathname.includes(PAGES.ACCESS_DENIED) && user && user.ad_groups.length > 0) {
+        // Before login user tried to access a specific page
+        // Because of this don't redirect to /planning view
+        if (initialPath) {
+          return;
+        }
+        return navigate(PAGES.PLANNING);
+      }
+    };
+
+    /**
+     * Other Page Redirecting Handler
+     */
+    const handlePageRedirects = (pathname: string) => {
+      // Redirect user to full project view if /basics or /notes is missing
+      const pathIsInvalid =
+        !pathname.includes(PAGES.PROJECT_BASICS) &&
+        !pathname.includes(PAGES.PROJECT_NOTES) &&
+        !pathname.includes(PAGES.PROJECT_NEW);
+      if (pathname.includes(PAGES.PROJECT) && pathIsInvalid) {
+        return navigate(`${pathname.replace(/\/$/, '')}/${PAGES.PROJECT_BASICS}`);
+      }
+    };
+
+    /**
+     * Maintenance Mode Handler
+     */
+    const handleMaintenanceModeRedirects = (pathname: string) => {
+      if (MAINTENANCE_MODE) {
+        if (
+          pathname.includes(PAGES.ACCESS_DENIED) ||
+          pathname.includes(PAGES.AUTH_HELSINKI_RETURN)
+        ) {
+          return;
+        }
+
+        if (!pathname.includes(PAGES.MAINTENANCE_MODE)) {
+          return navigate(PAGES.MAINTENANCE_MODE);
+        }
+        return;
+      }
+
+      // Redirect from maintenance page if not set true
+      if (pathname.includes(PAGES.MAINTENANCE_MODE)) {
+        return navigate(PAGES.PLANNING);
+      }
+    };
+
     const { pathname } = location;
 
     const initialPath = localStorage.getItem(INITIAL_PATH);
@@ -222,11 +246,71 @@ const AuthGuard: FC = () => {
       // Other redirects
       handlePageRedirects(pathname);
 
-      if (pathname == "/") {
+      if (pathname == '/') {
         navigate(PAGES.PLANNING);
       }
     }
-  }, [location, navigate, user, isAuthenticated, authError]);
+  }, [location, navigate, user, isAuthenticated, authError, MAINTENANCE_MODE]);
+
+  // Handle token expiration detection and user notification about expired token
+  useEffect(() => {
+    const handleTokenExpiration = async () => {
+      if (isTokenExpired) {
+        return;
+      }
+
+      setIsTokenExpired(true);
+
+      const confirmed = await isConfirmed({
+        dialogType: 'confirm',
+        confirmButtonText: t('confirm'),
+        title: t('notification.title.sessionExpired'),
+        description: t('notification.message.sessionExpired'),
+      });
+
+      if (confirmed) {
+        setIsTokenExpired(false);
+        window.location.reload();
+      }
+    };
+
+    const checkTokenExpirationOnFocus = () => {
+      // Check if token is expired when page becomes visible/focused
+      if (oidcUser?.expires_at && oidcUser.expires_at < Math.floor(Date.now() / 1000)) {
+        handleTokenExpiration();
+      }
+    };
+
+    // Handle page visibility change (when user switches tabs or computer wakes from sleep)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkTokenExpirationOnFocus();
+      }
+    };
+
+    // Handle window focus (when user clicks back to the tab/window)
+    const handleWindowFocus = () => {
+      checkTokenExpirationOnFocus();
+    };
+
+    // Add event listeners for page visibility and window focus
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+
+    // Set up OIDC event listener
+    auth.events.addAccessTokenExpired(handleTokenExpiration);
+    auth.events.addSilentRenewError(handleTokenExpiration);
+
+    return function cleanup() {
+      // Remove page visibility and focus listeners
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+
+      // Remove OIDC event listener
+      auth.events.removeAccessTokenExpired(handleTokenExpiration);
+      auth.events.removeSilentRenewError(handleTokenExpiration);
+    };
+  }, [auth, isConfirmed, oidcUser, isTokenExpired, t]);
 
   return <></>;
 };

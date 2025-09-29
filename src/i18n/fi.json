@@ -310,7 +310,8 @@
       "noteAddSuccess": "Muistiinpano lisätty",
       "noteAddError": "Muistiinpanon lisääminen epäonnistui",
       "update": "Päivitys",
-      "updateSuccessful": "Tietojen siirto onnistui"
+      "updateSuccessful": "Tietojen siirto onnistui",
+      "sessionExpired": "Istunto vanhentunut"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -339,7 +340,8 @@
       "accessError": "Käyttäjälläsi ei ole oikeutta suorittaa toimintoa.",
       "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu budjetti -näkymään.",
       "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu budjetti -näkymään tapahtui virhe.",
-      "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe."
+      "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe.",
+      "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen."
     }
   },
   "searchOrder": {
@@ -396,6 +398,7 @@
   "save": "Tallenna",
   "saveChanges": "Tallenna muutokset",
   "saveVersion": "Tallenna versio",
+  "confirm": "Vahvista",
   "budgetProposalPreparation": "Talousarvioehdotusten valmistelu",
   "allocationPreparation": "Määrärahojen valmistelu",
   "keur": "keur",

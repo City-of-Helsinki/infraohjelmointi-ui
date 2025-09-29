@@ -24,6 +24,9 @@ const MockUserManager: typeof UserManager = jest.fn(function (this: {
 
     addUserSessionChanged: jest.fn(),
     removeUserSessionChanged: jest.fn(),
+
+    addAccessTokenExpired: jest.fn(),
+    removeAccessTokenExpired: jest.fn(),
   };
   return this as UserManager;
 });
