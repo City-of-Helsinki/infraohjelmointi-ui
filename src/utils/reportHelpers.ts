@@ -1116,11 +1116,11 @@ const getUnderMillionSummary = (rows: IConstructionProgramTableRow[]) => {
  * Shows current year cost estimated budget (TA, "raamiluku") on
  * Strategy report for high level classes only.
  */
-const frameBudgetHandler = (
+export const frameBudgetHandler = (
   type: string,
   budgets: IPlanningCell[],
   path: string,
-  year = new Date().getFullYear() + 1,
+  year = new Date().getFullYear(),
 ) => {
   const allowedTypes = [
     'masterClass',
@@ -1277,13 +1277,13 @@ export const convertToReportRows = (
               parent: null,
               children: rowChildren,
               projects: rowProjects,
-              costForecast: c.cells[0].plannedBudget,
-              costForcedToFrameBudget: forcedToFrameBudget, // Ennuste
+              costForecast: c.cells[0].plannedBudget, // Ennuste
+              costForcedToFrameBudget: forcedToFrameBudget, // TS
               costForecastDeviation: calculateCostForecastDeviation(
                 forcedToFrameBudget,
                 c.cells[0].plannedBudget,
               ), // Poikkeama
-              costPlan: frameBudget,
+              costPlan: frameBudget, // TA
               type: c.type as ReportTableRowType,
             };
 
