@@ -688,7 +688,7 @@ const convertToConstructionReportProjects = (
   });
 };
 
-const convertToGroupValues = (
+export const convertToGroupValues = (
   projects: IProject[],
   forcedToFramBudget: string | undefined,
   sapCosts?: Record<string, IProjectSapCost>,
@@ -701,18 +701,27 @@ const convertToGroupValues = (
   let currentYearSapCost = 0;
   let beforeCurrentYearSapCosts = 0;
   let budgetOverrunReasons = '';
+  const processedSapProjects = new Set<string>();
 
   for (const p of projects) {
     spentBudget += parseFloat(p.spentBudget);
     budgetProposalCurrentYearPlus0 += parseFloat(p.finances.budgetProposalCurrentYearPlus0 ?? '0');
     budgetProposalCurrentYearPlus1 += parseFloat(p.finances.budgetProposalCurrentYearPlus1 ?? '0');
     budgetProposalCurrentYearPlus2 += parseFloat(p.finances.budgetProposalCurrentYearPlus2 ?? '0');
-    currentYearSapCost += currentYearSapValues
-      ? sumCosts(currentYearSapValues[p.id], 'project_task_costs', 'production_task_costs')
-      : 0;
-    beforeCurrentYearSapCosts += sapCosts
-      ? sumCosts(sapCosts[p.id], 'project_task_costs', 'production_task_costs') - currentYearSapCost
-      : 0;
+
+    // Only calculate SAP costs once per unique sapProject
+    if (p.sapProject && !processedSapProjects.has(p.sapProject)) {
+      processedSapProjects.add(p.sapProject);
+      const projectCurrentYearSapCost = currentYearSapValues
+        ? sumCosts(currentYearSapValues[p.id], 'project_task_costs', 'production_task_costs')
+        : 0;
+      currentYearSapCost += projectCurrentYearSapCost;
+      beforeCurrentYearSapCosts += sapCosts
+        ? sumCosts(sapCosts[p.id], 'project_task_costs', 'production_task_costs') -
+          projectCurrentYearSapCost
+        : 0;
+    }
+
     if (p.budgetOverrunReason) {
       const separator = budgetOverrunReasons !== '' ? '\n' : '';
       const reason = getBudgetOverrunReason(
@@ -1653,8 +1662,6 @@ export const convertToReportRows = (
             }
           }
         } else {
-          console.log('reportHelpers convertToReportRows', c);
-
           const forcedToFrameData = hierarchyInForcedToFrame?.find((hc) => hc.id === c.id);
           const forcedToFrameClass = forcedToFrameData ? forcedToFrameData : null;
           const forcedToFrameChildren =
