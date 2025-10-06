@@ -25,6 +25,7 @@ import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
 import { selectIsLoading, selectIsProjectCardLoading } from '@/reducers/loaderSlice';
 import { useLocationBasedProgrammer } from '@/hooks/useLocationBasedProgrammer';
+import { getDefaultProgrammerForClasses, programmerToListItem } from '@/utils/programmerUtils';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -215,7 +216,7 @@ const useProjectFormValues = () => {
 const useProjectForm = () => {
   const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
-  const { formValues, project } = useProjectFormValues();
+  const { formValues, project, classes, subClasses, masterClasses } = useProjectFormValues();
   const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: formValues,
@@ -241,24 +242,61 @@ const useProjectForm = () => {
   // Get class-based programmer logic
   const { getDefaultProgrammerFromClassHierarchy } = useLocationBasedProgrammer();
 
-  // Set the default programmer based on class hierarchy
+  // Set the default programmer based on class hierarchy - enhanced version
   const setDefaultProgrammerForClassHierarchy = useCallback(
     (masterClassId?: string, classId?: string, subClassId?: string) => {
-      const defaultProgrammer = getDefaultProgrammerFromClassHierarchy(
+      // First try the existing logic with Redux store
+      const defaultProgrammerFromRedux = getDefaultProgrammerFromClassHierarchy(
         masterClassId,
         classId,
         subClassId,
       );
 
-      if (defaultProgrammer) {
-        // Convert the programmer to an option format
+      if (defaultProgrammerFromRedux) {
         const programmerOption = {
-          value: defaultProgrammer.id,
-          label: defaultProgrammer.value,
+          value: defaultProgrammerFromRedux.id,
+          label: defaultProgrammerFromRedux.value,
         };
         setValue('personProgramming', programmerOption);
+        return;
+      }
+
+      // Fallback: Use direct class data (new approach)
+      const masterClass = masterClasses.find((c: IClass) => c.id === masterClassId);
+      const classItem = classes.find((c: IClass) => c.id === classId);
+      const subClass = subClasses.find((c: IClass) => c.id === subClassId);
+
+      // Debug logging (can be removed in production)
+      console.log('Setting default programmer:', {
+        masterClassId,
+        classId,
+        subClassId,
+        masterClass: masterClass?.name,
+        classItem: classItem?.name,
+        subClass: subClass?.name,
+        masterClassProgrammer: masterClass?.defaultProgrammer,
+        classProgrammer: classItem?.defaultProgrammer,
+        subClassProgrammer: subClass?.defaultProgrammer,
+      });
+
+      const directProgrammer = getDefaultProgrammerForClasses(masterClass, classItem, subClass);
+
+      if (directProgrammer) {
+        console.log('Found direct programmer:', directProgrammer);
+        const listItem = programmerToListItem(directProgrammer);
+        if (listItem) {
+          const programmerOption = {
+            value: listItem.id,
+            label: listItem.value,
+          };
+          console.log('Setting programmer option:', programmerOption);
+          setValue('personProgramming', programmerOption);
+        }
+      } else {
+        console.log('No default programmer found for selected classes');
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [getDefaultProgrammerFromClassHierarchy, setValue],
   );
 

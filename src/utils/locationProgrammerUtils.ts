@@ -41,6 +41,20 @@ export function getDefaultProgrammerForLocation(
       if (programmer) {
         return programmer;
       }
+
+      // If not found in the programmers list, create a direct mapping
+      // This handles cases where the defaultProgrammer from the API isn't in the Redux programmers list
+      if (
+        projectClass.defaultProgrammer.id &&
+        (projectClass.defaultProgrammer.firstName || projectClass.defaultProgrammer.lastName)
+      ) {
+        return {
+          id: projectClass.defaultProgrammer.id,
+          value: `${projectClass.defaultProgrammer.firstName || ''} ${
+            projectClass.defaultProgrammer.lastName || ''
+          }`.trim(),
+        };
+      }
     }
   }
 
