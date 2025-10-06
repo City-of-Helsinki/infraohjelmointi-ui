@@ -466,21 +466,21 @@ const isProjectInPlanningOrConstruction = (
   }
 };
 
-const isProjectOnSchedule = (
+export const isProjectOnSchedule = (
   budgetOverrunReason: string | undefined,
   onSchedule: boolean | undefined | null,
 ): boolean => {
   if (
     !budgetOverrunReason ||
     ['earlierSchedule', 'totalCostsClarification'].includes(budgetOverrunReason) ||
-    (budgetOverrunReason === 'otherReason' && onSchedule)
+    (budgetOverrunReason === 'otherReason' && onSchedule !== false)
   ) {
     return true;
   }
   return false;
 };
 
-const getIsProjectOnSchedule = (
+export const getIsProjectOnSchedule = (
   budgetOverrunReason: string | undefined,
   onSchedule: boolean | undefined | null,
 ): string => {
@@ -490,7 +490,7 @@ const getIsProjectOnSchedule = (
   return t('option.false');
 };
 
-const getIsGroupOnSchedule = (projects: IProject[]): string => {
+export const getIsGroupOnSchedule = (projects: IProject[]): string => {
   for (const p of projects) {
     if (!isProjectOnSchedule(p.budgetOverrunReason?.value, p.onSchedule)) {
       return t('option.false');
