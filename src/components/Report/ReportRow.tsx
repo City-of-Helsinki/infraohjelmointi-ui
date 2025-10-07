@@ -1,7 +1,11 @@
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IPlanningData, Reports, ReportType } from '@/interfaces/reportInterfaces';
-import { IClassHierarchy, ICoordinatorClassHierarchy, separateClassesIntoHierarchy } from '@/reducers/classSlice';
+import {
+  IClassHierarchy,
+  ICoordinatorClassHierarchy,
+  separateClassesIntoHierarchy,
+} from '@/reducers/classSlice';
 import DownloadPdfButton from './DownloadPdfButton';
 import DownloadCsvButton from './DownloadCsvButton';
 import './styles.css';
@@ -34,33 +38,41 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
 
   const getForcedToFrameData = async (year: number, forcedToFrame: boolean) => {
     // projects
-    const res = await getProjectsWithParams({
-      params: "limit=1000",
-      direct: false,
-      programmed: false,
-      forcedToFrame: forcedToFrame,
-      year: year,
-    }, true);
+    const res = await getProjectsWithParams(
+      {
+        params: 'limit=1000',
+        direct: false,
+        programmed: false,
+        forcedToFrame: forcedToFrame,
+        year: year,
+      },
+      true,
+    );
     let resultArray = res.results;
     let nextResultsPath = res.next;
     while (nextResultsPath != null) {
-      const nextResults = await getProjectsWithParams({fullPath: nextResultsPath})
+      const nextResults = await getProjectsWithParams({ fullPath: nextResultsPath });
       resultArray = resultArray.concat(nextResults.results);
       nextResultsPath = nextResults.next;
     }
-    const projects = resultArray.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'completed');
+    const projects = resultArray.filter(
+      (p) => p.phase.value !== 'proposal' && p.phase.value !== 'design',
+    );
 
     /* needed for the operational environment analysis report. The budgets of the projects that are in the warranty phase
        need to be added to the sums there separately and because of that we check here which projects are in this phase
        and do the calculations then in the reportsHelper.tsx */
     const projectsInWarrantyPhase = res.results.filter((p) => p.phase.value === 'warrantyPeriod');
-    
+
     // classes
     const classRes = await getCoordinationClasses({
       forcedToFrame: forcedToFrame,
-      year: year ,
+      year: year,
     });
-    const classHierarchy = separateClassesIntoHierarchy(classRes, true) as ICoordinatorClassHierarchy;
+    const classHierarchy = separateClassesIntoHierarchy(
+      classRes,
+      true,
+    ) as ICoordinatorClassHierarchy;
 
     // districts
     const locationRes = await getCoordinatorLocations({
@@ -80,16 +92,24 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       selectedDistrict: null,
       selectedCollectiveSubLevel: null,
       selectedSubLevelDistrict: null,
-      selectedOtherClassification: null
-    }
+      selectedOtherClassification: null,
+    };
 
-    return { res, projects, projectsInWarrantyPhase, classHierarchy, forcedToFrameDistricts, groupRes, initialSelections }
-  }
+    return {
+      res,
+      projects,
+      projectsInWarrantyPhase,
+      classHierarchy,
+      forcedToFrameDistricts,
+      groupRes,
+      initialSelections,
+    };
+  };
 
   const getCategories = async (): Promise<IListItem[]> => {
     const categories = await getProjectCategories();
     return categories;
-  }
+  };
 
   const getPlanningData = async (year: number) => {
     // projects
@@ -99,7 +119,9 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       forcedToFrame: false,
       year: year,
     });
-    const projects = res.results.filter((p) => p.phase.value !== 'proposal' && p.phase.value !== 'design' && p.phase.value !== 'completed');
+    const projects = res.results.filter(
+      (p) => p.phase.value !== 'proposal' && p.phase.value !== 'design',
+    );
 
     // classes
     const classRes = await getPlanningClasses(year);
@@ -120,25 +142,30 @@ const ReportRow: FC<IReportRowProps> = ({ type }) => {
       selectedDistrict: null,
       selectedCollectiveSubLevel: null,
       selectedSubLevelDistrict: null,
-      selectedOtherClassification: null
-    }
-    return { res, projects, classHierarchy, planningDistricts, groupRes, initialSelections }
-  }
+      selectedOtherClassification: null,
+    };
+    return { res, projects, classHierarchy, planningDistricts, groupRes, initialSelections };
+  };
 
   const getPlanningRows = (res: IPlanningData) => {
-    const planningRows = buildPlanningTableRows({
-      masterClasses: res.classHierarchy.masterClasses,
-      classes: res.classHierarchy.classes,
-      subClasses: res.classHierarchy.subClasses,
-      collectiveSubLevels: [],
-      districts: res.planningDistricts.districts,
-      otherClassifications: res.classHierarchy.otherClassifications,
-      otherClassificationSubLevels: [],
-      divisions: res.planningDistricts.divisions ?? [],
-      groups: res.groupRes
-    }, res.projects, res.initialSelections, res.planningDistricts.subDivisions);
+    const planningRows = buildPlanningTableRows(
+      {
+        masterClasses: res.classHierarchy.masterClasses,
+        classes: res.classHierarchy.classes,
+        subClasses: res.classHierarchy.subClasses,
+        collectiveSubLevels: [],
+        districts: res.planningDistricts.districts,
+        otherClassifications: res.classHierarchy.otherClassifications,
+        otherClassificationSubLevels: [],
+        divisions: res.planningDistricts.divisions ?? [],
+        groups: res.groupRes,
+      },
+      res.projects,
+      res.initialSelections,
+      res.planningDistricts.subDivisions,
+    );
     return planningRows;
-  }
+  };
 
   return (
     <div className="report-row-container" data-testid={`report-row-${type}`}>
