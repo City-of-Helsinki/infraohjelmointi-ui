@@ -1,4 +1,9 @@
-import { frameBudgetHandler } from './reportHelpers';
+import { convertToGroupValues, frameBudgetHandler } from './reportHelpers';
+import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
+
+jest.mock('i18next', () => ({
+  t: (key: string) => key,
+}));
 
 describe('reportHelpers', () => {
   describe('frameBudgetHandler', () => {
@@ -266,6 +271,163 @@ describe('reportHelpers', () => {
       expect(resultWithoutYear).toBe('5000000');
       expect(resultWithCurrentYear).toBe('5000000');
       expect(resultWithoutYear).toBe(resultWithCurrentYear);
+    });
+  });
+
+  describe('convertToGroupValues', () => {
+    it('should aggregate project and SAP cost data for groups while formatting results', () => {
+      const forcedToFrameBudget = '8000';
+      const currentYear = new Date().getFullYear();
+
+      const projectOne = createProject({
+        id: 'project-one',
+        name: 'Project One',
+        spentBudget: '1000',
+        sapProject: 'sap-1',
+        finances: {
+          year: currentYear,
+          budgetProposalCurrentYearPlus0: '5000',
+          budgetProposalCurrentYearPlus1: '6000',
+          budgetProposalCurrentYearPlus2: '7000',
+        },
+        budgetOverrunReason: createListItem('otherReason'),
+        otherBudgetOverrunReason: 'Custom reason',
+        onSchedule: true,
+      });
+
+      const projectTwo = createProject({
+        id: 'project-two',
+        name: 'Project Two',
+        spentBudget: '2000',
+        sapProject: 'sap-1',
+        finances: {
+          year: currentYear,
+          budgetProposalCurrentYearPlus0: '4000',
+          budgetProposalCurrentYearPlus1: '3000',
+          budgetProposalCurrentYearPlus2: '2000',
+        },
+        budgetOverrunReason: createListItem('delayed'),
+        onSchedule: false,
+      });
+
+      const sapCosts = {
+        [projectOne.id]: createSapCost('sap-cost-1', 2000000, 1000000),
+        [projectTwo.id]: createSapCost('sap-cost-2', 2000000, 1000000),
+      };
+
+      const currentYearSapValues = {
+        [projectOne.id]: createSapCost('sap-current-1', 500000, 250000),
+        [projectTwo.id]: createSapCost('sap-current-2', 500000, 250000),
+      };
+
+      const result = convertToGroupValues(
+        [projectOne, projectTwo],
+        forcedToFrameBudget,
+        sapCosts,
+        currentYearSapValues,
+      );
+
+      expect(result).toEqual({
+        spentBudget: '3,0',
+        budgetProposalCurrentYearPlus0: '9,0',
+        budgetProposalCurrentYearPlus1: '9,0',
+        budgetProposalCurrentYearPlus2: '9,0',
+        costForecastDeviation: '1,0',
+        isProjectOnSchedule: 'option.false',
+        costForecastDeviationPercent: '13%',
+        currentYearSapCost: '0,8',
+        beforeCurrentYearSapCosts: '2,3',
+        budgetOverrunReason: 'Project One: Custom reason\nProject Two: option.delayed',
+      });
+    });
+
+    it('should aggregate project and SAP costs from projects with distinct sapProject values', () => {
+      const forcedToFrameBudget = '5000';
+      const currentYear = new Date().getFullYear();
+
+      const projectAlpha = createProject({
+        id: 'project-alpha',
+        name: 'Project Alpha',
+        spentBudget: '1000',
+        sapProject: 'sap-alpha',
+        projectGroup: 'group-alpha',
+        finances: {
+          year: currentYear,
+          budgetProposalCurrentYearPlus0: '5000',
+          budgetProposalCurrentYearPlus1: '6000',
+          budgetProposalCurrentYearPlus2: '7000',
+        },
+      });
+
+      const projectBeta = createProject({
+        id: 'project-beta',
+        name: 'Project Beta',
+        spentBudget: '2000',
+        sapProject: 'sap-beta',
+        projectGroup: 'group-alpha',
+        finances: {
+          year: currentYear,
+          budgetProposalCurrentYearPlus0: '3000',
+          budgetProposalCurrentYearPlus1: '2000',
+          budgetProposalCurrentYearPlus2: '1000',
+        },
+      });
+
+      const sapCosts = {
+        [projectAlpha.id]: createSapCost('sap-cost-alpha', 2000000, 1000000),
+        [projectBeta.id]: createSapCost('sap-cost-beta', 1000000, 2000000),
+      };
+
+      const currentYearSapValues = {
+        [projectAlpha.id]: createSapCost('sap-current-alpha', 500000, 500000),
+        [projectBeta.id]: createSapCost('sap-current-beta', 250000, 250000),
+      };
+
+      const result = convertToGroupValues(
+        [projectAlpha, projectBeta],
+        forcedToFrameBudget,
+        sapCosts,
+        currentYearSapValues,
+      );
+
+      expect(result).toEqual({
+        spentBudget: '3,0',
+        budgetProposalCurrentYearPlus0: '8,0',
+        budgetProposalCurrentYearPlus1: '8,0',
+        budgetProposalCurrentYearPlus2: '8,0',
+        costForecastDeviation: '3,0',
+        isProjectOnSchedule: 'option.true',
+        costForecastDeviationPercent: '60%',
+        currentYearSapCost: '1,5',
+        beforeCurrentYearSapCosts: '4,5',
+        budgetOverrunReason: '',
+      });
+    });
+
+    it('should handle empty values and missing optional data gracefully', () => {
+      const currentYear = new Date().getFullYear();
+      const project = createProject({
+        id: 'project-zero',
+        name: 'Zero Project',
+        finances: {
+          year: currentYear,
+        },
+      });
+
+      const result = convertToGroupValues([project], undefined);
+
+      expect(result).toEqual({
+        spentBudget: '0,0',
+        budgetProposalCurrentYearPlus0: '0,0',
+        budgetProposalCurrentYearPlus1: '0,0',
+        budgetProposalCurrentYearPlus2: '0,0',
+        costForecastDeviation: '0,0',
+        isProjectOnSchedule: 'option.true',
+        costForecastDeviationPercent: '100%',
+        currentYearSapCost: '0,0',
+        beforeCurrentYearSapCosts: '0,0',
+        budgetOverrunReason: '',
+      });
     });
   });
 });
