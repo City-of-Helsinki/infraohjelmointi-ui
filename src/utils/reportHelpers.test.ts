@@ -1,4 +1,11 @@
-import { convertToGroupValues, frameBudgetHandler } from './reportHelpers';
+import { IProject } from '@/interfaces/projectInterfaces';
+import {
+  convertToGroupValues,
+  frameBudgetHandler,
+  getIsGroupOnSchedule,
+  getIsProjectOnSchedule,
+  isProjectOnSchedule,
+} from './reportHelpers';
 import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
 
 jest.mock('i18next', () => ({
@@ -427,6 +434,107 @@ describe('reportHelpers', () => {
         currentYearSapCost: '0,0',
         beforeCurrentYearSapCosts: '0,0',
         budgetOverrunReason: '',
+      });
+    });
+  });
+
+  describe('schedule helpers', () => {
+    describe('isProjectOnSchedule', () => {
+      const cases: Array<{
+        label: string;
+        budgetOverrunReason: string | undefined;
+        onSchedule: boolean | null | undefined;
+        expected: boolean;
+      }> = [
+        {
+          label: 'no budget overrun reason returns true',
+          budgetOverrunReason: undefined,
+          onSchedule: null,
+          expected: true,
+        },
+        {
+          label: 'earlierSchedule reason returns true even',
+          budgetOverrunReason: 'earlierSchedule',
+          onSchedule: null,
+          expected: true,
+        },
+        {
+          label: 'totalCostsClarification reason returns true',
+          budgetOverrunReason: 'totalCostsClarification',
+          onSchedule: null,
+          expected: true,
+        },
+        {
+          label: 'otherReason returns true while onSchedule is true',
+          budgetOverrunReason: 'otherReason',
+          onSchedule: true,
+          expected: true,
+        },
+        {
+          label: 'otherReason returns true while onSchedule is null',
+          budgetOverrunReason: 'otherReason',
+          onSchedule: null,
+          expected: true,
+        },
+        {
+          label: 'otherReason returns false when onSchedule is false',
+          budgetOverrunReason: 'otherReason',
+          onSchedule: false,
+          expected: false,
+        },
+        {
+          label: 'any other reason returns false',
+          budgetOverrunReason: 'delayed',
+          onSchedule: false,
+          expected: false,
+        },
+      ];
+
+      it.each(cases)('$label', ({ budgetOverrunReason, onSchedule, expected }) => {
+        expect(isProjectOnSchedule(budgetOverrunReason, onSchedule)).toBe(expected);
+      });
+    });
+
+    describe('getIsProjectOnSchedule', () => {
+      it('returns translated true when project is on schedule', () => {
+        expect(getIsProjectOnSchedule(undefined, true)).toBe('option.true');
+      });
+
+      it('returns translated false when project is not on schedule', () => {
+        expect(getIsProjectOnSchedule('delayed', false)).toBe('option.false');
+      });
+    });
+
+    describe('getIsGroupOnSchedule', () => {
+      const makeProject = (overrides: Partial<IProject> = {}) =>
+        createProject({
+          budgetOverrunReason: overrides.budgetOverrunReason,
+          onSchedule: overrides.onSchedule,
+        });
+
+      it('returns translated true when all projects are on schedule', () => {
+        const projects = [
+          makeProject({ onSchedule: true }),
+          makeProject({
+            budgetOverrunReason: createListItem('earlierSchedule'),
+            onSchedule: false,
+          }),
+          makeProject({
+            budgetOverrunReason: createListItem('otherReason'),
+            onSchedule: undefined,
+          }),
+        ];
+
+        expect(getIsGroupOnSchedule(projects)).toBe('option.true');
+      });
+
+      it('returns translated false when any project is not on schedule', () => {
+        const projects = [
+          makeProject({ budgetOverrunReason: createListItem('delayed'), onSchedule: true }),
+          makeProject({ budgetOverrunReason: createListItem('otherReason'), onSchedule: false }),
+        ];
+
+        expect(getIsGroupOnSchedule(projects)).toBe('option.false');
       });
     });
   });
