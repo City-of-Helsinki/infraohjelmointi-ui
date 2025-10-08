@@ -1761,7 +1761,6 @@ const strategyAndForecastRowObject = (reportName: string, row: IStrategyAndForec
     costPlan: row.costPlan, // TA value
     costForecast: row.costForecast ?? '', // TS value
     projectManager: row.projectManager ?? '',
-    // projectPhase: row.projectPhase ?? '',
     budgetOverrunReason: row.budgetOverrunReason ?? '',
     januaryStatus: row.januaryStatus ?? '',
     februaryStatus: row.februaryStatus ?? '',
@@ -2159,7 +2158,6 @@ function generateStrategyAndForecastCsvRows(
     [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
     [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]:
       r.projectManager,
-    // [`\n${t('projectPhase')}`]: r.projectPhase,
     [`\nTA ${reportYear}`]: r.costPlan,
     [`\nTS ${reportYear}`]: r.costForecast,
     ...(reportType === Reports.ForecastReport && {
