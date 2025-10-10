@@ -32,11 +32,7 @@ const styles = StyleSheet.create({
     ...cellStyles,
     width: '200px',
     paddingRight: '15px',
-    paddingLeft: '21px'
-  },
-  projectPhaseCell: {
-    ...cellStyles,
-    width: '100px',
+    paddingLeft: '21px',
   },
   budgetCell: {
     ...cellStyles,
@@ -45,7 +41,7 @@ const styles = StyleSheet.create({
   },
   monthCell: {
     ...cellStyles,
-    width: '30px'
+    width: '30px',
   },
   lastCell: {
     ...cellStyles,
@@ -64,27 +60,40 @@ interface StrategyTableHeaderProps {
   year?: number;
 }
 
-const StrategyAndForecastTableHeader = ({ isForecastReport, year = new Date().getFullYear() }: StrategyTableHeaderProps) => {
+const StrategyAndForecastTableHeader = ({
+  isForecastReport,
+  year = new Date().getFullYear(),
+}: StrategyTableHeaderProps) => {
   const { t } = useTranslation();
 
   return (
     <View style={styles.tableHeader}>
       <View style={styles.tableHeaderRow}>
         <Text style={styles.projectCell}>{`\n${t('report.strategy.projectNameTitle')}`}</Text>
-        <Text style={styles.projectManagerCell}>{`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`}</Text>
-        <Text style={styles.projectPhaseCell}>{`\n${t('projectPhase')}`}</Text>
-        <Text style={styles.budgetCell}>{`${t('report.shared.ta')} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
-        <Text style={styles.budgetCell}>{`${t('report.shared.ts')} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
-        {
-          isForecastReport ?
-            <>
-              <Text style={styles.budgetCell}>{`${t('report.forecastReport.forecastValue')} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
-              <Text style={styles.budgetCell}>{`${t('report.forecastReport.differenceValue')}\n${t('report.shared.kiloEuro')}`}</Text>
-            </> : null
-        }
-        {
-          isForecastReport && <Text style={styles.budgetOverrunReasonCell}>{`\n${t('report.constructionProgramForecast.differenceReasonTitle')}`}</Text>
-        }
+        <Text style={styles.projectManagerCell}>{`${t('report.strategy.projectsTitle')}\n${t(
+          'report.strategy.projectManagerTitle',
+        )}`}</Text>
+        <Text style={styles.budgetCell}>{`${t('report.shared.ta')} ${year}\n${t(
+          'report.shared.kiloEuro',
+        )}`}</Text>
+        <Text style={styles.budgetCell}>{`${t('report.shared.ts')} ${year}\n${t(
+          'report.shared.kiloEuro',
+        )}`}</Text>
+        {isForecastReport ? (
+          <>
+            <Text style={styles.budgetCell}>{`${t(
+              'report.forecastReport.forecastValue',
+            )} ${year}\n${t('report.shared.kiloEuro')}`}</Text>
+            <Text style={styles.budgetCell}>{`${t('report.forecastReport.differenceValue')}\n${t(
+              'report.shared.kiloEuro',
+            )}`}</Text>
+          </>
+        ) : null}
+        {isForecastReport && (
+          <Text style={styles.budgetOverrunReasonCell}>{`\n${t(
+            'report.constructionProgramForecast.differenceReasonTitle',
+          )}`}</Text>
+        )}
         <Text style={styles.monthCell}>{`${year}\n01`}</Text>
         <Text style={styles.monthCell}>{`\n02`}</Text>
         <Text style={styles.monthCell}>{`\n03`}</Text>
@@ -97,7 +106,7 @@ const StrategyAndForecastTableHeader = ({ isForecastReport, year = new Date().ge
         <Text style={styles.monthCell}>{`\n10`}</Text>
         <Text style={styles.monthCell}>{`\n11`}</Text>
         <Text style={styles.monthCell}>{`\n12`}</Text>
-        <Text style={styles.lastCell}/>
+        <Text style={styles.lastCell} />
       </View>
     </View>
   );
