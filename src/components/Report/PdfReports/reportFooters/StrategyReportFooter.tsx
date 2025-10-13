@@ -16,13 +16,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
   },
-  text: {
-    display: 'flex',
-    flexDirection: 'column',
-    fontSize: '9px',
-  },
   infoBoxes: {
-    marginLeft: '670px',
+    marginLeft: '770px',
     marginTop: '2px',
   },
   blackInfoBox: {
@@ -51,14 +46,12 @@ const styles = StyleSheet.create({
 });
 
 interface IStrategyTableFooterProps {
-  infoText: string;
   colorInfoTextOne: string;
   colorInfoTextTwo: string;
   colorInfoTextThree: string;
 }
 
 const StrategyTableFooter: FC<IStrategyTableFooterProps> = ({
-  infoText,
   colorInfoTextOne,
   colorInfoTextTwo,
   colorInfoTextThree,
@@ -66,9 +59,6 @@ const StrategyTableFooter: FC<IStrategyTableFooterProps> = ({
   return (
     <View fixed style={styles.footer}>
       <View style={styles.textAndLogo}>
-        <View style={styles.text}>
-          <Text>{infoText}</Text>
-        </View>
         <View style={styles.infoBoxes}>
           <Text style={styles.blackInfoBox}></Text>
           <Text style={styles.greenInfoBox}></Text>
