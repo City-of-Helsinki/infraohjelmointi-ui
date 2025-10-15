@@ -198,7 +198,6 @@ export interface IStrategyAndForecastTableRow extends ITableRowEssentials {
   children: Array<IStrategyAndForecastTableRow>;
   type: ReportTableRowType;
   projectManager?: string;
-  projectPhase?: string;
   costPlan?: string;
   costForecast?: string;
   costForcedToFrameBudget?: string;
@@ -317,17 +316,17 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
 }
 
 export interface IOperationalEnvironmentAnalysisSummaryCategoryRowData {
-    costForecast: string;
-    TAE: string;
-    TSE1: string;
-    TSE2: string;
-    initial1: string;
-    initial2: string;
-    initial3: string;
-    initial4: string;
-    initial5: string;
-    initial6: string;
-    initial7: string;
+  costForecast: string;
+  TAE: string;
+  TSE1: string;
+  TSE2: string;
+  initial1: string;
+  initial2: string;
+  initial3: string;
+  initial4: string;
+  initial5: string;
+  initial6: string;
+  initial7: string;
 }
 
 export interface IOperationalEnvironmentAnalysisSummaryCategoryRow {

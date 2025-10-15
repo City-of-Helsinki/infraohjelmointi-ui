@@ -177,87 +177,6 @@ const getPlannedBudgetsByCategories = (
   return totals;
 };
 
-const getProjectPhase = (
-  type: ReportType,
-  project: IProject,
-  year = new Date().getFullYear() + 1,
-) => {
-  const isForecastReport = type === Reports.ForecastReport;
-  const isStrategyReport = type === Reports.Strategy;
-
-  if (isForecastReport) return t(`option.${project.phase.value}`);
-
-  const yearStartDate = new Date(year, 0, 1);
-  const yearEndDate = new Date(year, 11, 0);
-  const dateFormat = 'DD.MM.YYYY';
-  const isPlanning = isStrategyReport
-    ? projectIsInPlanningPhase(
-        project.estPlanningStart,
-        yearStartDate,
-        project.estPlanningEnd,
-        yearEndDate,
-        project.planningStartYear,
-        dateFormat,
-      )
-    : projectIsInPlanningPhase(
-        project.frameEstPlanningStart,
-        yearStartDate,
-        project.frameEstPlanningEnd,
-        yearEndDate,
-        getYear(project.frameEstPlanningStart ?? ''),
-        dateFormat,
-      );
-  const isConstruction = isStrategyReport
-    ? projectIsInConstructionOrWarrantyPhase(
-        project.estConstructionStart,
-        yearStartDate,
-        project.estConstructionEnd,
-        yearEndDate,
-        project.estPlanningStart,
-        project.planningStartYear,
-        dateFormat,
-        'construction',
-      )
-    : projectIsInConstructionOrWarrantyPhase(
-        project.frameEstConstructionStart,
-        yearStartDate,
-        project.frameEstConstructionEnd,
-        yearEndDate,
-        project.frameEstPlanningStart,
-        getYear(project.frameEstPlanningStart ?? ''),
-        dateFormat,
-        'construction',
-      );
-  const isWarranty = isStrategyReport
-    ? projectIsInConstructionOrWarrantyPhase(
-        project.estWarrantyPhaseStart,
-        yearStartDate,
-        project.estWarrantyPhaseEnd,
-        yearEndDate,
-        project.estConstructionStart,
-        project.planningStartYear,
-        dateFormat,
-        'warranty',
-      )
-    : projectIsInConstructionOrWarrantyPhase(
-        project.frameEstWarrantyPhaseStart,
-        yearStartDate,
-        project.frameEstWarrantyPhaseEnd,
-        yearEndDate,
-        project.frameEstConstructionStart,
-        getYear(project.frameEstConstructionStart ?? ''),
-        dateFormat,
-        'warranty',
-      );
-
-  if (isPlanning && isConstruction) return 's r';
-  if (isConstruction && isWarranty) return 'r t';
-  if (isPlanning) return 's';
-  if (isConstruction) return 'r';
-  if (isWarranty) return 't';
-  return '';
-};
-
 const getStrategyReportProjectPhasePerMonth = (
   type: ReportType,
   project: IProject,
@@ -466,21 +385,21 @@ const isProjectInPlanningOrConstruction = (
   }
 };
 
-const isProjectOnSchedule = (
+export const isProjectOnSchedule = (
   budgetOverrunReason: string | undefined,
   onSchedule: boolean | undefined | null,
 ): boolean => {
   if (
     !budgetOverrunReason ||
     ['earlierSchedule', 'totalCostsClarification'].includes(budgetOverrunReason) ||
-    (budgetOverrunReason === 'otherReason' && onSchedule)
+    (budgetOverrunReason === 'otherReason' && onSchedule !== false)
   ) {
     return true;
   }
   return false;
 };
 
-const getIsProjectOnSchedule = (
+export const getIsProjectOnSchedule = (
   budgetOverrunReason: string | undefined,
   onSchedule: boolean | undefined | null,
 ): string => {
@@ -490,7 +409,7 @@ const getIsProjectOnSchedule = (
   return t('option.false');
 };
 
-const getIsGroupOnSchedule = (projects: IProject[]): string => {
+export const getIsGroupOnSchedule = (projects: IProject[]): string => {
   for (const p of projects) {
     if (!isProjectOnSchedule(p.budgetOverrunReason?.value, p.onSchedule)) {
       return t('option.false');
@@ -588,7 +507,6 @@ const convertToStrategyAndForecastReportProjects = (
       costForcedToFrameBudget: costForcedToFrameBudget, // Ennuste
       costForecastDeviation: costForecastDeviation, // Poikkeama
       projectManager: p.personPlanning?.lastName ?? t('report.strategy.projectManagerMissing'),
-      projectPhase: getProjectPhase(type, p, year),
       budgetOverrunReason: getBudgetOverrunReason(
         p.budgetOverrunReason?.value,
         p.otherBudgetOverrunReason,
@@ -1843,7 +1761,6 @@ const strategyAndForecastRowObject = (reportName: string, row: IStrategyAndForec
     costPlan: row.costPlan, // TA value
     costForecast: row.costForecast ?? '', // TS value
     projectManager: row.projectManager ?? '',
-    projectPhase: row.projectPhase ?? '',
     budgetOverrunReason: row.budgetOverrunReason ?? '',
     januaryStatus: row.januaryStatus ?? '',
     februaryStatus: row.februaryStatus ?? '',
@@ -2241,7 +2158,6 @@ function generateStrategyAndForecastCsvRows(
     [`\n${t('report.strategy.projectNameTitle')}`]: r.name,
     [`${t('report.strategy.projectsTitle')}\n${t('report.strategy.projectManagerTitle')}`]:
       r.projectManager,
-    [`\n${t('projectPhase')}`]: r.projectPhase,
     [`\nTA ${reportYear}`]: r.costPlan,
     [`\nTS ${reportYear}`]: r.costForecast,
     ...(reportType === Reports.ForecastReport && {
