@@ -146,6 +146,23 @@ describe('AdminView', () => {
       expect(await findByTestId('value-0')).toHaveTextContent('leikkipaikka');
     });
 
+    it('finds hashtags even if the search word casing differs', async () => {
+      const { findByTestId, user } = await render(null, '/admin/hashtags');
+
+      const searchInput = (await findByTestId('admin-hashtags-toolbar')).getElementsByTagName(
+        'input',
+      )[0];
+
+      await user.type(searchInput, 'TESTHASHTAG');
+
+      await waitFor(() => expect(screen.getByTestId('value-0')).toHaveTextContent('testhashtag1'));
+
+      for (let i = 1; i < 5; i++) {
+        expect(await findByTestId(`value-${i - 1}`)).toHaveTextContent(`testhashtag${i}`);
+      }
+      expect(screen.queryByTestId('value-4')).toBeNull();
+    });
+
     it('can archive a hashtag by patching', async () => {
       const patchHashtagResponse = {
         data: {
