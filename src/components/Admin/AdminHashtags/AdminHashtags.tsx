@@ -65,7 +65,7 @@ const AdminHashtags = () => {
   // Filter, slice and set hashtags and pagination variables based on the start and end indexes and search word
   useEffect(() => {
     const hashtagsForSearchWord = searchWord
-      ? allHashtags.filter((c) => c.value.includes(searchWord))
+      ? allHashtags.filter((c) => c.value.toLowerCase().includes(searchWord.toLowerCase()))
       : allHashtags;
 
     const hashtagsAmount = hashtagsForSearchWord.length;
