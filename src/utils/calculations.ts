@@ -181,13 +181,14 @@ export const calculateProjectRowSums = (project: IProject): IProjectSums => {
 
 export const calcPercentage = (value: number, total: number) => Math.round((value / total) * 100);
 
-export const keurToMillion = (value?: string | null | number) => {
+export const keurToMillion = (value?: string | null | number): string => {
   if (!value) return '0,0';
 
-  const valueAsNumber = typeof value !== 'number' ? formattedNumberToNumber(split(value, ".")[0]) : value;
+  const valueAsNumber =
+    typeof value !== 'number' ? formattedNumberToNumber(split(value, '.')[0]) : value;
   const millionValue = (valueAsNumber / 1000).toFixed(1);
 
-  return millionValue.toString().replace('.', ',');
+  return millionValue.replace('.', ',');
 };
 
 const roundUp = (number: number) => (number / 1000).toFixed(2);
@@ -201,6 +202,13 @@ export const convertToMillions = (value?: string | number): string => {
   return String(rounded);
 };
 
-export const sumCosts = (costs: IProjectSapCost | undefined | null, costType1: string, costType2: string): number => {
-  return costs ? (Number(costs[costType1 as keyof IProjectSapCost]) || 0) + (Number(costs[costType2 as keyof IProjectSapCost]) || 0) : 0;
-}
+export const sumCosts = (
+  costs: IProjectSapCost | undefined | null,
+  costType1: string,
+  costType2: string,
+): number => {
+  return costs
+    ? (Number(costs[costType1 as keyof IProjectSapCost]) || 0) +
+        (Number(costs[costType2 as keyof IProjectSapCost]) || 0)
+    : 0;
+};

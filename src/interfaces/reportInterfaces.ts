@@ -78,15 +78,7 @@ export interface IForecastTableCsvRow {
 }
 
 export interface IBudgetBookSummaryCsvRow {
-  [key: string]: string | IBudgetBookFinanceProperties | undefined;
-}
-
-export interface IOperationalEnvironmentAnalysisCsvRow {
-  [key: string]: string | IOperationalEnvironmentAnalysisFinanceProperties | undefined;
-}
-
-export interface IOperationalEnvironmentAnalysisSummaryCsvRow {
-  [key: string]: string | IOperationalEnvironmentAnalysisFinanceProperties | undefined | number;
+  [key: string]: string | undefined;
 }
 
 export enum Reports {
@@ -150,25 +142,25 @@ export interface IChild {
   plannedBudgets: IPlannedBudgets;
 }
 export interface IOperationalEnvironmentAnalysisFinanceProperties {
-  costForecast?: string;
-  TAE?: string;
-  TSE1?: string;
-  TSE2?: string;
-  initial1?: string;
-  initial2?: string;
-  initial3?: string;
-  initial4?: string;
-  initial5?: string;
-  initial6?: string;
-  initial7?: string;
-  [key: string]: string | undefined;
+  costForecast?: string | number;
+  TAE?: string | number;
+  TSE1?: string | number;
+  TSE2?: string | number;
+  initial1?: string | number;
+  initial2?: string | number;
+  initial3?: string | number;
+  initial4?: string | number;
+  initial5?: string | number;
+  initial6?: string | number;
+  initial7?: string | number;
 }
 
-export interface IFlattenedOperationalEnvironmentAnalysisProperties
+export interface IOperationalEnvironmentAnalysisCsvRow
   extends IOperationalEnvironmentAnalysisFinanceProperties {
-  id: string;
+  id?: string;
   name: string;
-  type: ReportTableRowType;
+  type?: ReportTableRowType;
+  description?: string;
 }
 
 export interface IBudgetBookFinanceProperties {
@@ -262,6 +254,20 @@ export interface IPlannedBudgets {
   plannedInitial7?: string;
 }
 
+export interface IPlannedBudgetsForCategories {
+  plannedCostForecast?: number;
+  plannedTAE?: number;
+  plannedTSE1?: number;
+  plannedTSE2?: number;
+  plannedInitial1?: number;
+  plannedInitial2?: number;
+  plannedInitial3?: number;
+  plannedInitial4?: number;
+  plannedInitial5?: number;
+  plannedInitial6?: number;
+  plannedInitial7?: number;
+}
+
 export interface ITotals {
   plannedCostForecast: number;
   plannedTAE: number;
@@ -296,7 +302,7 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
     updatedDate?: string;
     value?: string;
   };
-  plannedBudgetsForCategories?: IPlannedBudgets;
+  plannedBudgetsForCategories?: IPlannedBudgetsForCategories;
   frameBudgets: IOperationalEnvironmentAnalysisFinanceProperties;
   plannedBudgets: IPlannedBudgets;
   // muutospaine
@@ -316,17 +322,17 @@ export interface IOperationalEnvironmentAnalysisTableRow extends ITableRowEssent
 }
 
 export interface IOperationalEnvironmentAnalysisSummaryCategoryRowData {
-  costForecast: string;
-  TAE: string;
-  TSE1: string;
-  TSE2: string;
-  initial1: string;
-  initial2: string;
-  initial3: string;
-  initial4: string;
-  initial5: string;
-  initial6: string;
-  initial7: string;
+  costForecast: number;
+  TAE: number;
+  TSE1: number;
+  TSE2: number;
+  initial1: number;
+  initial2: number;
+  initial3: number;
+  initial4: number;
+  initial5: number;
+  initial6: number;
+  initial7: number;
 }
 
 export interface IOperationalEnvironmentAnalysisSummaryCategoryRow {

@@ -1,12 +1,14 @@
 import {
   IBudgetBookSummaryCsvRow,
   IConstructionProgramCsvRow,
-  IOperationalEnvironmentAnalysisSummaryCsvRow,
+  IOperationalEnvironmentAnalysisCsvRow,
 } from '@/interfaces/reportInterfaces';
 
 export const downloadCSV = (
   dataArray: (
-    IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow
+    | IConstructionProgramCsvRow
+    | IBudgetBookSummaryCsvRow
+    | IOperationalEnvironmentAnalysisCsvRow
   )[],
   filename = 'report.csv',
 ) => {
@@ -21,7 +23,10 @@ export const downloadCSV = (
 };
 
 export const arrayToCSV = (
-  dataArray: (IConstructionProgramCsvRow | IConstructionProgramCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow
+  dataArray: (
+    | IConstructionProgramCsvRow
+    | IConstructionProgramCsvRow
+    | IOperationalEnvironmentAnalysisCsvRow
   )[],
 ) => {
   const headers = Object.keys(dataArray[0])
