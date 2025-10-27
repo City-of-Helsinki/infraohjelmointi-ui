@@ -333,6 +333,14 @@ export const mockBudgetOverrunReasons: { data: Array<IListItem> } = {
       id: 'f5ae80e1-0eb4-421d-af5d-02068062dab8',
       value: 'earlierSchedule',
     },
+    {
+      id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+      value: 'annualCostDistributionClarification',
+    },
+    {
+      id: 'b2c3d4e5-f6g7-8901-2345-678901bcdefg',
+      value: 'planningCostsOrScheduleClarification',
+    },
   ],
 };
 

@@ -391,7 +391,12 @@ export const isProjectOnSchedule = (
 ): boolean => {
   if (
     !budgetOverrunReason ||
-    ['earlierSchedule', 'totalCostsClarification'].includes(budgetOverrunReason) ||
+    [
+      'earlierSchedule',
+      'totalCostsClarification',
+      'annualCostDistributionClarification',
+      'planningCostsOrScheduleClarification',
+    ].includes(budgetOverrunReason) ||
     (budgetOverrunReason === 'otherReason' && onSchedule !== false)
   ) {
     return true;
