@@ -95,16 +95,16 @@ export const calculateOperationalEnvironmentAnalysisCategorySums = (
 ) => {
   const sums: { [key: string]: number } = {};
 
-  categories.forEach((category) => {
-    Object.keys(category.data).forEach((keyString) => {
+  for (const category of categories) {
+    for (const keyString of Object.keys(category.data)) {
       const key = keyString as keyof IOperationalEnvironmentAnalysisSummaryCategoryRowData;
       if (!sums[key]) {
         sums[key] = category.data[key];
       } else {
         sums[key] = (sums[key] || 0) + category.data[key];
       }
-    });
-  });
+    }
+  }
 
   return sums;
 };

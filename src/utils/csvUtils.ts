@@ -23,11 +23,7 @@ export const downloadCSV = (
 };
 
 export const arrayToCSV = (
-  dataArray: (
-    | IConstructionProgramCsvRow
-    | IConstructionProgramCsvRow
-    | IOperationalEnvironmentAnalysisCsvRow
-  )[],
+  dataArray: (IConstructionProgramCsvRow | IOperationalEnvironmentAnalysisCsvRow)[],
 ) => {
   const headers = Object.keys(dataArray[0])
     .map((field) => `"${field}"`) // Wrap every field in quotes for consistency

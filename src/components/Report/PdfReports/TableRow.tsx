@@ -532,7 +532,7 @@ const getConstructionProgramForecastDeviationStyle = (deviationValueString: stri
   return styles.constructionForecastCellRed;
 };
 
-const STRATEGY_CLASS_NAME_TYPES = [
+const STRATEGY_CLASS_NAME_TYPES = new Set([
   'masterClass',
   'class',
   'subClass',
@@ -542,9 +542,9 @@ const STRATEGY_CLASS_NAME_TYPES = [
   'otherClassification',
   'districtPreview',
   'group',
-];
+]);
 
-const CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES = [
+const CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES = new Set([
   'masterClass',
   'class',
   'subClass',
@@ -553,9 +553,9 @@ const CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES = [
   'otherClassification',
   'districtPreview',
   'info',
-];
+]);
 
-const CONSTRUCTION_PROGRAM_FORECAST_CLASS_NAME_TYPES = [
+const CONSTRUCTION_PROGRAM_FORECAST_CLASS_NAME_TYPES = new Set([
   'masterClass',
   'class',
   'subClass',
@@ -565,7 +565,7 @@ const CONSTRUCTION_PROGRAM_FORECAST_CLASS_NAME_TYPES = [
   'otherClassification',
   'districtPreview',
   'info',
-];
+]);
 
 const STRATEGY_MONTH_KEYS = [
   'januaryStatus',
@@ -609,7 +609,7 @@ const StrategyAndForecastRow: FC<IStrategyAndForecastRowProps> = memo(
       >
         <Text
           style={
-            STRATEGY_CLASS_NAME_TYPES.includes(row.type ?? 'project')
+            STRATEGY_CLASS_NAME_TYPES.has(row.type ?? 'project')
               ? strategyReportStyles.classNameCell
               : strategyReportStyles.projectCell
           }
@@ -634,9 +634,7 @@ const StrategyAndForecastRow: FC<IStrategyAndForecastRowProps> = memo(
           <Text style={styles.budgetOverunReasonCell}>{row.budgetOverrunReason}</Text>
         )}
 
-        {STRATEGY_MONTH_KEYS.map((monthKey) =>
-          renderMonthCells(row[monthKey] as string | undefined, monthKey),
-        )}
+        {STRATEGY_MONTH_KEYS.map((monthKey) => renderMonthCells(row[monthKey], monthKey))}
         <View style={strategyReportStyles.lastCell}></View>
       </View>
     );
@@ -657,7 +655,7 @@ const ConstructionProgramRow: FC<IConstructionProgramRowProps> = memo(({ row, in
     <View wrap={false} style={getConstructionRowStyle(row.type ?? '', index)} key={row.id}>
       <Text
         style={
-          CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES.includes(row.type)
+          CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES.has(row.type)
             ? styles.classNameCell
             : styles.nameCell
         }
@@ -690,7 +688,7 @@ const ConstructionProgramForecastRow: FC<IConstructionProgramForecastRowProps> =
       <View wrap={false} style={getStrategyAndForecastRowStyle(row.type ?? '', index)} key={row.id}>
         <Text
           style={
-            CONSTRUCTION_PROGRAM_FORECAST_CLASS_NAME_TYPES.includes(row.type)
+            CONSTRUCTION_PROGRAM_FORECAST_CLASS_NAME_TYPES.has(row.type)
               ? styles.constructionForecastClassNameCell
               : styles.constructionForecastNameCell
           }

@@ -185,7 +185,7 @@ export const keurToMillion = (value?: string | null | number): string => {
   if (!value) return '0,0';
 
   const valueAsNumber =
-    typeof value !== 'number' ? formattedNumberToNumber(split(value, '.')[0]) : value;
+    typeof value === 'number' ? value : formattedNumberToNumber(split(value, '.')[0]);
   const millionValue = (valueAsNumber / 1000).toFixed(1);
 
   return millionValue.replace('.', ',');
