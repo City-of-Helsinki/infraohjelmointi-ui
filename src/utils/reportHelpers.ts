@@ -133,37 +133,31 @@ const getPlannedBudgetsByCategories = (
   };
   let totals = totalsParam || initialTotals;
 
+  const parseBudgetValue = (value?: string | null) => {
+    if (value == null) {
+      return 0;
+    }
+    const normalized = value.replace(/\s/g, '');
+    const parsed = Number(normalized);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+    return 0;
+  };
+
   classItem.projectRows.forEach((obj) => {
     if (obj.category?.value === category) {
-      totals.plannedCostForecast += Number(
-        obj.finances?.budgetProposalCurrentYearPlus0?.replace(/\s/g, ''),
-      );
-      totals.plannedTAE += Number(obj.finances?.budgetProposalCurrentYearPlus1?.replace(/\s/g, ''));
-      totals.plannedTSE1 += Number(
-        obj.finances?.budgetProposalCurrentYearPlus2?.replace(/\s/g, ''),
-      );
-      totals.plannedTSE2 += Number(obj.finances?.preliminaryCurrentYearPlus3?.replace(/\s/g, ''));
-      totals.plannedInitial1 += Number(
-        obj.finances?.preliminaryCurrentYearPlus4?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial2 += Number(
-        obj.finances?.preliminaryCurrentYearPlus5?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial3 += Number(
-        obj.finances?.preliminaryCurrentYearPlus6?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial4 += Number(
-        obj.finances?.preliminaryCurrentYearPlus7?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial5 += Number(
-        obj.finances?.preliminaryCurrentYearPlus8?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial6 += Number(
-        obj.finances?.preliminaryCurrentYearPlus9?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial7 += Number(
-        obj.finances?.preliminaryCurrentYearPlus10?.replace(/\s/g, ''),
-      );
+      totals.plannedCostForecast += parseBudgetValue(obj.finances?.budgetProposalCurrentYearPlus0);
+      totals.plannedTAE += parseBudgetValue(obj.finances?.budgetProposalCurrentYearPlus1);
+      totals.plannedTSE1 += parseBudgetValue(obj.finances?.budgetProposalCurrentYearPlus2);
+      totals.plannedTSE2 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus3);
+      totals.plannedInitial1 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus4);
+      totals.plannedInitial2 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus5);
+      totals.plannedInitial3 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus6);
+      totals.plannedInitial4 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus7);
+      totals.plannedInitial5 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus8);
+      totals.plannedInitial6 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus9);
+      totals.plannedInitial7 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus10);
     }
   });
 
