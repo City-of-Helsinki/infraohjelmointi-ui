@@ -18,7 +18,6 @@ import {
   IForecastTableCsvRow,
   IOperationalEnvironmentAnalysisSummaryCategoryRow,
   IOperationalEnvironmentAnalysisSummaryRow,
-  IOperationalEnvironmentAnalysisSummaryCsvRow,
   IOperationalEnvironmentAnalysisSummaryCategoryRowData,
 } from '@/interfaces/reportInterfaces';
 import {
@@ -134,37 +133,31 @@ const getPlannedBudgetsByCategories = (
   };
   let totals = totalsParam || initialTotals;
 
+  const parseBudgetValue = (value?: string | null) => {
+    if (value == null) {
+      return 0;
+    }
+    const normalized = value.replace(/\s/g, '');
+    const parsed = Number(normalized);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+    return 0;
+  };
+
   classItem.projectRows.forEach((obj) => {
     if (obj.category?.value === category) {
-      totals.plannedCostForecast += Number(
-        obj.finances?.budgetProposalCurrentYearPlus0?.replace(/\s/g, ''),
-      );
-      totals.plannedTAE += Number(obj.finances?.budgetProposalCurrentYearPlus1?.replace(/\s/g, ''));
-      totals.plannedTSE1 += Number(
-        obj.finances?.budgetProposalCurrentYearPlus2?.replace(/\s/g, ''),
-      );
-      totals.plannedTSE2 += Number(obj.finances?.preliminaryCurrentYearPlus3?.replace(/\s/g, ''));
-      totals.plannedInitial1 += Number(
-        obj.finances?.preliminaryCurrentYearPlus4?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial2 += Number(
-        obj.finances?.preliminaryCurrentYearPlus5?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial3 += Number(
-        obj.finances?.preliminaryCurrentYearPlus6?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial4 += Number(
-        obj.finances?.preliminaryCurrentYearPlus7?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial5 += Number(
-        obj.finances?.preliminaryCurrentYearPlus8?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial6 += Number(
-        obj.finances?.preliminaryCurrentYearPlus9?.replace(/\s/g, ''),
-      );
-      totals.plannedInitial7 += Number(
-        obj.finances?.preliminaryCurrentYearPlus10?.replace(/\s/g, ''),
-      );
+      totals.plannedCostForecast += parseBudgetValue(obj.finances?.budgetProposalCurrentYearPlus0);
+      totals.plannedTAE += parseBudgetValue(obj.finances?.budgetProposalCurrentYearPlus1);
+      totals.plannedTSE1 += parseBudgetValue(obj.finances?.budgetProposalCurrentYearPlus2);
+      totals.plannedTSE2 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus3);
+      totals.plannedInitial1 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus4);
+      totals.plannedInitial2 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus5);
+      totals.plannedInitial3 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus6);
+      totals.plannedInitial4 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus7);
+      totals.plannedInitial5 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus8);
+      totals.plannedInitial6 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus9);
+      totals.plannedInitial7 += parseBudgetValue(obj.finances?.preliminaryCurrentYearPlus10);
     }
   });
 
@@ -1825,8 +1818,6 @@ const processForecastTableRows = (tableRows: IStrategyAndForecastTableRow[]) => 
   return forecastCsvRows;
 };
 
-const operationalEnvironmentAnalysisCsvRows: IBudgetBookSummaryCsvRow[] = [];
-
 const getOperationalEnvironmentAnalysisData = (
   tableRow: IOperationalEnvironmentAnalysisTableRow,
 ) => {
@@ -1906,17 +1897,17 @@ const getOperationalEnvironmentAnalysisSummaryData = (
         name: row.name,
         type: row.type,
         data: {
-          costForecast: row.plannedBudgetsForCategories?.plannedCostForecast ?? '0',
-          TAE: row.plannedBudgetsForCategories?.plannedTAE ?? '0',
-          TSE1: row.plannedBudgetsForCategories?.plannedTSE1 ?? '0',
-          TSE2: row.plannedBudgetsForCategories?.plannedTSE2 ?? '0',
-          initial1: row.plannedBudgetsForCategories?.plannedInitial1 ?? '0',
-          initial2: row.plannedBudgetsForCategories?.plannedInitial2 ?? '0',
-          initial3: row.plannedBudgetsForCategories?.plannedInitial3 ?? '0',
-          initial4: row.plannedBudgetsForCategories?.plannedInitial4 ?? '0',
-          initial5: row.plannedBudgetsForCategories?.plannedInitial5 ?? '0',
-          initial6: row.plannedBudgetsForCategories?.plannedInitial6 ?? '0',
-          initial7: row.plannedBudgetsForCategories?.plannedInitial7 ?? '0',
+          costForecast: row.plannedBudgetsForCategories?.plannedCostForecast ?? 0,
+          TAE: row.plannedBudgetsForCategories?.plannedTAE ?? 0,
+          TSE1: row.plannedBudgetsForCategories?.plannedTSE1 ?? 0,
+          TSE2: row.plannedBudgetsForCategories?.plannedTSE2 ?? 0,
+          initial1: row.plannedBudgetsForCategories?.plannedInitial1 ?? 0,
+          initial2: row.plannedBudgetsForCategories?.plannedInitial2 ?? 0,
+          initial3: row.plannedBudgetsForCategories?.plannedInitial3 ?? 0,
+          initial4: row.plannedBudgetsForCategories?.plannedInitial4 ?? 0,
+          initial5: row.plannedBudgetsForCategories?.plannedInitial5 ?? 0,
+          initial6: row.plannedBudgetsForCategories?.plannedInitial6 ?? 0,
+          initial7: row.plannedBudgetsForCategories?.plannedInitial7 ?? 0,
         },
       });
     }
@@ -1927,7 +1918,8 @@ const getOperationalEnvironmentAnalysisSummaryData = (
 
 export const processOperationalEnvironmentAnalysisTableRows = (
   tableRows: IOperationalEnvironmentAnalysisTableRow[],
-): IBudgetBookSummaryCsvRow[] => {
+  operationalEnvironmentAnalysisCsvRows: IOperationalEnvironmentAnalysisCsvRow[],
+): IOperationalEnvironmentAnalysisCsvRow[] => {
   tableRows.forEach((tableRow) => {
     const data = getOperationalEnvironmentAnalysisData(tableRow);
     if (!operationalEnvironmentAnalysisCsvRows.some((row) => row.id === tableRow.id)) {
@@ -1940,8 +1932,14 @@ export const processOperationalEnvironmentAnalysisTableRows = (
     }
     // Recursive calls for children and projects. These shouldn't be done in the fourth level anymore
     if (!/^\d \d\d \d\d \d\d/.test(tableRow.name)) {
-      processOperationalEnvironmentAnalysisTableRows(tableRow.projects);
-      processOperationalEnvironmentAnalysisTableRows(tableRow.children);
+      processOperationalEnvironmentAnalysisTableRows(
+        tableRow.projects,
+        operationalEnvironmentAnalysisCsvRows,
+      );
+      processOperationalEnvironmentAnalysisTableRows(
+        tableRow.children,
+        operationalEnvironmentAnalysisCsvRows,
+      );
     }
   });
   return operationalEnvironmentAnalysisCsvRows;
@@ -2049,8 +2047,9 @@ const processConstructionForecastReportRows = (tableRows: IConstructionProgramTa
  */
 export const flattenOperationalEnvironmentAnalysisTableRows = (
   tableRows: Array<IOperationalEnvironmentAnalysisTableRow>,
-): Array<IOperationalEnvironmentAnalysisCsvRow> =>
-  processOperationalEnvironmentAnalysisTableRows(tableRows).flat(Infinity);
+): Array<IOperationalEnvironmentAnalysisCsvRow> => {
+  return processOperationalEnvironmentAnalysisTableRows(tableRows, []).flat(Infinity);
+};
 
 export const flattenBudgetBookSummaryTableRows = (
   tableRows: Array<IBudgetBookSummaryTableRow>,
@@ -2202,7 +2201,6 @@ export const getReportData = async (
   | Array<IBudgetBookSummaryCsvRow>
   | Array<IStrategyTableCsvRow>
   | Array<IOperationalEnvironmentAnalysisCsvRow>
-  | Array<IOperationalEnvironmentAnalysisSummaryCsvRow>
 > => {
   const previousYear = year - 1;
 
@@ -2317,16 +2315,39 @@ export const getReportData = async (
         const summaryTableRows = summaryRows.map((r) => ({
           [t('report.operationalEnvironmentAnalysis.code')]: r.name,
           [t('report.operationalEnvironmentAnalysis.codeDescription')]: r.description,
-          [`${year} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.costForecast,
-          [`${year + 1} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TAE,
-          [`${year + 2} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TSE1,
-          [`${year + 3} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.TSE2,
-          [`${year + 4} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial1,
-          [`${year + 5} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial2,
-          [`${year + 6} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial3,
-          [`${year + 7} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial4,
-          [`${year + 8} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial5,
-          [`${year + 9} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: r.initial6,
+          [`${year} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.costForecast,
+          ),
+          [`${year + 1} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.TAE,
+          ),
+          [`${year + 2} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.TSE1,
+          ),
+          [`${year + 3} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.TSE2,
+          ),
+          [`${year + 4} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.initial1,
+          ),
+          [`${year + 5} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.initial2,
+          ),
+          [`${year + 6} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.initial3,
+          ),
+          [`${year + 7} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.initial4,
+          ),
+          [`${year + 8} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.initial5,
+          ),
+          [`${year + 9} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.initial6,
+          ),
+          [`${year + 10} ${t('report.operationalEnvironmentAnalysis.millionEuro')}`]: keurToMillion(
+            r.initial7,
+          ),
         }));
 
         const emptyRow = [
@@ -2343,6 +2364,7 @@ export const getReportData = async (
             initial4: '',
             initial5: '',
             initial6: '',
+            initial7: '',
           },
         ];
 
@@ -2400,7 +2422,12 @@ export const getReportData = async (
           [`${year + 10} ${t('report.shared.kiloEuro')}`]: r.initial7,
         }));
 
-        return [...summaryTableRows, ...emptyRow, analysisHeaderRow, ...analysisTableRows];
+        return [
+          ...summaryTableRows,
+          ...emptyRow,
+          analysisHeaderRow,
+          ...analysisTableRows,
+        ] as IOperationalEnvironmentAnalysisCsvRow[];
       }
       default:
         return [];
@@ -2441,7 +2468,7 @@ export const updateCategoryFiveTotals = (
 const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummaryRow[]) => {
   const currentYear = new Date().getFullYear();
 
-  const tableRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
+  const tableRows: IOperationalEnvironmentAnalysisCsvRow[] = [];
 
   summaryData.forEach((classRow) => {
     const categoryFiveTotal = {
@@ -2457,8 +2484,8 @@ const generateSummaryRows = (summaryData: IOperationalEnvironmentAnalysisSummary
       initial6: 0,
     };
 
-    const categoryRows: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
-    const categoryRowsK5: IOperationalEnvironmentAnalysisSummaryCsvRow[] = [];
+    const categoryRows: IOperationalEnvironmentAnalysisCsvRow[] = [];
+    const categoryRowsK5: IOperationalEnvironmentAnalysisCsvRow[] = [];
 
     const cRow = {
       name: classRow.name,
