@@ -52,31 +52,25 @@ const PlanningRow: FC<
     }
   }, [type, groupsExpanded, searchedProjectId]);
 
-  const resetSearchedProjectId = useCallback(() => {
-    setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
-  }, []);
-
   // Listens to the 'project' searchParam and sets the searchedProjectId and expanded to true if
   // the current row contains the project
   useEffect(() => {
     if (!search) {
-      resetSearchedProjectId();
+      setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
       return;
     }
 
     const projectId = new URLSearchParams(search).get('project');
 
     if (!projectId) {
-      if (projectId !== searchedProjectId) {
-        resetSearchedProjectId();
-      }
+      setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
       return;
     }
 
     const project = projectRows.filter((p) => p.id === projectId)[0];
 
     if (!project) {
-      resetSearchedProjectId();
+      setPlanningRowState((current) => ({ ...current, searchedProjectId: '' }));
       return;
     }
 
@@ -85,7 +79,7 @@ const PlanningRow: FC<
       searchedProjectId: project.id,
       expanded: true,
     }));
-  }, [search, projectRows, resetSearchedProjectId, searchedProjectId]);
+  }, [search, projectRows]);
 
   // Listens to searchedProjectId and scrolls the viewport to the project
   useEffect(() => {
