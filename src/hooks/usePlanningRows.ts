@@ -59,7 +59,7 @@ const sortSubClassesWithLuonnonsuojelualueetLast = (subClasses: Array<IClass>) =
   const others: Array<IClass> = [];
   const luonnonsuojelualueet: Array<IClass> = [];
 
-  subClasses.forEach((subClass) => {
+  for (const subClass of subClasses) {
     const normalizedName = subClass.name?.trim().toLocaleLowerCase('fi') ?? '';
     const isLuonnonsuojelualueet = normalizedName === 'luonnonsuojelualueet';
 
@@ -68,7 +68,7 @@ const sortSubClassesWithLuonnonsuojelualueetLast = (subClasses: Array<IClass>) =
     } else {
       others.push(subClass);
     }
-  });
+  }
 
   return [...others, ...luonnonsuojelualueet];
 };
