@@ -1,6 +1,9 @@
 import { selectBatchedPlanningClasses } from '@/reducers/classSlice';
 import { useAppDispatch, useAppSelector } from './common';
-import { selectBatchedPlanningLocations, selectPlanningSubDivisions } from '@/reducers/locationSlice';
+import {
+  selectBatchedPlanningLocations,
+  selectPlanningSubDivisions,
+} from '@/reducers/locationSlice';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 import { ILocation } from '@/interfaces/locationInterfaces';
@@ -48,19 +51,45 @@ const sortLocationsByName = (list: Array<ILocation>) =>
   );
 
 /**
+ * Reorders the given subclasses so that entries whose normalized Finnish name
+ * equals `"luonnonsuojelualueet"` are moved to the end, preserving the relative
+ * order of all other subclasses.
+ */
+const sortSubClassesWithLuonnonsuojelualueetLast = (subClasses: Array<IClass>) => {
+  const others: Array<IClass> = [];
+  const luonnonsuojelualueet: Array<IClass> = [];
+
+  subClasses.forEach((subClass) => {
+    const normalizedName = subClass.name?.trim().toLocaleLowerCase('fi') ?? '';
+    const isLuonnonsuojelualueet = normalizedName === 'luonnonsuojelualueet';
+
+    if (isLuonnonsuojelualueet) {
+      luonnonsuojelualueet.push(subClass);
+    } else {
+      others.push(subClass);
+    }
+  });
+
+  return [...others, ...luonnonsuojelualueet];
+};
+
+/**
  * Merges subclass finances with district frame budget data.
- * 
+ *
  * This function takes a subclass and its associated district location, then creates
  * a merged finances object where the frame budget values from the district are
  * applied to each year in the subclass finances while preserving all other
  * financial data from the subclass.
- * 
+ *
  * @param subClass - The class object containing financial data to be merged
  * @param districtForSubClass - Optional district location object containing frame budget data
  * @returns A new IClassFinances object with merged financial data, or the original
  *          subclass finances if no district is provided
  */
-function mergeSubClassFinancesWithDistrictFrameBudget(subClass: IClass, districtForSubClass?: ILocation): IClassFinances {
+function mergeSubClassFinancesWithDistrictFrameBudget(
+  subClass: IClass,
+  districtForSubClass?: ILocation,
+): IClassFinances {
   // Return original subclass finances if no matching district is found
   if (!districtForSubClass || subClass.name !== districtForSubClass.name) {
     return subClass.finances;
@@ -69,14 +98,14 @@ function mergeSubClassFinancesWithDistrictFrameBudget(subClass: IClass, district
   const { budgetOverrunAmount, projectBudgets, year, ...rest } = subClass.finances;
 
   const mergedFinances: IClassFinances = cloneDeep(subClass.finances);
-  
+
   for (const yearKey of Object.keys(rest) as Array<keyof typeof rest>) {
     mergedFinances[yearKey] = {
       ...subClass.finances[yearKey],
       frameBudget: districtForSubClass.finances[yearKey].frameBudget,
     };
   }
-  
+
   return mergedFinances;
 }
 
@@ -95,9 +124,10 @@ export const buildPlanningTableRows = (
   list: IPlanningRowList,
   projects: Array<IProject>,
   selections: IPlanningRowSelections,
-  subDivisions?: Array<ILocation>
+  subDivisions?: Array<ILocation>,
 ) => {
-  const { masterClasses, classes, subClasses, districts, divisions, otherClassifications, groups } = list;
+  const { masterClasses, classes, subClasses, districts, divisions, otherClassifications, groups } =
+    list;
   const { selectedMasterClass, selectedClass, selectedSubClass, selectedDistrict } = selections;
 
   const districtType = selectedDistrict ? 'district' : 'districtPreview';
@@ -114,11 +144,24 @@ export const buildPlanningTableRows = (
     defaultExpanded?: boolean,
     districtsForSubClass?: IClass[],
     subDivisions?: Array<ILocation>,
-    parentRowPath?: string
-  ) => buildPlanningRow({ item, type, projects, expanded: defaultExpanded, districtsForSubClass, subDivisions: subDivisions, parentRowPath: parentRowPath });
+    parentRowPath?: string,
+  ) =>
+    buildPlanningRow({
+      item,
+      type,
+      projects,
+      expanded: defaultExpanded,
+      districtsForSubClass,
+      subDivisions: subDivisions,
+      parentRowPath: parentRowPath,
+    });
 
   // Groups can get mapped under subClasses, districts and divisions and sorts them by name
-  const getSortedGroupRows = (id: string, type: PlanningRowType, parentRowPath: string | undefined) => {
+  const getSortedGroupRows = (
+    id: string,
+    type: PlanningRowType,
+    parentRowPath: string | undefined,
+  ) => {
     const filteredGroups = [];
     // Filter all groups under subClassDistrict
     if (type === 'subClassDistrict') {
@@ -238,12 +281,7 @@ export const buildPlanningTableRows = (
     );
 
     const subClassDistrictRows = {
-      ...getRow(
-        { ...subClass, finances },
-        subClassType,
-        !!selectedSubClass,
-        districtsForSubClass,
-      ),
+      ...getRow({ ...subClass, finances }, subClassType, !!selectedSubClass, districtsForSubClass),
       // DIVISIONS & GROUPS
       children: [
         // groups
@@ -278,7 +316,7 @@ export const buildPlanningTableRows = (
   // Map the selected districts divisions and the groups & projects that belong to those divisions
   const districtRows = districts.map((district) => {
     const divisionsForDistrict = divisions.filter((division) => division.parent === district.id);
-    const parentClassPath = parentClassForDistrict(district)?.path
+    const parentClassPath = parentClassForDistrict(district)?.path;
     return {
       ...getRow(district, districtType, true),
       // DIVISIONS & GROUPS
@@ -287,7 +325,11 @@ export const buildPlanningTableRows = (
         ...getSortedGroupRows(district.id, districtType, parentClassPath),
         // divisions
         ...sortLocationsByName(divisionsForDistrict).map((filteredDivision) => {
-          const groupsForDivision = getSortedGroupRows(filteredDivision.id, 'division', parentClassPath);
+          const groupsForDivision = getSortedGroupRows(
+            filteredDivision.id,
+            'division',
+            parentClassPath,
+          );
           return {
             ...getRow(filteredDivision, 'division', groupsForDivision.length > 0),
             // GROUPS (for division)
@@ -349,7 +391,7 @@ const usePlanningRows = () => {
       try {
         const year = startYear ?? new Date().getFullYear();
         const projects = await fetchProjectsByRelation(type as PlanningRowType, id, false, year);
-        dispatch(setProjects({mode, projects}));
+        dispatch(setProjects({ mode, projects }));
       } catch (e) {
         console.log('Error fetching projects for planning selections: ', e);
       }
@@ -371,7 +413,13 @@ const usePlanningRows = () => {
     }
 
     const { masterClasses, classes, subClasses, otherClassifications } = batchedPlanningClasses;
-    const { selectedClass, selectedDistrict, selectedMasterClass, selectedSubClass, selectedOtherClassification} = selections;
+    const {
+      selectedClass,
+      selectedDistrict,
+      selectedMasterClass,
+      selectedSubClass,
+      selectedOtherClassification,
+    } = selections;
     const { districts, divisions } = batchedPlanningLocations;
 
     const finalDistricts = [];
@@ -387,7 +435,9 @@ const usePlanningRows = () => {
     const list = {
       masterClasses: getSelectedOrAll(selectedMasterClass, masterClasses),
       classes: getSelectedOrAll(selectedClass, classes),
-      subClasses: getSelectedOrAll(selectedSubClass, subClasses),
+      subClasses: sortSubClassesWithLuonnonsuojelualueetLast(
+        getSelectedOrAll(selectedSubClass, subClasses),
+      ),
       collectiveSubLevels: [],
       districts: finalDistricts,
       otherClassifications: getSelectedOrAll(selectedOtherClassification, otherClassifications),
@@ -397,12 +447,24 @@ const usePlanningRows = () => {
     };
 
     const nextRows = buildPlanningTableRows(list, projects, selections, subDivisions);
-
     // Re-build planning rows if the existing rows are not equal
     if (!isEqual(nextRows, rows)) {
       dispatch(setPlanningRows(nextRows));
     }
-  }, [startYear, batchedPlanningClasses, batchedPlanningLocations, groups, projects, selections, mode, forcedToFrame, startYear, subDivisions, rows, dispatch]);
+  }, [
+    startYear,
+    batchedPlanningClasses,
+    batchedPlanningLocations,
+    groups,
+    projects,
+    selections,
+    mode,
+    forcedToFrame,
+    startYear,
+    subDivisions,
+    rows,
+    dispatch,
+  ]);
 };
 
 export default usePlanningRows;
