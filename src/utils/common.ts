@@ -1,4 +1,4 @@
-import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
+import { IClass, IClassFinances, IProjectClassOption } from '@/interfaces/classInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IAppForms, FormValueType, IGroupForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
@@ -257,10 +257,13 @@ export const classesToListItems = (classes: Array<IClass>): Array<IListItem> =>
     value: mc.name,
   }));
 
-export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
+export const classesToOptions = (classes: Array<IClass>): Array<IProjectClassOption> =>
   classes.map((mc) => ({
     value: mc.id,
     label: mc.name,
+    defaultProgrammer: mc.defaultProgrammer,
+    computedDefaultProgrammer: mc.computedDefaultProgrammer,
+    autoSelectSubClass: mc.autoSelectSubClass,
   }));
 
 export const setHoveredClassToMonth = (month: string) => {

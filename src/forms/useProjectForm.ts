@@ -24,7 +24,7 @@ import _ from 'lodash';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
 import { selectIsLoading, selectIsProjectCardLoading } from '@/reducers/loaderSlice';
-import { useLocationBasedProgrammer } from '@/hooks/useLocationBasedProgrammer';
+import { useProjectProgrammer } from '@/utils/projectProgrammerUtils';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -239,16 +239,14 @@ const useProjectForm = () => {
   const locationOptions = useLocationOptions(selections?.selectedLocation);
 
   // Get class-based programmer logic
-  const { getDefaultProgrammerFromClassHierarchy } = useLocationBasedProgrammer();
+  const { getProgrammerForClass } = useProjectProgrammer();
 
   // Set the default programmer based on class hierarchy
   const setDefaultProgrammerForClassHierarchy = useCallback(
     (masterClassId?: string, classId?: string, subClassId?: string) => {
-      const defaultProgrammer = getDefaultProgrammerFromClassHierarchy(
-        masterClassId,
-        classId,
-        subClassId,
-      );
+      // Use the most specific class ID (backend handles hierarchy via computedDefaultProgrammer)
+      const mostSpecificClassId = subClassId || classId || masterClassId;
+      const defaultProgrammer = getProgrammerForClass(mostSpecificClassId);
 
       if (defaultProgrammer) {
         // Convert the programmer to an option format
@@ -259,7 +257,7 @@ const useProjectForm = () => {
         setValue('personProgramming', programmerOption);
       }
     },
-    [getDefaultProgrammerFromClassHierarchy, setValue],
+    [getProgrammerForClass, setValue],
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected
@@ -294,6 +292,7 @@ const useProjectForm = () => {
 
   const setLocationSubClass = useCallback(
     (name: string) => {
+      // Use backend-computed autoSelectSubClass field instead of hardcoded logic
       const newSubClass = classOptions.subClasses.find(({ label }) => label.includes(name));
       if (newSubClass) {
         setValue('subClass', newSubClass);
@@ -313,11 +312,11 @@ const useProjectForm = () => {
 
       if (name === 'district') {
         setValue('division', { label: '', value: '' });
-        if (
-          ['suurpiiri', 'östersundom'].some((substring) =>
-            formValues.subClass.label.includes(substring),
-          )
-        ) {
+        // Use backend-computed autoSelectSubClass instead of hardcoded keywords
+        const selectedClass = classOptions.subClasses.find(
+          (sc) => sc.value === formValues.subClass.value,
+        );
+        if (selectedClass?.autoSelectSubClass) {
           setLocationSubClass(form.district.label);
         }
       }
@@ -338,7 +337,14 @@ const useProjectForm = () => {
         setDefaultProgrammerForClassHierarchy(masterClassId, classId, subClassId);
       }
     },
-    [setValue, formValues, setLocationSubClass, getValues, setDefaultProgrammerForClassHierarchy],
+    [
+      setValue,
+      formValues,
+      setLocationSubClass,
+      getValues,
+      setDefaultProgrammerForClassHierarchy,
+      classOptions.subClasses,
+    ],
   );
 
   // Listen to changes in the form value and set selected class or location if those properties are changed

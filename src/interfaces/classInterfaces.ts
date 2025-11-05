@@ -37,12 +37,16 @@ export interface IClass {
   parent: string | null;
   finances: IClassFinances;
   defaultProgrammer?: IProgrammer;
+  computedDefaultProgrammer?: IProgrammer;
+  autoSelectSubClass?: boolean;
 }
 
 export interface IProjectClassOption {
   value: string;
   label: string;
   defaultProgrammer?: IProgrammer;
+  computedDefaultProgrammer?: IProgrammer;
+  autoSelectSubClass?: boolean;
 }
 
 export interface IClassPatchRequest {

@@ -14,6 +14,7 @@ import {
   isUserOnlyProjectAreaPlanner,
   isUserPlanner,
 } from '@/utils/userRoleHelpers';
+import { IProjectClassOption } from '@/interfaces/classInterfaces';
 
 /**
  * Creates lists of masterClasses, classes and subClasses. If filtering is used, then all
@@ -70,7 +71,7 @@ const useClassOptions = (currentClass: string | undefined) => {
   }, [classes, currentClass, selectedClass, selectedSubClass, subClasses]);
 
   const getNextOtherClassifications = useCallback(() => {
-    if (selectedSubClass){
+    if (selectedSubClass) {
       const subClassParent = subClasses.find((sc) => sc.parent === selectedSubClass.parent);
       return otherClassifications.filter((oc) => oc.parent === subClassParent?.id);
     } else {
