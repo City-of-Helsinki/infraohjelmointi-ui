@@ -20,7 +20,7 @@ import {
   selectProjectDivisions,
   selectProjectSubDivisions,
 } from '@/reducers/listsSlice';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
 import { selectIsLoading, selectIsProjectCardLoading } from '@/reducers/loaderSlice';
@@ -360,93 +360,69 @@ const useProjectForm = () => {
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setValue, setSelectedClass, setSelectedLocation]);
+  }, [watch, setSelectedClass, setSelectedLocation]);
 
   const dispatch = useAppDispatch();
 
   // Track previous values to avoid unnecessary resets
   const [prevValues, setPrevValues] = useState(formValues);
 
-  // Updates form with the selectedProject from redux
+  // Reset form values when receiving project updates or when loading states settle
   useEffect(() => {
-    const currentState = getValues();
-    const inComingState = formValues;
-    const isSubmitting = formState.isSubmitting;
-    const sameValuesInStates = _.isEqual(currentState, inComingState);
-    const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project?.id;
-
-    // Only reset if values have actually changed
-    if (!_.isEqual(prevValues, formValues)) {
-      setPrevValues(formValues);
-
-      if (
-        (projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates) ||
-        (selectedProject !== null && projectMode === 'new')
-      ) {
-        reset(formValues);
-        if (projectMode === 'edit' && !isSubmitting) {
-          dispatch(
-            notifyInfo({
-              title: 'update',
-              message: 'projectUpdated',
-              type: 'toast',
-              duration: 3500,
-            }),
-          );
-        }
-      }
+    if (isEqual(prevValues, formValues)) {
+      return;
     }
-  }, [
-    project,
-    projectUpdate,
-    dispatch,
-    formState.isSubmitting,
-    formValues,
-    getValues,
-    projectMode,
-    reset,
-    selectedProject,
-    prevValues,
-  ]);
 
-  // Reset form values when loading states change - with comprehensive safeguards
-  useEffect(() => {
-    if (!isProjectCardLoading && !isLoading) {
-      // Only reset if ALL conditions are met:
-      // 1. Values have actually changed
-      // 2. Form is not dirty (no user changes)
-      // 3. Not currently submitting
-      // 4. We have legitimate new data to populate (not empty formValues)
-      // This prevents resetting user-entered data on page refresh or during user interaction
+    const isSubmitting = formState.isSubmitting;
+    const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project?.id;
+    const triggeredByProjectUpdate =
+      (projectMode === 'edit' && projectUpdateMatchesCurrentProject) ||
+      (projectMode === 'new' && selectedProject !== null);
 
+    const canResetAfterLoading = !isProjectCardLoading && !isLoading;
+    let triggeredByLoadingStates = false;
+
+    if (canResetAfterLoading) {
       const formIsDirty = formState.isDirty;
       const hasLegitimateData = Object.values(formValues).some((value) => {
         if (typeof value === 'string') return value.length > 0;
         if (typeof value === 'object' && value !== null) {
-          // For dropdown objects (IOption), check if they have a valid value
           return 'value' in value && value.value && String(value.value).length > 0;
         }
         return value !== null && value !== undefined;
       });
 
-      if (
-        !_.isEqual(prevValues, formValues) &&
-        !formIsDirty &&
-        !formState.isSubmitting &&
-        hasLegitimateData
-      ) {
-        setPrevValues(formValues);
-        reset(formValues);
+      triggeredByLoadingStates = !formIsDirty && !isSubmitting && hasLegitimateData;
+    }
+
+    if (triggeredByProjectUpdate || (canResetAfterLoading && triggeredByLoadingStates)) {
+      setPrevValues(formValues);
+      reset(formValues);
+
+      if (triggeredByProjectUpdate && projectMode === 'edit' && !isSubmitting) {
+        dispatch(
+          notifyInfo({
+            title: 'update',
+            message: 'projectUpdated',
+            type: 'toast',
+            duration: 3500,
+          }),
+        );
       }
     }
   }, [
-    isProjectCardLoading,
-    isLoading,
-    formValues,
-    reset,
-    prevValues,
+    dispatch,
     formState.isDirty,
     formState.isSubmitting,
+    formValues,
+    isLoading,
+    isProjectCardLoading,
+    prevValues,
+    project,
+    projectMode,
+    projectUpdate,
+    reset,
+    selectedProject,
   ]);
 
   return {
