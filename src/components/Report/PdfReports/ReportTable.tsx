@@ -96,7 +96,7 @@ const ReportTable: FC<IReportTableProps> = ({
       case Reports.Strategy:
         return <StrategyAndForecastTableHeader isForecastReport={false} year={year} />;
       case Reports.StrategyForcedToFrame:
-        return <StrategyAndForecastTableHeader isForecastReport={false} year={year + 1} />;
+        return <StrategyAndForecastTableHeader isForecastReport={false} year={year} />;
       case Reports.ForecastReport:
         return <StrategyAndForecastTableHeader isForecastReport={true} />;
       case Reports.ConstructionProgram:
