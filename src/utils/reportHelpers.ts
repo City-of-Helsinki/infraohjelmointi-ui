@@ -179,10 +179,8 @@ const getStrategyReportProjectPhasePerMonth = (
   const isForecastOrStrategyReport = [Reports.Strategy, Reports.ForecastReport].includes(
     type as Reports,
   );
-  const yearsForward = isForecastOrStrategyReport ? 0 : 1;
-  const currentYearPlusYearsForward = year + yearsForward;
-  const monthStartDate = new Date(currentYearPlusYearsForward, month - 1, 1);
-  const monthEndDate = new Date(currentYearPlusYearsForward, month, 0);
+  const monthStartDate = new Date(year, month - 1, 1);
+  const monthEndDate = new Date(year, month, 0);
   const dateFormat = 'DD.MM.YYYY';
 
   const planningStartYear = () => {
