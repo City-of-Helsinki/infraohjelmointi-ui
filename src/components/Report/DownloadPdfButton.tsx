@@ -17,7 +17,11 @@ import { IListItem } from '@/interfaces/common';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports, viewHasProjects } from './common';
+import {
+  getCoordinatorAndForcedToFrameRows,
+  getForcedToFrameDataForReports,
+  viewHasProjects,
+} from './common';
 import { getProjectSapCosts, getProjectSapCurrentYear } from '@/reducers/sapCostSlice';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
@@ -43,6 +47,8 @@ const getPdfDocument = (
   currentYearSapValues?: Record<string, IProjectSapCost>,
   year?: number,
 ) => {
+  const currentYear = new Date().getFullYear();
+
   const pdfDocument = {
     operationalEnvironmentAnalysis: (
       <ReportContainer
@@ -56,15 +62,25 @@ const getPdfDocument = (
         data={{ categories, rows }}
         reportType={Reports.OperationalEnvironmentAnalysisForcedToFrame}
         projectsInWarrantyPhase={projectsInWarrantyPhase}
-    />
+      />
     ),
     strategy: <ReportContainer data={{ rows }} reportType={Reports.Strategy} year={year} />,
     strategyForcedToFrame: (
-      <ReportContainer data={{ rows }} reportType={Reports.StrategyForcedToFrame} />
+      <ReportContainer
+        data={{ rows }}
+        reportType={Reports.StrategyForcedToFrame}
+        year={currentYear + 1}
+      />
     ),
-    forecastReport: <ReportContainer data={{ rows }} reportType={Reports.ForecastReport} forcedToFrameRows={forcedToFrameRows}/>,
+    forecastReport: (
+      <ReportContainer
+        data={{ rows }}
+        reportType={Reports.ForecastReport}
+        forcedToFrameRows={forcedToFrameRows}
+      />
+    ),
     constructionProgramForecast: (
-      <ReportContainer 
+      <ReportContainer
         data={{ rows, divisions, subDivisions }}
         reportType={Reports.ConstructionProgramForecast}
         forcedToFrameRows={forcedToFrameRows}
@@ -157,27 +173,65 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
         case Reports.ForecastReport: {
           // For ForecastReport report, we will fetch both coordinator and forceToFrame data
           // true = coordinatorData, false = forcedToFrameData
-          const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
-          const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
+          const resCoordinator = await getForcedToFrameDataForReports(
+            getForcedToFrameData,
+            type,
+            year,
+            true,
+          );
+          const resForcedToFrame = await getForcedToFrameDataForReports(
+            getForcedToFrameData,
+            type,
+            year,
+            false,
+          );
 
           if (viewHasProjects(resCoordinator)) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            document = getPdfDocument(type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows);
+            document = getPdfDocument(
+              type,
+              rows.coordinatorRows,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              rows.forcedToFrameRows,
+            );
           }
           break;
         }
         case Reports.ConstructionProgramForecast: {
           // For ForecastReport report, we will fetch both coordinator and forceToFrame data
           // true = coordinatorData, false = forcedToFrameData
-          const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
-          const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
+          const resCoordinator = await getForcedToFrameDataForReports(
+            getForcedToFrameData,
+            type,
+            year,
+            true,
+          );
+          const resForcedToFrame = await getForcedToFrameDataForReports(
+            getForcedToFrameData,
+            type,
+            year,
+            false,
+          );
           const resDivisions = await getDistricts();
           const divisions = getProjectDistricts(resDivisions, 'division');
           const subDivisions = getProjectDistricts(resDivisions, 'subDivision');
 
           if (viewHasProjects(resCoordinator)) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            document = getPdfDocument(type, rows.coordinatorRows, divisions, subDivisions, undefined, undefined, rows.forcedToFrameRows, projectSapCosts, projectCurrentYearSapValues);
+            document = getPdfDocument(
+              type,
+              rows.coordinatorRows,
+              divisions,
+              subDivisions,
+              undefined,
+              undefined,
+              rows.forcedToFrameRows,
+              projectSapCosts,
+              projectCurrentYearSapValues,
+            );
           }
           break;
         }
@@ -213,7 +267,17 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
 
           if (viewHasProjects(res)) {
             const planningRows = getPlanningRows(res);
-            document = getPdfDocument(type, planningRows, divisions, subDivisions, undefined, undefined, undefined, projectSapCosts, projectCurrentYearSapValues);
+            document = getPdfDocument(
+              type,
+              planningRows,
+              divisions,
+              subDivisions,
+              undefined,
+              undefined,
+              undefined,
+              projectSapCosts,
+              projectCurrentYearSapValues,
+            );
           }
           break;
         }
@@ -259,7 +323,17 @@ const DownloadPdfButton: FC<IDownloadPdfButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if ([Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport, Reports.OperationalEnvironmentAnalysis, Reports.OperationalEnvironmentAnalysisForcedToFrame].includes(type as Reports)) navigate(0);
+      if (
+        [
+          Reports.Strategy,
+          Reports.StrategyForcedToFrame,
+          Reports.ForecastReport,
+          Reports.OperationalEnvironmentAnalysis,
+          Reports.OperationalEnvironmentAnalysisForcedToFrame,
+        ].includes(type as Reports)
+      ) {
+        navigate(0);
+      }
     }
   }, [
     dispatch,

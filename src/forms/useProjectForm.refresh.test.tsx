@@ -28,9 +28,9 @@ jest.mock('@/hooks/useLocationOptions', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useLocationBasedProgrammer', () => ({
-  useLocationBasedProgrammer: () => ({
-    getDefaultProgrammerFromClassHierarchy: jest.fn(() => null),
+jest.mock('@/utils/projectProgrammerUtils', () => ({
+  useProjectProgrammer: () => ({
+    getProgrammerForClass: jest.fn(() => null),
   }),
 }));
 

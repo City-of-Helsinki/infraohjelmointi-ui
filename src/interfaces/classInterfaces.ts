@@ -1,3 +1,5 @@
+import { Option } from 'hds-react';
+
 export interface IClassBudgets {
   plannedBudget: number;
   frameBudget: number;
@@ -37,12 +39,14 @@ export interface IClass {
   parent: string | null;
   finances: IClassFinances;
   defaultProgrammer?: IProgrammer;
+  computedDefaultProgrammer?: IProgrammer;
+  autoSelectSubClass?: boolean;
 }
 
-export interface IProjectClassOption {
-  value: string;
-  label: string;
+export interface IProjectClassOption extends Option {
   defaultProgrammer?: IProgrammer;
+  computedDefaultProgrammer?: IProgrammer;
+  autoSelectSubClass?: boolean;
 }
 
 export interface IClassPatchRequest {
