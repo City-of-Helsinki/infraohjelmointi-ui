@@ -119,6 +119,8 @@
     "weatherConditionsChange": "Sääolosuhteista johtuva muutos",
     "contractorScheduleChange": "Urakan toteuttajasta johtuva aikataulumuutos",
     "cityPlanScheduleChange": "Asemakaavan aikataulumuutokset",
+    "annualCostDistributionClarification": "Vuosittaisen kustannusjaon tarkentuminen",
+    "planningCostsOrScheduleClarification": "Suunnittelukustannusten- tai aikataulun tarkentuminen",
     "otherReason": "Muu syy"
   },
   "validation": {

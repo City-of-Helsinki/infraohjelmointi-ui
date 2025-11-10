@@ -11,6 +11,7 @@ import { selectIsProjectSaving } from '@/reducers/projectSlice';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 import TextAreaField from '@/components/shared/TextAreaField';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
+import { Option } from 'hds-react';
 
 interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
@@ -25,9 +26,9 @@ interface IProjectFinancialSectionProps {
     sapCurrentYear: IProjectSapCost | null;
   };
   classOptions: {
-    masterClasses: IOption[];
-    classes: IOption[];
-    subClasses: IOption[];
+    masterClasses: Option[];
+    classes: Option[];
+    subClasses: Option[];
   };
   isInputDisabled: boolean;
   isUserOnlyViewer: boolean;
@@ -108,7 +109,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
 
   const renderSelectField = (
     name: string,
-    options: IOption[],
+    options: Option[],
     size: 'full' | 'lg' | undefined,
     shouldTranslate: boolean,
     userIsProjectManager?: boolean,

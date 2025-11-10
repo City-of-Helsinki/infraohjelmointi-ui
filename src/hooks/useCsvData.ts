@@ -8,12 +8,15 @@ import {
   IDownloadCsvButtonProps,
   IConstructionProgramCsvRow,
   IBudgetBookSummaryCsvRow,
-  IOperationalEnvironmentAnalysisSummaryCsvRow
+  IOperationalEnvironmentAnalysisCsvRow,
 } from '@/interfaces/reportInterfaces';
 import { getCoordinationTableRows } from './useCoordinationRows';
 import { getDistricts } from '@/services/listServices';
 import { getProjectDistricts } from '@/reducers/listsSlice';
-import { getCoordinatorAndForcedToFrameRows, getForcedToFrameDataForReports } from '@/components/Report/common';
+import {
+  getCoordinatorAndForcedToFrameRows,
+  getForcedToFrameDataForReports,
+} from '@/components/Report/common';
 
 export const useCsvData = ({
   type,
@@ -28,14 +31,20 @@ export const useCsvData = ({
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const [csvData, setCsvData] = useState<
-    Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow>
+    Array<
+      IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisCsvRow
+    >
   >([]);
   const LOADING_CSV_DATA = 'loading-csv-data';
 
   const getCsvData = async () => {
     try {
       dispatch(setLoading({ text: 'Loading csv data', id: LOADING_CSV_DATA }));
-      let data: Array<IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow> = [];
+      let data: Array<
+        | IConstructionProgramCsvRow
+        | IBudgetBookSummaryCsvRow
+        | IOperationalEnvironmentAnalysisCsvRow
+      > = [];
 
       switch (type) {
         case Reports.BudgetBookSummary:
@@ -51,7 +60,19 @@ export const useCsvData = ({
               res.projects,
               res.groupRes,
             );
-            data = await getReportData(t, type, coordinatorRows, undefined, undefined, undefined, undefined, undefined, undefined, undefined, year);
+            data = await getReportData(
+              t,
+              type,
+              coordinatorRows,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              year,
+            );
           }
           break;
         }
@@ -59,12 +80,33 @@ export const useCsvData = ({
         case Reports.ForecastReport: {
           // For ForecastReport report, we will fetch both coordinator and forceToFrame data
           // true = coordinatorData, false = forcedToFrameData
-          const resCoordinator = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, true);
-          const resForcedToFrame = await getForcedToFrameDataForReports(getForcedToFrameData, type, year, false);
+          const resCoordinator = await getForcedToFrameDataForReports(
+            getForcedToFrameData,
+            type,
+            year,
+            true,
+          );
+          const resForcedToFrame = await getForcedToFrameDataForReports(
+            getForcedToFrameData,
+            type,
+            year,
+            false,
+          );
 
           if (resCoordinator && resCoordinator.projects.length > 0) {
             const rows = await getCoordinatorAndForcedToFrameRows(resCoordinator, resForcedToFrame);
-            data = await getReportData(t, type, rows.coordinatorRows, undefined, undefined, undefined, undefined, rows.forcedToFrameRows, sapCosts, currentYearSapValues);
+            data = await getReportData(
+              t,
+              type,
+              rows.coordinatorRows,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              rows.forcedToFrameRows,
+              sapCosts,
+              currentYearSapValues,
+            );
           }
           break;
         }
@@ -110,7 +152,7 @@ export const useCsvData = ({
               undefined,
               undefined,
               sapCosts,
-              currentYearSapValues
+              currentYearSapValues,
             );
           }
           break;

@@ -1,5 +1,5 @@
 import { INavigationItem } from '@/interfaces/common';
-import { SideNavigation as HDSSideNavigation } from 'hds-react/components/SideNavigation';
+import { SideNavigation as HDSSideNavigation } from 'hds-react';
 import { FC, useState, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';

@@ -1,5 +1,5 @@
 import { FC, memo, ReactNode } from 'react';
-import { Dialog } from 'hds-react/components/Dialog';
+import { Dialog } from 'hds-react';
 
 interface IDialogWrapperProps {
   isOpen: boolean;

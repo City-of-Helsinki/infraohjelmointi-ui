@@ -1,7 +1,7 @@
-import { Button, ButtonPresetTheme, ButtonVariant } from 'hds-react/components/Button';
+import { Button, ButtonPresetTheme, ButtonVariant } from 'hds-react';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
-import { Dialog } from 'hds-react/components/Dialog';
+import { Dialog } from 'hds-react';
 import { useAppDispatch } from '@/hooks/common';
 import { deleteNoteThunk } from '@/reducers/noteSlice';
 import { useTranslation } from 'react-i18next';

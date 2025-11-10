@@ -1,5 +1,5 @@
 import { HookFormControlType } from '@/interfaces/formInterfaces';
-import { TextInput } from 'hds-react/components/TextInput';
+import { TextInput } from 'hds-react';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, MouseEvent, useCallback, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
@@ -21,14 +21,11 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
   const projectMode = useAppSelector(selectProjectMode);
   const user = useAppSelector(selectUser);
   const isOnlyViewer = isUserOnlyViewer(user);
-  const handleSetEditing = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
+  const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
 
-      setEditing((currentState) => !currentState);
-    },
-    [projectMode],
-  );
+    setEditing((currentState) => !currentState);
+  }, []);
 
   return (
     <div className="project-name-form">

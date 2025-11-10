@@ -1,6 +1,6 @@
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { SelectionGroup } from 'hds-react/components/SelectionGroup';
-import { RadioButton as HDSRadioButton } from 'hds-react/components/RadioButton';
+import { SelectionGroup } from 'hds-react';
+import { RadioButton as HDSRadioButton } from 'hds-react';
 import { ChangeEvent, FC, memo, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -43,15 +43,15 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({
       control={control as Control<FieldValues>}
       render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
-          {readOnly ?
+          {readOnly ? (
             <TextField
               name={''}
-              label={label ?? ""}
+              label={label ?? ''}
               control={control}
               readOnly={true}
               readOnlyValue={options.find((o) => o.value == valueToString(value))?.label}
             />
-          :
+          ) : (
             <SelectionGroup
               label={t(label) ?? ''}
               direction="horizontal"
@@ -73,7 +73,7 @@ const RadioCheckboxField: FC<IRadioCheckboxFieldProps> = ({
                 />
               ))}
             </SelectionGroup>
-          }
+          )}
         </div>
       )}
     />

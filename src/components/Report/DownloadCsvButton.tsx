@@ -7,14 +7,17 @@ import {
   IDownloadCsvButtonProps,
   IConstructionProgramCsvRow,
   IBudgetBookSummaryCsvRow,
-  IOperationalEnvironmentAnalysisSummaryCsvRow,
+  IOperationalEnvironmentAnalysisCsvRow,
 } from '@/interfaces/reportInterfaces';
 import './styles.css';
 
 import { useCsvData } from '@/hooks/useCsvData';
 import { downloadCSV } from '@/utils/csvUtils';
 
-type dataTypes = IConstructionProgramCsvRow | IBudgetBookSummaryCsvRow | IOperationalEnvironmentAnalysisSummaryCsvRow;
+type dataTypes =
+  | IConstructionProgramCsvRow
+  | IBudgetBookSummaryCsvRow
+  | IOperationalEnvironmentAnalysisCsvRow;
 
 const downloadIcon = <IconDownload />;
 
@@ -45,7 +48,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
           const value = (row[typedKey] ?? '') as string;
           acc[typedKey] = value ? value.replace(/\s/g, '') : '';
         } else {
-          acc[typedKey] = row[typedKey] ?? '';
+          acc[typedKey] = (row[typedKey] as string) ?? '';
         }
         return acc;
       }, {} as dataTypes);
@@ -61,9 +64,7 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
         const documentName = t(`report.${type}.documentName`);
         downloadCSV(
           data,
-          `${documentName} ${
-            ['strategyForcedToFrame'].includes(type) ? year + 1 : year
-          }.csv`,
+          `${documentName} ${['strategyForcedToFrame'].includes(type) ? year + 1 : year}.csv`,
         );
       } else {
         console.warn('No data available for CSV download.');
@@ -74,13 +75,17 @@ const DownloadCsvButton: FC<IDownloadCsvButtonProps> = ({
       // Workaround: Reload the page after downloading Strategy report
       // If the Strategy report with ForcedToFrame data is downloaded after coord. data
       // without refreshing the page, the report is fetched from cache and will show incorrect data.
-      if ([
-        Reports.Strategy,
-        Reports.StrategyForcedToFrame,
-        Reports.ForecastReport,
-        Reports.OperationalEnvironmentAnalysis,
-        Reports.OperationalEnvironmentAnalysisForcedToFrame
-      ].includes(type as Reports)) navigate(0);
+      if (
+        [
+          Reports.Strategy,
+          Reports.StrategyForcedToFrame,
+          Reports.ForecastReport,
+          Reports.OperationalEnvironmentAnalysis,
+          Reports.OperationalEnvironmentAnalysisForcedToFrame,
+        ].includes(type as Reports)
+      ) {
+        navigate(0);
+      }
     }
   };
 

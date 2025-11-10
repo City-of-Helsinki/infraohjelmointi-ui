@@ -1,4 +1,4 @@
-import { Button, ButtonSize } from 'hds-react/components/Button';
+import { Button, ButtonSize } from 'hds-react';
 import { IconArrowLeft } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';

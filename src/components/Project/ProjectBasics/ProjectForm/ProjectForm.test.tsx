@@ -21,7 +21,7 @@ import {
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
-import { waitFor, act, within, screen, fireEvent } from '@testing-library/react';
+import { waitFor, act, within, screen } from '@testing-library/react';
 import { Route } from 'react-router';
 import { resetProject, setProjectMode, setSelectedProject } from '@/reducers/projectSlice';
 import { Dispatch } from '@reduxjs/toolkit';
@@ -139,7 +139,7 @@ describe('projectForm', () => {
   });
 
   it('fills the fields with existing project data', async () => {
-    const { findByDisplayValue, findByText, findByTestId } = await render();
+    const { findByDisplayValue, findByText, findAllByText, findByTestId } = await render();
 
     const project = mockProject.data;
     const sapCostAll = mockAllSapCostsProject.data;
@@ -149,7 +149,7 @@ describe('projectForm', () => {
     const expectDisplayValue = async (value: string | undefined) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
-      expect(await findByText(option || '')).toBeInTheDocument();
+      expect((await findAllByText(new RegExp(option || '', 'i')))[0]).toBeInTheDocument();
     const expectRadioBoolean = async (testId: string, value: boolean) =>
       expect(((await findByTestId(testId)) as HTMLInputElement).checked).toBe(value);
     const expectPersonOption = async (person: IPerson) =>
@@ -388,9 +388,7 @@ describe('projectForm', () => {
 
     const formSubmitButton = await findByTestId('submit-project-button');
 
-    await user.click(
-      document.getElementById('select-field-area-toggle-button') as unknown as Element,
-    );
+    await user.click(screen.getByRole('combobox', { name: /area/i }));
     await user.click(await findByText('option.lansisatama'));
     await user.click(formSubmitButton);
 
@@ -543,9 +541,7 @@ describe('projectForm', () => {
     expect((descriptionField as HTMLInputElement).value.length).toBeGreaterThan(0);
 
     // select phase
-    await user.click(
-      parentContainer.querySelector('#select-field-phase-toggle-button') as HTMLElement,
-    );
+    await user.click(screen.getAllByRole('combobox', { name: /phase/i })[0]);
     await user.click(await within(parentContainer).findByText('option.proposal'));
 
     // save project
@@ -598,8 +594,8 @@ describe('projectForm', () => {
       expect(otherBudgetOverrunReasonField).toBeDisabled();
 
       await user.click(
-        await screen.findByRole('button', {
-          name: getFormField('budgetOverrunReason'),
+        await screen.findByRole('combobox', {
+          name: /budgetOverrunReason/i,
         }),
       );
       await user.click(await screen.findByText('option.otherReason'));
@@ -613,14 +609,14 @@ describe('projectForm', () => {
       const otherBudgetOverrunReasonField = await screen.findByRole('textbox', {
         name: getFormField('otherBudgetOverrunReason'),
       });
-      const budgetOverrunReasonSelect = await screen.findByRole('button', {
-        name: getFormField('budgetOverrunReason'),
+      const budgetOverrunReasonSelect = await screen.findByRole('combobox', {
+        name: /budgetOverrunReason/i,
       });
 
       await user.click(budgetOverrunReasonSelect);
       await user.click(await screen.findByText('option.otherReason'));
 
-      fireEvent.change(otherBudgetOverrunReasonField, { target: { value: 'Some reason' } });
+      await user.type(otherBudgetOverrunReasonField, 'Some reason');
       expect(otherBudgetOverrunReasonField).toHaveValue('Some reason');
 
       await user.click(budgetOverrunReasonSelect);
@@ -636,8 +632,8 @@ describe('projectForm', () => {
       expect(screen.queryByText(getFormField('onSchedule'))).not.toBeInTheDocument();
 
       await user.click(
-        await screen.findByRole('button', {
-          name: getFormField('budgetOverrunReason'),
+        await screen.findByRole('combobox', {
+          name: /budgetOverrunReason/i,
         }),
       );
       await user.click(await screen.findByText('option.otherReason'));

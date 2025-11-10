@@ -1,6 +1,6 @@
 import { useState, MouseEvent, FC, useCallback, memo } from 'react';
-import { Button, ButtonVariant } from 'hds-react/components/Button';
-import { Dialog } from 'hds-react/components/Dialog';
+import { Button, ButtonVariant } from 'hds-react';
+import { Dialog } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/Loader';
 

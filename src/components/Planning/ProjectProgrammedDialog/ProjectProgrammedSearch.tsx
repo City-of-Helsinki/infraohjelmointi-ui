@@ -1,6 +1,6 @@
 import { getSearchResults } from '@/services/projectServices';
 import { arrayHasValue } from '@/utils/common';
-import { SearchInput } from 'hds-react/components/SearchInput';
+import { SearchInput } from 'hds-react';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOptions } from '@/hooks/useOptions';

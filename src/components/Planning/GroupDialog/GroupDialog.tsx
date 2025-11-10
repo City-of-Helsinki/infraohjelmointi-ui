@@ -1,6 +1,6 @@
 import { useState, MouseEvent, FC, useCallback, useMemo, memo, useEffect } from 'react';
-import { Button, ButtonVariant } from 'hds-react/components/Button';
-import { Dialog } from 'hds-react/components/Dialog';
+import { Button, ButtonVariant } from 'hds-react';
+import { Dialog } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { TextField, SelectField } from '@/components/shared';
 import { IOption } from '@/interfaces/common';
@@ -61,41 +61,15 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const [showAdvanceFields, setShowAdvanceFields] = useState(false);
     const { formMethods, formValues, classOptions, locationOptions } = useGroupForm(projects, id);
-    const { handleSubmit, reset, getValues, setValue, control, watch } = formMethods;
+    const { handleSubmit, reset, getValues, control, watch } = formMethods;
 
-    const nameField = watch('name');
-    const masterClassField = watch('masterClass');
-    const classField = watch('class');
     const subClassField = watch('subClass');
-    const districtField = watch('district');
-    const divisionField = watch('division');
 
     useEffect(() => {
       if (formValues.district.value || formValues.division.value) {
         setShowAdvanceFields(true);
       }
     }, [formValues.district.value, formValues.division.value]);
-
-    const isButtonDisabled = useCallback(() => {
-      return (
-        !nameField ||
-        !masterClassField.value ||
-        !classField.value ||
-        (['suurpiiri', 'östersundom'].some((subClassSubstring) =>
-          subClassField.label.includes(subClassSubstring),
-        ) &&
-          !districtField.value)
-      );
-    }, [
-      districtField.value,
-      divisionField.value,
-      nameField,
-      showAdvanceFields,
-      subClassField.value,
-      locationOptions,
-      masterClassField.value,
-      classField.value,
-    ]);
 
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
@@ -117,7 +91,7 @@ const DialogContainer: FC<IDialogProps> = memo(
           search: `${createSearchParams(searchParams)}`,
         });
       },
-      [id, mode, navigate],
+      [mode, navigate, hierarchyDistricts, hierarchyDivisions],
     );
 
     const handleDialogClose = useCallback(() => {
@@ -162,8 +136,15 @@ const DialogContainer: FC<IDialogProps> = memo(
           }
         }
       },
-
-      [dispatch, handleDialogClose, navigate, editMode, id],
+      [
+        dispatch,
+        handleDialogClose,
+        editMode,
+        id,
+        hierarchyDistricts,
+        hierarchyDivisions,
+        navigateToGroupLocation,
+      ],
     );
 
     const handleOnSubmitForm = useCallback(
@@ -173,13 +154,10 @@ const DialogContainer: FC<IDialogProps> = memo(
       [handleSubmit, onSubmit],
     );
 
-    const toggleAdvanceFields = useCallback(
-      (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setShowAdvanceFields((current) => !current);
-      },
-      [setValue],
-    );
+    const toggleAdvanceFields = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      setShowAdvanceFields((current) => !current);
+    }, []);
 
     const { Header, Content, ActionButtons } = Dialog;
 
@@ -213,7 +191,7 @@ const DialogContainer: FC<IDialogProps> = memo(
 
     const getDivisionValidation = useCallback(() => {
       return {};
-    }, [locationOptions, customValidation, t]);
+    }, []);
     const advanceFieldIcons = useMemo(
       () => (showAdvanceFields ? <IconAngleUp /> : <IconAngleDown />),
       [showAdvanceFields],
@@ -358,7 +336,7 @@ const DialogContainer: FC<IDialogProps> = memo(
               <Button
                 onClick={handleOnSubmitForm}
                 data-testid={editMode ? 'save-group-button' : 'create-group-button'}
-                disabled={isButtonDisabled()}
+                disabled={!formMethods.formState.isValid}
               >
                 {editMode ? t('save') : t('groupForm.createGroup')}
               </Button>

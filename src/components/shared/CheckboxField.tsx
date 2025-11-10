@@ -1,5 +1,5 @@
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { Checkbox as HDSCheckbox } from 'hds-react/components/Checkbox';
+import { Checkbox as HDSCheckbox } from 'hds-react';
 import { FC, memo, useCallback } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

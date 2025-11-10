@@ -1,5 +1,4 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { IOption } from '@/interfaces/common';
 import { SearchOrder } from '@/interfaces/searchInterfaces';
 import {
   getSearchResultsThunk,
@@ -7,7 +6,7 @@ import {
   selectSearchOrder,
   setSearchOrder,
 } from '@/reducers/searchSlice';
-import { Select } from 'hds-react/components/Select';
+import { Option, Select } from 'hds-react';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,23 +16,26 @@ const SearchOrderDropdown = () => {
   const searchOrder = useAppSelector(selectSearchOrder);
   const lastSearchParams = useAppSelector(selectLastSearchParams);
 
-  const orders: Array<IOption> = [
-    { value: 'new', label: t('searchOrder.new') },
-    { value: 'old', label: t('searchOrder.old') },
-    { value: 'project', label: t('searchOrder.project') },
-    { value: 'group', label: t('searchOrder.group') },
-    { value: 'phase', label: t('searchOrder.phase') },
-  ];
+  const orders: Array<{ value: string; label: string }> = useMemo(
+    () => [
+      { value: 'new', label: t('searchOrder.new') },
+      { value: 'old', label: t('searchOrder.old') },
+      { value: 'project', label: t('searchOrder.project') },
+      { value: 'group', label: t('searchOrder.group') },
+      { value: 'phase', label: t('searchOrder.phase') },
+    ],
+    [t],
+  );
 
   const orderBy = useMemo(
-    () => orders[orders.findIndex((o) => o.value === searchOrder)],
-    [searchOrder],
+    () => orders[orders.findIndex((o) => o.value === searchOrder)].value,
+    [searchOrder, orders],
   );
 
   const handleOrderChange = useCallback(
-    (value: IOption) => {
-      dispatch(setSearchOrder(value.value as SearchOrder));
-      return dispatch(getSearchResultsThunk({ params: lastSearchParams }));
+    (_: Option[], clickedOption: Option) => {
+      dispatch(setSearchOrder(clickedOption.value as SearchOrder));
+      dispatch(getSearchResultsThunk({ params: lastSearchParams }));
     },
     [dispatch, lastSearchParams],
   );
@@ -42,10 +44,10 @@ const SearchOrderDropdown = () => {
     <div data-testid="search-order-dropdown">
       <Select
         className="custom-select w-80"
-        label={t('order')}
         options={orders}
-        defaultValue={orderBy}
+        value={orderBy}
         onChange={handleOrderChange}
+        texts={{ label: t('order') }}
       />
     </div>
   );

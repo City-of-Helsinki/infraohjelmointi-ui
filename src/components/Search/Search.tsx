@@ -1,7 +1,7 @@
 import useSearchForm from '@/forms/useSearchForm';
 import { ISearchForm } from '@/interfaces/formInterfaces';
-import { Button, ButtonVariant } from 'hds-react/components/Button';
-import { Dialog } from 'hds-react/components/Dialog';
+import { Button, ButtonVariant } from 'hds-react';
+import { Dialog } from 'hds-react';
 import { useCallback } from 'react';
 import { FormFieldLabel, SelectField } from '../shared';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
@@ -10,7 +10,7 @@ import FreeSearchForm from './FreeSearchForm';
 import { useNavigate } from 'react-router';
 import MultiSelectField from '../shared/MultiSelectField';
 import CheckboxField from '../shared/CheckboxField';
-import { Fieldset } from 'hds-react/components/Fieldset';
+import { Fieldset } from 'hds-react';
 import { useOptions } from '@/hooks/useOptions';
 import {
   getSearchResultsThunk,
@@ -112,7 +112,7 @@ const Search = () => {
               options={programmedYearMin}
               shouldTranslate={false}
             />
-            
+
             <SelectField
               {...formProps('programmedYearMax')}
               options={programmedYearMax}

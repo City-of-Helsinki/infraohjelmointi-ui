@@ -13,7 +13,14 @@ import {
   mockProjectClasses,
   mockSubClasses,
 } from '@/mocks/mockClasses';
-import { mockDistrictOptions, mockDistricts, mockDivisionOptions, mockDivisions, mockLocations, mockSubDivisionOptions } from '@/mocks/mockLocations';
+import {
+  mockDistrictOptions,
+  mockDistricts,
+  mockDivisionOptions,
+  mockDivisions,
+  mockLocations,
+  mockSubDivisionOptions,
+} from '@/mocks/mockLocations';
 import { CustomContextMenu } from '@/components/CustomContextMenu';
 import { mockGroups } from '@/mocks/mockGroups';
 import PlanningView from '@/views/PlanningView';
@@ -72,7 +79,7 @@ const render = async () =>
             phases: mockProjectPhases.data,
             projectDistricts: mockDistrictOptions.data,
             projectDivisions: mockDivisionOptions.data,
-            projectSubDivisions: mockSubDivisionOptions.data
+            projectSubDivisions: mockSubDivisionOptions.data,
           },
           auth: {
             ...store.getState().auth,
@@ -157,18 +164,18 @@ describe('GroupDialog', () => {
             name: 'Vanha yrttimaantie',
             projectClass: '507e3e63-0c09-4c19-8d09-43549dcc65c8',
             projectLocation: 'koilinen-district-test',
-            projectDistrict: 'test-mock-district-option-1'
+            projectDistrict: 'test-mock-district-option-1',
           },
         ],
         count: 1,
       },
     };
 
-
     mockedAxios.get.mockResolvedValue(mockSuggestionsResponse);
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
 
-    const { user, findAllByTestId, findByTestId, findByRole, findByText } = renderResult;
+    const { user, findAllByTestId, findByTestId, findByRole, findByText, findAllByText } =
+      renderResult;
     await user.click(await findByTestId('new-item-button'));
 
     expect(await findByTestId('open-summing-group-dialog')).toBeInTheDocument();
@@ -188,31 +195,31 @@ describe('GroupDialog', () => {
       document.getElementById('select-field-masterClass-toggle-button') as HTMLElement,
     );
 
-    const masterClassMenu = document.getElementById('select-field-masterClass-menu') as HTMLElement;
-    await user.click(
-      await within(masterClassMenu).findByText(matchExact('803 Kadut, liikenneväylät')),
-    );
+    const masterClassMenu = await findByRole('combobox', { name: /groupForm.masterClass/i });
+    await user.click(masterClassMenu);
+    await user.click((await findAllByText(matchExact('803 Kadut, liikenneväylät')))[1]);
 
-    await user.click(document.getElementById('select-field-class-toggle-button') as HTMLElement);
-    await user.click(await dialog.findByText(matchExact('Uudisrakentaminen')));
+    const classMenu = await findByRole('combobox', { name: /groupForm.class/i });
+    await user.click(classMenu);
+    await user.click(await findByText(matchExact('Uudisrakentaminen')));
 
-    await user.click(document.getElementById('select-field-subClass-toggle-button') as HTMLElement);
-    await user.click(await dialog.findByText(matchExact('Koillinen')));
+    const subClassMenu = await findByRole('combobox', { name: /groupForm.subClass/i });
+    await user.click(subClassMenu);
+    await user.click(await findByText(matchExact('Koillinen')));
 
     await user.click(await dialog.findByText(matchExact(`groupForm.openAdvanceFilters`)));
 
-    const districtMenu = document.getElementById('select-field-district-menu') as HTMLElement;
-    await user.click(document.getElementById('select-field-district-toggle-button') as HTMLElement);
-    await user.click(await within(districtMenu).findByText(matchExact('Koillinen')));
+    const districtMenu = await findByRole('combobox', { name: /groupForm.district/i });
+    await user.click(districtMenu);
+    await user.click((await findAllByText(matchExact('Koillinen')))[1]);
 
-    expect(
-      document.getElementById('select-field-division-toggle-button') as HTMLElement,
-    ).toBeInTheDocument();
+    expect(await findByRole('combobox', { name: /groupForm.division/i })).toBeInTheDocument();
 
-    expect(
-      document.getElementById('select-field-subDivision-toggle-button') as HTMLElement,
-    ).toBeInTheDocument();
-    await user.type(await dialog.findByText('groupForm.searchForProjects'), 'Vanha');
+    expect(await findByRole('combobox', { name: /groupForm.subDivision/i })).toBeInTheDocument();
+    await user.type(
+      await findByRole('combobox', { name: /groupForm.searchForProjects/i }),
+      'Vanha',
+    );
 
     await waitFor(async () => {
       const project = await dialog.findByText('Vanha yrttimaantie');

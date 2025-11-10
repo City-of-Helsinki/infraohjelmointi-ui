@@ -1,9 +1,7 @@
 import {
   IBudgetBookSummaryCsvRow,
   IConstructionProgramTableRow,
-  IFlattenedBudgetBookSummaryProperties,
   IOperationalEnvironmentAnalysisCsvRow,
-  IFlattenedOperationalEnvironmentAnalysisProperties,
   ReportType,
   Reports,
   IStrategyAndForecastTableRow,
@@ -405,22 +403,6 @@ const forecastReportStyles = StyleSheet.create({
   },
 });
 
-interface ITableRowProps {
-  flattenedRows?:
-    | IBudgetBookSummaryCsvRow[]
-    | IOperationalEnvironmentAnalysisCsvRow[]
-    | IConstructionProgramTableRow[]
-    | IStrategyAndForecastTableRow[];
-  index?: number;
-  reportType: ReportType;
-}
-
-interface IRowProps extends ITableRowProps {
-  flattenedRow?:
-    | IFlattenedBudgetBookSummaryProperties
-    | IFlattenedOperationalEnvironmentAnalysisProperties;
-}
-
 const getMonthCellStyle = (monthCell: string | undefined, side: string) => {
   const dividedCellStyles = {
     paddingLeft: '0px',
@@ -550,454 +532,410 @@ const getConstructionProgramForecastDeviationStyle = (deviationValueString: stri
   return styles.constructionForecastCellRed;
 };
 
+const STRATEGY_CLASS_NAME_TYPES = new Set([
+  'masterClass',
+  'class',
+  'subClass',
+  'subClassDistrict',
+  'subLevelDistrict',
+  'collectiveSubLevel',
+  'otherClassification',
+  'districtPreview',
+  'group',
+]);
+
+const CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES = new Set([
+  'masterClass',
+  'class',
+  'subClass',
+  'subClassDistrict',
+  'collectiveSubLevel',
+  'otherClassification',
+  'districtPreview',
+  'info',
+]);
+
+const CONSTRUCTION_PROGRAM_FORECAST_CLASS_NAME_TYPES = new Set([
+  'masterClass',
+  'class',
+  'subClass',
+  'subClassDistrict',
+  'collectiveSubLevel',
+  'subLevelDistrict',
+  'otherClassification',
+  'districtPreview',
+  'info',
+]);
+
+const STRATEGY_MONTH_KEYS = [
+  'januaryStatus',
+  'februaryStatus',
+  'marchStatus',
+  'aprilStatus',
+  'mayStatus',
+  'juneStatus',
+  'julyStatus',
+  'augustStatus',
+  'septemberStatus',
+  'octoberStatus',
+  'novemberStatus',
+  'decemberStatus',
+] as const satisfies Array<keyof IStrategyAndForecastTableRow>;
+
+interface IStrategyAndForecastRowProps {
+  row: IStrategyAndForecastTableRow;
+  index: number;
+  reportType: ReportType;
+}
+
+const StrategyAndForecastRow: FC<IStrategyAndForecastRowProps> = memo(
+  ({ row, index, reportType }) => {
+    const renderMonthCells = (status: string | undefined, monthKey: string) => {
+      if (['planningAndConstruction', 'constructionAndWarranty'].includes(status ?? '')) {
+        return [
+          <Text key={`${monthKey}-left`} style={getMonthCellStyle(status, 'left')}></Text>,
+          <Text key={`${monthKey}-right`} style={getMonthCellStyle(status, 'right')}></Text>,
+        ];
+      }
+
+      return <View key={monthKey} style={getMonthCellStyle(status, 'left')}></View>;
+    };
+
+    return (
+      <View
+        wrap={false}
+        style={getStrategyAndForecastRowStyle(row.type ?? '', index ?? 0)}
+        key={row.id}
+      >
+        <Text
+          style={
+            STRATEGY_CLASS_NAME_TYPES.has(row.type ?? 'project')
+              ? strategyReportStyles.classNameCell
+              : strategyReportStyles.projectCell
+          }
+        >
+          {row.name}
+        </Text>
+        <Text style={strategyReportStyles.projectManagerCell}>{row.projectManager}</Text>
+        <Text style={strategyReportStyles.budgetCell}>{row.costPlan}</Text>
+        {reportType !== Reports.ForecastReport && (
+          <Text style={strategyReportStyles.budgetCell}>{row.costForecast}</Text>
+        )}
+        {reportType === Reports.ForecastReport && (
+          <>
+            <Text style={strategyReportStyles.budgetCell}>{row.costForcedToFrameBudget}</Text>
+            <Text style={strategyReportStyles.budgetCell}>{row.costForecast}</Text>
+            <Text style={getForecastDeviationStyle(row.type, row.costForecastDeviation ?? '0')}>
+              {row.costForecastDeviation}
+            </Text>
+          </>
+        )}
+        {reportType === Reports.ForecastReport && (
+          <Text style={styles.budgetOverunReasonCell}>{row.budgetOverrunReason}</Text>
+        )}
+
+        {STRATEGY_MONTH_KEYS.map((monthKey) => renderMonthCells(row[monthKey], monthKey))}
+        <View style={strategyReportStyles.lastCell}></View>
+      </View>
+    );
+  },
+);
+
+StrategyAndForecastRow.displayName = 'StrategyAndForecastRow';
+
+interface IConstructionProgramRowProps {
+  row: IConstructionProgramTableRow;
+  index: number;
+}
+
+const ConstructionProgramRow: FC<IConstructionProgramRowProps> = memo(({ row, index }) => {
+  if (!row || (row.name === '' && row.type !== 'empty')) return null;
+
+  return (
+    <View wrap={false} style={getConstructionRowStyle(row.type ?? '', index)} key={row.id}>
+      <Text
+        style={
+          CONSTRUCTION_PROGRAM_CLASS_NAME_TYPES.has(row.type)
+            ? styles.classNameCell
+            : styles.nameCell
+        }
+      >
+        {row.name}
+      </Text>
+      <Text style={styles.divisionCell}>{row.location}</Text>
+      <Text style={styles.costForecastCell}>{row.costForecast}</Text>
+      <Text style={styles.planAndConStartCell}>{row.startAndEnd}</Text>
+      <Text style={styles.previouslyUsedCell}>{row.beforeCurrentYearSapCosts}</Text>
+      <Text style={styles.cell}>{row.budgetProposalCurrentYearPlus0}</Text>
+      <Text style={styles.cell}>{row.budgetProposalCurrentYearPlus1}</Text>
+      <Text style={styles.lastCell}>{row.budgetProposalCurrentYearPlus2}</Text>
+    </View>
+  );
+});
+
+ConstructionProgramRow.displayName = 'ConstructionProgramRow';
+
+interface IConstructionProgramForecastRowProps {
+  row: IConstructionProgramTableRow;
+  index: number;
+}
+
+const ConstructionProgramForecastRow: FC<IConstructionProgramForecastRowProps> = memo(
+  ({ row, index }) => {
+    if (!row || (row.name === '' && row.type !== 'empty')) return null;
+
+    return (
+      <View wrap={false} style={getStrategyAndForecastRowStyle(row.type ?? '', index)} key={row.id}>
+        <Text
+          style={
+            CONSTRUCTION_PROGRAM_FORECAST_CLASS_NAME_TYPES.has(row.type)
+              ? styles.constructionForecastClassNameCell
+              : styles.constructionForecastNameCell
+          }
+        >
+          {row.name}
+        </Text>
+        <Text style={styles.divisionCell}>{row.location}</Text>
+        <Text style={styles.constructionForecastCell}>{row.costForecast}</Text>
+        <Text style={styles.constructionForecastPlanAndConStartCell}>{row.startAndEnd}</Text>
+        <Text style={styles.constructionForecastCell}>{row.isProjectOnSchedule}</Text>
+        <Text style={styles.constructionForecastCell}>{row.beforeCurrentYearSapCosts}</Text>
+        <Text style={styles.constructionForecastCell}>{row.currentYearSapCost}</Text>
+        <Text style={styles.constructionForecastCell}>{row.costForcedToFrameBudget}</Text>
+        <Text style={styles.constructionForecastCell}>{row.budgetProposalCurrentYearPlus0}</Text>
+        <Text style={styles.constructionForecastCell}>{row.costForecastDeviation}</Text>
+        <Text
+          style={getConstructionProgramForecastDeviationStyle(row.costForecastDeviationPercent)}
+        >
+          {row.costForecastDeviationPercent}
+        </Text>
+        <Text style={styles.budgetOverunReasonCell}>{row.budgetOverrunReason}</Text>
+      </View>
+    );
+  },
+);
+
+ConstructionProgramForecastRow.displayName = 'ConstructionProgramForecastRow';
+
+interface IBudgetBookSummaryRowProps {
+  row: IBudgetBookSummaryCsvRow;
+  index: number;
+}
+
+const BudgetBookSummaryRow: FC<IBudgetBookSummaryRowProps> = memo(({ row, index }) => {
+  if (!row) return <View></View>;
+
+  const getStyle = () => {
+    const isFourthLevelRow = /^\d \d\d \d\d \d\d/.test(row.name ?? '');
+    const isDistrictOrCollectiveSubLevel =
+      row.objectType === 'districtPreview' || row.objectType === 'collectiveSubLevel';
+    const extraStyle = isDistrictOrCollectiveSubLevel
+      ? styles.districtOrCollectiveSubLevel
+      : styles.fourthLevel;
+    let defaultStyle;
+
+    if (
+      ['class', 'otherClassification', 'collectiveSubLevel'].includes(row.type ?? '') ||
+      row.type === 'investmentpart'
+    ) {
+      defaultStyle = styles.classNameTargetCell;
+    } else {
+      defaultStyle = styles.nameTargetCell;
+    }
+
+    return isFourthLevelRow || isDistrictOrCollectiveSubLevel
+      ? [defaultStyle, extraStyle]
+      : defaultStyle;
+  };
+
+  return (
+    <View
+      wrap={false}
+      style={index && index % 2 ? styles.evenRow : styles.oddRow}
+      key={row.id as string}
+    >
+      <Text style={getStyle()}>{row.name}</Text>
+      <Text style={styles.unBoldedColumns}>{row.usage}</Text>
+      <Text style={styles.unBoldedColumns}>{row.budgetEstimation}</Text>
+      <Text style={styles.narrowerColumns}>{row.budgetEstimationSuggestion}</Text>
+      <Text style={styles.narrowerColumns}>{row.budgetPlanSuggestion1}</Text>
+      <Text style={styles.narrowerColumns}>{row.budgetPlanSuggestion2}</Text>
+      <Text style={styles.widerColumns}>{row.initial1}</Text>
+      <Text style={styles.widerColumns}>{row.initial2}</Text>
+      <Text style={styles.widerColumns}>{row.initial3}</Text>
+      <Text style={styles.widerColumns}>{row.initial4}</Text>
+      <Text style={styles.widerColumns}>{row.initial5}</Text>
+      <Text style={styles.widerColumns}>{row.initial6}</Text>
+      <Text style={styles.lastWiderColumn}>{row.initial7}</Text>
+    </View>
+  );
+});
+
+BudgetBookSummaryRow.displayName = 'BudgetBookSummaryRow';
+
+interface IOperationalEnvironmentAnalysisRowProps {
+  row: IOperationalEnvironmentAnalysisCsvRow;
+  index: number;
+}
+
+const OperationalEnvironmentAnalysisRow: FC<IOperationalEnvironmentAnalysisRowProps> = memo(
+  ({ row, index }) => {
+    if (!row) return <View></View>;
+
+    const getNameStyle = () => {
+      if (row.type === 'taeFrame')
+        return [
+          operationalEnvironmentAnalysisStyles.targetColumn,
+          operationalEnvironmentAnalysisStyles.frame,
+        ];
+      if (row.type === 'changePressure')
+        return [
+          operationalEnvironmentAnalysisStyles.targetColumn,
+          operationalEnvironmentAnalysisStyles.changePressure,
+        ];
+      return [operationalEnvironmentAnalysisStyles.targetColumn];
+    };
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const nameStyle: any = getNameStyle();
+
+    const getColor = () => {
+      if (row.type === 'taeFrame') return operationalEnvironmentAnalysisStyles.frame;
+      if (row.type === 'changePressure') return operationalEnvironmentAnalysisStyles.changePressure;
+      return operationalEnvironmentAnalysisStyles.basicRow;
+    };
+    const color = getColor();
+
+    const shouldHaveIndentation =
+      row.type === 'taeFrame' || row.type === 'changePressure' || row.type === 'category';
+
+    if (shouldHaveIndentation) nameStyle.push(operationalEnvironmentAnalysisStyles.indentation);
+
+    return (
+      <View wrap={false} style={index && index % 2 ? styles.evenRow : styles.oddRow} key={row.id}>
+        <Text style={nameStyle}>{row.name}</Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
+          {row.costForecast}
+        </Text>
+        <Text
+          style={[
+            operationalEnvironmentAnalysisStyles.numberColumns,
+            color,
+            operationalEnvironmentAnalysisStyles.tae,
+          ]}
+        >
+          {row.TAE}
+        </Text>
+        <Text
+          style={[
+            operationalEnvironmentAnalysisStyles.numberColumns,
+            color,
+            operationalEnvironmentAnalysisStyles.tse1,
+          ]}
+        >
+          {row.TSE1}
+        </Text>
+        <Text
+          style={[
+            operationalEnvironmentAnalysisStyles.numberColumns,
+            color,
+            operationalEnvironmentAnalysisStyles.tse2,
+          ]}
+        >
+          {row.TSE2}
+        </Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
+          {row.initial1}
+        </Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
+          {row.initial2}
+        </Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
+          {row.initial3}
+        </Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
+          {row.initial4}
+        </Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
+          {row.initial5}
+        </Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
+          {row.initial6}
+        </Text>
+        <Text style={[operationalEnvironmentAnalysisStyles.lastNumberColumn, color]}>
+          {row.initial7}
+        </Text>
+      </View>
+    );
+  },
+);
+
+OperationalEnvironmentAnalysisRow.displayName = 'OperationalEnvironmentAnalysisRow';
+
+type FlattenedRow =
+  | IBudgetBookSummaryCsvRow
+  | IOperationalEnvironmentAnalysisCsvRow
+  | IConstructionProgramTableRow
+  | IStrategyAndForecastTableRow;
+
+interface ITableRowProps {
+  flattenedRows?: FlattenedRow[];
+  index?: number;
+  reportType: ReportType;
+}
+
+interface IRowProps extends ITableRowProps {
+  flattenedRow?: FlattenedRow;
+}
+
 const Row: FC<IRowProps> = memo(({ flattenedRow, index, reportType }) => {
-  let tableRow;
+  if (!flattenedRow) {
+    return <View></View>;
+  }
+
+  const rowIndex = index ?? 0;
+
   switch (reportType) {
     case Reports.ForecastReport:
     case Reports.Strategy:
-    case Reports.StrategyForcedToFrame: {
-      const classNameTypes = [
-        'masterClass',
-        'class',
-        'subClass',
-        'subClassDistrict',
-        'subLevelDistrict',
-        'collectiveSubLevel',
-        'otherClassification',
-        'districtPreview',
-        'group',
-      ];
-
-      if (flattenedRow) {
-        tableRow = (
-          <View
-            wrap={false}
-            style={getStrategyAndForecastRowStyle(flattenedRow.type ?? '', index ?? 0)}
-            key={flattenedRow.id}
-          >
-            <Text
-              style={
-                classNameTypes.includes(flattenedRow.type ?? '')
-                  ? strategyReportStyles.classNameCell
-                  : strategyReportStyles.projectCell
-              }
-            >
-              {flattenedRow.name}
-            </Text>
-            <Text style={strategyReportStyles.projectManagerCell}>
-              {flattenedRow.projectManager}
-            </Text>
-            <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costPlan}</Text>
-            {reportType !== Reports.ForecastReport && (
-              <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-            )}
-            {reportType === Reports.ForecastReport && (
-              <>
-                <Text style={strategyReportStyles.budgetCell}>
-                  {flattenedRow.costForcedToFrameBudget}
-                </Text>
-                <Text style={strategyReportStyles.budgetCell}>{flattenedRow.costForecast}</Text>
-                <Text
-                  style={getForecastDeviationStyle(
-                    flattenedRow.type,
-                    flattenedRow.costForecastDeviation ?? '0',
-                  )}
-                >
-                  {flattenedRow.costForecastDeviation}
-                </Text>
-              </>
-            )}
-            {reportType === Reports.ForecastReport && (
-              <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
-            )}
-
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.januaryStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.januaryStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.januaryStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.februaryStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.februaryStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.februaryStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.februaryStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.marchStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.marchStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.marchStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.marchStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.aprilStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.aprilStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.aprilStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.aprilStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.mayStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.mayStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.mayStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.mayStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.juneStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.juneStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.juneStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.juneStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.julyStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.julyStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.julyStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.julyStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.augustStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.augustStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.augustStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.augustStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.septemberStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.septemberStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.septemberStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.septemberStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.octoberStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.octoberStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.octoberStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.octoberStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.novemberStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.novemberStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.novemberStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.novemberStatus, 'left')}></View>
-            )}
-            {['planningAndConstruction', 'constructionAndWarranty'].includes(
-              flattenedRow.decemberStatus ?? '',
-            ) ? (
-              <>
-                <Text style={getMonthCellStyle(flattenedRow.decemberStatus, 'left')}></Text>
-                <Text style={getMonthCellStyle(flattenedRow.decemberStatus, 'right')}></Text>
-              </>
-            ) : (
-              <View style={getMonthCellStyle(flattenedRow.decemberStatus, 'left')}></View>
-            )}
-            <View style={strategyReportStyles.lastCell}></View>
-          </View>
-        );
-      } else {
-        tableRow = <View></View>;
-      }
-
-      break;
-    }
+    case Reports.StrategyForcedToFrame:
+      return (
+        <StrategyAndForecastRow
+          row={flattenedRow as IStrategyAndForecastTableRow}
+          index={rowIndex}
+          reportType={reportType}
+        />
+      );
     case Reports.ConstructionProgram:
-    case Reports.ConstructionProgramForcedToFrame: {
-      // Programming view (hierarchy) colours for class rows
-      // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
-      if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
-        const classNameTypes = [
-          'masterClass',
-          'class',
-          'subClass',
-          'subClassDistrict',
-          'collectiveSubLevel',
-          'otherClassification',
-          'districtPreview',
-          'info',
-        ];
-
-        tableRow = (
-          <View
-            wrap={false}
-            style={getConstructionRowStyle(flattenedRow.type ?? '', index ?? 0)}
-            key={flattenedRow.id}
-          >
-            <Text
-              style={
-                classNameTypes.includes(flattenedRow.type) ? styles.classNameCell : styles.nameCell
-              }
-            >
-              {flattenedRow.name}
-            </Text>
-            <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
-            <Text style={styles.costForecastCell}>{flattenedRow.costForecast}</Text>
-            <Text style={styles.planAndConStartCell}>{flattenedRow.startAndEnd}</Text>
-            <Text style={styles.previouslyUsedCell}>{flattenedRow.beforeCurrentYearSapCosts}</Text>
-            <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus0}</Text>
-            <Text style={styles.cell}>{flattenedRow.budgetProposalCurrentYearPlus1}</Text>
-            <Text style={styles.lastCell}>{flattenedRow.budgetProposalCurrentYearPlus2}</Text>
-          </View>
-        );
-      }
-      break;
-    }
-    case Reports.ConstructionProgramForecast: {
-      // Programming view (hierarchy) colours for class rows
-      // We also hide all rows that names are empty, such as old budget item '8 01 Kiinteä omaisuus/Esirakentaminen'
-      if (flattenedRow && (flattenedRow.name !== '' || flattenedRow.type === 'empty')) {
-        const classNameTypes = [
-          'masterClass',
-          'class',
-          'subClass',
-          'subClassDistrict',
-          'collectiveSubLevel',
-          'subLevelDistrict',
-          'otherClassification',
-          'districtPreview',
-          'info',
-        ];
-
-        tableRow = (
-          <View
-            wrap={false}
-            style={getStrategyAndForecastRowStyle(flattenedRow.type ?? '', index ?? 0)}
-            key={flattenedRow.id}
-          >
-            <Text
-              style={
-                classNameTypes.includes(flattenedRow.type)
-                  ? styles.constructionForecastClassNameCell
-                  : styles.constructionForecastNameCell
-              }
-            >
-              {flattenedRow.name}
-            </Text>
-            <Text style={styles.divisionCell}>{flattenedRow.location}</Text>
-            <Text style={styles.constructionForecastCell}>{flattenedRow.costForecast}</Text>
-            <Text style={styles.constructionForecastPlanAndConStartCell}>
-              {flattenedRow.startAndEnd}
-            </Text>
-            <Text style={styles.constructionForecastCell}>{flattenedRow.isProjectOnSchedule}</Text>
-            <Text style={styles.constructionForecastCell}>
-              {flattenedRow.beforeCurrentYearSapCosts}
-            </Text>
-            <Text style={styles.constructionForecastCell}>{flattenedRow.currentYearSapCost}</Text>
-            <Text style={styles.constructionForecastCell}>
-              {flattenedRow.costForcedToFrameBudget}
-            </Text>
-            <Text style={styles.constructionForecastCell}>
-              {flattenedRow.budgetProposalCurrentYearPlus0}
-            </Text>
-            <Text style={styles.constructionForecastCell}>
-              {flattenedRow.costForecastDeviation}
-            </Text>
-            <Text
-              style={getConstructionProgramForecastDeviationStyle(
-                flattenedRow.costForecastDeviationPercent,
-              )}
-            >
-              {flattenedRow.costForecastDeviationPercent}
-            </Text>
-            <Text style={styles.budgetOverunReasonCell}>{flattenedRow.budgetOverrunReason}</Text>
-          </View>
-        );
-      }
-      break;
-    }
-    case Reports.BudgetBookSummary: {
-      if (flattenedRow) {
-        const getStyle = () => {
-          const isFourthLevelRow = /^\d \d\d \d\d \d\d/.test(flattenedRow.name);
-          const isDistrictOrCollectiveSubLevel =
-            flattenedRow.objectType === 'districtPreview' ||
-            flattenedRow.objectType === 'collectiveSubLevel';
-          const extraStyle = isDistrictOrCollectiveSubLevel
-            ? styles.districtOrCollectiveSubLevel
-            : styles.fourthLevel;
-          let defaultStyle;
-
-          if (
-            ['class', 'otherClassification', 'collectiveSubLevel'].includes(flattenedRow.type) ||
-            flattenedRow.type === 'investmentpart'
-          ) {
-            defaultStyle = styles.classNameTargetCell;
-          } else {
-            defaultStyle = styles.nameTargetCell;
-          }
-
-          return isFourthLevelRow || isDistrictOrCollectiveSubLevel
-            ? [defaultStyle, extraStyle]
-            : defaultStyle;
-        };
-        tableRow = (
-          <View
-            wrap={false}
-            style={index && index % 2 ? styles.evenRow : styles.oddRow}
-            key={flattenedRow.id}
-          >
-            <Text style={getStyle()}>{flattenedRow.name}</Text>
-            <Text style={styles.unBoldedColumns}>{flattenedRow.usage}</Text>
-            <Text style={styles.unBoldedColumns}>{flattenedRow.budgetEstimation}</Text>
-            <Text style={styles.narrowerColumns}>{flattenedRow.budgetEstimationSuggestion}</Text>
-            <Text style={styles.narrowerColumns}>{flattenedRow.budgetPlanSuggestion1}</Text>
-            <Text style={styles.narrowerColumns}>{flattenedRow.budgetPlanSuggestion2}</Text>
-            <Text style={styles.widerColumns}>{flattenedRow.initial1}</Text>
-            <Text style={styles.widerColumns}>{flattenedRow.initial2}</Text>
-            <Text style={styles.widerColumns}>{flattenedRow.initial3}</Text>
-            <Text style={styles.widerColumns}>{flattenedRow.initial4}</Text>
-            <Text style={styles.widerColumns}>{flattenedRow.initial5}</Text>
-            <Text style={styles.widerColumns}>{flattenedRow.initial6}</Text>
-            <Text style={styles.lastWiderColumn}>{flattenedRow.initial7}</Text>
-          </View>
-        );
-      } else {
-        tableRow = <View></View>;
-      }
-      break;
-    }
+    case Reports.ConstructionProgramForcedToFrame:
+      return (
+        <ConstructionProgramRow
+          row={flattenedRow as IConstructionProgramTableRow}
+          index={rowIndex}
+        />
+      );
+    case Reports.ConstructionProgramForecast:
+      return (
+        <ConstructionProgramForecastRow
+          row={flattenedRow as IConstructionProgramTableRow}
+          index={rowIndex}
+        />
+      );
+    case Reports.BudgetBookSummary:
+      return (
+        <BudgetBookSummaryRow row={flattenedRow as IBudgetBookSummaryCsvRow} index={rowIndex} />
+      );
     case Reports.OperationalEnvironmentAnalysis:
-    case Reports.OperationalEnvironmentAnalysisForcedToFrame: {
-      if (flattenedRow) {
-        const getNameStyle = () => {
-          if (flattenedRow.type === 'taeFrame')
-            return [
-              operationalEnvironmentAnalysisStyles.targetColumn,
-              operationalEnvironmentAnalysisStyles.frame,
-            ];
-          if (flattenedRow.type === 'changePressure')
-            return [
-              operationalEnvironmentAnalysisStyles.targetColumn,
-              operationalEnvironmentAnalysisStyles.changePressure,
-            ];
-          return [operationalEnvironmentAnalysisStyles.targetColumn];
-        };
-
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        const nameStyle: any = getNameStyle();
-
-        const getColor = () => {
-          if (flattenedRow.type === 'taeFrame') return operationalEnvironmentAnalysisStyles.frame;
-          if (flattenedRow.type === 'changePressure')
-            return operationalEnvironmentAnalysisStyles.changePressure;
-          return operationalEnvironmentAnalysisStyles.basicRow;
-        };
-        const color = getColor();
-
-        const shouldHaveIdentation =
-          flattenedRow.type === 'taeFrame' ||
-          flattenedRow.type === 'changePressure' ||
-          flattenedRow.type === 'category';
-
-        if (shouldHaveIdentation) nameStyle.push(operationalEnvironmentAnalysisStyles.indentation);
-
-        tableRow = (
-          <View
-            wrap={false}
-            style={index && index % 2 ? styles.evenRow : styles.oddRow}
-            key={flattenedRow.id}
-          >
-            <Text style={nameStyle}>{flattenedRow.name}</Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
-              {flattenedRow.costForecast}
-            </Text>
-            <Text
-              style={[
-                operationalEnvironmentAnalysisStyles.numberColumns,
-                color,
-                operationalEnvironmentAnalysisStyles.tae,
-              ]}
-            >
-              {flattenedRow.TAE}
-            </Text>
-            <Text
-              style={[
-                operationalEnvironmentAnalysisStyles.numberColumns,
-                color,
-                operationalEnvironmentAnalysisStyles.tse1,
-              ]}
-            >
-              {flattenedRow.TSE1}
-            </Text>
-            <Text
-              style={[
-                operationalEnvironmentAnalysisStyles.numberColumns,
-                color,
-                operationalEnvironmentAnalysisStyles.tse2,
-              ]}
-            >
-              {flattenedRow.TSE2}
-            </Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
-              {flattenedRow.initial1}
-            </Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
-              {flattenedRow.initial2}
-            </Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
-              {flattenedRow.initial3}
-            </Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
-              {flattenedRow.initial4}
-            </Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
-              {flattenedRow.initial5}
-            </Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.numberColumns, color]}>
-              {flattenedRow.initial6}
-            </Text>
-            <Text style={[operationalEnvironmentAnalysisStyles.lastNumberColumn, color]}>
-              {flattenedRow.initial7}
-            </Text>
-          </View>
-        );
-      }
-      break;
-    }
+    case Reports.OperationalEnvironmentAnalysisForcedToFrame:
+      return (
+        <OperationalEnvironmentAnalysisRow
+          row={flattenedRow as IOperationalEnvironmentAnalysisCsvRow}
+          index={rowIndex}
+        />
+      );
     default:
-      tableRow = <View></View>;
+      return <View></View>;
   }
-
-  return <>{tableRow}</>;
 });
 
 Row.displayName = 'Row';
@@ -1007,12 +945,7 @@ const TableRow: FC<ITableRowProps> = ({ flattenedRows, reportType }) => {
     <>
       {/* Class */}
       {flattenedRows?.map((row, index) => {
-        const typedRow = row as
-          | IFlattenedBudgetBookSummaryProperties
-          | IFlattenedOperationalEnvironmentAnalysisProperties;
-        return (
-          <Row key={typedRow.id} flattenedRow={typedRow} index={index} reportType={reportType} />
-        );
+        return <Row key={row.id} flattenedRow={row} index={index} reportType={reportType} />;
       })}
     </>
   );

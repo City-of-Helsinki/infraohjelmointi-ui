@@ -465,6 +465,18 @@ describe('reportHelpers', () => {
           expected: true,
         },
         {
+          label: 'annualCostDistributionClarification reason returns true',
+          budgetOverrunReason: 'annualCostDistributionClarification',
+          onSchedule: null,
+          expected: true,
+        },
+        {
+          label: 'planningCostsOrScheduleClarification reason returns true',
+          budgetOverrunReason: 'planningCostsOrScheduleClarification',
+          onSchedule: null,
+          expected: true,
+        },
+        {
           label: 'otherReason returns true while onSchedule is true',
           budgetOverrunReason: 'otherReason',
           onSchedule: true,
