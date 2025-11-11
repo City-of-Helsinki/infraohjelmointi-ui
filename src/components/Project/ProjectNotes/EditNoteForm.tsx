@@ -1,11 +1,11 @@
-import { Button, ButtonVariant } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
-import { Dialog } from 'hds-react/components/Dialog';
+import { Dialog } from 'hds-react';
 import { useAppDispatch } from '@/hooks/common';
 import { INote } from '@/interfaces/noteInterfaces';
 import { Controller } from 'react-hook-form';
-import { TextArea } from 'hds-react/components/Textarea';
+import { TextArea } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import useProjectNoteForm from '@/forms/useNoteForm';
 import { patchNoteThunk } from '@/reducers/noteSlice';

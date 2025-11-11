@@ -7,7 +7,7 @@ import {
   selectSearchLimit,
   setSearchLimit,
 } from '@/reducers/searchSlice';
-import { Select } from 'hds-react/components/Select';
+import { Option, Select } from 'hds-react';
 import { FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,12 +28,14 @@ const SearchLimitDropdown: FC<ISearchLimitDropdownProps> = ({ resultLength }) =>
   ];
 
   const handleLimitChange = useCallback(
-    (value: IOption) => {
-      dispatch(setSearchLimit(value.value as SearchLimit));
-      return dispatch(getSearchResultsThunk({ params: lastSearchParams }));
+    (_: Option[], clickedOption: Option) => {
+      dispatch(setSearchLimit(clickedOption.value as SearchLimit));
+      dispatch(getSearchResultsThunk({ params: lastSearchParams }));
     },
     [dispatch, lastSearchParams],
   );
+
+  const selectedLimit = limits[limits.findIndex((limit) => limit.value === searchLimit)].value;
 
   return (
     <div className="limit-dropdown-container">
@@ -44,11 +46,12 @@ const SearchLimitDropdown: FC<ISearchLimitDropdownProps> = ({ resultLength }) =>
       {resultLength > 0 && (
         <>
           <Select
-            label=""
-            defaultValue={limits[limits.findIndex((l) => l.value === searchLimit)]}
+            value={selectedLimit}
             options={limits}
             className="custom-select limit-dropdown"
             onChange={handleLimitChange}
+            texts={{ label: '' }}
+            style={{ width: '100px' }}
           />
           <span>kpl sivulla</span>
         </>

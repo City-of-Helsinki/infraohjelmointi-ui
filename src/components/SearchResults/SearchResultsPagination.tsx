@@ -5,7 +5,7 @@ import {
   selectSearchLimit,
   selectSearchOrder,
 } from '@/reducers/searchSlice';
-import { Pagination } from 'hds-react/components/Pagination';
+import { Pagination } from 'hds-react';
 import { FC, useCallback, useMemo, MouseEvent, useEffect, useState, memo } from 'react';
 import './styles.css';
 
@@ -41,7 +41,7 @@ const SearchResultsPagination: FC<ISearchResultsPagination> = ({ next, previous,
   // Reset pagination every time a new search is done or the order is changed
   useEffect(() => {
     handlePageChange(1);
-  }, [pageCount, searchOrder]);
+  }, [pageCount, searchOrder, handlePageChange]);
 
   const handleGetSearchResults = useCallback(
     async (event: MouseEvent<HTMLAnchorElement> | MouseEvent<HTMLButtonElement>) => {

@@ -1,4 +1,4 @@
-import { LoadingSpinner } from 'hds-react/components/LoadingSpinner';
+import { LoadingSpinner } from 'hds-react';
 import { FC } from 'react';
 import { useAppSelector } from '@/hooks/common';
 import { selectIsLoading } from '@/reducers/loaderSlice';

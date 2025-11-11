@@ -1144,13 +1144,6 @@
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
-"@babel/runtime@7.17.9":
-  version "7.17.9"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.17.9.tgz#d19fbf802d01a8cb6cf053a64e472d42c434ba72"
-  integrity sha512-lSiBBvodq29uShpWGNbgFdKYNiFDo5/HIYsaCEY9ff4sb10x9jizo2+pRrSyF4jKZCXqgzuqBOQKbUm90gQwJg==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
 "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.19.4", "@babel/runtime@^7.20.7", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
   version "7.22.3"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.3.tgz#0a7fce51d43adbf0f7b517a71f4c3aaca92ebcbb"
@@ -6768,18 +6761,18 @@ hasown@^2.0.2:
   dependencies:
     function-bind "^1.1.2"
 
-hds-core@4.0.0, hds-core@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-4.0.0.tgz#cc6c34853aa0985acae556ee17d4bdfccc9bc777"
-  integrity sha512-dYC7UimBTAklSpRywsbqNXu4SaoJEfYaorvYvUEqvQEg8848e0ojMJLWlvQq9Tyq0sfAHL1JRsGfC85K2+BEcg==
+hds-core@4.8.0, hds-core@^4.8.0:
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-4.8.0.tgz#1e814d16bf55ac646020caf6b4f5a578d2885b8b"
+  integrity sha512-Bdbo0SiUwLC4D1pgZtr1puORZR2h5Y6TstGE7QJ2xHWbZFn/UwTL4q2u4fGY6JH117y4hbzsJ1SWlLaSJlTMfA==
 
-hds-react@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-4.0.0.tgz#0ba5d8fdfcdaea0bd616e868846069026a4c622d"
-  integrity sha512-Ygdxtl3PwzJuKZGul7gNk83wBya3/NVZVbNJGhZoQgF5MbfsAWQC6yriDcYxQb0iEZcFboAL8Tf0negL3A+dxQ==
+hds-react@^4.8.0:
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-4.8.0.tgz#8b159561634e37eecbbc6e636cfb2fc9c6b812ff"
+  integrity sha512-zYFlOCpKYMF+jOQz39Fl4iwTaRi6yVh1OKh605OnFcfdv3jzYPF7MBgoO9Joiv6mJeVFkrheX02fzcQZgyG/fQ==
   dependencies:
     "@apollo/client" "^3.10.1"
-    "@babel/runtime" "7.17.9"
+    "@babel/runtime" "^7.26.10"
     "@emotion/styled-base" "^11.0.0"
     "@hookform/resolvers" "^2.9.11"
     "@juggle/resize-observer" "3.2.0"
@@ -6794,7 +6787,7 @@ hds-react@^4.0.0:
     date-fns "2.16.1"
     downshift "6.0.6"
     graphql "^16.8.1"
-    hds-core "4.0.0"
+    hds-core "4.8.0"
     jwt-decode "^3.1.2"
     kashe "1.0.4"
     lodash "^4.17.21"
@@ -10565,7 +10558,7 @@ regenerate@^1.4.2:
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.2.tgz#b9346d8827e8f5a32f7ba29637d398b69014848a"
   integrity sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==
 
-regenerator-runtime@^0.13.11, regenerator-runtime@^0.13.4, regenerator-runtime@^0.13.9:
+regenerator-runtime@^0.13.11, regenerator-runtime@^0.13.9:
   version "0.13.11"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
   integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==

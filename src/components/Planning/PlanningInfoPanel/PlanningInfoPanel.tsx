@@ -1,4 +1,4 @@
-import { Button, ButtonVariant } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { IconAngleLeft } from 'hds-react/icons';

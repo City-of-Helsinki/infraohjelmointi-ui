@@ -1,4 +1,4 @@
-import { TextInput as HDSTextInput } from 'hds-react/components/TextInput';
+import { TextInput as HDSTextInput } from 'hds-react';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';

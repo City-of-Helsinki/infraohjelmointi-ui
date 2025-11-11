@@ -1,5 +1,5 @@
 import useSearchTerms from '@/hooks/useSearchTerms';
-import { Tag } from 'hds-react/components/Tag';
+import { Tag } from 'hds-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';

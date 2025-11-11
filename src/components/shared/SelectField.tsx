@@ -1,8 +1,7 @@
-import { IOption } from '@/interfaces/common';
 import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { Select as HDSSelect } from 'hds-react/components/Select';
+import { Select as HDSSelect, Option } from 'hds-react';
 import { IconCrossCircle } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
@@ -11,7 +10,7 @@ import TextField from './TextField';
 interface ISelectFieldProps {
   name: string;
   control: HookFormControlType;
-  options: Array<IOption>;
+  options: Array<Option>;
   label?: string;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
@@ -79,14 +78,14 @@ const SelectField: FC<ISelectFieldProps> = ({
   );
 
   const translateValue = useCallback(
-    (option: IOption) => {
+    (option: Option) => {
       if (option?.label !== '' && !option?.label?.includes('option') && translate) {
         const translatedLabel = t(`option.${option.label}`);
         if (!translatedLabel.includes('option.')) {
-          return { value: option.value, label: translatedLabel };
+          return [{ value: option.value, label: translatedLabel }];
         }
       }
-      return option;
+      return [option];
     },
     [t, translate],
   );
@@ -118,10 +117,10 @@ const SelectField: FC<ISelectFieldProps> = ({
       control={control as Control<FieldValues>}
       rules={rules}
       render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
-        const handleChange = (event: { value: string }) => {
-          onChange(event);
-          if (shouldUpdateIcon && event?.value) {
-            updateIconBasedOnSelection(event.value);
+        const handleChange = (_: Option[], clickedOption: Option) => {
+          onChange(clickedOption);
+          if (shouldUpdateIcon && clickedOption?.value) {
+            updateIconBasedOnSelection(clickedOption.value);
           }
         };
         return (
@@ -143,24 +142,26 @@ const SelectField: FC<ISelectFieldProps> = ({
                   label={label ?? ''}
                   control={control}
                   readOnly={true}
-                  readOnlyValue={translateValue(value).label}
+                  readOnlyValue={translateValue(value)[0].label}
                 />
               ) : (
                 <HDSSelect
                   id={`select-field-${name}`}
                   className={`custom-select ${iconKey ? 'icon' : ''}`}
-                  value={value ? translateValue(value) : { value: '', label: '' }}
+                  value={value ? translateValue(value) : []}
                   onChange={handleChange}
                   onBlur={onBlur}
-                  label={!hideLabel && label && t(label)}
                   invalid={error ? true : false}
-                  error={error?.message}
                   options={translatedOptions ?? []}
                   required={required}
                   disabled={disabled}
-                  style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-                  placeholder={t('choose') ?? ''}
+                  style={{ paddingTop: hideLabel ? '1.745rem' : '0', maxWidth: '100%' }}
                   icon={icon}
+                  texts={{
+                    label: !hideLabel && label ? t(label) : undefined,
+                    error: error?.message,
+                    placeholder: t('choose') ?? '',
+                  }}
                 />
               )}
               {((clearable === undefined && value?.value) || (clearable && value?.value)) &&

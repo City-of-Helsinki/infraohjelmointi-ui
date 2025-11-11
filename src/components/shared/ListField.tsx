@@ -1,5 +1,5 @@
 import { IForm } from '@/interfaces/formInterfaces';
-import { NumberInput } from 'hds-react/components/NumberInput';
+import { NumberInput } from 'hds-react';
 import { FC, memo, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -28,8 +28,15 @@ const ListField: FC<IListFieldProps> = ({
   const [editing, setEditing] = useState(false);
   const { t } = useTranslation();
 
-  function sumCosts(costs: IProjectSapCost | undefined | null, costType1: string, costType2: string): number {
-    return costs ? (Number(costs[costType1 as keyof IProjectSapCost]) || 0) + (Number(costs[costType2 as keyof IProjectSapCost]) || 0) : 0;
+  function sumCosts(
+    costs: IProjectSapCost | undefined | null,
+    costType1: string,
+    costType2: string,
+  ): number {
+    return costs
+      ? (Number(costs[costType1 as keyof IProjectSapCost]) || 0) +
+          (Number(costs[costType2 as keyof IProjectSapCost]) || 0)
+      : 0;
   }
 
   function getSapCostValue(field: IForm): string {
@@ -45,24 +52,35 @@ const ListField: FC<IListFieldProps> = ({
         break;
 
       case 'comittedCost':
-        sapValue = sumCosts(field.sapCosts, 'project_task_commitments', 'production_task_commitments');
+        sapValue = sumCosts(
+          field.sapCosts,
+          'project_task_commitments',
+          'production_task_commitments',
+        );
         break;
 
       case 'spentCost':
-        sapValue = sumCosts(field.sapCosts, 'project_task_costs', 'production_task_costs') + sumCosts(field.sapCosts, 'project_task_commitments', 'production_task_commitments');
+        sapValue =
+          sumCosts(field.sapCosts, 'project_task_costs', 'production_task_costs') +
+          sumCosts(field.sapCosts, 'project_task_commitments', 'production_task_commitments');
         break;
 
       default:
         break;
     }
-    return formatNumberToContainSpaces(Number((sapValue).toFixed(0)));
-  };
+    return formatNumberToContainSpaces(Number(sapValue.toFixed(0)));
+  }
 
   const showTooltip = (field: IForm) => {
-    if (field.name === 'realizedCostCurrentYear' || field.name === 'realizedCost' || field.name === 'comittedCost' || field.name === 'spentCost') {
-        return true; 
+    if (
+      field.name === 'realizedCostCurrentYear' ||
+      field.name === 'realizedCost' ||
+      field.name === 'comittedCost' ||
+      field.name === 'spentCost'
+    ) {
+      return true;
     }
-  }
+  };
 
   const renderTooltip = (field: IForm) => {
     const tooltipLabels: { [key: string]: string } = {
@@ -72,8 +90,12 @@ const ListField: FC<IListFieldProps> = ({
       spentCost: t('projectForm.spentCostTooltipLabel'),
     };
     const tooltipLabel = tooltipLabels[field.name] || '';
-    return <Tooltip placement="top-start" className="list-field-tool-tip" >{tooltipLabel}</Tooltip>
-  }
+    return (
+      <Tooltip placement="top-start" className="list-field-tool-tip">
+        {tooltipLabel}
+      </Tooltip>
+    );
+  };
 
   const handleSetEditing = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -84,11 +106,11 @@ const ListField: FC<IListFieldProps> = ({
     if (cancelEdit && editing) {
       setEditing(false);
     }
-  }, [cancelEdit]);
+  }, [cancelEdit, editing]);
 
   const formatFieldValue = (fieldValue: string) => {
-    return formatNumberToContainSpaces(Number(Number(fieldValue).toFixed(0)))
-  }
+    return formatNumberToContainSpaces(Number(Number(fieldValue).toFixed(0)));
+  };
 
   return (
     <div className="input-wrapper" id={name} data-testid={name}>
@@ -108,11 +130,18 @@ const ListField: FC<IListFieldProps> = ({
             control={f.control as Control<FieldValues>}
             render={({ field, fieldState: { error } }) => (
               <div className="list-field-container" key={f.label}>
-                <label className="list-field-label">{t(f.label)}{showTooltip(f) ? renderTooltip(f) : null}</label>
-                
+                <label className="list-field-label">
+                  {t(f.label)}
+                  {showTooltip(f) ? renderTooltip(f) : null}
+                </label>
+
                 {!editing || f.readOnly ? (
                   <div className="list-field-values">
-                    <span>{f.isSapProject ? `${getSapCostValue(f)}` : `${formatFieldValue(field.value)}`}</span>
+                    <span>
+                      {f.isSapProject
+                        ? `${getSapCostValue(f)}`
+                        : `${formatFieldValue(field.value)}`}
+                    </span>
                     <span>{f.isSapProject ? '€' : 'keur'}</span>
                   </div>
                 ) : (

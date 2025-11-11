@@ -10,7 +10,7 @@ import {
 } from '@/reducers/planningSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { Button, ButtonVariant, IconCross } from 'hds-react';
-import { Dialog } from 'hds-react/components/Dialog';
+import { Dialog } from 'hds-react';
 import './styles.css';
 import { ICoordinatorNote } from '@/interfaces/noteInterfaces';
 import { selectUser } from '@/reducers/authSlice';
