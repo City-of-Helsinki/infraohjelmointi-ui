@@ -255,10 +255,6 @@ const AuthGuard: FC = () => {
   // Handle token expiration detection and user notification about expired token
   useEffect(() => {
     const handleTokenExpiration = async () => {
-      if (isTokenExpired) {
-        return;
-      }
-
       setIsTokenExpired(true);
 
       const confirmed = await isConfirmed({
@@ -269,13 +265,18 @@ const AuthGuard: FC = () => {
       });
 
       if (confirmed) {
-        setIsTokenExpired(false);
         window.location.reload();
       }
+
+      setIsTokenExpired(false);
     };
 
+    // Check if token is expired when page becomes visible/focused
     const checkTokenExpirationOnFocus = () => {
-      // Check if token is expired when page becomes visible/focused
+      if (isTokenExpired) {
+        return;
+      }
+
       if (oidcUser?.expires_at && oidcUser.expires_at < Math.floor(Date.now() / 1000)) {
         handleTokenExpiration();
       }
@@ -283,6 +284,10 @@ const AuthGuard: FC = () => {
 
     // Handle page visibility change (when user switches tabs or computer wakes from sleep)
     const handleVisibilityChange = () => {
+      if (isTokenExpired) {
+        return;
+      }
+
       if (!document.hidden) {
         checkTokenExpirationOnFocus();
       }

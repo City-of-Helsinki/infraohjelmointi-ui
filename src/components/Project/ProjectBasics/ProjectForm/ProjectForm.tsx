@@ -38,6 +38,7 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
+import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 
 const ProjectForm = () => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
@@ -86,60 +87,6 @@ const ProjectForm = () => {
     description: t('confirmLeaveDescription'),
     when: isDirty,
   });
-
-  const getFinanceYearName = (finances: IProjectFinances, year: number) => {
-    const index = year - finances.year;
-    if (index < 3) {
-      return ('budgetProposalCurrentYearPlus' + index) as keyof IProjectFinances;
-    } else {
-      return ('preliminaryCurrentYearPlus' + index) as keyof IProjectFinances;
-    }
-  };
-
-  // Function to move budget/budgets to the first year that's within the project schedule
-  const moveBudgetForwards = (
-    finances: IProjectFinances,
-    previousStartYear: number,
-    startYear: number,
-  ): IProjectFinances => {
-    let financesCopy = finances;
-    const numberOfYears = startYear - previousStartYear;
-    let budgetToMove = 0.0;
-    for (let i = 0; i < numberOfYears; ++i) {
-      const financeYearName = getFinanceYearName(finances, Number(previousStartYear) + i);
-      const financeValue = finances[financeYearName];
-      budgetToMove += parseFloat(financeValue as string);
-      financesCopy = { ...financesCopy, [financeYearName]: '0.00' };
-    }
-    const startYearName = getFinanceYearName(finances, startYear);
-    const newBudget = (parseFloat(finances[startYearName] as string) || 0.0) + budgetToMove || 0.0;
-
-    financesCopy = { ...financesCopy, [startYearName]: newBudget.toFixed(2) };
-    return financesCopy;
-  };
-
-  // Function to move budget/budgets to the last year that's within the project schedule
-  const moveBudgetBackwards = (
-    finances: IProjectFinances,
-    previousEndYear: number,
-    endYear: number,
-  ) => {
-    let financesCopy = finances;
-    const numberOfYears = previousEndYear - endYear;
-    const maxIndex = 10 - (endYear - finances.year);
-    let budgetToMove = 0.0;
-    for (let i = 1; i <= numberOfYears && i <= maxIndex; ++i) {
-      const financeYearName = getFinanceYearName(finances, Number(endYear) + i);
-      const financeValue = finances[financeYearName];
-      budgetToMove += parseFloat(financeValue as string);
-      financesCopy = { ...financesCopy, [financeYearName]: '0.00' };
-    }
-    const endYearName = getFinanceYearName(finances, endYear);
-    const newBudget = (parseFloat(finances[endYearName] as string) || 0.0) + budgetToMove || 0.0;
-
-    financesCopy = { ...financesCopy, [endYearName]: newBudget.toFixed(2) };
-    return financesCopy;
-  };
 
   const updatePlanningStartYear = (
     finances: IProjectFinances,
@@ -411,6 +358,7 @@ const ProjectForm = () => {
       dispatch(setIsSaving(false));
       dispatch(clearLoading(CREATE_NEW_PROJECT));
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       dispatch,
       isDirty,

@@ -1,4 +1,4 @@
-import { Button, ButtonVariant } from 'hds-react/components/Button';
+import { Button, ButtonVariant } from 'hds-react';
 import { IconCross } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { INewItemMenuDetails } from '@/interfaces/eventInterfaces';

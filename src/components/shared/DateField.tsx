@@ -1,4 +1,4 @@
-import { DateInput as HDSDateInput } from 'hds-react/components/DateInput';
+import { DateInput as HDSDateInput } from 'hds-react';
 import { FC, memo } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';

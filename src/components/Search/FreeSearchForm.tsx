@@ -1,5 +1,5 @@
-import { Tag } from 'hds-react/components/Tag';
-import { SearchInput } from 'hds-react/components/SearchInput';
+import { Tag } from 'hds-react';
+import { SearchInput } from 'hds-react';
 import { memo, useCallback, useState, MouseEvent } from 'react';
 import { getProjectsWithFreeSearch } from '@/services/projectServices';
 import { useTranslation } from 'react-i18next';
@@ -145,10 +145,7 @@ const FreeSearchForm = ({
     ) => {
       const formValue = getValues('freeSearchParams') as FreeSearchFormObject;
 
-      const {
-        [e.currentTarget?.innerText]: _,
-        ...nextChange
-      } = formValue;
+      const { [e.currentTarget?.innerText]: _, ...nextChange } = formValue;
 
       onChange(nextChange);
       setSearchState((current) => ({

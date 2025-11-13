@@ -8,6 +8,7 @@ import { deleteProject } from '@/services/projectServices';
 import { useNavigate } from 'react-router';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { loadCoordinationData, loadPlanningData } from '@/App';
+
 interface IProjectFormbannerProps {
   onSubmit: () =>
     | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
@@ -49,7 +50,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty, isI
         console.log('Error deleting project');
       }
     }
-  }, [isConfirmed]);
+  }, [isConfirmed, project, t, navigate, dispatch, startYear]);
 
   return (
     <div className="project-form-banner">

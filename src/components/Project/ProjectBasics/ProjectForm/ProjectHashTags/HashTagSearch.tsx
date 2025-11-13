@@ -1,5 +1,5 @@
 import { IListItem } from '@/interfaces/common';
-import { SearchInput } from 'hds-react/components/SearchInput';
+import { SearchInput } from 'hds-react';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

@@ -1,7 +1,12 @@
 import { Page, Document, StyleSheet, View } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
 import { FC, memo } from 'react';
-import { IBasicReportData, ReportType, Reports } from '@/interfaces/reportInterfaces';
+import {
+  IBasicReportData,
+  IOperationalEnvironmentAnalysisTableRow,
+  ReportType,
+  Reports,
+} from '@/interfaces/reportInterfaces';
 import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import DocumentHeader from './reportHeaders/DocumentHeader';
@@ -9,6 +14,9 @@ import ReportTable from './ReportTable';
 import StrategyReportFooter from './reportFooters/StrategyReportFooter';
 import DefaultReportFooter from './reportFooters/DefaultReportFooter';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
+import { buildOperationalEnvironmentAnalysisRows } from '../common';
+import { convertToReportRows } from '@/utils/reportHelpers';
 
 const styles = StyleSheet.create({
   page: {
@@ -134,35 +142,58 @@ const ReportContainer: FC<IPdfReportContainerProps> = ({
       ? 'portrait'
       : 'landscape';
 
+  const operationalEnvironmentAnalysisReport =
+    reportType === Reports.OperationalEnvironmentAnalysis ||
+    reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame;
+
+  const reportRows = convertToReportRows(
+    data.rows,
+    reportType,
+    data.categories,
+    t,
+    data.divisions,
+    data.subDivisions,
+    projectsInWarrantyPhase,
+    forcedToFrameRows,
+    sapCosts,
+    currentYearSapValues,
+    year,
+  );
+
+  const documentHeader = (
+    <DocumentHeader
+      title={documentTitle}
+      subtitleOne={documentSubtitleOne}
+      subtitleTwo={documentSubtitleTwo}
+      reportType={reportType}
+      date={operationalEnvironmentAnalysisReport ? currentDate : ''}
+    />
+  );
+
   return (
     <Document title={documentTitle}>
+      {operationalEnvironmentAnalysisReport && (
+        // For Operational Environment Analysis report, first page is category summary
+        <Page size="A2" style={styles.page}>
+          <View style={styles.document}>
+            {documentHeader}
+            <OperationalEnvironmentCategorySummary
+              rows={buildOperationalEnvironmentAnalysisRows(
+                reportRows as IOperationalEnvironmentAnalysisTableRow[],
+              )}
+            />
+            <DefaultReportFooter />
+          </View>
+        </Page>
+      )}
       <Page
         orientation={documentOrientation}
         size={reportType !== Reports.ForecastReport ? 'A3' : 'A2'}
         style={styles.page}
       >
         <View style={styles.document}>
-          <DocumentHeader
-            title={documentTitle}
-            subtitleOne={documentSubtitleOne}
-            subtitleTwo={documentSubtitleTwo}
-            reportType={reportType}
-            date={
-              reportType === Reports.OperationalEnvironmentAnalysis ||
-              reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame
-                ? currentDate
-                : ''
-            }
-          />
-          <ReportTable
-            reportType={reportType}
-            data={data}
-            projectsInWarrantyPhase={projectsInWarrantyPhase}
-            hierarchyInForcedToFrame={forcedToFrameRows}
-            sapCosts={sapCosts}
-            currentYearSapValues={currentYearSapValues}
-            year={year}
-          />
+          {documentHeader}
+          <ReportTable reportType={reportType} reportRows={reportRows} year={year} />
           {[Reports.Strategy, Reports.StrategyForcedToFrame, Reports.ForecastReport].includes(
             reportType as Reports,
           ) ? (

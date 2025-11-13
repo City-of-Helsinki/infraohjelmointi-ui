@@ -1,10 +1,11 @@
-import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
-import { IListItem, IOption } from '@/interfaces/common';
+import { IClass, IClassFinances, IProjectClassOption } from '@/interfaces/classInterfaces';
+import { IListItem } from '@/interfaces/common';
 import { IAppForms, FormValueType, IGroupForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import _ from 'lodash';
 import { IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
+import { Option } from 'hds-react';
 
 export const matchExact = (value: string) => new RegExp(value, 'i');
 
@@ -13,21 +14,33 @@ export const removeDotsFromString = (value: string) => value.replace('.', '');
 export const formatNumberToContainSpaces = (number: number) => {
   return String(new Intl.NumberFormat('de-DE').format(number)).replace(/\./g, ' ');
 };
-export const listItemToOption = (listItem: IListItem | undefined): IOption => ({
+export const listItemToOption = (listItem: IListItem | undefined): Option => ({
   label: listItem?.value ?? '',
   value: listItem?.id ?? '',
+  selected: false,
+  isGroupLabel: false,
+  visible: true,
+  disabled: false,
 });
 
-export const listItemsToOption = (listItems: Array<IListItem> | undefined): Array<IOption> =>
+export const listItemsToOption = (listItems: Array<IListItem> | undefined): Array<Option> =>
   listItems?.map((listItem) => ({
     label: listItem?.value ?? '',
     value: listItem?.id ?? '',
+    selected: false,
+    isGroupLabel: false,
+    visible: true,
+    disabled: false,
   })) ?? [];
 
-export const locationItemsToOptions = (locationList: ILocation[]): IOption[] =>
+export const locationItemsToOptions = (locationList: ILocation[]): Option[] =>
   locationList.map((locationItem) => ({
     label: locationItem?.name ?? '',
     value: locationItem?.id ?? '',
+    selected: false,
+    isGroupLabel: false,
+    visible: true,
+    disabled: false,
   }));
 
 export const booleanToString = (
@@ -36,7 +49,7 @@ export const booleanToString = (
 ): string =>
   typeof boolVal === 'boolean' && translate ? translate(`option.${boolVal.toString()}`) : 'Ei';
 
-export const isOptionEmpty = (option: IOption) => !option.value;
+export const isOptionEmpty = (option: Option) => !option.value;
 /**
  * Converts all empty string values from a form to null values. Useful when submitting forms,
  * since controlled forms always need to have a value as an empty string instead of null or undefined.
@@ -52,7 +65,7 @@ export const emptyStringsToNull = (formData: IAppForms) => {
   return { ...formData, ...transformedFields };
 };
 
-export const getOptionId = (option: IOption) => option.value || null;
+export const getOptionId = (option: Option) => option.value || null;
 
 export const isOption = (obj: object) => _.has(obj, 'label') && _.has(obj, 'value');
 
@@ -119,7 +132,7 @@ const getLowestLocationId = (
 const parseValue = (value: FormValueType) => {
   switch (true) {
     case value instanceof Object && isOption(value):
-      return getOptionId(value as IOption);
+      return getOptionId(value as Option);
     case value === '':
       return null;
     default:
@@ -257,10 +270,17 @@ export const classesToListItems = (classes: Array<IClass>): Array<IListItem> =>
     value: mc.name,
   }));
 
-export const classesToOptions = (classes: Array<IClass>): Array<IOption> =>
+export const classesToOptions = (classes: Array<IClass>): Array<IProjectClassOption> =>
   classes.map((mc) => ({
     value: mc.id,
     label: mc.name,
+    defaultProgrammer: mc.defaultProgrammer,
+    computedDefaultProgrammer: mc.computedDefaultProgrammer,
+    autoSelectSubClass: mc.autoSelectSubClass,
+    selected: false,
+    isGroupLabel: false,
+    visible: true,
+    disabled: false,
   }));
 
 export const setHoveredClassToMonth = (month: string) => {

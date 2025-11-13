@@ -1,5 +1,5 @@
 import { IListItem } from '@/interfaces/common';
-import { Tag } from 'hds-react/components/Tag';
+import { Tag } from 'hds-react';
 import { TFunction } from 'i18next';
 import { FC, memo, MouseEvent, KeyboardEvent, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ const HashTagsContainer: FC<IHashTagsProps> = ({ tags, onClick, onDelete, id, re
   const { t } = useTranslation();
 
   const handleOnClick = useCallback(
-    (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
+    (e: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) => {
       if (onClick) {
         onClick((e.currentTarget as HTMLDivElement).parentElement?.id ?? '');
       }

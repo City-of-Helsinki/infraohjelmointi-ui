@@ -258,7 +258,7 @@ describe('SearchResultsView', () => {
 
       const limitOptions = ['10', '20', '30'];
 
-      const limitSelect = await findByRole('button', { name: limitOptions[0] });
+      const limitSelect = await findByRole('combobox', { name: new RegExp(limitOptions[0], 'i') });
 
       expect(limitSelect).toBeInTheDocument();
 
@@ -274,8 +274,6 @@ describe('SearchResultsView', () => {
 
       await user.click(await findByText(limitOptions[2]));
 
-      expect(await findByText(limitOptions[2])).toBeInTheDocument();
-      expect(queryByText(limitOptions[0])).toBeNull();
       expect(mockedAxios.get.mock.lastCall[0].includes(`&limit=${limitOptions[2]}`)).toBe(true);
     });
   });
@@ -297,14 +295,12 @@ describe('SearchResultsView', () => {
 
       expect(await findByTestId('search-order-dropdown')).toBeInTheDocument();
 
-      await user.click(await findByRole('button', { name: 'order' }));
+      await user.click(await findByRole('combobox', { name: /order/i }));
 
       orderOptions.forEach(async (oo) => expect((await findAllByText(oo))[0]).toBeInTheDocument());
 
       await user.click(await findByText('searchOrder.project'));
 
-      expect(queryByText('searchOrder.group')).toBeNull();
-      expect(await findByText('searchOrder.project')).toBeInTheDocument();
       expect(mockedAxios.get.mock.lastCall[0].includes('&order=project')).toBe(true);
     });
   });

@@ -1,7 +1,7 @@
 import { FC, memo, useEffect, useRef } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { TextArea as HDSTextArea } from 'hds-react/components/Textarea';
+import { TextArea as HDSTextArea } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import autosize from 'autosize';
 

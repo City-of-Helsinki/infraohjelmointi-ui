@@ -1,34 +1,27 @@
 import { FC, memo } from 'react';
 import { View, StyleSheet } from '@react-pdf/renderer';
-import { useTranslation } from 'react-i18next';
 import ConstructionProgramTableHeader from './reportHeaders/ConstructionProgramTableHeader';
 import {
-  convertToReportRows,
   flattenBudgetBookSummaryTableRows,
   flattenStrategyTableRows,
   flattenOperationalEnvironmentAnalysisTableRows,
   flattenConstructionProgramTableRows,
   flattenForecastTableRows,
-  flattenConstructionProgramForecastTableRows
+  flattenConstructionProgramForecastTableRows,
 } from '@/utils/reportHelpers';
 import {
-  IBasicReportData,
   IBudgetBookSummaryTableRow,
   IConstructionProgramTableRow,
   IOperationalEnvironmentAnalysisTableRow,
+  IStrategyAndForecastTableRow,
   ReportType,
-  Reports
+  Reports,
 } from '@/interfaces/reportInterfaces';
-import { IProject } from '@/interfaces/projectInterfaces';
-import { IPlanningRow } from '@/interfaces/planningInterfaces';
 import BudgetBookSummaryTableHeader from './reportHeaders/BudgetBookSummaryTableHeader';
 import StrategyAndForecastTableHeader from './reportHeaders/StrategyAndForecastTableHeader';
 import OperationalEnvironmentAnalysisTableHeader from './reportHeaders/OperationalEnvironmentAnalysisTableHeader';
-import OperationalEnvironmentCategorySummary from './OperationalEnvironmentCategorySummary';
 import TableRow from './TableRow';
-import { buildOperationalEnvironmentAnalysisRows } from '../common';
 import ConstructionProgramForecastTableHeader from './reportHeaders/ConstructionProgramForecastTableHeader';
-import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
 const styles = StyleSheet.create({
   table: {
@@ -39,30 +32,34 @@ const styles = StyleSheet.create({
 
 interface IReportTableProps {
   reportType: ReportType;
-  data: IBasicReportData;
-  projectsInWarrantyPhase?: IProject[];
-  hierarchyInForcedToFrame?: IPlanningRow[];
-  sapCosts?: Record<string, IProjectSapCost>;
-  currentYearSapValues?: Record<string, IProjectSapCost>;
+  reportRows:
+    | IBudgetBookSummaryTableRow[]
+    | IOperationalEnvironmentAnalysisTableRow[]
+    | IStrategyAndForecastTableRow[];
   year?: number;
 }
 
-type IReportFlattenedRows = IBudgetBookSummaryTableRow | IOperationalEnvironmentAnalysisTableRow | IConstructionProgramTableRow;
+type IReportFlattenedRows =
+  | IBudgetBookSummaryTableRow
+  | IOperationalEnvironmentAnalysisTableRow
+  | IConstructionProgramTableRow;
 
-const getFlattenedRows = (
-  reportRows: IReportFlattenedRows[],
-  reportType: ReportType,
-) => {
+const getFlattenedRows = (reportRows: IReportFlattenedRows[], reportType: ReportType) => {
   if (reportType === Reports.BudgetBookSummary) {
     return flattenBudgetBookSummaryTableRows(reportRows as IBudgetBookSummaryTableRow[]);
-  } else if (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) {
-    return flattenOperationalEnvironmentAnalysisTableRows(reportRows as IOperationalEnvironmentAnalysisTableRow[]);
+  } else if (
+    reportType === Reports.OperationalEnvironmentAnalysis ||
+    reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame
+  ) {
+    return flattenOperationalEnvironmentAnalysisTableRows(
+      reportRows as IOperationalEnvironmentAnalysisTableRow[],
+    );
   } else if (reportType === Reports.ConstructionProgramForecast) {
     return flattenConstructionProgramForecastTableRows(reportRows);
   } else {
     return flattenConstructionProgramTableRows(reportRows);
   }
-}
+};
 
 const getStrategyAndForecastReportRows = (type: ReportType, rows: IReportFlattenedRows[]) => {
   if (type === Reports.Strategy || type === Reports.StrategyForcedToFrame) {
@@ -71,42 +68,23 @@ const getStrategyAndForecastReportRows = (type: ReportType, rows: IReportFlatten
     return flattenForecastTableRows(rows);
   }
   return [];
-}
+};
 
 const ReportTable: FC<IReportTableProps> = ({
   reportType,
-  data,
-  projectsInWarrantyPhase,
-  hierarchyInForcedToFrame,
-  sapCosts,
-  currentYearSapValues,
+  reportRows,
   year = new Date().getFullYear(),
 }) => {
-  const { t } = useTranslation();
-  const reportRows = convertToReportRows(
-    data.rows,
-    reportType,
-    data.categories,
-    t,
-    data.divisions,
-    data.subDivisions,
-    projectsInWarrantyPhase,
-    hierarchyInForcedToFrame,
-    sapCosts,
-    currentYearSapValues,
-    year,
-  );
-
   // We need to use one dimensional data for budgetBookSummary to style the report more easily
-  const flattenedRows = (
+  const flattenedRows =
     reportType === Reports.BudgetBookSummary ||
     reportType === Reports.OperationalEnvironmentAnalysis ||
     reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame ||
     reportType === Reports.ConstructionProgram ||
     reportType === Reports.ConstructionProgramForecast ||
-    reportType === Reports.ConstructionProgramForcedToFrame)
-      ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType) : [];
-
+    reportType === Reports.ConstructionProgramForcedToFrame
+      ? getFlattenedRows(reportRows as IReportFlattenedRows[], reportType)
+      : [];
 
   const strategyAndForecastReportRows = getStrategyAndForecastReportRows(reportType, reportRows);
 
@@ -114,11 +92,11 @@ const ReportTable: FC<IReportTableProps> = ({
     switch (reportType) {
       case Reports.OperationalEnvironmentAnalysis:
       case Reports.OperationalEnvironmentAnalysisForcedToFrame:
-        return <OperationalEnvironmentAnalysisTableHeader />
+        return <OperationalEnvironmentAnalysisTableHeader />;
       case Reports.Strategy:
         return <StrategyAndForecastTableHeader isForecastReport={false} year={year} />;
       case Reports.StrategyForcedToFrame:
-        return <StrategyAndForecastTableHeader isForecastReport={false} year={year + 1} />;
+        return <StrategyAndForecastTableHeader isForecastReport={false} year={year} />;
       case Reports.ForecastReport:
         return <StrategyAndForecastTableHeader isForecastReport={true} />;
       case Reports.ConstructionProgram:
@@ -129,22 +107,24 @@ const ReportTable: FC<IReportTableProps> = ({
       case Reports.ConstructionProgramForecast:
         return <ConstructionProgramForecastTableHeader />;
     }
-  }
+  };
 
   const tableHeader = getTableHeader();
 
   return (
     <View>
       <View style={styles.table}>
-        {
-          (reportType === Reports.OperationalEnvironmentAnalysis || reportType === Reports.OperationalEnvironmentAnalysisForcedToFrame) &&
-            <OperationalEnvironmentCategorySummary rows={buildOperationalEnvironmentAnalysisRows(reportRows as IOperationalEnvironmentAnalysisTableRow[])} />
-        }
         <View fixed>{tableHeader}</View>
-        <TableRow reportType={reportType} flattenedRows={
-          reportType === Reports.Strategy || reportType === Reports.StrategyForcedToFrame || reportType == Reports.ForecastReport ?
-            strategyAndForecastReportRows : flattenedRows
-        }/>
+        <TableRow
+          reportType={reportType}
+          flattenedRows={
+            reportType === Reports.Strategy ||
+            reportType === Reports.StrategyForcedToFrame ||
+            reportType == Reports.ForecastReport
+              ? strategyAndForecastReportRows
+              : flattenedRows
+          }
+        />
       </View>
     </View>
   );

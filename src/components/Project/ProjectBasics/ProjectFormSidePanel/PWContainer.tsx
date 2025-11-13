@@ -1,6 +1,6 @@
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, LinkSize } from 'hds-react/components/Link';
+import { Link, LinkSize } from 'hds-react';
 
 interface IPWContainerProps {
   pwFolderLink?: string | null;

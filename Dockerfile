@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Set environment variables
 ENV YARN_VERSION=1.22.19
-ENV NODE_VERSION=18.x
+ENV NODE_VERSION=22.x
 
 # Install necessary packages, Node.js, Yarn, and change ownership and user rights
 RUN microdnf update -y && \
@@ -21,8 +21,8 @@ RUN microdnf update -y && \
   chmod -R ug+rwX /var/lib/nginx /var/log/nginx /run
 
 # Add the NodeSource setup script and install Node.js
-ADD https://rpm.nodesource.com/setup_18.x /tmp/setup_18.x
-RUN bash /tmp/setup_18.x && rm /tmp/setup_18.x && \
+ADD https://rpm.nodesource.com/setup_22.x /tmp/setup_22.x
+RUN bash /tmp/setup_22.x && rm /tmp/setup_22.x && \
   microdnf install -y nodejs && \
   microdnf clean all
 

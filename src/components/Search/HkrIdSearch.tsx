@@ -1,12 +1,11 @@
-import { Tag } from 'hds-react/components/Tag';
-import { SearchInput } from 'hds-react/components/SearchInput';
+import { Tag } from 'hds-react';
+import { SearchInput } from 'hds-react';
 import { memo, useCallback, useState, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { arrayHasValue } from '@/utils/common';
 import { HookFormControlType, ISearchForm } from '@/interfaces/formInterfaces';
 import { Control, Controller, FieldValues, UseFormGetValues } from 'react-hook-form';
 import './styles.css';
-
 
 interface IHkrIdSearchState {
   searchWord: string;
@@ -29,13 +28,13 @@ const HkrIdSearch = ({
 
   const validateHkrId = (id: string) => {
     return id && id.length < 6;
-  }
+  };
 
   const handleSubmit = useCallback(
     (value: string, onChange: (...event: unknown[]) => void) => {
       const formValue = getValues('hkrIds');
       if (!arrayHasValue(formValue, value) && validateHkrId(value)) {
-        const nextChange = [...formValue, value]
+        const nextChange = [...formValue, value];
         onChange(nextChange);
         setSearchState((current) => {
           return {
@@ -50,18 +49,15 @@ const HkrIdSearch = ({
   );
 
   const onSelectionDelete = useCallback(
-    (
-      e: MouseEvent<HTMLDivElement | HTMLButtonElement>,
-      onChange: (event: string[]) => void,
-    ) => {
+    (e: MouseEvent<HTMLDivElement | HTMLButtonElement>, onChange: (event: string[]) => void) => {
       const targetText = e.currentTarget?.innerText || '';
       const formValue = getValues('hkrIds');
-      
-      const nextChange = formValue.filter(item => item !== targetText);
-  
+
+      const nextChange = formValue.filter((item) => item !== targetText);
+
       if (nextChange.length !== formValue.length) {
         onChange(nextChange);
-        setSearchState(current => ({
+        setSearchState((current) => ({
           ...current,
           selections: nextChange,
         }));
@@ -92,16 +88,16 @@ const HkrIdSearch = ({
               onSubmit={(v) => handleSubmit(v, onChange)}
             />
             <div className="hkr-id-search-selections">
-            {(Array.isArray(value) ? value : []).map((s) => (
+              {(Array.isArray(value) ? value : []).map((s) => (
                 <Tag
-                key={s}
-                onDelete={(e) => {
+                  key={s}
+                  onDelete={(e) => {
                     onSelectionDelete(e as React.MouseEvent<HTMLDivElement>, onChange);
-                }}
+                  }}
                 >
-                {s}
+                  {s}
                 </Tag>
-            ))}
+              ))}
             </div>
           </>
         )}

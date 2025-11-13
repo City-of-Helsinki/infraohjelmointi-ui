@@ -3,7 +3,7 @@ import { FC, memo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
-import { IOption } from '@/interfaces/common';
+import { Option } from 'hds-react';
 
 interface IProjectLocationSectionProps {
   getFieldProps: (name: string) => {
@@ -12,9 +12,9 @@ interface IProjectLocationSectionProps {
     control: Control<IProjectForm>;
   };
   locationOptions: {
-    districts: IOption[];
-    divisions: IOption[];
-    subDivisions: IOption[];
+    districts: Option[];
+    divisions: Option[];
+    subDivisions: Option[];
   };
   isInputDisabled: boolean;
   isUserOnlyViewer: boolean;
@@ -23,9 +23,8 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
   getFieldProps,
   locationOptions,
   isInputDisabled,
-  isUserOnlyViewer
+  isUserOnlyViewer,
 }) => {
-
   const { districts, divisions, subDivisions } = locationOptions;
 
   const responsibleZones = useOptions('responsibleZones');
@@ -81,15 +80,15 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <TextField {...getFieldProps('masterPlanAreaNumber')} readOnly={isUserOnlyViewer}/>
+          <TextField {...getFieldProps('masterPlanAreaNumber')} readOnly={isUserOnlyViewer} />
         </div>
         <div className="form-col-md">
-          <TextField {...getFieldProps('trafficPlanNumber')} readOnly={isUserOnlyViewer}/>
+          <TextField {...getFieldProps('trafficPlanNumber')} readOnly={isUserOnlyViewer} />
         </div>
       </div>
       <div className="form-row">
         <div className="form-col-md">
-          <TextField {...getFieldProps('bridgeNumber')} readOnly={isUserOnlyViewer}/>
+          <TextField {...getFieldProps('bridgeNumber')} readOnly={isUserOnlyViewer} />
         </div>
       </div>
     </div>

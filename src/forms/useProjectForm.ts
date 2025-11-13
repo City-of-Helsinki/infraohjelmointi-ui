@@ -20,12 +20,11 @@ import {
   selectProjectDivisions,
   selectProjectSubDivisions,
 } from '@/reducers/listsSlice';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
 import { selectIsLoading, selectIsProjectCardLoading } from '@/reducers/loaderSlice';
-import { useLocationBasedProgrammer } from '@/hooks/useLocationBasedProgrammer';
-import { getDefaultProgrammerForClasses, programmerToListItem } from '@/utils/programmerUtils';
+import { useProjectProgrammer } from '@/utils/projectProgrammerUtils';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -216,7 +215,7 @@ const useProjectFormValues = () => {
 const useProjectForm = () => {
   const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
-  const { formValues, project, classes, subClasses, masterClasses } = useProjectFormValues();
+  const { formValues, project } = useProjectFormValues();
   const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: formValues,
@@ -240,64 +239,25 @@ const useProjectForm = () => {
   const locationOptions = useLocationOptions(selections?.selectedLocation);
 
   // Get class-based programmer logic
-  const { getDefaultProgrammerFromClassHierarchy } = useLocationBasedProgrammer();
+  const { getProgrammerForClass } = useProjectProgrammer();
 
-  // Set the default programmer based on class hierarchy - enhanced version
+  // Set the default programmer based on class hierarchy
   const setDefaultProgrammerForClassHierarchy = useCallback(
     (masterClassId?: string, classId?: string, subClassId?: string) => {
-      // First try the existing logic with Redux store
-      const defaultProgrammerFromRedux = getDefaultProgrammerFromClassHierarchy(
-        masterClassId,
-        classId,
-        subClassId,
-      );
+      // Use the most specific class ID (backend handles hierarchy via computedDefaultProgrammer)
+      const mostSpecificClassId = subClassId || classId || masterClassId;
+      const defaultProgrammer = getProgrammerForClass(mostSpecificClassId);
 
-      if (defaultProgrammerFromRedux) {
+      if (defaultProgrammer) {
+        // Convert the programmer to an option format
         const programmerOption = {
-          value: defaultProgrammerFromRedux.id,
-          label: defaultProgrammerFromRedux.value,
+          value: defaultProgrammer.id,
+          label: defaultProgrammer.value,
         };
         setValue('personProgramming', programmerOption);
-        return;
-      }
-
-      // Fallback: Use direct class data (new approach)
-      const masterClass = masterClasses.find((c: IClass) => c.id === masterClassId);
-      const classItem = classes.find((c: IClass) => c.id === classId);
-      const subClass = subClasses.find((c: IClass) => c.id === subClassId);
-
-      // Debug logging (can be removed in production)
-      console.log('Setting default programmer:', {
-        masterClassId,
-        classId,
-        subClassId,
-        masterClass: masterClass?.name,
-        classItem: classItem?.name,
-        subClass: subClass?.name,
-        masterClassProgrammer: masterClass?.defaultProgrammer,
-        classProgrammer: classItem?.defaultProgrammer,
-        subClassProgrammer: subClass?.defaultProgrammer,
-      });
-
-      const directProgrammer = getDefaultProgrammerForClasses(masterClass, classItem, subClass);
-
-      if (directProgrammer) {
-        console.log('Found direct programmer:', directProgrammer);
-        const listItem = programmerToListItem(directProgrammer);
-        if (listItem) {
-          const programmerOption = {
-            value: listItem.id,
-            label: listItem.value,
-          };
-          console.log('Setting programmer option:', programmerOption);
-          setValue('personProgramming', programmerOption);
-        }
-      } else {
-        console.log('No default programmer found for selected classes');
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [getDefaultProgrammerFromClassHierarchy, setValue],
+    [getProgrammerForClass, setValue],
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected
@@ -332,6 +292,7 @@ const useProjectForm = () => {
 
   const setLocationSubClass = useCallback(
     (name: string) => {
+      // Use backend-computed autoSelectSubClass field instead of hardcoded logic
       const newSubClass = classOptions.subClasses.find(({ label }) => label.includes(name));
       if (newSubClass) {
         setValue('subClass', newSubClass);
@@ -351,11 +312,11 @@ const useProjectForm = () => {
 
       if (name === 'district') {
         setValue('division', { label: '', value: '' });
-        if (
-          ['suurpiiri', 'östersundom'].some((substring) =>
-            formValues.subClass.label.includes(substring),
-          )
-        ) {
+        // Use backend-computed autoSelectSubClass instead of hardcoded keywords
+        const selectedClass = classOptions.subClasses.find(
+          (sc) => sc.value === formValues.subClass.value,
+        );
+        if (selectedClass?.autoSelectSubClass) {
           setLocationSubClass(form.district.label);
         }
       }
@@ -376,7 +337,14 @@ const useProjectForm = () => {
         setDefaultProgrammerForClassHierarchy(masterClassId, classId, subClassId);
       }
     },
-    [setValue, formValues, setLocationSubClass, getValues, setDefaultProgrammerForClassHierarchy],
+    [
+      setValue,
+      formValues,
+      setLocationSubClass,
+      getValues,
+      setDefaultProgrammerForClassHierarchy,
+      classOptions.subClasses,
+    ],
   );
 
   // Listen to changes in the form value and set selected class or location if those properties are changed
@@ -392,93 +360,69 @@ const useProjectForm = () => {
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setValue, setSelectedClass, setSelectedLocation]);
+  }, [watch, setSelectedClass, setSelectedLocation]);
 
   const dispatch = useAppDispatch();
 
   // Track previous values to avoid unnecessary resets
   const [prevValues, setPrevValues] = useState(formValues);
 
-  // Updates form with the selectedProject from redux
+  // Reset form values when receiving project updates or when loading states settle
   useEffect(() => {
-    const currentState = getValues();
-    const inComingState = formValues;
-    const isSubmitting = formState.isSubmitting;
-    const sameValuesInStates = _.isEqual(currentState, inComingState);
-    const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project?.id;
-
-    // Only reset if values have actually changed
-    if (!_.isEqual(prevValues, formValues)) {
-      setPrevValues(formValues);
-
-      if (
-        (projectMode === 'edit' && projectUpdateMatchesCurrentProject && !sameValuesInStates) ||
-        (selectedProject !== null && projectMode === 'new')
-      ) {
-        reset(formValues);
-        if (projectMode === 'edit' && !isSubmitting) {
-          dispatch(
-            notifyInfo({
-              title: 'update',
-              message: 'projectUpdated',
-              type: 'toast',
-              duration: 3500,
-            }),
-          );
-        }
-      }
+    if (isEqual(prevValues, formValues)) {
+      return;
     }
-  }, [
-    project,
-    projectUpdate,
-    dispatch,
-    formState.isSubmitting,
-    formValues,
-    getValues,
-    projectMode,
-    reset,
-    selectedProject,
-    prevValues,
-  ]);
 
-  // Reset form values when loading states change - with comprehensive safeguards
-  useEffect(() => {
-    if (!isProjectCardLoading && !isLoading) {
-      // Only reset if ALL conditions are met:
-      // 1. Values have actually changed
-      // 2. Form is not dirty (no user changes)
-      // 3. Not currently submitting
-      // 4. We have legitimate new data to populate (not empty formValues)
-      // This prevents resetting user-entered data on page refresh or during user interaction
+    const isSubmitting = formState.isSubmitting;
+    const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project?.id;
+    const triggeredByProjectUpdate =
+      (projectMode === 'edit' && projectUpdateMatchesCurrentProject) ||
+      (projectMode === 'new' && selectedProject !== null);
 
+    const canResetAfterLoading = !isProjectCardLoading && !isLoading;
+    let triggeredByLoadingStates = false;
+
+    if (canResetAfterLoading) {
       const formIsDirty = formState.isDirty;
       const hasLegitimateData = Object.values(formValues).some((value) => {
         if (typeof value === 'string') return value.length > 0;
         if (typeof value === 'object' && value !== null) {
-          // For dropdown objects (IOption), check if they have a valid value
           return 'value' in value && value.value && String(value.value).length > 0;
         }
         return value !== null && value !== undefined;
       });
 
-      if (
-        !_.isEqual(prevValues, formValues) &&
-        !formIsDirty &&
-        !formState.isSubmitting &&
-        hasLegitimateData
-      ) {
-        setPrevValues(formValues);
-        reset(formValues);
+      triggeredByLoadingStates = !formIsDirty && !isSubmitting && hasLegitimateData;
+    }
+
+    if (triggeredByProjectUpdate || (canResetAfterLoading && triggeredByLoadingStates)) {
+      setPrevValues(formValues);
+      reset(formValues);
+
+      if (triggeredByProjectUpdate && projectMode === 'edit' && !isSubmitting) {
+        dispatch(
+          notifyInfo({
+            title: 'update',
+            message: 'projectUpdated',
+            type: 'toast',
+            duration: 3500,
+          }),
+        );
       }
     }
   }, [
-    isProjectCardLoading,
-    isLoading,
-    formValues,
-    reset,
-    prevValues,
+    dispatch,
     formState.isDirty,
     formState.isSubmitting,
+    formValues,
+    isLoading,
+    isProjectCardLoading,
+    prevValues,
+    project,
+    projectMode,
+    projectUpdate,
+    reset,
+    selectedProject,
   ]);
 
   return {
