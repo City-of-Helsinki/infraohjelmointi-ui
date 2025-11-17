@@ -9,7 +9,7 @@ interface ISideNavigationProps {
 }
 
 const SideNavigation: FC<ISideNavigationProps> = ({ navItems }) => {
-  const [active, setActive] = useState('#basics');
+  const [active, setActive] = useState(navItems[0]?.route || '#basics');
 
   const { t } = useTranslation();
   const navigate = useNavigate();

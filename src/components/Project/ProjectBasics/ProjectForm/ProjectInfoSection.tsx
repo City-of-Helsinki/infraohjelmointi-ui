@@ -21,17 +21,16 @@ interface IProjectInfoSectionProps {
   };
   getValues: UseFormGetValues<IProjectForm>;
   isInputDisabled: boolean;
-  projectMode: "edit" | "new";
+  projectMode: 'edit' | 'new';
   isUserOnlyViewer: boolean;
 }
 
 const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   project,
   getFieldProps,
-  getValues,
   control,
   isInputDisabled,
-  isUserOnlyViewer
+  isUserOnlyViewer,
 }) => {
   const areas = useOptions('areas');
   const types = useOptions('types');
@@ -105,7 +104,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             testId="project-form-description"
             {...getFieldProps('description')}
             size="l"
-            rules={{...validateMaxLength(1000,t), ...validateRequired('description', t)}}
+            rules={{ ...validateMaxLength(1000, t), ...validateRequired('description', t) }}
             formSaved={isSaving}
             readOnly={isUserOnlyViewer}
           />

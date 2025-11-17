@@ -7,12 +7,13 @@ import { useTranslation } from 'react-i18next';
 interface INumberFieldProps {
   name: string;
   label: string;
-  control: HookFormControlType;
+  control?: HookFormControlType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
   tooltip?: string;
   hideLabel?: boolean;
   disabled?: boolean;
+  size?: 'full' | 'l';
 }
 
 const NumberField: FC<INumberFieldProps> = ({
@@ -24,6 +25,7 @@ const NumberField: FC<INumberFieldProps> = ({
   tooltip,
   hideLabel,
   disabled,
+  size = 'l',
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
@@ -35,7 +37,7 @@ const NumberField: FC<INumberFieldProps> = ({
       render={({ field: { value, onChange }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
-            className="input-l"
+            className={`input-${size}`}
             value={value ?? ''}
             onChange={onChange}
             label={!hideLabel ? t(label) : ''}

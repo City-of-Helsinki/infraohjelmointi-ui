@@ -130,6 +130,18 @@ export interface IHashTagsForm {
   hashTag: string;
 }
 
+export interface IProjectTalpaForm {
+  budgetItemNumber: string;
+  budgetItemName: string;
+  projectNumberRange: IOption;
+  exampleProject: string;
+  projectType: IOption;
+  priority: IOption;
+  SAPName: string;
+  projectStart: string | null;
+  projectEnd: string | null;
+}
+
 export interface IAppForms
   extends IProjectHeaderForm,
     IProjectForm,

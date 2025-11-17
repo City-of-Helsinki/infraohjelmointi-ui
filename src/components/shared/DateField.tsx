@@ -7,12 +7,24 @@ import { useTranslation } from 'react-i18next';
 interface IDateFieldProps {
   name: string;
   label: string;
-  control: HookFormControlType;
+  control?: HookFormControlType;
   rules?: HookFormRulesType;
   readOnly?: boolean;
+  helperText?: string;
+  className?: string;
+  size?: 'full' | 'l';
 }
 
-const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly }) => {
+const DateField: FC<IDateFieldProps> = ({
+  name,
+  label,
+  control,
+  rules,
+  readOnly,
+  className = '',
+  helperText,
+  size = 'l',
+}) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
   const currentDate = new Date();
@@ -25,9 +37,13 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
       control={control as Control<FieldValues>}
       render={({ field: { onChange, value }, fieldState: { error } }) => {
         return (
-          <div className="input-wrapper date-field-wrapper" id={name} data-testid={name}>
+          <div
+            className={`input-wrapper date-field-wrapper ${className}`}
+            id={name}
+            data-testid={name}
+          >
             <HDSDateInput
-              className="input-l date-input"
+              className={`input-${size} date-input`}
               onChange={onChange}
               value={value}
               placeholder={''}
@@ -41,6 +57,7 @@ const DateField: FC<IDateFieldProps> = ({ name, label, control, rules, readOnly 
               errorText={error?.message}
               maxDate={datePlus10Years}
               disableDatePicker={readOnly}
+              helperText={helperText}
             />
           </div>
         );

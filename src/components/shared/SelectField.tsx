@@ -9,7 +9,7 @@ import TextField from './TextField';
 
 interface ISelectFieldProps {
   name: string;
-  control: HookFormControlType;
+  control?: HookFormControlType;
   options: Array<Option>;
   label?: string;
   rules?: HookFormRulesType;
@@ -21,6 +21,7 @@ interface ISelectFieldProps {
   size?: 'full' | 'lg';
   shouldTranslate?: boolean;
   readOnly?: boolean;
+  placeholder?: string;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -37,6 +38,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   size,
   shouldTranslate,
   readOnly,
+  placeholder,
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -160,7 +162,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   texts={{
                     label: !hideLabel && label ? t(label) : undefined,
                     error: error?.message,
-                    placeholder: t('choose') ?? '',
+                    placeholder: placeholder ?? t('choose'),
                   }}
                 />
               )}

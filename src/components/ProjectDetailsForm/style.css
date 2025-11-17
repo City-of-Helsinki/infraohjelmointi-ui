@@ -1,23 +1,23 @@
 .button-container {
-    border-bottom-width: 1px;
-    border-color: var(--color-black-20);
-    padding-left:12rem;
-    height: 50px;
+  border-bottom-width: 1px;
+  border-color: var(--color-black-20);
+  padding-left: 12rem;
+  height: 50px;
 
-    @media (max-width: 680px) {
-       padding-left: 20px;
-      }
+  @media (max-width: 680px) {
+    padding-left: 20px;
+  }
 }
 
 .button {
-    height: 100%;
-    padding: 0 27px;
-    color: var(--color-bus);
+  height: 100%;
+  padding: 0 27px;
+  color: var(--color-bus);
 }
 
 .buttonHighlighted {
-    height: 100%;
-    padding: 0 33px;
-    color: var(--color-bus);
-    border-bottom: 5px solid var(--color-bus);
+  height: 100%;
+  padding: 0 33px;
+  color: var(--color-bus);
+  border-bottom: 5px solid var(--color-bus);
 }

@@ -24,10 +24,14 @@ import ErrorView from './views/ErrorView';
 import AuthGuard from './components/AuthGuard';
 import SearchResultsView from './views/SearchResultsView';
 import { CustomContextMenu } from './components/CustomContextMenu';
-import { getCoordinationGroupsThunk, getForcedToFrameGroupsThunk, getPlanningGroupsThunk } from './reducers/groupSlice';
+import {
+  getCoordinationGroupsThunk,
+  getForcedToFrameGroupsThunk,
+  getPlanningGroupsThunk,
+} from './reducers/groupSlice';
 import { getHashTagsThunk } from './reducers/hashTagsSlice';
 import { clearLoading, setLoading } from './reducers/loaderSlice';
-import { getSapCostsThunk,getSapCurrentYearThunk } from './reducers/sapCostSlice';
+import { getSapCostsThunk, getSapCurrentYearThunk } from './reducers/sapCostSlice';
 import moment from 'moment';
 import 'moment/locale/fi';
 import ScrollHandler from './components/shared/ScrollHandler';
@@ -40,19 +44,24 @@ import AdminHashtags from './components/Admin/AdminHashtags';
 import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
 import useUpdateEvents from './hooks/useUpdateEvents';
-import { getCoordinatorNotesThunk, selectStartYear, setIsPlanningLoading } from './reducers/planningSlice';
+import {
+  getCoordinatorNotesThunk,
+  selectStartYear,
+  setIsPlanningLoading,
+} from './reducers/planningSlice';
 import AccessDeniedView from './views/AccessDeniedView';
 import { isUserOnlyViewer } from './utils/userRoleHelpers';
 import MaintenanceView from './views/Maintenance';
 import { AppDispatch } from './store';
 import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForcedToFrame';
 import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
+import ProjectTalpa from './components/Project/ProjectTalpa/ProjectTalpa';
 
 const LOADING_APP_ID = 'loading-app-data';
 
 export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
   dispatch(setIsPlanningLoading(true));
-  dispatch(setLoading({ text: 'Loading app data', id: "planning" }));
+  dispatch(setLoading({ text: 'Loading app data', id: 'planning' }));
   try {
     await dispatch(getPlanningGroupsThunk(year));
     await dispatch(getPlanningClassesThunk(year));
@@ -62,13 +71,13 @@ export const loadPlanningData = async (dispatch: AppDispatch, year: number) => {
     dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
   } finally {
     dispatch(setIsPlanningLoading(false));
-    dispatch(clearLoading("planning"));
+    dispatch(clearLoading('planning'));
   }
 };
 
 export const loadCoordinationData = async (dispatch: AppDispatch, year: number) => {
   dispatch(setIsPlanningLoading(true));
-  dispatch(setLoading({ text: 'Loading app data', id: "coordination" }));
+  dispatch(setLoading({ text: 'Loading app data', id: 'coordination' }));
   try {
     await dispatch(getCoordinationGroupsThunk(year));
     await dispatch(getCoordinationClassesThunk(year));
@@ -81,9 +90,9 @@ export const loadCoordinationData = async (dispatch: AppDispatch, year: number) 
     dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
   } finally {
     dispatch(setIsPlanningLoading(false));
-    dispatch(clearLoading("coordination"));
+    dispatch(clearLoading('coordination'));
   }
-}
+};
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
@@ -102,13 +111,13 @@ const App: FC = () => {
     const initializeStates = async () => {
       // Set moments locale to finnish for the app
       moment().locale('fi');
-  
+
       // When maintenance mode is on, don't fetch data
       if (MAINTENANCE_MODE) {
         setAppDataReady(true);
         return;
       }
-  
+
       dispatch(setLoading({ text: 'Loading app data', id: LOADING_APP_ID }));
       try {
         setAppDataReady(false);
@@ -121,7 +130,7 @@ const App: FC = () => {
         dispatch(notifyError({ message: 'appDataError', type: 'notification', title: '500' }));
       } finally {
         dispatch(clearLoading(LOADING_APP_ID));
-        setAppDataReady(true)
+        setAppDataReady(true);
       }
     };
     initializeStates().catch(Promise.reject);
@@ -143,7 +152,7 @@ const App: FC = () => {
       dispatch(getSapCostsThunk(yearNow));
       dispatch(getSapCurrentYearThunk(startYear));
     }
-  }, [user, startYear, MAINTENANCE_MODE, dispatch]);
+  }, [user, startYear, MAINTENANCE_MODE, dispatch, yearNow]);
 
   return (
     <div>
@@ -160,6 +169,7 @@ const App: FC = () => {
                 <Route path="basics" element={<ProjectBasics />} />
                 <Route path="new" element={<ProjectBasics />} />
                 <Route path="notes" element={<ProjectNotes />} />
+                <Route path="talpa" element={<ProjectTalpa />} />
               </Route>
               <Route path="/planning" element={<PlanningView />} />
               <Route path="/coordination" element={<PlanningView />} />
