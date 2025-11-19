@@ -54,7 +54,7 @@ const ProjectNote: FC<IProjectNoteProps> = ({ note }) => {
       </div>
       {/* content */}
       <div className="px-6 pb-8">
-        <p>{note.content}</p>
+        <p className="whitespace-pre-wrap">{note.content}</p>
       </div>
       {/* footer (buttons) */}
       <div className="note-footer">
