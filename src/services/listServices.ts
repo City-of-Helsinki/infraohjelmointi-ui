@@ -141,3 +141,12 @@ export const getProgrammers = async (): Promise<Array<IListItem>> => {
     return Promise.reject(e);
   }
 };
+
+export const getTalpaProjectRanges = async (): Promise<IListItem[]> => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/talpa-project-ranges/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};

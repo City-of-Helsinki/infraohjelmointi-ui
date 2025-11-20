@@ -16,6 +16,7 @@ import {
   getDistricts,
   getBudgetOverrunReasons,
   getProgrammers,
+  getTalpaProjectRanges,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -40,6 +41,7 @@ export interface IListState {
   budgetOverrunReasons: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
+  talpaProjectRanges: Array<IListItem>;
   error: IError | null | unknown;
 }
 
@@ -62,6 +64,7 @@ const initialState: IListState = {
   programmedYears: setProgrammedYears(),
   projectClasses: [],
   programmers: [],
+  talpaProjectRanges: [],
   error: null,
 };
 
@@ -115,6 +118,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await getBudgetOverrunReasons(),
       programmers: await getProgrammers(),
+      talpaProjectRanges: await getTalpaProjectRanges(),
       projectClasses: [],
     };
   } catch (err) {
@@ -148,5 +152,6 @@ export const selectProjectPhases = (state: RootState) => state.lists.phases;
 export const selectBudgetOverrunReasons = (state: RootState) => state.lists.budgetOverrunReasons;
 export const selectProjectClasses = (state: RootState) => state.lists.projectClasses;
 export const selectProgrammers = (state: RootState) => state.lists.programmers;
+export const selectTalpaProjectRanges = (state: RootState) => state.lists.talpaProjectRanges;
 
 export default listsSlice.reducer;

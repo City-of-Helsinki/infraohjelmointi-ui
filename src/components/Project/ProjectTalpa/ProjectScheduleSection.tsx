@@ -10,14 +10,16 @@ export default function ProjectScheduleSection() {
 
   return (
     <div className="mb-8">
-      <FormSectionTitle {...getFieldProps('projectSchedule')} />
+      <FormSectionTitle label="projectTalpaForm.projectSchedule" name="projectSchedule" />
       <div className={styles.formRowWithColumns}>
+        {/* Projektin aloituspäivämäärä */}
         <DateField
           {...getFieldProps('projectStart')}
           className="flex-1"
           size="full"
           rules={{ ...validateRequired('projectStart', t) }}
         />
+        {/* Projektin lopetuspäivämäärä */}
         <DateField
           {...getFieldProps('projectEnd')}
           className="flex-1"

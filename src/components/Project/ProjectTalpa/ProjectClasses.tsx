@@ -8,27 +8,29 @@ export default function ProjectClassesSection() {
 
   return (
     <div className="mb-12">
-      <FormSectionTitle {...getFieldProps('projectClasses')} />
+      <FormSectionTitle label="projectTalpaForm.projectClasses" name="projectClasses" />
+      {/* Palveluluokka */}
       <SelectField
         {...getFieldProps('serviceClass')}
         options={[]}
         size="full"
         placeholder={t('projectTalpaForm.serviceClassPlaceholder')}
       />
+      {/* Käyttöomaisuusluokka */}
       <SelectField
-        {...getFieldProps('performanceClasses')}
+        {...getFieldProps('assetClasses')}
         options={[]}
         size="full"
-        placeholder={t('projectTalpaForm.performanceClassesPlaceholder')}
+        placeholder={t('projectTalpaForm.assetClassesPlaceholder')}
       />
-      <TextField
-        {...getFieldProps('profileName')}
-        placeholder={t('projectTalpaForm.profileNamePlaceholder')}
-        size="full"
-      />
+      {/* Proﬁiilin nimi */}
+      <TextField {...getFieldProps('profileName')} size="full" />
       <div className={styles.formRowWithColumns}>
+        {/* Pitoaika */}
         <NumberField {...getFieldProps('holdingTime')} size="full" />
-        <TextField {...getFieldProps('investProfile')} size="full" />
+        {/* Investointiproﬁli */}
+        <TextField {...getFieldProps('investmentProfile')} size="full" />
+        {/* Valmius */}
         <TextField {...getFieldProps('readiness')} size="full" />
       </div>
     </div>

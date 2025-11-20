@@ -132,14 +132,24 @@ export interface IHashTagsForm {
 
 export interface IProjectTalpaForm {
   budgetItemNumber: string;
-  budgetItemName: string;
-  projectNumberRange: IOption;
-  exampleProject: string;
-  projectType: IOption;
-  priority: IOption;
-  SAPName: string;
-  projectStart: string | null;
-  projectEnd: string | null;
+  budgetAccount: string; // Talousarviokohdan nimi
+  projectNumberRange: IOption; // Projektinumeroväli
+  templateProject: string; // Malliprojekti
+  projectType: IOption; // Laji
+  priority: IOption; // Prioriteetti
+  projectName: string; // SAP-nimi
+  projectStart: string | null; // Projektin aloituspäivämäärä
+  projectEnd: string | null; // Projektin lopetuspäivämäärä
+  streetAddress: string; // Katuosoite
+  postalCode: string; // Postinumero
+  responsiblePerson: string; // Vastuuhenkilö
+  responsiblePersonEmail: string; // Vastuuhenkilön sähköposti
+  serviceClass: IOption; // Palveluluokka
+  assetClasses: IOption; // Käyttöomaisuusluokat
+  profileName: string; // Profiilin nimi
+  holdingTime: string; // Pitoaika
+  investmentProfile: string; // Investointiluokka
+  readiness: string; // Valmius
 }
 
 export interface IAppForms

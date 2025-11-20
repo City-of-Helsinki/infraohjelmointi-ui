@@ -1,5 +1,5 @@
 import useTalpaForm from '@/forms/useTalpaForm';
-import { FormProvider } from 'react-hook-form';
+import { FieldPath, FormProvider } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import ProjectIdentifiersSection from './ProjectIdentifiersSection';
 import ProjectBudgetItemSection from './ProjectBudgetItemSection';
@@ -9,7 +9,7 @@ import ProjectScheduleSection from './ProjectScheduleSection';
 import ProjectContactsSection from './ProjectContactsSection';
 import ProjectClassesSection from './ProjectClasses';
 
-export function getFieldProps(name: string) {
+export function getFieldProps(name: FieldPath<IProjectTalpaForm>) {
   return {
     name: name,
     label: `projectTalpaForm.${name}`,

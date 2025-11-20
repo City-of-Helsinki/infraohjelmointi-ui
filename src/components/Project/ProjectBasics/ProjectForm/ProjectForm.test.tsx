@@ -93,6 +93,7 @@ const render = async () =>
             budgetOverrunReasons: mockBudgetOverrunReasons.data,
             programmers: mockProgrammers.data,
             projectClasses: [],
+            talpaProjectRanges: [],
             error: {},
           },
           hashTags: {

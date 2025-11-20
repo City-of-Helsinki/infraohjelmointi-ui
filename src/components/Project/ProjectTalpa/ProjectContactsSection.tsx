@@ -9,8 +9,9 @@ export default function ProjectContactsSection() {
 
   return (
     <div className="mb-12">
-      <FormSectionTitle {...getFieldProps('projectContacts')} />
+      <FormSectionTitle label="projectTalpaForm.projectContacts" name="projectContacts" />
       <div className={styles.formRowWithColumns}>
+        {/* Katuosoite */}
         <TextField
           {...getFieldProps('streetAddress')}
           wrapperClassName="flex-1"
@@ -18,6 +19,7 @@ export default function ProjectContactsSection() {
           rules={{ ...validateRequired('streetAddress', t) }}
           placeholder={t('projectTalpaForm.streetAddressPlaceholder')}
         />
+        {/* Postinumero */}
         <TextField
           {...getFieldProps('postalCode')}
           wrapperClassName="flex-1"
@@ -26,19 +28,21 @@ export default function ProjectContactsSection() {
         />
       </div>
       <div className={styles.formRowWithColumns}>
+        {/* Vastuuhenkilö */}
         <TextField
-          {...getFieldProps('contactPerson')}
+          {...getFieldProps('responsiblePerson')}
           wrapperClassName="flex-1"
           size="full"
-          rules={{ ...validateRequired('contactPerson', t) }}
-          placeholder={t('projectTalpaForm.contactPersonPlaceholder')}
+          rules={{ ...validateRequired('responsiblePerson', t) }}
+          placeholder={t('projectTalpaForm.responsiblePersonPlaceholder')}
         />
+        {/* Vastuuhenkilön sähköposti */}
         <TextField
-          {...getFieldProps('contactEmail')}
+          {...getFieldProps('responsiblePersonEmail')}
           wrapperClassName="flex-1"
           size="full"
-          rules={{ ...validateRequired('contactEmail', t) }}
-          placeholder={t('projectTalpaForm.contactEmailPlaceholder')}
+          rules={{ ...validateRequired('responsiblePersonEmail', t) }}
+          placeholder={t('projectTalpaForm.responsiblePersonEmailPlaceholder')}
         />
       </div>
     </div>

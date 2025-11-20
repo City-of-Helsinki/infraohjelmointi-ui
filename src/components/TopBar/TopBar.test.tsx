@@ -58,6 +58,7 @@ const render = async (customRoute?: string) =>
             budgetOverrunReasons: [],
             programmers: [],
             projectClasses: [],
+            talpaProjectRanges: [],
             error: {},
           },
         },

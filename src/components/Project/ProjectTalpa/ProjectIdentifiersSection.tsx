@@ -4,42 +4,50 @@ import { useTranslation } from 'react-i18next';
 import { validateMaxLength, validateRequired } from '@/utils/validation';
 import { useFormContext } from 'react-hook-form';
 import { BudgetItemNumber } from './budgetItemNumber';
+import { selectTalpaProjectRanges } from '@/reducers/listsSlice';
+import { useSelector } from 'react-redux';
+import { listItemsToOption } from '@/utils/common';
 
 export default function ProjectIdentifiersSection() {
   const { t } = useTranslation();
   const { watch } = useFormContext();
   const budgetItemNumber = watch('budgetItemNumber');
+  const talpaProjectRanges = useSelector(selectTalpaProjectRanges);
 
   return (
     <div className="mb-12">
-      <FormSectionTitle {...getFieldProps('projectIdentifiers')} />
+      <FormSectionTitle label="projectTalpaForm.projectIdentifiers" name="projectIdentifiers" />
+      {/* Talousarviokohdan nimi */}
       <TextField
-        {...getFieldProps('budgetItemName')}
-        rules={{ ...validateRequired('budgetItemName', t) }}
+        {...getFieldProps('budgetAccount')}
+        rules={{ ...validateRequired('budgetAccount', t) }}
         size="full"
       />
+      {/* Projektinumeroväli */}
       <SelectField
         {...getFieldProps('projectNumberRange')}
-        options={[]}
+        options={listItemsToOption(talpaProjectRanges)}
         rules={{ ...validateRequired('projectNumberRange', t) }}
         size="full"
         placeholder={t('projectTalpaForm.projectNumberRangePlaceholder')}
       />
+      {/* Malliprojekti */}
       {budgetItemNumber === BudgetItemNumber.InfraInvestment ? (
         <TextField
-          {...getFieldProps('exampleProject')}
+          {...getFieldProps('templateProject')}
           defaultValue="2814I00000"
-          rules={{ ...validateRequired('exampleProject', t) }}
+          rules={{ ...validateRequired('templateProject', t) }}
           size="full"
         />
       ) : (
         <SelectField
-          {...getFieldProps('exampleProject')}
+          {...getFieldProps('templateProject')}
           options={[]}
-          rules={{ ...validateRequired('exampleProject', t) }}
+          rules={{ ...validateRequired('templateProject', t) }}
           size="full"
         />
       )}
+      {/* Laji */}
       <SelectField
         {...getFieldProps('projectType')}
         options={[]}
@@ -47,6 +55,7 @@ export default function ProjectIdentifiersSection() {
         size="full"
         placeholder={t('projectTalpaForm.projectTypePlaceholder')}
       />
+      {/* Prioriteetti */}
       <SelectField
         {...getFieldProps('priority')}
         options={[]}
@@ -54,15 +63,16 @@ export default function ProjectIdentifiersSection() {
         size="full"
         placeholder={t('projectTalpaForm.priorityPlaceholder')}
       />
+      {/* SAP-nimi */}
       <TextField
-        {...getFieldProps('SAPName')}
+        {...getFieldProps('projectName')}
         rules={{
-          ...validateRequired('SAPName', t),
+          ...validateRequired('projectName', t),
           ...validateMaxLength(24, t),
         }}
         size="full"
-        placeholder={t('projectTalpaForm.SAPNamePlaceholder')}
-        helperText={t('projectTalpaForm.SAPNameHelpText')}
+        placeholder={t('projectTalpaForm.projectNamePlaceholder')}
+        helperText={t('projectTalpaForm.projectNameHelpText')}
       />
     </div>
   );
