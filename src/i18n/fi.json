@@ -184,7 +184,12 @@
     "projectStart": "$t(projectTalpaForm.projectStart)",
     "projectEnd": "$t(projectTalpaForm.projectEnd)",
     "serviceClass": "$t(projectTalpaForm.serviceClass)",
-    "assetClass": "$t(projectTalpaForm.assetClass)"
+    "assetClass": "$t(projectTalpaForm.assetClass)",
+    "streetAddress": "$t(projectTalpaForm.streetAddress)",
+    "postalCode": "$t(projectTalpaForm.postalCode)",
+    "responsiblePerson": "$t(projectTalpaForm.responsiblePerson)",
+    "responsiblePersonEmail": "$t(projectTalpaForm.responsiblePersonEmail)",
+    "templateProject": "$t(projectTalpaForm.templateProject)"
   },
   "projectTalpaForm": {
     "budgetItemNumber": "Hankkeen talousarviokohdan numero",

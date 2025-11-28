@@ -32,10 +32,12 @@ export const validateMaxNumber = (max: number, t: TFunction<'translation'>) => (
   },
 });
 
+const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
 export const validateEmail = (t: TFunction<'translation'>) => ({
   validate: {
     isEmail: (value: string | null | undefined) =>
-      !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? true : t('validation.invalidEmail'),
+      !value || emailRegex.test(value) ? true : t('validation.invalidEmail'),
   },
 });
 
