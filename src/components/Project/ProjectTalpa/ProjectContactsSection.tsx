@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { FormSectionTitle, TextField } from '@/components/shared';
 import { getFieldProps } from './ProjectTalpaForm';
-import { validateRequired } from '@/utils/validation';
+import { validateEmail, validateRequired } from '@/utils/validation';
 import styles from './styles.module.css';
 
 export default function ProjectContactsSection() {
@@ -41,7 +41,7 @@ export default function ProjectContactsSection() {
           {...getFieldProps('responsiblePersonEmail')}
           wrapperClassName="flex-1"
           size="full"
-          rules={{ ...validateRequired('responsiblePersonEmail', t) }}
+          rules={{ ...validateRequired('responsiblePersonEmail', t), ...validateEmail(t) }}
           placeholder={t('projectTalpaForm.responsiblePersonEmailPlaceholder')}
         />
       </div>

@@ -3,10 +3,13 @@ import { ProjectFormSidePanel } from '../ProjectBasics/ProjectFormSidePanel';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
 import ProjectTalpaForm from './ProjectTalpaForm';
+import { TalpaStatusLabel } from './TalpaStatusLabel';
+import { selectTalpaProject } from '@/reducers/talpaSlice';
 
 export default function ProjectTalpa() {
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
+  const talpaProject = useAppSelector(selectTalpaProject);
 
   const navItems = [
     { route: '#budgetItemNumber', label: t('nav.budgetItemNumber') },
@@ -23,9 +26,12 @@ export default function ProjectTalpa() {
           navItems={navItems}
           pwFolderLink={project?.pwFolderLink}
           showSaveIndicator={false}
+          formStatusSection={
+            talpaProject?.status ? <TalpaStatusLabel status={talpaProject.status} /> : null
+          }
         />
       </div>
-      <div className="w-full pr-4" data-testid="talpa-form">
+      <div className="mb-20 w-full pr-4" data-testid="talpa-form">
         <ProjectTalpaForm />
       </div>
     </div>

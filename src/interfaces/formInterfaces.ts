@@ -131,12 +131,13 @@ export interface IHashTagsForm {
 }
 
 export interface IProjectTalpaForm {
-  budgetItemNumber: string;
-  budgetAccount: string; // Talousarviokohdan nimi
-  projectNumberRange: IOption; // Projektinumeroväli
-  templateProject: string; // Malliprojekti
-  projectType: IOption; // Laji
-  priority: IOption; // Prioriteetti
+  id?: string;
+  budgetItemNumber?: string;
+  budgetAccount: string; // Talousarviokohta
+  projectNumberRange: IOption | null; // Projektinumeroväli
+  templateProject: string | IOption; // Malliprojekti
+  projectType: IOption | null; // Laji
+  priority: IOption | null; // Lajin prioriteetti
   projectName: string; // SAP-nimi
   projectStart: string | null; // Projektin aloituspäivämäärä
   projectEnd: string | null; // Projektin lopetuspäivämäärä
@@ -144,10 +145,10 @@ export interface IProjectTalpaForm {
   postalCode: string; // Postinumero
   responsiblePerson: string; // Vastuuhenkilö
   responsiblePersonEmail: string; // Vastuuhenkilön sähköposti
-  serviceClass: IOption; // Palveluluokka
-  assetClasses: IOption; // Käyttöomaisuusluokat
+  serviceClass: IOption | null; // Palveluluokka
+  assetClass: IOption | null; // Käyttöomaisuusluokka
   profileName: string; // Profiilin nimi
-  holdingTime: string; // Pitoaika
+  holdingTime: number | null; // Pitoaika
   investmentProfile: string; // Investointiluokka
   readiness: string; // Valmius
 }

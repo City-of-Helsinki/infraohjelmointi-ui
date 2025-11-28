@@ -132,8 +132,10 @@ const handleError = (error: AxiosError): Promise<IError> => {
 
   const responseUrl = error?.request?.responseURL || '';
 
+  const excludedUrls = ['/project-hashtags', '/projects/', '/talpa'];
+
   // The handling of backend errors is still in the works, so we're excluding endpoints that we want to handle differently
-  if (!responseUrl.includes('project-hashtags') && !responseUrl.includes('/projects/')) {
+  if (!excludedUrls.some((excludedUrl) => responseUrl.includes(excludedUrl))) {
     store.dispatch(notifyError(getErrorNotification(error)));
   }
 

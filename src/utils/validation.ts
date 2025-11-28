@@ -32,6 +32,13 @@ export const validateMaxNumber = (max: number, t: TFunction<'translation'>) => (
   },
 });
 
+export const validateEmail = (t: TFunction<'translation'>) => ({
+  validate: {
+    isEmail: (value: string | null | undefined) =>
+      !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? true : t('validation.invalidEmail'),
+  },
+});
+
 export const validateBefore = (
   startDate: string | null,
   endDateField: string,

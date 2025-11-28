@@ -94,6 +94,9 @@ const render = async () =>
             programmers: mockProgrammers.data,
             projectClasses: [],
             talpaProjectRanges: [],
+            talpaProjectTypes: [],
+            talpaServiceClasses: [],
+            talpaAssetClasses: [],
             error: {},
           },
           hashTags: {

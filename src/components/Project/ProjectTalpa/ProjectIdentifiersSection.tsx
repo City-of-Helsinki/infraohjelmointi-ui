@@ -4,15 +4,99 @@ import { useTranslation } from 'react-i18next';
 import { validateMaxLength, validateRequired } from '@/utils/validation';
 import { useFormContext } from 'react-hook-form';
 import { BudgetItemNumber } from './budgetItemNumber';
-import { selectTalpaProjectRanges } from '@/reducers/listsSlice';
+import { selectTalpaProjectRanges, selectTalpaProjectTypes } from '@/reducers/listsSlice';
 import { useSelector } from 'react-redux';
-import { listItemsToOption } from '@/utils/common';
+import { groupOptions } from '@/utils/common';
+import { useEffect, useMemo } from 'react';
+import {
+  infraInvestmentTemplateProject,
+  preConstructionTemplateProjectOptions,
+} from './templateProjectOptions';
+import { uniqBy } from 'lodash';
+import { defaultFilter } from 'hds-react';
 
 export default function ProjectIdentifiersSection() {
   const { t } = useTranslation();
-  const { watch } = useFormContext();
-  const budgetItemNumber = watch('budgetItemNumber');
+  const { watch, setValue } = useFormContext();
+  const [budgetItemNumber, projectType] = watch(['budgetItemNumber', 'projectType']);
   const talpaProjectRanges = useSelector(selectTalpaProjectRanges);
+  const talpaProjectTypes = useSelector(selectTalpaProjectTypes);
+
+  const filteredProjectRanges = talpaProjectRanges.filter(
+    (projectRange) => projectRange.projectTypePrefix === budgetItemNumber,
+  );
+
+  const projectRangeGroups = useMemo(
+    () =>
+      budgetItemNumber === BudgetItemNumber.InfraInvestment
+        ? groupOptions(
+            filteredProjectRanges,
+            (projectRange) => projectRange.budgetAccount,
+            (projectRange) => ({
+              label: `${projectRange.majorDistrictName} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
+              value: projectRange.id,
+              selected: false,
+              isGroupLabel: false,
+              visible: true,
+              disabled: false,
+            }),
+          )
+        : groupOptions(
+            filteredProjectRanges,
+            (projectRange) => projectRange.budgetAccount,
+            (projectRange) => ({
+              label: `${projectRange.unit} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
+              value: projectRange.id,
+              selected: false,
+              isGroupLabel: false,
+              visible: true,
+              disabled: false,
+            }),
+          ),
+    [budgetItemNumber, filteredProjectRanges],
+  );
+
+  const projectTypeGroups = useMemo(
+    () =>
+      groupOptions(
+        uniqBy(talpaProjectTypes, 'name'),
+        (projectType) => projectType.category,
+        (projectType) => ({
+          label: projectType.name,
+          value: projectType.id,
+          selected: false,
+          isGroupLabel: false,
+          visible: true,
+          disabled: false,
+        }),
+      ),
+    [talpaProjectTypes],
+  );
+
+  const priorityGroups = useMemo(() => {
+    if (!projectType?.label) {
+      return [];
+    }
+
+    return groupOptions(
+      talpaProjectTypes.filter((pt) => pt.name === projectType.label),
+      (projectType) => projectType.name,
+      (projectType) => ({
+        label: `${projectType.priority} / ${projectType.description}`,
+        value: projectType.id,
+        selected: false,
+        isGroupLabel: false,
+        visible: true,
+        disabled: false,
+      }),
+    );
+  }, [talpaProjectTypes, projectType]);
+
+  useEffect(() => {
+    if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
+      setValue('templateProject', infraInvestmentTemplateProject);
+    }
+  }, [budgetItemNumber, setValue]);
 
   return (
     <div className="mb-12">
@@ -26,7 +110,8 @@ export default function ProjectIdentifiersSection() {
       {/* Projektinumeroväli */}
       <SelectField
         {...getFieldProps('projectNumberRange')}
-        options={listItemsToOption(talpaProjectRanges)}
+        groups={projectRangeGroups}
+        filter={defaultFilter}
         rules={{ ...validateRequired('projectNumberRange', t) }}
         size="full"
         placeholder={t('projectTalpaForm.projectNumberRangePlaceholder')}
@@ -35,14 +120,14 @@ export default function ProjectIdentifiersSection() {
       {budgetItemNumber === BudgetItemNumber.InfraInvestment ? (
         <TextField
           {...getFieldProps('templateProject')}
-          defaultValue="2814I00000"
           rules={{ ...validateRequired('templateProject', t) }}
           size="full"
         />
       ) : (
         <SelectField
           {...getFieldProps('templateProject')}
-          options={[]}
+          options={preConstructionTemplateProjectOptions}
+          shouldTranslate={false}
           rules={{ ...validateRequired('templateProject', t) }}
           size="full"
         />
@@ -50,16 +135,26 @@ export default function ProjectIdentifiersSection() {
       {/* Laji */}
       <SelectField
         {...getFieldProps('projectType')}
-        options={[]}
-        rules={{ ...validateRequired('projectType', t) }}
+        groups={projectTypeGroups}
+        filter={defaultFilter}
+        rules={
+          budgetItemNumber === BudgetItemNumber.InfraInvestment
+            ? { ...validateRequired('projectType', t) }
+            : undefined
+        }
         size="full"
         placeholder={t('projectTalpaForm.projectTypePlaceholder')}
       />
       {/* Prioriteetti */}
       <SelectField
         {...getFieldProps('priority')}
-        options={[]}
-        rules={{ ...validateRequired('priority', t) }}
+        groups={priorityGroups}
+        filter={defaultFilter}
+        rules={
+          budgetItemNumber === BudgetItemNumber.InfraInvestment
+            ? { ...validateRequired('priority', t) }
+            : undefined
+        }
         size="full"
         placeholder={t('projectTalpaForm.priorityPlaceholder')}
       />
