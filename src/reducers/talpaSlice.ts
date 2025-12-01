@@ -1,4 +1,3 @@
-import { IError } from '@/interfaces/common';
 import { RootState } from '@/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { notifySuccess } from './notificationSlice';
@@ -16,7 +15,7 @@ import { AxiosError } from 'axios';
 
 interface ITalpaState {
   talpaProject: ITalpaProjectOpening | null;
-  error: IError | null | unknown;
+  error: unknown;
 }
 
 const initialState: ITalpaState = {
@@ -95,7 +94,7 @@ const talpaSlice = createSlice({
     );
     builder.addCase(
       getTalpaProjectOpeningByProjectThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
+      (state, action: PayloadAction<unknown>) => {
         return { ...state, error: action.payload };
       },
     );
@@ -108,7 +107,7 @@ const talpaSlice = createSlice({
     );
     builder.addCase(
       postTalpaProjectOpeningThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
+      (state, action: PayloadAction<unknown>) => {
         return { ...state, error: action.payload };
       },
     );
@@ -121,7 +120,7 @@ const talpaSlice = createSlice({
     );
     builder.addCase(
       patchTalpaProjectOpeningThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
+      (state, action: PayloadAction<unknown>) => {
         return { ...state, error: action.payload };
       },
     );

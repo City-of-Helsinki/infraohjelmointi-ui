@@ -1,4 +1,4 @@
-import { IError, IListItem } from '@/interfaces/common';
+import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import {
@@ -54,7 +54,7 @@ export interface IListState {
   talpaProjectTypes: Array<ITalpaProjectType>;
   talpaServiceClasses: Array<ITalpaServiceClass>;
   talpaAssetClasses: Array<ITalpaAssetClass>;
-  error: IError | null | unknown;
+  error: unknown;
 }
 
 const initialState: IListState = {
@@ -169,7 +169,7 @@ export const listsSlice = createSlice({
         return { ...state, ...action.payload };
       },
     );
-    builder.addCase(getListsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
     // GET TALPA LISTS
@@ -179,12 +179,9 @@ export const listsSlice = createSlice({
         return { ...state, ...action.payload };
       },
     );
-    builder.addCase(
-      getTalpaListsThunk.rejected,
-      (state, action: PayloadAction<IError | unknown>) => {
-        return { ...state, error: action.payload };
-      },
-    );
+    builder.addCase(getTalpaListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
+      return { ...state, error: action.payload };
+    });
   },
 });
 

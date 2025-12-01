@@ -19,7 +19,7 @@ export default function RadioButtonField<T extends FieldValues>({
   rules,
   readOnly,
   ...rest
-}: IRadioButtonFieldProps<T>) {
+}: Readonly<IRadioButtonFieldProps<T>>) {
   const {
     field: { onChange, onBlur, value: inputValue, ref },
   } = useController({ name, rules });

@@ -4,9 +4,6 @@
 .project-form-side-panel {
   @apply flex w-full flex-col;
 }
-.project-form-side-panel .side-navigation {
-  /* @apply flex max-w-[17.5rem] justify-center; */
-}
 
 .project-form-side-panel .pw-folder-container {
   @apply mb-4 mt-16 flex justify-center;

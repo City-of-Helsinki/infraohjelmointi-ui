@@ -149,39 +149,21 @@ export const getProgrammers = async (): Promise<Array<IListItem>> => {
 };
 
 export const getTalpaProjectRanges = async (): Promise<ITalpaProjectRange[]> => {
-  try {
-    const res = await axios.get<ITalpaProjectRange[]>(`${REACT_APP_API_URL}/talpa-project-ranges/`);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+  const res = await axios.get<ITalpaProjectRange[]>(`${REACT_APP_API_URL}/talpa-project-ranges/`);
+  return res.data;
 };
 
 export const getTalpaProjectTypes = async (): Promise<ITalpaProjectType[]> => {
-  try {
-    const res = await axios.get<ITalpaProjectType[]>(`${REACT_APP_API_URL}/talpa-project-types/`);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+  const res = await axios.get<ITalpaProjectType[]>(`${REACT_APP_API_URL}/talpa-project-types/`);
+  return res.data;
 };
 
 export const getTalpaServiceClasses = async (): Promise<ITalpaServiceClass[]> => {
-  try {
-    const res = await axios.get<ITalpaServiceClass[]>(
-      `${REACT_APP_API_URL}/talpa-service-classes/`,
-    );
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+  const res = await axios.get<ITalpaServiceClass[]>(`${REACT_APP_API_URL}/talpa-service-classes/`);
+  return res.data;
 };
 
 export const getTalpaAssetClasses = async (): Promise<ITalpaAssetClass[]> => {
-  try {
-    const res = await axios.get<ITalpaAssetClass[]>(`${REACT_APP_API_URL}/talpa-asset-classes/`);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+  const res = await axios.get<ITalpaAssetClass[]>(`${REACT_APP_API_URL}/talpa-asset-classes/`);
+  return res.data;
 };

@@ -6,7 +6,7 @@ interface ITalpaStatusLabelProps {
   status: TalpaStatus;
 }
 
-export function TalpaStatusLabel({ status }: ITalpaStatusLabelProps) {
+export function TalpaStatusLabel({ status }: Readonly<ITalpaStatusLabelProps>) {
   const { t } = useTranslation();
 
   if (status === TalpaStatus.excel_generated) {
