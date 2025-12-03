@@ -123,7 +123,10 @@ const SelectField: FC<ISelectFieldProps> = ({
       name={name}
       control={control as Control<FieldValues>}
       rules={rules}
-      render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
+      render={({
+        field: { value, onChange, onBlur, disabled: fieldDisabled },
+        fieldState: { error },
+      }) => {
         const handleChange = (_: Option[], clickedOption: Option) => {
           onChange(clickedOption);
           if (shouldUpdateIcon && clickedOption?.value) {
@@ -161,7 +164,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   invalid={error ? true : false}
                   options={translatedOptions ?? []}
                   required={required}
-                  disabled={disabled}
+                  disabled={disabled ?? fieldDisabled}
                   style={{ paddingTop: hideLabel ? '1.745rem' : '0', maxWidth: '100%' }}
                   icon={icon}
                   filter={filter}

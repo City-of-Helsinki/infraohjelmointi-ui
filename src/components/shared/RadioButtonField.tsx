@@ -18,10 +18,11 @@ export default function RadioButtonField<T extends FieldValues>({
   label,
   rules,
   readOnly,
+  disabled,
   ...rest
 }: Readonly<IRadioButtonFieldProps<T>>) {
   const {
-    field: { onChange, onBlur, value: inputValue, ref },
+    field: { onChange, onBlur, value: inputValue, ref, disabled: fieldDisabled },
   } = useController({ name, rules });
 
   return (
@@ -34,6 +35,7 @@ export default function RadioButtonField<T extends FieldValues>({
       onBlur={onBlur}
       ref={ref}
       checked={inputValue === value}
+      disabled={disabled ?? fieldDisabled}
       data-testid={id}
       {...rest}
     />

@@ -149,6 +149,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
     holdingTime: formattedHoldingTime,
     investmentProfile: talpaProject.investmentProfile,
     readiness: talpaProject.readiness,
+    isLocked: talpaProject.isLocked,
   };
 };
 
@@ -160,6 +161,7 @@ export default function useTalpaForm() {
 
   const formMethods = useForm<IProjectTalpaForm>({
     values: formValues,
+    disabled: formValues.isLocked,
   });
 
   useEffect(() => {

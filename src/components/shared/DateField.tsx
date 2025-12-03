@@ -13,6 +13,7 @@ interface IDateFieldProps {
   helperText?: string;
   className?: string;
   size?: 'full' | 'l';
+  disabled?: boolean;
 }
 
 const DateField: FC<IDateFieldProps> = ({
@@ -24,6 +25,7 @@ const DateField: FC<IDateFieldProps> = ({
   className = '',
   helperText,
   size = 'l',
+  disabled,
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
@@ -35,7 +37,7 @@ const DateField: FC<IDateFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value }, fieldState: { error } }) => {
+      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => {
         return (
           <div
             className={`input-wrapper date-field-wrapper ${className}`}
@@ -58,6 +60,7 @@ const DateField: FC<IDateFieldProps> = ({
               maxDate={datePlus10Years}
               disableDatePicker={readOnly}
               helperText={helperText}
+              disabled={disabled ?? fieldDisabled}
             />
           </div>
         );

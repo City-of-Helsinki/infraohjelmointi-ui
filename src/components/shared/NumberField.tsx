@@ -34,7 +34,7 @@ const NumberField: FC<INumberFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { value, onChange }, fieldState: { error } }) => (
+      render={({ field: { value, onChange, disabled: fieldDisabled }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSNumberInput
             className={`input-${size}`}
@@ -48,7 +48,7 @@ const NumberField: FC<INumberFieldProps> = ({
             invalid={error ? true : false}
             errorText={error?.message}
             helperText={tooltip}
-            disabled={disabled}
+            disabled={disabled ?? fieldDisabled}
           />
         </div>
       )}

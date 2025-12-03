@@ -3,7 +3,7 @@ import { FieldPath, FormProvider } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import ProjectIdentifiersSection from './ProjectIdentifiersSection';
 import ProjectBudgetItemSection from './ProjectBudgetItemSection';
-import { Button, ButtonVariant, LoadingSpinner } from 'hds-react';
+import { Button, ButtonVariant, LoadingSpinner, Notification } from 'hds-react';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 import ProjectScheduleSection from './ProjectScheduleSection';
 import ProjectContactsSection from './ProjectContactsSection';
@@ -42,7 +42,7 @@ const formatDate = (date?: string | null) => {
   return parsedFallback.isValid() ? parsedFallback.format('YYYY-MM-DD') : null;
 };
 
-function mapTalpaFormToRequest(
+export function mapTalpaFormToRequest(
   formData: IProjectTalpaForm,
   requestType: 'create' | 'update',
   projectId: string | undefined,
@@ -88,10 +88,12 @@ export default function ProjectTalpaForm() {
   const dispatch = useAppDispatch();
   const formMethods = useTalpaForm();
   const { isDirty, isSubmitting } = formMethods.formState;
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, getValues } = formMethods;
   const project = useAppSelector(selectProject);
 
-  const saveButtonDisabled = isSubmitting;
+  const talpaProjectLocked = getValues('isLocked');
+
+  const saveButtonDisabled = isSubmitting || talpaProjectLocked;
   const saveButtonIconStart = isSubmitting ? <LoadingSpinner small /> : null;
   const saveButtonVariant = isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary;
 
@@ -112,6 +114,12 @@ export default function ProjectTalpaForm() {
   return (
     <FormProvider {...formMethods}>
       <form className="project-form max-w-xl" onSubmit={handleSubmit(submitForm)}>
+        {talpaProjectLocked && (
+          <Notification label={t('projectTalpaForm.projectSentLabel')} className="mb-8">
+            {t('projectTalpaForm.projectSentText')}
+          </Notification>
+        )}
+
         {/* SECTION 1 - Budget item number selection (hankkeen talousarviokohdan numero) */}
         <ProjectBudgetItemSection />
 

@@ -8,6 +8,7 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import {
   getTalpaProjectOpeningByProject,
+  markTalpaProjectAsSent,
   patchTalpaProjectOpening,
   postTalpaProjectOpening,
 } from '@/services/talpaServices';
@@ -80,6 +81,18 @@ export const patchTalpaProjectOpeningThunk = createAsyncThunk(
   },
 );
 
+export const markTalpaProjectAsSentThunk = createAsyncThunk(
+  'talpa/markAsSent',
+  async (talpaProjectId: string, thunkAPI) => {
+    try {
+      const talpaProject = await markTalpaProjectAsSent(talpaProjectId);
+      return talpaProject;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
 const talpaSlice = createSlice({
   name: 'talpa',
   initialState,
@@ -120,6 +133,19 @@ const talpaSlice = createSlice({
     );
     builder.addCase(
       patchTalpaProjectOpeningThunk.rejected,
+      (state, action: PayloadAction<unknown>) => {
+        return { ...state, error: action.payload };
+      },
+    );
+    // TALPA PROJECT OPENING MARK AS SENT
+    builder.addCase(
+      markTalpaProjectAsSentThunk.fulfilled,
+      (state, action: PayloadAction<ITalpaProjectOpening>) => {
+        return { ...state, talpaProject: action.payload };
+      },
+    );
+    builder.addCase(
+      markTalpaProjectAsSentThunk.rejected,
       (state, action: PayloadAction<unknown>) => {
         return { ...state, error: action.payload };
       },

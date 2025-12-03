@@ -230,7 +230,10 @@
     "readiness": "Valmius",
     "excelGenerated": "Avauspyyntö-excel muodostettu",
     "excelSent": "Avauspyyntö lähetetty talpaan",
-    "projectOpened": "Projekti avattu"
+    "projectOpened": "Projekti avattu",
+    "markAsSent": "Merkitse avauspyyntö lähetetyksi",
+    "projectSentLabel": "Projektitiedot lähetetty Talpaan",
+    "projectSentText": "Tietojen muokkaus ei ole enää mahdollista lähetyksen jälkeen."
   },
   "projectForm": {
     "name": "Hankkeen nimi",

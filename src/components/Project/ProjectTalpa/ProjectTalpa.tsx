@@ -1,15 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { ProjectFormSidePanel } from '../ProjectBasics/ProjectFormSidePanel';
-import { useAppSelector } from '@/hooks/common';
+import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
 import ProjectTalpaForm from './ProjectTalpaForm';
-import { TalpaStatusLabel } from './TalpaStatusLabel';
-import { selectTalpaProject } from '@/reducers/talpaSlice';
+import { markTalpaProjectAsSentThunk, selectTalpaProject } from '@/reducers/talpaSlice';
+import TalpaStatusSection from './TalpaStatusSection';
 
 export default function ProjectTalpa() {
   const { t } = useTranslation();
   const project = useAppSelector(selectProject);
   const talpaProject = useAppSelector(selectTalpaProject);
+  const dispatch = useAppDispatch();
 
   const navItems = [
     { route: '#budgetItemNumber', label: t('nav.budgetItemNumber') },
@@ -19,6 +20,12 @@ export default function ProjectTalpa() {
     { route: '#projectClasses', label: t('nav.projectClasses') },
   ];
 
+  function handleMarkAsSent() {
+    if (talpaProject?.id) {
+      dispatch(markTalpaProjectAsSentThunk(talpaProject.id));
+    }
+  }
+
   return (
     <div className="flex" data-testid="project-talpa">
       <div className="flex w-[35%] flex-shrink-0 justify-center">
@@ -27,7 +34,9 @@ export default function ProjectTalpa() {
           pwFolderLink={project?.pwFolderLink}
           showSaveIndicator={false}
           formStatusSection={
-            talpaProject?.status ? <TalpaStatusLabel status={talpaProject.status} /> : null
+            talpaProject?.status ? (
+              <TalpaStatusSection status={talpaProject.status} onMarkAsSent={handleMarkAsSent} />
+            ) : null
           }
         />
       </div>

@@ -151,6 +151,7 @@ export interface IProjectTalpaForm {
   holdingTime: number | null; // Pitoaika
   investmentProfile: string; // Investointiluokka
   readiness: string; // Valmius
+  isLocked?: boolean;
 }
 
 export interface IAppForms
