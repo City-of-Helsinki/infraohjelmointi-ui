@@ -11,11 +11,42 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import { renderWithProviders } from '@/utils/testUtils';
 import { Route } from 'react-router';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import mockTalpaProject from '@/mocks/mockTalpaProject';
+import { saveAs } from 'file-saver';
+import {
+  downloadExcel,
+  getTalpaProjectOpeningByProject,
+  patchTalpaProjectOpening,
+  postTalpaProjectOpening,
+} from '@/services/talpaServices';
+
+jest.mock('file-saver', () => ({
+  saveAs: jest.fn(),
+}));
+
+jest.mock('@/services/talpaServices', () => ({
+  downloadExcel: jest.fn(),
+  getTalpaProjectOpeningByProject: jest.fn(),
+  patchTalpaProjectOpening: jest.fn(),
+  postTalpaProjectOpening: jest.fn(),
+  markTalpaProjectAsSent: jest.fn(),
+}));
 
 jest.mock('react-i18next', () => mockI18next());
+
+const downloadExcelMock = downloadExcel as jest.MockedFunction<typeof downloadExcel>;
+const patchTalpaProjectOpeningMock = patchTalpaProjectOpening as jest.MockedFunction<
+  typeof patchTalpaProjectOpening
+>;
+const postTalpaProjectOpeningMock = postTalpaProjectOpening as jest.MockedFunction<
+  typeof postTalpaProjectOpening
+>;
+const getTalpaProjectOpeningByProjectMock = getTalpaProjectOpeningByProject as jest.MockedFunction<
+  typeof getTalpaProjectOpeningByProject
+>;
+const saveAsMock = saveAs as jest.MockedFunction<typeof saveAs>;
 
 async function render(talpaProjectOverrides: Partial<ITalpaProjectOpening> = {}) {
   return await act(async () =>
@@ -180,6 +211,28 @@ describe('talpa form', () => {
       expect(screen.getByRole('textbox', { name: /readiness/i })).toBeDisabled();
 
       expect(screen.getByRole('button', { name: /saveInformation/i })).toBeDisabled();
+    });
+  });
+
+  describe('submit form', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+      getTalpaProjectOpeningByProjectMock.mockResolvedValue(mockTalpaProject);
+      patchTalpaProjectOpeningMock.mockResolvedValue(mockTalpaProject);
+      postTalpaProjectOpeningMock.mockResolvedValue(mockTalpaProject);
+    });
+
+    it('downloads talpa excel after updating an existing talpa project', async () => {
+      const excelBlob = new Blob(['excel-content']);
+      downloadExcelMock.mockResolvedValueOnce(excelBlob);
+
+      const { user } = await render();
+      await user.click(screen.getByRole('button', { name: 'saveInformation' }));
+
+      await waitFor(() => {
+        expect(downloadExcelMock).toHaveBeenCalledWith(mockTalpaProject.id);
+        expect(saveAsMock).toHaveBeenCalledWith(excelBlob, 'projektin_avauslomake.xlsx');
+      });
     });
   });
 });

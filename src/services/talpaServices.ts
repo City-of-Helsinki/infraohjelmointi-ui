@@ -44,3 +44,13 @@ export const markTalpaProjectAsSent = async (
   );
   return res.data;
 };
+
+export const downloadExcel = async (talpaProjectId: string): Promise<Blob> => {
+  const res = await axios.get<Blob>(
+    `${REACT_APP_API_URL}/talpa-project-opening/${talpaProjectId}/download-excel/`,
+    {
+      responseType: 'blob',
+    },
+  );
+  return res.data;
+};

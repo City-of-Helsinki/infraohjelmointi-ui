@@ -10,6 +10,7 @@ import ProjectContactsSection from './ProjectContactsSection';
 import ProjectClassesSection from './ProjectClasses';
 import moment from 'moment';
 import {
+  ITalpaProjectOpening,
   ITalpaProjectOpeningRequest,
   TalpaPriority,
   TalpaReadiness,
@@ -20,6 +21,8 @@ import { selectProject } from '@/reducers/projectSlice';
 import { patchTalpaProjectOpeningThunk, postTalpaProjectOpeningThunk } from '@/reducers/talpaSlice';
 import { BudgetItemNumber } from './budgetItemNumber';
 import { IOption } from '@/interfaces/common';
+import { downloadExcel } from '@/services/talpaServices';
+import { saveAs } from 'file-saver';
 
 export function getFieldProps(name: FieldPath<IProjectTalpaForm>) {
   return {
@@ -87,7 +90,7 @@ export default function ProjectTalpaForm() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const formMethods = useTalpaForm();
-  const { isDirty, isSubmitting } = formMethods.formState;
+  const { isSubmitting } = formMethods.formState;
   const { handleSubmit, getValues } = formMethods;
   const project = useAppSelector(selectProject);
 
@@ -98,16 +101,21 @@ export default function ProjectTalpaForm() {
   const saveButtonVariant = isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary;
 
   async function submitForm(data: IProjectTalpaForm) {
-    if (isDirty) {
-      const requestData = mapTalpaFormToRequest(data, data.id ? 'update' : 'create', project?.id);
+    const requestData = mapTalpaFormToRequest(data, data.id ? 'update' : 'create', project?.id);
+    let excelBlob: Blob;
 
-      if (data.id) {
-        // Update existing talpa project
-        await dispatch(patchTalpaProjectOpeningThunk({ id: data.id, data: requestData }));
-      } else {
-        // Create new talpa project
-        await dispatch(postTalpaProjectOpeningThunk({ data: requestData }));
-      }
+    if (data.id) {
+      // Update existing talpa project
+      await dispatch(patchTalpaProjectOpeningThunk({ id: data.id, data: requestData }));
+      excelBlob = await downloadExcel(data.id);
+    } else {
+      // Create new talpa project
+      const res = await dispatch(postTalpaProjectOpeningThunk({ data: requestData }));
+      excelBlob = await downloadExcel((res.payload as ITalpaProjectOpening).id);
+    }
+
+    if (excelBlob) {
+      saveAs(excelBlob, 'projektin_avauslomake.xlsx');
     }
   }
 
