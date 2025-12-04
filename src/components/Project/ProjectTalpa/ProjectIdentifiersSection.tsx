@@ -33,7 +33,9 @@ export default function ProjectIdentifiersSection() {
             filteredProjectRanges,
             (projectRange) => projectRange.budgetAccount,
             (projectRange) => ({
-              label: `${projectRange.majorDistrictName} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
+              label: `${projectRange.majorDistrictName ?? projectRange.notes} / ${
+                projectRange.rangeStart
+              } - ${projectRange.rangeEnd}`,
               value: projectRange.id,
               selected: false,
               isGroupLabel: false,
@@ -79,7 +81,9 @@ export default function ProjectIdentifiersSection() {
     }
 
     return groupOptions(
-      talpaProjectTypes.filter((pt) => pt.name === projectType.label),
+      talpaProjectTypes
+        .filter((pt) => pt.isActive && pt.name === projectType.label)
+        .toSorted((a, b) => a.priority.localeCompare(b.priority)),
       (projectType) => projectType.name,
       (projectType) => ({
         label: `${projectType.priority} / ${projectType.description}`,

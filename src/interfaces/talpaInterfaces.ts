@@ -81,8 +81,8 @@ export interface ITalpaProjectOpening {
   projectType: ITalpaProjectType;
   priority: string;
   projectName: string;
-  projectStart: string | null;
-  projectEnd: string | null;
+  projectStartDate: string | null;
+  projectEndDate: string | null;
   streetAddress: string;
   postalCode: string;
   responsiblePerson: string;
