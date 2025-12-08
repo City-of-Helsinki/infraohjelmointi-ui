@@ -57,19 +57,20 @@ const parseFileNameFromContentDisposition = (
     return undefined;
   }
 
-  const utf8Match = headerValue.match(/filename\*=UTF-8''([^;]+)/i);
-  const asciiMatch = headerValue.match(/filename="?([^";]+)"?/i);
+  const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(headerValue);
+  const asciiMatch = /filename="?([^";]+)"?/i.exec(headerValue);
   const rawFileName = utf8Match?.[1] ?? asciiMatch?.[1];
 
   if (!rawFileName) {
     return undefined;
   }
 
-  const trimmed = rawFileName.trim().replace(/^(?:"|')|(?:"|')$/g, '');
+  const trimmed = rawFileName.trim().replaceAll(/['"]/g, '');
 
   try {
     return decodeURIComponent(trimmed);
-  } catch (_error) {
+  } catch (error) {
+    console.log('Error decoding filename from Content-Disposition header:', error);
     return trimmed;
   }
 };
