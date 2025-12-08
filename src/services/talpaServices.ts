@@ -65,7 +65,7 @@ const parseFileNameFromContentDisposition = (
     return undefined;
   }
 
-  const trimmed = rawFileName.trim().replace(/^['"]|['"]$/g, '');
+  const trimmed = rawFileName.trim().replace(/^(?:"|')|(?:"|')$/g, '');
 
   try {
     return decodeURIComponent(trimmed);
