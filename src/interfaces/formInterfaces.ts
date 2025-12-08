@@ -150,7 +150,7 @@ export interface IProjectTalpaForm {
   profileName: string; // Profiilin nimi
   holdingTime: number | null; // Pitoaika
   investmentProfile: string; // Investointiluokka
-  readiness: string; // Valmius
+  readiness: IOption | null; // Valmius
   isLocked?: boolean;
 }
 

@@ -14,13 +14,20 @@ import {
 } from './templateProjectOptions';
 import { uniqBy } from 'lodash';
 import { defaultFilter } from 'hds-react';
+import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 
 export default function ProjectIdentifiersSection() {
   const { t } = useTranslation();
-  const { watch, setValue } = useFormContext();
+  const {
+    watch,
+    setValue,
+    formState: { dirtyFields },
+  } = useFormContext<IProjectTalpaForm>();
   const [budgetItemNumber, projectType] = watch(['budgetItemNumber', 'projectType']);
   const talpaProjectRanges = useSelector(selectTalpaProjectRanges);
   const talpaProjectTypes = useSelector(selectTalpaProjectTypes);
+  const budgetItemNumberDirty = Boolean(dirtyFields?.budgetItemNumber);
+  const projectTypeDirty = Boolean(dirtyFields?.projectType);
 
   const filteredProjectRanges = talpaProjectRanges.filter(
     (projectRange) => projectRange.projectTypePrefix === budgetItemNumber,
@@ -82,8 +89,8 @@ export default function ProjectIdentifiersSection() {
 
     return groupOptions(
       talpaProjectTypes
-        .filter((pt) => pt.isActive && pt.name === projectType.label)
-        .toSorted((a, b) => a.priority.localeCompare(b.priority)),
+        .filter((pt) => pt.priority !== null && pt.name === projectType.label)
+        .toSorted((a, b) => (a.priority ?? '').localeCompare(b.priority ?? '')),
       (projectType) => projectType.name,
       (projectType) => ({
         label: `${projectType.priority} / ${projectType.description}`,
@@ -97,10 +104,22 @@ export default function ProjectIdentifiersSection() {
   }, [talpaProjectTypes, projectType]);
 
   useEffect(() => {
-    if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
-      setValue('templateProject', infraInvestmentTemplateProject);
+    if (budgetItemNumberDirty) {
+      setValue('projectNumberRange', null);
+
+      if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
+        setValue('templateProject', infraInvestmentTemplateProject);
+      } else {
+        setValue('templateProject', '');
+      }
     }
-  }, [budgetItemNumber, setValue]);
+  }, [budgetItemNumber, budgetItemNumberDirty, setValue]);
+
+  useEffect(() => {
+    if (projectTypeDirty) {
+      setValue('priority', null);
+    }
+  }, [projectTypeDirty, setValue]);
 
   return (
     <div className="mb-12">

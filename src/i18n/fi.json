@@ -126,7 +126,9 @@
     "cityPlanScheduleChange": "Asemakaavan aikataulumuutokset",
     "annualCostDistributionClarification": "Vuosittaisen kustannusjaon tarkentuminen",
     "planningCostsOrScheduleClarification": "Suunnittelukustannusten- tai aikataulun tarkentuminen",
-    "otherReason": "Muu syy"
+    "otherReason": "Muu syy",
+    "Kesken": "Kesken",
+    "Valmis": "Valmis"
   },
   "validation": {
     "required": "Täytä {{field}}",

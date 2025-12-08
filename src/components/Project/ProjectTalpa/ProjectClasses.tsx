@@ -11,15 +11,21 @@ import { groupOptions } from '@/utils/common';
 import { BudgetItemNumber } from './budgetItemNumber';
 import { InvestmentProfile } from './investmentProfile';
 import { validateRequired } from '@/utils/validation';
+import { TalpaReadiness } from '@/interfaces/talpaInterfaces';
 
 export default function ProjectClassesSection() {
   const { t } = useTranslation();
-  const { watch, setValue } = useFormContext<IProjectTalpaForm>();
+  const {
+    watch,
+    setValue,
+    formState: { dirtyFields },
+  } = useFormContext<IProjectTalpaForm>();
 
   const talpaServiceClasses = useSelector(selectTalpaServiceClasses);
   const talpaAssetClasses = useSelector(selectTalpaAssetClasses);
 
   const [budgetItemNumber, assetClass] = watch(['budgetItemNumber', 'assetClass']);
+  const budgetItemNumberDirty = Boolean(dirtyFields?.budgetItemNumber);
 
   const filteredServiceClasses = talpaServiceClasses.filter(
     (serviceClass) => serviceClass.projectTypePrefix === budgetItemNumber,
@@ -48,12 +54,16 @@ export default function ProjectClassesSection() {
   );
 
   useEffect(() => {
-    if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
-      setValue('investmentProfile', InvestmentProfile.InfraInvestment);
-    } else {
-      setValue('investmentProfile', InvestmentProfile.PreConstruction);
+    if (budgetItemNumberDirty) {
+      setValue('serviceClass', null);
+
+      if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
+        setValue('investmentProfile', InvestmentProfile.InfraInvestment);
+      } else {
+        setValue('investmentProfile', InvestmentProfile.PreConstruction);
+      }
     }
-  }, [budgetItemNumber, setValue]);
+  }, [budgetItemNumber, budgetItemNumberDirty, setValue]);
 
   useEffect(() => {
     const selectedAssetClass = talpaAssetClasses.find((ac) => ac.id === assetClass?.value);
@@ -90,7 +100,16 @@ export default function ProjectClassesSection() {
         {/* Investointiproﬁli */}
         <TextField {...getFieldProps('investmentProfile')} size="full" />
         {/* Valmius */}
-        <TextField {...getFieldProps('readiness')} size="full" />
+        {/* <TextField {...getFieldProps('readiness')} size="full" /> */}
+        <SelectField
+          {...getFieldProps('readiness')}
+          options={[
+            { label: TalpaReadiness.Kesken, value: TalpaReadiness.Kesken },
+            { label: TalpaReadiness.Valmis, value: TalpaReadiness.Valmis },
+          ]}
+          size="full"
+          wrapperClassName="basis-1/3"
+        />
       </div>
     </div>
   );

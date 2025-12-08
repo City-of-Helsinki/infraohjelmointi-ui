@@ -88,7 +88,7 @@ describe('useTalpaForm', () => {
       profileName: '',
       holdingTime: null,
       investmentProfile: 'Z12550',
-      readiness: '',
+      readiness: null,
     });
   });
 
@@ -142,7 +142,10 @@ describe('useTalpaForm', () => {
       value: '95d58127-342e-4649-bed6-d8430a0a06ca',
     });
     expect(values.holdingTime).toBe(20);
-    expect(values.readiness).toBe(TalpaReadiness.Kesken);
+    expect(values.readiness).toEqual({
+      label: TalpaReadiness.Kesken,
+      value: TalpaReadiness.Kesken,
+    });
   });
 
   it('wraps template project label to option when budget item number is not infra investment', () => {

@@ -44,7 +44,7 @@ export interface ITalpaProjectType {
   code: string;
   name: string;
   category: string;
-  priority: string;
+  priority: string | null;
   description: string;
   isActive: boolean;
   notes: string;

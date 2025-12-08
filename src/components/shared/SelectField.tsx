@@ -24,6 +24,7 @@ interface ISelectFieldProps extends SelectProps {
   shouldTranslate?: boolean;
   readOnly?: boolean;
   placeholder?: string;
+  wrapperClassName?: string;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -43,6 +44,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   placeholder,
   children,
   filter,
+  wrapperClassName,
   ...rest
 }) => {
   const required = rules?.required ? true : false;
@@ -133,8 +135,9 @@ const SelectField: FC<ISelectFieldProps> = ({
             updateIconBasedOnSelection(clickedOption.value);
           }
         };
+        const isDisabled = disabled || fieldDisabled;
         return (
-          <div className="input-wrapper" id={name} data-testid={name}>
+          <div className={`input-wrapper ${wrapperClassName ?? ''}`} id={name} data-testid={name}>
             {/**
              * - icon class: indicates it has an icon and needs extra padding
              * - placeholder class: our controlled form needs an empty value and the placeholder's color only becomes
@@ -164,7 +167,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                   invalid={error ? true : false}
                   options={translatedOptions ?? []}
                   required={required}
-                  disabled={disabled ?? fieldDisabled}
+                  disabled={isDisabled}
                   style={{ paddingTop: hideLabel ? '1.745rem' : '0', maxWidth: '100%' }}
                   icon={icon}
                   filter={filter}
@@ -178,7 +181,7 @@ const SelectField: FC<ISelectFieldProps> = ({
               )}
               {((clearable === undefined && value?.value) || (clearable && value?.value)) &&
                 !readOnly &&
-                !disabled &&
+                !isDisabled &&
                 !required && (
                   <button
                     className="empty-select-field-button"

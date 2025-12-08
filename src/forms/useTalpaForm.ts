@@ -71,6 +71,11 @@ const buildTempateProjectOption = (
   value: templateProject,
 });
 
+const buildReadinessOption = (readiness: string): IProjectTalpaForm['readiness'] => ({
+  label: readiness,
+  value: readiness,
+});
+
 const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
   const project = useAppSelector(selectProject);
   const talpaProject = useAppSelector(selectTalpaProject);
@@ -112,7 +117,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       assetClass: null,
       profileName: '',
       holdingTime: null,
-      readiness: '',
+      readiness: null,
     };
   }
 
@@ -148,7 +153,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
     profileName: talpaProject.profileName,
     holdingTime: formattedHoldingTime,
     investmentProfile: talpaProject.investmentProfile,
-    readiness: talpaProject.readiness,
+    readiness: buildReadinessOption(talpaProject.readiness),
     isLocked: talpaProject.isLocked,
   };
 };

@@ -81,7 +81,7 @@ export function mapTalpaFormToRequest(
     profileName: formData.profileName ?? '',
     holdingTime: holdingTimeValue,
     investmentProfile: formData.investmentProfile ?? '',
-    readiness: formData.readiness as TalpaReadiness,
+    readiness: formData.readiness?.value as TalpaReadiness,
     project: projectId ?? '',
   };
 }
@@ -102,20 +102,25 @@ export default function ProjectTalpaForm() {
 
   async function submitForm(data: IProjectTalpaForm) {
     const requestData = mapTalpaFormToRequest(data, data.id ? 'update' : 'create', project?.id);
-    let excelBlob: Blob;
+    let result;
 
     if (data.id) {
       // Update existing talpa project
-      await dispatch(patchTalpaProjectOpeningThunk({ id: data.id, data: requestData }));
-      excelBlob = await downloadExcel(data.id);
+      result = await dispatch(patchTalpaProjectOpeningThunk({ id: data.id, data: requestData }));
     } else {
       // Create new talpa project
-      const res = await dispatch(postTalpaProjectOpeningThunk({ data: requestData }));
-      excelBlob = await downloadExcel((res.payload as ITalpaProjectOpening).id);
+      result = await dispatch(postTalpaProjectOpeningThunk({ data: requestData }));
     }
 
-    if (excelBlob) {
-      saveAs(excelBlob, 'projektin_avauslomake.xlsx');
+    if (result.meta.requestStatus === 'rejected') {
+      return;
+    }
+
+    const excelFile = await downloadExcel((result.payload as ITalpaProjectOpening).id);
+
+    if (excelFile?.blob) {
+      const fileName = excelFile.fileName;
+      saveAs(excelFile.blob, fileName);
     }
   }
 

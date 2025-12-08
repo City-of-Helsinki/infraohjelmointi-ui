@@ -85,7 +85,7 @@ describe('talpa form', () => {
         profileName: 'Profile A',
         holdingTime: 12,
         investmentProfile: 'Infra',
-        readiness: TalpaReadiness.Kesken,
+        readiness: { label: TalpaReadiness.Kesken, value: TalpaReadiness.Kesken },
       };
 
       const request = mapTalpaFormToRequest(formData, 'create', 'project-1');
@@ -135,7 +135,7 @@ describe('talpa form', () => {
         profileName: '',
         holdingTime: null,
         investmentProfile: '',
-        readiness: TalpaReadiness.Valmis,
+        readiness: { label: TalpaReadiness.Valmis, value: TalpaReadiness.Valmis },
       };
 
       const request = mapTalpaFormToRequest(formData, 'update', 'project-2');
@@ -208,7 +208,10 @@ describe('talpa form', () => {
       expect(screen.getByRole('textbox', { name: /profileName/i })).toBeDisabled();
       expect(screen.getByRole('spinbutton', { name: /holdingTime/i })).toBeDisabled();
       expect(screen.getByRole('textbox', { name: /investmentProfile/i })).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: /readiness/i })).toBeDisabled();
+      expect(screen.getByRole('combobox', { name: /readiness/i })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
 
       expect(screen.getByRole('button', { name: /saveInformation/i })).toBeDisabled();
     });
@@ -224,14 +227,14 @@ describe('talpa form', () => {
 
     it('downloads talpa excel after updating an existing talpa project', async () => {
       const excelBlob = new Blob(['excel-content']);
-      downloadExcelMock.mockResolvedValueOnce(excelBlob);
+      downloadExcelMock.mockResolvedValueOnce({ blob: excelBlob, fileName: 'talpa.xlsx' });
 
       const { user } = await render();
       await user.click(screen.getByRole('button', { name: 'saveInformation' }));
 
       await waitFor(() => {
         expect(downloadExcelMock).toHaveBeenCalledWith(mockTalpaProject.id);
-        expect(saveAsMock).toHaveBeenCalledWith(excelBlob, 'projektin_avauslomake.xlsx');
+        expect(saveAsMock).toHaveBeenCalledWith(excelBlob, 'talpa.xlsx');
       });
     });
   });
