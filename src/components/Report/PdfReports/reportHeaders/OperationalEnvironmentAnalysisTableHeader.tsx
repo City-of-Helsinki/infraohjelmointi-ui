@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center' as unknown as 'center',
     padding: '0px 10px',
-  }
+  },
 });
 
 const OperationalEnvironmentAnalysisTableHeader = () => {
@@ -50,45 +50,45 @@ const OperationalEnvironmentAnalysisTableHeader = () => {
   const currentPlusYears = [4, 5, 6, 7, 8, 9, 10];
   return (
     <View style={styles.tableHeader}>
-        <Text style={styles.targetCell}>{t('target')}</Text>
-        <View style={styles.narrowerColumns}>
-            <Text>{t('report.operationalEnvironmentAnalysis.costForecastShortened')}</Text>
-            <Text>{new Date().getFullYear()}</Text>
-            <Text>{t('report.shared.kiloEuro')}</Text>
+      <Text style={styles.targetCell}>{t('target')}</Text>
+      <View style={styles.narrowerColumns}>
+        <Text>{t('report.operationalEnvironmentAnalysis.costForecastShortened')}</Text>
+        <Text>{new Date().getFullYear()}</Text>
+        <Text>{t('report.shared.kiloEuro')}</Text>
+      </View>
+      <View style={styles.narrowerColumns}>
+        <Text>{t('TAE')}</Text>
+        <Text>{new Date().getFullYear() + 1}</Text>
+        <Text>{t('report.shared.kiloEuro')}</Text>
+      </View>
+      <View style={styles.narrowerColumns}>
+        <Text>{t('TSE')}</Text>
+        <Text>{new Date().getFullYear() + 2}</Text>
+        <Text>{t('report.shared.kiloEuro')}</Text>
+      </View>
+      <View style={styles.narrowerColumns}>
+        <Text>{t('TSE')}</Text>
+        <Text>{new Date().getFullYear() + 3}</Text>
+        <Text>{t('report.shared.kiloEuro')}</Text>
+      </View>
+      <View style={styles.yearContainer}>
+        <Text>
+          {t('initialInvestmentProgram', {
+            startYear: new Date().getFullYear() + 4,
+            endYear: new Date().getFullYear() + 10,
+          })}
+        </Text>
+        <View style={styles.wideYearColumn}>
+          {currentPlusYears.map((year) => {
+            return (
+              <View key={year} style={styles.yearColumn}>
+                <Text>{new Date().getFullYear() + year}</Text>
+                <Text>{t('report.shared.kiloEuro')}</Text>
+              </View>
+            );
+          })}
         </View>
-        <View style={styles.narrowerColumns}>
-            <Text>{t('TAE')}</Text>
-            <Text>{new Date().getFullYear() + 1}</Text>
-            <Text>{t('report.shared.kiloEuro')}</Text>
-        </View>
-        <View style={styles.narrowerColumns}>
-            <Text>{t('TSE')}</Text>
-            <Text>{new Date().getFullYear() + 2}</Text>
-            <Text>{t('report.shared.kiloEuro')}</Text>
-        </View>
-        <View style={styles.narrowerColumns}>
-            <Text>{t('TSE')}</Text>
-            <Text>{new Date().getFullYear() + 3}</Text>
-            <Text>{t('report.shared.kiloEuro')}</Text>
-        </View>
-        <View style={styles.yearContainer}>
-          <Text>
-            {t('initialInvestmentProgram', {
-              startYear: new Date().getFullYear() + 4,
-              endYear: new Date().getFullYear() + 9,
-            })}
-          </Text>
-          <View style={styles.wideYearColumn}>
-            {currentPlusYears.map((year) => {
-                return (
-                  <View key={year} style={styles.yearColumn}>
-                    <Text>{new Date().getFullYear() + year}</Text>
-                    <Text>{t('report.shared.kiloEuro')}</Text>
-                  </View>
-                );
-            })}
-          </View>
-        </View>
+      </View>
     </View>
   );
 };
