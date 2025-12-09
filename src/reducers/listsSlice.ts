@@ -1,4 +1,4 @@
-import { IError, IListItem } from '@/interfaces/common';
+import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import {
@@ -16,10 +16,20 @@ import {
   getDistricts,
   getBudgetOverrunReasons,
   getProgrammers,
+  getTalpaProjectRanges,
+  getTalpaAssetClasses,
+  getTalpaProjectTypes,
+  getTalpaServiceClasses,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  ITalpaAssetClass,
+  ITalpaProjectRange,
+  ITalpaProjectType,
+  ITalpaServiceClass,
+} from '@/interfaces/talpaInterfaces';
 
 export interface IListState {
   types: Array<IListItem>;
@@ -40,7 +50,11 @@ export interface IListState {
   budgetOverrunReasons: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
-  error: IError | null | unknown;
+  talpaProjectRanges: Array<ITalpaProjectRange>;
+  talpaProjectTypes: Array<ITalpaProjectType>;
+  talpaServiceClasses: Array<ITalpaServiceClass>;
+  talpaAssetClasses: Array<ITalpaAssetClass>;
+  error: unknown;
 }
 
 const initialState: IListState = {
@@ -62,6 +76,10 @@ const initialState: IListState = {
   programmedYears: setProgrammedYears(),
   projectClasses: [],
   programmers: [],
+  talpaProjectRanges: [],
+  talpaProjectTypes: [],
+  talpaServiceClasses: [],
+  talpaAssetClasses: [],
   error: null,
 };
 
@@ -115,7 +133,24 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await getBudgetOverrunReasons(),
       programmers: await getProgrammers(),
+      talpaProjectRanges: [],
+      talpaProjectTypes: [],
+      talpaServiceClasses: [],
+      talpaAssetClasses: [],
       projectClasses: [],
+    };
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err);
+  }
+});
+
+export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, thunkAPI) => {
+  try {
+    return {
+      talpaProjectRanges: await getTalpaProjectRanges(),
+      talpaProjectTypes: await getTalpaProjectTypes(),
+      talpaServiceClasses: await getTalpaServiceClasses(),
+      talpaAssetClasses: await getTalpaAssetClasses(),
     };
   } catch (err) {
     return thunkAPI.rejectWithValue(err);
@@ -134,7 +169,17 @@ export const listsSlice = createSlice({
         return { ...state, ...action.payload };
       },
     );
-    builder.addCase(getListsThunk.rejected, (state, action: PayloadAction<IError | unknown>) => {
+    builder.addCase(getListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
+      return { ...state, error: action.payload };
+    });
+    // GET TALPA LISTS
+    builder.addCase(
+      getTalpaListsThunk.fulfilled,
+      (state, action: PayloadAction<Pick<IListState, 'talpaProjectRanges'>>) => {
+        return { ...state, ...action.payload };
+      },
+    );
+    builder.addCase(getTalpaListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
   },
@@ -148,5 +193,9 @@ export const selectProjectPhases = (state: RootState) => state.lists.phases;
 export const selectBudgetOverrunReasons = (state: RootState) => state.lists.budgetOverrunReasons;
 export const selectProjectClasses = (state: RootState) => state.lists.projectClasses;
 export const selectProgrammers = (state: RootState) => state.lists.programmers;
+export const selectTalpaProjectRanges = (state: RootState) => state.lists.talpaProjectRanges;
+export const selectTalpaProjectTypes = (state: RootState) => state.lists.talpaProjectTypes;
+export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpaServiceClasses;
+export const selectTalpaAssetClasses = (state: RootState) => state.lists.talpaAssetClasses;
 
 export default listsSlice.reducer;

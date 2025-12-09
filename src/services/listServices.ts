@@ -1,4 +1,10 @@
 import { IListItem } from '@/interfaces/common';
+import {
+  ITalpaAssetClass,
+  ITalpaProjectRange,
+  ITalpaProjectType,
+  ITalpaServiceClass,
+} from '@/interfaces/talpaInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
@@ -140,4 +146,24 @@ export const getProgrammers = async (): Promise<Array<IListItem>> => {
   } catch (e) {
     return Promise.reject(e);
   }
+};
+
+export const getTalpaProjectRanges = async (): Promise<ITalpaProjectRange[]> => {
+  const res = await axios.get<ITalpaProjectRange[]>(`${REACT_APP_API_URL}/talpa-project-ranges/`);
+  return res.data;
+};
+
+export const getTalpaProjectTypes = async (): Promise<ITalpaProjectType[]> => {
+  const res = await axios.get<ITalpaProjectType[]>(`${REACT_APP_API_URL}/talpa-project-types/`);
+  return res.data;
+};
+
+export const getTalpaServiceClasses = async (): Promise<ITalpaServiceClass[]> => {
+  const res = await axios.get<ITalpaServiceClass[]>(`${REACT_APP_API_URL}/talpa-service-classes/`);
+  return res.data;
+};
+
+export const getTalpaAssetClasses = async (): Promise<ITalpaAssetClass[]> => {
+  const res = await axios.get<ITalpaAssetClass[]>(`${REACT_APP_API_URL}/talpa-asset-classes/`);
+  return res.data;
 };

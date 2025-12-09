@@ -1,26 +1,23 @@
 import { FC, memo } from 'react';
 import { SideNavigation } from '../../../shared';
-import { useTranslation } from 'react-i18next';
 import PWContainer from './PWContainer';
 import SaveIndicator from './SaveIndicator';
+import { INavigationItem } from '@/interfaces/common';
 import './styles.css';
 
 interface IProjectFormSidePanelProps {
+  navItems: INavigationItem[];
   pwFolderLink?: string | null;
+  showSaveIndicator?: boolean;
+  formStatusSection?: React.ReactNode;
 }
 
-const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink }) => {
-  const { t } = useTranslation();
-  const navItems = [
-    { route: '#basics', label: t('nav.basics') },
-    { route: '#status', label: t('nav.status') },
-    { route: '#schedule', label: t('nav.schedule') },
-    { route: '#financial', label: t('nav.financial') },
-    { route: '#responsiblePersons', label: t('nav.responsiblePersons') },
-    { route: '#location', label: t('nav.location') },
-    { route: '#projectProgram', label: t('nav.projectProgram') },
-  ];
-
+const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
+  navItems,
+  pwFolderLink,
+  showSaveIndicator = true,
+  formStatusSection,
+}) => {
   return (
     // This "extra" div is here so that the side-panel-container's sticky position works
     <div>
@@ -29,8 +26,9 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({ pwFolderLink }) 
           <div className="side-navigation">
             <SideNavigation navItems={navItems} />
           </div>
+          {formStatusSection && <div className="form-status-container">{formStatusSection}</div>}
           <PWContainer pwFolderLink={pwFolderLink} />
-          <SaveIndicator />
+          {showSaveIndicator && <SaveIndicator />}
         </div>
       </div>
     </div>

@@ -7,6 +7,8 @@ import { IProjectFinances, IProjectRequest } from '@/interfaces/projectInterface
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { Option } from 'hds-react';
 
+type OptionGroup = { label: string; options: Option[] };
+
 export const matchExact = (value: string) => new RegExp(value, 'i');
 
 export const removeDotsFromString = (value: string) => value.replace('.', '');
@@ -42,6 +44,29 @@ export const locationItemsToOptions = (locationList: ILocation[]): Option[] =>
     visible: true,
     disabled: false,
   }));
+
+export const groupOptions = <T>(
+  items: T[],
+  getGroupLabel: (item: T) => string,
+  getOption: (item: T) => Option,
+): OptionGroup[] =>
+  items.reduce<OptionGroup[]>((groups, item) => {
+    const option = getOption(item);
+    const label = getGroupLabel(item);
+    const existingGroup = groups.find((group) => group.label === label);
+
+    if (existingGroup) {
+      existingGroup.options.push(option);
+      return groups;
+    }
+
+    groups.push({
+      label,
+      options: [option],
+    });
+
+    return groups;
+  }, []);
 
 export const booleanToString = (
   boolVal: boolean | undefined,

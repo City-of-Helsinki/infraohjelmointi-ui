@@ -1,16 +1,18 @@
 import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
-import { Select as HDSSelect, Option } from 'hds-react';
+import { Select as HDSSelect, SelectProps } from 'hds-react';
 import { IconCrossCircle } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
 import TextField from './TextField';
 
-interface ISelectFieldProps {
+type Option = { value: string; label: string };
+
+interface ISelectFieldProps extends SelectProps {
   name: string;
-  control: HookFormControlType;
-  options: Array<Option>;
+  control?: HookFormControlType;
+  options?: Array<Option>;
   label?: string;
   rules?: HookFormRulesType;
   hideLabel?: boolean;
@@ -21,6 +23,8 @@ interface ISelectFieldProps {
   size?: 'full' | 'lg';
   shouldTranslate?: boolean;
   readOnly?: boolean;
+  placeholder?: string;
+  wrapperClassName?: string;
 }
 
 const SelectField: FC<ISelectFieldProps> = ({
@@ -37,6 +41,11 @@ const SelectField: FC<ISelectFieldProps> = ({
   size,
   shouldTranslate,
   readOnly,
+  placeholder,
+  children,
+  filter,
+  wrapperClassName,
+  ...rest
 }) => {
   const required = rules?.required ? true : false;
   const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -68,7 +77,7 @@ const SelectField: FC<ISelectFieldProps> = ({
 
   const translatedOptions = useMemo(
     () =>
-      translate
+      translate && options !== undefined
         ? options.map(({ value, label }) => ({
             value,
             label: t(`option.${label.replace('.', '')}`),
@@ -98,7 +107,7 @@ const SelectField: FC<ISelectFieldProps> = ({
 
   const updateIconBasedOnSelection = useCallback(
     (selectedValue: string) => {
-      const selectedOption = options.find((option) => option.value === selectedValue);
+      const selectedOption = options?.find((option) => option.value === selectedValue);
       if (selectedOption) {
         const newIcon = optionIcon[selectedOption.label as keyof typeof optionIcon];
         setIcon(newIcon);
@@ -116,15 +125,19 @@ const SelectField: FC<ISelectFieldProps> = ({
       name={name}
       control={control as Control<FieldValues>}
       rules={rules}
-      render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
+      render={({
+        field: { value, onChange, onBlur, disabled: fieldDisabled },
+        fieldState: { error },
+      }) => {
         const handleChange = (_: Option[], clickedOption: Option) => {
           onChange(clickedOption);
           if (shouldUpdateIcon && clickedOption?.value) {
             updateIconBasedOnSelection(clickedOption.value);
           }
         };
+        const isDisabled = disabled || fieldDisabled;
         return (
-          <div className="input-wrapper" id={name} data-testid={name}>
+          <div className={`input-wrapper ${wrapperClassName ?? ''}`} id={name} data-testid={name}>
             {/**
              * - icon class: indicates it has an icon and needs extra padding
              * - placeholder class: our controlled form needs an empty value and the placeholder's color only becomes
@@ -154,19 +167,21 @@ const SelectField: FC<ISelectFieldProps> = ({
                   invalid={error ? true : false}
                   options={translatedOptions ?? []}
                   required={required}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   style={{ paddingTop: hideLabel ? '1.745rem' : '0', maxWidth: '100%' }}
                   icon={icon}
+                  filter={filter}
                   texts={{
                     label: !hideLabel && label ? t(label) : undefined,
                     error: error?.message,
-                    placeholder: t('choose') ?? '',
+                    placeholder: placeholder ?? t('choose'),
                   }}
+                  {...rest}
                 />
               )}
               {((clearable === undefined && value?.value) || (clearable && value?.value)) &&
                 !readOnly &&
-                !disabled &&
+                !isDisabled &&
                 !required && (
                   <button
                     className="empty-select-field-button"

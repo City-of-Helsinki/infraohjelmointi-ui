@@ -1,0 +1,3 @@
+.formRowWithColumns {
+  @apply flex flex-col gap-4 md:flex-row;
+}
