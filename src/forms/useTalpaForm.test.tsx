@@ -3,6 +3,7 @@ import useTalpaForm from './useTalpaForm';
 import { BudgetItemNumber } from '@/components/Project/ProjectTalpa/budgetItemNumber';
 import { ITalpaProjectOpening, TalpaReadiness } from '@/interfaces/talpaInterfaces';
 import mockTalpaProject from '@/mocks/mockTalpaProject';
+import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
 
 const mockUseAppSelector = jest.fn();
 const mockDispatch = jest.fn();
@@ -17,7 +18,8 @@ type SelectorName =
   | 'selectProject'
   | 'selectTalpaProject'
   | 'selectPlanningClasses'
-  | 'selectPlanningSubClasses';
+  | 'selectPlanningSubClasses'
+  | 'selectResponsiblePersonsRaw';
 
 function buildTalpaProject(overrides: Partial<ITalpaProjectOpening> = {}): ITalpaProjectOpening {
   return {
@@ -40,9 +42,10 @@ describe('useTalpaForm', () => {
       estWarrantyPhaseEnd: '2025-12-31',
       projectClass: 'ddbf3ce8-5bc4-410b-8759-e68d80dad99e',
       personProgramming: {
-        id: 'person-1',
+        id: 'programmer-1',
         firstName: 'Erkki',
         lastName: 'Esimerkki',
+        person: 'person-1',
       },
     };
 
@@ -57,6 +60,14 @@ describe('useTalpaForm', () => {
       selectTalpaProject: null,
       selectPlanningClasses: [planningClass],
       selectPlanningSubClasses: [],
+      selectResponsiblePersonsRaw: [
+        {
+          id: 'person-1',
+          firstName: 'Erkki',
+          lastName: 'Esimerkki',
+          email: 'erkki.esimerkki@example.com',
+        },
+      ],
     };
 
     mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {
@@ -82,13 +93,16 @@ describe('useTalpaForm', () => {
       streetAddress: '',
       postalCode: '',
       responsiblePerson: 'Erkki Esimerkki',
-      responsiblePersonEmail: '',
+      responsiblePersonEmail: 'erkki.esimerkki@example.com',
       serviceClass: null,
       assetClass: null,
-      profileName: '',
+      profileName: TalpaProfileName.FixedStructures,
       holdingTime: null,
       investmentProfile: 'Z12550',
-      readiness: null,
+      readiness: {
+        label: TalpaReadiness.Kesken,
+        value: TalpaReadiness.Kesken,
+      },
     });
   });
 
@@ -99,6 +113,7 @@ describe('useTalpaForm', () => {
       selectTalpaProject: null,
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
+      selectResponsiblePersonsRaw: [],
     };
 
     mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {
@@ -210,6 +225,7 @@ describe('useTalpaForm', () => {
       }),
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
+      selectResponsiblePersonsRaw: [],
     };
 
     mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {

@@ -51,6 +51,7 @@ const render = async (customRoute?: string) =>
             constructionPhases: mockLists.mockConstructionPhases.data,
             responsibleZones: mockLists.mockResponsibleZones.data,
             responsiblePersons: mockLists.mockResponsiblePersons.data,
+            responsiblePersonsRaw: [],
             programmedYears: [],
             projectDistricts: [],
             projectDivisions: [],

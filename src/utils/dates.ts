@@ -48,13 +48,13 @@ export const sortArrayByDates = (array: Array<any>, dateProperty: string, revers
 };
 
 /**
- * Adds a year to a HDS date string
+ * Adds years to a HDS date string
  *
  * @param date date string in HDS format
- * @returns HDS date with an added year
+ * @returns HDS date with added years
  */
-export const addYear = (date?: string | null) =>
-  date ? momentFromHDSDate(date).add(1, 'y').format('DD.MM.YYYY') : null;
+export const addYears = (date?: string | null, years = 1) =>
+  date ? momentFromHDSDate(date).add(years, 'y').format('DD.MM.YYYY') : null;
 
 /**
  * Removes a year from a HDS date string

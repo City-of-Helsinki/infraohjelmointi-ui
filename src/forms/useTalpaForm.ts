@@ -6,6 +6,7 @@ import {
   ITalpaProjectRange,
   ITalpaProjectType,
   ITalpaServiceClass,
+  TalpaReadiness,
 } from '@/interfaces/talpaInterfaces';
 import { BudgetItemNumber } from '@/components/Project/ProjectTalpa/budgetItemNumber';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
@@ -15,6 +16,10 @@ import { useEffect } from 'react';
 import { infraInvestmentTemplateProject } from '@/components/Project/ProjectTalpa/templateProjectOptions';
 import { InvestmentProfile } from '@/components/Project/ProjectTalpa/investmentProfile';
 import { getTalpaProjectOpeningByProjectThunk, selectTalpaProject } from '@/reducers/talpaSlice';
+import { addYears } from '@/utils/dates';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
+import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 
 const formatDateToHds = (date?: string | null) => {
   if (!date) {
@@ -76,18 +81,32 @@ const buildReadinessOption = (readiness: string): IProjectTalpaForm['readiness']
   value: readiness,
 });
 
+function useResponsiblePerson(project: IProject | null): {
+  responsiblePersonName: string;
+  responsiblePersonEmail: string;
+} {
+  const allPersons = useAppSelector(selectResponsiblePersonsRaw);
+  const responsiblePerson = allPersons.find((person) => {
+    return person.id === project?.personProgramming?.person;
+  });
+
+  const responsiblePersonName = responsiblePerson
+    ? `${responsiblePerson.firstName} ${responsiblePerson.lastName}`
+    : '';
+  const responsiblePersonEmail = responsiblePerson ? responsiblePerson.email : '';
+
+  return { responsiblePersonName, responsiblePersonEmail };
+}
+
 const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
   const project = useAppSelector(selectProject);
   const talpaProject = useAppSelector(selectTalpaProject);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
+  const { responsiblePersonName, responsiblePersonEmail } = useResponsiblePerson(project);
 
   // If no Talpa project opening exists, return default values
   if (!talpaProject) {
-    const responsiblePerson = project?.personProgramming
-      ? `${project.personProgramming.firstName} ${project.personProgramming.lastName}`
-      : '';
-
     const selectedSubClass = project
       ? subClasses.find(({ id }) => id === project.projectClass)
       : undefined;
@@ -103,21 +122,21 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       budgetAccount: selectedClass ? selectedClass.name : '',
       templateProject: infraInvestmentTemplateProject,
       projectStart: project?.estPlanningStart ?? null,
-      projectEnd: project?.estWarrantyPhaseEnd ?? project?.estConstructionEnd ?? null,
-      responsiblePerson,
+      projectEnd: project?.estWarrantyPhaseEnd ?? addYears(project?.estConstructionEnd, 6),
       investmentProfile: InvestmentProfile.InfraInvestment,
       projectNumberRange: null,
       projectType: null,
       priority: null,
       projectName: '',
-      streetAddress: '',
+      streetAddress: project?.address || '',
       postalCode: '',
-      responsiblePersonEmail: '',
+      responsiblePerson: responsiblePersonName,
+      responsiblePersonEmail,
       serviceClass: null,
       assetClass: null,
-      profileName: '',
+      profileName: TalpaProfileName.FixedStructures,
       holdingTime: null,
-      readiness: null,
+      readiness: buildReadinessOption(TalpaReadiness.Kesken),
     };
   }
 

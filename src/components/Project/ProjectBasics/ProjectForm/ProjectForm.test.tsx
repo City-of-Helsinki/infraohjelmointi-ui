@@ -86,6 +86,7 @@ const render = async () =>
             constructionPhases: mockConstructionPhases.data,
             responsibleZones: mockResponsibleZones.data,
             responsiblePersons: mockResponsiblePersons.data,
+            responsiblePersonsRaw: [],
             programmedYears: [],
             projectDistricts: [],
             projectDivisions: [],
