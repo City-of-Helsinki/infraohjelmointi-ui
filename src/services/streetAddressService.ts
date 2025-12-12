@@ -5,7 +5,7 @@
  * @returns The street name portion (leading non-digit characters) or an empty string if none are found.
  */
 function getStreetName(input: string) {
-  const matches = input.match(/^\D+/);
+  const matches = /^\D+/.exec(input);
   if (matches) {
     return matches[0].trimEnd();
   }
@@ -19,7 +19,7 @@ function getStreetName(input: string) {
  * @returns The numeric substring found at the end of the address, or `'1'` if no digits are present.
  */
 function getStreetNumber(input: string) {
-  const matches = input.match(/[0-9]{1,5}$/);
+  const matches = /\d{1,5}$/.exec(input);
   if (matches) {
     return matches[0];
   }
