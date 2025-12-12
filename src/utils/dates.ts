@@ -51,6 +51,7 @@ export const sortArrayByDates = (array: Array<any>, dateProperty: string, revers
  * Adds years to a HDS date string
  *
  * @param date date string in HDS format
+ * @param years number of years to add (default 1)
  * @returns HDS date with added years
  */
 export const addYears = (date?: string | null, years = 1) =>
