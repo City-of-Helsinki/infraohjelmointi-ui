@@ -3,6 +3,7 @@ import useTalpaForm from './useTalpaForm';
 import { BudgetItemNumber } from '@/components/Project/ProjectTalpa/budgetItemNumber';
 import { ITalpaProjectOpening, TalpaReadiness } from '@/interfaces/talpaInterfaces';
 import mockTalpaProject from '@/mocks/mockTalpaProject';
+import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
 
 const mockUseAppSelector = jest.fn();
 const mockDispatch = jest.fn();
@@ -13,11 +14,21 @@ jest.mock('@/hooks/common', () => ({
   useAppDispatch: () => mockDispatch,
 }));
 
+jest.mock('@/hooks/usePostalCode', () => ({
+  usePostalCode: (address: string) => {
+    if (address === 'Testitie 1') {
+      return '00100';
+    }
+    return '';
+  },
+}));
+
 type SelectorName =
   | 'selectProject'
   | 'selectTalpaProject'
   | 'selectPlanningClasses'
-  | 'selectPlanningSubClasses';
+  | 'selectPlanningSubClasses'
+  | 'selectResponsiblePersonsRaw';
 
 function buildTalpaProject(overrides: Partial<ITalpaProjectOpening> = {}): ITalpaProjectOpening {
   return {
@@ -40,10 +51,12 @@ describe('useTalpaForm', () => {
       estWarrantyPhaseEnd: '2025-12-31',
       projectClass: 'ddbf3ce8-5bc4-410b-8759-e68d80dad99e',
       personProgramming: {
-        id: 'person-1',
+        id: 'programmer-1',
         firstName: 'Erkki',
         lastName: 'Esimerkki',
+        person: 'person-1',
       },
+      address: 'Testitie 1',
     };
 
     const planningClass = {
@@ -57,6 +70,14 @@ describe('useTalpaForm', () => {
       selectTalpaProject: null,
       selectPlanningClasses: [planningClass],
       selectPlanningSubClasses: [],
+      selectResponsiblePersonsRaw: [
+        {
+          id: 'person-1',
+          firstName: 'Erkki',
+          lastName: 'Esimerkki',
+          email: 'erkki.esimerkki@example.com',
+        },
+      ],
     };
 
     mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {
@@ -79,16 +100,19 @@ describe('useTalpaForm', () => {
       projectName: '',
       projectStart: '2025-05-01',
       projectEnd: '2025-12-31',
-      streetAddress: '',
-      postalCode: '',
+      streetAddress: 'Testitie 1',
+      postalCode: '00100',
       responsiblePerson: 'Erkki Esimerkki',
-      responsiblePersonEmail: '',
+      responsiblePersonEmail: 'erkki.esimerkki@example.com',
       serviceClass: null,
       assetClass: null,
-      profileName: '',
+      profileName: TalpaProfileName.FixedStructures,
       holdingTime: null,
       investmentProfile: 'Z12550',
-      readiness: null,
+      readiness: {
+        label: TalpaReadiness.Kesken,
+        value: TalpaReadiness.Kesken,
+      },
     });
   });
 
@@ -99,6 +123,7 @@ describe('useTalpaForm', () => {
       selectTalpaProject: null,
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
+      selectResponsiblePersonsRaw: [],
     };
 
     mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {
@@ -210,6 +235,7 @@ describe('useTalpaForm', () => {
       }),
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
+      selectResponsiblePersonsRaw: [],
     };
 
     mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {

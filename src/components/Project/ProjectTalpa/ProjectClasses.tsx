@@ -12,6 +12,7 @@ import { BudgetItemNumber } from './budgetItemNumber';
 import { InvestmentProfile } from './investmentProfile';
 import { validateRequired } from '@/utils/validation';
 import { TalpaReadiness } from '@/interfaces/talpaInterfaces';
+import { TalpaProfileName } from './profileName';
 
 export default function ProjectClassesSection() {
   const { t } = useTranslation();
@@ -56,14 +57,16 @@ export default function ProjectClassesSection() {
   useEffect(() => {
     if (budgetItemNumberDirty) {
       setValue('serviceClass', null);
-
-      if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
-        setValue('investmentProfile', InvestmentProfile.InfraInvestment);
-      } else {
-        setValue('investmentProfile', InvestmentProfile.PreConstruction);
-      }
     }
-  }, [budgetItemNumber, budgetItemNumberDirty, setValue]);
+
+    if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
+      setValue('investmentProfile', InvestmentProfile.InfraInvestment);
+      setValue('profileName', TalpaProfileName.FixedStructures);
+    } else {
+      setValue('investmentProfile', InvestmentProfile.PreConstruction);
+      setValue('profileName', TalpaProfileName.LandAndWater);
+    }
+  }, [budgetItemNumber, budgetItemNumberDirty, setValue, t]);
 
   useEffect(() => {
     const selectedAssetClass = talpaAssetClasses.find((ac) => ac.id === assetClass?.value);
@@ -100,7 +103,6 @@ export default function ProjectClassesSection() {
         {/* Investointiproﬁli */}
         <TextField {...getFieldProps('investmentProfile')} size="full" />
         {/* Valmius */}
-        {/* <TextField {...getFieldProps('readiness')} size="full" /> */}
         <SelectField
           {...getFieldProps('readiness')}
           options={[

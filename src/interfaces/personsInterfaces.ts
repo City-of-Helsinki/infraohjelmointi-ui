@@ -5,4 +5,5 @@ export interface IPerson {
   email: string;
   title: string;
   phone: string;
+  person?: string;
 }

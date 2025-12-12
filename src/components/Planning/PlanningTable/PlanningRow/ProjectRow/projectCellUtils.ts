@@ -11,7 +11,7 @@ import {
   createDateToStartOfYear,
   removeYear,
   getFirstDate,
-  addYear,
+  addYears,
   getLastDate,
   getYear,
   updateYear,
@@ -124,7 +124,7 @@ export const getCellTypeUpdateRequestData = (
 
   const updateConstructionStart = () =>
     (req.estConstructionStart = nextCellIsConstruction
-      ? addYear(estConstructionStart)
+      ? addYears(estConstructionStart)
       : getDateFromFirstConCellAhead());
 
   const updateConstructionStartAndTraverseIfGaps = () => {
@@ -132,7 +132,7 @@ export const getCellTypeUpdateRequestData = (
 
     if (prevCellIsPlanning) {
       req.estPlanningEnd = estPlanningEnd
-        ? addYear(estPlanningEnd)
+        ? addYears(estPlanningEnd)
         : createDateToEndOfYear(cell.year);
       return;
     }
@@ -222,9 +222,9 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     };
 
     const updateStartOfTimeline = () => {
-      updateIfValueExists('estPlanningStart', addYear(planningStart));
-      updateIfValueExists('estPlanningEnd', addYear(planningEnd));
-      updateIfValueExists('estConstructionStart', addYear(constructionStart));
+      updateIfValueExists('estPlanningStart', addYears(planningStart));
+      updateIfValueExists('estPlanningEnd', addYears(planningEnd));
+      updateIfValueExists('estConstructionStart', addYears(constructionStart));
       req.planningStartYear = (getYear(planningEnd) ?? 0) + 1;
     };
 
@@ -236,9 +236,9 @@ export const getRemoveRequestData = (cell: IProjectCell): IProjectRequest => {
     };
 
     const updateMiddleOfTimeline = () => {
-      updateIfValueExists('estConstructionStart', addYear(constructionStart));
+      updateIfValueExists('estConstructionStart', addYears(constructionStart));
       updateIfValueExists('estPlanningEnd', removeYear(planningEnd));
-    }
+    };
 
     if (isStartOfTimeline && isEndOfTimeline) {
       updateLastCell();
@@ -326,10 +326,10 @@ export const getAddRequestData = (direction: ProjectCellGrowDirection, cell: IPr
 
   const updateRight = () => {
     if (type === 'planningEnd') {
-      updateIfValueExists('estPlanningEnd', addYear(planningEnd));
+      updateIfValueExists('estPlanningEnd', addYears(planningEnd));
     } else if (type === 'constructionEnd' || type === 'overlap') {
-      updateIfValueExists('estConstructionEnd', addYear(constructionEnd));
-      req.constructionEndYear = getYear(addYear(constructionEnd));
+      updateIfValueExists('estConstructionEnd', addYears(constructionEnd));
+      req.constructionEndYear = getYear(addYears(constructionEnd));
     }
   };
 
@@ -392,13 +392,13 @@ export const moveTimelineForward = (cell: IProjectCell, projectFinances: IProjec
     updateRequestIfValueExistsInProject(key, updatedValue, projectEstDates, req);
   };
 
-  updateIfValueExists('estPlanningStart', addYear(planningStart));
-  updateIfValueExists('estPlanningEnd', addYear(planningEnd));
-  updateIfValueExists('estConstructionStart', addYear(constructionStart));
-  updateIfValueExists('estConstructionEnd', addYear(constructionEnd));
+  updateIfValueExists('estPlanningStart', addYears(planningStart));
+  updateIfValueExists('estPlanningEnd', addYears(planningEnd));
+  updateIfValueExists('estConstructionStart', addYears(constructionStart));
+  updateIfValueExists('estConstructionEnd', addYears(constructionEnd));
 
-  req.planningStartYear = getYear(addYear(planningStart));
-  req.constructionEndYear = getYear(addYear(constructionEnd));
+  req.planningStartYear = getYear(addYears(planningStart));
+  req.constructionEndYear = getYear(addYears(constructionEnd));
 
   return req;
 };
