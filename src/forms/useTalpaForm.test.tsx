@@ -14,6 +14,15 @@ jest.mock('@/hooks/common', () => ({
   useAppDispatch: () => mockDispatch,
 }));
 
+jest.mock('@/hooks/usePostalCode', () => ({
+  usePostalCode: (address: string) => {
+    if (address === 'Testitie 1') {
+      return '00100';
+    }
+    return '';
+  },
+}));
+
 type SelectorName =
   | 'selectProject'
   | 'selectTalpaProject'
@@ -47,6 +56,7 @@ describe('useTalpaForm', () => {
         lastName: 'Esimerkki',
         person: 'person-1',
       },
+      address: 'Testitie 1',
     };
 
     const planningClass = {
@@ -90,8 +100,8 @@ describe('useTalpaForm', () => {
       projectName: '',
       projectStart: '2025-05-01',
       projectEnd: '2025-12-31',
-      streetAddress: '',
-      postalCode: '',
+      streetAddress: 'Testitie 1',
+      postalCode: '00100',
       responsiblePerson: 'Erkki Esimerkki',
       responsiblePersonEmail: 'erkki.esimerkki@example.com',
       serviceClass: null,

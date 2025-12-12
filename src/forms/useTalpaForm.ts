@@ -20,6 +20,7 @@ import { addYears } from '@/utils/dates';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
+import { usePostalCode } from '@/hooks/usePostalCode';
 
 const formatDateToHds = (date?: string | null) => {
   if (!date) {
@@ -104,6 +105,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
   const { responsiblePersonName, responsiblePersonEmail } = useResponsiblePerson(project);
+  const postalCode = usePostalCode(project?.address || '');
 
   // If no Talpa project opening exists, return default values
   if (!talpaProject) {
@@ -129,7 +131,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       priority: null,
       projectName: '',
       streetAddress: project?.address || '',
-      postalCode: '',
+      postalCode,
       responsiblePerson: responsiblePersonName,
       responsiblePersonEmail,
       serviceClass: null,
