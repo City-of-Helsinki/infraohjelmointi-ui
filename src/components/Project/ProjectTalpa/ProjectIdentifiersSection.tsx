@@ -30,7 +30,10 @@ export default function ProjectIdentifiersSection() {
   const projectTypeDirty = Boolean(dirtyFields?.projectType);
 
   const filteredProjectRanges = talpaProjectRanges.filter(
-    (projectRange) => projectRange.projectTypePrefix === budgetItemNumber,
+    (projectRange) =>
+      projectRange.projectTypePrefix === budgetItemNumber &&
+      projectRange.budgetAccount !== null &&
+      projectRange.budgetAccount.toLowerCase() !== 'malli',
   );
 
   const projectRangeGroups = useMemo(
