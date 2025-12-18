@@ -20,7 +20,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   getFieldProps,
   getValues,
   isInputDisabled,
-  isUserOnlyViewer
+  isUserOnlyViewer,
 }) => {
   const { t } = useTranslation();
 
@@ -28,13 +28,13 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const phases = useOptions('phases');
   const programmers = useOptions('programmers');
 
-  const draftInitiationPhase = phases[3]?.value ?? "";
-  const draftApprovalPhase = phases[4]?.value ?? "";
-  const constructionPlanPhase = phases[5]?.value ?? "";
-  const constructionWaitPhase = phases[6]?.value ?? "";
-  const constructionPhase = phases[7]?.value ?? "";
-  const warrantyPeriodPhase = phases[8]?.value ?? "";
-  const completedPhase = phases[9]?.value ?? "";
+  const draftInitiationPhase = phases[3]?.value ?? '';
+  const draftApprovalPhase = phases[4]?.value ?? '';
+  const constructionPlanPhase = phases[5]?.value ?? '';
+  const constructionWaitPhase = phases[6]?.value ?? '';
+  const constructionPhase = phases[7]?.value ?? '';
+  const warrantyPeriodPhase = phases[8]?.value ?? '';
+  const completedPhase = phases[9]?.value ?? '';
 
   const phasesThatNeedResponsiblePerson = useMemo(
     () => [
@@ -106,6 +106,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             rules={validatePersonPlanning()}
             shouldTranslate={false}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
         <div className="form-col-md">
@@ -116,6 +117,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             rules={validatePersonConstruction()}
             shouldTranslate={false}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
       </div>
@@ -128,10 +130,11 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             shouldTranslate={false}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
         <div className="form-col-md">
-          <TextField {...getFieldProps('otherPersons')} readOnly={isUserOnlyViewer}/>
+          <TextField {...getFieldProps('otherPersons')} readOnly={isUserOnlyViewer} />
         </div>
       </div>
     </div>
