@@ -3,7 +3,7 @@ import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { IListItem, IOption } from '@/interfaces/common';
 import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
@@ -14,6 +14,7 @@ import { mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
+import { Tooltip } from 'hds-react';
 
 interface IProjectStatusSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -29,9 +30,9 @@ interface IProjectStatusSectionProps {
 }
 
 const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: IListItem[]) => {
-  const phase = phasesWithIndexes.find(({id}) => id === phaseId);
+  const phase = phasesWithIndexes.find(({ id }) => id === phaseId);
   return phase?.index;
-}
+};
 
 const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   getFieldProps,
@@ -39,7 +40,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   constructionEndYear,
   isInputDisabled,
   isUserOnlyProjectManager,
-  isUserOnlyViewer
+  isUserOnlyViewer,
 }) => {
   const phases = useOptions('phases');
   const phasesWithIndexes = useAppSelector(selectProjectPhases);
@@ -51,13 +52,22 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
 
-  const checkPhaseIsBeforeCurrent = (previousPhaseIndex: number | undefined, newPhaseIndex: number | undefined) => {
-    return newPhaseIndex !== undefined && previousPhaseIndex !== undefined && (newPhaseIndex < previousPhaseIndex);
-  }
+  const checkPhaseIsBeforeCurrent = (
+    previousPhaseIndex: number | undefined,
+    newPhaseIndex: number | undefined,
+  ) => {
+    return (
+      newPhaseIndex !== undefined &&
+      previousPhaseIndex !== undefined &&
+      newPhaseIndex < previousPhaseIndex
+    );
+  };
 
-  const checkTodayIsBeforeWarrantyPhaseEnd = () => {
-    return getValues('estWarrantyPhaseEnd') && isBefore(getToday(), getValues('estWarrantyPhaseEnd'))
-  }
+  const checkTodayIsBeforeWarrantyPhaseEnd = useCallback(() => {
+    return (
+      getValues('estWarrantyPhaseEnd') && isBefore(getToday(), getValues('estWarrantyPhaseEnd'))
+    );
+  }, [getValues]);
 
   const [
     proposalPhase,
@@ -146,10 +156,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               break;
           }
 
-          const isProposalOrDesignPhase = phase.value === proposalPhase || phase.value === designPhase;
+          const isProposalOrDesignPhase =
+            phase.value === proposalPhase || phase.value === designPhase;
 
           // Check if programmed has the correct value
-          if ((isProposalOrDesignPhase && programmed) || !isProposalOrDesignPhase && !programmed) {
+          if (
+            (isProposalOrDesignPhase && programmed) ||
+            (!isProposalOrDesignPhase && !programmed)
+          ) {
             fields.push('programmed');
           }
           setPhaseRequirements(fields);
@@ -161,7 +175,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [
       t,
       isUserOnlyProjectManager,
-      getValues, 
+      getValues,
       proposalPhase,
       designPhase,
       currentPhase,
@@ -173,7 +187,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       constructionWaitPhase,
       constructionPhase,
       warrantyPeriodPhase,
-      completedPhase
+      completedPhase,
+      checkTodayIsBeforeWarrantyPhaseEnd,
     ],
   );
 
@@ -190,12 +205,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [completedPhase, constructionPhase, getValues, t, warrantyPeriodPhase],
+    [constructionPhase, getValues, t],
   );
 
   const isConstructionPhaseDetailsDisabled = useMemo(() => {
     return currentPhase !== constructionPhase;
-  }, [currentPhase, constructionPhase, warrantyPeriodPhase, completedPhase]);
+  }, [currentPhase, constructionPhase]);
 
   const validateProgrammed = useMemo(
     () => ({
@@ -230,7 +245,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const estPlanningEndValue = getValues('estPlanningEnd');
           const constructionEndYearValue = getValues('constructionEndYear');
 
-          const isAfterConstructionEnd = constructionEndYearValue && parseInt(date) > parseInt(constructionEndYearValue);
+          const isAfterConstructionEnd =
+            constructionEndYearValue && parseInt(date) > parseInt(constructionEndYearValue);
 
           // If the date is after construction end year
           if (isAfterConstructionEnd) {
@@ -239,16 +255,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             });
           }
 
-          if (!estPlanningStartValue){
+          if (!estPlanningStartValue) {
             return t('validation.required', {
               field: t('validation.estPlanningStart'),
             });
           }
 
-          const estPlanningStartToUpdate = updateYear(
-            parseInt(date),
-            estPlanningStartValue,
-          );
+          const estPlanningStartToUpdate = updateYear(parseInt(date), estPlanningStartValue);
 
           const isEstPlanningStartAfterEstPlanningEnd = !isBefore(
             estPlanningStartToUpdate,
@@ -281,9 +294,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           const estConstructionStartValue = getValues('estConstructionStart');
           const estConstructionEndValue = getValues('estConstructionEnd');
           const planningStartYearValue = getValues('planningStartYear');
-          const isBeforePlanningStart = planningStartYearValue && parseInt(date) < parseInt(planningStartYearValue);
+          const isBeforePlanningStart =
+            planningStartYearValue && parseInt(date) < parseInt(planningStartYearValue);
 
-          if (isUserOnlyProjectManager && constructionEndYear && constructionEndYear > parseInt(date)) {
+          if (
+            isUserOnlyProjectManager &&
+            constructionEndYear &&
+            constructionEndYear > parseInt(date)
+          ) {
             return t('validation.userNotAllowedToChangeYearBackwards');
           }
 
@@ -294,16 +312,13 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             });
           }
 
-          if (!estConstructionEndValue){
+          if (!estConstructionEndValue) {
             return t('validation.required', {
               field: t('validation.estConstructionEnd'),
             });
           }
 
-          const estConstructionEndToUpdate = updateYear(
-            parseInt(date),
-            estConstructionEndValue,
-          );
+          const estConstructionEndToUpdate = updateYear(parseInt(date), estConstructionEndValue);
 
           // Est construction start is not required for phases until construction phase
           if (!estConstructionStartValue) return true;
@@ -417,10 +432,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         </div>
       </div>
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('louhi')} readOnly={isUserOnlyViewer}/>
+        <RadioCheckboxField {...getFieldProps('louhi')} readOnly={isUserOnlyViewer} />
       </div>
       <div className="form-row">
-        <RadioCheckboxField {...getFieldProps('gravel')} readOnly={isUserOnlyViewer}/>
+        <RadioCheckboxField {...getFieldProps('gravel')} readOnly={isUserOnlyViewer} />
       </div>
       <div className="form-row">
         <div className="form-col-xl">
@@ -430,11 +445,20 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             rules={validateCategory}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
+            tooltip={
+              <Tooltip>
+                <Trans
+                  i18nKey="projectForm.categoryTooltip"
+                  components={{ p: <p />, strong: <strong /> }}
+                />
+              </Tooltip>
+            }
           />
         </div>
       </div>
       <div className="form-row">
-        <RadioCheckboxField 
+        <RadioCheckboxField
           {...getFieldProps('effectHousing')}
           disabled={isInputDisabled}
           readOnly={isUserOnlyViewer}
@@ -447,6 +471,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             options={riskAssessments}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
       </div>

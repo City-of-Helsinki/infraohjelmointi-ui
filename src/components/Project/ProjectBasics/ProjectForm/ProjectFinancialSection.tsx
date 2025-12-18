@@ -121,6 +121,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       shouldTranslate={shouldTranslate}
       disabled={userIsProjectManager ? false : isInputDisabled}
       readOnly={isUserOnlyViewer}
+      clearable
     />
   );
 
@@ -217,6 +218,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             size="full"
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
         {isOtherBudgetOverrunReasonSelected && (

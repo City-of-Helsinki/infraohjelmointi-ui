@@ -1,8 +1,7 @@
-import { FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 import { HookFormControlType, HookFormRulesType } from '@/interfaces/formInterfaces';
 import { Select as HDSSelect, SelectProps } from 'hds-react';
-import { IconCrossCircle } from 'hds-react/icons';
 import { useTranslation } from 'react-i18next';
 import optionIcon from '@/utils/optionIcon';
 import TextField from './TextField';
@@ -48,32 +47,8 @@ const SelectField: FC<ISelectFieldProps> = ({
   ...rest
 }) => {
   const required = rules?.required ? true : false;
-  const selectContainerRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
   const [translate, setTranslate] = useState(true);
-
-  /**
-   * Empties the selected value for the SelectField and focuses the field afterwards so that
-   * autosave-functionality works with the remove button.
-   *
-   * Since the HDS SelectField's button cannot be given a ref, we need to give the ref to the parent element
-   * to access the child elements for the button when focusing it.
-   */
-  const handleRemoveSelection = useCallback((onChange: (...event: unknown[]) => void) => {
-    if (!selectContainerRef?.current) {
-      return;
-    }
-    // If the SelectField has a label
-    if (selectContainerRef.current.children[0]?.children[1]?.children[0]) {
-      onChange({ value: '', label: '' });
-      (selectContainerRef.current.children[0].children[1].children[0] as HTMLButtonElement).focus();
-    }
-    // If the SelectField doesn't have a label
-    else if (selectContainerRef.current.children[0]?.children[0]?.children[0]) {
-      onChange({ value: '', label: '' });
-      (selectContainerRef.current.children[0].children[0].children[0] as HTMLButtonElement).focus();
-    }
-  }, []);
 
   const translatedOptions = useMemo(
     () =>
@@ -130,7 +105,7 @@ const SelectField: FC<ISelectFieldProps> = ({
         fieldState: { error },
       }) => {
         const handleChange = (_: Option[], clickedOption: Option) => {
-          onChange(clickedOption);
+          onChange(clickedOption ?? { value: '', label: '' });
           if (shouldUpdateIcon && clickedOption?.value) {
             updateIconBasedOnSelection(clickedOption.value);
           }
@@ -147,7 +122,6 @@ const SelectField: FC<ISelectFieldProps> = ({
               className={`select-field-wrapper ${size ? size : ''} ${iconKey ? 'with-icon' : ''} ${
                 !value || !value.value ? 'placeholder' : ''
               }`}
-              ref={selectContainerRef}
             >
               {readOnly ? (
                 <TextField
@@ -176,21 +150,10 @@ const SelectField: FC<ISelectFieldProps> = ({
                     error: error?.message,
                     placeholder: placeholder ?? t('choose'),
                   }}
+                  clearable={clearable && value?.value}
                   {...rest}
                 />
               )}
-              {((clearable === undefined && value?.value) || (clearable && value?.value)) &&
-                !readOnly &&
-                !isDisabled &&
-                !required && (
-                  <button
-                    className="empty-select-field-button"
-                    data-testid={`empty-${name}-selection-button`}
-                    onClick={() => handleRemoveSelection(onChange)}
-                  >
-                    <IconCrossCircle />
-                  </button>
-                )}
             </div>
           </div>
         );
