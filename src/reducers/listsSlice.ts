@@ -30,6 +30,7 @@ import {
   ITalpaProjectType,
   ITalpaServiceClass,
 } from '@/interfaces/talpaInterfaces';
+import { IPerson } from '@/interfaces/personsInterfaces';
 
 export interface IListState {
   types: Array<IListItem>;
@@ -43,6 +44,7 @@ export interface IListState {
   constructionPhases: Array<IListItem>;
   responsibleZones: Array<IListItem>;
   responsiblePersons: Array<IListItem>;
+  responsiblePersonsRaw: Array<IPerson>;
   programmedYears: Array<IListItem>;
   projectDistricts: Array<IListItem>;
   projectDivisions: Array<IListItem>;
@@ -69,6 +71,7 @@ const initialState: IListState = {
   constructionPhases: [],
   responsibleZones: [],
   responsiblePersons: [],
+  responsiblePersonsRaw: [],
   projectDistricts: [],
   projectDivisions: [],
   projectSubDivisions: [],
@@ -90,12 +93,7 @@ export const sortOptions = (persons: Array<IListItem>) =>
 const getResponsiblePersons = async () => {
   try {
     const persons = await getPersons();
-    return sortOptions(
-      persons.map(({ firstName, lastName, id }) => ({
-        value: `${lastName} ${firstName}`,
-        id,
-      })),
-    );
+    return persons;
   } catch (e) {
     console.log('Error getting responsible persons: ', e);
     return [];
@@ -115,6 +113,7 @@ export const getProjectDistricts = (districts: IProjectDistrict[], districtLevel
 export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) => {
   try {
     const districts = await getDistricts();
+    const persons = await getResponsiblePersons();
     return {
       types: await getProjectTypes(),
       phases: await getProjectPhases(),
@@ -126,7 +125,13 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       planningPhases: await getPlanningPhases(),
       constructionPhases: await getConstructionPhases(),
       responsibleZones: await getResponsibleZones(),
-      responsiblePersons: await getResponsiblePersons(),
+      responsiblePersons: sortOptions(
+        persons.map(({ firstName, lastName, id }) => ({
+          value: `${lastName} ${firstName}`,
+          id,
+        })),
+      ),
+      responsiblePersonsRaw: persons,
       programmedYears: setProgrammedYears(),
       projectDistricts: getProjectDistricts(districts, 'district'),
       projectDivisions: getProjectDistricts(districts, 'division'),
@@ -193,6 +198,7 @@ export const selectProjectPhases = (state: RootState) => state.lists.phases;
 export const selectBudgetOverrunReasons = (state: RootState) => state.lists.budgetOverrunReasons;
 export const selectProjectClasses = (state: RootState) => state.lists.projectClasses;
 export const selectProgrammers = (state: RootState) => state.lists.programmers;
+export const selectResponsiblePersonsRaw = (state: RootState) => state.lists.responsiblePersonsRaw;
 export const selectTalpaProjectRanges = (state: RootState) => state.lists.talpaProjectRanges;
 export const selectTalpaProjectTypes = (state: RootState) => state.lists.talpaProjectTypes;
 export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpaServiceClasses;

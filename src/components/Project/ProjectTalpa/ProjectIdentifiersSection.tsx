@@ -21,16 +21,20 @@ export default function ProjectIdentifiersSection() {
   const {
     watch,
     setValue,
-    formState: { dirtyFields },
+    formState: { dirtyFields, touchedFields },
   } = useFormContext<IProjectTalpaForm>();
   const [budgetItemNumber, projectType] = watch(['budgetItemNumber', 'projectType']);
   const talpaProjectRanges = useSelector(selectTalpaProjectRanges);
   const talpaProjectTypes = useSelector(selectTalpaProjectTypes);
+  const budgetItemNumberTouched = Boolean(touchedFields?.budgetItemNumber);
   const budgetItemNumberDirty = Boolean(dirtyFields?.budgetItemNumber);
   const projectTypeDirty = Boolean(dirtyFields?.projectType);
 
   const filteredProjectRanges = talpaProjectRanges.filter(
-    (projectRange) => projectRange.projectTypePrefix === budgetItemNumber,
+    (projectRange) =>
+      projectRange.projectTypePrefix === budgetItemNumber &&
+      projectRange.budgetAccount !== null &&
+      projectRange.budgetAccount.toLowerCase() !== 'malli',
   );
 
   const projectRangeGroups = useMemo(
@@ -68,7 +72,10 @@ export default function ProjectIdentifiersSection() {
   const projectTypeGroups = useMemo(
     () =>
       groupOptions(
-        uniqBy(talpaProjectTypes, 'name'),
+        uniqBy(
+          talpaProjectTypes.filter((pt) => pt.priority === null),
+          'name',
+        ),
         (projectType) => projectType.category,
         (projectType) => ({
           label: projectType.name,
@@ -83,17 +90,21 @@ export default function ProjectIdentifiersSection() {
   );
 
   const priorityGroups = useMemo(() => {
-    if (!projectType?.label) {
+    if (!projectType?.value) {
       return [];
     }
 
+    const selectedBaseItem = talpaProjectTypes.find((pt) => pt.id === projectType.value);
+
+    if (!selectedBaseItem?.code) return [];
+
     return groupOptions(
       talpaProjectTypes
-        .filter((pt) => pt.priority !== null && pt.name === projectType.label)
+        .filter((pt) => pt.priority !== null && pt.code === selectedBaseItem.code)
         .toSorted((a, b) => (a.priority ?? '').localeCompare(b.priority ?? '')),
-      (projectType) => projectType.name,
+      () => selectedBaseItem.name,
       (projectType) => ({
-        label: `${projectType.priority} / ${projectType.description}`,
+        label: `${projectType.priority} / ${projectType.name}`,
         value: projectType.id,
         selected: false,
         isGroupLabel: false,
@@ -104,7 +115,7 @@ export default function ProjectIdentifiersSection() {
   }, [talpaProjectTypes, projectType]);
 
   useEffect(() => {
-    if (budgetItemNumberDirty) {
+    if (budgetItemNumberDirty || budgetItemNumberTouched) {
       setValue('projectNumberRange', null);
 
       if (budgetItemNumber === BudgetItemNumber.InfraInvestment) {
@@ -113,13 +124,13 @@ export default function ProjectIdentifiersSection() {
         setValue('templateProject', '');
       }
     }
-  }, [budgetItemNumber, budgetItemNumberDirty, setValue]);
+  }, [budgetItemNumber, budgetItemNumberDirty, budgetItemNumberTouched, setValue]);
 
   useEffect(() => {
     if (projectTypeDirty) {
       setValue('priority', null);
     }
-  }, [projectTypeDirty, setValue]);
+  }, [projectTypeDirty, projectType, setValue]);
 
   return (
     <div className="mb-12">
