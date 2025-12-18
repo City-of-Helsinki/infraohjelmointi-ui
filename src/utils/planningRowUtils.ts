@@ -245,7 +245,7 @@ export const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelecti
   } else if (selectedDistrict) {
     return { type: 'district', id: selectedDistrict.id };
   } else if (selectedSubClass || selectedClass) {
-    return { type: 'class', id: selectedClass?.id };
+    return { type: 'class', id: selectedSubClass?.parent ?? selectedClass?.id };
   } else {
     return { type: null, id: null };
   }
