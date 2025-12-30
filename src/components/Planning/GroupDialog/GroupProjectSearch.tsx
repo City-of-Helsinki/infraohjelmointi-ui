@@ -17,17 +17,11 @@ interface IProjectSearchProps {
   control: Control<IGroupForm>;
 }
 
-const getProjectsUnderClassOrSubClass = async (
-  groupSubClass: string,
-  groupClass: string,
-  forcedToFrame: boolean,
-  year: number,
-) => {
+const getProjectsUnderClass = async (groupClass: string, forcedToFrame: boolean, year: number) => {
   const groupClassParam = groupClass ? `class=${groupClass}` : '';
-  const classParam = groupSubClass ? `subClass=${groupSubClass}` : groupClassParam;
   const res = await getProjectsWithParams(
     {
-      params: classParam + '&inGroup=false',
+      params: groupClassParam + '&inGroup=false',
       direct: false,
       programmed: true,
       forcedToFrame: forcedToFrame,
@@ -57,20 +51,15 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
     return searchedProjects;
   }, [searchedProjects]);
 
+  const groupClass = getValues('class.value');
+
   useEffect(() => {
     const setProjectsForSearch = async () => {
-      const groupClass = getValues('class.value');
-      const groupSubClass = getValues('subClass.value');
-      const projects = getProjectsUnderClassOrSubClass(
-        groupSubClass,
-        groupClass,
-        forcedToFrame,
-        year,
-      );
+      const projects = getProjectsUnderClass(groupClass, forcedToFrame, year);
       setAllProjectsUnderSelectedClass(await projects);
     };
     setProjectsForSearch();
-  }, [getValues('class.value'), getValues('subClass.value')]);
+  }, [groupClass, forcedToFrame, year]);
 
   useEffect(() => {
     const lowerCaseSearchWord = searchWord.toLowerCase();

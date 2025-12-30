@@ -235,7 +235,7 @@ describe('GroupDialog', () => {
 
     // Check that the correct url was called
     expect(getRequest.lastCall[0]).toBe(
-      `localhost:4000/projects/?subClass=507e3e63-0c09-4c19-8d09-43549dcc65c8&inGroup=false&year=${year}&forcedToFrame=false&direct=false&programmed=true`,
+      `localhost:4000/projects/?class=c6294258-41b1-4ad6-afdf-0b10849ca000&inGroup=false&year=${year}&forcedToFrame=false&direct=false&programmed=true`,
     );
 
     expect(submitButton).toBeEnabled();
