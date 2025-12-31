@@ -71,15 +71,6 @@ we give the container a 3rem margin left
   max-width: 24rem;
 }
 
-/* 
-  hide overflow from all selects used with the SelectField-component, max width is calculated to
-  prevent the text from overflowing on top of the empty-selections button
-*/
-.select-field-wrapper > div > div > button > span {
-  --max-w: calc(100% - 2rem);
-  @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;
-}
-
 .select-field-wrapper.with-icon > div > div > button > span {
   --max-w: calc(100% - 4rem);
   @apply max-w-[var(--max-w)] overflow-hidden text-ellipsis whitespace-nowrap;

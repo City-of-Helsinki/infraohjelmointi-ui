@@ -88,7 +88,12 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('area')} options={areas} readOnly={isUserOnlyViewer} />
+          <SelectField
+            {...getFieldProps('area')}
+            options={areas}
+            readOnly={isUserOnlyViewer}
+            clearable
+          />
         </div>
         <div className="form-col-xl">
           <TextField

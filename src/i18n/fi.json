@@ -268,6 +268,7 @@
     "louhi": "Louheen",
     "gravel": "Sorakatu",
     "category": "Kategoria",
+    "categoryTooltip": "<p><strong>K1</strong> = Kaupungin sopimusvelvoitteiden täyttämisen vuoksi välttämättömät hankkeet. Pääasiallisesti tällä tarkoitetaan hankkeita, joiden rakentaminen on käynnissä eli urakkasopimus on tehty.</p><p><strong>K2</strong> = Turvallisuuden, terveellisyyden & toimintavarmuuden näkökulmasta kriittiset peruskorjaushankkeet.</p><p><strong>K3</strong> = Lisääntyvän lakisääteisen palvelutarpeen vuoksi tehtävät laajennus- tai uudishankkeet.</p><p><strong>K4</strong> = Omaisuuden hallinnan näkökulmasta tarkoituksenmukaiset tai säästöä tuottavat peruskorjaushankkeet sekä tuotannon sujuvuuteen ja tehostamiseen liittyvät hankkeet.</p><p><strong>K5.1</strong> = Asuntotuotannon edellytysinvestointi</p><p><strong>K5.2</strong> = Alueiden valmiiksi saattaminen (perustoiminnallisuudet)</p><p><strong>K5.3</strong> = Vetovoimaan liittyvät erillishankkeet</p><p><strong>K5.4</strong> = Toimitilahankkeet</p><p><strong>K5.5</strong> = Muut</p>",
     "effectHousing": "Vaikutus asuntotuotantoon",
     "riskAssessment": "Riskiarvio",
     "planningStartYear": "Suunnittelun aloitusvuosi",
