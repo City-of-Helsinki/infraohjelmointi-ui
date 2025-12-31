@@ -17,9 +17,9 @@ jest.mock('@/hooks/common', () => ({
 jest.mock('@/hooks/usePostalCode', () => ({
   usePostalCode: (address: string) => {
     if (address === 'Testitie 1') {
-      return '00100';
+      return { postalCode: '00100', city: 'Helsinki' };
     }
-    return '';
+    return { postalCode: '', city: '' };
   },
 }));
 

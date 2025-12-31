@@ -36,16 +36,13 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
           control={control as Control<FieldValues>}
           render={({ field }) =>
             editing ? (
-              <>
-                <TextInput
-                  id={field.name}
-                  {...field}
-                  className="w-80"
-                  placeholder={t('name') ?? ''}
-                  aria-label="project-name"
-                />
-                <br />
-              </>
+              <TextInput
+                id={field.name}
+                {...field}
+                className="mb-[var(--spacing-m)] w-80"
+                placeholder={t('name') ?? ''}
+                aria-label="project-name"
+              />
             ) : (
               <h3 className="text-heading-m text-white">
                 {projectMode === 'new' ? t(`newProject`) : field.value}
@@ -62,9 +59,44 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
               <TextInput
                 id={field.name}
                 {...field}
-                className="edit-address-input"
+                className="mb-[var(--spacing-m)]"
                 placeholder={t('address') ?? ''}
                 aria-label="project-address"
+              />
+            ) : (
+              <p className="text-white">{field.value}</p>
+            )
+          }
+        />
+        {/* Postal Code */}
+        <Controller
+          name="postalCode"
+          control={control as Control<FieldValues>}
+          render={({ field }) =>
+            editing ? (
+              <TextInput
+                id={field.name}
+                {...field}
+                className="mb-[var(--spacing-m)]"
+                placeholder={t('projectForm.postalCode') ?? ''}
+                aria-label="project-postal-code"
+              />
+            ) : (
+              <p className="text-white">{field.value}</p>
+            )
+          }
+        />
+        {/* City */}
+        <Controller
+          name="city"
+          control={control as Control<FieldValues>}
+          render={({ field }) =>
+            editing ? (
+              <TextInput
+                id={field.name}
+                {...field}
+                placeholder={t('projectForm.city') ?? ''}
+                aria-label="project-city"
               />
             ) : (
               <p className="text-white">{field.value}</p>

@@ -25,6 +25,7 @@ import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import { notifyInfo } from '@/reducers/notificationSlice';
 import { selectIsLoading, selectIsProjectCardLoading } from '@/reducers/loaderSlice';
 import { useProjectProgrammer } from '@/utils/projectProgrammerUtils';
+import { usePostalCode } from '@/hooks/usePostalCode';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -346,6 +347,21 @@ const useProjectForm = () => {
       classOptions.subClasses,
     ],
   );
+
+  const address = watch('address');
+  const { postalCode, city } = usePostalCode(address || '');
+  // Update postal code and city when address changes
+  // when creating a new project
+  useEffect(() => {
+    if (projectMode === 'new') {
+      if (postalCode) {
+        setValue('postalCode', postalCode, { shouldDirty: true });
+      }
+      if (city) {
+        setValue('city', city, { shouldDirty: true });
+      }
+    }
+  }, [postalCode, city, projectMode, setValue]);
 
   // Listen to changes in the form value and set selected class or location if those properties are changed
   useEffect(() => {
