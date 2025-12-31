@@ -41,6 +41,8 @@ export interface IProjectHeaderForm {
   favourite: boolean;
   name: string;
   address?: string;
+  postalCode?: string;
+  city?: string;
 }
 
 export interface IProjectForm {
@@ -86,6 +88,9 @@ export interface IProjectForm {
   budgetOverrunReason: IOption;
   otherBudgetOverrunReason: string;
   onSchedule?: boolean | null;
+  address?: string;
+  postalCode?: string;
+  city?: string;
 }
 
 export interface ISearchForm {

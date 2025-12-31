@@ -191,7 +191,8 @@
     "postalCode": "$t(projectTalpaForm.postalCode)",
     "responsiblePerson": "$t(projectTalpaForm.responsiblePerson)",
     "responsiblePersonEmail": "$t(projectTalpaForm.responsiblePersonEmail)",
-    "templateProject": "$t(projectTalpaForm.templateProject)"
+    "templateProject": "$t(projectTalpaForm.templateProject)",
+    "address": "$t(projectForm.address)"
   },
   "projectTalpaForm": {
     "budgetItemNumber": "Hankkeen projektityyppi",
@@ -317,7 +318,10 @@
     "estWarrantyPhaseEnd": "Päättyy",
     "budgetOverrunReason": "Budjettipoikkeaman selitys",
     "otherBudgetOverrunReason": "Muu syy budjettipoikkeamalle",
-    "onSchedule": "Onko hanke aikataulussa"
+    "onSchedule": "Onko hanke aikataulussa",
+    "address": "Katuosoite",
+    "postalCode": "Postinumero",
+    "city": "Kaupunki"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",

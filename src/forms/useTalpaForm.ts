@@ -105,7 +105,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
   const { responsiblePersonName, responsiblePersonEmail } = useResponsiblePerson(project);
-  const postalCode = usePostalCode(project?.address || '');
+  const { postalCode } = usePostalCode(project?.address || '');
 
   // If no Talpa project opening exists, return default values
   if (!talpaProject) {
@@ -131,7 +131,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       priority: null,
       projectName: '',
       streetAddress: project?.address || '',
-      postalCode,
+      postalCode: project?.postalCode ?? postalCode,
       responsiblePerson: responsiblePersonName,
       responsiblePersonEmail,
       serviceClass: null,

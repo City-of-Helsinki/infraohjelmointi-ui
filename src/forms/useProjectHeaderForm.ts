@@ -5,6 +5,7 @@ import { useAppSelector } from '../hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { selectProject } from '@/reducers/projectSlice';
 import { selectUser } from '@/reducers/authSlice';
+import { usePostalCode } from '@/hooks/usePostalCode';
 
 /**
  * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
@@ -22,6 +23,8 @@ const useProjectHeaderValues = () => {
       phase: listItemToOption(selectedProject?.phase) ?? [],
       name: selectedProject?.name ?? '',
       address: selectedProject?.address ?? '',
+      postalCode: selectedProject?.postalCode ?? '',
+      city: selectedProject?.city ?? '',
     }),
     [selectedProject, user],
   );
@@ -44,14 +47,25 @@ const useProjectHeaderForm = () => {
     mode: 'onBlur',
   });
 
-  const { control, reset } = formMethods;
+  const { control, reset, watch, setValue } = formMethods;
 
   // Updates form when the selectedProject changes in redux
   useEffect(() => {
     if (selectedProject) {
       reset(formValues);
     }
-  }, [selectedProject, formValues]);
+  }, [selectedProject, formValues, reset]);
+
+  const address = watch('address');
+  const { postalCode, city } = usePostalCode(address || '');
+  useEffect(() => {
+    if (postalCode) {
+      setValue('postalCode', postalCode, { shouldDirty: true });
+    }
+    if (city) {
+      setValue('city', city, { shouldDirty: true });
+    }
+  }, [postalCode, city, setValue]);
 
   return { formMethods, control };
 };

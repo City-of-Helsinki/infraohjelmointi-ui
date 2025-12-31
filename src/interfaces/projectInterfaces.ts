@@ -11,6 +11,8 @@ export interface IProject {
   type: IListItem;
   name: string;
   address?: string;
+  postalCode?: string;
+  city?: string;
   entityName: string;
   description: string;
   phase: IListItem;
@@ -116,6 +118,8 @@ export interface IProjectRequest {
   sapNetwork?: Array<string>;
   name?: string | null;
   address?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
   favPersons?: Array<string> | [];
   phase?: string | null;
   estPlanningStart?: string | null;

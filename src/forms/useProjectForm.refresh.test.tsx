@@ -37,7 +37,7 @@ jest.mock('@/utils/projectProgrammerUtils', () => ({
 // Mock reducers - need to match actual Redux state structure
 const mockStore = configureStore({
   reducer: {
-    project: (state = { project: null, mode: 'new' }) => state,
+    project: (state = { project: null, mode: 'edit' }) => state,
     class: (
       state = {
         planning: {
