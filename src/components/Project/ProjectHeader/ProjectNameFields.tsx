@@ -36,15 +36,13 @@ const ProjectNameForm: FC<IProjectNameFormProps> = ({ control }) => {
           control={control as Control<FieldValues>}
           render={({ field }) =>
             editing ? (
-              <>
-                <TextInput
-                  id={field.name}
-                  {...field}
-                  className="mb-[var(--spacing-m)] w-80"
-                  placeholder={t('name') ?? ''}
-                  aria-label="project-name"
-                />
-              </>
+              <TextInput
+                id={field.name}
+                {...field}
+                className="mb-[var(--spacing-m)] w-80"
+                placeholder={t('name') ?? ''}
+                aria-label="project-name"
+              />
             ) : (
               <h3 className="text-heading-m text-white">
                 {projectMode === 'new' ? t(`newProject`) : field.value}

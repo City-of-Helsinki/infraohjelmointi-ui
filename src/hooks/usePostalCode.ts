@@ -20,7 +20,7 @@ export function usePostalCode(address: string) {
 
     let isActive = true;
 
-    const debounceId = window.setTimeout(() => {
+    const debounceId = globalThis.setTimeout(() => {
       fetchAddressData(address)
         .then((data) => {
           if (!isActive) {
@@ -43,7 +43,7 @@ export function usePostalCode(address: string) {
 
     return () => {
       isActive = false;
-      window.clearTimeout(debounceId);
+      globalThis.clearTimeout(debounceId);
     };
   }, [address]);
 
