@@ -156,6 +156,7 @@ export default function ProjectIdentifiersSection() {
           {...getFieldProps('templateProject')}
           rules={{ ...validateRequired('templateProject', t) }}
           size="full"
+          readOnly
         />
       ) : (
         <SelectField
@@ -171,11 +172,7 @@ export default function ProjectIdentifiersSection() {
         {...getFieldProps('projectType')}
         groups={projectTypeGroups}
         filter={defaultFilter}
-        rules={
-          budgetItemNumber === BudgetItemNumber.InfraInvestment
-            ? { ...validateRequired('projectType', t) }
-            : undefined
-        }
+        rules={{ ...validateRequired('projectType', t) }}
         size="full"
         placeholder={t('projectTalpaForm.projectTypePlaceholder')}
       />
@@ -184,11 +181,7 @@ export default function ProjectIdentifiersSection() {
         {...getFieldProps('priority')}
         groups={priorityGroups}
         filter={defaultFilter}
-        rules={
-          budgetItemNumber === BudgetItemNumber.InfraInvestment
-            ? { ...validateRequired('priority', t) }
-            : undefined
-        }
+        rules={{ ...validateRequired('priority', t) }}
         size="full"
         placeholder={t('projectTalpaForm.priorityPlaceholder')}
       />
