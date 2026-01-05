@@ -9,7 +9,7 @@ import { notifyError } from '@/reducers/notificationSlice';
 import { selectForcedToFrame, selectPlanningMode, selectStartYear } from '@/reducers/planningSlice';
 import { patchCoordinationClass } from '@/services/classServices';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
-import { formattedNumberToNumber } from '@/utils/calculations';
+import { formatNumber, formattedNumberToNumber } from '@/utils/calculations';
 import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -48,10 +48,11 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
       return 0;
     }
 
-    return Number(
-      Number(groupSapCosts.group_combined_commitments) + Number(groupSapCosts.group_combined_costs),
-    ).toFixed(2);
-  }, [type, id, cell]);
+    const eurValue =
+      Number(groupSapCosts.group_combined_commitments) + Number(groupSapCosts.group_combined_costs);
+    // Convert from EUR to kEUR (thousands of euros) to match budget display units
+    return Math.round(eurValue / 1000);
+  }, [id, sapCosts]);
 
   useOnClickOutsideRef(editBudgetChangeInputRef, onEditBudgetChange, editBudgetChange);
 
@@ -64,7 +65,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
     const frameBudgetElement = document.getElementById(`frame-budget-${id}-${year}`);
     const frameBudget = formattedNumberToNumber(frameBudgetElement?.innerHTML || '0');
     const parsedValue = formattedNumberToNumber(value || '0');
-    
+
     // We don't want the frame budget to be a negative value
     if (frameBudget - formattedNumberToNumber(budgetChange || '0') + parsedValue < 0) {
       dispatch(
@@ -94,7 +95,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
   };
 
   const checkValue = () => {
-    if((!value && editBudgetChange) || budgetChange != value){
+    if ((!value && editBudgetChange) || budgetChange != value) {
       setInputValue(formattedNumberToNumber(budgetChange));
     }
   }
@@ -124,7 +125,7 @@ const PlanningForecastSums: FC<IPlanningForecastSums> = ({ type, id, cell, sapCo
         {!editBudgetChange && (
           <div className={`planning-forecast-sums ${type} mt-[0.2rem]`}>
             <span data-testid={`planning-forecast-implemented-${id}`}>
-              {Number(forecastCostsForGroups).toFixed(0)}
+              {formatNumber(forecastCostsForGroups)}
             </span>
             <span data-testid={`planning-forecast-bound-${id}`}>0</span>
             {displayBudgetChange && (
