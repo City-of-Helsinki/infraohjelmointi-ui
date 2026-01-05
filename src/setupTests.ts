@@ -6,7 +6,7 @@
 import '@testing-library/jest-dom';
 import { mockEventSource } from './mocks/mockEventSource';
 import { TextEncoder, TextDecoder } from 'util';
-import { webcrypto } from 'crypto';
+import { webcrypto } from 'node:crypto';
 import { mockResizeObserver } from './mocks/mockResizeObserver';
 
 mockEventSource();
