@@ -124,7 +124,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       budgetAccount: selectedClass ? selectedClass.name : '',
       templateProject: infraInvestmentTemplateProject,
       projectStart: project?.estPlanningStart ?? null,
-      projectEnd: project?.estWarrantyPhaseEnd ?? addYears(project?.estConstructionEnd, 6),
+      projectEnd: addYears(project?.estWarrantyPhaseEnd ?? project?.estConstructionEnd, 6),
       investmentProfile: InvestmentProfile.InfraInvestment,
       projectNumberRange: null,
       projectType: null,
@@ -190,11 +190,21 @@ export default function useTalpaForm() {
     disabled: formValues.isLocked,
   });
 
+  const { watch, setValue } = formMethods;
+
   useEffect(() => {
     if (project) {
       dispatch(getTalpaProjectOpeningByProjectThunk(project.id));
     }
   }, [dispatch, project]);
+
+  const address = watch('streetAddress');
+  const postalCode = usePostalCode(address || '');
+  useEffect(() => {
+    if (postalCode) {
+      setValue('postalCode', postalCode);
+    }
+  }, [postalCode, setValue]);
 
   return formMethods;
 }

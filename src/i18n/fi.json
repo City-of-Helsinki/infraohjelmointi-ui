@@ -209,7 +209,7 @@
     "priorityPlaceholder": "Valitse hankkeen lajin prioriteetti",
     "projectName": "Hankkeen nimi SAP:iin",
     "projectNamePlaceholder": "Lisää hankkeen SAP-nimi",
-    "projectNameHelpText": "24 merkkiä sis. välilyönnit",
+    "projectNameHelpText": "Enimmäispituus 24 merkkiä sis. välilyönnit",
     "projectSchedule": "Hankkeen aikataulu",
     "projectStart": "Projektin aloituspäivämäärä",
     "projectEnd": "Projektin lopetuspäivämäärä",

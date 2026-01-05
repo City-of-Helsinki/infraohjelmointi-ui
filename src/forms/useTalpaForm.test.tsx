@@ -46,9 +46,9 @@ describe('useTalpaForm', () => {
   it('returns default form values when no talpa project data is loaded', () => {
     const project = {
       id: 'project-1',
-      estPlanningStart: '2025-05-01',
-      estConstructionEnd: '2025-11-30',
-      estWarrantyPhaseEnd: '2025-12-31',
+      estPlanningStart: '01.05.2025',
+      estConstructionEnd: '30.11.2025',
+      estWarrantyPhaseEnd: '31.12.2025',
       projectClass: 'ddbf3ce8-5bc4-410b-8759-e68d80dad99e',
       personProgramming: {
         id: 'programmer-1',
@@ -98,8 +98,8 @@ describe('useTalpaForm', () => {
       projectType: null,
       priority: null,
       projectName: '',
-      projectStart: '2025-05-01',
-      projectEnd: '2025-12-31',
+      projectStart: '01.05.2025',
+      projectEnd: '31.12.2031',
       streetAddress: 'Testitie 1',
       postalCode: '00100',
       responsiblePerson: 'Erkki Esimerkki',

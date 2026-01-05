@@ -111,6 +111,7 @@ export default function ProjectClassesSection() {
           ]}
           size="full"
           wrapperClassName="basis-1/3"
+          rules={{ ...validateRequired('readiness', t) }}
         />
       </div>
     </div>
