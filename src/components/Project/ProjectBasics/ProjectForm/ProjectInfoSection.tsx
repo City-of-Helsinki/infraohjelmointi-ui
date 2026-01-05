@@ -115,6 +115,26 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           />
         </div>
       </div>
+      {projectMode === 'new' && (
+        <>
+          <div className="form-row">
+            <div className="form-col-xl">
+              <TextField
+                {...getFieldProps('address')}
+                rules={{ ...validateRequired('address', t) }}
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-col-xl">
+              <TextField {...getFieldProps('postalCode')} />
+            </div>
+            <div className="form-col-xl">
+              <TextField {...getFieldProps('city')} />
+            </div>
+          </div>
+        </>
+      )}
       <div className="form-row">
         <ProjectHashTags
           name="hashTags"

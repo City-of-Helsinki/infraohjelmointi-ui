@@ -9,21 +9,43 @@ import { fetchAddressData } from '@/services/streetAddressService';
  */
 export function usePostalCode(address: string) {
   const [postalCode, setPostalCode] = useState<string>('');
+  const [city, setCity] = useState<string>('');
 
   useEffect(() => {
-    if (address) {
+    if (!address) {
+      setPostalCode('');
+      setCity('');
+      return;
+    }
+
+    let isActive = true;
+
+    const debounceId = globalThis.setTimeout(() => {
       fetchAddressData(address)
         .then((data) => {
+          if (!isActive) {
+            return;
+          }
+
           if (data?.features && data.features.length > 0) {
             const postalCode = data.features[0].properties.postinumero;
+            const city = data.features[0].properties.kaupunki;
             setPostalCode(postalCode);
+            setCity(city);
           }
         })
         .catch((error) => {
-          console.error('Error fetching postal code:', error);
+          if (isActive) {
+            console.error('Error fetching postal code:', error);
+          }
         });
-    }
+    }, 200);
+
+    return () => {
+      isActive = false;
+      globalThis.clearTimeout(debounceId);
+    };
   }, [address]);
 
-  return postalCode;
+  return { postalCode, city };
 }
