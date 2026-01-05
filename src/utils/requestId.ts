@@ -1,2 +1,5 @@
-export const createProjectsRequestId = () =>
-  `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+export const createProjectsRequestId = () => {
+  const array = new Uint32Array(1);
+  globalThis.crypto.getRandomValues(array);
+  return `${Date.now()}-${array[0].toString(36).slice(2, 11)}`;
+};

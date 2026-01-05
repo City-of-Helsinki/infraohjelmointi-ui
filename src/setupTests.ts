@@ -6,6 +6,7 @@
 import '@testing-library/jest-dom';
 import { mockEventSource } from './mocks/mockEventSource';
 import { TextEncoder, TextDecoder } from 'util';
+import { webcrypto } from 'crypto';
 import { mockResizeObserver } from './mocks/mockResizeObserver';
 
 mockEventSource();
@@ -24,6 +25,11 @@ jest.setTimeout(15000);
 
 (global as any).TextEncoder = TextEncoder;
 (global as any).TextDecoder = TextDecoder;
+
+// Provide a minimal crypto implementation so getRandomValues works in tests
+if (!globalThis.crypto) {
+  (globalThis as unknown as { crypto: Crypto }).crypto = webcrypto as Crypto;
+}
 
 module.exports = {
   testEnvironment: 'node',

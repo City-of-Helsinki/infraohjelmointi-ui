@@ -24,20 +24,16 @@ import {
   selectSelections,
   selectStartYear,
   setPlanningRows,
-  setProjects,
-  setProjectsRequestId,
 } from '@/reducers/planningSlice';
 import { isEqual, cloneDeep } from 'lodash';
 import {
   buildPlanningRow,
-  fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
   sortByName,
 } from '@/utils/planningRowUtils';
 import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
-import { isRequestCanceled } from '@/utils/http';
-import { createProjectsRequestId } from '@/utils/requestId';
+import { fetchProjectsForSelections } from './fetchProjectsForSelections';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -391,41 +387,21 @@ const usePlanningRows = () => {
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
-    const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
-      const year = startYear ?? new Date().getFullYear();
-      projectsFetchAbortController.current?.abort();
-      const abortController = new AbortController();
-      projectsFetchAbortController.current = abortController;
-      const requestId = createProjectsRequestId();
-      dispatch(setProjectsRequestId({ mode, requestId }));
-      try {
-        const projects = await fetchProjectsByRelation(
-          type as PlanningRowType,
-          id,
-          false,
-          year,
-          undefined,
-          abortController.signal,
-        );
-        dispatch(setProjects({ mode, projects, requestId }));
-      } catch (e) {
-        if (isRequestCanceled(e)) {
-          return;
-        }
-        console.log('Error fetching projects for planning selections: ', e);
-      } finally {
-        if (projectsFetchAbortController.current === abortController) {
-          projectsFetchAbortController.current = null;
-        }
-      }
-    };
-
     // Prevent fetching projects if selected class/district is different what is shown on the page
     const queryParams = new URLSearchParams(location.search);
     const openedViewId = queryParams.get(type as string);
 
     if (type && id && openedViewId === id) {
-      getAndSetProjectsForSelections(type as PlanningRowType, id);
+      fetchProjectsForSelections({
+        id,
+        type: type as PlanningRowType,
+        mode,
+        forcedToFrame: false,
+        startYear,
+        dispatch,
+        projectsFetchAbortController,
+        errorContext: 'planning selections',
+      });
     }
 
     return () => {

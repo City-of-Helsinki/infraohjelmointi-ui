@@ -163,7 +163,6 @@ export const planningSlice = createSlice({
         requestId?: string;
       }>,
     ) {
-      console.log('setProjects called with:', state.mode, action.payload);
       // In case the mode is switched while fetching projects, we don't want to set
       // different view projects on another view (['planning' | 'coordination']).
       const targetMode = action.payload.mode ?? state.mode;
