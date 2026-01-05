@@ -199,7 +199,7 @@ export default function useTalpaForm() {
   }, [dispatch, project]);
 
   const address = watch('streetAddress');
-  const postalCode = usePostalCode(address || '');
+  const { postalCode } = usePostalCode(address || '');
   useEffect(() => {
     if (postalCode) {
       setValue('postalCode', postalCode);
