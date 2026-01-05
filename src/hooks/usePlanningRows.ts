@@ -4,7 +4,7 @@ import {
   selectBatchedPlanningLocations,
   selectPlanningSubDivisions,
 } from '@/reducers/locationSlice';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
@@ -25,6 +25,7 @@ import {
   selectStartYear,
   setPlanningRows,
   setProjects,
+  setProjectsRequestId,
 } from '@/reducers/planningSlice';
 import { isEqual, cloneDeep } from 'lodash';
 import {
@@ -35,6 +36,8 @@ import {
   sortByName,
 } from '@/utils/planningRowUtils';
 import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
+import { isRequestCanceled } from '@/utils/http';
+import { createProjectsRequestId } from '@/utils/requestId';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -377,6 +380,7 @@ const usePlanningRows = () => {
   const location = useLocation();
 
   const mode = useAppSelector(selectPlanningMode);
+  const projectsFetchAbortController = useRef<AbortController | null>(null);
 
   // Fetch projects when selections change
   useEffect(() => {
@@ -388,12 +392,31 @@ const usePlanningRows = () => {
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
     const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
+      const year = startYear ?? new Date().getFullYear();
+      projectsFetchAbortController.current?.abort();
+      const abortController = new AbortController();
+      projectsFetchAbortController.current = abortController;
+      const requestId = createProjectsRequestId();
+      dispatch(setProjectsRequestId({ mode, requestId }));
       try {
-        const year = startYear ?? new Date().getFullYear();
-        const projects = await fetchProjectsByRelation(type as PlanningRowType, id, false, year);
-        dispatch(setProjects({ mode, projects }));
+        const projects = await fetchProjectsByRelation(
+          type as PlanningRowType,
+          id,
+          false,
+          year,
+          undefined,
+          abortController.signal,
+        );
+        dispatch(setProjects({ mode, projects, requestId }));
       } catch (e) {
+        if (isRequestCanceled(e)) {
+          return;
+        }
         console.log('Error fetching projects for planning selections: ', e);
+      } finally {
+        if (projectsFetchAbortController.current === abortController) {
+          projectsFetchAbortController.current = null;
+        }
       }
     };
 
@@ -404,6 +427,11 @@ const usePlanningRows = () => {
     if (type && id && openedViewId === id) {
       getAndSetProjectsForSelections(type as PlanningRowType, id);
     }
+
+    return () => {
+      projectsFetchAbortController.current?.abort();
+      projectsFetchAbortController.current = null;
+    };
   }, [selections, groups, mode, forcedToFrame, startYear, dispatch, location.search]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change

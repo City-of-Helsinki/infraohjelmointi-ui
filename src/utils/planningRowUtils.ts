@@ -10,6 +10,7 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import { calculatePlanningCells, calculatePlanningRowSums } from './calculations';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
+import { isRequestCanceled } from '@/utils/http';
 import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 
 // These utils are used by the usePlanningRows and useCoordinationRows
@@ -203,6 +204,7 @@ export const fetchProjectsByRelation = async (
   forcedToFrame: boolean,
   year: number,
   isCoordinator?: boolean,
+  signal?: AbortSignal,
 ): Promise<Array<IProject>> => {
   const direct = type === 'subClassDistrict';
   try {
@@ -215,9 +217,13 @@ export const fetchProjectsByRelation = async (
         year: year,
       },
       isCoordinator,
+      { signal },
     );
     return allResults.results;
   } catch (e) {
+    if (isRequestCanceled(e)) {
+      throw e;
+    }
     console.log('Error fetching projects by relation: ', e);
   }
   return [];

@@ -28,6 +28,7 @@ interface IPlanningState {
   searchedProjectId: string | null;
   selections: IPlanningRowSelections;
   projects: Array<IProject>;
+  projectsRequestId: Record<PlanningMode, string | null>;
   rows: Array<IPlanningRow>;
   mode: PlanningMode;
   forcedToFrame: boolean;
@@ -100,13 +101,14 @@ const initialState: IPlanningState = {
   },
   mode: 'planning',
   projects: [],
+  projectsRequestId: { planning: null, coordination: null },
   rows: [],
   forcedToFrame: false,
   isLoading: false,
   notesDialogOpen: false,
-  notesDialogData: {name: '', id: '', selectedYear: null},
-  notesModalOpen: {isOpen: false, id: ''},
-  notesModalData: {name: '', id: ''},
+  notesDialogData: { name: '', id: '', selectedYear: null },
+  notesModalOpen: { isOpen: false, id: '' },
+  notesModalData: { name: '', id: '' },
   coordinatorNotes: [],
 };
 
@@ -153,14 +155,39 @@ export const planningSlice = createSlice({
     setPlanningRows(state, action: PayloadAction<Array<IPlanningRow>>) {
       return { ...state, rows: action.payload };
     },
-    setProjects(state, action: PayloadAction<{mode?: string, projects: Array<IProject>}>) {
+    setProjects(
+      state,
+      action: PayloadAction<{
+        mode?: PlanningMode;
+        projects: Array<IProject>;
+        requestId?: string;
+      }>,
+    ) {
+      console.log('setProjects called with:', state.mode, action.payload);
       // In case the mode is switched while fetching projects, we don't want to set
       // different view projects on another view (['planning' | 'coordination']).
-      if (!action.payload.mode || action.payload.mode === state.mode){
+      const targetMode = action.payload.mode ?? state.mode;
+      if (!action.payload.mode || action.payload.mode === state.mode) {
+        if (action.payload.requestId) {
+          const expectedId = state.projectsRequestId[targetMode];
+          if (expectedId && action.payload.requestId !== expectedId) {
+            return state;
+          }
+        }
+
         return { ...state, projects: action.payload.projects };
       }
 
       return state;
+    },
+    setProjectsRequestId(state, action: PayloadAction<{ mode: PlanningMode; requestId: string }>) {
+      return {
+        ...state,
+        projectsRequestId: {
+          ...state.projectsRequestId,
+          [action.payload.mode]: action.payload.requestId,
+        },
+      };
     },
     setGroupsExpanded(state, action: PayloadAction<boolean>) {
       return { ...state, groupsExpanded: action.payload };
@@ -178,17 +205,20 @@ export const planningSlice = createSlice({
       return { ...state, isLoading: action.payload };
     },
     setNotesDialogOpen(state, action: PayloadAction<boolean>) {
-      return { ...state, notesDialogOpen: action.payload}
+      return { ...state, notesDialogOpen: action.payload };
     },
     setNotesDialogData(state, action: PayloadAction<IPlanningNotesDialogData>) {
-      return { ...state, notesDialogData: action.payload}
+      return { ...state, notesDialogData: action.payload };
     },
     setNotesModalOpen(state, action: PayloadAction<ICoordinatorNotesModalOpen>) {
-      return { ...state, notesModalOpen: {id: action.payload.id, isOpen:!state.notesModalOpen.isOpen}}
+      return {
+        ...state,
+        notesModalOpen: { id: action.payload.id, isOpen: !state.notesModalOpen.isOpen },
+      };
     },
     setNotesModalData(state, action: PayloadAction<IPlanningNotesModalData>) {
-      return { ...state, notesModalData: action.payload}
-    }
+      return { ...state, notesModalData: action.payload };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -214,7 +244,7 @@ export const planningSlice = createSlice({
         };
       }
     });
-  }
+  },
 });
 
 export const selectSelectedYear = (state: RootState) => state.planning.selectedYear;
@@ -246,6 +276,7 @@ export const {
   setProjects,
   setGroupsExpanded,
   setPlanningMode,
+  setProjectsRequestId,
   resetSelections,
   setForcedToFrame,
   setIsPlanningLoading,
