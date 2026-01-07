@@ -5,6 +5,7 @@ import { mockHashTags } from '@/mocks/mockHashTags';
 import {
   mockBudgetOverrunReasons,
   mockConstructionPhaseDetails,
+  mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
   mockProjectAreas,
@@ -87,6 +88,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockProjectAreas);
       case url === '/construction-phase-details/':
         return Promise.resolve(mockConstructionPhaseDetails);
+      case url === '/construction-procurement-methods/':
+        return Promise.resolve(mockConstructionProcurementMethods);
       case url === '/project-categories/':
         return Promise.resolve(mockProjectCategories);
       case url === '/project-risks/':

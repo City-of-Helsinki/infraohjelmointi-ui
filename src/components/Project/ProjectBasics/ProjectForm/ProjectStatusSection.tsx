@@ -47,6 +47,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const categories = useOptions('categories');
   const riskAssessments = useOptions('riskAssessments');
   const constructionPhaseDetails = useOptions('constructionPhaseDetails');
+  const constructionProcurementMethods = useOptions('constructionProcurementMethods');
   const currentPhase = getValues('phase').value;
   const { t } = useTranslation();
 
@@ -391,6 +392,16 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             rules={validateConstructionPhaseDetails}
             disabled={isConstructionPhaseDetailsDisabled}
             readOnly={isUserOnlyViewer}
+          />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-col-xl">
+          <SelectField
+            {...getFieldProps('constructionProcurementMethod')}
+            options={constructionProcurementMethods}
+            readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
       </div>

@@ -47,6 +47,15 @@ export const getConstructionPhaseDetails = async () => {
   }
 };
 
+export const getConstructionProcurementMethods = async () => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/construction-procurement-methods/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
 export const getProjectCategories = async (): Promise<IListItem[]> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-categories/`);

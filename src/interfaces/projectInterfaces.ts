@@ -18,6 +18,7 @@ export interface IProject {
   phase: IListItem;
   programmed: boolean;
   constructionPhaseDetail: IListItem;
+  constructionProcurementMethod: IListItem;
   estPlanningStart: string | null;
   estPlanningEnd: string | null;
   estConstructionStart: string | null;
@@ -133,6 +134,7 @@ export interface IProjectRequest {
   visibilityStart?: string;
   visibilityEnd?: string;
   constructionPhaseDetail?: string | null;
+  constructionProcurementMethod?: string | null;
   louhi?: boolean;
   programmed?: boolean;
   gravel?: boolean;

@@ -32,6 +32,7 @@ import {
 import {
   mockBudgetOverrunReasons,
   mockConstructionPhaseDetails,
+  mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
   mockProjectAreas,
@@ -95,6 +96,7 @@ describe('App', () => {
       expect(lists.areas).toStrictEqual(mockProjectAreas.data);
       expect(lists.types).toStrictEqual(mockProjectTypes.data);
       expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
+      expect(lists.constructionProcurementMethods).toStrictEqual(mockConstructionProcurementMethods.data);
       expect(lists.riskAssessments).toStrictEqual(mockProjectRisks.data);
       expect(lists.projectQualityLevels).toStrictEqual(mockProjectQualityLevels.data);
       expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);

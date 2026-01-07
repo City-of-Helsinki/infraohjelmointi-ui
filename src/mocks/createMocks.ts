@@ -54,6 +54,7 @@ export const createProject = (overrides: ProjectOverrides = {}): IProject => {
     phase: createListItem('phase'),
     programmed: false,
     constructionPhaseDetail: createListItem('construction-detail'),
+    constructionProcurementMethod: createListItem('procurement-method'),
     estPlanningStart: null,
     estPlanningEnd: null,
     estConstructionStart: null,

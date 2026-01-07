@@ -61,6 +61,10 @@ const mockProject: { data: IProject } = {
       id: '9df21c80-7ed0-4ac0-830c-dae5d1d675b9',
       value: 'preConstruction',
     },
+    constructionProcurementMethod: {
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      value: 'Stara',
+    },
     riskAssessment: {
       id: '8fd009ef-ab34-492e-889c-9062a2b3fce8',
       value: 'Placeholder risk',
