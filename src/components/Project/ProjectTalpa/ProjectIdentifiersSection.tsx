@@ -16,6 +16,15 @@ import { uniqBy } from 'lodash';
 import { defaultFilter } from 'hds-react';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 
+const formatCategoryLabel = (category?: string | null) => {
+  if (!category) {
+    return '';
+  }
+
+  const normalized = category.toLowerCase();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
+
 export default function ProjectIdentifiersSection() {
   const { t } = useTranslation();
   const {
@@ -76,7 +85,7 @@ export default function ProjectIdentifiersSection() {
           talpaProjectTypes.filter((pt) => pt.priority === null),
           'name',
         ),
-        (projectType) => projectType.category,
+        (projectType) => formatCategoryLabel(projectType.category),
         (projectType) => ({
           label: projectType.name,
           value: projectType.id,
