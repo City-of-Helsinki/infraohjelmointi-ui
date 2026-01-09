@@ -63,6 +63,7 @@ export type ListType =
   | 'responsibleZones'
   | 'responsiblePersons'
   | 'constructionPhaseDetails'
+  | 'constructionProcurementMethods'
   | 'riskAssessments'
   | 'projectQualityLevels'
   | 'planningPhases'

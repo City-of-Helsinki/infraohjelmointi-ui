@@ -57,6 +57,7 @@ export interface IProjectForm {
   phase: IOption;
   programmed: boolean;
   constructionPhaseDetail: IOption;
+  constructionProcurementMethod: IOption;
   costForecast: string;
   louhi: boolean;
   gravel: boolean;

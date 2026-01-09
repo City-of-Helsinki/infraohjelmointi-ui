@@ -7,6 +7,7 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockBudgetOverrunReasons,
   mockConstructionPhaseDetails,
+  mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
   mockProjectAreas,
@@ -79,6 +80,7 @@ const render = async () =>
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,
             constructionPhaseDetails: mockConstructionPhaseDetails.data,
+            constructionProcurementMethods: mockConstructionProcurementMethods.data,
             categories: mockProjectCategories.data,
             riskAssessments: mockProjectRisks.data,
             projectQualityLevels: mockProjectQualityLevels.data,

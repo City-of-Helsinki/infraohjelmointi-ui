@@ -140,6 +140,27 @@ export const mockConstructionPhaseDetails: { data: Array<IListItem> } = {
   ],
 };
 
+export const mockConstructionProcurementMethods: { data: Array<IListItem> } = {
+  data: [
+    {
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      value: 'Stara',
+    },
+    {
+      id: 'b2c3d4e5-f6g7-8901-bcde-f12345678901',
+      value: 'Puitesopimus',
+    },
+    {
+      id: 'c3d4e5f6-g7h8-9012-cdef-123456789012',
+      value: 'Kilpailutettu',
+    },
+    {
+      id: 'd4e5f6g7-h8i9-0123-defg-234567890123',
+      value: 'Yhteistoiminnalliset',
+    },
+  ],
+};
+
 export const mockProjectCategories: { data: Array<IListItem> } = {
   data: [
     {
