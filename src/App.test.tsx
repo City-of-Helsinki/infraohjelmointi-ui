@@ -35,11 +35,11 @@ import {
   mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
-  mockProjectAreas,
   mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
   mockProjectRisks,
+  mockProjectTypeQualifiers,
   mockProjectTypes,
   mockResponsiblePersons,
   mockResponsibleZones,
@@ -51,7 +51,7 @@ import { getPlanningLocationsThunk } from './reducers/locationSlice';
 import { mockHashTags } from './mocks/mockHashTags';
 import { getHashTagsThunk, sortByHashtagName } from './reducers/hashTagsSlice';
 import { Route } from 'react-router';
-import { getListsThunk, sortOptions} from './reducers/listsSlice';
+import { getListsThunk, sortOptions } from './reducers/listsSlice';
 import { getPlanningGroupsThunk } from './reducers/groupSlice';
 import mockProject from './mocks/mockProject';
 import { mockUser } from './mocks/mockUsers';
@@ -93,8 +93,8 @@ describe('App', () => {
       expect(lists.categories).toStrictEqual(mockProjectCategories.data);
       expect(lists.responsiblePersons).toStrictEqual(sortOptions(mockResponsiblePersons.data));
       expect(lists.phases).toStrictEqual(mockProjectPhases.data);
-      expect(lists.areas).toStrictEqual(mockProjectAreas.data);
       expect(lists.types).toStrictEqual(mockProjectTypes.data);
+      expect(lists.typeQualifiers).toStrictEqual(mockProjectTypeQualifiers.data);
       expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
       expect(lists.constructionProcurementMethods).toStrictEqual(mockConstructionProcurementMethods.data);
       expect(lists.riskAssessments).toStrictEqual(mockProjectRisks.data);

@@ -10,7 +10,6 @@ import {
   mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
-  mockProjectAreas,
   mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
@@ -19,6 +18,7 @@ import {
   mockResponsiblePersons,
   mockResponsibleZones,
   mockProgrammers,
+  mockProjectTypeQualifiers,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
@@ -76,9 +76,9 @@ const render = async () =>
           },
           auth: { user: mockUser.data, error: {} },
           lists: {
-            areas: mockProjectAreas.data,
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,
+            typeQualifiers: mockProjectTypeQualifiers.data,
             constructionPhaseDetails: mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockConstructionProcurementMethods.data,
             categories: mockProjectCategories.data,
@@ -162,8 +162,8 @@ describe('projectForm', () => {
     const expectPersonOption = async (person: IPerson) =>
       expect(await findByText(`${person.firstName} ${person.lastName}`)).toBeInTheDocument();
 
-    expectOption(project?.area?.value);
     expectOption(project?.type?.value);
+    expectOption(project?.typeQualifier?.value);
     expectOption(project?.projectQualityLevel?.value);
     expectOption(project?.planningPhase?.value);
     expectOption(project?.constructionPhase?.value);
@@ -222,7 +222,6 @@ describe('projectForm', () => {
     ).toBeInTheDocument();
 
     expectDisplayValue(project?.description);
-    expectDisplayValue(project?.entityName);
     expectDisplayValue(project?.hkrId);
     expectDisplayValue(project?.planningStartYear?.toString());
     expectDisplayValue(project?.constructionEndYear?.toString());
@@ -383,10 +382,13 @@ describe('projectForm', () => {
   });
 
   it('can patch a SelectField', async () => {
-    const expectedValue = { id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c', value: 'lansisatama' };
+    const expectedValue = {
+      id: '706c71fd-0039-4a72-a408-adea06842194',
+      value: 'newConstruction',
+    };
     const project = mockProject.data;
     const responseProject: { data: IProject } = {
-      data: { ...project, area: expectedValue },
+      data: { ...project, type: expectedValue },
     };
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
@@ -395,12 +397,12 @@ describe('projectForm', () => {
 
     const formSubmitButton = await findByTestId('submit-project-button');
 
-    await user.click(screen.getByRole('combobox', { name: /area/i }));
-    await user.click(await findByText('option.lansisatama'));
+    await user.click(screen.getAllByRole('combobox', { name: /type/i })[0]);
+    await user.click(await findByText('option.newConstruction'));
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
-    expect(formPatchRequest.area).toEqual(expectedValue.id);
+    expect(formPatchRequest.type).toEqual(expectedValue.id);
     expect(await findByText(matchExact(expectedValue.value))).toBeInTheDocument();
   });
 

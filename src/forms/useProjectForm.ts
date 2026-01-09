@@ -133,14 +133,11 @@ const useProjectFormValues = () => {
   const formValues: IProjectForm = useMemo(
     () => ({
       type: listItemToOption(project?.type),
+      typeQualifier: listItemToOption(project?.typeQualifier),
       name: value(project?.name),
       description: value(project?.description),
-      area: listItemToOption(project?.area),
       hkrId: value(project?.hkrId),
       sapProject: value(project?.sapProject),
-      sapNetwork:
-        project?.sapNetwork && project.sapNetwork.length > 0 ? project?.sapNetwork[0] : '',
-      entityName: value(project?.entityName),
       hashTags: project?.hashTags ?? [],
       estPlanningStart: value(project?.estPlanningStart),
       estPlanningEnd: value(project?.estPlanningEnd),
