@@ -4,7 +4,7 @@ import {
   selectBatchedPlanningLocations,
   selectPlanningSubDivisions,
 } from '@/reducers/locationSlice';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import {
@@ -24,17 +24,16 @@ import {
   selectSelections,
   selectStartYear,
   setPlanningRows,
-  setProjects,
 } from '@/reducers/planningSlice';
 import { isEqual, cloneDeep } from 'lodash';
 import {
   buildPlanningRow,
-  fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
   sortByName,
 } from '@/utils/planningRowUtils';
 import { IClass, IClassFinances } from '@/interfaces/classInterfaces';
+import { fetchProjectsForSelections } from './fetchProjectsForSelections';
 
 /**
  * Parses a location name and returns the number value at the beginning of the name.
@@ -377,6 +376,7 @@ const usePlanningRows = () => {
   const location = useLocation();
 
   const mode = useAppSelector(selectPlanningMode);
+  const projectsFetchAbortController = useRef<AbortController | null>(null);
 
   // Fetch projects when selections change
   useEffect(() => {
@@ -387,23 +387,27 @@ const usePlanningRows = () => {
 
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
-    const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
-      try {
-        const year = startYear ?? new Date().getFullYear();
-        const projects = await fetchProjectsByRelation(type as PlanningRowType, id, false, year);
-        dispatch(setProjects({ mode, projects }));
-      } catch (e) {
-        console.log('Error fetching projects for planning selections: ', e);
-      }
-    };
-
     // Prevent fetching projects if selected class/district is different what is shown on the page
     const queryParams = new URLSearchParams(location.search);
     const openedViewId = queryParams.get(type as string);
 
     if (type && id && openedViewId === id) {
-      getAndSetProjectsForSelections(type as PlanningRowType, id);
+      fetchProjectsForSelections({
+        id,
+        type: type as PlanningRowType,
+        mode,
+        forcedToFrame: false,
+        startYear,
+        dispatch,
+        projectsFetchAbortController,
+        errorContext: 'planning selections',
+      });
     }
+
+    return () => {
+      projectsFetchAbortController.current?.abort();
+      projectsFetchAbortController.current = null;
+    };
   }, [selections, groups, mode, forcedToFrame, startYear, dispatch, location.search]);
 
   // Build planning table rows when locations, classes, groups, project, mode or selections change
