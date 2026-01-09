@@ -19,14 +19,14 @@ export default function ProjectClassesSection() {
   const {
     watch,
     setValue,
-    formState: { dirtyFields },
+    formState: { touchedFields },
   } = useFormContext<IProjectTalpaForm>();
 
   const talpaServiceClasses = useSelector(selectTalpaServiceClasses);
   const talpaAssetClasses = useSelector(selectTalpaAssetClasses);
 
   const [budgetItemNumber, assetClass] = watch(['budgetItemNumber', 'assetClass']);
-  const budgetItemNumberDirty = Boolean(dirtyFields?.budgetItemNumber);
+  const budgetItemNumberTouched = Boolean(touchedFields?.budgetItemNumber);
 
   const filteredServiceClasses = talpaServiceClasses.filter(
     (serviceClass) => serviceClass.projectTypePrefix === budgetItemNumber,
@@ -55,7 +55,7 @@ export default function ProjectClassesSection() {
   );
 
   useEffect(() => {
-    if (budgetItemNumberDirty) {
+    if (budgetItemNumberTouched && budgetItemNumber === BudgetItemNumber.InfraInvestment) {
       setValue('serviceClass', null);
     }
 
@@ -65,8 +65,9 @@ export default function ProjectClassesSection() {
     } else {
       setValue('investmentProfile', InvestmentProfile.PreConstruction);
       setValue('profileName', TalpaProfileName.LandAndWater);
+      setValue('serviceClass', serviceClassOptions[0] || null);
     }
-  }, [budgetItemNumber, budgetItemNumberDirty, setValue, t]);
+  }, [budgetItemNumber, budgetItemNumberTouched, setValue, t, serviceClassOptions]);
 
   useEffect(() => {
     const selectedAssetClass = talpaAssetClasses.find((ac) => ac.id === assetClass?.value);
