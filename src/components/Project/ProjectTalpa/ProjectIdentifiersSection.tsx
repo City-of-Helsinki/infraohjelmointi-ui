@@ -65,7 +65,7 @@ export default function ProjectIdentifiersSection() {
           )
         : groupOptions(
             filteredProjectRanges,
-            (projectRange) => projectRange.budgetAccount,
+            (projectRange) => `${projectRange.budgetAccount} ${projectRange.area}`,
             (projectRange) => ({
               label: `${projectRange.unit} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
               value: projectRange.id,
