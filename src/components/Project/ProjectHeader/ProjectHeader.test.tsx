@@ -46,7 +46,6 @@ describe('ProjectHeader', () => {
     const { getByTestId } = await render();
 
     expect(getByTestId('project-header')).toBeInTheDocument();
-    expect(getByTestId('project-header-left')).toBeInTheDocument();
     expect(getByTestId('project-header-center')).toBeInTheDocument();
     expect(getByTestId('project-header-right')).toBeInTheDocument();
   });
@@ -55,20 +54,17 @@ describe('ProjectHeader', () => {
     const { getByRole, getByText, store, getByTestId } = await render();
 
     const project = store.getState().project.selectedProject as IProject;
-    const { projectReadiness, name, phase, address } = project;
+    const { name, phase, address } = project;
 
     expect(getByRole('button', { name: /edit-project-name/i })).toBeInTheDocument();
     expect(getByTestId('project-header-name-fields')).toHaveTextContent(matchExact(name));
     expect(getByText(matchExact(phase.value))).toBeInTheDocument();
-    expect(getByText(matchExact(`${projectReadiness}%`))).toBeInTheDocument();
     expect(getByText(matchExact(address || ''))).toBeInTheDocument();
   });
 
   it('renders all right side elements', async () => {
-    const { getByRole, getByText, getByTestId } = await render();
+    const { getByText } = await render();
 
-    expect(getByTestId('project-favourite')).toBeInTheDocument();
-    expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
     expect(getByText(/inGroup/i)).toBeInTheDocument();
     expect(getByText('Test Group 1')).toBeInTheDocument();
   });

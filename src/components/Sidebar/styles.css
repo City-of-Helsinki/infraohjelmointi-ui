@@ -14,11 +14,11 @@
   @apply cursor-not-allowed !text-black-40 hover:bg-white;
 }
 
-.sidebar-button:nth-child(7) {
+.sidebar-button:nth-child(4) {
   box-shadow: inset 0px 1px 0px 0px var(--color-black-20);
   @apply pt-4;
 }
 
-.sidebar-button:nth-child(7):hover {
+.sidebar-button:nth-child(4):hover {
   @apply rounded-none;
 }

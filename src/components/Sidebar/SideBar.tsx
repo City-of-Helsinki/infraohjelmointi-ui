@@ -2,15 +2,7 @@ import { INavigationItem } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import './styles.css';
-import {
-  IconBagCogwheel,
-  IconBinoculars,
-  IconCogwheel,
-  IconGraphColumns,
-  IconHistory,
-  IconLocation,
-  IconScrollCogwheel,
-} from 'hds-react';
+import { IconBinoculars, IconCogwheel, IconGraphColumns, IconScrollCogwheel } from 'hds-react';
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserAdmin, isUserOnlyViewer } from '@/utils/userRoleHelpers';
@@ -43,28 +35,10 @@ const SideBar = () => {
       disabled: MAINTENANCE_MODE || user?.ad_groups.length === 0,
     },
     {
-      route: 'placeholder 1',
-      label: 'placeholder 1',
-      component: <IconLocation style={iconStyles} />,
-      disabled: true,
-    },
-    {
-      route: 'placeholder 2',
-      label: 'placeholder 2',
-      component: <IconBagCogwheel style={iconStyles} />,
-      disabled: true,
-    },
-    {
       route: 'reports',
       label: t('reports'),
       component: <IconGraphColumns style={iconStyles} />,
       disabled: MAINTENANCE_MODE || isUserOnlyViewer(user) || user?.ad_groups.length === 0,
-    },
-    {
-      route: 'placeholder 4',
-      label: 'placeholder 4',
-      component: <IconHistory style={iconStyles} />,
-      disabled: true,
     },
     {
       route: 'admin/functions',
@@ -78,8 +52,9 @@ const SideBar = () => {
     <div className="sidebar" data-testid="sidebar">
       {navItems.map((n) => (
         <button
-          className={`sidebar-button ${pathname.includes(n.route) ? 'selected' : ''} ${n.disabled ? 'disabled' : ''
-            }`}
+          className={`sidebar-button ${pathname.includes(n.route) ? 'selected' : ''} ${
+            n.disabled ? 'disabled' : ''
+          }`}
           onClick={() => navigate(n.route)}
           aria-label={n.label}
           key={n.route}
