@@ -3,10 +3,6 @@ import {
   IconCollapse,
   IconPlusCircle,
   IconSort,
-  IconSliders,
-  IconDrag,
-  IconShare,
-  IconDownload,
   IconMoneyBag,
   IconMoneyBagFill,
 } from 'hds-react/icons/';
@@ -67,10 +63,6 @@ const PlanningToolbar = () => {
   );
 
   const plusIcon = useMemo(() => <IconPlusCircle />, []);
-  const slidersIcon = useMemo(() => <IconSliders />, []);
-  const dragIcon = useMemo(() => <IconDrag />, []);
-  const shareIcon = useMemo(() => <IconShare />, []);
-  const downloadIcon = useMemo(() => <IconDownload />, []);
 
   const { groupDialogVisible, projectProgrammedDialogVisible } = toolbarState;
 
@@ -178,15 +170,6 @@ const PlanningToolbar = () => {
       left={
         <>
           <div className="planning-toolbar-left">
-            {/* Manage */}
-            <Button
-              variant={ButtonVariant.Supplementary}
-              className="toolbar-button"
-              iconStart={slidersIcon}
-              disabled={true}
-            >
-              {t('manage')}
-            </Button>
             {/* Expand groups */}
             <Button
               onClick={toggleGroupsExpanded}
@@ -198,15 +181,6 @@ const PlanningToolbar = () => {
             >
               {groupsExpanded ? t(`closeAllGroups`) || '' : t('openAllGroups') || ''}
             </Button>
-            {/* Organize */}
-            <Button
-              variant={ButtonVariant.Supplementary}
-              className="toolbar-button"
-              iconStart={dragIcon}
-              disabled={true}
-            >
-              {t('organize')}
-            </Button>
             {/* New item */}
             <Button
               variant={ButtonVariant.Supplementary}
@@ -217,24 +191,6 @@ const PlanningToolbar = () => {
               disabled={isNewItemButtonDisabled}
             >
               {t('new')}
-            </Button>
-            {/* Save version */}
-            <Button
-              variant={ButtonVariant.Supplementary}
-              className="toolbar-button"
-              iconStart={downloadIcon}
-              disabled={true}
-            >
-              {t('saveVersion')}
-            </Button>
-            {/* Share version */}
-            <Button
-              variant={ButtonVariant.Supplementary}
-              className="toolbar-button"
-              iconStart={shareIcon}
-              disabled={true}
-            >
-              {t('shareVersion')}
             </Button>
             <GroupDialog
               isOpen={groupDialogVisible}

@@ -42,15 +42,7 @@ const render = async () =>
   );
 
 describe('SideBar', () => {
-  const navItems = [
-    'coordination',
-    'planning',
-    'placeholder 1',
-    'placeholder 2',
-    'reports',
-    'placeholder 4',
-    'admin',
-  ];
+  const navItems = ['coordination', 'planning', 'reports', 'admin'];
 
   const spyScrollTo = jest.fn();
   Object.defineProperty(global.window, 'scrollTo', { value: spyScrollTo });

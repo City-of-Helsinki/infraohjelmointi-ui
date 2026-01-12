@@ -80,12 +80,6 @@ describe('ProjectView', () => {
     expect(getByTestId('project-view')).toBeInTheDocument();
   });
 
-  it('renders the ProjectToolbar', async () => {
-    const { getByTestId } = await render();
-
-    expect(getByTestId('toolbar')).toBeInTheDocument();
-  });
-
   it('renders the ProjectHeader', async () => {
     const { getByTestId } = await render();
 
