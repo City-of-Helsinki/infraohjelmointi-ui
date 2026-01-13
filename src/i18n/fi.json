@@ -218,7 +218,7 @@
     "projectSchedule": "Hankkeen aikataulu",
     "projectStart": "Projektin aloituspäivämäärä",
     "projectEnd": "Projektin lopetuspäivämäärä",
-    "projectEndHelpText": "Huomioi projektin takuuaika (+6v)",
+    "projectEndHelpText": "Oletuksena rakentaminen päättyy + 6 vuotta",
     "projectContacts": "Hankkeen osoite- ja yhteystiedot",
     "streetAddress": "Katuosoite",
     "streetAddressPlaceholder": "Lisää hankkeen osoite",
