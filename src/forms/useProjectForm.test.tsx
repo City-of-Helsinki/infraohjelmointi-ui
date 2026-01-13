@@ -37,12 +37,10 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => {
   const methods = useForm<IProjectForm>({
     defaultValues: {
       type: { value: '', label: '' },
-      entityName: '',
+      typeQualifier: { value: '', label: '' },
       description: '',
-      area: { value: '', label: '' },
       hkrId: '',
       sapProject: '',
-      sapNetwork: '',
       hashTags: [],
       phase: { value: '', label: '' },
       programmed: false,
@@ -141,7 +139,7 @@ describe('useProjectForm', () => {
     expect(formValues.name).toBe('');
     expect(formValues.description).toBe('');
     expect(isEmptyOption(formValues.type)).toBeTruthy();
-    expect(isEmptyOption(formValues.area)).toBeTruthy();
+    expect(isEmptyOption(formValues.typeQualifier)).toBeTruthy();
     expect(isEmptyOption(formValues.masterClass)).toBeTruthy();
     expect(isEmptyOption(formValues.class)).toBeTruthy();
     expect(isEmptyOption(formValues.subClass)).toBeTruthy();

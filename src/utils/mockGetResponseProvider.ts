@@ -8,11 +8,11 @@ import {
   mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
-  mockProjectAreas,
   mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
   mockProjectRisks,
+  mockProjectTypeQualifiers,
   mockProjectTypes,
   mockResponsibleZones,
 } from '@/mocks/mockLists';
@@ -76,6 +76,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockHashTags);
       case url === '/project-types/':
         return Promise.resolve(mockProjectTypes);
+      case url === '/project-type-qualifiers/':
+        return Promise.resolve(mockProjectTypeQualifiers);
       case url === '/project-districts/':
         return Promise.resolve(mockDistrictOptions);
       case url === '/project-divisions/':
@@ -84,8 +86,6 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockSubDivisionOptions);
       case url === '/project-phases/':
         return Promise.resolve(mockProjectPhases);
-      case url === '/project-areas/':
-        return Promise.resolve(mockProjectAreas);
       case url === '/construction-phase-details/':
         return Promise.resolve(mockConstructionPhaseDetails);
       case url === '/construction-procurement-methods/':

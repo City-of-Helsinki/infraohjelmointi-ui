@@ -9,6 +9,7 @@ export interface IProject {
   sapProject?: string;
   sapNetwork: Array<string>;
   type: IListItem;
+  typeQualifier: IListItem;
   name: string;
   address?: string;
   postalCode?: string;
@@ -110,6 +111,7 @@ export interface IProjectRequest {
     | number
     | undefined;
   type?: string | null;
+  typeQualifier?: string | null;
   description?: string;
   entityName?: string | null;
   hkrId?: string | null;

@@ -3,36 +3,37 @@ import { IListItem } from '@/interfaces/common';
 export const mockProjectTypes: { data: Array<IListItem> } = {
   data: [
     {
-      id: '4e60a0b0-4801-4cb2-8178-69d876515d96',
-      value: 'projectComplex',
+      id: '706c71fd-0039-4a72-a408-adea06842194',
+      value: 'newConstruction',
     },
     {
-      id: 'af6963ac-4804-4e03-b298-0948331a5f58',
+      id: '448138b6-271f-4150-8dad-7ee42eb81d1c',
+      value: 'basicImprovement',
+    },
+  ],
+};
+
+export const mockProjectTypeQualifiers: { data: Array<IListItem> } = {
+  data: [
+    {
+      id: '4dd7f084-b9c5-435a-978b-bf09110b3677',
       value: 'street',
     },
     {
-      id: 'cc0989ad-8e2b-4f0f-8953-0d22d070a695',
-      value: 'traffic',
-    },
-    {
-      id: '434e8052-9f76-4c41-b450-d9eff680d503',
-      value: 'sports',
-    },
-    {
-      id: '8b3c83c0-3849-4bbe-9e04-2a26c229caf3',
-      value: 'omaStadi',
-    },
-    {
-      id: '7b39f7bd-6f55-4762-81df-54bf0c58e1bb',
-      value: 'projectArea',
-    },
-    {
-      id: '720bddee-9a45-40cd-83f6-89fc44dfd8f6',
+      id: '59fe744c-be17-45fd-bf2a-b4f34a67818e',
       value: 'park',
     },
     {
-      id: '7e60a0b0-4801-4cb2-8178-69d876515d96',
+      id: '04bbcdc7-652e-437d-a9a1-edbb53d3f92d',
       value: 'preConstruction',
+    },
+    {
+      id: '3e45c512-2865-4b3f-b9a7-3e17cdf9b3d0',
+      value: 'sports',
+    },
+    {
+      id: 'a41d6366-1e9d-4854-954d-32a555ab39f6',
+      value: 'spesialtyStructures',
     },
   ],
 };
@@ -78,43 +79,6 @@ export const mockProjectPhases: { data: Array<IListItem> } = {
     {
       id: '6e21081e-2bb4-4cc4-87e1-01440c50bab9',
       value: 'completed',
-    },
-  ],
-};
-
-export const mockProjectAreas: { data: Array<IListItem> } = {
-  data: [
-    {
-      id: '801c8b0e-92e0-4688-b253-a88b4d93b17a',
-      value: 'honkasuo',
-    },
-    {
-      id: '5c437630-5b14-4ade-9270-2552d373e4e4',
-      value: 'kalasatama',
-    },
-    {
-      id: '97198d5f-2f2f-4e2d-a4ad-bd755af44797',
-      value: 'kruunuvuorenranta',
-    },
-    {
-      id: 'c19cb619-3be8-45c3-b752-4f303dd14164',
-      value: 'kuninkaantammi',
-    },
-    {
-      id: '35279d39-1b70-4cb7-a360-a43cd45d7b5c',
-      value: 'lansisatama',
-    },
-    {
-      id: '39d8ae2c-f727-4f10-a05d-3ec2062949c9',
-      value: 'malminLentokenttaalue',
-    },
-    {
-      id: '273b10b2-56f3-4433-91d3-a0116bbc8da3',
-      value: 'pasila',
-    },
-    {
-      id: 'c6faf257-5b2d-4df7-bbd7-72a408e46e23',
-      value: 'ostersundom',
     },
   ],
 };

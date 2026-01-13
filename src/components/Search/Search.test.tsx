@@ -2,7 +2,6 @@ import axios from 'axios';
 import mockI18next from '@/mocks/mockI18next';
 import { renderWithProviders } from '@/utils/testUtils';
 import {
-  mockProjectAreas,
   mockProjectCategories,
   mockProjectPhases,
   mockProjectTypes,
@@ -71,7 +70,6 @@ const render = async () =>
           },
           lists: {
             ...store.getState().lists,
-            areas: mockProjectAreas.data,
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,
             categories: mockProjectCategories.data,
@@ -143,7 +141,6 @@ describe('Search', () => {
     expect(planningLocations.divisions.length).toBeGreaterThan(0);
     expect(planningLocations.subDivisions.length).toBeGreaterThan(0);
     // List store
-    expect(lists.areas).toStrictEqual(mockProjectAreas.data);
     expect(lists.types).toStrictEqual(mockProjectTypes.data);
     expect(lists.phases).toStrictEqual(mockProjectPhases.data);
     expect(lists.categories).toStrictEqual(mockProjectCategories.data);

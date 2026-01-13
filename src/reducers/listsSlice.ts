@@ -4,7 +4,6 @@ import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import {
   getConstructionPhases,
   getPlanningPhases,
-  getProjectAreas,
   getProjectPhases,
   getProjectQualityLevels,
   getProjectTypes,
@@ -21,6 +20,7 @@ import {
   getTalpaAssetClasses,
   getTalpaProjectTypes,
   getTalpaServiceClasses,
+  getProjectTypeQualifiers,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -35,8 +35,8 @@ import { IPerson } from '@/interfaces/personsInterfaces';
 
 export interface IListState {
   types: Array<IListItem>;
+  typeQualifiers: Array<IListItem>;
   phases: Array<IListItem>;
-  areas: Array<IListItem>;
   constructionPhaseDetails: Array<IListItem>;
   constructionProcurementMethods: Array<IListItem>;
   categories: Array<IListItem>;
@@ -63,8 +63,8 @@ export interface IListState {
 
 const initialState: IListState = {
   types: [],
+  typeQualifiers: [],
   phases: [],
-  areas: [],
   constructionPhaseDetails: [],
   constructionProcurementMethods: [],
   categories: [],
@@ -119,8 +119,8 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
     const persons = await getResponsiblePersons();
     return {
       types: await getProjectTypes(),
+      typeQualifiers: await getProjectTypeQualifiers(),
       phases: await getProjectPhases(),
-      areas: await getProjectAreas(),
       constructionPhaseDetails: await getConstructionPhaseDetails(),
       constructionProcurementMethods: await getConstructionProcurementMethods(),
       categories: await getProjectCategories(),

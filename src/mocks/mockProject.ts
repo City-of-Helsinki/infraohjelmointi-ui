@@ -21,6 +21,10 @@ const mockProject: { data: IProject } = {
     projectReadiness: 95,
     type: {
       id: '9e8ccbe3-6738-4db9-893d-57c19561fbb6',
+      value: 'newConstruction',
+    },
+    typeQualifier: {
+      id: '9e8ccbe3-6738-4db9-893d-57c19561fbb7',
       value: 'street',
     },
     phase: {
@@ -148,7 +152,7 @@ const mockProject: { data: IProject } = {
     frameEstConstructionEnd: '10.04.2031',
     frameEstWarrantyPhaseStart: '11.04.2031',
     frameEstWarrantyPhaseEnd: '14.04.2032',
-    currentYearsSapValues: [mockSapCostforProjectCard]
+    currentYearsSapValues: [mockSapCostforProjectCard],
   },
 };
 
