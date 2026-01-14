@@ -1,21 +1,16 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { useCallback, useEffect } from 'react';
+import { useAppSelector } from '@/hooks/common';
+import { useCallback } from 'react';
 import ProjectNote from './ProjectNote';
 import NewNoteForm from './NewNoteForm';
-import { getNotesByProjectThunk, selectNotes } from '@/reducers/noteSlice';
 import './styles.css';
 import { t } from 'i18next';
 import { selectProject } from '@/reducers/projectSlice';
 import { sortArrayByDates } from '@/utils/dates';
+import { useGetNotesByProjectQuery } from '@/api/notesApi';
 
 const ProjectNotes = () => {
-  const dispatch = useAppDispatch();
   const projectId = useAppSelector(selectProject)?.id;
-  const notes = useAppSelector(selectNotes);
-
-  useEffect(() => {
-    if (projectId) dispatch(getNotesByProjectThunk(projectId));
-  }, [projectId]);
+  const { data: notes = [] } = useGetNotesByProjectQuery(projectId || '');
 
   const sortedNotes = useCallback(() => sortArrayByDates(notes, 'createdDate', true), [notes]);
 

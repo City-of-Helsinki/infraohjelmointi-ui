@@ -2,10 +2,9 @@ import { Button, ButtonPresetTheme, ButtonVariant } from 'hds-react';
 import { IconAlertCircle, IconTrash } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react';
-import { useAppDispatch } from '@/hooks/common';
-import { deleteNoteThunk } from '@/reducers/noteSlice';
 import { useTranslation } from 'react-i18next';
 import DialogWrapper from '@/components/shared/DialogWrapper';
+import { useDeleteNoteMutation } from '@/api/notesApi';
 
 interface IProjectDeleteNoteFormProps {
   isOpen: boolean;
@@ -16,16 +15,16 @@ interface IProjectDeleteNoteFormProps {
 const ProjectDeleteNoteForm: FC<IProjectDeleteNoteFormProps> = ({ isOpen, close, noteId }) => {
   const { Content, ActionButtons } = Dialog;
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const [deleteNote] = useDeleteNoteMutation();
 
   const handleDeleteNote = useCallback(async () => {
     try {
-      await dispatch(deleteNoteThunk(noteId));
+      await deleteNote(noteId);
       close();
     } catch (e) {
       console.log('Error deleting note: ', e);
     }
-  }, [close, dispatch, noteId]);
+  }, [close, noteId, deleteNote]);
 
   return (
     <DialogWrapper
