@@ -153,7 +153,7 @@ describe('projectForm', () => {
     const sapCostCurrentYear = project.currentYearsSapValues
       ? project.currentYearsSapValues[0]
       : null;
-    const expectDisplayValue = async (value: string | undefined) =>
+    const expectDisplayValue = async (value: string | undefined | null) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
       expect((await findAllByText(new RegExp(option || '', 'i')))[0]).toBeInTheDocument();
@@ -453,7 +453,7 @@ describe('projectForm', () => {
     const yearToBeSet = expectedValue.split('.')[2];
 
     expect(planningStartYear).not.toEqual(yearToBeSet);
-    expect(mockedAxios.patch.mock.lastCall).toBeUndefined;
+    expect(mockedAxios.patch.mock.lastCall).toBeUndefined();
   });
 
   it('can patch a TextField', async () => {
@@ -572,6 +572,34 @@ describe('projectForm', () => {
     );
     expect(await findByTestId('phase')).toHaveTextContent(matchExact(expectedPhase.value));
   }, 15000);
+
+  it('can patch a project', async () => {
+    const expectedDescription = 'Patched project description';
+    const expectedHkrId = null;
+    const project = mockProject.data;
+    const responseProject: { data: IProject } = {
+      data: { ...project, description: expectedDescription, hkrId: expectedHkrId },
+    };
+
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+    const { user, findByDisplayValue, findByTestId, findByRole } = await render();
+
+    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
+    const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+    const formSubmitButton = await findByTestId('submit-project-button');
+
+    await user.clear(descriptionField);
+    await user.type(descriptionField, expectedDescription);
+    await user.clear(hkrIdField);
+
+    await user.click(formSubmitButton);
+
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    expect(formPatchRequest.description).toEqual(expectedDescription);
+    expect(formPatchRequest.hkrId).toEqual(expectedHkrId);
+    expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
+  });
 
   it('can delete a project', async () => {
     const project = mockProject.data;

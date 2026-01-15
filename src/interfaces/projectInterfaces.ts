@@ -5,7 +5,7 @@ import { ISapCost } from './sapCostsInterfaces';
 export interface IProject {
   id: string;
   projectReadiness: number;
-  hkrId: string;
+  hkrId: string | null;
   sapProject?: string;
   sapNetwork: Array<string>;
   type: IListItem;
