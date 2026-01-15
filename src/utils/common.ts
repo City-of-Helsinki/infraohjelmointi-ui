@@ -162,7 +162,7 @@ const getLowestLocationId = (
 const parseValue = (value: FormValueType) => {
   switch (true) {
     case value instanceof Object && isOption(value):
-      return getOptionId(value as Option);
+      return getOptionId(value);
     case value === '':
       return null;
     default:
