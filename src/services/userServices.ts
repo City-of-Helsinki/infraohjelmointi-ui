@@ -1,10 +1,8 @@
-import { IUser } from '@/interfaces/userInterfaces';
 import axios from 'axios';
 
 import { User } from 'oidc-client-ts';
 
 const {
-  REACT_APP_API_URL,
   REACT_APP_API_ID,
   REACT_APP_API_TOKEN_GRANT_TYPE,
   REACT_APP_AUTHORITY,
@@ -24,15 +22,6 @@ const getUserFromSessionStorage = () => {
   }
 
   return User.fromStorageString(oidcStorage);
-};
-
-export const getUser = async (): Promise<IUser> => {
-  try {
-    const res = await axios.get(`${REACT_APP_API_URL}/who-am-i/`);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
 };
 
 const getTokenEndpoint = async (): Promise<string | undefined> => {

@@ -6,13 +6,13 @@ import { act } from 'react-dom/test-utils';
 import AuthGuard from './AuthGuard';
 import { Route } from 'react-router';
 import { mockError } from '@/mocks/mockError';
-import { getUserThunk } from '@/reducers/authSlice';
 import { IError } from '@/interfaces/common';
+import { authApi } from '@/api/authApi';
 
 jest.mock('react-i18next', () => mockI18next());
 jest.mock('axios');
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const axiosMock = axios as jest.MockedFunction<typeof axios>;
 
 const store = setupStore();
 
@@ -21,12 +21,26 @@ const render = async () =>
 
 describe('AuthGuard', () => {
   it('catches a failed users fetch', async () => {
-    mockedAxios.get.mockRejectedValue(mockError);
+    axiosMock.mockRejectedValue({
+      response: {
+        status: mockError.status,
+        data: mockError,
+      },
+      message: mockError.message,
+    });
 
     const { store } = await render();
 
     await act(async () => {
-      await store.dispatch(getUserThunk());
+      const result = store.dispatch(authApi.endpoints.getUser.initiate());
+
+      try {
+        await result.unwrap();
+      } catch {
+        // Expected rejection for this test case
+      } finally {
+        result.unsubscribe();
+      }
     });
 
     const storeError = store.getState().auth.error as IError;

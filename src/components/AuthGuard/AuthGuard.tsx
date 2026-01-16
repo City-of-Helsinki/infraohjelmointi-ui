@@ -1,13 +1,14 @@
 import { FC, useEffect, useState } from 'react';
 import { useAuth, hasAuthParams } from 'react-oidc-context';
 import { getApiToken } from '@/services/userServices';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { getUserThunk, selectAuthError, selectUser } from '@/reducers/authSlice';
+import { useAppSelector } from '@/hooks/common';
+import { selectAuthError, selectUser } from '@/reducers/authSlice';
 import { NavigateFunction, useLocation, useNavigate } from 'react-router';
 import { isUserAdmin, isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { IUser } from '@/interfaces/userInterfaces';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
 import { useTranslation } from 'react-i18next';
+import { useLazyGetUserQuery } from '@/api/authApi';
 
 const INITIAL_PATH = 'initialPath';
 
@@ -30,7 +31,6 @@ const PAGES = {
  */
 const AuthGuard: FC = () => {
   const auth = useAuth();
-  const dispatch = useAppDispatch();
   const [hasTriedSignin, setHasTriedSignin] = useState(false);
   const user = useAppSelector(selectUser);
   const authError = useAppSelector(selectAuthError);
@@ -40,6 +40,7 @@ const AuthGuard: FC = () => {
   const [isTokenExpired, setIsTokenExpired] = useState(false);
   const { isConfirmed } = useConfirmDialog();
   const { t } = useTranslation();
+  const [fetchUser] = useLazyGetUserQuery();
 
   const MAINTENANCE_MODE: boolean = process.env.REACT_APP_MAINTENANCE_MODE === 'true';
 
@@ -57,7 +58,7 @@ const AuthGuard: FC = () => {
         // Get user
         if (!user || (user?.uuid !== oidcUser.profile.sub && !auth.isLoading)) {
           try {
-            await dispatch(getUserThunk());
+            await fetchUser();
           } catch (e) {
             console.log('Error getting user: ', e);
           }
@@ -85,7 +86,7 @@ const AuthGuard: FC = () => {
 
       getApiTokenAndUser();
     }
-  }, [oidcUser, user, auth.isLoading, dispatch, navigate]);
+  }, [oidcUser, user, auth.isLoading, navigate, fetchUser]);
 
   // Check if user exists and sign in
   useEffect(() => {
