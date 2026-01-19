@@ -37,6 +37,7 @@ export interface ITalpaProjectRange {
   notes: string;
   isActive: boolean;
   updatedDate: string;
+  displayName?: string; // Computed display name from API (handles null values)
 }
 
 export interface ITalpaProjectType {

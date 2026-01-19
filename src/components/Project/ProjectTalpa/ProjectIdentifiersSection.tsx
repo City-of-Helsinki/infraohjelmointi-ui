@@ -42,39 +42,39 @@ export default function ProjectIdentifiersSection() {
   const filteredProjectRanges = talpaProjectRanges.filter(
     (projectRange) =>
       projectRange.projectTypePrefix === budgetItemNumber &&
-      projectRange.budgetAccount !== null &&
-      projectRange.budgetAccount.toLowerCase() !== 'malli',
+      (budgetItemNumber === BudgetItemNumber.InfraInvestment
+        ? true
+        : projectRange.budgetAccount !== null &&
+        projectRange.budgetAccount.toLowerCase() !== 'malli'),
   );
 
   const projectRangeGroups = useMemo(
     () =>
       budgetItemNumber === BudgetItemNumber.InfraInvestment
         ? groupOptions(
-            filteredProjectRanges,
-            (projectRange) => projectRange.budgetAccount,
-            (projectRange) => ({
-              label: `${projectRange.majorDistrictName ?? projectRange.notes} / ${
-                projectRange.rangeStart
-              } - ${projectRange.rangeEnd}`,
-              value: projectRange.id,
-              selected: false,
-              isGroupLabel: false,
-              visible: true,
-              disabled: false,
-            }),
-          )
+          filteredProjectRanges,
+          (projectRange) => projectRange.majorDistrictName ?? '',
+          (projectRange) => ({
+            label: projectRange.displayName || '',
+            value: projectRange.id,
+            selected: false,
+            isGroupLabel: false,
+            visible: true,
+            disabled: false,
+          }),
+        )
         : groupOptions(
-            filteredProjectRanges,
-            (projectRange) => `${projectRange.budgetAccount} ${projectRange.area}`,
-            (projectRange) => ({
-              label: `${projectRange.unit} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
-              value: projectRange.id,
-              selected: false,
-              isGroupLabel: false,
-              visible: true,
-              disabled: false,
-            }),
-          ),
+          filteredProjectRanges,
+          (projectRange) => `${projectRange.budgetAccount} ${projectRange.area}`,
+          (projectRange) => ({
+            label: projectRange.displayName || '',
+            value: projectRange.id,
+            selected: false,
+            isGroupLabel: false,
+            visible: true,
+            disabled: false,
+          }),
+        ),
     [budgetItemNumber, filteredProjectRanges],
   );
 
