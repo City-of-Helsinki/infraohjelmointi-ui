@@ -40,9 +40,9 @@ const render = async (customRoute?: string) =>
           auth: { user: null, error: {} },
           project: { ...store.getState().project, selectedProject: mockProject.data },
           lists: {
-            areas: mockLists.mockProjectAreas.data,
             phases: mockLists.mockProjectPhases.data,
             types: mockLists.mockProjectTypes.data,
+            typeQualifiers: mockLists.mockProjectTypeQualifiers.data,
             constructionPhaseDetails: mockLists.mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockLists.mockConstructionProcurementMethods.data,
             categories: mockLists.mockProjectCategories.data,

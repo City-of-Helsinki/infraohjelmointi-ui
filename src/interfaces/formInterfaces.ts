@@ -47,12 +47,10 @@ export interface IProjectHeaderForm {
 
 export interface IProjectForm {
   type: IOption;
-  entityName: string;
+  typeQualifier: IOption;
   description: string;
-  area: IOption;
   hkrId: string;
   sapProject: string;
-  sapNetwork: string;
   hashTags: Array<string>;
   phase: IOption;
   programmed: boolean;

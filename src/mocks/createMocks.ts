@@ -48,6 +48,7 @@ export const createProject = (overrides: ProjectOverrides = {}): IProject => {
     hkrId: 'hkr-id',
     sapNetwork: [],
     type: createListItem('type'),
+    typeQualifier: createListItem('type-qualifier'),
     name: 'Default Project',
     entityName: 'Entity',
     description: 'Description',

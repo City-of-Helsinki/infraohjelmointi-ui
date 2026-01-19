@@ -132,7 +132,9 @@
     "planningCostsOrScheduleClarification": "Suunnittelukustannusten- tai aikataulun tarkentuminen",
     "otherReason": "Muu syy",
     "Kesken": "Kesken",
-    "Valmis": "Valmis"
+    "Valmis": "Valmis",
+    "newConstruction": "Uudisrakentaminen",
+    "basicImprovement": "Perusparantaminen"
   },
   "validation": {
     "required": "Täytä {{field}}",
@@ -247,11 +249,10 @@
     "name": "Hankkeen nimi",
     "basics": "Hankkeen perustiedot",
     "type": "Hanketyyppi",
-    "entityName": "Hankekokonaisuuden nimi",
+    "typeQualifier": "Hanketyypin tarkenne",
     "description": "Hankkeen kuvaus",
     "area": "Projektialue",
     "hkrId": "PW Hanketunnus",
-    "sapNetwork": "Verkkonumerot",
     "sapProject": "Projektinumero",
     "hashTags": "Tunnisteet",
     "schedule": "Hankkeen aikataulu",

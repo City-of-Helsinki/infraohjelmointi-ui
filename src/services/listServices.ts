@@ -20,18 +20,18 @@ export const getProjectTypes = async () => {
   }
 };
 
-export const getProjectPhases = async () => {
+export const getProjectTypeQualifiers = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-phases/`);
+    const res = await axios.get(`${REACT_APP_API_URL}/project-type-qualifiers/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
   }
 };
 
-export const getProjectAreas = async () => {
+export const getProjectPhases = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-areas/`);
+    const res = await axios.get(`${REACT_APP_API_URL}/project-phases/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

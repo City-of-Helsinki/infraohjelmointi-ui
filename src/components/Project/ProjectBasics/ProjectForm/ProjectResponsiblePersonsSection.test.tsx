@@ -1,10 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection';
-import { useTranslation } from 'react-i18next';
-import { Control, FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { fireEvent } from '@testing-library/react';
 
 // Mock the hooks
@@ -15,6 +12,7 @@ jest.mock('react-i18next', () => ({
 // Mock the SelectField component
 jest.mock('@/components/shared/SelectField', () => {
   return function MockSelectField({ name, value, options, control }: any) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { Controller } = require('react-hook-form');
     return (
       <Controller
@@ -124,12 +122,12 @@ jest.mock('@/reducers/listsSlice', () => ({
 
 const defaultFormValues = {
   type: { value: '', label: '' },
+  typeQualifier: { value: '', label: '' },
   entityName: '',
   description: '',
   area: { value: '', label: '' },
   hkrId: '',
   sapProject: '',
-  sapNetwork: '',
   hashTags: [],
   phase: { value: '', label: '' },
   programmed: false,
