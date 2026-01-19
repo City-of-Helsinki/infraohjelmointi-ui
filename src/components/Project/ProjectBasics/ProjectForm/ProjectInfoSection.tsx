@@ -21,20 +21,19 @@ interface IProjectInfoSectionProps {
   };
   getValues: UseFormGetValues<IProjectForm>;
   isInputDisabled: boolean;
-  projectMode: "edit" | "new";
+  projectMode: 'edit' | 'new';
   isUserOnlyViewer: boolean;
 }
 
 const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   project,
   getFieldProps,
-  getValues,
   control,
   isInputDisabled,
-  isUserOnlyViewer
+  isUserOnlyViewer,
 }) => {
-  const areas = useOptions('areas');
   const types = useOptions('types');
+  const typeQualifiers = useOptions('typeQualifiers');
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
 
@@ -70,11 +69,10 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <TextField
-            {...getFieldProps('entityName')}
-            rules={validateMaxLength(80, t)}
-            disabled={isInputDisabled}
-            readOnly={isUserOnlyViewer}
+          <SelectField
+            {...getFieldProps('typeQualifier')}
+            options={typeQualifiers}
+            rules={{ ...validateRequired('typeQualifier', t) }}
           />
         </div>
         <div className="form-col-xl">
@@ -89,28 +87,36 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
       </div>
       <div className="form-row">
         <div className="form-col-xl">
-          <SelectField {...getFieldProps('area')} options={areas} readOnly={isUserOnlyViewer} />
-        </div>
-        <div className="form-col-xl">
-          <TextField
-            {...getFieldProps('sapNetwork')}
-            readOnly={true}
-            rules={validateMaxLength(15, t)}
-          />
-        </div>
-      </div>
-      <div className="form-row">
-        <div className="form-col-xl">
           <TextAreaField
             testId="project-form-description"
             {...getFieldProps('description')}
             size="l"
-            rules={{...validateMaxLength(1000,t), ...validateRequired('description', t)}}
+            rules={{ ...validateMaxLength(1000, t), ...validateRequired('description', t) }}
             formSaved={isSaving}
             readOnly={isUserOnlyViewer}
           />
         </div>
       </div>
+      {projectMode === 'new' && (
+        <>
+          <div className="form-row">
+            <div className="form-col-xl">
+              <TextField
+                {...getFieldProps('address')}
+                rules={{ ...validateRequired('address', t) }}
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-col-xl">
+              <TextField {...getFieldProps('postalCode')} />
+            </div>
+            <div className="form-col-xl">
+              <TextField {...getFieldProps('city')} />
+            </div>
+          </div>
+        </>
+      )}
       <div className="form-row">
         <ProjectHashTags
           name="hashTags"

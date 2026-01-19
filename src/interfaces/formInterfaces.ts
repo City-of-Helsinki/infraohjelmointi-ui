@@ -41,20 +41,21 @@ export interface IProjectHeaderForm {
   favourite: boolean;
   name: string;
   address?: string;
+  postalCode?: string;
+  city?: string;
 }
 
 export interface IProjectForm {
   type: IOption;
-  entityName: string;
+  typeQualifier: IOption;
   description: string;
-  area: IOption;
   hkrId: string;
   sapProject: string;
-  sapNetwork: string;
   hashTags: Array<string>;
   phase: IOption;
   programmed: boolean;
   constructionPhaseDetail: IOption;
+  constructionProcurementMethod: IOption;
   costForecast: string;
   louhi: boolean;
   gravel: boolean;
@@ -86,6 +87,9 @@ export interface IProjectForm {
   budgetOverrunReason: IOption;
   otherBudgetOverrunReason: string;
   onSchedule?: boolean | null;
+  address?: string;
+  postalCode?: string;
+  city?: string;
 }
 
 export interface ISearchForm {
@@ -128,6 +132,30 @@ export interface IGroupForm {
 
 export interface IHashTagsForm {
   hashTag: string;
+}
+
+export interface IProjectTalpaForm {
+  id?: string;
+  budgetItemNumber?: string;
+  budgetAccount: string; // Talousarviokohta
+  projectNumberRange: IOption | null; // Projektinumeroväli
+  templateProject: string | IOption; // Malliprojekti
+  projectType: IOption | null; // Laji
+  priority: IOption | null; // Lajin prioriteetti
+  projectName: string; // SAP-nimi
+  projectStart: string | null; // Projektin aloituspäivämäärä
+  projectEnd: string | null; // Projektin lopetuspäivämäärä
+  streetAddress: string; // Katuosoite
+  postalCode: string; // Postinumero
+  responsiblePerson: string; // Vastuuhenkilö
+  responsiblePersonEmail: string; // Vastuuhenkilön sähköposti
+  serviceClass: IOption | null; // Palveluluokka
+  assetClass: IOption | null; // Käyttöomaisuusluokka
+  profileName: string; // Profiilin nimi
+  holdingTime: number | null; // Pitoaika
+  investmentProfile: string; // Investointiluokka
+  readiness: IOption | null; // Valmius
+  isLocked?: boolean;
 }
 
 export interface IAppForms

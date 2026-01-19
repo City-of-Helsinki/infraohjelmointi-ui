@@ -21,6 +21,10 @@ const mockProject: { data: IProject } = {
     projectReadiness: 95,
     type: {
       id: '9e8ccbe3-6738-4db9-893d-57c19561fbb6',
+      value: 'newConstruction',
+    },
+    typeQualifier: {
+      id: '9e8ccbe3-6738-4db9-893d-57c19561fbb7',
       value: 'street',
     },
     phase: {
@@ -60,6 +64,10 @@ const mockProject: { data: IProject } = {
     constructionPhaseDetail: {
       id: '9df21c80-7ed0-4ac0-830c-dae5d1d675b9',
       value: 'preConstruction',
+    },
+    constructionProcurementMethod: {
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      value: 'Stara',
     },
     riskAssessment: {
       id: '8fd009ef-ab34-492e-889c-9062a2b3fce8',
@@ -144,7 +152,7 @@ const mockProject: { data: IProject } = {
     frameEstConstructionEnd: '10.04.2031',
     frameEstWarrantyPhaseStart: '11.04.2031',
     frameEstWarrantyPhaseEnd: '14.04.2032',
-    currentYearsSapValues: [mockSapCostforProjectCard]
+    currentYearsSapValues: [mockSapCostforProjectCard],
   },
 };
 

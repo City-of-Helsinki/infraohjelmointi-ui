@@ -24,7 +24,6 @@ import _ from 'lodash';
 import './styles.css';
 import { canUserEditProjectFormField } from '@/utils/validation';
 import { selectUser } from '@/reducers/authSlice';
-import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 import { getYear, isSameYear, updateYear } from '@/utils/dates';
 import {
   selectPlanningDistricts,
@@ -48,25 +47,6 @@ const ProjectForm = () => {
   const user = useAppSelector(selectUser);
   const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
-  const sapCosts = useAppSelector(getProjectSapCosts);
-
-  const currentYearSapValues = useMemo(() => {
-    if (project?.currentYearsSapValues) {
-      const filteredSapValues = project.currentYearsSapValues
-        .filter((value) => value.project_id != null)
-        .map((value) => ({
-          id: value.project_id,
-          year: value.year,
-          sap_id: value.id,
-          project_task_costs: value.project_task_costs,
-          project_task_commitments: value.project_task_commitments,
-          production_task_costs: value.production_task_costs,
-          production_task_commitments: value.production_task_commitments,
-        }));
-      return filteredSapValues.length > 0 ? filteredSapValues[0] : null;
-    }
-    return null;
-  }, [project?.currentYearsSapValues]);
 
   const isOnlyViewer = isUserOnlyViewer(user);
 
@@ -379,11 +359,9 @@ const ProjectForm = () => {
         name: name,
         label: `projectForm.${name}`,
         control: control,
-        sapCosts: project ? sapCosts[project?.id] : null,
-        sapCurrentYear: project ? currentYearSapValues : null,
       };
     },
-    [control, project, sapCosts, currentYearSapValues],
+    [control],
   );
 
   const formProps = useMemo(

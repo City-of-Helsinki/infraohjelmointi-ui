@@ -1,5 +1,5 @@
 import { FormSectionTitle, ListField, NumberField, SelectField } from '@/components/shared';
-import { FC, memo, useEffect, useMemo } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -7,11 +7,11 @@ import { IOption } from '@/interfaces/common';
 import { validateInteger, validateMaxLength } from '@/utils/validation';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/common';
-import { selectIsProjectSaving } from '@/reducers/projectSlice';
-import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { selectIsProjectSaving, selectProject } from '@/reducers/projectSlice';
 import TextAreaField from '@/components/shared/TextAreaField';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import { Option } from 'hds-react';
+import { getProjectSapCosts } from '@/reducers/sapCostSlice';
 
 interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
@@ -22,8 +22,6 @@ interface IProjectFinancialSectionProps {
     name: string;
     label: string;
     control: Control<IProjectForm>;
-    sapCosts: IProjectSapCost | null;
-    sapCurrentYear: IProjectSapCost | null;
   };
   classOptions: {
     masterClasses: Option[];
@@ -47,6 +45,34 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const { masterClasses, classes, subClasses } = classOptions;
 
   const isSaving = useAppSelector(selectIsProjectSaving);
+  const project = useAppSelector(selectProject);
+  const sapCosts = useAppSelector(getProjectSapCosts);
+
+  const currentYearSapValues = useMemo(() => {
+    if (project?.currentYearsSapValues) {
+      const filteredSapValues = project.currentYearsSapValues
+        .filter((value) => value.project_id != null)
+        .map((value) => ({
+          id: value.project_id,
+          year: value.year,
+          sap_id: value.id,
+          project_task_costs: value.project_task_costs,
+          project_task_commitments: value.project_task_commitments,
+          production_task_costs: value.production_task_costs,
+          production_task_commitments: value.production_task_commitments,
+        }));
+      return filteredSapValues.length > 0 ? filteredSapValues[0] : null;
+    }
+    return null;
+  }, [project?.currentYearsSapValues]);
+
+  const getSapProps = useCallback(
+    () => ({
+      sapCosts: project ? sapCosts[project?.id] : null,
+      sapCurrentYear: project ? currentYearSapValues : null,
+    }),
+    [project, sapCosts, currentYearSapValues],
+  );
 
   const constructionPhases = useOptions('constructionPhases');
   const projectQualityLevels = useOptions('projectQualityLevels');
@@ -121,6 +147,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       shouldTranslate={shouldTranslate}
       disabled={userIsProjectManager ? false : isInputDisabled}
       readOnly={isUserOnlyViewer}
+      clearable
     />
   );
 
@@ -187,21 +214,25 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           },
           {
             ...getFieldProps('realizedCostCurrentYear'),
+            ...getSapProps(),
             readOnly: true,
             isSapProject: true,
           },
           {
             ...getFieldProps('realizedCost'),
+            ...getSapProps(),
             readOnly: true,
             isSapProject: true,
           },
           {
             ...getFieldProps('comittedCost'),
+            ...getSapProps(),
             readOnly: true,
             isSapProject: true,
           },
           {
             ...getFieldProps('spentCost'),
+            ...getSapProps(),
             readOnly: true,
             isSapProject: true,
           },
@@ -217,6 +248,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
             size="full"
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
         {isOtherBudgetOverrunReasonSelected && (

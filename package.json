@@ -28,7 +28,7 @@
     "oidc-client-ts": "^2.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.39.5",
+    "react-hook-form": "^7.67.0",
     "react-i18next": "^15.5.3",
     "react-intersection-observer": "^9.4.1",
     "react-oidc-context": "^2.2.2",

@@ -8,7 +8,7 @@ import {
   selectBatchedCoordinationLocations,
   selectBatchedForcedToFrameLocations,
 } from '@/reducers/locationSlice';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   IPlanningRow,
   IPlanningRowList,
@@ -25,11 +25,9 @@ import {
   selectSelections,
   selectStartYear,
   setPlanningRows,
-  setProjects,
 } from '@/reducers/planningSlice';
 import {
   buildPlanningRow,
-  fetchProjectsByRelation,
   getSelectedOrAll,
   getTypeAndIdForLowestExpandedRow,
   sortByName,
@@ -38,6 +36,7 @@ import _ from 'lodash';
 import { IClass } from '@/interfaces/classInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { IGroup } from '@/interfaces/groupInterfaces';
+import { fetchProjectsForSelections } from './fetchProjectsForSelections';
 
 /**
  * Builds a hierarchy-list of IPlanningTableRows
@@ -340,6 +339,7 @@ const useCoordinationRows = () => {
   const batchedForcedToFrameLocations = useAppSelector(selectBatchedForcedToFrameLocations);
 
   const mode = useAppSelector(selectPlanningMode);
+  const projectsFetchAbortController = useRef<AbortController | null>(null);
 
   // Fetch projects when selections change
   useEffect(() => {
@@ -348,27 +348,26 @@ const useCoordinationRows = () => {
       return;
     }
 
-    const year = startYear ?? new Date().getFullYear();
     const { type, id } = getTypeAndIdForLowestExpandedRow(selections);
 
-    const getAndSetProjectsForSelections = async (type: PlanningRowType, id: string) => {
-      try {
-        const projects = await fetchProjectsByRelation(
-          type as PlanningRowType,
-          id,
-          forcedToFrame,
-          year,
-          true,
-        );
-        dispatch(setProjects({ mode, projects }));
-      } catch (e) {
-        console.log('Error fetching projects for coordination selections: ', e);
-      }
-    };
-
     if (type && id) {
-      getAndSetProjectsForSelections(type as PlanningRowType, id);
+      fetchProjectsForSelections({
+        id,
+        type: type as PlanningRowType,
+        mode,
+        forcedToFrame,
+        startYear,
+        isCoordinator: true,
+        dispatch,
+        projectsFetchAbortController,
+        errorContext: 'coordination selections',
+      });
     }
+
+    return () => {
+      projectsFetchAbortController.current?.abort();
+      projectsFetchAbortController.current = null;
+    };
   }, [selections, coordinationGroups, mode, forcedToFrame, startYear, dispatch]);
 
   /**

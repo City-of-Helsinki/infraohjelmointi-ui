@@ -4,9 +4,6 @@
 .project-form-side-panel {
   @apply flex w-full flex-col;
 }
-.project-form-side-panel .side-navigation {
-  @apply flex max-w-[17.5rem] justify-center;
-}
 
 .project-form-side-panel .pw-folder-container {
   @apply mb-4 mt-16 flex justify-center;
@@ -22,4 +19,9 @@
 }
 .project-form-side-panel .pw-folder-link-container .pw-folder-link-not-exist {
   @apply m-1 text-sm font-bold;
+}
+
+.project-form-side-panel .form-status-container {
+  @apply py-5;
+  border-bottom: 1px solid var(--color-black-20);
 }

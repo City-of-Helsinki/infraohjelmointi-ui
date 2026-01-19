@@ -46,7 +46,6 @@ describe('ProjectHeader', () => {
     const { getByTestId } = await render();
 
     expect(getByTestId('project-header')).toBeInTheDocument();
-    expect(getByTestId('project-header-left')).toBeInTheDocument();
     expect(getByTestId('project-header-center')).toBeInTheDocument();
     expect(getByTestId('project-header-right')).toBeInTheDocument();
   });
@@ -55,32 +54,35 @@ describe('ProjectHeader', () => {
     const { getByRole, getByText, store, getByTestId } = await render();
 
     const project = store.getState().project.selectedProject as IProject;
-    const { projectReadiness, name, phase, address } = project;
+    const { name, phase, address } = project;
 
     expect(getByRole('button', { name: /edit-project-name/i })).toBeInTheDocument();
     expect(getByTestId('project-header-name-fields')).toHaveTextContent(matchExact(name));
     expect(getByText(matchExact(phase.value))).toBeInTheDocument();
-    expect(getByText(matchExact(`${projectReadiness}%`))).toBeInTheDocument();
     expect(getByText(matchExact(address || ''))).toBeInTheDocument();
   });
 
   it('renders all right side elements', async () => {
-    const { getByRole, getByText, getByTestId } = await render();
+    const { getByText } = await render();
 
-    expect(getByTestId('project-favourite')).toBeInTheDocument();
-    expect(getByRole('button', { name: /addFavourite/i })).toBeInTheDocument();
     expect(getByText(/inGroup/i)).toBeInTheDocument();
     expect(getByText('Test Group 1')).toBeInTheDocument();
   });
 
   it('can autosave patch a form value', async () => {
     const { queryByRole, getByRole, user, getByText } = await render();
-    const expectedValue = 'New name';
+    const expectedName = 'New name';
+    const expectedAddress = 'New address 123';
+    const expectedPostalCode = '00100';
+    const expectedCity = 'Helsinki';
     const project = mockProject.data;
 
     const responseProject: IProject = {
       ...project,
-      name: expectedValue,
+      name: expectedName,
+      address: expectedAddress,
+      postalCode: expectedPostalCode,
+      city: expectedCity,
     };
 
     mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
@@ -89,16 +91,29 @@ describe('ProjectHeader', () => {
     await user.click(getByRole('button', { name: /edit-project-name/i }));
 
     const nameField = getByRole('textbox', { name: 'project-name' });
+    const addressField = getByRole('textbox', { name: 'project-address' });
+    const postalCodeField = getByRole('textbox', { name: 'project-postal-code' });
+    const cityField = getByRole('textbox', { name: 'project-city' });
 
     await user.clear(nameField);
-    await user.type(nameField, expectedValue);
+    await user.type(nameField, expectedName);
+    await user.clear(addressField);
+    await user.type(addressField, expectedAddress);
+    await user.type(postalCodeField, expectedPostalCode);
+    await user.type(cityField, expectedCity);
 
     // Close edit mode
     await user.click(getByRole('button', { name: /edit-project-name/i }));
     expect(queryByRole('textbox')).toBeNull();
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
-    expect(formPatchRequest.name).toEqual(expectedValue);
-    expect(getByText(matchExact(expectedValue))).toBeInTheDocument();
+    expect(formPatchRequest.name).toEqual(expectedName);
+    expect(getByText(matchExact(expectedName))).toBeInTheDocument();
+    expect(formPatchRequest.address).toEqual(expectedAddress);
+    expect(getByText(matchExact(expectedAddress))).toBeInTheDocument();
+    expect(formPatchRequest.postalCode).toEqual(expectedPostalCode);
+    expect(getByText(matchExact(expectedPostalCode))).toBeInTheDocument();
+    expect(formPatchRequest.city).toEqual(expectedCity);
+    expect(getByText(matchExact(expectedCity))).toBeInTheDocument();
   });
 });

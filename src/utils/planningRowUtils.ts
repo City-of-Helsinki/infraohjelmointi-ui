@@ -10,6 +10,7 @@ import { ILocation } from '@/interfaces/locationInterfaces';
 import { calculatePlanningCells, calculatePlanningRowSums } from './calculations';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { getProjectsWithParams } from '@/services/projectServices';
+import { isRequestCanceled } from '@/utils/http';
 import { IClassHierarchy, ICoordinatorClassHierarchy } from '@/reducers/classSlice';
 
 // These utils are used by the usePlanningRows and useCoordinationRows
@@ -72,11 +73,10 @@ export const filterProjectsForPlanningRow = (
   districtsForSubClass?: Array<IClass>,
   allSubDivisions?: Array<ILocation>,
 ) => {
-
   const getSubDivisionParentId = (locationId: string | undefined) => {
     const subDivision = allSubDivisions?.find(({ id }) => id === locationId);
     return subDivision?.parentClass;
-  }
+  };
 
   const getProjectsForClasses = () =>
     projects.filter((p) => !p.projectGroup && !p.projectLocation && p.projectClass === id);
@@ -94,7 +94,9 @@ export const filterProjectsForPlanningRow = (
     projects.filter((p) => p.projectGroup).filter((p) => p.projectGroup === id);
 
   const getProjectsForLocation = () =>
-    projects.filter((p) => !p.projectGroup).filter((p) => p.projectLocation === id || getSubDivisionParentId(p.projectLocation) === id);
+    projects
+      .filter((p) => !p.projectGroup)
+      .filter((p) => p.projectLocation === id || getSubDivisionParentId(p.projectLocation) === id);
 
   switch (type) {
     case 'class':
@@ -191,7 +193,7 @@ export const getSelectedOrAll = (
 /**
  * Fetches projects for a given location or class.
  *
- * It will add the direct=true parameter to the search query if we're fetching projects for classes or subClasses, which
+ * It will add the direct=true parameter to the search query if we're fetching projects for subClassDistrict, which
  * will only return projects that are directly underneath that class or subClass (children ignored).
  *
  * @returns a promise list of projects.
@@ -202,8 +204,9 @@ export const fetchProjectsByRelation = async (
   forcedToFrame: boolean,
   year: number,
   isCoordinator?: boolean,
+  signal?: AbortSignal,
 ): Promise<Array<IProject>> => {
-  const direct = type === 'class' || type === 'subClassDistrict';
+  const direct = type === 'subClassDistrict';
   try {
     const allResults = await getProjectsWithParams(
       {
@@ -214,9 +217,13 @@ export const fetchProjectsByRelation = async (
         year: year,
       },
       isCoordinator,
+      { signal },
     );
     return allResults.results;
   } catch (e) {
+    if (isRequestCanceled(e)) {
+      throw e;
+    }
     console.log('Error fetching projects by relation: ', e);
   }
   return [];
@@ -243,10 +250,8 @@ export const getTypeAndIdForLowestExpandedRow = (selections: IPlanningRowSelecti
     return { type: 'collectiveSubLevel', id: selectedCollectiveSubLevel.id };
   } else if (selectedDistrict) {
     return { type: 'district', id: selectedDistrict.id };
-  } else if (selectedSubClass) {
-    return { type: 'subClass', id: selectedSubClass.id };
-  } else if (selectedClass) {
-    return { type: 'class', id: selectedClass.id };
+  } else if (selectedSubClass || selectedClass) {
+    return { type: 'class', id: selectedSubClass?.parent ?? selectedClass?.id };
   } else {
     return { type: null, id: null };
   }

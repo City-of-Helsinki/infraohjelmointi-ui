@@ -40,6 +40,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             size="full"
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
       </div>
@@ -53,6 +54,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             shouldTranslate={false}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
       </div>
@@ -65,6 +67,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             shouldTranslate={false}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
         <div className="form-col-md">
@@ -75,6 +78,7 @@ const ProjectLocationSection: FC<IProjectLocationSectionProps> = ({
             shouldTranslate={false}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            clearable
           />
         </div>
       </div>

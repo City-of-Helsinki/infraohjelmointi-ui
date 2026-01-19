@@ -37,7 +37,7 @@ jest.mock('@/utils/projectProgrammerUtils', () => ({
 // Mock reducers - need to match actual Redux state structure
 const mockStore = configureStore({
   reducer: {
-    project: (state = { project: null, mode: 'new' }) => state,
+    project: (state = { project: null, mode: 'edit' }) => state,
     class: (
       state = {
         planning: {
@@ -78,7 +78,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
 
     // Simulate user entering data
     act(() => {
-      result.current.formMethods.setValue('entityName', 'User Entered Name', { shouldDirty: true });
+      result.current.formMethods.setValue('hkrId', 'User Entered Name', { shouldDirty: true });
     });
 
     // Wait for form state to update
@@ -89,7 +89,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
     // Simulate loading state change (like on refresh)
     // The hook should NOT reset because form is dirty
     await waitFor(() => {
-      expect(result.current.formMethods.getValues('entityName')).toBe('User Entered Name');
+      expect(result.current.formMethods.getValues('hkrId')).toBe('User Entered Name');
     });
   });
 
@@ -98,7 +98,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
 
     // Simulate user entering data
     act(() => {
-      result.current.formMethods.setValue('entityName', 'User Data');
+      result.current.formMethods.setValue('hkrId', 'User Data');
       result.current.formMethods.setValue('description', 'User Description');
     });
 
@@ -109,7 +109,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
     // (simulating the refresh scenario where Redux data might be empty initially)
 
     await waitFor(() => {
-      expect(result.current.formMethods.getValues('entityName')).toBe('User Data');
+      expect(result.current.formMethods.getValues('hkrId')).toBe('User Data');
       expect(result.current.formMethods.getValues('description')).toBe('User Description');
     });
   });
@@ -154,13 +154,13 @@ describe('Form Refresh Scenarios - Integration Tests', () => {
 
     // Step 1: User fills form
     act(() => {
-      result.current.formMethods.setValue('entityName', 'My Project');
+      result.current.formMethods.setValue('hkrId', 'My Project');
       result.current.formMethods.setValue('description', 'Project Description');
     });
 
     // Step 2 & 3: Simulate page refresh (loading state changes are handled in useEffect)
     // Step 4: Verify data is retained
-    expect(result.current.formMethods.getValues('entityName')).toBe('My Project');
+    expect(result.current.formMethods.getValues('hkrId')).toBe('My Project');
     expect(result.current.formMethods.getValues('description')).toBe('Project Description');
   });
 
@@ -241,7 +241,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
     act(() => {
       // Text field
-      result.current.formMethods.setValue('entityName', 'Mixed Test Project', {
+      result.current.formMethods.setValue('sapProject', 'Mixed Test Project', {
         shouldDirty: true,
       });
       // Dropdown field
@@ -266,7 +266,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
     // Simulate refresh - all different field types should be preserved
     await waitFor(() => {
-      expect(result.current.formMethods.getValues('entityName')).toBe('Mixed Test Project');
+      expect(result.current.formMethods.getValues('sapProject')).toBe('Mixed Test Project');
       expect(result.current.formMethods.getValues('masterClass')).toEqual({
         label: 'Test Class',
         value: 'test-class',
@@ -309,14 +309,14 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
       result.current.formMethods.setValue('masterClass', { label: '', value: '' });
       result.current.formMethods.setValue('description', '');
       // But keep some legitimate data
-      result.current.formMethods.setValue('entityName', 'Project with Mixed Values', {
+      result.current.formMethods.setValue('hkrId', 'Project with Mixed Values', {
         shouldDirty: true,
       });
     });
 
     await waitFor(() => {
       // The form should not be considered "empty" just because some fields are empty
-      expect(result.current.formMethods.getValues('entityName')).toBe('Project with Mixed Values');
+      expect(result.current.formMethods.getValues('hkrId')).toBe('Project with Mixed Values');
       expect(result.current.formMethods.getValues('masterClass')).toEqual({ label: '', value: '' });
       expect(result.current.formMethods.getValues('description')).toBe('');
     });
@@ -328,9 +328,9 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
     act(() => {
       // Rapid consecutive changes
-      result.current.formMethods.setValue('entityName', 'First Name', { shouldDirty: true });
-      result.current.formMethods.setValue('entityName', 'Second Name', { shouldDirty: true });
-      result.current.formMethods.setValue('entityName', 'Final Name', { shouldDirty: true });
+      result.current.formMethods.setValue('hkrId', 'First Name', { shouldDirty: true });
+      result.current.formMethods.setValue('hkrId', 'Second Name', { shouldDirty: true });
+      result.current.formMethods.setValue('hkrId', 'Final Name', { shouldDirty: true });
       result.current.formMethods.setValue('description', 'Quick Description', {
         shouldDirty: true,
       });
@@ -338,7 +338,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
     // Final values should be preserved
     await waitFor(() => {
-      expect(result.current.formMethods.getValues('entityName')).toBe('Final Name');
+      expect(result.current.formMethods.getValues('hkrId')).toBe('Final Name');
       expect(result.current.formMethods.getValues('description')).toBe('Quick Description');
       expect(result.current.formMethods.formState.isDirty).toBe(true);
     });
@@ -352,12 +352,12 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
     const unicodePath = 'Helsinki/Käpylä/Östra_delen';
 
     act(() => {
-      result.current.formMethods.setValue('entityName', specialText, { shouldDirty: true });
+      result.current.formMethods.setValue('hkrId', specialText, { shouldDirty: true });
       result.current.formMethods.setValue('description', unicodePath, { shouldDirty: true });
     });
 
     await waitFor(() => {
-      expect(result.current.formMethods.getValues('entityName')).toBe(specialText);
+      expect(result.current.formMethods.getValues('hkrId')).toBe(specialText);
       expect(result.current.formMethods.getValues('description')).toBe(unicodePath);
     });
   });
@@ -371,12 +371,12 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
       'Project with very long name that exceeds normal expectations and might cause issues in some implementations but should work fine here';
 
     act(() => {
-      result.current.formMethods.setValue('entityName', longName, { shouldDirty: true });
+      result.current.formMethods.setValue('hkrId', longName, { shouldDirty: true });
       result.current.formMethods.setValue('description', longDescription, { shouldDirty: true });
     });
 
     await waitFor(() => {
-      expect(result.current.formMethods.getValues('entityName')).toBe(longName);
+      expect(result.current.formMethods.getValues('hkrId')).toBe(longName);
       expect(result.current.formMethods.getValues('description')).toBe(longDescription);
       expect(result.current.formMethods.getValues('description').length).toBe(5000);
     });
@@ -393,16 +393,10 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
         { label: '', value: '' },
         { shouldDirty: true },
       );
-      result.current.formMethods.setValue('entityName', 'Project with empty dropdown', {
-        shouldDirty: true,
-      });
     });
 
     await waitFor(() => {
       expect(result.current.formMethods.getValues('masterClass')).toEqual({ label: '', value: '' });
-      expect(result.current.formMethods.getValues('entityName')).toBe(
-        'Project with empty dropdown',
-      );
       // Form should still be considered to have legitimate data due to the name field
     });
   });

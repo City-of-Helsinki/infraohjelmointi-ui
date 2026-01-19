@@ -9,13 +9,17 @@ export interface IProject {
   sapProject?: string;
   sapNetwork: Array<string>;
   type: IListItem;
+  typeQualifier: IListItem;
   name: string;
   address?: string;
+  postalCode?: string;
+  city?: string;
   entityName: string;
   description: string;
   phase: IListItem;
   programmed: boolean;
   constructionPhaseDetail: IListItem;
+  constructionProcurementMethod: IListItem;
   estPlanningStart: string | null;
   estPlanningEnd: string | null;
   estConstructionStart: string | null;
@@ -107,6 +111,7 @@ export interface IProjectRequest {
     | number
     | undefined;
   type?: string | null;
+  typeQualifier?: string | null;
   description?: string;
   entityName?: string | null;
   hkrId?: string | null;
@@ -116,6 +121,8 @@ export interface IProjectRequest {
   sapNetwork?: Array<string>;
   name?: string | null;
   address?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
   favPersons?: Array<string> | [];
   phase?: string | null;
   estPlanningStart?: string | null;
@@ -129,6 +136,7 @@ export interface IProjectRequest {
   visibilityStart?: string;
   visibilityEnd?: string;
   constructionPhaseDetail?: string | null;
+  constructionProcurementMethod?: string | null;
   louhi?: boolean;
   programmed?: boolean;
   gravel?: boolean;

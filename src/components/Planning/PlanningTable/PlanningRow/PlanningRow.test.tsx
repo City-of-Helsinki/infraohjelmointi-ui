@@ -75,6 +75,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
       },
       mode: 'planning' as const,
       projects: [],
+      projectsRequestId: { planning: null, coordination: null },
       rows: [],
       forcedToFrame: false,
       isLoading: false,

@@ -8,12 +8,16 @@ import {
   setProjectMode,
   setSelectedProject,
 } from '@/reducers/projectSlice';
-import ProjectDetailsForm from '@/components/ProjectDetailsForm'
+import ProjectDetailsForm from '@/components/ProjectDetailsForm';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ProjectToolbar } from '@/components/Project/ProjectToolbar';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
-import { clearIsProjectCardLoading, clearLoading, setIsProjectCardLoading, setLoading } from '@/reducers/loaderSlice';
+import {
+  clearIsProjectCardLoading,
+  clearLoading,
+  setIsProjectCardLoading,
+  setLoading,
+} from '@/reducers/loaderSlice';
 import { selectUser } from '@/reducers/authSlice';
 import _ from 'lodash';
 
@@ -45,6 +49,7 @@ const ProjectView = () => {
     if (!_.isEqual(project, selectedProject)) {
       dispatch(setSelectedProject(project));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectUpdate]);
 
   useEffect(() => {
@@ -82,13 +87,13 @@ const ProjectView = () => {
       }
     }
     dispatch(clearIsProjectCardLoading());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, projectMode, user]);
 
   return (
     <div className="w-full" data-testid="project-view">
       {(selectedProject || projectMode === 'new') && (
         <>
-          <ProjectToolbar />
           <ProjectHeader />
           <ProjectDetailsForm projectMode={projectMode} />
         </>

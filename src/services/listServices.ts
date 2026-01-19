@@ -1,4 +1,10 @@
 import { IListItem } from '@/interfaces/common';
+import {
+  ITalpaAssetClass,
+  ITalpaProjectRange,
+  ITalpaProjectType,
+  ITalpaServiceClass,
+} from '@/interfaces/talpaInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
@@ -14,6 +20,15 @@ export const getProjectTypes = async () => {
   }
 };
 
+export const getProjectTypeQualifiers = async () => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-type-qualifiers/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
 export const getProjectPhases = async () => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-phases/`);
@@ -23,18 +38,18 @@ export const getProjectPhases = async () => {
   }
 };
 
-export const getProjectAreas = async () => {
+export const getConstructionPhaseDetails = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-areas/`);
+    const res = await axios.get(`${REACT_APP_API_URL}/construction-phase-details/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
   }
 };
 
-export const getConstructionPhaseDetails = async () => {
+export const getConstructionProcurementMethods = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/construction-phase-details/`);
+    const res = await axios.get(`${REACT_APP_API_URL}/construction-procurement-methods/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -140,4 +155,24 @@ export const getProgrammers = async (): Promise<Array<IListItem>> => {
   } catch (e) {
     return Promise.reject(e);
   }
+};
+
+export const getTalpaProjectRanges = async (): Promise<ITalpaProjectRange[]> => {
+  const res = await axios.get<ITalpaProjectRange[]>(`${REACT_APP_API_URL}/talpa-project-ranges/`);
+  return res.data;
+};
+
+export const getTalpaProjectTypes = async (): Promise<ITalpaProjectType[]> => {
+  const res = await axios.get<ITalpaProjectType[]>(`${REACT_APP_API_URL}/talpa-project-types/`);
+  return res.data;
+};
+
+export const getTalpaServiceClasses = async (): Promise<ITalpaServiceClass[]> => {
+  const res = await axios.get<ITalpaServiceClass[]>(`${REACT_APP_API_URL}/talpa-service-classes/`);
+  return res.data;
+};
+
+export const getTalpaAssetClasses = async (): Promise<ITalpaAssetClass[]> => {
+  const res = await axios.get<ITalpaAssetClass[]>(`${REACT_APP_API_URL}/talpa-asset-classes/`);
+  return res.data;
 };

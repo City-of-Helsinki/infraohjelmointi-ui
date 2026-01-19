@@ -50,8 +50,8 @@ export interface IListItem {
 
 export type ListType =
   | 'types'
+  | 'typeQualifiers'
   | 'phases'
-  | 'areas'
   | 'phaseDetails'
   | 'categories'
   | 'masterClasses'
@@ -63,6 +63,7 @@ export type ListType =
   | 'responsibleZones'
   | 'responsiblePersons'
   | 'constructionPhaseDetails'
+  | 'constructionProcurementMethods'
   | 'riskAssessments'
   | 'projectQualityLevels'
   | 'planningPhases'

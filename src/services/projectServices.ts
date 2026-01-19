@@ -34,7 +34,9 @@ export const deleteProject = async (id: string): Promise<{ id: string }> => {
   }
 };
 
-export const patchProject = async (request: IProjectPatchRequestObject): Promise<IProjectResponse> => {
+export const patchProject = async (
+  request: IProjectPatchRequestObject,
+): Promise<IProjectResponse> => {
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/projects/${request.id}/`, request.data);
     return res;
@@ -43,7 +45,9 @@ export const patchProject = async (request: IProjectPatchRequestObject): Promise
   }
 };
 
-export const postProject = async (request: IProjectPostRequestObject): Promise<IProjectResponse> => {
+export const postProject = async (
+  request: IProjectPostRequestObject,
+): Promise<IProjectResponse> => {
   try {
     const res = await axios.post(`${REACT_APP_API_URL}/projects/`, request.data);
     return res;
@@ -54,7 +58,7 @@ export const postProject = async (request: IProjectPostRequestObject): Promise<I
 
 export const getSearchResults = async (req: ISearchRequest): Promise<ISearchResults> => {
   try {
-    const endOfFullPath = req.fullPath?.split("/projects")[1];
+    const endOfFullPath = req.fullPath?.split('/projects')[1];
     const url = endOfFullPath
       ? `${REACT_APP_API_URL}/projects${endOfFullPath}`
       : `${REACT_APP_API_URL}/projects/search-results/?${req.params}&limit=${req.limit}&order=${req.order}`;
@@ -83,11 +87,12 @@ export const patchForcedToFrameProjects = async (): Promise<any> => {
   } catch (e) {
     return Promise.reject(e);
   }
-}
+};
 
 export const getProjectsWithParams = async (
   req: IProjectSearchRequest,
   isCoordinator?: boolean,
+  options?: { signal?: AbortSignal },
 ): Promise<IProjectsResponse> => {
   const { params, direct, programmed, forcedToFrame, year, fullPath } = req;
 
@@ -100,11 +105,12 @@ export const getProjectsWithParams = async (
     : `${REACT_APP_API_URL}/projects/?${allParams}`;
 
   const nextPageUrl = isCoordinator
-    ? `${REACT_APP_API_URL}/projects/coordinator/${fullPath?.split("/projects/coordinator/")[1]}`
-    : `${REACT_APP_API_URL}/projects/${fullPath?.split("/projects/")[1]}`;
+    ? `${REACT_APP_API_URL}/projects/coordinator/${fullPath?.split('/projects/coordinator/')[1]}`
+    : `${REACT_APP_API_URL}/projects/${fullPath?.split('/projects/')[1]}`;
 
   try {
-    const res = await axios.get(fullPath ? nextPageUrl : url);
+    const axiosConfig = options?.signal ? { signal: options.signal } : undefined;
+    const res = await axios.get(fullPath ? nextPageUrl : url, axiosConfig);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
