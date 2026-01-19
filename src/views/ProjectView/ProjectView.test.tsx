@@ -2,7 +2,6 @@ import mockI18next from '@/mocks/mockI18next';
 import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import ProjectView from './ProjectView';
-import { getProjectThunk } from '@/reducers/projectSlice';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
@@ -16,13 +15,14 @@ import { IProject } from '@/interfaces/projectInterfaces';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor } from '@testing-library/react';
 import { ProjectBasics } from '@/components/Project/ProjectBasics';
+import { projectApi } from '@/api/projectApi';
 
 const store = setupStore();
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as jest.Mocked<typeof axios> & jest.MockedFunction<typeof axios>;
 
 const render = async () =>
   await act(async () =>
@@ -92,12 +92,30 @@ describe('ProjectView', () => {
     expect(await findByTestId('tabs-list')).toBeInTheDocument();
   });
 
-  it('catches a failed project  fetch', async () => {
+  it('catches a failed project fetch', async () => {
     const { store } = await render();
 
-    mockedAxios.get.mockRejectedValueOnce(mockError);
+    mockedAxios.mockRejectedValueOnce({
+      response: {
+        status: mockError.status,
+        data: mockError,
+      },
+      message: mockError.message,
+    });
 
-    await act(() => store.dispatch(getProjectThunk(mockProject.data.id)));
+    await act(async () => {
+      const result = store.dispatch(
+        projectApi.endpoints.getProjectById.initiate(mockProject.data.id),
+      );
+
+      try {
+        await result.unwrap();
+      } catch {
+        // expected rejection for this test
+      } finally {
+        result.unsubscribe();
+      }
+    });
 
     const storeError = store.getState().project.error as IError;
     expect(storeError.message).toBe(mockError.message);
