@@ -41,7 +41,7 @@ const axiosBaseQuery =
 export const infraohjelmointiApi = createApi({
   reducerPath: 'infraohjelmointiApi',
   baseQuery: axiosBaseQuery({ baseUrl: process.env.REACT_APP_API_URL || '' }),
-  tagTypes: ['Notes', 'User'],
+  tagTypes: ['Notes', 'User', 'Projects'],
   // Endpoints are injected in other files in order to keep them modular
   endpoints: () => ({}),
 });

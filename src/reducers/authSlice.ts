@@ -2,6 +2,7 @@ import { authApi } from '@/api/authApi';
 import { IError } from '@/interfaces/common';
 import { IUser } from '@/interfaces/userInterfaces';
 import { RootState } from '@/store';
+import { getErrorFromRejectedAction } from '@/utils/reduxErrorUtils';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface IUserState {
@@ -79,26 +80,7 @@ export const authSlice = createSlice({
       })
       .addMatcher(authApi.endpoints.getUser.matchRejected, (state, action) => {
         state.user = null;
-        if (action.payload && typeof action.payload === 'object') {
-          const payload = action.payload as { status?: number; data?: unknown };
-          const data = payload.data as IError | string | undefined;
-
-          if (data && typeof data === 'object') {
-            state.error = data;
-            return;
-          }
-
-          state.error = {
-            status: payload.status,
-            message: typeof data === 'string' ? data : action.error?.message || 'Unknown error',
-          };
-          return;
-        }
-
-        state.error = {
-          status: undefined,
-          message: action.error?.message || 'Unknown error',
-        };
+        state.error = getErrorFromRejectedAction(action);
       });
   },
 });
