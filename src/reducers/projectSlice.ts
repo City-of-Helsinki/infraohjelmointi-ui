@@ -1,13 +1,15 @@
+import { projectApi } from '@/api/projectApi';
+import { IError } from '@/interfaces/common';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { getProject } from '@/services/projectServices';
 import { RootState } from '@/store';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getErrorFromRejectedAction } from '@/utils/reduxErrorUtils';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IProjectState {
   selectedProject: IProject | null;
   count: number | null;
   page: number;
-  error: unknown;
+  error: IError | null | unknown;
   isSaving: boolean;
   mode: 'edit' | 'new';
 }
@@ -20,16 +22,6 @@ const initialState: IProjectState = {
   isSaving: false,
   mode: 'edit',
 };
-
-export const getProjectThunk = createAsyncThunk('project/getOne', async (id: string, thunkAPI) => {
-  thunkAPI.dispatch(resetProject());
-  try {
-    const project = await getProject(id);
-    return project;
-  } catch (e) {
-    return thunkAPI.rejectWithValue(e);
-  }
-});
 
 export const projectSlice = createSlice({
   name: 'project',
@@ -55,13 +47,19 @@ export const projectSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // GET ONE
-    builder.addCase(getProjectThunk.fulfilled, (state, action: PayloadAction<IProject>) => {
-      return { ...state, selectedProject: action.payload };
-    });
-    builder.addCase(getProjectThunk.rejected, (state, action: PayloadAction<unknown>) => {
-      return { ...state, error: action.payload };
-    });
+    builder
+      .addMatcher(projectApi.endpoints.getProjectById.matchPending, (state) => {
+        state.error = null;
+        state.selectedProject = null;
+      })
+      .addMatcher(projectApi.endpoints.getProjectById.matchFulfilled, (state, action) => {
+        state.selectedProject = action.payload;
+        state.error = null;
+      })
+      .addMatcher(projectApi.endpoints.getProjectById.matchRejected, (state, action) => {
+        state.selectedProject = null;
+        state.error = getErrorFromRejectedAction(action);
+      });
   },
 });
 
