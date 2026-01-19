@@ -12,7 +12,7 @@ import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
 import _ from 'lodash';
 import { mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
-import { selectProject } from '@/reducers/projectSlice';
+import { selectProject, selectProjectMode } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
 import { Tooltip } from 'hds-react';
 
@@ -50,6 +50,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
   const currentPhase = getValues('phase').value;
   const { t } = useTranslation();
+  const projectMode = useAppSelector(selectProjectMode);
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
 
@@ -113,8 +114,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             'category',
             'masterClass',
             'class',
-            'address',
           ];
+          if (projectMode === 'new') {
+            programmedRequirements.push('address');
+          }
           const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
           const generalConstructionRequirements = [
             'estConstructionStart',
@@ -191,6 +194,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       warrantyPeriodPhase,
       completedPhase,
       checkTodayIsBeforeWarrantyPhaseEnd,
+      projectMode,
     ],
   );
 
