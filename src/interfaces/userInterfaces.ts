@@ -27,5 +27,6 @@ export enum UserRole {
   VIEWER = 'sl_dyn_kymp_sso_io_katselijat',
   VIEWER_OTHERS = 'sg_kymp_sso_io_katselijat_muut',
   VIEWER_OUTSIDE_ORGANIZATION = 'az_kymp_asgd_u_infraohjelmointi_ulkopuoliset',
+  VIEWER_OUTSIDE_ORGANIZATION_ALT = '952da398-75b3-404a-b274-c8f351d7f5a7',
   ADMIN = 'sg_kymp_sso_io_admin',
 }

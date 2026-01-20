@@ -56,7 +56,11 @@ export const isUserProjectManager = (user: IUser | null) => {
   );
 };
 
-const adGroupIsViewer = (adGroup: IAdGroup) => adGroup.name === UserRole.VIEWER || adGroup.name === UserRole.VIEWER_OTHERS || adGroup.name === UserRole.VIEWER_OUTSIDE_ORGANIZATION;
+const adGroupIsViewer = (adGroup: IAdGroup) =>
+  adGroup.name === UserRole.VIEWER ||
+  adGroup.name === UserRole.VIEWER_OTHERS ||
+  adGroup.name === UserRole.VIEWER_OUTSIDE_ORGANIZATION ||
+  adGroup.name === UserRole.VIEWER_OUTSIDE_ORGANIZATION_ALT;
 
 export const isUserOnlyViewer = (user: IUser | null): boolean => {
   if (!user) {
