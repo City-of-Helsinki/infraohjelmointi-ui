@@ -29,6 +29,7 @@ const mockTalpaProject: ITalpaProjectOpening = {
     notes: '',
     isActive: true,
     updatedDate: '2025-01-01',
+    groupLabel: '8 03 01 01 Katujen uudisrakentaminen',
   },
   templateProject: '2814I00000',
   projectType: {
