@@ -2,15 +2,14 @@ import { Button, ButtonVariant } from 'hds-react';
 import { IconPenLine } from 'hds-react/icons';
 import { FC, memo, useCallback } from 'react';
 import { Dialog } from 'hds-react';
-import { useAppDispatch } from '@/hooks/common';
 import { INote } from '@/interfaces/noteInterfaces';
 import { Controller } from 'react-hook-form';
 import { TextArea } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import useProjectNoteForm from '@/forms/useNoteForm';
-import { patchNoteThunk } from '@/reducers/noteSlice';
 import DialogWrapper from '@/components/shared/DialogWrapper';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
+import { usePatchNoteMutation } from '@/api/notesApi';
 
 interface IProjectEditNoteFormProps {
   isOpen: boolean;
@@ -22,16 +21,16 @@ const ProjectEditNoteForm: FC<IProjectEditNoteFormProps> = ({ isOpen, close, not
   const { Content, ActionButtons } = Dialog;
   const { formMethods } = useProjectNoteForm(note);
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const [patchNote] = usePatchNoteMutation();
 
   const { handleSubmit, control } = formMethods;
 
   const onSubmit = useCallback(
     async (form: IProjectNoteForm) => {
-      await dispatch(patchNoteThunk({ content: form.content, id: form.id }));
+      await patchNote({ content: form.content, id: form.id });
       close();
     },
-    [close, dispatch],
+    [close, patchNote],
   );
 
   return (
