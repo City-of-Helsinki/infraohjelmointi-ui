@@ -17,13 +17,16 @@ interface IProjectYearSummaryProps {
 }
 
 const ProjectYearSummary: FC<IProjectYearSummaryProps> = (props) => {
-  const { startYear, year, monthlyDataList, sapCurrentYear } = props;
-  const showYearSummaryTable = useMemo(() => startYear === year, [startYear, year]);
+  const { year, monthlyDataList, sapCurrentYear } = props;
+  const currentYear = new Date().getFullYear();
+  const showYearSummaryTable = useMemo(() => year === currentYear, [year, currentYear]);
 
   return (
     <>
       {/* Year summary (only visible for the first year in the table) */}
-      {showYearSummaryTable && <ProjectYearSummaryTable {...props} sapCurrentYear={sapCurrentYear} />}
+      {showYearSummaryTable && (
+        <ProjectYearSummaryTable {...props} sapCurrentYear={sapCurrentYear} />
+      )}
       {/* Monthly graph */}
       {monthlyDataList.map((c) => (
         <MonthlyGraphCell key={c.month} {...c} month={c.month} {...props} />

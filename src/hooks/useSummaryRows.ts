@@ -24,18 +24,15 @@ export const getPlanningRowTitle = (startYear: number) => {
   const diff = startYear - currentYear;
 
   if (diff === 0) {
-    return "kuluva TA";
-  }
-  else if (diff === 1) {
-    return "TAE";
-  }
-  else if (diff < 0) {
-    return "TA";
-  }
-  else if (diff <= 3) {
-    return "TSE";
+    return 'kuluva TA';
+  } else if (diff === 1) {
+    return 'TAE';
+  } else if (diff < 0) {
+    return 'TA';
+  } else if (diff <= 3) {
+    return 'TSE';
   } else {
-    return "alustava";
+    return 'alustava';
   }
 };
 
@@ -44,11 +41,12 @@ export const getPlanningRowTitle = (startYear: number) => {
  */
 const buildPlanningSummaryHeadCells = (startYear: number) => {
   const cells = [];
+  const currentYear = new Date().getFullYear();
   for (let i = 0; i < 11; i++) {
     cells.push({
       year: startYear + i,
       title: getPlanningRowTitle(startYear + i),
-      isCurrentYear: startYear + i === startYear,
+      isCurrentYear: startYear + i === currentYear,
     });
   }
   return cells;
