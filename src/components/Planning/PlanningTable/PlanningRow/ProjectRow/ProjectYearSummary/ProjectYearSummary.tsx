@@ -23,7 +23,7 @@ const ProjectYearSummary: FC<IProjectYearSummaryProps> = (props) => {
 
   return (
     <>
-      {/* Year summary (only visible for the first year in the table) */}
+      {/* Year summary (only visible for the current year in the table) */}
       {showYearSummaryTable && (
         <ProjectYearSummaryTable {...props} sapCurrentYear={sapCurrentYear} />
       )}
