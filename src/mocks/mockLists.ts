@@ -116,7 +116,7 @@ export const mockConstructionProcurementMethods: { data: Array<IListItem> } = {
     },
     {
       id: 'c3d4e5f6-g7h8-9012-cdef-123456789012',
-      value: 'Kilpailutettu',
+      value: 'Kilpailutus',
     },
     {
       id: 'd4e5f6g7-h8i9-0123-defg-234567890123',
