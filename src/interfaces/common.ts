@@ -64,7 +64,6 @@ export type ListType =
   | 'responsiblePersons'
   | 'constructionPhaseDetails'
   | 'constructionProcurementMethods'
-  | 'riskAssessments'
   | 'projectQualityLevels'
   | 'planningPhases'
   | 'constructionPhases'
@@ -73,7 +72,8 @@ export type ListType =
   | 'projectSubDistricts'
   | 'projectSubSubDistricts'
   | 'budgetOverrunReasons'
-  | 'programmers';
+  | 'programmers'
+  | 'priorities';
 
 type NotificationType = 'notification' | 'toast';
 export type NotificationColorType = 'error' | 'info' | 'success';

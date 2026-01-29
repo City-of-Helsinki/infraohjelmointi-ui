@@ -188,6 +188,7 @@ const useProjectFormValues = () => {
       budgetOverrunReason: listItemToOption(project?.budgetOverrunReason),
       otherBudgetOverrunReason: value(project?.otherBudgetOverrunReason),
       onSchedule: project?.onSchedule,
+      priority: listItemToOption(project?.priority),
     }),
     [project, getProjectClassFields, getProjectLocationFields],
   );

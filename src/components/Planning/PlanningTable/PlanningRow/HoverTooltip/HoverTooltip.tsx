@@ -6,27 +6,35 @@ interface IHoverTooltipProps {
   id?: string;
 }
 
+interface ITooltipState {
+  tooltip: string;
+  rect?: DOMRect | DOMRectReadOnly | null;
+}
+
 const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
-  const [state, setState] = useState({ tooltip: text || '', sourceEvent: undefined });
-  const { tooltip } = state;
+  const [state, setState] = useState<ITooltipState>({ tooltip: text || '', rect: null });
+  const { tooltip, rect } = state;
   const elementRef = useRef<HTMLElement>(null);
 
   const showTooltip = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
-      if (tooltip !== event.detail.text) {
-        setState({ tooltip: event.detail.text, sourceEvent: event.detail.event });
+      const { text: tooltipText, rect } = event.detail ?? {};
+      if (!tooltipText) {
+        return;
       }
+      setState({ tooltip: tooltipText, rect });
     },
-    [elementRef.current],
+    [],
   );
 
   const hideTooltip = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
-      setState({ tooltip: event.detail?.text, sourceEvent: event });
+      const tooltipText = event.detail?.text ?? '';
+      setState({ tooltip: tooltipText, rect: null });
     },
-    [elementRef.current],
+    [],
   );
 
   useEffect(() => {
@@ -44,12 +52,11 @@ const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
       current.removeEventListener('hideTooltip', hideTooltip);
       document.removeEventListener('scroll', hideTooltip);
     };
-  }, [elementRef]);
+  }, [elementRef, hideTooltip, showTooltip]);
 
   useEffect(() => {
     const { current } = elementRef;
     const targetElement = current as HTMLElement;
-    const { tooltip, sourceEvent: e } = state;
     if (!current) {
       return;
     }
@@ -60,23 +67,20 @@ const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
       return;
     }
 
-    if (!e) {
+    if (!rect) {
       // support inline tooltip
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const event = e as any;
-    const { offsetX, offsetY } = event.nativeEvent;
-    const { clientX: left, clientY: top } = event;
-    const x = left - offsetX;
-    const y = top - offsetY;
-    targetElement.style.left = x + 'px';
-    targetElement.style.top = y - 68 + 'px';
+    const { left, top, width } = rect;
+    const horizontalCenter = left + width / 2;
+    targetElement.style.left = horizontalCenter + 'px';
+    targetElement.style.top = top - 70 + 'px';
+    targetElement.style.transform = 'translateX(-50%)';
     targetElement.style.position = 'fixed';
     targetElement.style.display = 'block';
     targetElement.style.height = '60px';
     (targetElement.children[0] as HTMLElement).style.display = 'block';
-  }, [state]);
+  }, [rect, tooltip]);
 
   return (
     <section

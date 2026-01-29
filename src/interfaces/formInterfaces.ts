@@ -90,6 +90,7 @@ export interface IProjectForm {
   address?: string;
   postalCode?: string;
   city?: string;
+  priority?: IOption | null;
 }
 
 export interface ISearchForm {

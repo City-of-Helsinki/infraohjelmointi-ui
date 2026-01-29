@@ -32,6 +32,7 @@ interface IPlanningState {
   rows: Array<IPlanningRow>;
   mode: PlanningMode;
   forcedToFrame: boolean;
+  hoverTooltipsEnabled: boolean;
   isLoading: boolean;
   notesDialogOpen: boolean;
   notesDialogData: IPlanningNotesDialogData;
@@ -104,6 +105,7 @@ const initialState: IPlanningState = {
   projectsRequestId: { planning: null, coordination: null },
   rows: [],
   forcedToFrame: false,
+  hoverTooltipsEnabled: true,
   isLoading: false,
   notesDialogOpen: false,
   notesDialogData: { name: '', id: '', selectedYear: null },
@@ -200,6 +202,9 @@ export const planningSlice = createSlice({
     setForcedToFrame(state, action: PayloadAction<boolean>) {
       return { ...state, forcedToFrame: action.payload };
     },
+    setHoverTooltipsEnabled(state, action: PayloadAction<boolean>) {
+      return { ...state, hoverTooltipsEnabled: action.payload };
+    },
     setIsPlanningLoading(state, action: PayloadAction<boolean>) {
       return { ...state, isLoading: action.payload };
     },
@@ -254,6 +259,7 @@ export const selectProjects = (state: RootState) => state.planning.projects;
 export const selectGroupsExpanded = (state: RootState) => state.planning.groupsExpanded;
 export const selectPlanningMode = (state: RootState) => state.planning.mode;
 export const selectForcedToFrame = (state: RootState) => state.planning.forcedToFrame;
+export const selectHoverTooltipsEnabled = (state: RootState) => state.planning.hoverTooltipsEnabled;
 export const selectIsPlanningLoading = (state: RootState) => state.planning.isLoading;
 export const selectNotesDialogOpen = (state: RootState) => state.planning.notesDialogOpen;
 export const selectNotesDialogData = (state: RootState) => state.planning.notesDialogData;
@@ -278,6 +284,7 @@ export const {
   setProjectsRequestId,
   resetSelections,
   setForcedToFrame,
+  setHoverTooltipsEnabled,
   setIsPlanningLoading,
   setNotesDialogOpen,
   setNotesDialogData,

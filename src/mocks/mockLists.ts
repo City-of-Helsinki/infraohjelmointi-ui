@@ -166,12 +166,11 @@ export const mockProjectCategories: { data: Array<IListItem> } = {
   ],
 };
 
-export const mockProjectRisks: { data: Array<IListItem> } = {
+export const mockPriorities: { data: Array<IListItem> } = {
   data: [
-    {
-      id: 'ec49d5ad-95db-460d-bc8b-0823e234a739',
-      value: 'placeholderRisk',
-    },
+    { id: 'priority-high', value: 'high' },
+    { id: 'priority-medium', value: 'medium' },
+    { id: 'priority-low', value: 'low' },
   ],
 };
 

@@ -9,7 +9,11 @@ import { GroupDialog } from '../../GroupDialog';
 import './styles.css';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
-import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlice';
+import {
+  selectForcedToFrame,
+  selectHoverTooltipsEnabled,
+  selectPlanningMode,
+} from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 
 interface IPlanningHeadProps extends IPlanningRow {
@@ -32,6 +36,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const navigate = useNavigate();
   const mode = useAppSelector(selectPlanningMode);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
   const { search } = useLocation();
 
   const [groupDialogState, setGroupDialogState] = useState({
@@ -95,11 +100,17 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     [handleExpand, mode, navigate, search, urlSearchParam],
   );
 
-  const showTooltip = useCallback((event: React.SyntheticEvent<HTMLSpanElement>) => {
-    const targetElement = event.target as HTMLElement;
-    const text = targetElement.textContent || targetElement.innerText;
-    dispatchTooltipEvent(event, 'show', { text });
-  }, []);
+  const showTooltip = useCallback(
+    (event: React.SyntheticEvent<HTMLSpanElement>) => {
+      if (!hoverTooltipsEnabled) {
+        return;
+      }
+      const targetElement = event.target as HTMLElement;
+      const text = targetElement.textContent || targetElement.innerText;
+      dispatchTooltipEvent(event, 'show', { text });
+    },
+    [hoverTooltipsEnabled],
+  );
 
   const hideTooltip = useCallback((event: React.SyntheticEvent<HTMLSpanElement>) => {
     dispatchTooltipEvent(event, 'hide', { text: '' });

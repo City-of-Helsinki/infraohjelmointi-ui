@@ -134,7 +134,10 @@
     "Kesken": "Kesken",
     "Valmis": "Valmis",
     "newConstruction": "Uudisrakentaminen",
-    "basicImprovement": "Perusparantaminen"
+    "basicImprovement": "Perusparantaminen",
+    "high": "Prioriteetti 1",
+    "medium": "Prioriteetti 2",
+    "low": "Prioriteetti 3"
   },
   "validation": {
     "required": "Täytä {{field}}",
@@ -329,7 +332,9 @@
     "onSchedule": "Onko hanke aikataulussa",
     "address": "Katuosoite",
     "postalCode": "Postinumero",
-    "city": "Kaupunki"
+    "city": "Kaupunki",
+    "priority": "Prioriteetti",
+    "priorityTooltip": "<p><strong>Prioriteetti 1:</strong> Hanke on kiireellisesti edistettävä. Hankkeen kiireellisyys voi johtua esim. sidoksista toisiin hankkeisiin tai tapahtumiin, terveellisyyden ja turvallisuuden varmistamisesta tai poliittisesta tahtotilasta.</p><p><strong>Prioriteetti 2:</strong> Hanke on tavanomaisesti edistettävä. Hanketta pyritään edistämään esitetyssä aikataulussa resurssit huomioiden.</p><p><strong>Prioriteetti 3:</strong> Hankkeen edistäminen voi odottaa. Hankkeen edistäminen voi esim. odottaa vielä tarvittavien lupaprosessien tai liittyvien hankkeiden etenemistä tai liittyvien valitusten käsittelyä.</p>"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -769,6 +774,15 @@
       "K53": "5.3 Vetovoimaan liittyvät erillishankkeet",
       "K54": "5.4 Toimitilahankkeet",
       "K55": "5.5 Muut"
+    }
+  },
+  "tooltips": {
+    "hideTooltips": "Piilota infoikkunat",
+    "showTooltips": "Näytä infoikkunat",
+    "priority": {
+      "high": "Hanke on kiireellisesti edistettävä",
+      "medium": "Hanke on tavanomaisesti edistettävä",
+      "low": "Hankkeen edistäminen voi odottaa"
     }
   }
 }

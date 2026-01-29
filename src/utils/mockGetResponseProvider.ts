@@ -11,7 +11,7 @@ import {
   mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
-  mockProjectRisks,
+  mockPriorities,
   mockProjectTypeQualifiers,
   mockProjectTypes,
   mockResponsibleZones,
@@ -92,8 +92,6 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockConstructionProcurementMethods);
       case url === '/project-categories/':
         return Promise.resolve(mockProjectCategories);
-      case url === '/project-risks/':
-        return Promise.resolve(mockProjectRisks);
       case url === '/project-quality-levels/':
         return Promise.resolve(mockProjectQualityLevels);
       case url === '/planning-phases/':
@@ -102,6 +100,8 @@ export const mockGetResponseProvider = () =>
         return Promise.resolve(mockConstructionPhases);
       case url === '/responsible-zones/':
         return Promise.resolve(mockResponsibleZones);
+      case url === '/project-priority/':
+        return Promise.resolve(mockPriorities);
       case url === '/persons/':
         return Promise.resolve(mockPersons);
       case url === `/project-classes/?year=${year}`:

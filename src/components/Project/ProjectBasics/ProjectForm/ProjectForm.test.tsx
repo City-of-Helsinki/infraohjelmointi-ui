@@ -13,7 +13,6 @@ import {
   mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
-  mockProjectRisks,
   mockProjectTypes,
   mockResponsiblePersons,
   mockResponsibleZones,
@@ -82,7 +81,6 @@ const render = async () =>
             constructionPhaseDetails: mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockConstructionProcurementMethods.data,
             categories: mockProjectCategories.data,
-            riskAssessments: mockProjectRisks.data,
             projectQualityLevels: mockProjectQualityLevels.data,
             planningPhases: mockPlanningPhases.data,
             constructionPhases: mockConstructionPhases.data,
@@ -96,6 +94,7 @@ const render = async () =>
             budgetOverrunReasons: mockBudgetOverrunReasons.data,
             programmers: mockProgrammers.data,
             projectClasses: [],
+            priorities: [],
             talpaProjectRanges: [],
             talpaProjectTypes: [],
             talpaServiceClasses: [],
@@ -169,7 +168,7 @@ describe('projectForm', () => {
     expectOption(project?.constructionPhase?.value);
     expectOption(project?.constructionPhaseDetail?.value);
     expectOption(project?.category?.value);
-    expectOption(project?.riskAssessment?.value);
+    expectOption(project?.priority?.value);
     expectPersonOption(project?.personPlanning as IPerson);
     expectPersonOption(project?.personConstruction as IPerson);
     expectPersonOption(project?.personProgramming as IPerson);

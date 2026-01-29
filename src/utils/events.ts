@@ -36,11 +36,23 @@ export const dispatchTooltipEvent = (
   data: ITooltipEventData,
 ) => {
   e.preventDefault();
+  const currentTarget = e.currentTarget as HTMLElement | null;
+  const rect = currentTarget?.getBoundingClientRect() ?? null;
   document.getElementById('tooltip-view')?.dispatchEvent(
     new CustomEvent(type === 'show' ? 'showTooltip' : 'hideTooltip', {
       detail: {
-        event: e,
+        rect,
         ...data,
+      },
+    }),
+  );
+};
+
+export const hideTooltipImmediately = () => {
+  document.getElementById('tooltip-view')?.dispatchEvent(
+    new CustomEvent('hideTooltip', {
+      detail: {
+        text: '',
       },
     }),
   );

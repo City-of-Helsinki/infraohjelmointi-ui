@@ -10,7 +10,6 @@ import {
   getConstructionPhaseDetails,
   getConstructionProcurementMethods,
   getProjectCategories,
-  getProjectRisks,
   getResponsibleZones,
   getPersons,
   getDistricts,
@@ -21,6 +20,7 @@ import {
   getTalpaProjectTypes,
   getTalpaServiceClasses,
   getProjectTypeQualifiers,
+  getPriorities,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -40,7 +40,6 @@ export interface IListState {
   constructionPhaseDetails: Array<IListItem>;
   constructionProcurementMethods: Array<IListItem>;
   categories: Array<IListItem>;
-  riskAssessments: Array<IListItem>;
   projectQualityLevels: Array<IListItem>;
   planningPhases: Array<IListItem>;
   constructionPhases: Array<IListItem>;
@@ -54,6 +53,7 @@ export interface IListState {
   budgetOverrunReasons: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
+  priorities: Array<IListItem>;
   talpaProjectRanges: Array<ITalpaProjectRange>;
   talpaProjectTypes: Array<ITalpaProjectType>;
   talpaServiceClasses: Array<ITalpaServiceClass>;
@@ -68,7 +68,6 @@ const initialState: IListState = {
   constructionPhaseDetails: [],
   constructionProcurementMethods: [],
   categories: [],
-  riskAssessments: [],
   projectQualityLevels: [],
   planningPhases: [],
   constructionPhases: [],
@@ -82,6 +81,7 @@ const initialState: IListState = {
   programmedYears: setProgrammedYears(),
   projectClasses: [],
   programmers: [],
+  priorities: [],
   talpaProjectRanges: [],
   talpaProjectTypes: [],
   talpaServiceClasses: [],
@@ -124,7 +124,6 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       constructionPhaseDetails: await getConstructionPhaseDetails(),
       constructionProcurementMethods: await getConstructionProcurementMethods(),
       categories: await getProjectCategories(),
-      riskAssessments: await getProjectRisks(),
       projectQualityLevels: await getProjectQualityLevels(),
       planningPhases: await getPlanningPhases(),
       constructionPhases: await getConstructionPhases(),
@@ -142,6 +141,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await getBudgetOverrunReasons(),
       programmers: await getProgrammers(),
+      priorities: await getPriorities(),
       talpaProjectRanges: [],
       talpaProjectTypes: [],
       talpaServiceClasses: [],
