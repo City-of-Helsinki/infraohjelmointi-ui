@@ -10,6 +10,7 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
     i18n: {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       changeLanguage: () => new Promise(() => {}),
     },
   }),
@@ -84,6 +85,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
       notesModalOpen: { isOpen: false, id: '' },
       notesModalData: { name: '', id: '' },
       coordinatorNotes: [],
+      hoverTooltipsEnabled: true,
       ...initialState,
     },
   });
