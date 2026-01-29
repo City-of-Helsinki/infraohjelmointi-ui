@@ -107,7 +107,6 @@ describe('talpa form', () => {
         serviceClassId: 'service-1',
         assetClassId: 'asset-1',
         profileName: 'Profile A',
-        holdingTime: '12',
         investmentProfile: 'Infra',
         readiness: TalpaReadiness.Kesken,
         project: 'project-1',
@@ -157,7 +156,6 @@ describe('talpa form', () => {
         serviceClassId: '',
         assetClassId: '',
         profileName: '',
-        holdingTime: '',
         investmentProfile: '',
         readiness: TalpaReadiness.Valmis,
         project: 'project-2',
@@ -206,7 +204,7 @@ describe('talpa form', () => {
         'true',
       );
       expect(screen.getByRole('textbox', { name: /profileName/i })).toBeDisabled();
-      expect(screen.getByRole('spinbutton', { name: /holdingTime/i })).toBeDisabled();
+      expect(screen.getByRole('textbox', { name: /holdingTime/i })).toBeDisabled();
       expect(screen.getByRole('textbox', { name: /investmentProfile/i })).toBeDisabled();
       expect(screen.getByRole('combobox', { name: /readiness/i })).toHaveAttribute(
         'aria-disabled',
