@@ -108,6 +108,7 @@ export interface ITalpaProjectOpeningRequest
     | 'projectType'
     | 'serviceClass'
     | 'assetClass'
+    | 'holdingTime'
   > {
   projectNumberRangeId: string;
   projectTypeId: string;

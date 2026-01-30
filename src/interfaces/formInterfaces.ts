@@ -152,7 +152,7 @@ export interface IProjectTalpaForm {
   serviceClass: IOption | null; // Palveluluokka
   assetClass: IOption | null; // Käyttöomaisuusluokka
   profileName: string; // Profiilin nimi
-  holdingTime: number | null; // Pitoaika
+  holdingTime: number | string | null; // Pitoaika
   investmentProfile: string; // Investointiluokka
   readiness: IOption | null; // Valmius
   isLocked?: boolean;

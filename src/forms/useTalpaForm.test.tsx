@@ -107,7 +107,7 @@ describe('useTalpaForm', () => {
       serviceClass: null,
       assetClass: null,
       profileName: TalpaProfileName.FixedStructures,
-      holdingTime: null,
+      holdingTime: '',
       investmentProfile: 'Z12550',
       readiness: {
         label: TalpaReadiness.Kesken,
@@ -255,6 +255,6 @@ describe('useTalpaForm', () => {
       value: '09868124-3ea1-495e-8486-970fcac28877',
     });
     expect(values.projectStart).toBe('15.03.2025');
-    expect(values.holdingTime).toBeNull();
+    expect(values.holdingTime).toBe('Ei pitoaikaa');
   });
 });
