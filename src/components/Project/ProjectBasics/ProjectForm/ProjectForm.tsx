@@ -263,10 +263,6 @@ const ProjectForm = () => {
           if (data?.projectClass && project.projectLocation) {
             data = { ...data, projectLocation: null };
           }
-          // The projectDistrict should also be deleted in order to not show it on the project form when class is changed
-          if (data?.projectClass && project.projectDistrict) {
-            data = { ...data, projectDistrict: null };
-          }
 
           try {
             const response = await patchProject({ id: project?.id, data });
