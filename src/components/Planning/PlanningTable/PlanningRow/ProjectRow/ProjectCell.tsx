@@ -51,14 +51,18 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject, sapCurrentYear }) => {
+const ProjectCell: FC<IProjectCellProps> = ({
+  cell,
+  projectFinances,
+  sapProject,
+  sapCurrentYear,
+}) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
   const selectedYear = useAppSelector(selectSelectedYear);
+  const currentYear = new Date().getFullYear();
   const forcedToFrame = useAppSelector(selectForcedToFrame);
-
-  const UPDATE_CELL_DATA = 'update-cell-data';
 
   const user = useAppSelector(selectUser);
   const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
@@ -188,8 +192,8 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
 
   // Convert any cell type to 'planning' / 'construction' / 'overlap' / 'none'
   const cellTypeClass = useMemo(() => {
-    if (type === "constructionAndWarrantyOverlap") {
-      return "constructionAndWarrantyOverlap";
+    if (type === 'constructionAndWarrantyOverlap') {
+      return 'constructionAndWarrantyOverlap';
     } else if (type.includes('planning')) {
       return 'planning';
     } else if (type.includes('construction')) {
@@ -208,8 +212,8 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
   );
 
   const currentYearClass = useMemo(
-    () => (year === startYear ? 'current-year' : ''),
-    [year, startYear],
+    () => (year === currentYear ? 'current-year' : ''),
+    [year, currentYear],
   );
 
   // Open the custom context menu when right-clicking a cell
@@ -277,7 +281,12 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject,
           ))}
       </td>
       {selectedYearClass && (
-        <ProjectYearSummary cellType={cellTypeClass} {...cell} sapProject={sapProject} sapCurrentYear={sapCurrentYear} />
+        <ProjectYearSummary
+          cellType={cellTypeClass}
+          {...cell}
+          sapProject={sapProject}
+          sapCurrentYear={sapCurrentYear}
+        />
       )}
     </>
   );
