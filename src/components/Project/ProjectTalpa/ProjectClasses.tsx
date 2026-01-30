@@ -1,4 +1,4 @@
-import { FormSectionTitle, NumberField, SelectField, TextField } from '@/components/shared';
+import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
 import { getFieldProps } from './ProjectTalpaForm';
 import styles from './styles.module.css';
 import { useTranslation } from 'react-i18next';
