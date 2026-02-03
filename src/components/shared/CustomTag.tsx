@@ -10,6 +10,7 @@ interface ICustomTagProps {
   id?: string;
   textColor?: string;
   showLoading?: boolean;
+  circular?: boolean;
 }
 
 /**
@@ -25,10 +26,15 @@ const CustomTag: FC<ICustomTagProps> = ({
   id,
   textColor,
   showLoading,
+  circular,
 }) => {
+  const containerClassName = circular
+    ? 'custom-tag-container custom-tag-container--circular'
+    : 'custom-tag-container';
+
   return (
     <div
-      className="custom-tag-container"
+      className={containerClassName}
       data-testid={id ?? ''}
       style={{
         background: color ?? 'var(--color-silver)',

@@ -45,7 +45,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const phases = useOptions('phases');
   const phasesWithIndexes = useAppSelector(selectProjectPhases);
   const categories = useOptions('categories');
-  const riskAssessments = useOptions('riskAssessments');
+  const priorities = useOptions('priorities').toReversed(); // Higher priority first
   const constructionPhaseDetails = useOptions('constructionPhaseDetails');
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
   const currentPhase = getValues('phase').value;
@@ -483,11 +483,19 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       <div className="form-row">
         <div className="form-col-xl">
           <SelectField
-            {...getFieldProps('riskAssessment')}
-            options={riskAssessments}
+            {...getFieldProps('priority')}
+            options={priorities}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
             clearable
+            tooltip={
+              <Tooltip>
+                <Trans
+                  i18nKey="projectForm.priorityTooltip"
+                  components={{ p: <p />, strong: <strong /> }}
+                />
+              </Tooltip>
+            }
           />
         </div>
       </div>
