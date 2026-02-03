@@ -50,11 +50,6 @@ export function mapTalpaFormToRequest(
   requestType: 'create' | 'update',
   projectId: string | undefined,
 ): ITalpaProjectOpeningRequest {
-  const holdingTimeValue =
-    formData.holdingTime === null || formData.holdingTime === undefined
-      ? ''
-      : String(formData.holdingTime);
-
   const templateProject =
     formData.budgetItemNumber === BudgetItemNumber.InfraInvestment
       ? (formData.templateProject as string)
@@ -79,7 +74,6 @@ export function mapTalpaFormToRequest(
     serviceClassId: formData.serviceClass?.value ?? '',
     assetClassId: formData.assetClass?.value ?? '',
     profileName: formData.profileName ?? '',
-    holdingTime: holdingTimeValue,
     investmentProfile: formData.investmentProfile ?? '',
     readiness: formData.readiness?.value as TalpaReadiness,
     project: projectId ?? '',

@@ -140,7 +140,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       serviceClass: null,
       assetClass: null,
       profileName: TalpaProfileName.FixedStructures,
-      holdingTime: null,
+      holdingTime: '',
       readiness: buildReadinessOption(TalpaReadiness.Kesken),
     };
   }
@@ -175,7 +175,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       : null,
     assetClass: talpaProject.assetClass ? buildAssetClassOption(talpaProject.assetClass) : null,
     profileName: talpaProject.profileName,
-    holdingTime: formattedHoldingTime,
+    holdingTime: formattedHoldingTime ?? 'Ei pitoaikaa',
     investmentProfile: talpaProject.investmentProfile,
     readiness: buildReadinessOption(talpaProject.readiness),
     isLocked: talpaProject.isLocked,
