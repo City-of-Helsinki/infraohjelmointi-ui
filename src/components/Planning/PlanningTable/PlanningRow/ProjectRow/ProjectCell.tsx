@@ -22,7 +22,7 @@ import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
-  selectSelectedYear,
+  selectSelectedYears,
   selectSelections,
   updateProject,
 } from '@/reducers/planningSlice';
@@ -60,7 +60,7 @@ const ProjectCell: FC<IProjectCellProps> = ({
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
-  const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedYears = useAppSelector(selectSelectedYears);
   const currentYear = new Date().getFullYear();
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
@@ -205,10 +205,9 @@ const ProjectCell: FC<IProjectCellProps> = ({
     }
   }, [type]);
 
-  //
   const selectedYearClass = useMemo(
-    () => (year === selectedYear ? 'selected-year' : ''),
-    [selectedYear, year],
+    () => (selectedYears.includes(year) ? 'selected-year' : ''),
+    [selectedYears, year],
   );
 
   const currentYearClass = useMemo(
@@ -240,10 +239,13 @@ const ProjectCell: FC<IProjectCellProps> = ({
     setProjectCellState((current) => ({ ...current, formValue: parseInt(budget ?? '0') }));
   }, [budget]);
 
-  // Sets isSelectedYear to true if the current cell is the selectedYear
+  // Sets isSelectedYear to true if the current cell is one of the selected years
   useEffect(() => {
-    setProjectCellState((current) => ({ ...current, isSelectedYear: selectedYear === year }));
-  }, [selectedYear, year]);
+    setProjectCellState((current) => ({
+      ...current,
+      isSelectedYear: selectedYears.includes(year),
+    }));
+  }, [selectedYears, year]);
 
   return (
     <>

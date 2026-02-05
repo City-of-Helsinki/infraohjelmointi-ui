@@ -417,21 +417,33 @@ const getCellGrowDirections = (
   return growDirections;
 };
 
-const getIsStartOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
+const getIsStartOfTimeline = (
+  cellYear: number,
+  timelineDates: ITimelineDates,
+  prevCell: IProjectCell | null,
+) => {
   const { planningStart, constructionStart, estWarrantyPhaseStart } = timelineDates;
+
   return (
-    isSameYear(estWarrantyPhaseStart, cellYear) ||
-    isSameYear(constructionStart, cellYear) ||
-    isSameYear(planningStart, cellYear)
+    (isSameYear(estWarrantyPhaseStart, cellYear) ||
+      isSameYear(constructionStart, cellYear) ||
+      isSameYear(planningStart, cellYear)) &&
+    prevCell?.type === 'none'
   );
 };
 
-const getIsEndOfTimeline = (cellYear: number, timelineDates: ITimelineDates) => {
+const getIsEndOfTimeline = (
+  cellYear: number,
+  timelineDates: ITimelineDates,
+  nextCell: IProjectCell | null,
+) => {
   const { planningEnd, constructionEnd, estWarrantyPhaseEnd } = timelineDates;
+
   return (
-    isSameYear(estWarrantyPhaseEnd, cellYear) ||
-    isSameYear(constructionEnd, cellYear) ||
-    isSameYear(planningEnd, cellYear)
+    (isSameYear(estWarrantyPhaseEnd, cellYear) ||
+      isSameYear(constructionEnd, cellYear) ||
+      isSameYear(planningEnd, cellYear)) &&
+    nextCell?.type === 'none'
   );
 };
 
@@ -524,19 +536,9 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
 
     const type = getCellType(cellYear, financeValue, timelineDates);
 
-    const isStartOfTimeline = getIsStartOfTimeline(cellYear, timelineDates);
-    const isEndOfTimeline = getIsEndOfTimeline(cellYear, timelineDates);
     const isLastOfType = getIsLastOfType(cellYear, timelineDates);
 
     const monthlyDataList = getMonthlyDataList(cellYear, timelineDates);
-
-    const affectsDates = getAffectsDates(
-      type,
-      timelineDates,
-      isStartOfTimeline,
-      isEndOfTimeline,
-      isLastOfType,
-    );
 
     return {
       year: cellYear,
@@ -546,8 +548,8 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
       isLastOfType,
       financeKey: key as keyof IProjectFinances,
       budget: value,
-      isStartOfTimeline,
-      isEndOfTimeline,
+      isStartOfTimeline: false,
+      isEndOfTimeline: false,
       prev: null,
       next: null,
       cellToUpdate: null,
@@ -555,7 +557,7 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
       id: id,
       growDirections: [],
       financesToReset: null,
-      affectsDates,
+      affectsDates: false,
       monthlyDataList,
       projectEstDates: {
         ...datesToUse,
@@ -563,29 +565,46 @@ const getProjectCells = (project: IProject, forcedToFrame: boolean, sapCosts: IP
     };
   });
 
-  // Add financesToReset, next, prev and cellToUpdate
+  // Add financesToReset, next, prev, cellToUpdate,
+  // isStartOfTimeline, isEndOfTimeline, growDirections, affectsDates
   const projectCells = cells.map((cell, index) => {
     const prev = index === 0 ? null : cells[index - 1];
     const next = index === cells.length - 1 ? null : cells[index + 1];
-    const cellToUpdate = cell.type !== 'none' ? getCellToUpdate(cell, index, cells) : null;
+    const isStartOfTimeline = getIsStartOfTimeline(cell.year, timelineDates, prev);
+    const isEndOfTimeline = getIsEndOfTimeline(cell.year, timelineDates, next);
+
+    const affectsDates = getAffectsDates(
+      cell.type,
+      timelineDates,
+      isStartOfTimeline,
+      isEndOfTimeline,
+      cell.isLastOfType,
+    );
+
+    const projectCell = {
+      ...cell,
+      prev,
+      next,
+      growDirections: getCellGrowDirections(cell, prev, next),
+      isStartOfTimeline,
+      isEndOfTimeline,
+      affectsDates,
+    };
+
+    const cellToUpdate =
+      projectCell.type !== 'none' ? getCellToUpdate(projectCell, index, cells) : null;
 
     const updateIndex =
       cellToUpdate && cells.findIndex((c) => c.financeKey === cellToUpdate?.financeKey);
 
     const financesToReset =
-      cell.affectsDates && updateIndex
-        ? getFinancesToReset(cell, index, updateIndex, cells, year)
+      projectCell.affectsDates && updateIndex
+        ? getFinancesToReset(projectCell, index, updateIndex, cells, year)
         : null;
 
-    return {
-      ...cell,
-      financesToReset,
-      prev,
-      next,
-      cellToUpdate,
-      growDirections: getCellGrowDirections(cell, prev, next),
-    };
+    return { ...projectCell, cellToUpdate, financesToReset };
   });
+
   /**
    * Transforms the provided list to a linkedList
    * @param list list of IProjectCell

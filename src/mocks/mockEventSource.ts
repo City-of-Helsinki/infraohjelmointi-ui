@@ -5,7 +5,11 @@ type EventMessage = {
 };
 
 let singleton: EventSourceMock;
-let listeners: { [key: string]: any };
+type ListenerMap = {
+  [eventName: string]: Array<(message: EventMessage) => void>;
+};
+
+let listeners: ListenerMap;
 
 export default class EventSourceMock {
   constructor() {
@@ -16,19 +20,28 @@ export default class EventSourceMock {
     return singleton;
   }
 
-  addEventListener(name: string, callback: any) {
-    listeners[name] = callback;
+  addEventListener(name: string, callback: (message: EventMessage) => void) {
+    if (!listeners[name]) {
+      listeners[name] = [];
+    }
+    listeners[name].push(callback);
   }
 
-  removeEventListener(name: string, callback: any) {
-    delete listeners[name];
+  removeEventListener(name: string, callback: (message: EventMessage) => void) {
+    if (!listeners[name]) {
+      return;
+    }
+    listeners[name] = listeners[name].filter((listener) => listener !== callback);
+    if (!listeners[name].length) {
+      delete listeners[name];
+    }
   }
 
   close() {}
 
   emitMessage(message: EventMessage) {
-    const callback = listeners[message.type];
-    callback(message);
+    const callbacks = listeners[message.type] ?? [];
+    callbacks.forEach((callback) => callback(message));
   }
 
   onerror() {}

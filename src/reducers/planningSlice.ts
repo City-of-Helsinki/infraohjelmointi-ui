@@ -20,9 +20,10 @@ import { notifyError } from './notificationSlice';
 interface ICoordinatorNotesModalOpen {
   isOpen: boolean;
   id: string;
+  selectedYear: number | null;
 }
 interface IPlanningState {
-  selectedYear: number | null;
+  selectedYears: number[];
   startYear: number;
   groupsExpanded: boolean;
   searchedProjectId: string | null;
@@ -86,7 +87,7 @@ export const updateProject = createAsyncThunk(
 );
 
 const initialState: IPlanningState = {
-  selectedYear: null,
+  selectedYears: [],
   startYear: new Date().getFullYear(),
   groupsExpanded: false,
   searchedProjectId: null,
@@ -107,7 +108,7 @@ const initialState: IPlanningState = {
   isLoading: false,
   notesDialogOpen: false,
   notesDialogData: { name: '', id: '', selectedYear: null },
-  notesModalOpen: { isOpen: false, id: '' },
+  notesModalOpen: { isOpen: false, id: '', selectedYear: null },
   notesModalData: { name: '', id: '' },
   coordinatorNotes: [],
 };
@@ -116,8 +117,15 @@ export const planningSlice = createSlice({
   name: 'planning',
   initialState,
   reducers: {
-    setSelectedYear(state, action: PayloadAction<number | null>) {
-      return { ...state, selectedYear: action.payload };
+    toggleSelectedYear(state, action: PayloadAction<number>) {
+      const year = action.payload;
+      const isAlreadySelected = state.selectedYears.includes(year);
+      return {
+        ...state,
+        selectedYears: isAlreadySelected
+          ? state.selectedYears.filter((selectedYear) => selectedYear !== year)
+          : [...state.selectedYears, year],
+      };
     },
     setStartYear(state, action: PayloadAction<number>) {
       return { ...state, startYear: action.payload };
@@ -210,10 +218,7 @@ export const planningSlice = createSlice({
       return { ...state, notesDialogData: action.payload };
     },
     setNotesModalOpen(state, action: PayloadAction<ICoordinatorNotesModalOpen>) {
-      return {
-        ...state,
-        notesModalOpen: { id: action.payload.id, isOpen: !state.notesModalOpen.isOpen },
-      };
+      return { ...state, notesModalOpen: action.payload };
     },
     setNotesModalData(state, action: PayloadAction<IPlanningNotesModalData>) {
       return { ...state, notesModalData: action.payload };
@@ -246,7 +251,7 @@ export const planningSlice = createSlice({
   },
 });
 
-export const selectSelectedYear = (state: RootState) => state.planning.selectedYear;
+export const selectSelectedYears = (state: RootState) => state.planning.selectedYears;
 export const selectStartYear = (state: RootState) => state.planning.startYear;
 export const selectSelections = (state: RootState) => state.planning.selections;
 export const selectPlanningRows = (state: RootState) => state.planning.rows;
@@ -262,7 +267,7 @@ export const selectNotesModalData = (state: RootState) => state.planning.notesMo
 export const selectNotes = (state: RootState) => state.planning.coordinatorNotes;
 
 export const {
-  setSelectedYear,
+  toggleSelectedYear,
   setPlanningRows,
   setSelectedMasterClass,
   setSelectedClass,

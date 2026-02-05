@@ -306,8 +306,8 @@ export const classesToOptions = (classes: Array<IClass>): Array<IProjectClassOpt
     disabled: false,
   }));
 
-export const setHoveredClassToMonth = (month: string) => {
-  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${month}`);
+export const setHoveredClassToMonth = (key: string) => {
+  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${key}`);
 
   if (elementsForHoveredMonth.length > 0) {
     Array.from(elementsForHoveredMonth).forEach((element) => {
@@ -316,8 +316,8 @@ export const setHoveredClassToMonth = (month: string) => {
   }
 };
 
-export const removeHoveredClassFromMonth = (month: string) => {
-  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${month}`);
+export const removeHoveredClassFromMonth = (key: string) => {
+  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${key}`);
   if (elementsForHoveredMonth.length > 0) {
     Array.from(elementsForHoveredMonth).forEach((element) => {
       element.classList.remove('hovered');

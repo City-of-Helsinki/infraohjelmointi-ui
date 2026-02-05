@@ -1,11 +1,13 @@
 import { IProject } from '@/interfaces/projectInterfaces';
 import { mockSapCostforProjectCard } from './mockSapCosts';
 
+const currentYear = new Date().getFullYear();
+
 const mockProject: { data: IProject } = {
   data: {
     id: 'mock-project-id',
     finances: {
-      year: 2023,
+      year: currentYear,
       budgetProposalCurrentYearPlus0: '0.00',
       budgetProposalCurrentYearPlus1: '0.00',
       budgetProposalCurrentYearPlus2: '0.00',

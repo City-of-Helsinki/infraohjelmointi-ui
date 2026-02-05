@@ -10,6 +10,7 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (str: string) => str,
     i18n: {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       changeLanguage: () => new Promise(() => {}),
     },
   }),
@@ -60,7 +61,7 @@ const mockGroup: IPlanningRow = {
 const renderPlanningRow = (initialState = {}, search = '') => {
   const store = setupStore({
     planning: {
-      selectedYear: null,
+      selectedYears: [],
       startYear: 2024,
       groupsExpanded: false,
       searchedProjectId: null,
@@ -81,7 +82,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
       isLoading: false,
       notesDialogOpen: false,
       notesDialogData: { name: '', id: '', selectedYear: null },
-      notesModalOpen: { isOpen: false, id: '' },
+      notesModalOpen: { isOpen: false, id: '', selectedYear: null },
       notesModalData: { name: '', id: '' },
       coordinatorNotes: [],
       ...initialState,
