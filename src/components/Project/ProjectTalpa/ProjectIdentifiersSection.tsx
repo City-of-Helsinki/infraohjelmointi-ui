@@ -134,11 +134,7 @@ export default function ProjectIdentifiersSection() {
     <div className="mb-12">
       <FormSectionTitle label="projectTalpaForm.projectIdentifiers" name="projectIdentifiers" />
       {/* Talousarviokohdan nimi */}
-      <TextField
-        {...getFieldProps('budgetAccount')}
-        rules={{ ...validateRequired('budgetAccount', t) }}
-        size="full"
-      />
+      <TextField {...getFieldProps('budgetAccount')} size="full" />
       {/* Projektinumeroväli */}
       <SelectField
         {...getFieldProps('projectNumberRange')}
@@ -150,12 +146,7 @@ export default function ProjectIdentifiersSection() {
       />
       {/* Malliprojekti */}
       {budgetItemNumber === BudgetItemNumber.InfraInvestment ? (
-        <TextField
-          {...getFieldProps('templateProject')}
-          rules={{ ...validateRequired('templateProject', t) }}
-          size="full"
-          readOnly
-        />
+        <TextField {...getFieldProps('templateProject')} size="full" />
       ) : (
         <SelectField
           {...getFieldProps('templateProject')}
