@@ -3,8 +3,8 @@ import { IProjectSums } from '@/interfaces/planningInterfaces';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
-import { dispatchContextMenuEvent, dispatchTooltipEvent } from '@/utils/events';
-import { useCallback, MouseEvent as ReactMouseEvent, memo, FC, SyntheticEvent } from 'react';
+import { dispatchContextMenuEvent } from '@/utils/events';
+import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
 import { IconMenuDots, IconSize } from 'hds-react/icons';
 import optionIcon from '@/utils/optionIcon';
@@ -14,8 +14,8 @@ import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
-import { selectHoverTooltipsEnabled } from '@/reducers/planningSlice';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { useHoverTooltip } from '../HoverTooltip/useHoverTooltip';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -46,7 +46,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const user = useAppSelector(selectUser);
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
-  const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
+  const { showTooltip, hideTooltip } = useHoverTooltip();
   const isPhaseValid = useProjectPhaseValidation({
     getProject: () => project,
   });
@@ -95,20 +95,16 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   );
 
   const showPriorityTooltip = useCallback(
-    (event: SyntheticEvent<HTMLElement>) => {
-      if (!priorityTooltipTextKey || !hoverTooltipsEnabled) {
-        return;
-      }
-      dispatchTooltipEvent(event, 'show', {
-        text: t(`tooltips.priority.${priorityTooltipTextKey}`),
-      });
-    },
-    [priorityTooltipTextKey, hoverTooltipsEnabled, t],
+    (e: React.SyntheticEvent<HTMLElement>) =>
+      showTooltip(e, t(`tooltips.priority.${priorityTooltipTextKey?.toLowerCase()}`)),
+    [priorityTooltipTextKey, showTooltip, t],
   );
 
-  const hidePriorityTooltip = useCallback((event: SyntheticEvent<HTMLElement>) => {
-    dispatchTooltipEvent(event, 'hide', { text: '' });
-  }, []);
+  const showProjectBudgetTooltip = useCallback(
+    (e: React.SyntheticEvent<HTMLDivElement>) =>
+      showTooltip(e, <Trans i18nKey={'tooltips.totalBudgets.project'} />),
+    [showTooltip],
+  );
 
   return (
     <th className="project-head-cell" data-testid={`head-${project.id}`}>
@@ -137,7 +133,12 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         {/* Category & Budgets */}
         <div className="project-right-icons-container">
           {project.priority && priorityTagText && (
-            <div onMouseEnter={showPriorityTooltip} onMouseLeave={hidePriorityTooltip}>
+            <div
+              onMouseEnter={showPriorityTooltip}
+              onMouseLeave={hideTooltip}
+              onFocus={showPriorityTooltip}
+              onBlur={hideTooltip}
+            >
               <CustomTag
                 text={priorityTagText}
                 color={priorityBgColor}
@@ -157,7 +158,13 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
               />
             )}
           </div>
-          <div className="flex flex-col">
+          <div
+            className="flex flex-col"
+            onMouseEnter={showProjectBudgetTooltip}
+            onMouseLeave={hideTooltip}
+            onFocus={showProjectBudgetTooltip}
+            onBlur={hideTooltip}
+          >
             <span data-testid={`available-frame-budget-${project.id}`}>{availableFrameBudget}</span>
             <span
               className="text-sm font-normal"

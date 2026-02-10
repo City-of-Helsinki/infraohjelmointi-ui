@@ -2,12 +2,12 @@ import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import './styles.css';
 
 interface IHoverTooltipProps {
-  text?: string;
+  text?: string | JSX.Element;
   id?: string;
 }
 
 interface ITooltipState {
-  tooltip: string;
+  tooltip: string | JSX.Element;
   rect?: DOMRect | DOMRectReadOnly | null;
 }
 
@@ -63,7 +63,6 @@ const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
 
     if (!tooltip) {
       targetElement.style.display = 'none';
-      (targetElement.children[0] as HTMLElement).style.display = 'none';
       return;
     }
 
@@ -74,12 +73,10 @@ const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
     const { left, top, width } = rect;
     const horizontalCenter = left + width / 2;
     targetElement.style.left = horizontalCenter + 'px';
-    targetElement.style.top = top - 70 + 'px';
-    targetElement.style.transform = 'translateX(-50%)';
+    targetElement.style.top = top - 15 + 'px';
+    targetElement.style.transform = 'translate(-50%, -100%)';
     targetElement.style.position = 'fixed';
     targetElement.style.display = 'block';
-    targetElement.style.height = '60px';
-    (targetElement.children[0] as HTMLElement).style.display = 'block';
   }, [rect, tooltip]);
 
   return (

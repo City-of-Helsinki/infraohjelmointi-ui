@@ -10,6 +10,8 @@
   z-index: 999;
   font-weight: 400;
   display: none;
+  height: max-content;
+  box-shadow: 0px 1px 4px var(--color-black-30);
 }
 
 .tooltip-arrow {
@@ -26,7 +28,6 @@
 
 .tooltip-arrow-container {
   border-bottom: 8px solid var(--color-coat-of-arms);
-  display: none;
   position: absolute;
   bottom: 0;
   left: 0;
