@@ -29,6 +29,8 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
+import { useHoverTooltip } from './HoverTooltip/useHoverTooltip';
+import { Trans } from 'react-i18next';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -79,6 +81,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
     dispatch(setNotesModalOpen({ isOpen: true, id, selectedYear: year }));
     dispatch(setNotesModalData({ name, id }));
   }, [dispatch, id, name, notesModalOpen, year]);
+
+  const { showTooltip, hideTooltip } = useHoverTooltip();
 
   const onEditFrameBudget = useCallback(() => {
     setEditFrameBudget((current) => !current);
@@ -154,6 +158,14 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
     [forcedToFrame, mode, user],
   );
 
+  const totalBudgetTooltipType = type === 'group' ? 'group' : 'class';
+
+  const showTotalBudgetTooltip = useCallback(
+    (e: React.SyntheticEvent<HTMLDivElement>) =>
+      showTooltip(e, <Trans i18nKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`} />),
+    [showTooltip, totalBudgetTooltipType],
+  );
+
   return (
     <>
       <td
@@ -168,7 +180,13 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
             data-testid={`edit-framed-budget-${id}-${year}`}
             onClick={onEditFrameBudget}
           >
-            <div className={`planning-cell-container`}>
+            <div
+              className={`planning-cell-container`}
+              onMouseEnter={showTotalBudgetTooltip}
+              onMouseLeave={hideTooltip}
+              onFocus={showTotalBudgetTooltip}
+              onBlur={hideTooltip}
+            >
               <>
                 <span data-testid={`planned-budget-${id}-${year}`} className="planning-budget">
                   {plannedBudget}
