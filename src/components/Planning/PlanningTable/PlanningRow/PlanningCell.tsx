@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useMemo, useRef, useState, Fragment } from 'react';
+import { FC, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { IPlanningCell, IPlanningRow, PlanningRowType } from '@/interfaces/planningInterfaces';
 import moment from 'moment';
 import PlanningForecastSums from './PlanningForecastSums';
@@ -6,8 +6,9 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
   selectNotes,
+  selectNotesModalOpen,
   selectPlanningMode,
-  selectSelectedYear,
+  selectSelectedYears,
   selectStartYear,
   setNotesModalData,
   setNotesModalOpen,
@@ -51,7 +52,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const { pathname } = useLocation();
   const mode = useAppSelector(selectPlanningMode);
   const [editFrameBudget, setEditFrameBudget] = useState(false);
-  const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedYears = useAppSelector(selectSelectedYears);
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const groupSapCurrentYear = useAppSelector(getGroupSapCurrentYear);
@@ -62,10 +63,22 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const editFrameBudgetInputRef = useRef<HTMLInputElement>(null);
 
   const notes = useAppSelector(selectNotes);
- 
-  const matchingNotes = notes.filter((note) => (
-      note.year === selectedYear && note.coordinatorClass === id
-  ));
+  const notesModalOpen = useAppSelector(selectNotesModalOpen);
+
+  const matchingNotes = notes.filter((note) => note.year === year && note.coordinatorClass === id);
+
+  const toggleCoordinatorNotesModal = useCallback(() => {
+    const isCurrentModalOpen =
+      notesModalOpen.isOpen && notesModalOpen.id === id && notesModalOpen.selectedYear === year;
+
+    if (isCurrentModalOpen) {
+      dispatch(setNotesModalOpen({ isOpen: false, id: '', selectedYear: null }));
+      return;
+    }
+
+    dispatch(setNotesModalOpen({ isOpen: true, id, selectedYear: year }));
+    dispatch(setNotesModalData({ name, id }));
+  }, [dispatch, id, name, notesModalOpen, year]);
 
   const onEditFrameBudget = useCallback(() => {
     setEditFrameBudget((current) => !current);
@@ -84,7 +97,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
     }
 
     // If negative value, do not send request
-    if (parseInt(value) < 0){
+    if (parseInt(value) < 0) {
       return;
     }
 
@@ -112,29 +125,29 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
             frameBudget: valueToPatch,
           },
         },
-        forcedToFrame: forcedToFrame
+        forcedToFrame: forcedToFrame,
       },
     };
 
     if (type === 'district' || type === 'districtPreview' || type === 'subLevelDistrict') {
       patchCoordinationLocation(request).finally(() => {
         dispatch(clearLoading(UPDATE_CELL_DATA));
-      })
+      });
     } else {
       patchCoordinationClass(request).finally(() => {
         dispatch(clearLoading(UPDATE_CELL_DATA));
-      })
+      });
     }
   };
 
   const checkValue = () => {
     setInputValue(formattedNumberToNumber(displayFrameBudget));
-  }
+  };
 
   const budgetOverlapAlertIcon = useMemo(
     () => isFrameBudgetOverlap && <IconAlertCircle className="budget-overlap-circle" />,
     [isFrameBudgetOverlap],
-  ); 
+  );
 
   const isEditFrameBudgetDisabled = useMemo(
     () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame,
@@ -181,7 +194,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
         {editFrameBudget && (
           // height 0 prevents the table cell from growing
           <div className="frame-budget-container">
-            <input autoFocus
+            <input
+              autoFocus
               id="edit-frame-budget-input"
               className="frame-budget-input"
               type="number"
@@ -195,37 +209,47 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
         )}
       </td>
       {/* There will be data generated here (at least for the first year) in future tasks */}
-      {year === selectedYear && (
+      {selectedYears.includes(year) && (
         <>
-          {isCurrentYear && <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCurrentYear} />}
-          {moment.months().map((m) => (
-            pathname.includes('coordination') && m === 'tammikuu' ?
-            <Fragment key={id}>
+          {isCurrentYear && (
+            <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCurrentYear} />
+          )}
+          {moment.months().map((m) => {
+            const hoverKey = `${year}-${m}`;
+            if (pathname.includes('coordination') && m === 'tammikuu') {
+              return (
+                <td
+                  key={`coordination-${id}-${m}`}
+                  className={`monthly-cell ${type} hoverable-${hoverKey} ${
+                    forcedToFrame ? 'framed' : ''
+                  }`}
+                  onMouseOver={() => setHoveredClassToMonth(hoverKey)}
+                  onFocus={() => setHoveredClassToMonth(hoverKey)}
+                  onMouseLeave={() => removeHoveredClassFromMonth(hoverKey)}
+                >
+                  <button id="coordinator-note" onClick={toggleCoordinatorNotesModal}>
+                    {matchingNotes.length ? (
+                      <IconSpeechbubbleText color="white" />
+                    ) : (
+                      <IconSpeechbubble color="white" />
+                    )}
+                  </button>
+                  <CoordinatorNotesModal id={id} type={type} selectedYear={year} />
+                </td>
+              );
+            }
+            return (
               <td
-                key={id}
-                className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
-                onMouseOver={() => setHoveredClassToMonth(m)}
-                onFocus={() => setHoveredClassToMonth(m)}
-                onMouseLeave={() => removeHoveredClassFromMonth(m)}
-              >
-                <button id="coordinator-note" onClick={() => {
-                  dispatch(setNotesModalOpen({isOpen: true, id}));
-                  dispatch(setNotesModalData({name, id}))
-                }}>
-                  { matchingNotes.length ? <IconSpeechbubbleText color="white" /> : <IconSpeechbubble color="white" /> }
-                </button>
-                <CoordinatorNotesModal id={id} type={type} selectedYear={selectedYear}/>
-              </td>
-            </Fragment>
-            :
-            <td
-              key={m}
-              className={`monthly-cell ${type} hoverable-${m} ${forcedToFrame ? 'framed' : ''}`}
-              onMouseOver={() => setHoveredClassToMonth(m)}
-              onFocus={() => setHoveredClassToMonth(m)}
-              onMouseLeave={() => removeHoveredClassFromMonth(m)}
-            />
-          ))}
+                key={`${year}-${id}-${m}`}
+                className={`monthly-cell ${type} hoverable-${hoverKey} ${
+                  forcedToFrame ? 'framed' : ''
+                }`}
+                onMouseOver={() => setHoveredClassToMonth(hoverKey)}
+                onFocus={() => setHoveredClassToMonth(hoverKey)}
+                onMouseLeave={() => removeHoveredClassFromMonth(hoverKey)}
+              />
+            );
+          })}
         </>
       )}
     </>

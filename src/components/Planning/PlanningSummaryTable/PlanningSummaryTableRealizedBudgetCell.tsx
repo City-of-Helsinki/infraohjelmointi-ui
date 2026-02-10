@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { formattedNumberToNumber } from '@/utils/calculations';
 import { useAppSelector } from '@/hooks/common';
-import { selectSelectedYear } from '@/reducers/planningSlice';
+import { selectSelectedYears } from '@/reducers/planningSlice';
 import moment from 'moment';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import './styles.css';
@@ -19,7 +19,7 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
   year,
   isCurrentYear,
 }) => {
-  const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedYears = useAppSelector(selectSelectedYears);
   return (
     <>
       <td className="planning-summary-frame-and-deviation-cell">
@@ -37,7 +37,7 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
           </span>
         </div>
       </td>
-      {year === selectedYear && (
+      {selectedYears.includes(year) && (
         <>
           {isCurrentYear && (
             <td
@@ -46,17 +46,20 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
               data-testid="year-summary"
             ></td>
           )}
-          {moment.months().map((m) => (
-            <td
-              key={m}
-              className={`monthly-cell hoverable-${m}`}
-              data-testid={`graph-cell-${m}`}
-              onMouseOver={() => setHoveredClassToMonth(m)}
-              onMouseLeave={() => removeHoveredClassFromMonth(m)}
-            >
-              {/* There's going to be graph here and we can use each months cell to paint the graph */}
-            </td>
-          ))}
+          {moment.months().map((m) => {
+            const hoverKey = `${year}-${m}`;
+            return (
+              <td
+                key={hoverKey}
+                className={`monthly-cell hoverable-${hoverKey}`}
+                data-testid={`graph-cell-${year}-${m}`}
+                onMouseOver={() => setHoveredClassToMonth(hoverKey)}
+                onMouseLeave={() => removeHoveredClassFromMonth(hoverKey)}
+              >
+                {/* There's going to be graph here and we can use each months cell to paint the graph */}
+              </td>
+            );
+          })}
         </>
       )}
     </>
