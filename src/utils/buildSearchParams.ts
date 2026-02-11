@@ -43,8 +43,7 @@ const buildSearchParams = (form: ISearchForm) => {
           if (paramType === 'hashtag') {
             searchParams.push(`${paramType}=${encodedValue}`);
           } else {
-            searchParams.push(`projectName=${encodedValue}`);
-            searchParams.push(`group=${encodedValue}`);
+            searchParams.push(`projectName=${encodedValue}`, `group=${encodedValue}`);
           }
         }
         break;
