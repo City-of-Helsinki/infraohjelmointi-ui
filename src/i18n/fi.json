@@ -258,6 +258,8 @@
     "hkrId": "PW Hanketunnus",
     "sapProject": "Projektinumero",
     "hashTags": "Tunnisteet",
+    "searchForHashTags": "Hae tunnisteita",
+    "selectHashTag": "Valitse tunniste valikosta",
     "schedule": "Hankkeen aikataulu",
     "planning": "Suunnittelu",
     "estPlanningStart": "Alkaa",

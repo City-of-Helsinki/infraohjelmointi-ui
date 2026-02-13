@@ -1,7 +1,8 @@
-import { IListItem } from '@/interfaces/common';
-import { SearchInput } from 'hds-react';
+import { IListItem, IOption } from '@/interfaces/common';
+import { defaultFilter } from 'hds-react';
 import { FC, memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Select } from 'hds-react';
 
 interface IHashTagSearchProps {
   onHashTagClick: (value: string) => void;
@@ -10,35 +11,44 @@ interface IHashTagSearchProps {
 
 const HashTagSearch: FC<IHashTagSearchProps> = ({ onHashTagClick, hashTags }) => {
   const { t } = useTranslation();
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState<string[]>([]);
 
-  const handleValueChange = useCallback((value: string) => setValue(value), []);
-
-  const getSuggestions = (inputValue: string): Promise<{ value: string }[]> =>
-    new Promise((resolve) => {
-      const filteredItems = hashTags.filter(
-        (h) => h.value.toLowerCase().indexOf(inputValue.toLowerCase()) > -1,
-      );
-      resolve(filteredItems);
-    });
-
-  const handleSubmit = (value: string) => {
-    value && onHashTagClick(value);
-    setValue('');
+  const getHashTagsAsSelectOptions = (hashTags: IListItem[]): IOption[] => {
+    return hashTags.map((h) => ({ value: h.value, label: h.value }));
   };
+
+  const hashTagsAsOptions = getHashTagsAsSelectOptions(hashTags);
+
+  const handleValueChange = useCallback(
+    (selectedOptions: IOption[], clickedOption: IOption) => {
+      onHashTagClick(clickedOption.value);
+      const values = selectedOptions.map((option) => option.value);
+      setValue(values);
+    },
+    [onHashTagClick],
+  );
 
   return (
     <div className="dialog-section" data-testid="search-hash-tag-field-section">
       <p className="text-normal font-bold">{t('addHashTagsToProject')}</p>
-      <SearchInput
-        label={t('addHashTag')}
-        getSuggestions={getSuggestions}
-        clearButtonAriaLabel="Clear search field"
-        searchButtonAriaLabel="Search"
-        suggestionLabelField="value"
-        value={value}
-        onChange={handleValueChange}
-        onSubmit={handleSubmit}
+      <Select
+        noTags
+        multiSelect
+        required={true}
+        style={{ maxWidth: '100%' }}
+        options={hashTagsAsOptions}
+        filter={defaultFilter}
+        value={value || []}
+        onChange={(selectedOptions, clickedOption) =>
+          handleValueChange(selectedOptions, clickedOption)
+        }
+        texts={{
+          clearButtonAriaLabel_multiple: 'Clear all selections',
+          tagRemoveSelectionAriaLabel: `Remove ${value}`,
+          placeholder: t('projectForm.selectHashTag'),
+          label: t('addHashTag'),
+          filterPlaceholder: t('projectForm.searchForHashTags'),
+        }}
       />
     </div>
   );
