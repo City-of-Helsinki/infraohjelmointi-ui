@@ -62,7 +62,7 @@ export type ListType =
   | 'subDivisions'
   | 'responsibleZones'
   | 'responsiblePersons'
-  | 'constructionPhaseDetails'
+  | 'projectPhaseDetails'
   | 'constructionProcurementMethods'
   | 'projectQualityLevels'
   | 'planningPhases'

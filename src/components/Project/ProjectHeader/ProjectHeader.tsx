@@ -108,7 +108,20 @@ const ProjectHeader: FC = () => {
             {projectHeaderPhaseString && (
               <div className="project-header-phase">
                 <div className="project-header-icon">{icon}</div>
-                <div>{projectHeaderPhaseString}</div>
+                <div>
+                  {projectHeaderPhaseString}
+                  {project?.phase?.value === 'suspended' &&
+                    project?.suspendedDate &&
+                    project?.suspendedFromPhase && (
+                      <span className="project-header-suspended">
+                        {' — '}
+                        {t('projectCard.suspended', {
+                          phase: t(`option.${project.suspendedFromPhase.value}`),
+                          date: project.suspendedDate,
+                        })}
+                      </span>
+                    )}
+                </div>
               </div>
             )}
           </div>

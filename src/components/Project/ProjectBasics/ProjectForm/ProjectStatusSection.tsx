@@ -46,7 +46,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const phasesWithIndexes = useAppSelector(selectProjectPhases);
   const categories = useOptions('categories');
   const priorities = useOptions('priorities').toReversed(); // Higher priority first
-  const constructionPhaseDetails = useOptions('constructionPhaseDetails');
+  const projectPhaseDetails = useOptions('projectPhaseDetails');
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
   const currentPhase = getValues('phase').value;
   const { t } = useTranslation();
@@ -142,7 +142,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
               break;
             case constructionPhase:
-              fields.push(...fieldsIfEmpty([...combinedRequirements, 'constructionPhaseDetail']));
+              fields.push(...fieldsIfEmpty([...combinedRequirements, 'phaseDetail']));
               break;
             case warrantyPeriodPhase:
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
@@ -198,14 +198,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     ],
   );
 
-  const validateConstructionPhaseDetails = useMemo(
+  const validatePhaseDetail = useMemo(
     () => ({
       validate: {
-        isConstructionPhaseDetailsValid: (constructionPhaseDetail: IOption) => {
+        isPhaseDetailValid: (phaseDetail: IOption) => {
           const phase = getValues('phase');
           // Required after phase is changed to construction
-          if (phase.value === constructionPhase && constructionPhaseDetail?.value === '') {
-            return t('validation.required', { field: t('validation.constructionPhaseDetail') });
+          if (phase.value === constructionPhase && phaseDetail?.value === '') {
+            return t('validation.required', { field: t('validation.phaseDetail') });
           }
           return true;
         },
@@ -214,7 +214,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [constructionPhase, getValues, t],
   );
 
-  const isConstructionPhaseDetailsDisabled = useMemo(() => {
+  const isPhaseDetailDisabled = useMemo(() => {
     return currentPhase !== constructionPhase;
   }, [currentPhase, constructionPhase]);
 
@@ -392,10 +392,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         </div>
         <div className="form-col-xl">
           <SelectField
-            {...getFieldProps('constructionPhaseDetail')}
-            options={constructionPhaseDetails}
-            rules={validateConstructionPhaseDetails}
-            disabled={isConstructionPhaseDetailsDisabled}
+            {...getFieldProps('phaseDetail')}
+            options={projectPhaseDetails}
+            rules={validatePhaseDetail}
+            disabled={isPhaseDetailDisabled}
             readOnly={isUserOnlyViewer}
           />
         </div>

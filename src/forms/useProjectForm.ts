@@ -151,7 +151,7 @@ const useProjectFormValues = () => {
       visibilityEnd: value(project?.visibilityEnd),
       phase: listItemToOption(project?.phase),
       programmed: project?.programmed ?? false,
-      constructionPhaseDetail: listItemToOption(project?.constructionPhaseDetail),
+      phaseDetail: listItemToOption(project?.phaseDetail),
       constructionProcurementMethod: listItemToOption(project?.constructionProcurementMethod),
       louhi: project?.louhi ?? false,
       gravel: project?.gravel ?? false,

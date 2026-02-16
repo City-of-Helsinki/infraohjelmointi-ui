@@ -131,7 +131,7 @@ const defaultFormValues = {
   hashTags: [],
   phase: { value: '', label: '' },
   programmed: false,
-  constructionPhaseDetail: { value: '', label: '' },
+  phaseDetail: { value: '', label: '' },
   constructionProcurementMethod: { value: '', label: '' },
   costForecast: '',
   louhi: false,

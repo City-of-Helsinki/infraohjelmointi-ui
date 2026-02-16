@@ -133,6 +133,17 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
           >
             {project.name}
           </Link>
+          {project.phase?.value === 'suspended' &&
+            project.suspendedDate &&
+            project.suspendedFromPhase && (
+              <span className="project-head-suspended" data-testid={`suspended-${project.id}`}>
+                {' — '}
+                {t('projectCard.suspended', {
+                  phase: t(`option.${project.suspendedFromPhase.value}`),
+                  date: project.suspendedDate,
+                })}
+              </span>
+            )}
         </div>
         {/* Category & Budgets */}
         <div className="project-right-icons-container">

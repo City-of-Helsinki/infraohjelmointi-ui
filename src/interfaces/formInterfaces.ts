@@ -54,7 +54,7 @@ export interface IProjectForm {
   hashTags: Array<string>;
   phase: IOption;
   programmed: boolean;
-  constructionPhaseDetail: IOption;
+  phaseDetail: IOption;
   constructionProcurementMethod: IOption;
   costForecast: string;
   louhi: boolean;

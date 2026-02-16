@@ -18,7 +18,9 @@ export interface IProject {
   description: string;
   phase: IListItem;
   programmed: boolean;
-  constructionPhaseDetail: IListItem;
+  phaseDetail: IListItem;
+  suspendedDate?: string | null;
+  suspendedFromPhase?: IListItem | null;
   constructionProcurementMethod: IListItem;
   estPlanningStart: string | null;
   estPlanningEnd: string | null;
@@ -135,7 +137,7 @@ export interface IProjectRequest {
   presenceEnd?: string;
   visibilityStart?: string;
   visibilityEnd?: string;
-  constructionPhaseDetail?: string | null;
+  phaseDetail?: string | null;
   constructionProcurementMethod?: string | null;
   louhi?: boolean;
   programmed?: boolean;

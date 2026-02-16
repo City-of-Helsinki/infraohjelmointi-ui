@@ -15,7 +15,7 @@ const urlsToExclueFromLoading = [
   '/project-types/',
   '/project-phases/',
   '/project-areas/',
-  '/construction-phase-details/',
+  '/project-phase-details/',
   '/project-categories/',
   '/project-risks/',
   '/project-quality-levels/',

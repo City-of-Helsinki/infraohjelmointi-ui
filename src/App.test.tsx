@@ -94,7 +94,7 @@ describe('App', () => {
       expect(lists.phases).toStrictEqual(mockProjectPhases.data);
       expect(lists.types).toStrictEqual(mockProjectTypes.data);
       expect(lists.typeQualifiers).toStrictEqual(mockProjectTypeQualifiers.data);
-      expect(lists.constructionPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
+      expect(lists.projectPhaseDetails).toStrictEqual(mockConstructionPhaseDetails.data);
       expect(lists.constructionProcurementMethods).toStrictEqual(
         mockConstructionProcurementMethods.data,
       );
