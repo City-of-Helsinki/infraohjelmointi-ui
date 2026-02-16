@@ -4,7 +4,6 @@ import authReducer from '@/reducers/authSlice';
 import notificationReducer from '@/reducers/notificationSlice';
 import loaderReducer from './reducers/loaderSlice';
 import listsReducer from './reducers/listsSlice';
-import noteReducer from './reducers/noteSlice';
 import classReducer from './reducers/classSlice';
 import locationReducer from './reducers/locationSlice';
 import hashTagReducer from './reducers/hashTagsSlice';
@@ -15,6 +14,7 @@ import planningReducer from './reducers/planningSlice';
 import sapCostReducer from './reducers/sapCostSlice';
 import appStateValuesReducer from './reducers/appStateValueSlice';
 import talpaReducer from './reducers/talpaSlice';
+import { infraohjelmointiApi } from './api/infraohjelmointiApi';
 
 // Add slices (reducers) here, this is imported into the test-utils for providing the redux state into tests
 export const storeItems = {
@@ -23,7 +23,6 @@ export const storeItems = {
   notifications: notificationReducer,
   loader: loaderReducer,
   lists: listsReducer,
-  note: noteReducer,
   class: classReducer,
   location: locationReducer,
   hashTags: hashTagReducer,
@@ -34,6 +33,7 @@ export const storeItems = {
   sapCosts: sapCostReducer,
   appStateValues: appStateValuesReducer,
   talpa: talpaReducer,
+  [infraohjelmointiApi.reducerPath]: infraohjelmointiApi.reducer,
 };
 
 const rootReducer = combineReducers(storeItems);
@@ -42,6 +42,8 @@ export const setupStore = (preloadedState?: Partial<RootState>) => {
   return configureStore({
     reducer: rootReducer,
     preloadedState,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(infraohjelmointiApi.middleware),
   });
 };
 
