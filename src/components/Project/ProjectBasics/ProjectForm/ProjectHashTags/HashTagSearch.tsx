@@ -1,23 +1,33 @@
 import { IListItem, IOption } from '@/interfaces/common';
 import { defaultFilter } from 'hds-react';
-import { FC, memo, useCallback, useState } from 'react';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Select } from 'hds-react';
 
 interface IHashTagSearchProps {
   onHashTagClick: (value: string) => void;
-  hashTags: Array<IListItem>;
+  availableHashTags: Array<IListItem>;
+  hashTagsForSubmit: Array<IListItem>;
 }
 
-const HashTagSearch: FC<IHashTagSearchProps> = ({ onHashTagClick, hashTags }) => {
+const HashTagSearch: FC<IHashTagSearchProps> = ({
+  onHashTagClick,
+  availableHashTags,
+  hashTagsForSubmit,
+}) => {
   const { t } = useTranslation();
   const [value, setValue] = useState<string[]>([]);
 
-  const getHashTagsAsSelectOptions = (hashTags: IListItem[]): IOption[] => {
-    return hashTags.map((h) => ({ value: h.value, label: h.value }));
-  };
+  useEffect(() => {
+    // Update selectedValues on first render and if hashTagsForSubmit change onDelete
+    const selectedValues = hashTagsForSubmit.map((tag) => tag.value);
+    setValue(selectedValues);
+  }, [hashTagsForSubmit]);
 
-  const hashTagsAsOptions = getHashTagsAsSelectOptions(hashTags);
+  const hashTagsAsOptions = availableHashTags.map((tag) => ({
+    value: tag.value,
+    label: tag.value,
+  }));
 
   const handleValueChange = useCallback(
     (selectedOptions: IOption[], clickedOption: IOption) => {
@@ -42,8 +52,8 @@ const HashTagSearch: FC<IHashTagSearchProps> = ({ onHashTagClick, hashTags }) =>
           handleValueChange(selectedOptions, clickedOption)
         }
         texts={{
-          clearButtonAriaLabel_multiple: 'Clear all selections',
-          tagRemoveSelectionAriaLabel: `Remove ${value}`,
+          clearButtonAriaLabel_multiple: t('projectForm.clearHashTagSelection'),
+          tagRemoveSelectionAriaLabel: `${t('projectForm.removeHashTag')} ${value}`,
           placeholder: t('projectForm.selectHashTag'),
           label: t('addHashTag'),
           filterPlaceholder: t('projectForm.searchForHashTags'),
