@@ -1,5 +1,6 @@
 import { INote, INoteRequest } from '@/interfaces/noteInterfaces';
 import { infraohjelmointiApi } from './infraohjelmointiApi';
+import { notifySuccess } from '@/reducers/notificationSlice';
 
 export const notesApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -22,6 +23,20 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
         url: `/notes/${id}/`,
         method: 'DELETE',
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(
+            notifySuccess({
+              title: 'deleteSuccess',
+              message: 'noteDeleteSuccess',
+              type: 'toast',
+            }),
+          );
+        } catch (error) {
+          console.error('Error deleting note: ', error);
+        }
+      },
       invalidatesTags: ['Notes'],
     }),
     patchNote: build.mutation<INote, Partial<INote>>({
@@ -30,6 +45,20 @@ export const notesApi = infraohjelmointiApi.injectEndpoints({
         method: 'PATCH',
         data: note,
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(
+            notifySuccess({
+              title: 'patchSuccess',
+              message: 'notePatchSuccess',
+              type: 'toast',
+            }),
+          );
+        } catch (error) {
+          console.error('Error patching note: ', error);
+        }
+      },
       invalidatesTags: ['Notes'],
     }),
   }),
