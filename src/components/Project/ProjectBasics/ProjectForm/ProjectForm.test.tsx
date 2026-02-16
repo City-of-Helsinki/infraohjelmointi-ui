@@ -277,7 +277,8 @@ describe('projectForm', () => {
     expect((await dialog.findAllByTestId('project-hashtags')).length).toBe(2);
 
     // Search for a hashTag and click on the search result
-    await user.click(await dialog.findByText('projectForm.selectHashTag'));
+    await user.click(await dialog.findByText('addHashTag'));
+
     await user.type(await dialog.findByPlaceholderText('projectForm.searchForHashTags'), 'hul');
     await waitFor(async () => await user.click(await dialog.findByText('hulevesi')));
 
