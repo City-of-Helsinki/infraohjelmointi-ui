@@ -34,7 +34,6 @@ const HashTagSearch: FC<IHashTagSearchProps> = ({ onHashTagClick, hashTags }) =>
       <Select
         noTags
         multiSelect
-        required={true}
         style={{ maxWidth: '100%' }}
         options={hashTagsAsOptions}
         filter={defaultFilter}
