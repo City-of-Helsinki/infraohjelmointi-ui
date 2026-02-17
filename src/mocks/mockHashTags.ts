@@ -75,7 +75,7 @@ export const mockHashTags: { data: IHashTagsResponse } = {
       },
       {
         id: 'hashtag-11',
-        value: 'viima-ratiotie',
+        value: 'viima-ratiotie 2',
         usageCount: 0,
         archived: false,
         createdDate: '2023-08-04T15:51:02.348709+03:00',
@@ -91,7 +91,7 @@ export const mockHashTags: { data: IHashTagsResponse } = {
       },
       {
         id: 'hashtag-6',
-        value: 'viima-ratiotie',
+        value: 'viima-ratiotie 3',
         usageCount: 0,
         archived: false,
         createdDate: '2023-08-04T15:51:02.348709+03:00',

@@ -242,7 +242,11 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
                   id={'popular-hashtags'}
                 />
               </div>
-              <HashTagSearch onHashTagClick={onHashTagClick} hashTags={hashTagsForSearch} />
+              <HashTagSearch
+                onHashTagClick={onHashTagClick}
+                availableHashTags={hashTagsForSearch}
+                hashTagsForSubmit={formState.hashTagsForSubmit}
+              />
             </div>
           </Content>
           <hr />
