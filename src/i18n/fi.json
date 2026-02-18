@@ -695,7 +695,26 @@
     "menus": {
       "name": "Valikot",
       "description": "Muokkaa valikoiden sisältöä, lisää uusia kohteita valikoihin ja poista kohteita valikoista.",
-      "button": "Muokkaa valikoita"
+      "button": "Muokkaa valikoita",
+      "addRowButton": "Lisää uusi",
+      "menuType": {
+        "category": { "name": "Kategoria" },
+        "type": { "name": "Hankkeen tyyppi" },
+        "program": { "name": "Hankeohjelma" },
+        "phase": { "name": "Hankkeen vaihe" },
+        "projectPhaseSpesification": { "name": "Vaiheen tarkenne" },
+        "constructionPhaseDetail": { "name": "Rakennusvaiheen tarkenne" },
+        "constructionProcurementMethod": { "name": "Rakentamisen hankintatapa" },
+        "projectCost": { "name": "Hankekustannus ja laatutaso (menu)" },
+        "planningCostEstimate": { "name": "Suunnittelun kustannusarvio (menu)" },
+        "buildingCostEstimate": { "name": "Rakentamisen kustannusarvio (menu)" },
+        "responsibleZone": { "name": "Vastuuyksikkö" },
+        "responsiblePersonsList": { "name": "Vastuuhenkilölistat" },
+        "programmer": { "name": "Ohjelmoija" },
+        "budgetOverrunReason": { "name": "Budjettipoikkeaman selitys" }
+      },
+      "tableEmptyText": "Valikossa ei ole vielä vaihtoehtoja. Lisää uusi valinta aloittaaksesi.",
+      "sideNavigationToggleButton": "Navigoi valikkoon"
     },
     "auditlog": {
       "name": "Muutoshistoria",

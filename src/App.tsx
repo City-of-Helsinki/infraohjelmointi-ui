@@ -41,6 +41,7 @@ import ConfirmDialog from './components/shared/ConfirmDialog';
 import ReportsView from './views/ReportsView';
 import AdminView from './views/AdminView/AdminView';
 import AdminHashtags from './components/Admin/AdminHashtags';
+import AdminMenus from './components/Admin/AdminMenus';
 import AdminFunctions from './components/Admin/AdminFunctions';
 import { selectUser } from './reducers/authSlice';
 import useUpdateEvents from './hooks/useUpdateEvents';
@@ -178,6 +179,7 @@ const App: FC = () => {
               <Route path="/admin" element={<AdminView />}>
                 <Route path="functions" element={<AdminFunctions />} />
                 <Route path="hashtags" element={<AdminHashtags />} />
+                <Route path="menus" element={<AdminMenus />} />
                 <Route path="forcedtoframestate" element={<AdminForcedToFrame />} />
               </Route>
               <Route path="/access-denied" element={<AccessDeniedView />} />
