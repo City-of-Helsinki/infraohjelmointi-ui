@@ -5,6 +5,16 @@ export interface INote {
   project: string;
   createdDate: string;
   history: Array<INoteHistory>;
+  attachments?: Array<INoteAttachment>;
+}
+
+// NOTE: Placeholder interface for note attachments, to be replaced with actual implementation when backend supports it
+export interface INoteAttachment {
+  id?: string;
+  name: string;
+  src: string;
+  size?: string;
+  createdDate?: string;
 }
 
 export interface INoteRequest {
