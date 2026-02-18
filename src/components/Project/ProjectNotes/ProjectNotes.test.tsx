@@ -35,7 +35,7 @@ const normalizeConfig = (config?: AxiosRequestConfig | string): AxiosRequestConf
 const createProjectState = () => ({
   selectedProject: mockProject.data,
   count: 1,
-  error: {},
+  error: null,
   page: 1,
   isSaving: false,
   mode: 'edit' as const,

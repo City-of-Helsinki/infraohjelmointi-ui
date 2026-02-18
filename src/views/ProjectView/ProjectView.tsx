@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
-  getProjectThunk,
   resetProject,
   selectProjectMode,
   selectProject,
@@ -20,6 +19,8 @@ import {
 } from '@/reducers/loaderSlice';
 import { selectUser } from '@/reducers/authSlice';
 import _ from 'lodash';
+import { useGetProjectByIdQuery } from '@/api/projectApi';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 const LOADING_PROJECT = 'loading-project';
 
@@ -31,6 +32,10 @@ const ProjectView = () => {
   const projectUpdate = useAppSelector(selectProjectUpdate);
   const projectMode = useAppSelector(selectProjectMode);
   const user = useAppSelector(selectUser);
+  const shouldFetchProject = Boolean(projectId && user && projectMode !== 'new');
+  const { isFetching: isProjectFetching, isError: isProjectError } = useGetProjectByIdQuery(
+    shouldFetchProject && projectId ? projectId : skipToken,
+  );
 
   // Update selectedProject to redux with a project-update event
   useEffect(() => {
@@ -41,7 +46,7 @@ const ProjectView = () => {
     }
 
     // Don't update the selectedProject if the user is viewing another project
-    if (!selectedProject || project.id !== selectedProject.id) {
+    if (project.id !== selectedProject?.id) {
       return;
     }
 
@@ -53,42 +58,36 @@ const ProjectView = () => {
   }, [projectUpdate]);
 
   useEffect(() => {
-    const getProjectById = async (id: string) => {
-      dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
-      dispatch(setIsProjectCardLoading());
-
-      try {
-        const res = await dispatch(getProjectThunk(id));
-        if (res.type.includes('rejected') && projectId && user) {
-          // If the project is not found
-          navigate('/not-found');
-        }
-      } catch (e) {
-        console.log('Error getting project by id: ', e);
-      } finally {
-        dispatch(clearLoading(LOADING_PROJECT));
-      }
-    };
-
-    // Before loading user information, check user is authenticated to make project fetch successfully.
-    if (projectId && user) {
-      // If a new project is added after a successfull POST request goes through we want to change the mode to edit
-      if (projectMode === 'new') {
+    if (projectMode === 'new') {
+      if (projectId && user) {
         dispatch(setProjectMode('edit'));
-      }
-      // If project mode is not new then we fetch the project to make sure we got the latest changes
-      else {
-        getProjectById(projectId);
-      }
-    } else if (projectMode === 'new') {
-      // If the mode is 'new' and there was no project yet, reset the project to make sure selectedProject isn't still in redux
-      if (!projectId) {
+      } else if (!projectId) {
         dispatch(resetProject());
       }
     }
-    dispatch(clearIsProjectCardLoading());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, projectMode, user]);
+  }, [projectId, projectMode, user, dispatch]);
+
+  useEffect(() => {
+    if (!shouldFetchProject) {
+      dispatch(clearLoading(LOADING_PROJECT));
+      dispatch(clearIsProjectCardLoading());
+      return;
+    }
+
+    if (isProjectFetching) {
+      dispatch(setLoading({ text: 'Loading project', id: LOADING_PROJECT }));
+      dispatch(setIsProjectCardLoading());
+    } else {
+      dispatch(clearLoading(LOADING_PROJECT));
+      dispatch(clearIsProjectCardLoading());
+    }
+  }, [dispatch, isProjectFetching, shouldFetchProject]);
+
+  useEffect(() => {
+    if (shouldFetchProject && isProjectError) {
+      navigate('/not-found');
+    }
+  }, [isProjectError, navigate, shouldFetchProject]);
 
   return (
     <div className="w-full" data-testid="project-view">

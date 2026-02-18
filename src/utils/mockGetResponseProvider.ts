@@ -29,12 +29,117 @@ import mockPlanningViewProjects from '@/mocks/mockPlanningViewProjects';
 import mockProject from '@/mocks/mockProject';
 import { mockSapCosts } from '@/mocks/mockSapCosts';
 import { mockSearchResults } from '@/mocks/mockSearch';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 jest.mock('axios');
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as jest.Mocked<typeof axios> & jest.MockedFunction<typeof axios>;
 const { REACT_APP_API_URL } = process.env;
+
+const normalizeUrl = (url?: string) => {
+  if (!url) {
+    return '';
+  }
+
+  if (REACT_APP_API_URL) {
+    return url.replace(REACT_APP_API_URL, '');
+  }
+
+  return url;
+};
+
+const getMockResponseForUrl = (rawUrl?: string) => {
+  const url = normalizeUrl(rawUrl);
+
+  if (!url) {
+    console.log('not found!: ', rawUrl);
+    return Promise.reject(new Error('not found'));
+  }
+
+  const lowerCaseUrl = url.toLocaleLowerCase();
+  const year = new Date().getFullYear();
+
+  switch (true) {
+    case url === '/projects/':
+      return Promise.resolve(mockProject);
+    case url === `/projects/${mockProject.data.id}`:
+      return Promise.resolve(mockProject);
+    case url === '/project-hashtags/':
+      return Promise.resolve(mockHashTags);
+    case url === '/project-types/':
+      return Promise.resolve(mockProjectTypes);
+    case url === '/project-type-qualifiers/':
+      return Promise.resolve(mockProjectTypeQualifiers);
+    case url === '/project-districts/':
+      return Promise.resolve(mockDistrictOptions);
+    case url === '/project-divisions/':
+      return Promise.resolve(mockDivisionOptions);
+    case url === '/project-sub-divisions/':
+      return Promise.resolve(mockSubDivisionOptions);
+    case url === '/project-phases/':
+      return Promise.resolve(mockProjectPhases);
+    case url === '/construction-phase-details/':
+      return Promise.resolve(mockConstructionPhaseDetails);
+    case url === '/construction-procurement-methods/':
+      return Promise.resolve(mockConstructionProcurementMethods);
+    case url === '/project-categories/':
+      return Promise.resolve(mockProjectCategories);
+    case url === '/project-quality-levels/':
+      return Promise.resolve(mockProjectQualityLevels);
+    case url === '/planning-phases/':
+      return Promise.resolve(mockPlanningPhases);
+    case url === '/construction-phases/':
+      return Promise.resolve(mockConstructionPhases);
+    case url === '/responsible-zones/':
+      return Promise.resolve(mockResponsibleZones);
+    case url === '/project-priority/':
+      return Promise.resolve(mockPriorities);
+    case url === '/persons/':
+      return Promise.resolve(mockPersons);
+    case url === `/project-classes/?year=${year}`:
+      return Promise.resolve(mockProjectClasses);
+    case url === `/project-classes/coordinator/?forcedToFrame=false&year=${year}`:
+      return Promise.resolve(mockProjectCoordinatorClasses);
+    case url === `/project-classes/coordinator/?forcedToFrame=true&year=${year}`:
+      return Promise.resolve(mockCoordinatorLocations);
+    case url === `/project-locations/?year=${year}`:
+      return Promise.resolve(mockLocations);
+    case url === `/project-locations/coordinator/?forcedToFrame=false&year=${year}`:
+      return Promise.resolve(mockCoordinatorLocations);
+    case url === `/project-locations/coordinator/?forcedToFrame=true&year=${year}`:
+      return Promise.resolve(mockCoordinatorLocations);
+    case url === `/projects/${mockProject.data.id}/notes/`:
+      return Promise.resolve(mockNotes);
+    case url === `/project-groups/?year=${year}`:
+      return Promise.resolve(mockGroups);
+    case url === `/project-groups/coordinator/`:
+      return Promise.resolve(mockGroups);
+    case url === `/project-groups/coordinator/?year=${year}`:
+      return Promise.resolve(mockGroups);
+    case lowerCaseUrl.includes(`/projects/search-results/`):
+      return Promise.resolve(mockSearchResults);
+    case lowerCaseUrl.includes(`/projects/`):
+      return Promise.resolve(mockPlanningViewProjects);
+    case lowerCaseUrl.includes(`/sap-costs/${year}/`):
+      return Promise.resolve(mockSapCosts);
+    case lowerCaseUrl.includes(`/coordinator-notes/`):
+      return Promise.resolve(mockCoordinatorNotes);
+    case lowerCaseUrl.includes(`/sap-current-year-costs/${year}/`):
+      return Promise.resolve(mockSapCosts);
+    case lowerCaseUrl.includes('/budget-overrun-reasons/'):
+      return Promise.resolve(mockBudgetOverrunReasons);
+    case url === '/project-programmers/':
+      return Promise.resolve(mockProgrammers);
+    case url === '/app-state-value/':
+      return Promise.resolve(mockAppStateValue);
+    case url.includes('/project-groups/coordinator/?year=2025&forcedToFrame=true'):
+      return Promise.resolve(mockGroups);
+    default:
+      console.log('not found!: ', url);
+
+      return Promise.reject(new Error('not found'));
+  }
+};
 
 const mockProgrammers = {
   data: [
@@ -62,89 +167,10 @@ const mockAppStateValue = {
  *
  * @returns provides mock data for the respective url.
  */
-export const mockGetResponseProvider = () =>
-  mockedAxios.get.mockImplementation((url) => {
-    url = url.replace(`${REACT_APP_API_URL}`, '');
-    const year = new Date().getFullYear();
-
-    switch (true) {
-      case url === '/projects/':
-        return Promise.resolve(mockProject);
-      case url === `/projects/${mockProject.data.id}`:
-        return Promise.resolve(mockProject);
-      case url === '/project-hashtags/':
-        return Promise.resolve(mockHashTags);
-      case url === '/project-types/':
-        return Promise.resolve(mockProjectTypes);
-      case url === '/project-type-qualifiers/':
-        return Promise.resolve(mockProjectTypeQualifiers);
-      case url === '/project-districts/':
-        return Promise.resolve(mockDistrictOptions);
-      case url === '/project-divisions/':
-        return Promise.resolve(mockDivisionOptions);
-      case url === '/project-sub-divisions/':
-        return Promise.resolve(mockSubDivisionOptions);
-      case url === '/project-phases/':
-        return Promise.resolve(mockProjectPhases);
-      case url === '/construction-phase-details/':
-        return Promise.resolve(mockConstructionPhaseDetails);
-      case url === '/construction-procurement-methods/':
-        return Promise.resolve(mockConstructionProcurementMethods);
-      case url === '/project-categories/':
-        return Promise.resolve(mockProjectCategories);
-      case url === '/project-quality-levels/':
-        return Promise.resolve(mockProjectQualityLevels);
-      case url === '/planning-phases/':
-        return Promise.resolve(mockPlanningPhases);
-      case url === '/construction-phases/':
-        return Promise.resolve(mockConstructionPhases);
-      case url === '/responsible-zones/':
-        return Promise.resolve(mockResponsibleZones);
-      case url === '/project-priority/':
-        return Promise.resolve(mockPriorities);
-      case url === '/persons/':
-        return Promise.resolve(mockPersons);
-      case url === `/project-classes/?year=${year}`:
-        return Promise.resolve(mockProjectClasses);
-      case url === `/project-classes/coordinator/?forcedToFrame=false&year=${year}`:
-        return Promise.resolve(mockProjectCoordinatorClasses);
-      case url === `/project-classes/coordinator/?forcedToFrame=true&year=${year}`:
-        return Promise.resolve(mockCoordinatorLocations);
-      case url === `/project-locations/?year=${year}`:
-        return Promise.resolve(mockLocations);
-      case url === `/project-locations/coordinator/?forcedToFrame=false&year=${year}`:
-        return Promise.resolve(mockCoordinatorLocations);
-      case url === `/project-locations/coordinator/?forcedToFrame=true&year=${year}`:
-        return Promise.resolve(mockCoordinatorLocations);
-      case url === `/projects/${mockProject.data.id}/notes/`:
-        return Promise.resolve(mockNotes);
-      case url === `/project-groups/?year=${year}`:
-        return Promise.resolve(mockGroups);
-      case url === `/project-groups/coordinator/`:
-        return Promise.resolve(mockGroups);
-      case url === `/project-groups/coordinator/?year=${year}`:
-        return Promise.resolve(mockGroups);
-      case url.toLocaleLowerCase().includes(`/projects/search-results/`):
-        return Promise.resolve(mockSearchResults);
-      case url.toLocaleLowerCase().includes(`/projects/`):
-        return Promise.resolve(mockPlanningViewProjects);
-      case url.toLocaleLowerCase().includes(`/sap-costs/${year}/`):
-        return Promise.resolve(mockSapCosts);
-      case url.toLocaleLowerCase().includes(`/coordinator-notes/`):
-        return Promise.resolve(mockCoordinatorNotes);
-      case url.toLocaleLowerCase().includes(`/sap-current-year-costs/${year}/`):
-        return Promise.resolve(mockSapCosts);
-      case url.toLocaleLowerCase().includes('/budget-overrun-reasons/'):
-        return Promise.resolve(mockBudgetOverrunReasons);
-      case url === '/project-programmers/':
-        return Promise.resolve(mockProgrammers);
-      case url === '/app-state-value/':
-        return Promise.resolve(mockAppStateValue);
-      case url.includes('/project-groups/coordinator/?year=2025&forcedToFrame=true'):
-        return Promise.resolve(mockGroups);
-      default:
-        console.log('not found!: ', url);
-
-        return Promise.reject(new Error('not found'));
-    }
+export const mockGetResponseProvider = () => {
+  mockedAxios.get.mockImplementation((url) => getMockResponseForUrl(url));
+  mockedAxios.mockImplementation((config?: AxiosRequestConfig | string) => {
+    const requestUrl = typeof config === 'string' ? config : config?.url;
+    return getMockResponseForUrl(requestUrl);
   });
+};
