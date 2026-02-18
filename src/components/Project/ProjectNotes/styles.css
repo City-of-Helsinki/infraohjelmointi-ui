@@ -43,7 +43,7 @@
 }
 
 .note-footer {
-  @apply flex justify-between px-3 pb-4;
+  @apply flex justify-end px-3 pb-4;
 }
 
 .new-note-form-container {
