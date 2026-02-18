@@ -129,6 +129,17 @@ describe('ProjectNotes', () => {
     });
   });
 
+  it('renders attachment sections for loaded notes', async () => {
+    const { findAllByText, findAllByRole } = await renderWithNotesLoaded();
+
+    expect((await findAllByText('noteAttachments.imageAttachments')).length).toBe(
+      mockNotes.data.length,
+    );
+    expect((await findAllByRole('button', { name: 'noteAttachments.view' })).length).toBe(
+      mockNotes.data.length * 2,
+    );
+  });
+
   it('renders history label and history button only if a note has history', async () => {
     const { findAllByText, findAllByRole } = await renderWithNotesLoaded();
 

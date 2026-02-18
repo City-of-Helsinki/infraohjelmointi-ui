@@ -37,7 +37,7 @@ const useProjectNoteForm = (note?: INote) => {
     if (projectId) {
       reset(formValues);
     }
-  }, [projectId, formValues, userId]);
+  }, [projectId, formValues, userId, reset]);
 
   return { formMethods, formValues };
 };

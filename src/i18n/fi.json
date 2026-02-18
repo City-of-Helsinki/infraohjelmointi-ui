@@ -568,6 +568,17 @@
   "confirmLeaveDescription": "Olet poistumassa keskeneräiseltä lomakkeelta, antamiasi tietoja ei tallenneta. Haluatko varmasti poistua?",
   "proceed": "Jatka",
   "newProject": "Uusi hanke",
+  "noteAttachments": {
+    "dragAndDrop": "Raahaa liitetiedosto",
+    "imageAttachments": "Kuvaliitteet",
+    "attachmentAdded": "Liitetiedosto lisätty",
+    "view": "Näytä"
+  },
+  "attachmentSlideshowDialog": {
+    "nextImage": "Seuraava kuva",
+    "previousImage": "Edellinen kuva",
+    "close": "Sulje"
+  },
   "report": {
     "shared": {
       "ta": "TA",
