@@ -68,12 +68,12 @@ const render = async () =>
           project: {
             selectedProject: mockProject.data,
             count: 1,
-            error: {},
+            error: null,
             page: 1,
             isSaving: false,
             mode: 'edit',
           },
-          auth: { user: mockUser.data, error: {} },
+          auth: { user: mockUser.data, error: null },
           lists: {
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,

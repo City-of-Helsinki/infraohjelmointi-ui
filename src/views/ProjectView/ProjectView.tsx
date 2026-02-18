@@ -46,7 +46,7 @@ const ProjectView = () => {
     }
 
     // Don't update the selectedProject if the user is viewing another project
-    if (!selectedProject || project.id !== selectedProject.id) {
+    if (project.id !== selectedProject?.id) {
       return;
     }
 

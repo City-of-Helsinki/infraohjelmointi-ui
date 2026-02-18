@@ -9,7 +9,7 @@ interface IProjectState {
   selectedProject: IProject | null;
   count: number | null;
   page: number;
-  error: IError | null | unknown;
+  error: IError | null;
   isSaving: boolean;
   mode: 'edit' | 'new';
 }
