@@ -3,10 +3,10 @@ import { ISearchForm } from '@/interfaces/formInterfaces';
 
 // Build a search parameter with all the choices from the search form
 const buildSearchParams = (form: ISearchForm) => {
-  const typeToParam: {[key in FreeSearchFormItem['type']]?: string} = {
+  const typeToParam: { [key in FreeSearchFormItem['type']]?: string } = {
     projects: 'projectName',
     groups: 'group',
-    hashtags: 'hashtag'
+    hashtags: 'hashtag',
   };
   const searchParams = [];
   for (const [key, value] of Object.entries(form)) {
@@ -39,17 +39,17 @@ const buildSearchParams = (form: ISearchForm) => {
         for (const [_, v] of Object.entries(value as FreeSearchFormObject)) {
           const paramType = typeToParam[v.type];
           const paramValue = v.type === 'hashtags' ? v.value : v.label;
-          if (paramType === "hashtag") {
-            searchParams.push(`${paramType}=${paramValue}`);
+          const encodedValue = encodeURIComponent(paramValue);
+          if (paramType === 'hashtag') {
+            searchParams.push(`${paramType}=${encodedValue}`);
           } else {
-            searchParams.push(`projectName=${paramValue}`);
-            searchParams.push(`group=${paramValue}`);
+            searchParams.push(`projectName=${encodedValue}`, `group=${encodedValue}`);
           }
         }
         break;
       case 'hkrIds':
         for (const hkrId of value) {
-          searchParams.push(`hkrId=${hkrId}`)
+          searchParams.push(`hkrId=${hkrId}`);
         }
         break;
       default:

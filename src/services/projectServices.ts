@@ -113,7 +113,7 @@ export const getProjectsWithFreeSearch = async (
 ): Promise<IFreeSearchResults> => {
   try {
     const res = await axios.get(
-      `${REACT_APP_API_URL}/projects/search-results/?freeSearch=${searchWord}`,
+      `${REACT_APP_API_URL}/projects/search-results/?freeSearch=${encodeURIComponent(searchWord)}`,
     );
     return res.data;
   } catch (e) {
