@@ -202,7 +202,9 @@
     "responsiblePerson": "$t(projectTalpaForm.responsiblePerson)",
     "responsiblePersonEmail": "$t(projectTalpaForm.responsiblePersonEmail)",
     "templateProject": "$t(projectTalpaForm.templateProject)",
-    "address": "$t(projectForm.address)"
+    "address": "$t(projectForm.address)",
+    "type": "$t(projectForm.type)",
+    "typeQualifier": "$t(projectForm.typeQualifier)"
   },
   "projectTalpaForm": {
     "budgetItemNumber": "Hankkeen projektityyppi",
