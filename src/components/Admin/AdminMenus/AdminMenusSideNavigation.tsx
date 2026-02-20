@@ -1,16 +1,15 @@
 import { SideNavigation } from 'hds-react';
-import { memo, useState } from 'react';
+import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
 import { IADMIN_MENUS_MENU_TYPE } from './AdminMenus.types';
 
-const AdminMenusSideNavigation = () => {
+interface AdminMenusSideNavigationProps {
+  active: string | null;
+  setActivePage: (id: string) => void;
+}
+const AdminMenusSideNavigation: FC<AdminMenusSideNavigationProps> = ({ active, setActivePage }) => {
   const { t } = useTranslation();
-  const [active, setActive] = useState<string | null>(null);
-
-  const setActivePage = (event: React.SyntheticEvent<HTMLElement>) => {
-    setActive(event.currentTarget.getAttribute('href'));
-  };
 
   return (
     <div className="sidebar-container">
@@ -24,11 +23,11 @@ const AdminMenusSideNavigation = () => {
           {IADMIN_MENUS_MENU_TYPE.map((menuType) => {
             return (
               <SideNavigation.MainLevel
-                href={`#admin-menus-card-${menuType}`}
-                active={active === `#admin-menus-card-${menuType}`}
+                href={`#menu-card-${menuType}`}
+                active={active === `menu-card-${menuType}`}
                 id={`${menuType}-navItem`}
-                label={t(`adminFunctions.menus.menuType.${menuType}.name`)}
-                onClick={setActivePage}
+                label={t(`adminFunctions.menus.menuType.${menuType}`)}
+                onClick={() => setActivePage(`menu-card-${menuType}`)}
                 key={menuType}
               />
             );

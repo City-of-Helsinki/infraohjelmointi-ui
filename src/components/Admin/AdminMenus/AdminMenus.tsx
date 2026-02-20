@@ -1,48 +1,102 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import './styles.css';
 import AdminMenusSideNavigation from './AdminMenusSideNavigation';
 import AdminMenusCard from './AdminMenusCard';
+import { useEffect } from 'react';
+import { menuCardItemContents } from './AdminMenusMenuCardItems';
+import { DialogState } from './AdminMenus.types';
+import AddOrEditMenuItemDialog from './AddOrEditMenuItemDialog';
 
 const AdminMenus = () => {
+  const [activeMenuItem, setActiveMenuItem] = useState<string | null>(null);
+
+  const setActivePage = (id: string) => {
+    setActiveMenuItem(id);
+  };
+
+  useEffect(() => {
+    const sections = document.querySelectorAll("[id^='menu-card-']");
+
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+
+            setActiveMenuItem(id);
+            window.history.replaceState(null, '', `#${id}`);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '0px 0px -60% 0px',
+        threshold: 0,
+      },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
+
+  const [dialogState, setDialogState] = useState<DialogState>({
+    open: false,
+    mode: 'add',
+    menuType: undefined,
+    value: '',
+    rowIndex: undefined,
+  });
+
+  const handleEdit = (menuType: string, value: string, rowIndex: number) => {
+    setDialogState({
+      open: true,
+      mode: 'edit',
+      menuType,
+      value,
+      rowIndex,
+    });
+  };
+
+  const handleAdd = (menuType: string) => {
+    setDialogState({
+      open: true,
+      mode: 'add',
+      menuType,
+      value: '',
+    });
+  };
+
+  const handleClose = () => {
+    setDialogState({
+      mode: 'add',
+      open: false,
+      value: '',
+      rowIndex: undefined,
+      menuType: undefined,
+    });
+  };
+
   return (
     <div className="admin-menus-view">
-      <AdminMenusSideNavigation />
+      <AdminMenusSideNavigation active={activeMenuItem} setActivePage={setActivePage} />
       <div className="admin-menus-content">
-        <AdminMenusCard menuType="category" listName="categories" translateValues={true} />
-        <AdminMenusCard menuType="type" listName="types" translateValues={true} />
-        {/* <AdminMenusCard menuType="program" listName="" translateValues={true}/> */}
-        <AdminMenusCard menuType="phase" listName="phases" translateValues={true} />
-        {/* <AdminMenusCard menuType="projectPhaseSpesification" listName="" translateValues={true}/> */}
-        <AdminMenusCard
-          menuType="constructionPhaseDetail"
-          listName="constructionPhaseDetails"
-          translateValues={true}
-        />
-        <AdminMenusCard
-          menuType="constructionProcurementMethod"
-          listName="constructionProcurementMethods"
-          translateValues={true}
-        />
-        {/* <AdminMenusCard menuType="projectCost" listName="" translateValues={true}/> */}
-        {/* <AdminMenusCard menuType="planningCostEstimate" listName="" translateValues={true}/> */}
-        {/* <AdminMenusCard menuType="buildingCostEstimate" listName="" translateValues={true}/> */}
-        <AdminMenusCard
-          menuType="responsibleZone"
-          listName="responsibleZones"
-          translateValues={true}
-        />
-        <AdminMenusCard
-          menuType="responsiblePersonsList"
-          listName="responsiblePersons"
-          translateValues={false}
-        />
-        <AdminMenusCard menuType="programmer" listName="programmers" translateValues={false} />
-        <AdminMenusCard
-          menuType="budgetOverrunReason"
-          listName="budgetOverrunReasons"
-          translateValues={true}
-        />
+        {menuCardItemContents.map((card) => {
+          return (
+            <AdminMenusCard
+              menuType={card.menuType}
+              listName={card.listName}
+              translateValues={card.translateValues}
+              key={card.menuType}
+              onEditMenuItem={handleEdit}
+              onAddMenuItem={handleAdd}
+            />
+          );
+        })}
       </div>
+      <AddOrEditMenuItemDialog dialogState={dialogState} handleClose={handleClose} />
     </div>
   );
 };
