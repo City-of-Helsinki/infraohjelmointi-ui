@@ -15,23 +15,6 @@ const IADMIN_MENUS_MENU_TYPE = [
   'budgetOverrunReason',
 ] as const;
 
-// const IADMIN_MENUS_MENU_TYPE_AS_CONST = {
-//   CATEGORY: 'category',
-//   TYPE: 'type',
-//   PROGRAM: 'program',
-//   PHASE: 'phase',
-//   PROJECT_PHASE_SPESIFICATION: 'projectPhaseSpesification',
-//   CONSTRUCTION_PHASE_DETAIL: 'constructionPhaseDetail',
-//   CONSTRUCTION_PROCUREMENT_METHOD: 'constructionProcurementMethod',
-//   PROJECT_QUALITY_LEVEL: 'projectQualityLevel',
-//   PLANNING_PHASE: 'planningPhase',
-//   CONSTRUCTION_PHASE: 'constructionPhase',
-//   RESPONSIBLE_ZONE: 'responsibleZone',
-//   RESPONSIBLE_PERSONS_LIST: 'responsiblePersonsList',
-//   PROGRAMMER: 'programmer',
-//   BUDGET_OVERRUN_REASON: 'budgetOverrunReason',
-// } as const;
-
 type IAdminMenusMenuType = (typeof IADMIN_MENUS_MENU_TYPE)[number];
 
 interface MenuItemDialogMessages {
