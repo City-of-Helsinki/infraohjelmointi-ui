@@ -45,7 +45,7 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
     [],
   );
 
-  const onAddHashtag = useCallback(async () => {
+  const onSaveMenuItemChange = useCallback(async () => {
     if (!menuItemName) {
       return;
     }
@@ -104,7 +104,7 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
           />
         </Content>
         <ActionButtons>
-          <Button onClick={onAddHashtag} data-testid="submit-hashtag-button">
+          <Button onClick={onSaveMenuItemChange} data-testid="submit-menu-item-button">
             {t('save')}
           </Button>
           <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
