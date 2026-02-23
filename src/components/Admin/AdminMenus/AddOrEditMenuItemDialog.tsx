@@ -1,12 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IError } from '@/interfaces/common';
-import { postHashTagThunk, selectHashTags } from '@/reducers/hashTagsSlice';
+import { DialogState, MenuItemDialogMessages } from '@/interfaces/menuItemsInterfaces';
+import { patchMenuItemsThunk, postMenuItemsThunk, selectLists } from '@/reducers/listsSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { getErrorText } from '@/utils/validation';
 import { Button, ButtonVariant, Dialog, TextInput } from 'hds-react';
 import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DialogState, MenuItemDialogMessages } from './AdminMenus.types';
 
 interface AddOrEditMenuItemDialogProps {
   dialogState: DialogState;
@@ -21,6 +21,7 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
   const dispatch = useAppDispatch();
   const { Header, Content, ActionButtons } = Dialog;
   const [menuItemName, setMenuItemName] = useState<string>('');
+  const [editableItemId, setEditableItemId] = useState<string>('');
 
   const dialogMessages: MenuItemDialogMessages = {
     submitSuccess: t(dialogState.mode === 'add' ? 'postSuccess' : 'patchSuccess'),
@@ -36,9 +37,10 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
 
   useEffect(() => {
     setMenuItemName(dialogState.value);
+    setEditableItemId(dialogState.editableItemId);
   }, [dialogState]);
 
-  const error = useAppSelector(selectHashTags).error as IError;
+  const error = useAppSelector(selectLists).error as IError;
 
   const onSetMenuItemName = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => setMenuItemName(e.target.value),
@@ -46,24 +48,32 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
   );
 
   const onSaveMenuItemChange = useCallback(async () => {
-    if (!menuItemName) {
-      return;
-    }
+    if (!menuItemName) return;
     try {
-      const res = await dispatch(postHashTagThunk({ value: menuItemName }));
-      if (!res.type.includes('rejected')) {
-        setMenuItemName('');
-        handleClose();
-        dispatch(
-          notifySuccess({
-            message: dialogMessages.submitSuccess,
-            title: dialogMessages.submitSuccess,
-            type: 'toast',
-            duration: 1500,
+      if (dialogState.mode === 'edit') {
+        await dispatch(
+          patchMenuItemsThunk({
+            request: { id: editableItemId, data: menuItemName },
+            path: dialogState.path,
           }),
-        );
+        ).unwrap();
+      } else {
+        await dispatch(
+          postMenuItemsThunk({ request: { value: menuItemName }, path: dialogState.path }),
+        ).unwrap();
       }
-    } catch (e) {
+      setMenuItemName('');
+      handleClose();
+
+      dispatch(
+        notifySuccess({
+          message: dialogMessages.submitSuccess,
+          title: dialogMessages.submitSuccess,
+          type: 'toast',
+          duration: 1500,
+        }),
+      );
+    } catch {
       dispatch(
         notifyError({
           message: dialogMessages.submitError,
@@ -75,10 +85,13 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
     }
   }, [
     menuItemName,
+    dialogState.path,
     dispatch,
     handleClose,
     dialogMessages.submitError,
     dialogMessages.submitSuccess,
+    dialogState.mode,
+    editableItemId,
   ]);
 
   return (

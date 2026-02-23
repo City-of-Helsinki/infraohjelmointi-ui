@@ -2,7 +2,7 @@ import { SideNavigation } from 'hds-react';
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
-import { IADMIN_MENUS_MENU_TYPE } from './AdminMenus.types';
+import { IADMIN_MENUS_MENU_TYPE } from '@/interfaces/menuItemsInterfaces';
 
 interface AdminMenusSideNavigationProps {
   active: string | null;
@@ -26,7 +26,7 @@ const AdminMenusSideNavigation: FC<AdminMenusSideNavigationProps> = ({ active, s
                 href={`#menu-card-${menuType}`}
                 active={active === `menu-card-${menuType}`}
                 id={`${menuType}-navItem`}
-                label={t(`adminFunctions.menus.menuType.${menuType}`)}
+                label={t(`adminFunctions.menus.listType.${menuType}`)}
                 onClick={() => setActivePage(`menu-card-${menuType}`)}
                 key={menuType}
               />

@@ -1,66 +1,65 @@
-import { IAdminMenusMenuType } from './AdminMenus.types';
-import { ListType } from '@/interfaces/common';
+import { IListState } from '@/reducers/listsSlice';
 
 const menuCardItemContents = [
   {
-    menuType: 'category' as IAdminMenusMenuType,
-    listName: 'categories' as ListType,
+    listType: 'categories' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'project-categories',
   },
   {
-    menuType: 'type' as IAdminMenusMenuType,
-    listName: 'types' as ListType,
+    listType: 'types' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'project-types',
   },
   {
-    menuType: 'phase' as IAdminMenusMenuType,
-    listName: 'phases' as ListType,
+    listType: 'phases' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'project-phases',
   },
   {
-    menuType: 'constructionPhaseDetail' as IAdminMenusMenuType,
-    listName: 'constructionPhaseDetails' as ListType,
+    listType: 'constructionPhaseDetails' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'construction-phase-details',
   },
   {
-    menuType: 'constructionProcurementMethod' as IAdminMenusMenuType,
-    listName: 'constructionProcurementMethods' as ListType,
+    listType: 'constructionProcurementMethods' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'construction-procurement-methods',
   },
   {
-    menuType: 'projectQualityLevel' as IAdminMenusMenuType,
-    listName: 'projectQualityLevels' as ListType,
+    listType: 'projectQualityLevels' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'project-quality-levels',
   },
   {
-    menuType: 'planningPhase' as IAdminMenusMenuType,
-    listName: 'planningPhases' as ListType,
+    listType: 'planningPhases' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'planning-phases',
   },
   {
-    menuType: 'constructionPhase' as IAdminMenusMenuType,
-    listName: 'constructionPhases' as ListType,
+    listType: 'constructionPhases' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'construction-phases',
   },
   {
-    menuType: 'responsibleZone' as IAdminMenusMenuType,
-    listName: 'responsibleZones' as ListType,
+    listType: 'responsibleZones' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'responsible-zones',
   },
   {
-    menuType: 'responsiblePersonsList' as IAdminMenusMenuType,
-    listName: 'responsiblePersons' as ListType,
+    listType: 'responsiblePersons' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'persons',
   },
   {
-    menuType: 'programmer' as IAdminMenusMenuType,
-    listName: 'programmers' as ListType,
+    listType: 'programmers' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'project-programmers',
   },
   {
-    menuType: 'budgetOverrunReason' as IAdminMenusMenuType,
-    listName: 'budgetOverrunReasons' as ListType,
+    listType: 'budgetOverrunReasons' as keyof Omit<IListState, 'error'>,
     translateValues: true,
+    path: 'budget-overrun-reasons',
   },
 ];
 
