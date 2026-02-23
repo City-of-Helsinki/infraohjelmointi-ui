@@ -1,33 +1,31 @@
 import { FC } from 'react';
-import { IAdminMenusMenuType } from './AdminMenus.types';
 import { IconArrowDown, IconArrowUp, IconPen } from 'hds-react';
+import { IAdminMenuOrderCellProps } from '@/interfaces/menuItemsInterfaces';
+import { moveRow, saveTableOrderThunk } from '@/reducers/listsSlice';
+import { useAppDispatch } from '@/hooks/common';
 
-interface IAdminMenuOrderCellProps {
-  rowIndex: number;
-  menuType: IAdminMenusMenuType;
-  rowLength: number;
-}
-
-const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, menuType, rowLength }) => {
+const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, rowLength, id }) => {
+  const dispatch = useAppDispatch();
   const isFirstRow = rowIndex === 0;
   const isLastRow = rowIndex === rowLength - 1;
 
-  const changeRowOrder = (rowIndex: number, change: 1 | -1) => {
-    console.log(change, rowIndex);
+  const moveAndSave = (rowId: string, direction: 'up' | 'down') => {
+    dispatch(moveRow({ listType, rowId, direction }));
+    dispatch(saveTableOrderThunk({ listType, path }));
   };
 
   return (
     <>
       <button
-        onClick={() => changeRowOrder(rowIndex, -1)}
-        data-testid={`admin-menus-order-down-button-${menuType}`}
+        onClick={() => moveAndSave(id, 'down')}
+        data-testid={`admin-menus-order-down-button-id-${id}`}
         disabled={isFirstRow}
       >
         <IconArrowDown color={isFirstRow ? 'var(--color-black-60)' : 'var(--color-bus)'} />
       </button>
       <button
-        onClick={() => changeRowOrder(rowIndex, 1)}
-        data-testid={`admin-menus-order-up-button-${menuType}`}
+        onClick={() => moveAndSave(id, 'up')}
+        data-testid={`admin-menus-order-up-button-id-${id}`}
         disabled={isLastRow}
       >
         <IconArrowUp color={isLastRow ? 'var(--color-black-60)' : 'var(--color-bus)'} />
@@ -37,17 +35,18 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, menuType, rowLength
 };
 
 interface IAdminMenuEditCellProps {
-  onEditMenuItem: (menuType: string, value: string, rowIndex: number) => void;
-  menuType: IAdminMenusMenuType;
+  onEditMenuItem: (value: string, rowIndex: number, id: string, path: string) => void;
   value: string;
   rowIndex: number;
+  path: string;
+  id: string;
 }
 
-const EditCell: FC<IAdminMenuEditCellProps> = ({ menuType, onEditMenuItem, value, rowIndex }) => {
+const EditCell: FC<IAdminMenuEditCellProps> = ({ onEditMenuItem, value, rowIndex, id, path }) => {
   return (
     <button
-      onClick={() => onEditMenuItem(menuType, value, rowIndex)}
-      data-testid={`admin-menus-edit-button-${menuType}`}
+      onClick={() => onEditMenuItem(value, rowIndex, id, path)}
+      data-testid={`admin-menus-edit-button-id-${id}`}
     >
       <IconPen />
     </button>

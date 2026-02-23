@@ -5,51 +5,48 @@ import { IconPlusCircle } from 'hds-react';
 import { RootState } from '@/store';
 
 import './styles.css';
-import { IAdminMenusMenuType } from './AdminMenus.types';
 import { useAppSelector } from '@/hooks/common';
 import { IListState } from '@/reducers/listsSlice';
-import { IListItem, ListType } from '@/interfaces/common';
+import { IListItem } from '@/interfaces/common';
 import { EditCell, OrderCell } from './AdminMenusTableActionButtons';
-
-interface IAdminMenusCardProps {
-  menuType: IAdminMenusMenuType;
-  listName: ListType;
-  translateValues: boolean;
-  onEditMenuItem: (menuType: string, value: string, rowIndex: number) => void;
-  onAddMenuItem: (tableType: string) => void;
-}
+import { IAdminMenusCardProps } from '@/interfaces/menuItemsInterfaces';
 
 const AdminMenusCard: FC<IAdminMenusCardProps> = ({
-  menuType,
-  listName,
+  path,
+  listType,
   translateValues,
   onEditMenuItem,
   onAddMenuItem,
 }) => {
   const { t } = useTranslation();
 
-  const listOfAvailableItemsForMenuType = useAppSelector(
-    (state: RootState) => state.lists[listName as keyof IListState],
+  const listOfAvailableItemsForListType = useAppSelector(
+    (state: RootState) => state.lists[listType as keyof IListState],
   ) as Array<IListItem>;
 
-  const availableRowsList = listOfAvailableItemsForMenuType.map((item, index) => {
-    const value = translateValues ? t(`option.${item.value}`) : item.value;
+  const availableRowsList = listOfAvailableItemsForListType.map((item, index) => {
+    const value = translateValues
+      ? t(`option.${item.value}`, { defaultValue: item.value })
+      : item.value;
     const rowItem = {
       value,
-      id: value,
+      id: item.id,
       order: (
         <OrderCell
           rowIndex={index}
-          menuType={menuType}
-          rowLength={listOfAvailableItemsForMenuType.length}
+          listType={listType}
+          rowLength={listOfAvailableItemsForListType.length}
+          id={item.id}
+          path={path}
         />
       ),
       edit: (
         <EditCell
-          menuType={menuType}
           onEditMenuItem={onEditMenuItem}
           value={value}
           rowIndex={index}
+          path={path}
+          id={item.id}
         />
       ),
       rowIndex: index,
@@ -58,16 +55,16 @@ const AdminMenusCard: FC<IAdminMenusCardProps> = ({
   });
 
   const cols = [
-    { key: 'value', headerName: t(`adminFunctions.menus.menuType.${menuType}`) },
+    { key: 'value', headerName: t(`adminFunctions.menus.listType.${listType}`) },
     { key: 'order', headerName: t('order') },
-    { key: 'edit', headerName: 'Edit' },
+    { key: 'edit', headerName: t('edit') },
   ];
 
   return (
     <Card
-      heading={t(`adminFunctions.menus.menuType.${menuType}`)}
-      data-testid={`admin-menus-card-${menuType}`}
-      id={`menu-card-${menuType}`}
+      heading={t(`adminFunctions.menus.listType.${listType}`)}
+      data-testid={`admin-menus-card-${listType}`}
+      id={`menu-card-${listType}`}
       className="admin-menus-card"
     >
       <div className="admin-menus-card-content">
@@ -87,8 +84,8 @@ const AdminMenusCard: FC<IAdminMenusCardProps> = ({
       <Button
         variant={ButtonVariant.Secondary}
         role="link"
-        onClick={() => onAddMenuItem(menuType)}
-        data-testid={`admin-menus-card-button-${menuType}`}
+        onClick={() => onAddMenuItem(path)}
+        data-testid={`admin-menus-card-button-${listType}`}
         iconStart={
           <IconPlusCircle aria-label={t('adminFunctions.addRowButton')} aria-hidden={false} />
         }

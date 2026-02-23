@@ -4,8 +4,8 @@ import AdminMenusSideNavigation from './AdminMenusSideNavigation';
 import AdminMenusCard from './AdminMenusCard';
 import { useEffect } from 'react';
 import { menuCardItemContents } from './AdminMenusMenuCardItems';
-import { DialogState } from './AdminMenus.types';
 import AddOrEditMenuItemDialog from './AddOrEditMenuItemDialog';
+import { DialogState } from '@/interfaces/menuItemsInterfaces';
 
 const AdminMenus = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<string | null>(null);
@@ -45,27 +45,30 @@ const AdminMenus = () => {
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     mode: 'add',
-    menuType: undefined,
     value: '',
     rowIndex: undefined,
+    editableItemId: '',
+    path: '',
   });
 
-  const handleEdit = (menuType: string, value: string, rowIndex: number) => {
+  const handleEdit = (value: string, rowIndex: number, editableItemId: string, path: string) => {
     setDialogState({
       open: true,
       mode: 'edit',
-      menuType,
       value,
+      editableItemId,
       rowIndex,
+      path,
     });
   };
 
-  const handleAdd = (menuType: string) => {
+  const handleAdd = (path: string) => {
     setDialogState({
       open: true,
       mode: 'add',
-      menuType,
       value: '',
+      path,
+      editableItemId: '',
     });
   };
 
@@ -75,7 +78,8 @@ const AdminMenus = () => {
       open: false,
       value: '',
       rowIndex: undefined,
-      menuType: undefined,
+      path: '',
+      editableItemId: '',
     });
   };
 
@@ -86,10 +90,10 @@ const AdminMenus = () => {
         {menuCardItemContents.map((card) => {
           return (
             <AdminMenusCard
-              menuType={card.menuType}
-              listName={card.listName}
+              path={card.path}
+              listType={card.listType}
               translateValues={card.translateValues}
-              key={card.menuType}
+              key={card.listType}
               onEditMenuItem={handleEdit}
               onAddMenuItem={handleAdd}
             />

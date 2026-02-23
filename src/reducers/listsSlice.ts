@@ -21,6 +21,9 @@ import {
   getTalpaServiceClasses,
   getProjectTypeQualifiers,
   getPriorities,
+  patchMenuListItem,
+  postMenuListItem,
+  putMenuListOrder,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -32,6 +35,11 @@ import {
   ITalpaServiceClass,
 } from '@/interfaces/talpaInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
+import {
+  IMenuItemPatchThunkContent,
+  IMenuItemPostThunkContent,
+  MoveRowPayload,
+} from '@/interfaces/menuItemsInterfaces';
 
 export interface IListState {
   types: Array<IListItem>;
@@ -166,10 +174,73 @@ export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, t
   }
 });
 
+export const patchMenuItemsThunk = createAsyncThunk(
+  'listItem/patch',
+  async (thunkContent: IMenuItemPatchThunkContent, thunkAPI) => {
+    try {
+      const listItem = await patchMenuListItem(thunkContent.request, thunkContent.path);
+      return listItem;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
+export const postMenuItemsThunk = createAsyncThunk(
+  'listItem/post',
+  async (thunkContent: IMenuItemPostThunkContent, thunkAPI) => {
+    try {
+      const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
+      return listItem;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
+export const saveTableOrderThunk = createAsyncThunk(
+  'listItem/saveOrder',
+  async (
+    {
+      listType,
+      path,
+    }: {
+      listType: keyof Omit<IListState, 'error'>;
+      path: string;
+    },
+    thunkAPI,
+  ) => {
+    try {
+      const state = thunkAPI.getState() as RootState;
+      const listData = state.lists[listType] as IListItem[];
+
+      const savedTable = await putMenuListOrder(listData, path);
+      return savedTable;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
 export const listsSlice = createSlice({
   name: 'lists',
   initialState,
-  reducers: {},
+  reducers: {
+    moveRow: (state, action: PayloadAction<MoveRowPayload>) => {
+      const { listType, rowId, direction } = action.payload;
+
+      const list = state[listType];
+
+      const index = list.findIndex((row) => row.id === rowId);
+      if (index === -1) return;
+
+      const newIndex = direction === 'up' ? index - 1 : index + 1;
+
+      if (newIndex < 0 || newIndex >= list.length) return;
+
+      [list[index], list[newIndex]] = [list[newIndex], list[index]];
+    },
+  },
   extraReducers: (builder) => {
     // GET All LISTS
     builder.addCase(
@@ -207,5 +278,8 @@ export const selectTalpaProjectRanges = (state: RootState) => state.lists.talpaP
 export const selectTalpaProjectTypes = (state: RootState) => state.lists.talpaProjectTypes;
 export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpaServiceClasses;
 export const selectTalpaAssetClasses = (state: RootState) => state.lists.talpaAssetClasses;
+export const selectLists = (state: RootState) => state.lists;
+
+export const { moveRow } = listsSlice.actions;
 
 export default listsSlice.reducer;
