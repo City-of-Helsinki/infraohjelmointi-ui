@@ -46,18 +46,16 @@ const AdminMenus = () => {
     open: false,
     mode: 'add',
     value: '',
-    rowIndex: undefined,
     editableItemId: '',
     path: '',
   });
 
-  const handleEdit = (value: string, rowIndex: number, editableItemId: string, path: string) => {
+  const handleEdit = (value: string, editableItemId: string, path: string) => {
     setDialogState({
       open: true,
       mode: 'edit',
       value,
       editableItemId,
-      rowIndex,
       path,
     });
   };
@@ -77,7 +75,6 @@ const AdminMenus = () => {
       mode: 'add',
       open: false,
       value: '',
-      rowIndex: undefined,
       path: '',
       editableItemId: '',
     });

@@ -2,7 +2,7 @@ import { SideNavigation } from 'hds-react';
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles.css';
-import { IADMIN_MENUS_MENU_TYPE } from '@/interfaces/menuItemsInterfaces';
+import { ADMIN_MENUS_MENU_TYPE } from '@/interfaces/menuItemsInterfaces';
 
 interface AdminMenusSideNavigationProps {
   active: string | null;
@@ -20,7 +20,7 @@ const AdminMenusSideNavigation: FC<AdminMenusSideNavigationProps> = ({ active, s
           toggleButtonLabel={t('adminFunctions.menus.sideNavigationToggleButton')}
           className="admin-menus-side-nav"
         >
-          {IADMIN_MENUS_MENU_TYPE.map((menuType) => {
+          {ADMIN_MENUS_MENU_TYPE.map((menuType) => {
             return (
               <SideNavigation.MainLevel
                 href={`#menu-card-${menuType}`}

@@ -37,8 +37,8 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import {
-  IMenuItemPatchThunkContent,
-  IMenuItemPostThunkContent,
+  MenuItemPatchThunkContent,
+  MenuItemPostThunkContent,
   MoveRowPayload,
 } from '@/interfaces/menuItemsInterfaces';
 
@@ -180,7 +180,7 @@ export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, t
 
 export const patchMenuItemsThunk = createAsyncThunk(
   'listItem/patch',
-  async (thunkContent: IMenuItemPatchThunkContent, thunkAPI) => {
+  async (thunkContent: MenuItemPatchThunkContent, thunkAPI) => {
     try {
       const listItem = await patchMenuListItem(thunkContent.request, thunkContent.path);
       return listItem;
@@ -192,7 +192,7 @@ export const patchMenuItemsThunk = createAsyncThunk(
 
 export const postMenuItemsThunk = createAsyncThunk(
   'listItem/post',
-  async (thunkContent: IMenuItemPostThunkContent, thunkAPI) => {
+  async (thunkContent: MenuItemPostThunkContent, thunkAPI) => {
     try {
       const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
       return listItem;
