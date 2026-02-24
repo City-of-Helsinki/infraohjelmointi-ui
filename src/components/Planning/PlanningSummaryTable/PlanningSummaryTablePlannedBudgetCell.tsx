@@ -1,6 +1,6 @@
 import { FC, memo, useMemo } from 'react';
 import { useAppSelector } from '@/hooks/common';
-import { selectForcedToFrame, selectSelectedYear } from '@/reducers/planningSlice';
+import { selectForcedToFrame, selectSelectedYears } from '@/reducers/planningSlice';
 import moment from 'moment';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import './styles.css';
@@ -16,7 +16,7 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
   plannedBudget,
   isCurrentYear,
 }) => {
-  const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedYears = useAppSelector(selectSelectedYears);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const budgetCellColor = useMemo(() => {
@@ -34,7 +34,7 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
       <td className={`planned-budget-cell ${forcedToFrame ? 'framed' : ''}`}>
         <span data-testid={`summary-budget-${year}`}>{plannedBudget}</span>
       </td>
-      {year === selectedYear && (
+      {selectedYears.includes(year) && (
         <>
           {isCurrentYear && (
             <td
@@ -42,14 +42,17 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
               className={`monthly-summary-cell summary-budget ${budgetCellColor}`}
             ></td>
           )}
-          {moment.months().map((m) => (
-            <td
-              key={m}
-              className={`monthly-cell hoverable-${m} summary-budget ${budgetCellColor}`}
-              onMouseOver={() => setHoveredClassToMonth(m)}
-              onMouseLeave={() => removeHoveredClassFromMonth(m)}
-            />
-          ))}
+          {moment.months().map((m) => {
+            const hoverKey = `${year}-${m}`;
+            return (
+              <td
+                key={hoverKey}
+                className={`monthly-cell hoverable-${hoverKey} summary-budget ${budgetCellColor}`}
+                onMouseOver={() => setHoveredClassToMonth(hoverKey)}
+                onMouseLeave={() => removeHoveredClassFromMonth(hoverKey)}
+              />
+            );
+          })}
         </>
       )}
     </>

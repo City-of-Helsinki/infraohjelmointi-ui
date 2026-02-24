@@ -5,13 +5,14 @@ const year = new Date().getFullYear();
 
 const mockPlanningViewProjects: { data: IProjectsResponse } = {
   data: {
-    count: 10,
+    count: 13,
     results: [
       // Without group and in class (for testing project rows)
       {
         ...mockProject.data,
         id: 'planning-project-1',
         projectClass: 'test-class-1',
+        projectGroup: null,
         estPlanningStart: null,
         estPlanningEnd: null,
         estConstructionStart: null,
@@ -19,7 +20,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         constructionEndYear: 2031,
         planningStartYear: 2024,
         finances: {
-          year: 2023,
+          year,
           budgetProposalCurrentYearPlus0: '40.00',
           budgetProposalCurrentYearPlus1: '20.00',
           budgetProposalCurrentYearPlus2: '30.00',
@@ -38,13 +39,18 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         ...mockProject.data,
         id: 'planning-project-2',
         projectClass: 'test-class-1',
+        projectGroup: null,
+        planningStartYear: year + 1,
+        constructionEndYear: year + 6,
         estPlanningStart: `12.02.${year + 1}`,
         estPlanningEnd: `12.02.${year + 3}`,
         estConstructionStart: `12.02.${year + 3}`,
         estConstructionEnd: `12.02.${year + 6}`,
+        estWarrantyPhaseStart: null,
+        estWarrantyPhaseEnd: null,
         category: undefined,
         finances: {
-          year: 2023,
+          year,
           budgetProposalCurrentYearPlus0: '0.00',
           budgetProposalCurrentYearPlus1: '0.00',
           budgetProposalCurrentYearPlus2: '30.00',
@@ -63,6 +69,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         id: 'planning-project-3',
         projectClass: 'test-sub-class-1',
         name: 'not-in-group-project',
+        projectGroup: null,
       },
       // With group and in subClass
       {
@@ -108,6 +115,7 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         ...mockProject.data,
         id: 'planning-project-9',
         projectClass: 'test-class-1',
+        projectGroup: null,
         estPlanningStart: null,
         estPlanningEnd: null,
         estConstructionStart: `12.02.${year + 3}`,
@@ -120,16 +128,18 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         ...mockProject.data,
         id: 'planning-project-10',
         projectClass: 'test-class-1',
+        projectGroup: null,
         estPlanningStart: `12.02.${year + 3}`,
         estPlanningEnd: `12.02.${year + 3}`,
-        estConstructionStart: null,
-        estConstructionEnd: null,
+        estConstructionStart: `12.02.${year + 4}`,
+        estConstructionEnd: `12.02.${year + 4}`,
       },
       // For deleting last overlap cell
       {
         ...mockProject.data,
         id: 'planning-project-11',
         projectClass: 'test-class-1',
+        projectGroup: null,
         estPlanningStart: `12.02.${year + 3}`,
         estPlanningEnd: `12.02.${year + 3}`,
         estConstructionStart: `12.02.${year + 3}`,
@@ -140,16 +150,22 @@ const mockPlanningViewProjects: { data: IProjectsResponse } = {
         ...mockProject.data,
         id: 'planning-project-12',
         projectClass: 'test-class-1',
+        projectGroup: null,
+        planningStartYear: year + 3,
+        constructionEndYear: year + 5,
         estPlanningStart: `12.02.${year + 3}`,
         estPlanningEnd: `12.02.${year + 3}`,
         estConstructionStart: `12.02.${year + 3}`,
         estConstructionEnd: `12.02.${year + 5}`,
+        estWarrantyPhaseStart: null,
+        estWarrantyPhaseEnd: null,
       },
       // For deleting an overlap construction
       {
         ...mockProject.data,
         id: 'planning-project-13',
         projectClass: 'test-class-1',
+        projectGroup: null,
         estPlanningStart: `12.02.${year + 1}`,
         estPlanningEnd: `12.02.${year + 3}`,
         estConstructionStart: `12.02.${year + 3}`,

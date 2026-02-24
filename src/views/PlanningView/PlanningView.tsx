@@ -4,10 +4,10 @@ import { PlanningInfoPanel } from '@/components/Planning/PlanningInfoPanel';
 import { PlanningBreadcrumbs } from '@/components/Planning/PlanningBreadcrumbs';
 import { PlanningSummaryTable } from '@/components/Planning/PlanningSummaryTable';
 import { PlanningTable } from '@/components/Planning/PlanningTable';
-import { CoordinatorNotesDialog } from '../../components/CoordinatorNotesDialog/CoordinatorNotesDialog'
+import { CoordinatorNotesDialog } from '../../components/CoordinatorNotesDialog/CoordinatorNotesDialog';
 import usePlanningRows from '@/hooks/usePlanningRows';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectIsPlanningLoading, selectSelectedYear } from '@/reducers/planningSlice';
+import { selectIsPlanningLoading, selectSelectedYears } from '@/reducers/planningSlice';
 import usePlanningRoutes from '@/hooks/usePlanningRoutes';
 import useCoordinationRows from '@/hooks/useCoordinationRows';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
@@ -17,7 +17,7 @@ const LOADING_PLANNING_DATA_ID = 'loading-planning-data';
 
 const PlanningView: FC = () => {
   const dispatch = useAppDispatch();
-  const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedYears = useAppSelector(selectSelectedYears);
   const isPlanningLoading = useAppSelector(selectIsPlanningLoading);
   const { pathname } = useLocation();
   useEffect(() => {
@@ -26,7 +26,7 @@ const PlanningView: FC = () => {
     } else {
       dispatch(clearLoading(LOADING_PLANNING_DATA_ID));
     }
-  }, [isPlanningLoading]);
+  }, [isPlanningLoading, dispatch]);
 
   usePlanningRows();
   useCoordinationRows();
@@ -38,13 +38,11 @@ const PlanningView: FC = () => {
       <PlanningToolbar />
       {!isPlanningLoading && (
         <div
-          className={`planning-view-container ${selectedYear ? '!mr-20' : ''}`}
+          className={`planning-view-container ${selectedYears.length ? '!mr-20' : ''}`}
           id="planning-view"
         >
           <div className="planning-header-container">
-            { pathname.includes('coordination') &&
-              <CoordinatorNotesDialog />
-            }
+            {pathname.includes('coordination') && <CoordinatorNotesDialog />}
             <CoordinatorNotesDialog />
             <PlanningInfoPanel />
             <PlanningSummaryTable />

@@ -26,7 +26,7 @@ export const CoordinatorNotesDialog = () => {
 
   const handleClose = useCallback(async () => {
     dispatch(setNotesDialogOpen(false));
-  }, []);
+  }, [dispatch]);
 
   const handleSubmit = async () => {
     const data = {

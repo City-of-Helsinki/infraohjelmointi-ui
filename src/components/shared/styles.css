@@ -89,6 +89,14 @@
   white-space: nowrap;
 }
 
+.custom-tag-container.custom-tag-container--circular {
+  @apply h-8 w-8 justify-center px-0;
+}
+
+.custom-tag-container.custom-tag-container--circular span {
+  margin: 0;
+}
+
 .select-field-wrapper,
 .select-field-wrapper.lg {
   @apply relative max-w-[24rem];

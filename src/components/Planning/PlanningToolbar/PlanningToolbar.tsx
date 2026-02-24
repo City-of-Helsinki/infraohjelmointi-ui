@@ -5,9 +5,11 @@ import {
   IconSort,
   IconMoneyBag,
   IconMoneyBagFill,
+  IconEyeCrossed,
+  IconEye,
 } from 'hds-react/icons/';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
-import { dispatchContextMenuEvent } from '@/utils/events';
+import { dispatchContextMenuEvent, hideTooltipImmediately } from '@/utils/events';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { Button, ButtonVariant } from 'hds-react';
 import { GroupDialog } from '../GroupDialog';
@@ -16,11 +18,13 @@ import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
   selectForcedToFrame,
   selectGroupsExpanded,
+  selectHoverTooltipsEnabled,
   selectPlanningMode,
-  selectSelectedYear,
+  selectSelectedYears,
   selectSelections,
   setForcedToFrame,
   setGroupsExpanded,
+  setHoverTooltipsEnabled,
 } from '@/reducers/planningSlice';
 import { t } from 'i18next';
 import './styles.css';
@@ -43,7 +47,7 @@ const PlanningToolbar = () => {
   const dispatch = useAppDispatch();
   const mode = useAppSelector(selectPlanningMode);
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
-  const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedYears = useAppSelector(selectSelectedYears);
   const [toolbarState, setToolbarState] = useState({
     groupDialogVisible: false,
     projectProgrammedDialogVisible: false,
@@ -55,6 +59,7 @@ const PlanningToolbar = () => {
   const planningClasses = useAppSelector(selectBatchedPlanningClasses);
   const selections = useAppSelector(selectSelections);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
   const user = useAppSelector(selectUser);
 
   const groupsExpandIcon = useMemo(
@@ -96,6 +101,14 @@ const PlanningToolbar = () => {
     () => setToolbarState((current) => ({ ...current, groupDialogVisible: false })),
     [],
   );
+
+  const toggleHoverTooltips = useCallback(() => {
+    const nextValue = !hoverTooltipsEnabled;
+    if (!nextValue) {
+      hideTooltipImmediately();
+    }
+    dispatch(setHoverTooltipsEnabled(nextValue));
+  }, [dispatch, hoverTooltipsEnabled]);
 
   const onOpenNewProjectForm = useCallback(() => {
     dispatch(resetProject());
@@ -192,6 +205,15 @@ const PlanningToolbar = () => {
             >
               {t('new')}
             </Button>
+            <Button
+              variant={ButtonVariant.Supplementary}
+              className="toolbar-button"
+              onClick={toggleHoverTooltips}
+              data-testid="toggle-tooltips-button"
+              iconStart={hoverTooltipsEnabled ? <IconEyeCrossed /> : <IconEye />}
+            >
+              {hoverTooltipsEnabled ? t('tooltips.hideTooltips') : t('tooltips.showTooltips')}
+            </Button>
             <GroupDialog
               isOpen={groupDialogVisible}
               handleClose={onCloseGroupDialog}
@@ -205,7 +227,9 @@ const PlanningToolbar = () => {
         </>
       }
       right={
-        <div className={`planning-toolbar-right ${selectedYear ? 'monthly-view-open' : ''}`}>
+        <div
+          className={`planning-toolbar-right ${selectedYears.length ? 'monthly-view-open' : ''}`}
+        >
           <div>
             <button
               aria-label="ideal budget view"

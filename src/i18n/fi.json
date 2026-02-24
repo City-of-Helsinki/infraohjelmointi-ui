@@ -80,7 +80,7 @@
     "secondPhase": "Toinen vaihe / viimeistely",
     "Stara": "Stara",
     "Puitesopimus": "Puitesopimus",
-    "Kilpailutettu": "Kilpailutettu",
+    "Kilpailutus": "Kilpailutus",
     "Yhteistoiminnalliset": "Yhteistoiminnalliset",
     "K1": "K1",
     "K2": "K2",
@@ -134,7 +134,10 @@
     "Kesken": "Kesken",
     "Valmis": "Valmis",
     "newConstruction": "Uudisrakentaminen",
-    "basicImprovement": "Perusparantaminen"
+    "basicImprovement": "Perusparantaminen",
+    "high": "Prioriteetti 1",
+    "medium": "Prioriteetti 2",
+    "low": "Prioriteetti 3"
   },
   "validation": {
     "required": "Täytä {{field}}",
@@ -239,7 +242,7 @@
     "investmentProfile": "Invest.profiili",
     "readiness": "Valmius",
     "excelGenerated": "Avauspyyntö-excel muodostettu",
-    "excelSent": "Avauspyyntö lähetetty talpaan",
+    "excelSent": "Avauspyyntö lähetetty Talpaan",
     "projectOpened": "Projekti avattu",
     "markAsSent": "Merkitse avauspyyntö lähetetyksi",
     "projectSentLabel": "Projektitiedot lähetetty Talpaan",
@@ -254,7 +257,11 @@
     "area": "Projektialue",
     "hkrId": "PW Hanketunnus",
     "sapProject": "Projektinumero",
+    "clearHashTagSelection": "Tyhjennä valinnat",
     "hashTags": "Tunnisteet",
+    "removeHashTag": "Poista tunniste:",
+    "searchForHashTags": "Hae tunnisteita",
+    "selectHashTag": "Valitse tunniste valikosta",
     "schedule": "Hankkeen aikataulu",
     "planning": "Suunnittelu",
     "estPlanningStart": "Alkaa",
@@ -329,7 +336,9 @@
     "onSchedule": "Onko hanke aikataulussa",
     "address": "Katuosoite",
     "postalCode": "Postinumero",
-    "city": "Kaupunki"
+    "city": "Kaupunki",
+    "priority": "Prioriteetti",
+    "priorityTooltip": "<p><strong>Prioriteetti 1:</strong> Hanke on kiireellisesti edistettävä. Hankkeen kiireellisyys voi johtua esim. sidoksista toisiin hankkeisiin tai tapahtumiin, terveellisyyden ja turvallisuuden varmistamisesta tai poliittisesta tahtotilasta.</p><p><strong>Prioriteetti 2:</strong> Hanke on tavanomaisesti edistettävä. Hanketta pyritään edistämään esitetyssä aikataulussa resurssit huomioiden.</p><p><strong>Prioriteetti 3:</strong> Hankkeen edistäminen voi odottaa. Hankkeen edistäminen voi esim. odottaa vielä tarvittavien lupaprosessien tai liittyvien hankkeiden etenemistä tai liittyvien valitusten käsittelyä.</p>"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -769,6 +778,15 @@
       "K53": "5.3 Vetovoimaan liittyvät erillishankkeet",
       "K54": "5.4 Toimitilahankkeet",
       "K55": "5.5 Muut"
+    }
+  },
+  "tooltips": {
+    "hideTooltips": "Piilota infoikkunat",
+    "showTooltips": "Näytä infoikkunat",
+    "priority": {
+      "high": "Hanke on kiireellisesti edistettävä",
+      "medium": "Hanke on tavanomaisesti edistettävä",
+      "low": "Hankkeen edistäminen voi odottaa"
     }
   }
 }

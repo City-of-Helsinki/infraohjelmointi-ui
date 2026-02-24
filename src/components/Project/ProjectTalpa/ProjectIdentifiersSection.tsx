@@ -39,43 +39,32 @@ export default function ProjectIdentifiersSection() {
   const budgetItemNumberDirty = Boolean(dirtyFields?.budgetItemNumber);
   const projectTypeDirty = Boolean(dirtyFields?.projectType);
 
+  // Both 2814I and 2814E now have budgetAccount populated - unified filter
   const filteredProjectRanges = talpaProjectRanges.filter(
     (projectRange) =>
       projectRange.projectTypePrefix === budgetItemNumber &&
-      projectRange.budgetAccount !== null &&
-      projectRange.budgetAccount.toLowerCase() !== 'malli',
+      projectRange.budgetAccount &&
+      projectRange.budgetAccount.trim() !== '' &&
+      !projectRange.budgetAccount.toLowerCase().includes('malli'),
   );
 
+  // Unified grouping - groupLabel is always populated for both 2814I and 2814E
   const projectRangeGroups = useMemo(
     () =>
-      budgetItemNumber === BudgetItemNumber.InfraInvestment
-        ? groupOptions(
-            filteredProjectRanges,
-            (projectRange) => projectRange.budgetAccount,
-            (projectRange) => ({
-              label: `${projectRange.majorDistrictName ?? projectRange.notes} / ${
-                projectRange.rangeStart
-              } - ${projectRange.rangeEnd}`,
-              value: projectRange.id,
-              selected: false,
-              isGroupLabel: false,
-              visible: true,
-              disabled: false,
-            }),
-          )
-        : groupOptions(
-            filteredProjectRanges,
-            (projectRange) => `${projectRange.budgetAccount} ${projectRange.area}`,
-            (projectRange) => ({
-              label: `${projectRange.unit} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
-              value: projectRange.id,
-              selected: false,
-              isGroupLabel: false,
-              visible: true,
-              disabled: false,
-            }),
-          ),
-    [budgetItemNumber, filteredProjectRanges],
+      groupOptions(
+        filteredProjectRanges,
+        // Group by groupLabel (e.g., "8 03 01 01 Katujen uudisrakentaminen")
+        (projectRange) => projectRange.groupLabel ?? projectRange.budgetAccount ?? '',
+        (projectRange) => ({
+          label: projectRange.displayName || '',
+          value: projectRange.id,
+          selected: false,
+          isGroupLabel: false,
+          visible: true,
+          disabled: false,
+        }),
+      ),
+    [filteredProjectRanges],
   );
 
   const projectTypeGroups = useMemo(
@@ -145,11 +134,7 @@ export default function ProjectIdentifiersSection() {
     <div className="mb-12">
       <FormSectionTitle label="projectTalpaForm.projectIdentifiers" name="projectIdentifiers" />
       {/* Talousarviokohdan nimi */}
-      <TextField
-        {...getFieldProps('budgetAccount')}
-        rules={{ ...validateRequired('budgetAccount', t) }}
-        size="full"
-      />
+      <TextField {...getFieldProps('budgetAccount')} size="full" />
       {/* Projektinumeroväli */}
       <SelectField
         {...getFieldProps('projectNumberRange')}
@@ -161,12 +146,7 @@ export default function ProjectIdentifiersSection() {
       />
       {/* Malliprojekti */}
       {budgetItemNumber === BudgetItemNumber.InfraInvestment ? (
-        <TextField
-          {...getFieldProps('templateProject')}
-          rules={{ ...validateRequired('templateProject', t) }}
-          size="full"
-          readOnly
-        />
+        <TextField {...getFieldProps('templateProject')} size="full" />
       ) : (
         <SelectField
           {...getFieldProps('templateProject')}

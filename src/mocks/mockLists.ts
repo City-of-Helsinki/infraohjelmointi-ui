@@ -116,7 +116,7 @@ export const mockConstructionProcurementMethods: { data: Array<IListItem> } = {
     },
     {
       id: 'c3d4e5f6-g7h8-9012-cdef-123456789012',
-      value: 'Kilpailutettu',
+      value: 'Kilpailutus',
     },
     {
       id: 'd4e5f6g7-h8i9-0123-defg-234567890123',
@@ -166,12 +166,11 @@ export const mockProjectCategories: { data: Array<IListItem> } = {
   ],
 };
 
-export const mockProjectRisks: { data: Array<IListItem> } = {
+export const mockPriorities: { data: Array<IListItem> } = {
   data: [
-    {
-      id: 'ec49d5ad-95db-460d-bc8b-0823e234a739',
-      value: 'placeholderRisk',
-    },
+    { id: 'priority-high', value: 'high' },
+    { id: 'priority-medium', value: 'medium' },
+    { id: 'priority-low', value: 'low' },
   ],
 };
 

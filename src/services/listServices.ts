@@ -65,15 +65,6 @@ export const getProjectCategories = async (): Promise<IListItem[]> => {
   }
 };
 
-export const getProjectRisks = async () => {
-  try {
-    const res = await axios.get(`${REACT_APP_API_URL}/project-risks/`);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
-};
-
 export const getProjectQualityLevels = async () => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-quality-levels/`);
@@ -131,6 +122,15 @@ export const getDistricts = async (): Promise<Array<IProjectDistrict>> => {
 export const getBudgetOverrunReasons = async () => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/budget-overrun-reasons/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const getPriorities = async () => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/project-priority/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

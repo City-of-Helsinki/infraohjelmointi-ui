@@ -1,4 +1,4 @@
-import { FormSectionTitle, NumberField, SelectField, TextField } from '@/components/shared';
+import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
 import { getFieldProps } from './ProjectTalpaForm';
 import styles from './styles.module.css';
 import { useTranslation } from 'react-i18next';
@@ -72,7 +72,7 @@ export default function ProjectClassesSection() {
   useEffect(() => {
     const selectedAssetClass = talpaAssetClasses.find((ac) => ac.id === assetClass?.value);
     if (selectedAssetClass) {
-      setValue('holdingTime', selectedAssetClass.holdingPeriodYears);
+      setValue('holdingTime', selectedAssetClass.holdingPeriodYears ?? 'Ei pitoaikaa');
     }
   }, [assetClass, talpaAssetClasses, setValue]);
 
@@ -100,7 +100,7 @@ export default function ProjectClassesSection() {
       <TextField {...getFieldProps('profileName')} size="full" />
       <div className={styles.formRowWithColumns}>
         {/* Pitoaika */}
-        <NumberField {...getFieldProps('holdingTime')} size="full" />
+        <TextField {...getFieldProps('holdingTime')} size="full" />
         {/* Investointiproﬁli */}
         <TextField {...getFieldProps('investmentProfile')} size="full" />
         {/* Valmius */}

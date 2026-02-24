@@ -227,6 +227,58 @@ describe('Search', () => {
     expect(getRequest.calls[1][0].includes('hashtag=123')).toBe(true);
   });
 
+  it('encodes special characters in projectName search params', async () => {
+    const specialFreeSearch = 'Puisto+';
+    const specialProjectName = 'Puisto+katu & tie';
+
+    mockedAxios.get.mockResolvedValueOnce({
+      data: {
+        hashtags: [],
+        projects: [{ value: specialProjectName, id: 'special-project' }],
+        groups: [],
+      },
+    });
+
+    mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
+
+    const { user, store, getByText, getByTestId } = await render();
+
+    await waitFor(() => store.dispatch(toggleSearch()));
+
+    await user.type(getByText('searchForm.searchWord'), specialFreeSearch);
+
+    await waitFor(() => expect(getByText(specialProjectName)).toBeInTheDocument());
+
+    // Test that the free search request is encoded correctly
+    const freeSearchRequestCall = mockedAxios.get.mock.calls.find(([url]) =>
+      url.includes('freeSearch='),
+    );
+
+    expect(freeSearchRequestCall).toBeDefined();
+
+    const [freeSearchRequestUrl] = freeSearchRequestCall as [string];
+
+    expect(freeSearchRequestUrl).toContain(`freeSearch=${encodeURIComponent(specialFreeSearch)}`);
+
+    await user.click(getByText(specialProjectName));
+    await user.click(getByTestId('search-projects-button'));
+
+    await waitFor(() => expect(getByTestId('search-results-view')).toBeInTheDocument());
+
+    // Test that the search request with the selected project is encoded correctly
+    const encodedValue = encodeURIComponent(specialProjectName);
+    const searchRequestCall = mockedAxios.get.mock.calls.find(([url]) =>
+      url.includes('projectName='),
+    );
+
+    expect(searchRequestCall).toBeDefined();
+
+    const [requestUrl] = searchRequestCall as [string];
+
+    expect(requestUrl).toContain(`/projects/search-results/?projectName=${encodedValue}`);
+    expect(requestUrl).toContain(`group=${encodedValue}`);
+  });
+
   it('adds search results to redux with a successful GET request and redirects the user to SearchResults', async () => {
     mockedAxios.get.mockResolvedValueOnce(mockSearchResults);
 

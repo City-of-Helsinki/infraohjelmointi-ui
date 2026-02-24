@@ -13,7 +13,6 @@ import {
   mockProjectCategories,
   mockProjectPhases,
   mockProjectQualityLevels,
-  mockProjectRisks,
   mockProjectTypes,
   mockResponsiblePersons,
   mockResponsibleZones,
@@ -69,12 +68,12 @@ const render = async () =>
           project: {
             selectedProject: mockProject.data,
             count: 1,
-            error: {},
+            error: null,
             page: 1,
             isSaving: false,
             mode: 'edit',
           },
-          auth: { user: mockUser.data, error: {} },
+          auth: { user: mockUser.data, error: null },
           lists: {
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,
@@ -82,7 +81,6 @@ const render = async () =>
             constructionPhaseDetails: mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockConstructionProcurementMethods.data,
             categories: mockProjectCategories.data,
-            riskAssessments: mockProjectRisks.data,
             projectQualityLevels: mockProjectQualityLevels.data,
             planningPhases: mockPlanningPhases.data,
             constructionPhases: mockConstructionPhases.data,
@@ -96,6 +94,7 @@ const render = async () =>
             budgetOverrunReasons: mockBudgetOverrunReasons.data,
             programmers: mockProgrammers.data,
             projectClasses: [],
+            priorities: [],
             talpaProjectRanges: [],
             talpaProjectTypes: [],
             talpaServiceClasses: [],
@@ -153,7 +152,7 @@ describe('projectForm', () => {
     const sapCostCurrentYear = project.currentYearsSapValues
       ? project.currentYearsSapValues[0]
       : null;
-    const expectDisplayValue = async (value: string | undefined) =>
+    const expectDisplayValue = async (value: string | undefined | null) =>
       expect(await findByDisplayValue(value || '')).toBeInTheDocument();
     const expectOption = async (option: string | undefined) =>
       expect((await findAllByText(new RegExp(option || '', 'i')))[0]).toBeInTheDocument();
@@ -169,7 +168,7 @@ describe('projectForm', () => {
     expectOption(project?.constructionPhase?.value);
     expectOption(project?.constructionPhaseDetail?.value);
     expectOption(project?.category?.value);
-    expectOption(project?.riskAssessment?.value);
+    expectOption(project?.priority?.value);
     expectPersonOption(project?.personPlanning as IPerson);
     expectPersonOption(project?.personConstruction as IPerson);
     expectPersonOption(project?.personProgramming as IPerson);
@@ -278,8 +277,9 @@ describe('projectForm', () => {
     expect((await dialog.findAllByTestId('project-hashtags')).length).toBe(2);
 
     // Search for a hashTag and click on the search result
-    await user.type(await dialog.findByRole('combobox', { name: 'addHashTag' }), 'hul');
+    await user.click(await dialog.findByText('addHashTag'));
 
+    await user.type(await dialog.findByPlaceholderText('projectForm.searchForHashTags'), 'hul');
     await waitFor(async () => await user.click(await dialog.findByText('hulevesi')));
 
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
@@ -455,7 +455,7 @@ describe('projectForm', () => {
     const yearToBeSet = expectedValue.split('.')[2];
 
     expect(planningStartYear).not.toEqual(yearToBeSet);
-    expect(mockedAxios.patch.mock.lastCall).toBeUndefined;
+    expect(mockedAxios.patch.mock.lastCall).toBeUndefined();
   });
 
   it('can patch a TextField', async () => {
@@ -574,6 +574,34 @@ describe('projectForm', () => {
     );
     expect(await findByTestId('phase')).toHaveTextContent(matchExact(expectedPhase.value));
   }, 15000);
+
+  it('can patch a project', async () => {
+    const expectedDescription = 'Patched project description';
+    const expectedHkrId = null;
+    const project = mockProject.data;
+    const responseProject: { data: IProject } = {
+      data: { ...project, description: expectedDescription, hkrId: expectedHkrId },
+    };
+
+    mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+    const { user, findByDisplayValue, findByTestId, findByRole } = await render();
+
+    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
+    const hkrIdField = await findByRole('spinbutton', { name: getFormField('hkrId') });
+    const formSubmitButton = await findByTestId('submit-project-button');
+
+    await user.clear(descriptionField);
+    await user.type(descriptionField, expectedDescription);
+    await user.clear(hkrIdField);
+
+    await user.click(formSubmitButton);
+
+    const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+    expect(formPatchRequest.description).toEqual(expectedDescription);
+    expect(formPatchRequest.hkrId).toEqual(expectedHkrId);
+    expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
+  });
 
   it('can delete a project', async () => {
     const project = mockProject.data;

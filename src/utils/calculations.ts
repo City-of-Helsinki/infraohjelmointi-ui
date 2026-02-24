@@ -91,10 +91,12 @@ export const calculatePlanningCells = (
     // Frame budget is always displayed along with the budgetChange
     const displayFrameBudget = budgetChange ? budgetChange + frameBudget : frameBudget;
 
+    const currentYear = new Date().getFullYear();
+
     return {
       key,
       year: year + i,
-      isCurrentYear: year + i === year,
+      isCurrentYear: year + i === currentYear,
       isFrameBudgetOverlap: isFrameBudgetOverlap,
       // we don't return any budgets for divisions
       ...(type !== 'division' && {

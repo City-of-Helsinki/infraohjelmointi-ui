@@ -1,13 +1,12 @@
-import { useAppDispatch } from '@/hooks/common';
 import useProjectNoteForm from '@/forms/useNoteForm';
 import { IProjectNoteForm } from '@/interfaces/formInterfaces';
 import { INoteRequest } from '@/interfaces/noteInterfaces';
-import { postNoteThunk } from '@/reducers/noteSlice';
 import { Button, ButtonSize } from 'hds-react';
 import { TextArea } from 'hds-react';
 import { memo, useCallback } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { usePostNoteMutation } from '@/api/notesApi';
 
 const ProjectNewNoteForm = () => {
   const { formMethods, formValues } = useProjectNoteForm();
@@ -18,18 +17,18 @@ const ProjectNewNoteForm = () => {
     reset,
     formState: { isDirty },
   } = formMethods;
-  const dispatch = useAppDispatch();
+  const [postNote] = usePostNoteMutation();
 
   const onSubmit = useCallback(
     async (form: IProjectNoteForm) => {
       try {
-        await dispatch(postNoteThunk(form as INoteRequest));
+        await postNote(form as INoteRequest);
         reset(formValues);
       } catch (e) {
         console.log('Error posting note: ', e);
       }
     },
-    [dispatch, formValues, reset],
+    [formValues, reset, postNote],
   );
 
   return (

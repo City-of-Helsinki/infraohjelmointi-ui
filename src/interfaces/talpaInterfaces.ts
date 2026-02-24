@@ -37,6 +37,8 @@ export interface ITalpaProjectRange {
   notes: string;
   isActive: boolean;
   updatedDate: string;
+  displayName?: string; // Computed display name from API (handles null values)
+  groupLabel?: string; // Computed group label for dropdown grouping (e.g., '8 03 01 01 Katujen uudisrakentaminen')
 }
 
 export interface ITalpaProjectType {
@@ -106,6 +108,7 @@ export interface ITalpaProjectOpeningRequest
     | 'projectType'
     | 'serviceClass'
     | 'assetClass'
+    | 'holdingTime'
   > {
   projectNumberRangeId: string;
   projectTypeId: string;

@@ -37,14 +37,17 @@ const formatDateToHds = (date?: string | null) => {
 };
 
 const buildProjectRangeOption = (
-  projectRange: ITalpaProjectRange,
-): IProjectTalpaForm['projectNumberRange'] => ({
-  label:
-    projectRange.projectTypePrefix === BudgetItemNumber.InfraInvestment
-      ? `${projectRange.majorDistrictName} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`
-      : `${projectRange.unit} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
-  value: projectRange.id,
-});
+  projectRange: ITalpaProjectRange | null,
+): IProjectTalpaForm['projectNumberRange'] =>
+  projectRange
+    ? {
+        label:
+          projectRange.projectTypePrefix === BudgetItemNumber.InfraInvestment
+            ? `${projectRange.majorDistrictName} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`
+            : `${projectRange.unit} / ${projectRange.rangeStart} - ${projectRange.rangeEnd}`,
+        value: projectRange.id,
+      }
+    : null;
 
 const buildProjectTypeOption = (
   projectType: ITalpaProjectType,
@@ -137,7 +140,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       serviceClass: null,
       assetClass: null,
       profileName: TalpaProfileName.FixedStructures,
-      holdingTime: null,
+      holdingTime: '',
       readiness: buildReadinessOption(TalpaReadiness.Kesken),
     };
   }
@@ -172,7 +175,7 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       : null,
     assetClass: talpaProject.assetClass ? buildAssetClassOption(talpaProject.assetClass) : null,
     profileName: talpaProject.profileName,
-    holdingTime: formattedHoldingTime,
+    holdingTime: formattedHoldingTime ?? 'Ei pitoaikaa',
     investmentProfile: talpaProject.investmentProfile,
     readiness: buildReadinessOption(talpaProject.readiness),
     isLocked: talpaProject.isLocked,

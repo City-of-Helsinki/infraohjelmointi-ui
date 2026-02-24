@@ -5,7 +5,7 @@ import moment from 'moment';
 import './styles.css';
 import { calcPercentage } from '@/utils/calculations';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectSelectedYear, setSelectedYear } from '@/reducers/planningSlice';
+import { selectSelectedYears, toggleSelectedYear } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import { dispatchDateIndicatorEvent } from '@/utils/events';
 
@@ -21,15 +21,15 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   isCurrentYear,
 }) => {
   const dispatch = useAppDispatch();
-  const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedYears = useAppSelector(selectSelectedYears);
 
-  // Sets the selectedYear or null if the year is given again, so that the monthly view can be closed
-  // when the same year is re-clicked
+  // Toggles the given year in the selection so multiple monthly views can stay open simultaneously
   const handleSetSelectedYear = useCallback(
-    (year: number | null) => {
-      dispatch(setSelectedYear(year === selectedYear ? null : year));
+    (year: number) => {
+      const isSelected = selectedYears.includes(year);
+      dispatch(toggleSelectedYear(year));
 
-      if (selectedYear !== year) {
+      if (!isSelected) {
         // when opening not current year
         dispatchDateIndicatorEvent({
           isVisible: isCurrentYear,
@@ -43,7 +43,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
         });
       }
     },
-    [dispatch, selectedYear],
+    [dispatch, isCurrentYear, selectedYears],
   );
 
   /**
@@ -66,10 +66,10 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
 
   const arrows = useMemo(
     () => ({
-      left: selectedYear === year ? <IconAngleRight /> : <IconAngleLeft />,
-      right: selectedYear === year ? <IconAngleLeft /> : <IconAngleRight />,
+      left: selectedYears.includes(year) ? <IconAngleRight /> : <IconAngleLeft />,
+      right: selectedYears.includes(year) ? <IconAngleLeft /> : <IconAngleRight />,
     }),
-    [selectedYear, year],
+    [selectedYears, year],
   );
 
   const showDateIndicator = useCallback(
@@ -78,22 +78,25 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
   );
 
   // Dispatch an event that tells the PlanningSummaryTable to display the date indicator and what its position should be
-  const notifyDateIndicator = useCallback((i: number, m: string) => {
-    if (showDateIndicator(i + 1)) {
-      // "Async" hack to wait for the element to render before calling document.getElementById
-      setTimeout(() => {
-        const element = document.getElementById(`month-label-${m}`);
-        if (element) {
-          const elementPosition = (element as HTMLElement).offsetLeft;
-          dispatchDateIndicatorEvent({
-            isVisible: true,
-            position: elementPosition + getDateIndicatorLeftPixels(i + 1),
-          });
-        }
-      }, 0);
-    }
-    return null;
-  }, []);
+  const notifyDateIndicator = useCallback(
+    (i: number, m: string) => {
+      if (showDateIndicator(i + 1)) {
+        // "Async" hack to wait for the element to render before calling document.getElementById
+        setTimeout(() => {
+          const element = document.getElementById(`month-label-${year}-${m}`);
+          if (element) {
+            const elementPosition = (element as HTMLElement).offsetLeft;
+            dispatchDateIndicatorEvent({
+              isVisible: true,
+              position: elementPosition + getDateIndicatorLeftPixels(i + 1),
+            });
+          }
+        }, 0);
+      }
+      return null;
+    },
+    [getDateIndicatorLeftPixels, showDateIndicator, year],
+  );
 
   return (
     <>
@@ -110,7 +113,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
           </div>
         </button>
       </td>
-      {year === selectedYear && (
+      {selectedYears.includes(year) && (
         <>
           {isCurrentYear && (
             <td key={`${year}-monthly-view`} className="monthly-summary-cell label">
@@ -119,20 +122,24 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
               </div>
             </td>
           )}
-          {moment.months().map((m, i) => (
-            <td
-              key={m}
-              className={`monthly-cell label hoverable-${m}`}
-              id={`month-label-${m}`}
-              onMouseOver={() => setHoveredClassToMonth(m)}
-              onMouseLeave={() => removeHoveredClassFromMonth(m)}
-            >
-              <div className="monthly-cell-container relative" data-testid={`month-label-${m}`}>
-                <span>{m.substring(0, 3)}</span>
-                {notifyDateIndicator(i, m)}
-              </div>
-            </td>
-          ))}
+          {moment.months().map((m, i) => {
+            const hoverKey = `${year}-${m}`;
+            const monthLabelId = `month-label-${year}-${m}`;
+            return (
+              <td
+                key={`${year}-${m}`}
+                className={`monthly-cell label hoverable-${hoverKey}`}
+                id={monthLabelId}
+                onMouseOver={() => setHoveredClassToMonth(hoverKey)}
+                onMouseLeave={() => removeHoveredClassFromMonth(hoverKey)}
+              >
+                <div className="monthly-cell-container relative" data-testid={monthLabelId}>
+                  <span>{m.substring(0, 3)}</span>
+                  {notifyDateIndicator(i, m)}
+                </div>
+              </td>
+            );
+          })}
         </>
       )}
     </>

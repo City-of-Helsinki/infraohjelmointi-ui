@@ -3,8 +3,8 @@ import { IProjectSums } from '@/interfaces/planningInterfaces';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { patchProject } from '@/services/projectServices';
-import { dispatchContextMenuEvent } from '@/utils/events';
-import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
+import { dispatchContextMenuEvent, dispatchTooltipEvent } from '@/utils/events';
+import { useCallback, MouseEvent as ReactMouseEvent, memo, FC, SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { IconMenuDots, IconSize } from 'hds-react/icons';
 import optionIcon from '@/utils/optionIcon';
@@ -14,6 +14,26 @@ import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
+import { selectHoverTooltipsEnabled } from '@/reducers/planningSlice';
+import { useTranslation } from 'react-i18next';
+
+const PRIORITY_VALUE_MAP: Record<string, string> = {
+  high: '1',
+  medium: '2',
+  low: '3',
+};
+
+const PRIORITY_BG_COLOR_MAP: Record<string, string> = {
+  high: 'var(--color-brick)',
+  medium: 'var(--color-success)',
+  low: 'var(--color-black-20)',
+};
+
+const PRIORITY_TEXT_COLOR_MAP: Record<string, string> = {
+  high: 'var(--color-white)',
+  medium: 'var(--color-white)',
+  low: 'var(--color-black-90)',
+};
 
 interface IProjectHeadProps {
   project: IProject;
@@ -21,14 +41,26 @@ interface IProjectHeadProps {
 }
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
+  const { t } = useTranslation();
   const { costEstimateBudget, availableFrameBudget } = sums;
   const user = useAppSelector(selectUser);
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
+  const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
   const isPhaseValid = useProjectPhaseValidation({
     getProject: () => project,
   });
   const projectPhase = project.phase?.value;
+  const priorityTagText = project.priority?.value
+    ? PRIORITY_VALUE_MAP[project.priority.value.toLowerCase()] ?? project.priority.value
+    : undefined;
+  const priorityBgColor = project.priority?.value
+    ? PRIORITY_BG_COLOR_MAP[project.priority.value.toLowerCase()]
+    : undefined;
+  const priorityTextColor = project.priority?.value
+    ? PRIORITY_TEXT_COLOR_MAP[project.priority.value.toLowerCase()]
+    : undefined;
+  const priorityTooltipTextKey = project.priority?.value;
 
   const onSubmitPhase = useCallback(
     (req: IProjectRequest) => {
@@ -62,6 +94,22 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
     [onSubmitPhase, project.name, project.phase?.id],
   );
 
+  const showPriorityTooltip = useCallback(
+    (event: SyntheticEvent<HTMLElement>) => {
+      if (!priorityTooltipTextKey || !hoverTooltipsEnabled) {
+        return;
+      }
+      dispatchTooltipEvent(event, 'show', {
+        text: t(`tooltips.priority.${priorityTooltipTextKey}`),
+      });
+    },
+    [priorityTooltipTextKey, hoverTooltipsEnabled, t],
+  );
+
+  const hidePriorityTooltip = useCallback((event: SyntheticEvent<HTMLElement>) => {
+    dispatchTooltipEvent(event, 'hide', { text: '' });
+  }, []);
+
   return (
     <th className="project-head-cell" data-testid={`head-${project.id}`}>
       <div className="project-head-cell-container">
@@ -88,6 +136,18 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         </div>
         {/* Category & Budgets */}
         <div className="project-right-icons-container">
+          {project.priority && priorityTagText && (
+            <div onMouseEnter={showPriorityTooltip} onMouseLeave={hidePriorityTooltip}>
+              <CustomTag
+                text={priorityTagText}
+                color={priorityBgColor}
+                textColor={priorityTextColor}
+                weight={'light'}
+                id={`priority-${project.id}`}
+                circular
+              />
+            </div>
+          )}
           <div>
             {project.category && (
               <CustomTag

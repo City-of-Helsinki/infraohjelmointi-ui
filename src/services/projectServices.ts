@@ -16,15 +16,6 @@ import axios from 'axios';
 
 const { REACT_APP_API_URL } = process.env;
 
-export const getProject = async (id: string): Promise<IProject> => {
-  try {
-    const res = await axios.get(`${REACT_APP_API_URL}/projects/${id}/`);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
-};
-
 export const deleteProject = async (id: string): Promise<{ id: string }> => {
   try {
     const res = await axios.delete(`${REACT_APP_API_URL}/projects/${id}/`);
@@ -122,7 +113,7 @@ export const getProjectsWithFreeSearch = async (
 ): Promise<IFreeSearchResults> => {
   try {
     const res = await axios.get(
-      `${REACT_APP_API_URL}/projects/search-results/?freeSearch=${searchWord}`,
+      `${REACT_APP_API_URL}/projects/search-results/?freeSearch=${encodeURIComponent(searchWord)}`,
     );
     return res.data;
   } catch (e) {

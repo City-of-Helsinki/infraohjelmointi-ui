@@ -11,6 +11,7 @@ interface IMonthlyGraphCellProps {
   month: string;
   id: string;
   timelineDates: ITimelineDates;
+  year: number;
 }
 
 const MonthlyGraphCell: FC<IMonthlyGraphCellProps> = ({
@@ -21,19 +22,28 @@ const MonthlyGraphCell: FC<IMonthlyGraphCellProps> = ({
   month,
   id,
   timelineDates,
+  year,
 }) => {
-  const { planningStart, planningEnd, constructionStart, constructionEnd, estWarrantyPhaseStart, estWarrantyPhaseEnd } = timelineDates;
+  const {
+    planningStart,
+    planningEnd,
+    constructionStart,
+    constructionEnd,
+    estWarrantyPhaseStart,
+    estWarrantyPhaseEnd,
+  } = timelineDates;
   const isPercentZero = (percent: string) => percent.startsWith('0');
+  const hoverKey = `${year}-${month}`;
 
   return (
     <td
-      className={`monthly-cell project ${cellType} hoverable-${month}`}
+      className={`monthly-cell project ${cellType} hoverable-${hoverKey}`}
       data-testid={`project-monthly-graph-cell-${id}-${month}`}
-      onMouseOver={() => setHoveredClassToMonth(month)}
-      onMouseLeave={() => removeHoveredClassFromMonth(month)}
+      onMouseOver={() => setHoveredClassToMonth(hoverKey)}
+      onMouseLeave={() => removeHoveredClassFromMonth(hoverKey)}
     >
       {/*
-       * planning.isStart, construction.isStart and warrantyPhase.isStart is used here because 
+       * planning.isStart, construction.isStart and warrantyPhase.isStart is used here because
        * Firefox doesn't support the :has()-selector by default.
        * The :has()-selector logic is already implemented in the styles file for this component,
        * so the isStart logic can be safely removed when Firefox enables the :has()-selector.

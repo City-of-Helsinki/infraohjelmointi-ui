@@ -92,7 +92,12 @@ export const emptyStringsToNull = (formData: IAppForms) => {
 
 export const getOptionId = (option: Option) => option.value || null;
 
-export const isOption = (obj: object) => _.has(obj, 'label') && _.has(obj, 'value');
+export const isOption = (obj: unknown): obj is Option => {
+  if (typeof obj === 'object' && obj !== null) {
+    return _.has(obj, 'label') && _.has(obj, 'value');
+  }
+  return false;
+};
 
 const getLocation = (list: ILocation[], locationName: string) => {
   const location = list.find(({ name }) => name.includes(locationName));
@@ -157,7 +162,7 @@ const getLowestLocationId = (
 const parseValue = (value: FormValueType) => {
   switch (true) {
     case value instanceof Object && isOption(value):
-      return getOptionId(value as Option);
+      return getOptionId(value);
     case value === '':
       return null;
     default:
@@ -199,18 +204,11 @@ export const dirtyFieldsToRequestObject = (
     const convertedKey = getKey(key);
     const assignValueToKey = (key: string, value: FormValueType) => {
       if (value !== undefined) {
-        // Convert null to undefined since IProjectRequest doesn't accept null
-        const convertedValue = value === null ? undefined : value;
-        if (convertedValue !== undefined) {
-          // Convert IOption to string if needed
-          const finalValue =
-            typeof convertedValue === 'object' && 'value' in convertedValue
-              ? convertedValue.value
-              : convertedValue;
+        // Convert IOption to string if needed
+        const finalValue = isOption(value) ? value.value : value;
 
-          // Cast to the expected type
-          request[key] = finalValue as string | boolean | string[] | undefined;
-        }
+        // Cast to the expected type
+        request[key] = finalValue as string | boolean | string[] | null;
       }
     };
 
@@ -308,8 +306,8 @@ export const classesToOptions = (classes: Array<IClass>): Array<IProjectClassOpt
     disabled: false,
   }));
 
-export const setHoveredClassToMonth = (month: string) => {
-  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${month}`);
+export const setHoveredClassToMonth = (key: string) => {
+  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${key}`);
 
   if (elementsForHoveredMonth.length > 0) {
     Array.from(elementsForHoveredMonth).forEach((element) => {
@@ -318,8 +316,8 @@ export const setHoveredClassToMonth = (month: string) => {
   }
 };
 
-export const removeHoveredClassFromMonth = (month: string) => {
-  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${month}`);
+export const removeHoveredClassFromMonth = (key: string) => {
+  const elementsForHoveredMonth = document.getElementsByClassName(`hoverable-${key}`);
   if (elementsForHoveredMonth.length > 0) {
     Array.from(elementsForHoveredMonth).forEach((element) => {
       element.classList.remove('hovered');
