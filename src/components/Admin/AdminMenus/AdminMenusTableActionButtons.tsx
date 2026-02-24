@@ -35,17 +35,16 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
 };
 
 interface IAdminMenuEditCellProps {
-  onEditMenuItem: (value: string, rowIndex: number, id: string, path: string) => void;
+  onEditMenuItem: (value: string, id: string, path: string) => void;
   value: string;
-  rowIndex: number;
   path: string;
   id: string;
 }
 
-const EditCell: FC<IAdminMenuEditCellProps> = ({ onEditMenuItem, value, rowIndex, id, path }) => {
+const EditCell: FC<IAdminMenuEditCellProps> = ({ onEditMenuItem, value, id, path }) => {
   return (
     <button
-      onClick={() => onEditMenuItem(value, rowIndex, id, path)}
+      onClick={() => onEditMenuItem(value, id, path)}
       data-testid={`admin-menus-edit-button-id-${id}`}
     >
       <IconPen />

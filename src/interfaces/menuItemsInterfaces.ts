@@ -1,6 +1,6 @@
 import { IListState } from '@/reducers/listsSlice';
 
-const IADMIN_MENUS_MENU_TYPE = [
+const ADMIN_MENUS_MENU_TYPE = [
   'categories',
   'types',
   'programs',
@@ -16,7 +16,7 @@ const IADMIN_MENUS_MENU_TYPE = [
   'budgetOverrunReasons',
 ] as const;
 
-type IAdminMenusMenuType = (typeof IADMIN_MENUS_MENU_TYPE)[number];
+type AdminMenusMenuType = (typeof ADMIN_MENUS_MENU_TYPE)[number];
 
 interface MenuItemDialogMessages {
   submitSuccess: string;
@@ -38,13 +38,12 @@ interface DialogState {
   value: string;
   path: string;
   editableItemId: string;
-  rowIndex?: number;
 }
 
-interface IAdminMenusCardProps {
+interface AdminMenusCardProps {
   listType: keyof Omit<IListState, 'error'>;
   translateValues: boolean;
-  onEditMenuItem: (value: string, rowIndex: number, editableItemId: string, path: string) => void;
+  onEditMenuItem: (value: string, editableItemId: string, path: string) => void;
   onAddMenuItem: (path: string) => void;
   path: string;
 }
@@ -57,22 +56,22 @@ interface IAdminMenuOrderCellProps {
   path: string;
 }
 
-interface IMenuItemPatchRequest {
-  data: string;
+interface MenuItemPatchRequest {
+  value: string;
   id: string;
 }
 
-interface IMenuItemPostRequest {
+interface MenuItemPostRequest {
   value: string;
 }
 
-interface IMenuItemPatchThunkContent {
-  request: IMenuItemPatchRequest;
+interface MenuItemPatchThunkContent {
+  request: MenuItemPatchRequest;
   path: string;
 }
 
-interface IMenuItemPostThunkContent {
-  request: IMenuItemPostRequest;
+interface MenuItemPostThunkContent {
+  request: MenuItemPostRequest;
   path: string;
 }
 
@@ -82,17 +81,17 @@ interface MoveRowPayload {
   direction: 'up' | 'down';
 }
 
-export { IADMIN_MENUS_MENU_TYPE };
+export { ADMIN_MENUS_MENU_TYPE };
 export type {
-  IAdminMenusCardProps,
-  IAdminMenusMenuType,
+  AdminMenusCardProps,
+  AdminMenusMenuType,
   MenuItemDialogMessages,
   DialogMode,
   DialogState,
   IAdminMenuOrderCellProps,
-  IMenuItemPatchRequest,
-  IMenuItemPostRequest,
-  IMenuItemPatchThunkContent,
-  IMenuItemPostThunkContent,
+  MenuItemPatchRequest,
+  MenuItemPostRequest,
+  MenuItemPatchThunkContent,
+  MenuItemPostThunkContent,
   MoveRowPayload,
 };

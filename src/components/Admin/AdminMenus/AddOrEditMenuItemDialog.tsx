@@ -53,7 +53,7 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
       if (dialogState.mode === 'edit') {
         await dispatch(
           patchMenuItemsThunk({
-            request: { id: editableItemId, data: menuItemName },
+            request: { id: editableItemId, value: menuItemName },
             path: dialogState.path,
           }),
         ).unwrap();

@@ -9,9 +9,9 @@ import { useAppSelector } from '@/hooks/common';
 import { IListState } from '@/reducers/listsSlice';
 import { IListItem } from '@/interfaces/common';
 import { EditCell, OrderCell } from './AdminMenusTableActionButtons';
-import { IAdminMenusCardProps } from '@/interfaces/menuItemsInterfaces';
+import { AdminMenusCardProps } from '@/interfaces/menuItemsInterfaces';
 
-const AdminMenusCard: FC<IAdminMenusCardProps> = ({
+const AdminMenusCard: FC<AdminMenusCardProps> = ({
   path,
   listType,
   translateValues,
@@ -31,7 +31,7 @@ const AdminMenusCard: FC<IAdminMenusCardProps> = ({
     const rowItem = {
       value,
       id: item.id,
-      order: (
+      orderCell: (
         <OrderCell
           rowIndex={index}
           listType={listType}
@@ -40,24 +40,16 @@ const AdminMenusCard: FC<IAdminMenusCardProps> = ({
           path={path}
         />
       ),
-      edit: (
-        <EditCell
-          onEditMenuItem={onEditMenuItem}
-          value={value}
-          rowIndex={index}
-          path={path}
-          id={item.id}
-        />
-      ),
-      rowIndex: index,
+      editCell: <EditCell onEditMenuItem={onEditMenuItem} value={value} path={path} id={item.id} />,
+      order: item.order,
     };
     return rowItem;
   });
 
   const cols = [
     { key: 'value', headerName: t(`adminFunctions.menus.listType.${listType}`) },
-    { key: 'order', headerName: t('order') },
-    { key: 'edit', headerName: t('edit') },
+    { key: 'orderCell', headerName: t('order') },
+    { key: 'editCell', headerName: t('edit') },
   ];
 
   return (

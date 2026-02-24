@@ -8,7 +8,7 @@ import {
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
-import { IMenuItemPatchRequest, IMenuItemPostRequest } from '@/interfaces/menuItemsInterfaces';
+import { MenuItemPatchRequest, MenuItemPostRequest } from '@/interfaces/menuItemsInterfaces';
 
 const { REACT_APP_API_URL } = process.env;
 
@@ -187,7 +187,7 @@ export const putMenuListOrder = async (request: IListItem[], path: string) => {
   }
 };
 
-export const postMenuListItem = async (request: IMenuItemPostRequest, path: string) => {
+export const postMenuListItem = async (request: MenuItemPostRequest, path: string) => {
   try {
     const res = await axios.post(`${REACT_APP_API_URL}/${path}/`, request);
     return res.data;
@@ -196,9 +196,11 @@ export const postMenuListItem = async (request: IMenuItemPostRequest, path: stri
   }
 };
 
-export const patchMenuListItem = async (request: IMenuItemPatchRequest, path: string) => {
+export const patchMenuListItem = async (request: MenuItemPatchRequest, path: string) => {
   try {
-    const res = await axios.patch(`${REACT_APP_API_URL}/${path}/${request.id}/`, request.data);
+    const res = await axios.patch(`${REACT_APP_API_URL}/${path}/${request.id}/`, {
+      value: request.value,
+    });
     return res.data;
   } catch (e) {
     return Promise.reject(e);
