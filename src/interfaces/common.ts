@@ -48,6 +48,11 @@ export interface IListItem {
   index?: number;
 }
 
+/** Phase detail from project-phase-details API; includes projectPhase for filtering by phase */
+export interface IProjectPhaseDetailListItem extends IListItem {
+  projectPhase?: { id: string; value?: string };
+}
+
 export type ListType =
   | 'types'
   | 'typeQualifiers'

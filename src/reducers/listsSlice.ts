@@ -1,4 +1,4 @@
-import { IListItem } from '@/interfaces/common';
+import { IListItem, IProjectPhaseDetailListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import {
@@ -37,7 +37,7 @@ export interface IListState {
   types: Array<IListItem>;
   typeQualifiers: Array<IListItem>;
   phases: Array<IListItem>;
-  projectPhaseDetails: Array<IListItem>;
+  projectPhaseDetails: Array<IProjectPhaseDetailListItem>;
   constructionProcurementMethods: Array<IListItem>;
   categories: Array<IListItem>;
   projectQualityLevels: Array<IListItem>;
@@ -199,6 +199,7 @@ export const selectProjectDivisions = (state: RootState) => state.lists.projectD
 export const selectProjectSubDivisions = (state: RootState) => state.lists.projectSubDivisions;
 export const selectCategories = (state: RootState) => state.lists.categories;
 export const selectProjectPhases = (state: RootState) => state.lists.phases;
+export const selectProjectPhaseDetails = (state: RootState) => state.lists.projectPhaseDetails;
 export const selectBudgetOverrunReasons = (state: RootState) => state.lists.budgetOverrunReasons;
 export const selectProjectClasses = (state: RootState) => state.lists.projectClasses;
 export const selectProgrammers = (state: RootState) => state.lists.programmers;

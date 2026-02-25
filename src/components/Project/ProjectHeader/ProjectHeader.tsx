@@ -112,15 +112,25 @@ const ProjectHeader: FC = () => {
                   {projectHeaderPhaseString}
                   {project?.phase?.value === 'suspended' &&
                     project?.suspendedDate &&
-                    project?.suspendedFromPhase && (
-                      <span className="project-header-suspended">
-                        {' — '}
-                        {t('projectCard.suspended', {
-                          phase: t(`option.${project.suspendedFromPhase.value}`),
-                          date: project.suspendedDate,
-                        })}
-                      </span>
-                    )}
+                    project?.suspendedFromPhase && (() => {
+                      const phaseValue = project.suspendedFromPhase?.value;
+                      const phaseLabel =
+                        phaseValue && phaseValue !== 'undefined'
+                          ? (() => {
+                              const translated = t(`option.${phaseValue}`);
+                              return translated.startsWith('option.') ? phaseValue : translated;
+                            })()
+                          : '—';
+                      return (
+                        <span className="project-header-suspended">
+                          {' — '}
+                          {t('projectCard.suspended', {
+                            phase: phaseLabel,
+                            date: project.suspendedDate,
+                          })}
+                        </span>
+                      );
+                    })()}
                 </div>
               </div>
             )}

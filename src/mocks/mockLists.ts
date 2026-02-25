@@ -83,23 +83,30 @@ export const mockProjectPhases: { data: Array<IListItem> } = {
   ],
 };
 
-export const mockConstructionPhaseDetails: { data: Array<IListItem> } = {
+const constructionPhaseId = 'c874452e-aaac-4fe8-927a-e7dd0ba182f2'; // matches mockProjectPhases construction
+export const mockConstructionPhaseDetails: {
+  data: Array<IListItem & { projectPhase?: { id: string; value: string } }>;
+} = {
   data: [
     {
       id: '4f9f98f1-0bec-4cf4-b09f-208521d2b70d',
       value: 'preConstruction',
+      projectPhase: { id: constructionPhaseId, value: 'construction' },
     },
     {
       id: '57903f81-15ff-46ff-b55e-b74c4a833af8',
       value: 'firstPhase',
+      projectPhase: { id: constructionPhaseId, value: 'construction' },
     },
     {
       id: 'e73a7646-83d2-4256-bb69-c7dca2d7b269',
       value: 'firstPhaseComplete',
+      projectPhase: { id: constructionPhaseId, value: 'construction' },
     },
     {
       id: '04b350dd-dd7a-44f6-bfe4-20a5715173ea',
       value: 'secondPhase',
+      projectPhase: { id: constructionPhaseId, value: 'construction' },
     },
   ],
 };
