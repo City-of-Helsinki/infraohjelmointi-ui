@@ -19,16 +19,16 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
       <button
         onClick={() => moveAndSave(id, 'down')}
         data-testid={`admin-menus-order-down-button-id-${id}`}
-        disabled={isFirstRow}
+        disabled={isLastRow}
       >
-        <IconArrowDown color={isFirstRow ? 'var(--color-black-60)' : 'var(--color-bus)'} />
+        <IconArrowDown color={isLastRow ? 'var(--color-black-60)' : 'var(--color-bus)'} />
       </button>
       <button
         onClick={() => moveAndSave(id, 'up')}
         data-testid={`admin-menus-order-up-button-id-${id}`}
-        disabled={isLastRow}
+        disabled={isFirstRow}
       >
-        <IconArrowUp color={isLastRow ? 'var(--color-black-60)' : 'var(--color-bus)'} />
+        <IconArrowUp color={isFirstRow ? 'var(--color-black-60)' : 'var(--color-bus)'} />
       </button>
     </>
   );

@@ -228,17 +228,19 @@ export const listsSlice = createSlice({
   reducers: {
     moveRow: (state, action: PayloadAction<MoveRowPayload>) => {
       const { listType, rowId, direction } = action.payload;
-
       const list = state[listType];
 
       const index = list.findIndex((row) => row.id === rowId);
       if (index === -1) return;
 
       const newIndex = direction === 'up' ? index - 1 : index + 1;
-
       if (newIndex < 0 || newIndex >= list.length) return;
 
       [list[index], list[newIndex]] = [list[newIndex], list[index]];
+
+      list.forEach((row, idx) => {
+        row.order = idx;
+      });
     },
   },
   extraReducers: (builder) => {
