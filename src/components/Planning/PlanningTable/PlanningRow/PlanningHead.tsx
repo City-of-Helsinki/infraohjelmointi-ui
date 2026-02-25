@@ -9,12 +9,10 @@ import { GroupDialog } from '../../GroupDialog';
 import './styles.css';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
-import {
-  selectForcedToFrame,
-  selectHoverTooltipsEnabled,
-  selectPlanningMode,
-} from '@/reducers/planningSlice';
+import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
+import { Trans } from 'react-i18next';
+import { useHoverTooltip } from './HoverTooltip/useHoverTooltip';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -36,7 +34,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const navigate = useNavigate();
   const mode = useAppSelector(selectPlanningMode);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
-  const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
+  const { showTooltip, hideTooltip } = useHoverTooltip();
   const { search } = useLocation();
 
   const [groupDialogState, setGroupDialogState] = useState({
@@ -45,6 +43,8 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   });
 
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
+
+  const totalBudgetTooltipType = type === 'group' ? 'groupHead' : 'class';
 
   const projectsToIOption = useCallback((): IOption[] => {
     return projectRows.map((p) => ({ value: p.id, label: p.name }));
@@ -100,21 +100,11 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     [handleExpand, mode, navigate, search, urlSearchParam],
   );
 
-  const showTooltip = useCallback(
-    (event: React.SyntheticEvent<HTMLSpanElement>) => {
-      if (!hoverTooltipsEnabled) {
-        return;
-      }
-      const targetElement = event.target as HTMLElement;
-      const text = targetElement.textContent || targetElement.innerText;
-      dispatchTooltipEvent(event, 'show', { text });
-    },
-    [hoverTooltipsEnabled],
+  const showTotalBudgetTooltip = useCallback(
+    (e: React.SyntheticEvent<HTMLDivElement>) =>
+      showTooltip(e, <Trans i18nKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`} />),
+    [showTooltip, totalBudgetTooltipType],
   );
-
-  const hideTooltip = useCallback((event: React.SyntheticEvent<HTMLSpanElement>) => {
-    dispatchTooltipEvent(event, 'hide', { text: '' });
-  }, []);
 
   return (
     <th
@@ -175,7 +165,13 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
         </div>
         {/* Budgets (not visible for coordinator) */}
         {mode === 'planning' && (
-          <div className="total-budgets">
+          <div
+            className="total-budgets"
+            onMouseOver={showTotalBudgetTooltip}
+            onMouseLeave={hideTooltip}
+            onFocus={showTotalBudgetTooltip}
+            onBlur={hideTooltip}
+          >
             <span className="text-base" data-testid={`planned-budgets-${id}`}>
               {plannedBudgets}
             </span>

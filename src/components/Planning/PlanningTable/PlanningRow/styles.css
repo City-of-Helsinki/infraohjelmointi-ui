@@ -40,8 +40,7 @@
 }
 
 .planning-head.otherClassification.coordination,
-.planning-head.subLevelDistrict
- {
+.planning-head.subLevelDistrict {
   @apply bg-[var(--color-districtPreview)] pl-[7rem];
 }
 
@@ -206,7 +205,7 @@
 }
 
 .planning-head .total-budgets {
-  @apply grid w-[5.5rem] grid-flow-row text-right;
+  @apply grid;
 }
 
 .planning-forecast-sums-container {

@@ -46,7 +46,7 @@ export interface IContextMenuData {
 }
 
 export interface ITooltipEventData {
-  text: string;
+  text: string | JSX.Element;
 }
 
 export interface IFinancePlanningData {

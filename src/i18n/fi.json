@@ -787,6 +787,12 @@
       "high": "Hanke on kiireellisesti edistettävä",
       "medium": "Hanke on tavanomaisesti edistettävä",
       "low": "Hankkeen edistäminen voi odottaa"
+    },
+    "totalBudgets": {
+      "class": "<p>Tarve-esitys</p><p>Raamiluku</p><p>Erotus</p>",
+      "groupHead": "<p>Ohjelmoitu yht.</p><p>Hankkeen budj. yht</p>",
+      "group": "Ohjelmoitu yht.",
+      "project": "<p>Ohjelmoitu</p><p>Hankkeen budjetti</p>"
     }
   }
 }
