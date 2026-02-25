@@ -78,7 +78,7 @@ const render = async () =>
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,
             typeQualifiers: mockProjectTypeQualifiers.data,
-            constructionPhaseDetails: mockConstructionPhaseDetails.data,
+            projectPhaseDetails: mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockConstructionProcurementMethods.data,
             categories: mockProjectCategories.data,
             projectQualityLevels: mockProjectQualityLevels.data,
@@ -166,7 +166,7 @@ describe('projectForm', () => {
     expectOption(project?.projectQualityLevel?.value);
     expectOption(project?.planningPhase?.value);
     expectOption(project?.constructionPhase?.value);
-    expectOption(project?.constructionPhaseDetail?.value);
+    expectOption(project?.phaseDetail?.value);
     expectOption(project?.category?.value);
     expectOption(project?.priority?.value);
     expectPersonOption(project?.personPlanning as IPerson);

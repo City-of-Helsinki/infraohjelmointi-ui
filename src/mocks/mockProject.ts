@@ -63,7 +63,7 @@ const mockProject: { data: IProject } = {
       id: '8b614fbe-bb41-4d66-9efc-bdba3d0d943a',
       value: 'K1',
     },
-    constructionPhaseDetail: {
+    phaseDetail: {
       id: '9df21c80-7ed0-4ac0-830c-dae5d1d675b9',
       value: 'preConstruction',
     },

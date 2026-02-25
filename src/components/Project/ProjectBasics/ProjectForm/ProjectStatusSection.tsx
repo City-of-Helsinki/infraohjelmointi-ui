@@ -10,10 +10,10 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
 import _ from 'lodash';
-import { mapIconKey } from '@/utils/common';
+import { listItemToOption, mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProject, selectProjectMode } from '@/reducers/projectSlice';
-import { selectProjectPhases } from '@/reducers/listsSlice';
+import { selectProjectPhaseDetails, selectProjectPhases } from '@/reducers/listsSlice';
 import { Tooltip } from 'hds-react';
 
 interface IProjectStatusSectionProps {
@@ -46,7 +46,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const phasesWithIndexes = useAppSelector(selectProjectPhases);
   const categories = useOptions('categories');
   const priorities = useOptions('priorities').toReversed(); // Higher priority first
-  const constructionPhaseDetails = useOptions('constructionPhaseDetails');
+  const projectPhaseDetailsRaw = useAppSelector(selectProjectPhaseDetails);
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
   const currentPhase = getValues('phase').value;
   const { t } = useTranslation();
@@ -83,6 +83,19 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     warrantyPeriodPhase,
     completedPhase,
   ] = useMemo(() => phases.map(({ value }) => value), [phases]);
+
+  // Phase details are per-phase from API; filter by current phase and convert to options for SelectField
+  const detailsForCurrentPhaseRaw = useMemo(
+    () =>
+      projectPhaseDetailsRaw.filter((d) => d.projectPhase?.id === currentPhase),
+    [projectPhaseDetailsRaw, currentPhase],
+  );
+  const detailsForCurrentPhase = useMemo(
+    () => detailsForCurrentPhaseRaw.map(listItemToOption),
+    [detailsForCurrentPhaseRaw],
+  );
+  const currentPhaseHasDetails = detailsForCurrentPhaseRaw.length > 0;
+  const projectPhaseDetailsWithPhase = projectPhaseDetailsRaw;
 
   const validatePhase = useMemo(
     () => ({
@@ -130,6 +143,14 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             ...generalConstructionRequirements,
           ];
 
+          // Require phase detail when the selected phase has details (from API)
+          const phaseHasDetails = projectPhaseDetailsWithPhase.some(
+            (d) => d.projectPhase?.id === phase.value,
+          );
+          if (phaseHasDetails) {
+            fields.push(...fieldsIfEmpty(['phaseDetail']));
+          }
+
           // Check fields that cannot be empty
           switch (phaseToSubmit) {
             case programmedPhase:
@@ -142,7 +163,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
               break;
             case constructionPhase:
-              fields.push(...fieldsIfEmpty([...combinedRequirements, 'constructionPhaseDetail']));
+              fields.push(...fieldsIfEmpty([...combinedRequirements]));
               break;
             case warrantyPeriodPhase:
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
@@ -195,28 +216,26 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       completedPhase,
       checkTodayIsBeforeWarrantyPhaseEnd,
       projectMode,
+      projectPhaseDetailsWithPhase,
     ],
   );
 
-  const validateConstructionPhaseDetails = useMemo(
+  const validatePhaseDetail = useMemo(
     () => ({
       validate: {
-        isConstructionPhaseDetailsValid: (constructionPhaseDetail: IOption) => {
-          const phase = getValues('phase');
-          // Required after phase is changed to construction
-          if (phase.value === constructionPhase && constructionPhaseDetail?.value === '') {
-            return t('validation.required', { field: t('validation.constructionPhaseDetail') });
+        isPhaseDetailValid: (phaseDetail: IOption) => {
+          // Required when current phase has phase details (from API)
+          if (currentPhaseHasDetails && phaseDetail?.value === '') {
+            return t('validation.required', { field: t('validation.phaseDetail') });
           }
           return true;
         },
       },
     }),
-    [constructionPhase, getValues, t],
+    [currentPhaseHasDetails, t],
   );
 
-  const isConstructionPhaseDetailsDisabled = useMemo(() => {
-    return currentPhase !== constructionPhase;
-  }, [currentPhase, constructionPhase]);
+  const isPhaseDetailDisabled = !currentPhaseHasDetails;
 
   const validateProgrammed = useMemo(
     () => ({
@@ -392,10 +411,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         </div>
         <div className="form-col-xl">
           <SelectField
-            {...getFieldProps('constructionPhaseDetail')}
-            options={constructionPhaseDetails}
-            rules={validateConstructionPhaseDetails}
-            disabled={isConstructionPhaseDetailsDisabled}
+            {...getFieldProps('phaseDetail')}
+            options={detailsForCurrentPhase}
+            rules={validatePhaseDetail}
+            disabled={isPhaseDetailDisabled}
             readOnly={isUserOnlyViewer}
           />
         </div>

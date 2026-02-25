@@ -78,7 +78,7 @@ const getMockResponseForUrl = (rawUrl?: string) => {
       return Promise.resolve(mockSubDivisionOptions);
     case url === '/project-phases/':
       return Promise.resolve(mockProjectPhases);
-    case url === '/construction-phase-details/':
+    case url === '/project-phase-details/':
       return Promise.resolve(mockConstructionPhaseDetails);
     case url === '/construction-procurement-methods/':
       return Promise.resolve(mockConstructionProcurementMethods);

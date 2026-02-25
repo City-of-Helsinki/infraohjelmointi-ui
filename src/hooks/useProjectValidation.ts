@@ -73,7 +73,7 @@ export const useProjectPhaseValidation = ({
             fields = fieldsIfEmpty([...programmedRequirements, ...planningRequirements], project);
             break;
           case constructionPhase:
-            fields = fieldsIfEmpty([...combinedRequirements, 'constructionPhaseDetail'], project);
+            fields = fieldsIfEmpty([...combinedRequirements, 'phaseDetail'], project);
             break;
           case warrantyPeriodPhase:
           case completedPhase:
