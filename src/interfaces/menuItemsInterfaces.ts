@@ -18,6 +18,22 @@ const ADMIN_MENUS_MENU_TYPE = [
 
 type AdminMenusMenuType = (typeof ADMIN_MENUS_MENU_TYPE)[number];
 
+type ReorderableListType = keyof Pick<
+  IListState,
+  | 'types'
+  | 'phases'
+  | 'constructionPhaseDetails'
+  | 'constructionProcurementMethods'
+  | 'categories'
+  | 'projectQualityLevels'
+  | 'budgetOverrunReasons'
+  | 'constructionPhases'
+  | 'planningPhases'
+  | 'responsiblePersons'
+  | 'responsibleZones'
+  | 'programmers'
+>;
+
 interface MenuItemDialogMessages {
   submitSuccess: string;
   submitError: string;
@@ -41,7 +57,7 @@ interface DialogState {
 }
 
 interface AdminMenusCardProps {
-  listType: keyof Omit<IListState, 'error'>;
+  listType: ReorderableListType;
   translateValues: boolean;
   onEditMenuItem: (value: string, editableItemId: string, path: string) => void;
   onAddMenuItem: (path: string) => void;
@@ -50,7 +66,7 @@ interface AdminMenusCardProps {
 
 interface IAdminMenuOrderCellProps {
   rowIndex: number;
-  listType: keyof Omit<IListState, 'error'>;
+  listType: ReorderableListType;
   rowLength: number;
   id: string;
   path: string;
@@ -76,7 +92,7 @@ interface MenuItemPostThunkContent {
 }
 
 interface MoveRowPayload {
-  listType: keyof Omit<IListState, 'error'>;
+  listType: ReorderableListType;
   rowId: string;
   direction: 'up' | 'down';
 }
@@ -94,4 +110,5 @@ export type {
   MenuItemPatchThunkContent,
   MenuItemPostThunkContent,
   MoveRowPayload,
+  ReorderableListType,
 };
