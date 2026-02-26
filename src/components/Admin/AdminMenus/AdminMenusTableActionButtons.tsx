@@ -16,7 +16,7 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
     async (rowId: string, direction: 'up' | 'down') => {
       try {
         dispatch(moveRow({ listType, rowId, direction }));
-        dispatch(saveTableOrderThunk({ listType, path }));
+        await dispatch(saveTableOrderThunk({ listType, path })).unwrap();
 
         dispatch(
           notifySuccess({
