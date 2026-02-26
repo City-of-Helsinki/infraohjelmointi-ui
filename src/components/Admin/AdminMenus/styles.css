@@ -1,0 +1,42 @@
+.admin-menus-view {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  .admin-menus-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+    .admin-menus-card {
+      min-width: 70%;
+    }
+  }
+}
+
+.admin-menus-card-content {
+  margin-bottom: var(--spacing-l);
+}
+
+.sidebar-container {
+  background-color: #f5f5f5;
+  display: grid;
+  min-width: 321px;
+  max-width: 400px;
+  margin-top: var(--spacing-xs);
+
+  position: sticky;
+  top: 0;
+  height: fit-content;
+
+  .sidebar-content {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.admin-menus-side-nav li:last-child {
+  border-bottom-width: 1px;
+  border-color: var(--color-black-20);
+}

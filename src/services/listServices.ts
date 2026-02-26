@@ -8,6 +8,7 @@ import {
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
+import { MenuItemPatchRequest, MenuItemPostRequest } from '@/interfaces/menuItemsInterfaces';
 
 const { REACT_APP_API_URL } = process.env;
 
@@ -175,4 +176,33 @@ export const getTalpaServiceClasses = async (): Promise<ITalpaServiceClass[]> =>
 export const getTalpaAssetClasses = async (): Promise<ITalpaAssetClass[]> => {
   const res = await axios.get<ITalpaAssetClass[]>(`${REACT_APP_API_URL}/talpa-asset-classes/`);
   return res.data;
+};
+
+export const putMenuListOrder = async (request: IListItem[], path: string) => {
+  try {
+    const res = await axios.put(`${REACT_APP_API_URL}/${path}/reorder/`, request);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const postMenuListItem = async (request: MenuItemPostRequest, path: string) => {
+  try {
+    const res = await axios.post(`${REACT_APP_API_URL}/${path}/`, request);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const patchMenuListItem = async (request: MenuItemPatchRequest, path: string) => {
+  try {
+    const res = await axios.patch(`${REACT_APP_API_URL}/${path}/${request.id}/`, {
+      value: request.value,
+    });
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };

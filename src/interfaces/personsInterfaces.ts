@@ -6,4 +6,5 @@ export interface IPerson {
   title: string;
   phone: string;
   person?: string;
+  order?: number;
 }
