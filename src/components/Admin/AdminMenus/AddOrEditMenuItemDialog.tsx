@@ -24,7 +24,12 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
   const [editableItemId, setEditableItemId] = useState<string>('');
 
   const dialogMessages: MenuItemDialogMessages = {
-    submitSuccess: t(dialogState.mode === 'add' ? 'postSuccess' : 'patchSuccess'),
+    submitSuccessTitle: t(
+      dialogState.mode === 'add' ? 'adminMenuPostSuccess' : 'adminMenuPatchSuccess',
+    ),
+    submitSuccessMessage: t(
+      dialogState.mode === 'add' ? 'adminMenuPostSuccess' : 'adminMenuPatchSuccess',
+    ),
     submitError: t(dialogState.mode === 'add' ? 'postError' : 'patchError'),
     dialogId: `${dialogState.mode}-menu-item-dialog`,
     titleId: `${dialogState.mode}-menu-item-title`,
@@ -48,18 +53,23 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
   );
 
   const onSaveMenuItemChange = useCallback(async () => {
-    if (!menuItemName) return;
+    if (!menuItemName || !dialogState.listType) return;
     try {
       if (dialogState.mode === 'edit') {
         await dispatch(
           patchMenuItemsThunk({
             request: { id: editableItemId, value: menuItemName },
             path: dialogState.path,
+            listType: dialogState.listType,
           }),
         ).unwrap();
       } else {
         await dispatch(
-          postMenuItemsThunk({ request: { value: menuItemName }, path: dialogState.path }),
+          postMenuItemsThunk({
+            request: { value: menuItemName },
+            path: dialogState.path,
+            listType: dialogState.listType,
+          }),
         ).unwrap();
       }
       setMenuItemName('');
@@ -67,8 +77,8 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
 
       dispatch(
         notifySuccess({
-          message: dialogMessages.submitSuccess,
-          title: dialogMessages.submitSuccess,
+          message: dialogMessages.submitSuccessMessage,
+          title: dialogMessages.submitSuccessTitle,
           type: 'toast',
           duration: 1500,
         }),
@@ -89,9 +99,11 @@ const AddOrEditMenuItemDialog: FC<AddOrEditMenuItemDialogProps> = ({
     dispatch,
     handleClose,
     dialogMessages.submitError,
-    dialogMessages.submitSuccess,
+    dialogMessages.submitSuccessTitle,
+    dialogMessages.submitSuccessMessage,
     dialogState.mode,
     editableItemId,
+    dialogState.listType,
   ]);
 
   return (

@@ -254,6 +254,28 @@ export const listsSlice = createSlice({
     builder.addCase(getListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
     });
+    builder.addCase(postMenuItemsThunk.fulfilled, (state, action) => {
+      const { listType } = action.meta.arg;
+      const newItem = action.payload;
+
+      const list = state[listType];
+      if (!list) return;
+
+      list.push({
+        ...newItem,
+        order: list.length,
+      });
+    });
+    builder.addCase(patchMenuItemsThunk.fulfilled, (state, action) => {
+      const { listType } = action.meta.arg;
+      const updatedItem = action.payload;
+
+      const index = state[listType].findIndex((item) => item.id === updatedItem.id);
+
+      if (index !== -1) {
+        state[listType][index] = updatedItem;
+      }
+    });
     // GET TALPA LISTS
     builder.addCase(
       getTalpaListsThunk.fulfilled,
