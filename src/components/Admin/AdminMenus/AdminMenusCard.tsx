@@ -61,14 +61,7 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
     >
       <div className="admin-menus-card-content">
         {availableRowsList && availableRowsList.length > 0 ? (
-          <Table
-            cols={cols}
-            rows={availableRowsList}
-            indexKey="id"
-            renderIndexCol={false}
-            initialSortingColumnKey={'index'}
-            initialSortingOrder="asc"
-          />
+          <Table cols={cols} rows={availableRowsList} indexKey="id" renderIndexCol={false} />
         ) : (
           <p>{t('adminFunctions.menus.tableEmptyText')}</p>
         )}
@@ -77,7 +70,7 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
         variant={ButtonVariant.Secondary}
         role="link"
         onClick={() => onAddMenuItem(path)}
-        data-testid={`admin-menus-card-button-${listType}`}
+        data-testid={`admin-menus-card-add-row-button-${listType}`}
         iconStart={
           <IconPlusCircle aria-label={t('adminFunctions.addRowButton')} aria-hidden={false} />
         }

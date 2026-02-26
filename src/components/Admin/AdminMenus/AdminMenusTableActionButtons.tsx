@@ -1,30 +1,56 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { IconArrowDown, IconArrowUp, IconPen } from 'hds-react';
 import { IAdminMenuOrderCellProps } from '@/interfaces/menuItemsInterfaces';
 import { moveRow, saveTableOrderThunk } from '@/reducers/listsSlice';
 import { useAppDispatch } from '@/hooks/common';
+import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
+import { useTranslation } from 'react-i18next';
 
 const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, rowLength, id }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const isFirstRow = rowIndex === 0;
   const isLastRow = rowIndex === rowLength - 1;
 
-  const moveAndSave = (rowId: string, direction: 'up' | 'down') => {
-    dispatch(moveRow({ listType, rowId, direction }));
-    dispatch(saveTableOrderThunk({ listType, path }));
-  };
+  const onMoveAndSaveRow = useCallback(
+    async (rowId: string, direction: 'up' | 'down') => {
+      try {
+        dispatch(moveRow({ listType, rowId, direction }));
+        dispatch(saveTableOrderThunk({ listType, path }));
+
+        dispatch(
+          notifySuccess({
+            message: t('reorderSuccess'),
+            title: t('reorderSuccess'),
+            type: 'toast',
+            duration: 1500,
+          }),
+        );
+      } catch {
+        dispatch(
+          notifyError({
+            message: t('reorderError'),
+            title: t('reorderError'),
+            type: 'toast',
+            duration: 1500,
+          }),
+        );
+      }
+    },
+    [dispatch, listType, path, t],
+  );
 
   return (
     <>
       <button
-        onClick={() => moveAndSave(id, 'down')}
+        onClick={() => onMoveAndSaveRow(id, 'down')}
         data-testid={`admin-menus-order-down-button-id-${id}`}
         disabled={isLastRow}
       >
         <IconArrowDown color={isLastRow ? 'var(--color-black-60)' : 'var(--color-bus)'} />
       </button>
       <button
-        onClick={() => moveAndSave(id, 'up')}
+        onClick={() => onMoveAndSaveRow(id, 'up')}
         data-testid={`admin-menus-order-up-button-id-${id}`}
         disabled={isFirstRow}
       >

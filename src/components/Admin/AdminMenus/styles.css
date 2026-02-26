@@ -26,6 +26,10 @@
   max-width: 400px;
   margin-top: var(--spacing-xs);
 
+  position: sticky;
+  top: 0;
+  height: fit-content;
+
   .sidebar-content {
     height: 100%;
     width: 100%;
