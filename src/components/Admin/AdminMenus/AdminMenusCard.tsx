@@ -40,7 +40,15 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
           path={path}
         />
       ),
-      editCell: <EditCell onEditMenuItem={onEditMenuItem} value={value} path={path} id={item.id} />,
+      editCell: (
+        <EditCell
+          onEditMenuItem={onEditMenuItem}
+          value={value}
+          path={path}
+          id={item.id}
+          listType={listType}
+        />
+      ),
       order: item.order,
     };
     return rowItem;
@@ -69,7 +77,9 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
       <Button
         variant={ButtonVariant.Secondary}
         role="link"
-        onClick={() => onAddMenuItem(path)}
+        onClick={() => {
+          onAddMenuItem(path, listType);
+        }}
         data-testid={`admin-menus-card-add-row-button-${listType}`}
         iconStart={
           <IconPlusCircle aria-label={t('adminFunctions.addRowButton')} aria-hidden={false} />

@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { IconArrowDown, IconArrowUp, IconPen } from 'hds-react';
-import { IAdminMenuOrderCellProps } from '@/interfaces/menuItemsInterfaces';
+import { IAdminMenuOrderCellProps, ReorderableListType } from '@/interfaces/menuItemsInterfaces';
 import { moveRow, saveTableOrderThunk } from '@/reducers/listsSlice';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
@@ -61,16 +61,17 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
 };
 
 interface IAdminMenuEditCellProps {
-  onEditMenuItem: (value: string, id: string, path: string) => void;
+  onEditMenuItem: (value: string, id: string, path: string, listType: ReorderableListType) => void;
   value: string;
   path: string;
   id: string;
+  listType: ReorderableListType;
 }
 
-const EditCell: FC<IAdminMenuEditCellProps> = ({ onEditMenuItem, value, id, path }) => {
+const EditCell: FC<IAdminMenuEditCellProps> = ({ onEditMenuItem, value, id, path, listType }) => {
   return (
     <button
-      onClick={() => onEditMenuItem(value, id, path)}
+      onClick={() => onEditMenuItem(value, id, path, listType)}
       data-testid={`admin-menus-edit-button-id-${id}`}
     >
       <IconPen />

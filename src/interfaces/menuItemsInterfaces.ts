@@ -35,7 +35,8 @@ type ReorderableListType = keyof Pick<
 >;
 
 interface MenuItemDialogMessages {
-  submitSuccess: string;
+  submitSuccessTitle: string;
+  submitSuccessMessage: string;
   submitError: string;
   dialogId: string;
   titleId: string;
@@ -54,13 +55,19 @@ interface DialogState {
   value: string;
   path: string;
   editableItemId: string;
+  listType?: ReorderableListType;
 }
 
 interface AdminMenusCardProps {
   listType: ReorderableListType;
   translateValues: boolean;
-  onEditMenuItem: (value: string, editableItemId: string, path: string) => void;
-  onAddMenuItem: (path: string) => void;
+  onEditMenuItem: (
+    value: string,
+    editableItemId: string,
+    path: string,
+    listType: ReorderableListType,
+  ) => void;
+  onAddMenuItem: (path: string, listType: ReorderableListType) => void;
   path: string;
 }
 
@@ -84,11 +91,13 @@ interface MenuItemPostRequest {
 interface MenuItemPatchThunkContent {
   request: MenuItemPatchRequest;
   path: string;
+  listType: ReorderableListType;
 }
 
 interface MenuItemPostThunkContent {
   request: MenuItemPostRequest;
   path: string;
+  listType: ReorderableListType;
 }
 
 interface MoveRowPayload {
