@@ -12,7 +12,7 @@ const AdminMenusSideNavigation: FC<AdminMenusSideNavigationProps> = ({ active, s
   const { t } = useTranslation();
 
   return (
-    <div className="sidebar-container">
+    <div className="sidebar-container" data-testid="admin-menus-side-navigation">
       <div className="sidebar-content">
         <SideNavigation
           defaultOpenMainLevels={[]}
