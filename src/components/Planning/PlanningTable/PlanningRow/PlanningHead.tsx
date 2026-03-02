@@ -13,8 +13,7 @@ import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlic
 import { createSearchParams } from 'react-router-dom';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
-import { Trans } from 'react-i18next';
-import { useHoverTooltip } from './HoverTooltip/useHoverTooltip';
+import TooltipWrapper from './HoverTooltip/TooltipWrapper';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -36,7 +35,6 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const navigate = useNavigate();
   const mode = useAppSelector(selectPlanningMode);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
-  const { showTooltip, hideTooltip } = useHoverTooltip();
   const { search } = useLocation();
   const user = useAppSelector(selectUser);
 
@@ -103,12 +101,6 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     [handleExpand, mode, navigate, search, urlSearchParam],
   );
 
-  const showTotalBudgetTooltip = useCallback(
-    (e: React.SyntheticEvent<HTMLDivElement>) =>
-      showTooltip(e, <Trans i18nKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`} />),
-    [showTooltip, totalBudgetTooltipType],
-  );
-
   return (
     <th
       className={`planning-head ${type} ${mode} ${forcedToFrame ? 'framed' : ''}`}
@@ -157,27 +149,15 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               onClick={onExpand}
               data-testid={`title-${id}`}
             >
-              <span
-                className="planning-head-title"
-                onMouseOver={showTooltip}
-                onMouseLeave={hideTooltip}
-                onFocus={showTooltip}
-                onBlur={hideTooltip}
-                tabIndex={0}
-              >
-                {name}
-              </span>
+              <TooltipWrapper className="planning-head-title">{name}</TooltipWrapper>
             </button>
           </div>
         </div>
         {/* Budgets (not visible for coordinator) */}
         {mode === 'planning' && (
-          <div
+          <TooltipWrapper
             className="total-budgets"
-            onMouseOver={showTotalBudgetTooltip}
-            onMouseLeave={hideTooltip}
-            onFocus={showTotalBudgetTooltip}
-            onBlur={hideTooltip}
+            translationKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`}
           >
             <span className="text-base" data-testid={`planned-budgets-${id}`}>
               {plannedBudgets}
@@ -188,7 +168,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
             <span className="planning-head-deviation" data-testid={`deviation-${id}`}>
               {deviation}
             </span>
-          </div>
+          </TooltipWrapper>
         )}
       </div>
     </th>

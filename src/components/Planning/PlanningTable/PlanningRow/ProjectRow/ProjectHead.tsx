@@ -14,8 +14,7 @@ import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
-import { Trans, useTranslation } from 'react-i18next';
-import { useHoverTooltip } from '../HoverTooltip/useHoverTooltip';
+import TooltipWrapper from '../HoverTooltip/TooltipWrapper';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -41,12 +40,10 @@ interface IProjectHeadProps {
 }
 
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
-  const { t } = useTranslation();
   const { costEstimateBudget, availableFrameBudget } = sums;
   const user = useAppSelector(selectUser);
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
-  const { showTooltip, hideTooltip } = useHoverTooltip();
   const isPhaseValid = useProjectPhaseValidation({
     getProject: () => project,
   });
@@ -94,18 +91,6 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
     [onSubmitPhase, project.name, project.phase?.id],
   );
 
-  const showPriorityTooltip = useCallback(
-    (e: React.SyntheticEvent<HTMLElement>) =>
-      showTooltip(e, t(`tooltips.priority.${priorityTooltipTextKey?.toLowerCase()}`)),
-    [priorityTooltipTextKey, showTooltip, t],
-  );
-
-  const showProjectBudgetTooltip = useCallback(
-    (e: React.SyntheticEvent<HTMLDivElement>) =>
-      showTooltip(e, <Trans i18nKey={'tooltips.totalBudgets.project'} />),
-    [showTooltip],
-  );
-
   return (
     <th className="project-head-cell" data-testid={`head-${project.id}`}>
       <div className="project-head-cell-container">
@@ -133,11 +118,8 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
         {/* Category & Budgets */}
         <div className="project-right-icons-container">
           {project.priority && priorityTagText && (
-            <div
-              onMouseEnter={showPriorityTooltip}
-              onMouseLeave={hideTooltip}
-              onFocus={showPriorityTooltip}
-              onBlur={hideTooltip}
+            <TooltipWrapper
+              translationKey={`tooltips.priority.${priorityTooltipTextKey?.toLowerCase()}`}
             >
               <CustomTag
                 text={priorityTagText}
@@ -147,7 +129,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
                 id={`priority-${project.id}`}
                 circular
               />
-            </div>
+            </TooltipWrapper>
           )}
           <div>
             {project.category && (
@@ -158,12 +140,9 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
               />
             )}
           </div>
-          <div
+          <TooltipWrapper
             className="flex flex-col"
-            onMouseEnter={showProjectBudgetTooltip}
-            onMouseLeave={hideTooltip}
-            onFocus={showProjectBudgetTooltip}
-            onBlur={hideTooltip}
+            translationKey={`tooltips.totalBudgets.project`}
           >
             <span data-testid={`available-frame-budget-${project.id}`}>{availableFrameBudget}</span>
             <span
@@ -172,7 +151,7 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
             >
               {costEstimateBudget}
             </span>
-          </div>
+          </TooltipWrapper>
         </div>
       </div>
     </th>

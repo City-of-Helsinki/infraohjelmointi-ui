@@ -29,8 +29,7 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
-import { useHoverTooltip } from './HoverTooltip/useHoverTooltip';
-import { Trans } from 'react-i18next';
+import TooltipWrapper from './HoverTooltip/TooltipWrapper';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -81,8 +80,6 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
     dispatch(setNotesModalOpen({ isOpen: true, id, selectedYear: year }));
     dispatch(setNotesModalData({ name, id }));
   }, [dispatch, id, name, notesModalOpen, year]);
-
-  const { showTooltip, hideTooltip } = useHoverTooltip();
 
   const onEditFrameBudget = useCallback(() => {
     setEditFrameBudget((current) => !current);
@@ -160,12 +157,6 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
 
   const totalBudgetTooltipType = type === 'group' ? 'group' : 'class';
 
-  const showTotalBudgetTooltip = useCallback(
-    (e: React.SyntheticEvent<HTMLDivElement>) =>
-      showTooltip(e, <Trans i18nKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`} />),
-    [showTooltip, totalBudgetTooltipType],
-  );
-
   return (
     <>
       <td
@@ -180,12 +171,9 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
             data-testid={`edit-framed-budget-${id}-${year}`}
             onClick={onEditFrameBudget}
           >
-            <div
-              className={`planning-cell-container`}
-              onMouseEnter={showTotalBudgetTooltip}
-              onMouseLeave={hideTooltip}
-              onFocus={showTotalBudgetTooltip}
-              onBlur={hideTooltip}
+            <TooltipWrapper
+              className="planning-cell-container"
+              translationKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`}
             >
               <>
                 <span data-testid={`planned-budget-${id}-${year}`} className="planning-budget">
@@ -206,7 +194,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                   {deviation}
                 </span>
               </>
-            </div>
+            </TooltipWrapper>
           </button>
         )}
         {editFrameBudget && (
