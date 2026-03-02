@@ -8,7 +8,7 @@ import { IListItem, IOption } from '@/interfaces/common';
 import { getToday, isBefore, updateYear } from '@/utils/dates';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
-import { getFieldsIfEmpty, validateMaxNumber } from '@/utils/validation';
+import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
 import _ from 'lodash';
 import { mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
@@ -348,27 +348,6 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [t, constructionEndYear, isUserOnlyProjectManager, getValues],
   );
 
-  const validateCategory = useMemo(
-    () => ({
-      validate: {
-        isCategoryValid: (category: IOption) => {
-          const phase = getValues('phase').value;
-
-          const phasesThatNeedCategory = phases.slice(0, 2).map(({ value }) => value);
-
-          phasesThatNeedCategory.forEach((p) => {
-            if (phase !== p && category.value === '') {
-              return t('validation.required', { field: t('validation.category') });
-            }
-          });
-
-          return true;
-        },
-      },
-    }),
-    [getValues, phases, t],
-  );
-
   const projectFormPhase = getValues('phase').label;
   const projectPhase = useAppSelector(selectProject)?.phase;
   const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
@@ -458,7 +437,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           <SelectField
             {...getFieldProps('category')}
             options={categories}
-            rules={validateCategory}
+            required
+            rules={validateRequiredSelect('category', t)}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
             clearable
@@ -487,6 +467,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             options={priorities}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
+            required
+            rules={validateRequiredSelect('priority', t)}
             clearable
             tooltip={
               <Tooltip>

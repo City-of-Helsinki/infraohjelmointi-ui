@@ -7,7 +7,7 @@ import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
-import { validateMaxLength, validateRequired } from '@/utils/validation';
+import { validateMaxLength, validateRequired, validateRequiredSelect } from '@/utils/validation';
 import { useAppSelector } from '@/hooks/common';
 import { selectIsProjectSaving, selectProjectMode } from '@/reducers/projectSlice';
 
@@ -54,7 +54,8 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('type')}
             options={types}
             disabled={isInputDisabled}
-            rules={{ required: t('validation.required', { field: t('validation.phase') }) ?? '' }}
+            required
+            rules={validateRequiredSelect('type', t)}
             readOnly={isUserOnlyViewer}
           />
         </div>
@@ -72,7 +73,9 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           <SelectField
             {...getFieldProps('typeQualifier')}
             options={typeQualifiers}
-            rules={{ ...validateRequired('typeQualifier', t) }}
+            required
+            rules={validateRequiredSelect('typeQualifier', t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-xl">

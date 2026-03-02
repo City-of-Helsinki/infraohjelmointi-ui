@@ -17,8 +17,18 @@ export const validateInteger = (t: TFunction<'translation'>) => ({
       Number.isInteger(Number(value)) ? true : t('validation.wholeNumber'),
   },
 });
+
 export const validateRequired = (field: string, t: TFunction<'translation'>) => ({
   required: t('validation.required', { field: t(`validation.${field}`) }) ?? '',
+});
+
+// Validation for select fields where the value is an object with a 'value' property
+export const validateRequiredSelect = (field: string, t: TFunction<'translation'>) => ({
+  validate(option: IOption | null | undefined) {
+    if (!option || option.value === '') {
+      return t('validation.required', { field: t(`validation.${field}`) });
+    }
+  },
 });
 
 export const validateMaxNumber = (max: number, t: TFunction<'translation'>) => ({

@@ -127,7 +127,7 @@
 }
 
 .pen-and-label-button {
-  @apply !border-0 !px-0 !text-black;
+  @apply !border-0 !pl-0 !text-black;
 }
 
 .pen-and-label-button:hover {
