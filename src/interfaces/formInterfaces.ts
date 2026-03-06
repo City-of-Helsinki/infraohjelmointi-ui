@@ -77,6 +77,7 @@ export interface IProjectForm {
   personConstruction: IOption;
   personPlanning: IOption;
   personProgramming: IOption | null;
+  otherPersons: Array<IOption>;
   name: string;
   masterClass: IOption;
   class: IOption;
@@ -179,4 +180,4 @@ export type HookFormRulesType = Omit<
   'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
 >;
 
-export type FormValueType = string | boolean | IOption | string[] | null | undefined;
+export type FormValueType = string | boolean | IOption | IOption[] | string[] | null | undefined;

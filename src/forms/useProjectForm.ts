@@ -184,7 +184,7 @@ const useProjectFormValues = () => {
       personPlanning: personToOption(project?.personPlanning),
       personConstruction: personToOption(project?.personConstruction),
       personProgramming: personToOption(project?.personProgramming),
-      otherPersons: value(project?.otherPersons),
+      otherPersons: project?.otherPersons?.map(personToOption) ?? [],
       budgetOverrunReason: listItemToOption(project?.budgetOverrunReason),
       otherBudgetOverrunReason: value(project?.otherBudgetOverrunReason),
       onSchedule: project?.onSchedule,

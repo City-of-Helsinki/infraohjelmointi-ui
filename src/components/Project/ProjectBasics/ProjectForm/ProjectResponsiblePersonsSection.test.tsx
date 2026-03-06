@@ -163,7 +163,7 @@ const defaultFormValues = {
   subDivision: { value: '', label: '' },
   budgetOverrunReason: { value: '', label: '' },
   otherBudgetOverrunReason: '',
-  otherPersons: '',
+  otherPersons: [],
 } as IProjectForm;
 
 const TestComponent = () => {

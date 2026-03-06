@@ -80,7 +80,7 @@ export interface IProject {
   projectLocation?: string;
   projectDistrict?: string;
   projectProgram?: string;
-  otherPersons?: string;
+  otherPersons?: IPerson[];
   responsibleZone?: IListItem;
   masterPlanAreaNumber?: string;
   trafficPlanNumber?: string;
@@ -166,7 +166,7 @@ export interface IProjectRequest {
   masterPlanAreaNumber?: string | null;
   trafficPlanNumber?: string | null;
   bridgeNumber?: string | null;
-  otherPersons?: string;
+  otherPersons?: string[];
   personPlanning?: string;
   personProgramming?: string;
   personConstruction?: string;
