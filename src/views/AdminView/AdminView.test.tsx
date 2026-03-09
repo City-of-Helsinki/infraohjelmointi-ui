@@ -58,14 +58,14 @@ describe('AdminView', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the title and admin functions using the outlet and has all but hashtag functions disabled', async () => {
+  it('renders the title and admin functions using the outlet and has all but hashtag and menus functions disabled', async () => {
     const { findByTestId, getByTestId } = await render();
 
     expect(await findByTestId('admin-view-title')).toHaveTextContent('helloUser');
 
     adminFunctions.forEach((af) => {
       expect(getByTestId(`admin-card-${af}`)).toBeInTheDocument();
-      if (af === 'hashtags' || af === 'forcedtoframestate') {
+      if (af === 'hashtags' || af === 'menus' || af === 'forcedtoframestate') {
         expect(getByTestId(`admin-card-button-${af}`)).not.toBeDisabled();
       } else {
         expect(getByTestId(`admin-card-button-${af}`)).toBeDisabled();
