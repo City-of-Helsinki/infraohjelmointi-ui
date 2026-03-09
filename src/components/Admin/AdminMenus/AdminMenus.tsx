@@ -98,7 +98,7 @@ const AdminMenus = () => {
             <AdminMenusCard
               path={card.path}
               listType={card.listType}
-              translateValues={card.translateValues}
+              useUntranslatedValues={card.useUntranslatedValues}
               key={card.listType}
               onEditMenuItem={handleEdit}
               onAddMenuItem={handleAdd}

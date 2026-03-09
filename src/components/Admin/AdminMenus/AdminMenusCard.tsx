@@ -14,7 +14,7 @@ import { AdminMenusCardProps } from '@/interfaces/menuItemsInterfaces';
 const AdminMenusCard: FC<AdminMenusCardProps> = ({
   path,
   listType,
-  translateValues,
+  useUntranslatedValues,
   onEditMenuItem,
   onAddMenuItem,
 }) => {
@@ -25,9 +25,10 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
   ) as Array<IListItem>;
 
   const availableRowsList = listOfAvailableItemsForListType.map((item, index) => {
-    const value = translateValues
-      ? t(`option.${item.value}`, { defaultValue: item.value })
-      : item.value;
+    const value = useUntranslatedValues
+      ? item.value
+      : t(`option.${item.value}`, { defaultValue: item.value });
+
     const rowItem = {
       value,
       id: item.id,

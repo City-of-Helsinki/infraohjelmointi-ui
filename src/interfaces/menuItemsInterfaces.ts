@@ -60,7 +60,6 @@ interface DialogState {
 
 interface AdminMenusCardProps {
   listType: ReorderableListType;
-  translateValues: boolean;
   onEditMenuItem: (
     value: string,
     editableItemId: string,
@@ -69,6 +68,7 @@ interface AdminMenusCardProps {
   ) => void;
   onAddMenuItem: (path: string, listType: ReorderableListType) => void;
   path: string;
+  useUntranslatedValues?: boolean;
 }
 
 interface IAdminMenuOrderCellProps {
