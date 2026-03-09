@@ -48,12 +48,12 @@ const menuCardItemContents = [
   },
   {
     listType: 'responsiblePersons' as ReorderableListType,
-    translateValues: true,
+    translateValues: false,
     path: 'persons',
   },
   {
     listType: 'programmers' as ReorderableListType,
-    translateValues: true,
+    translateValues: false,
     path: 'project-programmers',
   },
   {
