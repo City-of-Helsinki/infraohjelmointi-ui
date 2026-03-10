@@ -15,6 +15,8 @@ import {
   selectPlanningMode,
 } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
+import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
+import { selectUser } from '@/reducers/authSlice';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -38,6 +40,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const forcedToFrame = useAppSelector(selectForcedToFrame);
   const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
   const { search } = useLocation();
+  const user = useAppSelector(selectUser);
 
   const [groupDialogState, setGroupDialogState] = useState({
     groupDeleteOpen: false,
@@ -149,7 +152,11 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
                   />
                 </>
               )}
-              <button onClick={handleGroupRowMenu} data-testid={`show-more-icon-${id}`}>
+              <button
+                onClick={handleGroupRowMenu}
+                data-testid={`show-more-icon-${id}`}
+                disabled={isUserOnlyViewer(user)}
+              >
                 <IconMenuDots size={IconSize.Small} />
               </button>
             </div>
