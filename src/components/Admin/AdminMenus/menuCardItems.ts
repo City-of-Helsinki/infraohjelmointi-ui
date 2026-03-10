@@ -10,7 +10,7 @@ const createMenuCardItem = (
   ...(useUntranslatedValues && { useUntranslatedValues }),
 });
 
-const menuCardItemContents = [
+const menuCardItems = [
   createMenuCardItem('categories', 'project-categories'),
   createMenuCardItem('types', 'project-types'),
   createMenuCardItem('phases', 'project-phases'),
@@ -25,4 +25,4 @@ const menuCardItemContents = [
   createMenuCardItem('budgetOverrunReasons', 'budget-overrun-reasons'),
 ];
 
-export { menuCardItemContents };
+export { menuCardItems };

@@ -3,7 +3,7 @@ import './styles.css';
 import AdminMenusSideNavigation from './AdminMenusSideNavigation';
 import AdminMenusCard from './AdminMenusCard';
 import { useEffect } from 'react';
-import { menuCardItemContents } from './AdminMenusMenuCardItems';
+import { menuCardItems } from './menuCardItems';
 import AddOrEditMenuItemDialog from './AddOrEditMenuItemDialog';
 import { DialogState, ReorderableListType } from '@/interfaces/menuItemsInterfaces';
 
@@ -93,7 +93,7 @@ const AdminMenus = () => {
     <div className="admin-menus-view">
       <AdminMenusSideNavigation active={activeMenuItem} setActivePage={setActivePage} />
       <div className="admin-menus-content">
-        {menuCardItemContents.map((card) => {
+        {menuCardItems.map((card) => {
           return (
             <AdminMenusCard
               path={card.path}
