@@ -25,6 +25,9 @@ import {
   patchMenuListItem,
   postMenuListItem,
   putMenuListOrder,
+  patchPersonTypeMenuListItem,
+  postPersonTypeMenuListItem,
+  getRawProgrammers,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -40,6 +43,8 @@ import {
   MenuItemPatchThunkContent,
   MenuItemPostThunkContent,
   MoveRowPayload,
+  PersonTypeMenuItemPatchThunkContent,
+  PersonTypeMenuItemPostThunkContent,
 } from '@/interfaces/menuItemsInterfaces';
 
 export interface IListState {
@@ -63,6 +68,7 @@ export interface IListState {
   budgetOverrunReasons: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
+  programmersRaw: Array<IPerson>;
   priorities: Array<IListItem>;
   talpaProjectRanges: Array<ITalpaProjectRange>;
   talpaProjectTypes: Array<ITalpaProjectType>;
@@ -92,6 +98,7 @@ const initialState: IListState = {
   programmedYears: setProgrammedYears(),
   projectClasses: [],
   programmers: [],
+  programmersRaw: [],
   priorities: [],
   talpaProjectRanges: [],
   talpaProjectTypes: [],
@@ -128,6 +135,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
   try {
     const districts = await getDistricts();
     const persons = await getResponsiblePersons();
+
     return {
       types: await getProjectTypes(),
       typeQualifiers: await getProjectTypeQualifiers(),
@@ -153,6 +161,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await getBudgetOverrunReasons(),
       programmers: await getProgrammers(),
+      programmersRaw: await getRawProgrammers(),
       priorities: await getPriorities(),
       talpaProjectRanges: [],
       talpaProjectTypes: [],
@@ -182,7 +191,11 @@ export const patchMenuItemsThunk = createAsyncThunk(
   'listItem/patch',
   async (thunkContent: MenuItemPatchThunkContent, thunkAPI) => {
     try {
-      const listItem = await patchMenuListItem(thunkContent.request, thunkContent.path);
+      const listItem = await patchMenuListItem(
+        thunkContent.request,
+        thunkContent.path,
+        thunkContent.id,
+      );
       return listItem;
     } catch (e) {
       return thunkAPI.rejectWithValue(e);
@@ -195,6 +208,34 @@ export const postMenuItemsThunk = createAsyncThunk(
   async (thunkContent: MenuItemPostThunkContent, thunkAPI) => {
     try {
       const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
+      return listItem;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
+export const patchPersonTypeMenuItemsThunk = createAsyncThunk(
+  'listItem/patch',
+  async (thunkContent: PersonTypeMenuItemPatchThunkContent, thunkAPI) => {
+    try {
+      const listItem = await patchPersonTypeMenuListItem(
+        thunkContent.request,
+        thunkContent.path,
+        thunkContent.id,
+      );
+      return listItem;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
+export const postPersonTypeMenuItemsThunk = createAsyncThunk(
+  'listItem/post',
+  async (thunkContent: PersonTypeMenuItemPostThunkContent, thunkAPI) => {
+    try {
+      const listItem = await postPersonTypeMenuListItem(thunkContent.request, thunkContent.path);
       return listItem;
     } catch (e) {
       return thunkAPI.rejectWithValue(e);

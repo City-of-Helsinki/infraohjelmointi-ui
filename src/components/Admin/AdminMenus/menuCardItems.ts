@@ -20,8 +20,8 @@ const menuCardItems = [
   createMenuCardItem('planningPhases', 'planning-phases'),
   createMenuCardItem('constructionPhases', 'construction-phases'),
   createMenuCardItem('responsibleZones', 'responsible-zones'),
-  createMenuCardItem('responsiblePersons', 'persons', true),
-  createMenuCardItem('programmers', 'project-programmers', true),
+  createMenuCardItem('responsiblePersonsRaw', 'persons', true),
+  createMenuCardItem('programmersRaw', 'project-programmers', true),
   createMenuCardItem('budgetOverrunReasons', 'budget-overrun-reasons'),
 ];
 

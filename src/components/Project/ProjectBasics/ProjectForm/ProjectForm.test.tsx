@@ -95,6 +95,7 @@ const render = async () =>
             projectSubDivisions: [],
             budgetOverrunReasons: mockBudgetOverrunReasons.data,
             programmers: mockProgrammers.data,
+            programmersRaw: [],
             projectClasses: [],
             priorities: [],
             talpaProjectRanges: [],

@@ -5,7 +5,11 @@ import AdminMenusCard from './AdminMenusCard';
 import { useEffect } from 'react';
 import { menuCardItems } from './menuCardItems';
 import AddOrEditMenuItemDialog from './AddOrEditMenuItemDialog';
-import { DialogState, ReorderableListType } from '@/interfaces/menuItemsInterfaces';
+import {
+  DialogState,
+  PersonTypeDialogValues,
+  ReorderableListType,
+} from '@/interfaces/menuItemsInterfaces';
 
 const AdminMenus = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<string | null>(null);
@@ -49,6 +53,7 @@ const AdminMenus = () => {
     editableItemId: '',
     path: '',
     listType: undefined,
+    personTypeDialogValues: undefined,
   });
 
   const handleEdit = (
@@ -56,6 +61,7 @@ const AdminMenus = () => {
     editableItemId: string,
     path: string,
     listType: ReorderableListType,
+    personTypeDialogValues?: PersonTypeDialogValues,
   ) => {
     setDialogState({
       open: true,
@@ -64,6 +70,7 @@ const AdminMenus = () => {
       editableItemId,
       path,
       listType,
+      personTypeDialogValues,
     });
   };
 
@@ -86,6 +93,7 @@ const AdminMenus = () => {
       path: '',
       editableItemId: '',
       listType: undefined,
+      personTypeDialogValues: undefined,
     });
   };
 

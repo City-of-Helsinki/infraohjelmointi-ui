@@ -67,7 +67,7 @@ describe('AdminMenus', () => {
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('adminFunctions.menus.addItemDialogHeader')).toBeInTheDocument();
-    expect(screen.getByTestId('add-menu-item-input')).toBeInTheDocument();
+    expect(screen.getByTestId('add-menu-item-input-value')).toBeInTheDocument();
   });
 
   it('opens edit dialog when clicking edit icon', async () => {
@@ -79,7 +79,7 @@ describe('AdminMenus', () => {
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('adminFunctions.menus.editItemDialogHeader')).toBeInTheDocument();
-    expect(screen.getByTestId('edit-menu-item-input')).toBeInTheDocument();
-    expect(screen.getByTestId('edit-menu-item-input')).toHaveValue('option.K1');
+    expect(screen.getByTestId('edit-menu-item-input-value')).toBeInTheDocument();
+    expect(screen.getByTestId('edit-menu-item-input-value')).toHaveValue('option.K1');
   });
 });

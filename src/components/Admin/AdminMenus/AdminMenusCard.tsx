@@ -10,6 +10,8 @@ import { IListState } from '@/reducers/listsSlice';
 import { IListItem } from '@/interfaces/common';
 import { EditCell, OrderCell } from './AdminMenusTableActionButtons';
 import { AdminMenusCardProps } from '@/interfaces/menuItemsInterfaces';
+import { IPerson } from '@/interfaces/personsInterfaces';
+import { getAdminMenuItemDisplayValue, getPersonTypeDialogValues } from '@/utils/adminMenusUtils';
 
 const AdminMenusCard: FC<AdminMenusCardProps> = ({
   path,
@@ -22,12 +24,11 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
 
   const listOfAvailableItemsForListType = useAppSelector(
     (state: RootState) => state.lists[listType as keyof IListState],
-  ) as Array<IListItem>;
+  ) as Array<IListItem | IPerson>;
 
   const availableRowsList = listOfAvailableItemsForListType.map((item, index) => {
-    const value = useUntranslatedValues
-      ? item.value
-      : t(`option.${item.value}`, { defaultValue: item.value });
+    const value = getAdminMenuItemDisplayValue(t, item, useUntranslatedValues);
+    const personTypeDialogValues = getPersonTypeDialogValues(item);
 
     const rowItem = {
       value,
@@ -48,6 +49,7 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
           path={path}
           id={item.id}
           listType={listType}
+          personTypeDialogValues={personTypeDialogValues}
         />
       ),
       order: item.order,

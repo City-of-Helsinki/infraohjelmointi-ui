@@ -11,8 +11,8 @@ const ADMIN_MENUS_MENU_TYPE = [
   'planningPhases',
   'constructionPhases',
   'responsibleZones',
-  'responsiblePersons',
-  'programmers',
+  'responsiblePersonsRaw',
+  'programmersRaw',
   'budgetOverrunReasons',
 ] as const;
 
@@ -29,9 +29,9 @@ type ReorderableListType = keyof Pick<
   | 'budgetOverrunReasons'
   | 'constructionPhases'
   | 'planningPhases'
-  | 'responsiblePersons'
+  | 'responsiblePersonsRaw'
   | 'responsibleZones'
-  | 'programmers'
+  | 'programmersRaw'
 >;
 
 interface MenuItemDialogMessages {
@@ -44,7 +44,12 @@ interface MenuItemDialogMessages {
   closeButtonLabelText: string;
   dialogHeader: string;
   dialogInputId: string;
-  inputLabel: string;
+  firstNameInputLabel: string;
+  lastNameInputLabel: string;
+  emailInputLabel: string;
+  phoneNumberInputLabel: string;
+  valueInputLabel: string;
+  titleInputLabel: string;
 }
 
 type DialogMode = 'add' | 'edit';
@@ -55,7 +60,16 @@ interface DialogState {
   value: string;
   path: string;
   editableItemId: string;
+  personTypeDialogValues?: PersonTypeDialogValues;
   listType?: ReorderableListType;
+}
+
+interface PersonTypeDialogValues {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  title?: string;
+  phone?: string;
 }
 
 interface AdminMenusCardProps {
@@ -79,23 +93,40 @@ interface IAdminMenuOrderCellProps {
   path: string;
 }
 
-interface MenuItemPatchRequest {
-  value: string;
-  id: string;
-}
-
-interface MenuItemPostRequest {
+interface MenuItemRequest {
   value: string;
 }
 
 interface MenuItemPatchThunkContent {
-  request: MenuItemPatchRequest;
+  request: MenuItemRequest;
   path: string;
+  id: string;
   listType: ReorderableListType;
 }
 
 interface MenuItemPostThunkContent {
-  request: MenuItemPostRequest;
+  request: MenuItemRequest;
+  path: string;
+  listType: ReorderableListType;
+}
+
+interface PersonTypeMenuItemRequest {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  title?: string;
+}
+
+interface PersonTypeMenuItemPatchThunkContent {
+  request: PersonTypeMenuItemRequest;
+  path: string;
+  id: string;
+  listType: ReorderableListType;
+}
+
+interface PersonTypeMenuItemPostThunkContent {
+  request: PersonTypeMenuItemRequest;
   path: string;
   listType: ReorderableListType;
 }
@@ -114,10 +145,13 @@ export type {
   DialogMode,
   DialogState,
   IAdminMenuOrderCellProps,
-  MenuItemPatchRequest,
-  MenuItemPostRequest,
+  MenuItemRequest,
+  PersonTypeMenuItemRequest,
+  PersonTypeMenuItemPatchThunkContent,
+  PersonTypeMenuItemPostThunkContent,
   MenuItemPatchThunkContent,
   MenuItemPostThunkContent,
   MoveRowPayload,
   ReorderableListType,
+  PersonTypeDialogValues,
 };

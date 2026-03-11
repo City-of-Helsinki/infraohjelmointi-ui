@@ -730,8 +730,17 @@
       "addRowButton": "Lisää uusi",
       "addItemDialogHeader": "Lisää arvo valikkoon",
       "editItemDialogHeader": "Muokkaa arvoa valikossa",
-      "addItemInputLabel": "Lisättävä arvo",
-      "editItemInputLabel": "Muokattava arvo",
+      "inputLabel": {
+        "firstName": "Etunimi",
+        "lastName": "Sukunimi",
+        "email": "Sähköposti",
+        "phoneNumber": "Puhelinumero",
+        "title": "Titteli",
+        "value": {
+          "add": "Lisättävä arvo",
+          "edit": "Muokattava arvo"
+        }
+      },
       "listType": {
         "categories": "Kategoria",
         "types": "Hankkeen tyyppi",
@@ -743,8 +752,8 @@
         "planningPhases": "Suunnittelun kustannusarvio (menu)",
         "constructionPhases": "Rakentamisen kustannusarvio (menu)",
         "responsibleZones": "Vastuuyksikkö",
-        "responsiblePersons": "Vastuuhenkilölistat",
-        "programmers": "Ohjelmoija",
+        "responsiblePersonsRaw": "Vastuuhenkilölistat",
+        "programmersRaw": "Ohjelmoija",
         "budgetOverrunReasons": "Budjettipoikkeaman selitys"
       },
       "tableEmptyText": "Valikossa ei ole vielä vaihtoehtoja. Lisää uusi valinta aloittaaksesi.",
