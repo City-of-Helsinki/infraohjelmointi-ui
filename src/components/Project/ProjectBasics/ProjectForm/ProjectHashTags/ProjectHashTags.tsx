@@ -1,5 +1,5 @@
 import { useAppSelector } from '@/hooks/common';
-import { HookFormControlType } from '@/interfaces/formInterfaces';
+import { HookFormControlType, IProjectForm } from '@/interfaces/formInterfaces';
 import { Button } from 'hds-react';
 import { Dialog } from 'hds-react';
 import {
@@ -11,11 +11,10 @@ import {
   useEffect,
   memo,
   useCallback,
-  useMemo,
   Dispatch,
   SetStateAction,
 } from 'react';
-import { Control, Controller, FieldValues } from 'react-hook-form';
+import { Control, Controller, FieldValues, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FormFieldLabel from '@/components/shared/FormFieldLabel';
 import HashTagsContainer from './HashTagsContainer';
@@ -117,31 +116,34 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           ),
         }));
       }
-    }, [projectHashTags]);
+    }, [projectHashTags, allHashTags, projectMode, setHashTagsState]);
 
-    const onHashTagDelete = useCallback((value: string) => {
-      setFormState((current) => {
-        const hashTagsForSubmit = current.hashTagsForSubmit.filter((hv) => hv.id !== value);
+    const onHashTagDelete = useCallback(
+      (value: string) => {
+        setFormState((current) => {
+          const hashTagsForSubmit = current.hashTagsForSubmit.filter((hv) => hv.id !== value);
 
-        if (projectMode === 'new') {
-          setHashTagsState((current) => ({
+          if (projectMode === 'new') {
+            setHashTagsState((current) => ({
+              ...current,
+              projectHashTags: hashTagsForSubmit,
+            }));
+          }
+
+          return {
             ...current,
-            projectHashTags: hashTagsForSubmit,
-          }));
-        }
-
-        return {
-          ...current,
-          hashTagsForSubmit: hashTagsForSubmit,
-          hashTagsForSearch: allHashTags.hashTags.filter(
-            (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
-          ),
-          popularHashTags: allHashTags.popularHashTags.filter(
-            (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
-          ),
-        };
-      });
-    }, []);
+            hashTagsForSubmit: hashTagsForSubmit,
+            hashTagsForSearch: allHashTags.hashTags.filter(
+              (ah) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ah.id) === -1,
+            ),
+            popularHashTags: allHashTags.popularHashTags.filter(
+              (ph) => hashTagsForSubmit.findIndex((hfs) => hfs.id === ph.id) === -1,
+            ),
+          };
+        });
+      },
+      [allHashTags, projectMode, setHashTagsState],
+    );
 
     // Set a hashtag to be submitted, make sure that the hashtag exists
     // Make sure the value doesn't already exist in hashTagsForSubmit
@@ -167,7 +169,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           });
         }
       },
-      [hashTagsObject, hashTagsForSubmit],
+      [hashTagsObject, hashTagsForSubmit, allHashTags],
     );
 
     // Submit hashTagsForSubmit and close the dialog
@@ -192,7 +194,15 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
           console.log('Error patching project hashtags: ', e);
         }
       },
-      [hashTagsForSubmit, projectId, toggleOpenDialog, onChange, hashTagsObject],
+      [
+        hashTagsForSubmit,
+        projectId,
+        toggleOpenDialog,
+        onChange,
+        hashTagsObject,
+        projectMode,
+        setHashTagsState,
+      ],
     );
 
     const handleClose = useCallback(() => {
@@ -271,6 +281,7 @@ interface IProjectHashTagsProps {
   project: IProject | null;
   projectMode: 'edit' | 'new';
   readOnly?: boolean;
+  watch: UseFormWatch<IProjectForm>;
 }
 
 interface IProjectHashTagsState {
@@ -285,28 +296,24 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({
   project,
   projectMode,
   readOnly,
+  watch,
 }) => {
   const { t } = useTranslation();
   const allHashTags = useAppSelector(selectHashTags);
+  const formHashTags = watch('hashTags');
   const [state, setState] = useState<IProjectHashTagsState>({
     openDialog: false,
     projectHashTags: [],
   });
 
-  const { projectId, projectName } = useMemo(() => {
-    if (project?.hashTags) {
+  useEffect(() => {
+    if (formHashTags) {
       setState((current) => ({
         ...current,
-        projectHashTags: allHashTags.hashTags.filter(({ id }) =>
-          arrayHasValue(project.hashTags, id),
-        ),
+        projectHashTags: allHashTags.hashTags.filter(({ id }) => arrayHasValue(formHashTags, id)),
       }));
     }
-    return {
-      projectId: project?.id,
-      projectName: project?.name,
-    };
-  }, [project]);
+  }, [formHashTags, allHashTags.hashTags]);
 
   const toggleOpenDialog = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     if (e) {
@@ -331,8 +338,8 @@ const ProjectHashTags: FC<IProjectHashTagsProps> = ({
               label={label}
               toggleOpenDialog={toggleOpenDialog}
               openDialog={openDialog}
-              projectId={projectId}
-              projectName={projectName}
+              projectId={project?.id}
+              projectName={project?.name}
               projectMode={projectMode}
               setHashTagsState={setState}
             />
