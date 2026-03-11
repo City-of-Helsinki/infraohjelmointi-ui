@@ -116,6 +116,71 @@ describe('useTalpaForm', () => {
     });
   });
 
+  it.each([
+    {
+      className: '8 08 01 Esirakentaminen',
+      subClassName: '8 08 01 02 Länsisatama',
+      expectedBudgetAccount: '8 08 01 02 Länsisatama',
+    },
+    {
+      className: '8 09 01 Malminkartano-Kannelmäki',
+      subClassName: '8 09 01 02 Kadut uudisrakentaminen',
+      expectedBudgetAccount: '8 09 01 02 Kadut uudisrakentaminen',
+    },
+    {
+      className: '8 03 01 01 Uudisrakentaminen',
+      subClassName: 'Eteläinen suurpiiri',
+      expectedBudgetAccount: '8 03 01 01 Uudisrakentaminen',
+    },
+    {
+      className:
+        '8 01 01 Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset',
+      subClassName: null,
+      expectedBudgetAccount:
+        '8 01 01 Kiinteistöjen ostot ja lunastukset sekä kaavoitus- ja täydennysrakennuskorvaukset',
+    },
+  ])(
+    'sets budgetAccount correctly for class "$className"',
+    ({ className, subClassName, expectedBudgetAccount }) => {
+      const project = {
+        id: 'project-2',
+        estPlanningStart: '01.01.2026',
+        estConstructionEnd: '31.12.2026',
+        projectClass: 'sub-class-1',
+        address: 'Testitie 1',
+      };
+
+      const planningClass = {
+        id: 'class-1',
+        name: className,
+      };
+
+      const planningSubClass = {
+        id: 'sub-class-1',
+        name: subClassName,
+        parent: 'class-1',
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const selectors: Record<SelectorName, any> = {
+        selectProject: project,
+        selectTalpaProject: null,
+        selectPlanningClasses: [planningClass],
+        selectPlanningSubClasses: [planningSubClass],
+        selectResponsiblePersonsRaw: [],
+      };
+
+      mockUseAppSelector.mockImplementation((selector: { name: SelectorName }) => {
+        return selectors[selector.name];
+      });
+
+      const { result } = renderHook(() => useTalpaForm());
+      const values = result.current.getValues();
+
+      expect(values.budgetAccount).toBe(expectedBudgetAccount);
+    },
+  );
+
   it('populates form values when talpa project data is loaded', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {
