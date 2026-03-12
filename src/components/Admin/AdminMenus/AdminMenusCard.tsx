@@ -1,7 +1,6 @@
 import { FC, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonVariant, Card, Table } from 'hds-react';
-import { IconPlusCircle } from 'hds-react';
+import { Button, ButtonVariant, Card, IconPlusCircle, Table } from 'hds-react';
 import { RootState } from '@/store';
 
 import './styles.css';

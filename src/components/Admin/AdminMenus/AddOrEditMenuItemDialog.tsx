@@ -5,13 +5,7 @@ import {
   MenuItemDialogMessages,
   PersonTypeDialogValues,
 } from '@/interfaces/menuItemsInterfaces';
-import {
-  patchMenuItemsThunk,
-  patchPersonTypeMenuItemsThunk,
-  postMenuItemsThunk,
-  postPersonTypeMenuItemsThunk,
-  selectLists,
-} from '@/reducers/listsSlice';
+import { patchMenuItemsThunk, postMenuItemsThunk, selectLists } from '@/reducers/listsSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { getErrorText } from '@/utils/validation';
 import { Button, ButtonVariant, Dialog, TextInput } from 'hds-react';
@@ -99,37 +93,35 @@ const MenuItemDialog: FC<MenuItemDialogProps> = ({ handleClose, dialogState, dia
   ]);
 
   return (
-    <>
-      <Dialog
-        isOpen={dialogState.open}
-        close={handleClose}
-        id={dialogMessages.dialogId}
-        aria-labelledby={dialogMessages.titleId}
-        aria-describedby={dialogMessages.descriptionId}
-        closeButtonLabelText={dialogMessages.closeButtonLabelText}
-      >
-        <Header id={dialogMessages.titleId} title={dialogMessages.dialogHeader} />
-        <Content>
-          <TextInput
-            id={`${dialogMessages.dialogInputId}-value`}
-            label={dialogMessages.valueInputLabel}
-            value={menuItemName}
-            onChange={onSetMenuItemName}
-            data-testid={`${dialogMessages.dialogInputId}-value`}
-            errorText={getErrorText('value', error, t)}
-            invalid={getErrorText('value', error, t) !== ''}
-          />
-        </Content>
-        <ActionButtons>
-          <Button onClick={onSaveMenuItemChange} data-testid="submit-menu-item-button">
-            {t('save')}
-          </Button>
-          <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
-            {t('cancel')}
-          </Button>
-        </ActionButtons>
-      </Dialog>
-    </>
+    <Dialog
+      isOpen={dialogState.open}
+      close={handleClose}
+      id={dialogMessages.dialogId}
+      aria-labelledby={dialogMessages.titleId}
+      aria-describedby={dialogMessages.descriptionId}
+      closeButtonLabelText={dialogMessages.closeButtonLabelText}
+    >
+      <Header id={dialogMessages.titleId} title={dialogMessages.dialogHeader} />
+      <Content>
+        <TextInput
+          id={`${dialogMessages.dialogInputId}-value`}
+          label={dialogMessages.valueInputLabel}
+          value={menuItemName}
+          onChange={onSetMenuItemName}
+          data-testid={`${dialogMessages.dialogInputId}-value`}
+          errorText={getErrorText('value', error, t)}
+          invalid={getErrorText('value', error, t) !== ''}
+        />
+      </Content>
+      <ActionButtons>
+        <Button onClick={onSaveMenuItemChange} data-testid="submit-menu-item-button">
+          {t('save')}
+        </Button>
+        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+          {t('cancel')}
+        </Button>
+      </ActionButtons>
+    </Dialog>
   );
 };
 
@@ -178,13 +170,13 @@ const PersonTypeMenuItemDialog: FC<MenuItemDialogProps> = ({
   );
 
   const onSaveMenuItemChange = useCallback(async () => {
-    if (!Object.values(personTypeDialogValues).every((value) => !value) || !dialogState.listType)
+    if (Object.values(personTypeDialogValues).every((value) => !value) || !dialogState.listType)
       return;
 
     try {
       if (dialogState.mode === 'edit') {
         await dispatch(
-          patchPersonTypeMenuItemsThunk({
+          patchMenuItemsThunk({
             request: {
               firstName: personTypeDialogValues.firstName,
               lastName: personTypeDialogValues.lastName,
@@ -199,7 +191,7 @@ const PersonTypeMenuItemDialog: FC<MenuItemDialogProps> = ({
         ).unwrap();
       } else {
         await dispatch(
-          postPersonTypeMenuItemsThunk({
+          postMenuItemsThunk({
             request: {
               firstName: personTypeDialogValues.firstName,
               lastName: personTypeDialogValues.lastName,
@@ -247,76 +239,74 @@ const PersonTypeMenuItemDialog: FC<MenuItemDialogProps> = ({
   ]);
 
   return (
-    <>
-      <Dialog
-        isOpen={dialogState.open}
-        close={handleClose}
-        id={dialogMessages.dialogId}
-        aria-labelledby={dialogMessages.titleId}
-        aria-describedby={dialogMessages.descriptionId}
-        closeButtonLabelText={dialogMessages.closeButtonLabelText}
-      >
-        <Header id={dialogMessages.titleId} title={dialogMessages.dialogHeader} />
-        <Content>
-          <TextInput
-            id={`${dialogMessages.dialogInputId}-first-name`}
-            label={dialogMessages.firstNameInputLabel}
-            value={personTypeDialogValues.firstName}
-            onChange={(e) => onSetMenuItemName('firstName', e)}
-            data-testid={`${dialogMessages.dialogInputId}-first-name`}
-            errorText={getErrorText('value', error, t)}
-            invalid={getErrorText('value', error, t) !== ''}
-            required
-          />
-          <TextInput
-            id={`${dialogMessages.dialogInputId}-last-name`}
-            label={dialogMessages.lastNameInputLabel}
-            value={personTypeDialogValues.lastName}
-            onChange={(e) => onSetMenuItemName('lastName', e)}
-            data-testid={`${dialogMessages.dialogInputId}-last-name`}
-            errorText={getErrorText('value', error, t)}
-            invalid={getErrorText('value', error, t) !== ''}
-            required
-          />
-          <TextInput
-            id={`${dialogMessages.dialogInputId}-title`}
-            label={dialogMessages.titleInputLabel}
-            value={personTypeDialogValues.title}
-            onChange={(e) => onSetMenuItemName('title', e)}
-            data-testid={`${dialogMessages.dialogInputId}-title`}
-            errorText={getErrorText('value', error, t)}
-            invalid={getErrorText('value', error, t) !== ''}
-          />
-          <TextInput
-            id={`${dialogMessages.dialogInputId}-email`}
-            label={dialogMessages.emailInputLabel}
-            value={personTypeDialogValues.email}
-            onChange={(e) => onSetMenuItemName('email', e)}
-            data-testid={`${dialogMessages.dialogInputId}-email`}
-            errorText={getErrorText('value', error, t)}
-            invalid={getErrorText('value', error, t) !== ''}
-            required={dialogState.listType === 'responsiblePersonsRaw'}
-          />
-          <TextInput
-            id={`${dialogMessages.dialogInputId}-phone-number`}
-            label={dialogMessages.phoneNumberInputLabel}
-            value={personTypeDialogValues.phone}
-            onChange={(e) => onSetMenuItemName('phone', e)}
-            data-testid={`${dialogMessages.dialogInputId}-phone-number`}
-            errorText={getErrorText('value', error, t)}
-            invalid={getErrorText('value', error, t) !== ''}
-          />
-        </Content>
-        <ActionButtons>
-          <Button onClick={onSaveMenuItemChange} data-testid="submit-person-type-menu-item-button">
-            {t('save')}
-          </Button>
-          <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
-            {t('cancel')}
-          </Button>
-        </ActionButtons>
-      </Dialog>
-    </>
+    <Dialog
+      isOpen={dialogState.open}
+      close={handleClose}
+      id={dialogMessages.dialogId}
+      aria-labelledby={dialogMessages.titleId}
+      aria-describedby={dialogMessages.descriptionId}
+      closeButtonLabelText={dialogMessages.closeButtonLabelText}
+    >
+      <Header id={dialogMessages.titleId} title={dialogMessages.dialogHeader} />
+      <Content>
+        <TextInput
+          id={`${dialogMessages.dialogInputId}-first-name`}
+          label={dialogMessages.firstNameInputLabel}
+          value={personTypeDialogValues.firstName}
+          onChange={(e) => onSetMenuItemName('firstName', e)}
+          data-testid={`${dialogMessages.dialogInputId}-first-name`}
+          errorText={getErrorText('value', error, t)}
+          invalid={getErrorText('value', error, t) !== ''}
+          required
+        />
+        <TextInput
+          id={`${dialogMessages.dialogInputId}-last-name`}
+          label={dialogMessages.lastNameInputLabel}
+          value={personTypeDialogValues.lastName}
+          onChange={(e) => onSetMenuItemName('lastName', e)}
+          data-testid={`${dialogMessages.dialogInputId}-last-name`}
+          errorText={getErrorText('value', error, t)}
+          invalid={getErrorText('value', error, t) !== ''}
+          required
+        />
+        <TextInput
+          id={`${dialogMessages.dialogInputId}-title`}
+          label={dialogMessages.titleInputLabel}
+          value={personTypeDialogValues.title}
+          onChange={(e) => onSetMenuItemName('title', e)}
+          data-testid={`${dialogMessages.dialogInputId}-title`}
+          errorText={getErrorText('value', error, t)}
+          invalid={getErrorText('value', error, t) !== ''}
+        />
+        <TextInput
+          id={`${dialogMessages.dialogInputId}-email`}
+          label={dialogMessages.emailInputLabel}
+          value={personTypeDialogValues.email}
+          onChange={(e) => onSetMenuItemName('email', e)}
+          data-testid={`${dialogMessages.dialogInputId}-email`}
+          errorText={getErrorText('value', error, t)}
+          invalid={getErrorText('value', error, t) !== ''}
+          required={dialogState.listType === 'responsiblePersonsRaw'}
+        />
+        <TextInput
+          id={`${dialogMessages.dialogInputId}-phone-number`}
+          label={dialogMessages.phoneNumberInputLabel}
+          value={personTypeDialogValues.phone}
+          onChange={(e) => onSetMenuItemName('phone', e)}
+          data-testid={`${dialogMessages.dialogInputId}-phone-number`}
+          errorText={getErrorText('value', error, t)}
+          invalid={getErrorText('value', error, t) !== ''}
+        />
+      </Content>
+      <ActionButtons>
+        <Button onClick={onSaveMenuItemChange} data-testid="submit-person-type-menu-item-button">
+          {t('save')}
+        </Button>
+        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+          {t('cancel')}
+        </Button>
+      </ActionButtons>
+    </Dialog>
   );
 };
 

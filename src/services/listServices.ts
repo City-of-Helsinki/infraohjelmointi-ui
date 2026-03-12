@@ -199,26 +199,8 @@ export const putMenuListOrder = async (request: IListItem[], path: string) => {
   }
 };
 
-export const postMenuListItem = async (request: MenuItemRequest, path: string) => {
-  try {
-    const res = await axios.post(`${REACT_APP_API_URL}/${path}/`, request);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
-};
-
-export const patchMenuListItem = async (request: MenuItemRequest, path: string, itemId: string) => {
-  try {
-    const res = await axios.patch(`${REACT_APP_API_URL}/${path}/${itemId}/`, request);
-    return res.data;
-  } catch (e) {
-    return Promise.reject(e);
-  }
-};
-
-export const postPersonTypeMenuListItem = async (
-  request: PersonTypeMenuItemRequest,
+export const postMenuListItem = async (
+  request: MenuItemRequest | PersonTypeMenuItemRequest,
   path: string,
 ) => {
   try {
@@ -229,8 +211,8 @@ export const postPersonTypeMenuListItem = async (
   }
 };
 
-export const patchPersonTypeMenuListItem = async (
-  request: PersonTypeMenuItemRequest,
+export const patchMenuListItem = async (
+  request: MenuItemRequest | PersonTypeMenuItemRequest,
   path: string,
   itemId: string,
 ) => {

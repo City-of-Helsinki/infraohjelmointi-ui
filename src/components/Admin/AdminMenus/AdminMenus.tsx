@@ -1,8 +1,7 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import './styles.css';
 import AdminMenusSideNavigation from './AdminMenusSideNavigation';
 import AdminMenusCard from './AdminMenusCard';
-import { useEffect } from 'react';
 import { menuCardItems } from './menuCardItems';
 import AddOrEditMenuItemDialog from './AddOrEditMenuItemDialog';
 import {
@@ -19,18 +18,17 @@ const AdminMenus = () => {
   };
 
   useEffect(() => {
-    const sections = document.querySelectorAll("[id^='menu-card-']");
+    const sections = globalThis.document?.querySelectorAll("[id^='menu-card-']");
+    if (!sections?.length) return;
 
-    if (!sections.length) return;
-
-    const observer = new IntersectionObserver(
+    const observer = new globalThis.IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.id;
 
             setActiveMenuItem(id);
-            window.history.replaceState(null, '', `#${id}`);
+            globalThis.history?.replaceState(null, '', `#${id}`);
           }
         });
       },

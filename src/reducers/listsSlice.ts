@@ -25,8 +25,6 @@ import {
   patchMenuListItem,
   postMenuListItem,
   putMenuListOrder,
-  patchPersonTypeMenuListItem,
-  postPersonTypeMenuListItem,
   getRawProgrammers,
 } from '@/services/listServices';
 import { RootState } from '@/store';
@@ -189,7 +187,10 @@ export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, t
 
 export const patchMenuItemsThunk = createAsyncThunk(
   'listItem/patch',
-  async (thunkContent: MenuItemPatchThunkContent, thunkAPI) => {
+  async (
+    thunkContent: MenuItemPatchThunkContent | PersonTypeMenuItemPatchThunkContent,
+    thunkAPI,
+  ) => {
     try {
       const listItem = await patchMenuListItem(
         thunkContent.request,
@@ -205,37 +206,9 @@ export const patchMenuItemsThunk = createAsyncThunk(
 
 export const postMenuItemsThunk = createAsyncThunk(
   'listItem/post',
-  async (thunkContent: MenuItemPostThunkContent, thunkAPI) => {
+  async (thunkContent: MenuItemPostThunkContent | PersonTypeMenuItemPostThunkContent, thunkAPI) => {
     try {
       const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
-      return listItem;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
-export const patchPersonTypeMenuItemsThunk = createAsyncThunk(
-  'listItem/patch',
-  async (thunkContent: PersonTypeMenuItemPatchThunkContent, thunkAPI) => {
-    try {
-      const listItem = await patchPersonTypeMenuListItem(
-        thunkContent.request,
-        thunkContent.path,
-        thunkContent.id,
-      );
-      return listItem;
-    } catch (e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  },
-);
-
-export const postPersonTypeMenuItemsThunk = createAsyncThunk(
-  'listItem/post',
-  async (thunkContent: PersonTypeMenuItemPostThunkContent, thunkAPI) => {
-    try {
-      const listItem = await postPersonTypeMenuListItem(thunkContent.request, thunkContent.path);
       return listItem;
     } catch (e) {
       return thunkAPI.rejectWithValue(e);
