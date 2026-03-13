@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { selectTalpaAssetClasses, selectTalpaServiceClasses } from '@/reducers/listsSlice';
 import { useFormContext } from 'react-hook-form';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { groupOptions } from '@/utils/common';
 import { BudgetItemNumber } from './budgetItemNumber';
 import { InvestmentProfile } from './investmentProfile';
@@ -28,18 +28,20 @@ export default function ProjectClassesSection() {
   const [budgetItemNumber, assetClass] = watch(['budgetItemNumber', 'assetClass']);
   const budgetItemNumberTouched = Boolean(touchedFields?.budgetItemNumber);
 
-  const filteredServiceClasses = talpaServiceClasses.filter(
-    (serviceClass) => serviceClass.projectTypePrefix === budgetItemNumber,
-  );
+  const serviceClassOptions = useMemo(() => {
+    const filteredServiceClasses = talpaServiceClasses.filter(
+      (serviceClass) => serviceClass.projectTypePrefix === budgetItemNumber,
+    );
 
-  const serviceClassOptions = filteredServiceClasses.map((serviceClass) => ({
-    label: `${serviceClass.code} ${serviceClass.name}`,
-    value: serviceClass.id,
-    selected: false,
-    isGroupLabel: false,
-    visible: true,
-    disabled: false,
-  }));
+    return filteredServiceClasses.map((serviceClass) => ({
+      label: `${serviceClass.code} ${serviceClass.name}`,
+      value: serviceClass.id,
+      selected: false,
+      isGroupLabel: false,
+      visible: true,
+      disabled: false,
+    }));
+  }, [talpaServiceClasses, budgetItemNumber]);
 
   const assetClassGroups = groupOptions(
     talpaAssetClasses,
