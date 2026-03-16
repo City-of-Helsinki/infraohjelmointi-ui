@@ -159,7 +159,11 @@ describe('projectForm', () => {
     const expectRadioBoolean = async (testId: string, value: boolean) =>
       expect(((await findByTestId(testId)) as HTMLInputElement).checked).toBe(value);
     const expectPersonOption = async (person: IPerson) =>
-      expect(await findByText(`${person.firstName} ${person.lastName}`)).toBeInTheDocument();
+      expect(
+        (await findAllByText(`${person.firstName} ${person.lastName}`))[0],
+      ).toBeInTheDocument();
+    const expectedPersonOptions = async (persons: IPerson[]) =>
+      await Promise.all(persons.map(expectPersonOption));
 
     expectOption(project?.type?.value);
     expectOption(project?.typeQualifier?.value);
@@ -172,6 +176,7 @@ describe('projectForm', () => {
     expectPersonOption(project?.personPlanning as IPerson);
     expectPersonOption(project?.personConstruction as IPerson);
     expectPersonOption(project?.personProgramming as IPerson);
+    expectedPersonOptions(project?.otherPersons as IPerson[]);
     expectRadioBoolean('programmed-0', true);
     expectRadioBoolean('louhi-0', false);
     expectRadioBoolean('gravel-0', false);
@@ -393,12 +398,12 @@ describe('projectForm', () => {
 
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
-    const { user, findByText, findByTestId } = await render();
+    const { user, findByText, findByTestId, findByRole } = await render();
 
     const formSubmitButton = await findByTestId('submit-project-button');
 
     await user.click(screen.getAllByRole('combobox', { name: /type/i })[0]);
-    await user.click(await findByText('option.newConstruction'));
+    await user.click(await findByRole('option', { name: /newConstruction/i }));
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -551,7 +556,7 @@ describe('projectForm', () => {
 
     // select phase
     await user.click(screen.getAllByRole('combobox', { name: /phase/i })[0]);
-    await user.click(await within(parentContainer).findByText('option.proposal'));
+    await user.click(await within(parentContainer).findByText('proposal'));
 
     // save project
     const submitProjectButton = await findByTestId('submit-project-button');
@@ -635,7 +640,7 @@ describe('projectForm', () => {
           name: /budgetOverrunReason/i,
         }),
       );
-      await user.click(await screen.findByText('option.otherReason'));
+      await user.click(await screen.findByText('otherReason'));
 
       expect(otherBudgetOverrunReasonField).toBeEnabled();
     });
@@ -651,13 +656,13 @@ describe('projectForm', () => {
       });
 
       await user.click(budgetOverrunReasonSelect);
-      await user.click(await screen.findByText('option.otherReason'));
+      await user.click(await screen.findByText('otherReason'));
 
       await user.type(otherBudgetOverrunReasonField, 'Some reason');
       expect(otherBudgetOverrunReasonField).toHaveValue('Some reason');
 
       await user.click(budgetOverrunReasonSelect);
-      await user.click(await screen.findByText('option.earlierSchedule'));
+      await user.click(await screen.findByText('earlierSchedule'));
 
       expect(otherBudgetOverrunReasonField).toBeDisabled();
       expect(otherBudgetOverrunReasonField).toHaveValue('');
@@ -673,7 +678,7 @@ describe('projectForm', () => {
           name: /budgetOverrunReason/i,
         }),
       );
-      await user.click(await screen.findByText('option.otherReason'));
+      await user.click(await screen.findByText('otherReason'));
 
       expect(screen.queryByText(getFormField('onSchedule'))).toBeInTheDocument();
     });

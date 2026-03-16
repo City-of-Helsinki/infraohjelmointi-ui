@@ -202,10 +202,30 @@ export const dirtyFieldsToRequestObject = (
   for (const key in dirtyFields) {
     const parsedValue = parseValue(form[key as keyof IAppForms]);
     const convertedKey = getKey(key);
+    /**
+     * Normalizes and assigns a form field value into the `request` object by key.
+     *
+     * - Ignores `undefined` values (no assignment is made).
+     * - If the value is a single option object, assigns its `.value`.
+     * - If the value is an array of option objects, assigns an array of each option's `.value`.
+     * - Otherwise assigns the value as-is.
+     *
+     * The assigned value is cast to the request field union type:
+     * `string | boolean | string[] | null`.
+     *
+     * @param key - Target property name in the request object.
+     * @param value - Raw form value to normalize and assign.
+     */
     const assignValueToKey = (key: string, value: FormValueType) => {
       if (value !== undefined) {
-        // Convert IOption to string if needed
-        const finalValue = isOption(value) ? value.value : value;
+        let finalValue: FormValueType;
+        if (isOption(value)) {
+          finalValue = value.value;
+        } else if (Array.isArray(value) && value.every(isOption)) {
+          finalValue = value.map((option) => option.value);
+        } else {
+          finalValue = value;
+        }
 
         // Cast to the expected type
         request[key] = finalValue as string | boolean | string[] | null;

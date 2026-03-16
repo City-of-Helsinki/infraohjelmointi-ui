@@ -38,45 +38,50 @@ const SelectField: FC<ISelectFieldProps> = ({
   disabled,
   clearable,
   size,
-  shouldTranslate,
+  shouldTranslate = true,
   readOnly,
   placeholder,
   children,
   filter,
   wrapperClassName,
+  multiSelect,
   ...rest
 }) => {
   const required = rules?.required ? true : false;
   const { t } = useTranslation();
-  const [translate, setTranslate] = useState(true);
+
+  const translateOption = useCallback(
+    (option: Option) => {
+      if (!shouldTranslate || !option?.label || option.label.includes('option')) {
+        return option;
+      }
+
+      const translatedLabel = t(`option.${option.label.replace('.', '')}`);
+      if (translatedLabel.includes('option.')) {
+        return option;
+      }
+
+      return { value: option.value, label: translatedLabel };
+    },
+    [t, shouldTranslate],
+  );
 
   const translatedOptions = useMemo(
-    () =>
-      translate && options !== undefined
-        ? options.map(({ value, label }) => ({
-            value,
-            label: t(`option.${label.replace('.', '')}`),
-          }))
-        : options,
-    [options, t, translate],
+    () => options?.map(translateOption),
+    [options, translateOption],
   );
 
   const translateValue = useCallback(
-    (option: Option) => {
-      if (option?.label !== '' && !option?.label?.includes('option') && translate) {
-        const translatedLabel = t(`option.${option.label}`);
-        if (!translatedLabel.includes('option.')) {
-          return [{ value: option.value, label: translatedLabel }];
-        }
+    (value?: Option | Option[]) => {
+      if (!value) {
+        return [];
       }
-      return [option];
-    },
-    [t, translate],
-  );
 
-  useEffect(() => {
-    setTranslate(shouldTranslate ?? true);
-  }, [shouldTranslate]);
+      const values = Array.isArray(value) ? value : [value];
+      return values.map(translateOption);
+    },
+    [translateOption],
+  );
 
   const [icon, setIcon] = useState(optionIcon[iconKey as keyof typeof optionIcon]);
 
@@ -104,8 +109,9 @@ const SelectField: FC<ISelectFieldProps> = ({
         field: { value, onChange, onBlur, disabled: fieldDisabled },
         fieldState: { error },
       }) => {
-        const handleChange = (_: Option[], clickedOption: Option) => {
-          onChange(clickedOption ?? { value: '', label: '' });
+        const handleChange = (selectedOptions: Option[], clickedOption: Option) => {
+          const options = multiSelect ? selectedOptions : clickedOption;
+          onChange(options);
           if (shouldUpdateIcon && clickedOption?.value) {
             updateIconBasedOnSelection(clickedOption.value);
           }
@@ -151,6 +157,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                     placeholder: placeholder ?? t('choose'),
                   }}
                   clearable={clearable && value?.value}
+                  multiSelect={multiSelect}
                   {...rest}
                 />
               )}

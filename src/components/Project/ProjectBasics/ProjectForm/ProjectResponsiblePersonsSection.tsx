@@ -1,10 +1,11 @@
-import { FormSectionTitle, SelectField, TextField } from '@/components/shared';
+import { FormSectionTitle, SelectField } from '@/components/shared';
 import { FC, memo, useCallback, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
 import { Control, UseFormGetValues } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
+import { defaultFilter } from 'hds-react';
 
 interface IProjectResponsiblePersonsSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
@@ -107,6 +108,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             shouldTranslate={false}
             readOnly={isUserOnlyViewer}
             clearable
+            filter={defaultFilter}
           />
         </div>
         <div className="form-col-md">
@@ -118,6 +120,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             shouldTranslate={false}
             readOnly={isUserOnlyViewer}
             clearable
+            filter={defaultFilter}
           />
         </div>
       </div>
@@ -131,10 +134,20 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
             clearable
+            filter={defaultFilter}
           />
         </div>
         <div className="form-col-md">
-          <TextField {...getFieldProps('otherPersons')} readOnly={isUserOnlyViewer} />
+          <SelectField
+            {...getFieldProps('otherPersons')}
+            iconKey="person"
+            options={responsiblePersons}
+            shouldTranslate={false}
+            readOnly={isUserOnlyViewer}
+            clearable
+            filter={defaultFilter}
+            multiSelect
+          />
         </div>
       </div>
     </div>
