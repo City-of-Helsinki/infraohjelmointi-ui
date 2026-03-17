@@ -15,6 +15,7 @@ import {
   mockProjectTypeQualifiers,
   mockProjectTypes,
   mockResponsibleZones,
+  mockStaraProcurementReasons,
 } from '@/mocks/mockLists';
 import {
   mockCoordinatorLocations,
@@ -82,6 +83,8 @@ const getMockResponseForUrl = (rawUrl?: string) => {
       return Promise.resolve(mockConstructionPhaseDetails);
     case url === '/construction-procurement-methods/':
       return Promise.resolve(mockConstructionProcurementMethods);
+    case url === '/stara-procurement-reasons/':
+      return Promise.resolve(mockStaraProcurementReasons);
     case url === '/project-categories/':
       return Promise.resolve(mockProjectCategories);
     case url === '/project-quality-levels/':

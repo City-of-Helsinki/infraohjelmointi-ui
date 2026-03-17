@@ -45,6 +45,7 @@ const render = async (customRoute?: string) =>
             typeQualifiers: mockLists.mockProjectTypeQualifiers.data,
             constructionPhaseDetails: mockLists.mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockLists.mockConstructionProcurementMethods.data,
+            staraProcurementReasons: mockLists.mockStaraProcurementReasons.data,
             categories: mockLists.mockProjectCategories.data,
             projectQualityLevels: mockLists.mockProjectQualityLevels.data,
             planningPhases: mockLists.mockPlanningPhases.data,

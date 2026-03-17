@@ -64,6 +64,7 @@ export type ListType =
   | 'responsiblePersons'
   | 'constructionPhaseDetails'
   | 'constructionProcurementMethods'
+  | 'staraProcurementReasons'
   | 'projectQualityLevels'
   | 'planningPhases'
   | 'constructionPhases'

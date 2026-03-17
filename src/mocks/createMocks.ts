@@ -56,6 +56,7 @@ export const createProject = (overrides: ProjectOverrides = {}): IProject => {
     programmed: false,
     constructionPhaseDetail: createListItem('construction-detail'),
     constructionProcurementMethod: createListItem('procurement-method'),
+    staraProcurementReason: createListItem('stara-procurement-reason'),
     estPlanningStart: null,
     estPlanningEnd: null,
     estConstructionStart: null,

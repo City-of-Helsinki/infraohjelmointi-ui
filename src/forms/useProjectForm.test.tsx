@@ -193,5 +193,6 @@ describe('useProjectForm', () => {
     expect(result.current).toBeDefined();
     expect(result.current.formMethods).toBeDefined();
     expect(result.current.classOptions).toBeDefined();
+    expect(result.current.useWatchField).toBeDefined();
   });
 });

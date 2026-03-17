@@ -71,6 +71,10 @@ const mockProject: { data: IProject } = {
       id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
       value: 'Stara',
     },
+    staraProcurementReason: {
+      id: 'b2c3d4e5-f6g7-8901-hijk-lmno12345678',
+      value: 'flexibleWork',
+    },
     riskAssessment: {
       id: '8fd009ef-ab34-492e-889c-9062a2b3fce8',
       value: 'Placeholder risk',

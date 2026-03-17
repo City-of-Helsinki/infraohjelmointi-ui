@@ -1,6 +1,6 @@
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch, Control } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
@@ -153,6 +153,7 @@ const useProjectFormValues = () => {
       programmed: project?.programmed ?? false,
       constructionPhaseDetail: listItemToOption(project?.constructionPhaseDetail),
       constructionProcurementMethod: listItemToOption(project?.constructionProcurementMethod),
+      staraProcurementReason: listItemToOption(project?.staraProcurementReason),
       louhi: project?.louhi ?? false,
       gravel: project?.gravel ?? false,
       category: listItemToOption(project?.category),
@@ -231,6 +232,9 @@ const useProjectForm = () => {
 
   // control,
   const { reset, watch, setValue, getValues, formState } = formMethods;
+
+  const useWatchField = (name: keyof IProjectForm, control: Control<IProjectForm>) =>
+    useWatch({ control, name });
 
   const selectedMasterClassName = formValues.masterClass.label;
 
@@ -445,6 +449,7 @@ const useProjectForm = () => {
     classOptions,
     locationOptions,
     selectedMasterClassName,
+    useWatchField,
   };
 };
 

@@ -56,6 +56,15 @@ export const getConstructionProcurementMethods = async () => {
   }
 };
 
+export const getStaraProcurementReasons = async () => {
+  try {
+    const res = await axios.get(`${REACT_APP_API_URL}/stara-procurement-reasons/`);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
 export const getProjectCategories = async (): Promise<IListItem[]> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-categories/`);
