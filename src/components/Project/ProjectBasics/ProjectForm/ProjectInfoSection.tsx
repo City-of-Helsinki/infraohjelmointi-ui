@@ -3,11 +3,11 @@ import TextAreaField from '@/components/shared/TextAreaField';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { FC, memo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues } from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { ProjectHashTags } from './ProjectHashTags';
-import { validateMaxLength, validateRequired } from '@/utils/validation';
+import { validateMaxLength, validateRequired, validateRequiredSelect } from '@/utils/validation';
 import { useAppSelector } from '@/hooks/common';
 import { selectIsProjectSaving, selectProjectMode } from '@/reducers/projectSlice';
 
@@ -20,6 +20,7 @@ interface IProjectInfoSectionProps {
     control: Control<IProjectForm>;
   };
   getValues: UseFormGetValues<IProjectForm>;
+  watch: UseFormWatch<IProjectForm>;
   isInputDisabled: boolean;
   projectMode: 'edit' | 'new';
   isUserOnlyViewer: boolean;
@@ -31,6 +32,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   control,
   isInputDisabled,
   isUserOnlyViewer,
+  watch,
 }) => {
   const types = useOptions('types');
   const typeQualifiers = useOptions('typeQualifiers');
@@ -54,7 +56,8 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
             {...getFieldProps('type')}
             options={types}
             disabled={isInputDisabled}
-            rules={{ required: t('validation.required', { field: t('validation.phase') }) ?? '' }}
+            required
+            rules={validateRequiredSelect('type', t)}
             readOnly={isUserOnlyViewer}
           />
         </div>
@@ -72,7 +75,9 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           <SelectField
             {...getFieldProps('typeQualifier')}
             options={typeQualifiers}
-            rules={{ ...validateRequired('typeQualifier', t) }}
+            required
+            rules={validateRequiredSelect('typeQualifier', t)}
+            readOnly={isUserOnlyViewer}
           />
         </div>
         <div className="form-col-xl">
@@ -125,6 +130,7 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           project={project}
           projectMode={projectMode}
           readOnly={isUserOnlyViewer}
+          watch={watch}
         />
       </div>
     </div>

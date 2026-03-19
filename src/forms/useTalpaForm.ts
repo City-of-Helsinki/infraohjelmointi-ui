@@ -85,6 +85,15 @@ const buildReadinessOption = (readiness: string): IProjectTalpaForm['readiness']
   value: readiness,
 });
 
+/**
+ * Determines whether a sub-class name should be used for a budget account.
+ * @param subClassName - The sub-class name to validate. If undefined or empty, returns false.
+ * @returns True if the sub-class name is defined and starts with a digit; otherwise false.
+ */
+function shouldUseSubClassForBudgetAccount(subClassName?: string): boolean {
+  return !!subClassName && /^\d/gm.test(subClassName);
+}
+
 function useResponsiblePerson(project: IProject | null): {
   responsiblePersonName: string;
   responsiblePersonEmail: string;
@@ -122,9 +131,13 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
       ? classes.find(({ id }) => id === projectClassId)
       : undefined;
 
+    const budgetAccount = shouldUseSubClassForBudgetAccount(selectedSubClass?.name)
+      ? selectedSubClass?.name
+      : selectedClass?.name;
+
     return {
       budgetItemNumber: BudgetItemNumber.InfraInvestment,
-      budgetAccount: selectedClass ? selectedClass.name : '',
+      budgetAccount: budgetAccount || '',
       templateProject: infraInvestmentTemplateProject,
       projectStart: project?.estPlanningStart ?? null,
       projectEnd: addYears(project?.estWarrantyPhaseEnd ?? project?.estConstructionEnd, 6),
