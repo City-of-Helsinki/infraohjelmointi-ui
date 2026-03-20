@@ -111,7 +111,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       }) => {
         const handleChange = (selectedOptions: Option[], clickedOption: Option) => {
           const options = multiSelect ? selectedOptions : clickedOption;
-          onChange(options);
+          onChange(options ?? { value: '', label: '' });
           if (shouldUpdateIcon && clickedOption?.value) {
             updateIconBasedOnSelection(clickedOption.value);
           }
