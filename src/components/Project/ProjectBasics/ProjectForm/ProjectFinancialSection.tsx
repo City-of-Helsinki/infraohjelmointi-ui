@@ -80,14 +80,21 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const budgetOverrunReasons = useOptions('budgetOverrunReasons');
 
   const selectedBudgetOverrunReason = watch('budgetOverrunReason');
+  const otherBudgetOverrunReason = budgetOverrunReasons.find(
+    (item) => item.label === 'otherReason',
+  );
+
   const isOtherBudgetOverrunReasonSelected =
-    selectedBudgetOverrunReason.value ===
-    budgetOverrunReasons.find((item) => item.label === 'otherReason')?.value;
+    !!selectedBudgetOverrunReason &&
+    !!otherBudgetOverrunReason &&
+    selectedBudgetOverrunReason.value === otherBudgetOverrunReason.value;
 
   const validateBudgetOverrunReason = useMemo(
     () => ({
       validate: {
-        isBudgetOverrunReasonValid: (budgetOverrunReason: IOption) => {
+        isBudgetOverrunReasonValid: (budgetOverrunReason?: IOption) => {
+          if (!budgetOverrunReason) return true;
+
           const mappedBudgetOverrunReason = budgetOverrunReasons.find(
             (item) => item.value === budgetOverrunReason.value,
           );
@@ -96,6 +103,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
           if (mappedBudgetOverrunReason?.label == 'otherReason' && otherReason == '') {
             return t('validation.required', { field: t('projectForm.otherBudgetOverrunReason') });
           }
+
           return true;
         },
       },
@@ -107,8 +115,10 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     () => ({
       validate: {
         isOtherReasonFieldValid: (otherReasonField: string) => {
+          const selectedReason = getValues('budgetOverrunReason');
+
           const budgetOverrunReason = budgetOverrunReasons.find(
-            (item) => item.value === getValues('budgetOverrunReason').value,
+            (item) => item.value === selectedReason?.value,
           );
           const isBudgetOverrunReasonOtherReason = budgetOverrunReason?.label == 'otherReason';
 
