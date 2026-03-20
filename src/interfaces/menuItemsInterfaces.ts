@@ -7,6 +7,7 @@ const ADMIN_MENUS_MENU_TYPE = [
   'phases',
   'constructionPhaseDetails',
   'constructionProcurementMethods',
+  'staraProcurementReasons',
   'projectQualityLevels',
   'planningPhases',
   'constructionPhases',
@@ -24,6 +25,7 @@ type ReorderableListType = keyof Pick<
   | 'phases'
   | 'constructionPhaseDetails'
   | 'constructionProcurementMethods'
+  | 'staraProcurementReasons'
   | 'categories'
   | 'projectQualityLevels'
   | 'budgetOverrunReasons'
