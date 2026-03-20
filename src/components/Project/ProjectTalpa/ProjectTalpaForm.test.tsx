@@ -50,7 +50,7 @@ const saveAsMock = saveAs as jest.MockedFunction<typeof saveAs>;
 
 async function render(talpaProjectOverrides: Partial<ITalpaProjectOpening> = {}) {
   return await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectTalpaForm />} />, {
+    renderWithProviders(<Route path="/" element={<ProjectTalpaForm project={null} />} />, {
       preloadedState: {
         talpa: {
           talpaProject: { ...mockTalpaProject, ...talpaProjectOverrides },

@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { ProjectFormSidePanel } from '../ProjectBasics/ProjectFormSidePanel';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectProject } from '@/reducers/projectSlice';
 import ProjectTalpaForm from './ProjectTalpaForm';
 import { markTalpaProjectAsSentThunk, selectTalpaProject } from '@/reducers/talpaSlice';
 import TalpaStatusSection from './TalpaStatusSection';
+import useGetProject from '@/hooks/useGetProject';
 
 export default function ProjectTalpa() {
   const { t } = useTranslation();
-  const project = useAppSelector(selectProject);
+  const { data: project } = useGetProject();
   const talpaProject = useAppSelector(selectTalpaProject);
   const dispatch = useAppDispatch();
 
@@ -31,7 +31,7 @@ export default function ProjectTalpa() {
       <div className="flex w-[35%] flex-shrink-0 justify-center">
         <ProjectFormSidePanel
           navItems={navItems}
-          pwFolderLink={project?.pwFolderLink}
+          project={project ?? null}
           showSaveIndicator={false}
           formStatusSection={
             talpaProject?.status ? (
@@ -41,7 +41,7 @@ export default function ProjectTalpa() {
         />
       </div>
       <div className="mb-20 w-full pr-4" data-testid="talpa-form">
-        <ProjectTalpaForm />
+        <ProjectTalpaForm project={project ?? null} />
       </div>
     </div>
   );

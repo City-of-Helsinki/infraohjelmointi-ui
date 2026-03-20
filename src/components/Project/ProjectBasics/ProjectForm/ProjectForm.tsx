@@ -2,15 +2,9 @@ import useProjectForm from '@/forms/useProjectForm';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { IAppForms, IProjectForm } from '@/interfaces/formInterfaces';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  selectProjectMode,
-  selectProject,
-  setIsSaving,
-  setSelectedProject,
-} from '@/reducers/projectSlice';
+import { selectProjectMode, setIsSaving, setProjectMode } from '@/reducers/projectSlice';
 import { IProject, IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { dirtyFieldsToRequestObject } from '@/utils/common';
-import { patchProject, postProject } from '@/services/projectServices';
 import ProjectStatusSection from './ProjectStatusSection';
 import ProjectInfoSection from './ProjectInfoSection';
 import ProjectScheduleSection from './ProjectScheduleSection';
@@ -38,15 +32,21 @@ import { isUserOnlyProjectManager, isUserOnlyViewer } from '@/utils/userRoleHelp
 import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
+import { usePatchProjectMutation, usePostProjectMutation } from '@/api/projectApi';
 
-const ProjectForm = () => {
+interface IProjectFormProps {
+  project: IProject | null;
+}
+
+const ProjectForm = ({ project }: IProjectFormProps) => {
   const { formMethods, classOptions, locationOptions, selectedMasterClassName, useWatchField } =
-    useProjectForm();
+    useProjectForm(project);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [postProject] = usePostProjectMutation();
+  const [patchProject] = usePatchProjectMutation();
 
   const user = useAppSelector(selectUser);
-  const project = useAppSelector(selectProject);
   const projectMode = useAppSelector(selectProjectMode);
 
   const isOnlyViewer = isUserOnlyViewer(user);
@@ -61,6 +61,7 @@ const ProjectForm = () => {
     getFieldState,
     watch,
     setValue,
+    reset,
   } = formMethods;
 
   usePromptConfirmOnNavigate({
@@ -219,10 +220,11 @@ const ProjectForm = () => {
     }
 
     if (!isDirty && newProjectId) {
+      dispatch(setProjectMode('edit'));
       navigate(`/project/${newProjectId}/basics`);
       setNewProjectId('');
     }
-  }, [isDirty, newProjectId, navigate, projectMode]);
+  }, [isDirty, newProjectId, navigate, projectMode, dispatch]);
 
   const hierarchyDistricts = useAppSelector(selectPlanningDistricts);
   const hierarchyDivisions = useAppSelector(selectPlanningDivisions);
@@ -266,11 +268,8 @@ const ProjectForm = () => {
           }
 
           try {
-            const response = await patchProject({ id: project?.id, data });
-            if (response.status === 200) {
-              dispatch(setSelectedProject(response.data));
-              dispatch(setIsSaving(false));
-            }
+            await patchProject({ id: project?.id, data }).unwrap();
+            dispatch(setIsSaving(false));
           } catch (error: unknown) {
             console.log('project patch error: ', error);
             if ((error as AxiosError).status === 403) {
@@ -301,12 +300,10 @@ const ProjectForm = () => {
         // Post project
         if (projectMode === 'new') {
           try {
-            const response = await postProject({ data });
-            if (response.status === 201) {
-              dispatch(setIsSaving(false));
-              dispatch(setSelectedProject(response.data));
-              setNewProjectId(response.data.id);
-            }
+            const response = await postProject({ data }).unwrap();
+            dispatch(setIsSaving(false));
+            reset(form);
+            setNewProjectId(response.id);
           } catch (error) {
             console.log('project post error: ', error);
             if ((error as AxiosError).status === 403) {
@@ -433,6 +430,7 @@ const ProjectForm = () => {
       {/* SECTION 2 - STATUS */}
       <ProjectStatusSection
         {...formProps}
+        project={project}
         constructionEndYear={project?.constructionEndYear}
         isInputDisabled={isInputDisabled}
         isUserOnlyProjectManager={isUserProjectManagerCheck}
@@ -447,6 +445,7 @@ const ProjectForm = () => {
       {/* SECTION 4 - FINANCIALS */}
       <ProjectFinancialSection
         {...formProps}
+        project={project}
         classOptions={classOptions}
         isInputDisabled={isInputDisabled}
         isUserOnlyViewer={isOnlyViewer}
@@ -469,6 +468,7 @@ const ProjectForm = () => {
       {/* BANNER */}
       {!isOnlyViewer && (
         <ProjectFormBanner
+          project={project}
           onSubmit={submitCallback}
           isDirty={isDirty}
           isInputDisabled={isInputDisabled}

@@ -16,13 +16,13 @@ import {
   TalpaReadiness,
   TalpaSubject,
 } from '@/interfaces/talpaInterfaces';
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectProject } from '@/reducers/projectSlice';
+import { useAppDispatch } from '@/hooks/common';
 import { patchTalpaProjectOpeningThunk, postTalpaProjectOpeningThunk } from '@/reducers/talpaSlice';
 import { BudgetItemNumber } from './budgetItemNumber';
 import { IOption } from '@/interfaces/common';
 import { downloadExcel } from '@/services/talpaServices';
 import { saveAs } from 'file-saver';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 export function getFieldProps(name: FieldPath<IProjectTalpaForm>) {
   return {
@@ -80,13 +80,16 @@ export function mapTalpaFormToRequest(
   };
 }
 
-export default function ProjectTalpaForm() {
+interface IProjectTalpaFormProps {
+  project: IProject | null;
+}
+
+export default function ProjectTalpaForm({ project }: IProjectTalpaFormProps) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const formMethods = useTalpaForm();
+  const formMethods = useTalpaForm(project);
   const { isSubmitting } = formMethods.formState;
   const { handleSubmit, getValues } = formMethods;
-  const project = useAppSelector(selectProject);
 
   const talpaProjectLocked = getValues('isLocked');
 

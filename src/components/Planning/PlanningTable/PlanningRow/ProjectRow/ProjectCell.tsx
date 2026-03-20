@@ -24,7 +24,6 @@ import {
   selectForcedToFrame,
   selectSelectedYears,
   selectSelections,
-  updateProject,
 } from '@/reducers/planningSlice';
 import {
   getCellTypeUpdateRequestData,
@@ -37,6 +36,9 @@ import {
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { usePatchProjectMutation } from '@/api/projectApi';
+import { notifyError } from '@/reducers/notificationSlice';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 interface IProjectCellProps {
   cell: IProjectCell;
@@ -51,6 +53,8 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
+const UPDATE_PROJECT = 'update-project';
+
 const ProjectCell: FC<IProjectCellProps> = ({
   cell,
   projectFinances,
@@ -63,6 +67,7 @@ const ProjectCell: FC<IProjectCellProps> = ({
   const selectedYears = useAppSelector(selectSelectedYears);
   const currentYear = new Date().getFullYear();
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const [patchProject] = usePatchProjectMutation();
 
   const user = useAppSelector(selectUser);
   const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
@@ -97,22 +102,21 @@ const ProjectCell: FC<IProjectCellProps> = ({
   }, [type, user, selectedMasterClass]);
 
   const updateCell = useCallback(
-    (req: IProjectRequest) => {
+    async (req: IProjectRequest) => {
       if (forcedToFrame) {
         convertToForcedToFrameProjectRequest(req);
       }
 
-      dispatch(
-        updateProject({
-          request: {
-            id,
-            data: req,
-          },
-          errorNotification: { message: 'financeChangeError', title: 'patchError' },
-        }),
-      );
+      try {
+        dispatch(setLoading({ text: 'Update project data', id: UPDATE_PROJECT }));
+        await patchProject({ id, data: req }).unwrap();
+      } catch (error) {
+        dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
+      } finally {
+        dispatch(clearLoading(UPDATE_PROJECT));
+      }
     },
-    [forcedToFrame, id, dispatch],
+    [forcedToFrame, id, dispatch, patchProject],
   );
 
   const canTypeUpdate = useCallback(() => {

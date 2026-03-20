@@ -2,7 +2,6 @@ import { CustomTag } from '@/components/shared';
 import { IProjectSums } from '@/interfaces/planningInterfaces';
 import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
-import { patchProject } from '@/services/projectServices';
 import { dispatchContextMenuEvent } from '@/utils/events';
 import { useCallback, MouseEvent as ReactMouseEvent, memo, FC } from 'react';
 import { Link } from 'react-router-dom';
@@ -15,6 +14,7 @@ import { selectUser } from '@/reducers/authSlice';
 import { useOptions } from '@/hooks/useOptions';
 import { useProjectPhaseValidation } from '@/hooks/useProjectValidation';
 import TooltipWrapper from '../HoverTooltip/TooltipWrapper';
+import { usePatchProjectMutation } from '@/api/projectApi';
 
 const PRIORITY_VALUE_MAP: Record<string, string> = {
   high: '1',
@@ -42,6 +42,7 @@ interface IProjectHeadProps {
 const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
   const { costEstimateBudget, availableFrameBudget } = sums;
   const user = useAppSelector(selectUser);
+  const [patchProject] = usePatchProjectMutation();
   const phases = useOptions('phases');
   const dispatch = useAppDispatch();
   const isPhaseValid = useProjectPhaseValidation({
@@ -69,11 +70,11 @@ const ProjectHead: FC<IProjectHeadProps> = ({ project, sums }) => {
           return;
         }
       }
-      patchProject({ data: req, id: project.id }).catch(() =>
-        dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })),
-      );
+      patchProject({ data: req, id: project.id })
+        .unwrap()
+        .catch(() => dispatch(notifyError({ message: 'phaseChangeError', title: 'patchError' })));
     },
-    [dispatch, isPhaseValid, phases, project.id],
+    [dispatch, isPhaseValid, phases, project.id, patchProject],
   );
 
   // Open the custom context menu for editing the project phase on click

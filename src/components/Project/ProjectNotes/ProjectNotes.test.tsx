@@ -33,7 +33,6 @@ const normalizeConfig = (config?: AxiosRequestConfig | string): AxiosRequestConf
   typeof config === 'string' ? { url: config } : config ?? {};
 
 const createProjectState = () => ({
-  selectedProject: mockProject.data,
   count: 1,
   error: null,
   page: 1,
@@ -47,9 +46,13 @@ const getPreloadedState = () => ({
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectNotes />} />, {
-      preloadedState: getPreloadedState(),
-    }),
+    renderWithProviders(
+      <Route path="/project/:projectId/notes" element={<ProjectNotes />} />,
+      {
+        preloadedState: getPreloadedState(),
+      },
+      { route: `/project/${mockProject.data.id}/notes` },
+    ),
   );
 
 const renderWithNotesLoaded = async () => {

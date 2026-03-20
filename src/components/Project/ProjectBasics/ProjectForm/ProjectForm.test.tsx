@@ -3,6 +3,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { arrayHasValue, formatNumberToContainSpaces, matchExact } from '@/utils/common';
+import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCallsToMethodMocks';
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockBudgetOverrunReasons,
@@ -24,15 +25,12 @@ import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor, act, within, screen } from '@testing-library/react';
 import { Route } from 'react-router';
-import { resetProject, setProjectMode, setSelectedProject } from '@/reducers/projectSlice';
-import { Dispatch } from '@reduxjs/toolkit';
+import { setProjectMode } from '@/reducers/projectSlice';
 import ProjectForm from './ProjectForm';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
-import ProjectView from '@/views/ProjectView';
-import ProjectBasics from '../ProjectBasics';
-import PlanningView from '@/views/PlanningView/PlanningView';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import ConfirmDialogContextProvider from '@/components/context/ConfirmDialogContext';
+import * as projectApiHooks from '@/api/projectApi';
 import { mockUser } from '@/mocks/mockUsers';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { mockAllSapCostsProject, mockCurrentYearSapCostsProject } from '@/mocks/mockSapCosts';
@@ -45,7 +43,12 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const getFormField = (name: string) => `projectForm.${name}`;
 
-const render = async () =>
+const render = async (
+  { project = mockProject.data, mode = 'edit' }: { project?: IProject; mode?: 'edit' | 'new' } = {
+    project: mockProject.data,
+    mode: 'edit',
+  },
+) =>
   await act(async () =>
     renderWithProviders(
       <Route>
@@ -53,26 +56,21 @@ const render = async () =>
           path="/"
           element={
             <ConfirmDialogContextProvider>
-              <ProjectForm />
+              <ProjectForm project={project} />
               <ConfirmDialog />
             </ConfirmDialogContextProvider>
           }
         />
-        <Route path="/project/:projectId?" element={<ProjectView />}>
-          <Route path="basics" element={<ProjectBasics />} />
-        </Route>
-        <Route path="/planning" element={<PlanningView />} />
       </Route>,
 
       {
         preloadedState: {
           project: {
-            selectedProject: mockProject.data,
             count: 1,
             error: null,
             page: 1,
             isSaving: false,
-            mode: 'edit',
+            mode,
           },
           auth: { user: mockUser.data, error: null },
           lists: {
@@ -121,13 +119,9 @@ const render = async () =>
     ),
   );
 
-/**
- * simulate event and setting selected project since it happens in projectview
- */
-const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project: IProject) => {
+const sendProjectUpdateEventForProject = async (project: IProject) => {
   try {
     await sendProjectUpdateEvent(project);
-    dispatch(setSelectedProject(project));
   } catch (e) {
     console.log('Error setting project update event listener: ', e);
   }
@@ -136,6 +130,7 @@ const sendProjectUpdateEventAndUpdateRedux = async (dispatch: Dispatch, project:
 describe('projectForm', () => {
   beforeEach(() => {
     mockGetResponseProvider();
+    routeAxiosConfigCallsToMethodMocks(mockedAxios);
   });
   afterEach(async () => {
     jest.clearAllMocks();
@@ -265,9 +260,8 @@ describe('projectForm', () => {
 
     const expectedValues = [...(mockProject.data.hashTags as Array<string>), 'hashtag-3'];
 
-    const project = store.getState().project.selectedProject as IProject;
     const responseProject: { data: IProject } = {
-      data: { ...project, hashTags: expectedValues },
+      data: { ...mockProject.data, hashTags: expectedValues },
     };
 
     // Open modal
@@ -277,7 +271,9 @@ describe('projectForm', () => {
     mockedAxios.patch.mockResolvedValueOnce(responseProject);
 
     // Expect all elements
-    expect(await dialog.findByText(`${project.name} - manageHashTags`)).toBeInTheDocument();
+    expect(
+      await dialog.findByText(`${mockProject.data.name} - manageHashTags`),
+    ).toBeInTheDocument();
     expect(await dialog.findByText('projectHashTags')).toBeInTheDocument();
     expect(await dialog.findByText('popularHashTags')).toBeInTheDocument();
     expect(await dialog.findByText('addHashTagsToProject')).toBeInTheDocument();
@@ -293,7 +289,7 @@ describe('projectForm', () => {
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
 
     await act(async () => {
-      sendProjectUpdateEventAndUpdateRedux(store.dispatch, responseProject.data);
+      sendProjectUpdateEventForProject(responseProject.data);
     });
 
     await waitFor(() => expect(dialog).not.toBeInTheDocument);
@@ -350,7 +346,7 @@ describe('projectForm', () => {
     );
 
     // simulate event and setting selected project since it happens in projectview
-    await act(() => sendProjectUpdateEventAndUpdateRedux(dispatch, mockPatchProjectResponse.data));
+    await act(() => sendProjectUpdateEventForProject(mockPatchProjectResponse.data));
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
     const hashTagsAfterSubmit = mockHashTags.data.hashTags.filter((h) =>
@@ -513,8 +509,10 @@ describe('projectForm', () => {
   });
 
   it('can post a new project', async () => {
-    const { user, findByDisplayValue, findByTestId, findByRole, store } = await render();
-    const { dispatch } = store;
+    const { user, findByDisplayValue, findByTestId, findByRole, store } = await render({
+      project: undefined,
+      mode: 'new',
+    });
 
     const expectedName = 'Post project';
     const expectedDescription = 'Post project description';
@@ -525,24 +523,21 @@ describe('projectForm', () => {
     };
 
     const project = mockProject.data;
+    const createdProject: IProject = {
+      ...project,
+      id: 'post-project-id',
+      description: expectedDescription,
+      programmed: expectedProgrammed,
+      phase: expectedPhase,
+      name: expectedName,
+    };
+
     const mockPostResponse: { data: IProject; status: number } = {
-      data: {
-        ...project,
-        id: 'post-project-id',
-        description: expectedDescription,
-        programmed: expectedProgrammed,
-        phase: expectedPhase,
-        name: expectedName,
-      },
+      data: createdProject,
       status: 201,
     };
 
     // reset the form and set project mode to new
-    await waitFor(() => {
-      store.dispatch(resetProject());
-      store.dispatch(setProjectMode('new'));
-    });
-    expect(store.getState().project.selectedProject).toBe(null);
     expect(store.getState().project.mode).toBe('new');
 
     mockedAxios.post.mockResolvedValueOnce(mockPostResponse);
@@ -563,16 +558,14 @@ describe('projectForm', () => {
 
     // save project
     const submitProjectButton = await findByTestId('submit-project-button');
-    mockedAxios.get.mockResolvedValueOnce(mockPostResponse);
     await waitFor(async () => {
       await user.click(submitProjectButton);
-      dispatch(setSelectedProject(mockPostResponse.data));
       store.dispatch(setProjectMode('edit'));
     });
 
     // Ensure that mode is edit and store contains the saved project
     expect(store.getState().project.mode).toBe('edit');
-    expect(store.getState().project.selectedProject).toBe(mockPostResponse.data);
+    // expect(store.getState().project.selectedProject).toBe(mockPostResponse.data);
     expect(await findByTestId('open-delete-project-dialog-button')).toBeInTheDocument();
 
     // Ensure that correct values are present on the form
@@ -613,8 +606,11 @@ describe('projectForm', () => {
 
   it('can delete a project', async () => {
     const project = mockProject.data;
-    const deleteResponse = { data: { id: project.id } };
-    mockedAxios.delete.mockResolvedValueOnce(deleteResponse);
+    const deleteProjectInitiateSpy = jest.spyOn(
+      projectApiHooks.projectApi.endpoints.deleteProject,
+      'initiate',
+    );
+
     const { user, findByTestId, findByRole } = await render();
 
     const openDeleteDialogButton = await findByTestId('open-delete-project-dialog-button');
@@ -625,7 +621,12 @@ describe('projectForm', () => {
     expect(deleteProjectButton).toBeInTheDocument();
     await user.click(deleteProjectButton);
 
-    expect(mockedAxios.delete).toHaveBeenCalledWith('localhost:4000/projects/mock-project-id/');
+    await waitFor(() => {
+      expect(deleteProjectInitiateSpy).toHaveBeenCalledTimes(1);
+      expect(deleteProjectInitiateSpy.mock.calls[0][0]).toBe(project.id);
+    });
+
+    deleteProjectInitiateSpy.mockRestore();
   });
 
   describe('budget overrun reason selection', () => {
