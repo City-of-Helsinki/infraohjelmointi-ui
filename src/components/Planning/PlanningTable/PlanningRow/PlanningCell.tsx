@@ -29,6 +29,7 @@ import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
 import { useLocation } from 'react-router';
+import TooltipWrapper from './HoverTooltip/TooltipWrapper';
 
 interface IPlanningCellProps extends IPlanningRow {
   cell: IPlanningCell;
@@ -154,6 +155,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
     [forcedToFrame, mode, user],
   );
 
+  const totalBudgetTooltipType = type === 'group' ? 'group' : 'class';
+
   return (
     <>
       <td
@@ -168,7 +171,10 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
             data-testid={`edit-framed-budget-${id}-${year}`}
             onClick={onEditFrameBudget}
           >
-            <div className={`planning-cell-container`}>
+            <TooltipWrapper
+              className="planning-cell-container"
+              translationKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`}
+            >
               <>
                 <span data-testid={`planned-budget-${id}-${year}`} className="planning-budget">
                   {plannedBudget}
@@ -188,7 +194,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
                   {deviation}
                 </span>
               </>
-            </div>
+            </TooltipWrapper>
           </button>
         )}
         {editFrameBudget && (
