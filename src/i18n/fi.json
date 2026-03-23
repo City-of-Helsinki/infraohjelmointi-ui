@@ -748,6 +748,7 @@
         "phases": "Hankkeen vaihe",
         "constructionPhaseDetails": "Rakennusvaiheen tarkenne",
         "constructionProcurementMethods": "Rakentamisen hankintatapa",
+        "staraProcurementReasons": "Staran hankinnan peruste",
         "projectQualityLevels": "Hankekustannus ja laatutaso (menu)",
         "planningPhases": "Suunnittelun kustannusarvio (menu)",
         "constructionPhases": "Rakentamisen kustannusarvio (menu)",
