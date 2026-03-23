@@ -137,7 +137,11 @@
     "basicImprovement": "Perusparantaminen",
     "high": "Prioriteetti 1",
     "medium": "Prioriteetti 2",
-    "low": "Prioriteetti 3"
+    "low": "Prioriteetti 3",
+    "flexibleWork": "Joustotyö",
+    "smallWork": "Pieni työ",
+    "urgentWork": "Kiireellinen työ",
+    "difficultTenderableWork": "Vaikeasti kilpailutettava työ"
   },
   "validation": {
     "required": "Täytä {{field}}",
@@ -282,6 +286,7 @@
     "false": "Ei",
     "constructionPhaseDetail": "Rakentamisvaiheen tarkenne",
     "constructionProcurementMethod": "Rakentamisen hankintatapa",
+    "staraProcurementReason": "Staran hankinnan peruste",
     "louhi": "Louheen",
     "gravel": "Sorakatu",
     "category": "Kategoria",

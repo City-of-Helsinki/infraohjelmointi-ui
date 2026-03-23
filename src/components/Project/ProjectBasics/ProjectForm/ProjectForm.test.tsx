@@ -18,6 +18,7 @@ import {
   mockResponsibleZones,
   mockProgrammers,
   mockProjectTypeQualifiers,
+  mockStaraProcurementReasons,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
@@ -80,6 +81,7 @@ const render = async () =>
             typeQualifiers: mockProjectTypeQualifiers.data,
             constructionPhaseDetails: mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockConstructionProcurementMethods.data,
+            staraProcurementReasons: mockStaraProcurementReasons.data,
             categories: mockProjectCategories.data,
             projectQualityLevels: mockProjectQualityLevels.data,
             planningPhases: mockPlanningPhases.data,

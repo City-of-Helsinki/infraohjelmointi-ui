@@ -40,7 +40,8 @@ import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 
 const ProjectForm = () => {
-  const { formMethods, classOptions, locationOptions, selectedMasterClassName } = useProjectForm();
+  const { formMethods, classOptions, locationOptions, selectedMasterClassName, useWatchField } =
+    useProjectForm();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -368,8 +369,9 @@ const ProjectForm = () => {
       getFieldState,
       watch,
       setValue,
+      useWatchField,
     }),
-    [control, getFieldProps, getFieldState, getValues, watch, setValue],
+    [control, getFieldProps, getFieldState, getValues, watch, setValue, useWatchField],
   );
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);

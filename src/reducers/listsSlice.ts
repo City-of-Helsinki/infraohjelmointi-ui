@@ -21,6 +21,7 @@ import {
   getTalpaServiceClasses,
   getProjectTypeQualifiers,
   getPriorities,
+  getStaraProcurementReasons,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -39,6 +40,7 @@ export interface IListState {
   phases: Array<IListItem>;
   constructionPhaseDetails: Array<IListItem>;
   constructionProcurementMethods: Array<IListItem>;
+  staraProcurementReasons: Array<IListItem>;
   categories: Array<IListItem>;
   projectQualityLevels: Array<IListItem>;
   planningPhases: Array<IListItem>;
@@ -67,6 +69,7 @@ const initialState: IListState = {
   phases: [],
   constructionPhaseDetails: [],
   constructionProcurementMethods: [],
+  staraProcurementReasons: [],
   categories: [],
   projectQualityLevels: [],
   planningPhases: [],
@@ -123,6 +126,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       phases: await getProjectPhases(),
       constructionPhaseDetails: await getConstructionPhaseDetails(),
       constructionProcurementMethods: await getConstructionProcurementMethods(),
+      staraProcurementReasons: await getStaraProcurementReasons(),
       categories: await getProjectCategories(),
       projectQualityLevels: await getProjectQualityLevels(),
       planningPhases: await getPlanningPhases(),

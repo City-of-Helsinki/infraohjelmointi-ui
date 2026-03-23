@@ -42,6 +42,7 @@ import {
   mockProjectTypes,
   mockResponsiblePersons,
   mockResponsibleZones,
+  mockStaraProcurementReasons,
 } from './mocks/mockLists';
 import { mockError } from './mocks/mockError';
 import { IError } from './interfaces/common';
@@ -98,6 +99,7 @@ describe('App', () => {
       expect(lists.constructionProcurementMethods).toStrictEqual(
         mockConstructionProcurementMethods.data,
       );
+      expect(lists.staraProcurementReasons).toStrictEqual(mockStaraProcurementReasons.data);
       expect(lists.projectQualityLevels).toStrictEqual(mockProjectQualityLevels.data);
       expect(lists.constructionPhases).toStrictEqual(mockConstructionPhases.data);
       expect(lists.planningPhases).toStrictEqual(mockPlanningPhases.data);
