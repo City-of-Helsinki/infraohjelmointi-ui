@@ -792,9 +792,9 @@
     },
     "totalBudgets": {
       "class": "<p>Tarve-esitys</p><p>Raamiluku</p><p>Erotus</p>",
-      "groupHead": "<p>Ohjelmoitu yht.</p><p>Hankkeen budj. yht</p>",
+      "groupHead": "<p>Ohjelmoitu yhteensä</p><p>Hankkeiden kokonaisrahoitusvaraukset yhteensä</p>",
       "group": "Ohjelmoitu yht.",
-      "project": "<p>Ohjelmoitu</p><p>Hankkeen budjetti</p>"
+      "project": "<p>Ohjelmoitu</p><p>Hankkeen kokonaisrahoitusvaraus</p>"
     }
   }
 }
