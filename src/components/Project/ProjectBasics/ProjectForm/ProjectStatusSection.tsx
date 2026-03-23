@@ -74,7 +74,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
 
   useEffect(() => {
     if (!showStaraProcurementReason) {
-      setValue('staraProcurementReason', { value: '', label: '' });
+      setValue('staraProcurementReason', { value: '', label: '' }, { shouldDirty: true });
     }
   }, [showStaraProcurementReason, setValue]);
 
