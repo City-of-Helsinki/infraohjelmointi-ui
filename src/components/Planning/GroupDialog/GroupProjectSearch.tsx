@@ -83,11 +83,11 @@ const GroupProjectSearch: FC<IProjectSearchProps> = ({ getValues, control }) => 
         project.projectClass === groupSubClass || project.projectClass === groupClass;
       const districtMatches =
         project.projectDistrict === groupDistrict ||
-        getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision ||
+        getLocationParent(projectSubDivisions, project.projectDistrict) === groupDistrict ||
         getLocationParent(
           projectDivisions,
           getLocationParent(projectSubDivisions, project.projectDistrict),
-        ) === groupDivision;
+        ) === groupDistrict;
       const divisionMatches =
         project.projectDistrict === groupDivision ||
         getLocationParent(projectSubDivisions, project.projectDistrict) === groupDivision;

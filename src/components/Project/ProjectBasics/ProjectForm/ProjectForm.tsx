@@ -259,12 +259,6 @@ const ProjectForm = () => {
             }
           }
 
-          /* If project is under a district and user changes the class, the district has to be removed or the
-             project will remain under that district in the new class, which isn't intended behavior */
-          if (data?.projectClass && project.projectLocation) {
-            data = { ...data, projectLocation: null };
-          }
-
           try {
             const response = await patchProject({ id: project?.id, data });
             if (response.status === 200) {
