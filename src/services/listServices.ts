@@ -8,6 +8,7 @@ import {
 import { IProjectDistrict } from '@/interfaces/locationInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import axios from 'axios';
+import { MenuItemRequest, PersonTypeMenuItemRequest } from '@/interfaces/menuItemsInterfaces';
 
 const { REACT_APP_API_URL } = process.env;
 
@@ -146,24 +147,27 @@ export const getPriorities = async () => {
   }
 };
 
-export const getProgrammers = async (): Promise<Array<IListItem>> => {
+export const getRawProgrammers = async (): Promise<Array<IPerson>> => {
   try {
     const res = await axios.get(`${REACT_APP_API_URL}/project-programmers/`);
-    return res.data
-      .filter(
-        (programmer: { id: string; firstName: string; lastName: string }) =>
-          // Filter out empty names and "Ei Valintaa" programmer
-          programmer.firstName?.trim() &&
-          programmer.lastName?.trim() &&
-          !(programmer.firstName === 'Ei' && programmer.lastName === 'Valintaa'),
-      )
-      .map((programmer: { id: string; firstName: string; lastName: string }) => ({
-        id: programmer.id,
-        value: `${programmer.firstName} ${programmer.lastName}`.trim(),
-      }));
+    return res.data.filter(
+      (programmer: { id: string; firstName: string; lastName: string }) =>
+        // Filter out empty names and "Ei Valintaa" programmer
+        programmer.firstName?.trim() &&
+        programmer.lastName?.trim() &&
+        !(programmer.firstName === 'Ei' && programmer.lastName === 'Valintaa'),
+    );
   } catch (e) {
     return Promise.reject(e);
   }
+};
+
+export const getProgrammers = async (): Promise<Array<IListItem>> => {
+  const rawProgrammers = await getRawProgrammers();
+  return rawProgrammers.map((programmer: { id: string; firstName: string; lastName: string }) => ({
+    id: programmer.id,
+    value: `${programmer.firstName} ${programmer.lastName}`.trim(),
+  }));
 };
 
 export const getTalpaProjectRanges = async (): Promise<ITalpaProjectRange[]> => {
@@ -184,4 +188,38 @@ export const getTalpaServiceClasses = async (): Promise<ITalpaServiceClass[]> =>
 export const getTalpaAssetClasses = async (): Promise<ITalpaAssetClass[]> => {
   const res = await axios.get<ITalpaAssetClass[]>(`${REACT_APP_API_URL}/talpa-asset-classes/`);
   return res.data;
+};
+
+export const putMenuListOrder = async (request: IListItem[], path: string) => {
+  try {
+    const res = await axios.put(`${REACT_APP_API_URL}/${path}/reorder/`, request);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const postMenuListItem = async (
+  request: MenuItemRequest | PersonTypeMenuItemRequest,
+  path: string,
+) => {
+  try {
+    const res = await axios.post(`${REACT_APP_API_URL}/${path}/`, request);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const patchMenuListItem = async (
+  request: MenuItemRequest | PersonTypeMenuItemRequest,
+  path: string,
+  itemId: string,
+) => {
+  try {
+    const res = await axios.patch(`${REACT_APP_API_URL}/${path}/${itemId}/`, request);
+    return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };

@@ -59,6 +59,7 @@ const render = async (customRoute?: string) =>
             projectSubDivisions: [],
             budgetOverrunReasons: [],
             programmers: [],
+            programmersRaw: [],
             projectClasses: [],
             priorities: [],
             talpaProjectRanges: [],

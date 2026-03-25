@@ -32,7 +32,7 @@ const AdminCard: FC<IAdminCardProps> = ({ type }) => {
     if (!user || !isUserAdmin(user)) {
       return true;
     }
-    return type === 'auditlog' || type === 'financialstatements' || type === 'menus';
+    return type === 'auditlog' || type === 'financialstatements';
   }, [type, user]);
 
   return (
