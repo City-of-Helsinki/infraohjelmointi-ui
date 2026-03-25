@@ -261,12 +261,6 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
             }
           }
 
-          /* If project is under a district and user changes the class, the district has to be removed or the
-             project will remain under that district in the new class, which isn't intended behavior */
-          if (data?.projectClass && project.projectLocation) {
-            data = { ...data, projectLocation: null };
-          }
-
           try {
             await patchProject({ id: project?.id, data }).unwrap();
             dispatch(setIsSaving(false));
