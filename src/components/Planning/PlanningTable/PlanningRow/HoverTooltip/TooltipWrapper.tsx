@@ -16,7 +16,7 @@ export default function TooltipWrapper({
   const { showTooltip, hideTooltip } = useHoverTooltip();
 
   const handleShowTooltip = useCallback(
-    (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    (e: React.SyntheticEvent<HTMLDivElement>) => {
       if (translationKey) {
         showTooltip(e, <Trans i18nKey={translationKey} />);
       } else {
@@ -27,7 +27,7 @@ export default function TooltipWrapper({
   );
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         handleShowTooltip(e);
@@ -41,9 +41,10 @@ export default function TooltipWrapper({
   );
 
   return (
-    <button
-      type="button"
+    <div
       className={className}
+      aria-describedby="tooltip-view"
+      tabIndex={0}
       onMouseEnter={handleShowTooltip}
       onMouseLeave={hideTooltip}
       onFocus={handleShowTooltip}
@@ -51,8 +52,9 @@ export default function TooltipWrapper({
       onKeyDown={handleKeyDown}
       onTouchStart={handleShowTooltip}
       onTouchEnd={hideTooltip}
+      onTouchCancel={hideTooltip}
     >
       {children}
-    </button>
+    </div>
   );
 }

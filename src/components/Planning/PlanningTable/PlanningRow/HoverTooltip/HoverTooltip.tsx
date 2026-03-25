@@ -85,6 +85,8 @@ const HoverTooltip: FC<IHoverTooltipProps> = ({ text, id }) => {
       data-testid={`hover-tooltip-${id}`}
       ref={elementRef}
       id="tooltip-view"
+      role="tooltip"
+      aria-hidden={!tooltip}
     >
       {tooltip}
       <div className="tooltip-arrow-container">
