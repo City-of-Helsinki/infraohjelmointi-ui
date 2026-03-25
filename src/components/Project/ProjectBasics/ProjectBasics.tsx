@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/common';
-import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
+import { selectProjectMode } from '@/reducers/projectSlice';
 import ProjectSidePanel from './ProjectFormSidePanel/ProjectFormSidePanel';
 import ProjectForm from './ProjectForm/ProjectForm';
 import './styles.css';
+import useGetProject from '@/hooks/useGetProject';
 
 const ProjectBasics = () => {
-  const project = useAppSelector(selectProject);
+  const { data: project } = useGetProject();
   const projectMode = useAppSelector(selectProjectMode);
   const { t } = useTranslation();
 
@@ -25,10 +26,10 @@ const ProjectBasics = () => {
       {(project || projectMode === 'new') && (
         <>
           <div className="flex w-[35%] justify-center">
-            <ProjectSidePanel navItems={navItems} pwFolderLink={project?.pwFolderLink} />
+            <ProjectSidePanel navItems={navItems} project={project ?? null} />
           </div>
           <div className="flex w-[65%]" data-testid="form-panel">
-            <ProjectForm />
+            <ProjectForm project={project ?? null} />
           </div>
         </>
       )}

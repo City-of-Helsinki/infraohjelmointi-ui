@@ -64,6 +64,7 @@ const getMockResponseForUrl = (rawUrl?: string) => {
     case url === '/projects/':
       return Promise.resolve(mockProject);
     case url === `/projects/${mockProject.data.id}`:
+    case url === `/projects/${mockProject.data.id}/`:
       return Promise.resolve(mockProject);
     case url === '/project-hashtags/':
       return Promise.resolve(mockHashTags);

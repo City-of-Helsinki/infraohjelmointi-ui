@@ -38,7 +38,7 @@ const render = async (customRoute?: string) =>
       {
         preloadedState: {
           auth: { user: null, error: {} },
-          project: { ...store.getState().project, selectedProject: mockProject.data },
+          project: { ...store.getState().project },
           lists: {
             phases: mockLists.mockProjectPhases.data,
             types: mockLists.mockProjectTypes.data,

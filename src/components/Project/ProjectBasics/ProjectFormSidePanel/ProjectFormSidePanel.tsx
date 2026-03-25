@@ -4,17 +4,18 @@ import PWContainer from './PWContainer';
 import SaveIndicator from './SaveIndicator';
 import { INavigationItem } from '@/interfaces/common';
 import './styles.css';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 interface IProjectFormSidePanelProps {
+  project: IProject | null;
   navItems: INavigationItem[];
-  pwFolderLink?: string | null;
   showSaveIndicator?: boolean;
   formStatusSection?: React.ReactNode;
 }
 
 const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
+  project,
   navItems,
-  pwFolderLink,
   showSaveIndicator = true,
   formStatusSection,
 }) => {
@@ -27,8 +28,8 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
             <SideNavigation navItems={navItems} />
           </div>
           {formStatusSection && <div className="form-status-container">{formStatusSection}</div>}
-          <PWContainer pwFolderLink={pwFolderLink} />
-          {showSaveIndicator && <SaveIndicator />}
+          <PWContainer pwFolderLink={project?.pwFolderLink} />
+          {showSaveIndicator && <SaveIndicator project={project} />}
         </div>
       </div>
     </div>

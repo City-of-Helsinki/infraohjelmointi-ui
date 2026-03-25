@@ -84,7 +84,6 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => {
 
 // Type for our selectors
 type SelectorName =
-  | 'selectProject'
   | 'selectProjectMode'
   | 'selectProjectUpdate'
   | 'selectIsLoading'
@@ -106,7 +105,6 @@ describe('useProjectForm', () => {
   it('initializes with empty values when no project is selected', () => {
     // Mock the selectors to return stable values
     const mockSelectors: Record<SelectorName, any> = {
-      selectProject: null,
       selectProjectMode: 'new',
       selectProjectUpdate: { project: { id: null } }, // Properly structured project update
       selectIsLoading: false,
@@ -124,7 +122,7 @@ describe('useProjectForm', () => {
       (selector: { name: SelectorName }) => mockSelectors[selector.name] ?? [],
     );
 
-    const { result } = renderHook(() => useProjectForm(), {
+    const { result } = renderHook(() => useProjectForm(null), {
       wrapper: Wrapper,
     });
 
@@ -168,7 +166,6 @@ describe('useProjectForm', () => {
     };
 
     const mockSelectors: Record<SelectorName, any> = {
-      selectProject: null,
       selectProjectMode: 'new',
       selectProjectUpdate: { project: { id: null } },
       selectIsLoading: false,
@@ -185,7 +182,7 @@ describe('useProjectForm', () => {
       (selector: { name: SelectorName }) => mockSelectors[selector.name] ?? [],
     );
 
-    const { result } = renderHook(() => useProjectForm(), {
+    const { result } = renderHook(() => useProjectForm(null), {
       wrapper: Wrapper,
     });
 

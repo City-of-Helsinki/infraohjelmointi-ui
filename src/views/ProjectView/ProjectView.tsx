@@ -1,14 +1,8 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import {
-  resetProject,
-  selectProjectMode,
-  selectProject,
-  setProjectMode,
-  setSelectedProject,
-} from '@/reducers/projectSlice';
+import { selectProjectMode } from '@/reducers/projectSlice';
 import ProjectDetailsForm from '@/components/ProjectDetailsForm';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ProjectHeader } from '@/components/Project/ProjectHeader';
 import { selectProjectUpdate } from '@/reducers/eventsSlice';
 import {
@@ -17,55 +11,43 @@ import {
   setIsProjectCardLoading,
   setLoading,
 } from '@/reducers/loaderSlice';
-import { selectUser } from '@/reducers/authSlice';
 import _ from 'lodash';
-import { useGetProjectByIdQuery } from '@/api/projectApi';
-import { skipToken } from '@reduxjs/toolkit/query';
+import useGetProject from '@/hooks/useGetProject';
 
 const LOADING_PROJECT = 'loading-project';
 
 const ProjectView = () => {
   const dispatch = useAppDispatch();
-  const { projectId } = useParams();
   const navigate = useNavigate();
-  const selectedProject = useAppSelector(selectProject);
   const projectUpdate = useAppSelector(selectProjectUpdate);
   const projectMode = useAppSelector(selectProjectMode);
-  const user = useAppSelector(selectUser);
-  const shouldFetchProject = Boolean(projectId && user && projectMode !== 'new');
-  const { isFetching: isProjectFetching, isError: isProjectError } = useGetProjectByIdQuery(
-    shouldFetchProject && projectId ? projectId : skipToken,
-  );
+  const {
+    isFetching: isProjectFetching,
+    isError: isProjectError,
+    data: project,
+    refetch,
+    shouldFetchProject,
+  } = useGetProject();
 
-  // Update selectedProject to redux with a project-update event
+  // Refetch project data when there is a project-update event
   useEffect(() => {
-    const project = projectUpdate?.project;
+    const updatedProject = projectUpdate?.project;
 
-    if (!project) {
+    if (!updatedProject) {
       return;
     }
 
-    // Don't update the selectedProject if the user is viewing another project
-    if (project.id !== selectedProject?.id) {
+    // Don't refetch if the user is viewing another project
+    if (updatedProject.id !== project?.id) {
       return;
     }
 
-    // Update the selectedProject if the project-update event gives different values
-    if (!_.isEqual(project, selectedProject)) {
-      dispatch(setSelectedProject(project));
+    // Refetch if the project-update event gives different values
+    if (!_.isEqual(project, updatedProject)) {
+      refetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectUpdate]);
-
-  useEffect(() => {
-    if (projectMode === 'new') {
-      if (projectId && user) {
-        dispatch(setProjectMode('edit'));
-      } else if (!projectId) {
-        dispatch(resetProject());
-      }
-    }
-  }, [projectId, projectMode, user, dispatch]);
 
   useEffect(() => {
     if (!shouldFetchProject) {
@@ -89,11 +71,19 @@ const ProjectView = () => {
     }
   }, [isProjectError, navigate, shouldFetchProject]);
 
+  // Clear view-specific loaders if route changes during a fetch/error transition.
+  useEffect(() => {
+    return () => {
+      dispatch(clearLoading(LOADING_PROJECT));
+      dispatch(clearIsProjectCardLoading());
+    };
+  }, [dispatch]);
+
   return (
     <div className="w-full" data-testid="project-view">
-      {(selectedProject || projectMode === 'new') && (
+      {(project || projectMode === 'new') && (
         <>
-          <ProjectHeader />
+          <ProjectHeader project={project ?? null} />
           <ProjectDetailsForm projectMode={projectMode} />
         </>
       )}

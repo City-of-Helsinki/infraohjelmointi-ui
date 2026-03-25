@@ -4,6 +4,7 @@ import { BudgetItemNumber } from '@/components/Project/ProjectTalpa/budgetItemNu
 import { ITalpaProjectOpening, TalpaReadiness } from '@/interfaces/talpaInterfaces';
 import mockTalpaProject from '@/mocks/mockTalpaProject';
 import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 const mockUseAppSelector = jest.fn();
 const mockDispatch = jest.fn();
@@ -24,7 +25,6 @@ jest.mock('@/hooks/usePostalCode', () => ({
 }));
 
 type SelectorName =
-  | 'selectProject'
   | 'selectTalpaProject'
   | 'selectPlanningClasses'
   | 'selectPlanningSubClasses'
@@ -57,7 +57,7 @@ describe('useTalpaForm', () => {
         person: 'person-1',
       },
       address: 'Testitie 1',
-    };
+    } as IProject;
 
     const planningClass = {
       id: 'ddbf3ce8-5bc4-410b-8759-e68d80dad99e',
@@ -66,7 +66,6 @@ describe('useTalpaForm', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {
-      selectProject: project,
       selectTalpaProject: null,
       selectPlanningClasses: [planningClass],
       selectPlanningSubClasses: [],
@@ -84,7 +83,7 @@ describe('useTalpaForm', () => {
       return selectors[selector.name];
     });
 
-    const { result } = renderHook(() => useTalpaForm());
+    const { result } = renderHook(() => useTalpaForm(project));
 
     expect(mockDispatch).toHaveBeenCalledTimes(1);
 
@@ -148,7 +147,7 @@ describe('useTalpaForm', () => {
         estConstructionEnd: '31.12.2026',
         projectClass: 'sub-class-1',
         address: 'Testitie 1',
-      };
+      } as IProject;
 
       const planningClass = {
         id: 'class-1',
@@ -163,7 +162,6 @@ describe('useTalpaForm', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const selectors: Record<SelectorName, any> = {
-        selectProject: project,
         selectTalpaProject: null,
         selectPlanningClasses: [planningClass],
         selectPlanningSubClasses: [planningSubClass],
@@ -174,7 +172,7 @@ describe('useTalpaForm', () => {
         return selectors[selector.name];
       });
 
-      const { result } = renderHook(() => useTalpaForm());
+      const { result } = renderHook(() => useTalpaForm(project));
       const values = result.current.getValues();
 
       expect(values.budgetAccount).toBe(expectedBudgetAccount);
@@ -184,7 +182,6 @@ describe('useTalpaForm', () => {
   it('populates form values when talpa project data is loaded', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {
-      selectProject: { id: 'f0edf54d-4367-49c7-bb42-1420cacebb3e' },
       selectTalpaProject: null,
       selectPlanningClasses: [],
       selectPlanningSubClasses: [],
@@ -195,9 +192,11 @@ describe('useTalpaForm', () => {
       return selectors[selector.name];
     });
 
+    const project = { id: 'f0edf54d-4367-49c7-bb42-1420cacebb3e' } as IProject;
+
     const talpaProject = buildTalpaProject();
 
-    const { result, rerender } = renderHook(() => useTalpaForm());
+    const { result, rerender } = renderHook(() => useTalpaForm(project));
 
     expect(mockDispatch).toHaveBeenCalledTimes(1);
 
@@ -241,7 +240,6 @@ describe('useTalpaForm', () => {
   it('wraps template project label to option when budget item number is not infra investment', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const selectors: Record<SelectorName, any> = {
-      selectProject: null,
       selectTalpaProject: buildTalpaProject({
         id: 'a5566bf7-a6fc-49bc-99b9-65341a684a33',
         budgetAccount: '8 01 03 01 Muu esirakentaminen',
@@ -307,7 +305,7 @@ describe('useTalpaForm', () => {
       return selectors[selector.name];
     });
 
-    const { result } = renderHook(() => useTalpaForm());
+    const { result } = renderHook(() => useTalpaForm(null));
 
     const values = result.current.getValues();
 

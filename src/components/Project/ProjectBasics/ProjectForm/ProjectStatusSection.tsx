@@ -12,11 +12,13 @@ import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/u
 import _ from 'lodash';
 import { mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
-import { selectProject, selectProjectMode } from '@/reducers/projectSlice';
+import { selectProjectMode } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
 import { Tooltip } from 'hds-react';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 interface IProjectStatusSectionProps {
+  project: IProject | null;
   getValues: UseFormGetValues<IProjectForm>;
   setValue: UseFormSetValue<IProjectForm>;
   getFieldProps: (name: string) => {
@@ -41,6 +43,7 @@ const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: 
 };
 
 const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
+  project,
   getFieldProps,
   getValues,
   setValue,
@@ -373,7 +376,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   );
 
   const projectFormPhase = getValues('phase').label;
-  const projectPhase = useAppSelector(selectProject)?.phase;
+  const projectPhase = project?.phase;
   const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
   useEffect(() => {
     setIconKey(mapIconKey(getValues('phase').label));

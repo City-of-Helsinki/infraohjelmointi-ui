@@ -23,9 +23,9 @@ import { IListItem } from '@/interfaces/common';
 import { arrayHasValue } from '@/utils/common';
 import { selectHashTags } from '@/reducers/hashTagsSlice';
 import { IProject } from '@/interfaces/projectInterfaces';
-import { patchProject } from '@/services/projectServices';
 import './styles.css';
 import _ from 'lodash';
+import { usePatchProjectMutation } from '@/api/projectApi';
 
 export interface IHashTagsObject {
   [key: string]: { value: string; id: string };
@@ -68,6 +68,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
     const { Header, Content, ActionButtons } = Dialog;
     const allHashTags = useAppSelector(selectHashTags);
     const { t } = useTranslation();
+    const [patchProject] = usePatchProjectMutation();
 
     const [formState, setFormState] = useState<IFormState>({
       hashTagsObject: {},
@@ -202,6 +203,7 @@ const ProjectHashTagsDialog: FC<IProjectHashTagsDialogProps> = forwardRef(
         hashTagsObject,
         projectMode,
         setHashTagsState,
+        patchProject,
       ],
     );
 
