@@ -84,7 +84,7 @@ interface IProjectTalpaFormProps {
   project: IProject | null;
 }
 
-export default function ProjectTalpaForm({ project }: IProjectTalpaFormProps) {
+export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const formMethods = useTalpaForm(project);

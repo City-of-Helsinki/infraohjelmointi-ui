@@ -111,6 +111,7 @@ const ProjectCell: FC<IProjectCellProps> = ({
         dispatch(setLoading({ text: 'Update project data', id: UPDATE_PROJECT }));
         await patchProject({ id, data: req }).unwrap();
       } catch (error) {
+        console.error('Failed to update project:', error);
         dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
       } finally {
         dispatch(clearLoading(UPDATE_PROJECT));
