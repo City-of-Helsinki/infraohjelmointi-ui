@@ -83,22 +83,29 @@ const SelectField: FC<ISelectFieldProps> = ({
     [translateOption],
   );
 
-  const [icon, setIcon] = useState(optionIcon[iconKey as keyof typeof optionIcon]);
+  const resolveIcon = useCallback((key?: string) => {
+    if (!key || !(key in optionIcon)) {
+      return undefined;
+    }
+
+    return optionIcon[key as keyof typeof optionIcon];
+  }, []);
+
+  const [icon, setIcon] = useState(resolveIcon(iconKey));
 
   const updateIconBasedOnSelection = useCallback(
     (selectedValue: string) => {
       const selectedOption = options?.find((option) => option.value === selectedValue);
       if (selectedOption) {
-        const newIcon = optionIcon[selectedOption.label as keyof typeof optionIcon];
-        setIcon(newIcon);
+        setIcon(resolveIcon(selectedOption.label));
       }
     },
-    [options],
+    [options, resolveIcon],
   );
 
   useEffect(() => {
-    setIcon(optionIcon[iconKey as keyof typeof optionIcon]);
-  }, [iconKey]);
+    setIcon(resolveIcon(iconKey));
+  }, [iconKey, resolveIcon]);
 
   return (
     <Controller
@@ -109,7 +116,11 @@ const SelectField: FC<ISelectFieldProps> = ({
         field: { value, onChange, onBlur, disabled: fieldDisabled },
         fieldState: { error },
       }) => {
-        const handleChange = (selectedOptions: Option[], clickedOption: Option) => {
+        const translatedValue = translateValue(value);
+        const readOnlyValue = translatedValue.at(0)?.label;
+        const hasValue = Array.isArray(value) ? value.length > 0 : Boolean(value?.value);
+
+        const handleChange = (selectedOptions: Option[] = [], clickedOption?: Option) => {
           const options = multiSelect ? selectedOptions : clickedOption;
           onChange(options ?? { value: '', label: '' });
           if (shouldUpdateIcon && clickedOption?.value) {
@@ -135,13 +146,13 @@ const SelectField: FC<ISelectFieldProps> = ({
                   label={label ?? ''}
                   control={control}
                   readOnly={true}
-                  readOnlyValue={translateValue(value)[0].label}
+                  readOnlyValue={readOnlyValue}
                 />
               ) : (
                 <HDSSelect
                   id={`select-field-${name}`}
                   className={`custom-select ${iconKey ? 'icon' : ''}`}
-                  value={value ? translateValue(value) : []}
+                  value={translatedValue}
                   onChange={handleChange}
                   onBlur={onBlur}
                   invalid={error ? true : false}
@@ -156,7 +167,7 @@ const SelectField: FC<ISelectFieldProps> = ({
                     error: error?.message,
                     placeholder: placeholder ?? t('choose'),
                   }}
-                  clearable={clearable && value?.value}
+                  clearable={Boolean(clearable && hasValue)}
                   multiSelect={multiSelect}
                   {...rest}
                 />
