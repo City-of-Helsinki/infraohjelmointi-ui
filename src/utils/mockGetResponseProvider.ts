@@ -4,7 +4,7 @@ import { mockGroups } from '@/mocks/mockGroups';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import {
   mockBudgetOverrunReasons,
-  mockConstructionPhaseDetails,
+  mockProjectPhaseDetails,
   mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
@@ -80,8 +80,8 @@ const getMockResponseForUrl = (rawUrl?: string) => {
       return Promise.resolve(mockSubDivisionOptions);
     case url === '/project-phases/':
       return Promise.resolve(mockProjectPhases);
-    case url === '/construction-phase-details/':
-      return Promise.resolve(mockConstructionPhaseDetails);
+    case url === '/project-phase-details/':
+      return Promise.resolve(mockProjectPhaseDetails);
     case url === '/construction-procurement-methods/':
       return Promise.resolve(mockConstructionProcurementMethods);
     case url === '/stara-procurement-reasons/':

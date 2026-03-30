@@ -5,7 +5,7 @@ const ADMIN_MENUS_MENU_TYPE = [
   'types',
   'programs',
   'phases',
-  'constructionPhaseDetails',
+  'projectPhaseDetails',
   'constructionProcurementMethods',
   'staraProcurementReasons',
   'projectQualityLevels',
@@ -23,7 +23,7 @@ type ReorderableListType = keyof Pick<
   IListState,
   | 'types'
   | 'phases'
-  | 'constructionPhaseDetails'
+  | 'projectPhaseDetails'
   | 'constructionProcurementMethods'
   | 'staraProcurementReasons'
   | 'categories'

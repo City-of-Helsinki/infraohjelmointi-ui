@@ -7,7 +7,7 @@ import {
   getProjectPhases,
   getProjectQualityLevels,
   getProjectTypes,
-  getConstructionPhaseDetails,
+  getProjectPhaseDetails,
   getConstructionProcurementMethods,
   getProjectCategories,
   getResponsibleZones,
@@ -49,7 +49,7 @@ export interface IListState {
   types: Array<IListItem>;
   typeQualifiers: Array<IListItem>;
   phases: Array<IListItem>;
-  constructionPhaseDetails: Array<IListItem>;
+  projectPhaseDetails: Array<IListItem>;
   constructionProcurementMethods: Array<IListItem>;
   staraProcurementReasons: Array<IListItem>;
   categories: Array<IListItem>;
@@ -79,7 +79,7 @@ const initialState: IListState = {
   types: [],
   typeQualifiers: [],
   phases: [],
-  constructionPhaseDetails: [],
+  projectPhaseDetails: [],
   constructionProcurementMethods: [],
   staraProcurementReasons: [],
   categories: [],
@@ -138,7 +138,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       types: await getProjectTypes(),
       typeQualifiers: await getProjectTypeQualifiers(),
       phases: await getProjectPhases(),
-      constructionPhaseDetails: await getConstructionPhaseDetails(),
+      projectPhaseDetails: await getProjectPhaseDetails(),
       constructionProcurementMethods: await getConstructionProcurementMethods(),
       staraProcurementReasons: await getStaraProcurementReasons(),
       categories: await getProjectCategories(),
