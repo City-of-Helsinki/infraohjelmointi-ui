@@ -3,16 +3,16 @@
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+}
 
-  .admin-menus-content {
-    display: flex;
-    flex-direction: column;
-    width: 80%;
+.admin-menus-content {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
 
-    .admin-menus-card {
-      min-width: 70%;
-    }
-  }
+.admin-menus-card {
+  min-width: 70%;
 }
 
 .admin-menus-card-content {
@@ -29,11 +29,11 @@
   position: sticky;
   top: 0;
   height: fit-content;
+}
 
-  .sidebar-content {
-    height: 100%;
-    width: 100%;
-  }
+.sidebar-content {
+  height: 100%;
+  width: 100%;
 }
 
 .admin-menus-side-nav li:last-child {
