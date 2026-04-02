@@ -853,10 +853,10 @@
       "low": "Hankkeen edistäminen voi odottaa"
     },
     "totalBudgets": {
-      "class": "<p>Tarve-esitys</p><p>Raamiluku</p><p>Erotus</p>",
+      "class": "<p>Tarve-esitys</p><p>Talousarvion raamiluku</p><p>Raamiluvun ja tarve-esityksen erotus</p>",
       "groupHead": "<p>Ohjelmoitu yhteensä</p><p>Hankkeiden kokonaisrahoitusvaraukset yhteensä</p>",
-      "group": "Ohjelmoitu yht.",
-      "project": "<p>Ohjelmoitu</p><p>Hankkeen kokonaisrahoitusvaraus</p>"
+      "group": "Hankkeiden ohjelmoidut rahavaraukset yhteensä",
+      "project": "<p>Hankkeen ohjelmoitu rahavaraus</p><p>Hankkeen kokonaisrahoitusvaraus eli budjetti</p>"
     }
   }
 }
