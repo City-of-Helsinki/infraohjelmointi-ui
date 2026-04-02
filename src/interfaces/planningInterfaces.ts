@@ -2,7 +2,10 @@ import { IClass } from './classInterfaces';
 import { IGroup } from './groupInterfaces';
 import { ILocation } from './locationInterfaces';
 import { IProject } from './projectInterfaces';
-import { IBudgetBookFinanceProperties, IOperationalEnvironmentAnalysisFinanceProperties } from './reportInterfaces';
+import {
+  IBudgetBookFinanceProperties,
+  IOperationalEnvironmentAnalysisFinanceProperties,
+} from './reportInterfaces';
 
 // This types are used to create search params and style the rows differently
 export type PlanningRowType =
@@ -39,7 +42,7 @@ export interface IPlanningCell {
   displayFrameBudget?: string;
   budgetChange?: string;
   year: number;
-  isCurrentYear: boolean;
+  isCurrentOrPastYear: boolean;
   isFrameBudgetOverlap: boolean;
 }
 

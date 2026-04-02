@@ -23,7 +23,7 @@ import { patchCoordinationLocation } from '@/services/locationServices';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { formattedNumberToNumber } from '@/utils/calculations';
-import { getGroupSapCurrentYear } from '@/reducers/sapCostSlice';
+import { getGroupSapCurrentYearByYear } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
@@ -43,7 +43,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
     plannedBudget,
     deviation,
     year,
-    isCurrentYear,
+    isCurrentOrPastYear,
     isFrameBudgetOverlap,
     displayFrameBudget,
     budgetChange,
@@ -56,7 +56,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   const selectedYears = useAppSelector(selectSelectedYears);
   const startYear = useAppSelector(selectStartYear);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
-  const groupSapCurrentYear = useAppSelector(getGroupSapCurrentYear);
+  const groupSapByYear = useAppSelector(getGroupSapCurrentYearByYear);
+  const groupSapCurrentYear = groupSapByYear[year] ?? {};
 
   const { value, onChange, setInputValue } = useNumberInput(displayFrameBudget);
   const UPDATE_CELL_DATA = 'update-cell-data';
@@ -217,7 +218,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
       {/* There will be data generated here (at least for the first year) in future tasks */}
       {selectedYears.includes(year) && (
         <>
-          {isCurrentYear && (
+          {isCurrentOrPastYear && (
             <PlanningForecastSums cell={cell} id={id} type={type} sapCosts={groupSapCurrentYear} />
           )}
           {moment.months().map((m) => {

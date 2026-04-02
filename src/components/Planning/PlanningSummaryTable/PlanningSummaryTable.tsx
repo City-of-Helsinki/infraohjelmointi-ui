@@ -25,8 +25,10 @@ const PlanningSummaryTable = () => {
    * Listen to PlanningSummaryTable/PlanningTable and update scroll position for PlanningTable/PlanningSummaryTable
    */
   useEffect(() => {
+    const planningSummaryTableParent = planningSummaryTableRef.current?.parentElement;
+
     const onPlanningTableScroll = (): void => {
-      planningSummaryTableRef?.current?.parentElement?.scrollTo({
+      planningSummaryTableParent?.scrollTo({
         left: planningTable?.scrollLeft,
       });
       const dateIndicatorElement = dateIndicatorRef.current;
@@ -45,7 +47,7 @@ const PlanningSummaryTable = () => {
       // to avoid a forever loop, we need to check whether scrolling is happining while mouse is over the head element
       if (overPlanningSummaryTable) {
         planningTable?.scrollTo({
-          left: planningSummaryTableRef.current.parentElement?.scrollLeft,
+          left: planningSummaryTableParent?.scrollLeft,
         });
       }
     };
@@ -55,35 +57,17 @@ const PlanningSummaryTable = () => {
     const onPlanningSummaryTableLeave = () => {
       overPlanningSummaryTable = false;
     };
-    planningSummaryTableRef.current?.parentElement?.addEventListener(
-      'scroll',
-      onPlanningSummaryTableScroll,
-    );
-    planningSummaryTableRef.current?.parentElement?.addEventListener(
-      'mouseover',
-      onPlanningSummaryTableOver,
-    );
-    planningSummaryTableRef.current?.parentElement?.addEventListener(
-      'mouseleave',
-      onPlanningSummaryTableLeave,
-    );
+    planningSummaryTableParent?.addEventListener('scroll', onPlanningSummaryTableScroll);
+    planningSummaryTableParent?.addEventListener('mouseover', onPlanningSummaryTableOver);
+    planningSummaryTableParent?.addEventListener('mouseleave', onPlanningSummaryTableLeave);
 
     return () => {
       /**
        * Remove listeners from planning summary table
        */
-      planningSummaryTableRef.current?.parentElement?.removeEventListener(
-        'scroll',
-        onPlanningSummaryTableScroll,
-      );
-      planningSummaryTableRef.current?.parentElement?.removeEventListener(
-        'mouseover',
-        onPlanningSummaryTableOver,
-      );
-      planningSummaryTableRef.current?.parentElement?.removeEventListener(
-        'mouseleave',
-        onPlanningSummaryTableLeave,
-      );
+      planningSummaryTableParent?.removeEventListener('scroll', onPlanningSummaryTableScroll);
+      planningSummaryTableParent?.removeEventListener('mouseover', onPlanningSummaryTableOver);
+      planningSummaryTableParent?.removeEventListener('mouseleave', onPlanningSummaryTableLeave);
 
       /**
        * Remove listeners from planning table
@@ -128,13 +112,8 @@ const PlanningSummaryTable = () => {
           <thead data-testid="planning-summary-head">
             {/* Year and title row */}
             <tr data-testid="planning-summary-head-row">
-              {heads.map(({ year, title, isCurrentYear }) => (
-                <PlanningSummaryTableHeadCell
-                  key={year}
-                  year={year}
-                  title={title}
-                  isCurrentYear={isCurrentYear}
-                />
+              {heads.map(({ year, title }) => (
+                <PlanningSummaryTableHeadCell key={year} year={year} title={title} />
               ))}
             </tr>
           </thead>
