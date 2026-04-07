@@ -7,7 +7,7 @@ import './styles.css';
 import { useAppSelector } from '@/hooks/common';
 import { IListState } from '@/reducers/listsSlice';
 import { IListItem } from '@/interfaces/common';
-import { EditCell, OrderCell } from './AdminMenusTableActionButtons';
+import { DeleteCell, EditCell, OrderCell } from './AdminMenusTableActionButtons';
 import { AdminMenusCardProps } from '@/interfaces/menuItemsInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { getAdminMenuItemDisplayValue, getPersonTypeDialogValues } from '@/utils/adminMenusUtils';
@@ -18,6 +18,7 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
   useUntranslatedValues,
   onEditMenuItem,
   onAddMenuItem,
+  onDeleteMenuItem,
 }) => {
   const { t } = useTranslation();
 
@@ -51,6 +52,15 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
           personTypeDialogValues={personTypeDialogValues}
         />
       ),
+      deleteCell: (
+        <DeleteCell
+          onDeleteMenuItem={onDeleteMenuItem}
+          value={value}
+          path={path}
+          id={item.id}
+          listType={listType}
+        />
+      ),
       order: item.order,
     };
     return rowItem;
@@ -60,6 +70,7 @@ const AdminMenusCard: FC<AdminMenusCardProps> = ({
     { key: 'value', headerName: t(`adminFunctions.menus.listType.${listType}`) },
     { key: 'orderCell', headerName: t('order') },
     { key: 'editCell', headerName: t('edit') },
+    { key: 'deleteCell', headerName: t('delete') },
   ];
 
   return (

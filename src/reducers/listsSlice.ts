@@ -26,6 +26,7 @@ import {
   postMenuListItem,
   putMenuListOrder,
   getRawProgrammers,
+  deleteMenuListItem,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -38,6 +39,8 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import {
+  DeleteRowPayload,
+  MenuItemDeleteThunkContent,
   MenuItemPatchThunkContent,
   MenuItemPostThunkContent,
   MoveRowPayload,
@@ -216,6 +219,18 @@ export const postMenuItemsThunk = createAsyncThunk(
   },
 );
 
+export const deleteMenuItemsThunk = createAsyncThunk(
+  'listItem/delete',
+  async (thunkContent: MenuItemDeleteThunkContent, thunkAPI) => {
+    try {
+      await deleteMenuListItem(thunkContent.path, thunkContent.id);
+      thunkContent.dispatch(deleteRow({ listType: thunkContent.listType, rowId: thunkContent.id }));
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
 export const saveTableOrderThunk = createAsyncThunk(
   'listItem/saveOrder',
   async (
@@ -259,6 +274,15 @@ export const listsSlice = createSlice({
       list.forEach((row, idx) => {
         row.order = idx;
       });
+    },
+    deleteRow: (state, action: PayloadAction<DeleteRowPayload>) => {
+      const { listType, rowId } = action.payload;
+      const list = state[listType];
+
+      const index = list.findIndex((row: { id: string }) => row.id === rowId);
+      if (index === -1) return;
+
+      list.splice(index, 1);
     },
   },
   extraReducers: (builder) => {
@@ -322,6 +346,6 @@ export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpa
 export const selectTalpaAssetClasses = (state: RootState) => state.lists.talpaAssetClasses;
 export const selectLists = (state: RootState) => state.lists;
 
-export const { moveRow } = listsSlice.actions;
+export const { deleteRow, moveRow } = listsSlice.actions;
 
 export default listsSlice.reducer;

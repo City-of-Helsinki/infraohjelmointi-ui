@@ -223,3 +223,11 @@ export const patchMenuListItem = async (
     return Promise.reject(e);
   }
 };
+
+export const deleteMenuListItem = async (path: string, itemId: string) => {
+  try {
+    await axios.delete(`${REACT_APP_API_URL}/${path}/${itemId}/`);
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
