@@ -85,7 +85,6 @@ export const sapCostsSlice = createSlice({
     builder.addCase(
       getSapCurrentYearThunk.fulfilled,
       (state, action: PayloadAction<Array<ISapCost>>) => {
-        console.log('getSapCurrentYearThunk - action.payload:', action.payload);
         const sapProjectsByYear = mapValues(
           groupBy(
             action.payload.filter((sapCost) => sapCost.project_id != null),
