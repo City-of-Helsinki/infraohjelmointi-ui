@@ -356,7 +356,9 @@
     "postalCode": "Postinumero",
     "city": "Kaupunki",
     "priority": "Prioriteetti",
-    "priorityTooltip": "<p><strong>Prioriteetti 1:</strong> Hanke on kiireellisesti edistettävä. Hankkeen kiireellisyys voi johtua esim. sidoksista toisiin hankkeisiin tai tapahtumiin, terveellisyyden ja turvallisuuden varmistamisesta tai poliittisesta tahtotilasta.</p><p><strong>Prioriteetti 2:</strong> Hanke on tavanomaisesti edistettävä. Hanketta pyritään edistämään esitetyssä aikataulussa resurssit huomioiden.</p><p><strong>Prioriteetti 3:</strong> Hankkeen edistäminen voi odottaa. Hankkeen edistäminen voi esim. odottaa vielä tarvittavien lupaprosessien tai liittyvien hankkeiden etenemistä tai liittyvien valitusten käsittelyä.</p>"
+    "priorityTooltip": "<p><strong>Prioriteetti 1:</strong> Hanke on kiireellisesti edistettävä. Hankkeen kiireellisyys voi johtua esim. sidoksista toisiin hankkeisiin tai tapahtumiin, terveellisyyden ja turvallisuuden varmistamisesta tai poliittisesta tahtotilasta.</p><p><strong>Prioriteetti 2:</strong> Hanke on tavanomaisesti edistettävä. Hanketta pyritään edistämään esitetyssä aikataulussa resurssit huomioiden.</p><p><strong>Prioriteetti 3:</strong> Hankkeen edistäminen voi odottaa. Hankkeen edistäminen voi esim. odottaa vielä tarvittavien lupaprosessien tai liittyvien hankkeiden etenemistä tai liittyvien valitusten käsittelyä.</p>",
+    "noPostalCodeFound": "Katuosoitteelle ei löytynyt postinumeroa",
+    "noCityFound": "Katuosoitteelle ei löytynyt kaupunkia"
   },
   "searchForm": {
     "searchWord": "Mitä haet?",

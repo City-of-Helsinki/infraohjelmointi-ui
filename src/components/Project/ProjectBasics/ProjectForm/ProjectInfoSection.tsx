@@ -38,8 +38,13 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
   const typeQualifiers = useOptions('typeQualifiers');
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
-
   const isSaving = useAppSelector(selectIsProjectSaving);
+
+  const address = watch('address');
+  const postalCode = watch('postalCode');
+  const city = watch('city');
+  const showPostalCodeInfo = address && !postalCode;
+  const showCityInfo = address && !city;
 
   return (
     <div className="w-full" id="basics-info-section">
@@ -114,10 +119,16 @@ const ProjectInfoSection: FC<IProjectInfoSectionProps> = ({
           </div>
           <div className="form-row">
             <div className="form-col-xl">
-              <TextField {...getFieldProps('postalCode')} />
+              <TextField
+                {...getFieldProps('postalCode')}
+                infoText={showPostalCodeInfo ? t('projectForm.noPostalCodeFound') : undefined}
+              />
             </div>
             <div className="form-col-xl">
-              <TextField {...getFieldProps('city')} />
+              <TextField
+                {...getFieldProps('city')}
+                infoText={showCityInfo ? t('projectForm.noCityFound') : undefined}
+              />
             </div>
           </div>
         </>
