@@ -15,7 +15,7 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
   cellType,
   id,
   sapProject,
-  sapCurrentYear
+  sapCurrentYear,
 }) => {
   const { t } = useTranslation();
 
@@ -29,7 +29,7 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
       productionTaskCosts: Number(projectCosts?.production_task_costs || 0),
       productionTaskCommitments: Number(projectCosts?.production_task_commitments || 0),
     };
-  }, [cellType, id]);
+  }, [id, sapCurrentYear]);
 
   // Format the numbers to be displayed in the table, e.g. 1 000000 and rounded to closest 1 000
   const formatSapNumbers = (number: number) => {
@@ -52,13 +52,19 @@ const ProjectYearSummaryTable: FC<IProjectYearSummaryTableProps> = ({
               <tr>
                 <th></th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">{t('monthlySummaryTable.currentYearSapCosts')}</span>
+                  <span className="ml-2 text-sm font-medium text-black-60">
+                    {t('monthlySummaryTable.currentYearSapCosts')}
+                  </span>
                 </th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">{t('monthlySummaryTable.currentYearSapCommitments')}</span>
+                  <span className="ml-2 text-sm font-medium text-black-60">
+                    {t('monthlySummaryTable.currentYearSapCommitments')}
+                  </span>
                 </th>
                 <th className="w-11">
-                  <span className="ml-2 text-sm font-medium text-black-60">{t('monthlySummaryTable.totalValues')}</span>
+                  <span className="ml-2 text-sm font-medium text-black-60">
+                    {t('monthlySummaryTable.totalValues')}
+                  </span>
                 </th>
               </tr>
             </thead>

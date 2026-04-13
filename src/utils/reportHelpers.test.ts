@@ -26,7 +26,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '1000000',
           plannedBudget: '900000',
           frameBudget: '1000000',
-          isCurrentYear: true,
+          isCurrentOrPastYear: true,
           isFrameBudgetOverlap: false,
         },
         {
@@ -35,7 +35,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '2000000',
           plannedBudget: '1800000',
           frameBudget: '2000000',
-          isCurrentYear: false,
+          isCurrentOrPastYear: false,
           isFrameBudgetOverlap: false,
         },
       ];
@@ -68,7 +68,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '1000000',
           plannedBudget: '900000',
           frameBudget: '1000000',
-          isCurrentYear: true,
+          isCurrentOrPastYear: true,
           isFrameBudgetOverlap: false,
         },
       ];
@@ -86,7 +86,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '1000000',
           plannedBudget: '900000',
           frameBudget: '1000000',
-          isCurrentYear: true,
+          isCurrentOrPastYear: true,
           isFrameBudgetOverlap: false,
         },
       ];
@@ -108,7 +108,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '1000000',
           plannedBudget: '900000',
           frameBudget: '1000000',
-          isCurrentYear: true,
+          isCurrentOrPastYear: true,
           isFrameBudgetOverlap: false,
         },
       ];
@@ -130,7 +130,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '1000000',
           plannedBudget: '900000',
           frameBudget: '1000000',
-          isCurrentYear: false,
+          isCurrentOrPastYear: false,
           isFrameBudgetOverlap: false,
         },
       ];
@@ -153,7 +153,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '1000000',
           plannedBudget: '900000',
           frameBudget: '1000000',
-          isCurrentYear: true,
+          isCurrentOrPastYear: true,
           isFrameBudgetOverlap: false,
         },
       ];
@@ -188,7 +188,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '1000000',
           plannedBudget: '900000',
           frameBudget: '1000000',
-          isCurrentYear: true,
+          isCurrentOrPastYear: true,
           isFrameBudgetOverlap: false,
         },
         {
@@ -197,7 +197,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '3000000',
           plannedBudget: '2700000',
           frameBudget: '3000000',
-          isCurrentYear: false,
+          isCurrentOrPastYear: false,
           isFrameBudgetOverlap: false,
         },
       ];
@@ -245,7 +245,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '5000000',
           plannedBudget: '4500000',
           frameBudget: '5000000',
-          isCurrentYear: true,
+          isCurrentOrPastYear: true,
           isFrameBudgetOverlap: false,
         },
         {
@@ -254,7 +254,7 @@ describe('reportHelpers', () => {
           displayFrameBudget: '6000000',
           plannedBudget: '5500000',
           frameBudget: '6000000',
-          isCurrentYear: false,
+          isCurrentOrPastYear: false,
           isFrameBudgetOverlap: false,
         },
       ];

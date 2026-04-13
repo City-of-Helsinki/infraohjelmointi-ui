@@ -3,7 +3,8 @@ import { FC, memo, useMemo } from 'react';
 import ProjectYearSummaryTable from './ProjectYearSummaryTable';
 import MonthlyGraphCell from './MonthlyGraphCell';
 import './styles.css';
-import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { getProjectSapCurrentYearByYear } from '@/reducers/sapCostSlice';
+import { useAppSelector } from '@/hooks/common';
 
 interface IProjectYearSummaryProps {
   id: string;
@@ -13,17 +14,18 @@ interface IProjectYearSummaryProps {
   cellType: CellType;
   timelineDates: ITimelineDates;
   sapProject: string | undefined;
-  sapCurrentYear: Record<string, IProjectSapCost>;
 }
 
 const ProjectYearSummary: FC<IProjectYearSummaryProps> = (props) => {
-  const { year, monthlyDataList, sapCurrentYear } = props;
+  const { year, monthlyDataList } = props;
+  const projectSapValuesByYear = useAppSelector(getProjectSapCurrentYearByYear);
+  const sapCurrentYear = projectSapValuesByYear[props.year] ?? {};
   const currentYear = new Date().getFullYear();
-  const showYearSummaryTable = useMemo(() => year === currentYear, [year, currentYear]);
+  const showYearSummaryTable = useMemo(() => year <= currentYear, [year, currentYear]);
 
   return (
     <>
-      {/* Year summary (only visible for the current year in the table) */}
+      {/* Year summary (only visible for the current and past years in the table) */}
       {showYearSummaryTable && (
         <ProjectYearSummaryTable {...props} sapCurrentYear={sapCurrentYear} />
       )}

@@ -11,7 +11,6 @@ import { selectPlanningMode, selectSelections, selectStartYear } from '@/reducer
 interface IPlanningSummaryHeadCell {
   year: number;
   title: string;
-  isCurrentYear: boolean;
 }
 
 interface IPlanningSummaryTableState {
@@ -41,12 +40,10 @@ export const getPlanningRowTitle = (startYear: number) => {
  */
 const buildPlanningSummaryHeadCells = (startYear: number) => {
   const cells = [];
-  const currentYear = new Date().getFullYear();
   for (let i = 0; i < 11; i++) {
     cells.push({
       year: startYear + i,
       title: getPlanningRowTitle(startYear + i),
-      isCurrentYear: startYear + i === currentYear,
     });
   }
   return cells;

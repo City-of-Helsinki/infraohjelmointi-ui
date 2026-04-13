@@ -35,7 +35,6 @@ import {
 } from './projectCellUtils';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
-import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 import { usePatchProjectMutation } from '@/api/projectApi';
 import { notifyError } from '@/reducers/notificationSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
@@ -44,8 +43,6 @@ interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
   sapProject: string | undefined;
-  sapCosts: Record<string, IProjectSapCost>;
-  sapCurrentYear: Record<string, IProjectSapCost>;
 }
 
 interface IProjectCellState {
@@ -55,12 +52,7 @@ interface IProjectCellState {
 
 const UPDATE_PROJECT = 'update-project';
 
-const ProjectCell: FC<IProjectCellProps> = ({
-  cell,
-  projectFinances,
-  sapProject,
-  sapCurrentYear,
-}) => {
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
@@ -288,12 +280,7 @@ const ProjectCell: FC<IProjectCellProps> = ({
           ))}
       </td>
       {selectedYearClass && (
-        <ProjectYearSummary
-          cellType={cellTypeClass}
-          {...cell}
-          sapProject={sapProject}
-          sapCurrentYear={sapCurrentYear}
-        />
+        <ProjectYearSummary cellType={cellTypeClass} {...cell} sapProject={sapProject} />
       )}
     </>
   );
