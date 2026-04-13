@@ -64,7 +64,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
   const staraProcurementReasons = useOptions('staraProcurementReasons');
 
-  const currentPhase = getValues('phase').value;
+  const watchedPhase = useWatchField('phase', control) as IOption | undefined;
+  const currentPhase = watchedPhase?.value ?? '';
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
 
@@ -282,7 +283,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [allPhaseDetails, getValues, t],
+    [allPhaseDetails, currentPhase, getValues, t],
   );
 
   const isPhaseDetailsDisabled = useMemo(() => {
@@ -306,7 +307,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [designPhase, getValues, proposalPhase, t],
+    [designPhase, currentPhase, getValues, proposalPhase, t],
   );
 
   const validatePlanningStartYear = useMemo(
@@ -419,12 +420,11 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [t, constructionEndYear, isUserOnlyProjectManager, getValues],
   );
 
-  const projectFormPhase = getValues('phase').label;
   const projectPhase = project?.phase;
-  const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
+  const [iconKey, setIconKey] = useState(() => mapIconKey(watchedPhase?.label ?? ''));
   useEffect(() => {
-    setIconKey(mapIconKey(getValues('phase').label));
-  }, [getValues, projectFormPhase, projectPhase]);
+    setIconKey(mapIconKey(watchedPhase?.label ?? ''));
+  }, [watchedPhase?.label, projectPhase]);
 
   return (
     <div className="w-full" id="basics-status-section">

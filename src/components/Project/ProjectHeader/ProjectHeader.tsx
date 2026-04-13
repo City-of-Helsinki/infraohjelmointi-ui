@@ -113,7 +113,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
               </div>
             )}
             {project?.phase?.value === 'suspended' && project?.suspendedDate && (
-              <div className="mt-1 text-sm text-yellow-300">
+              <div className="project-header-suspended-message">
                 {t('projectHeader.suspendedMessage', {
                   phase: project?.suspendedFromPhase
                     ? t(`option.${project.suspendedFromPhase.value}`)
