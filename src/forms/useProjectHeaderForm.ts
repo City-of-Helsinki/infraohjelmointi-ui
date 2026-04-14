@@ -56,12 +56,8 @@ const useProjectHeaderForm = (project: IProject | null) => {
   const address = watch('address');
   const { postalCode, city } = usePostalCode(address || '');
   useEffect(() => {
-    if (postalCode) {
-      setValue('postalCode', postalCode, { shouldDirty: true });
-    }
-    if (city) {
-      setValue('city', city, { shouldDirty: true });
-    }
+    setValue('postalCode', postalCode, { shouldDirty: !!postalCode });
+    setValue('city', city, { shouldDirty: !!city });
   }, [postalCode, city, setValue]);
 
   return { formMethods, control };
