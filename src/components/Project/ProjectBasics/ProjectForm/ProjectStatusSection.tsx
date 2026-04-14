@@ -10,12 +10,11 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
 import _ from 'lodash';
-import { mapIconKey } from '@/utils/common';
+import { listItemToOption, mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
 import { RootState } from '@/store';
-import { listItemToOption } from '@/utils/common';
 import { Tooltip } from 'hds-react';
 import { IProject } from '@/interfaces/projectInterfaces';
 
