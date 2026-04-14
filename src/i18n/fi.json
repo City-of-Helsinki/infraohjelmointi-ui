@@ -464,6 +464,8 @@
       "patchError": "Päivitys epäonnistui",
       "postError": "Luonti epäonnistui",
       "postSuccess": "Lisäys onnistui",
+      "deleteSuccess": "Arvon poistaminen onnistui",
+      "deleteError": "Arvon poistaminen epäonnistui",
       "addMenuItemSuccess": "Uusi arvo lisätty valikkoon onnistuneesti",
       "editMenuItemSuccess": "Arvon muokkaus onnistui",
       "deleteMenuItemSuccess": "Arvon poistaminen onnistui",
