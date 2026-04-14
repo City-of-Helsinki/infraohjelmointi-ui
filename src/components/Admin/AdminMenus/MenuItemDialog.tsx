@@ -371,8 +371,8 @@ const DeleteMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
     } catch {
       dispatch(
         notifyError({
-          message: dialogMessages.submitError,
-          title: dialogMessages.submitError,
+          message: 'deleteError',
+          title: 'deleteError',
           type: 'toast',
           duration: 1500,
         }),
@@ -386,7 +386,6 @@ const DeleteMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
     handleClose,
     dialogMessages.submitSuccessMessage,
     dialogMessages.submitSuccessTitle,
-    dialogMessages.submitError,
   ]);
 
   return (
@@ -426,17 +425,10 @@ const MenuItemDialog: FC<MenuItemDialogProps> = ({ handleClose, dialogState }) =
   const isPersonTypeMenu =
     dialogState.listType === 'responsiblePersonsRaw' || dialogState.listType === 'programmersRaw';
 
-  const submitErrorId =
-    dialogState.mode === 'add'
-      ? 'postError'
-      : dialogState.mode === 'delete'
-      ? 'deleteError'
-      : 'patchError';
-
   const sharedDialogMessages: MenuItemDialogMessages = {
     submitSuccessTitle: t(`${dialogState.mode}MenuItemSuccess`),
     submitSuccessMessage: t(`${dialogState.mode}MenuItemSuccess`),
-    submitError: t(submitErrorId),
+    submitError: t(dialogState.mode === 'add' ? 'postError' : 'patchError'),
     dialogId: `${dialogState.mode}-menu-item-dialog`,
     titleId: `${dialogState.mode}-menu-item-title`,
     descriptionId: `${dialogState.mode}-menu-item-content`,
@@ -445,29 +437,34 @@ const MenuItemDialog: FC<MenuItemDialogProps> = ({ handleClose, dialogState }) =
     dialogInputId: `${dialogState.mode}-menu-item-input`,
   };
 
-  return (
-    <>
-      {isDeleteDialog ? (
-        <DeleteMenuItemDialog
-          handleClose={handleClose}
-          dialogState={dialogState}
-          dialogMessages={sharedDialogMessages}
-        />
-      ) : isPersonTypeMenu ? (
-        <PersonTypeMenuItemDialog
-          handleClose={handleClose}
-          dialogState={dialogState}
-          dialogMessages={sharedDialogMessages}
-        />
-      ) : (
-        <AddOrEditMenuItemDialog
-          handleClose={handleClose}
-          dialogState={dialogState}
-          dialogMessages={sharedDialogMessages}
-        />
-      )}
-    </>
-  );
+  let dialogComponent;
+  if (isDeleteDialog) {
+    dialogComponent = (
+      <DeleteMenuItemDialog
+        handleClose={handleClose}
+        dialogState={dialogState}
+        dialogMessages={sharedDialogMessages}
+      />
+    );
+  } else if (isPersonTypeMenu) {
+    dialogComponent = (
+      <PersonTypeMenuItemDialog
+        handleClose={handleClose}
+        dialogState={dialogState}
+        dialogMessages={sharedDialogMessages}
+      />
+    );
+  } else {
+    dialogComponent = (
+      <AddOrEditMenuItemDialog
+        handleClose={handleClose}
+        dialogState={dialogState}
+        dialogMessages={sharedDialogMessages}
+      />
+    );
+  }
+
+  return <>{dialogComponent}</>;
 };
 
 export default memo(MenuItemDialog);
