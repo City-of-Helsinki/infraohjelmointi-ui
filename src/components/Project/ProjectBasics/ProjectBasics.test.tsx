@@ -7,25 +7,30 @@ import mockProject from '@/mocks/mockProject';
 import { Route } from 'react-router';
 import { mockProjectPhases } from '@/mocks/mockLists';
 import { mockUser } from '@/mocks/mockUsers';
+import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 
+jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
 const store = setupStore();
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectBasics />} />, {
-      preloadedState: {
-        auth: { user: mockUser.data, error: {} },
-        project: {
-          ...store.getState().project,
-          selectedProject: mockProject.data,
-        },
-        lists: {
-          ...store.getState().lists,
-          phases: mockProjectPhases.data,
+    renderWithProviders(
+      <Route path="/project/:projectId/basics" element={<ProjectBasics />} />,
+      {
+        preloadedState: {
+          auth: { user: mockUser.data, error: {} },
+          project: {
+            ...store.getState().project,
+          },
+          lists: {
+            ...store.getState().lists,
+            phases: mockProjectPhases.data,
+          },
         },
       },
-    }),
+      { route: `/project/${mockProject.data.id}/basics` },
+    ),
   );
 describe('ProjectBasics', () => {
   const spyScrollTo = jest.fn();
@@ -34,17 +39,18 @@ describe('ProjectBasics', () => {
 
   beforeEach(() => {
     spyScrollTo.mockClear();
+    mockGetResponseProvider();
   });
 
   it('renders all component wrappers', async () => {
-    const { getByTestId } = await render();
+    const { getByTestId, findByTestId } = await render();
     expect(getByTestId('project-basics')).toBeInTheDocument();
-    expect(getByTestId('side-panel')).toBeInTheDocument();
-    expect(getByTestId('form-panel')).toBeInTheDocument();
+    expect(await findByTestId('side-panel')).toBeInTheDocument();
+    expect(await findByTestId('form-panel')).toBeInTheDocument();
   });
 
   it('renders SideNavigation and links', async () => {
-    const { container, getByRole, getByTestId } = await render();
+    const { findByRole, findByTestId } = await render();
 
     const navItems = [
       'nav.basics',
@@ -56,21 +62,21 @@ describe('ProjectBasics', () => {
       'nav.projectProgram',
     ];
 
-    expect(container.getElementsByClassName('side-nav').length).toBe(2);
-    expect(getByTestId('pw-folder-container')).toBeInTheDocument();
+    expect(await findByTestId('side-panel')).toBeInTheDocument();
+    expect(await findByTestId('pw-folder-container')).toBeInTheDocument();
+    expect(await findByTestId('pw-folder-link')).toBeInTheDocument();
 
-    expect(getByTestId('pw-folder-link')).toBeInTheDocument();
-    navItems.forEach((n) => {
+    for (const navItem of navItems) {
       expect(
-        getByRole('link', {
-          name: n,
+        await findByRole('link', {
+          name: navItem,
         }),
       ).toBeInTheDocument();
-    });
+    }
   });
 
   it('renders ProjectForm', async () => {
-    const { getByTestId } = await render();
-    expect(getByTestId('project-form')).toBeInTheDocument();
+    const { findByTestId } = await render();
+    expect(await findByTestId('project-form')).toBeInTheDocument();
   });
 });

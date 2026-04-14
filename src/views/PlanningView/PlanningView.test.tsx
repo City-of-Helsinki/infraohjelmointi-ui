@@ -44,6 +44,7 @@ import { getToday, updateYear } from '@/utils/dates';
 import moment from 'moment';
 import { updateClass, updateMasterClass } from '@/reducers/classSlice';
 import { IGroup } from '@/interfaces/groupInterfaces';
+import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCallsToMethodMocks';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -57,6 +58,7 @@ jest.mock('@/components/shared', () => {
 jest.setTimeout(7000);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
 const store = setupStore();
 
 const PlanningViewTestApp = () => {
@@ -145,6 +147,7 @@ describe('PlanningView', () => {
 
   beforeEach(() => {
     mockGetResponseProvider();
+    routeAxiosConfigCallsToMethodMocks(mockedAxios);
   });
 
   afterEach(() => {

@@ -3,12 +3,12 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '../hooks/common';
 import { INote } from '@/interfaces/noteInterfaces';
-import { selectProject } from '@/reducers/projectSlice';
 import { selectUser } from '@/reducers/authSlice';
+import { useParams } from 'react-router-dom';
 
 const useNoteValues = (note?: INote) => {
   const userId = useAppSelector(selectUser)?.uuid;
-  const projectId = useAppSelector(selectProject)?.id;
+  const { projectId } = useParams<{ projectId: string }>();
 
   const formValues = useMemo(
     () => ({
@@ -37,7 +37,7 @@ const useProjectNoteForm = (note?: INote) => {
     if (projectId) {
       reset(formValues);
     }
-  }, [projectId, formValues, userId]);
+  }, [projectId, formValues, userId, reset]);
 
   return { formMethods, formValues };
 };

@@ -7,13 +7,15 @@ import { IOption } from '@/interfaces/common';
 import { validateInteger, validateMaxLength } from '@/utils/validation';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/common';
-import { selectIsProjectSaving, selectProject } from '@/reducers/projectSlice';
+import { selectIsProjectSaving } from '@/reducers/projectSlice';
 import TextAreaField from '@/components/shared/TextAreaField';
 import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import { Option } from 'hds-react';
 import { getProjectSapCosts } from '@/reducers/sapCostSlice';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 interface IProjectFinancialSectionProps {
+  project: IProject | null;
   control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
   watch: UseFormWatch<IProjectForm>;
@@ -32,6 +34,7 @@ interface IProjectFinancialSectionProps {
   isUserOnlyViewer: boolean;
 }
 const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
+  project,
   getValues,
   getFieldProps,
   watch,
@@ -45,7 +48,6 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   const { masterClasses, classes, subClasses } = classOptions;
 
   const isSaving = useAppSelector(selectIsProjectSaving);
-  const project = useAppSelector(selectProject);
   const sapCosts = useAppSelector(getProjectSapCosts);
 
   const currentYearSapValues = useMemo(() => {

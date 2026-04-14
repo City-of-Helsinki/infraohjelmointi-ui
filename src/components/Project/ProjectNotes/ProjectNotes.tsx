@@ -1,16 +1,16 @@
-import { useAppSelector } from '@/hooks/common';
 import { useCallback } from 'react';
 import ProjectNote from './ProjectNote';
 import NewNoteForm from './NewNoteForm';
 import './styles.css';
 import { t } from 'i18next';
-import { selectProject } from '@/reducers/projectSlice';
 import { sortArrayByDates } from '@/utils/dates';
 import { useGetNotesByProjectQuery } from '@/api/notesApi';
+import { useParams } from 'react-router-dom';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 const ProjectNotes = () => {
-  const projectId = useAppSelector(selectProject)?.id;
-  const { data: notes = [] } = useGetNotesByProjectQuery(projectId || '');
+  const { projectId } = useParams<{ projectId: string }>();
+  const { data: notes = [] } = useGetNotesByProjectQuery(projectId ?? skipToken);
 
   const sortedNotes = useCallback(() => sortArrayByDates(notes, 'createdDate', true), [notes]);
 

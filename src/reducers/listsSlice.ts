@@ -21,6 +21,11 @@ import {
   getTalpaServiceClasses,
   getProjectTypeQualifiers,
   getPriorities,
+  getStaraProcurementReasons,
+  patchMenuListItem,
+  postMenuListItem,
+  putMenuListOrder,
+  getRawProgrammers,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -32,6 +37,13 @@ import {
   ITalpaServiceClass,
 } from '@/interfaces/talpaInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
+import {
+  MenuItemPatchThunkContent,
+  MenuItemPostThunkContent,
+  MoveRowPayload,
+  PersonTypeMenuItemPatchThunkContent,
+  PersonTypeMenuItemPostThunkContent,
+} from '@/interfaces/menuItemsInterfaces';
 
 export interface IListState {
   types: Array<IListItem>;
@@ -39,6 +51,7 @@ export interface IListState {
   phases: Array<IListItem>;
   constructionPhaseDetails: Array<IListItem>;
   constructionProcurementMethods: Array<IListItem>;
+  staraProcurementReasons: Array<IListItem>;
   categories: Array<IListItem>;
   projectQualityLevels: Array<IListItem>;
   planningPhases: Array<IListItem>;
@@ -53,6 +66,7 @@ export interface IListState {
   budgetOverrunReasons: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
+  programmersRaw: Array<IPerson>;
   priorities: Array<IListItem>;
   talpaProjectRanges: Array<ITalpaProjectRange>;
   talpaProjectTypes: Array<ITalpaProjectType>;
@@ -67,6 +81,7 @@ const initialState: IListState = {
   phases: [],
   constructionPhaseDetails: [],
   constructionProcurementMethods: [],
+  staraProcurementReasons: [],
   categories: [],
   projectQualityLevels: [],
   planningPhases: [],
@@ -81,6 +96,7 @@ const initialState: IListState = {
   programmedYears: setProgrammedYears(),
   projectClasses: [],
   programmers: [],
+  programmersRaw: [],
   priorities: [],
   talpaProjectRanges: [],
   talpaProjectTypes: [],
@@ -117,12 +133,14 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
   try {
     const districts = await getDistricts();
     const persons = await getResponsiblePersons();
+
     return {
       types: await getProjectTypes(),
       typeQualifiers: await getProjectTypeQualifiers(),
       phases: await getProjectPhases(),
       constructionPhaseDetails: await getConstructionPhaseDetails(),
       constructionProcurementMethods: await getConstructionProcurementMethods(),
+      staraProcurementReasons: await getStaraProcurementReasons(),
       categories: await getProjectCategories(),
       projectQualityLevels: await getProjectQualityLevels(),
       planningPhases: await getPlanningPhases(),
@@ -141,6 +159,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await getBudgetOverrunReasons(),
       programmers: await getProgrammers(),
+      programmersRaw: await getRawProgrammers(),
       priorities: await getPriorities(),
       talpaProjectRanges: [],
       talpaProjectTypes: [],
@@ -166,10 +185,82 @@ export const getTalpaListsThunk = createAsyncThunk('lists/getTalpa', async (_, t
   }
 });
 
+export const patchMenuItemsThunk = createAsyncThunk(
+  'listItem/patch',
+  async (
+    thunkContent: MenuItemPatchThunkContent | PersonTypeMenuItemPatchThunkContent,
+    thunkAPI,
+  ) => {
+    try {
+      const listItem = await patchMenuListItem(
+        thunkContent.request,
+        thunkContent.path,
+        thunkContent.id,
+      );
+      return listItem;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
+export const postMenuItemsThunk = createAsyncThunk(
+  'listItem/post',
+  async (thunkContent: MenuItemPostThunkContent | PersonTypeMenuItemPostThunkContent, thunkAPI) => {
+    try {
+      const listItem = await postMenuListItem(thunkContent.request, thunkContent.path);
+      return listItem;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
+export const saveTableOrderThunk = createAsyncThunk(
+  'listItem/saveOrder',
+  async (
+    {
+      listType,
+      path,
+    }: {
+      listType: keyof Omit<IListState, 'error'>;
+      path: string;
+    },
+    thunkAPI,
+  ) => {
+    try {
+      const state = thunkAPI.getState() as RootState;
+      const listData = state.lists[listType] as IListItem[];
+
+      const savedTable = await putMenuListOrder(listData, path);
+      return savedTable;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
 export const listsSlice = createSlice({
   name: 'lists',
   initialState,
-  reducers: {},
+  reducers: {
+    moveRow: (state, action: PayloadAction<MoveRowPayload>) => {
+      const { listType, rowId, direction } = action.payload;
+      const list = state[listType];
+
+      const index = list.findIndex((row) => row.id === rowId);
+      if (index === -1) return;
+
+      const newIndex = direction === 'up' ? index - 1 : index + 1;
+      if (newIndex < 0 || newIndex >= list.length) return;
+
+      [list[index], list[newIndex]] = [list[newIndex], list[index]];
+
+      list.forEach((row, idx) => {
+        row.order = idx;
+      });
+    },
+  },
   extraReducers: (builder) => {
     // GET All LISTS
     builder.addCase(
@@ -180,6 +271,28 @@ export const listsSlice = createSlice({
     );
     builder.addCase(getListsThunk.rejected, (state, action: PayloadAction<unknown>) => {
       return { ...state, error: action.payload };
+    });
+    builder.addCase(postMenuItemsThunk.fulfilled, (state, action) => {
+      const { listType } = action.meta.arg;
+      const newItem = action.payload;
+
+      const list = state[listType];
+      if (!list) return;
+
+      list.push({
+        ...newItem,
+        order: list.length,
+      });
+    });
+    builder.addCase(patchMenuItemsThunk.fulfilled, (state, action) => {
+      const { listType } = action.meta.arg;
+      const updatedItem = action.payload;
+
+      const index = state[listType].findIndex((item) => item.id === updatedItem.id);
+
+      if (index !== -1) {
+        state[listType][index] = updatedItem;
+      }
     });
     // GET TALPA LISTS
     builder.addCase(
@@ -207,5 +320,8 @@ export const selectTalpaProjectRanges = (state: RootState) => state.lists.talpaP
 export const selectTalpaProjectTypes = (state: RootState) => state.lists.talpaProjectTypes;
 export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpaServiceClasses;
 export const selectTalpaAssetClasses = (state: RootState) => state.lists.talpaAssetClasses;
+export const selectLists = (state: RootState) => state.lists;
+
+export const { moveRow } = listsSlice.actions;
 
 export default listsSlice.reducer;

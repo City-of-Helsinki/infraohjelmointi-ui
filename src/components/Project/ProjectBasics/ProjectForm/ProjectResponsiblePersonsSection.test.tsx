@@ -133,6 +133,7 @@ const defaultFormValues = {
   programmed: false,
   constructionPhaseDetail: { value: '', label: '' },
   constructionProcurementMethod: { value: '', label: '' },
+  staraProcurementReason: { value: '', label: '' },
   costForecast: '',
   louhi: false,
   gravel: false,

@@ -28,7 +28,7 @@ import {
 } from '@/reducers/planningSlice';
 import { t } from 'i18next';
 import './styles.css';
-import { resetProject, setProjectMode } from '@/reducers/projectSlice';
+import { setProjectMode } from '@/reducers/projectSlice';
 import { useNavigate } from 'react-router-dom';
 import {
   selectBatchedCoordinationClasses,
@@ -111,7 +111,6 @@ const PlanningToolbar = () => {
   }, [dispatch, hoverTooltipsEnabled]);
 
   const onOpenNewProjectForm = useCallback(() => {
-    dispatch(resetProject());
     dispatch(setProjectMode('new'));
     navigate('/project/new');
   }, [dispatch, navigate]);

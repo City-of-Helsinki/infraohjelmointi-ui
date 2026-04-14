@@ -2,14 +2,15 @@ import { Button, ButtonVariant, IconTrash } from 'hds-react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { BaseSyntheticEvent, FC, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { selectProject } from '@/reducers/projectSlice';
 import useConfirmDialog from '@/hooks/useConfirmDialog';
-import { deleteProject } from '@/services/projectServices';
 import { useNavigate } from 'react-router';
 import { selectStartYear } from '@/reducers/planningSlice';
 import { loadCoordinationData, loadPlanningData } from '@/App';
+import { IProject } from '@/interfaces/projectInterfaces';
+import { useDeleteProjectMutation } from '@/api/projectApi';
 
 interface IProjectFormbannerProps {
+  project: IProject | null;
   onSubmit: () =>
     | ((e?: BaseSyntheticEvent<object, unknown, unknown> | undefined) => Promise<void>)
     | undefined;
@@ -17,12 +18,17 @@ interface IProjectFormbannerProps {
   isInputDisabled: boolean;
 }
 
-const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty, isInputDisabled }) => {
+const ProjectFormBanner: FC<IProjectFormbannerProps> = ({
+  project,
+  onSubmit,
+  isDirty,
+  isInputDisabled,
+}) => {
   const dispatch = useAppDispatch();
   const startYear = useAppSelector(selectStartYear);
   const { t } = useTranslation();
-  const project = useAppSelector(selectProject);
   const navigate = useNavigate();
+  const [deleteProject] = useDeleteProjectMutation();
 
   const { isConfirmed } = useConfirmDialog();
 
@@ -50,7 +56,7 @@ const ProjectFormBanner: FC<IProjectFormbannerProps> = ({ onSubmit, isDirty, isI
         console.log('Error deleting project');
       }
     }
-  }, [isConfirmed, project, t, navigate, dispatch, startYear]);
+  }, [isConfirmed, project, t, navigate, dispatch, startYear, deleteProject]);
 
   return (
     <div className="project-form-banner">

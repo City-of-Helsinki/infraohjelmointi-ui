@@ -1,30 +1,34 @@
 import { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { dirtyFieldsToRequestObject, mapIconKey } from '@/utils/common';
-import { IProjectRequest } from '@/interfaces/projectInterfaces';
-import { selectProject, setIsSaving, setSelectedProject } from '@/reducers/projectSlice';
+import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
+import { setIsSaving } from '@/reducers/projectSlice';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { HookFormControlType, IAppForms, IProjectHeaderForm } from '@/interfaces/formInterfaces';
 import ProjectNameFields from './ProjectNameFields';
 import useProjectHeaderForm from '@/forms/useProjectHeaderForm';
 import { selectUser } from '@/reducers/authSlice';
 import { useTranslation } from 'react-i18next';
-import { patchProject } from '@/services/projectServices';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import optionIcon from '@/utils/optionIcon';
+import { usePatchProjectMutation } from '@/api/projectApi';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
 }
 
-const ProjectHeader: FC = () => {
+interface IProjectHeaderProps {
+  project: IProject | null;
+}
+
+const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
   const dispatch = useAppDispatch();
-  const project = useAppSelector(selectProject);
   const user = useAppSelector(selectUser);
   const groups = useAppSelector(selectPlanningGroups);
   const { t } = useTranslation();
-  const { formMethods } = useProjectHeaderForm();
+  const [patchProject] = usePatchProjectMutation();
+  const { formMethods } = useProjectHeaderForm(project);
 
   const projectGroupName = useMemo(() => {
     return project?.projectGroup
@@ -59,11 +63,8 @@ const ProjectHeader: FC = () => {
 
         if (project?.id) {
           try {
-            const response = await patchProject({ id: project?.id, data });
-            if (response.status === 200) {
-              dispatch(setSelectedProject(response.data));
-              dispatch(setIsSaving(false));
-            }
+            await patchProject({ id: project?.id, data }).unwrap();
+            dispatch(setIsSaving(false));
           } catch (error) {
             console.log('project patch error: ', error);
             dispatch(setIsSaving(false));
@@ -79,7 +80,7 @@ const ProjectHeader: FC = () => {
         }
       }
     },
-    [isDirty, dispatch, dirtyFields, project?.id, project?.favPersons, user?.uuid],
+    [isDirty, dispatch, dirtyFields, project?.id, project?.favPersons, user?.uuid, patchProject],
   );
 
   const phase = watch('phase');

@@ -44,8 +44,9 @@ export interface INotification {
 export interface IListItem {
   id: string;
   value: string;
-  parent?: string;
   index?: number;
+  order?: number;
+  parent?: string;
 }
 
 export type ListType =
@@ -64,6 +65,7 @@ export type ListType =
   | 'responsiblePersons'
   | 'constructionPhaseDetails'
   | 'constructionProcurementMethods'
+  | 'staraProcurementReasons'
   | 'projectQualityLevels'
   | 'planningPhases'
   | 'constructionPhases'

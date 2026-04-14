@@ -5,6 +5,7 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { matchExact } from '@/utils/common';
+import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCallsToMethodMocks';
 import { act } from 'react-dom/test-utils';
 import { Route } from 'react-router';
 import { setupStore } from '@/store';
@@ -19,10 +20,9 @@ const store = setupStore();
 
 const render = async () =>
   await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectHeader />} />, {
+    renderWithProviders(<Route path="/" element={<ProjectHeader project={mockProject.data} />} />, {
       preloadedState: {
         project: {
-          selectedProject: mockProject.data,
           count: 1,
           error: null,
           page: 1,
@@ -38,6 +38,10 @@ const render = async () =>
   );
 
 describe('ProjectHeader', () => {
+  beforeEach(() => {
+    routeAxiosConfigCallsToMethodMocks(mockedAxios);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -51,10 +55,9 @@ describe('ProjectHeader', () => {
   });
 
   it('renders all left side elements', async () => {
-    const { getByRole, getByText, store, getByTestId } = await render();
+    const { getByRole, getByText, getByTestId } = await render();
 
-    const project = store.getState().project.selectedProject as IProject;
-    const { name, phase, address } = project;
+    const { name, phase, address } = mockProject.data;
 
     expect(getByRole('button', { name: /edit-project-name/i })).toBeInTheDocument();
     expect(getByTestId('project-header-name-fields')).toHaveTextContent(matchExact(name));

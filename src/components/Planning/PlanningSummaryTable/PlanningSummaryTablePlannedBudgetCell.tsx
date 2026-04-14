@@ -8,26 +8,26 @@ import './styles.css';
 interface IPlanningSummaryTablePlannedBudgetCellProps {
   year: number;
   plannedBudget?: string;
-  isCurrentYear: boolean;
+  isCurrentOrPastYear: boolean;
 }
 
 const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudgetCellProps> = ({
   year,
   plannedBudget,
-  isCurrentYear,
+  isCurrentOrPastYear,
 }) => {
   const selectedYears = useAppSelector(selectSelectedYears);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
 
   const budgetCellColor = useMemo(() => {
-    if (isCurrentYear && forcedToFrame) {
+    if (isCurrentOrPastYear && forcedToFrame) {
       return '!bg-brick';
     } else if (forcedToFrame) {
       return '!bg-brick-d';
-    } else if (isCurrentYear) {
+    } else if (isCurrentOrPastYear) {
       return '!bg-bus';
     }
-  }, [isCurrentYear, forcedToFrame]);
+  }, [isCurrentOrPastYear, forcedToFrame]);
 
   return (
     <>
@@ -36,7 +36,7 @@ const PlanningSummaryTablePlannedBudgetCell: FC<IPlanningSummaryTablePlannedBudg
       </td>
       {selectedYears.includes(year) && (
         <>
-          {isCurrentYear && (
+          {isCurrentOrPastYear && (
             <td
               key={`${year}-monthly-view`}
               className={`monthly-summary-cell summary-budget ${budgetCellColor}`}

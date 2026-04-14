@@ -10,14 +10,14 @@ interface IPlanningSummaryTableRealizedBudgetCellProps {
   frameBudget?: string;
   deviation?: string;
   year: number;
-  isCurrentYear: boolean;
+  isCurrentOrPastYear: boolean;
 }
 
 const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBudgetCellProps> = ({
   frameBudget,
   deviation,
   year,
-  isCurrentYear,
+  isCurrentOrPastYear,
 }) => {
   const selectedYears = useAppSelector(selectSelectedYears);
   return (
@@ -39,7 +39,7 @@ const PlanningSummaryTableRealizedBudgetCell: FC<IPlanningSummaryTableRealizedBu
       </td>
       {selectedYears.includes(year) && (
         <>
-          {isCurrentYear && (
+          {isCurrentOrPastYear && (
             <td
               key={`${year}-monthly-view`}
               className="monthly-summary-cell"

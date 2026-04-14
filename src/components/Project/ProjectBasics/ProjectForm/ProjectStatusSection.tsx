@@ -1,7 +1,7 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
 import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues } from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { Trans, useTranslation } from 'react-i18next';
 import { IListItem, IOption } from '@/interfaces/common';
@@ -12,21 +12,29 @@ import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/u
 import _ from 'lodash';
 import { mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
-import { selectProject, selectProjectMode } from '@/reducers/projectSlice';
+import { selectProjectMode } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
 import { Tooltip } from 'hds-react';
+import { IProject } from '@/interfaces/projectInterfaces';
 
 interface IProjectStatusSectionProps {
+  project: IProject | null;
   getValues: UseFormGetValues<IProjectForm>;
+  setValue: UseFormSetValue<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
     control: Control<IProjectForm>;
   };
+  control: Control<IProjectForm>;
   constructionEndYear: number | null | undefined;
   isInputDisabled: boolean;
   isUserOnlyProjectManager: boolean;
   isUserOnlyViewer: boolean;
+  useWatchField: (
+    name: keyof IProjectForm,
+    control: Control<IProjectForm>,
+  ) => IProjectForm[keyof IProjectForm];
 }
 
 const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: IListItem[]) => {
@@ -35,12 +43,16 @@ const getPhaseIndexByPhaseId = (phaseId: string | undefined, phasesWithIndexes: 
 };
 
 const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
+  project,
   getFieldProps,
   getValues,
+  setValue,
+  control,
   constructionEndYear,
   isInputDisabled,
   isUserOnlyProjectManager,
   isUserOnlyViewer,
+  useWatchField,
 }) => {
   const phases = useOptions('phases');
   const phasesWithIndexes = useAppSelector(selectProjectPhases);
@@ -48,11 +60,26 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const priorities = useOptions('priorities').toReversed(); // Higher priority first
   const constructionPhaseDetails = useOptions('constructionPhaseDetails');
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
+  const staraProcurementReasons = useOptions('staraProcurementReasons');
+
   const currentPhase = getValues('phase').value;
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
 
+  const watchedConstructionProcurementMethod = useWatchField(
+    'constructionProcurementMethod',
+    control,
+  ) as IOption | undefined;
+
+  const showStaraProcurementReason = watchedConstructionProcurementMethod?.label === 'Stara';
+
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
+
+  useEffect(() => {
+    if (!showStaraProcurementReason) {
+      setValue('staraProcurementReason', { value: '', label: '' }, { shouldDirty: true });
+    }
+  }, [showStaraProcurementReason, setValue]);
 
   const checkPhaseIsBeforeCurrent = (
     previousPhaseIndex: number | undefined,
@@ -349,7 +376,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   );
 
   const projectFormPhase = getValues('phase').label;
-  const projectPhase = useAppSelector(selectProject)?.phase;
+  const projectPhase = project?.phase;
   const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
   useEffect(() => {
     setIconKey(mapIconKey(getValues('phase').label));
@@ -388,6 +415,16 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             clearable
           />
         </div>
+        {showStaraProcurementReason && (
+          <div className="form-col-xl">
+            <SelectField
+              {...getFieldProps('staraProcurementReason')}
+              options={staraProcurementReasons}
+              readOnly={isUserOnlyViewer}
+              clearable
+            />
+          </div>
+        )}
       </div>
       {/* Error summary since phase has many requirements  */}
       {phaseRequirements.length > 0 && (

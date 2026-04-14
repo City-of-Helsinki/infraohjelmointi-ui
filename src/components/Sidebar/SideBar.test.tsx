@@ -5,7 +5,6 @@ import { matchExact } from '@/utils/common';
 import { act } from 'react-dom/test-utils';
 import { Route } from 'react-router';
 import { setupStore } from '@/store';
-import mockProject from '@/mocks/mockProject';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import PlanningView from '@/views/PlanningView';
 import { mockProjectPhases } from '@/mocks/mockLists';
@@ -30,7 +29,6 @@ const render = async () =>
           auth: { user: mockUser.data, error: {} },
           project: {
             ...store.getState().project,
-            selectedProject: mockProject.data,
           },
           lists: {
             ...store.getState().lists,

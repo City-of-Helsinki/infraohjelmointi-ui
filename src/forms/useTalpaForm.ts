@@ -10,7 +10,6 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import { BudgetItemNumber } from '@/components/Project/ProjectTalpa/budgetItemNumber';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { selectProject } from '@/reducers/projectSlice';
 import { selectPlanningClasses, selectPlanningSubClasses } from '@/reducers/classSlice';
 import { useEffect } from 'react';
 import { infraInvestmentTemplateProject } from '@/components/Project/ProjectTalpa/templateProjectOptions';
@@ -111,8 +110,7 @@ function useResponsiblePerson(project: IProject | null): {
   return { responsiblePersonName, responsiblePersonEmail };
 }
 
-const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
-  const project = useAppSelector(selectProject);
+const useTalpaProjectOpeningToFormValues = (project: IProject | null): IProjectTalpaForm => {
   const talpaProject = useAppSelector(selectTalpaProject);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
@@ -195,11 +193,10 @@ const useTalpaProjectOpeningToFormValues = (): IProjectTalpaForm => {
   };
 };
 
-export default function useTalpaForm() {
-  const project = useAppSelector(selectProject);
+export default function useTalpaForm(project: IProject | null) {
   const dispatch = useAppDispatch();
 
-  const formValues = useTalpaProjectOpeningToFormValues();
+  const formValues = useTalpaProjectOpeningToFormValues(project);
 
   const formMethods = useForm<IProjectTalpaForm>({
     values: formValues,

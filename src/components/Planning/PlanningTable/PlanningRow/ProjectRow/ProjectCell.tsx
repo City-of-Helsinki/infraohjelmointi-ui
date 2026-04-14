@@ -24,7 +24,6 @@ import {
   selectForcedToFrame,
   selectSelectedYears,
   selectSelections,
-  updateProject,
 } from '@/reducers/planningSlice';
 import {
   getCellTypeUpdateRequestData,
@@ -36,14 +35,14 @@ import {
 } from './projectCellUtils';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyProjectAreaPlanner, isUserOnlyViewer } from '@/utils/userRoleHelpers';
-import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
+import { usePatchProjectMutation } from '@/api/projectApi';
+import { notifyError } from '@/reducers/notificationSlice';
+import { clearLoading, setLoading } from '@/reducers/loaderSlice';
 
 interface IProjectCellProps {
   cell: IProjectCell;
   projectFinances: IProjectFinances | null;
   sapProject: string | undefined;
-  sapCosts: Record<string, IProjectSapCost>;
-  sapCurrentYear: Record<string, IProjectSapCost>;
 }
 
 interface IProjectCellState {
@@ -51,18 +50,16 @@ interface IProjectCellState {
   formValue: number | null | string;
 }
 
-const ProjectCell: FC<IProjectCellProps> = ({
-  cell,
-  projectFinances,
-  sapProject,
-  sapCurrentYear,
-}) => {
+const UPDATE_PROJECT = 'update-project';
+
+const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject }) => {
   const { budget, type, financeKey, year, growDirections, id, title, startYear } = cell;
   const dispatch = useAppDispatch();
   const cellRef = useRef<HTMLTableCellElement>(null);
   const selectedYears = useAppSelector(selectSelectedYears);
   const currentYear = new Date().getFullYear();
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const [patchProject] = usePatchProjectMutation();
 
   const user = useAppSelector(selectUser);
   const selectedMasterClass = useAppSelector(selectSelections).selectedMasterClass;
@@ -97,22 +94,22 @@ const ProjectCell: FC<IProjectCellProps> = ({
   }, [type, user, selectedMasterClass]);
 
   const updateCell = useCallback(
-    (req: IProjectRequest) => {
+    async (req: IProjectRequest) => {
       if (forcedToFrame) {
         convertToForcedToFrameProjectRequest(req);
       }
 
-      dispatch(
-        updateProject({
-          request: {
-            id,
-            data: req,
-          },
-          errorNotification: { message: 'financeChangeError', title: 'patchError' },
-        }),
-      );
+      try {
+        dispatch(setLoading({ text: 'Update project data', id: UPDATE_PROJECT }));
+        await patchProject({ id, data: req }).unwrap();
+      } catch (error) {
+        console.error('Failed to update project:', error);
+        dispatch(notifyError({ message: 'financeChangeError', title: 'patchError' }));
+      } finally {
+        dispatch(clearLoading(UPDATE_PROJECT));
+      }
     },
-    [forcedToFrame, id, dispatch],
+    [forcedToFrame, id, dispatch, patchProject],
   );
 
   const canTypeUpdate = useCallback(() => {
@@ -283,12 +280,7 @@ const ProjectCell: FC<IProjectCellProps> = ({
           ))}
       </td>
       {selectedYearClass && (
-        <ProjectYearSummary
-          cellType={cellTypeClass}
-          {...cell}
-          sapProject={sapProject}
-          sapCurrentYear={sapCurrentYear}
-        />
+        <ProjectYearSummary cellType={cellTypeClass} {...cell} sapProject={sapProject} />
       )}
     </>
   );

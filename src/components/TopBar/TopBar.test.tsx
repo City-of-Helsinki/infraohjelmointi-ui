@@ -38,13 +38,14 @@ const render = async (customRoute?: string) =>
       {
         preloadedState: {
           auth: { user: null, error: {} },
-          project: { ...store.getState().project, selectedProject: mockProject.data },
+          project: { ...store.getState().project },
           lists: {
             phases: mockLists.mockProjectPhases.data,
             types: mockLists.mockProjectTypes.data,
             typeQualifiers: mockLists.mockProjectTypeQualifiers.data,
             constructionPhaseDetails: mockLists.mockConstructionPhaseDetails.data,
             constructionProcurementMethods: mockLists.mockConstructionProcurementMethods.data,
+            staraProcurementReasons: mockLists.mockStaraProcurementReasons.data,
             categories: mockLists.mockProjectCategories.data,
             projectQualityLevels: mockLists.mockProjectQualityLevels.data,
             planningPhases: mockLists.mockPlanningPhases.data,
@@ -58,6 +59,7 @@ const render = async (customRoute?: string) =>
             projectSubDivisions: [],
             budgetOverrunReasons: [],
             programmers: [],
+            programmersRaw: [],
             projectClasses: [],
             priorities: [],
             talpaProjectRanges: [],

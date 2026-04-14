@@ -125,6 +125,27 @@ export const mockConstructionProcurementMethods: { data: Array<IListItem> } = {
   ],
 };
 
+export const mockStaraProcurementReasons: { data: Array<IListItem> } = {
+  data: [
+    {
+      id: 'a1b2c3d4-e5f6-7890-abcd-1234567890ab',
+      value: 'flexibleWork',
+    },
+    {
+      id: 'b2c3d4e5-f6g7-8901-bcde-2345678901bc',
+      value: 'smallWork',
+    },
+    {
+      id: 'c3d4e5f6-g7h8-9012-cdef-3456789012cd',
+      value: 'urgentWork',
+    },
+    {
+      id: 'd4e5f6g7-h8i9-0123-defg-4567890123de',
+      value: 'difficultTenderableWork',
+    },
+  ],
+};
+
 export const mockProjectCategories: { data: Array<IListItem> } = {
   data: [
     {

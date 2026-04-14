@@ -1,12 +1,12 @@
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch, Control } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import { listItemToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
-import { selectProjectMode, selectProject } from '@/reducers/projectSlice';
+import { selectProjectMode } from '@/reducers/projectSlice';
 import {
   selectPlanningClasses,
   selectAllPlanningClasses,
@@ -28,14 +28,11 @@ import { useProjectProgrammer } from '@/utils/projectProgrammerUtils';
 import { usePostalCode } from '@/hooks/usePostalCode';
 
 /**
- * Creates the memoized initial values for react-hook-form useForm()-hook. It also returns the
- * project which can be needed to check for updates.
+ * Creates the memoized initial values for react-hook-form useForm()-hook.
  *
- * @returns formValues, project
+ * @returns formValues
  */
-const useProjectFormValues = () => {
-  const project = useAppSelector(selectProject);
-
+const useProjectFormValues = (project: IProject | null) => {
   const masterClasses = useAppSelector(selectAllPlanningClasses);
   const classes = useAppSelector(selectPlanningClasses);
   const subClasses = useAppSelector(selectPlanningSubClasses);
@@ -153,6 +150,7 @@ const useProjectFormValues = () => {
       programmed: project?.programmed ?? false,
       constructionPhaseDetail: listItemToOption(project?.constructionPhaseDetail),
       constructionProcurementMethod: listItemToOption(project?.constructionProcurementMethod),
+      staraProcurementReason: listItemToOption(project?.staraProcurementReason),
       louhi: project?.louhi ?? false,
       gravel: project?.gravel ?? false,
       category: listItemToOption(project?.category),
@@ -195,7 +193,6 @@ const useProjectFormValues = () => {
 
   return {
     formValues,
-    project,
     classes,
     subClasses,
     masterClasses,
@@ -206,16 +203,14 @@ const useProjectFormValues = () => {
 };
 
 /**
- * This hook initializes a react-hook-form control for the project form. It will keep the
- * form up to date with the selectedProject from redux and return all needed functions to handle
- * the form.
+ * This hook initializes a react-hook-form control for the project form. It returns
+ * all needed functions to handle the form.
  *
  * @returns handleSubmit, reset, formFields, dirtyFields
  */
-const useProjectForm = () => {
-  const selectedProject = useAppSelector(selectProject);
+const useProjectForm = (project: IProject | null) => {
   const projectUpdate = useAppSelector(selectProjectUpdate);
-  const { formValues, project } = useProjectFormValues();
+  const { formValues } = useProjectFormValues(project);
   const projectMode = useAppSelector(selectProjectMode);
   const formMethods = useForm<IProjectForm>({
     defaultValues: formValues,
@@ -231,6 +226,9 @@ const useProjectForm = () => {
 
   // control,
   const { reset, watch, setValue, getValues, formState } = formMethods;
+
+  const useWatchField = (name: keyof IProjectForm, control: Control<IProjectForm>) =>
+    useWatch({ control, name });
 
   const selectedMasterClassName = formValues.masterClass.label;
 
@@ -392,7 +390,7 @@ const useProjectForm = () => {
     const projectUpdateMatchesCurrentProject = project?.id === projectUpdate?.project?.id;
     const triggeredByProjectUpdate =
       (projectMode === 'edit' && projectUpdateMatchesCurrentProject) ||
-      (projectMode === 'new' && selectedProject !== null);
+      (projectMode === 'new' && project !== null);
 
     const canResetAfterLoading = !isProjectCardLoading && !isLoading;
     let triggeredByLoadingStates = false;
@@ -437,7 +435,6 @@ const useProjectForm = () => {
     projectMode,
     projectUpdate,
     reset,
-    selectedProject,
   ]);
 
   return {
@@ -445,6 +442,7 @@ const useProjectForm = () => {
     classOptions,
     locationOptions,
     selectedMasterClassName,
+    useWatchField,
   };
 };
 

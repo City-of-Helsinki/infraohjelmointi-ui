@@ -39,7 +39,7 @@ const mockGroup: IPlanningRow = {
       plannedBudget: '100',
       frameBudget: '150',
       deviation: '-50',
-      isCurrentYear: false,
+      isCurrentOrPastYear: false,
       isFrameBudgetOverlap: false,
     },
     {
@@ -48,7 +48,7 @@ const mockGroup: IPlanningRow = {
       plannedBudget: '200',
       frameBudget: '250',
       deviation: '-50',
-      isCurrentYear: true,
+      isCurrentOrPastYear: true,
       isFrameBudgetOverlap: false,
     },
   ],
@@ -98,7 +98,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
         <MemoryRouter initialEntries={[`/planning${search}`]}>
           <table>
             <tbody>
-              <PlanningRow {...mockGroup} sapCosts={{}} sapCurrentYear={{}} />
+              <PlanningRow {...mockGroup} sapCosts={{}} />
             </tbody>
           </table>
         </MemoryRouter>
@@ -202,7 +202,7 @@ describe('PlanningRow - Group Expansion Issue (IO-749)', () => {
         <MemoryRouter initialEntries={['/planning']}>
           <table>
             <tbody>
-              <PlanningRow {...mockGroup} sapCosts={{}} sapCurrentYear={{}} />
+              <PlanningRow {...mockGroup} sapCosts={{}} />
             </tbody>
           </table>
         </MemoryRouter>

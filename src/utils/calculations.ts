@@ -96,7 +96,7 @@ export const calculatePlanningCells = (
     return {
       key,
       year: year + i,
-      isCurrentYear: year + i === currentYear,
+      isCurrentOrPastYear: year + i <= currentYear,
       isFrameBudgetOverlap: isFrameBudgetOverlap,
       // we don't return any budgets for divisions
       ...(type !== 'division' && {

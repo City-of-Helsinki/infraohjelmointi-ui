@@ -19,10 +19,9 @@ interface IPlanningRowState {
 const PlanningRow: FC<
   IPlanningRow & {
     sapCosts: Record<string, IProjectSapCost>;
-    sapCurrentYear: Record<string, IProjectSapCost>;
   }
 > = (props) => {
-  const { defaultExpanded, projectRows, cells, id, type, sapCosts, sapCurrentYear } = props;
+  const { defaultExpanded, projectRows, cells, id, type, sapCosts } = props;
   const groupsExpanded = useAppSelector(selectGroupsExpanded);
   const { search } = useLocation();
 
@@ -136,12 +135,11 @@ const PlanningRow: FC<
               isSearched={p.id === searchedProjectId}
               parentId={id}
               sapCosts={sapCosts}
-              sapCurrentYear={sapCurrentYear}
             />
           ))}
           {/* Render the rows recursively for each childRows */}
           {props.children.map((c) => (
-            <PlanningRow {...c} sapCosts={sapCosts} sapCurrentYear={sapCurrentYear} />
+            <PlanningRow {...c} sapCosts={sapCosts} />
           ))}
         </>
       )}

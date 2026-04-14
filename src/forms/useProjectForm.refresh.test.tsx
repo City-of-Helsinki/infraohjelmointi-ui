@@ -74,7 +74,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
   });
 
   it('should NOT reset form when user has made changes (isDirty = true)', async () => {
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     // Simulate user entering data
     act(() => {
@@ -94,7 +94,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
   });
 
   it('should NOT reset form when formValues are empty/default', async () => {
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     // Simulate user entering data
     act(() => {
@@ -115,7 +115,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
   });
 
   it('should reset form when legitimate new data arrives and form is not dirty', async () => {
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     // Form starts clean (not dirty)
     expect(result.current.formMethods.formState.isDirty).toBe(false);
@@ -131,7 +131,7 @@ describe('useProjectForm - Refresh Bug Fix', () => {
   });
 
   it('should NOT reset form during submission', async () => {
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     // Simulate form submission state
     // Note: This would require mocking the form submission state
@@ -150,7 +150,7 @@ describe('Form Refresh Scenarios - Integration Tests', () => {
     // 3. Loading states change
     // 4. Form should retain user data
 
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     // Step 1: User fills form
     act(() => {
@@ -166,7 +166,7 @@ describe('Form Refresh Scenarios - Integration Tests', () => {
 
   it('should handle dropdown fields on page refresh', async () => {
     // This test specifically addresses the dropdown refresh issue
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     // User fills dropdown fields (like Pääluokka, Luokka, Alaluokka)
     act(() => {
@@ -206,7 +206,7 @@ describe('Form Refresh Scenarios - Integration Tests', () => {
 
   it('should preserve programmer field when changing class selections', async () => {
     // This test ensures programmer field is not cleared when changing classes
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     // User sets a programmer
     act(() => {
@@ -237,7 +237,7 @@ describe('Form Refresh Scenarios - Integration Tests', () => {
 describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
   it('should handle mixed field types on refresh', async () => {
     // Test edge case: mix of text fields, dropdowns, numbers, dates
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     act(() => {
       // Text field
@@ -280,7 +280,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
   it('should handle empty dropdown options on refresh', async () => {
     // Edge case: user selected dropdown option that becomes unavailable after refresh
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     act(() => {
       // User selects a dropdown option
@@ -300,7 +300,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
   it('should handle null and undefined values properly', async () => {
     // Edge case: form fields with null/undefined values should not trigger false reset
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     act(() => {
       // Set some fields to null/undefined (common during form initialization)
@@ -324,7 +324,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
   it('should handle rapid consecutive field changes', async () => {
     // Edge case: user quickly changes multiple fields before state updates
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     act(() => {
       // Rapid consecutive changes
@@ -346,7 +346,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
   it('should handle special characters and Unicode in form fields', async () => {
     // Edge case: ensure special characters don't break the refresh logic
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     const specialText = 'Projekti äöüßñ 特殊字符 🚀 @#$%^&*()';
     const unicodePath = 'Helsinki/Käpylä/Östra_delen';
@@ -364,7 +364,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
   it('should handle very long form field values', async () => {
     // Edge case: ensure large text values don't affect refresh logic
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     const longDescription = 'A'.repeat(5000); // Very long text
     const longName =
@@ -384,7 +384,7 @@ describe('Edge Cases - Advanced Form Refresh Scenarios', () => {
 
   it('should handle dropdown with empty string value', async () => {
     // Edge case: dropdown with empty string value (different from null/undefined)
-    const { result } = renderHook(() => useProjectForm(), { wrapper });
+    const { result } = renderHook(() => useProjectForm(null), { wrapper });
 
     act(() => {
       // Dropdown with empty value (but still valid IOption structure)

@@ -9,14 +9,11 @@ import { GroupDialog } from '../../GroupDialog';
 import './styles.css';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks/common';
-import {
-  selectForcedToFrame,
-  selectHoverTooltipsEnabled,
-  selectPlanningMode,
-} from '@/reducers/planningSlice';
+import { selectForcedToFrame, selectPlanningMode } from '@/reducers/planningSlice';
 import { createSearchParams } from 'react-router-dom';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import { selectUser } from '@/reducers/authSlice';
+import TooltipWrapper from './HoverTooltip/TooltipWrapper';
 
 interface IPlanningHeadProps extends IPlanningRow {
   handleExpand: () => void;
@@ -38,7 +35,6 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   const navigate = useNavigate();
   const mode = useAppSelector(selectPlanningMode);
   const forcedToFrame = useAppSelector(selectForcedToFrame);
-  const hoverTooltipsEnabled = useAppSelector(selectHoverTooltipsEnabled);
   const { search } = useLocation();
   const user = useAppSelector(selectUser);
 
@@ -48,6 +44,8 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
   });
 
   const angleIcon = useMemo(() => (expanded ? <IconAngleUp /> : <IconAngleDown />), [expanded]);
+
+  const totalBudgetTooltipType = type === 'group' ? 'groupHead' : 'class';
 
   const projectsToIOption = useCallback((): IOption[] => {
     return projectRows.map((p) => ({ value: p.id, label: p.name }));
@@ -103,22 +101,6 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
     [handleExpand, mode, navigate, search, urlSearchParam],
   );
 
-  const showTooltip = useCallback(
-    (event: React.SyntheticEvent<HTMLSpanElement>) => {
-      if (!hoverTooltipsEnabled) {
-        return;
-      }
-      const targetElement = event.target as HTMLElement;
-      const text = targetElement.textContent || targetElement.innerText;
-      dispatchTooltipEvent(event, 'show', { text });
-    },
-    [hoverTooltipsEnabled],
-  );
-
-  const hideTooltip = useCallback((event: React.SyntheticEvent<HTMLSpanElement>) => {
-    dispatchTooltipEvent(event, 'hide', { text: '' });
-  }, []);
-
   return (
     <th
       className={`planning-head ${type} ${mode} ${forcedToFrame ? 'framed' : ''}`}
@@ -167,22 +149,16 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
               onClick={onExpand}
               data-testid={`title-${id}`}
             >
-              <span
-                className="planning-head-title"
-                onMouseOver={showTooltip}
-                onMouseLeave={hideTooltip}
-                onFocus={showTooltip}
-                onBlur={hideTooltip}
-                tabIndex={0}
-              >
-                {name}
-              </span>
+              <TooltipWrapper className="planning-head-title">{name}</TooltipWrapper>
             </button>
           </div>
         </div>
         {/* Budgets (not visible for coordinator) */}
         {mode === 'planning' && (
-          <div className="total-budgets">
+          <TooltipWrapper
+            className="total-budgets"
+            translationKey={`tooltips.totalBudgets.${totalBudgetTooltipType}`}
+          >
             <span className="text-base" data-testid={`planned-budgets-${id}`}>
               {plannedBudgets}
             </span>
@@ -192,7 +168,7 @@ const PlanningHead: FC<IPlanningHeadProps> = ({
             <span className="planning-head-deviation" data-testid={`deviation-${id}`}>
               {deviation}
             </span>
-          </div>
+          </TooltipWrapper>
         )}
       </div>
     </th>

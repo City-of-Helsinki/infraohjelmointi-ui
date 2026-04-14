@@ -81,7 +81,13 @@
     "Stara": "Stara",
     "Puitesopimus": "Puitesopimus",
     "Kilpailutus": "Kilpailutus",
+    "Kilpailutettu": "Kilpailutettu",
     "Yhteistoiminnalliset": "Yhteistoiminnalliset",
+    "frameAgreementMidSized": "Puitesopimus (keskisuuret)",
+    "frameAgreementSmall": "Puitesopimus (pienet)",
+    "frameAgreementGreenery": "Viherpuitesopimus",
+    "frameAgreementSportSite": "Liikuntapaikkapuitesopimus",
+    "directProcurement": "Suorahankinta",
     "K1": "K1",
     "K2": "K2",
     "K3": "K3",
@@ -91,6 +97,11 @@
     "K53": "K5.3",
     "K54": "K5.4",
     "K55": "K5.5",
+    "K5.1": "K5.1",
+    "K5.2": "K5.2",
+    "K5.3": "K5.3",
+    "K5.4": "K5.4",
+    "K5.5": "K5.5",
     "placeholderRisk": "Risky",
     "1class": "1 luokka",
     "2class": "2 luokka",
@@ -137,7 +148,11 @@
     "basicImprovement": "Perusparantaminen",
     "high": "Prioriteetti 1",
     "medium": "Prioriteetti 2",
-    "low": "Prioriteetti 3"
+    "low": "Prioriteetti 3",
+    "flexibleWork": "Joustotyö",
+    "smallWork": "Pieni työ",
+    "urgentWork": "Kiireellinen työ",
+    "difficultTenderableWork": "Vaikeasti kilpailutettava työ"
   },
   "validation": {
     "required": "Täytä {{field}}",
@@ -282,6 +297,7 @@
     "false": "Ei",
     "constructionPhaseDetail": "Rakentamisvaiheen tarkenne",
     "constructionProcurementMethod": "Rakentamisen hankintatapa",
+    "staraProcurementReason": "Staran hankinnan peruste",
     "louhi": "Louheen",
     "gravel": "Sorakatu",
     "category": "Kategoria",
@@ -386,8 +402,13 @@
       "403": "Kielletty toiminto",
       "404": "Virhe, resurssia ei löytynyt",
       "500": "Palvelinvirhe",
+      "reorderSuccess": "Rivien järjestäminen onnistui",
+      "reorderError": "Rivien järjestäminen epäonnistui",
+      "adminMenuPostSuccess": "Uusi arvo lisätty",
+      "adminMenuPatchSuccess": "Tallennettu onnistuneesti!",
       "sendSuccess": "Lähetys onnistui",
       "patchSuccess": "Muokkaus onnistui",
+      "postSuccess": "Lisäys onnistui",
       "deleteSuccess": "Poisto onnistui",
       "saveSuccess": "Lomakkeen tallennus onnistui",
       "projectNotFound": "Hanketta ei löytynyt",
@@ -423,6 +444,14 @@
       "Request failed with status code 500": "Pyyntö epäonnistui virhekoodilla 500",
       "projectNotFound": "Varmista että etsimäsi hanke on olemassa",
       "appDataError": "Virhe ladattaessa sovellustietoja",
+      "reorderSuccess": "Rivien järjestäminen onnistui",
+      "reorderError": "Rivien järjestäminen epäonnistui",
+      "patchSuccess": "Muokkaus onnistui",
+      "patchError": "Päivitys epäonnistui",
+      "postError": "Luonti epäonnistui",
+      "postSuccess": "Lisäys onnistui",
+      "adminMenuPostSuccess": "Uusi arvo lisätty valikkoon onnistuneesti",
+      "adminMenuPatchSuccess": "Arvon muokkaus onnistui",
       "hashtagPatchSuccess": "Tunniste päivitetty onnistuneesti!",
       "hashtagPatchError": "Tunnisteen päivitys epäonnistui.",
       "hashtagPostSuccess": "Uusi tunniste tallennettu onnistuneesti!",
@@ -482,6 +511,7 @@
   "removeFavourite": "Poista suosikeista",
   "addFavourite": "Lisää suosikkeihin",
   "inGroup": "Kuuluu ryhmään",
+  "closeDialog": "Sulje dialogi",
   "closeCoordinatorNotesDialog": "Sulje muistiinpanodialogi",
   "closeNotification": "Sulje ilmoitus",
   "removeHashTag": "Poista tunniste",
@@ -701,7 +731,39 @@
     "menus": {
       "name": "Valikot",
       "description": "Muokkaa valikoiden sisältöä, lisää uusia kohteita valikoihin ja poista kohteita valikoista.",
-      "button": "Muokkaa valikoita"
+      "button": "Muokkaa valikoita",
+      "addRowButton": "Lisää uusi",
+      "addItemDialogHeader": "Lisää arvo valikkoon",
+      "editItemDialogHeader": "Muokkaa arvoa valikossa",
+      "inputLabel": {
+        "firstName": "Etunimi",
+        "lastName": "Sukunimi",
+        "email": "Sähköposti",
+        "phoneNumber": "Puhelinumero",
+        "title": "Titteli",
+        "value": {
+          "add": "Lisättävä arvo",
+          "edit": "Muokattava arvo"
+        }
+      },
+      "listType": {
+        "categories": "Kategoria",
+        "types": "Hankkeen tyyppi",
+        "programs": "Hankeohjelma",
+        "phases": "Hankkeen vaihe",
+        "constructionPhaseDetails": "Rakennusvaiheen tarkenne",
+        "constructionProcurementMethods": "Rakentamisen hankintatapa",
+        "staraProcurementReasons": "Staran hankinnan peruste",
+        "projectQualityLevels": "Hankekustannus ja laatutaso (menu)",
+        "planningPhases": "Suunnittelun kustannusarvio (menu)",
+        "constructionPhases": "Rakentamisen kustannusarvio (menu)",
+        "responsibleZones": "Vastuuyksikkö",
+        "responsiblePersonsRaw": "Vastuuhenkilölistat",
+        "programmersRaw": "Ohjelmoija",
+        "budgetOverrunReasons": "Budjettipoikkeaman selitys"
+      },
+      "tableEmptyText": "Valikossa ei ole vielä vaihtoehtoja. Lisää uusi valinta aloittaaksesi.",
+      "sideNavigationToggleButton": "Navigoi valikkoon"
     },
     "auditlog": {
       "name": "Muutoshistoria",
@@ -789,6 +851,12 @@
       "high": "Hanke on kiireellisesti edistettävä",
       "medium": "Hanke on tavanomaisesti edistettävä",
       "low": "Hankkeen edistäminen voi odottaa"
+    },
+    "totalBudgets": {
+      "class": "<p>Tarve-esitys</p><p>Talousarvion raamiluku</p><p>Raamiluvun ja tarve-esityksen erotus</p>",
+      "groupHead": "<p>Ohjelmoitu yhteensä</p><p>Hankkeiden kokonaisrahoitusvaraukset yhteensä</p>",
+      "group": "Hankkeiden ohjelmoidut rahavaraukset yhteensä",
+      "project": "<p>Hankkeen ohjelmoitu rahavaraus</p><p>Hankkeen kokonaisrahoitusvaraus eli budjetti</p>"
     }
   }
 }

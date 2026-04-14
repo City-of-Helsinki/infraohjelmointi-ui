@@ -20,6 +20,7 @@ export interface IProject {
   programmed: boolean;
   constructionPhaseDetail: IListItem;
   constructionProcurementMethod: IListItem;
+  staraProcurementReason: IListItem;
   estPlanningStart: string | null;
   estPlanningEnd: string | null;
   estConstructionStart: string | null;

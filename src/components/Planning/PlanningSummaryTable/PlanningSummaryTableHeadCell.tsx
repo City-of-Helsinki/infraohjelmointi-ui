@@ -12,16 +12,14 @@ import { dispatchDateIndicatorEvent } from '@/utils/events';
 interface IPlanningSummaryTableHeadCellProps {
   year: number;
   title: string;
-  isCurrentYear: boolean;
 }
 
-const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
-  year,
-  title,
-  isCurrentYear,
-}) => {
+const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({ year, title }) => {
   const dispatch = useAppDispatch();
   const selectedYears = useAppSelector(selectSelectedYears);
+  const currentYear = new Date().getFullYear();
+  const isCurrentYear = year === currentYear;
+  const isCurrentOrPastYear = year <= currentYear;
 
   // Toggles the given year in the selection so multiple monthly views can stay open simultaneously
   const handleSetSelectedYear = useCallback(
@@ -43,7 +41,7 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
         });
       }
     },
-    [dispatch, isCurrentYear, selectedYears],
+    [dispatch, selectedYears, isCurrentYear],
   );
 
   /**
@@ -115,10 +113,10 @@ const PlanningSummaryTableHeadCell: FC<IPlanningSummaryTableHeadCellProps> = ({
       </td>
       {selectedYears.includes(year) && (
         <>
-          {isCurrentYear && (
+          {isCurrentOrPastYear && (
             <td key={`${year}-monthly-view`} className="monthly-summary-cell label">
               <div className="monthly-cell-container">
-                <span data-testid="date-today-label">{getToday()}</span>
+                {isCurrentYear && <span data-testid="date-today-label">{getToday()}</span>}
               </div>
             </td>
           )}
