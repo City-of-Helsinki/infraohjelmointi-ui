@@ -10,10 +10,11 @@ import RadioCheckboxField from '@/components/shared/RadioCheckboxField';
 import ErrorSummary from './ErrorSummary';
 import { getFieldsIfEmpty, validateMaxNumber, validateRequiredSelect } from '@/utils/validation';
 import _ from 'lodash';
-import { mapIconKey } from '@/utils/common';
+import { listItemToOption, mapIconKey } from '@/utils/common';
 import { useAppSelector } from '@/hooks/common';
 import { selectProjectMode } from '@/reducers/projectSlice';
 import { selectProjectPhases } from '@/reducers/listsSlice';
+import { RootState } from '@/store';
 import { Tooltip } from 'hds-react';
 import { IProject } from '@/interfaces/projectInterfaces';
 
@@ -56,15 +57,23 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
 }) => {
   const phases = useOptions('phases');
   const phasesWithIndexes = useAppSelector(selectProjectPhases);
+  const allPhaseDetails = useAppSelector((state: RootState) => state.lists.projectPhaseDetails);
   const categories = useOptions('categories');
   const priorities = useOptions('priorities').toReversed(); // Higher priority first
-  const constructionPhaseDetails = useOptions('constructionPhaseDetails');
   const constructionProcurementMethods = useOptions('constructionProcurementMethods');
   const staraProcurementReasons = useOptions('staraProcurementReasons');
 
-  const currentPhase = getValues('phase').value;
+  const watchedPhase = useWatchField('phase', control) as IOption | undefined;
+  const currentPhase = watchedPhase?.value ?? '';
   const { t } = useTranslation();
   const projectMode = useAppSelector(selectProjectMode);
+
+  const filteredPhaseDetails = useMemo(() => {
+    if (!currentPhase) return [];
+    return allPhaseDetails
+      .filter((detail) => detail.projectPhase?.id === currentPhase)
+      .map((detail) => listItemToOption(detail));
+  }, [allPhaseDetails, currentPhase]);
 
   const watchedConstructionProcurementMethod = useWatchField(
     'constructionProcurementMethod',
@@ -74,6 +83,18 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const showStaraProcurementReason = watchedConstructionProcurementMethod?.label === 'Stara';
 
   const [phaseRequirements, setPhaseRequirements] = useState<Array<string>>([]);
+
+  useEffect(() => {
+    const currentDetail = getValues('phaseDetail');
+    if (currentDetail?.value) {
+      const detailBelongsToPhase = allPhaseDetails.some(
+        (d) => d.id === currentDetail.value && d.projectPhase?.id === currentPhase,
+      );
+      if (!detailBelongsToPhase) {
+        setValue('phaseDetail', { value: '', label: '' }, { shouldDirty: true });
+      }
+    }
+  }, [currentPhase, allPhaseDetails, getValues, setValue]);
 
   useEffect(() => {
     if (!showStaraProcurementReason) {
@@ -98,18 +119,23 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     );
   }, [getValues]);
 
-  const [
-    proposalPhase,
-    designPhase,
-    programmedPhase,
-    draftInitiationPhase,
-    draftApprovalPhase,
-    constructionPlanPhase,
-    constructionWaitPhase,
-    constructionPhase,
-    warrantyPeriodPhase,
-    completedPhase,
-  ] = useMemo(() => phases.map(({ value }) => value), [phases]);
+  const phaseValues = useMemo(() => phases.map(({ value }) => value), [phases]);
+  const phaseByValue = useCallback(
+    (val: string) => phaseValues.find((v) => v === val),
+    [phaseValues],
+  );
+  const proposalPhase = phaseByValue('proposal');
+  const designPhase = phaseByValue('design');
+  const programmedPhase = phaseByValue('programming');
+  const draftInitiationPhase = phaseByValue('draftInitiation');
+  const draftApprovalPhase = phaseByValue('draftApproval');
+  const constructionPlanPhase = phaseByValue('constructionPlan');
+  const constructionWaitPhase = phaseByValue('constructionWait');
+  const constructionPreparationPhase = phaseByValue('constructionPreparation');
+  const constructionPhase = phaseByValue('construction');
+  const warrantyPeriodPhase = phaseByValue('warrantyPeriod');
+  const completedPhase = phaseByValue('completed');
+  const suspendedPhase = phaseByValue('suspended');
 
   const validatePhase = useMemo(
     () => ({
@@ -157,19 +183,28 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             ...generalConstructionRequirements,
           ];
 
+          const hasDetailsForPhase = allPhaseDetails.some(
+            (d) => d.projectPhase?.id === phaseToSubmit,
+          );
+
           // Check fields that cannot be empty
           switch (phaseToSubmit) {
             case programmedPhase:
               fields.push(...fieldsIfEmpty([...programmedRequirements]));
+              if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
               break;
             case draftInitiationPhase:
             case draftApprovalPhase:
             case constructionPlanPhase:
             case constructionWaitPhase:
               fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
+              if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
+              break;
+            case constructionPreparationPhase:
+              fields.push(...fieldsIfEmpty([...combinedRequirements, 'phaseDetail']));
               break;
             case constructionPhase:
-              fields.push(...fieldsIfEmpty([...combinedRequirements, 'constructionPhaseDetail']));
+              fields.push(...fieldsIfEmpty([...combinedRequirements, 'phaseDetail']));
               break;
             case warrantyPeriodPhase:
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
@@ -186,17 +221,21 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               }
               fields.push(...fieldsIfEmpty([...combinedRequirements]));
               break;
+            case suspendedPhase:
+              break;
           }
 
           const isProposalOrDesignPhase =
             phase.value === proposalPhase || phase.value === designPhase;
+          const isSuspendedPhase = phase.value === suspendedPhase;
 
-          // Check if programmed has the correct value
-          if (
-            (isProposalOrDesignPhase && programmed) ||
-            (!isProposalOrDesignPhase && !programmed)
-          ) {
-            fields.push('programmed');
+          if (!isSuspendedPhase) {
+            if (
+              (isProposalOrDesignPhase && programmed) ||
+              (!isProposalOrDesignPhase && !programmed)
+            ) {
+              fields.push('programmed');
+            }
           }
           setPhaseRequirements(fields);
 
@@ -217,33 +256,38 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       draftApprovalPhase,
       constructionPlanPhase,
       constructionWaitPhase,
+      constructionPreparationPhase,
       constructionPhase,
       warrantyPeriodPhase,
       completedPhase,
+      suspendedPhase,
+      allPhaseDetails,
       checkTodayIsBeforeWarrantyPhaseEnd,
       projectMode,
     ],
   );
 
-  const validateConstructionPhaseDetails = useMemo(
+  const validatePhaseDetails = useMemo(
     () => ({
       validate: {
-        isConstructionPhaseDetailsValid: (constructionPhaseDetail: IOption) => {
+        isPhaseDetailValid: (phaseDetail: IOption) => {
           const phase = getValues('phase');
-          // Required after phase is changed to construction
-          if (phase.value === constructionPhase && constructionPhaseDetail?.value === '') {
-            return t('validation.required', { field: t('validation.constructionPhaseDetail') });
+          const hasDetailsForPhase = allPhaseDetails.some(
+            (d) => d.projectPhase?.id === phase.value,
+          );
+          if (hasDetailsForPhase && (!phaseDetail || phaseDetail.value === '')) {
+            return t('validation.required', { field: t('validation.phaseDetail') });
           }
           return true;
         },
       },
     }),
-    [constructionPhase, getValues, t],
+    [allPhaseDetails, currentPhase, getValues, t],
   );
 
-  const isConstructionPhaseDetailsDisabled = useMemo(() => {
-    return currentPhase !== constructionPhase;
-  }, [currentPhase, constructionPhase]);
+  const isPhaseDetailsDisabled = useMemo(() => {
+    return filteredPhaseDetails.length === 0;
+  }, [filteredPhaseDetails]);
 
   const validateProgrammed = useMemo(
     () => ({
@@ -262,7 +306,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [designPhase, getValues, proposalPhase, t],
+    [designPhase, currentPhase, getValues, proposalPhase, t],
   );
 
   const validatePlanningStartYear = useMemo(
@@ -375,12 +419,11 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
     [t, constructionEndYear, isUserOnlyProjectManager, getValues],
   );
 
-  const projectFormPhase = getValues('phase').label;
   const projectPhase = project?.phase;
-  const [iconKey, setIconKey] = useState(mapIconKey(getValues('phase').label));
+  const [iconKey, setIconKey] = useState(() => mapIconKey(watchedPhase?.label ?? ''));
   useEffect(() => {
-    setIconKey(mapIconKey(getValues('phase').label));
-  }, [getValues, projectFormPhase, projectPhase]);
+    setIconKey(mapIconKey(watchedPhase?.label ?? ''));
+  }, [watchedPhase?.label, projectPhase]);
 
   return (
     <div className="w-full" id="basics-status-section">
@@ -398,10 +441,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         </div>
         <div className="form-col-xl">
           <SelectField
-            {...getFieldProps('constructionPhaseDetail')}
-            options={constructionPhaseDetails}
-            rules={validateConstructionPhaseDetails}
-            disabled={isConstructionPhaseDetailsDisabled}
+            {...getFieldProps('phaseDetail')}
+            options={filteredPhaseDetails}
+            rules={validatePhaseDetails}
+            disabled={isPhaseDetailsDisabled}
             readOnly={isUserOnlyViewer}
           />
         </div>

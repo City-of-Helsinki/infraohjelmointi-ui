@@ -444,6 +444,8 @@ export const enum IconKey {
   Construction = 'construction',
   WarrantyPeriod = 'warrantyPeriod',
   Completed = 'completed',
+  ConstructionPreparation = 'constructionPreparation',
+  Suspended = 'suspended',
   Location = 'location',
   Person = 'person',
 }
@@ -480,6 +482,12 @@ export const mapIconKey = (type: string): IconKey => {
     case 'completed':
     case 'Valmis / ylläpidossa':
       return IconKey.Completed;
+    case 'constructionPreparation':
+    case 'Rakentamisen valmistelu':
+      return IconKey.ConstructionPreparation;
+    case 'suspended':
+    case 'Keskeytetty':
+      return IconKey.Suspended;
     default:
       return IconKey.Programming;
   }

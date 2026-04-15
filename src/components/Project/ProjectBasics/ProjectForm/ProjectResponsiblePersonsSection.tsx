@@ -29,13 +29,14 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
   const phases = useOptions('phases');
   const programmers = useOptions('programmers');
 
-  const draftInitiationPhase = phases[3]?.value ?? '';
-  const draftApprovalPhase = phases[4]?.value ?? '';
-  const constructionPlanPhase = phases[5]?.value ?? '';
-  const constructionWaitPhase = phases[6]?.value ?? '';
-  const constructionPhase = phases[7]?.value ?? '';
-  const warrantyPeriodPhase = phases[8]?.value ?? '';
-  const completedPhase = phases[9]?.value ?? '';
+  const findPhase = (val: string) => phases.find((p) => p.value === val)?.value ?? '';
+  const draftInitiationPhase = findPhase('draftInitiation');
+  const draftApprovalPhase = findPhase('draftApproval');
+  const constructionPlanPhase = findPhase('constructionPlan');
+  const constructionWaitPhase = findPhase('constructionWait');
+  const constructionPhase = findPhase('construction');
+  const warrantyPeriodPhase = findPhase('warrantyPeriod');
+  const completedPhase = findPhase('completed');
 
   const phasesThatNeedResponsiblePerson = useMemo(
     () => [

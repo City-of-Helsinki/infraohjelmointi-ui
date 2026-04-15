@@ -7,7 +7,7 @@ import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCall
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
   mockBudgetOverrunReasons,
-  mockConstructionPhaseDetails,
+  mockProjectPhaseDetails,
   mockConstructionProcurementMethods,
   mockConstructionPhases,
   mockPlanningPhases,
@@ -77,7 +77,7 @@ const render = async (
             phases: mockProjectPhases.data,
             types: mockProjectTypes.data,
             typeQualifiers: mockProjectTypeQualifiers.data,
-            constructionPhaseDetails: mockConstructionPhaseDetails.data,
+            projectPhaseDetails: mockProjectPhaseDetails.data,
             constructionProcurementMethods: mockConstructionProcurementMethods.data,
             staraProcurementReasons: mockStaraProcurementReasons.data,
             categories: mockProjectCategories.data,
@@ -170,7 +170,7 @@ describe('projectForm', () => {
     expectOption(project?.projectQualityLevel?.value);
     expectOption(project?.planningPhase?.value);
     expectOption(project?.constructionPhase?.value);
-    expectOption(project?.constructionPhaseDetail?.value);
+    expectOption(project?.phaseDetail?.value);
     expectOption(project?.category?.value);
     expectOption(project?.priority?.value);
     expectPersonOption(project?.personPlanning as IPerson);
