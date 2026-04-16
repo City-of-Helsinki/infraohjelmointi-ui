@@ -3,8 +3,9 @@ import axios from 'axios';
 import mockProject from '@/mocks/mockProject';
 import { renderWithProviders, sendProjectUpdateEvent } from '@/utils/testUtils';
 import { arrayHasValue, formatNumberToContainSpaces, matchExact } from '@/utils/common';
+import * as commonUtils from '@/utils/common';
 import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCallsToMethodMocks';
-import { IProject } from '@/interfaces/projectInterfaces';
+import { IProject, IProjectRequest } from '@/interfaces/projectInterfaces';
 import {
   mockBudgetOverrunReasons,
   mockProjectPhaseDetails,
@@ -34,6 +35,7 @@ import * as projectApiHooks from '@/api/projectApi';
 import { mockUser } from '@/mocks/mockUsers';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import { mockAllSapCostsProject, mockCurrentYearSapCostsProject } from '@/mocks/mockSapCosts';
+import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 
 jest.mock('axios');
 jest.mock('react-i18next', () => mockI18next());
@@ -128,6 +130,37 @@ const sendProjectUpdateEventForProject = async (project: IProject) => {
     console.log('Error setting project update event listener: ', e);
   }
 };
+
+const getProjectWithShiftableFinances = ({
+  planningStartYear = 2020,
+  estPlanningStart = '01.01.2020',
+  estPlanningEnd = '01.04.2028',
+  estConstructionStart = '10.04.2029',
+  estConstructionEnd = '10.04.2030',
+  constructionEndYear = 2030,
+}: Partial<IProject> = {}): IProject => ({
+  ...mockProject.data,
+  planningStartYear,
+  estPlanningStart,
+  estPlanningEnd,
+  estConstructionStart,
+  estConstructionEnd,
+  constructionEndYear,
+  finances: {
+    year: planningStartYear ?? 2020,
+    budgetProposalCurrentYearPlus0: '100.00',
+    budgetProposalCurrentYearPlus1: '200.00',
+    budgetProposalCurrentYearPlus2: '300.00',
+    preliminaryCurrentYearPlus3: '400.00',
+    preliminaryCurrentYearPlus4: '500.00',
+    preliminaryCurrentYearPlus5: '600.00',
+    preliminaryCurrentYearPlus6: '700.00',
+    preliminaryCurrentYearPlus7: '800.00',
+    preliminaryCurrentYearPlus8: '900.00',
+    preliminaryCurrentYearPlus9: '1000.00',
+    preliminaryCurrentYearPlus10: '1100.00',
+  },
+});
 
 describe('projectForm', () => {
   beforeEach(() => {
@@ -604,6 +637,220 @@ describe('projectForm', () => {
     expect(formPatchRequest.description).toEqual(expectedDescription);
     expect(formPatchRequest.hkrId).toEqual(expectedHkrId);
     expect(await findByDisplayValue(matchExact(expectedDescription))).toBeInTheDocument();
+  });
+
+  describe('finance updates from schedule changes', () => {
+    it('moves finances forwards when planningStartYear is increased', async () => {
+      const project = getProjectWithShiftableFinances();
+      const expectedPlanningStartYear = 2022;
+      const expectedFinances = moveBudgetForwards(
+        project.finances,
+        2020,
+        expectedPlanningStartYear,
+      );
+      const responseProject: { data: IProject } = {
+        data: {
+          ...project,
+          planningStartYear: expectedPlanningStartYear,
+          finances: expectedFinances,
+        },
+      };
+
+      mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+      const { user, findByRole, findByTestId } = await render({ project });
+
+      const planningStartYearField = await findByRole('spinbutton', {
+        name: getFormField('planningStartYear'),
+      });
+      const formSubmitButton = await findByTestId('submit-project-button');
+
+      await user.clear(planningStartYearField);
+      await user.type(planningStartYearField, expectedPlanningStartYear.toString());
+      await user.click(formSubmitButton);
+
+      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      expect(formPatchRequest.finances).toEqual(expectedFinances);
+    });
+
+    it('moves finances backwards when estPlanningEnd is moved earlier', async () => {
+      const project = getProjectWithShiftableFinances();
+      const expectedPlanningEnd = '01.04.2027';
+      const expectedFinances = moveBudgetBackwards(project.finances, 2028, 2027);
+      const dirtyFieldsToRequestObjectSpy = jest
+        .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
+        .mockReturnValueOnce({ estPlanningEnd: expectedPlanningEnd } as IProjectRequest);
+      const responseProject: { data: IProject } = {
+        data: {
+          ...project,
+          estPlanningEnd: expectedPlanningEnd,
+          finances: expectedFinances,
+        },
+      };
+
+      mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+      const { user, findByRole, findByTestId } = await render({ project });
+
+      const descriptionField = await findByRole('textbox', {
+        name: getFormField('description *'),
+      });
+      const formSubmitButton = await findByTestId('submit-project-button');
+
+      await user.clear(descriptionField);
+      await user.type(descriptionField, 'description update for submit');
+      await user.click(formSubmitButton);
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      expect(formPatchRequest.finances).toEqual(expectedFinances);
+      dirtyFieldsToRequestObjectSpy.mockRestore();
+    });
+
+    it('moves finances backwards from previous end year minus one when planning end overlaps construction start', async () => {
+      const project = getProjectWithShiftableFinances({
+        estPlanningEnd: '01.04.2028',
+        estConstructionStart: '10.04.2028',
+      });
+      const expectedPlanningEnd = '01.04.2026';
+      const expectedFinances = moveBudgetBackwards(project.finances, 2027, 2026);
+      const dirtyFieldsToRequestObjectSpy = jest
+        .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
+        .mockReturnValueOnce({ estPlanningEnd: expectedPlanningEnd } as IProjectRequest);
+      const responseProject: { data: IProject } = {
+        data: {
+          ...project,
+          estPlanningEnd: expectedPlanningEnd,
+          finances: expectedFinances,
+        },
+      };
+
+      mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+      const { user, findByRole, findByTestId } = await render({ project });
+
+      const descriptionField = await findByRole('textbox', {
+        name: getFormField('description *'),
+      });
+      const formSubmitButton = await findByTestId('submit-project-button');
+
+      await user.clear(descriptionField);
+      await user.type(descriptionField, 'description update for overlap submit');
+      await user.click(formSubmitButton);
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      expect(formPatchRequest.finances).toEqual(expectedFinances);
+      dirtyFieldsToRequestObjectSpy.mockRestore();
+    });
+
+    it('moves finances forwards when estConstructionStart is moved later', async () => {
+      const project = getProjectWithShiftableFinances();
+      const expectedConstructionStart = '10.04.2030';
+      const expectedFinances = moveBudgetForwards(project.finances, 2029, 2030);
+      const dirtyFieldsToRequestObjectSpy = jest
+        .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
+        .mockReturnValueOnce({
+          estConstructionStart: expectedConstructionStart,
+        } as IProjectRequest);
+      const responseProject: { data: IProject } = {
+        data: {
+          ...project,
+          estConstructionStart: expectedConstructionStart,
+          finances: expectedFinances,
+        },
+      };
+
+      mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+      const { user, findByRole, findByTestId } = await render({ project });
+
+      const descriptionField = await findByRole('textbox', {
+        name: getFormField('description *'),
+      });
+      const formSubmitButton = await findByTestId('submit-project-button');
+
+      await user.clear(descriptionField);
+      await user.type(descriptionField, 'description update for submit');
+      await user.click(formSubmitButton);
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      expect(formPatchRequest.finances).toEqual(expectedFinances);
+      dirtyFieldsToRequestObjectSpy.mockRestore();
+    });
+
+    it('moves finances forwards from previous start year plus one when construction start overlaps planning end', async () => {
+      const project = getProjectWithShiftableFinances({
+        estPlanningEnd: '01.04.2029',
+        estConstructionStart: '10.04.2029',
+      });
+      const expectedConstructionStart = '10.04.2031';
+      const expectedFinances = moveBudgetForwards(project.finances, 2030, 2031);
+      const dirtyFieldsToRequestObjectSpy = jest
+        .spyOn(commonUtils, 'dirtyFieldsToRequestObject')
+        .mockReturnValueOnce({
+          estConstructionStart: expectedConstructionStart,
+        } as IProjectRequest);
+      const responseProject: { data: IProject } = {
+        data: {
+          ...project,
+          estConstructionStart: expectedConstructionStart,
+          finances: expectedFinances,
+        },
+      };
+
+      mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+      const { user, findByRole, findByTestId } = await render({ project });
+
+      const descriptionField = await findByRole('textbox', {
+        name: getFormField('description *'),
+      });
+      const formSubmitButton = await findByTestId('submit-project-button');
+
+      await user.clear(descriptionField);
+      await user.type(descriptionField, 'description update for overlap construction submit');
+      await user.click(formSubmitButton);
+
+      await waitFor(() => expect(mockedAxios.patch).toHaveBeenCalled());
+      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      expect(formPatchRequest.finances).toEqual(expectedFinances);
+      dirtyFieldsToRequestObjectSpy.mockRestore();
+    });
+
+    it('moves finances backwards when constructionEndYear is decreased', async () => {
+      const project = getProjectWithShiftableFinances();
+      const expectedConstructionEndYear = 2029;
+      const expectedFinances = moveBudgetBackwards(
+        project.finances,
+        2030,
+        expectedConstructionEndYear,
+      );
+      const responseProject: { data: IProject } = {
+        data: {
+          ...project,
+          constructionEndYear: expectedConstructionEndYear,
+          finances: expectedFinances,
+        },
+      };
+
+      mockedAxios.patch.mockResolvedValueOnce(responseProject);
+
+      const { user, findByRole, findByTestId } = await render({ project });
+
+      const constructionEndYearField = await findByRole('spinbutton', {
+        name: getFormField('constructionEndYear'),
+      });
+      const formSubmitButton = await findByTestId('submit-project-button');
+
+      await user.clear(constructionEndYearField);
+      await user.type(constructionEndYearField, expectedConstructionEndYear.toString());
+      await user.click(formSubmitButton);
+
+      const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
+      expect(formPatchRequest.finances).toEqual(expectedFinances);
+    });
   });
 
   it('can delete a project', async () => {

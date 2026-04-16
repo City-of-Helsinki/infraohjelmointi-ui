@@ -70,80 +70,70 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     when: isDirty,
   });
 
-  const updatePlanningStartYear = (
-    finances: IProjectFinances,
-    previousStartYear: number | null,
-    startYear: number,
-  ): IProjectFinances => {
-    let updatedFinances = finances;
-    // If new planning start year is bigger than the previous one, budget from years that are not within the schedule of the project
-    // need to be moved to the new planning start year
-    if (previousStartYear && startYear > previousStartYear) {
-      updatedFinances = moveBudgetForwards(finances, previousStartYear, startYear);
-    }
-    return updatedFinances;
-  };
-
-  const updateEstPlanningEndYear = (
+  /**
+   * Reallocates budget when a phase end year is moved earlier.
+   *
+   * The budget from years that are no longer inside the schedule is moved into the new end year.
+   * If the previous end year overlaps with the next phase start year, that overlapping year is kept
+   * untouched and only fully out-of-schedule years are moved.
+   *
+   * Returns the original values when there is no earlier end-year change or when
+   * there is no year range left to move.
+   */
+  const moveFinancesWhenEndYearMovesEarlier = (
     finances: IProjectFinances,
     previousEndYear: number | null,
     endYear: number | null,
     startYear: number | null,
   ): IProjectFinances => {
-    let updatedFinances = finances;
-    // If new planning end year is smaller that the previous one, budget from the years that are not within the schedule need to
-    // be moved backwards to the new end year
-    if (previousEndYear && endYear && endYear < previousEndYear) {
-      // If there was an overlap between planning end year and construction start year, budget shouldn't be moved from that year
-      // but still needs to be moved from all the years that are not within the schedule anymore
-      const yearIsOverlap = startYear == previousEndYear;
-      const isMoreThanOneYearDifference = previousEndYear - endYear > 1;
-
-      if (yearIsOverlap && isMoreThanOneYearDifference) {
-        updatedFinances = moveBudgetBackwards(finances, previousEndYear - 1, endYear);
-      } else if (!yearIsOverlap) {
-        updatedFinances = moveBudgetBackwards(finances, previousEndYear, endYear);
-      }
+    // No change needed unless the end year was moved earlier.
+    if (previousEndYear === null || endYear === null || endYear >= previousEndYear) {
+      return finances;
     }
-    return updatedFinances;
+
+    // If schedule phases overlap (e.g. planning end == construction start), keep the overlapping year in place
+    // and only move budgets that fall fully outside the updated schedule.
+    const overlapAtPreviousEndYear = startYear !== null && startYear === previousEndYear;
+    const sourceEndYear = overlapAtPreviousEndYear ? previousEndYear - 1 : previousEndYear;
+
+    if (sourceEndYear <= endYear) {
+      return finances;
+    }
+
+    return moveBudgetBackwards(finances, sourceEndYear, endYear);
   };
 
-  const updateEstConstructionStartYear = (
+  /**
+   * Reallocates budget when a phase start year is moved later.
+   *
+   * The budget from years that are no longer inside the schedule is moved into the new start year.
+   * If the previous start year overlaps with the preceding phase end year, that overlapping year is kept
+   * untouched and only fully out-of-schedule years are moved.
+   *
+   * Returns the original values when there is no later start-year change or when
+   * there is no year range left to move.
+   */
+  const moveFinancesWhenStartYearMovesLater = (
     finances: IProjectFinances,
     previousStartYear: number | null,
     startYear: number | null,
     endYear: number | null,
   ): IProjectFinances => {
-    let updatedFinances = finances;
-    // If new construction start year is bigger than the previous one, budget from years that are not within the schedule of the project
-    // need to be moved to the new construction start year
-    if (previousStartYear && startYear && startYear > previousStartYear) {
-      // If there was an overlap between planning end year and construction start year, budget shouldn't be moved from that year
-      // but still needs to be moved from all the years that are not within the schedule anymore
-      const yearIsOverlap = endYear == previousStartYear;
-      const isMoreThanOneYearDifference = startYear - previousStartYear > 1;
-
-      if (yearIsOverlap && isMoreThanOneYearDifference) {
-        updatedFinances = moveBudgetForwards(finances, previousStartYear + 1, startYear);
-      } else if (!yearIsOverlap) {
-        updatedFinances = moveBudgetForwards(finances, previousStartYear, startYear);
-      }
+    // No change needed unless the start year was moved later.
+    if (previousStartYear === null || startYear === null || startYear <= previousStartYear) {
+      return finances;
     }
-    return updatedFinances;
-  };
 
-  const updateConstructionEndYear = (
-    finances: IProjectFinances,
-    previousEndYear: number | null,
-    endYear: number,
-  ): IProjectFinances => {
-    let updatedFinances = finances;
-    // If new construction end year is smaller that the previous one, budget from the years that are not within the schedule need to
-    // be moved backwards to the new end year
-    if (previousEndYear && endYear < previousEndYear) {
-      updatedFinances = moveBudgetBackwards(finances, previousEndYear, endYear);
+    // If schedule phases overlap (e.g. planning end == construction start), keep the overlapping year in place
+    // and only move budgets that fall fully outside the updated schedule.
+    const overlapAtPreviousStartYear = endYear !== null && endYear === previousStartYear;
+    const sourceStartYear = overlapAtPreviousStartYear ? previousStartYear + 1 : previousStartYear;
+
+    if (sourceStartYear >= startYear) {
+      return finances;
     }
-    return updatedFinances;
+
+    return moveBudgetForwards(finances, sourceStartYear, startYear);
   };
 
   const updateFinances = (data: IProjectRequest, project: IProject) => {
@@ -152,17 +142,18 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
       if (data.planningStartYear) {
         const planningStartYear = project.planningStartYear ?? null;
-        updatedFinances = updatePlanningStartYear(
+        updatedFinances = moveFinancesWhenStartYearMovesLater(
           updatedFinances,
           planningStartYear,
           data.planningStartYear,
+          null,
         );
       }
       if (data.estPlanningEnd) {
         const previousPlanningEndYear = getYear(project.estPlanningEnd);
         const planningEndYear = getYear(data.estPlanningEnd);
         const constructionStartYear = getYear(project.estConstructionStart);
-        updatedFinances = updateEstPlanningEndYear(
+        updatedFinances = moveFinancesWhenEndYearMovesEarlier(
           updatedFinances,
           previousPlanningEndYear,
           planningEndYear,
@@ -173,7 +164,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         const previousConstructionStartYear = getYear(project.estConstructionStart);
         const constructionStartYear = getYear(data.estConstructionStart);
         const planningEndYear = getYear(project.estPlanningEnd);
-        updatedFinances = updateEstConstructionStartYear(
+        updatedFinances = moveFinancesWhenStartYearMovesLater(
           updatedFinances,
           previousConstructionStartYear,
           constructionStartYear,
@@ -182,10 +173,11 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       }
       if (data.constructionEndYear) {
         const constructionEndYear = project.constructionEndYear;
-        updatedFinances = updateConstructionEndYear(
+        updatedFinances = moveFinancesWhenEndYearMovesEarlier(
           updatedFinances,
           constructionEndYear,
           data.constructionEndYear,
+          null,
         );
       }
 
@@ -249,7 +241,12 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
         // Patch project
         if (project?.id && projectMode === 'edit') {
-          if (data.planningStartYear || data.constructionEndYear) {
+          if (
+            data.planningStartYear ||
+            data.estPlanningEnd ||
+            data.estConstructionStart ||
+            data.constructionEndYear
+          ) {
             data = updateFinances(data, project);
             data = updateDateBasedOnYear(data, project);
           }
