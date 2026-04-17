@@ -351,12 +351,8 @@ const useProjectForm = (project: IProject | null) => {
   // when creating a new project
   useEffect(() => {
     if (projectMode === 'new') {
-      if (postalCode) {
-        setValue('postalCode', postalCode, { shouldDirty: true });
-      }
-      if (city) {
-        setValue('city', city, { shouldDirty: true });
-      }
+      setValue('postalCode', postalCode, { shouldDirty: !!postalCode });
+      setValue('city', city, { shouldDirty: !!city });
     }
   }, [postalCode, city, projectMode, setValue]);
 

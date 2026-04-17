@@ -32,6 +32,9 @@ export function usePostalCode(address: string) {
             const city = data.features[0].properties.kaupunki;
             setPostalCode(postalCode);
             setCity(city);
+          } else {
+            setPostalCode('');
+            setCity('');
           }
         })
         .catch((error) => {
