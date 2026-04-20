@@ -152,7 +152,7 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   );
 
   const isEditFrameBudgetDisabled = useMemo(
-    () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame,
+    () => !isUserCoordinator(user) || forcedToFrame,
     [forcedToFrame, mode, user],
   );
 
