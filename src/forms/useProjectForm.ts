@@ -236,26 +236,46 @@ const useProjectForm = (project: IProject | null) => {
 
   const locationOptions = useLocationOptions(selections?.selectedLocation);
 
-  // Get class-based programmer logic
-  const { getProgrammerForClass } = useProjectProgrammer();
+  // Get class- and district-based programmer logic (IO-411)
+  const { getProgrammerForClass, getProgrammerForDistrict } = useProjectProgrammer();
 
-  // Set the default programmer based on class hierarchy
+  /**
+   * Resolve the default programmer for the *current* form selection and write
+   * it into ``personProgramming``.
+   *
+   * IO-411: the class hierarchy is consulted first because it's the most
+   * specific source — a class like ``"Katujen perusparantaminen"`` directly
+   * pins down a programmer. If the class chain yields nothing we fall back
+   * to the picked district chain; suurpiirit (e.g. ``"Itäinen suurpiiri"``)
+   * live on the district side and the backend's ``computedDefaultProgrammer``
+   * resolves them by walking the ``parent`` pointer.
+   *
+   * The original behaviour of always overwriting is preserved: handlers only
+   * fire when the user actively changes class or location, so overwriting
+   * reflects a fresh intent each time.
+   */
   const setDefaultProgrammerForClassHierarchy = useCallback(
     (masterClassId?: string, classId?: string, subClassId?: string) => {
-      // Use the most specific class ID (backend handles hierarchy via computedDefaultProgrammer)
       const mostSpecificClassId = subClassId || classId || masterClassId;
-      const defaultProgrammer = getProgrammerForClass(mostSpecificClassId);
+
+      const currentForm = getValues();
+      const mostSpecificDistrictId =
+        currentForm.subDivision?.value ||
+        currentForm.division?.value ||
+        currentForm.district?.value;
+
+      const defaultProgrammer =
+        getProgrammerForClass(mostSpecificClassId) ||
+        getProgrammerForDistrict(mostSpecificDistrictId);
 
       if (defaultProgrammer) {
-        // Convert the programmer to an option format
-        const programmerOption = {
+        setValue('personProgramming', {
           value: defaultProgrammer.id,
           label: defaultProgrammer.value,
-        };
-        setValue('personProgramming', programmerOption);
+        });
       }
     },
-    [getProgrammerForClass, setValue],
+    [getProgrammerForClass, getProgrammerForDistrict, getValues, setValue],
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected

@@ -1,6 +1,6 @@
 import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
-import { IProjectDistrict } from '@/interfaces/locationInterfaces';
+import { IProjectDistrict, IProjectDistrictOption } from '@/interfaces/locationInterfaces';
 import {
   getConstructionPhases,
   getPlanningPhases,
@@ -60,9 +60,9 @@ export interface IListState {
   responsiblePersons: Array<IListItem>;
   responsiblePersonsRaw: Array<IPerson>;
   programmedYears: Array<IListItem>;
-  projectDistricts: Array<IListItem>;
-  projectDivisions: Array<IListItem>;
-  projectSubDivisions: Array<IListItem>;
+  projectDistricts: Array<IProjectDistrictOption>;
+  projectDivisions: Array<IProjectDistrictOption>;
+  projectSubDivisions: Array<IProjectDistrictOption>;
   budgetOverrunReasons: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
@@ -105,8 +105,11 @@ const initialState: IListState = {
   error: null,
 };
 
-// Sorting the list of responsible persons by value which has the person name with lastname first
-export const sortOptions = (persons: Array<IListItem>) =>
+// Sorting the list of responsible persons by value which has the person name with lastname first.
+// Generic on the element type so callers that pass a widened option (e.g.
+// IProjectDistrictOption, which carries computedDefaultProgrammer) don't lose
+// their extra fields on the way out.
+export const sortOptions = <T extends IListItem>(persons: Array<T>): Array<T> =>
   [...persons].sort((a, b) => (a.value < b.value ? -1 : a.value > b.value ? 1 : 0));
 
 const getResponsiblePersons = async () => {
@@ -119,13 +122,22 @@ const getResponsiblePersons = async () => {
   }
 };
 
-export const getProjectDistricts = (districts: IProjectDistrict[], districtLevel: string) => {
+export const getProjectDistricts = (
+  districts: IProjectDistrict[],
+  districtLevel: string,
+): IProjectDistrictOption[] => {
   const filtered = districts.filter(({ level }) => level == districtLevel);
-  const mapped = filtered.map(({ id, name, parent }) => ({
-    value: name,
-    id,
-    ...(parent && { parent: parent }),
-  }));
+  const mapped: IProjectDistrictOption[] = filtered.map(
+    // IO-411: keep computedDefaultProgrammer on the option so the project form
+    // can pre-fill Ohjelmoija directly from the district chain. Without this
+    // the backend response is thrown away here and the form never sees it.
+    ({ id, name, parent, computedDefaultProgrammer }) => ({
+      value: name,
+      id,
+      ...(parent && { parent }),
+      ...(computedDefaultProgrammer && { computedDefaultProgrammer }),
+    }),
+  );
   return sortOptions(mapped);
 };
 

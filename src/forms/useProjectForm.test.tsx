@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import useProjectForm from './useProjectForm';
 import { IProjectForm } from '@/interfaces/formInterfaces';
@@ -191,5 +191,107 @@ describe('useProjectForm', () => {
     expect(result.current.formMethods).toBeDefined();
     expect(result.current.classOptions).toBeDefined();
     expect(result.current.useWatchField).toBeDefined();
+  });
+
+  // IO-411: district-side auto-fill. Drive the form via
+  // result.current.formMethods.setValue() and read personProgramming back
+  // out — the exact same code path the UI uses when the user picks a
+  // district from the dropdown.
+  describe('district-based programmer auto-fill (IO-411)', () => {
+    const renderFormWithDistrict = ({
+      districts,
+    }: {
+      districts: Array<{
+        id: string;
+        value: string;
+        computedDefaultProgrammer?: {
+          id: string;
+          firstName: string;
+          lastName: string;
+        } | null;
+      }>;
+    }) => {
+      const mockSelectors: Record<SelectorName, any> = {
+        selectProjectMode: 'new',
+        selectProjectUpdate: { project: { id: null } },
+        selectIsLoading: false,
+        selectIsProjectCardLoading: false,
+        selectAllPlanningClasses: [],
+        selectPlanningClasses: [],
+        selectPlanningSubClasses: [],
+        selectProjectDistricts: districts,
+        selectProjectDivisions: [],
+        selectProjectSubDivisions: [],
+      };
+
+      mockUseAppSelector.mockImplementation(
+        (selector: { name: SelectorName }) => mockSelectors[selector.name] ?? [],
+      );
+
+      const { result } = renderHook(() => useProjectForm(null), {
+        wrapper: Wrapper,
+      });
+
+      return { result };
+    };
+
+    it('pre-fills personProgramming from district.computedDefaultProgrammer', async () => {
+      const { result } = renderFormWithDistrict({
+        districts: [
+          {
+            id: 'district-itainen',
+            value: 'Itäinen suurpiiri',
+            computedDefaultProgrammer: {
+              id: 'prog-tia',
+              firstName: 'Tia',
+              lastName: 'Ohjelmoija',
+            },
+          },
+        ],
+      });
+
+      await act(async () => {
+        result.current.formMethods.setValue('district', {
+          value: 'district-itainen',
+          label: 'Itäinen suurpiiri',
+        });
+      });
+
+      await waitFor(() => {
+        const current = result.current.formMethods.getValues().personProgramming;
+        expect(current).toEqual({ value: 'prog-tia', label: 'Tia Ohjelmoija' });
+      });
+    });
+
+    it('does not overwrite personProgramming when the district has no computed programmer', async () => {
+      const { result } = renderFormWithDistrict({
+        districts: [
+          {
+            id: 'district-without',
+            value: 'Tuntematon suurpiiri',
+          },
+        ],
+      });
+
+      // Baseline before the change: for a new project personProgramming is
+      // the empty option { value: '', label: '' } — see personToOption in
+      // useProjectFormValues.
+      const baseline = result.current.formMethods.getValues().personProgramming;
+      expect(baseline).toEqual({ value: '', label: '' });
+
+      await act(async () => {
+        result.current.formMethods.setValue('district', {
+          value: 'district-without',
+          label: 'Tuntematon suurpiiri',
+        });
+      });
+
+      // Give the watch subscription a tick to run, then verify the field is
+      // unchanged — no phantom value from a stale lookup.
+      await new Promise((r) => setTimeout(r, 0));
+
+      const current = result.current.formMethods.getValues().personProgramming;
+      expect(current).toEqual({ value: '', label: '' });
+    });
   });
 });

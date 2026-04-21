@@ -31,6 +31,9 @@ jest.mock('@/hooks/useLocationOptions', () => ({
 jest.mock('@/utils/projectProgrammerUtils', () => ({
   useProjectProgrammer: () => ({
     getProgrammerForClass: jest.fn(() => null),
+    // IO-411: district-side auto-fill. Stubbed to null so this refresh test
+    // keeps exercising the "no auto-fill happens" path.
+    getProgrammerForDistrict: jest.fn(() => null),
   }),
 }));
 
