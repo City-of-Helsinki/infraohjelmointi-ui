@@ -46,6 +46,7 @@ import {
   MoveRowPayload,
   PersonTypeMenuItemPatchThunkContent,
   PersonTypeMenuItemPostThunkContent,
+  ReorderableListType,
 } from '@/interfaces/menuItemsInterfaces';
 
 export interface IListState {
@@ -275,6 +276,13 @@ export const listsSlice = createSlice({
         row.order = idx;
       });
     },
+    revertRowOrder: (
+      state,
+      action: PayloadAction<{ listType: ReorderableListType; rows: IListItem[] | IPerson[] }>,
+    ) => {
+      const { listType, rows } = action.payload;
+      Object.assign(state, { [listType]: rows });
+    },
     deleteRow: (state, action: PayloadAction<DeleteRowPayload>) => {
       const { listType, rowId } = action.payload;
       const list = state[listType];
@@ -346,6 +354,6 @@ export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpa
 export const selectTalpaAssetClasses = (state: RootState) => state.lists.talpaAssetClasses;
 export const selectLists = (state: RootState) => state.lists;
 
-export const { deleteRow, moveRow } = listsSlice.actions;
+export const { deleteRow, moveRow, revertRowOrder } = listsSlice.actions;
 
 export default listsSlice.reducer;

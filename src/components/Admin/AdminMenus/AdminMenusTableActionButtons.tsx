@@ -5,23 +5,28 @@ import {
   PersonTypeDialogValues,
   ReorderableListType,
 } from '@/interfaces/menuItemsInterfaces';
-import { moveRow, saveTableOrderThunk } from '@/reducers/listsSlice';
+import { moveRow, saveTableOrderThunk, revertRowOrder } from '@/reducers/listsSlice';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useTranslation } from 'react-i18next';
+import { RootState } from '@/store';
+import { useStore } from 'react-redux';
 
 const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, rowLength, id }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const store = useStore();
   const isFirstRow = rowIndex === 0;
   const isLastRow = rowIndex === rowLength - 1;
 
   const onMoveAndSaveRow = useCallback(
     async (rowId: string, direction: 'up' | 'down') => {
+      const previousRows = (store.getState() as RootState).lists[listType];
+
+      dispatch(moveRow({ listType, rowId, direction }));
+
       try {
         await dispatch(saveTableOrderThunk({ listType, path })).unwrap();
-        dispatch(moveRow({ listType, rowId, direction }));
-
         dispatch(
           notifySuccess({
             message: t('reorderSuccess'),
@@ -31,6 +36,7 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
           }),
         );
       } catch {
+        dispatch(revertRowOrder({ listType, rows: previousRows }));
         dispatch(
           notifyError({
             message: t('reorderError'),
@@ -41,7 +47,7 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
         );
       }
     },
-    [dispatch, listType, path, t],
+    [dispatch, store, listType, path, t],
   );
 
   return (
