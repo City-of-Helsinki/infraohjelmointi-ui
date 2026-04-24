@@ -152,8 +152,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   );
 
   const isEditFrameBudgetDisabled = useMemo(
-    () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame,
-    [forcedToFrame, mode, user],
+    () => !isUserCoordinator(user) || mode !== 'coordination',
+    [mode, user],
   );
 
   const totalBudgetTooltipType = type === 'group' ? 'group' : 'class';
