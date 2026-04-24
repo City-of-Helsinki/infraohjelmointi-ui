@@ -100,6 +100,9 @@ export const isOption = (obj: unknown): obj is Option => {
 };
 
 const getLocation = (list: ILocation[], locationName: string) => {
+  if (locationName === '') {
+    return undefined;
+  }
   const location = list.find(({ name }) => name.includes(locationName));
   return location;
 };
@@ -140,19 +143,19 @@ const getLowestLocationId = (
   hierarchySubDivisions: ILocation[] | undefined,
   form: IAppForms,
 ) => {
-  let lowestLocationId: string | undefined;
+  let lowestLocationId: string | null = null;
   if (hierarchyDistricts) {
     const districts = getLocationList(hierarchyDistricts, undefined, form.subClass.value);
     const district = getLocation(districts, form.district.label);
-    lowestLocationId = district?.id;
+    lowestLocationId = district?.id ?? null;
     if (canGetNextLevel(form.division.value, district, hierarchyDivisions)) {
       const divisions = getLocationList(hierarchyDivisions, district?.id);
       const division = getLocation(divisions, form.division.label);
-      lowestLocationId = division?.id ?? district?.id;
+      lowestLocationId = division?.id ?? district?.id ?? null;
       if (canGetNextLevel(form.subDivision.value, division, hierarchySubDivisions)) {
         const subDivisions = getLocationList(hierarchySubDivisions, division?.id);
         const subDivision = getLocation(subDivisions, form.subDivision.label);
-        lowestLocationId = subDivision?.id ?? division?.id;
+        lowestLocationId = subDivision?.id ?? division?.id ?? null;
       }
     }
   }
@@ -171,17 +174,13 @@ const parseValue = (value: FormValueType) => {
 };
 
 const getKey = (key: string) => {
-  if (compareKeyToValues(key, ['masterClass', 'class', 'subClass'])) {
+  if (['masterClass', 'class', 'subClass'].includes(key)) {
     return 'projectClass';
-  } else if (compareKeyToValues(key, ['district', 'division', 'subDivision'])) {
+  } else if (['district', 'division', 'subDivision'].includes(key)) {
     return 'projectDistrict';
   } else {
     return key;
   }
-};
-
-const compareKeyToValues = (key: string, values: string[]): boolean => {
-  return values.includes(key);
 };
 
 /**
@@ -232,7 +231,10 @@ export const dirtyFieldsToRequestObject = (
       }
     };
 
-    if (compareKeyToValues(key, ['district', 'division', 'subDivision']) && parsedValue) {
+    // If the changed field is related to location,
+    // we need to calculate the lowest selected location and set it to request object.
+    // If location is not found, projectLocation is set to null.
+    if (['masterClass', 'class', 'subClass', 'district', 'division', 'subDivision'].includes(key)) {
       _.assign(request, {
         projectLocation: getLowestLocationId(
           hierarchyDistricts,
@@ -246,16 +248,16 @@ export const dirtyFieldsToRequestObject = (
     // if subDivision or division is removed, we need to set projectDistrict to be the new lowest
     // selected location class (e.g. if subDivision is removed, new lowest selected would be division)
     switch (true) {
-      case !parsedValue && compareKeyToValues(key, ['subDivision']):
+      case !parsedValue && key === 'subDivision':
         assignValueToKey(convertedKey, parseValue(form['division' as keyof IAppForms]));
         break;
-      case !parsedValue && compareKeyToValues(key, ['division']):
+      case !parsedValue && key === 'division':
         assignValueToKey(convertedKey, parseValue(form['district' as keyof IAppForms]));
         break;
       default:
         assignValueToKey(convertedKey, parsedValue);
 
-        if (compareKeyToValues(key, ['district']) && hierarchyDistricts) {
+        if (key === 'district' && hierarchyDistricts) {
           const subClass = parseValue(form['subClass' as keyof IAppForms]);
           const projectClass = parseValue(form['class' as keyof IAppForms]);
           assignValueToKey('projectClass', subClass ?? projectClass);
