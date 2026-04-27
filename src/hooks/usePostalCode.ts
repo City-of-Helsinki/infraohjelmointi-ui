@@ -28,8 +28,8 @@ export function usePostalCode(address: string) {
           }
 
           if (data?.features && data.features.length > 0) {
-            const postalCode = data.features[0].properties.postinumero;
-            const city = data.features[0].properties.kaupunki;
+            const postalCode = data.features[0].properties.postinumero || '';
+            const city = data.features[0].properties.kaupunki || '';
             setPostalCode(postalCode);
             setCity(city);
           } else {
