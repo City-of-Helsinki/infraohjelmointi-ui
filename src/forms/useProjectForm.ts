@@ -236,26 +236,40 @@ const useProjectForm = (project: IProject | null) => {
 
   const locationOptions = useLocationOptions(selections?.selectedLocation);
 
-  // Get class-based programmer logic
-  const { getProgrammerForClass } = useProjectProgrammer();
+  const { getProgrammerForClass, getProgrammerForDistrict } = useProjectProgrammer();
 
-  // Set the default programmer based on class hierarchy
+  /**
+   * Pre-fill personProgramming from the current class / district pick when
+   * the field is empty. Resolution order mirrors ProjectCreateSerializer:
+   * class chain first, then district chain (IO-411). Skipping when the
+   * field already has a value preserves a user's manual pick.
+   */
   const setDefaultProgrammerForClassHierarchy = useCallback(
     (masterClassId?: string, classId?: string, subClassId?: string) => {
-      // Use the most specific class ID (backend handles hierarchy via computedDefaultProgrammer)
+      const currentForm = getValues();
+
+      if (currentForm.personProgramming?.value) {
+        return;
+      }
+
       const mostSpecificClassId = subClassId || classId || masterClassId;
-      const defaultProgrammer = getProgrammerForClass(mostSpecificClassId);
+      const mostSpecificDistrictId =
+        currentForm.subDivision?.value ||
+        currentForm.division?.value ||
+        currentForm.district?.value;
+
+      const defaultProgrammer =
+        getProgrammerForClass(mostSpecificClassId) ||
+        getProgrammerForDistrict(mostSpecificDistrictId);
 
       if (defaultProgrammer) {
-        // Convert the programmer to an option format
-        const programmerOption = {
+        setValue('personProgramming', {
           value: defaultProgrammer.id,
           label: defaultProgrammer.value,
-        };
-        setValue('personProgramming', programmerOption);
+        });
       }
     },
-    [getProgrammerForClass, setValue],
+    [getProgrammerForClass, getProgrammerForDistrict, getValues, setValue],
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected
