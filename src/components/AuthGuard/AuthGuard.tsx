@@ -23,6 +23,7 @@ const PAGES = {
   PROJECT_BASICS: 'basics',
   PROJECT_NOTES: 'notes',
   PROJECT_TALPA: 'talpa',
+  CONSTRUCTION_HANDOVER: 'construction-handover',
   SEARCH_RESULTS: 'search-results',
 };
 
@@ -191,12 +192,13 @@ const AuthGuard: FC = () => {
      * Other Page Redirecting Handler
      */
     const handlePageRedirects = (pathname: string) => {
-      // Redirect user to full project view if /basics or /notes is missing
+      // Redirect user to full project view if /basics, /notes, /new, /talpa or /construction-handover is missing
       const pathIsInvalid =
         !pathname.includes(PAGES.PROJECT_BASICS) &&
         !pathname.includes(PAGES.PROJECT_NOTES) &&
         !pathname.includes(PAGES.PROJECT_NEW) &&
-        !pathname.includes(PAGES.PROJECT_TALPA);
+        !pathname.includes(PAGES.PROJECT_TALPA) &&
+        !pathname.includes(PAGES.CONSTRUCTION_HANDOVER);
       if (pathname.includes(PAGES.PROJECT) && pathIsInvalid) {
         return navigate(`${pathname.replace(/\/$/, '')}/${PAGES.PROJECT_BASICS}`);
       }

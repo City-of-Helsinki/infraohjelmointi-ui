@@ -2,7 +2,7 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch, Control } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { listItemToOption } from '@/utils/common';
+import { listItemToOption, personToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
@@ -14,7 +14,6 @@ import {
 } from '@/reducers/classSlice';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
-import { IPerson } from '@/interfaces/personsInterfaces';
 import {
   selectProjectDistricts,
   selectProjectDivisions,
@@ -121,11 +120,6 @@ const useProjectFormValues = (project: IProject | null) => {
     },
     [districts, divisions, subDivisions, getSelectedLocation],
   );
-
-  const personToOption = (person?: IPerson): IOption => ({
-    label: person ? `${person.firstName} ${person.lastName}` : '',
-    value: person ? person.id : '',
-  });
 
   const formValues: IProjectForm = useMemo(
     () => ({

@@ -11,6 +11,7 @@ interface IProjectFormSidePanelProps {
   navItems: INavigationItem[];
   showSaveIndicator?: boolean;
   formStatusSection?: React.ReactNode;
+  showPwFolderLink?: boolean;
 }
 
 const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
@@ -18,6 +19,7 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
   navItems,
   showSaveIndicator = true,
   formStatusSection,
+  showPwFolderLink = true,
 }) => {
   return (
     // This "extra" div is here so that the side-panel-container's sticky position works
@@ -28,7 +30,7 @@ const ProjectFormSidePanel: FC<IProjectFormSidePanelProps> = ({
             <SideNavigation navItems={navItems} />
           </div>
           {formStatusSection && <div className="form-status-container">{formStatusSection}</div>}
-          <PWContainer pwFolderLink={project?.pwFolderLink} />
+          {showPwFolderLink && <PWContainer pwFolderLink={project?.pwFolderLink} />}
           {showSaveIndicator && <SaveIndicator project={project} />}
         </div>
       </div>

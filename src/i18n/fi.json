@@ -36,7 +36,9 @@
     "projectIdentifiers": "Hankkeen SAP-projektin tiedot",
     "projectSchedule": "Hankkeen aikataulu",
     "projectContacts": "Hankkeen osoite- ja yhteystiedot",
-    "projectClasses": "Hankkeen luokittelu"
+    "projectClasses": "Hankkeen luokittelu",
+    "nameAndDescription": "Hankkeen nimi ja kuvaus",
+    "constructionHandoverContacts": "Yhteyshenkilöt"
   },
   "option": {
     "underConstruction": "Rakenteilla",
@@ -316,7 +318,6 @@
     "riskAssessment": "Riskiarvio",
     "planningStartYear": "Suunnittelun aloitusvuosi",
     "constructionEndYear": "Rakentamisen valmistumisvuosi",
-    "phaseDetail": "Vaiheen tarkenne",
     "financial": "Hankkeen kustannustiedot",
     "masterClass": "Pääluokka",
     "class": "Luokka",
@@ -407,6 +408,23 @@
     "searchForProjects": "Etsi hankkeita",
     "createGroup": "Luo ryhmä"
   },
+  "constructionHandoverForm": {
+    "constructionHandoverNotStarted": "Rakennuttamiseen siirtoa ei ole vielä aloitettu. Aloita siirto painikkeesta.",
+    "startConstructionHandover": "Aloita rakennuttamiseen siirto",
+    "nameAndDescription": "Hankkeen nimi ja kuvaus",
+    "projectSchedule": "Hankkeen aikataulu",
+    "name": "Hankkeen nimi",
+    "description": "Hankkeen kuvaus",
+    "descriptionTooltip": "Kuvaa urakan sisältö lyhyesti sekä tarkista luontoarvojen kartoitusten ajantasaisuus ja tarvittavat luvat (esim. suojellut lajit, vesilupa, alueen haltuunotto).",
+    "constructionProcurementMethod": "Hankintatapa",
+    "constructionStart": "Aloitus viimeistään",
+    "constructionEnd": "Valmis viimeistään",
+    "otherTimelineNotes": "Muut aikataulun sidoinnaisuudet ja välitavoitteet",
+    "otherTimelineNotesTooltip": "Kuvaa hankkeen ja aikataulutuksen välitavoitteita",
+    "contacts": "Yhteyshenkilöt",
+    "personPlanning": "Suunnittelu ja tekniset asiat",
+    "personFinancing": "Rahoitus ja aikataulu"
+  },
   "notification": {
     "title": {
       "400": "Virheellinen pyyntö",
@@ -438,7 +456,8 @@
       "noteAddError": "Muistiinpanon lisääminen epäonnistui",
       "update": "Päivitys",
       "updateSuccessful": "Tietojen siirto onnistui",
-      "sessionExpired": "Istunto vanhentunut"
+      "sessionExpired": "Istunto vanhentunut",
+      "linkCopied": "Linkki kopioitu"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -481,6 +500,8 @@
       "forcedToFrameUpdated": "Koordinointinäkymän tiedot siirrettiin onnistuneesti Sovitettu budjetti -näkymään.",
       "forcedToFrameDataUpdateError": "Tietojen päivityksessä Sovitettu budjetti -näkymään tapahtui virhe.",
       "forcedToFrameStatusUpdateError": "Sovitettu budjetti -näkymän tilan vaihtamisessa tapahtui virhe.",
+      "linkCopiedToClipboard": "Linkki kopioitu leikepöydälle",
+      "linkCopyFailed": "Linkin kopiointi epäonnistui",
       "sessionExpired": "Jatkaaksesi työskentelyä, kirjaudu sisään uudelleen."
     }
   },
@@ -520,6 +541,7 @@
   "basicInfo": "Perustiedot",
   "notes": "Muistiinpanot",
   "talpa": "Projektitiedot Talpaan",
+  "constructionHandover": "Rakennuttamiseen siirto",
   "tasks": "Tehtävät",
   "new": "Uusi",
   "shareProject": "Jaa hanke",
@@ -544,6 +566,7 @@
   "saveChanges": "Tallenna muutokset",
   "saveVersion": "Tallenna versio",
   "saveInformation": "Tallenna tiedot",
+  "copyLink": "Kopioi linkki",
   "confirm": "Vahvista",
   "budgetProposalPreparation": "Talousarvioehdotusten valmistelu",
   "allocationPreparation": "Määrärahojen valmistelu",
