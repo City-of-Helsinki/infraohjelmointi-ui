@@ -30,10 +30,10 @@ export default function ConstructionHandoverContainer() {
         />
       </div>
       <div className="project-form max-w-xl pr-4" data-testid="construction-handover-form">
-        {!isConstructionHandoverStarted ? (
-          <StartConstructionHandover onStartHandover={handleStartHandover} />
-        ) : (
+        {isConstructionHandoverStarted ? (
           <ConstructionHandoverForm project={project ?? null} />
+        ) : (
+          <StartConstructionHandover onStartHandover={handleStartHandover} />
         )}
       </div>
     </div>

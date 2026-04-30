@@ -30,7 +30,7 @@ export default function ConstructionHandoverForm({
 
   function onCopyLinkClick() {
     navigator.clipboard
-      .writeText(window.location.href)
+      .writeText(globalThis.location.href)
       .then(() => {
         dispatch(
           notifySuccess({
