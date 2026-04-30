@@ -57,6 +57,7 @@ import { AppDispatch } from './store';
 import AdminForcedToFrame from './components/Admin/AdminForcedToFrame/AdminForcedToFrame';
 import { getAppStateValuesThunk } from './reducers/appStateValueSlice';
 import ProjectTalpa from './components/Project/ProjectTalpa/ProjectTalpa';
+import ConstructionHandoverContainer from './components/Project/ConstructionHandover/ConstructionHandoverContainer';
 
 const LOADING_APP_ID = 'loading-app-data';
 
@@ -171,6 +172,10 @@ const App: FC = () => {
                 <Route path="new" element={<ProjectBasics />} />
                 <Route path="notes" element={<ProjectNotes />} />
                 <Route path="talpa" element={<ProjectTalpa />} />
+                <Route
+                  path="construction-handover"
+                  element={<ConstructionHandoverContainer />}
+                />
               </Route>
               <Route path="/planning" element={<PlanningView />} />
               <Route path="/coordination" element={<PlanningView />} />

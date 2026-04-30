@@ -20,6 +20,7 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
   const onBasicsPage = location.includes('basics');
   const onNotesPage = location.includes('notes');
   const onTalpaPage = location.includes('talpa');
+  const onConstructionHandoverPage = location.includes('construction-handover');
 
   return (
     <div data-testid="tabs-list">
@@ -47,6 +48,15 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
             onClick={() => navigate('talpa')}
           >
             {t('talpa')}
+          </button>
+        )}
+        {projectMode !== 'new' && !isOnlyViewer && (
+          <button
+            role="link"
+            className={onConstructionHandoverPage ? 'buttonHighlighted' : 'button'}
+            onClick={() => navigate('construction-handover')}
+          >
+            {t('constructionHandover')}
           </button>
         )}
       </div>
