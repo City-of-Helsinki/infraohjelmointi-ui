@@ -33,6 +33,7 @@ import { AxiosError } from 'axios';
 import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { moveBudgetBackwards, moveBudgetForwards } from './financesUtils';
 import { usePatchProjectMutation, usePostProjectMutation } from '@/api/projectApi';
+import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
 
 interface IProjectFormProps {
   project: IProject | null;
@@ -277,7 +278,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
             }
             dispatch(
               notifyError({
-                message: 'formSaveError',
+                message: getProjectPatchErrorMessage(error),
                 title: 'saveError',
                 type: 'notification',
               }),
