@@ -316,7 +316,6 @@
     "riskAssessment": "Riskiarvio",
     "planningStartYear": "Suunnittelun aloitusvuosi",
     "constructionEndYear": "Rakentamisen valmistumisvuosi",
-    "phaseDetail": "Vaiheen tarkenne",
     "financial": "Hankkeen kustannustiedot",
     "masterClass": "Pääluokka",
     "class": "Luokka",
@@ -757,6 +756,7 @@
       "editItemDialogHeader": "Muokkaa arvoa valikossa",
       "deleteItemDialogHeader": "Poista arvo valikosta",
       "deleteDialogContent": "Oletko varma että haluat poistaa tämän arvon valikosta?",
+      "requiredField": "Kenttä on pakollinen",
       "inputLabel": {
         "firstName": "Etunimi",
         "lastName": "Sukunimi",

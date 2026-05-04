@@ -9,11 +9,10 @@ import {
   deleteMenuItemsThunk,
   patchMenuItemsThunk,
   postMenuItemsThunk,
-  selectLists,
 } from '@/reducers/listsSlice';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
-import { getErrorText } from '@/utils/validation';
 import { Button, ButtonVariant, Dialog, TextInput } from 'hds-react';
+import { TFunction } from 'i18next';
 import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +21,15 @@ interface ModifyMenuItemDialogProps {
   handleClose: () => void;
   dialogMessages: MenuItemDialogMessages;
 }
+
+const getFieldError = (
+  t: TFunction<'translation'>,
+  submitAttempted: boolean,
+  value: string | undefined,
+) => {
+  if (!submitAttempted) return undefined;
+  return !value ? t('adminFunctions.menus.requiredField') : undefined;
+};
 
 const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   handleClose,
@@ -33,13 +41,12 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   const { Header, Content, ActionButtons } = Dialog;
   const [menuItemName, setMenuItemName] = useState<string>('');
   const [editableItemId, setEditableItemId] = useState<string>('');
+  const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
 
   useEffect(() => {
     setMenuItemName(dialogState.value);
     setEditableItemId(dialogState.menuItemId);
   }, [dialogState]);
-
-  const error = useAppSelector(selectLists).error as IError;
 
   const onSetMenuItemName = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => setMenuItemName(e.target.value),
@@ -47,6 +54,7 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   );
 
   const onSaveMenuItemChange = useCallback(async () => {
+    setSubmitAttempted(true);
     if (!menuItemName || !dialogState.listType) return;
     try {
       if (dialogState.mode === 'edit') {
@@ -68,6 +76,7 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
         ).unwrap();
       }
       setMenuItemName('');
+      setSubmitAttempted(false);
       handleClose();
 
       dispatch(
@@ -118,15 +127,22 @@ const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
           value={menuItemName}
           onChange={onSetMenuItemName}
           data-testid={`${dialogMessages.dialogInputId}-value`}
-          errorText={getErrorText('value', error, t)}
-          invalid={getErrorText('value', error, t) !== ''}
+          errorText={getFieldError(t, submitAttempted, menuItemName)}
+          invalid={getFieldError(t, submitAttempted, menuItemName) !== undefined}
+          required
         />
       </Content>
       <ActionButtons>
         <Button onClick={onSaveMenuItemChange} data-testid="submit-menu-item-button">
           {t('save')}
         </Button>
-        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+        <Button
+          onClick={() => {
+            handleClose();
+            setSubmitAttempted(false);
+          }}
+          variant={ButtonVariant.Secondary}
+        >
           {t('cancel')}
         </Button>
       </ActionButtons>
@@ -151,6 +167,7 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   const dispatch = useAppDispatch();
   const { Header, Content, ActionButtons } = Dialog;
   const isResponsiblePersonDialog = dialogState.listType === 'responsiblePersonsRaw';
+  const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
   const [editableItemId, setEditableItemId] = useState<string>('');
   const [personTypeDialogValues, setPersonTypeDialogValues] = useState<PersonTypeDialogValues>(
     emptyPersonTypeDialogValues,
@@ -174,8 +191,6 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
     setEditableItemId(dialogState.menuItemId);
   }, [dialogState, isResponsiblePersonDialog]);
 
-  const error = useAppSelector(selectLists).error as IError;
-
   const onSetMenuItemName = useCallback(
     (value: keyof PersonTypeDialogValues, e: ChangeEvent<HTMLInputElement>) =>
       setPersonTypeDialogValues((prev) => ({
@@ -186,8 +201,8 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
   );
 
   const onSaveMenuItemChange = useCallback(async () => {
-    if (Object.values(personTypeDialogValues).every((value) => !value) || !dialogState.listType)
-      return;
+    setSubmitAttempted(true);
+    if (!Object.values(personTypeDialogValues).every(Boolean) || !dialogState.listType) return;
 
     const baseRequest = {
       firstName: personTypeDialogValues.firstName,
@@ -223,6 +238,7 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
         ).unwrap();
       }
       setPersonTypeDialogValues(emptyPersonTypeDialogValues);
+      setSubmitAttempted(false);
       handleClose();
 
       dispatch(
@@ -274,8 +290,10 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
           value={personTypeDialogValues.firstName}
           onChange={(e) => onSetMenuItemName('firstName', e)}
           data-testid={`${dialogMessages.dialogInputId}-first-name`}
-          errorText={getErrorText('value', error, t)}
-          invalid={getErrorText('value', error, t) !== ''}
+          errorText={getFieldError(t, submitAttempted, personTypeDialogValues.firstName)}
+          invalid={
+            getFieldError(t, submitAttempted, personTypeDialogValues.firstName) !== undefined
+          }
           required
         />
         <TextInput
@@ -284,8 +302,8 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
           value={personTypeDialogValues.lastName}
           onChange={(e) => onSetMenuItemName('lastName', e)}
           data-testid={`${dialogMessages.dialogInputId}-last-name`}
-          errorText={getErrorText('value', error, t)}
-          invalid={getErrorText('value', error, t) !== ''}
+          errorText={getFieldError(t, submitAttempted, personTypeDialogValues.lastName)}
+          invalid={getFieldError(t, submitAttempted, personTypeDialogValues.lastName) !== undefined}
           required
         />
         {isResponsiblePersonDialog && (
@@ -296,8 +314,11 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
               value={personTypeDialogValues.title}
               onChange={(e) => onSetMenuItemName('title', e)}
               data-testid={`${dialogMessages.dialogInputId}-title`}
-              errorText={getErrorText('value', error, t)}
-              invalid={getErrorText('value', error, t) !== ''}
+              errorText={getFieldError(t, submitAttempted, personTypeDialogValues.title)}
+              invalid={
+                getFieldError(t, submitAttempted, personTypeDialogValues.title) !== undefined
+              }
+              required={isResponsiblePersonDialog}
             />
             <TextInput
               id={`${dialogMessages.dialogInputId}-email`}
@@ -305,9 +326,11 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
               value={personTypeDialogValues.email}
               onChange={(e) => onSetMenuItemName('email', e)}
               data-testid={`${dialogMessages.dialogInputId}-email`}
-              errorText={getErrorText('value', error, t)}
-              invalid={getErrorText('value', error, t) !== ''}
-              required={dialogState.listType === 'responsiblePersonsRaw'}
+              errorText={getFieldError(t, submitAttempted, personTypeDialogValues.email)}
+              invalid={
+                getFieldError(t, submitAttempted, personTypeDialogValues.email) !== undefined
+              }
+              required={isResponsiblePersonDialog}
             />
             <TextInput
               id={`${dialogMessages.dialogInputId}-phone-number`}
@@ -315,8 +338,11 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
               value={personTypeDialogValues.phone}
               onChange={(e) => onSetMenuItemName('phone', e)}
               data-testid={`${dialogMessages.dialogInputId}-phone-number`}
-              errorText={getErrorText('value', error, t)}
-              invalid={getErrorText('value', error, t) !== ''}
+              errorText={getFieldError(t, submitAttempted, personTypeDialogValues.phone)}
+              invalid={
+                getFieldError(t, submitAttempted, personTypeDialogValues.phone) !== undefined
+              }
+              required={isResponsiblePersonDialog}
             />
           </>
         )}
@@ -325,7 +351,13 @@ const PersonTypeMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
         <Button onClick={onSaveMenuItemChange} data-testid="submit-person-type-menu-item-button">
           {t('save')}
         </Button>
-        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+        <Button
+          onClick={() => {
+            handleClose();
+            setSubmitAttempted(false);
+          }}
+          variant={ButtonVariant.Secondary}
+        >
           {t('cancel')}
         </Button>
       </ActionButtons>
