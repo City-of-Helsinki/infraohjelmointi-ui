@@ -20,22 +20,36 @@ export function usePostalCode(address: string) {
 
     let isActive = true;
 
+    const findPostalInfo = (data: {
+      features?: Array<{
+        properties?: {
+          postinumero?: string;
+          kaupunki?: string;
+        };
+      }>;
+    }) => {
+      if (data?.features && data.features.length > 0) {
+        const firstItemInListThatContainsPostalCode = data.features.find(
+          (feature: { properties?: { postinumero?: string } }) => feature?.properties?.postinumero,
+        )?.properties;
+
+        return {
+          postinumero: firstItemInListThatContainsPostalCode?.postinumero || '',
+          kaupunki: firstItemInListThatContainsPostalCode?.kaupunki || '',
+        };
+      }
+
+      return { postinumero: '', kaupunki: '' };
+    };
+
     const debounceId = globalThis.setTimeout(() => {
       fetchAddressData(address)
         .then((data) => {
-          if (!isActive) {
-            return;
-          }
+          if (!isActive) return;
 
-          if (data?.features && data.features.length > 0) {
-            const postalCode = data.features[0].properties.postinumero || '';
-            const city = data.features[0].properties.kaupunki || '';
-            setPostalCode(postalCode);
-            setCity(city);
-          } else {
-            setPostalCode('');
-            setCity('');
-          }
+          const { postinumero, kaupunki } = findPostalInfo(data);
+          setPostalCode(postinumero);
+          setCity(kaupunki);
         })
         .catch((error) => {
           if (isActive) {
