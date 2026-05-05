@@ -1,5 +1,10 @@
-import { getBestProgrammerForClass, programmerToListItem } from './projectProgrammerUtils';
+import {
+  getBestProgrammerForClass,
+  getBestProgrammerForDistrict,
+  programmerToListItem,
+} from './projectProgrammerUtils';
 import { IClass, IProgrammer } from '@/interfaces/classInterfaces';
+import { IProjectDistrictOption } from '@/interfaces/locationInterfaces';
 
 describe('projectProgrammerUtils', () => {
   describe('getBestProgrammerForClass', () => {
@@ -78,6 +83,40 @@ describe('projectProgrammerUtils', () => {
       const result = getBestProgrammerForClass(null);
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('getBestProgrammerForDistrict (IO-411)', () => {
+    it('returns computedDefaultProgrammer when the district has one', () => {
+      const option: IProjectDistrictOption = {
+        id: 'district-1',
+        value: 'Itäinen suurpiiri',
+        computedDefaultProgrammer: {
+          id: 'prog-itainen',
+          firstName: 'Tia',
+          lastName: 'Ohjelmoija',
+        },
+      };
+
+      expect(getBestProgrammerForDistrict(option)).toEqual({
+        id: 'prog-itainen',
+        firstName: 'Tia',
+        lastName: 'Ohjelmoija',
+      });
+    });
+
+    it('returns null for districts without a computed programmer', () => {
+      const option: IProjectDistrictOption = {
+        id: 'district-2',
+        value: 'Some district',
+      };
+
+      expect(getBestProgrammerForDistrict(option)).toBeNull();
+    });
+
+    it('returns null when the district is null or undefined', () => {
+      expect(getBestProgrammerForDistrict(null)).toBeNull();
+      expect(getBestProgrammerForDistrict(undefined)).toBeNull();
     });
   });
 

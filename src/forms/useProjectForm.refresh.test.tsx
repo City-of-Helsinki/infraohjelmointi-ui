@@ -31,6 +31,9 @@ jest.mock('@/hooks/useLocationOptions', () => ({
 jest.mock('@/utils/projectProgrammerUtils', () => ({
   useProjectProgrammer: () => ({
     getProgrammerForClass: jest.fn(() => null),
+    // IO-411: stubbed to null so this refresh test keeps exercising the
+    // "no auto-fill" path.
+    getProgrammerForDistrict: jest.fn(() => null),
   }),
 }));
 
