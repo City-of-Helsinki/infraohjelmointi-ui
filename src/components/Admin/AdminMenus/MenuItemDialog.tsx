@@ -1,5 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { IError } from '@/interfaces/common';
+import { useAppDispatch } from '@/hooks/common';
 import {
   DialogState,
   MenuItemDialogMessages,
@@ -28,7 +27,8 @@ const getFieldError = (
   value: string | undefined,
 ) => {
   if (!submitAttempted) return undefined;
-  return !value ? t('adminFunctions.menus.requiredField') : undefined;
+  if (value) return undefined;
+  return t('adminFunctions.menus.requiredField');
 };
 
 const AddOrEditMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
