@@ -161,6 +161,17 @@ export interface IProjectTalpaForm {
   isLocked?: boolean;
 }
 
+export interface IConstructionHandoverForm {
+  name: string; // Hankkeen nimi
+  description: string; // Hankkeen kuvaus
+  constructionProcurementMethod: IOption; // Hankintatapa
+  constructionStart: string | null; // Hankkeen aloituspäivämäärä
+  constructionEnd: string | null; // Hankkeen lopetuspäivämäärä
+  otherTimelineNotes: string; // Muut aikataulun sidoinnaisuudet ja välitavoitteet
+  personPlanning: IOption; // Suunnittelu- ja tekniset asiat
+  personFinancing: IOption; // Rahoitus- ja aikataulu
+}
+
 export interface IAppForms
   extends IProjectHeaderForm,
     IProjectForm,

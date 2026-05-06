@@ -1,11 +1,12 @@
 import { IClass, IClassFinances, IProjectClassOption } from '@/interfaces/classInterfaces';
-import { IListItem } from '@/interfaces/common';
+import { IListItem, IOption } from '@/interfaces/common';
 import { IAppForms, FormValueType, IGroupForm } from '@/interfaces/formInterfaces';
 import { TFunction } from 'i18next';
 import _ from 'lodash';
 import { IProjectFinances, IProjectRequest } from '@/interfaces/projectInterfaces';
 import { ILocation } from '@/interfaces/locationInterfaces';
 import { Option } from 'hds-react';
+import { IPerson } from '@/interfaces/personsInterfaces';
 
 type OptionGroup = { label: string; options: Option[] };
 
@@ -67,6 +68,11 @@ export const groupOptions = <T>(
 
     return groups;
   }, []);
+
+export const personToOption = (person?: IPerson): IOption => ({
+  label: person ? `${person.firstName} ${person.lastName}` : '',
+  value: person ? person.id : '',
+});
 
 export const booleanToString = (
   boolVal: boolean | undefined,
