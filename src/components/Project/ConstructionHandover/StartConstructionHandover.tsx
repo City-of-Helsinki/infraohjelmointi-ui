@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Button, ButtonVariant, Card } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 
@@ -5,9 +6,7 @@ interface IStartConstructionHandoverProps {
   onStartHandover: () => void;
 }
 
-export default function StartConstructionHandover({
-  onStartHandover,
-}: Readonly<IStartConstructionHandoverProps>) {
+function StartConstructionHandover({ onStartHandover }: Readonly<IStartConstructionHandoverProps>) {
   const { t } = useTranslation();
 
   return (
@@ -30,3 +29,5 @@ export default function StartConstructionHandover({
     </Card>
   );
 }
+
+export default memo(StartConstructionHandover);

@@ -1,17 +1,17 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { t } from 'i18next';
 import './style.css';
 import { useAppSelector } from '@/hooks/common';
 import { selectUser } from '@/reducers/authSlice';
 import { isUserOnlyViewer } from '@/utils/userRoleHelpers';
 import useTalpaLists from '@/hooks/useTalpaLists';
+import Link from '../shared/Link';
 
 interface IProjectDetailsProps {
   projectMode: 'edit' | 'new';
 }
 
 const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
-  const navigate = useNavigate();
   const location = useLocation().pathname;
   const user = useAppSelector(selectUser);
   const isOnlyViewer = isUserOnlyViewer(user);
@@ -25,39 +25,26 @@ const ProjectDetailsForm = ({ projectMode }: IProjectDetailsProps) => {
   return (
     <div data-testid="tabs-list">
       <div className="button-container">
-        <button
-          role="link"
-          className={onBasicsPage ? 'buttonHighlighted' : 'button'}
-          onClick={() => navigate('basics')}
-        >
+        <Link className={`button ${onBasicsPage ? 'buttonHighlighted' : ''}`} href="basics">
           {t('basicInfo')}
-        </button>
+        </Link>
         {projectMode !== 'new' && !isOnlyViewer && (
-          <button
-            role="link"
-            className={onNotesPage ? 'buttonHighlighted' : 'button'}
-            onClick={() => navigate('notes')}
-          >
+          <Link className={`button ${onNotesPage ? 'buttonHighlighted' : ''}`} href="notes">
             {t('notes')}
-          </button>
+          </Link>
         )}
         {projectMode !== 'new' && !isOnlyViewer && (
-          <button
-            role="link"
-            className={onTalpaPage ? 'buttonHighlighted' : 'button'}
-            onClick={() => navigate('talpa')}
-          >
+          <Link className={`button ${onTalpaPage ? 'buttonHighlighted' : ''}`} href="talpa">
             {t('talpa')}
-          </button>
+          </Link>
         )}
         {projectMode !== 'new' && !isOnlyViewer && (
-          <button
-            role="link"
-            className={onConstructionHandoverPage ? 'buttonHighlighted' : 'button'}
-            onClick={() => navigate('construction-handover')}
+          <Link
+            className={`button ${onConstructionHandoverPage ? 'buttonHighlighted' : ''}`}
+            href="construction-handover"
           >
             {t('constructionHandover')}
-          </button>
+          </Link>
         )}
       </div>
 

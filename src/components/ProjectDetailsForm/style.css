@@ -9,14 +9,13 @@
 }
 
 .button {
-  height: 100%;
-  padding: 13px 27px 11px;
-  color: var(--color-bus);
+  display: inline-block;
+  padding: 11px 27px;
+  color: var(--color-bus) !important;
+  text-decoration: none;
 }
 
 .buttonHighlighted {
-  height: 100%;
-  padding: 13px 33px 11px;
-  color: var(--color-bus);
-  border-bottom: 5px solid var(--color-bus);
+  border: none;
+  border-bottom: 5px solid var(--color-bus) !important;
 }

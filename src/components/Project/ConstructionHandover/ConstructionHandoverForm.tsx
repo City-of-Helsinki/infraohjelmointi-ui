@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FieldPath, FormProvider } from 'react-hook-form';
 import NameAndDescriptionSection from './NameAndDescriptionSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
@@ -21,9 +22,7 @@ interface IConstructionHandoverFormProps {
   project: IProject | null;
 }
 
-export default function ConstructionHandoverForm({
-  project,
-}: Readonly<IConstructionHandoverFormProps>) {
+function ConstructionHandoverForm({ project }: Readonly<IConstructionHandoverFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const formMethods = useConstructionHandoverForm(project);
@@ -76,3 +75,5 @@ export default function ConstructionHandoverForm({
     </FormProvider>
   );
 }
+
+export default memo(ConstructionHandoverForm);
