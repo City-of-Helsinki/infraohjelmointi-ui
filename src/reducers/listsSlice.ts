@@ -124,6 +124,37 @@ const getResponsiblePersons = async () => {
   }
 };
 
+const toResponsiblePersonsListItems = (persons: Array<IPerson>): Array<IListItem> =>
+  sortOptions(
+    persons.map(({ firstName, lastName, id }) => ({
+      value: `${lastName} ${firstName}`,
+      id,
+    })),
+  );
+
+const toProgrammersListItems = (programmers: Array<IPerson>): Array<IListItem> =>
+  programmers
+    .filter(
+      ({ firstName, lastName }) =>
+        firstName?.trim() &&
+        lastName?.trim() &&
+        !(firstName === 'Ei' && lastName === 'Valintaa'),
+    )
+    .map(({ id, firstName, lastName }) => ({
+      id,
+      value: `${firstName} ${lastName}`.trim(),
+    }));
+
+const syncDerivedPersonLists = (state: IListState, listType: ReorderableListType) => {
+  if (listType === 'responsiblePersonsRaw') {
+    state.responsiblePersons = toResponsiblePersonsListItems(state.responsiblePersonsRaw);
+  }
+
+  if (listType === 'programmersRaw') {
+    state.programmers = toProgrammersListItems(state.programmersRaw);
+  }
+};
+
 export const getProjectDistricts = (
   districts: IProjectDistrict[],
   districtLevel: string,
@@ -159,12 +190,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       planningPhases: await getPlanningPhases(),
       constructionPhases: await getConstructionPhases(),
       responsibleZones: await getResponsibleZones(),
-      responsiblePersons: sortOptions(
-        persons.map(({ firstName, lastName, id }) => ({
-          value: `${lastName} ${firstName}`,
-          id,
-        })),
-      ),
+      responsiblePersons: toResponsiblePersonsListItems(persons),
       responsiblePersonsRaw: persons,
       programmedYears: setProgrammedYears(),
       projectDistricts: getProjectDistricts(districts, 'district'),
@@ -234,7 +260,10 @@ export const deleteMenuItemsThunk = createAsyncThunk(
   async (thunkContent: MenuItemDeleteThunkContent, thunkAPI) => {
     try {
       await deleteMenuListItem(thunkContent.path, thunkContent.id);
-      thunkContent.dispatch(deleteRow({ listType: thunkContent.listType, rowId: thunkContent.id }));
+      return {
+        listType: thunkContent.listType,
+        rowId: thunkContent.id,
+      };
     } catch (e) {
       return thunkAPI.rejectWithValue(e);
     }
@@ -324,6 +353,8 @@ export const listsSlice = createSlice({
         ...newItem,
         order: list.length,
       });
+
+      syncDerivedPersonLists(state, listType);
     });
     builder.addCase(patchMenuItemsThunk.fulfilled, (state, action) => {
       const { listType } = action.meta.arg;
@@ -333,6 +364,18 @@ export const listsSlice = createSlice({
 
       if (index !== -1) {
         state[listType][index] = updatedItem;
+        syncDerivedPersonLists(state, listType);
+      }
+    });
+    builder.addCase(deleteMenuItemsThunk.fulfilled, (state, action) => {
+      const { listType, rowId } = action.payload;
+
+      const list = state[listType];
+      const index = list.findIndex((row: { id: string }) => row.id === rowId);
+
+      if (index !== -1) {
+        list.splice(index, 1);
+        syncDerivedPersonLists(state, listType);
       }
     });
     // GET TALPA LISTS

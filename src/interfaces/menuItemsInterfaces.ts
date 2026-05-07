@@ -1,5 +1,4 @@
 import { IListState } from '@/reducers/listsSlice';
-import { AppDispatch } from '@/store';
 
 const ADMIN_MENUS_MENU_TYPE = [
   'categories',
@@ -114,7 +113,6 @@ interface MenuItemPostThunkContent {
 }
 
 interface MenuItemDeleteThunkContent {
-  dispatch: AppDispatch;
   path: string;
   id: string;
   listType: ReorderableListType;
