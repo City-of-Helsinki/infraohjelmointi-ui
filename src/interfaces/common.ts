@@ -101,3 +101,5 @@ export interface ICoordinatorRequestParams {
   forcedToFrame: boolean;
   year: number;
 }
+
+export type DialogMode = 'add' | 'edit' | 'delete';

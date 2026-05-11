@@ -1,4 +1,6 @@
 import { IListItem } from './common';
+import { AppDispatch } from '@/store';
+import { DialogMode } from './menuItemsInterfaces';
 import { IPerson } from './personsInterfaces';
 
 export enum ConstructionHandoverStatus {
@@ -47,4 +49,27 @@ export interface IConstructionHandoverPatchRequest {
 export interface IConstructionHandoverTransitionResponse {
   currentStatus: ConstructionHandoverStatus;
   possibleTransitions: ConstructionHandoverStatus[];
+}
+export interface FinancingDialogState {
+  open: boolean;
+  mode: DialogMode;
+  itemId: string;
+  values?: FinancingRowValues;
+}
+
+export interface FinancingRowValues {
+  financer: string;
+  budgetItem: string;
+  projectNumber: string;
+  budget: string;
+  id: string;
+}
+
+export interface FinancingRowPostAndPatchThunkContent {
+  request: FinancingRowValues;
+}
+
+export interface FinancingRowDeleteThunkContent {
+  dispatch: AppDispatch;
+  id: string;
 }

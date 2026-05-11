@@ -19,6 +19,7 @@ import {
   IConstructionHandoverRequest,
 } from '@/interfaces/constructionHandoverInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
+import FinancingSection from './FinancingSection/FinancingSection';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -120,6 +121,7 @@ function ConstructionHandoverForm({
       <form onSubmit={handleSubmit(submitForm)}>
         <NameAndDescriptionSection />
         <ScheduleSection />
+        <FinancingSection />
         <ContactsSection />
 
         <div className="project-form-banner">

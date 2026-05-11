@@ -437,7 +437,22 @@
     "toStatus": {
       "SUBMITTED_TO_PROGRAMMER": "ohjelmoijalle",
       "SUBMITTED_TO_CONSTRUCTION": "rakentamiselle"
-    }
+    },
+    "financingSection": {
+      "title": "Hankkeen rahoitus",
+      "addRow": "Lisää rahoitusrivi",
+      "closeDialogButton": "Takaisin",
+      "deleteDialogContent": "Haluatko varmasti poistaa tämän rahoitusrivin?",
+      "deleteDialogTitle": "Poista rahoitusrivi",
+      "editDialogTitle": "Muokkaa rahoitusriviä",
+      "addDialogTitle": "Lisää rahoitusrivi",
+      "tableEmptyText": "Ei rahoitustietoja",
+      "label": {
+        "financer": "Rahoittava taho",
+        "budgetItem": "Talousarviokohta",
+        "projectNumber": "Projektinumero",
+        "budget": "Budjetti"
+      }
   },
   "notification": {
     "title": {
@@ -503,6 +518,8 @@
       "postSuccess": "Lisäys onnistui",
       "deleteSuccess": "Arvon poistaminen onnistui",
       "deleteError": "Arvon poistaminen epäonnistui",
+      "rowDeleteSuccess": "Rivin poistaminen onnistui",
+      "rowDeleteError": "Rivin poistaminen epäonnistui",
       "addMenuItemSuccess": "Uusi arvo lisätty valikkoon onnistuneesti",
       "editMenuItemSuccess": "Arvon muokkaus onnistui",
       "deleteMenuItemSuccess": "Arvon poistaminen onnistui",
