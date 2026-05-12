@@ -387,7 +387,6 @@ const DeleteMenuItemDialog: FC<ModifyMenuItemDialogProps> = ({
           path: dialogState.path,
           id: deletableItemId,
           listType: dialogState.listType,
-          dispatch: dispatch,
         }),
       ).unwrap();
       handleClose();
