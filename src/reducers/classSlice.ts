@@ -29,6 +29,11 @@ interface IClassUpdatePayload {
   type: 'coordination' | 'planning' | 'forcedToFrame';
 }
 
+interface ICoordinatorClassUpdatePayload {
+  data: IClass | null;
+  type: 'coordination' | 'forcedToFrame';
+}
+
 const initialClasses = {
   allClasses: [],
   masterClasses: [],
@@ -156,42 +161,42 @@ export const classSlice = createSlice({
         return { ...state, [type]: { ...state[type], subClasses } };
       }
     },
-    updateCollectiveSubLevel(state, action: PayloadAction<IClass | null>) {
-      const data = action.payload;
+    updateCollectiveSubLevel(state, action: PayloadAction<ICoordinatorClassUpdatePayload>) {
+      const { data, type } = action.payload;
 
       if (data) {
-        const collectiveSubLevels = [...state.coordination.collectiveSubLevels].map((csl) =>
+        const collectiveSubLevels = [...state[type].collectiveSubLevels].map((csl) =>
           csl.id === data.id ? data : csl,
         );
         return {
           ...state,
-          coordination: { ...state.coordination, collectiveSubLevels },
+          [type]: { ...state[type], collectiveSubLevels },
         };
       }
     },
-    updateOtherClassification(state, action: PayloadAction<IClass | null>) {
-      const data = action.payload;
+    updateOtherClassification(state, action: PayloadAction<ICoordinatorClassUpdatePayload>) {
+      const { data, type } = action.payload;
       if (data) {
-        const otherClassifications = [...state.coordination.otherClassifications].map((oc) =>
+        const otherClassifications = [...state[type].otherClassifications].map((oc) =>
           oc.id === data.id ? data : oc,
         );
         return {
           ...state,
-          coordination: { ...state.coordination, otherClassifications },
+          [type]: { ...state[type], otherClassifications },
         };
       }
     },
-    updateOtherClassificationSubLevel(state, action: PayloadAction<IClass | null>) {
-      const data = action.payload;
+    updateOtherClassificationSubLevel(state, action: PayloadAction<ICoordinatorClassUpdatePayload>) {
+      const { data, type } = action.payload;
 
       if (data) {
         const otherClassificationSubLevels = [
-          ...state.coordination.otherClassificationSubLevels,
+          ...state[type].otherClassificationSubLevels,
         ].map((ocsl) => (ocsl.id === data.id ? data : ocsl));
         return {
           ...state,
-          coordination: {
-            ...state.coordination,
+          [type]: {
+            ...state[type],
             otherClassificationSubLevels,
           },
         };
