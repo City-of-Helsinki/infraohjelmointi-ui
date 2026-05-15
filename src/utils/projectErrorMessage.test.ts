@@ -43,4 +43,12 @@ describe('getProjectPatchErrorMessage', () => {
     const error = { data: { hkrId: PW_PROJECT_NOT_FOUND_CODE } };
     expect(getProjectPatchErrorMessage(error)).toBe('formSaveError');
   });
+
+  it('matches when the PW code is present but not first in the array', () => {
+    const error = {
+      status: 400,
+      data: { hkrId: ['SOME_OTHER_CODE', PW_PROJECT_NOT_FOUND_CODE] },
+    };
+    expect(getProjectPatchErrorMessage(error)).toBe('pwProjectNotFound');
+  });
 });
