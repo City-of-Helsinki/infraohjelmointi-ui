@@ -161,3 +161,20 @@ export const isSameOrBefore = (start?: string | null, end?: string | null) => {
   }
   return true;
 };
+
+/**
+ * Formats a date string to HDS format if possible, otherwise returns null
+ */
+export const formatDateToHds = (date?: string | null) => {
+  if (!date) {
+    return null;
+  }
+
+  const parsed = moment(date, ['YYYY-MM-DD', 'DD.MM.YYYY'], true);
+  if (parsed.isValid()) {
+    return parsed.format('DD.MM.YYYY');
+  }
+
+  const fallback = moment(date);
+  return fallback.isValid() ? fallback.format('DD.MM.YYYY') : null;
+};

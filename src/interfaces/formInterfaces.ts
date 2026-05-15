@@ -162,6 +162,7 @@ export interface IProjectTalpaForm {
 }
 
 export interface IConstructionHandoverForm {
+  id?: string;
   name: string; // Hankkeen nimi
   description: string; // Hankkeen kuvaus
   constructionProcurementMethod: IOption; // Hankintatapa

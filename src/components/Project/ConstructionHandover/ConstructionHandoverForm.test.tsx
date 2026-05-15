@@ -5,6 +5,13 @@ import { Route } from 'react-router';
 import { act } from 'react-dom/test-utils';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import ConstructionHandoverForm from './ConstructionHandoverForm';
+import { createConstructionHandover, createProject } from '@/mocks/createMocks';
+
+const mockPatchConstructionHandover = jest.fn();
+
+jest.mock('@/api/constructionHandoverApi', () => ({
+  usePatchConstructionHandoverMutation: () => [mockPatchConstructionHandover],
+}));
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -32,9 +39,16 @@ jest.mock('hds-react', () => {
 
 describe('ConstructionHandoverForm copy link', () => {
   it('copies to clipboard and dispatches success notification when copy button is clicked', async () => {
+    const constructionHandover = createConstructionHandover();
+
     const { store } = await act(async () =>
       renderWithProviders(
-        <Route path="/" element={<ConstructionHandoverForm project={null} />} />,
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
+          }
+        />,
       ),
     );
 
@@ -65,9 +79,16 @@ describe('ConstructionHandoverForm copy link', () => {
   });
 
   it('dispatches error notification when clipboard write fails', async () => {
+    const constructionHandover = createConstructionHandover();
+
     const { store } = await act(async () =>
       renderWithProviders(
-        <Route path="/" element={<ConstructionHandoverForm project={null} />} />,
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
+          }
+        />,
       ),
     );
 
@@ -96,5 +117,90 @@ describe('ConstructionHandoverForm copy link', () => {
     });
 
     writeTextSpy.mockRestore();
+  });
+});
+
+describe('ConstructionHandoverForm submit', () => {
+  beforeEach(() => {
+    mockPatchConstructionHandover.mockClear();
+  });
+
+  it('submits form and calls patch mutation with mapped payload', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+    });
+    const project = createProject({ id: 'project-123' });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm
+              project={project}
+              constructionHandover={constructionHandover}
+            />
+          }
+        />,
+      ),
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith({
+        id: 'handover-1',
+        data: {
+          name: 'Test Handover',
+          description: 'This is a test construction handover.',
+          constructionProcurementMethod: '',
+          constructionStart: '01.01.2026',
+          constructionEnd: '01.02.2026',
+          otherTimelineNotes: '',
+          personPlanning: '',
+          personFinancing: '',
+          project: 'project-123',
+          totalCost: null,
+          linkDesignDrawings: null,
+          linkCostAllocation: null,
+          linkContractBoundaries: null,
+          constructionProjectManager: null,
+        },
+      });
+    });
+  });
+
+  it('does not submit when project is missing', async () => {
+    const constructionHandover = createConstructionHandover();
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
+          }
+        />,
+      ),
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
+    });
   });
 });

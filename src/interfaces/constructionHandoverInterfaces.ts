@@ -1,3 +1,4 @@
+import { IListItem } from './common';
 import { IPerson } from './personsInterfaces';
 
 export enum ConstructionHandoverStatus {
@@ -14,7 +15,7 @@ export interface IConstructionHandover {
   status: ConstructionHandoverStatus;
   name: string | null;
   description: string | null;
-  constructionProcurementMethod: string | null;
+  constructionProcurementMethod: IListItem | null;
   constructionStart: string | null;
   constructionEnd: string | null;
   otherTimelineNotes: string;
@@ -25,4 +26,20 @@ export interface IConstructionHandover {
   linkCostAllocation: string | null;
   linkContractBoundaries: string | null;
   constructionProjectManager: IPerson | null;
+}
+
+export interface IConstructionHandoverRequest
+  extends Omit<
+    IConstructionHandover,
+    'id' | 'status' | 'constructionProcurementMethod' | 'personPlanning' | 'personFinancing'
+  > {
+  project: string;
+  constructionProcurementMethod: string;
+  personPlanning: string;
+  personFinancing: string;
+}
+
+export interface IConstructionHandoverPatchRequest {
+  id: string;
+  data: IConstructionHandoverRequest;
 }
