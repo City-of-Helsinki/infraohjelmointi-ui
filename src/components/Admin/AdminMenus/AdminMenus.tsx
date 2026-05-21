@@ -3,7 +3,7 @@ import './styles.css';
 import AdminMenusSideNavigation from './AdminMenusSideNavigation';
 import AdminMenusCard from './AdminMenusCard';
 import { menuCardItems } from './menuCardItems';
-import AddOrEditMenuItemDialog from './AddOrEditMenuItemDialog';
+import MenuItemDialog from './MenuItemDialog';
 import {
   DialogState,
   PersonTypeDialogValues,
@@ -48,15 +48,15 @@ const AdminMenus = () => {
     open: false,
     mode: 'add',
     value: '',
-    editableItemId: '',
+    menuItemId: '',
     path: '',
     listType: undefined,
-    personTypeDialogValues: undefined,
+    personTypeDialogValues: {},
   });
 
   const handleEdit = (
     value: string,
-    editableItemId: string,
+    menuItemId: string,
     path: string,
     listType: ReorderableListType,
     personTypeDialogValues?: PersonTypeDialogValues,
@@ -65,10 +65,26 @@ const AdminMenus = () => {
       open: true,
       mode: 'edit',
       value,
-      editableItemId,
+      menuItemId,
       path,
       listType,
       personTypeDialogValues,
+    });
+  };
+
+  const handleDelete = (
+    value: string,
+    menuItemId: string,
+    path: string,
+    listType: ReorderableListType,
+  ) => {
+    setDialogState({
+      open: true,
+      mode: 'delete',
+      value,
+      menuItemId,
+      path,
+      listType,
     });
   };
 
@@ -78,7 +94,7 @@ const AdminMenus = () => {
       mode: 'add',
       value: '',
       path,
-      editableItemId: '',
+      menuItemId: '',
       listType,
     });
   };
@@ -89,9 +105,9 @@ const AdminMenus = () => {
       open: false,
       value: '',
       path: '',
-      editableItemId: '',
+      menuItemId: '',
       listType: undefined,
-      personTypeDialogValues: undefined,
+      personTypeDialogValues: {},
     });
   };
 
@@ -108,11 +124,12 @@ const AdminMenus = () => {
               key={card.listType}
               onEditMenuItem={handleEdit}
               onAddMenuItem={handleAdd}
+              onDeleteMenuItem={handleDelete}
             />
           );
         })}
       </div>
-      <AddOrEditMenuItemDialog dialogState={dialogState} handleClose={handleClose} />
+      <MenuItemDialog dialogState={dialogState} handleClose={handleClose} />
     </div>
   );
 };

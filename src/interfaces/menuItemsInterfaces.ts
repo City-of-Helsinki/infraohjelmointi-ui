@@ -5,7 +5,7 @@ const ADMIN_MENUS_MENU_TYPE = [
   'types',
   'programs',
   'phases',
-  'constructionPhaseDetails',
+  'projectPhaseDetails',
   'constructionProcurementMethods',
   'staraProcurementReasons',
   'projectQualityLevels',
@@ -23,7 +23,7 @@ type ReorderableListType = keyof Pick<
   IListState,
   | 'types'
   | 'phases'
-  | 'constructionPhaseDetails'
+  | 'projectPhaseDetails'
   | 'constructionProcurementMethods'
   | 'staraProcurementReasons'
   | 'categories'
@@ -46,22 +46,16 @@ interface MenuItemDialogMessages {
   closeButtonLabelText: string;
   dialogHeader: string;
   dialogInputId: string;
-  firstNameInputLabel: string;
-  lastNameInputLabel: string;
-  emailInputLabel: string;
-  phoneNumberInputLabel: string;
-  valueInputLabel: string;
-  titleInputLabel: string;
 }
 
-type DialogMode = 'add' | 'edit';
+type DialogMode = 'add' | 'edit' | 'delete';
 
 interface DialogState {
   open: boolean;
   mode: DialogMode;
   value: string;
   path: string;
-  editableItemId: string;
+  menuItemId: string;
   personTypeDialogValues?: PersonTypeDialogValues;
   listType?: ReorderableListType;
 }
@@ -78,7 +72,13 @@ interface AdminMenusCardProps {
   listType: ReorderableListType;
   onEditMenuItem: (
     value: string,
-    editableItemId: string,
+    menuItemId: string,
+    path: string,
+    listType: ReorderableListType,
+  ) => void;
+  onDeleteMenuItem: (
+    value: string,
+    menuItemId: string,
     path: string,
     listType: ReorderableListType,
   ) => void;
@@ -112,6 +112,12 @@ interface MenuItemPostThunkContent {
   listType: ReorderableListType;
 }
 
+interface MenuItemDeleteThunkContent {
+  path: string;
+  id: string;
+  listType: ReorderableListType;
+}
+
 interface PersonTypeMenuItemRequest {
   firstName?: string;
   lastName?: string;
@@ -139,15 +145,22 @@ interface MoveRowPayload {
   direction: 'up' | 'down';
 }
 
+interface DeleteRowPayload {
+  listType: ReorderableListType;
+  rowId: string;
+}
+
 export { ADMIN_MENUS_MENU_TYPE };
 export type {
   AdminMenusCardProps,
   AdminMenusMenuType,
   MenuItemDialogMessages,
+  DeleteRowPayload,
   DialogMode,
   DialogState,
   IAdminMenuOrderCellProps,
   MenuItemRequest,
+  MenuItemDeleteThunkContent,
   PersonTypeMenuItemRequest,
   PersonTypeMenuItemPatchThunkContent,
   PersonTypeMenuItemPostThunkContent,

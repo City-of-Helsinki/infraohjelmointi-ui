@@ -47,13 +47,14 @@ export interface IListItem {
   index?: number;
   order?: number;
   parent?: string;
+  projectPhase?: IListItem;
 }
 
 export type ListType =
   | 'types'
   | 'typeQualifiers'
   | 'phases'
-  | 'phaseDetails'
+  | 'projectPhaseDetails'
   | 'categories'
   | 'masterClasses'
   | 'classes'
@@ -63,7 +64,6 @@ export type ListType =
   | 'subDivisions'
   | 'responsibleZones'
   | 'responsiblePersons'
-  | 'constructionPhaseDetails'
   | 'constructionProcurementMethods'
   | 'staraProcurementReasons'
   | 'projectQualityLevels'

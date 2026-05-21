@@ -1,27 +1,32 @@
 import { FC, useCallback } from 'react';
-import { IconArrowDown, IconArrowUp, IconPen } from 'hds-react';
+import { IconArrowDown, IconArrowUp, IconPen, IconTrash } from 'hds-react';
 import {
   IAdminMenuOrderCellProps,
   PersonTypeDialogValues,
   ReorderableListType,
 } from '@/interfaces/menuItemsInterfaces';
-import { moveRow, saveTableOrderThunk } from '@/reducers/listsSlice';
+import { moveRow, saveTableOrderThunk, revertRowOrder } from '@/reducers/listsSlice';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useTranslation } from 'react-i18next';
+import { RootState } from '@/store';
+import { useStore } from 'react-redux';
 
 const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, rowLength, id }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const store = useStore();
   const isFirstRow = rowIndex === 0;
   const isLastRow = rowIndex === rowLength - 1;
 
   const onMoveAndSaveRow = useCallback(
     async (rowId: string, direction: 'up' | 'down') => {
-      try {
-        dispatch(moveRow({ listType, rowId, direction }));
-        await dispatch(saveTableOrderThunk({ listType, path })).unwrap();
+      const previousRows = (store.getState() as RootState).lists[listType];
 
+      dispatch(moveRow({ listType, rowId, direction }));
+
+      try {
+        await dispatch(saveTableOrderThunk({ listType, path })).unwrap();
         dispatch(
           notifySuccess({
             message: t('reorderSuccess'),
@@ -31,6 +36,7 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
           }),
         );
       } catch {
+        dispatch(revertRowOrder({ listType, rows: previousRows }));
         dispatch(
           notifyError({
             message: t('reorderError'),
@@ -41,7 +47,7 @@ const OrderCell: FC<IAdminMenuOrderCellProps> = ({ rowIndex, path, listType, row
         );
       }
     },
-    [dispatch, listType, path, t],
+    [dispatch, store, listType, path, t],
   );
 
   return (
@@ -97,4 +103,34 @@ const EditCell: FC<IAdminMenuEditCellProps> = ({
   );
 };
 
-export { EditCell, OrderCell };
+interface IAdminMenuDeleteCellProps {
+  onDeleteMenuItem: (
+    value: string,
+    id: string,
+    path: string,
+    listType: ReorderableListType,
+  ) => void;
+  value: string;
+  path: string;
+  id: string;
+  listType: ReorderableListType;
+}
+
+const DeleteCell: FC<IAdminMenuDeleteCellProps> = ({
+  onDeleteMenuItem,
+  value,
+  id,
+  path,
+  listType,
+}) => {
+  return (
+    <button
+      onClick={() => onDeleteMenuItem(value, id, path, listType)}
+      data-testid={`admin-menus-delete-button-id-${id}`}
+    >
+      <IconTrash />
+    </button>
+  );
+};
+
+export { DeleteCell, EditCell, OrderCell };

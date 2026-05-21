@@ -80,26 +80,53 @@ export const mockProjectPhases: { data: Array<IListItem> } = {
       id: '6e21081e-2bb4-4cc4-87e1-01440c50bab9',
       value: 'completed',
     },
+    {
+      id: 'a1b2c3d4-mock-construction-prep',
+      value: 'constructionPreparation',
+    },
+    {
+      id: 'a1b2c3d4-mock-suspended',
+      value: 'suspended',
+    },
   ],
 };
 
-export const mockConstructionPhaseDetails: { data: Array<IListItem> } = {
+export const mockProjectPhaseDetails: { data: Array<IListItem> } = {
   data: [
     {
       id: '4f9f98f1-0bec-4cf4-b09f-208521d2b70d',
       value: 'preConstruction',
+      projectPhase: { id: 'c874452e-aaac-4fe8-927a-e7dd0ba182f2', value: 'construction' },
     },
     {
       id: '57903f81-15ff-46ff-b55e-b74c4a833af8',
       value: 'firstPhase',
+      projectPhase: { id: 'c874452e-aaac-4fe8-927a-e7dd0ba182f2', value: 'construction' },
     },
     {
       id: 'e73a7646-83d2-4256-bb69-c7dca2d7b269',
       value: 'firstPhaseComplete',
+      projectPhase: { id: 'c874452e-aaac-4fe8-927a-e7dd0ba182f2', value: 'construction' },
     },
     {
       id: '04b350dd-dd7a-44f6-bfe4-20a5715173ea',
       value: 'secondPhase',
+      projectPhase: { id: 'c874452e-aaac-4fe8-927a-e7dd0ba182f2', value: 'construction' },
+    },
+    {
+      id: 'a1b2c3d4-mock-programming-1',
+      value: 'waitingProjectManager',
+      projectPhase: { id: 'f99bcf35-c1f4-4624-8ddc-e3dbf6d5f2dc', value: 'programming' },
+    },
+    {
+      id: 'a1b2c3d4-mock-programming-2',
+      value: 'waitingPlanningStart',
+      projectPhase: { id: 'f99bcf35-c1f4-4624-8ddc-e3dbf6d5f2dc', value: 'programming' },
+    },
+    {
+      id: 'a1b2c3d4-mock-constructionWait-1',
+      value: 'waitingFunding',
+      projectPhase: { id: '741cdfd3-ecd1-48dc-9d01-560deee400c5', value: 'constructionWait' },
     },
   ],
 };

@@ -2,7 +2,7 @@ import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch, Control } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
-import { listItemToOption } from '@/utils/common';
+import { listItemToOption, personToOption } from '@/utils/common';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IListItem, IOption } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
@@ -14,7 +14,6 @@ import {
 } from '@/reducers/classSlice';
 import useClassOptions from '@/hooks/useClassOptions';
 import useLocationOptions from '@/hooks/useLocationOptions';
-import { IPerson } from '@/interfaces/personsInterfaces';
 import {
   selectProjectDistricts,
   selectProjectDivisions,
@@ -122,11 +121,6 @@ const useProjectFormValues = (project: IProject | null) => {
     [districts, divisions, subDivisions, getSelectedLocation],
   );
 
-  const personToOption = (person?: IPerson): IOption => ({
-    label: person ? `${person.firstName} ${person.lastName}` : '',
-    value: person ? person.id : '',
-  });
-
   const formValues: IProjectForm = useMemo(
     () => ({
       type: listItemToOption(project?.type),
@@ -148,7 +142,7 @@ const useProjectFormValues = (project: IProject | null) => {
       visibilityEnd: value(project?.visibilityEnd),
       phase: listItemToOption(project?.phase),
       programmed: project?.programmed ?? false,
-      constructionPhaseDetail: listItemToOption(project?.constructionPhaseDetail),
+      phaseDetail: listItemToOption(project?.phaseDetail),
       constructionProcurementMethod: listItemToOption(project?.constructionProcurementMethod),
       staraProcurementReason: listItemToOption(project?.staraProcurementReason),
       louhi: project?.louhi ?? false,
@@ -236,26 +230,40 @@ const useProjectForm = (project: IProject | null) => {
 
   const locationOptions = useLocationOptions(selections?.selectedLocation);
 
-  // Get class-based programmer logic
-  const { getProgrammerForClass } = useProjectProgrammer();
+  const { getProgrammerForClass, getProgrammerForDistrict } = useProjectProgrammer();
 
-  // Set the default programmer based on class hierarchy
+  /**
+   * Pre-fill personProgramming from the current class / district pick when
+   * the field is empty. Resolution order mirrors ProjectCreateSerializer:
+   * class chain first, then district chain (IO-411). Skipping when the
+   * field already has a value preserves a user's manual pick.
+   */
   const setDefaultProgrammerForClassHierarchy = useCallback(
     (masterClassId?: string, classId?: string, subClassId?: string) => {
-      // Use the most specific class ID (backend handles hierarchy via computedDefaultProgrammer)
+      const currentForm = getValues();
+
+      if (currentForm.personProgramming?.value) {
+        return;
+      }
+
       const mostSpecificClassId = subClassId || classId || masterClassId;
-      const defaultProgrammer = getProgrammerForClass(mostSpecificClassId);
+      const mostSpecificDistrictId =
+        currentForm.subDivision?.value ||
+        currentForm.division?.value ||
+        currentForm.district?.value;
+
+      const defaultProgrammer =
+        getProgrammerForClass(mostSpecificClassId) ||
+        getProgrammerForDistrict(mostSpecificDistrictId);
 
       if (defaultProgrammer) {
-        // Convert the programmer to an option format
-        const programmerOption = {
+        setValue('personProgramming', {
           value: defaultProgrammer.id,
           label: defaultProgrammer.value,
-        };
-        setValue('personProgramming', programmerOption);
+        });
       }
     },
-    [getProgrammerForClass, setValue],
+    [getProgrammerForClass, getProgrammerForDistrict, getValues, setValue],
   );
 
   // Set the selected class and empty the other selected classes if a parent class is selected
@@ -351,12 +359,8 @@ const useProjectForm = (project: IProject | null) => {
   // when creating a new project
   useEffect(() => {
     if (projectMode === 'new') {
-      if (postalCode) {
-        setValue('postalCode', postalCode, { shouldDirty: true });
-      }
-      if (city) {
-        setValue('city', city, { shouldDirty: true });
-      }
+      setValue('postalCode', postalCode, { shouldDirty: !!postalCode });
+      setValue('city', city, { shouldDirty: !!city });
     }
   }, [postalCode, city, projectMode, setValue]);
 

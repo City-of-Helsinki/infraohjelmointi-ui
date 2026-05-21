@@ -15,7 +15,7 @@ import {
 } from '@/reducers/planningSlice';
 import { removeHoveredClassFromMonth, setHoveredClassToMonth } from '@/utils/common';
 import { patchCoordinationClass } from '@/services/classServices';
-import { IClassPatchRequest } from '@/interfaces/classInterfaces';
+import { IClass, IClassPatchRequest } from '@/interfaces/classInterfaces';
 import useOnClickOutsideRef from '@/hooks/useOnClickOutsideRef';
 import './styles.css';
 import useNumberInput from '@/hooks/useNumberInput';
@@ -25,6 +25,16 @@ import { isUserCoordinator } from '@/utils/userRoleHelpers';
 import { formattedNumberToNumber } from '@/utils/calculations';
 import { getGroupSapCurrentYearByYear } from '@/reducers/sapCostSlice';
 import { clearLoading, setLoading } from '@/reducers/loaderSlice';
+import {
+  updateClass,
+  updateCollectiveSubLevel,
+  updateMasterClass,
+  updateOtherClassification,
+  updateOtherClassificationSubLevel,
+  updateSubClass,
+} from '@/reducers/classSlice';
+import { updateDistrict } from '@/reducers/locationSlice';
+import { ILocation } from '@/interfaces/locationInterfaces';
 
 import { CoordinatorNotesModal } from '@/components/CoordinatorNotesModal';
 import { IconAlertCircle, IconSpeechbubble, IconSpeechbubbleText } from 'hds-react';
@@ -131,14 +141,60 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
       },
     };
 
+    const reduxViewType = forcedToFrame ? 'forcedToFrame' : 'coordination';
+
+    const updateCellState = (updatedData: IClass | ILocation) => {
+      switch (type) {
+        case 'masterClass':
+          dispatch(updateMasterClass({ data: updatedData as IClass, type: reduxViewType }));
+          break;
+        case 'class':
+          dispatch(updateClass({ data: updatedData as IClass, type: reduxViewType }));
+          break;
+        case 'subClass':
+          dispatch(updateSubClass({ data: updatedData as IClass, type: reduxViewType }));
+          break;
+        case 'collectiveSubLevel':
+          dispatch(updateCollectiveSubLevel({ data: updatedData as IClass, type: reduxViewType }));
+          break;
+        case 'otherClassification':
+          dispatch(updateOtherClassification({ data: updatedData as IClass, type: reduxViewType }));
+          break;
+        case 'otherClassificationSubLevel':
+          dispatch(
+            updateOtherClassificationSubLevel({ data: updatedData as IClass, type: reduxViewType }),
+          );
+          break;
+        case 'district':
+        case 'districtPreview':
+        case 'subLevelDistrict':
+          dispatch(updateDistrict({ data: updatedData as ILocation, type: reduxViewType }));
+          break;
+        default:
+          break;
+      }
+    };
+
     if (type === 'district' || type === 'districtPreview' || type === 'subLevelDistrict') {
-      patchCoordinationLocation(request).finally(() => {
-        dispatch(clearLoading(UPDATE_CELL_DATA));
-      });
+      patchCoordinationLocation(request)
+        .then((updatedLocation) => {
+          if (updatedLocation) {
+            updateCellState(updatedLocation);
+          }
+        })
+        .finally(() => {
+          dispatch(clearLoading(UPDATE_CELL_DATA));
+        });
     } else {
-      patchCoordinationClass(request).finally(() => {
-        dispatch(clearLoading(UPDATE_CELL_DATA));
-      });
+      patchCoordinationClass(request)
+        .then((updatedClass) => {
+          if (updatedClass) {
+            updateCellState(updatedClass);
+          }
+        })
+        .finally(() => {
+          dispatch(clearLoading(UPDATE_CELL_DATA));
+        });
     }
   };
 
@@ -152,8 +208,8 @@ const PlanningCell: FC<IPlanningCellProps> = ({ type, id, cell, name }) => {
   );
 
   const isEditFrameBudgetDisabled = useMemo(
-    () => !isUserCoordinator(user) || mode !== 'coordination' || forcedToFrame,
-    [forcedToFrame, mode, user],
+    () => !isUserCoordinator(user) || mode !== 'coordination',
+    [mode, user],
   );
 
   const totalBudgetTooltipType = type === 'group' ? 'group' : 'class';

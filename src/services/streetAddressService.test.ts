@@ -31,14 +31,12 @@ describe('fetchAddressData', () => {
     expect(result).toEqual({ features: [] });
   });
 
-  it('falls back to street number 1 when no trailing digits exist', async () => {
+  it('does not return search param for street number when no trailing digits exist', async () => {
     const jsonMock = jest.fn().mockResolvedValue({ features: [{ id: 1 }] });
     (globalThis.fetch as unknown as jest.Mock).mockResolvedValue({ json: jsonMock });
 
     const address = 'Testikuja 5B';
-    const expectedUrl =
-      `${baseUrl}&CQL_FILTER=((katunimi%20ILIKE%20%27Testikuja%25%27%20OR%20gatan%20ILIKE%20%27Testikuja%25%27)` +
-      `AND(osoitenumero=%271%27))`;
+    const expectedUrl = `${baseUrl}&CQL_FILTER=((katunimi%20ILIKE%20%27Testikuja%25%27%20OR%20gatan%20ILIKE%20%27Testikuja%25%27))`;
 
     const result = await fetchAddressData(address);
 

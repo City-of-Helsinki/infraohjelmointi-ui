@@ -1,13 +1,13 @@
 import { IListItem } from '@/interfaces/common';
 import { IClass } from '@/interfaces/classInterfaces';
-import { IProjectDistrict } from '@/interfaces/locationInterfaces';
+import { IProjectDistrict, IProjectDistrictOption } from '@/interfaces/locationInterfaces';
 import {
   getConstructionPhases,
   getPlanningPhases,
   getProjectPhases,
   getProjectQualityLevels,
   getProjectTypes,
-  getConstructionPhaseDetails,
+  getProjectPhaseDetails,
   getConstructionProcurementMethods,
   getProjectCategories,
   getResponsibleZones,
@@ -26,6 +26,7 @@ import {
   postMenuListItem,
   putMenuListOrder,
   getRawProgrammers,
+  deleteMenuListItem,
 } from '@/services/listServices';
 import { RootState } from '@/store';
 import { setProgrammedYears } from '@/utils/common';
@@ -38,18 +39,21 @@ import {
 } from '@/interfaces/talpaInterfaces';
 import { IPerson } from '@/interfaces/personsInterfaces';
 import {
+  DeleteRowPayload,
+  MenuItemDeleteThunkContent,
   MenuItemPatchThunkContent,
   MenuItemPostThunkContent,
   MoveRowPayload,
   PersonTypeMenuItemPatchThunkContent,
   PersonTypeMenuItemPostThunkContent,
+  ReorderableListType,
 } from '@/interfaces/menuItemsInterfaces';
 
 export interface IListState {
   types: Array<IListItem>;
   typeQualifiers: Array<IListItem>;
   phases: Array<IListItem>;
-  constructionPhaseDetails: Array<IListItem>;
+  projectPhaseDetails: Array<IListItem>;
   constructionProcurementMethods: Array<IListItem>;
   staraProcurementReasons: Array<IListItem>;
   categories: Array<IListItem>;
@@ -60,9 +64,9 @@ export interface IListState {
   responsiblePersons: Array<IListItem>;
   responsiblePersonsRaw: Array<IPerson>;
   programmedYears: Array<IListItem>;
-  projectDistricts: Array<IListItem>;
-  projectDivisions: Array<IListItem>;
-  projectSubDivisions: Array<IListItem>;
+  projectDistricts: Array<IProjectDistrictOption>;
+  projectDivisions: Array<IProjectDistrictOption>;
+  projectSubDivisions: Array<IProjectDistrictOption>;
   budgetOverrunReasons: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
@@ -79,7 +83,7 @@ const initialState: IListState = {
   types: [],
   typeQualifiers: [],
   phases: [],
-  constructionPhaseDetails: [],
+  projectPhaseDetails: [],
   constructionProcurementMethods: [],
   staraProcurementReasons: [],
   categories: [],
@@ -105,8 +109,9 @@ const initialState: IListState = {
   error: null,
 };
 
-// Sorting the list of responsible persons by value which has the person name with lastname first
-export const sortOptions = (persons: Array<IListItem>) =>
+// Sorting the list of responsible persons by value which has the person name with lastname first.
+// Generic so widened options (e.g. IProjectDistrictOption) keep their extra fields.
+export const sortOptions = <T extends IListItem>(persons: Array<T>): Array<T> =>
   [...persons].sort((a, b) => (a.value < b.value ? -1 : a.value > b.value ? 1 : 0));
 
 const getResponsiblePersons = async () => {
@@ -119,13 +124,52 @@ const getResponsiblePersons = async () => {
   }
 };
 
-export const getProjectDistricts = (districts: IProjectDistrict[], districtLevel: string) => {
+const toResponsiblePersonsListItems = (persons: Array<IPerson>): Array<IListItem> =>
+  sortOptions(
+    persons.map(({ firstName, lastName, id }) => ({
+      value: `${lastName} ${firstName}`,
+      id,
+    })),
+  );
+
+const toProgrammersListItems = (programmers: Array<IPerson>): Array<IListItem> =>
+  programmers
+    .filter(
+      ({ firstName, lastName }) =>
+        firstName?.trim() &&
+        lastName?.trim() &&
+        !(firstName === 'Ei' && lastName === 'Valintaa'),
+    )
+    .map(({ id, firstName, lastName }) => ({
+      id,
+      value: `${firstName} ${lastName}`.trim(),
+    }));
+
+const syncDerivedPersonLists = (state: IListState, listType: ReorderableListType) => {
+  if (listType === 'responsiblePersonsRaw') {
+    state.responsiblePersons = toResponsiblePersonsListItems(state.responsiblePersonsRaw);
+  }
+
+  if (listType === 'programmersRaw') {
+    state.programmers = toProgrammersListItems(state.programmersRaw);
+  }
+};
+
+export const getProjectDistricts = (
+  districts: IProjectDistrict[],
+  districtLevel: string,
+): IProjectDistrictOption[] => {
   const filtered = districts.filter(({ level }) => level == districtLevel);
-  const mapped = filtered.map(({ id, name, parent }) => ({
-    value: name,
-    id,
-    ...(parent && { parent: parent }),
-  }));
+  // IO-411: keep computedDefaultProgrammer on the option so the project form
+  // can pre-fill Ohjelmoija directly from the district chain.
+  const mapped: IProjectDistrictOption[] = filtered.map(
+    ({ id, name, parent, computedDefaultProgrammer }) => ({
+      value: name,
+      id,
+      ...(parent && { parent }),
+      ...(computedDefaultProgrammer && { computedDefaultProgrammer }),
+    }),
+  );
   return sortOptions(mapped);
 };
 
@@ -138,7 +182,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       types: await getProjectTypes(),
       typeQualifiers: await getProjectTypeQualifiers(),
       phases: await getProjectPhases(),
-      constructionPhaseDetails: await getConstructionPhaseDetails(),
+      projectPhaseDetails: await getProjectPhaseDetails(),
       constructionProcurementMethods: await getConstructionProcurementMethods(),
       staraProcurementReasons: await getStaraProcurementReasons(),
       categories: await getProjectCategories(),
@@ -146,12 +190,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       planningPhases: await getPlanningPhases(),
       constructionPhases: await getConstructionPhases(),
       responsibleZones: await getResponsibleZones(),
-      responsiblePersons: sortOptions(
-        persons.map(({ firstName, lastName, id }) => ({
-          value: `${lastName} ${firstName}`,
-          id,
-        })),
-      ),
+      responsiblePersons: toResponsiblePersonsListItems(persons),
       responsiblePersonsRaw: persons,
       programmedYears: setProgrammedYears(),
       projectDistricts: getProjectDistricts(districts, 'district'),
@@ -216,6 +255,21 @@ export const postMenuItemsThunk = createAsyncThunk(
   },
 );
 
+export const deleteMenuItemsThunk = createAsyncThunk(
+  'listItem/delete',
+  async (thunkContent: MenuItemDeleteThunkContent, thunkAPI) => {
+    try {
+      await deleteMenuListItem(thunkContent.path, thunkContent.id);
+      return {
+        listType: thunkContent.listType,
+        rowId: thunkContent.id,
+      };
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  },
+);
+
 export const saveTableOrderThunk = createAsyncThunk(
   'listItem/saveOrder',
   async (
@@ -260,6 +314,22 @@ export const listsSlice = createSlice({
         row.order = idx;
       });
     },
+    revertRowOrder: (
+      state,
+      action: PayloadAction<{ listType: ReorderableListType; rows: IListItem[] | IPerson[] }>,
+    ) => {
+      const { listType, rows } = action.payload;
+      Object.assign(state, { [listType]: rows });
+    },
+    deleteRow: (state, action: PayloadAction<DeleteRowPayload>) => {
+      const { listType, rowId } = action.payload;
+      const list = state[listType];
+
+      const index = list.findIndex((row: { id: string }) => row.id === rowId);
+      if (index === -1) return;
+
+      list.splice(index, 1);
+    },
   },
   extraReducers: (builder) => {
     // GET All LISTS
@@ -283,6 +353,8 @@ export const listsSlice = createSlice({
         ...newItem,
         order: list.length,
       });
+
+      syncDerivedPersonLists(state, listType);
     });
     builder.addCase(patchMenuItemsThunk.fulfilled, (state, action) => {
       const { listType } = action.meta.arg;
@@ -292,6 +364,18 @@ export const listsSlice = createSlice({
 
       if (index !== -1) {
         state[listType][index] = updatedItem;
+        syncDerivedPersonLists(state, listType);
+      }
+    });
+    builder.addCase(deleteMenuItemsThunk.fulfilled, (state, action) => {
+      const { listType, rowId } = action.payload;
+
+      const list = state[listType];
+      const index = list.findIndex((row: { id: string }) => row.id === rowId);
+
+      if (index !== -1) {
+        list.splice(index, 1);
+        syncDerivedPersonLists(state, listType);
       }
     });
     // GET TALPA LISTS
@@ -322,6 +406,6 @@ export const selectTalpaServiceClasses = (state: RootState) => state.lists.talpa
 export const selectTalpaAssetClasses = (state: RootState) => state.lists.talpaAssetClasses;
 export const selectLists = (state: RootState) => state.lists;
 
-export const { moveRow } = listsSlice.actions;
+export const { deleteRow, moveRow, revertRowOrder } = listsSlice.actions;
 
 export default listsSlice.reducer;

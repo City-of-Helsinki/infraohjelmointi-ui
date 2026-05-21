@@ -30,7 +30,7 @@ const mockProject: { data: IProject } = {
       value: 'street',
     },
     phase: {
-      id: '5572f4e5-fdf7-434f-9467-2605912004fc',
+      id: 'f99bcf35-c1f4-4624-8ddc-e3dbf6d5f2dc',
       value: 'programming',
     },
     personPlanning: {
@@ -63,10 +63,12 @@ const mockProject: { data: IProject } = {
       id: '8b614fbe-bb41-4d66-9efc-bdba3d0d943a',
       value: 'K1',
     },
-    constructionPhaseDetail: {
-      id: '9df21c80-7ed0-4ac0-830c-dae5d1d675b9',
-      value: 'preConstruction',
+    phaseDetail: {
+      id: 'a1b2c3d4-mock-programming-1',
+      value: 'waitingProjectManager',
     },
+    suspendedDate: null,
+    suspendedFromPhase: null,
     constructionProcurementMethod: {
       id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
       value: 'Stara',

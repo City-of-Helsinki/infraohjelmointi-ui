@@ -18,7 +18,9 @@ export interface IProject {
   description: string;
   phase: IListItem;
   programmed: boolean;
-  constructionPhaseDetail: IListItem;
+  phaseDetail: IListItem;
+  suspendedDate: string | null;
+  suspendedFromPhase: IListItem | null;
   constructionProcurementMethod: IListItem;
   staraProcurementReason: IListItem;
   estPlanningStart: string | null;
@@ -136,7 +138,7 @@ export interface IProjectRequest {
   presenceEnd?: string;
   visibilityStart?: string;
   visibilityEnd?: string;
-  constructionPhaseDetail?: string | null;
+  phaseDetail?: string | null;
   constructionProcurementMethod?: string | null;
   louhi?: boolean;
   programmed?: boolean;
@@ -227,6 +229,8 @@ export enum ProjectPhase {
   Construction = 'construction',
   WarrantyPeriod = 'warrantyPeriod',
   Completed = 'completed',
+  ConstructionPreparation = 'constructionPreparation',
+  Suspended = 'suspended',
 }
 
 export enum ProjectArea {

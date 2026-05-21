@@ -39,9 +39,9 @@ export const getProjectPhases = async () => {
   }
 };
 
-export const getConstructionPhaseDetails = async () => {
+export const getProjectPhaseDetails = async () => {
   try {
-    const res = await axios.get(`${REACT_APP_API_URL}/construction-phase-details/`);
+    const res = await axios.get(`${REACT_APP_API_URL}/project-phase-details/`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
@@ -219,6 +219,14 @@ export const patchMenuListItem = async (
   try {
     const res = await axios.patch(`${REACT_APP_API_URL}/${path}/${itemId}/`, request);
     return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const deleteMenuListItem = async (path: string, itemId: string) => {
+  try {
+    await axios.delete(`${REACT_APP_API_URL}/${path}/${itemId}/`);
   } catch (e) {
     return Promise.reject(e);
   }

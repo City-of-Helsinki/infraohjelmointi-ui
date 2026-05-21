@@ -218,9 +218,9 @@ const useUpdateEvents = () => {
           dispatch(updateMasterClass({ data: coordination.masterClass, type })),
           dispatch(updateClass({ data: coordination.class, type })),
           dispatch(updateSubClass({ data: coordination.subClass, type })),
-          dispatch(updateCollectiveSubLevel(coordination.collectiveSubLevel)),
-          dispatch(updateOtherClassification(coordination.otherClassification)),
-          dispatch(updateOtherClassificationSubLevel(coordination.otherClassificationSubLevel)),
+          dispatch(updateCollectiveSubLevel({ data: coordination.collectiveSubLevel, type })),
+          dispatch(updateOtherClassification({ data: coordination.otherClassification, type })),
+          dispatch(updateOtherClassificationSubLevel({ data: coordination.otherClassificationSubLevel, type })),
           dispatch(updateGroup({ data: coordination.group, type })),
           dispatch(updateDistrict({ data: coordination.district, type })),
         ]).catch((e) => console.log('Error updating coordination finances: ', e));
@@ -237,9 +237,9 @@ const useUpdateEvents = () => {
           dispatch(updateMasterClass({ data: forcedToFrame.masterClass, type })),
           dispatch(updateClass({ data: forcedToFrame.class, type })),
           dispatch(updateSubClass({ data: forcedToFrame.subClass, type })),
-          dispatch(updateCollectiveSubLevel(forcedToFrame.collectiveSubLevel)),
-          dispatch(updateOtherClassification(forcedToFrame.otherClassification)),
-          dispatch(updateOtherClassificationSubLevel(forcedToFrame.otherClassificationSubLevel)),
+          dispatch(updateCollectiveSubLevel({ data: forcedToFrame.collectiveSubLevel, type })),
+          dispatch(updateOtherClassification({ data: forcedToFrame.otherClassification, type })),
+          dispatch(updateOtherClassificationSubLevel({ data: forcedToFrame.otherClassificationSubLevel, type })),
           dispatch(updateDistrict({ data: forcedToFrame.district, type })),
         ]).catch((e) => console.log('Error updating forced to frame finances: ', e));
       }

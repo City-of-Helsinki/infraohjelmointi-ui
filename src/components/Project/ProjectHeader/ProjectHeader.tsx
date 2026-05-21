@@ -112,6 +112,16 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
                 <div>{projectHeaderPhaseString}</div>
               </div>
             )}
+            {project?.phase?.value === 'suspended' && project?.suspendedDate && (
+              <div className="project-header-suspended-message">
+                {t('projectHeader.suspendedMessage', {
+                  phase: project?.suspendedFromPhase
+                    ? t(`option.${project.suspendedFromPhase.value}`)
+                    : '-',
+                  date: new Date(project.suspendedDate + 'T00:00:00').toLocaleDateString('fi-FI'),
+                })}
+              </div>
+            )}
           </div>
         </div>
         <div className="mr-3 flex-1" data-testid="project-header-right">
