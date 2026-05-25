@@ -1,7 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { listItemToOption, personToOption } from '@/utils/common';
-import { IConstructionHandover } from '@/interfaces/constructionHandoverInterfaces';
+import {
+  ConstructionHandoverStatus,
+  IConstructionHandover,
+} from '@/interfaces/constructionHandoverInterfaces';
 import { formatDateToHds } from '@/utils/dates';
 
 function useConstructionHandoverFormValues(
@@ -27,6 +30,7 @@ export default function useConstructionHandoverForm(constructionHandover: IConst
 
   const formMethods = useForm<IConstructionHandoverForm>({
     values: formValues,
+    disabled: constructionHandover.status !== ConstructionHandoverStatus.DRAFT,
   });
 
   return formMethods;

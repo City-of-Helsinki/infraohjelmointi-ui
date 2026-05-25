@@ -1,9 +1,11 @@
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
+  ConstructionHandoverStatus,
   IConstructionHandover,
   IConstructionHandoverPatchRequest,
 } from '@/interfaces/constructionHandoverInterfaces';
 import { notifySuccess } from '@/reducers/notificationSlice';
+import { t } from 'i18next';
 
 export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
   endpoints: (build) => ({
@@ -53,6 +55,32 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
       }),
       invalidatesTags: ['ConstructionHandovers'],
     }),
+    transitionConstructionHandoverStatus: build.mutation<
+      IConstructionHandover,
+      { id: string; to: ConstructionHandoverStatus }
+    >({
+      query: ({ id, to }) => ({
+        url: `/construction-handovers/${id}/transitions/`,
+        method: 'POST',
+        data: { to },
+      }),
+      async onQueryStarted({ to }, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(
+            notifySuccess({
+              title: 'statusTransitionSuccess',
+              message: 'constructionHandoverStatusTransitionSuccess',
+              parameter: t(`constructionHandoverForm.toStatus.${to}`),
+              type: 'toast',
+            }),
+          );
+        } catch (error) {
+          console.error('Error transitioning construction handover status: ', error);
+        }
+      },
+      invalidatesTags: ['ConstructionHandovers'],
+    }),
   }),
 });
 
@@ -61,4 +89,5 @@ export const {
   usePostConstructionHandoverMutation,
   usePatchConstructionHandoverMutation,
   useDeleteConstructionHandoverMutation,
+  useTransitionConstructionHandoverStatusMutation,
 } = constructionHandoverApi;

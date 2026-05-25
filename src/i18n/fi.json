@@ -424,13 +424,19 @@
     "contacts": "Yhteyshenkilöt",
     "personPlanning": "Suunnittelu ja tekniset asiat",
     "personFinancing": "Rahoitus ja aikataulu",
-    "saveDraft": "Tallenna luonnoksena ",
+    "saveDraft": "Tallenna luonnoksena",
+    "submitToProgrammer": "Siirrä ohjelmoijalle",
+    "submitToConstruction": "Siirrä rakentamiselle",
     "status": {
       "draft": "Luonnos",
       "submittedToProgrammer": "Siirretty ohjelmoijalle",
       "submittedToConstruction": "Siirretty rakennuttajalle",
       "projectManagerNamed": "Projektipäällikkö nimetty",
       "movedToConstructionPreparation": "Siirretty rakentamisen valmisteluun"
+    },
+    "toStatus": {
+      "SUBMITTED_TO_PROGRAMMER": "ohjelmoijalle",
+      "SUBMITTED_TO_CONSTRUCTION": "rakentamiselle"
     }
   },
   "notification": {
@@ -465,7 +471,8 @@
       "update": "Päivitys",
       "updateSuccessful": "Tietojen siirto onnistui",
       "sessionExpired": "Istunto vanhentunut",
-      "linkCopied": "Linkki kopioitu"
+      "linkCopied": "Linkki kopioitu",
+      "statusTransitionSuccess": "Siirretty onnistuneesti"
     },
     "message": {
       "projectUpdated": "Hankkeen tietoja päivitettiin",
@@ -479,6 +486,7 @@
       "talpaProjectPostSuccess": "Projektin avauspyyntö-excel luotu onnistuneesti.",
       "talpaProjectPatchSuccess": "Projektin avauspyyntö-excel muokattu onnistuneesti.",
       "constructionHandoverPatchSuccess": "Rakennuttamiseen siirron luonnos muokattu onnistuneesti.",
+      "constructionHandoverStatusTransitionSuccess": "Siirretty {{parameter}} onnistuneesti",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
       "Request failed with status code 401": "Pyyntö epäonnistui virhekoodilla 401",
       "Request failed with status code 403": "Pyyntö epäonnistui virhekoodilla 403",
