@@ -1,5 +1,7 @@
 import { IProject } from '@/interfaces/projectInterfaces';
 import {
+  checkGroupHasBudgets,
+  checkProjectHasBudgets,
   convertToGroupValues,
   frameBudgetHandler,
   getIsGroupOnSchedule,
@@ -7,6 +9,7 @@ import {
   isProjectOnSchedule,
 } from './reportHelpers';
 import { createListItem, createProject, createSapCost } from '@/mocks/createMocks';
+import { IConstructionProgramTableRow, Reports } from '@/interfaces/reportInterfaces';
 
 jest.mock('i18next', () => ({
   t: (key: string) => key,
@@ -547,6 +550,112 @@ describe('reportHelpers', () => {
         ];
 
         expect(getIsGroupOnSchedule(projects)).toBe('option.false');
+      });
+    });
+  });
+
+  // IO-896: items funded only in window years +1/+2 (not Plus0) appeared in the
+  // planning report but were dropped from the forced-to-frame report, because
+  // the forced-to-frame budget check only looked at Plus0. Both reports must
+  // now use the full three-window-year check; the forecast report stays
+  // current-year-only.
+  describe('forced-to-frame budget checks (IO-896)', () => {
+    const budgetCheck = (
+      type: Reports,
+      plus0: string,
+      plus1: string,
+      plus2: string,
+    ) => ({
+      budgetProposalCurrentYearPlus0: plus0,
+      budgetProposalCurrentYearPlus1: plus1,
+      budgetProposalCurrentYearPlus2: plus2,
+      forcedToFrameProject: undefined,
+      type,
+    });
+
+    const groupRow = (
+      plus0: string,
+      plus1: string,
+      plus2: string,
+    ): IConstructionProgramTableRow =>
+      ({
+        id: 'g1',
+        name: 'Group',
+        parent: null,
+        children: [],
+        projects: [],
+        type: 'groupWithValues',
+        budgetProposalCurrentYearPlus0: plus0,
+        budgetProposalCurrentYearPlus1: plus1,
+        budgetProposalCurrentYearPlus2: plus2,
+        costForcedToFrameBudget: undefined,
+      } as unknown as IConstructionProgramTableRow);
+
+    describe('checkProjectHasBudgets', () => {
+      it('keeps a forced-to-frame project funded only in +2 (regression)', () => {
+        expect(
+          checkProjectHasBudgets(
+            budgetCheck(Reports.ConstructionProgramForcedToFrame, '0,0', '0,0', '200,0'),
+          ),
+        ).toBeTruthy();
+      });
+
+      it('keeps a forced-to-frame project funded only in +1', () => {
+        expect(
+          checkProjectHasBudgets(
+            budgetCheck(Reports.ConstructionProgramForcedToFrame, '0,0', '1900,0', '0,0'),
+          ),
+        ).toBeTruthy();
+      });
+
+      it('drops a forced-to-frame project with no budget in any window year', () => {
+        expect(
+          checkProjectHasBudgets(
+            budgetCheck(Reports.ConstructionProgramForcedToFrame, '0,0', '0,0', '0,0'),
+          ),
+        ).toBeFalsy();
+      });
+
+      it('matches the planning report for the same finances', () => {
+        const finances: [string, string, string] = ['0,0', '0,0', '200,0'];
+        expect(
+          checkProjectHasBudgets(
+            budgetCheck(Reports.ConstructionProgram, ...finances),
+          ),
+        ).toBeTruthy();
+        expect(
+          checkProjectHasBudgets(
+            budgetCheck(Reports.ConstructionProgramForcedToFrame, ...finances),
+          ),
+        ).toBeTruthy();
+      });
+
+      it('leaves the forecast report current-year-only', () => {
+        expect(
+          checkProjectHasBudgets(
+            budgetCheck(Reports.ConstructionProgramForecast, '0,0', '1900,0', '200,0'),
+          ),
+        ).toBeFalsy();
+      });
+    });
+
+    describe('checkGroupHasBudgets', () => {
+      it('keeps a forced-to-frame group funded only in +1/+2 (regression)', () => {
+        expect(
+          checkGroupHasBudgets(
+            groupRow('0,0', '1900,0', '2000,0'),
+            Reports.ConstructionProgramForcedToFrame,
+          ),
+        ).toBeTruthy();
+      });
+
+      it('drops a forced-to-frame group with no budget in any window year', () => {
+        expect(
+          checkGroupHasBudgets(
+            groupRow('0,0', '0,0', '0,0'),
+            Reports.ConstructionProgramForcedToFrame,
+          ),
+        ).toBeFalsy();
       });
     });
   });
