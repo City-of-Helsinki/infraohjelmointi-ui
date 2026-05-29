@@ -14,4 +14,4 @@ jobs:
     with:
       node-version: 22.x
       extra-commands: |
-        cp .env.template .env
+        echo "CI=false" >> $GITHUB_ENV
