@@ -35,9 +35,7 @@ export const useProjectPhaseValidation = ({
   const proposalPhase = findPhase('proposal');
   const designPhase = findPhase('design');
   const programmedPhase = findPhase('programming');
-  const draftInitiationPhase = findPhase('draftInitiation');
-  const draftApprovalPhase = findPhase('draftApproval');
-  const constructionPlanPhase = findPhase('constructionPlan');
+  const planningPhase = findPhase('designPlanning');
   const constructionWaitPhase = findPhase('constructionWait');
   const constructionPreparationPhase = findPhase('constructionPreparation');
   const constructionPhase = findPhase('construction');
@@ -83,9 +81,7 @@ export const useProjectPhaseValidation = ({
             fields = fieldsIfEmpty([...programmedRequirements], project);
             if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail'], project));
             break;
-          case draftInitiationPhase:
-          case draftApprovalPhase:
-          case constructionPlanPhase:
+          case planningPhase:
           case constructionWaitPhase:
             fields = fieldsIfEmpty([...programmedRequirements, ...planningRequirements], project);
             if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail'], project));
@@ -124,9 +120,7 @@ export const useProjectPhaseValidation = ({
       proposalPhase,
       designPhase,
       programmedPhase,
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
+      planningPhase,
       constructionWaitPhase,
       constructionPreparationPhase,
       constructionPhase,

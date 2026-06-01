@@ -445,9 +445,11 @@ export const enum IconKey {
   Proposal = 'proposal',
   Design = 'design',
   Programming = 'programming',
-  DraftInitiation = 'draftInitiation',
-  DraftApproval = 'draftApproval',
-  ConstructionPlan = 'constructionPlan',
+  // IO-863: the three former planning phases (draftInitiation, draftApproval,
+  // constructionPlan) were merged into one "Suunnittelu" phase; the tarkenne now
+  // tells the user which planning sub-step a project is in. Value is `designPlanning`
+  // (not `planning`) to avoid colliding with the existing option.planning i18n key.
+  Planning = 'designPlanning',
   ConstructionWait = 'constructionWait',
   Construction = 'construction',
   WarrantyPeriod = 'warrantyPeriod',
@@ -469,15 +471,20 @@ export const mapIconKey = (type: string): IconKey => {
     case 'programming':
     case 'Ohjelmointi':
       return IconKey.Programming;
+    // IO-863: the `planning` ("Suunnittelu") phase and all its tarkenne share
+    // one icon. The old planning-phase values/labels are kept so any stale data
+    // still maps cleanly.
+    case 'designPlanning':
+    case 'Suunnittelu':
     case 'draftInitiation':
+    case 'Katu- ja puistosuunnittelu':
     case 'Katu- ja puistosuunnittelun aloitus/suunnitelmaluonnos':
-      return IconKey.DraftInitiation;
     case 'draftApproval':
     case 'Katu-/puistosuunnitelmaehdotus ja hyväksyminen':
-      return IconKey.DraftApproval;
     case 'constructionPlan':
     case 'Rakennussuunnitelma':
-      return IconKey.ConstructionPlan;
+    case 'Rakennussuunnittelu':
+      return IconKey.Planning;
     case 'constructionWait':
     case 'Odottaa rakentamista':
       return IconKey.ConstructionWait;
@@ -489,12 +496,14 @@ export const mapIconKey = (type: string): IconKey => {
       return IconKey.WarrantyPeriod;
     case 'completed':
     case 'Valmis / ylläpidossa':
+    case 'Valmis / kunnossapidossa':
       return IconKey.Completed;
     case 'constructionPreparation':
     case 'Rakentamisen valmistelu':
       return IconKey.ConstructionPreparation;
     case 'suspended':
     case 'Keskeytetty':
+    case 'Keskeytetty toistaiseksi':
       return IconKey.Suspended;
     default:
       return IconKey.Programming;

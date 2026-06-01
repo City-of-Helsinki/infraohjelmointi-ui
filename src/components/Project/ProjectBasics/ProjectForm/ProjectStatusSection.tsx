@@ -127,9 +127,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const proposalPhase = phaseByValue('proposal');
   const designPhase = phaseByValue('design');
   const programmedPhase = phaseByValue('programming');
-  const draftInitiationPhase = phaseByValue('draftInitiation');
-  const draftApprovalPhase = phaseByValue('draftApproval');
-  const constructionPlanPhase = phaseByValue('constructionPlan');
+  const planningPhase = phaseByValue('designPlanning');
   const constructionWaitPhase = phaseByValue('constructionWait');
   const constructionPreparationPhase = phaseByValue('constructionPreparation');
   const constructionPhase = phaseByValue('construction');
@@ -193,9 +191,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               fields.push(...fieldsIfEmpty([...programmedRequirements]));
               if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
               break;
-            case draftInitiationPhase:
-            case draftApprovalPhase:
-            case constructionPlanPhase:
+            case planningPhase:
             case constructionWaitPhase:
               fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
               if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
@@ -252,9 +248,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       currentPhase,
       phasesWithIndexes,
       programmedPhase,
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
+      planningPhase,
       constructionWaitPhase,
       constructionPreparationPhase,
       constructionPhase,

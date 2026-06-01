@@ -32,13 +32,37 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
 
   const phases = useOptions('phases');
 
+  // IO-863: the validators below compare against getValues('phase').value, which is
+  // the phase *id*. So resolve these phase-value sets to their option ids via the
+  // option label (listItemToOption maps label = phase value, value = phase id).
+  // This replaces fragile index slicing (slice(3,…) / slice(7,…)) that broke when the
+  // three planning phases were merged into one `planning` phase.
   const phasesThatNeedPlanning = useMemo(
-    () => phases?.slice(3, phases.length - 1).map(({ value }) => value),
+    () =>
+      phases
+        .filter((p) =>
+          [
+            'designPlanning',
+            'constructionWait',
+            'constructionPreparation',
+            'construction',
+            'warrantyPeriod',
+            'completed',
+          ].includes(p.label),
+        )
+        .map((p) => p.value),
     [phases],
   );
 
   const phasesThatNeedConstruction = useMemo(
-    () => phases?.slice(7, phases.length - 1).map(({ value }) => value),
+    () =>
+      phases
+        .filter((p) =>
+          ['constructionPreparation', 'construction', 'warrantyPeriod', 'completed'].includes(
+            p.label,
+          ),
+        )
+        .map((p) => p.value),
     [phases],
   );
 

@@ -999,7 +999,7 @@ describe('PlanningView', () => {
       it('can patch the project phase with the custom context menu', async () => {
         const project = mockPlanningViewProjects.data.results[1];
         const phasesAsOptions = mockProjectPhases.data.map((p) => listItemToOption(p));
-        const preferredPhaseLabel = 'draftInitiation';
+        const preferredPhaseLabel = 'designPlanning';
         const targetPhaseOption =
           phasesAsOptions.find((option) => option.label === preferredPhaseLabel) ??
           phasesAsOptions.find((option) => option.value !== project.phase?.id) ??
