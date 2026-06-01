@@ -463,6 +463,7 @@
       "projectUpdated": "Hankkeen tietoja päivitettiin",
       "formSaveSuccess": "Lomake tallennettu onnistuneesti.",
       "formSaveError": "Lomakkeen tallennus ei onnistunut.",
+      "pwProjectNotFound": "Hankekortille merkittyä PW-hanketunnusta ei löydy – poista tai muokkaa PW-hanketunnus.",
       "projectCreatingError": "Uuden hankkeen luominen epäonnistui.",
       "formFillError": "Pakollisia kenttiä puuttuu.",
       "noteAddedToClass": "Muistiinpano lisätty luokkaan {{parameter}}",

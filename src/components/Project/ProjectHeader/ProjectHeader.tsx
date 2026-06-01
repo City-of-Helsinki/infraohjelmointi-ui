@@ -13,6 +13,7 @@ import { selectPlanningGroups } from '@/reducers/groupSlice';
 import { notifyError } from '@/reducers/notificationSlice';
 import optionIcon from '@/utils/optionIcon';
 import { usePatchProjectMutation } from '@/api/projectApi';
+import { getProjectPatchErrorMessage } from '@/utils/projectErrorMessage';
 
 export interface IProjectHeaderFieldProps {
   control: HookFormControlType;
@@ -70,7 +71,7 @@ const ProjectHeader: FC<IProjectHeaderProps> = ({ project }) => {
             dispatch(setIsSaving(false));
             dispatch(
               notifyError({
-                message: 'formSaveError',
+                message: getProjectPatchErrorMessage(error),
                 title: 'saveError',
                 type: 'notification',
               }),
