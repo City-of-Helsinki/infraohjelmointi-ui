@@ -5,7 +5,7 @@ import { Route } from 'react-router';
 import { act } from 'react-dom/test-utils';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import ConstructionHandoverForm from './ConstructionHandoverForm';
-import { createConstructionHandover, createProject } from '@/mocks/createMocks';
+import { createConstructionHandover } from '@/mocks/createMocks';
 import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 
 const mockPatchConstructionHandover = jest.fn();
@@ -51,9 +51,7 @@ describe('ConstructionHandoverForm copy link', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -91,9 +89,7 @@ describe('ConstructionHandoverForm copy link', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -136,18 +132,12 @@ describe('ConstructionHandoverForm submit', () => {
       constructionStart: '2026-01-01',
       constructionEnd: '2026-02-01',
     });
-    const project = createProject({ id: 'project-123' });
 
     await act(async () =>
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm
-              project={project}
-              constructionHandover={constructionHandover}
-            />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -170,14 +160,12 @@ describe('ConstructionHandoverForm submit', () => {
           constructionStart: '01.01.2026',
           constructionEnd: '01.02.2026',
           otherTimelineNotes: '',
-          personPlanning: '',
-          personFinancing: '',
-          project: 'project-123',
+          personPlanning: 'person-1',
+          personFinancing: 'person-2',
           totalCost: null,
           linkDesignDrawings: null,
           linkCostAllocation: null,
           linkContractBoundaries: null,
-          constructionProjectManager: null,
         },
       });
     });
@@ -190,9 +178,7 @@ describe('ConstructionHandoverForm submit', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -216,18 +202,12 @@ describe('ConstructionHandoverForm submit', () => {
       constructionEnd: '2026-02-01',
       totalCost: 75000,
     });
-    const project = createProject({ id: 'project-456' });
 
     await act(async () =>
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm
-              project={project}
-              constructionHandover={constructionHandover}
-            />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -257,18 +237,12 @@ describe('ConstructionHandoverForm submit', () => {
       constructionEnd: '2026-02-01',
       totalCost: null,
     });
-    const project = createProject({ id: 'project-789' });
 
     await act(async () =>
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm
-              project={project}
-              constructionHandover={constructionHandover}
-            />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -298,18 +272,12 @@ describe('ConstructionHandoverForm submit', () => {
       constructionEnd: '2026-02-01',
       totalCost: Number.NaN,
     });
-    const project = createProject({ id: 'project-999' });
 
     await act(async () =>
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm
-              project={project}
-              constructionHandover={constructionHandover}
-            />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -339,18 +307,12 @@ describe('ConstructionHandoverForm submit', () => {
       constructionEnd: '2026-02-01',
       totalCost: null,
     });
-    const project = createProject({ id: 'project-1000' });
 
     await act(async () =>
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm
-              project={project}
-              constructionHandover={constructionHandover}
-            />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -400,12 +362,7 @@ describe('ConstructionHandoverForm financing rows', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm
-              project={createProject()}
-              constructionHandover={constructionHandover}
-            />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -432,9 +389,7 @@ describe('ConstructionHandoverForm status transitions', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -458,9 +413,7 @@ describe('ConstructionHandoverForm status transitions', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );
@@ -490,9 +443,7 @@ describe('ConstructionHandoverForm status transitions', () => {
       renderWithProviders(
         <Route
           path="/"
-          element={
-            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
-          }
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
         />,
       ),
     );

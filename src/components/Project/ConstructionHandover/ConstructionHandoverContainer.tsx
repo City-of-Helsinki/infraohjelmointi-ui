@@ -9,6 +9,8 @@ import {
 } from '@/api/constructionHandoverApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 import ConstructionHandoverStatusLabel from './ConstructionHandoverStatusLabel';
+import HandoverFinalizingForm from './HandoverFinalizingForm';
+import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 
 export default function ConstructionHandoverContainer() {
   const { t } = useTranslation();
@@ -22,6 +24,13 @@ export default function ConstructionHandoverContainer() {
     constructionHandovers && constructionHandovers.length > 0 ? constructionHandovers[0] : null;
   const [postConstructionHandover] = usePostConstructionHandoverMutation();
   const isConstructionHandoverStarted = constructionHandover !== null;
+
+  const showHandoverFinalizingForm =
+    isConstructionHandoverStarted &&
+    [
+      ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,
+    ].includes(constructionHandover.status);
 
   const navItems = [
     { route: '#nameAndDescription', label: t('nav.nameAndDescription') },
@@ -58,10 +67,13 @@ export default function ConstructionHandoverContainer() {
       </div>
       <div className="project-form max-w-xl pr-4" data-testid="construction-handover-form">
         {isConstructionHandoverStarted ? (
-          <ConstructionHandoverForm
-            constructionHandover={constructionHandover}
-            project={project ?? null}
-          />
+          <>
+            {showHandoverFinalizingForm && (
+              <HandoverFinalizingForm constructionHandover={constructionHandover} />
+            )}
+
+            <ConstructionHandoverForm constructionHandover={constructionHandover} />
+          </>
         ) : (
           <StartConstructionHandover onStartHandover={handleStartHandover} />
         )}

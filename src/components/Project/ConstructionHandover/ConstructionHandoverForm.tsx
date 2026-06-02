@@ -5,7 +5,7 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import ScheduleSection from './ScheduleSection';
 import ContactsSection from './ContactsSection';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonVariant, IconLink } from 'hds-react';
+import { Button, ButtonVariant, IconLink, Notification, NotificationSize } from 'hds-react';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import {
@@ -17,7 +17,6 @@ import {
   IConstructionHandover,
   IConstructionHandoverRequest,
 } from '@/interfaces/constructionHandoverInterfaces';
-import { IProject } from '@/interfaces/projectInterfaces';
 import FinancingSection from './FinancingSection/FinancingSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { parseCurrency } from '@/utils/constructionHandoverUtils';
@@ -29,10 +28,7 @@ export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   };
 }
 
-function mapFormToRequest(
-  formData: IConstructionHandoverForm,
-  projectId: string,
-): IConstructionHandoverRequest {
+function mapFormToRequest(formData: IConstructionHandoverForm): IConstructionHandoverRequest {
   const parsedTotalCost = parseCurrency(formData.totalCost);
 
   return {
@@ -44,28 +40,27 @@ function mapFormToRequest(
     otherTimelineNotes: formData.otherTimelineNotes,
     personPlanning: formData.personPlanning.value,
     personFinancing: formData.personFinancing.value,
-    project: projectId,
     totalCost: parsedTotalCost,
     linkDesignDrawings: null,
     linkCostAllocation: null,
     linkContractBoundaries: null,
-    constructionProjectManager: null,
   };
 }
 
 interface IConstructionHandoverFormProps {
   constructionHandover: IConstructionHandover;
-  project: IProject | null;
 }
 
 function ConstructionHandoverForm({
   constructionHandover,
-  project,
 }: Readonly<IConstructionHandoverFormProps>) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const formMethods = useConstructionHandoverForm(constructionHandover);
-  const { handleSubmit } = formMethods;
+  const {
+    handleSubmit,
+    formState: { isDirty },
+  } = formMethods;
   const [patchConstructionHandover] = usePatchConstructionHandoverMutation();
   const [doStatusTransition] = useTransitionConstructionHandoverStatusMutation();
 
@@ -94,50 +89,57 @@ function ConstructionHandoverForm({
       });
   }
 
-  function submitForm(data: IConstructionHandoverForm) {
-    if (data.id && project?.id) {
-      const requestData = mapFormToRequest(data, project.id);
-      patchConstructionHandover({ id: data.id, data: requestData });
+  async function submitForm(data: IConstructionHandoverForm) {
+    if (data.id) {
+      const requestData = mapFormToRequest(data);
+      await patchConstructionHandover({ id: data.id, data: requestData });
     }
   }
 
-  function submitToProgrammer() {
-    if (constructionHandover.id) {
-      doStatusTransition({
-        id: constructionHandover.id,
-        to: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
-      });
+  async function submitToProgrammer() {
+    if (isDirty) {
+      // If there are unsaved changes, save them before submitting to programmer
+      await submitForm(formMethods.getValues());
     }
+
+    doStatusTransition({
+      id: constructionHandover.id,
+      to: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+    });
   }
 
   function submitToConstruction() {
-    if (constructionHandover.id) {
-      doStatusTransition({
-        id: constructionHandover.id,
-        to: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
-      });
-    }
+    doStatusTransition({
+      id: constructionHandover.id,
+      to: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+    });
   }
 
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(submitForm)}>
-        <NameAndDescriptionSection />
+        <NameAndDescriptionSection
+          shouldShowProcurementMethod={[
+            ConstructionHandoverStatus.DRAFT,
+            ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+            ConstructionHandoverStatus.MOVED_TO_CONSTRUCTION_PREPARATION,
+          ].includes(constructionHandover.status)}
+        />
         <ScheduleSection />
         <FinancingSection />
         <ContactsSection />
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">
-            <div className="flex gap-6">
+            <div className="flex items-center gap-6">
               {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
-                <Button type="button" onClick={submitToProgrammer}>
+                <Button type="button" onClick={handleSubmit(submitToProgrammer)}>
                   {t('constructionHandoverForm.submitToProgrammer')}
                 </Button>
               )}
               {constructionHandover.status ===
                 ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && (
-                <Button type="button" onClick={submitToConstruction}>
+                <Button type="button" onClick={handleSubmit(submitToConstruction)}>
                   {t('constructionHandoverForm.submitToConstruction')}
                 </Button>
               )}
@@ -154,6 +156,18 @@ function ConstructionHandoverForm({
               >
                 {t('copyLink')}
               </Button>
+              {constructionHandover.status ===
+                ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION && (
+                <div>
+                  <Notification
+                    label={t('constructionHandoverForm.nameProjectManagerNotification')}
+                    type="error"
+                    size={NotificationSize.Small}
+                  >
+                    {t('constructionHandoverForm.nameProjectManagerNotification')}
+                  </Notification>
+                </div>
+              )}
             </div>
           </div>
         </div>

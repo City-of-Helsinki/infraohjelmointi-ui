@@ -45,6 +45,7 @@ export default function useConstructionHandoverForm(constructionHandover: IConst
 
   const formMethods = useForm<IConstructionHandoverForm>({
     values: formValues,
+    mode: 'onBlur',
     disabled: constructionHandover.status !== ConstructionHandoverStatus.DRAFT,
   });
 

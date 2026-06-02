@@ -35,21 +35,23 @@ export interface IConstructionHandoverRequest
   extends Omit<
     IConstructionHandover,
     | 'id'
+    | 'project'
     | 'status'
     | 'constructionProcurementMethod'
     | 'personPlanning'
     | 'personFinancing'
     | 'constructionHandoverFinancing'
+    | 'constructionProjectManager'
   > {
-  project: string;
   constructionProcurementMethod: string;
   personPlanning: string;
   personFinancing: string;
+  constructionProjectManager?: string;
 }
 
 export interface IConstructionHandoverPatchRequest {
   id: string;
-  data: IConstructionHandoverRequest;
+  data: Partial<IConstructionHandoverRequest>;
 }
 
 export interface IConstructionHandoverTransitionResponse {

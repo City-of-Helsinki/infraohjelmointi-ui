@@ -45,12 +45,16 @@ const TextField: FC<ITextFieldProps> = ({
       rules={rules}
       control={control as Control<FieldValues>}
       defaultValue={defaultValue}
-      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => (
+      render={({
+        field: { onChange, onBlur, value, disabled: fieldDisabled },
+        fieldState: { error },
+      }) => (
         <div className={`input-wrapper ${wrapperClassName}`} id={name} data-testid={name}>
           <HDSTextInput
             className={`input-${size}`}
             value={readOnlyValue ?? value}
             onChange={onChange}
+            onBlur={onBlur}
             label={t(label)}
             hideLabel={hideLabel}
             id={id ?? label}
