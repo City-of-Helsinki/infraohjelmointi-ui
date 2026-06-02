@@ -693,8 +693,11 @@ const checkYearRange = (props: IYearCheck) => {
   }
 };
 
-const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
-  if (projectFinances.type === Reports.ConstructionProgram) {
+export const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
+  if (
+    projectFinances.type === Reports.ConstructionProgram ||
+    projectFinances.type === Reports.ConstructionProgramForcedToFrame
+  ) {
     return (
       parseFloat((projectFinances.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
       parseFloat((projectFinances.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
@@ -712,8 +715,11 @@ const checkProjectHasBudgets = (projectFinances: IBudgetCheck) => {
   );
 };
 
-const checkGroupHasBudgets = (group: IConstructionProgramTableRow, reportType: ReportType) => {
-  if (reportType === Reports.ConstructionProgram) {
+export const checkGroupHasBudgets = (group: IConstructionProgramTableRow, reportType: ReportType) => {
+  if (
+    reportType === Reports.ConstructionProgram ||
+    reportType === Reports.ConstructionProgramForcedToFrame
+  ) {
     return (
       parseFloat((group.budgetProposalCurrentYearPlus0 ?? '0').replace(',', '.')) > 0 ||
       parseFloat((group.budgetProposalCurrentYearPlus1 ?? '0').replace(',', '.')) > 0 ||
@@ -738,8 +744,8 @@ export const getInvestmentPart = (forcedToFrameHierarchy: IBudgetBookSummaryTabl
     objectType: '',
   };
 
-  /* Loop through the financeProperties of each "classGrandparent" and create an object (investmentPart) that contains the summed values 
-    e.g. each classGrandparent has a property called budgetEstimation --> here we take the budgetEstimation of every classGrandParent and sum them 
+  /* Loop through the financeProperties of each "classGrandparent" and create an object (investmentPart) that contains the summed values
+    e.g. each classGrandparent has a property called budgetEstimation --> here we take the budgetEstimation of every classGrandParent and sum them
     together and the same thing is done to the other financeProperties as well */
 
   const investmentPart = forcedToFrameHierarchy.reduce(
@@ -780,7 +786,7 @@ const classOrChildrenHasBudgets = (cells: IPlanningCell[]) => {
 
 const getBudgetBookSummaryProperties = (coordinatorRows: IPlanningRow[]) => {
   const properties = [];
-  /* We want to show only those lower level items that start with some number or one letter and a space after that. 
+  /* We want to show only those lower level items that start with some number or one letter and a space after that.
     This rule is meant for the lower level items but every item in the hierarchy in forced to frame view data should match this */
   const nameCheckPattern = /^(\d+|\w)\s/;
   for (const c of coordinatorRows) {
@@ -1363,7 +1369,7 @@ export const convertToReportRows = (
             c.children.some((child) => child.type !== 'subClass');
 
           const isClassWithoutChildren = c.children.length === 0 && typeIsClass;
-          /* 
+          /*
             In general: if the class is on the fourth level, we want to add some extra rows there.
             isClassWithoutChildren: if the class is on a higher level and it doesn't contain children, it might have projects
             that aren't under any subClass so we need to take that into account as well
