@@ -9,7 +9,7 @@ on:
 
 jobs:
   common:
-    uses: City-of-Helsinki/.github/.github/workflows/ci-node.yml@ci-node-sonar-secret
+    uses: City-of-Helsinki/.github/.github/workflows/ci-node.yml@main
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     with:
