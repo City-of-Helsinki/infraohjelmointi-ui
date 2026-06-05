@@ -38,7 +38,7 @@ resources:
 
 extends:
   # Filename in Azure DevOps Repository
-  template: components/infraohjelmointi-ui/pipelines/infraohjelmointi-ui-dev.yml@infraohjelmointi-pipelines
+  template: components/infraohjelmointi-ui/pipelines/infraohjelmointi-ui-devtest.yml@infraohjelmointi-pipelines
   # parameters:
     # Application build arguments and config map values as key value pairs.
     # Does not contain all buildArguments or configMap values, the rest located in infraohjelmointi-pipelines
