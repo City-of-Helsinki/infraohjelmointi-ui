@@ -33,6 +33,7 @@ resources:
     # Azure DevOps repository
     - repository: infraohjelmointi-pipelines
       type: git
+      ref: ansible_automation_update
       # Azure DevOps project/repository
       name: infraohjelmointi/infraohjelmointi-pipelines
 
