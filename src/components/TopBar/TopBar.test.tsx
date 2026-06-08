@@ -67,6 +67,7 @@ const render = async (customRoute?: string) =>
             talpaServiceClasses: [],
             talpaAssetClasses: [],
             error: {},
+            financingParties: mockLists.mockFinancingParties.data,
           },
         },
       },

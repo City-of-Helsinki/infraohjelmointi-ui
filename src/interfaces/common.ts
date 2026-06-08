@@ -74,6 +74,7 @@ export type ListType =
   | 'projectSubDistricts'
   | 'projectSubSubDistricts'
   | 'budgetOverrunReasons'
+  | 'financingParties'
   | 'programmers'
   | 'priorities';
 

@@ -200,6 +200,7 @@
     "requiredFalse": "{{field}} on oltava 'Ei'",
     "programmed": "Ohjelmoitu",
     "description": "Hankkeen kuvaus",
+    "totalCostRequired": "Kokonaiskustannukset ovat pakolliset",
     "phaseTooEarly": "Hankkeen vaihe ei voi olla {{value}} jos nykyinen päivä on ennen rakentamisen päättymispäivää",
     "completedPhaseTooEarly": "Hankkeen vaihe ei voi olla Valmis / ylläpidossa jos nykyinen päivä on ennen takuuajan päättymispäivää",
     "category": "Kategoria",
@@ -438,8 +439,10 @@
       "SUBMITTED_TO_PROGRAMMER": "ohjelmoijalle",
       "SUBMITTED_TO_CONSTRUCTION": "rakentamiselle"
     },
+    "totalCost": "Kokonaiskustannus",
     "financingSection": {
       "title": "Hankkeen rahoitus",
+      "requiredField": "Pakollinen kenttä",
       "addRow": "Lisää rahoitusrivi",
       "closeDialogButton": "Takaisin",
       "deleteDialogContent": "Haluatko varmasti poistaa tämän rahoitusrivin?",

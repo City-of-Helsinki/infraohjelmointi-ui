@@ -5,10 +5,13 @@ import {
   FinancingRowDeleteThunkContent,
   FinancingRowPostAndPatchThunkContent,
 } from '@/interfaces/constructionHandoverInterfaces';
+import { DialogMode } from '@/interfaces/menuItemsInterfaces';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
+import { useOptions } from '@/hooks/useOptions';
+import useGetProject from '@/hooks/useGetProject';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { Button, ButtonVariant, Dialog, TextInput } from 'hds-react';
+import { Button, ButtonVariant, Dialog, Select as HDSSelect, TextInput } from 'hds-react';
 import { TFunction } from 'i18next';
 import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -79,6 +82,8 @@ export const deleteFinancingRowThunk = createAsyncThunk(
 interface FinancingDialogProps {
   dialogState: FinancingDialogState;
   handleClose: () => void;
+  onRowSaved: (row: FinancingRowValues, mode: DialogMode) => void;
+  onRowDeleted: (id: string) => void;
 }
 
 const getFieldError = (
@@ -93,15 +98,41 @@ const getFieldError = (
 
 const emptyDialogValues = {
   financer: '',
+  description: '',
   budgetItem: '',
   projectNumber: '',
   budget: '',
   id: '',
 };
 
-const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState }) => {
+const normalizeSavedRow = (
+  saved: unknown,
+  fallbackValues: FinancingRowValues,
+): FinancingRowValues => {
+  if (!saved || typeof saved !== 'object') {
+    return {
+      ...fallbackValues,
+      id: fallbackValues.id,
+    };
+  }
+
+  const row = saved as Record<string, unknown>;
+
+  return {
+    financer: String(row.financer ?? row.financingParty ?? fallbackValues.financer ?? ''),
+    description: String(row.description ?? fallbackValues.description ?? ''),
+    budgetItem: String(row.budgetItem ?? fallbackValues.budgetItem ?? ''),
+    projectNumber: String(row.projectNumber ?? fallbackValues.projectNumber ?? ''),
+    budget: String(row.budget ?? fallbackValues.budget ?? ''),
+    id: String(row.id ?? fallbackValues.id ?? ''),
+  };
+};
+
+const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState, onRowSaved }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { data: project } = useGetProject();
+  const financingPartyOptions = useOptions('financingParties');
   const { Header, Content, ActionButtons } = Dialog;
   const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
   const [dialogValues, setDialogValues] = useState<FinancingRowValues>(emptyDialogValues);
@@ -109,12 +140,15 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
   useEffect(() => {
     setDialogValues({
       financer: dialogState.values?.financer ?? '',
+      description: dialogState.values?.description ?? '',
       budgetItem: dialogState.values?.budgetItem ?? '',
       projectNumber: dialogState.values?.projectNumber ?? '',
       budget: dialogState.values?.budget ?? '',
       id: dialogState.values?.id ?? '',
     });
   }, [dialogState]);
+
+  const isOtherFinancingSelected = dialogValues.financer === 'OTHER';
 
   const onSetMenuItemName = useCallback(
     (value: keyof FinancingRowValues, e: ChangeEvent<HTMLInputElement>) =>
@@ -127,30 +161,35 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
 
   const onSaveChange = useCallback(async () => {
     setSubmitAttempted(true);
-    if (!Object.values(dialogValues).every(Boolean)) return;
+    if (
+      !dialogValues.financer ||
+      !dialogValues.budgetItem ||
+      !dialogValues.projectNumber ||
+      !dialogValues.budget ||
+      (isOtherFinancingSelected && !dialogValues.description)
+    ) {
+      return;
+    }
 
-    const request = {
+    const baseRequest = {
       financer: dialogValues.financer,
+      description: dialogValues.description,
       budgetItem: dialogValues.budgetItem,
       projectNumber: dialogValues.projectNumber,
       budget: dialogValues.budget,
-      id: dialogValues.id,
     };
 
     try {
-      if (dialogState.mode === 'edit') {
-        await dispatch(
-          patchFinancingRowThunk({
-            request,
-          }),
-        ).unwrap();
-      } else {
-        await dispatch(
-          postFinancingRowThunk({
-            request,
-          }),
-        ).unwrap();
-      }
+      // Financing row API endpoints are not available yet.
+      // Save rows to form state locally to avoid failing requests.
+      onRowSaved(
+        normalizeSavedRow(undefined, {
+          ...baseRequest,
+          id: dialogValues.id,
+        }),
+        dialogState.mode,
+      );
+
       setDialogValues(emptyDialogValues);
       setSubmitAttempted(false);
       handleClose();
@@ -173,7 +212,15 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
         }),
       );
     }
-  }, [dialogValues, dialogState.mode, handleClose, dispatch, t]);
+  }, [
+    dialogValues,
+    dialogState.mode,
+    handleClose,
+    dispatch,
+    isOtherFinancingSelected,
+    onRowSaved,
+    t,
+  ]);
 
   return (
     <Dialog
@@ -189,16 +236,45 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
         title={t(`constructionHandoverForm.financingSection.${dialogState.mode}DialogTitle`)}
       />
       <Content>
-        <TextInput
-          id="financing-dialog-financer-input"
-          label={t('constructionHandoverForm.financingSection.label.financer')}
-          value={dialogValues.financer}
-          onChange={(e) => onSetMenuItemName('financer', e)}
-          data-testid="financing-dialog-financer-input"
-          errorText={getFieldError(t, submitAttempted, dialogValues.financer)}
-          invalid={getFieldError(t, submitAttempted, dialogValues.financer) !== undefined}
-          required
-        />
+        <div data-testid="financing-dialog-financer-input">
+          <HDSSelect
+            id="financing-dialog-financer-select"
+            options={financingPartyOptions}
+            value={
+              dialogValues.financer
+                ? financingPartyOptions.filter((option) => option.value === dialogValues.financer)
+                : []
+            }
+            onChange={(_, clickedOption) => {
+              const selectedFinancingParty = clickedOption?.value ?? '';
+
+              setDialogValues((prev) => ({
+                ...prev,
+                financer: selectedFinancingParty,
+                ...(selectedFinancingParty === 'KYMP'
+                  ? {
+                      description: '',
+                      budgetItem: project?.siteId?.site ?? project?.siteId?.siteName ?? '',
+                      projectNumber: project?.sapProject ?? '',
+                      budget: project?.totalCost ?? project?.budget ?? project?.costForecast ?? '',
+                    }
+                  : {
+                      description: selectedFinancingParty === 'OTHER' ? prev.description ?? '' : '',
+                      budgetItem: '',
+                      projectNumber: '',
+                      budget: '',
+                    }),
+              }));
+            }}
+            invalid={getFieldError(t, submitAttempted, dialogValues.financer) !== undefined}
+            required
+            texts={{
+              label: t('constructionHandoverForm.financingSection.label.financer'),
+              error: getFieldError(t, submitAttempted, dialogValues.financer),
+              placeholder: t('choose'),
+            }}
+          />
+        </div>
         <TextInput
           id="financing-dialog-budget-item-input"
           label={t('constructionHandoverForm.financingSection.label.budgetItem')}
@@ -229,6 +305,18 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
           invalid={getFieldError(t, submitAttempted, dialogValues.budget) !== undefined}
           required
         />
+        {isOtherFinancingSelected && (
+          <TextInput
+            id="financing-dialog-description-input"
+            label={t('constructionHandoverForm.description')}
+            value={dialogValues.description ?? ''}
+            onChange={(e) => onSetMenuItemName('description', e)}
+            data-testid="financing-dialog-description-input"
+            errorText={getFieldError(t, submitAttempted, dialogValues.description)}
+            invalid={getFieldError(t, submitAttempted, dialogValues.description) !== undefined}
+            required
+          />
+        )}
       </Content>
       <ActionButtons>
         <Button onClick={onSaveChange} data-testid="submit-financing-row-button">
@@ -248,7 +336,7 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
   );
 };
 
-const DeleteRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState }) => {
+const DeleteRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState, onRowDeleted }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { Header, ActionButtons, Content } = Dialog;
@@ -267,6 +355,7 @@ const DeleteRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState })
           dispatch: dispatch,
         }),
       ).unwrap();
+      onRowDeleted(deletableItemId);
       handleClose();
 
       dispatch(
@@ -287,7 +376,7 @@ const DeleteRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState })
         }),
       );
     }
-  }, [deletableItemId, dispatch, handleClose]);
+  }, [deletableItemId, dispatch, handleClose, onRowDeleted]);
 
   return (
     <Dialog
@@ -319,12 +408,27 @@ const DeleteRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState })
   );
 };
 
-const FinancingDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState }) => {
+const FinancingDialog: FC<FinancingDialogProps> = ({
+  handleClose,
+  dialogState,
+  onRowSaved,
+  onRowDeleted,
+}) => {
   const isDeleteDialog = dialogState.mode === 'delete';
   return isDeleteDialog ? (
-    <DeleteRowDialog handleClose={handleClose} dialogState={dialogState} />
+    <DeleteRowDialog
+      handleClose={handleClose}
+      dialogState={dialogState}
+      onRowSaved={onRowSaved}
+      onRowDeleted={onRowDeleted}
+    />
   ) : (
-    <AddOrEditRowDialog handleClose={handleClose} dialogState={dialogState} />
+    <AddOrEditRowDialog
+      handleClose={handleClose}
+      dialogState={dialogState}
+      onRowSaved={onRowSaved}
+      onRowDeleted={onRowDeleted}
+    />
   );
 };
 

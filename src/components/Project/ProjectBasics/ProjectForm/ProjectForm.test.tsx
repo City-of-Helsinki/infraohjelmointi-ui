@@ -21,6 +21,7 @@ import {
   mockProgrammers,
   mockProjectTypeQualifiers,
   mockStaraProcurementReasons,
+  mockFinancingParties,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
@@ -94,6 +95,7 @@ const render = async (
             projectDivisions: [],
             projectSubDivisions: [],
             budgetOverrunReasons: mockBudgetOverrunReasons.data,
+            financingParties: mockFinancingParties.data,
             programmers: mockProgrammers.data,
             programmersRaw: [],
             projectClasses: [],

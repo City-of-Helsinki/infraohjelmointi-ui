@@ -52,6 +52,7 @@ describe('useConstructionHandoverForm', () => {
       constructionStart: '01.01.2026',
       constructionEnd: '30.09.2028',
       otherTimelineNotes: '',
+      constructionHandoverFinancing: [],
       personPlanning: {
         label: 'Erkki Esimerkki',
         value: 'person-planning-1',
@@ -60,6 +61,7 @@ describe('useConstructionHandoverForm', () => {
         label: 'Matti Mallikas',
         value: 'person-programming-1',
       },
+      totalCost: '',
     });
   });
 });

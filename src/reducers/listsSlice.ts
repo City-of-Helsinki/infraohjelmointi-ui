@@ -14,6 +14,7 @@ import {
   getPersons,
   getDistricts,
   getBudgetOverrunReasons,
+  getFinancingParties,
   getProgrammers,
   getTalpaProjectRanges,
   getTalpaAssetClasses,
@@ -68,6 +69,7 @@ export interface IListState {
   projectDivisions: Array<IProjectDistrictOption>;
   projectSubDivisions: Array<IProjectDistrictOption>;
   budgetOverrunReasons: Array<IListItem>;
+  financingParties: Array<IListItem>;
   projectClasses: Array<IClass>;
   programmers: Array<IListItem>;
   programmersRaw: Array<IPerson>;
@@ -97,6 +99,7 @@ const initialState: IListState = {
   projectDivisions: [],
   projectSubDivisions: [],
   budgetOverrunReasons: [],
+  financingParties: [],
   programmedYears: setProgrammedYears(),
   projectClasses: [],
   programmers: [],
@@ -197,6 +200,7 @@ export const getListsThunk = createAsyncThunk('lists/get', async (_, thunkAPI) =
       projectDivisions: getProjectDistricts(districts, 'division'),
       projectSubDivisions: getProjectDistricts(districts, 'subDivision'),
       budgetOverrunReasons: await getBudgetOverrunReasons(),
+      financingParties: await getFinancingParties(),
       programmers: await getProgrammers(),
       programmersRaw: await getRawProgrammers(),
       priorities: await getPriorities(),

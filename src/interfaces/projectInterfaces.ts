@@ -1,4 +1,5 @@
 import { IListItem } from './common';
+import { IConstructionHandoverFinancing } from './constructionHandoverInterfaces';
 import { IPerson } from './personsInterfaces';
 import { ISapCost } from './sapCostsInterfaces';
 
@@ -101,6 +102,8 @@ export interface IProject {
   budgetOverrunReason?: IListItem;
   otherBudgetOverrunReason?: string;
   onSchedule?: boolean;
+  totalCost?: string | null;
+  constructionHandoverFinancing?: Array<IConstructionHandoverFinancing>;
 }
 
 export interface IProjectRequest {

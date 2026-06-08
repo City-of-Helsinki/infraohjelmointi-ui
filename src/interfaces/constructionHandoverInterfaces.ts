@@ -59,10 +59,28 @@ export interface FinancingDialogState {
 
 export interface FinancingRowValues {
   financer: string;
+  description?: string;
   budgetItem: string;
   projectNumber: string;
   budget: string;
   id: string;
+}
+
+export interface IConstructionHandoverFinancing {
+  id: string;
+  financingParty: string;
+  description?: string;
+  budgetItem:
+    | string
+    | {
+        id?: string;
+        name?: string;
+        site?: string;
+        siteName?: string;
+      }
+    | null;
+  projectNumber: string;
+  budget: string | number | null;
 }
 
 export interface FinancingRowPostAndPatchThunkContent {
