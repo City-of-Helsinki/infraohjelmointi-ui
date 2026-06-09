@@ -21,10 +21,12 @@ import { ContextMenuType } from '@/interfaces/eventInterfaces';
 import ProjectYearSummary from './ProjectYearSummary/ProjectYearSummary';
 import { useAppDispatch, useAppSelector } from '@/hooks/common';
 import {
+  selectChangeHistoryEnabled,
   selectForcedToFrame,
   selectSelectedYears,
   selectSelections,
 } from '@/reducers/planningSlice';
+import ProjectCellHistory from './ProjectCellHistory';
 import {
   getCellTypeUpdateRequestData,
   getRemoveRequestData,
@@ -59,6 +61,7 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject 
   const selectedYears = useAppSelector(selectSelectedYears);
   const currentYear = new Date().getFullYear();
   const forcedToFrame = useAppSelector(selectForcedToFrame);
+  const changeHistoryEnabled = useAppSelector(selectChangeHistoryEnabled);
   const [patchProject] = usePatchProjectMutation();
 
   const user = useAppSelector(selectUser);
@@ -278,6 +281,9 @@ const ProjectCell: FC<IProjectCellProps> = ({ cell, projectFinances, sapProject 
               onDoubleClick={onMoveTimeline}
             />
           ))}
+        {changeHistoryEnabled && type !== 'none' && (
+          <ProjectCellHistory projectId={id} year={year} />
+        )}
       </td>
       {selectedYearClass && (
         <ProjectYearSummary cellType={cellTypeClass} {...cell} sapProject={sapProject} />

@@ -1,0 +1,137 @@
+.project-history-overlay {
+  @apply fixed inset-0 z-[100] flex justify-end;
+}
+
+.project-history-scrim {
+  @apply absolute inset-0 cursor-default border-0 p-0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.project-history-panel {
+  @apply relative flex h-full w-full max-w-[28rem] flex-col bg-white;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
+  animation: project-history-slide-in 0.2s ease-out;
+}
+
+@keyframes project-history-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.project-history-panel-header {
+  @apply flex items-center justify-between px-6 py-4;
+  border-bottom: 1px solid var(--color-black-20);
+}
+
+.project-history-panel-title {
+  @apply flex items-center gap-2 text-l font-bold;
+}
+
+.project-history-close {
+  @apply flex cursor-pointer items-center justify-center border-0 bg-transparent p-1;
+}
+
+.project-history-close:focus-visible {
+  outline: 2px solid var(--color-coat-of-arms);
+}
+
+.project-history-content {
+  @apply flex-1 overflow-y-auto px-6 py-4;
+}
+
+.project-history-status {
+  @apply flex items-center gap-2 py-4 text-base text-black-60;
+}
+
+.project-history-timeline {
+  @apply flex list-none flex-col p-0;
+}
+
+.project-history-entry {
+  @apply relative flex gap-3 pb-6;
+}
+
+/* Timeline connector running through the avatars. */
+.project-history-entry:not(:last-child)::before {
+  content: '';
+  @apply absolute left-4 top-9 w-px;
+  bottom: 0;
+  background: var(--color-black-20);
+}
+
+.project-history-avatar {
+  @apply flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full font-bold text-white;
+  z-index: 1;
+  font-size: 0.75rem;
+}
+
+.project-history-entry-body {
+  @apply flex min-w-0 flex-1 flex-col gap-2 pt-1;
+}
+
+.project-history-entry-header {
+  @apply flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm;
+}
+
+.project-history-actor {
+  @apply font-bold;
+}
+
+.project-history-action {
+  @apply text-black-90;
+}
+
+.project-history-date {
+  @apply ml-auto whitespace-nowrap text-sm text-black-60;
+}
+
+.project-history-changes {
+  @apply flex flex-col gap-2 rounded px-3 py-2;
+  background: var(--color-black-5);
+}
+
+.project-history-change {
+  @apply flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm;
+}
+
+.project-history-change--pills {
+  @apply items-center;
+}
+
+.project-history-field-label {
+  @apply font-medium text-black-90;
+}
+
+.project-history-diff {
+  @apply flex flex-wrap items-baseline gap-x-1;
+}
+
+.project-history-old-value {
+  @apply text-black-60 line-through;
+}
+
+.project-history-new-value {
+  @apply font-medium text-black-90;
+}
+
+.project-history-arrow {
+  @apply text-black-60;
+}
+
+.project-history-pill {
+  @apply inline-flex items-center rounded-full px-3 py-1 text-sm;
+}
+
+.project-history-pill.is-old {
+  @apply text-black-60 line-through;
+  background: var(--color-black-10);
+}
+
+.project-history-pill.is-new {
+  @apply font-medium text-white;
+  background: var(--color-coat-of-arms);
+}

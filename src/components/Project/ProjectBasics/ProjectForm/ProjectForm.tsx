@@ -13,6 +13,8 @@ import ProjectResponsiblePersonsSection from './ProjectResponsiblePersonsSection
 import ProjectLocationSection from './ProjectLocationSection';
 import ProjectProgramSection from './ProjectProgramSection';
 import ProjectFormBanner from './ProjectFormBanner';
+import ProjectHistoryPanel from './ProjectHistoryPanel';
+import { Button, ButtonVariant, IconClock } from 'hds-react';
 import { useNavigate } from 'react-router';
 import _ from 'lodash';
 import './styles.css';
@@ -53,6 +55,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const isOnlyViewer = isUserOnlyViewer(user);
 
   const [newProjectId, setNewProjectId] = useState('');
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const {
     formState: { dirtyFields, isDirty },
@@ -411,6 +414,24 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
   return (
     <form data-testid="project-form" className="project-form">
+      {/* FORM-LEVEL CHANGE HISTORY (IO-883) — available to every role that can view the project */}
+      {project?.id && (
+        <div className="project-form-toolbar">
+          <Button
+            variant={ButtonVariant.Supplementary}
+            iconStart={<IconClock />}
+            onClick={() => setIsHistoryOpen(true)}
+            data-testid="open-project-history-button"
+          >
+            {t('projectForm.changeHistory.button')}
+          </Button>
+          <ProjectHistoryPanel
+            isOpen={isHistoryOpen}
+            onClose={() => setIsHistoryOpen(false)}
+            projectId={project.id}
+          />
+        </div>
+      )}
       {/* SECTION 1 - BASIC INFO */}
       <ProjectInfoSection
         {...formProps}

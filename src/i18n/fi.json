@@ -369,7 +369,31 @@
     "priority": "Prioriteetti",
     "priorityTooltip": "<p><strong>Prioriteetti 1:</strong> Hanke on kiireellisesti edistettävä. Hankkeen kiireellisyys voi johtua esim. sidoksista toisiin hankkeisiin tai tapahtumiin, terveellisyyden ja turvallisuuden varmistamisesta tai poliittisesta tahtotilasta.</p><p><strong>Prioriteetti 2:</strong> Hanke on tavanomaisesti edistettävä. Hanketta pyritään edistämään esitetyssä aikataulussa resurssit huomioiden.</p><p><strong>Prioriteetti 3:</strong> Hankkeen edistäminen voi odottaa. Hankkeen edistäminen voi esim. odottaa vielä tarvittavien lupaprosessien tai liittyvien hankkeiden etenemistä tai liittyvien valitusten käsittelyä.</p>",
     "noPostalCodeFound": "Katuosoitteelle ei löytynyt postinumeroa",
-    "noCityFound": "Katuosoitteelle ei löytynyt kaupunkia"
+    "noCityFound": "Katuosoitteelle ei löytynyt kaupunkia",
+    "changeHistory": {
+      "button": "Näytä muutoshistoria",
+      "title": "Hankkeen muutoshistoria",
+      "loading": "Ladataan muutoshistoriaa…",
+      "empty": "Tälle hankkeelle ei ole tallennettua muutoshistoriaa.",
+      "error": "Muutoshistorian lataaminen epäonnistui.",
+      "unknownActor": "Tuntematon käyttäjä",
+      "noPreviousValue": "—",
+      "field": "Kenttä",
+      "change": "Muutos",
+      "close": "Sulje",
+      "operation": {
+        "CREATE": "Hanke luotu",
+        "UPDATE": "Muokkaus",
+        "DELETE": "Hanke poistettu"
+      },
+      "action": {
+        "created": "loi hankkeen",
+        "deleted": "poisti hankkeen",
+        "changedPhase": "muutti hankkeen vaihetta",
+        "editedField": "muokkasi {{field}}-kenttää",
+        "editedForm": "muokkasi lomaketta"
+      }
+    }
   },
   "searchForm": {
     "searchWord": "Mitä haet?",
@@ -903,6 +927,15 @@
   "tooltips": {
     "hideTooltips": "Piilota infoikkunat",
     "showTooltips": "Näytä infoikkunat",
+    "showChangeHistory": "Näytä muutoshistoria",
+    "hideChangeHistory": "Piilota muutoshistoria",
+    "history": {
+      "loading": "Ladataan…",
+      "empty": "Ei muutoshistoriaa",
+      "unknownActor": "Tuntematon käyttäjä",
+      "showMore": "Näytä {{count}} muuta päivitystä",
+      "showLess": "Näytä vähemmän"
+    },
     "priority": {
       "high": "Hanke on kiireellisesti edistettävä",
       "medium": "Hanke on tavanomaisesti edistettävä",

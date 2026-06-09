@@ -1,5 +1,7 @@
 import {
   IProject,
+  IProjectHistoryRequest,
+  IProjectHistoryResponse,
   IProjectPatchRequestObject,
   IProjectPostRequestObject,
 } from '@/interfaces/projectInterfaces';
@@ -12,6 +14,22 @@ export const projectApi = infraohjelmointiApi.injectEndpoints({
         url: `/projects/${projectId}/`,
       }),
       providesTags: (result, error, projectId) => [{ type: 'Projects', id: projectId }],
+    }),
+    getProjectHistory: build.query<IProjectHistoryResponse, IProjectHistoryRequest>({
+      query: ({ projectId, year, field, operation, page, pageSize }) => {
+        const params = new URLSearchParams();
+        if (year !== undefined && year !== null) params.append('year', String(year));
+        if (field) params.append('field', field);
+        if (operation) params.append('operation', operation);
+        if (page) params.append('page', String(page));
+        if (pageSize) params.append('page_size', String(pageSize));
+        const queryString = params.toString();
+        return {
+          url: `/projects/${projectId}/history/${queryString ? `?${queryString}` : ''}`,
+        };
+      },
+      // Tie the history cache to the project so editing it refetches the log.
+      providesTags: (result, error, { projectId }) => [{ type: 'Projects', id: projectId }],
     }),
     postProject: build.mutation<IProject, IProjectPostRequestObject>({
       query: (request) => ({
@@ -42,6 +60,8 @@ export const projectApi = infraohjelmointiApi.injectEndpoints({
 export const {
   useGetProjectByIdQuery,
   useLazyGetProjectByIdQuery,
+  useGetProjectHistoryQuery,
+  useLazyGetProjectHistoryQuery,
   usePostProjectMutation,
   usePatchProjectMutation,
   useDeleteProjectMutation,
