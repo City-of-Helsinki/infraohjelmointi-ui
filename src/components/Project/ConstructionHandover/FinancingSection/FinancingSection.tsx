@@ -1,9 +1,9 @@
 import { FormSectionTitle, TextField } from '@/components/shared';
 import { Button, ButtonVariant, IconPlus, Table } from 'hds-react';
-import { memo, useState } from 'react';
+import { IconAngleDown, IconAngleUp } from 'hds-react/icons';
+import { memo, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import FinancingDialog from './FinancingDialog';
 import {
   FinancingDialogState,
   FinancingRowValues,
@@ -13,6 +13,8 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { DeleteCell, EditCell } from './FinancingTableActionButtons';
 import { getFieldProps } from '../ConstructionHandoverForm';
 import { validateRequired } from '@/utils/validation';
+import { useOptions } from '@/hooks/useOptions';
+import FinancingDialog from './FinancingDialog';
 
 const formatBudgetEuro = (value: string): string => {
   const numericValue = Number(
@@ -35,6 +37,8 @@ const formatBudgetEuro = (value: string): string => {
 const FinancingSection = () => {
   const { t } = useTranslation();
   const { control } = useFormContext<IConstructionHandoverForm>();
+  const financingPartyOptions = useOptions('financingParties');
+  const projectTypeQualifierOptions = useOptions('typeQualifiers');
   const { fields, append, update, remove } = useFieldArray<
     IConstructionHandoverForm,
     'constructionHandoverFinancing',
@@ -51,6 +55,7 @@ const FinancingSection = () => {
     values: undefined,
     itemId: '',
   });
+  const [expandedMainRows, setExpandedMainRows] = useState<Record<string, boolean>>({});
 
   const handleEdit = (itemId: string, values?: FinancingRowValues) => {
     setDialogState({
@@ -107,27 +112,139 @@ const FinancingSection = () => {
     }
   };
 
-  const availableRowsList = fields.map((item) => ({
-    description: item.description ?? '',
-    budget: formatBudgetEuro(item.budget),
-    projectNumber: item.projectNumber,
-    budgetItem: item.budgetItem,
-    id: item.id,
-    formId: item.formId,
-    editCell: <EditCell onEditRow={handleEdit} id={item.id} values={item} />,
-    deleteCell: <DeleteCell onDeleteRow={handleDelete} id={item.id} />,
+  const getFinancingPartyLabel = (code: string) =>
+    financingPartyOptions.find((option) => option.value === code)?.label ?? code;
+
+  const getBudgetItemLabel = (id: string) =>
+    t(
+      `option.${projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? ''}`,
+      {
+        defaultValue: projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? id,
+      },
+    );
+
+  const groupedRows = useMemo(() => {
+    const kympRows = fields.filter((item) => item.financer === 'KYMP');
+    const nonKympRows = fields.filter((item) => item.financer !== 'KYMP');
+
+    const rows: Array<{
+      key: string;
+      isMainRow: boolean;
+      isSubRow: boolean;
+      hasSubRows: boolean;
+      item?: FinancingRowValues;
+      mainRowKey: string;
+      budgetItemText: string;
+      projectNumber: string;
+      budget: string;
+      showActions: boolean;
+    }> = [];
+
+    if (kympRows.length > 1) {
+      const mainRowKey = 'KYMP-main';
+      rows.push({
+        key: mainRowKey,
+        isMainRow: true,
+        isSubRow: false,
+        hasSubRows: true,
+        mainRowKey,
+        budgetItemText: getFinancingPartyLabel('KYMP'),
+        projectNumber: '',
+        budget: '',
+        showActions: false,
+      });
+
+      if (expandedMainRows[mainRowKey] ?? false) {
+        kympRows.forEach((item) => {
+          rows.push({
+            key: item.formId,
+            isMainRow: false,
+            isSubRow: true,
+            hasSubRows: false,
+            item,
+            mainRowKey,
+            budgetItemText: getBudgetItemLabel(item.budgetItem),
+            projectNumber: item.projectNumber,
+            budget: formatBudgetEuro(item.budget),
+            showActions: true,
+          });
+        });
+      }
+    } else if (kympRows.length === 1) {
+      const item = kympRows[0];
+      rows.push({
+        key: item.formId,
+        isMainRow: true,
+        isSubRow: false,
+        hasSubRows: false,
+        item,
+        mainRowKey: item.formId,
+        budgetItemText: getFinancingPartyLabel(item.financer),
+        projectNumber: item.projectNumber,
+        budget: formatBudgetEuro(item.budget),
+        showActions: true,
+      });
+    }
+
+    nonKympRows.forEach((item) => {
+      rows.push({
+        key: item.formId,
+        isMainRow: true,
+        isSubRow: false,
+        hasSubRows: false,
+        item,
+        mainRowKey: item.formId,
+        budgetItemText: getFinancingPartyLabel(item.financer),
+        projectNumber: item.projectNumber,
+        budget: formatBudgetEuro(item.budget),
+        showActions: true,
+      });
+    });
+
+    return rows;
+  }, [expandedMainRows, fields, financingPartyOptions, projectTypeQualifierOptions, t]);
+
+  const tableRows = groupedRows.map((row) => ({
+    id: row.key,
+    budgetItem: row.hasSubRows ? (
+      <button
+        type="button"
+        onClick={() =>
+          setExpandedMainRows((prev) => ({
+            ...prev,
+            [row.mainRowKey]: !(prev[row.mainRowKey] ?? false),
+          }))
+        }
+      >
+        <span>{row.budgetItemText}</span>
+        {expandedMainRows[row.mainRowKey] ? <IconAngleUp /> : <IconAngleDown />}
+      </button>
+    ) : (
+      row.budgetItemText
+    ),
+    projectNumber: row.projectNumber,
+    budget: row.budget,
+    editCell:
+      row.showActions && row.item ? (
+        <EditCell onEditRow={handleEdit} id={row.item.id} values={row.item} />
+      ) : null,
+    deleteCell:
+      row.showActions && row.item ? <DeleteCell onDeleteRow={handleDelete} id={row.item.id} /> : null,
   }));
 
   const cols = [
     {
       key: 'budgetItem',
-      headerName: t(`constructionHandoverForm.financingSection.label.budgetItem`),
+      headerName: t('constructionHandoverForm.financingSection.label.budgetItem'),
     },
     {
       key: 'projectNumber',
-      headerName: t(`constructionHandoverForm.financingSection.label.projectNumber`),
+      headerName: t('constructionHandoverForm.financingSection.label.projectNumber'),
     },
-    { key: 'budget', headerName: t(`constructionHandoverForm.financingSection.label.budget`) },
+    {
+      key: 'budget',
+      headerName: t('constructionHandoverForm.financingSection.label.budget'),
+    },
     { key: 'editCell', headerName: t('edit') },
     { key: 'deleteCell', headerName: t('delete') },
   ];
@@ -139,8 +256,8 @@ const FinancingSection = () => {
         name="constructionHandoverFinancing"
       />
       <div>
-        {availableRowsList.length > 0 ? (
-          <Table cols={cols} rows={availableRowsList} indexKey="formId" renderIndexCol={false} />
+        {tableRows.length > 0 ? (
+          <Table cols={cols} rows={tableRows} indexKey="id" renderIndexCol={false} />
         ) : (
           <p>{t('constructionHandoverForm.financingSection.tableEmptyText')}</p>
         )}

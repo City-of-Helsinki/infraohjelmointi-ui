@@ -11,7 +11,7 @@ import { formatDateToHds } from '@/utils/dates';
 const getBudgetItemLabel = (budgetItem: IConstructionHandoverFinancing['budgetItem']): string => {
   if (!budgetItem) return '';
   if (typeof budgetItem === 'string') return budgetItem;
-  return budgetItem.siteName ?? budgetItem.site ?? budgetItem.name ?? budgetItem.id ?? '';
+  return budgetItem.id ?? budgetItem.value ?? budgetItem.siteName ?? budgetItem.site ?? budgetItem.name ?? '';
 };
 
 function useConstructionHandoverFormValues(

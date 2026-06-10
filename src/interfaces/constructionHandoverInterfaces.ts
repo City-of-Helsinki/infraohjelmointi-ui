@@ -74,6 +74,7 @@ export interface IConstructionHandoverFinancing {
     | string
     | {
         id?: string;
+        value?: string;
         name?: string;
         site?: string;
         siteName?: string;
@@ -85,6 +86,16 @@ export interface IConstructionHandoverFinancing {
 
 export interface FinancingRowPostAndPatchThunkContent {
   request: FinancingRowValues;
+}
+
+export interface FinancingRowRequest {
+  handover?: string;
+  project?: string;
+  financingParty: string;
+  description?: string;
+  budgetItemId?: string | null;
+  projectNumber: string;
+  budget: string;
 }
 
 export interface FinancingRowDeleteThunkContent {
