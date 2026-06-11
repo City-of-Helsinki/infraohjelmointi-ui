@@ -1,5 +1,4 @@
 import { useForm } from 'react-hook-form';
-import moment from 'moment';
 import { IProjectTalpaForm } from '@/interfaces/formInterfaces';
 import {
   ITalpaAssetClass,
@@ -15,25 +14,11 @@ import { useEffect } from 'react';
 import { infraInvestmentTemplateProject } from '@/components/Project/ProjectTalpa/templateProjectOptions';
 import { InvestmentProfile } from '@/components/Project/ProjectTalpa/investmentProfile';
 import { getTalpaProjectOpeningByProjectThunk, selectTalpaProject } from '@/reducers/talpaSlice';
-import { addYears } from '@/utils/dates';
+import { addYears, formatDateToHds } from '@/utils/dates';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { TalpaProfileName } from '@/components/Project/ProjectTalpa/profileName';
 import { selectResponsiblePersonsRaw } from '@/reducers/listsSlice';
 import { usePostalCode } from '@/hooks/usePostalCode';
-
-const formatDateToHds = (date?: string | null) => {
-  if (!date) {
-    return null;
-  }
-
-  const parsed = moment(date, ['YYYY-MM-DD', 'DD.MM.YYYY'], true);
-  if (parsed.isValid()) {
-    return parsed.format('DD.MM.YYYY');
-  }
-
-  const fallback = moment(date);
-  return fallback.isValid() ? fallback.format('DD.MM.YYYY') : null;
-};
 
 const buildProjectRangeOption = (
   projectRange: ITalpaProjectRange | null,

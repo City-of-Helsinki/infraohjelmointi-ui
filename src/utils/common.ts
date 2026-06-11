@@ -17,7 +17,7 @@ export const removeDotsFromString = (value: string) => value.replace('.', '');
 export const formatNumberToContainSpaces = (number: number) => {
   return String(new Intl.NumberFormat('de-DE').format(number)).replace(/\./g, ' ');
 };
-export const listItemToOption = (listItem: IListItem | undefined): Option => ({
+export const listItemToOption = (listItem: IListItem | undefined | null): Option => ({
   label: listItem?.value ?? '',
   value: listItem?.id ?? '',
   selected: false,
@@ -69,7 +69,7 @@ export const groupOptions = <T>(
     return groups;
   }, []);
 
-export const personToOption = (person?: IPerson): IOption => ({
+export const personToOption = (person?: IPerson | null): IOption => ({
   label: person ? `${person.firstName} ${person.lastName}` : '',
   value: person ? person.id : '',
 });

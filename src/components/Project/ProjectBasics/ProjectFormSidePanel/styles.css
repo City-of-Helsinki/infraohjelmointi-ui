@@ -23,5 +23,8 @@
 
 .project-form-side-panel .form-status-container {
   @apply py-5;
+}
+
+.project-form-side-panel .form-status-container:not(:last-child) {
   border-bottom: 1px solid var(--color-black-20);
 }

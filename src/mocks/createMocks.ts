@@ -1,4 +1,8 @@
 import { IListItem } from '@/interfaces/common';
+import {
+  ConstructionHandoverStatus,
+  IConstructionHandover,
+} from '@/interfaces/constructionHandoverInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { IProjectSapCost } from '@/interfaces/sapCostsInterfaces';
 
@@ -104,3 +108,27 @@ export const createProject = (overrides: ProjectOverrides = {}): IProject => {
     },
   };
 };
+
+export function createConstructionHandover(
+  overrides?: Partial<IConstructionHandover>,
+): IConstructionHandover {
+  return {
+    id: 'handover-1',
+    name: 'Test Handover',
+    description: 'This is a test construction handover.',
+    constructionProcurementMethod: null,
+    constructionStart: null,
+    constructionEnd: null,
+    otherTimelineNotes: '',
+    personPlanning: null,
+    personFinancing: null,
+    linkDesignDrawings: null,
+    linkCostAllocation: null,
+    linkContractBoundaries: null,
+    constructionProjectManager: null,
+    project: 'project-1',
+    status: ConstructionHandoverStatus.DRAFT,
+    totalCost: null,
+    ...overrides,
+  };
+}

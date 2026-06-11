@@ -423,7 +423,15 @@
     "otherTimelineNotesTooltip": "Kuvaa hankkeen ja aikataulutuksen välitavoitteita",
     "contacts": "Yhteyshenkilöt",
     "personPlanning": "Suunnittelu ja tekniset asiat",
-    "personFinancing": "Rahoitus ja aikataulu"
+    "personFinancing": "Rahoitus ja aikataulu",
+    "saveDraft": "Tallenna luonnoksena ",
+    "status": {
+      "draft": "Luonnos",
+      "submittedToProgrammer": "Siirretty ohjelmoijalle",
+      "submittedToConstruction": "Siirretty rakennuttajalle",
+      "projectManagerNamed": "Projektipäällikkö nimetty",
+      "movedToConstructionPreparation": "Siirretty rakentamisen valmisteluun"
+    }
   },
   "notification": {
     "title": {
@@ -471,6 +479,7 @@
       "notePatchSuccess": "Muistiinpano muokattu onnistuneesti",
       "talpaProjectPostSuccess": "Projektin avauspyyntö-excel luotu onnistuneesti.",
       "talpaProjectPatchSuccess": "Projektin avauspyyntö-excel muokattu onnistuneesti.",
+      "constructionHandoverPatchSuccess": "Rakennuttamiseen siirron luonnos muokattu onnistuneesti.",
       "Request failed with status code 400": "Pyyntö epäonnistui virhekoodilla 400",
       "Request failed with status code 401": "Pyyntö epäonnistui virhekoodilla 401",
       "Request failed with status code 403": "Pyyntö epäonnistui virhekoodilla 403",
