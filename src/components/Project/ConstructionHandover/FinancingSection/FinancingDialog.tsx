@@ -222,7 +222,7 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
                       description: '',
                       budgetItem: project?.typeQualifier?.id ?? '',
                       projectNumber: project?.sapProject ?? '',
-                      budget: project?.totalCost ?? project?.budget ?? project?.costForecast ?? '',
+                      budget: project?.budget ?? '',
                     }
                   : {
                       description: selectedFinancingParty === 'OTHER' ? prev.description ?? '' : '',

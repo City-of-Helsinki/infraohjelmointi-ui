@@ -255,7 +255,7 @@ const FinancingSection = () => {
         label="constructionHandoverForm.financingSection.title"
         name="constructionHandoverFinancing"
       />
-      <div>
+      <div className="input-wrapper">
         {tableRows.length > 0 ? (
           <Table cols={cols} rows={tableRows} indexKey="id" renderIndexCol={false} />
         ) : (
@@ -269,7 +269,8 @@ const FinancingSection = () => {
         >
           {t('constructionHandoverForm.financingSection.addRow')}
         </Button>
-        <TextField
+      </div>        
+      <TextField
           required
           {...getFieldProps('totalCost')}
           rules={{ ...validateRequired('totalCost', t) }}
@@ -280,7 +281,6 @@ const FinancingSection = () => {
           onRowSaved={onRowSaved}
           onRowDeleted={onRowDeleted}
         />
-      </div>
     </div>
   );
 };
