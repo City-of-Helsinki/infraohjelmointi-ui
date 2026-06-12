@@ -8,30 +8,11 @@ import { DialogMode } from '@/interfaces/menuItemsInterfaces';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useOptions } from '@/hooks/useOptions';
 import useGetProject from '@/hooks/useGetProject';
-import axios from 'axios';
 import { Button, ButtonVariant, Dialog, Notification, Select as HDSSelect, TextInput } from 'hds-react';
 import { TFunction } from 'i18next';
 import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const { REACT_APP_API_URL } = process.env;
-
-export const postFinancingRow = async (request: FinancingRowRequest) => {
-  const res = await axios.post(`${REACT_APP_API_URL}/construction-handover-financings/`, request);
-  return res.data;
-};
-
-export const patchFinancingRow = async (request: FinancingRowRequest, itemId: string) => {
-  const res = await axios.patch(
-    `${REACT_APP_API_URL}/construction-handover-financings/${itemId}/`,
-    request,
-  );
-  return res.data;
-};
-
-export const deleteFinancingRow = async (itemId: string) => {
-  await axios.delete(`${REACT_APP_API_URL}/construction-handover-financings/${itemId}/`);
-};
+import { deleteFinancingRow, patchFinancingRow, postFinancingRow } from '@/services/constructionHandoverServices';
 
 interface FinancingDialogProps {
   dialogState: FinancingDialogState;
@@ -59,25 +40,37 @@ const emptyDialogValues: FinancingRowValues = {
   id: '',
 };
 
-const normalizeSavedRow = (
-  saved: unknown,
-  fallbackValues: FinancingRowValues,
-): FinancingRowValues => {
-  if (!saved || typeof saved !== 'object') {
-    return fallbackValues;
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const mapDialogValuesToRequest = (
+  values: FinancingRowValues,
+  projectId: string | undefined,
+): FinancingRowRequest => {
+  return {
+    financingParty: values.financer,
+    description: values.description,
+    budgetItemId: values.budgetItem,
+    projectNumber: values.projectNumber,
+    budget: values.budget,
+    project: projectId,
+  };
+};
+
+const getSavedRowId = (saved: unknown): string | undefined => {
+  if (!isRecord(saved)) {
+    return undefined;
   }
 
-  const row = saved as Record<string, unknown>;
-  const budgetItem = row.budgetItem as Record<string, unknown> | undefined;
+  if (typeof saved.id === 'string') {
+    return saved.id;
+  }
 
-  return {
-    financer: String(row.financingParty ?? fallbackValues.financer ?? ''),
-    description: String(row.description ?? fallbackValues.description ?? ''),
-    budgetItem: String(budgetItem?.id ?? fallbackValues.budgetItem ?? ''),
-    projectNumber: String(row.projectNumber ?? fallbackValues.projectNumber ?? ''),
-    budget: String(row.budget ?? fallbackValues.budget ?? ''),
-    id: String(row.id ?? fallbackValues.id ?? ''),
-  };
+  if (typeof saved.id === 'number') {
+    return String(saved.id);
+  }
+
+  return undefined;
 };
 
 const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState, onRowSaved }) => {
@@ -106,6 +99,13 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
 
   const isOtherFinancingSelected = dialogValues.financer === 'OTHER';
 
+  const fieldError = (value: string | undefined) => getFieldError(t, submitAttempted, value);
+  const financerError = fieldError(dialogValues.financer);
+  const budgetItemError = fieldError(dialogValues.budgetItem);
+  const projectNumberError = fieldError(dialogValues.projectNumber);
+  const descriptionError = fieldError(dialogValues.description);
+  const budgetError = fieldError(dialogValues.budget);
+
   const onSetMenuItemName = useCallback(
     (value: keyof FinancingRowValues, e: ChangeEvent<HTMLInputElement>) =>
       setDialogValues((prev) => ({
@@ -127,14 +127,7 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
       return;
     }
 
-    const request: FinancingRowRequest = {
-      financingParty: dialogValues.financer,
-      description: dialogValues.description,
-      budgetItemId: dialogValues.budgetItem,
-      projectNumber: dialogValues.projectNumber,
-      budget: dialogValues.budget,
-      project: project?.id,
-    };
+    const request = mapDialogValuesToRequest(dialogValues, project?.id);
 
     try {
       const savedRow =
@@ -142,15 +135,13 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
           ? await patchFinancingRow(request, dialogValues.id)
           : await postFinancingRow(request);
 
+      const savedRowId = getSavedRowId(savedRow);
+
       onRowSaved(
-        normalizeSavedRow(savedRow, {
-          financer: dialogValues.financer,
-          description: dialogValues.description,
-          budgetItem: dialogValues.budgetItem,
-          projectNumber: dialogValues.projectNumber,
-          budget: dialogValues.budget,
-          id: dialogValues.id,
-        }),
+        {
+          ...dialogValues,
+          id: dialogState.mode === 'edit' ? dialogValues.id : (savedRowId ?? dialogValues.id),
+        },
         dialogState.mode,
       );
 
@@ -160,8 +151,8 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
 
       dispatch(
         notifySuccess({
-          message: t('constructionHandoverForm.financingSection.submitSuccessMessage'),
-          title: t('constructionHandoverForm.financingSection.submitSuccessTitle'),
+          message: dialogState.mode === 'edit' ? 'patchSuccess' : 'postSuccess',
+          title: dialogState.mode === 'edit' ? 'patchSuccess' : 'postSuccess',
           type: 'toast',
           duration: 1500,
         }),
@@ -169,8 +160,8 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
     } catch {
       dispatch(
         notifyError({
-          message: t('constructionHandoverForm.financingSection.submitError'),
-          title: t('constructionHandoverForm.financingSection.submitError'),
+          message: dialogState.mode === 'edit' ? 'patchError' : 'postError',
+          title: dialogState.mode === 'edit' ? 'patchError' : 'postError',
           type: 'toast',
           duration: 1500,
         }),
@@ -231,13 +222,11 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
                     }),
               }));
             }}
-            invalid={
-              getFieldError(t, submitAttempted, dialogValues.financer) !== undefined
-            }
+            invalid={financerError !== undefined}
             required
             texts={{
               label: t('constructionHandoverForm.financingSection.label.financer'),
-              error: getFieldError(t, submitAttempted, dialogValues.financer),
+              error: financerError,
               placeholder: t('choose'),
             }}
           />
@@ -258,13 +247,11 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
                   budgetItem: clickedOption?.value ?? '',
                 }));
               }}
-              invalid={
-                getFieldError(t, submitAttempted, dialogValues.budgetItem) !== undefined
-              }
+              invalid={budgetItemError !== undefined}
               required
               texts={{
                 label: t('constructionHandoverForm.financingSection.label.budgetItem'),
-                error: getFieldError(t, submitAttempted, dialogValues.budgetItem),
+                error: budgetItemError,
                 placeholder: t('choose'),
               }}
             />
@@ -278,10 +265,8 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
               value={dialogValues.projectNumber}
               onChange={(e) => onSetMenuItemName('projectNumber', e)}
               data-testid="financing-dialog-project-number-input"
-              errorText={getFieldError(t, submitAttempted, dialogValues.projectNumber)}
-              invalid={
-                getFieldError(t, submitAttempted, dialogValues.projectNumber) !== undefined
-              }
+              errorText={projectNumberError}
+              invalid={projectNumberError !== undefined}
               required
             />
             {dialogState.mode === 'edit' &&
@@ -305,8 +290,8 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
             value={dialogValues.description ?? ''}
             onChange={(e) => onSetMenuItemName('description', e)}
             data-testid="financing-dialog-description-input"
-            errorText={getFieldError(t, submitAttempted, dialogValues.description)}
-            invalid={getFieldError(t, submitAttempted, dialogValues.description) !== undefined}
+            errorText={descriptionError}
+            invalid={descriptionError !== undefined}
             required
           />
         )}
@@ -316,8 +301,8 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
           value={dialogValues.budget}
           onChange={(e) => onSetMenuItemName('budget', e)}
           data-testid="financing-dialog-budget-input"
-          errorText={getFieldError(t, submitAttempted, dialogValues.budget)}
-          invalid={getFieldError(t, submitAttempted, dialogValues.budget) !== undefined}
+          errorText={budgetError}
+          invalid={budgetError !== undefined}
           required
         />
       </Content>

@@ -1,6 +1,6 @@
 import { IListItem } from './common';
-import { AppDispatch } from '@/store';
-import { DialogMode } from './menuItemsInterfaces';
+import type { AppDispatch } from '@/store';
+import type { DialogMode } from './menuItemsInterfaces';
 import { IPerson } from './personsInterfaces';
 
 export enum ConstructionHandoverStatus {

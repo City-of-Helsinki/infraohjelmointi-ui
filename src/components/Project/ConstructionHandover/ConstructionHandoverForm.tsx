@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { FieldPath, FormProvider } from 'react-hook-form';
 import NameAndDescriptionSection from './NameAndDescriptionSection';
-import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import ScheduleSection from './ScheduleSection';
 import ContactsSection from './ContactsSection';
@@ -20,6 +19,7 @@ import {
 } from '@/interfaces/constructionHandoverInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
 import FinancingSection from './FinancingSection/FinancingSection';
+import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -45,7 +45,7 @@ function mapFormToRequest(
     personPlanning: formData.personPlanning.value,
     personFinancing: formData.personFinancing.value,
     project: projectId,
-    totalCost: parsedTotalCost !== null && !isNaN(parsedTotalCost) ? parsedTotalCost : null,
+    totalCost: parsedTotalCost,
     linkDesignDrawings: null,
     linkCostAllocation: null,
     linkContractBoundaries: null,

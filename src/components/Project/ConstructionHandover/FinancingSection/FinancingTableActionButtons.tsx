@@ -11,6 +11,7 @@ interface EditCellProps {
 const EditCell: FC<EditCellProps> = ({ onEditRow, id, values }) => {
   return (
     <button
+      type="button"
       onClick={() => onEditRow(id, values)}
       data-testid={`financing-row-edit-button-id-${id}`}
     >

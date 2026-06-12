@@ -16,6 +16,10 @@ import { useOptions } from '@/hooks/useOptions';
 import FinancingDialog from './FinancingDialog';
 
 const formatBudgetEuro = (value: string): string => {
+  if (value.trim() === '') {
+    return '';
+  }
+
   const numericValue = Number(
     value
       .replace(/\s/g, '')
@@ -270,7 +274,9 @@ const FinancingSection = () => {
           {t('constructionHandoverForm.financingSection.addRow')}
         </Button>
       </div>
-      <TextField {...getFieldProps('totalCost')} />
+      <TextField
+        {...getFieldProps('totalCost')}
+      />
       <FinancingDialog
         dialogState={dialogState}
         handleClose={handleClose}
