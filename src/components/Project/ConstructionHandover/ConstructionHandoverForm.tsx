@@ -32,6 +32,9 @@ function mapFormToRequest(
   formData: IConstructionHandoverForm,
   projectId: string,
 ): IConstructionHandoverRequest {
+  const parsedTotalCost =
+    formData.totalCost !== '' ? Number(formData.totalCost) : null;
+
   return {
     name: formData.name,
     description: formData.description,
@@ -42,7 +45,7 @@ function mapFormToRequest(
     personPlanning: formData.personPlanning.value,
     personFinancing: formData.personFinancing.value,
     project: projectId,
-    totalCost: null,
+    totalCost: parsedTotalCost !== null && !isNaN(parsedTotalCost) ? parsedTotalCost : null,
     linkDesignDrawings: null,
     linkCostAllocation: null,
     linkContractBoundaries: null,

@@ -455,7 +455,9 @@
         "budgetItem": "Talousarviokohta",
         "projectNumber": "Projektinumero",
         "budget": "Budjetti"
-      }
+      },
+      "projectNumberWarning": "Projektinumeroa ei voitu hakea tietokannasta. Kirjaa se käsin tai yritä myöhemmin uudelleen."
+    }
   },
   "notification": {
     "title": {

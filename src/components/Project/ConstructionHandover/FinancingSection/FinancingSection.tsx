@@ -12,7 +12,6 @@ import { DialogMode } from '@/interfaces/menuItemsInterfaces';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { DeleteCell, EditCell } from './FinancingTableActionButtons';
 import { getFieldProps } from '../ConstructionHandoverForm';
-import { validateRequired } from '@/utils/validation';
 import { useOptions } from '@/hooks/useOptions';
 import FinancingDialog from './FinancingDialog';
 
@@ -209,6 +208,7 @@ const FinancingSection = () => {
     budgetItem: row.hasSubRows ? (
       <button
         type="button"
+        style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         onClick={() =>
           setExpandedMainRows((prev) => ({
             ...prev,
@@ -216,14 +216,14 @@ const FinancingSection = () => {
           }))
         }
       >
-        <span>{row.budgetItemText}</span>
         {expandedMainRows[row.mainRowKey] ? <IconAngleUp /> : <IconAngleDown />}
+        <span>{row.budgetItemText}</span>
       </button>
     ) : (
       row.budgetItemText
     ),
     projectNumber: row.projectNumber,
-    budget: row.budget,
+    budget: <span style={{ whiteSpace: 'nowrap' }}>{row.budget}</span>,
     editCell:
       row.showActions && row.item ? (
         <EditCell onEditRow={handleEdit} id={row.item.id} values={row.item} />
@@ -269,18 +269,14 @@ const FinancingSection = () => {
         >
           {t('constructionHandoverForm.financingSection.addRow')}
         </Button>
-      </div>        
-      <TextField
-          required
-          {...getFieldProps('totalCost')}
-          rules={{ ...validateRequired('totalCost', t) }}
-        />
-        <FinancingDialog
-          dialogState={dialogState}
-          handleClose={handleClose}
-          onRowSaved={onRowSaved}
-          onRowDeleted={onRowDeleted}
-        />
+      </div>
+      <TextField {...getFieldProps('totalCost')} />
+      <FinancingDialog
+        dialogState={dialogState}
+        handleClose={handleClose}
+        onRowSaved={onRowSaved}
+        onRowDeleted={onRowDeleted}
+      />
     </div>
   );
 };

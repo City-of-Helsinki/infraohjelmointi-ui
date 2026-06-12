@@ -9,7 +9,7 @@ import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
 import { useOptions } from '@/hooks/useOptions';
 import useGetProject from '@/hooks/useGetProject';
 import axios from 'axios';
-import { Button, ButtonVariant, Dialog, Select as HDSSelect, TextInput } from 'hds-react';
+import { Button, ButtonVariant, Dialog, Notification, Select as HDSSelect, TextInput } from 'hds-react';
 import { TFunction } from 'i18next';
 import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -105,7 +105,6 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
   }, [dialogState]);
 
   const isOtherFinancingSelected = dialogValues.financer === 'OTHER';
-  const isDescriptionRequired = isOtherFinancingSelected;
 
   const onSetMenuItemName = useCallback(
     (value: keyof FinancingRowValues, e: ChangeEvent<HTMLInputElement>) =>
@@ -120,10 +119,10 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
     setSubmitAttempted(true);
     if (
       !dialogValues.financer ||
-      !dialogValues.budgetItem ||
-      !dialogValues.projectNumber ||
+      (!isOtherFinancingSelected && !dialogValues.budgetItem) ||
+      (!isOtherFinancingSelected && !dialogValues.projectNumber) ||
       !dialogValues.budget ||
-      (isDescriptionRequired && !dialogValues.description)
+      (isOtherFinancingSelected && !dialogValues.description)
     ) {
       return;
     }
@@ -182,7 +181,7 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
     dialogState.mode,
     dispatch,
     handleClose,
-    isDescriptionRequired,
+    isOtherFinancingSelected,
     onRowSaved,
     project?.id,
     t,
@@ -222,7 +221,7 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
                       description: '',
                       budgetItem: project?.typeQualifier?.id ?? '',
                       projectNumber: project?.sapProject ?? '',
-                      budget: project?.budget ?? '',
+                      budget: project?.budget ?? '0',
                     }
                   : {
                       description: selectedFinancingParty === 'OTHER' ? prev.description ?? '' : '',
@@ -243,55 +242,63 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
             }}
           />
         </div>
-        <div data-testid="financing-dialog-budget-item-select">
-          <HDSSelect
-            id="financing-dialog-budget-item-select"
-            options={budgetItemOptions}
-            value={
-              dialogValues.budgetItem
-                ? budgetItemOptions.filter((option) => option.value === dialogValues.budgetItem)
-                : []
-            }
-            onChange={(_, clickedOption) => {
-              setDialogValues((prev) => ({
-                ...prev,
-                budgetItem: clickedOption?.value ?? '',
-              }));
-            }}
-            invalid={
-              getFieldError(t, submitAttempted, dialogValues.budgetItem) !== undefined
-            }
-            required
-            texts={{
-              label: t('constructionHandoverForm.financingSection.label.budgetItem'),
-              error: getFieldError(t, submitAttempted, dialogValues.budgetItem),
-              placeholder: t('choose'),
-            }}
-          />
-        </div>
-        <TextInput
-          id="financing-dialog-project-number-input"
-          label={t('constructionHandoverForm.financingSection.label.projectNumber')}
-          value={dialogValues.projectNumber}
-          onChange={(e) => onSetMenuItemName('projectNumber', e)}
-          data-testid="financing-dialog-project-number-input"
-          errorText={getFieldError(t, submitAttempted, dialogValues.projectNumber)}
-          invalid={
-            getFieldError(t, submitAttempted, dialogValues.projectNumber) !== undefined
-          }
-          required
-        />
-        <TextInput
-          id="financing-dialog-budget-input"
-          label={t('constructionHandoverForm.financingSection.label.budget')}
-          value={dialogValues.budget}
-          onChange={(e) => onSetMenuItemName('budget', e)}
-          data-testid="financing-dialog-budget-input"
-          errorText={getFieldError(t, submitAttempted, dialogValues.budget)}
-          invalid={getFieldError(t, submitAttempted, dialogValues.budget) !== undefined}
-          required
-        />
-        {isDescriptionRequired && (
+        {!isOtherFinancingSelected && (
+          <div data-testid="financing-dialog-budget-item-select">
+            <HDSSelect
+              id="financing-dialog-budget-item-select"
+              options={budgetItemOptions}
+              value={
+                dialogValues.budgetItem
+                  ? budgetItemOptions.filter((option) => option.value === dialogValues.budgetItem)
+                  : []
+              }
+              onChange={(_, clickedOption) => {
+                setDialogValues((prev) => ({
+                  ...prev,
+                  budgetItem: clickedOption?.value ?? '',
+                }));
+              }}
+              invalid={
+                getFieldError(t, submitAttempted, dialogValues.budgetItem) !== undefined
+              }
+              required
+              texts={{
+                label: t('constructionHandoverForm.financingSection.label.budgetItem'),
+                error: getFieldError(t, submitAttempted, dialogValues.budgetItem),
+                placeholder: t('choose'),
+              }}
+            />
+          </div>
+        )}
+        {!isOtherFinancingSelected && (
+          <>
+            <TextInput
+              id="financing-dialog-project-number-input"
+              label={t('constructionHandoverForm.financingSection.label.projectNumber')}
+              value={dialogValues.projectNumber}
+              onChange={(e) => onSetMenuItemName('projectNumber', e)}
+              data-testid="financing-dialog-project-number-input"
+              errorText={getFieldError(t, submitAttempted, dialogValues.projectNumber)}
+              invalid={
+                getFieldError(t, submitAttempted, dialogValues.projectNumber) !== undefined
+              }
+              required
+            />
+            {dialogState.mode === 'edit' &&
+              dialogValues.financer === 'KYMP' &&
+              !dialogValues.projectNumber && (
+                <Notification
+                  label=""
+                  type="alert"
+                  position="inline"
+                  data-testid="financing-project-number-warning"
+                >
+                  {t('constructionHandoverForm.financingSection.projectNumberWarning')}
+                </Notification>
+              )}
+          </>
+        )}
+        {isOtherFinancingSelected && (
           <TextInput
             id="financing-dialog-description-input"
             label={t('constructionHandoverForm.description')}
@@ -303,6 +310,16 @@ const AddOrEditRowDialog: FC<FinancingDialogProps> = ({ handleClose, dialogState
             required
           />
         )}
+        <TextInput
+          id="financing-dialog-budget-input"
+          label={t('constructionHandoverForm.financingSection.label.budget')}
+          value={dialogValues.budget}
+          onChange={(e) => onSetMenuItemName('budget', e)}
+          data-testid="financing-dialog-budget-input"
+          errorText={getFieldError(t, submitAttempted, dialogValues.budget)}
+          invalid={getFieldError(t, submitAttempted, dialogValues.budget) !== undefined}
+          required
+        />
       </Content>
       <ActionButtons>
         <Button onClick={onSaveChange} data-testid="submit-financing-row-button">

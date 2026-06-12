@@ -28,12 +28,13 @@ export interface IConstructionHandover {
   linkCostAllocation: string | null;
   linkContractBoundaries: string | null;
   constructionProjectManager: IPerson | null;
+  constructionHandoverFinancing: IConstructionHandoverFinancing[];
 }
 
 export interface IConstructionHandoverRequest
   extends Omit<
     IConstructionHandover,
-    'id' | 'status' | 'constructionProcurementMethod' | 'personPlanning' | 'personFinancing'
+    'id' | 'status' | 'constructionProcurementMethod' | 'personPlanning' | 'personFinancing' | 'constructionHandoverFinancing'
   > {
   project: string;
   constructionProcurementMethod: string;
@@ -59,7 +60,7 @@ export interface FinancingDialogState {
 
 export interface FinancingRowValues {
   financer: string;
-  description?: string;
+  description: string;
   budgetItem: string;
   projectNumber: string;
   budget: string;

@@ -206,6 +206,164 @@ describe('ConstructionHandoverForm submit', () => {
       expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
     });
   });
+
+  it('maps totalCost as a number when form has a value', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: 75000,
+    });
+    const project = createProject({ id: 'project-456' });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm
+              project={project}
+              constructionHandover={constructionHandover}
+            />
+          }
+        />,
+      ),
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: 75000,
+          }),
+        }),
+      );
+    });
+  });
+
+  it('maps totalCost as null when form field is empty', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: null,
+    });
+    const project = createProject({ id: 'project-789' });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm
+              project={project}
+              constructionHandover={constructionHandover}
+            />
+          }
+        />,
+      ),
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: null,
+          }),
+        }),
+      );
+    });
+  });
+
+  it('maps totalCost as null when value is not a valid number', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: Number.NaN,
+    });
+    const project = createProject({ id: 'project-999' });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm
+              project={project}
+              constructionHandover={constructionHandover}
+            />
+          }
+        />,
+      ),
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: null,
+          }),
+        }),
+      );
+    });
+  });
+});
+
+describe('ConstructionHandoverForm financing rows', () => {
+  it('displays financing rows returned from API in table', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionHandoverFinancing: [
+        {
+          id: 'financing-1',
+          financingParty: 'KYMP',
+          description: '',
+          budgetItem: { id: 'budget-1', value: 'K1' },
+          projectNumber: 'HEL-2024-001',
+          budget: '150000',
+        },
+      ],
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm
+              project={createProject()}
+              constructionHandover={constructionHandover}
+            />
+          }
+        />,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('HEL-2024-001')).toBeInTheDocument();
+    });
+  });
 });
 
 describe('ConstructionHandoverForm status transitions', () => {
