@@ -113,7 +113,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       control={control as Control<FieldValues>}
       rules={rules}
       render={({
-        field: { value, onChange, onBlur, disabled: fieldDisabled },
+        field: { value, onChange, onBlur },
         fieldState: { error },
       }) => {
         const translatedValue = translateValue(value);
@@ -127,7 +127,7 @@ const SelectField: FC<ISelectFieldProps> = ({
             updateIconBasedOnSelection(clickedOption.value);
           }
         };
-        const isDisabled = disabled || fieldDisabled;
+        const isDisabled = Boolean(disabled);
         return (
           <div className={`input-wrapper ${wrapperClassName ?? ''}`} id={name} data-testid={name}>
             {/**

@@ -37,7 +37,7 @@ const DateField: FC<IDateFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => {
+      render={({ field: { onChange, value }, fieldState: { error } }) => {
         return (
           <div
             className={`input-wrapper date-field-wrapper ${className}`}
@@ -60,7 +60,7 @@ const DateField: FC<IDateFieldProps> = ({
               maxDate={datePlus10Years}
               disableDatePicker={readOnly}
               helperText={helperText}
-              disabled={disabled ?? fieldDisabled}
+              disabled={disabled}
             />
           </div>
         );

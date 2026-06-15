@@ -25,7 +25,11 @@ export default function ProjectClassesSection() {
   const talpaServiceClasses = useSelector(selectTalpaServiceClasses);
   const talpaAssetClasses = useSelector(selectTalpaAssetClasses);
 
-  const [budgetItemNumber, assetClass] = watch(['budgetItemNumber', 'assetClass']);
+  const [budgetItemNumber, assetClass, isLocked] = watch([
+    'budgetItemNumber',
+    'assetClass',
+    'isLocked',
+  ]);
   const budgetItemNumberTouched = Boolean(touchedFields?.budgetItemNumber);
 
   const serviceClassOptions = useMemo(() => {
@@ -89,6 +93,7 @@ export default function ProjectClassesSection() {
         size="full"
         rules={{ ...validateRequired('serviceClass', t) }}
         placeholder={t('projectTalpaForm.serviceClassPlaceholder')}
+        disabled={isLocked}
       />
       {/* Käyttöomaisuusluokka */}
       <SelectField
@@ -97,6 +102,7 @@ export default function ProjectClassesSection() {
         size="full"
         rules={{ ...validateRequired('assetClass', t) }}
         placeholder={t('projectTalpaForm.assetClassPlaceholder')}
+        disabled={isLocked}
       />
       {/* Proﬁiilin nimi */}
       <TextField {...getFieldProps('profileName')} size="full" />
@@ -115,6 +121,7 @@ export default function ProjectClassesSection() {
           size="full"
           wrapperClassName="basis-1/3"
           rules={{ ...validateRequired('readiness', t) }}
+          disabled={isLocked}
         />
       </div>
     </div>

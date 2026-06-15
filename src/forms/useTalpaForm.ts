@@ -185,7 +185,6 @@ export default function useTalpaForm(project: IProject | null) {
 
   const formMethods = useForm<IProjectTalpaForm>({
     values: formValues,
-    disabled: formValues.isLocked,
   });
 
   const { watch, setValue } = formMethods;
