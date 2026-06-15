@@ -32,8 +32,9 @@ function mapFormToRequest(
   formData: IConstructionHandoverForm,
   projectId: string,
 ): IConstructionHandoverRequest {
-  const parsedTotalCost =
-    formData.totalCost !== '' ? Number(formData.totalCost) : null;
+const parsedTotalCost = formData.totalCost === '' || formData.totalCost == null
+    ? null
+    : Number(formData.totalCost);
 
   return {
     name: formData.name,
