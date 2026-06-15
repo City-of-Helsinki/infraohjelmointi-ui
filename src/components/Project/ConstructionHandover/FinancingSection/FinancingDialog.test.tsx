@@ -44,10 +44,19 @@ jest.mock('@/services/constructionHandoverServices', () => ({
 jest.mock('hds-react', () => {
   const Dialog = ({ isOpen, children }: { isOpen: boolean; children?: ReactNode }) =>
     isOpen ? <div>{children}</div> : null;
+  Dialog.displayName = 'Dialog';
 
-  Dialog.Header = ({ title }: { title?: ReactNode }) => <div>{title}</div>;
-  Dialog.Content = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
-  Dialog.ActionButtons = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
+  const Header = ({ title }: { title?: ReactNode }) => <div>{title}</div>;
+  Header.displayName = 'Dialog.Header';
+  Dialog.Header = Header;
+
+  const Content = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
+  Content.displayName = 'Dialog.Content';
+  Dialog.Content = Content;
+
+  const ActionButtons = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
+  ActionButtons.displayName = 'Dialog.ActionButtons';
+  Dialog.ActionButtons = ActionButtons;
 
   return {
     Dialog,
