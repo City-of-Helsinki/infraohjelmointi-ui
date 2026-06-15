@@ -43,3 +43,8 @@ export interface IConstructionHandoverPatchRequest {
   id: string;
   data: IConstructionHandoverRequest;
 }
+
+export interface IConstructionHandoverTransitionResponse {
+  currentStatus: ConstructionHandoverStatus;
+  possibleTransitions: ConstructionHandoverStatus[];
+}

@@ -3,6 +3,7 @@ import {
   ConstructionHandoverStatus,
   IConstructionHandover,
   IConstructionHandoverPatchRequest,
+  IConstructionHandoverTransitionResponse,
 } from '@/interfaces/constructionHandoverInterfaces';
 import { notifySuccess } from '@/reducers/notificationSlice';
 import { t } from 'i18next';
@@ -56,7 +57,7 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
       invalidatesTags: ['ConstructionHandovers'],
     }),
     transitionConstructionHandoverStatus: build.mutation<
-      IConstructionHandover,
+      IConstructionHandoverTransitionResponse,
       { id: string; to: ConstructionHandoverStatus }
     >({
       query: ({ id, to }) => ({
