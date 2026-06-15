@@ -13,6 +13,7 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { DeleteCell, EditCell } from './FinancingTableActionButtons';
 import { getFieldProps } from '../ConstructionHandoverForm';
 import { useOptions } from '@/hooks/useOptions';
+import { formatNumberToContainSpaces } from '@/utils/common';
 import FinancingDialog from './FinancingDialog';
 
 const formatBudgetEuro = (value: string): string => {
@@ -20,21 +21,13 @@ const formatBudgetEuro = (value: string): string => {
     return '';
   }
 
-  const numericValue = Number(
-    value
-      .replace(/\s/g, '')
-      .replace('€', '')
-      .replace(',', '.'),
-  );
+  const numericValue = Number(value);
 
   if (!Number.isFinite(numericValue)) {
     return value;
   }
 
-  const [integerPart, decimalPart] = numericValue.toFixed(2).split('.');
-  const groupedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
-  return `${groupedInteger},${decimalPart}€`;
+  return `${formatNumberToContainSpaces(numericValue)}€`;
 };
 
 const FinancingSection = () => {

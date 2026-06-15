@@ -167,7 +167,7 @@ describe('FinancingSection', () => {
 
     await waitFor(() => {
       expect(screen.getByText('HEL-NEW-001')).toBeInTheDocument();
-      expect(screen.getByText(/12 345,00/)).toBeInTheDocument();
+      expect(screen.getByText('12 345€')).toBeInTheDocument();
     });
   });
 
@@ -243,5 +243,29 @@ describe('FinancingSection', () => {
       expect(screen.getByText('HEL-KYMP-001')).toBeInTheDocument();
       expect(screen.getByText('HEL-KYMP-002')).toBeInTheDocument();
     });
+  });
+
+  it('keeps backend-provided decimals', async () => {
+    await renderSection([
+      {
+        id: 'row-decimal',
+        financer: 'OTHER',
+        description: 'Has decimals',
+        budgetItem: '',
+        projectNumber: 'HEL-DEC-001',
+        budget: '1000.5',
+      },
+      {
+        id: 'row-integer',
+        financer: 'OTHER',
+        description: 'No decimals',
+        budgetItem: '',
+        projectNumber: 'HEL-INT-001',
+        budget: '2000',
+      },
+    ]);
+
+    expect(screen.getByText('1 000,5€')).toBeInTheDocument();
+    expect(screen.getByText('2 000€')).toBeInTheDocument();
   });
 });
