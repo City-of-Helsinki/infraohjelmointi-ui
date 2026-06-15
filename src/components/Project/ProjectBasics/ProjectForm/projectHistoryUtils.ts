@@ -1,6 +1,10 @@
+import { TFunction } from 'i18next';
+import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem } from '@/interfaces/common';
 import { IListState } from '@/reducers/listsSlice';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
+
+export const NO_PREVIOUS_VALUE = '—';
 
 // Financial figures are stored keyed by calendar year ("2026"); form-field
 // changes are keyed by field name. The form-level panel only shows the latter —
@@ -14,6 +18,7 @@ const RELATION_FIELD_LISTS: Partial<Record<string, keyof IListState>> = {
   phase: 'phases',
   phaseDetail: 'projectPhaseDetails',
   category: 'categories',
+  projectClass: 'projectClasses',
   constructionProcurementMethod: 'constructionProcurementMethods',
   staraProcurementReason: 'staraProcurementReasons',
   type: 'types',
@@ -25,6 +30,19 @@ const RELATION_FIELD_LISTS: Partial<Record<string, keyof IListState>> = {
 
 // Fields rendered as state "pills" (old → new) instead of a text diff.
 export const PILL_FIELDS = new Set<string>(['phase', 'phaseDetail']);
+
+export const historyFieldLabelKey = (field: string): string =>
+  `projectForm.changeHistory.fields.${field}`;
+
+export const historyFieldLabel = (field: string, t: TFunction): string =>
+  t(historyFieldLabelKey(field), {
+    defaultValue: t(`projectForm.${field}`, { defaultValue: field }),
+  });
+
+const resolveProjectClassName = (raw: string, classes: Array<IClass>): string | undefined => {
+  const match = classes.find((item) => item.id === raw);
+  return match?.name;
+};
 
 export const resolveHistoryValue = (
   field: string,
@@ -38,10 +56,17 @@ export const resolveHistoryValue = (
 
   const listKey = RELATION_FIELD_LISTS[field];
   if (listKey) {
-    const list = lists[listKey] as Array<IListItem> | undefined;
-    const match = Array.isArray(list) ? list.find((item) => item.id === raw) : undefined;
-    if (match?.value) {
-      return match.value;
+    if (listKey === 'projectClasses') {
+      const resolved = resolveProjectClassName(raw, lists.projectClasses ?? []);
+      if (resolved) {
+        return resolved;
+      }
+    } else {
+      const list = lists[listKey] as Array<IListItem> | undefined;
+      const match = Array.isArray(list) ? list.find((item) => item.id === raw) : undefined;
+      if (match?.value) {
+        return match.value;
+      }
     }
   }
   return raw;
@@ -79,16 +104,15 @@ export const historyActionOf = (
   return { key: 'editedForm' };
 };
 
-// Deterministic avatar background so the same actor keeps the same colour.
 const AVATAR_COLORS = [
-  '#9b3074', // coat-of-arms / plum
-  '#0072c6', // bus / blue
-  '#00a393', // success / teal
-  '#c2a251', // gold
-  '#e07799', // pink
-  '#7a51c2', // purple
-  '#1a7a4c', // green
-  '#bd2719', // brick
+  'var(--color-coat-of-arms)',
+  'var(--color-bus)',
+  'var(--color-success)',
+  'var(--color-gold)',
+  'var(--color-suomenlinna)',
+  'var(--color-trams)',
+  'var(--color-copper)',
+  'var(--color-error)',
 ];
 
 export const avatarColor = (seed: string): string => {

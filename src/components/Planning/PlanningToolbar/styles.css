@@ -46,7 +46,3 @@
   border: 1px solid var(--color-bus);
   @apply bg-bus-l;
 }
-
-.toolbar-button-active {
-  @apply !text-bus;
-}

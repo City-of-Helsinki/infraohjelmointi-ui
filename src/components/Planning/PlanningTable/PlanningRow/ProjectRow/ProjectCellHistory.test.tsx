@@ -61,7 +61,7 @@ describe('ProjectCellHistory (IO-881)', () => {
     expect(screen.getByText('Mats Mattsen')).toBeInTheDocument();
     expect(screen.queryByText('Third Person')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId('cell-history-more-p1-2026'));
+    fireEvent.mouseDown(screen.getByTestId('cell-history-more-p1-2026'));
     expect(screen.getByText('Third Person')).toBeInTheDocument();
   });
 

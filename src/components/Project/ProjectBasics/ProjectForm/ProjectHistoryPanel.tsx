@@ -10,8 +10,10 @@ import {
   actorNameOf,
   avatarColor,
   formFieldsOf,
+  historyFieldLabel,
   historyActionOf,
   initialsOf,
+  NO_PREVIOUS_VALUE,
   PILL_FIELDS,
   resolveHistoryValue,
 } from './projectHistoryUtils';
@@ -64,12 +66,11 @@ const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, p
   }
 
   const unknownActor = t('projectForm.changeHistory.unknownActor');
-  const noPreviousValue = t('projectForm.changeHistory.noPreviousValue');
 
   const renderChange = (entry: IProjectHistoryEntry, field: string) => {
     const oldValue = resolveHistoryValue(field, entry.old_values?.[field], lists);
     const newValue = resolveHistoryValue(field, entry.new_values?.[field], lists);
-    const fieldLabel = t(`projectForm.${field}`, { defaultValue: field });
+    const fieldLabel = historyFieldLabel(field, t);
 
     if (PILL_FIELDS.has(field)) {
       return (
@@ -80,7 +81,7 @@ const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, p
         >
           {oldValue && <span className="project-history-pill is-old">{oldValue}</span>}
           {oldValue && <span className="project-history-arrow" aria-hidden="true">→</span>}
-          <span className="project-history-pill is-new">{newValue || noPreviousValue}</span>
+          <span className="project-history-pill is-new">{newValue || NO_PREVIOUS_VALUE}</span>
         </div>
       );
     }
@@ -93,9 +94,9 @@ const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, p
       >
         <span className="project-history-field-label">{fieldLabel}</span>
         <span className="project-history-diff">
-          <span className="project-history-old-value">{oldValue || noPreviousValue}</span>
+          <span className="project-history-old-value">{oldValue || NO_PREVIOUS_VALUE}</span>
           <span className="project-history-arrow" aria-hidden="true">→</span>
-          <span className="project-history-new-value">{newValue || noPreviousValue}</span>
+          <span className="project-history-new-value">{newValue || NO_PREVIOUS_VALUE}</span>
         </span>
       </div>
     );
@@ -107,7 +108,7 @@ const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, p
     const actionText =
       action.key === 'editedField'
         ? t('projectForm.changeHistory.action.editedField', {
-            field: t(`projectForm.${action.field}`, { defaultValue: action.field }),
+            field: historyFieldLabel(action.field ?? '', t),
           })
         : t(`projectForm.changeHistory.action.${action.key}`);
     const fields = formFieldsOf(entry);

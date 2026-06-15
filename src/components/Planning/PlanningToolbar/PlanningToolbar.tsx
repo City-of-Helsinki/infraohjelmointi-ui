@@ -7,7 +7,6 @@ import {
   IconMoneyBagFill,
   IconEyeCrossed,
   IconEye,
-  IconClock,
 } from 'hds-react/icons/';
 import { useCallback, MouseEvent as ReactMouseEvent, useState, memo, useMemo } from 'react';
 import { dispatchContextMenuEvent, hideTooltipImmediately } from '@/utils/events';
@@ -230,10 +229,10 @@ const PlanningToolbar = () => {
             {/* Change history (IO-881) */}
             <Button
               variant={ButtonVariant.Supplementary}
-              className={`toolbar-button ${changeHistoryEnabled ? 'toolbar-button-active' : ''}`}
+              className="toolbar-button"
               onClick={toggleChangeHistory}
               data-testid="toggle-change-history-button"
-              iconStart={<IconClock />}
+              iconStart={changeHistoryEnabled ? <IconEyeCrossed /> : <IconEye />}
             >
               {changeHistoryEnabled
                 ? t('tooltips.hideChangeHistory')

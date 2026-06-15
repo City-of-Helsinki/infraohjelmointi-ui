@@ -25,6 +25,10 @@
   @apply py-5;
 }
 
+.project-form-side-panel .change-history-container {
+  @apply border-b border-black-20 py-5;
+}
+
 .project-form-side-panel .form-status-container:not(:last-child) {
   border-bottom: 1px solid var(--color-black-20);
 }

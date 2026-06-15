@@ -377,7 +377,6 @@
       "empty": "Tälle hankkeelle ei ole tallennettua muutoshistoriaa.",
       "error": "Muutoshistorian lataaminen epäonnistui.",
       "unknownActor": "Tuntematon käyttäjä",
-      "noPreviousValue": "—",
       "field": "Kenttä",
       "change": "Muutos",
       "close": "Sulje",
@@ -392,6 +391,26 @@
         "changedPhase": "muutti hankkeen vaihetta",
         "editedField": "muokkasi {{field}}-kenttää",
         "editedForm": "muokkasi lomaketta"
+      },
+      "fields": {
+        "name": "Hankkeen nimi",
+        "description": "Hankkeen kuvaus",
+        "category": "Kategoria",
+        "projectClass": "Alaluokka",
+        "phase": "Hankkeen vaihe",
+        "phaseDetail": "Vaiheen tarkenne",
+        "planningStartYear": "Suunnittelun aloitusvuosi",
+        "constructionEndYear": "Rakentamisen valmistumisvuosi",
+        "estPlanningStart": "Suunnittelu, alkaa",
+        "estPlanningEnd": "Suunnittelu, päättyy",
+        "estConstructionStart": "Rakentaminen, alkaa",
+        "estConstructionEnd": "Rakentaminen, päättyy",
+        "estWarrantyPhaseStart": "Takuuaika, alkaa",
+        "estWarrantyPhaseEnd": "Takuuaika, päättyy",
+        "presenceStart": "Esilläolo alkaa",
+        "presenceEnd": "Esilläolo päättyy",
+        "visibilityStart": "Nähtävilläolo alkaa",
+        "visibilityEnd": "Nähtävilläolo päättyy"
       }
     }
   },
