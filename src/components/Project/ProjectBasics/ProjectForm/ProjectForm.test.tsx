@@ -321,7 +321,8 @@ describe('projectForm', () => {
     await user.click(await dialog.findByText('addHashTag'));
 
     await user.type(await dialog.findByPlaceholderText('projectForm.searchForHashTags'), 'hul');
-    await waitFor(async () => await user.click(await dialog.findByText('hulevesi')));
+    const hulevesiOption = await dialog.findByText('hulevesi', undefined, { timeout: 10000 });
+    await user.click(hulevesiOption);
 
     await user.click(await dialog.findByRole('button', { name: matchExact('save') }));
 

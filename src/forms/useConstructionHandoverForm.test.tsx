@@ -64,4 +64,29 @@ describe('useConstructionHandoverForm', () => {
       totalCost: '',
     });
   });
+
+  it('keeps totalCost zero value formatted in form values', () => {
+    const constructionHandover = {
+      id: 'handover-2',
+      name: 'Nollakustannus',
+      description: '',
+      constructionProcurementMethod: null,
+      constructionStart: null,
+      constructionEnd: null,
+      otherTimelineNotes: '',
+      personPlanning: null,
+      personFinancing: null,
+      project: 'project-123',
+      status: 'DRAFT',
+      linkDesignDrawings: null,
+      linkCostAllocation: null,
+      linkContractBoundaries: null,
+      constructionProjectManager: null,
+      totalCost: 0,
+    } as unknown as IConstructionHandover;
+
+    const { result } = renderHook(() => useConstructionHandoverForm(constructionHandover));
+
+    expect(result.current.getValues().totalCost).toBe('0,00€');
+  });
 });

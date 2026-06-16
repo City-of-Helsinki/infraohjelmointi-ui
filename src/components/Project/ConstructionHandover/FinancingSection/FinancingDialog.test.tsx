@@ -6,6 +6,7 @@ import FinancingDialog from './FinancingDialog';
 const mockDispatch = jest.fn();
 const mockPostFinancingRow = jest.fn();
 const mockPatchFinancingRow = jest.fn();
+const mockDeleteFinancingRow = jest.fn();
 
 jest.mock('react-i18next', () => mockI18next());
 
@@ -35,10 +36,18 @@ jest.mock('@/hooks/useGetProject', () => ({
   default: () => ({ data: { id: 'project-123' } }),
 }));
 
-jest.mock('@/services/constructionHandoverServices', () => ({
-  postFinancingRow: (request: unknown) => mockPostFinancingRow(request),
-  patchFinancingRow: (request: unknown, id: string) => mockPatchFinancingRow(request, id),
-  deleteFinancingRow: jest.fn(),
+jest.mock('@/api/constructionHandoverApi', () => ({
+  usePostConstructionHandoverFinancingMutation: () => [
+    (request: unknown) => ({ unwrap: () => mockPostFinancingRow(request) }),
+  ],
+  usePatchConstructionHandoverFinancingMutation: () => [
+    ({ id, request }: { id: string; request: unknown }) => ({
+      unwrap: () => mockPatchFinancingRow(request, id),
+    }),
+  ],
+  useDeleteConstructionHandoverFinancingMutation: () => [
+    (id: string) => ({ unwrap: () => mockDeleteFinancingRow(id) }),
+  ],
 }));
 
 jest.mock('hds-react', () => {
@@ -87,7 +96,10 @@ jest.mock('hds-react', () => {
       id: string;
       options: Array<{ value: string; label: string }>;
       value?: Array<{ value: string; label: string }>;
-      onChange?: (selectedOptions: unknown[], clickedOption?: { value: string; label: string }) => void;
+      onChange?: (
+        selectedOptions: unknown[],
+        clickedOption?: { value: string; label: string },
+      ) => void;
     }) => (
       <select
         data-testid={id}
@@ -125,6 +137,7 @@ describe('FinancingDialog', () => {
     mockDispatch.mockClear();
     mockPostFinancingRow.mockReset();
     mockPatchFinancingRow.mockReset();
+    mockDeleteFinancingRow.mockReset();
   });
 
   it('uses dialog values for add flow and only reads id from save response', async () => {
@@ -146,21 +159,22 @@ describe('FinancingDialog', () => {
           open: true,
           mode: 'add',
           itemId: '',
-          values: undefined,
+          values: {
+            financer: 'OTHER',
+            description: 'Local description',
+            budgetItem: '',
+            projectNumber: '',
+            budget: '123',
+            id: '',
+          },
         }}
         onRowSaved={onRowSaved}
         onRowDeleted={jest.fn()}
       />,
     );
 
-    fireEvent.change(screen.getByTestId('financing-dialog-financer-select'), {
-      target: { value: 'OTHER' },
-    });
     fireEvent.change(screen.getByTestId('financing-dialog-description-input'), {
       target: { value: 'Local description' },
-    });
-    fireEvent.change(screen.getByTestId('financing-dialog-budget-input'), {
-      target: { value: '123' },
     });
 
     fireEvent.click(screen.getByTestId('submit-financing-row-button'));
@@ -171,7 +185,7 @@ describe('FinancingDialog', () => {
         description: 'Local description',
         budgetItemId: '',
         projectNumber: '',
-        budget: '123',
+        budget: '123.00',
         project: 'project-123',
       });
     });
@@ -183,7 +197,7 @@ describe('FinancingDialog', () => {
           description: 'Local description',
           budgetItem: '',
           projectNumber: '',
-          budget: '123',
+          budget: '123,00€',
           id: 'created-42',
         },
         'add',
@@ -226,9 +240,6 @@ describe('FinancingDialog', () => {
     fireEvent.change(screen.getByTestId('financing-dialog-description-input'), {
       target: { value: 'Edited locally' },
     });
-    fireEvent.change(screen.getByTestId('financing-dialog-budget-input'), {
-      target: { value: '555' },
-    });
 
     fireEvent.click(screen.getByTestId('submit-financing-row-button'));
 
@@ -239,7 +250,7 @@ describe('FinancingDialog', () => {
           description: 'Edited locally',
           budgetItemId: '',
           projectNumber: '',
-          budget: '555',
+          budget: '100.00',
           project: 'project-123',
         },
         'row-1',
@@ -253,11 +264,53 @@ describe('FinancingDialog', () => {
           description: 'Edited locally',
           budgetItem: '',
           projectNumber: '',
-          budget: '555',
+          budget: '100,00€',
           id: 'row-1',
         },
         'edit',
       );
+    });
+  });
+
+  it('normalizes formatted budget value to decimal string in request payload', async () => {
+    mockPostFinancingRow.mockResolvedValue({ id: 'created-43' });
+
+    render(
+      <FinancingDialog
+        handleClose={jest.fn()}
+        dialogState={{
+          open: true,
+          mode: 'add',
+          itemId: '',
+          values: {
+            financer: 'OTHER',
+            description: 'Formatted budget row',
+            budgetItem: '',
+            projectNumber: '',
+            budget: '1 000,5€',
+            id: '',
+          },
+        }}
+        onRowSaved={jest.fn()}
+        onRowDeleted={jest.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByTestId('financing-dialog-description-input'), {
+      target: { value: 'Formatted budget row' },
+    });
+
+    fireEvent.click(screen.getByTestId('submit-financing-row-button'));
+
+    await waitFor(() => {
+      expect(mockPostFinancingRow).toHaveBeenCalledWith({
+        financingParty: 'OTHER',
+        description: 'Formatted budget row',
+        budgetItemId: '',
+        projectNumber: '',
+        budget: '1000.50',
+        project: 'project-123',
+      });
     });
   });
 });

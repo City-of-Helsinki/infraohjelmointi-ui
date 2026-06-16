@@ -15,7 +15,7 @@ const EditCell: FC<EditCellProps> = ({ onEditRow, id, values }) => {
       onClick={() => onEditRow(id, values)}
       data-testid={`financing-row-edit-button-id-${id}`}
     >
-      <IconPen />
+      <IconPen color="var(--color-bus)" />
     </button>
   );
 };
@@ -27,8 +27,12 @@ interface DeleteCellProps {
 
 const DeleteCell: FC<DeleteCellProps> = ({ onDeleteRow, id }) => {
   return (
-    <button onClick={() => onDeleteRow(id)} data-testid={`financing-row-delete-button-id-${id}`}>
-      <IconTrash />
+    <button
+      type="button"
+      onClick={() => onDeleteRow(id)}
+      data-testid={`financing-row-delete-button-id-${id}`}
+    >
+      <IconTrash color="var(--color-brick)" />
     </button>
   );
 };

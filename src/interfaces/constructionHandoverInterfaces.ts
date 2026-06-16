@@ -34,7 +34,12 @@ export interface IConstructionHandover {
 export interface IConstructionHandoverRequest
   extends Omit<
     IConstructionHandover,
-    'id' | 'status' | 'constructionProcurementMethod' | 'personPlanning' | 'personFinancing' | 'constructionHandoverFinancing'
+    | 'id'
+    | 'status'
+    | 'constructionProcurementMethod'
+    | 'personPlanning'
+    | 'personFinancing'
+    | 'constructionHandoverFinancing'
   > {
   project: string;
   constructionProcurementMethod: string;
@@ -71,16 +76,7 @@ export interface IConstructionHandoverFinancing {
   id: string;
   financingParty: string;
   description?: string;
-  budgetItem:
-    | string
-    | {
-        id?: string;
-        value?: string;
-        name?: string;
-        site?: string;
-        siteName?: string;
-      }
-    | null;
+  budgetItem: IListItem | null;
   projectNumber: string;
   budget: string | number | null;
 }
@@ -102,4 +98,26 @@ export interface FinancingRowRequest {
 export interface FinancingRowDeleteThunkContent {
   dispatch: AppDispatch;
   id: string;
+}
+
+export type OnFinancingRowSaved = (row: FinancingRowValues, mode: DialogMode) => void;
+
+export type OnFinancingRowDeleted = (id: string) => void;
+
+export interface FinancingDialogBaseProps {
+  dialogState: FinancingDialogState;
+  handleClose: () => void;
+}
+
+export interface FinancingDialogModifyProps extends FinancingDialogBaseProps {
+  onRowSaved: OnFinancingRowSaved;
+}
+
+export interface FinancingDialogDeleteProps extends FinancingDialogBaseProps {
+  onRowDeleted: OnFinancingRowDeleted;
+}
+
+export interface FinancingDialogProps extends FinancingDialogBaseProps {
+  onRowSaved: OnFinancingRowSaved;
+  onRowDeleted: OnFinancingRowDeleted;
 }

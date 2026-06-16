@@ -1,6 +1,7 @@
 import { FormSectionTitle, TextField } from '@/components/shared';
 import { Button, ButtonVariant, IconPlus, Table } from 'hds-react';
 import { IconAngleDown, IconAngleUp } from 'hds-react/icons';
+import { ChangeEvent, FocusEvent } from 'react';
 import { memo, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -13,26 +14,13 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { DeleteCell, EditCell } from './FinancingTableActionButtons';
 import { getFieldProps } from '../ConstructionHandoverForm';
 import { useOptions } from '@/hooks/useOptions';
-import { formatNumberToContainSpaces } from '@/utils/common';
+import { formatBudgetEuro } from '@/utils/common';
 import FinancingDialog from './FinancingDialog';
-
-const formatBudgetEuro = (value: string): string => {
-  if (value.trim() === '') {
-    return '';
-  }
-
-  const numericValue = Number(value);
-
-  if (!Number.isFinite(numericValue)) {
-    return value;
-  }
-
-  return `${formatNumberToContainSpaces(numericValue)}€`;
-};
+import styles from '../styles.module.css';
 
 const FinancingSection = () => {
   const { t } = useTranslation();
-  const { control } = useFormContext<IConstructionHandoverForm>();
+  const { control, setValue, watch } = useFormContext<IConstructionHandoverForm>();
   const financingPartyOptions = useOptions('financingParties');
   const projectTypeQualifierOptions = useOptions('typeQualifiers');
   const { fields, append, update, remove } = useFieldArray<
@@ -112,16 +100,17 @@ const FinancingSection = () => {
     financingPartyOptions.find((option) => option.value === code)?.label ?? code;
 
   const getBudgetItemLabel = (id: string) =>
-    t(
-      `option.${projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? ''}`,
-      {
-        defaultValue: projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? id,
-      },
-    );
+    t(`option.${projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? ''}`, {
+      defaultValue: projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? id,
+    });
 
   const groupedRows = useMemo(() => {
     const kympRows = fields.filter((item) => item.financer === 'KYMP');
     const nonKympRows = fields.filter((item) => item.financer !== 'KYMP');
+    const kympTotalBudget = kympRows.reduce((sum, item) => {
+      const budgetValue = Number(item.budget);
+      return Number.isFinite(budgetValue) ? sum + budgetValue : sum;
+    }, 0);
 
     const rows: Array<{
       key: string;
@@ -136,49 +125,33 @@ const FinancingSection = () => {
       showActions: boolean;
     }> = [];
 
-    if (kympRows.length > 1) {
-      const mainRowKey = 'KYMP-main';
-      rows.push({
-        key: mainRowKey,
-        isMainRow: true,
-        isSubRow: false,
-        hasSubRows: true,
-        mainRowKey,
-        budgetItemText: getFinancingPartyLabel('KYMP'),
-        projectNumber: '',
-        budget: '',
-        showActions: false,
-      });
+    const mainRowKey = 'KYMP-main';
+    rows.push({
+      key: mainRowKey,
+      isMainRow: true,
+      isSubRow: false,
+      hasSubRows: true,
+      mainRowKey,
+      budgetItemText: getFinancingPartyLabel('KYMP'),
+      projectNumber: '',
+      budget: formatBudgetEuro(String(kympTotalBudget)),
+      showActions: false,
+    });
 
-      if (expandedMainRows[mainRowKey] ?? false) {
-        kympRows.forEach((item) => {
-          rows.push({
-            key: item.formId,
-            isMainRow: false,
-            isSubRow: true,
-            hasSubRows: false,
-            item,
-            mainRowKey,
-            budgetItemText: getBudgetItemLabel(item.budgetItem),
-            projectNumber: item.projectNumber,
-            budget: formatBudgetEuro(item.budget),
-            showActions: true,
-          });
+    if (expandedMainRows[mainRowKey] ?? false) {
+      kympRows.forEach((item) => {
+        rows.push({
+          key: item.formId,
+          isMainRow: false,
+          isSubRow: true,
+          hasSubRows: false,
+          item,
+          mainRowKey,
+          budgetItemText: getBudgetItemLabel(item.budgetItem),
+          projectNumber: item.projectNumber,
+          budget: formatBudgetEuro(item.budget),
+          showActions: true,
         });
-      }
-    } else if (kympRows.length === 1) {
-      const item = kympRows[0];
-      rows.push({
-        key: item.formId,
-        isMainRow: true,
-        isSubRow: false,
-        hasSubRows: false,
-        item,
-        mainRowKey: item.formId,
-        budgetItemText: getFinancingPartyLabel(item.financer),
-        projectNumber: item.projectNumber,
-        budget: formatBudgetEuro(item.budget),
-        showActions: true,
       });
     }
 
@@ -205,6 +178,7 @@ const FinancingSection = () => {
     budgetItem: row.hasSubRows ? (
       <button
         type="button"
+        className={styles.mainRowButton}
         style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         onClick={() =>
           setExpandedMainRows((prev) => ({
@@ -216,6 +190,8 @@ const FinancingSection = () => {
         {expandedMainRows[row.mainRowKey] ? <IconAngleUp /> : <IconAngleDown />}
         <span>{row.budgetItemText}</span>
       </button>
+    ) : !row.isSubRow ? (
+      <span className={styles.mainRowSpan}>{row.budgetItemText}</span>
     ) : (
       row.budgetItemText
     ),
@@ -226,7 +202,9 @@ const FinancingSection = () => {
         <EditCell onEditRow={handleEdit} id={row.item.id} values={row.item} />
       ) : null,
     deleteCell:
-      row.showActions && row.item ? <DeleteCell onDeleteRow={handleDelete} id={row.item.id} /> : null,
+      row.showActions && row.item ? (
+        <DeleteCell onDeleteRow={handleDelete} id={row.item.id} />
+      ) : null,
   }));
 
   const cols = [
@@ -246,6 +224,13 @@ const FinancingSection = () => {
     { key: 'deleteCell', headerName: t('delete') },
   ];
 
+  const totalCostRawValue = watch('totalCost') ?? '';
+
+  const onTotalCostBlur = (e: FocusEvent<HTMLInputElement>) => {
+    const formattedValue = formatBudgetEuro(e.target.value);
+    setValue('totalCost', formattedValue, { shouldDirty: true });
+  };
+
   return (
     <div className="mb-12">
       <FormSectionTitle
@@ -254,10 +239,18 @@ const FinancingSection = () => {
       />
       <div className="input-wrapper">
         {tableRows.length > 0 ? (
-          <Table cols={cols} rows={tableRows} indexKey="id" renderIndexCol={false} />
+          <Table
+            className={styles.constructionHandoverFinancingTable}
+            cols={cols}
+            rows={tableRows}
+            indexKey="id"
+            renderIndexCol={false}
+          />
         ) : (
           <p>{t('constructionHandoverForm.financingSection.tableEmptyText')}</p>
         )}
+      </div>
+      <div className="input-wrapper">
         <Button
           variant={ButtonVariant.Secondary}
           onClick={addFinancingRow}
@@ -269,6 +262,8 @@ const FinancingSection = () => {
       </div>
       <TextField
         {...getFieldProps('totalCost')}
+        value={totalCostRawValue}
+        onBlur={onTotalCostBlur}
       />
       <FinancingDialog
         dialogState={dialogState}

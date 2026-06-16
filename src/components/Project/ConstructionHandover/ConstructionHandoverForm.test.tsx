@@ -14,6 +14,9 @@ const mockTransitionConstructionHandoverStatus = jest.fn();
 jest.mock('@/api/constructionHandoverApi', () => ({
   usePatchConstructionHandoverMutation: () => [mockPatchConstructionHandover],
   useTransitionConstructionHandoverStatusMutation: () => [mockTransitionConstructionHandoverStatus],
+  usePostConstructionHandoverFinancingMutation: () => [jest.fn()],
+  usePatchConstructionHandoverFinancingMutation: () => [jest.fn()],
+  useDeleteConstructionHandoverFinancingMutation: () => [jest.fn()],
 }));
 
 jest.mock('react-i18next', () => mockI18next());
@@ -329,6 +332,53 @@ describe('ConstructionHandoverForm submit', () => {
       );
     });
   });
+
+  it('maps localized formatted totalCost value as number on submit', async () => {
+    const constructionHandover = createConstructionHandover({
+      constructionStart: '2026-01-01',
+      constructionEnd: '2026-02-01',
+      totalCost: null,
+    });
+    const project = createProject({ id: 'project-1000' });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm
+              project={project}
+              constructionHandover={constructionHandover}
+            />
+          }
+        />,
+      ),
+    );
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('constructionHandoverForm.totalCost'), {
+        target: { value: '1000,5' },
+      });
+    });
+
+    const submitButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.saveDraft',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            totalCost: 1000.5,
+          }),
+        }),
+      );
+    });
+  });
 });
 
 describe('ConstructionHandoverForm financing rows', () => {
@@ -359,6 +409,8 @@ describe('ConstructionHandoverForm financing rows', () => {
         />,
       ),
     );
+
+    fireEvent.click(screen.getByRole('button', { name: /^KYMP/ }));
 
     await waitFor(() => {
       expect(screen.getByText('HEL-2024-001')).toBeInTheDocument();

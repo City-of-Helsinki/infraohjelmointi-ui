@@ -67,14 +67,17 @@ jest.mock('./FinancingDialog', () => ({
     onRowSaved,
     onRowDeleted,
   }: {
-    onRowSaved: (row: {
-      financer: string;
-      description: string;
-      budgetItem: string;
-      projectNumber: string;
-      budget: string;
-      id: string;
-    }, mode: 'add' | 'edit' | 'delete') => void;
+    onRowSaved: (
+      row: {
+        financer: string;
+        description: string;
+        budgetItem: string;
+        projectNumber: string;
+        budget: string;
+        id: string;
+      },
+      mode: 'add' | 'edit' | 'delete',
+    ) => void;
     onRowDeleted: (id: string) => void;
   }) => (
     <div>
@@ -153,9 +156,7 @@ const renderSection = async (
     );
   };
 
-  return act(async () =>
-    renderWithProviders(<Route path="/" element={<TestForm />} />),
-  );
+  return act(async () => renderWithProviders(<Route path="/" element={<TestForm />} />));
 };
 
 describe('FinancingSection', () => {
@@ -167,7 +168,7 @@ describe('FinancingSection', () => {
 
     await waitFor(() => {
       expect(screen.getByText('HEL-NEW-001')).toBeInTheDocument();
-      expect(screen.getByText('12 345€')).toBeInTheDocument();
+      expect(screen.getByText('12 345,00€')).toBeInTheDocument();
     });
   });
 
@@ -265,7 +266,29 @@ describe('FinancingSection', () => {
       },
     ]);
 
-    expect(screen.getByText('1 000,5€')).toBeInTheDocument();
-    expect(screen.getByText('2 000€')).toBeInTheDocument();
+    expect(screen.getByText('1 000,50€')).toBeInTheDocument();
+    expect(screen.getByText('2 000,00€')).toBeInTheDocument();
+  });
+
+  it('formats total cost field value euro currency style', async () => {
+    await renderSection();
+
+    fireEvent.change(screen.getByLabelText('constructionHandoverForm.totalCost'), {
+      target: { value: '1234567' },
+    });
+    fireEvent.blur(screen.getByLabelText('constructionHandoverForm.totalCost'));
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('1 234 567,00€')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByLabelText('constructionHandoverForm.totalCost'), {
+      target: { value: '1000.5' },
+    });
+    fireEvent.blur(screen.getByLabelText('constructionHandoverForm.totalCost'));
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('1 000,50€')).toBeInTheDocument();
+    });
   });
 });

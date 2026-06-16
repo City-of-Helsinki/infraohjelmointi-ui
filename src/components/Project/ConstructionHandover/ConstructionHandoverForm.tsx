@@ -20,6 +20,7 @@ import {
 import { IProject } from '@/interfaces/projectInterfaces';
 import FinancingSection from './FinancingSection/FinancingSection';
 import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
+import { parseCurrency } from '@/utils/common';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -32,9 +33,7 @@ function mapFormToRequest(
   formData: IConstructionHandoverForm,
   projectId: string,
 ): IConstructionHandoverRequest {
-const parsedTotalCost = formData.totalCost === '' || formData.totalCost == null
-    ? null
-    : Number(formData.totalCost);
+  const parsedTotalCost = parseCurrency(formData.totalCost);
 
   return {
     name: formData.name,

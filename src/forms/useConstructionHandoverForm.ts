@@ -5,20 +5,12 @@ import {
   IConstructionHandover,
   IConstructionHandoverFinancing,
 } from '@/interfaces/constructionHandoverInterfaces';
-import { listItemToOption, personToOption } from '@/utils/common';
+import { formatBudgetEuro, listItemToOption, personToOption } from '@/utils/common';
 import { formatDateToHds } from '@/utils/dates';
 
 const getBudgetItemLabel = (budgetItem: IConstructionHandoverFinancing['budgetItem']): string => {
   if (!budgetItem) return '';
-  if (typeof budgetItem === 'string') return budgetItem;
-  return (
-    budgetItem.id ??
-    budgetItem.value ??
-    budgetItem.siteName ??
-    budgetItem.site ??
-    budgetItem.name ??
-    ''
-  );
+  return budgetItem.value ?? '';
 };
 
 function useConstructionHandoverFormValues(
@@ -39,14 +31,17 @@ function useConstructionHandoverFormValues(
     constructionHandoverFinancing: (constructionHandover.constructionHandoverFinancing ?? []).map(
       (item) => ({
         description: item.description ?? '',
-        budget: item.budget !== null && item.budget !== undefined ? `${item.budget}` : '',
+        budget: item.budget != null ? String(item.budget) : '',
         projectNumber: item.projectNumber ?? '',
         budgetItem: getBudgetItemLabel(item.budgetItem),
         id: item.id,
         financer: item.financingParty ?? '',
       }),
     ),
-    totalCost: constructionHandover.totalCost ? `${constructionHandover.totalCost}` : '',
+    totalCost:
+      constructionHandover.totalCost != null
+        ? formatBudgetEuro(String(constructionHandover.totalCost))
+        : '',
   };
 }
 

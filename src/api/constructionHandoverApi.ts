@@ -1,7 +1,9 @@
 import { infraohjelmointiApi } from './infraohjelmointiApi';
 import {
   ConstructionHandoverStatus,
+  FinancingRowRequest,
   IConstructionHandover,
+  IConstructionHandoverFinancing,
   IConstructionHandoverPatchRequest,
   IConstructionHandoverTransitionResponse,
 } from '@/interfaces/constructionHandoverInterfaces';
@@ -21,6 +23,17 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
         url: '/construction-handovers/',
         method: 'POST',
         data: handover,
+      }),
+      invalidatesTags: ['ConstructionHandovers'],
+    }),
+    postConstructionHandoverFinancing: build.mutation<
+      IConstructionHandoverFinancing,
+      FinancingRowRequest
+    >({
+      query: (request: FinancingRowRequest) => ({
+        url: '/construction-handover-financings/',
+        method: 'POST',
+        data: request,
       }),
       invalidatesTags: ['ConstructionHandovers'],
     }),
@@ -47,6 +60,17 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
           console.error('Error patching construction handover: ', error);
         }
       },
+      invalidatesTags: ['ConstructionHandovers'],
+    }),
+    patchConstructionHandoverFinancing: build.mutation<
+      IConstructionHandoverFinancing,
+      { id: string; request: FinancingRowRequest }
+    >({
+      query: ({ id, request }: { id: string; request: FinancingRowRequest }) => ({
+        url: `/construction-handover-financings/${id}/`,
+        method: 'PATCH',
+        data: request,
+      }),
       invalidatesTags: ['ConstructionHandovers'],
     }),
     deleteConstructionHandover: build.mutation<{ success: boolean }, string>({
@@ -82,13 +106,23 @@ export const constructionHandoverApi = infraohjelmointiApi.injectEndpoints({
       },
       invalidatesTags: ['ConstructionHandovers'],
     }),
+    deleteConstructionHandoverFinancing: build.mutation<void, string>({
+      query: (id: string) => ({
+        url: `/construction-handover-financings/${id}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ConstructionHandovers'],
+    }),
   }),
 });
 
 export const {
   useGetConstructionHandoversByProjectQuery,
   usePostConstructionHandoverMutation,
+  usePostConstructionHandoverFinancingMutation,
   usePatchConstructionHandoverMutation,
+  usePatchConstructionHandoverFinancingMutation,
   useDeleteConstructionHandoverMutation,
   useTransitionConstructionHandoverStatusMutation,
+  useDeleteConstructionHandoverFinancingMutation,
 } = constructionHandoverApi;
