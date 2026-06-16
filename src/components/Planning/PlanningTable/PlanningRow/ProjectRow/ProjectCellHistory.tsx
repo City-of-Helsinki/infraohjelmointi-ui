@@ -31,9 +31,12 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [placement, setPlacement] = useState<'above' | 'below'>('above');
-  const [coords, setCoords] = useState<{ top: number; left: number; maxHeight: number } | null>(
-    null,
-  );
+  const [coords, setCoords] = useState<{
+    left: number;
+    top?: number;
+    bottom?: number;
+    maxHeight: number;
+  } | null>(null);
   const [trigger, { data, isFetching, isUninitialized }] = useLazyGetProjectHistoryQuery();
 
   const positionPopover = useCallback(() => {
@@ -43,16 +46,24 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
     }
     const spaceAbove = rect.top - VIEWPORT_GAP;
     const spaceBelow = window.innerHeight - rect.bottom - VIEWPORT_GAP;
-    const placeAbove = spaceAbove >= 80 || spaceAbove >= spaceBelow;
+    // Keep the design's "above the cell" placement when a short popover fits;
+    // otherwise drop below so it is not clipped at the top of the viewport.
+    const placeAbove = spaceAbove >= 120 || spaceAbove >= spaceBelow;
     const maxHeight = Math.min(
       POPOVER_MAX_HEIGHT,
       Math.max(80, placeAbove ? spaceAbove : spaceBelow),
     );
-    const top = placeAbove
-      ? Math.max(VIEWPORT_GAP, rect.top - maxHeight - VIEWPORT_GAP)
-      : rect.bottom + VIEWPORT_GAP;
+    // Anchor the popover to the hovered cell — its bottom just above the cell
+    // (above) or its top just below it (below) — so the box hugs the cell
+    // instead of floating up by the reserved max height.
     setPlacement(placeAbove ? 'above' : 'below');
-    setCoords({ top, left: rect.left, maxHeight });
+    setCoords({
+      left: rect.left,
+      maxHeight,
+      ...(placeAbove
+        ? { bottom: window.innerHeight - rect.top + VIEWPORT_GAP }
+        : { top: rect.bottom + VIEWPORT_GAP }),
+    });
   }, []);
 
   const cancelHide = useCallback(() => {
@@ -126,6 +137,7 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
             coords
               ? {
                   top: coords.top,
+                  bottom: coords.bottom,
                   left: coords.left,
                   maxHeight: coords.maxHeight,
                 }

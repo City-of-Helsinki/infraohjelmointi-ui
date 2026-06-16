@@ -69,8 +69,10 @@ describe('ProjectHistoryPanel (IO-883)', () => {
     expect(screen.getByText('Anna Hakala')).toBeInTheDocument();
     // actor initials avatar
     expect(screen.getByText('AH')).toBeInTheDocument();
-    expect(screen.getByText('proposal')).toBeInTheDocument();
-    expect(screen.getByText('design')).toBeInTheDocument();
+    // Phase values are resolved and run through the shared option catalogue
+    // (the i18n test mock echoes the key, proving the translation path is used).
+    expect(screen.getByText('option.proposal')).toBeInTheDocument();
+    expect(screen.getByText('option.design')).toBeInTheDocument();
     expect(screen.queryByTestId('project-history-entry-entry-financial')).not.toBeInTheDocument();
   });
 

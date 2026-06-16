@@ -130,22 +130,20 @@ export default function ProjectTalpaForm({ project }: Readonly<IProjectTalpaForm
           </Notification>
         )}
 
-        <fieldset disabled={talpaProjectLocked} className="min-w-0 border-0 p-0">
-          {/* SECTION 1 - Budget item number selection (hankkeen talousarviokohdan numero) */}
-          <ProjectBudgetItemSection />
+        {/* SECTION 1 - Budget item number selection (hankkeen talousarviokohdan numero) */}
+        <ProjectBudgetItemSection />
 
-          {/* SECTION 2 - Project Identifiers (hankkeen tunnisteet) */}
-          <ProjectIdentifiersSection />
+        {/* SECTION 2 - Project Identifiers (hankkeen tunnisteet) */}
+        <ProjectIdentifiersSection />
 
-          {/* SECTION 3 - Project Schedule (hankkeen aikataulu) */}
-          <ProjectScheduleSection />
+        {/* SECTION 3 - Project Schedule (hankkeen aikataulu) */}
+        <ProjectScheduleSection />
 
-          {/* SECTION 4 - Project address and contacts (hankkeen osoite- ja yhteystiedot) */}
-          <ProjectContactsSection />
+        {/* SECTION 4 - Project address and contacts (hankkeen osoite- ja yhteystiedot) */}
+        <ProjectContactsSection />
 
-          {/* SECTION 5 - Project Classes (hankkeen luokat) */}
-          <ProjectClassesSection />
-        </fieldset>
+        {/* SECTION 5 - Project Classes (hankkeen luokat) */}
+        <ProjectClassesSection />
 
         <div className="project-form-banner">
           <div className="project-form-banner-container">

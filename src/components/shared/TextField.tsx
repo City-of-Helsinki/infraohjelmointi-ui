@@ -45,7 +45,7 @@ const TextField: FC<ITextFieldProps> = ({
       rules={rules}
       control={control as Control<FieldValues>}
       defaultValue={defaultValue}
-      render={({ field: { onChange, value }, fieldState: { error } }) => (
+      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => (
         <div className={`input-wrapper ${wrapperClassName}`} id={name} data-testid={name}>
           <HDSTextInput
             className={`input-${size}`}
@@ -60,7 +60,7 @@ const TextField: FC<ITextFieldProps> = ({
             errorText={error?.message}
             helperText={tooltip}
             style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-            disabled={disabled}
+            disabled={disabled ?? fieldDisabled}
             {...rest}
           />
         </div>

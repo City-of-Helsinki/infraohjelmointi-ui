@@ -401,6 +401,7 @@
         "phaseDetail": "Vaiheen tarkenne",
         "planningStartYear": "Suunnittelun aloitusvuosi",
         "constructionEndYear": "Rakentamisen valmistumisvuosi",
+        "constructionProcurementMethod": "Rakentamisen hankintatapa",
         "estPlanningStart": "Suunnittelu, alkaa",
         "estPlanningEnd": "Suunnittelu, päättyy",
         "estConstructionStart": "Rakentaminen, alkaa",

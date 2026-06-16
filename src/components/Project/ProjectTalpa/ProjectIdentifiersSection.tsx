@@ -32,11 +32,7 @@ export default function ProjectIdentifiersSection() {
     setValue,
     formState: { dirtyFields, touchedFields },
   } = useFormContext<IProjectTalpaForm>();
-  const [budgetItemNumber, projectType, isLocked] = watch([
-    'budgetItemNumber',
-    'projectType',
-    'isLocked',
-  ]);
+  const [budgetItemNumber, projectType] = watch(['budgetItemNumber', 'projectType']);
   const talpaProjectRanges = useSelector(selectTalpaProjectRanges);
   const talpaProjectTypes = useSelector(selectTalpaProjectTypes);
   const budgetItemNumberTouched = Boolean(touchedFields?.budgetItemNumber);
@@ -147,7 +143,6 @@ export default function ProjectIdentifiersSection() {
         rules={{ ...validateRequired('projectNumberRange', t) }}
         size="full"
         placeholder={t('projectTalpaForm.projectNumberRangePlaceholder')}
-        disabled={isLocked}
       />
       {/* Malliprojekti */}
       {budgetItemNumber === BudgetItemNumber.InfraInvestment ? (
@@ -159,7 +154,6 @@ export default function ProjectIdentifiersSection() {
           shouldTranslate={false}
           rules={{ ...validateRequired('templateProject', t) }}
           size="full"
-          disabled={isLocked}
         />
       )}
       {/* Laji */}
@@ -170,7 +164,6 @@ export default function ProjectIdentifiersSection() {
         rules={{ ...validateRequired('projectType', t) }}
         size="full"
         placeholder={t('projectTalpaForm.projectTypePlaceholder')}
-        disabled={isLocked}
       />
       {/* Prioriteetti */}
       <SelectField
@@ -180,7 +173,6 @@ export default function ProjectIdentifiersSection() {
         rules={{ ...validateRequired('priority', t) }}
         size="full"
         placeholder={t('projectTalpaForm.priorityPlaceholder')}
-        disabled={isLocked}
       />
       {/* SAP-nimi */}
       <TextField

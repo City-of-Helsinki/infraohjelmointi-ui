@@ -18,7 +18,6 @@ const RELATION_FIELD_LISTS: Partial<Record<string, keyof IListState>> = {
   phase: 'phases',
   phaseDetail: 'projectPhaseDetails',
   category: 'categories',
-  projectClass: 'projectClasses',
   constructionProcurementMethod: 'constructionProcurementMethods',
   staraProcurementReason: 'staraProcurementReasons',
   type: 'types',
@@ -39,36 +38,47 @@ export const historyFieldLabel = (field: string, t: TFunction): string =>
     defaultValue: t(`projectForm.${field}`, { defaultValue: field }),
   });
 
-const resolveProjectClassName = (raw: string, classes: Array<IClass>): string | undefined => {
-  const match = classes.find((item) => item.id === raw);
-  return match?.name;
-};
+// projectClass changes (master/class/subclass) are audited as the related
+// class UUID; resolve against the class hierarchy to a readable name.
+const CLASS_FIELDS = new Set<string>(['projectClass']);
+
+// The backend stringifies an absent relation as "None" (and may send "null"),
+// so treat those as "no value" and let the panel render the em dash instead.
+const isEmptyHistoryValue = (raw: string): boolean =>
+  raw === '' || raw === 'None' || raw === 'null' || raw === 'undefined';
 
 export const resolveHistoryValue = (
   field: string,
   value: unknown,
   lists: IListState,
+  classes: Array<IClass>,
+  t: TFunction,
 ): string => {
-  if (value === null || value === undefined || value === '') {
+  if (value === null || value === undefined) {
     return '';
   }
   const raw = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  if (isEmptyHistoryValue(raw)) {
+    return '';
+  }
 
+  // Class / subclass: resolve the UUID to the class name.
+  if (CLASS_FIELDS.has(field)) {
+    return classes.find((item) => item.id === raw)?.name ?? raw;
+  }
+
+  // Other relation fields are audited either as the list row's UUID (project
+  // form) or directly as its enum value (planning phase menu). Resolve a UUID to
+  // its enum value, then translate via the shared `option.<value>` catalogue,
+  // falling back to the raw value when there is no matching translation.
   const listKey = RELATION_FIELD_LISTS[field];
   if (listKey) {
-    if (listKey === 'projectClasses') {
-      const resolved = resolveProjectClassName(raw, lists.projectClasses ?? []);
-      if (resolved) {
-        return resolved;
-      }
-    } else {
-      const list = lists[listKey] as Array<IListItem> | undefined;
-      const match = Array.isArray(list) ? list.find((item) => item.id === raw) : undefined;
-      if (match?.value) {
-        return match.value;
-      }
-    }
+    const list = lists[listKey] as Array<IListItem> | undefined;
+    const match = Array.isArray(list) ? list.find((item) => item.id === raw) : undefined;
+    const optionValue = match?.value ?? raw;
+    return t(`option.${optionValue}`, { defaultValue: optionValue });
   }
+
   return raw;
 };
 
@@ -110,7 +120,7 @@ const AVATAR_COLORS = [
   'var(--color-success)',
   'var(--color-gold)',
   'var(--color-suomenlinna)',
-  'var(--color-trams)',
+  'var(--color-tram)',
   'var(--color-copper)',
   'var(--color-error)',
 ];

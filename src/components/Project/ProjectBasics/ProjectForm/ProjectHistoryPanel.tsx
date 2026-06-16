@@ -3,6 +3,7 @@ import { IconClock, IconCross, LoadingSpinner } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/common';
 import { selectLists } from '@/reducers/listsSlice';
+import { selectAllPlanningClasses } from '@/reducers/classSlice';
 import { useGetProjectHistoryQuery } from '@/api/projectApi';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
 import { stringToDateTime } from '@/utils/dates';
@@ -34,6 +35,7 @@ interface IProjectHistoryPanelProps {
 const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, projectId }) => {
   const { t } = useTranslation();
   const lists = useAppSelector(selectLists);
+  const classes = useAppSelector(selectAllPlanningClasses);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const { data, isFetching, isError } = useGetProjectHistoryQuery(
@@ -68,8 +70,8 @@ const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, p
   const unknownActor = t('projectForm.changeHistory.unknownActor');
 
   const renderChange = (entry: IProjectHistoryEntry, field: string) => {
-    const oldValue = resolveHistoryValue(field, entry.old_values?.[field], lists);
-    const newValue = resolveHistoryValue(field, entry.new_values?.[field], lists);
+    const oldValue = resolveHistoryValue(field, entry.old_values?.[field], lists, classes, t);
+    const newValue = resolveHistoryValue(field, entry.new_values?.[field], lists, classes, t);
     const fieldLabel = historyFieldLabel(field, t);
 
     if (PILL_FIELDS.has(field)) {
