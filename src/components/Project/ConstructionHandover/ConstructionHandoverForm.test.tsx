@@ -6,11 +6,14 @@ import { act } from 'react-dom/test-utils';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import ConstructionHandoverForm from './ConstructionHandoverForm';
 import { createConstructionHandover, createProject } from '@/mocks/createMocks';
+import { ConstructionHandoverStatus } from '@/interfaces/constructionHandoverInterfaces';
 
 const mockPatchConstructionHandover = jest.fn();
+const mockTransitionConstructionHandoverStatus = jest.fn();
 
 jest.mock('@/api/constructionHandoverApi', () => ({
   usePatchConstructionHandoverMutation: () => [mockPatchConstructionHandover],
+  useTransitionConstructionHandoverStatusMutation: () => [mockTransitionConstructionHandoverStatus],
 }));
 
 jest.mock('react-i18next', () => mockI18next());
@@ -201,6 +204,102 @@ describe('ConstructionHandoverForm submit', () => {
 
     await waitFor(() => {
       expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe('ConstructionHandoverForm status transitions', () => {
+  beforeEach(() => {
+    mockTransitionConstructionHandoverStatus.mockClear();
+  });
+
+  it('disables form fields when handover status is not draft', async () => {
+    const constructionHandover = createConstructionHandover({
+      status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
+          }
+        />,
+      ),
+    );
+
+    expect(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i })).toBeDisabled();
+    expect(
+      screen.getByRole('textbox', { name: /constructionHandoverForm\.description/i }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('textbox', { name: /constructionHandoverForm\.constructionStart/i }),
+    ).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'constructionHandoverForm.saveDraft' })).toBeNull();
+  });
+
+  it('submits handover to programmer when submit to programmer button is clicked', async () => {
+    const constructionHandover = createConstructionHandover({
+      status: ConstructionHandoverStatus.DRAFT,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
+          }
+        />,
+      ),
+    );
+
+    const submitToProgrammerButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.submitToProgrammer',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitToProgrammerButton);
+    });
+
+    await waitFor(() => {
+      expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+        id: 'handover-1',
+        to: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+      });
+    });
+  });
+
+  it('submits handover to construction when submit to construction button is clicked', async () => {
+    const constructionHandover = createConstructionHandover({
+      status: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={
+            <ConstructionHandoverForm project={null} constructionHandover={constructionHandover} />
+          }
+        />,
+      ),
+    );
+
+    const submitToConstructionButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.submitToConstruction',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitToConstructionButton);
+    });
+
+    await waitFor(() => {
+      expect(mockTransitionConstructionHandoverStatus).toHaveBeenCalledWith({
+        id: 'handover-1',
+        to: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      });
     });
   });
 });

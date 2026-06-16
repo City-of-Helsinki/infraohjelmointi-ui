@@ -59,7 +59,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value }, fieldState: { error } }) => (
+      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => (
         <div className="input-wrapper" id={name} data-testid={name}>
           <HDSTextArea
             data-testid={testId}
@@ -75,7 +75,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
             invalid={error ? true : false}
             errorText={error?.message}
             style={{ paddingTop: hideLabel ? '1.745rem' : '0' }}
-            disabled={disabled}
+            disabled={disabled || fieldDisabled}
             tooltip={tooltip}
           />
         </div>

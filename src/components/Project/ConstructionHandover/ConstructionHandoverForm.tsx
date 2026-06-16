@@ -9,8 +9,12 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant, IconLink } from 'hds-react';
 import { useAppDispatch } from '@/hooks/common';
 import { notifyError, notifySuccess } from '@/reducers/notificationSlice';
-import { usePatchConstructionHandoverMutation } from '@/api/constructionHandoverApi';
 import {
+  usePatchConstructionHandoverMutation,
+  useTransitionConstructionHandoverStatusMutation,
+} from '@/api/constructionHandoverApi';
+import {
+  ConstructionHandoverStatus,
   IConstructionHandover,
   IConstructionHandoverRequest,
 } from '@/interfaces/constructionHandoverInterfaces';
@@ -59,6 +63,7 @@ function ConstructionHandoverForm({
   const formMethods = useConstructionHandoverForm(constructionHandover);
   const { handleSubmit } = formMethods;
   const [patchConstructionHandover] = usePatchConstructionHandoverMutation();
+  const [doStatusTransition] = useTransitionConstructionHandoverStatusMutation();
 
   function onCopyLinkClick() {
     navigator.clipboard
@@ -85,10 +90,28 @@ function ConstructionHandoverForm({
       });
   }
 
-  async function submitForm(data: IConstructionHandoverForm) {
+  function submitForm(data: IConstructionHandoverForm) {
     if (data.id && project?.id) {
       const requestData = mapFormToRequest(data, project.id);
       patchConstructionHandover({ id: data.id, data: requestData });
+    }
+  }
+
+  function submitToProgrammer() {
+    if (constructionHandover.id) {
+      doStatusTransition({
+        id: constructionHandover.id,
+        to: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
+      });
+    }
+  }
+
+  function submitToConstruction() {
+    if (constructionHandover.id) {
+      doStatusTransition({
+        id: constructionHandover.id,
+        to: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      });
     }
   }
 
@@ -102,9 +125,22 @@ function ConstructionHandoverForm({
         <div className="project-form-banner">
           <div className="project-form-banner-container">
             <div className="flex gap-6">
-              <Button variant={ButtonVariant.Secondary} type="submit">
-                {t('constructionHandoverForm.saveDraft')}
-              </Button>
+              {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
+                <Button type="button" onClick={submitToProgrammer}>
+                  {t('constructionHandoverForm.submitToProgrammer')}
+                </Button>
+              )}
+              {constructionHandover.status ===
+                ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER && (
+                <Button type="button" onClick={submitToConstruction}>
+                  {t('constructionHandoverForm.submitToConstruction')}
+                </Button>
+              )}
+              {constructionHandover.status === ConstructionHandoverStatus.DRAFT && (
+                <Button variant={ButtonVariant.Secondary} type="submit">
+                  {t('constructionHandoverForm.saveDraft')}
+                </Button>
+              )}
               <Button
                 variant={ButtonVariant.Secondary}
                 iconStart={<IconLink />}
