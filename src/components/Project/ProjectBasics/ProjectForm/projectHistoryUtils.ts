@@ -118,7 +118,7 @@ const AVATAR_COLORS = [
 export const avatarColor = (seed: string): string => {
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+    hash = (hash * 31 + (seed.codePointAt(i) ?? 0)) >>> 0;
   }
   return AVATAR_COLORS[hash % AVATAR_COLORS.length];
 };

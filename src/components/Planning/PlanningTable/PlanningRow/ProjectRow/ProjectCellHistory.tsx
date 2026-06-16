@@ -108,6 +108,9 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
       ref={overlayRef}
       className="cell-history-overlay"
       data-testid={`cell-history-${projectId}-${year}`}
+      role="button"
+      aria-haspopup="dialog"
+      aria-expanded={open}
       onMouseEnter={show}
       onMouseLeave={scheduleHide}
       onFocus={show}

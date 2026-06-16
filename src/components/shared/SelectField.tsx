@@ -67,7 +67,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   );
 
   const translatedOptions = useMemo(
-    () => options?.map(translateOption),
+    () => options?.map((option) => translateOption(option)),
     [options, translateOption],
   );
 
@@ -78,7 +78,7 @@ const SelectField: FC<ISelectFieldProps> = ({
       }
 
       const values = Array.isArray(value) ? value : [value];
-      return values.map(translateOption);
+      return values.map((option) => translateOption(option));
     },
     [translateOption],
   );
