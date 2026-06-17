@@ -1,8 +1,7 @@
 import { FormSectionTitle, TextField } from '@/components/shared';
 import { Button, ButtonVariant, IconPlus, Table } from 'hds-react';
 import { IconAngleDown, IconAngleUp } from 'hds-react/icons';
-import { ChangeEvent, FocusEvent } from 'react';
-import { memo, useMemo, useState } from 'react';
+import { FocusEvent, memo, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
@@ -173,28 +172,34 @@ const FinancingSection = () => {
     return rows;
   }, [expandedMainRows, fields, financingPartyOptions, projectTypeQualifierOptions, t]);
 
+  const getBudgetItemElement = (row: typeof groupedRows[0]) => {
+    if (row.hasSubRows) {
+      return (
+        <button
+          type="button"
+          className={styles.mainRowButton}
+          style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          onClick={() =>
+            setExpandedMainRows((prev) => ({
+              ...prev,
+              [row.mainRowKey]: !(prev[row.mainRowKey] ?? false),
+            }))
+          }
+        >
+          {expandedMainRows[row.mainRowKey] ? <IconAngleUp /> : <IconAngleDown />}
+          <span>{row.budgetItemText}</span>
+        </button>
+      );
+    }
+    if (!row.isSubRow) {
+      return <span className={styles.mainRowSpan}>{row.budgetItemText}</span>;
+    }
+    return row.budgetItemText;
+  };
+
   const tableRows = groupedRows.map((row) => ({
     id: row.key,
-    budgetItem: row.hasSubRows ? (
-      <button
-        type="button"
-        className={styles.mainRowButton}
-        style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-        onClick={() =>
-          setExpandedMainRows((prev) => ({
-            ...prev,
-            [row.mainRowKey]: !(prev[row.mainRowKey] ?? false),
-          }))
-        }
-      >
-        {expandedMainRows[row.mainRowKey] ? <IconAngleUp /> : <IconAngleDown />}
-        <span>{row.budgetItemText}</span>
-      </button>
-    ) : !row.isSubRow ? (
-      <span className={styles.mainRowSpan}>{row.budgetItemText}</span>
-    ) : (
-      row.budgetItemText
-    ),
+    budgetItem: getBudgetItemElement(row),
     projectNumber: row.projectNumber,
     budget: <span style={{ whiteSpace: 'nowrap' }}>{row.budget}</span>,
     editCell:

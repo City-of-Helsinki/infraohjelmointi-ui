@@ -26,7 +26,7 @@ function useConstructionHandoverFormValues(
     constructionHandoverFinancing: (constructionHandover.constructionHandoverFinancing ?? []).map(
       (item) => ({
         description: item.description ?? '',
-        budget: item.budget != null ? String(item.budget) : '',
+        budget: item.budget == null ? '' : formatBudgetEuro(String(item.budget)),
         projectNumber: item.projectNumber ?? '',
         budgetItem: item.budgetItem?.id ?? '',
         id: item.id,
@@ -34,9 +34,9 @@ function useConstructionHandoverFormValues(
       }),
     ),
     totalCost:
-      constructionHandover.totalCost != null
-        ? formatBudgetEuro(String(constructionHandover.totalCost))
-        : '',
+      constructionHandover.totalCost == null
+        ? ''
+        : formatBudgetEuro(String(constructionHandover.totalCost)),
   };
 }
 

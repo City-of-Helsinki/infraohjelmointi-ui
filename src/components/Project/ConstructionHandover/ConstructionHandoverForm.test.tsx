@@ -210,7 +210,7 @@ describe('ConstructionHandoverForm submit', () => {
     });
   });
 
-  it('maps totalCost as a number when form has a value', async () => {
+  it('maps totalCost as number when untouched form has initial value', async () => {
     const constructionHandover = createConstructionHandover({
       constructionStart: '2026-01-01',
       constructionEnd: '2026-02-01',

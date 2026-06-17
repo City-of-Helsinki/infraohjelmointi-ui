@@ -1,6 +1,3 @@
-import { IConstructionHandoverFinancing } from '@/interfaces/constructionHandoverInterfaces';
-import { TFunction } from 'i18next';
-
 export const parseCurrency = (value?: string | number | null): number | null => {
   if (typeof value === 'number') {
     return Number.isFinite(value) ? value : null;
@@ -8,7 +5,7 @@ export const parseCurrency = (value?: string | number | null): number | null => 
 
   const normalized =
     value
-      ?.replace(/€/g, '')
+      ?.replaceAll('€', '')
       .replace(/[\s\u00A0]/g, '')
       .replace(',', '.')
       .trim() ?? '';
@@ -29,7 +26,7 @@ export const formatBudgetEuro = (value?: string): string => {
     maximumFractionDigits: 2,
   })
     .format(numericValue)
-    .replace(/\u00A0/g, ' ');
+    .replaceAll('\u00A0', ' ');
 
   return `${formattedValue}€`;
 };
