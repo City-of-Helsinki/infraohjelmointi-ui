@@ -290,7 +290,7 @@ export interface IProjectHistoryEntry {
   actor_username: string | null;
   actor_first_name: string | null;
   actor_last_name: string | null;
-  operation: 'CREATE' | 'UPDATE' | 'DELETE' | string;
+  operation: 'CREATE' | 'UPDATE' | 'DELETE';
   old_values: Record<string, unknown> | null;
   new_values: Record<string, unknown> | null;
   changed_fields: Array<string>;

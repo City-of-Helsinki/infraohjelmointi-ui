@@ -24,8 +24,9 @@ export const projectApi = infraohjelmointiApi.injectEndpoints({
         if (page) params.append('page', String(page));
         if (pageSize) params.append('page_size', String(pageSize));
         const queryString = params.toString();
+        const suffix = queryString ? `?${queryString}` : '';
         return {
-          url: `/projects/${projectId}/history/${queryString ? `?${queryString}` : ''}`,
+          url: `/projects/${projectId}/history/${suffix}`,
         };
       },
       // Tie the history cache to the project so editing it refetches the log.

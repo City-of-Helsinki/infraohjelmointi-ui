@@ -27,7 +27,7 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
   const { t } = useTranslation();
   const overlayRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const hideTimerRef = useRef<number>();
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [placement, setPlacement] = useState<'above' | 'below'>('above');
@@ -45,7 +45,7 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
       return;
     }
     const spaceAbove = rect.top - VIEWPORT_GAP;
-    const spaceBelow = window.innerHeight - rect.bottom - VIEWPORT_GAP;
+    const spaceBelow = globalThis.innerHeight - rect.bottom - VIEWPORT_GAP;
     // Keep the design's "above the cell" placement when a short popover fits;
     // otherwise drop below so it is not clipped at the top of the viewport.
     const placeAbove = spaceAbove >= 120 || spaceAbove >= spaceBelow;
@@ -61,21 +61,21 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
       left: rect.left,
       maxHeight,
       ...(placeAbove
-        ? { bottom: window.innerHeight - rect.top + VIEWPORT_GAP }
+        ? { bottom: globalThis.innerHeight - rect.top + VIEWPORT_GAP }
         : { top: rect.bottom + VIEWPORT_GAP }),
     });
   }, []);
 
   const cancelHide = useCallback(() => {
     if (hideTimerRef.current) {
-      window.clearTimeout(hideTimerRef.current);
+      clearTimeout(hideTimerRef.current);
       hideTimerRef.current = undefined;
     }
   }, []);
 
   const scheduleHide = useCallback(() => {
     cancelHide();
-    hideTimerRef.current = window.setTimeout(() => {
+    hideTimerRef.current = setTimeout(() => {
       setOpen(false);
       setExpanded(false);
     }, 120);
@@ -119,14 +119,8 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
       ref={overlayRef}
       className="cell-history-overlay"
       data-testid={`cell-history-${projectId}-${year}`}
-      role="button"
-      aria-haspopup="dialog"
-      aria-expanded={open}
       onMouseEnter={show}
       onMouseLeave={scheduleHide}
-      onFocus={show}
-      onBlur={scheduleHide}
-      tabIndex={0}
     >
       {open && (
         <div

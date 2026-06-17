@@ -57,7 +57,10 @@ export const resolveHistoryValue = (
   if (value === null || value === undefined) {
     return '';
   }
-  const raw = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  const raw =
+    typeof value === 'object'
+      ? JSON.stringify(value)
+      : String(value as string | number | boolean);
   if (isEmptyHistoryValue(raw)) {
     return '';
   }
