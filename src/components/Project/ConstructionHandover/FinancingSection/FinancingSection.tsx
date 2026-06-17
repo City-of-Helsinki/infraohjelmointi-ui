@@ -14,9 +14,9 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import { DeleteCell, EditCell } from './FinancingTableActionButtons';
 import { getFieldProps } from '../ConstructionHandoverForm';
 import { useOptions } from '@/hooks/useOptions';
-import { formatBudgetEuro } from '@/utils/common';
 import FinancingDialog from './FinancingDialog';
 import styles from '../styles.module.css';
+import { formatBudgetEuro } from '@/utils/constructionHandoverUtils';
 
 const FinancingSection = () => {
   const { t } = useTranslation();

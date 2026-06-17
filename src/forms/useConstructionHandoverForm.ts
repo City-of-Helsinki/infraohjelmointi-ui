@@ -3,15 +3,10 @@ import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import {
   ConstructionHandoverStatus,
   IConstructionHandover,
-  IConstructionHandoverFinancing,
 } from '@/interfaces/constructionHandoverInterfaces';
-import { formatBudgetEuro, listItemToOption, personToOption } from '@/utils/common';
+import { listItemToOption, personToOption } from '@/utils/common';
 import { formatDateToHds } from '@/utils/dates';
-
-const getBudgetItemLabel = (budgetItem: IConstructionHandoverFinancing['budgetItem']): string => {
-  if (!budgetItem) return '';
-  return budgetItem.value ?? '';
-};
+import { formatBudgetEuro } from '@/utils/constructionHandoverUtils';
 
 function useConstructionHandoverFormValues(
   constructionHandover: IConstructionHandover,
@@ -33,7 +28,7 @@ function useConstructionHandoverFormValues(
         description: item.description ?? '',
         budget: item.budget != null ? String(item.budget) : '',
         projectNumber: item.projectNumber ?? '',
-        budgetItem: getBudgetItemLabel(item.budgetItem),
+        budgetItem: item.budgetItem?.id ?? '',
         id: item.id,
         financer: item.financingParty ?? '',
       }),

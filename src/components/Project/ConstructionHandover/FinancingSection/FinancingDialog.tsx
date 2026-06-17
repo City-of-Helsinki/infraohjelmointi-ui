@@ -25,8 +25,12 @@ import {
 import { TFunction } from 'i18next';
 import { ChangeEvent, FC, FocusEvent, memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { currencyToRequestValue, formatBudgetEuro, parseCurrency } from '@/utils/common';
 import styles from '../styles.module.css';
+import {
+  formatBudgetEuro,
+  parseCurrency,
+  currencyToRequestValue,
+} from '@/utils/constructionHandoverUtils';
 
 const getFieldError = (
   t: TFunction<'translation'>,
@@ -330,6 +334,7 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
           id="financing-dialog-budget-input"
           label={t('constructionHandoverForm.financingSection.label.budget')}
           value={dialogValues.budget}
+          onChange={(e) => handleDialogFieldChange('budget', e)}
           onBlur={onBudgetBlur}
           data-testid="financing-dialog-budget-input"
           errorText={budgetError}

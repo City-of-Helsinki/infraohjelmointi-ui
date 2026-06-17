@@ -1,6 +1,5 @@
 import mockI18next from '@/mocks/mockI18next';
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import { ReactNode } from 'react';
 import FinancingDialog from './FinancingDialog';
 
 const mockDispatch = jest.fn();
@@ -49,88 +48,6 @@ jest.mock('@/api/constructionHandoverApi', () => ({
     (id: string) => ({ unwrap: () => mockDeleteFinancingRow(id) }),
   ],
 }));
-
-jest.mock('hds-react', () => {
-  const Dialog = ({ isOpen, children }: { isOpen: boolean; children?: ReactNode }) =>
-    isOpen ? <div>{children}</div> : null;
-  Dialog.displayName = 'Dialog';
-
-  const Header = ({ title }: { title?: ReactNode }) => <div>{title}</div>;
-  Header.displayName = 'Dialog.Header';
-  Dialog.Header = Header;
-
-  const Content = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
-  Content.displayName = 'Dialog.Content';
-  Dialog.Content = Content;
-
-  const ActionButtons = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
-  ActionButtons.displayName = 'Dialog.ActionButtons';
-  Dialog.ActionButtons = ActionButtons;
-
-  return {
-    Dialog,
-    ButtonVariant: {
-      Secondary: 'secondary',
-    },
-    Button: ({
-      children,
-      onClick,
-      type = 'button',
-      'data-testid': dataTestId,
-    }: {
-      children?: ReactNode;
-      onClick?: React.MouseEventHandler<HTMLButtonElement>;
-      type?: 'button' | 'submit' | 'reset';
-      'data-testid'?: string;
-    }) => (
-      <button type={type} onClick={onClick} data-testid={dataTestId}>
-        {children}
-      </button>
-    ),
-    Select: ({
-      id,
-      options,
-      value,
-      onChange,
-    }: {
-      id: string;
-      options: Array<{ value: string; label: string }>;
-      value?: Array<{ value: string; label: string }>;
-      onChange?: (
-        selectedOptions: unknown[],
-        clickedOption?: { value: string; label: string },
-      ) => void;
-    }) => (
-      <select
-        data-testid={id}
-        value={value?.[0]?.value ?? ''}
-        onChange={(e) => {
-          const clickedOption = options.find((option) => option.value === e.target.value);
-          onChange?.([], clickedOption);
-        }}
-      >
-        <option value="">--</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    ),
-    TextInput: ({
-      id,
-      value,
-      onChange,
-      'data-testid': dataTestId,
-    }: {
-      id: string;
-      value?: string;
-      onChange?: React.ChangeEventHandler<HTMLInputElement>;
-      'data-testid'?: string;
-    }) => <input id={id} data-testid={dataTestId ?? id} value={value ?? ''} onChange={onChange} />,
-    Notification: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
-  };
-});
 
 describe('FinancingDialog', () => {
   beforeEach(() => {
@@ -311,6 +228,51 @@ describe('FinancingDialog', () => {
         budget: '1000.50',
         project: 'project-123',
       });
+    });
+  });
+
+  it('updates budget value from input edits before submit', async () => {
+    mockPatchFinancingRow.mockResolvedValue({ id: 'row-2' });
+
+    render(
+      <FinancingDialog
+        handleClose={jest.fn()}
+        dialogState={{
+          open: true,
+          mode: 'edit',
+          itemId: 'row-2',
+          values: {
+            financer: 'OTHER',
+            description: 'Editable budget',
+            budgetItem: '',
+            projectNumber: '',
+            budget: '100',
+            id: 'row-2',
+          },
+        }}
+        onRowSaved={jest.fn()}
+        onRowDeleted={jest.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByTestId('financing-dialog-budget-input'), {
+      target: { value: '250,75€' },
+    });
+
+    fireEvent.click(screen.getByTestId('submit-financing-row-button'));
+
+    await waitFor(() => {
+      expect(mockPatchFinancingRow).toHaveBeenCalledWith(
+        {
+          financingParty: 'OTHER',
+          description: 'Editable budget',
+          budgetItemId: '',
+          projectNumber: '',
+          budget: '250.75',
+          project: 'project-123',
+        },
+        'row-2',
+      );
     });
   });
 });
