@@ -199,6 +199,7 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
     patchConstructionHandoverFinancing,
     postConstructionHandoverFinancing,
     project?.id,
+    isKympFinancingSelected,
     t,
   ]);
 

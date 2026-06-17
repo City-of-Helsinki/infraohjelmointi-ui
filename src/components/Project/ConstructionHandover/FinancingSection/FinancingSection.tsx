@@ -15,7 +15,7 @@ import { getFieldProps } from '../ConstructionHandoverForm';
 import { useOptions } from '@/hooks/useOptions';
 import FinancingDialog from './FinancingDialog';
 import styles from '../styles.module.css';
-import { formatBudgetEuro } from '@/utils/constructionHandoverUtils';
+import { formatBudgetEuro, parseCurrency } from '@/utils/constructionHandoverUtils';
 
 const FinancingSection = () => {
   const { t } = useTranslation();
@@ -107,8 +107,8 @@ const FinancingSection = () => {
     const kympRows = fields.filter((item) => item.financer === 'KYMP');
     const nonKympRows = fields.filter((item) => item.financer !== 'KYMP');
     const kympTotalBudget = kympRows.reduce((sum, item) => {
-      const budgetValue = Number(item.budget);
-      return Number.isFinite(budgetValue) ? sum + budgetValue : sum;
+      const budgetValue = parseCurrency(item.budget) ?? 0;
+      return sum + budgetValue;
     }, 0);
 
     const rows: Array<{
@@ -170,9 +170,18 @@ const FinancingSection = () => {
     });
 
     return rows;
-  }, [expandedMainRows, fields, financingPartyOptions, projectTypeQualifierOptions, t]);
+  }, [
+    expandedMainRows,
+    fields,
+    financingPartyOptions,
+    projectTypeQualifierOptions,
+    t,
+    getBudgetItemLabel,
+    getFinancingPartyLabel,
+    getBudgetItemLabel,
+  ]);
 
-  const getBudgetItemElement = (row: typeof groupedRows[0]) => {
+  const getBudgetItemElement = (row: (typeof groupedRows)[0]) => {
     if (row.hasSubRows) {
       return (
         <button

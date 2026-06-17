@@ -1,5 +1,4 @@
 import { IListItem } from './common';
-import { IConstructionHandoverFinancing } from './constructionHandoverInterfaces';
 import { IPerson } from './personsInterfaces';
 import { ISapCost } from './sapCostsInterfaces';
 
