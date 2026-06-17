@@ -102,8 +102,6 @@ export interface IProject {
   budgetOverrunReason?: IListItem;
   otherBudgetOverrunReason?: string;
   onSchedule?: boolean;
-  totalCost?: string | null;
-  constructionHandoverFinancing?: Array<IConstructionHandoverFinancing>;
 }
 
 export interface IProjectRequest {
