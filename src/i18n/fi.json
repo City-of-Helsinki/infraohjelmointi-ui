@@ -376,6 +376,8 @@
       "loading": "Ladataan muutoshistoriaa…",
       "empty": "Tälle hankkeelle ei ole tallennettua muutoshistoriaa.",
       "error": "Muutoshistorian lataaminen epäonnistui.",
+      "today": "tänään",
+      "yesterday": "eilen",
       "unknownActor": "Tuntematon käyttäjä",
       "field": "Kenttä",
       "change": "Muutos",

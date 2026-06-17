@@ -6,16 +6,18 @@ import { selectLists } from '@/reducers/listsSlice';
 import { selectAllPlanningClasses } from '@/reducers/classSlice';
 import { useGetProjectHistoryQuery } from '@/api/projectApi';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
-import { stringToDateTime } from '@/utils/dates';
+import optionIcon from '@/utils/optionIcon';
 import {
   actorNameOf,
   avatarColor,
   formFieldsOf,
   historyFieldLabel,
   historyActionOf,
+  historyOptionKey,
   initialsOf,
   NO_PREVIOUS_VALUE,
   PILL_FIELDS,
+  relativeHistoryDateTime,
   resolveHistoryValue,
 } from './projectHistoryUtils';
 import './projectHistoryPanel.css';
@@ -75,15 +77,27 @@ const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, p
     const fieldLabel = historyFieldLabel(field, t);
 
     if (PILL_FIELDS.has(field)) {
+      const oldIcon =
+        optionIcon[historyOptionKey(field, entry.old_values?.[field], lists) as keyof typeof optionIcon];
+      const newIcon =
+        optionIcon[historyOptionKey(field, entry.new_values?.[field], lists) as keyof typeof optionIcon];
       return (
         <div
           key={field}
           className="project-history-change project-history-change--pills"
           data-testid={`project-history-field-${field}`}
         >
-          {oldValue && <span className="project-history-pill is-old">{oldValue}</span>}
+          {oldValue && (
+            <span className="project-history-pill is-old">
+              {oldIcon}
+              {oldValue}
+            </span>
+          )}
           {oldValue && <span className="project-history-arrow" aria-hidden="true">→</span>}
-          <span className="project-history-pill is-new">{newValue || NO_PREVIOUS_VALUE}</span>
+          <span className="project-history-pill is-new">
+            {newIcon}
+            {newValue || NO_PREVIOUS_VALUE}
+          </span>
         </div>
       );
     }
@@ -132,7 +146,9 @@ const ProjectHistoryPanel: FC<IProjectHistoryPanelProps> = ({ isOpen, onClose, p
           <div className="project-history-entry-header">
             <span className="project-history-actor">{actorName}</span>
             <span className="project-history-action">{actionText}</span>
-            <span className="project-history-date">{stringToDateTime(entry.createdDate)}</span>
+            <span className="project-history-date">
+              {relativeHistoryDateTime(entry.createdDate, t)}
+            </span>
           </div>
           {fields.length > 0 && (
             <div className="project-history-changes">

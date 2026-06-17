@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { TFunction } from 'i18next';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListItem } from '@/interfaces/common';
@@ -83,6 +84,36 @@ export const resolveHistoryValue = (
   }
 
   return raw;
+};
+
+// The raw option key (e.g. "programming") behind a pill value, used to pick the
+// matching phase icon. Mirrors resolveHistoryValue's UUID → enum-value step.
+export const historyOptionKey = (field: string, value: unknown, lists: IListState): string => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  const raw = String(value);
+  const listKey = RELATION_FIELD_LISTS[field];
+  const list = listKey ? (lists[listKey] as Array<IListItem> | undefined) : undefined;
+  const match = Array.isArray(list) ? list.find((item) => item.id === raw) : undefined;
+  return match?.value ?? raw;
+};
+
+// Format an audit timestamp the way the design shows it: "tänään HH:mm" /
+// "eilen HH:mm" for the last two days, otherwise "D.M.YYYY HH:mm".
+export const relativeHistoryDateTime = (iso: string, t: TFunction): string => {
+  const m = moment(iso);
+  if (!m.isValid()) {
+    return iso;
+  }
+  const time = m.format('HH:mm');
+  if (m.isSame(moment(), 'day')) {
+    return `${t('projectForm.changeHistory.today')} ${time}`;
+  }
+  if (m.isSame(moment().subtract(1, 'day'), 'day')) {
+    return `${t('projectForm.changeHistory.yesterday')} ${time}`;
+  }
+  return m.format('D.M.YYYY HH:mm');
 };
 
 // The non-financial fields this entry changed, in a stable order.

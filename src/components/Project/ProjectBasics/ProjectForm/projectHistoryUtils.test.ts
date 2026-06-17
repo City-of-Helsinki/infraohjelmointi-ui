@@ -1,7 +1,12 @@
+import moment from 'moment';
 import { TFunction } from 'i18next';
 import { IClass } from '@/interfaces/classInterfaces';
 import { IListState } from '@/reducers/listsSlice';
-import { resolveHistoryValue } from './projectHistoryUtils';
+import {
+  historyOptionKey,
+  relativeHistoryDateTime,
+  resolveHistoryValue,
+} from './projectHistoryUtils';
 
 // Echo the i18n key so we can assert the option catalogue is consulted.
 const t = ((key: string) => key) as unknown as TFunction;
@@ -45,5 +50,33 @@ describe('resolveHistoryValue', () => {
 
   it('returns a plain (non-relation) field value unchanged', () => {
     expect(resolveHistoryValue('name', 'Hanke A', lists, classes, t)).toBe('Hanke A');
+  });
+});
+
+describe('historyOptionKey', () => {
+  it('returns the enum value behind a relation UUID', () => {
+    expect(historyOptionKey('phase', 'phase-uuid', lists)).toBe('programming');
+  });
+
+  it('passes an enum value (non-UUID) through unchanged', () => {
+    expect(historyOptionKey('phase', 'proposal', lists)).toBe('proposal');
+  });
+});
+
+describe('relativeHistoryDateTime', () => {
+  it('formats a timestamp from today as "today HH:mm"', () => {
+    const iso = moment().hour(12).minute(22).second(0).millisecond(0).toISOString();
+    const result = relativeHistoryDateTime(iso, t);
+    expect(result).toContain('projectForm.changeHistory.today');
+    expect(result).toContain(moment(iso).format('HH:mm'));
+  });
+
+  it('formats a timestamp from yesterday as "yesterday HH:mm"', () => {
+    const iso = moment().subtract(1, 'day').hour(13).minute(25).second(0).toISOString();
+    expect(relativeHistoryDateTime(iso, t)).toContain('projectForm.changeHistory.yesterday');
+  });
+
+  it('formats an older timestamp as an absolute date-time', () => {
+    expect(relativeHistoryDateTime('2025-03-12T14:08:00', t)).toBe('12.3.2025 14:08');
   });
 });
