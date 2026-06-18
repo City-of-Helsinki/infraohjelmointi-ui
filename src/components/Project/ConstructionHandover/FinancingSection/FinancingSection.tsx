@@ -170,16 +170,7 @@ const FinancingSection = () => {
     });
 
     return rows;
-  }, [
-    expandedMainRows,
-    fields,
-    financingPartyOptions,
-    projectTypeQualifierOptions,
-    t,
-    getBudgetItemLabel,
-    getFinancingPartyLabel,
-    getBudgetItemLabel,
-  ]);
+  }, [expandedMainRows, fields, getBudgetItemLabel, getFinancingPartyLabel]);
 
   const getBudgetItemElement = (row: (typeof groupedRows)[0]) => {
     if (row.hasSubRows) {

@@ -200,7 +200,6 @@ const AddOrEditRowDialog: FC<FinancingDialogModifyProps> = ({
     postConstructionHandoverFinancing,
     project?.id,
     isKympFinancingSelected,
-    t,
   ]);
 
   const onBudgetBlur = useCallback((e: FocusEvent<HTMLInputElement>) => {
