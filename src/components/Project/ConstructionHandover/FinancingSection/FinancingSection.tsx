@@ -1,7 +1,7 @@
 import { FormSectionTitle, TextField } from '@/components/shared';
 import { Button, ButtonVariant, IconPlus, Table } from 'hds-react';
 import { IconAngleDown, IconAngleUp } from 'hds-react/icons';
-import { FocusEvent, memo, useMemo, useState } from 'react';
+import { FocusEvent, memo, useCallback, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
@@ -95,13 +95,22 @@ const FinancingSection = () => {
     }
   };
 
-  const getFinancingPartyLabel = (code: string) =>
-    financingPartyOptions.find((option) => option.value === code)?.label ?? code;
+  const getFinancingPartyLabel = useCallback(
+    (code: string) => financingPartyOptions.find((option) => option.value === code)?.label ?? code,
+    [financingPartyOptions],
+  );
 
-  const getBudgetItemLabel = (id: string) =>
-    t(`option.${projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? ''}`, {
-      defaultValue: projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? id,
-    });
+  const getBudgetItemLabel = useCallback(
+    (id: string) =>
+      t(
+        `option.${projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? ''}`,
+        {
+          defaultValue:
+            projectTypeQualifierOptions.find((option) => option.value === id)?.label ?? id,
+        },
+      ),
+    [t, projectTypeQualifierOptions],
+  );
 
   const groupedRows = useMemo(() => {
     const kympRows = fields.filter((item) => item.financer === 'KYMP');
