@@ -3,7 +3,9 @@
 }
 
 .cell-history-popover {
-  @apply fixed z-50 flex min-w-[12rem] max-w-[18rem] flex-col gap-1 rounded p-3 text-sm;
+  /* z-[999] keeps the popover above the sticky planning summary header
+     (z-[100]); it is portaled to the body so this is the effective layer. */
+  @apply fixed z-[999] flex min-w-[12rem] max-w-[18rem] flex-col gap-1 rounded p-3 text-sm;
   background: var(--color-black-5);
   border: 1px solid var(--color-black-20);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);

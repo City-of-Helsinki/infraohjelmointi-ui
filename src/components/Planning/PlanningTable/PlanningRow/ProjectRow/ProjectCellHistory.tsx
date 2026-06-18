@@ -1,4 +1,5 @@
 import { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useLazyGetProjectHistoryQuery } from '@/api/projectApi';
 import { IProjectHistoryEntry } from '@/interfaces/projectInterfaces';
@@ -22,6 +23,9 @@ const VIEWPORT_GAP = 8;
  *
  * The popover is fixed-positioned above the cell (design default) with a
  * scrollable body so long lists stay readable without moving with the table.
+ * It is rendered through a portal to document.body so it escapes the cell
+ * overlay's stacking context and is not clipped behind the sticky planning
+ * summary header for the top project rows.
  */
 const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) => {
   const { t } = useTranslation();
@@ -122,65 +126,70 @@ const ProjectCellHistory: FC<IProjectCellHistoryProps> = ({ projectId, year }) =
       onMouseEnter={show}
       onMouseLeave={scheduleHide}
     >
-      {open && (
-        <div
-          ref={popoverRef}
-          className={`cell-history-popover cell-history-popover--${placement}`}
-          role="tooltip"
-          style={
-            coords
-              ? {
-                  top: coords.top,
-                  bottom: coords.bottom,
-                  left: coords.left,
-                  maxHeight: coords.maxHeight,
-                }
-              : undefined
-          }
-          data-testid={`cell-history-popover-${projectId}-${year}`}
-          onMouseEnter={cancelHide}
-          onMouseLeave={scheduleHide}
-        >
-          {isLoading && (
-            <span className="cell-history-message">{t('tooltips.history.loading')}</span>
-          )}
-          {!isLoading && entries.length === 0 && (
-            <span className="cell-history-message" data-testid={`cell-history-empty-${projectId}`}>
-              {t('tooltips.history.empty')}
-            </span>
-          )}
-          {!isLoading && (
-            <div className="cell-history-rows">
-              {visibleEntries.map((entry) => (
-                <div key={entry.id} className="cell-history-row">
-                  <span className="cell-history-actor">{getActorName(entry)}</span>
-                  <span className="cell-history-date">{stringToDateTime(entry.createdDate)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          {!isLoading && remaining > 0 && (
-            <button
-              type="button"
-              className="cell-history-more"
-              onMouseDown={handleExpand}
-              data-testid={`cell-history-more-${projectId}-${year}`}
-            >
-              {t('tooltips.history.showMore', { count: remaining })}
-            </button>
-          )}
-          {!isLoading && expanded && entries.length > DEFAULT_VISIBLE && (
-            <button
-              type="button"
-              className="cell-history-more"
-              onMouseDown={handleCollapse}
-              data-testid={`cell-history-less-${projectId}-${year}`}
-            >
-              {t('tooltips.history.showLess')}
-            </button>
-          )}
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div
+            ref={popoverRef}
+            className={`cell-history-popover cell-history-popover--${placement}`}
+            role="tooltip"
+            style={
+              coords
+                ? {
+                    top: coords.top,
+                    bottom: coords.bottom,
+                    left: coords.left,
+                    maxHeight: coords.maxHeight,
+                  }
+                : undefined
+            }
+            data-testid={`cell-history-popover-${projectId}-${year}`}
+            onMouseEnter={cancelHide}
+            onMouseLeave={scheduleHide}
+          >
+            {isLoading && (
+              <span className="cell-history-message">{t('tooltips.history.loading')}</span>
+            )}
+            {!isLoading && entries.length === 0 && (
+              <span
+                className="cell-history-message"
+                data-testid={`cell-history-empty-${projectId}`}
+              >
+                {t('tooltips.history.empty')}
+              </span>
+            )}
+            {!isLoading && (
+              <div className="cell-history-rows">
+                {visibleEntries.map((entry) => (
+                  <div key={entry.id} className="cell-history-row">
+                    <span className="cell-history-actor">{getActorName(entry)}</span>
+                    <span className="cell-history-date">{stringToDateTime(entry.createdDate)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {!isLoading && remaining > 0 && (
+              <button
+                type="button"
+                className="cell-history-more"
+                onMouseDown={handleExpand}
+                data-testid={`cell-history-more-${projectId}-${year}`}
+              >
+                {t('tooltips.history.showMore', { count: remaining })}
+              </button>
+            )}
+            {!isLoading && expanded && entries.length > DEFAULT_VISIBLE && (
+              <button
+                type="button"
+                className="cell-history-more"
+                onMouseDown={handleCollapse}
+                data-testid={`cell-history-less-${projectId}-${year}`}
+              >
+                {t('tooltips.history.showLess')}
+              </button>
+            )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
