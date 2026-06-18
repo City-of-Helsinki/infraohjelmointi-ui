@@ -86,6 +86,7 @@ const renderPlanningRow = (initialState = {}, search = '') => {
       notesModalData: { name: '', id: '' },
       coordinatorNotes: [],
       hoverTooltipsEnabled: true,
+      changeHistoryEnabled: false,
       ...initialState,
     },
   });

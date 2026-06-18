@@ -278,6 +278,45 @@ export interface IProjectsResponse {
   next?: string | null;
 }
 
+/**
+ * A single audit-log entry returned by GET /projects/<id>/history/ (IO-879).
+ * old_values / new_values are keyed either by form field name (form edits) or
+ * by calendar year as a string (financial edits); changed_fields is the union
+ * of those keys, provided by the backend so the UI does not have to derive it.
+ */
+export interface IProjectHistoryEntry {
+  id: string;
+  actor: string | null;
+  actor_username: string | null;
+  actor_first_name: string | null;
+  actor_last_name: string | null;
+  operation: 'CREATE' | 'UPDATE' | 'DELETE';
+  old_values: Record<string, unknown> | null;
+  new_values: Record<string, unknown> | null;
+  changed_fields: Array<string>;
+  endpoint: string | null;
+  createdDate: string;
+  updatedDate: string;
+}
+
+export interface IProjectHistoryResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Array<IProjectHistoryEntry>;
+}
+
+export interface IProjectHistoryRequest {
+  projectId: string;
+  /** Narrow to a single budget cell: only entries that touch this year. */
+  year?: number | string;
+  /** Narrow to a single form field: only entries that touch this field. */
+  field?: string;
+  operation?: 'CREATE' | 'UPDATE' | 'DELETE';
+  page?: number;
+  pageSize?: number;
+}
+
 export interface IProjectResponse {
   data: IProject;
   status: number;
