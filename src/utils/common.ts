@@ -17,6 +17,7 @@ export const removeDotsFromString = (value: string) => value.replace('.', '');
 export const formatNumberToContainSpaces = (number: number) => {
   return String(new Intl.NumberFormat('de-DE').format(number)).replace(/\./g, ' ');
 };
+
 export const listItemToOption = (listItem: IListItem | undefined | null): Option => ({
   label: listItem?.value ?? '',
   value: listItem?.id ?? '',

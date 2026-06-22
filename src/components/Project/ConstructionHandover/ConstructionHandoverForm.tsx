@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { FieldPath, FormProvider } from 'react-hook-form';
 import NameAndDescriptionSection from './NameAndDescriptionSection';
-import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
 import { IConstructionHandoverForm } from '@/interfaces/formInterfaces';
 import ScheduleSection from './ScheduleSection';
 import ContactsSection from './ContactsSection';
@@ -19,6 +18,9 @@ import {
   IConstructionHandoverRequest,
 } from '@/interfaces/constructionHandoverInterfaces';
 import { IProject } from '@/interfaces/projectInterfaces';
+import FinancingSection from './FinancingSection/FinancingSection';
+import useConstructionHandoverForm from '@/forms/useConstructionHandoverForm';
+import { parseCurrency } from '@/utils/constructionHandoverUtils';
 
 export function getFieldProps(name: FieldPath<IConstructionHandoverForm>) {
   return {
@@ -31,6 +33,8 @@ function mapFormToRequest(
   formData: IConstructionHandoverForm,
   projectId: string,
 ): IConstructionHandoverRequest {
+  const parsedTotalCost = parseCurrency(formData.totalCost);
+
   return {
     name: formData.name,
     description: formData.description,
@@ -41,7 +45,7 @@ function mapFormToRequest(
     personPlanning: formData.personPlanning.value,
     personFinancing: formData.personFinancing.value,
     project: projectId,
-    totalCost: null,
+    totalCost: parsedTotalCost,
     linkDesignDrawings: null,
     linkCostAllocation: null,
     linkContractBoundaries: null,
@@ -120,6 +124,7 @@ function ConstructionHandoverForm({
       <form onSubmit={handleSubmit(submitForm)}>
         <NameAndDescriptionSection />
         <ScheduleSection />
+        <FinancingSection />
         <ContactsSection />
 
         <div className="project-form-banner">

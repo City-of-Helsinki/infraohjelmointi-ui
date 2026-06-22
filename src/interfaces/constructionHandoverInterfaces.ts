@@ -1,4 +1,6 @@
 import { IListItem } from './common';
+import type { AppDispatch } from '@/store';
+import type { DialogMode } from './menuItemsInterfaces';
 import { IPerson } from './personsInterfaces';
 
 export enum ConstructionHandoverStatus {
@@ -26,12 +28,18 @@ export interface IConstructionHandover {
   linkCostAllocation: string | null;
   linkContractBoundaries: string | null;
   constructionProjectManager: IPerson | null;
+  constructionHandoverFinancing: IConstructionHandoverFinancing[];
 }
 
 export interface IConstructionHandoverRequest
   extends Omit<
     IConstructionHandover,
-    'id' | 'status' | 'constructionProcurementMethod' | 'personPlanning' | 'personFinancing'
+    | 'id'
+    | 'status'
+    | 'constructionProcurementMethod'
+    | 'personPlanning'
+    | 'personFinancing'
+    | 'constructionHandoverFinancing'
   > {
   project: string;
   constructionProcurementMethod: string;
@@ -47,4 +55,69 @@ export interface IConstructionHandoverPatchRequest {
 export interface IConstructionHandoverTransitionResponse {
   currentStatus: ConstructionHandoverStatus;
   possibleTransitions: ConstructionHandoverStatus[];
+}
+export interface FinancingDialogState {
+  open: boolean;
+  mode: DialogMode;
+  itemId: string;
+  values?: FinancingRowValues;
+}
+
+export interface FinancingRowValues {
+  financer: string;
+  description: string;
+  budgetItem: string;
+  projectNumber: string;
+  budget: string;
+  id: string;
+}
+
+export interface IConstructionHandoverFinancing {
+  id: string;
+  financingParty: string;
+  description?: string;
+  budgetItem: IListItem | null;
+  projectNumber: string;
+  budget: string | number | null;
+}
+
+export interface FinancingRowPostAndPatchThunkContent {
+  request: FinancingRowValues;
+}
+
+export interface FinancingRowRequest {
+  handover?: string;
+  project?: string;
+  financingParty: string;
+  description?: string;
+  budgetItemId?: string | null;
+  projectNumber: string;
+  budget: string;
+}
+
+export interface FinancingRowDeleteThunkContent {
+  dispatch: AppDispatch;
+  id: string;
+}
+
+export type OnFinancingRowSaved = (row: FinancingRowValues, mode: DialogMode) => void;
+
+export type OnFinancingRowDeleted = (id: string) => void;
+
+export interface FinancingDialogBaseProps {
+  dialogState: FinancingDialogState;
+  handleClose: () => void;
+}
+
+export interface FinancingDialogModifyProps extends FinancingDialogBaseProps {
+  onRowSaved: OnFinancingRowSaved;
+}
+
+export interface FinancingDialogDeleteProps extends FinancingDialogBaseProps {
+  onRowDeleted: OnFinancingRowDeleted;
+}
+
+export interface FinancingDialogProps extends FinancingDialogBaseProps {
+  onRowSaved: OnFinancingRowSaved;
+  onRowDeleted: OnFinancingRowDeleted;
 }

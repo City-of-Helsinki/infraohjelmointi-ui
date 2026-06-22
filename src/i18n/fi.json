@@ -200,6 +200,7 @@
     "requiredFalse": "{{field}} on oltava 'Ei'",
     "programmed": "Ohjelmoitu",
     "description": "Hankkeen kuvaus",
+    "totalCostRequired": "Kokonaiskustannukset ovat pakolliset",
     "phaseTooEarly": "Hankkeen vaihe ei voi olla {{value}} jos nykyinen päivä on ennen rakentamisen päättymispäivää",
     "completedPhaseTooEarly": "Hankkeen vaihe ei voi olla Valmis / ylläpidossa jos nykyinen päivä on ennen takuuajan päättymispäivää",
     "category": "Kategoria",
@@ -483,6 +484,25 @@
     "toStatus": {
       "SUBMITTED_TO_PROGRAMMER": "ohjelmoijalle",
       "SUBMITTED_TO_CONSTRUCTION": "rakentamiselle"
+    },
+    "totalCost": "Kokonaiskustannus",
+    "financingSection": {
+      "title": "Hankkeen rahoitus",
+      "requiredField": "Pakollinen kenttä",
+      "addRow": "Lisää rahoitusrivi",
+      "closeDialogButton": "Takaisin",
+      "deleteDialogContent": "Haluatko varmasti poistaa tämän rahoitusrivin?",
+      "deleteDialogTitle": "Poista rahoitusrivi",
+      "editDialogTitle": "Muokkaa rahoitusriviä",
+      "addDialogTitle": "Lisää rahoitusrivi",
+      "tableEmptyText": "Ei rahoitustietoja",
+      "label": {
+        "financer": "Rahoittava taho",
+        "budgetItem": "Talousarviokohta",
+        "projectNumber": "Projektinumero",
+        "budget": "Budjetti"
+      },
+      "projectNumberWarning": "Projektinumeroa ei voitu hakea tietokannasta. Kirjaa se käsin tai yritä myöhemmin uudelleen."
     }
   },
   "notification": {
@@ -549,6 +569,8 @@
       "postSuccess": "Lisäys onnistui",
       "deleteSuccess": "Arvon poistaminen onnistui",
       "deleteError": "Arvon poistaminen epäonnistui",
+      "rowDeleteSuccess": "Rivin poistaminen onnistui",
+      "rowDeleteError": "Rivin poistaminen epäonnistui",
       "addMenuItemSuccess": "Uusi arvo lisätty valikkoon onnistuneesti",
       "editMenuItemSuccess": "Arvon muokkaus onnistui",
       "deleteMenuItemSuccess": "Arvon poistaminen onnistui",

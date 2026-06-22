@@ -1,5 +1,6 @@
 import { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
 import { FreeSearchFormObject, IOption } from './common';
+import { FinancingRowValues } from './constructionHandoverInterfaces';
 import { IProjectSapCost } from './sapCostsInterfaces';
 
 export enum FormField {
@@ -169,8 +170,10 @@ export interface IConstructionHandoverForm {
   constructionStart: string | null; // Hankkeen aloituspäivämäärä
   constructionEnd: string | null; // Hankkeen lopetuspäivämäärä
   otherTimelineNotes: string; // Muut aikataulun sidoinnaisuudet ja välitavoitteet
+  constructionHandoverFinancing: FinancingRowValues[]; // Rahoitusrivit
   personPlanning: IOption; // Suunnittelu- ja tekniset asiat
   personFinancing: IOption; // Rahoitus- ja aikataulu
+  totalCost: string; // Kokonaiskustannus
 }
 
 export interface IAppForms

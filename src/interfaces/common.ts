@@ -74,6 +74,7 @@ export type ListType =
   | 'projectSubDistricts'
   | 'projectSubSubDistricts'
   | 'budgetOverrunReasons'
+  | 'financingParties'
   | 'programmers'
   | 'priorities';
 
@@ -101,3 +102,5 @@ export interface ICoordinatorRequestParams {
   forcedToFrame: boolean;
   year: number;
 }
+
+export type DialogMode = 'add' | 'edit' | 'delete';

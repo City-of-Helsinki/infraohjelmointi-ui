@@ -126,6 +126,7 @@ export function createConstructionHandover(
     linkCostAllocation: null,
     linkContractBoundaries: null,
     constructionProjectManager: null,
+    constructionHandoverFinancing: [],
     project: 'project-1',
     status: ConstructionHandoverStatus.DRAFT,
     totalCost: null,

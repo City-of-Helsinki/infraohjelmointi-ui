@@ -376,6 +376,23 @@ export const mockBudgetOverrunReasons: { data: Array<IListItem> } = {
   ],
 };
 
+export const mockFinancingParties: { data: Array<IListItem> } = {
+  data: [
+    { id: 'KYMP', value: 'KYMP-rahoitus' },
+    { id: 'GLOBAL_CONNECT', value: 'GlobalConnect Oy' },
+    { id: 'HELEN', value: 'Helen Oy' },
+    { id: 'HELEN_SAHKO', value: 'Helen Sahkoverkko Oy' },
+    { id: 'HSY', value: 'Helsingin seudun ymparistopalvelut-kuntayhtyma HSY' },
+    { id: 'ELISA', value: 'Elisa Oyj' },
+    { id: 'DNA', value: 'DNA Oyj' },
+    { id: 'TELIA', value: 'Telia Finland Oyj' },
+    { id: 'AURIS', value: 'Auris Kaasunjakelu Oy' },
+    { id: 'CINIA', value: 'Cinia Cloud Oy' },
+    { id: 'KAUPUNKILIIKENNE', value: 'Paakaupunkiseudun Kaupunkiliikenne Oy' },
+    { id: 'OTHER', value: 'Muu rahoitus' },
+  ],
+};
+
 export const mockProgrammers: { data: Array<IListItem> } = {
   data: [
     {
