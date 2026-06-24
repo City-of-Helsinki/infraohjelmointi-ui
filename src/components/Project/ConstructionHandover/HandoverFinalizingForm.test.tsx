@@ -139,6 +139,50 @@ describe('HandoverFinalizingForm', () => {
     });
   });
 
+  it('omits procurement method from payload when status is SUBMITTED_TO_CONSTRUCTION and select is empty', async () => {
+    const constructionHandover = createConstructionHandover({
+      status: ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION,
+      constructionProjectManager: {
+        id: 'manager-1',
+        firstName: 'Matti',
+        lastName: 'Meikalainen',
+        email: 'matti.meikalainen@example.com',
+        title: 'Project Manager',
+        phone: '0401234567',
+      },
+      constructionProcurementMethod: null,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<HandoverFinalizingForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'constructionHandoverForm.saveProjectManagerButton',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalledTimes(1);
+    });
+
+    const requestPayload = mockPatchConstructionHandover.mock.calls[0][0];
+
+    expect(requestPayload).toEqual({
+      id: 'handover-1',
+      data: {
+        constructionProjectManager: 'manager-1',
+      },
+    });
+    expect(requestPayload.data).not.toHaveProperty('constructionProcurementMethod');
+  });
+
   it('submits only procurement method when status is PROJECT_MANAGER_NAMED', async () => {
     const constructionHandover = createConstructionHandover({
       status: ConstructionHandoverStatus.PROJECT_MANAGER_NAMED,

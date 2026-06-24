@@ -16,7 +16,7 @@ import { validateRequiredSelect } from '@/utils/validation';
 
 function useHandoverFinalizingForm(constructionHandover: IConstructionHandover | null) {
   const formMethods = useForm<IConstructionHandoverFinalizingForm>({
-    defaultValues: {
+    values: {
       constructionProjectManager: personToOption(constructionHandover?.constructionProjectManager),
       constructionProcurementMethod: listItemToOption(
         constructionHandover?.constructionProcurementMethod,
@@ -33,21 +33,22 @@ function useHandoverFinalizingForm(constructionHandover: IConstructionHandover |
     let requestData: Partial<IConstructionHandoverRequest>;
     const isSubmittedToConstruction =
       constructionHandover.status === ConstructionHandoverStatus.SUBMITTED_TO_CONSTRUCTION;
+    const procurementMethodId = data.constructionProcurementMethod?.value;
 
     if (isSubmittedToConstruction) {
       requestData = {
         constructionProjectManager: data.constructionProjectManager.value,
       };
 
-      if (data.constructionProcurementMethod) {
+      if (procurementMethodId) {
         requestData = {
           ...requestData,
-          constructionProcurementMethod: data.constructionProcurementMethod.value,
+          constructionProcurementMethod: procurementMethodId,
         };
       }
     } else {
       requestData = {
-        constructionProcurementMethod: data.constructionProcurementMethod.value,
+        constructionProcurementMethod: procurementMethodId,
       };
     }
 

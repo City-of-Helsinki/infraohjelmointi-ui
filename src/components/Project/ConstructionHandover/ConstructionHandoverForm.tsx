@@ -91,15 +91,23 @@ function ConstructionHandoverForm({
 
   async function submitForm(data: IConstructionHandoverForm) {
     if (data.id) {
-      const requestData = mapFormToRequest(data);
-      await patchConstructionHandover({ id: data.id, data: requestData });
+      try {
+        const requestData = mapFormToRequest(data);
+        await patchConstructionHandover({ id: data.id, data: requestData }).unwrap();
+      } catch (error) {
+        return error;
+      }
     }
   }
 
   async function submitToProgrammer() {
     if (isDirty) {
       // If there are unsaved changes, save them before submitting to programmer
-      await submitForm(formMethods.getValues());
+      const error = await submitForm(formMethods.getValues());
+      if (error) {
+        // If there was an error saving the form, do not proceed with the status transition
+        return;
+      }
     }
 
     doStatusTransition({

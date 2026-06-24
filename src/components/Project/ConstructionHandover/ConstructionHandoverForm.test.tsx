@@ -353,6 +353,7 @@ describe('ConstructionHandoverForm financing rows', () => {
 describe('ConstructionHandoverForm status transitions', () => {
   beforeEach(() => {
     mockTransitionConstructionHandoverStatus.mockClear();
+    mockPatchConstructionHandover.mockClear();
   });
 
   it('disables form fields when handover status is not draft', async () => {
@@ -406,6 +407,43 @@ describe('ConstructionHandoverForm status transitions', () => {
         id: 'handover-1',
         to: ConstructionHandoverStatus.SUBMITTED_TO_PROGRAMMER,
       });
+    });
+  });
+
+  it('does not submit handover to programmer when patching draft changes fails', async () => {
+    const unwrap = jest.fn().mockRejectedValue(new Error('Patch failed'));
+    mockPatchConstructionHandover.mockReturnValue({ unwrap });
+
+    const constructionHandover = createConstructionHandover({
+      status: ConstructionHandoverStatus.DRAFT,
+    });
+
+    await act(async () =>
+      renderWithProviders(
+        <Route
+          path="/"
+          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
+        />,
+      ),
+    );
+
+    await act(async () => {
+      fireEvent.change(screen.getByRole('textbox', { name: /constructionHandoverForm\.name/i }), {
+        target: { value: 'Updated handover name' },
+      });
+    });
+
+    const submitToProgrammerButton = screen.getByRole('button', {
+      name: 'constructionHandoverForm.submitToProgrammer',
+    });
+
+    await act(async () => {
+      fireEvent.click(submitToProgrammerButton);
+    });
+
+    await waitFor(() => {
+      expect(mockPatchConstructionHandover).toHaveBeenCalled();
+      expect(mockTransitionConstructionHandoverStatus).not.toHaveBeenCalled();
     });
   });
 
