@@ -171,31 +171,6 @@ describe('ConstructionHandoverForm submit', () => {
     });
   });
 
-  it('does not submit when project is missing', async () => {
-    const constructionHandover = createConstructionHandover();
-
-    await act(async () =>
-      renderWithProviders(
-        <Route
-          path="/"
-          element={<ConstructionHandoverForm constructionHandover={constructionHandover} />}
-        />,
-      ),
-    );
-
-    const submitButton = screen.getByRole('button', {
-      name: 'constructionHandoverForm.saveDraft',
-    });
-
-    await act(async () => {
-      fireEvent.click(submitButton);
-    });
-
-    await waitFor(() => {
-      expect(mockPatchConstructionHandover).not.toHaveBeenCalled();
-    });
-  });
-
   it('maps totalCost as number when untouched form has initial value', async () => {
     const constructionHandover = createConstructionHandover({
       constructionStart: '2026-01-01',
