@@ -157,31 +157,33 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   }, [isOtherBudgetOverrunReasonSelected, setValue, getValues]);
 
   const findPhase = useCallback(
-    (value: string) => phases.find((phase) => phase.value === value)?.value ?? '',
+    (value: string) => phases.find((phase) => phase.label === value)?.value ?? '',
     [phases],
   );
 
   const phasesRequiringClass = useMemo(
-    () => [
-      findPhase('programming'),
-      findPhase('draftInitiation'),
-      findPhase('draftApproval'),
-      findPhase('constructionPlan'),
-      findPhase('constructionWait'),
-      findPhase('constructionPreparation'),
-      findPhase('construction'),
-      findPhase('warrantyPeriod'),
-      findPhase('completed'),
-    ],
+    () =>
+      [
+        findPhase('programming'),
+        findPhase('draftInitiation'),
+        findPhase('draftApproval'),
+        findPhase('constructionPlan'),
+        findPhase('constructionWait'),
+        findPhase('constructionPreparation'),
+        findPhase('construction'),
+        findPhase('warrantyPeriod'),
+        findPhase('completed'),
+      ].filter((phase): phase is string => phase !== ''),
     [findPhase],
   );
 
-  const currentPhase = getValues('phase').value;
+  const currentPhase = watch('phase')?.value;
 
   useEffect(() => {
     if (!hasSubmitAttempted) {
       return;
     }
+
     trigger('masterClass');
     trigger('class');
   }, [currentPhase, hasSubmitAttempted, trigger]);

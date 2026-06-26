@@ -1,13 +1,14 @@
 import { FormSectionTitle, SelectField } from '@/components/shared';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues, UseFormTrigger } from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormTrigger, useWatch } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
 import { defaultFilter } from 'hds-react';
 
 interface IProjectResponsiblePersonsSectionProps {
+  control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
   trigger: UseFormTrigger<IProjectForm>;
   getFieldProps: (name: string) => {
@@ -20,6 +21,7 @@ interface IProjectResponsiblePersonsSectionProps {
   isUserOnlyViewer: boolean;
 }
 const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProps> = ({
+  control,
   getFieldProps,
   getValues,
   trigger,
@@ -68,12 +70,16 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
     [completedPhase, constructionPhase, warrantyPeriodPhase],
   );
 
-  const currentPhase = getValues('phase').value;
+  const currentPhase = useWatch({
+    control,
+    name: 'phase',
+  })?.value;
 
   useEffect(() => {
     if (!hasSubmitAttempted) {
       return;
     }
+
     trigger('personPlanning');
     trigger('personConstruction');
   }, [currentPhase, hasSubmitAttempted, trigger]);

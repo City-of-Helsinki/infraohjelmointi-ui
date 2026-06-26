@@ -403,16 +403,20 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
   const updateDateBasedOnYear = (data: IProjectRequest, project: IProject) => {
     if (data.planningStartYear) {
       const estPlanningStart = data.estPlanningStart ?? project.estPlanningStart;
-      const isSamePlanningStartYear = isSameYear(estPlanningStart, data.planningStartYear);
-      if (!isSamePlanningStartYear) {
-        data.estPlanningStart = updateYear(data.planningStartYear, estPlanningStart);
+      if (estPlanningStart) {
+        const isSamePlanningStartYear = isSameYear(estPlanningStart, data.planningStartYear);
+        if (!isSamePlanningStartYear) {
+          data.estPlanningStart = updateYear(data.planningStartYear, estPlanningStart);
+        }
       }
     }
     if (data.constructionEndYear) {
       const estConstructionEnd = data.estConstructionEnd ?? project.estConstructionEnd;
-      const isSameConstructionEndYear = isSameYear(estConstructionEnd, data.constructionEndYear);
-      if (!isSameConstructionEndYear) {
-        data.estConstructionEnd = updateYear(data.constructionEndYear, estConstructionEnd);
+      if (estConstructionEnd) {
+        const isSameConstructionEndYear = isSameYear(estConstructionEnd, data.constructionEndYear);
+        if (!isSameConstructionEndYear) {
+          data.estConstructionEnd = updateYear(data.constructionEndYear, estConstructionEnd);
+        }
       }
     }
     return data;
@@ -474,6 +478,8 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
 
           try {
             await patchProject({ id: project?.id, data }).unwrap();
+            reset(form);
+            setHasSubmitAttempted(false);
             dispatch(setIsSaving(false));
           } catch (error: unknown) {
             console.log('project patch error: ', error);
@@ -512,6 +518,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
             const response = await postProject({ data }).unwrap();
             dispatch(setIsSaving(false));
             reset(form);
+            setHasSubmitAttempted(false);
             setNewProjectId(response.id);
           } catch (error) {
             console.log('project post error: ', error);
@@ -581,7 +588,17 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       trigger,
       hasSubmitAttempted,
     }),
-    [control, getFieldProps, getFieldState, getValues, watch, setValue, useWatchField, trigger, hasSubmitAttempted],
+    [
+      control,
+      getFieldProps,
+      getFieldState,
+      getValues,
+      watch,
+      setValue,
+      useWatchField,
+      trigger,
+      hasSubmitAttempted,
+    ],
   );
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);

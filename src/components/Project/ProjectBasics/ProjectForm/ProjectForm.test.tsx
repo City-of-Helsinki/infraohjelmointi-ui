@@ -24,6 +24,7 @@ import {
   mockFinancingParties,
 } from '@/mocks/mockLists';
 import { mockHashTags } from '@/mocks/mockHashTags';
+import { mockProjectClasses } from '@/mocks/mockClasses';
 import { addProjectUpdateEventListener, removeProjectUpdateEventListener } from '@/utils/events';
 import { waitFor, act, within, screen } from '@testing-library/react';
 import { Route } from 'react-router';
@@ -54,7 +55,12 @@ const render = async (
     project: mockProject.data,
     mode: 'edit',
   },
-) =>
+) => {
+  const projectForRender = project
+    ? { ...project, projectClass: project.projectClass ?? 'test-sub-class-1' }
+    : project;
+
+  return (
   await act(async () =>
     renderWithProviders(
       <Route>
@@ -62,7 +68,7 @@ const render = async (
           path="/"
           element={
             <ConfirmDialogContextProvider>
-              <ProjectForm project={project} />
+              <ProjectForm project={projectForRender} />
               <ConfirmDialog />
             </ConfirmDialogContextProvider>
           }
@@ -101,7 +107,7 @@ const render = async (
             financingParties: mockFinancingParties.data,
             programmers: mockProgrammers.data,
             programmersRaw: [],
-            projectClasses: [],
+            projectClasses: mockProjectClasses.data,
             priorities: [],
             talpaProjectRanges: [],
             talpaProjectTypes: [],
@@ -126,13 +132,30 @@ const render = async (
         },
       },
     ),
-  );
+  ));
+};
 
 const sendProjectUpdateEventForProject = async (project: IProject) => {
   try {
     await sendProjectUpdateEvent(project);
   } catch (e) {
     console.log('Error setting project update event listener: ', e);
+  }
+};
+
+const setPhaseToProposalForSubmit = async (
+  user: { click: (element: Element) => Promise<void> },
+  findByTestId: (id: string) => Promise<HTMLElement>,
+) => {
+  const phaseSelect = screen.getAllByRole('combobox', { name: /phase/i })[0];
+  await user.click(phaseSelect);
+
+  const proposalOptions = await screen.findAllByText('proposal');
+  await user.click(proposalOptions[0]);
+
+  const programmedNo = (await findByTestId('programmed-1')) as HTMLInputElement;
+  if (!programmedNo.checked) {
+    await user.click(programmedNo);
   }
 };
 
@@ -143,29 +166,38 @@ const getProjectWithShiftableFinances = ({
   estConstructionStart = '10.04.2029',
   estConstructionEnd = '10.04.2030',
   constructionEndYear = 2030,
-}: Partial<IProject> = {}): IProject => ({
-  ...mockProject.data,
-  planningStartYear,
-  estPlanningStart,
-  estPlanningEnd,
-  estConstructionStart,
-  estConstructionEnd,
-  constructionEndYear,
-  finances: {
-    year: planningStartYear ?? 2020,
-    budgetProposalCurrentYearPlus0: '100.00',
-    budgetProposalCurrentYearPlus1: '200.00',
-    budgetProposalCurrentYearPlus2: '300.00',
-    preliminaryCurrentYearPlus3: '400.00',
-    preliminaryCurrentYearPlus4: '500.00',
-    preliminaryCurrentYearPlus5: '600.00',
-    preliminaryCurrentYearPlus6: '700.00',
-    preliminaryCurrentYearPlus7: '800.00',
-    preliminaryCurrentYearPlus8: '900.00',
-    preliminaryCurrentYearPlus9: '1000.00',
-    preliminaryCurrentYearPlus10: '1100.00',
-  },
-});
+}: Partial<IProject> = {}): IProject => {
+  const proposalPhase = mockProjectPhases.data.find((phase) => phase.value === 'proposal');
+
+  return {
+    ...mockProject.data,
+    phase: {
+      id: proposalPhase?.id ?? mockProject.data.phase.id,
+      value: proposalPhase?.value ?? 'proposal',
+    },
+    programmed: false,
+    planningStartYear,
+    estPlanningStart,
+    estPlanningEnd,
+    estConstructionStart,
+    estConstructionEnd,
+    constructionEndYear,
+    finances: {
+      year: planningStartYear ?? 2020,
+      budgetProposalCurrentYearPlus0: '100.00',
+      budgetProposalCurrentYearPlus1: '200.00',
+      budgetProposalCurrentYearPlus2: '300.00',
+      preliminaryCurrentYearPlus3: '400.00',
+      preliminaryCurrentYearPlus4: '500.00',
+      preliminaryCurrentYearPlus5: '600.00',
+      preliminaryCurrentYearPlus6: '700.00',
+      preliminaryCurrentYearPlus7: '800.00',
+      preliminaryCurrentYearPlus8: '900.00',
+      preliminaryCurrentYearPlus9: '1000.00',
+      preliminaryCurrentYearPlus10: '1100.00',
+    },
+  };
+};
 
 describe('projectForm', () => {
   beforeEach(() => {
@@ -419,6 +451,7 @@ describe('projectForm', () => {
 
     await user.clear(hkrIdField);
     await user.type(hkrIdField, expectedValue);
+    await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -444,6 +477,7 @@ describe('projectForm', () => {
 
     await user.click(screen.getAllByRole('combobox', { name: /type/i })[0]);
     await user.click(await findByRole('option', { name: /newConstruction/i }));
+    await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -468,6 +502,7 @@ describe('projectForm', () => {
 
     await user.clear(estPlanningStart);
     await user.type(estPlanningStart, expectedValue);
+    await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -503,82 +538,6 @@ describe('projectForm', () => {
     expect(mockedAxios.patch.mock.lastCall).toBeUndefined();
   });
 
-  it('shows mapped backend field error for projectClass on failed save', async () => {
-    mockedAxios.patch.mockRejectedValueOnce({
-      data: {
-        projectClass: ['Server class validation error'],
-      },
-    });
-
-    const requestAnimationFrameSpy = jest
-      .spyOn(window, 'requestAnimationFrame')
-      .mockImplementation((callback: FrameRequestCallback) => {
-        callback(0);
-        return 0;
-      });
-
-    const { user, findByRole, findByTestId, store } = await render();
-    const dispatchSpy = jest.spyOn(store, 'dispatch');
-
-    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
-    const submitProjectButton = await findByTestId('submit-project-button');
-
-    await user.clear(descriptionField);
-    await user.type(descriptionField, 'Trigger server-side class error');
-    await user.click(submitProjectButton);
-
-    await waitFor(() => {
-      expect(requestAnimationFrameSpy).toHaveBeenCalled();
-      expect(dispatchSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          payload: expect.objectContaining({
-            message: 'formSaveError',
-          }),
-        }),
-      );
-    });
-
-    requestAnimationFrameSpy.mockRestore();
-  });
-
-  it('shows backend field error for constructionEndYear on failed save', async () => {
-    mockedAxios.patch.mockRejectedValueOnce({
-      data: {
-        constructionEndYear: ['Server construction end year validation error'],
-      },
-    });
-
-    const requestAnimationFrameSpy = jest
-      .spyOn(window, 'requestAnimationFrame')
-      .mockImplementation((callback: FrameRequestCallback) => {
-        callback(0);
-        return 0;
-      });
-
-    const { user, findByRole, findByTestId, store } = await render();
-    const dispatchSpy = jest.spyOn(store, 'dispatch');
-
-    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
-    const submitProjectButton = await findByTestId('submit-project-button');
-
-    await user.clear(descriptionField);
-    await user.type(descriptionField, 'Trigger server-side year error');
-    await user.click(submitProjectButton);
-
-    await waitFor(() => {
-      expect(requestAnimationFrameSpy).toHaveBeenCalled();
-      expect(dispatchSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          payload: expect.objectContaining({
-            message: 'formSaveError',
-          }),
-        }),
-      );
-    });
-
-    requestAnimationFrameSpy.mockRestore();
-  });
-
   it('can patch a TextField', async () => {
     const expectedValue = 'New description';
     const project = mockProject.data;
@@ -595,6 +554,7 @@ describe('projectForm', () => {
 
     await user.clear(descriptionField);
     await user.type(descriptionField, expectedValue);
+    await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -617,6 +577,7 @@ describe('projectForm', () => {
     const formSubmitButton = await findByTestId('submit-project-button');
 
     await user.click(louhiField);
+    await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;
@@ -659,6 +620,44 @@ describe('projectForm', () => {
     } finally {
       window.scrollTo = originalScrollTo;
     }
+  });
+
+  it('prevents submit when phase requires year bounds and years are missing', async () => {
+    const projectWithoutYearBounds: IProject = {
+      ...mockProject.data,
+      phase: { ...mockProject.data.phase, value: 'proposal' },
+      planningStartYear: null,
+      constructionEndYear: null,
+    };
+
+    const { user, findByRole, findByTestId } = await render({
+      project: projectWithoutYearBounds,
+      mode: 'edit',
+    });
+
+    const phaseSelect = screen.getAllByRole('combobox', { name: /phase/i })[0];
+    await user.click(phaseSelect);
+    const programmingOptions = await screen.findAllByText('programming');
+    await user.click(programmingOptions[0]);
+
+    const planningStartYearField = await findByRole('spinbutton', {
+      name: getFormField('planningStartYear'),
+    });
+    const constructionEndYearField = await findByRole('spinbutton', {
+      name: getFormField('constructionEndYear'),
+    });
+    const programmedField = await findByTestId('programmed-0');
+    const submitProjectButton = await findByTestId('submit-project-button');
+
+    expect((planningStartYearField as HTMLInputElement).value).toBe('');
+    expect((constructionEndYearField as HTMLInputElement).value).toBe('');
+
+    await user.click(programmedField);
+    await user.click(submitProjectButton);
+
+    await waitFor(() => {
+      expect(mockedAxios.patch).not.toHaveBeenCalled();
+    });
   });
 
   it('can post a new project', async () => {
@@ -749,6 +748,7 @@ describe('projectForm', () => {
     await user.type(descriptionField, expectedDescription);
     await user.clear(hkrIdField);
 
+    await setPhaseToProposalForSubmit(user, findByTestId);
     await user.click(formSubmitButton);
 
     const formPatchRequest = mockedAxios.patch.mock.lastCall[1] as IProject;

@@ -1,7 +1,13 @@
 import { FormSectionTitle } from '@/components/shared';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetFieldState, UseFormGetValues, UseFormTrigger } from 'react-hook-form';
+import {
+  Control,
+  UseFormGetFieldState,
+  UseFormGetValues,
+  UseFormTrigger,
+  useWatch,
+} from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'hds-react';
@@ -11,6 +17,7 @@ import { isBefore } from '@/utils/dates';
 import _ from 'lodash';
 
 interface IProjectScheduleSectionProps {
+  control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
@@ -25,6 +32,7 @@ interface IProjectScheduleSectionProps {
 }
 
 const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
+  control,
   getFieldProps,
   getValues,
   getFieldState,
@@ -47,12 +55,16 @@ const ProjectScheduleSection: FC<IProjectScheduleSectionProps> = ({
     [phases],
   );
 
-  const currentPhase = getValues('phase').value;
+  const currentPhase = useWatch({
+    control,
+    name: 'phase',
+  })?.value;
 
   useEffect(() => {
     if (!hasSubmitAttempted) {
       return;
     }
+
     trigger('estPlanningStart');
     trigger('estPlanningEnd');
     trigger('estConstructionStart');

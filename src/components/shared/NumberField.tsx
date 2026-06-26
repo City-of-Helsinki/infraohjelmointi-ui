@@ -31,6 +31,7 @@ const NumberField: FC<INumberFieldProps> = ({
 }) => {
   const isRequired = required ?? (rules?.required ? true : false);
   const { t } = useTranslation();
+
   return (
     <Controller
       name={name}

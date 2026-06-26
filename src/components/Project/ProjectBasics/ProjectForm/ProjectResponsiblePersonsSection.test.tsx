@@ -175,6 +175,7 @@ const TestComponent = () => {
   return (
     <FormProvider {...methods}>
       <ProjectResponsiblePersonsSection
+        control={methods.control}
         getValues={methods.getValues}
         getFieldProps={(name) => ({
           name,
