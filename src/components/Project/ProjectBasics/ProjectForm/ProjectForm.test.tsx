@@ -44,7 +44,10 @@ jest.setTimeout(15000);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const getFormField = (name: string) => `projectForm.${name}`;
+const getFormField = (name: string) => {
+  const normalizedName = name.replace(/\s\*$/, '');
+  return new RegExp(`^projectForm\\.${normalizedName}( \\*)?$`);
+};
 
 const render = async (
   { project = mockProject.data, mode = 'edit' }: { project?: IProject; mode?: 'edit' | 'new' } = {
@@ -500,6 +503,82 @@ describe('projectForm', () => {
     expect(mockedAxios.patch.mock.lastCall).toBeUndefined();
   });
 
+  it('shows mapped backend field error for projectClass on failed save', async () => {
+    mockedAxios.patch.mockRejectedValueOnce({
+      data: {
+        projectClass: ['Server class validation error'],
+      },
+    });
+
+    const requestAnimationFrameSpy = jest
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
+        return 0;
+      });
+
+    const { user, findByRole, findByTestId, store } = await render();
+    const dispatchSpy = jest.spyOn(store, 'dispatch');
+
+    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
+    const submitProjectButton = await findByTestId('submit-project-button');
+
+    await user.clear(descriptionField);
+    await user.type(descriptionField, 'Trigger server-side class error');
+    await user.click(submitProjectButton);
+
+    await waitFor(() => {
+      expect(requestAnimationFrameSpy).toHaveBeenCalled();
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            message: 'formSaveError',
+          }),
+        }),
+      );
+    });
+
+    requestAnimationFrameSpy.mockRestore();
+  });
+
+  it('shows backend field error for constructionEndYear on failed save', async () => {
+    mockedAxios.patch.mockRejectedValueOnce({
+      data: {
+        constructionEndYear: ['Server construction end year validation error'],
+      },
+    });
+
+    const requestAnimationFrameSpy = jest
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
+        return 0;
+      });
+
+    const { user, findByRole, findByTestId, store } = await render();
+    const dispatchSpy = jest.spyOn(store, 'dispatch');
+
+    const descriptionField = await findByRole('textbox', { name: getFormField('description *') });
+    const submitProjectButton = await findByTestId('submit-project-button');
+
+    await user.clear(descriptionField);
+    await user.type(descriptionField, 'Trigger server-side year error');
+    await user.click(submitProjectButton);
+
+    await waitFor(() => {
+      expect(requestAnimationFrameSpy).toHaveBeenCalled();
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            message: 'formSaveError',
+          }),
+        }),
+      );
+    });
+
+    requestAnimationFrameSpy.mockRestore();
+  });
+
   it('can patch a TextField', async () => {
     const expectedValue = 'New description';
     const project = mockProject.data;
@@ -544,6 +623,42 @@ describe('projectForm', () => {
 
     expect(formPatchRequest.louhi).toEqual(expectedValue);
     expect(louhiField.checked).toBe(expectedValue);
+  });
+
+  it('scrolls to the first errored field on invalid submit', async () => {
+    const { user, findByRole, findByTestId } = await render({
+      project: undefined,
+      mode: 'new',
+    });
+
+    const descriptionField = await findByRole('textbox', {
+      name: getFormField('description *'),
+    });
+    const addressField = await findByRole('textbox', {
+      name: getFormField('address *'),
+    });
+    const submitProjectButton = await findByTestId('submit-project-button');
+    const scrollToMock = jest.fn();
+    const originalScrollTo = window.scrollTo;
+
+    window.scrollTo = scrollToMock;
+
+    try {
+      await user.type(descriptionField, 'Invalid submit test');
+      await user.click(submitProjectButton);
+
+      await waitFor(() => {
+        expect(scrollToMock).toHaveBeenCalled();
+        expect(scrollToMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            behavior: 'smooth',
+          }),
+        );
+        expect(addressField).toHaveFocus();
+      });
+    } finally {
+      window.scrollTo = originalScrollTo;
+    }
   });
 
   it('can post a new project', async () => {

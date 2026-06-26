@@ -1,7 +1,13 @@
 import { FormSectionTitle, ListField, NumberField, SelectField } from '@/components/shared';
 import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import {
+  Control,
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormTrigger,
+  UseFormWatch,
+} from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { validateInteger, validateMaxLength } from '@/utils/validation';
@@ -19,7 +25,9 @@ interface IProjectFinancialSectionProps {
   control: Control<IProjectForm>;
   getValues: UseFormGetValues<IProjectForm>;
   watch: UseFormWatch<IProjectForm>;
+  trigger: UseFormTrigger<IProjectForm>;
   setValue: UseFormSetValue<IProjectForm>;
+  hasSubmitAttempted: boolean;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
@@ -38,7 +46,9 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   getValues,
   getFieldProps,
   watch,
+  trigger,
   setValue,
+  hasSubmitAttempted,
   classOptions,
   isInputDisabled,
   isUserOnlyViewer,
@@ -77,6 +87,7 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
   );
 
   const constructionPhases = useOptions('constructionPhases');
+  const phases = useOptions('phases');
   const projectQualityLevels = useOptions('projectQualityLevels');
   const planningPhases = useOptions('planningPhases');
   const budgetOverrunReasons = useOptions('budgetOverrunReasons');
@@ -145,18 +156,82 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
     }
   }, [isOtherBudgetOverrunReasonSelected, setValue, getValues]);
 
+  const findPhase = useCallback(
+    (value: string) => phases.find((phase) => phase.value === value)?.value ?? '',
+    [phases],
+  );
+
+  const phasesRequiringClass = useMemo(
+    () => [
+      findPhase('programming'),
+      findPhase('draftInitiation'),
+      findPhase('draftApproval'),
+      findPhase('constructionPlan'),
+      findPhase('constructionWait'),
+      findPhase('constructionPreparation'),
+      findPhase('construction'),
+      findPhase('warrantyPeriod'),
+      findPhase('completed'),
+    ],
+    [findPhase],
+  );
+
+  const currentPhase = getValues('phase').value;
+
+  useEffect(() => {
+    if (!hasSubmitAttempted) {
+      return;
+    }
+    trigger('masterClass');
+    trigger('class');
+  }, [currentPhase, hasSubmitAttempted, trigger]);
+
+  const validateMasterClass = useMemo(
+    () => ({
+      validate: {
+        isMasterClassValid: (masterClass?: IOption) => {
+          const phase = getValues('phase').value;
+          if (phasesRequiringClass.includes(phase) && !masterClass?.value) {
+            return t('validation.required', { field: t('validation.masterClass') });
+          }
+          return true;
+        },
+      },
+    }),
+    [getValues, phasesRequiringClass, t],
+  );
+
+  const validateClass = useMemo(
+    () => ({
+      validate: {
+        isClassValid: (selectedClass?: IOption) => {
+          const phase = getValues('phase').value;
+          if (phasesRequiringClass.includes(phase) && !selectedClass?.value) {
+            return t('validation.required', { field: t('validation.class') });
+          }
+          return true;
+        },
+      },
+    }),
+    [getValues, phasesRequiringClass, t],
+  );
+
   const renderSelectField = (
     name: string,
     options: Option[],
     size: 'full' | 'lg' | undefined,
     shouldTranslate: boolean,
     userIsProjectManager?: boolean,
+    required?: boolean,
+    rules?: { validate: Record<string, (value?: IOption) => true | string> },
   ) => (
     <SelectField
       {...getFieldProps(name)}
       options={options}
       size={size}
       shouldTranslate={shouldTranslate}
+      required={required}
+      rules={rules}
       disabled={userIsProjectManager ? false : isInputDisabled}
       readOnly={isUserOnlyViewer}
       clearable
@@ -178,11 +253,29 @@ const ProjectFinancialSection: FC<IProjectFinancialSectionProps> = ({
       <FormSectionTitle {...getFieldProps('financial')} />
       <div className="form-row">
         <div className="form-col-xxl">
-          {renderSelectField('masterClass', masterClasses, 'full', false)}
+          {renderSelectField(
+            'masterClass',
+            masterClasses,
+            'full',
+            false,
+            false,
+            phasesRequiringClass.includes(currentPhase),
+            validateMasterClass,
+          )}
         </div>
       </div>
       <div className="form-row">
-        <div className="form-col-md">{renderSelectField('class', classes, undefined, false)}</div>
+        <div className="form-col-md">
+          {renderSelectField(
+            'class',
+            classes,
+            undefined,
+            false,
+            false,
+            phasesRequiringClass.includes(currentPhase),
+            validateClass,
+          )}
+        </div>
         <div className="form-col-md">
           {renderSelectField('subClass', subClasses, undefined, false)}
         </div>

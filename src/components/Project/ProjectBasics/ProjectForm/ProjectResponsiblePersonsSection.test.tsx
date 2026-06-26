@@ -11,7 +11,7 @@ jest.mock('react-i18next', () => ({
 
 // Mock the SelectField component
 jest.mock('@/components/shared/SelectField', () => {
-  return function MockSelectField({ name, value, options, control }: any) {
+  return function MockSelectField({ name, options, control }: any) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { Controller } = require('react-hook-form');
     return (
@@ -183,6 +183,8 @@ const TestComponent = () => {
         })}
         isInputDisabled={false}
         isUserOnlyViewer={false}
+        trigger={methods.trigger}
+        hasSubmitAttempted={false}
       />
     </FormProvider>
   );
@@ -214,7 +216,6 @@ describe('ProjectResponsiblePersonsSection', () => {
 
   it('starts with no programmer selected when no default is set', () => {
     render(<TestComponent />);
-    const dropdown = screen.getByTestId('personProgramming');
     const valueInput = screen.getByTestId('personProgramming-value');
     expect(valueInput).toHaveValue('');
   });

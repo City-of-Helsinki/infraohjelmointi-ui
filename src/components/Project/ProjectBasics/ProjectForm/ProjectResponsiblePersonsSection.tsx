@@ -1,7 +1,7 @@
 import { FormSectionTitle, SelectField } from '@/components/shared';
-import { FC, memo, useCallback, useMemo } from 'react';
+import { FC, memo, useCallback, useEffect, useMemo } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues } from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormTrigger } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { IOption } from '@/interfaces/common';
 import { useTranslation } from 'react-i18next';
@@ -9,17 +9,21 @@ import { defaultFilter } from 'hds-react';
 
 interface IProjectResponsiblePersonsSectionProps {
   getValues: UseFormGetValues<IProjectForm>;
+  trigger: UseFormTrigger<IProjectForm>;
   getFieldProps: (name: string) => {
     name: string;
     label: string;
     control: Control<IProjectForm>;
   };
+  hasSubmitAttempted: boolean;
   isInputDisabled: boolean;
   isUserOnlyViewer: boolean;
 }
 const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProps> = ({
   getFieldProps,
   getValues,
+  trigger,
+  hasSubmitAttempted,
   isInputDisabled,
   isUserOnlyViewer,
 }) => {
@@ -64,6 +68,16 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
     [completedPhase, constructionPhase, warrantyPeriodPhase],
   );
 
+  const currentPhase = getValues('phase').value;
+
+  useEffect(() => {
+    if (!hasSubmitAttempted) {
+      return;
+    }
+    trigger('personPlanning');
+    trigger('personConstruction');
+  }, [currentPhase, hasSubmitAttempted, trigger]);
+
   const validatePersonPlanning = useCallback(() => {
     return {
       validate: {
@@ -106,6 +120,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             iconKey="person"
             options={responsiblePersons}
             rules={validatePersonPlanning()}
+            required={phasesThatNeedResponsiblePerson.includes(currentPhase)}
             shouldTranslate={false}
             readOnly={isUserOnlyViewer}
             clearable
@@ -118,6 +133,7 @@ const ProjectResponsiblePersonsSection: FC<IProjectResponsiblePersonsSectionProp
             iconKey="person"
             options={responsiblePersons}
             rules={validatePersonConstruction()}
+            required={phasesThatNeedConstruction.includes(currentPhase)}
             shouldTranslate={false}
             readOnly={isUserOnlyViewer}
             clearable

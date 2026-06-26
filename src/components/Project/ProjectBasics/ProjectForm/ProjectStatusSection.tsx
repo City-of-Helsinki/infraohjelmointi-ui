@@ -1,7 +1,7 @@
 import { FormSectionTitle, NumberField, SelectField } from '@/components/shared';
 import { FC, memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useOptions } from '@/hooks/useOptions';
-import { Control, UseFormGetValues, UseFormSetValue } from 'react-hook-form';
+import { Control, UseFormGetValues, UseFormSetValue, UseFormTrigger } from 'react-hook-form';
 import { IProjectForm } from '@/interfaces/formInterfaces';
 import { Trans, useTranslation } from 'react-i18next';
 import { IListItem, IOption } from '@/interfaces/common';
@@ -32,6 +32,8 @@ interface IProjectStatusSectionProps {
   isInputDisabled: boolean;
   isUserOnlyProjectManager: boolean;
   isUserOnlyViewer: boolean;
+  hasSubmitAttempted: boolean;
+  trigger: UseFormTrigger<IProjectForm>;
   useWatchField: (
     name: keyof IProjectForm,
     control: Control<IProjectForm>,
@@ -53,6 +55,8 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   isInputDisabled,
   isUserOnlyProjectManager,
   isUserOnlyViewer,
+  hasSubmitAttempted,
+  trigger,
   useWatchField,
 }) => {
   const phases = useOptions('phases');
@@ -97,6 +101,17 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   }, [currentPhase, allPhaseDetails, getValues, setValue]);
 
   useEffect(() => {
+    if (!hasSubmitAttempted) {
+      return;
+    }
+
+    trigger('phaseDetail');
+    trigger('programmed');
+    trigger('planningStartYear');
+    trigger('constructionEndYear');
+  }, [currentPhase, hasSubmitAttempted, trigger]);
+
+  useEffect(() => {
     if (!showStaraProcurementReason) {
       setValue('staraProcurementReason', { value: '', label: '' }, { shouldDirty: true });
     }
@@ -135,7 +150,30 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
   const constructionPhase = phaseByValue('construction');
   const warrantyPeriodPhase = phaseByValue('warrantyPeriod');
   const completedPhase = phaseByValue('completed');
-  const suspendedPhase = phaseByValue('suspended');
+  const phasesThatNeedYearBounds = useMemo(
+    () => [
+      programmedPhase,
+      draftInitiationPhase,
+      draftApprovalPhase,
+      constructionPlanPhase,
+      constructionWaitPhase,
+      constructionPreparationPhase,
+      constructionPhase,
+      warrantyPeriodPhase,
+      completedPhase,
+    ],
+    [
+      programmedPhase,
+      draftInitiationPhase,
+      draftApprovalPhase,
+      constructionPlanPhase,
+      constructionWaitPhase,
+      constructionPreparationPhase,
+      constructionPhase,
+      warrantyPeriodPhase,
+      completedPhase,
+    ],
+  );
 
   const validatePhase = useMemo(
     () => ({
@@ -155,62 +193,11 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           }
 
           const phaseToSubmit = phase.value;
-          const programmed = getValues('programmed');
-          const fields: Array<string> = [];
-          const fieldsIfEmpty = (fields: Array<string>) => getFieldsIfEmpty(fields, getValues);
-
-          const programmedRequirements = [
-            'planningStartYear',
-            'constructionEndYear',
-            'estPlanningStart',
-            'estConstructionEnd',
-            'category',
-            'masterClass',
-            'class',
-          ];
-          if (projectMode === 'new') {
-            programmedRequirements.push('address');
-          }
-          const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
-          const generalConstructionRequirements = [
-            'estConstructionStart',
-            'estConstructionEnd',
-            'personConstruction',
-          ];
-          const combinedRequirements = [
-            ...programmedRequirements,
-            ...planningRequirements,
-            ...generalConstructionRequirements,
-          ];
-
-          const hasDetailsForPhase = allPhaseDetails.some(
-            (d) => d.projectPhase?.id === phaseToSubmit,
-          );
-
-          // Check fields that cannot be empty
           switch (phaseToSubmit) {
-            case programmedPhase:
-              fields.push(...fieldsIfEmpty([...programmedRequirements]));
-              if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
-              break;
-            case draftInitiationPhase:
-            case draftApprovalPhase:
-            case constructionPlanPhase:
-            case constructionWaitPhase:
-              fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
-              if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
-              break;
-            case constructionPreparationPhase:
-              fields.push(...fieldsIfEmpty([...combinedRequirements, 'phaseDetail']));
-              break;
-            case constructionPhase:
-              fields.push(...fieldsIfEmpty([...combinedRequirements, 'phaseDetail']));
-              break;
             case warrantyPeriodPhase:
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
                 return t('validation.phaseTooEarly', { value: phase.label });
               }
-              fields.push(...fieldsIfEmpty([...combinedRequirements]));
               break;
             case completedPhase:
               if (isBefore(getToday(), getValues('estConstructionEnd'))) {
@@ -219,27 +206,10 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
               if (checkTodayIsBeforeWarrantyPhaseEnd()) {
                 return t('validation.completedPhaseTooEarly');
               }
-              fields.push(...fieldsIfEmpty([...combinedRequirements]));
-              break;
-            case suspendedPhase:
               break;
           }
 
-          const isProposalOrDesignPhase =
-            phase.value === proposalPhase || phase.value === designPhase;
-          const isSuspendedPhase = phase.value === suspendedPhase;
-
-          if (!isSuspendedPhase) {
-            if (
-              (isProposalOrDesignPhase && programmed) ||
-              (!isProposalOrDesignPhase && !programmed)
-            ) {
-              fields.push('programmed');
-            }
-          }
-          setPhaseRequirements(fields);
-
-          return fields.length === 0;
+          return true;
         },
       },
     }),
@@ -247,25 +217,84 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       t,
       isUserOnlyProjectManager,
       getValues,
-      proposalPhase,
-      designPhase,
       currentPhase,
       phasesWithIndexes,
-      programmedPhase,
-      draftInitiationPhase,
-      draftApprovalPhase,
-      constructionPlanPhase,
-      constructionWaitPhase,
-      constructionPreparationPhase,
-      constructionPhase,
       warrantyPeriodPhase,
       completedPhase,
-      suspendedPhase,
-      allPhaseDetails,
       checkTodayIsBeforeWarrantyPhaseEnd,
-      projectMode,
     ],
   );
+
+  useEffect(() => {
+    const phase = getValues('phase').value;
+    const fieldsIfEmpty = (fields: Array<string>) => getFieldsIfEmpty(fields, getValues);
+    const fields: Array<string> = [];
+
+    const programmedRequirements = [
+      'planningStartYear',
+      'constructionEndYear',
+      'estPlanningStart',
+      'estConstructionEnd',
+      'category',
+      'masterClass',
+      'class',
+    ];
+
+    if (projectMode === 'new') {
+      programmedRequirements.push('address');
+    }
+
+    const planningRequirements = ['estPlanningEnd', 'estPlanningStart', 'personPlanning'];
+    const generalConstructionRequirements = [
+      'estConstructionStart',
+      'estConstructionEnd',
+      'personConstruction',
+    ];
+    const combinedRequirements = [
+      ...programmedRequirements,
+      ...planningRequirements,
+      ...generalConstructionRequirements,
+    ];
+
+    const hasDetailsForPhase = allPhaseDetails.some((d) => d.projectPhase?.id === phase);
+
+    switch (phase) {
+      case programmedPhase:
+        fields.push(...fieldsIfEmpty([...programmedRequirements]));
+        if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
+        break;
+      case draftInitiationPhase:
+      case draftApprovalPhase:
+      case constructionPlanPhase:
+      case constructionWaitPhase:
+        fields.push(...fieldsIfEmpty([...programmedRequirements, ...planningRequirements]));
+        if (hasDetailsForPhase) fields.push(...fieldsIfEmpty(['phaseDetail']));
+        break;
+      case constructionPreparationPhase:
+      case constructionPhase:
+        fields.push(...fieldsIfEmpty([...combinedRequirements, 'phaseDetail']));
+        break;
+      case warrantyPeriodPhase:
+      case completedPhase:
+        fields.push(...fieldsIfEmpty([...combinedRequirements]));
+        break;
+    }
+
+    setPhaseRequirements(fields);
+  }, [
+    allPhaseDetails,
+    getValues,
+    projectMode,
+    programmedPhase,
+    draftInitiationPhase,
+    draftApprovalPhase,
+    constructionPlanPhase,
+    constructionWaitPhase,
+    constructionPreparationPhase,
+    constructionPhase,
+    warrantyPeriodPhase,
+    completedPhase,
+  ]);
 
   const validatePhaseDetails = useMemo(
     () => ({
@@ -282,7 +311,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [allPhaseDetails, currentPhase, getValues, t],
+    [allPhaseDetails, getValues, t],
   );
 
   const isPhaseDetailsDisabled = useMemo(() => {
@@ -306,7 +335,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [designPhase, currentPhase, getValues, proposalPhase, t],
+    [designPhase, getValues, proposalPhase, t],
   );
 
   const validatePlanningStartYear = useMemo(
@@ -314,6 +343,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       ...validateMaxNumber(3000, t),
       validate: {
         isPlanningStartYearValid: (date: string | null) => {
+          const phase = getValues('phase').value;
+
+          if (phasesThatNeedYearBounds.includes(phase) && !date) {
+            return t('validation.required', { field: t('validation.planningStartYear') });
+          }
+
           if (!date) {
             return true;
           }
@@ -356,7 +391,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [getValues, t],
+    [getValues, phasesThatNeedYearBounds, t],
   );
 
   const validateConstructionEndYear = useCallback(
@@ -364,6 +399,12 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
       ...validateMaxNumber(3000, t),
       validate: {
         isConstructionEndYearValid: (date: string | null) => {
+          const phase = getValues('phase').value;
+
+          if (phasesThatNeedYearBounds.includes(phase) && !date) {
+            return t('validation.required', { field: t('validation.constructionEndYear') });
+          }
+
           if (!date) {
             return true;
           }
@@ -416,7 +457,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
         },
       },
     }),
-    [t, constructionEndYear, isUserOnlyProjectManager, getValues],
+    [t, constructionEndYear, isUserOnlyProjectManager, getValues, phasesThatNeedYearBounds],
   );
 
   const projectPhase = project?.phase;
@@ -445,6 +486,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
             options={filteredPhaseDetails}
             rules={validatePhaseDetails}
             disabled={isPhaseDetailsDisabled}
+            required={filteredPhaseDetails.length > 0}
             readOnly={isUserOnlyViewer}
           />
         </div>
@@ -491,6 +533,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           <NumberField
             {...getFieldProps('planningStartYear')}
             rules={validatePlanningStartYear}
+            required={phasesThatNeedYearBounds.includes(currentPhase)}
             disabled={isInputDisabled}
             readOnly={isUserOnlyViewer}
           />
@@ -501,6 +544,7 @@ const ProjectStatusSection: FC<IProjectStatusSectionProps> = ({
           <NumberField
             {...getFieldProps('constructionEndYear')}
             rules={validateConstructionEndYear()}
+            required={phasesThatNeedYearBounds.includes(currentPhase)}
             disabled={isUserOnlyProjectManager ? false : isInputDisabled}
             readOnly={isUserOnlyViewer}
           />
