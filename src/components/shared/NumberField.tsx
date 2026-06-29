@@ -29,7 +29,7 @@ const NumberField: FC<INumberFieldProps> = ({
   disabled,
   size = 'l',
 }) => {
-  const isRequired = required ?? (rules?.required ? true : false);
+  const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
 
   return (

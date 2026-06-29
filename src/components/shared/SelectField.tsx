@@ -48,7 +48,7 @@ const SelectField: FC<ISelectFieldProps> = ({
   multiSelect,
   ...rest
 }) => {
-  const isRequired = required ?? (rules?.required ? true : false);
+  const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
 
   const translateOption = useCallback(

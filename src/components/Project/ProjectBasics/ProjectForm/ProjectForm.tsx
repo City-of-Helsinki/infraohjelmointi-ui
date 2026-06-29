@@ -141,82 +141,87 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     return [...fieldNames];
   }, []);
 
-  const scrollToFirstField = useCallback((preferredElements: HTMLElement[] = [], fieldNames: string[] = []) => {
-    if (!formRef.current) {
-      return;
-    }
-
-    const form = formRef.current;
-
-    const invalidFieldSelectors = [
-      'input[aria-invalid="true"]',
-      'textarea[aria-invalid="true"]',
-      'select[aria-invalid="true"]',
-      '[role="combobox"][aria-invalid="true"]',
-      '[aria-invalid="true"] input:not([type="hidden"])',
-      '[aria-invalid="true"] textarea',
-      '[aria-invalid="true"] [role="combobox"]',
-    ].join(', ');
-
-    const queriedInvalidElements = Array.from(
-      form.querySelectorAll<HTMLElement>(invalidFieldSelectors),
-    );
-
-    const fieldNameElements = fieldNames.flatMap((fieldName) => {
-      const selectors = [
-        `[id="${fieldName}"]`,
-        `[id="projectForm.${fieldName}"]`,
-        `[name="${fieldName}"]`,
-        `[data-testid="${fieldName}"]`,
-      ];
-
-      return selectors
-        .map((selector) => form.querySelector<HTMLElement>(selector))
-        .filter((element): element is HTMLElement => element instanceof HTMLElement);
-    });
-
-    const uniqueCandidates = Array.from(
-      new Set([...preferredElements, ...fieldNameElements, ...queriedInvalidElements]),
-    ).filter((element) => element instanceof HTMLElement && form.contains(element));
-
-    const visibleCandidates = uniqueCandidates.filter((element) => element.getClientRects().length > 0);
-    const candidatesToSort = visibleCandidates.length > 0 ? visibleCandidates : uniqueCandidates;
-
-    const scrollTarget = [...candidatesToSort].sort((first, second) => {
-      const firstTop = first.getBoundingClientRect().top + window.scrollY;
-      const secondTop = second.getBoundingClientRect().top + window.scrollY;
-
-      if (firstTop !== secondTop) {
-        return firstTop - secondTop;
+  const scrollToFirstField = useCallback(
+    (preferredElements: HTMLElement[] = [], fieldNames: string[] = []) => {
+      if (!formRef.current) {
+        return;
       }
 
-      const firstLeft = first.getBoundingClientRect().left + window.scrollX;
-      const secondLeft = second.getBoundingClientRect().left + window.scrollX;
-      return firstLeft - secondLeft;
-    })[0];
+      const form = formRef.current;
 
-    if (!scrollTarget) {
-      return;
-    }
+      const invalidFieldSelectors = [
+        'input[aria-invalid="true"]',
+        'textarea[aria-invalid="true"]',
+        'select[aria-invalid="true"]',
+        '[role="combobox"][aria-invalid="true"]',
+        '[aria-invalid="true"] input:not([type="hidden"])',
+        '[aria-invalid="true"] textarea',
+        '[aria-invalid="true"] [role="combobox"]',
+      ].join(', ');
 
-    const focusTarget =
-      (scrollTarget.matches(
-        'input:not([type="hidden"]), textarea, select, [role="combobox"], button, [tabindex]:not([tabindex="-1"])',
-      )
-        ? scrollTarget
-        : scrollTarget.querySelector<HTMLElement>(
-        'input:not([type="hidden"]), textarea, [role="combobox"], button, [tabindex]:not([tabindex="-1"])',
-          )) ?? scrollTarget;
+      const queriedInvalidElements = Array.from(
+        form.querySelectorAll<HTMLElement>(invalidFieldSelectors),
+      );
 
-    const absoluteTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
-    const targetTop = Math.max(absoluteTop - 120, 0);
+      const fieldNameElements = fieldNames.flatMap((fieldName) => {
+        const selectors = [
+          `[id="${fieldName}"]`,
+          `[id="projectForm.${fieldName}"]`,
+          `[name="${fieldName}"]`,
+          `[data-testid="${fieldName}"]`,
+        ];
 
-    window.scrollTo({ top: targetTop, behavior: 'smooth' });
+        return selectors
+          .map((selector) => form.querySelector<HTMLElement>(selector))
+          .filter((element): element is HTMLElement => element instanceof HTMLElement);
+      });
 
-    if (typeof focusTarget.focus === 'function') {
-      focusTarget.focus({ preventScroll: true });
-    }
-  }, []);
+      const uniqueCandidates = Array.from(
+        new Set([...preferredElements, ...fieldNameElements, ...queriedInvalidElements]),
+      ).filter((element) => element instanceof HTMLElement && form.contains(element));
+
+      const visibleCandidates = uniqueCandidates.filter(
+        (element) => element.getClientRects().length > 0,
+      );
+      const candidatesToSort = visibleCandidates.length > 0 ? visibleCandidates : uniqueCandidates;
+
+      const scrollTarget = [...candidatesToSort].sort((first, second) => {
+        const firstTop = first.getBoundingClientRect().top + window.scrollY;
+        const secondTop = second.getBoundingClientRect().top + window.scrollY;
+
+        if (firstTop !== secondTop) {
+          return firstTop - secondTop;
+        }
+
+        const firstLeft = first.getBoundingClientRect().left + window.scrollX;
+        const secondLeft = second.getBoundingClientRect().left + window.scrollX;
+        return firstLeft - secondLeft;
+      })[0];
+
+      if (!scrollTarget) {
+        return;
+      }
+
+      const focusTarget =
+        (scrollTarget.matches(
+          'input:not([type="hidden"]), textarea, select, [role="combobox"], button, [tabindex]:not([tabindex="-1"])',
+        )
+          ? scrollTarget
+          : scrollTarget.querySelector<HTMLElement>(
+              'input:not([type="hidden"]), textarea, [role="combobox"], button, [tabindex]:not([tabindex="-1"])',
+            )) ?? scrollTarget;
+
+      const absoluteTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
+      const targetTop = Math.max(absoluteTop - 120, 0);
+
+      window.scrollTo({ top: targetTop, behavior: 'smooth' });
+
+      if (typeof focusTarget.focus === 'function') {
+        focusTarget.focus({ preventScroll: true });
+      }
+    },
+    [],
+  );
 
   const setBackendFieldErrors = useCallback(
     (error: unknown) => {
@@ -241,18 +246,20 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
         const mappedField =
           backendToFormFieldMap[backendField] ?? (backendField as FieldPath<IProjectForm>);
 
-        const isFieldInForm =
-          backendField in getValues() || backendField in backendToFormFieldMap;
+        const isFieldInForm = backendField in getValues() || backendField in backendToFormFieldMap;
 
         if (!isFieldInForm) {
           continue;
         }
 
-        const message = Array.isArray(fieldError)
-          ? fieldError.find((item) => typeof item === 'string')
-          : typeof fieldError === 'string'
-            ? fieldError
-            : '';
+        let message: string;
+        if (Array.isArray(fieldError)) {
+          message = fieldError.find((item) => typeof item === 'string') ?? '';
+        } else if (typeof fieldError === 'string') {
+          message = fieldError;
+        } else {
+          message = '';
+        }
 
         if (!message) {
           continue;
@@ -267,7 +274,7 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
       }
 
       if (hasFieldErrors) {
-        window.requestAnimationFrame(() => {
+        globalThis.requestAnimationFrame(() => {
           scrollToFirstField([], [...fieldNamesWithErrors]);
         });
       }
@@ -631,10 +638,13 @@ const ProjectForm = ({ project }: IProjectFormProps) => {
     };
   }, []);
 
-  const onFormInvalid = useCallback<SubmitErrorHandler<IProjectForm>>((errors) => {
-    setHasSubmitAttempted(true);
-    scrollToFirstField(collectErrorElements(errors), collectErrorFieldNames(errors));
-  }, [collectErrorElements, collectErrorFieldNames, scrollToFirstField]);
+  const onFormInvalid = useCallback<SubmitErrorHandler<IProjectForm>>(
+    (errors) => {
+      setHasSubmitAttempted(true);
+      scrollToFirstField(collectErrorElements(errors), collectErrorFieldNames(errors));
+    },
+    [collectErrorElements, collectErrorFieldNames, scrollToFirstField],
+  );
 
   const submitCallback = useCallback(() => {
     // We disable onBlur events when the datepicker is opened because it messes up with the HDS DateInput's DatePicker

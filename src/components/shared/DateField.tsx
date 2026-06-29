@@ -29,7 +29,7 @@ const DateField: FC<IDateFieldProps> = ({
   size = 'l',
   disabled,
 }) => {
-  const isRequired = required ?? (rules?.required ? true : false);
+  const isRequired = required ?? !!rules?.required;
   const { t } = useTranslation();
   const currentDate = new Date();
   const datePlus10Years = new Date(currentDate.getFullYear() + 10, 11, 31);
