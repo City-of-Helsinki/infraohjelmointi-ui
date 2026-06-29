@@ -127,7 +127,7 @@ const SelectField: FC<ISelectFieldProps> = ({
             updateIconBasedOnSelection(clickedOption.value);
           }
         };
-        const isDisabled = disabled || fieldDisabled;
+        const isDisabled = disabled ?? fieldDisabled;
         return (
           <div className={`input-wrapper ${wrapperClassName ?? ''}`} id={name} data-testid={name}>
             {/**

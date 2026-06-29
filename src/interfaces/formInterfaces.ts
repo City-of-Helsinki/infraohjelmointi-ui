@@ -176,6 +176,11 @@ export interface IConstructionHandoverForm {
   totalCost: string; // Kokonaiskustannus
 }
 
+export interface IConstructionHandoverFinalizingForm {
+  constructionProjectManager: IOption;
+  constructionProcurementMethod: IOption;
+}
+
 export interface IAppForms
   extends IProjectHeaderForm,
     IProjectForm,

@@ -37,7 +37,10 @@ const DateField: FC<IDateFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
-      render={({ field: { onChange, value, disabled: fieldDisabled }, fieldState: { error } }) => {
+      render={({
+        field: { onChange, onBlur, value, disabled: fieldDisabled },
+        fieldState: { error },
+      }) => {
         return (
           <div
             className={`input-wrapper date-field-wrapper ${className}`}
@@ -47,6 +50,7 @@ const DateField: FC<IDateFieldProps> = ({
             <HDSDateInput
               className={`input-${size} date-input`}
               onChange={onChange}
+              onBlur={onBlur}
               value={value}
               placeholder={''}
               label={t(label)}
