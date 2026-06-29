@@ -6,19 +6,50 @@ interface IRejectedAction {
   error?: SerializedError;
 }
 
-export const getErrorFromRejectedAction = (action: IRejectedAction): IError => {
-  if (action.payload && typeof action.payload === 'object') {
-    const payload = action.payload as { status?: number; data?: unknown };
-    const data = payload.data as IError | string | undefined;
+export const toSerializableError = (error: unknown): IError => {
+  if (error && typeof error === 'object') {
+    const errorObject = error as {
+      status?: number;
+      data?: unknown;
+      message?: string;
+      errors?: IError['errors'];
+      type?: string;
+    };
 
-    if (data && typeof data === 'object') {
-      return data;
+    if (errorObject.data && typeof errorObject.data === 'object') {
+      return errorObject.data as IError;
+    }
+
+    if (typeof errorObject.data === 'string') {
+      return {
+        status: errorObject.status,
+        message: errorObject.data,
+        errors: errorObject.errors,
+        type: errorObject.type,
+      };
     }
 
     return {
-      status: payload.status,
-      message: typeof data === 'string' ? data : action.error?.message || 'Unknown error',
+      status: errorObject.status,
+      message: errorObject.message || 'Unknown error',
+      errors: errorObject.errors,
+      type: errorObject.type,
     };
+  }
+
+  if (typeof error === 'string') {
+    return { status: undefined, message: error };
+  }
+
+  return {
+    status: undefined,
+    message: 'Unknown error',
+  };
+};
+
+export const getErrorFromRejectedAction = (action: IRejectedAction): IError => {
+  if (action.payload) {
+    return toSerializableError(action.payload);
   }
 
   return {

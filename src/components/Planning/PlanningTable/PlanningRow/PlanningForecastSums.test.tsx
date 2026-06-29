@@ -36,12 +36,14 @@ describe('PlanningForecastSums', () => {
       <Provider store={store}>
         <table>
           <tbody>
-            <PlanningForecastSums
-              type="group"
-              id="test-group-1"
-              cell={mockCell}
-              sapCosts={mockSapCosts}
-            />
+            <tr>
+              <PlanningForecastSums
+                type="group"
+                id="test-group-1"
+                cell={mockCell}
+                sapCosts={mockSapCosts}
+              />
+            </tr>
           </tbody>
         </table>
       </Provider>,
@@ -62,12 +64,14 @@ describe('PlanningForecastSums', () => {
       <Provider store={store}>
         <table>
           <tbody>
-            <PlanningForecastSums
-              type="group"
-              id="unknown-group"
-              cell={mockCell}
-              sapCosts={mockSapCosts}
-            />
+            <tr>
+              <PlanningForecastSums
+                type="group"
+                id="unknown-group"
+                cell={mockCell}
+                sapCosts={mockSapCosts}
+              />
+            </tr>
           </tbody>
         </table>
       </Provider>,

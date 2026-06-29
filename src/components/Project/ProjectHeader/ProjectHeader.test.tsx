@@ -6,7 +6,6 @@ import mockProject from '@/mocks/mockProject';
 import { IProject } from '@/interfaces/projectInterfaces';
 import { matchExact } from '@/utils/common';
 import { routeAxiosConfigCallsToMethodMocks } from '@/utils/routeAxiosConfigCallsToMethodMocks';
-import { act } from 'react-dom/test-utils';
 import { Route } from 'react-router';
 import { setupStore } from '@/store';
 import { mockGroups } from '@/mocks/mockGroups';
@@ -19,23 +18,21 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 const store = setupStore();
 
 const render = async () =>
-  await act(async () =>
-    renderWithProviders(<Route path="/" element={<ProjectHeader project={mockProject.data} />} />, {
-      preloadedState: {
-        project: {
-          count: 1,
-          error: null,
-          page: 1,
-          isSaving: false,
-          mode: 'edit',
-        },
-        group: {
-          ...store.getState().group,
-          planning: { ...store.getState().group.planning, groups: mockGroups.data },
-        },
+  renderWithProviders(<Route path="/" element={<ProjectHeader project={mockProject.data} />} />, {
+    preloadedState: {
+      project: {
+        count: 1,
+        error: null,
+        page: 1,
+        isSaving: false,
+        mode: 'edit',
       },
-    }),
-  );
+      group: {
+        ...store.getState().group,
+        planning: { ...store.getState().group.planning, groups: mockGroups.data },
+      },
+    },
+  });
 
 describe('ProjectHeader', () => {
   beforeEach(() => {
@@ -88,7 +85,7 @@ describe('ProjectHeader', () => {
       city: expectedCity,
     };
 
-    mockedAxios.patch.mockResolvedValue(async () => await Promise.resolve(responseProject));
+    mockedAxios.patch.mockResolvedValue({ data: responseProject });
 
     // Open edit mode
     await user.click(getByRole('button', { name: /edit-project-name/i }));

@@ -1,6 +1,7 @@
 import { IGroupSapCost, IProjectSapCost, ISapCost } from '@/interfaces/sapCostsInterfaces';
 import { getSapCosts, getSapCurrentYear } from '@/services/sapCostsServices';
 import { RootState } from '@/store';
+import { toSerializableError } from '@/utils/reduxErrorUtils';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { groupBy, keyBy, mapValues } from 'lodash';
 
@@ -26,7 +27,7 @@ export const getSapCostsThunk = createAsyncThunk(
     try {
       return await getSapCosts(year);
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );
@@ -37,7 +38,7 @@ export const getSapCurrentYearThunk = createAsyncThunk(
     try {
       return await getSapCurrentYear(year);
     } catch (e) {
-      return thunkAPI.rejectWithValue(e);
+      return thunkAPI.rejectWithValue(toSerializableError(e));
     }
   },
 );

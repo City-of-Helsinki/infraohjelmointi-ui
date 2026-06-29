@@ -31,6 +31,23 @@ if (!globalThis.crypto) {
   (globalThis as unknown as { crypto: Crypto }).crypto = webcrypto as Crypto;
 }
 
+// Needed for React 18 so async updates are treated as act-aware in tests.
+(globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+const originalStyleAppendChild = HTMLStyleElement.prototype.appendChild;
+HTMLStyleElement.prototype.appendChild = function <T extends Node>(newChild: T): T {
+  if (
+    newChild.nodeType === Node.TEXT_NODE &&
+    typeof newChild.textContent === 'string' &&
+    newChild.textContent.includes('hds-')
+  ) {
+    // hds-react injects large runtime CSS blocks that jsdom cannot parse reliably.
+    return newChild;
+  }
+
+  return originalStyleAppendChild.call(this, newChild) as T;
+};
+
 module.exports = {
   testEnvironment: 'node',
 };

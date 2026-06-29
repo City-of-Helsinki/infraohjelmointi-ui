@@ -5,7 +5,7 @@ import ProjectView from './ProjectView';
 import { renderWithProviders } from '@/utils/testUtils';
 import { IError } from '@/interfaces/common';
 import { mockError } from '@/mocks/mockError';
-import { act } from 'react-dom/test-utils';
+import { act } from '@testing-library/react';
 import { mockGetResponseProvider } from '@/utils/mockGetResponseProvider';
 import { Route } from 'react-router';
 import { ProjectNotes } from '@/components/Project/ProjectNotes';
@@ -21,24 +21,29 @@ jest.mock('react-i18next', () => mockI18next());
 
 const mockedAxios = axios as jest.Mocked<typeof axios> & jest.MockedFunction<typeof axios>;
 
-const render = async () =>
-  await act(async () =>
-    renderWithProviders(
-      <Route path="/projects/:projectId" element={<ProjectView />}>
-        <Route path="basics" element={<ProjectBasics />} />
-        <Route path="new" element={<ProjectBasics />} />
-        <Route path="notes" element={<ProjectNotes />} />
-      </Route>,
+const render = async () => {
+  const rendered = renderWithProviders(
+    <Route path="/projects/:projectId" element={<ProjectView />}>
+      <Route path="basics" element={<ProjectBasics />} />
+      <Route path="new" element={<ProjectBasics />} />
+      <Route path="notes" element={<ProjectNotes />} />
+    </Route>,
 
-      {
-        preloadedState: {
-          project: { ...store.getState().project },
-          auth: { user: mockUser.data, error: null },
-        },
+    {
+      preloadedState: {
+        project: { ...store.getState().project },
+        auth: { user: mockUser.data, error: null },
       },
-      { route: `/projects/${mockProject.data.id}/basics` },
-    ),
+    },
+    { route: `/projects/${mockProject.data.id}/basics` },
   );
+
+  await act(async () => {
+    await Promise.resolve();
+  });
+
+  return rendered;
+};
 
 describe('ProjectView', () => {
   beforeEach(() => {

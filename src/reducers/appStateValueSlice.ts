@@ -1,6 +1,7 @@
 import { IError } from "@/interfaces/common"
 import { getAllAppStateValues } from "@/services/appStateValueServices"
 import { RootState } from "@/store"
+import { toSerializableError } from "@/utils/reduxErrorUtils"
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 export interface IForcedToFrameState {
@@ -61,13 +62,14 @@ const getForcedToFrameDataUpdated = (appStateValues: Array<any>): IForcedToFrame
 
 export const getAppStateValuesThunk = createAsyncThunk("appStateValues/get", async (_, thunkAPI) => {
     try {
-        const appStateValues = await getAllAppStateValues();
+        const appStateValuesResponse = await getAllAppStateValues();
+        const appStateValues = Array.isArray(appStateValuesResponse) ? appStateValuesResponse : [];
         return {
             forcedToFrameState: getForcedToFrameState(appStateValues),
             forcedToFrameDataUpdated: getForcedToFrameDataUpdated(appStateValues),
         }
     } catch (err) {
-        return thunkAPI.rejectWithValue(err);
+        return thunkAPI.rejectWithValue(toSerializableError(err));
     }
 });
 

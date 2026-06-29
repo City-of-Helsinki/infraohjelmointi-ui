@@ -59,6 +59,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
       name={name}
       rules={rules}
       control={control as Control<FieldValues>}
+      defaultValue=""
       render={({
         field: { onChange, onBlur, value, disabled: fieldDisabled },
         fieldState: { error },
@@ -69,7 +70,7 @@ const TextAreaField: FC<ITextAreaFieldProps> = ({
             ref={textAreaRef}
             onChange={onChange}
             onBlur={onBlur}
-            value={value}
+            value={value ?? ''}
             className={`textarea-field input-${size || 'xl'}`}
             label={t(label)}
             hideLabel={hideLabel}
